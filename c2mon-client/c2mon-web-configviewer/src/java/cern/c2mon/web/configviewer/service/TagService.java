@@ -6,8 +6,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.transform.TransformerException;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,25 +14,21 @@ import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagConfigImpl;
-import cern.c2mon.web.configviewer.util.XsltTransformUtility;
 
 /**
  * Datatag service providing the XML representation of a given datatag
- * */
+ */
 @Service
 public class TagService {
 
   /**
    * TagService logger
-   * */
+   */
   private static Logger logger = Logger.getLogger(TagService.class);
-
-  /** the path to the xslt document */
-  private static final String XSLT_PATH = "../xslt/datatag.xsl";
 
   /**
    * Gateway to C2monService
-   * */
+   */
   @Autowired
   private ServiceGateway gateway;
 
@@ -44,7 +38,7 @@ public class TagService {
    * @return XML datatag value representation
    * @throws TagIdException if the datatag was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
-   * */
+   */
   public String getDataTagValueXml(final String dataTagId) throws TagIdException {
     try {
       ClientDataTagImpl value = (ClientDataTagImpl) getDataTagValue(Long.parseLong(dataTagId));
@@ -63,7 +57,7 @@ public class TagService {
    * @return XML datatag config representation
    * @throws TagIdException if the datatag was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
-   * */
+   */
 
   public String getDataTagConfigXml(final String tagId) throws TagIdException {
     try {
@@ -77,42 +71,12 @@ public class TagService {
     }
   }
 
-  public String generateDataTagConfigHtmlResponse(final String tagId) throws TransformerException, TagIdException {
-
-    String html = null;
-    String tagConfigXml = getDataTagConfigXml(tagId);
-
-    try {
-      html = XsltTransformUtility.performXsltTransformation(tagConfigXml, XSLT_PATH);
-    } catch (TransformerException e) {
-      logger.error("Error while performing xslt transformation.");
-      throw new TransformerException("Error while performing xslt transformation.");
-    }
-
-    return html;
-  }
-
-  public String generateDataTagValueHtmlResponse(final String tagId) throws TransformerException, TagIdException {
-
-    String html = null;
-    String tagConfigXml = getDataTagValueXml(tagId);
-
-    try {
-      html = XsltTransformUtility.performXsltTransformation(tagConfigXml, XSLT_PATH);
-    } catch (TransformerException e) {
-      logger.error("Error while performing xslt transformation.");
-      throw new TransformerException("Error while performing xslt transformation.");
-    }
-
-    return html;
-  }
-
   /**
    * Retrieves a tagConfig object from the service gateway tagManager
    * @param tagId id of the datatag
    * @return tag configuration
-   * */
-  private TagConfig getTagConfig(final long tagId) {
+   */
+  public TagConfig getTagConfig(final long tagId) {
     TagConfig tc = null;
     List<Long> tagIds = new ArrayList<Long>();
     tagIds.add(tagId);
@@ -129,7 +93,7 @@ public class TagService {
    * Retrieves a tagValue object from the service gateway tagManager
    * @param dataTagId id of the datatag
    * @return tag value
-   * */
+   */
   public ClientDataTagValue getDataTagValue(final long dataTagId) {
     ClientDataTagValue dt = null;
     List<Long> tagIds = new ArrayList<Long>();

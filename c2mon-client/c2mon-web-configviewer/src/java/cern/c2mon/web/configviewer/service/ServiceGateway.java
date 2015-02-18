@@ -13,33 +13,33 @@ import cern.c2mon.client.ext.history.C2monHistoryManager;
 
 /**
  * Service gateway wrapper for C2monServiceGateway
- * */
+ */
 @Service
 public class ServiceGateway {
 
   /**
    * ServiceGateway logger
-   * */
+   */
   private static Logger logger = Logger.getLogger(TagService.class);
 
   /**
    * Tag manager
-   * */
+   */
   private C2monTagManager tagManager;
 
   /**
    * Command manager
-   * */
+   */
   private C2monCommandManager commandManager;
   
   /**
    * Command manager
-   * */
+   */
   private C2monHistoryManager historyManager;
 
   /**
    * Initializes the tagManager and commandManager
-   * */
+   */
   @PostConstruct
   public void init() {
     startC2monServiceGateway();
@@ -63,7 +63,7 @@ public class ServiceGateway {
   /**
    * Getter for tagManager
    * @return tag manager instance
-   * */
+   */
   public C2monTagManager getTagManager() {
     return this.tagManager;
   }
@@ -71,7 +71,7 @@ public class ServiceGateway {
   /**
    * Getter for commandManager
    * @return command manager instance
-   * */
+   */
   public C2monCommandManager getCommandManager() {
     return this.commandManager;
   }
@@ -79,7 +79,7 @@ public class ServiceGateway {
   /**
    * Getter for HistoryManager
    * @return History Manager instance
-   * */
+   */
   public C2monHistoryManager getHistoryManager() {
     return historyManager;
   }

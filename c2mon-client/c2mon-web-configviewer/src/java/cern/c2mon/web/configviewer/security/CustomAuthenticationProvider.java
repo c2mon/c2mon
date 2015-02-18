@@ -22,7 +22,7 @@ public class CustomAuthenticationProvider  implements AuthenticationProvider  {
 
   /**
    * CustomAuthenticationProvider logger
-   * */
+   */
   private static Logger logger = Logger.getLogger(CustomAuthenticationProvider.class);
 
   /**

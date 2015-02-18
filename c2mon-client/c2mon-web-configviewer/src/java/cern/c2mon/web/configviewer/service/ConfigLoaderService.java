@@ -1,9 +1,9 @@
 package cern.c2mon.web.configviewer.service;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 import javax.naming.CannotProceedException;
-import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,23 +13,22 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
 import cern.c2mon.web.configviewer.util.ReportHandler;
-import cern.c2mon.web.configviewer.util.XsltTransformUtility;
 
 /**
  * ConfigLoaderService service providing the XML representation for a given
  * config
- * */
+ */
 @Service
 public class ConfigLoaderService {
 
   /**
    * ConfigLoaderService logger
-   * */
+   */
   private static Logger logger = Logger.getLogger(ConfigLoaderService.class);
 
   /**
    * Gateway to ConfigLoaderService
-   * */
+   */
   @Autowired
   private ServiceGateway gateway;
 
@@ -43,9 +42,6 @@ public class ConfigLoaderService {
    **/
   private HashMap<String, ConfigurationReport> finalReports = new HashMap<String, ConfigurationReport>();
 
-  /** the path to the xslt document */
-  private static final String XSLT_PATH = "../xslt/config_report.xsl";
-
   /**
    * Gets the XML representation of the ConfigurationReport
    *
@@ -54,7 +50,7 @@ public class ConfigLoaderService {
    * @throws TagIdException if id not found or a non-numeric id was requested (
    *           {@link TagIdException}), or any other exception thrown by the
    *           underlying service gateway.
-   * */
+   */
   public String getConfigurationReportXml(final String configurationId) throws TagIdException {
 
     try {
@@ -68,68 +64,13 @@ public class ConfigLoaderService {
     }
   }
 
-  /**
-   * Transforms the given Configuration Report to an html page.
-   *
-   * @param report the report to be transformed to an html page
-   * @return An html representation of the specified Configuration Report
-   *
-   * @throws TransformerException if an error occurs while generating the html
-   *           page
-   * @throws TagIdException if an invalid Configuration Id was given
-   * @throws CannotProceedException if a serious error occurs (like a
-   *           Configuration Report that is missing)
-   */
-  private String generateHtmlForConfigurationReport(final ConfigurationReport report) throws TagIdException, TransformerException, CannotProceedException {
-
-    String xml = null;
-
-    try {
-      if (report != null)
-        xml = report.toXML();
-      else
-        throw new CannotProceedException("Report cannot be found.");
-    } catch (NumberFormatException e) {
-      throw new TagIdException("Invalid configuration Id");
-    }
-
-    String html = null;
-
-    try {
-      html = XsltTransformUtility.performXsltTransformation(xml, XSLT_PATH);
-    } catch (TransformerException e) {
-      logger.error("Error while performing xslt transformation." + e.getMessage());
-      throw new TransformerException("Error while performing xslt transformation." + e.getMessage());
-    }
-
-    return html;
-  }
-
-  /**
-   * Retrieves a ConfigurationReport object from the service gateway tagManager
-   * and Transforms it to an html page.
-   *
-   * @param configurationId id of the configuration
-   * @return An html representation of the Configuration Report
-   *
-   * @throws TransformerException if an error occurs while generating the html
-   *           page
-   * @throws TagIdException if an invalid Configuration Id was given
-   * @throws CannotProceedException if a serious error occurs (like a
-   *           Configuration Report that is missing)
-   */
-  public String generateHtmlResponse(final String configurationId) throws TagIdException, TransformerException, CannotProceedException {
-
-    ConfigurationReport report = getConfigurationReport(Long.parseLong(configurationId));
-    return generateHtmlForConfigurationReport(report);
-  }
 
   /**
    * Retrieves a ConfigurationReport object from the service gateway tagManager
    *
    * @param configurationId id of the configuration
    * @return Configuration Report
-   * */
+   */
   private ConfigurationReport getConfigurationReport(final long configurationId) {
     ConfigurationReport report = gateway.getTagManager().applyConfiguration(configurationId);
 
@@ -148,7 +89,7 @@ public class ConfigLoaderService {
    * @param configurationId id of the configuration of the request
    * @throws CannotProceedException In case a serious error occurs (for example
    *           in case a null Configuration Report is received).
-   * */
+   */
   public void getConfigurationReportWithReportUpdates(final long configurationId) throws CannotProceedException {
 
     ReportHandler reportHandler = new ReportHandler(configurationId);
@@ -173,7 +114,7 @@ public class ConfigLoaderService {
    *
    * @param configurationId id of the configuration of the request
    * @return Configuration Report
-   * */
+   */
   public ConfigurationReport getStoredConfigurationReport(final String configurationId) {
 
     ConfigurationReport report = finalReports.get(configurationId);
@@ -188,27 +129,15 @@ public class ConfigLoaderService {
   }
 
   /**
-   * Retrieves a ConfigurationReport stored in the web server and returns the
-   * result as an Html Page.
-   *
-   * @param configurationId id of the configuration
-   * @return Html page for the Configuration Report
-   *
-   * @throws TransformerException if an error occurs while generating the html
-   *           page
-   * @throws TagIdException if an invalid Configuration Id was given
-   * @throws CannotProceedException if a serious error occurs (like a
-   *           Configuration Report that is missing)
-   * */
-  public String getStoredConfigurationReportHtml(final String configurationId) throws TagIdException, TransformerException, CannotProceedException {
-
-    return generateHtmlForConfigurationReport(getStoredConfigurationReport(configurationId));
-  }
-
-  /**
    * @return all the previously applied configuration reports
    */
   public HashMap<String, ConfigurationReport> getFinalReports() {
+    if (finalReports.isEmpty()) {
+      Collection<ConfigurationReport> reports = gateway.getTagManager().getConfigurationReports();
+      for (ConfigurationReport report : reports) {
+        finalReports.put(String.valueOf(report.getId()), report);
+      }
+    }
     return finalReports;
   }
 
@@ -216,7 +145,7 @@ public class ConfigLoaderService {
    * @param configurationId id of the configuration request
    * @return a Progress Report for the specified configuration (must be
    *         currently running!)
-   * */
+   */
   public ClientRequestProgressReport getProgressReportForConfiguration(final String configurationId) {
 
     ClientRequestProgressReport report = null;

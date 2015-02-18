@@ -5,7 +5,7 @@ import java.util.Map;
 
 /**
  * Utility class to ease preparation of data for the MVC model
- * */
+ */
 public final class FormUtility {
 
   /**
@@ -15,7 +15,7 @@ public final class FormUtility {
    * @param formSubmitUrl url to which the form should be submitted
    * @param formTagValue previous value of a tag (datatag, alarm, command) entered in the form, that should be displayed in the form
    * @return a map of values ready to be used in the MVC model
-   * */
+   */
   public static Map<String, String> getFormModel(final String title, final String instruction, final String formSubmitUrl, final String formTagValue, final String tagDataUrl) {
     Map<String, String> model = new HashMap<String, String>();
     model.put("title", title);
@@ -56,7 +56,7 @@ public final class FormUtility {
 
   /**
    * Utility class never needs instantiating.
-   * */
+   */
   private FormUtility() { };
 
 }

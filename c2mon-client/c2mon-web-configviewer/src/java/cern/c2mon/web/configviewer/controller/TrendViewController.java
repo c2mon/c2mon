@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -65,10 +66,15 @@ public class TrendViewController {
   /** Instruction for the form page */
   public static final String INSTRUCTION = "Enter a Tag Id to create a Trend View.";
 
-  public static final String URL_HELP = System.getProperty("c2mon.web.trend.viewer.help.url");
-
   /** How many records in history to ask for (default): 100 looks ok! */
   private static final int RECORDS_TO_ASK_FOR = 100;
+
+  /**
+   * Link to a custom help page. If the URL contains the placeholder "{id}" then
+   * it will be replaced with the tag id.
+   */
+  @Value("${c2mon.web.trend.viewer.help.url:}")
+  public String helpUrl;
 
   /** HistoryService */
   @Autowired
@@ -96,8 +102,9 @@ public class TrendViewController {
     model.addAttribute("unit", tag.getUnit());
     model.addAttribute("id", tag.getId());
     model.addAttribute("fill_graph", true);
-    model.addAttribute("url_help", URL_HELP);
+    model.addAttribute("help_url", helpUrl.replaceAll("\\{id\\}", tag.getId().toString()));
     model.addAttribute("labels", new String[] { "Server Timestamp", "[" + tag.getId() + "] " });
+    model.addAttribute("title", TREND_FORM_TITLE);
 
     return model;
   }
@@ -107,7 +114,7 @@ public class TrendViewController {
    *
    * @param id the last records of the given tag id are being shown
    * @param lastRecords number of records to be shown
-   * */
+   */
   @RequestMapping(value = TREND_VIEW_URL + "{id}" + LAST_RECORDS_URL + "{lastRecords}", method = { RequestMethod.GET })
   public final String viewTrendLastRecords(@PathVariable(value = "id") final String id, @PathVariable(value = "lastRecords") final int lastRecords, Model model)
       throws IOException {
@@ -126,7 +133,6 @@ public class TrendViewController {
       model.addAttribute("CSV", historyService.getHistoryCSV(historyValues, isBooleanData));
       model.addAttribute("invalidPoints", invalidPoints);
       model.addAttribute("is_boolean", ((Boolean) (isBooleanData)));
-      model.addAttribute("url_help", URL_HELP);
       model.addAttribute("records", lastRecords);
       model.addAttribute("view_title", tagValue.getName());
       model.addAttribute("view_description", "(Last " + lastRecords + " records)");
@@ -166,7 +172,6 @@ public class TrendViewController {
     model.addAttribute("CSV", historyCSV);
     model.addAttribute("invalidPoints", invalidPoints);
     model.addAttribute("is_boolean", ((Boolean) (isBooleanData)));
-    model.addAttribute("url_help", URL_HELP);
     model.addAttribute("view_title", tagValue.getName());
     model.addAttribute("view_description", "(Last " + days + " days)");
     model.addAttribute("queryParameters", LAST_DAYS_PARAMETER + "=" + days);
@@ -203,7 +208,6 @@ public class TrendViewController {
     model.addAttribute("CSV", historyCSV);
     model.addAttribute("invalidPoints", invalidPoints);
     model.addAttribute("is_boolean", ((Boolean) (isBooleanData)));
-    model.addAttribute("url_help", URL_HELP);
     model.addAttribute("records", records);
     model.addAttribute("view_title", tagValue.getName());
     model.addAttribute("view_description", "(Last " + records + " records)");
@@ -242,7 +246,6 @@ public class TrendViewController {
     model.addAttribute("CSV", historyCSV);
     model.addAttribute("invalidPoints", invalidPoints);
     model.addAttribute("is_boolean", ((Boolean) (isBooleanData)));
-    model.addAttribute("url_help", URL_HELP);
     model.addAttribute("view_title", tagValue.getName());
     model.addAttribute("view_description", " (From " + start + " to " + end + ")");
     model.addAttribute("queryParameters", START_DATE_PARAMETER + "=" + start + "&" + END_DATE_PARAMETER + "=" + end);
@@ -266,7 +269,7 @@ public class TrendViewController {
    * @param end (Optional parameter) If given, this will be the End Date of the
    *          history query. {@link TrendViewController#DATE_FORMAT}
    *
-   * */
+   */
   @RequestMapping(value = TREND_VIEW_URL + "{id}", method = { RequestMethod.GET })
   public final String viewTrend(@PathVariable(value = "id") final String id,
       @RequestParam(value = MAX_RECORDS_PARAMETER, required = false) final String maxRecords,
@@ -320,7 +323,7 @@ public class TrendViewController {
    *
    * @param model Spring MVC Model instance to be filled in before jsp processes
    *          it
-   * */
+   */
   @RequestMapping(value = TREND_VIEW_FORM_URL, method = { RequestMethod.GET, RequestMethod.POST })
   public final String viewTrendFormPost(@RequestParam(value = "id", required = false) final String id,
       @RequestParam(value = "error", required = false) final String wrongId, @RequestParam(value = "records", required = false) final String records,

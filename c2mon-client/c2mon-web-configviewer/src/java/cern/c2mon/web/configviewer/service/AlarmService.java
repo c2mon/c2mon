@@ -5,43 +5,42 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.transform.TransformerException;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
-import cern.c2mon.web.configviewer.util.XsltTransformUtility;
 
 /**
  * Alarm service providing the XML representation of a given alarm
- * */
+ */
 @Service
 public class AlarmService {
 
   /**
    * AlarmService logger
-   * */
+   */
   private static Logger logger = Logger.getLogger(AlarmService.class);
-
-  /** the path to the xslt document */
-  private static final String XSLT_PATH = "../xslt/alarm.xsl";
 
   /**
    * Gateway to C2monService
-   * */
+   */
   @Autowired
   private ServiceGateway gateway;
 
   /**
-   * Gets the XML representation of the current value and configuration of an alarm
+   * Gets the XML representation of the current value and configuration of an
+   * alarm
+   *
    * @param alarmId id of the alarm
+   *
    * @return XML representation of alarm value and configuration
-   * @throws TagIdException if alarm was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
-   * thrown by the underlying service gateway.
-   * */
+   *
+   * @throws TagIdException if alarm was not found or a non-numeric id was
+   *           requested ({@link TagIdException}), or any other exception thrown
+   *           by the underlying service gateway.
+   */
   public String getAlarmTagXml(final String alarmId) throws TagIdException {
     try {
       AlarmValueImpl alarm = (AlarmValueImpl) getAlarmValue(Long.parseLong(alarmId));
@@ -54,44 +53,19 @@ public class AlarmService {
     }
   }
 
-  public String generateHtmlResponse(final String alarmId)
-    throws TagIdException, TransformerException {
-
-    String xml = null;
-
-    try {
-      AlarmValueImpl alarm = (AlarmValueImpl) getAlarmValue(Long.parseLong(alarmId));
-      if (alarm != null)
-        xml = alarm.getXml();
-      else
-        throw new TagIdException("No alarm found");
-    } catch (NumberFormatException e) {
-      throw new TagIdException("Invalid alarm id");
-    }
-
-    String html = null;
-
-    try {
-      html = XsltTransformUtility.performXsltTransformation(xml, XSLT_PATH);
-    } catch (TransformerException e) {
-      logger.error("Error while performing xslt transformation.");
-      throw new TransformerException("Error while performing xslt transformation.");
-    }
-
-    return html;
-  }
-
   /**
    * Retrieves a alarmValue object from the service gateway tagManager
+   *
    * @param alarmId id of the alarm
+   *
    * @return alarm value
-   * */
-  private AlarmValue getAlarmValue(final long alarmId) {
+   */
+  public AlarmValue getAlarmValue(final long alarmId) {
     AlarmValue av = null;
     List<Long> alarmIds = new ArrayList<Long>();
     alarmIds.add(alarmId);
     Collection<AlarmValue> alarms = gateway.getTagManager().getAlarms(alarmIds);
-    //tagManager.getAlarms(alarmIds);
+    // tagManager.getAlarms(alarmIds);
     Iterator<AlarmValue> it = alarms.iterator();
     if (it.hasNext()) {
       av = it.next();

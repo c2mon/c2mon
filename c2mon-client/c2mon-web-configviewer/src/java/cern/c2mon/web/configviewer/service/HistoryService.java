@@ -10,8 +10,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.transform.TransformerException;
-
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
@@ -25,24 +23,20 @@ import cern.c2mon.client.ext.history.common.exception.LoadingParameterException;
 import cern.c2mon.client.ext.history.updates.HistoryTagValueUpdateImpl;
 import cern.c2mon.web.configviewer.controller.TrendViewController;
 import cern.c2mon.web.configviewer.util.InvalidPoint;
-import cern.c2mon.web.configviewer.util.XsltTransformUtility;
 
 /**
  * HistoryService providing the XML representation for the history of a given tag.
- * */
+ */
 @Service
 public class HistoryService {
 
   /**
    * HistoryService logger
-   * */
+   */
   private static Logger logger = Logger.getLogger(HistoryService.class);
 
   /** Date format used in our trend views */
   private static final String CHART_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
-
-  /** the path to the xslt document */
-  private static final String XSLT_PATH = "../xslt/history.xsl";
 
   /** App base url */
   private static final String BASE_URL = "../";
@@ -78,7 +72,7 @@ public class HistoryService {
    * @throws Exception if tag was not found or a non-numeric id was requested
    *  ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
-   * */
+   */
   public final String getHistoryXml(final String dataTagId, final int numberOfRecords)
       throws HistoryProviderException, LoadingParameterException  {
 
@@ -100,7 +94,7 @@ public class HistoryService {
    * @throws Exception if tag was not found or a non-numeric id was requested
    *  ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
-   * */
+   */
   public final String getHistoryXmlForLastDays(final String dataTagId, final int numberOfDays)
       throws HistoryProviderException, LoadingParameterException  {
 
@@ -125,7 +119,7 @@ public class HistoryService {
    * @throws Exception if tag was not found or a non-numeric id was requested
    *  ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
-   * */
+   */
   public final String getHistoryXml(final String dataTagId,
       final Timestamp startTime,
       final Timestamp endTime)
@@ -146,7 +140,7 @@ public class HistoryService {
    * Same as {@link #getHistoryXml(String, Timestamp, Timestamp)}
    * but startTime and endTime are given as strings (should follow {@link #DATE_FORMAT})
    *
-   * */
+   */
   public final String getHistoryXml(final String dataTagId,
       final String startTime,
       final String endTime)
@@ -169,7 +163,7 @@ public class HistoryService {
    *
    *  ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
-   * */
+   */
   public final String getHistoryCSV(final List<HistoryTagValueUpdate> historyValues,
       final boolean isBooleanData) {
 
@@ -187,7 +181,7 @@ public class HistoryService {
    * @throws Exception if tag was not found or a non-numeric id was requested
    *  ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
-   * */
+   */
   public final String getHistoryCSV(final String dataTagId, final int numberOfRecords)
       throws HistoryProviderException, LoadingParameterException  {
 
@@ -469,55 +463,6 @@ public class HistoryService {
     else {
       return 0;
     }
-  }
-
-
-  /**
-   * @return history in html format
-   *
-   * @param xml History in xml format
-   *
-   * @throws HistoryProviderException in case a HistoryProvider cannot be created
-   * @throws LoadingParameterException in case of an invalid configurations
-   */
-  public final String generateHtmlResponse(final String xml)
-    throws TagIdException, TransformerException,
-      HistoryProviderException, LoadingParameterException {
-
-    String html = null;
-
-    try {
-      html = XsltTransformUtility.performXsltTransformation(xml, XSLT_PATH);
-    } catch (TransformerException e) {
-      logger.error("Error while performing xslt transformation.");
-      throw new TransformerException("Error while performing xslt transformation.");
-    }
-    return html;
-  }
-
-  /**
-   * Used to make a request for HistoryData.
-   * @param dataTagId The tag id whose history we are looking for
-   * @param numberOfRecords number of records to retrieve from history
-   * @return history in html format
-   * @throws HistoryProviderException in case a HistoryProvider cannot be created
-   * @throws LoadingParameterException in case of an invalid configurations
-   */
-  public final String generateHtmlResponse(final String dataTagId, final int numberOfRecords)
-    throws TagIdException, TransformerException,
-      HistoryProviderException, LoadingParameterException {
-
-    final String xml = getHistoryXml(dataTagId, numberOfRecords);
-
-    String html = null;
-
-    try {
-      html = XsltTransformUtility.performXsltTransformation(xml, XSLT_PATH);
-    } catch (TransformerException e) {
-      logger.error("Error while performing xslt transformation.");
-      throw new TransformerException("Error while performing xslt transformation.");
-    }
-    return html;
   }
 
   /**

@@ -2,11 +2,12 @@ package cern.c2mon.web.configviewer.controller;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,13 +15,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.web.configviewer.service.TagIdException;
 import cern.c2mon.web.configviewer.service.TagService;
 import cern.c2mon.web.configviewer.util.FormUtility;
 
 /**
  * A controller for the datatag viewer
- * */
+ */
 @Controller
 public class DataTagController {
 
@@ -29,12 +31,12 @@ public class DataTagController {
 
   /**
    * A REST-style URL to tagviewer, combined with tag id displays datatag configuration
-   * */
+   */
   private static final String TAG_URL = "../";
 
   /**
    * A URL to the tagviewer with input form
-   * */
+   */
   public static final String TAG_FORM_URL = "/" + TAGVIEWER_PAGE_NAME + "/form";
 
   /**
@@ -51,29 +53,36 @@ public class DataTagController {
 
   /**
    * Title for the datatag form page
-   * */
-  public static final String TAG_FORM_TITLE = "Tag  Viewer";
+   */
+  public static final String TAG_FORM_TITLE = "Tag Viewer";
 
   /**
    * Description for the datatag form page
-   * */
+   */
   public static final String TAG_FORM_INSTR = "Enter a tag id to view the tag's configuration.";
 
   /**
+   * Link to a custom help page. If the URL contains the placeholder "{id}" then
+   * it will be replaced with the tag id.
+   */
+  @Value("${c2mon.web.trend.viewer.help.url:}")
+  public String helpUrl;
+
+  /**
    * A datatag service
-   * */
+   */
   @Autowired
   private TagService service;
 
   /**
    * DataTagController logger
-   * */
+   */
   private static Logger logger = Logger.getLogger(DataTagController.class);
 
 
   /**
    * @return Redirects to the form
-   * */
+   */
   @RequestMapping(value = "/" + TAGVIEWER_PAGE_NAME + "/", method = { RequestMethod.GET })
   public String viewTag(final Model model) {
     logger.info("/" + TAGVIEWER_PAGE_NAME + "/");
@@ -86,25 +95,21 @@ public class DataTagController {
    *
    * @param id tag id
    * @param response we write the html result to that HttpServletResponse response
-   * */
+   */
   @RequestMapping(value = "/" + TAGVIEWER_PAGE_NAME + "/{id}", method = { RequestMethod.GET })
-  public String viewTag(@PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException  {
+  public String viewTag(@PathVariable(value = "id") final String id, final HttpServletResponse response, final Model model, final HttpServletRequest request) throws IOException  {
     logger.info("/" + TAGVIEWER_PAGE_NAME + "/{id} " + id);
-    try {
-      response.setContentType("text/html; charset=UTF-8");
-      response.getWriter().println(FormUtility.getHeader("../"));
-      response.getWriter().println(service.generateDataTagValueHtmlResponse(id));
-      response.getWriter().println(service.generateDataTagConfigHtmlResponse(id));
-      response.getWriter().println(FormUtility.getFooter());
-      return null;
-    } catch (TransformerException e) {
-      logger.error(e.getMessage());
-      response.getWriter().println(e.getMessage());
-    } catch (TagIdException e) {
-      logger.error(e.getMessage());
+
+    ClientDataTagValue tag = service.getDataTagValue(new Long(id));
+    if (tag == null) {
       return ("redirect:" + "/" + TAGVIEWER_PAGE_NAME + "/errorform/" + id);
     }
-    return null;
+
+    model.addAttribute("title", TAG_FORM_TITLE);
+    model.addAttribute("tag", tag);
+    model.addAttribute("tagConfig", service.getTagConfig(new Long(id)));
+    model.addAttribute("help_url", helpUrl.replaceAll("\\{id\\}", tag.getId().toString()));
+    return "datatag";
   }
 
   /**
@@ -115,7 +120,7 @@ public class DataTagController {
    *
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * */
+   */
   @RequestMapping(value = TAG_CONFIG_XML_URL + "/{id}", method = { RequestMethod.GET })
   public String viewTagConfigXml(@PathVariable final String id,  final Model model) {
     logger.info(TAG_CONFIG_XML_URL + id);
@@ -135,7 +140,7 @@ public class DataTagController {
    *
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * */
+   */
   @RequestMapping(value = TAG_VALUE_XML_URL + "/{id}", method = { RequestMethod.GET })
   public String viewTagValueXml(@PathVariable final String id,  final Model model) {
     logger.info(TAG_VALUE_XML_URL + id);
@@ -154,7 +159,7 @@ public class DataTagController {
    *
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * */
+   */
   @RequestMapping(value = "/" + TAGVIEWER_PAGE_NAME + "/errorform/{id}", method = { RequestMethod.GET, RequestMethod.POST })
   public String viewTagErrorForm(@PathVariable(value = "id") final String errorId,
       @RequestParam(value = "id", required = false) final String id, final Model model) {
@@ -178,7 +183,7 @@ public class DataTagController {
    * @param id datatag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
-   * */
+   */
   @RequestMapping(value = "/" + TAGVIEWER_PAGE_NAME + "/form/{id}", method = { RequestMethod.GET })
   public String viewTagWithForm(@PathVariable final String id, final Model model) {
     logger.info("/" + TAGVIEWER_PAGE_NAME + "/form/{id} " + id);
@@ -191,7 +196,7 @@ public class DataTagController {
    * @param id datatag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
-   * */
+   */
   @RequestMapping(value = "/" + TAGVIEWER_PAGE_NAME + "/form", method = { RequestMethod.GET, RequestMethod.POST })
   public String viewTagFormPost(@RequestParam(value = "id", required = false) final String id, final Model model) {
     logger.info("/" + TAGVIEWER_PAGE_NAME + "/form " + id);

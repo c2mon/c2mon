@@ -2,7 +2,7 @@ package cern.c2mon.web.configviewer.service;
 
 /**
  * Exception representing invalid tag id or tag not found.
- * */
+ */
 public class TagIdException extends Exception {
 
     /**

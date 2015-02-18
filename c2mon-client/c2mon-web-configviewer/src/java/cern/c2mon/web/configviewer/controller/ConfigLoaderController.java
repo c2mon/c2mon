@@ -2,9 +2,8 @@ package cern.c2mon.web.configviewer.controller;
 
 import java.io.IOException;
 
-import javax.naming.CannotProceedException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,17 +16,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
 import cern.c2mon.shared.util.json.GsonFactory;
 import cern.c2mon.web.configviewer.service.ConfigLoaderService;
-import cern.c2mon.web.configviewer.service.TagIdException;
 import cern.c2mon.web.configviewer.util.FormUtility;
 
 import com.google.gson.Gson;
 
 /**
  * A controller for the ConfigLoader
- * */
+ */
 @Controller
 public class ConfigLoaderController {
 
@@ -36,12 +35,12 @@ public class ConfigLoaderController {
 
   /**
    * A REST-style URL
-   * */
+   */
   public static final String CONFIG_LOADER_URL = "/configloader/";
 
   /**
    * A URL to the config report viewer with input form
-   * */
+   */
   public static final String CONFIG_LOADER_FORM_URL = CONFIG_LOADER_URL + "form";
 
   /**
@@ -62,23 +61,23 @@ public class ConfigLoaderController {
 
   /**
    * Title for the config form page
-   * */
-  public static final String CONFIG_LOADER_FORM_TITLE = "Config Loader";
+   */
+  public static final String CONFIG_LOADER_FORM_TITLE = "Configuration Loader";
 
   /**
    * Description for the config form page
-   * */
+   */
   public static final String CONFIG_LOADER_FORM_INSTR = "Please enter the Configuration ID you want to apply.";
 
   /**
    * A config loader service
-   * */
+   */
   @Autowired
   private ConfigLoaderService service;
 
   /**
    * ConfigLoaderController logger
-   * */
+   */
   private static Logger logger = Logger.getLogger(ConfigLoaderController.class);
 
   /**
@@ -97,7 +96,7 @@ public class ConfigLoaderController {
    * @param id config id
    * @param model Spring MVC Model instance to be filled in before jsp processes
    *          it
-   * */
+   */
   @RequestMapping(value = CONFIG_LOADER_PROGRESS_FINAL_REPORT_XML_URL + "/{id}", method = { RequestMethod.GET })
   public String viewXml(@PathVariable final String id, final Model model) {
     logger.debug(CONFIG_LOADER_PROGRESS_FINAL_REPORT_XML_URL + id);
@@ -111,64 +110,39 @@ public class ConfigLoaderController {
   }
 
   /**
-   * @return Applies the configuration for the given Configuration Id and also
-   *         displays the generated configuration report.
-   *
-   * @param id the configuration it to be applied
-   * @param response we write the html result to that HttpServletResponse
-   *          response
-   * @throws IOException
-   * */
-  @RequestMapping(value = CONFIG_LOADER_URL + "{id}", method = { RequestMethod.GET })
-  public String viewConfig(@PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException {
-    logger.debug("/configloader/{id} " + id);
-
-    try {
-      response.setContentType("text/html; charset=UTF-8");
-      response.getWriter().println(FormUtility.getHeader("../../.."));
-      response.getWriter().println(service.generateHtmlResponse(id));
-      response.getWriter().println(FormUtility.getFooter());
-    } catch (TransformerException e) {
-      response.setStatus(400);
-      response.getWriter().println(e.getMessage());
-      logger.error(e.getMessage());
-    } catch (TagIdException e) {
-      return ("redirect:" + "/configloader/errorform/" + id);
-    } catch (CannotProceedException e) {
-      response.setStatus(400);
-      response.getWriter().println(e.getMessage());
-      logger.error(e.getMessage());
-    }
-    return null;
-  }
-
-  /**
    * @return Retrieves a stored Configuration Report and displays it.
    *
    * @param id the Configuration Report id
    * @param response we write the html result to that HttpServletResponse
    *          response
    * @throws IOException
-   * */
+   */
   @RequestMapping(value = CONFIG_LOADER_PROGRESS_FINAL_REPORT_URL + "{id}", method = { RequestMethod.GET })
-  public String viewFinalReport(@PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException {
+  public String viewFinalReport(@PathVariable(value = "id") final String id, final HttpServletResponse response, final Model model, final HttpServletRequest request) throws IOException {
     logger.debug(CONFIG_LOADER_PROGRESS_FINAL_REPORT_URL + "/{id} " + id);
 
-    try {
-      response.setContentType("text/html; charset=UTF-8");
-      response.getWriter().println(FormUtility.getHeader("../../.."));
-      response.getWriter().println(service.getStoredConfigurationReportHtml(id));
-      response.getWriter().println(FormUtility.getFooter());
+//    try {
+//      response.setContentType("text/html; charset=UTF-8");
+//      response.getWriter().println(FormUtility.getHeader("../../.."));
+//      response.getWriter().println(service.getStoredConfigurationReportHtml(id));
+//      response.getWriter().println(FormUtility.getFooter());
+//
+//    } catch (TagIdException e) {
+//      return ("redirect:" + "/configloader/errorform/" + id);
+//
+//    } catch (Exception e) {
+//      response.setStatus(400);
+//      response.getWriter().println(e.getMessage());
+//      logger.error("viewFinalReport() - Error occured whilst trying show final report.", e);
+//    }
+//    return null;
 
-    } catch (TagIdException e) {
-      return ("redirect:" + "/configloader/errorform/" + id);
+    ConfigurationReport report = service.getFinalReports().get(id);
+    logger.debug(report);
+    model.addAttribute("report", report);
+    model.addAttribute("title", "Configuration Report: " + id);
 
-    } catch (Exception e) {
-      response.setStatus(400);
-      response.getWriter().println(e.getMessage());
-      logger.error("viewFinalReport() - Error occured whilst trying show final report.", e);
-    }
-    return null;
+    return "config/configReport";
   }
 
   /**
@@ -178,7 +152,7 @@ public class ConfigLoaderController {
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes
    *          it
-   * */
+   */
   @RequestMapping(value = "/configloader/errorform/{id}")
   public String viewConfigLoaderErrorForm(@PathVariable(value = "id") final String errorId, @RequestParam(value = "id", required = false) final String id,
       final Model model) {
@@ -200,7 +174,7 @@ public class ConfigLoaderController {
    * @param id config id
    * @param model Spring MVC Model instance to be filled in before jsp processes
    *          it
-   * */
+   */
   @RequestMapping(value = CONFIG_LOADER_FORM_URL + "/{id}", method = { RequestMethod.GET })
   public String viewConfigLoaderWithForm(@PathVariable final String id, final Model model) {
     logger.debug("/configloader/form/{id} " + id);
@@ -218,7 +192,7 @@ public class ConfigLoaderController {
    * @param id config id
    * @param model Spring MVC Model instance to be filled in before jsp processes
    *          it
-   * */
+   */
   @RequestMapping(value = CONFIG_LOADER_FORM_URL, method = { RequestMethod.GET, RequestMethod.POST })
   public String viewConfigLoaderFormPost(@RequestParam(value = "id", required = false) final String id, final Model model) {
     logger.debug("/configloader/form " + id);

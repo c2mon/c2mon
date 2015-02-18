@@ -2,11 +2,12 @@ package cern.c2mon.web.configviewer.controller;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.web.configviewer.service.AlarmService;
 import cern.c2mon.web.configviewer.service.TagIdException;
 import cern.c2mon.web.configviewer.util.FormUtility;
@@ -26,7 +28,7 @@ public class AlarmController {
 
   /**
    * A REST-style URL to alarmviewer, combined with alarm id displays alarm information
-   * */
+   */
   public static final String ALARM_URL = "/alarmviewer/";
 
   /**
@@ -37,33 +39,35 @@ public class AlarmController {
 
   /**
    * A URL to the alarmviewer with input form
-   * */
+   */
   public static final String ALARM_FORM_URL = "/alarmviewer/form";
 
   /**
    * Title for the alarm form page
-   * */
+   */
   public static final String ALARM_FORM_TITLE = "Alarm Configuration Viewer";
 
   /**
    * Description for the alarm form page
-   * */
+   */
   public static final String ALARM_FORM_INSTR = "Enter an alarm id.";
 
   /**
-   * A link to the helpalarm
-   * */
-  public static final String HELPALARM_FORM = "http://oraweb.cern.ch/pls/timw3/helpalarm.AlarmForm?p_alarmid=";
+   * Link to a custom help page. If the URL contains the placeholder "{id}" then
+   * it will be replaced with the tag id.
+   */
+  @Value("${c2mon.web.trend.viewer.help.url:}")
+  public String helpUrl;
 
   /**
    * An alarm service
-   * */
+   */
   @Autowired
   private AlarmService service;
 
   /**
    * AlarmController logger
-   * */
+   */
   private static Logger logger = Logger.getLogger(AlarmController.class);
 
   /**
@@ -80,7 +84,7 @@ public class AlarmController {
    *
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * */
+   */
   @RequestMapping(value = ALARM_XML_URL + "/{id}", method = { RequestMethod.GET })
   public String viewXml(@PathVariable final String id,  final Model model) {
     logger.info(ALARM_XML_URL + id);
@@ -98,24 +102,21 @@ public class AlarmController {
    *
    * @param id alarm id
    * @param response we write the html result to that HttpServletResponse response
-   * */
+   */
   @RequestMapping(value = ALARM_URL + "/{id}", method = { RequestMethod.GET })
-  public String viewAlarm(@PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException  {
+  public String viewAlarm(@PathVariable(value = "id") final String id, final HttpServletResponse response, final Model model, final HttpServletRequest request)
+      throws IOException  {
     logger.info(ALARM_URL + id);
 
-    try {
-      response.setContentType("text/html; charset=UTF-8");
-      response.getWriter().println(FormUtility.getHeader("../"));
-      response.getWriter().println(service.generateHtmlResponse(id));
-      response.getWriter().println(FormUtility.getFooter());
-      return null;
-    } catch (TransformerException e) {
-      response.getWriter().println(e.getMessage());
-      logger.error(e.getMessage());
-    } catch (TagIdException e) {
+    AlarmValue alarm = service.getAlarmValue(new Long(id));
+    if (alarm == null) {
       return ("redirect:" + "/alarmviewer/errorform/" + id);
     }
-    return null;
+
+    model.addAttribute("alarm", alarm);
+    model.addAttribute("title", ALARM_FORM_TITLE);
+    model.addAttribute("help_url", helpUrl.replaceAll("\\{id\\}", alarm.getTagId().toString()));
+    return "alarm";
   }
 
   /**
@@ -124,7 +125,7 @@ public class AlarmController {
    *
    * @param id alarm id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * */
+   */
   @RequestMapping(value = "/alarmviewer/form/{id}", method = { RequestMethod.GET })
   public String viewAlarmWithForm(@PathVariable final String id, final Model model) {
     logger.info("/alarmviewer/form/{id} " + id);
@@ -140,7 +141,7 @@ public class AlarmController {
    *
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * */
+   */
   @RequestMapping(value = "/alarmviewer/errorform/{id}")
   public String viewAlarmErrorForm(@PathVariable(value = "id") final String errorId,
       @RequestParam(value = "id", required = false) final String id, final Model model) {
@@ -163,7 +164,7 @@ public class AlarmController {
    *
    * @param id alarm id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * */
+   */
   @RequestMapping(value = "/alarmviewer/form", method = { RequestMethod.GET, RequestMethod.POST })
   public String viewAlarmFormPost(@RequestParam(value = "id", required = false) final String id, final Model model) {
     logger.info("/alarmviewer/form " + id);

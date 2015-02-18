@@ -26,7 +26,7 @@ public class ReportHandler implements ClientRequestReportListener {
   
   /**
    * ReportHandler logger
-   * */
+   */
   private static Logger logger = Logger.getLogger(ReportHandler.class);
   
   public ReportHandler(final Long id) {
