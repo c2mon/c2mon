@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>cern.c2mon.c2mon-client</groupId>
@@ -40,6 +41,11 @@
       <groupId>cern.c2mon.c2mon-client</groupId>
       <artifactId>c2mon-client-ext-history</artifactId>
     </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-statistics</groupId>
+      <artifactId>c2mon-statistics-generator</artifactId>
+      <version>[1.0.1-SNAPSHOT,2.0.0)</version>
+    </dependency>
 
     <!-- SPRING library dependencies -->
     <dependency>
@@ -70,12 +76,8 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
-      <exclusions>
-        <exclusion>
-          <artifactId>commons-logging</artifactId>
-          <groupId>commons-logging</groupId>
-        </exclusion>
-      </exclusions>
+      <!-- <exclusions> <exclusion> <artifactId>commons-logging</artifactId> 
+        <groupId>commons-logging</groupId> </exclusion> </exclusions> -->
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -129,7 +131,12 @@
       <artifactId>servlet-api</artifactId>
       <version>6.0.35</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis</artifactId>
+      <version>3.2.7</version>
+    </dependency>
+    
     <!-- Test dependencies -->
     <dependency>
       <groupId>junit</groupId>
