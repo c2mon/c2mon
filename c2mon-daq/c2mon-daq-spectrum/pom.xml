@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>c2mon-daq-spectrum</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 	<description>C2MON DAQ component for acquisition of the GM and FESA alarms</description>
