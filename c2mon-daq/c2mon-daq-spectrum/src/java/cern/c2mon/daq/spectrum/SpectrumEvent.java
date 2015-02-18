@@ -22,48 +22,33 @@ import org.apache.log4j.Logger;
  *                       but not used. Instead, we ignore the alarm id in the incoming message and put the 
  *                       cause id into the field alarm id (avoids any other code changes)
  */
-public class Event {
+public class SpectrumEvent {
     
     public static int MESSAGE_FORMAT_VERSION = 1;
-    
-    /**
-     * Identifier for the "keep alive" message for a given Spectrum server
-     */
-    public static final String EVENT_KEEP_ALIVE = "KAL";
-    
-    /**
-     * A Spectrum alarm is cleared, which does not mean that a LASER alarm has to be terminated!
-     */
-    public static final String EVENT_CLEAR_ALARM = "CLR";
-    
-    /**
-     * A Spectrum alarm is updated, should not really affect our system except for problem description
-     */
-    public static final String EVENT_UPDATE_ALARM = "UPD";
-        
-    /**
-     * A Spectrum alarm is activated, note that the LASER alarm might already be up
-     */
-    public static final String EVENT_SET_ALARM = "SET";
-    
-    /**
-     * Sent by the Spectrum server when it restarts, so that we that all alarms can first be terminated.
-     */
-    public static final String EVENT_RESET = "RST";
+
+    enum SpectrumEventType {     
+        INVALID_MESSAGE,     // in case the code found in the message is not known
+        KAL,                 // server keep-alive
+        CLR,                 // alarm termination in Spectrum wording
+        UPD,
+        SET,                // alarm activation in Spectrum words
+        RST                // server asks to reset all alarms
+    }
 
     /**
-     * The date format as transmitted by Spectrum
+     * The date format as transmitted by Spectrum, DO NOT CHANGE without prior discussion with IT!
      */
     private SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
     
     
-    private static Logger log = Logger.getLogger(Event.class);    
-    private static Logger logComm = Logger.getLogger("LOG_COMM");
+    private static final Logger LOG = Logger.getLogger(SpectrumEvent.class);    
+    private static final Logger LOG_COMM = Logger.getLogger("LOG_COMM");
 
     // Message data sent over TCP by the Spectrum server
+    private boolean prepared = false;
     private String serverName;                  // Hostname of the Spectrum server at the origin of this event
     private String msg;                         // The raw data received over TCP socket
-    private String eventType;                   // The event type might be CLR, SET, UPD or RESET
+    private SpectrumEventType eventType;        // The event type might be CLR, SET, UPD or RESET
     private String ipAddress;                   // in the form aaa.bbb.ccc.dddd sent over TCP by Spectrum 
     private boolean spectrumNotifierOk = true;  // maybe false (when keep alive from Spectrum signals an error)
     private String dateString;                  // in the form yyyy/mm/dd
@@ -97,7 +82,7 @@ public class Event {
      * @param serverName <code>String</code>    the name of the Spectrum server sending the event
      * @param msg <code>String</code>   the raw event data sent over TCP by the Spectrum server
      */
-    public Event(String serverName, String msg) {       
+    public SpectrumEvent(String serverName, String msg) {       
         this.msg = msg;
         this.serverName = serverName;
         StringTokenizer st = new StringTokenizer(msg);
@@ -111,63 +96,67 @@ public class Event {
      * Hack the event properties out of the raw data. Should be called on event consuming, not generating !
      */
     public void prepare() {
-        synchronized(lock) {
-            StringTokenizer st = new StringTokenizer(msg);
-            try {
-                logComm.debug(">>>" + msg + "<<<");
-                setEventType(st.nextToken());
-                
-                //
-                // If this is a keepalive message, we check the status of the notifier
-                // else, the second field is the IP address of the host concerned by the alarm
-                if (this.isKeepAlive()) {
-                    String status = st.nextToken();
-                    if (status.equals("OK")) this.spectrumNotifierOk = true;
-                    else this.spectrumNotifierOk = false;
-                } else setIpAddress(st.nextToken());
-                
-                //
-                // Standard fields valid for all messages
-                dateString =  st.nextToken();
-                timeString = st.nextToken();
-                model = st.nextToken();
-                                
-                String sAlarmId = st.nextToken();
+        if (!prepared)
+        {
+            synchronized(lock) {
+                StringTokenizer st = new StringTokenizer(msg);
                 try {
-                    // Parse alarmId only for if the message is not of type "keepalive"
-                    if (this.isKeepAlive()) alarmId = 0;
-                    else alarmId = Long.parseLong(sAlarmId);
-                } catch (NumberFormatException nfe) {
-                    log.warn("Failed to parse alarm id " + sAlarmId + " to long value.", nfe);
-                }
-                
-                //
-                // version 29 July 2010: ignore the alarm id in favor of the new cause id!
-                // note KAL (keepalive) messages do not have ids, skip this par
-                //
-//                if (MESSAGE_FORMAT_VERSION > 1)
-//                {
-                    causeId = st.nextToken(); 
-                    if (!this.isKeepAlive()) {
-                        long oldAlarmId = alarmId;
-                        alarmId = Long.parseLong(causeId, 16);
-                        logComm.debug("Message format " + MESSAGE_FORMAT_VERSION + "]: replaced alarm id " 
-                            + oldAlarmId + " with " + alarmId + " based on cause id " + causeId);
+                    LOG_COMM.debug(">>>" + msg + "<<<");
+                    setEventType(st.nextToken());
+                    
+                    //
+                    // If this is a keepalive message, we check the status of the notifier
+                    // else, the second field is the IP address of the host concerned by the alarm
+                    if (this.isKeepAlive()) {
+                        String status = st.nextToken();
+                        if (status.equals("OK")) this.spectrumNotifierOk = true;
+                        else this.spectrumNotifierOk = false;
+                    } else setIpAddress(st.nextToken());
+                    
+                    //
+                    // Standard fields valid for all messages
+                    dateString =  st.nextToken();
+                    timeString = st.nextToken();
+                    model = st.nextToken();
+                                    
+                    String sAlarmId = st.nextToken();
+                    try {
+                        // Parse alarmId only for if the message is not of type "keepalive"
+                        if (this.isKeepAlive()) alarmId = 0;
+                        else alarmId = Long.parseLong(sAlarmId);
+                    } catch (NumberFormatException nfe) {
+                        LOG.warn("Failed to parse alarm id " + sAlarmId + " to long value.", nfe);
                     }
-//                }
-                // end change 29 July 2010
-                
-                // optional fields model handle and problem description
-                if (st.hasMoreTokens()) {
-                    modelHandle = st.nextToken();
-                    if (alarmId > 0) {
-                        contextURL ="http://spectrum.cern.ch/spectrum/oneclick.jnlp?alarm=" + modelHandle + "@" + alarmId;
-                        log.debug("Spectrum URL is [" + contextURL + "]");
+                    
+                    //
+                    // version 29 July 2010: ignore the alarm id in favor of the new cause id!
+                    // note KAL (keepalive) messages do not have ids, skip this par
+                    //
+    //                if (MESSAGE_FORMAT_VERSION > 1)
+    //                {
+                        causeId = st.nextToken(); 
+                        if (!this.isKeepAlive()) {
+                            long oldAlarmId = alarmId;
+                            alarmId = Long.parseLong(causeId, 16);
+                            LOG_COMM.debug("Message format " + MESSAGE_FORMAT_VERSION + "]: replaced alarm id " 
+                                + oldAlarmId + " with " + alarmId + " based on cause id " + causeId);
+                        }
+    //                }
+                    // end change 29 July 2010
+                    
+                    // optional fields model handle and problem description
+                    if (st.hasMoreTokens()) {
+                        modelHandle = st.nextToken();
+                        if (alarmId > 0) {
+                            contextURL ="http://spectrum.cern.ch/spectrum/oneclick.jnlp?alarm=" + modelHandle + "@" + alarmId;
+                            LOG.debug("Spectrum URL is [" + contextURL + "]");
+                        }
                     }
+                    if (st.hasMoreTokens()) problemDescription = st.nextToken("\"");
+                } catch (Exception e) {
+                    LOG.error("Parsing of message into alarm structure failed",e);
                 }
-                if (st.hasMoreTokens()) problemDescription = st.nextToken("\"");
-            } catch (Exception e) {
-                log.error("Parsing of message into alarm structure failed",e);
+                prepared = true;
             }
         }
     }
@@ -203,7 +192,12 @@ public class Event {
      * @param eventType <code>String</code> should be one of CLR, SET, UPD, RESET
      */
     private void setEventType(String eventType) {
-        this.eventType = eventType;
+        try {   
+            this.eventType = SpectrumEventType.valueOf(eventType);
+        } catch (Exception e) {
+            this.eventType = SpectrumEventType.INVALID_MESSAGE;
+            LOG.error("{} is not a valid message type code!");
+        }
     }
     
     /***
@@ -228,7 +222,7 @@ public class Event {
                 hostname = "Unknown host for IP " + ipAddress;
             }
         } else hostname = "not specified";
-        log.debug("Hostname derived from " + ipAddress + " is " + hostname);
+        LOG.debug("Hostname derived from " + ipAddress + " is " + hostname);
     }
     
     /**
@@ -261,7 +255,7 @@ public class Event {
         try {
             uts = sdf.parse(dtStr).getTime();
         } catch (Exception e) {
-            log.error("Failed to parse date string [" + dtStr + "]", e);
+            LOG.error("Failed to parse date string [" + dtStr + "]", e);
         }
         return uts;
     }
@@ -284,7 +278,9 @@ public class Event {
      * @return <code>boolean</code> true for KAL events, false otherwise
      */
     public boolean isKeepAlive() {
-        if (this.eventType.equals(EVENT_KEEP_ALIVE)) return true;
+        if (this.eventType == SpectrumEventType.KAL) {
+            return true;
+        }
         return false;       
     }
     
@@ -292,8 +288,9 @@ public class Event {
      * @return <code>boolean</code> true for SET and UPD events, false otherwise
      */
     public boolean toActivate() {
-        if (this.eventType.equals(EVENT_SET_ALARM)) return true;
-        if (this.eventType.equals(EVENT_UPDATE_ALARM)) return true;
+        if (this.eventType == SpectrumEventType.SET || this.eventType == SpectrumEventType.UPD) {
+            return true;
+        }
         return false;
     }
     
@@ -301,7 +298,9 @@ public class Event {
      * @return <code>boolean</code> true for CLR events, false otherwise
      */
     public boolean toTerminate() {
-        if (this.eventType.equals(EVENT_CLEAR_ALARM)) return true;
+        if (this.eventType == SpectrumEventType.CLR) {
+            return true;
+        }
         return false;
     }
     
@@ -309,8 +308,14 @@ public class Event {
      * @return <code>boolean</code> true for RESET, false otherwise
      */
     public boolean toReset() {
-        if (this.eventType.equals(EVENT_RESET)) return true;
+        if (this.eventType == SpectrumEventType.RST) {
+            return true;
+        }
         return false;       
+    }
+
+    public SpectrumEventType getType() {
+        return this.eventType;
     }
     
     

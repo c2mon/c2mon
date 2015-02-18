@@ -24,16 +24,14 @@ import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 
 /**
- * TODO time compression mode: do not sleep if the message concerns an quipment we are not interested in
- * TODO player should have command line interface for step by step execution (and exit, and run n msg's)
  * TODO add "active list interface to the DAQ", based on JDK web
  * TODO compare results to production status
- * TODO create unit tests especially for referencing/dreferencing alarms for the same host
+ * TODO create unit tests especially for referencing/dereferencing alarms for the same host
  *      
  * @author mbuttner
  */
-public class SpectrumMessageHandler extends EquipmentMessageHandler implements Runnable, IDataTagChanger,
-IEquipmentConfigurationChanger {
+public class SpectrumMessageHandler extends EquipmentMessageHandler 
+    implements IDataTagChanger, IEquipmentConfigurationChanger {
 
     private static final Logger LOG = LoggerFactory.getLogger(SpectrumMessageHandler.class);
 
@@ -41,7 +39,7 @@ IEquipmentConfigurationChanger {
     private SpectrumListenerIntf spectrum;
     
     private Thread procThr;
-    private EventProcessor proc;
+    private SpectrumEventProcessor proc;
     
     //
     // --- CONNECT / DISCONNECT -------------------------------------------------------------------------------
@@ -51,16 +49,22 @@ IEquipmentConfigurationChanger {
         IEquipmentConfiguration config = getEquipmentConfiguration();
         SpectrumEquipConfig spectrumConfig = JsonUtils.fromJson(config.getAddress(), SpectrumEquipConfig.class);
 
-        proc = new EventProcessor(getEquipmentMessageSender(), spectrumConfig);
+        proc = new SpectrumEventProcessor(getEquipmentMessageSender(), spectrumConfig);
         procThr = new Thread(proc);
 
         spectrum = SpectrumConnector.getListener();
         spectrum.setConfig(spectrumConfig);
         spectrum.setQueue(proc.getQueue());
+        spectrum.setProcessor(proc);
         listenerThr = new Thread(spectrum);
-        
+
+        for (ISourceDataTag tag : getEquipmentConfiguration().getSourceDataTags().values()) {
+            registerTag(tag);
+        }        
+    
         listenerThr.start();
         procThr.start();
+        getEquipmentMessageSender().confirmEquipmentStateOK();
     }
 
     @Override
@@ -141,19 +145,6 @@ IEquipmentConfigurationChanger {
         LOG.debug(format("leaving onUpdateDataTag(%d,%d)", sourceDataTag.getId(), oldSourceDataTag.getId()));        
     }
 
-    //
-    // TODO ask for what this one is supposed to be good?
-    //
-    @Override
-    public void run() {
-        getEquipmentMessageSender().confirmEquipmentStateOK();
-        for (ISourceDataTag tag : getEquipmentConfiguration().getSourceDataTags().values()) {
-            registerTag(tag);
-        }        
-    }
-
-
-
     @Override
     public void refreshAllDataTags() {
         // WB left this one out in the alarm monitors ...
@@ -166,6 +157,7 @@ IEquipmentConfigurationChanger {
 
     
     synchronized void registerTag(ISourceDataTag tag) {
+        LOG.info("Register tag {} ...", tag.getName());
         try {
             SimpleHardwareAddress saddr = (SimpleHardwareAddress) tag.getHardwareAddress();
             SpectrumHardwareAddress addr = SpectrumHardwareAddressFactory.fromJson(saddr.getAddress().trim());

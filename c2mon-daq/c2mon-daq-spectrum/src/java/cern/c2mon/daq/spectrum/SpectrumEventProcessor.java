@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.common.IEquipmentMessageSender;
+import cern.c2mon.daq.spectrum.SpectrumEvent.SpectrumEventType;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 
 
@@ -65,9 +66,9 @@ import cern.c2mon.shared.common.datatag.ISourceDataTag;
  * @version 0.1-000, 26 May 2010
  * 
  */
-public class EventProcessor implements Runnable {
+public class SpectrumEventProcessor implements Runnable {
         
-    private static final Logger LOG = LoggerFactory.getLogger(EventProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SpectrumEventProcessor.class);
 
     public static final long BACKUP_DELAY = 10 * 60 * 1000; // 10mn
     
@@ -83,12 +84,12 @@ public class EventProcessor implements Runnable {
     private boolean primaryOk = true;
     private boolean secondaryOk = true;
 
-    private LinkedBlockingQueue<Event> eventQueue = new LinkedBlockingQueue<Event>();
+    private LinkedBlockingQueue<SpectrumEvent> eventQueue = new LinkedBlockingQueue<SpectrumEvent>();
 
     //
     // --- CONSTRUCTION -------------------------------------------------------------------------------
     //
-    public EventProcessor(IEquipmentMessageSender equipmentMessageSender, SpectrumEquipConfig config) {        
+    public SpectrumEventProcessor(IEquipmentMessageSender equipmentMessageSender, SpectrumEquipConfig config) {        
         this.equipmentMessageSender = equipmentMessageSender;
         this.config = config;
         LOG.info("Ready to go.");        
@@ -99,7 +100,7 @@ public class EventProcessor implements Runnable {
         cont = false;
     }
     
-    public Queue<Event> getQueue() {
+    public Queue<SpectrumEvent> getQueue() {
         return eventQueue;
     }
     
@@ -108,9 +109,26 @@ public class EventProcessor implements Runnable {
     }
 
     public void add(String hostname, ISourceDataTag tag) {
-        monitoredHosts.put(hostname, new SpectrumAlarm(tag));
+        monitoredHosts.put(hostname.toUpperCase(), new SpectrumAlarm(tag));
     }    
 
+    public boolean isInteresting(SpectrumEvent event) {
+        if (event.getType() == SpectrumEventType.RST)
+        {
+            return true;
+        }
+        if (event.getType() == SpectrumEventType.KAL)
+        {
+            return false;
+        }
+        event.prepare();
+        LOG.info("Checking if event for host {} is of interest", event.getHostname());
+        if (monitoredHosts.get(event.getHostname()) != null)
+        {
+            return true;
+        }        
+        return false;
+    }
     
     /**
      * The event consumer thread. Spectrum events are taken from the event queue and converted as possible
@@ -148,7 +166,7 @@ public class EventProcessor implements Runnable {
                 
                 // ... and than process whatever is available on the event queue.
                 while (!eventQueue.isEmpty()) {
-                    Event event = eventQueue.poll();
+                    SpectrumEvent event = eventQueue.poll();
 
                     LOG.debug("Processing event {}", event.toString());
                     
@@ -161,11 +179,11 @@ public class EventProcessor implements Runnable {
                     } else {                        
                         // set attributes of the event based on the raw data stored on construction
                         event.prepare();
-                        LOG.debug("RECEIVED: [" + event.getServerName() + "] " + event);
+                        LOG.debug("RECEIVED:"  + event.getType() + " ["+ event.getServerName() + "] ");
                         
                         if (event.isKeepAlive()) {
                             setLastKeepAliveTs(event.getServerName(), event.isSpectrumNotifierOk());
-                            LOG.info("RECEIVED: [" + event.getServerName() + "] " + event);
+                            LOG.info("RECEIVED: keep-alive [" + event.getServerName() + "] ");
                         } else {
                         
                             String hostname = event.getHostname();

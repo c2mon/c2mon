@@ -21,7 +21,8 @@ public class SpectrumListenerMock implements SpectrumListenerIntf {
     private static final Logger LOG = LoggerFactory.getLogger(SpectrumListenerMock.class);
     
     private SpectrumEquipConfig config;     // primary and secondary server, port for listening
-    private Queue<Event> eventQueue;        // reference to the @see EventProcessor queue
+    private SpectrumEventProcessor proc;
+    private Queue<SpectrumEvent> eventQueue;        // reference to the @see EventProcessor queue
     private boolean cont = true;            // used by shutdown for smooth interrupt
 
     //
@@ -34,8 +35,6 @@ public class SpectrumListenerMock implements SpectrumListenerIntf {
         try {
             inr = new BufferedReader(new FileReader("testdata/log-comm.log"));
             while (cont) {
-                Thread.sleep(1 * 1000); // first attempt: inject one event per n seconds
-
                 String ligne = inr.readLine();
                 if (ligne != null && ligne.indexOf(">>>") > 0) {
                     String msg = ligne.substring(ligne.indexOf(">>>") + 3);  
@@ -43,9 +42,17 @@ public class SpectrumListenerMock implements SpectrumListenerIntf {
                     LOG.debug("Generating an event ...");
                     LOG.trace("Raw:  {}", ligne);
                     LOG.trace("Trim: {}", msg);
-                    eventQueue.add(new Event(config.getPrimaryServer(), msg));
-                    // TODO sleep longer if we have a real event, less or not at all if we do not have 
-                    // a valid alarm event
+
+                    SpectrumEvent event = new SpectrumEvent(config.getPrimaryServer(), msg);
+                    if (proc.isInteresting(event))
+                    {
+                        Thread.sleep(5 * 1000); // first attempt: inject one event per n seconds
+                    }
+                    eventQueue.add(event);
+                }
+                if (ligne == null) {
+                    Thread.sleep(15 * 1000); // first attempt: inject one event per n seconds
+                    cont= false;
                 }
             }
         } catch (Exception e) {
@@ -79,8 +86,13 @@ public class SpectrumListenerMock implements SpectrumListenerIntf {
     }
 
     @Override
-    public void setQueue(Queue<Event> eventQueue) {
+    public void setQueue(Queue<SpectrumEvent> eventQueue) {
         this.eventQueue = eventQueue;
+    }
+
+    @Override
+    public void setProcessor(SpectrumEventProcessor proc) {
+        this.proc = proc;
     }
 
 }

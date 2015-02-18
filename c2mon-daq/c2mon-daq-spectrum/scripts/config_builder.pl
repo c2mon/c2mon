@@ -81,7 +81,7 @@ sub print_tag
 	printf DA "\t\t\t<HardwareAddress class=\"cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl\">\n";
 	printf DA "\t\t\t\t<address>\n";
 	printf DA "\t\t\t\t{\n";
-	printf DA "\t\t\t\t\"hostname\": \"%s\",\n", $hostname;	
+	printf DA "\t\t\t\t\"hostname\": \"%s\"\n", $hostname;	
 	printf DA "\t\t\t\t}\n";
 	printf DA "\t\t\t\t</address>\n";
 	printf DA "\t\t\t</HardwareAddress>\n";

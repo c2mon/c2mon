@@ -18,6 +18,8 @@ public interface SpectrumListenerIntf extends Runnable {
 
     void shutdown();
 
-    void setQueue(Queue<Event> queue);
+    void setQueue(Queue<SpectrumEvent> queue);
+
+    void setProcessor(SpectrumEventProcessor proc);
 
 }

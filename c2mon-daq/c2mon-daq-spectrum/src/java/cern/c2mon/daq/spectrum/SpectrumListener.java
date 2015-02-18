@@ -32,7 +32,7 @@ public class SpectrumListener implements Runnable, SpectrumListenerIntf {
     private SpectrumEquipConfig config;
     private boolean cont = true;
 
-    private Queue<Event> eventQueue;
+    private Queue<SpectrumEvent> eventQueue;
     
     //
     // --- CONSTRUCTION --------------------------------------------------------------------
@@ -64,7 +64,7 @@ public class SpectrumListener implements Runnable, SpectrumListenerIntf {
     }
 
     @Override
-    public void setQueue(Queue<Event> eventQueue) {
+    public void setQueue(Queue<SpectrumEvent> eventQueue) {
         this.eventQueue = eventQueue;
     }
         
@@ -94,7 +94,7 @@ public class SpectrumListener implements Runnable, SpectrumListenerIntf {
                         BufferedReader in = new BufferedReader(new InputStreamReader(skt.getInputStream()));
                         while (!in.ready()) { /**/ }
                         String msg = in.readLine();
-                        eventQueue.add(new Event(serverName, msg));
+                        eventQueue.add(new SpectrumEvent(serverName, msg));
                         in.close();
                         log.info("Event " + msg + " processed.");
                     } else {
@@ -109,6 +109,11 @@ public class SpectrumListener implements Runnable, SpectrumListenerIntf {
         } catch(Exception eFatal) {
             eFatal.printStackTrace();
         }
+    }
+
+    @Override
+    public void setProcessor(SpectrumEventProcessor proc) {
+        //
     }
     
 }
