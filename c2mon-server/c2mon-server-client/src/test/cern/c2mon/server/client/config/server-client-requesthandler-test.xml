@@ -44,6 +44,11 @@
     factory-method="createMock">
     <constructor-arg value="cern.c2mon.server.cache.ProcessCache" />
   </bean>
+  
+    <bean id="processFacade" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.server.cache.ProcessFacade" />
+  </bean>
 
   <bean id="deviceFacade" class="org.easymock.EasyMock"
     factory-method="createMock">
