@@ -25,8 +25,13 @@ import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 
 /**
  * TODO add "active list interface to the DAQ", based on JDK web
- * TODO compare results to production status
- * TODO create unit tests especially for referencing/dereferencing alarms for the same host
+ * TODO create unit tests especially for referencing/dereferencing alarms for the same host (based on fake message
+ *      added by the unit tests to the event queue and than checking for result on tag)
+ * 
+ * TODO change prod system to forward messages?
+ *      
+ * TODO create deployment project
+ * TODO install and compare results to production status
  *      
  * @author mbuttner
  */
