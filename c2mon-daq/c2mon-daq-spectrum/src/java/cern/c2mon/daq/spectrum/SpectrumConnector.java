@@ -28,6 +28,9 @@ public class SpectrumConnector {
         if (connectionMode.equals("test")) {
             return new SpectrumListenerMock();
         }
+        if (connectionMode.equals("jms")) {
+            return new SpectrumListenerJms();
+        }
         return SpectrumListener.getInstance();            
     }
     
