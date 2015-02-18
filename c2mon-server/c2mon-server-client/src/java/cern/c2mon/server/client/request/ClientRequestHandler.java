@@ -4,9 +4,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.jms.DeliveryMode;
@@ -27,6 +29,7 @@ import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.DeviceClassFacade;
 import cern.c2mon.server.cache.DeviceFacade;
 import cern.c2mon.server.cache.ProcessCache;
+import cern.c2mon.server.cache.ProcessFacade;
 import cern.c2mon.server.cache.ProcessXMLProvider;
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.TagLocationService;
@@ -51,6 +54,9 @@ import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.process.ProcessXmlResponseImpl;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestResult;
+import cern.c2mon.shared.client.statistics.ProcessTagStatistics;
+import cern.c2mon.shared.client.statistics.TagStatisticsResponse;
+import cern.c2mon.shared.client.statistics.TagStatisticsResponseImpl;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.util.json.GsonFactory;
 
@@ -98,6 +104,9 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    */
   private final ProcessCache processCache;
 
+  /** Reference to the Process facade */
+  private final ProcessFacade processFacade;
+
   /** Reference to the Device facade */
   private final DeviceFacade deviceFacade;
 
@@ -132,6 +141,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * @param pConfigurationLoader Reference to the ConfigurationLoader
    * @param pCommandExecutionManager Reference to the CommandExecutionManager
    * @param pProcessCache Reference to the ProcessCache
+   * @param pProcessFacade Reference to the ProcessFacade
    * @param pDeviceFacade Reference to the DeviceFacade
    */
   @Autowired
@@ -143,6 +153,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
                               final ConfigurationLoader pConfigurationLoader,
                               final CommandExecutionManager pCommandExecutionManager,
                               final ProcessCache pProcessCache,
+                              final ProcessFacade pProcessFacade,
                               final DeviceFacade pDeviceFacade,
                               final DeviceClassFacade pDeviceClassFacade) {
     tagLocationService = pTagLocationService;
@@ -153,6 +164,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     configurationLoader = pConfigurationLoader;
     commandExecutionManager = pCommandExecutionManager;
     processCache = pProcessCache;
+    processFacade = pProcessFacade;
     deviceFacade = pDeviceFacade;
     deviceClassFacade = pDeviceClassFacade;
   }
@@ -307,6 +319,11 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
         LOG.debug("handleClientRequest() - Received a DEVICE_REQUEST");
       }
       return handleDeviceRequest(clientRequest);
+    case TAG_STATISTICS_REQUEST:
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("handleClientRequest() - Received a TAG_STATISTICS_REQUEST");
+      }
+      return handleTagStatisticsRequest(clientRequest);
     default:
       LOG.error("handleClientRequest() - Client request not supported: " + clientRequest.getRequestType());
       return Collections.emptyList();
@@ -650,5 +667,46 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     }
 
     return transferDevices;
+  }
+
+  /**
+   * Inner method which handles the tag statistics request.
+   *
+   * TODO: rewrite this to use Ehcache search instead of stupid iteration.
+   *
+   * @param tagStatisticsRequest the request sent by the client
+   * @return a single-item collection containing the tag statistics response
+   */
+  private Collection<? extends ClientRequestResult> handleTagStatisticsRequest(final ClientRequest tagStatisticsRequest) {
+    Collection<TagStatisticsResponse> tagStatistics = new ArrayList<>();
+    Map<String, ProcessTagStatistics> processes = new HashMap<>();
+    int total = 0;
+    int invalid = 0;
+
+    // TODO: rewrite this in a more intelligent way
+
+    for (Long processId : processCache.getKeys()) {
+      try {
+        processCache.acquireReadLockOnKey(processId);
+
+        Collection<Long> tagsForProcess = processFacade.getDataTagIds(processId);
+        total += tagsForProcess.size();
+        int processInvalid = 0;
+
+        for (Long tagId : tagsForProcess) {
+          if (!tagLocationService.get(tagId).isValid()) {
+            invalid++;
+            processInvalid++;
+          }
+        }
+
+        processes.put(processCache.get(processId).getName(), new ProcessTagStatistics(tagsForProcess.size(), processInvalid));
+      } finally {
+        processCache.releaseReadLockOnKey(processId);
+      }
+    }
+
+    tagStatistics.add(new TagStatisticsResponseImpl(total, invalid, processes));
+    return tagStatistics;
   }
 }
