@@ -24,7 +24,7 @@
           <mail address="tim-admin@cern.ch" />
         </notification>
       </deployment>
-      <startscript name="rda3-publisher-startup">
+      <startscript name="TIM-PUBLISHER-RDA3">
         <preExec>
           <![CDATA[
             [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
@@ -49,7 +49,7 @@
     <application name="tim-publisher-rda3-test" extends="default">
       <deployment installLocation="/opt/tim-publisher-rda3-test" />
 
-      <startscript name="rda3-publisher-startup">
+      <startscript name="TIM-PUBLISHER-RDA3">
         <preExec>
           <![CDATA[
             [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
