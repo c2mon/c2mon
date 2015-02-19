@@ -17,9 +17,13 @@
  ******************************************************************************/
 package cern.c2mon.web.configviewer.statistics.scheduler;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import javax.annotation.PostConstruct;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.log4j.Logger;
 import org.apache.xerces.parsers.DOMParser;
@@ -85,8 +89,9 @@ class GenerateStatisticsTask {
 
     try {
       // Parse graph XML file
-      parser.parse(chartConfigLocation);
-      graphXMLDocument = parser.getDocument();
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder builder = factory.newDocumentBuilder();
+      graphXMLDocument = builder.parse(new FileInputStream(chartConfigLocation));
 
       // Generate the charts from the XML
       deployer.configure(graphXMLDocument);

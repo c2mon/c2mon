@@ -41,27 +41,28 @@
   <bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
     <property name="locations">
       <list>
-        <value>/WEB-INF/jms.properties</value>
+        <value>${c2mon.web.conf.url}</value>
+        <value>${c2mon.client.conf.url}</value>
       </list>
     </property>
   </bean>
-
-  <bean id="cacheDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+  
+  <bean id="statisticsDataSource" class="org.apache.commons.dbcp.BasicDataSource">
     <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
     <property name="url" value="${c2mon.jdbc.statistics.url}" />
-    <property name="username" value="${c2mon.jdbc.statistics.user}" />
-    <property name="password" value="${c2mon.jdbc.statistics.password}" />
+    <property name="username" value="${c2mon.jdbc.statistics.stlog.user}" />
+    <property name="password" value="${c2mon.jdbc.statistics.stlog.password}" />
   </bean>
 
-  <bean id="cacheTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-    <property name="dataSource" ref="cacheDataSource" />
+  <bean id="statisticsTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="statisticsDataSource" />
   </bean>
 
-  <tx:annotation-driven transaction-manager="cacheTransactionManager" />
+  <tx:annotation-driven transaction-manager="statisticsTransactionManager" />
 
   <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
     <property name="configLocation" value="classpath:cern/c2mon/web/configviewer/statistics/sqlmaps/sql-map-config.xml" />
-    <property name="dataSource" ref="cacheDataSource" />
+    <property name="dataSource" ref="statisticsDataSource" />
   </bean>
 
   <bean id="statisticsMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">

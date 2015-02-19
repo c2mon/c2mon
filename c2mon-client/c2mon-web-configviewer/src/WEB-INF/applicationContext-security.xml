@@ -8,6 +8,14 @@
 
   <global-method-security pre-post-annotations="enabled">
   </global-method-security>
+  
+  <beans:bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <beans:property name="locations">
+      <beans:list>
+        <beans:value>${c2mon.web.conf.url}</beans:value>
+      </beans:list>
+    </beans:property>
+  </beans:bean>
 
   <!-- Our custom AccessDecisionManager uses rbac for Authentication -->
   <beans:bean id="RbacAccessDecisionManager" class="cern.c2mon.web.configviewer.security.RbacDecisionManager">
@@ -38,8 +46,6 @@
     <!-- # RBAC class/device/property for C2MON -->
     <!-- <beans:constructor-arg name="adminDetails" value="${c2mon.web.rbac.admin}"/> <beans:constructor-arg name="processViewerDetails" value="${c2mon.web.rbac.user}"/> -->
   </beans:bean>
-
-  <beans:bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
 
   <authentication-manager alias="authenticationManager">
     <authentication-provider ref="customAuthenticationProvider" />

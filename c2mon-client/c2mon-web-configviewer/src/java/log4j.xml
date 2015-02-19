@@ -8,7 +8,7 @@
   
   <appender name="fileAppender" class="org.apache.log4j.RollingFileAppender">
     <param name="Append" value="true" />
-    <param name="File" value="${tim.web.logs}/c2mon-web.log" />
+    <param name="File" value="${c2mon.web.log.dir}/c2mon-web.log" />
     <param name="MaxBackupIndex" value="5" />
     <param name="MaxFileSize" value="100MB" />
     <param name="BufferedIO" value="false" />
