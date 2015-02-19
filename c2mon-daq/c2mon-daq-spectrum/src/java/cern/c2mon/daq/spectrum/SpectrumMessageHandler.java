@@ -8,12 +8,14 @@ import static java.lang.String.format;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
 import cern.c2mon.daq.spectrum.address.SpectrumHardwareAddress;
 import cern.c2mon.daq.spectrum.address.SpectrumHardwareAddressFactory;
+import cern.c2mon.daq.spectrum.listener.SpectrumListenerIntf;
 import cern.c2mon.daq.spectrum.util.JsonUtils;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
@@ -39,6 +41,7 @@ public class SpectrumMessageHandler extends EquipmentMessageHandler
     implements IDataTagChanger, IEquipmentConfigurationChanger {
 
     private static final Logger LOG = LoggerFactory.getLogger(SpectrumMessageHandler.class);
+    private static ClassPathXmlApplicationContext ctx;
 
     private Thread listenerThr;
     private SpectrumListenerIntf spectrum;
@@ -51,10 +54,19 @@ public class SpectrumMessageHandler extends EquipmentMessageHandler
     //
     @Override
     public void connectToDataSource() throws EqIOException {
+        
+        if (ctx == null) {
+            ctx = new ClassPathXmlApplicationContext("classpath:resources/dmn-spectrum-config.xml");
+            ctx.getEnvironment().setDefaultProfiles("PRO");
+            ctx.refresh();
+        }
+        
         IEquipmentConfiguration config = getEquipmentConfiguration();
         SpectrumEquipConfig spectrumConfig = JsonUtils.fromJson(config.getAddress(), SpectrumEquipConfig.class);
 
-        proc = new SpectrumEventProcessor(getEquipmentMessageSender(), spectrumConfig);
+        proc = ctx.getBean("eventProc", SpectrumEventProcessor.class);
+        proc.setSender(getEquipmentMessageSender());
+        proc.setConfig(spectrumConfig);
         procThr = new Thread(proc);
 
         spectrum = SpectrumConnector.getListener();

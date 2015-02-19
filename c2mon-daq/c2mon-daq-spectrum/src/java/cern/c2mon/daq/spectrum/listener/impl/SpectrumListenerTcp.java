@@ -2,7 +2,7 @@
  * Copyright (c) 2015 European Organisation for Nuclear Research (CERN), All Rights Reserved.
  */
 
-package cern.c2mon.daq.spectrum;
+package cern.c2mon.daq.spectrum.listener.impl;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -14,6 +14,11 @@ import java.util.Queue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cern.c2mon.daq.spectrum.SpectrumEquipConfig;
+import cern.c2mon.daq.spectrum.SpectrumEvent;
+import cern.c2mon.daq.spectrum.SpectrumEventProcessor;
+import cern.c2mon.daq.spectrum.listener.SpectrumListenerIntf;
+
 /**
  * The message reception thread. The thread is waiting on a given TCP port, for each incoming request
  * a single line is taken from the socket and converted into an Event object placed on the event queue.
@@ -24,10 +29,10 @@ import org.slf4j.LoggerFactory;
  * @version 29 May 2009
  * 
  */
-public class SpectrumListener implements Runnable, SpectrumListenerIntf {
+public class SpectrumListenerTcp implements Runnable, SpectrumListenerIntf {
 
-    private static final Logger log = LoggerFactory.getLogger(SpectrumListener.class);
-    private static SpectrumListener listener;
+    private static final Logger log = LoggerFactory.getLogger(SpectrumListenerTcp.class);
+    private static SpectrumListenerTcp listener;
     
     private SpectrumEquipConfig config;
     private boolean cont = true;
@@ -37,13 +42,13 @@ public class SpectrumListener implements Runnable, SpectrumListenerIntf {
     //
     // --- CONSTRUCTION --------------------------------------------------------------------
     //
-    private SpectrumListener() {
+    private SpectrumListenerTcp() {
         
     }
 
-    public static SpectrumListener getInstance() {
+    public static SpectrumListenerTcp getInstance() {
         if (listener == null) {
-            listener = new SpectrumListener();
+            listener = new SpectrumListenerTcp();
         }
         return listener;
     }

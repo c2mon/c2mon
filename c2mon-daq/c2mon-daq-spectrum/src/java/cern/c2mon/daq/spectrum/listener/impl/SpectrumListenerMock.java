@@ -1,5 +1,5 @@
 
-package cern.c2mon.daq.spectrum;
+package cern.c2mon.daq.spectrum.listener.impl;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -8,6 +8,11 @@ import java.util.Queue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import cern.c2mon.daq.spectrum.SpectrumEquipConfig;
+import cern.c2mon.daq.spectrum.SpectrumEvent;
+import cern.c2mon.daq.spectrum.SpectrumEventProcessor;
+import cern.c2mon.daq.spectrum.listener.SpectrumListenerIntf;
 
 /**
  * For testing without real connection to the Spectrum server. This class starts a thread

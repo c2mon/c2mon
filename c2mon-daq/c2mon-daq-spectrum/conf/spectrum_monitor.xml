@@ -11,8 +11,8 @@
 	<commfault-tag-value>false</commfault-tag-value>
 	<address>
 		{
-			"primaryServer": "cs-srv-42.cern.ch",
-			"secondaryServer": "cs-srv-43.cern.ch",
+			"primaryServer": "cs-srv-44.cern.ch",
+			"secondaryServer": "cs-srv-45.cern.ch",
 			"port": 12001
 		}
 	</address>	
