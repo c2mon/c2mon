@@ -2,6 +2,15 @@
 <%@ taglib prefix="c2mon" tagdir="/WEB-INF/tags"%>
 
 <c2mon:template title="${title}">
+
+  <style>
+.input-group .form-control {
+  margin-bottom: 0;
+  width: 100%;
+  display:block !important;
+}
+</style>
+
   <div class="row">
     <div class="col-lg-12">
       <ul class="breadcrumb">
@@ -17,12 +26,12 @@
       <div class="panel panel-success">
         <div class="panel-heading">
           <div class="row">
-            <div class="col-xs-3">
+            <div class="col-xs-3 auto-resize">
               <i class="fa fa-check fa-5x"></i>
             </div>
             <div class="col-xs-9 text-right">
               <div class="huge">
-                <span id="server-uptime-total"></span><small>%</small>
+                <span id="server-uptime-total">-</span><small>%</small>
               </div>
               <div>Server availability this year</div>
             </div>
@@ -35,14 +44,14 @@
       <div class="panel panel-default">
         <div class="panel-heading">
           <div class="row">
-            <div class="col-xs-3">
+            <div class="col-xs-3 auto-resize">
               <i class="fa fa-tags fa-5x"></i>
             </div>
             <div class="col-xs-9 text-right">
               <div class="huge">
-                <span id="num-updates-yesterday"></span>
+                <span id="num-updates-yesterday">-</span>
               </div>
-              <div>Number of tag updates yesterday</div>
+              <div>Tag updates yesterday</div>
             </div>
           </div>
         </div>
@@ -53,14 +62,14 @@
       <div class="panel panel-info">
         <div class="panel-heading">
           <div class="row">
-            <div class="col-xs-3">
+            <div class="col-xs-3 auto-resize">
               <i class="fa fa-repeat fa-5x"></i>
             </div>
             <div class="col-xs-9 text-right">
               <div class="huge">
-                <span id="num-rolling-restarts"></span>
+                <span id="num-rolling-restarts">-</span>
               </div>
-              <div>Transparent server restarts this year</div>
+              <div>Transparent restarts this year</div>
             </div>
           </div>
         </div>
@@ -71,12 +80,12 @@
       <div class="panel panel-danger">
         <div class="panel-heading">
           <div class="row">
-            <div class="col-xs-3">
+            <div class="col-xs-3 auto-resize">
               <i class="fa fa-warning fa-5x"></i>
             </div>
             <div class="col-xs-9 text-right">
               <div class="huge">
-                <span id="num-service-outages"></span>
+                <span id="num-service-outages">-</span>
               </div>
               <div>Service outages this year</div>
             </div>
@@ -113,7 +122,7 @@
           <div role="tabpanel" class="tab-pane active" id="application-server">
 
             <div class="row">
-              <div class="col-lg-6" style="padding-bottom: 20px;">
+              <div class="col-lg-12" style="padding-bottom: 20px;">
                 <h3>
                   C2MON Server Statistics <br> <small> <span> <i class="fa fa-tags fa-fw"></i> <strong><span
                         id="num-tags-configured"><i class="fa fa-refresh fa-spin"></i></span></strong> tags configured
@@ -132,14 +141,14 @@
               <div class="col-lg-6">
                 <div class="panel panel-default">
                   <div class="panel-heading">
-                    <div class="pull-right">
-                      <form class="form-inline" style="margin-top: -7px;">
+
+                      <form class="form-inline pull-right" style="margin-top: -7px;">
                         <div class="form-group">
-                          <label for="server-availability-select">Year: </label> <select id="server-availability-year" class="form-control">
+                          <label for="server-availability-select">Select Year: </label> <select id="server-availability-year" class="form-control">
                           </select>
                         </div>
                       </form>
-                    </div>
+
                     <i class="fa fa-bar-chart-o fa-fw"></i> Server Availability
                   </div>
                   <!-- /.panel-heading -->
@@ -348,3 +357,14 @@
 
 <script src="<c:url value="/js/highcharts.js"/>" type="text/javascript"></script>
 <script src="<c:url value="/js/dashboard.js"/>" type="text/javascript"></script>
+<script src="<c:url value="/js/jquery/jquery-fittext.js"/>" type="text/javascript"></script>
+<script>
+  jQuery(".huge").fitText(0.56, {
+    minFontSize : '20px',
+    maxFontSize : '40px'
+  });
+  jQuery(".auto-resize").fitText(0.3, {
+    minFontSize : '8px',
+    maxFontSize : '15px'
+  });
+</script>
