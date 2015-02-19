@@ -68,14 +68,18 @@ public final class SqlMapper {
 
       // the input stream for properties file
       FileInputStream timPropertiesFile = null;
-      if (timPropertiesLocation.startsWith("file:///")) {
-        timPropertiesLocation = timPropertiesLocation.replace("file:///", "");
+
+      // Windows path name hack
+      if (System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) {
+          timPropertiesLocation = timPropertiesLocation.replace("file:///", "");
+      } else {
+          timPropertiesLocation = timPropertiesLocation.replace("file://", "");
       }
 
       try {
         timPropertiesFile = new FileInputStream(timPropertiesLocation);
       } catch (java.io.FileNotFoundException ex) {
-        LOGGER.error("FileNotFoundException caught when looking for c2mon.properties: " + ex.getMessage());
+        LOGGER.error("FileNotFoundException caught when looking for properties: " + ex.getMessage());
         ex.printStackTrace();
         throw new RuntimeException(ex);
       }
@@ -86,7 +90,7 @@ public final class SqlMapper {
       try {
           properties.load(timPropertiesFile);
       } catch (java.io.IOException ex) {
-          LOGGER.error("IOException caught when loading tim.properties file: " + ex.getMessage());
+          LOGGER.error("IOException caught when loading properties file: " + ex.getMessage());
           ex.printStackTrace();
           throw new RuntimeException(ex);
       }
