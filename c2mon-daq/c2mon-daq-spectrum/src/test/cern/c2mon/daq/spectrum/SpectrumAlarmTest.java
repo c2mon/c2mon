@@ -4,16 +4,16 @@
 
 package cern.c2mon.daq.spectrum;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.daq.spectrum.SpectrumEvent.SpectrumEventType;
 import cern.c2mon.daq.spectrum.listener.impl.SpectrumListenerJunit;
@@ -24,7 +24,7 @@ import cern.c2mon.daq.test.UseHandler;
 import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 
 //@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/resources/dmn-spectrum-config.xml")
+//@ContextConfiguration("/resources/dmn-spectrum-config.xml")
 @UseHandler(SpectrumMessageHandler.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SpectrumAlarmTest extends GenericMessageHandlerTst {
