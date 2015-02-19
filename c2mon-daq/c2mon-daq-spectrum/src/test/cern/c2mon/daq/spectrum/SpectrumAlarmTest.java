@@ -30,7 +30,6 @@ import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 public class SpectrumAlarmTest extends GenericMessageHandlerTst {
 
     Logger LOG = LoggerFactory.getLogger(SpectrumAlarmTest.class);
-    static { System.setProperty("spectrum.mode", "junit"); }
     protected static SpectrumMessageHandler theHandler;
     private static SpectrumEquipConfig config;
     
@@ -96,6 +95,7 @@ public class SpectrumAlarmTest extends GenericMessageHandlerTst {
     @Override
     protected void beforeTest() throws Exception {
         LOG.info("Init ...");
+        System.setProperty("spectrum.mode", "junit");
         theHandler = (SpectrumMessageHandler) msgHandler;        
         theHandler.connectToDataSource();
                 
