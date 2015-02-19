@@ -1,7 +1,7 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2009 CERN This program is free software; you can redistribute
  * it and/or modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 2 of the License,
@@ -12,7 +12,7 @@
  * copy of the GNU General Public License along with this program; if not, write
  * to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 
@@ -37,38 +37,41 @@ import com.ibatis.sqlmap.client.SqlMapClientBuilder;
 
 /**
  * Wrapper class for the SqlMapClient (ibatis)
- * 
+ *
  * @author mbrightw
- * 
+ *
  */
 public final class SqlMapper {
-    
+
     /**
      * Logger.
      */
     private static final Logger LOGGER = Logger.getLogger(SqlMapper.class);
-  
+
     /**
      * The SqlMapClient that this class is wrapping.
      */
     private static final SqlMapClient SQLMAP;
-    
+
     //configures the SqlMapClient from the configuration file
     static {
-      //get tim.properties file containing DB access details      
+      //get properties file containing DB access details
       String timPropertiesLocation;
-      if (System.getProperty("c2mon.properties") == null) {
+      if (System.getProperty("c2mon.web.conf.url") == null) {
           //if not set as option, then get from user home
-          timPropertiesLocation = System.getProperty("user.home") + "/c2mon.properties"; 
+          timPropertiesLocation = System.getProperty("user.home") + "/c2mon-web.properties";
       }
       else {
-          //else use the specified tim.properties
-          timPropertiesLocation = System.getProperty("c2mon.properties");
+          //else use the specified properties
+          timPropertiesLocation = System.getProperty("c2mon.web.conf.url");
       }
-      
+
       // the input stream for properties file
       FileInputStream timPropertiesFile = null;
-      
+      if (timPropertiesLocation.startsWith("file:///")) {
+        timPropertiesLocation = timPropertiesLocation.replace("file:///", "");
+      }
+
       try {
         timPropertiesFile = new FileInputStream(timPropertiesLocation);
       } catch (java.io.FileNotFoundException ex) {
@@ -76,9 +79,9 @@ public final class SqlMapper {
         ex.printStackTrace();
         throw new RuntimeException(ex);
       }
-      
+
       Properties properties = new Properties();
-      
+
       //load the properties
       try {
           properties.load(timPropertiesFile);
@@ -87,8 +90,8 @@ public final class SqlMapper {
           ex.printStackTrace();
           throw new RuntimeException(ex);
       }
-      
-      //set the SQLMAP, injecting the properties      
+
+      //set the SQLMAP, injecting the properties
       try {
           String resource = "cern/c2mon/statistics/generator/sqlmap/GeneratorSqlMapConfig.xml";
           Reader reader = Resources.getResourceAsReader(resource);
@@ -99,16 +102,16 @@ public final class SqlMapper {
           throw new RuntimeException("Error initializing SqlConfig class. Cause: " + e);
       }
     }
-    
+
     /**
      * Private constructor to override public one.
      */
-    private SqlMapper() {     
+    private SqlMapper() {
     }
 
     /**
      * Getter method returning the wrapped SqlMapClient.
-     * 
+     *
      * @return the SqlMapClient
      */
     public static SqlMapClient getSqlMapInstance() {
@@ -117,26 +120,26 @@ public final class SqlMapper {
 
     /**
      * Method returning a List of BarChartValue's read from the database.
-     * 
+     *
      * @param tableName the table/view from which the values must be read
      * @return the list of values
      * @throws SQLException error in database transaction
      */
-    public static List<BarChartValue> getBarChartData(final String tableName) throws SQLException {        
+    public static List<BarChartValue> getBarChartData(final String tableName) throws SQLException {
         //type safety below is ensured in ibatis result-map statement
-        List<BarChartValue> chartValues = SqlMapper.getSqlMapInstance().queryForList("getBarChartData", tableName);        
+        List<BarChartValue> chartValues = SqlMapper.getSqlMapInstance().queryForList("getBarChartData", tableName);
         return chartValues;
     }
-    
-    public static List<IChartCollectionValue> getBarChartCollectionData(final String tableName) throws SQLException {        
+
+    public static List<IChartCollectionValue> getBarChartCollectionData(final String tableName) throws SQLException {
         //type safety below is ensured in ibatis result-map statement
-        List<IChartCollectionValue> chartValues = SqlMapper.getSqlMapInstance().queryForList("getBarChartCollectionData", tableName);        
+        List<IChartCollectionValue> chartValues = SqlMapper.getSqlMapInstance().queryForList("getBarChartCollectionData", tableName);
         return chartValues;
     }
-    
+
     /**
      * The static method used for collecting the stacked bar chart data from the database.
-     * 
+     *
      * @param tableName the table/view from which the values are read
      * @return the list of values
      * @throws SQLException exception in database transaction
@@ -146,7 +149,7 @@ public final class SqlMapper {
         List<StackedBarChartValue> chartValues = SqlMapper.getSqlMapInstance().queryForList("getStackedBarChartData", tableName);
         return chartValues;
     }
-    
+
     /**
      * Static method returning getting the data from the database for collections of stacked bar charts.
      * @param tableName the table where the values are kept
@@ -158,11 +161,11 @@ public final class SqlMapper {
         List<IChartCollectionValue> chartValues = SqlMapper.getSqlMapInstance().queryForList("getStackedBarChartCollectionData", tableName);
         return chartValues;
     }
-    
-    
+
+
     /**
      * Method returning a List of PieChartValue's read from the database.
-     * 
+     *
      * @param tableName the table/view from which the values must be read
      * @return the list of values
      * @throws SQLException error in database transaction
@@ -172,7 +175,7 @@ public final class SqlMapper {
         List<PieChartValue> chartValues = SqlMapper.getSqlMapInstance().queryForList("getPieChartData", tableName);
         return chartValues;
     }
-    
+
     public static List<IChartCollectionValue> getPieChartCollectionData(final String tableName) throws SQLException {
         //type safety below is ensured in ibatis result-map statement
         List<IChartCollectionValue> chartValues = SqlMapper.getSqlMapInstance().queryForList("getPieChartCollectionData", tableName);
