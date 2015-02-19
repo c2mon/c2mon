@@ -23,7 +23,7 @@ import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
 import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+//@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/resources/dmn-spectrum-config.xml")
 @UseHandler(SpectrumMessageHandler.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
