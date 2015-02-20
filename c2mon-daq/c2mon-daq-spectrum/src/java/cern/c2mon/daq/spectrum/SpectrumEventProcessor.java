@@ -9,9 +9,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
@@ -85,7 +85,7 @@ public class SpectrumEventProcessor implements Runnable {
     
     private IEquipmentMessageSender equipmentMessageSender;
     private SpectrumEquipConfig config;
-    private HashMap<String, SpectrumAlarm> monitoredHosts = new HashMap<String, SpectrumAlarm>();
+    private ConcurrentHashMap<String, SpectrumAlarm> monitoredHosts = new ConcurrentHashMap<String, SpectrumAlarm>();
     private boolean cont = true;
     
     private long lastEventPrimary = 0;
