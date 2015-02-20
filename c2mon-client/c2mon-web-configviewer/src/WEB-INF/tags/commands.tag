@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
-<c:url var="commandviewer" value="../commandviewer" />
+<c:url var="commandviewer" value="/commandviewer" />
 
 <c:choose>
   <c:when test="${fn:length(equipment.sourceCommandTags) == 0}">
@@ -20,9 +20,10 @@
     <table class="table table-bordered table-hover" style="border-collapse: collapse;">
       <thead>
         <tr>
-          <th class="col-sm-2">ID</th>
+          <th class="col-sm-1">ID</th>
           <th class="col-sm-7">Name</th>
           <th class="col-sm-3">Equipment</th>
+          <th class="col-sm-1"></th>
         </tr>
       </thead>
 
@@ -31,11 +32,11 @@
           <c:set var="command" value="${entry.value}"></c:set>
 
           <tr data-toggle="collapse" data-target="#collapseme-${command.id}" class="accordion-toggle clickable">
-            <td>
-              <a href="${commandviewer}/${command.id}">${command.id}</a>
-            </td>
+            <td>${command.id}</td>
             <td>${command.name}</td>
             <td>${equipment.name}</td>
+            <td><a href="${commandviewer}/${command.id}" class="view-command btn btn-default btn-sm"> <i class="fa fa-external-link"></i> View Command
+            </a></td>
           </tr>
 
           <tr>

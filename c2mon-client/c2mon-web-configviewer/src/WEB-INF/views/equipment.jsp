@@ -197,6 +197,10 @@ th {
     e.stopPropagation();
   });
   
+  $('.view-command').click(function(e) {
+    e.stopPropagation();
+  });
+  
   // on load of the page: switch to the currently selected tab
   var hash = window.location.hash;
   $('#tabs a[href="' + hash + '"]').tab('show');
