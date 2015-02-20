@@ -132,8 +132,8 @@ th {
                 <!-- Nav tabs -->
                 <ul class="nav nav-tabs" role="tablist" id="tabs">
                   <li role="presentation" class="active"><a href="#datatags" aria-controls="datatags" role="tab" data-toggle="tab">DataTags</a></li>
-                  <li role="presentation"><a href="#subequipment" aria-controls="subequipment" role="tab" data-toggle="tab">SubEquipment</a></li>
                   <li role="presentation"><a href="#commands" aria-controls="commands" role="tab" data-toggle="tab">Commands</a></li>
+                  <li role="presentation"><a href="#subequipment" aria-controls="subequipment" role="tab" data-toggle="tab">SubEquipment</a></li>
                 </ul>
 
                 <!-- Tab panes -->
@@ -141,13 +141,13 @@ th {
                   <div role="tabpanel" class="tab-pane active" id="datatags">
                     <c2mon:datatags equipment="${equipment}"></c2mon:datatags>
                   </div>
+                 
+                  <div role="tabpanel" class="tab-pane" id="commands">
+                    <c2mon:commands equipment="${equipment}"></c2mon:commands>
+                  </div>
                   
                   <div role="tabpanel" class="tab-pane" id="subequipment">
                     <c2mon:subequipment equipment="${equipment}"></c2mon:subequipment>
-                  </div>
-
-                  <div role="tabpanel" class="tab-pane" id="commands">
-                    <c2mon:commands equipment="${equipment}"></c2mon:commands>
                   </div>
                 </div>
               </div>
