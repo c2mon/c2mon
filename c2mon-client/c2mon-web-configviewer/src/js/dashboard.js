@@ -200,7 +200,7 @@ function initialiseProcessCharts(process) {
     options.series[0].data = chart.yaxis.data;
     var serverAvailabilityChart = new Highcharts.Chart(options);
   }).fail(function(e) {
-    $('#daq-availability-monthly').html('<div class="alert alert-warning"><strong>Oh dear!</strong> Something went wrong retrieving this chart.</div>');
+    $('#daq-availability-monthly').html('<div class="alert alert-warning"><strong>Oh dear!</strong> Availability statistics are not available for this DAQ.</div>');
   });
 
   $.getJSON('statistics/process/' + process + '/updates/filtered/reasons', function(chart) {
