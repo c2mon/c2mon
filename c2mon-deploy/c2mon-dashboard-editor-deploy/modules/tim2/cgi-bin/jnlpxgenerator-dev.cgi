@@ -8,11 +8,11 @@ use Config::Properties;
 # Definition of global variables
 #
 my $jardir                    = "../lib";
-my $appdir                    = "tim2-dashboard-editor/";
+my $appdir                    = "tim2-dashboard-editor-stable/";
 # Default codebase points to operation
-my $codebase                  = "http://timweb.cern.ch/javaws";
-my $c2monClientPropertiesFile = "/user/timoper/rep/c2mon/client/c2mon-client.properties";
-my $c2monClientPropertiesURL  = "http://timweb/conf/c2mon-client.properties";
+my $codebase                  = "http://timweb.cern.ch/test/javaws";
+my $c2monClientPropertiesFile = "/user/timtest/rep/c2mon/client/c2mon-client.properties";
+my $c2monClientPropertiesURL  = "http://timweb/test/conf/c2mon-client.properties";
 
 ##
 # Reading version number from ../version.txt
@@ -22,6 +22,13 @@ open VFILE, "< ../version.txt"
 my $viewerVersion = <VFILE>;
 chomp $viewerVersion; # removes new line character
 close VFILE;
+
+##
+# In case of a SNAPSHOT
+#
+if ($viewerVersion =~ /-SNAPSHOT/) {
+  $appdir = "tim2-dashboard-editor/";
+}
 
 ##
 # Reading C2MON Client properties file #
@@ -52,7 +59,7 @@ sub jarlist {
         readdir DIR;
     closedir DIR;
     foreach (@contents) {
-              my $htmldir = $appdir.substr($_, 3, length($_));
+              my $htmldir = substr($_, 3, length($_));
         if (!-l && -d) {
       &jarlist($_);
     }
@@ -76,11 +83,10 @@ sub jarlist {
 #         Generating JNLP file           #
 ##########################################
 
-print "Content-type: application/x-java-jnlp-file" , "\n\n";
 print "<?xml version = '1.0' encoding = 'utf-8'?>
-  <jnlp spec=\"1.0+\" codebase=\"$codebase\">
+  <jnlp spec=\"1.0+\" codebase=\"$codebase/$appdir\">
   <information>
-    <title>TIM Dashboard Editor (Version $viewerVersion)</title>
+    <title>TIM Dashboard Editor TEST ($viewerVersion)</title>
     <vendor>Technical Infrastructure Monitoring (TIM) Team</vendor>
     <homepage href=\"http://timweb.cern.ch\"/>
     <description>This application is based on the IBM ILOG Dashboard Editor and allows users to draw dashboard diagrams for the TIM Viewer.</description>
@@ -90,10 +96,15 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
     <all-permissions/> 
   </security> 
   <resources>
-    <java version=\"1.7+\" initial-heap-size=\"512M\"  max-heap-size=\"512M\"/>" , "\n";
+    <java version=\"1.6+\" initial-heap-size=\"128M\"  max-heap-size=\"128M\"/>" , "\n";
 
 jarlist ("$jardir");
 
+
+# Defines the application name for RBAC
+print "    <property name=\"app.name\" value=\"tim-dashboard-editor-test\"/>\n";
+# Defines the version number for RBAC
+print "    <property name=\"app.version\" value=\"$viewerVersion\"/>\n";
 # Defines the version number that is shown in the TIM Viewer about dialog
 print "    <property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
 # Configuration parameters needed by C2MON client API
