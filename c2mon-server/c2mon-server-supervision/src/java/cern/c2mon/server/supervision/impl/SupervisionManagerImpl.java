@@ -293,8 +293,8 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
               // (4) Only proceed if the process is actually running
               if (processFacade.isRunning(processId)) {
 
-                String processStopMessage = "DAQ process " + processCopy.getName() + "was stopped.";
-                LOGGER.trace("onProcessDisconnection - DAQ process " + processCopy.getName() + " was stopped.");
+                String processStopMessage = "DAQ process " + processCopy.getName() + " was stopped.";
+                LOGGER.trace("onProcessDisconnection - " + processStopMessage);
 
                 // (5) LEGACY: TODO what does this comment mean?!
                 Timestamp stopTime = new Timestamp(System.currentTimeMillis());
