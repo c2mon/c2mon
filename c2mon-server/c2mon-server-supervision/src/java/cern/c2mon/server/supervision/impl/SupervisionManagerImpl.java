@@ -322,7 +322,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           }
         } catch (CacheElementNotFoundException cacheEx) {
           LOGGER.error("State tag " + processCopy.getStateTagId() + " or the alive tag "
-              + processCopy.getAliveTagId() + " for process " + processCopy.getId() + "could not be found in the "
+              + processCopy.getAliveTagId() + " for process " + processCopy.getId() + " could not be found in the "
               + "cache - disconnection actions could not be completed.", cacheEx);
         }
 
