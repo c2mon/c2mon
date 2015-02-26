@@ -40,7 +40,7 @@ public class CMWServerHandlerTest extends GenericMessageHandlerTst {
 
     @BeforeClass
     public static void beforeClass() {
-        System.setProperty("cmw.directory.list", "cs-ccr-ctb07:5021");
+        System.setProperty("cmw.directory.client.serverList", "cs-ccr-ctb05:5021");
     }
 
     @Override
@@ -55,7 +55,7 @@ public class CMWServerHandlerTest extends GenericMessageHandlerTst {
 
     @Test
     @UseConf("e_cmwadmin_test_conf_1.xml")
-    public void testStartStopHandler() throws Exception {
+    public void testStartStopHandlerRda2() throws Exception {
 
         Capture<Long> id = new Capture<Long>();
         Capture<Boolean> val = new Capture<Boolean>();
@@ -67,7 +67,7 @@ public class CMWServerHandlerTest extends GenericMessageHandlerTst {
         SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
 
         messageSender.addValue(EasyMock.capture(sdtv));
-        expectLastCall().times(2);
+        expectLastCall().times(1);
 
         replay(messageSender);
 
@@ -88,13 +88,46 @@ public class CMWServerHandlerTest extends GenericMessageHandlerTst {
         assertEquals(SourceDataQuality.OK, sdtv.getFirstValue(52501L).getQuality().getQualityCode());
         assertEquals(true, sdtv.getFirstValue(52501L).getValue());
         assertEquals("", sdtv.getFirstValue(52501L).getValueDescription());
-
-        assertEquals(SourceDataQuality.OK, sdtv.getFirstValue(52502L).getQuality().getQualityCode());
-        assertEquals(0, sdtv.getFirstValue(52502L).getValue());
-        assertEquals("", sdtv.getFirstValue(52502L).getValueDescription());
-
     }
 
+    @Test
+    @UseConf("e_cmwadmin_test_conf_4.xml")
+    public void testStartStopHandlerRda3() throws Exception {
+
+        Capture<Long> id = new Capture<Long>();
+        Capture<Boolean> val = new Capture<Boolean>();
+        Capture<String> msg = new Capture<String>();
+
+        messageSender.sendCommfaultTag(EasyMock.capture(id), EasyMock.capture(val), EasyMock.capture(msg));
+        expectLastCall().once();
+
+        SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
+
+        messageSender.addValue(EasyMock.capture(sdtv));
+        expectLastCall().times(1);
+
+        replay(messageSender);
+
+        try {
+            handler.connectToDataSource();
+        } catch (EqIOException ex) {
+            fail("EqIOException was  NOT expected");
+        }
+
+        Thread.sleep(5000);
+
+        verify(messageSender);
+
+        assertEquals(107211L, id.getValue().longValue());
+        assertEquals(true, val.getValue());
+        assertEquals("initial connection state", msg.getValue());
+
+        assertEquals(SourceDataQuality.OK, sdtv.getFirstValue(52501L).getQuality().getQualityCode());
+        assertEquals(true, sdtv.getFirstValue(52501L).getValue());
+        assertEquals("", sdtv.getFirstValue(52501L).getValueDescription());
+    }
+
+    
     @Test
     @UseConf("e_cmwadmin_test_conf_3.xml")
     public void tetEqAddressNull() throws Exception {

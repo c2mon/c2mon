@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-daq</groupId>
 		<artifactId>c2mon-daq-pom</artifactId>
-		<version>1.1.7</version>
+		<version>1.1.8</version>
 	</parent>
 
 	<version>1.1.2-SNAPSHOT</version>
@@ -50,15 +50,27 @@
 			<artifactId>easymockclassextension</artifactId>
 		</dependency>
 
+		<!-- <dependency> -->
+		<!-- <groupId>cern.cmw</groupId> -->
+		<!-- <artifactId>cmw-rda</artifactId> -->
+		<!-- <version>2.12.1</version> -->
+		<!-- </dependency> -->
+
 		<dependency>
 			<groupId>cern.cmw</groupId>
-			<artifactId>cmw-rda</artifactId>
-			<version>2.12.1</version>
+			<artifactId>cmw-rda3-cern</artifactId>
+			<version>1.2.0</version>
 		</dependency>
-		<dependency>
-			<groupId>cern.accsoft.security</groupId>
-			<artifactId>accsoft-security-rba-util</artifactId>
+			<dependency>
+			<groupId>cern.cmw</groupId>
+			<artifactId>cmw-rda3-admin</artifactId>
+			<version>[0.4.3,1.0.0)</version>
 		</dependency>
+		
+<!-- 		<dependency> -->
+<!-- 			<groupId>cern.accsoft.security</groupId> -->
+<!-- 			<artifactId>accsoft-security-rba-util</artifactId> -->
+<!-- 		</dependency> -->
 
 		<dependency>
 			<groupId>log4j</groupId>

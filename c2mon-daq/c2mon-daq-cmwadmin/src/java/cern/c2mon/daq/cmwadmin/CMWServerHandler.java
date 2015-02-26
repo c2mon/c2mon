@@ -26,7 +26,8 @@ import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
  *
  * @author Mark Buttner, Wojtek Buczak
  */
-public class CMWServerHandler extends EquipmentMessageHandler implements Runnable, IDataTagChanger, IEquipmentConfigurationChanger {
+public class CMWServerHandler extends EquipmentMessageHandler implements Runnable, IDataTagChanger,
+        IEquipmentConfigurationChanger {
 
     // C2MON equipment address parsing parameters. For the moment, it JMX based (which explains the
     // unused fields) to avoid a specialized implementation in the common API
@@ -69,7 +70,8 @@ public class CMWServerHandler extends EquipmentMessageHandler implements Runnabl
      * defines the 2 tags, which are mandatory for that type of equipment
      */
     enum TagType {
-        STATUS, REACHABLE
+        STATUS,
+        REACHABLE
     }
 
     /**
@@ -376,7 +378,8 @@ public class CMWServerHandler extends EquipmentMessageHandler implements Runnabl
 
         // check if this tag is not already registered
         if (isTagAlreadyRegistered(tag.getId())) {
-            getEquipmentLogger().warn(format("tag: %d is already registered. You must unregister it first!", tag.getId()));
+            getEquipmentLogger().warn(
+                    format("tag: %d is already registered. You must unregister it first!", tag.getId()));
             return;
         }
 
@@ -434,7 +437,6 @@ public class CMWServerHandler extends EquipmentMessageHandler implements Runnabl
 
         return result;
     }
-
 
     @Override
     public void onUpdateEquipmentConfiguration(

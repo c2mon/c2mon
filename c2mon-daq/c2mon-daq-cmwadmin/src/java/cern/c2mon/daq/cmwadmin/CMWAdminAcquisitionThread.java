@@ -7,9 +7,12 @@ import static java.lang.String.format;
 import cern.c2mon.daq.cmwadmin.CMWServerHandler.TagType;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
+import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataQuality;
-import cern.cmw.adm.ServerAdmin;
+import cern.cmw.rda3.client.admin.ServerAdmin;
+import cern.cmw.rda3.common.exception.RdaException;
+import cern.cmw.rda3cern.client.admin.CernServerAdminFactory;
 
 /**
  * The thread that connects to the server and queries for status information. As it is a single thread per server, there
@@ -32,6 +35,8 @@ public class CMWAdminAcquisitionThread extends Thread {
     long lastContact = 0; // timestamp of the last successful contact we had with the server
     private String lastError = ""; // error message, applies only in case of failure
 
+    private CernServerAdminFactory factory;
+
     // ------------------ CONSTRUCTORS ------------------------------------------------------
 
     /**
@@ -39,11 +44,16 @@ public class CMWAdminAcquisitionThread extends Thread {
      *
      * @param handler <code>CMWServerHandler</code> the implementation of C2MON's EquipmentMessageHandler
      */
-    public CMWAdminAcquisitionThread(final CMWServerHandler handler) {
+    public CMWAdminAcquisitionThread(final CMWServerHandler handler) throws EqIOException {
         this.handler = handler;
         this.serviceUrl = handler.getServiceUrl();
         this.pollingTime = handler.getPollingTime();
         this.log = handler.getEquipmentLogger();
+        try {
+            this.factory = new CernServerAdminFactory();
+        } catch (RdaException e) {
+            throw new EqIOException(e);
+        }
     }
 
     // ------------------------------------- GETTERS -----------------------------------
@@ -109,31 +119,26 @@ public class CMWAdminAcquisitionThread extends Thread {
             // go through all configured tags and try to match with some data coming from
             // the CMW server
             ISourceDataTag reachableTag = handler.getTag(TagType.REACHABLE);
-            ISourceDataTag statusTag = handler.getTag(TagType.STATUS);
 
             try {
-                log.debug(format("Trying to connect to CMW server: %s", handler.getServiceUrl()));
 
-                ServerAdmin server = new ServerAdmin(serviceUrl);
-                int status = server.getStatus().value(); // 0 = OK, 1 = WRN, 2 = ERR ?
+                ServerAdmin server = factory.createServerAdmin(serviceUrl);
+
+                log.debug(format("Trying to connect to CMW server: %s", handler.getServiceUrl()));
+                server.getServerInformation();
 
                 this.setLastContact(System.currentTimeMillis());
+
                 if (log.isDebugEnabled())
                     log.debug(format("successfully connected to CMW server: %s", serviceUrl));
 
                 if (reachableTag != null)
                     this.updateValue(reachableTag, null, true);
-                if (statusTag != null)
-                    this.updateValue(statusTag, null, status);
 
-                // the NoConnectionException is special in the sense that it requires the update
-                // of a special datatag which should be present in all configurations
-            } catch (cern.cmw.NoConnection nce) {
+            } catch (RdaException ex) {
                 if (reachableTag != null)
-                    this.updateValue(reachableTag, nce.getMessage(), false);
+                    this.updateValue(reachableTag, ex.getMessage(), false);
 
-                // all other exceptions
-            } catch (Exception ex) {
                 StringBuilder bld = new StringBuilder("Failed to contact CMW server: ");
                 bld.append(serviceUrl);
                 bld.append(" Exception caught: ");

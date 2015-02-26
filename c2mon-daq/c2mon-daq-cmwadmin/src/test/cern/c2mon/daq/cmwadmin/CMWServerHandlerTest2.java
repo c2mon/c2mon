@@ -65,8 +65,7 @@ public class CMWServerHandlerTest2 extends GenericMessageHandlerTst {
 
         SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
 
-        messageSender.addValue(EasyMock.capture(sdtv));
-        // expectLastCall().times(2);
+        messageSender.addValue(EasyMock.capture(sdtv));        
         expectLastCall().atLeastOnce();
 
         replay(messageSender);
