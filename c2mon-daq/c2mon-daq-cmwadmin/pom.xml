@@ -50,27 +50,16 @@
 			<artifactId>easymockclassextension</artifactId>
 		</dependency>
 
-		<!-- <dependency> -->
-		<!-- <groupId>cern.cmw</groupId> -->
-		<!-- <artifactId>cmw-rda</artifactId> -->
-		<!-- <version>2.12.1</version> -->
-		<!-- </dependency> -->
-
 		<dependency>
 			<groupId>cern.cmw</groupId>
 			<artifactId>cmw-rda3-cern</artifactId>
 			<version>1.2.0</version>
 		</dependency>
-			<dependency>
+		<dependency>
 			<groupId>cern.cmw</groupId>
 			<artifactId>cmw-rda3-admin</artifactId>
 			<version>[0.4.3,1.0.0)</version>
 		</dependency>
-		
-<!-- 		<dependency> -->
-<!-- 			<groupId>cern.accsoft.security</groupId> -->
-<!-- 			<artifactId>accsoft-security-rba-util</artifactId> -->
-<!-- 		</dependency> -->
 
 		<dependency>
 			<groupId>log4j</groupId>
