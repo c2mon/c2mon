@@ -153,6 +153,15 @@ public class HistoryLoadingConfiguration {
   public Integer getNumberOfDays() {
     return numberOfDays;
   }
+  
+  /**
+   * This method is interesting to check, whether the request comprises a time
+   * window or only a maximum number of tags.
+   * @return <code>true</code>, if either a startTime or an endTime is set
+   */
+  public boolean isTimeWindowSet() {
+    return (this.startTime != null || this.endTime != null);
+  }
 
   /**
    * @return <code>true</code> if the initial values at time 0 also should be

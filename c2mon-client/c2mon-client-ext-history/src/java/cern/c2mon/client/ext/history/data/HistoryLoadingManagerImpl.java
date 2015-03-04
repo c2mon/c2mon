@@ -20,8 +20,10 @@ package cern.c2mon.client.ext.history.data;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
@@ -154,6 +156,21 @@ public class HistoryLoadingManagerImpl extends HistoryLoadingManagerAbs implemen
    * The thread loading the data
    */
   class LoadingThread extends Thread {
+    private boolean allDailySnapshotsIsLoaded = false;
+    
+    // TODO: For multiple calls of the loadRecordsFromSTL()
+    // this value gets overridden. Eventually this might not
+    // be wished in the future.
+    private boolean maximumRecordsReached = false;
+    
+    private final Timestamp loadingEndTime = getLoadingEndTime();
+
+    // used to retrieve later the supervision events
+    private Timestamp lastestTime;
+    private Timestamp earliestTime;
+    private Timestamp earliestTimeWithData;
+    
+    
     /** Constructor */
     public LoadingThread() {
       super("History-Loading-Thread");
@@ -161,7 +178,106 @@ public class HistoryLoadingManagerImpl extends HistoryLoadingManagerAbs implemen
     
     @Override
     public void run() {
-      // Notifying listeners
+
+      this.fireOnLoadingStarting();
+      this.initLoading();
+
+      if (getConfiguration().isTimeWindowSet()) {
+        this.loadRecordsFromSTL(getTagsToLoad());
+      }
+      else {
+        // Load tags one by one, in order to respect the
+        // maximum amount of records per tag
+        Map<Long, ClientDataTag> entryMap = null;
+        for (Entry<Long, ClientDataTag> entry : getTagsToLoad().entrySet()) {
+          entryMap = new HashMap<>(1);
+          entryMap.put(entry.getKey(), entry.getValue());
+
+          this.loadRecordsFromSTL(entryMap);
+        }
+      }
+      
+      HistoryLoadingManagerImpl.this.earliestTimeLoaded = earliestTime;
+      HistoryLoadingManagerImpl.this.latestTimeLoaded = lastestTime;
+      
+      loadIntitialValueAndSupervisionEvents();
+      
+      fireOnLoadingComplete();
+      
+      finalizeLoadingThread();
+    }
+
+    /**
+     * In case that the maximum records limit has not been reached we
+     * add initial values and initial supervision events to the result.
+     */
+    private void loadIntitialValueAndSupervisionEvents() {
+      
+      if (isLoading()) {
+        final List <SupervisionEventRequest> supervisionRequests = new ArrayList<SupervisionEventRequest>();
+        if (getConfiguration().isLoadSupervisionEvents()) {
+          // Gets supervision events
+          for (SupervisionEventId id : getSupervisionEventsToLoad()) {
+            supervisionRequests.add(new SupervisionEventRequest(id.getEntityId(), id.getEntity()));
+          }
+        }
+        
+        if (getConfiguration().isLoadInitialValues() && !maximumRecordsReached) {
+          // Gets initial records
+          addTagValueUpdates(historyProvider.getInitialValuesForTags(
+              getTagIdsToLoad().toArray(new Long[0]), 
+              earliestTimeWithData));
+          
+          addSupervisionEvents(historyProvider.getInitialSupervisionEvents(
+              earliestTimeWithData, 
+              supervisionRequests));
+        }
+        
+        // Loads the supervision events
+        addSupervisionEvents(historyProvider.getSupervisionEvents(earliestTime, lastestTime, supervisionRequests));
+      }
+    }
+
+    /**
+     * Called at the end of the loading process to wakes up 
+     * the parent thread that is waiting for the end of the
+     * history loading.
+     */
+    private void finalizeLoadingThread() {
+      // Stops loading.
+      loadingThreadLock.lock();
+      try {
+        setLoading(false);
+        synchronized (loadingThread) {
+          loadingThread.notify();
+        }
+        loadingThread = null;
+      }
+      finally {
+        loadingThreadLock.unlock();
+      }
+    }
+
+    /**
+     * Notifies all listeners that history loading is now complete
+     */
+    private void fireOnLoadingComplete() {
+      
+      for (HistoryLoadingManagerListener listener : getListeners()) {
+        try {
+          listener.onLoadingComplete();
+        }
+        catch (Exception e) {
+          LOG.error("Error while notifying listener", e);
+        }
+      }
+    }
+    
+    /**
+     * Notifies all listeners that history loading is now starting
+     */
+    private void fireOnLoadingStarting() {
+
       for (HistoryLoadingManagerListener listener : getListeners()) {
         try {
           listener.onLoadingStarting();
@@ -170,10 +286,18 @@ public class HistoryLoadingManagerImpl extends HistoryLoadingManagerAbs implemen
           LOG.error("Error while notifying listener", e);
         }
       }
+    }
+    
+    private Timestamp getLoadingEndTime() {
+      Timestamp loadingEndTime = getConfiguration().getEndTime();
+      if (loadingEndTime == null) {
+        loadingEndTime = DateUtil.latestTimeInDay(System.currentTimeMillis());
+      }
       
-      final Map<Long, ClientDataTag> tags = getTagsToLoad();
-      
-      boolean allDailySnapshotsIsLoaded = false;
+      return loadingEndTime;
+    }
+    
+    private void initLoading() {
       
       if (getConfiguration().getStartTime() != null
           && getConfiguration().getEndTime() != null) {
@@ -181,44 +305,41 @@ public class HistoryLoadingManagerImpl extends HistoryLoadingManagerAbs implemen
         allDailySnapshotsIsLoaded = true;
       }
       
+      lastestTime = loadingEndTime;
+      earliestTime = loadingEndTime;
+      earliestTimeWithData = loadingEndTime;
+    }
+    
+    /**
+     * Fetches the historical records of the given list of tags from the
+     * database. To optimize the loading performance it does one query per
+     * day, taking advantage of the snapshot table entries to sort out tags
+     * which have not been updated during the given day.
+     *
+     * @param tags The tags to load
+     */
+    private void loadRecordsFromSTL(final Map<Long, ClientDataTag> tags) {
       
-      Timestamp loadingEndTime = getConfiguration().getEndTime();
-      if (loadingEndTime == null) {
-        loadingEndTime = DateUtil.latestTimeInDay(System.currentTimeMillis());
-      }
-      
-      boolean maximumRecordsReached = false;
       boolean loadingTimesReached = false;
       boolean numberOfDaysReached = false;
-      
       boolean startTimeReached = false;
       boolean endTimeReached = false;
       
-      Integer numberOfDays;
-      Integer numberOfRecords;
-      if (getConfiguration().getMaximumRecords() == null) {
-        numberOfRecords = null;
-      }
-      else {
-        numberOfRecords = 0;
-      }
-      if (getConfiguration().getNumberOfDays() == null) {
-        numberOfDays = null;
-      }
-      else {
-        numberOfDays = 0;
-      }
+      Integer numberOfDays = getConfiguration().getNumberOfDays() == null ? null : 0;
       
-      Timestamp lastestTime = loadingEndTime;
-      Timestamp earliestTime = loadingEndTime;
-      
-      Timestamp earliestTimeWithData = loadingEndTime;
+      Timestamp myLastestTime = loadingEndTime;
+      Timestamp myLoadingEndTime = loadingEndTime;
+      Timestamp myEarliestTime = loadingEndTime;
+      Timestamp myEarliestTimeWithData = loadingEndTime;
+
+      Integer numberOfRecords = getConfiguration().getMaximumRecords() == null ? null : 0;
+      maximumRecordsReached = false;
       
       while (!maximumRecordsReached
           && !loadingTimesReached
           && !numberOfDaysReached
           && isLoading()
-          && !earliestTime.before(getConfiguration().getEarliestTimestamp())) {
+          && !myEarliestTime.before(getConfiguration().getEarliestTimestamp())) {
         
         // Sets the maxium number of records variable
         Integer maximumNumberOfRecords;
@@ -236,12 +357,12 @@ public class HistoryLoadingManagerImpl extends HistoryLoadingManagerAbs implemen
         // or there are more than one day to the start time,
         // it is set to the beginning of the day which is now going to be loaded
         if (loadingStartTime == null
-            || !DateUtil.isDaysEqual(loadingStartTime.getTime(), loadingEndTime.getTime())) {
-          loadingStartTime = DateUtil.earliestTimeInDay(loadingEndTime.getTime());
+            || !DateUtil.isDaysEqual(loadingStartTime.getTime(), myLoadingEndTime.getTime())) {
+          loadingStartTime = DateUtil.earliestTimeInDay(myLoadingEndTime.getTime());
         }
         
         if (!allDailySnapshotsIsLoaded) {
-          loadDailySnapshots(loadingStartTime, loadingEndTime);
+          loadDailySnapshots(loadingStartTime, myLoadingEndTime);
         }
         
         // Filters out which tags to load
@@ -251,7 +372,7 @@ public class HistoryLoadingManagerImpl extends HistoryLoadingManagerAbs implemen
           // Load the tag if the start or end time is outside of the timespan
           if (timespan == null
               || timespan.getStart().before(loadingStartTime)
-              || timespan.getEnd().after(loadingEndTime)) {
+              || timespan.getEnd().after(myLoadingEndTime)) {
             tagsToLoad.add(tagId);
           }
         }
@@ -261,10 +382,10 @@ public class HistoryLoadingManagerImpl extends HistoryLoadingManagerAbs implemen
           
           // Loads the data from history
           if (maximumNumberOfRecords == null) {
-            result = historyProvider.getHistory(tagsToLoad.toArray(new Long[0]), loadingStartTime, loadingEndTime);
+            result = historyProvider.getHistory(tagsToLoad.toArray(new Long[0]), loadingStartTime, myLoadingEndTime);
           }
           else {
-            result = historyProvider.getHistory(tagsToLoad.toArray(new Long[0]), loadingStartTime, loadingEndTime, (int) maximumNumberOfRecords);
+            result = historyProvider.getHistory(tagsToLoad.toArray(new Long[0]), loadingStartTime, myLoadingEndTime, (int) maximumNumberOfRecords);
           }
           if (result != null) {
             addTagValueUpdates(result);
@@ -274,8 +395,8 @@ public class HistoryLoadingManagerImpl extends HistoryLoadingManagerAbs implemen
             }
             
             if (result.size() > 0) {
-              if (loadingStartTime.compareTo(earliestTimeWithData) < 0) {
-                earliestTimeWithData = loadingStartTime;
+              if (loadingStartTime.compareTo(myEarliestTimeWithData) < 0) {
+                myEarliestTimeWithData = loadingStartTime;
               }
             }
           }
@@ -284,11 +405,11 @@ public class HistoryLoadingManagerImpl extends HistoryLoadingManagerAbs implemen
           numberOfDays++;
         }
         
-        if (loadingEndTime.compareTo(lastestTime) > 0) {
-          lastestTime = loadingEndTime;
+        if (myLoadingEndTime.compareTo(myLastestTime) > 0) {
+          myLastestTime = myLoadingEndTime;
         }
-        if (loadingStartTime.compareTo(earliestTime) < 0) {
-          earliestTime = loadingStartTime;
+        if (loadingStartTime.compareTo(myEarliestTime) < 0) {
+          myEarliestTime = loadingStartTime;
         }
         
         // Checking which criterias is met
@@ -306,64 +427,28 @@ public class HistoryLoadingManagerImpl extends HistoryLoadingManagerAbs implemen
 
         endTimeReached = 
             getConfiguration().getEndTime() != null
-            && loadingEndTime.compareTo(getConfiguration().getEndTime()) <= 0;
+            && myLoadingEndTime.compareTo(getConfiguration().getEndTime()) <= 0;
          
         loadingTimesReached = startTimeReached && endTimeReached;
         
         // Sets new ending day
-        loadingEndTime = DateUtil.latestTimeInDay(DateUtil.addDays(loadingEndTime.getTime(), -1).getTime());
+        myLoadingEndTime = DateUtil.latestTimeInDay(DateUtil.addDays(myLoadingEndTime.getTime(), -1).getTime());
         
       } // End of while
       
-      HistoryLoadingManagerImpl.this.earliestTimeLoaded = earliestTime;
-      HistoryLoadingManagerImpl.this.latestTimeLoaded = lastestTime;
       
-      if (isLoading()) {
-        final List <SupervisionEventRequest> supervisionRequests = new ArrayList<SupervisionEventRequest>();
-        if (getConfiguration().isLoadSupervisionEvents()) {
-          // Gets supervision events
-          for (SupervisionEventId id : getSupervisionEventsToLoad()) {
-            supervisionRequests.add(new SupervisionEventRequest(id.getEntityId(), id.getEntity()));
-          }
-        }
-        
-        if (getConfiguration().isLoadInitialValues() && !maximumRecordsReached) {
-          // Gets initial records
-          addTagValueUpdates(historyProvider.getInitialValuesForTags(
-              tags.keySet().toArray(new Long[0]), 
-              earliestTimeWithData));
-          
-          addSupervisionEvents(historyProvider.getInitialSupervisionEvents(
-              earliestTimeWithData, 
-              supervisionRequests));
-        }
-        
-        // Loads the supervision events
-        addSupervisionEvents(historyProvider.getSupervisionEvents(earliestTime, lastestTime, supervisionRequests));
+      // Adjust latest time  
+      if (myLastestTime.compareTo(lastestTime) > 0) {
+        lastestTime = myLastestTime;
+      }
+      // Adjust earliest time
+      if (myEarliestTime.compareTo(earliestTime) < 0) {
+        earliestTime = myEarliestTime;
+      }
+      if (myEarliestTimeWithData.compareTo(earliestTimeWithData) < 0) {
+        earliestTimeWithData = myEarliestTimeWithData;
       }
       
-      // Notifying listeners
-      for (HistoryLoadingManagerListener listener : getListeners()) {
-        try {
-          listener.onLoadingComplete();
-        }
-        catch (Exception e) {
-          LOG.error("Error while notifying listener", e);
-        }
-      }
-      
-      // Stops loading.
-      loadingThreadLock.lock();
-      try {
-        setLoading(false);
-        synchronized (loadingThread) {
-          loadingThread.notify();
-        }
-        loadingThread = null;
-      }
-      finally {
-        loadingThreadLock.unlock();
-      }
     }
     
   }

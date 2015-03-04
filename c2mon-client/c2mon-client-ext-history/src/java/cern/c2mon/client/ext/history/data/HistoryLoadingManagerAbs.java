@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -345,6 +346,29 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
       return new ArrayList<HistoryTagValueUpdate>(); 
     }
   }
+  
+  /**
+   * Counts how many history records have been loaded per tag
+   * @return A map with tag ids as keys and the history count as value
+   */
+  protected Map<Long, Integer> getHistoryEventCount() {
+    Map<Long, Integer> counterMap = new HashMap<>(this.loadedHistoryTagValueUpdates.size());
+
+    this.loadedHistoryTagValueUpdatesLock.readLock().lock();
+    try {
+    
+      for (Entry<Long,List<HistoryTagValueUpdate>> entry : this.loadedHistoryTagValueUpdates.entrySet()) {
+        Long tagId = entry.getKey();
+        counterMap.put(tagId, entry.getValue().size());
+      }
+      
+    }
+    finally {
+      this.loadedHistoryTagValueUpdatesLock.readLock().unlock();
+    }
+    
+    return counterMap;
+  }
 
   @Override
   public Collection<HistorySupervisionEvent> getHistory(final SupervisionEventId supervisionEventId) {
@@ -499,6 +523,13 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
    */
   protected Map<Long, ClientDataTag> getTagsToLoad() {
     return new HashMap<Long, ClientDataTag>(tagsToLoad);
+  }
+  
+  /**
+   * @return a list of tags ids to load
+   */
+  protected Set<Long> getTagIdsToLoad() {
+    return new HashSet<Long>(tagsToLoad.keySet());
   }
 
   /**
