@@ -1,6 +1,7 @@
 package cern.c2mon.daq.japc.bis;
 
 import cern.c2mon.daq.japc.GenericJapcMessageHandler;
+import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
@@ -20,6 +21,10 @@ public class BisJapcMessageHandler extends GenericJapcMessageHandler {
     public static final String NAMES_ARRAY_FIELD = "registerNames";
     public static final String VALUES_ARRAY_FIELD = "registerValues";
 
+    @Override
+    protected final void beforeConnectToDataSource() throws EqIOException {
+        initRbac();
+    }
 
     @Override
     protected void handleJAPCValue(ISourceDataTag tag, String pParameterName, AcquiredParameterValue pParameterValue) {
@@ -55,7 +60,7 @@ public class BisJapcMessageHandler extends GenericJapcMessageHandler {
 
             SimpleParameterValue valuesField = mapValue.get(VALUES_ARRAY_FIELD);
             if (valuesField == null) {
-                throw new ParameterException("field: "+VALUES_ARRAY_FIELD + " not found");
+                throw new ParameterException("field: " + VALUES_ARRAY_FIELD + " not found");
             }
 
             ValueType valuesFieldType = valuesField.getValueType();

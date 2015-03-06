@@ -15,6 +15,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.security.auth.login.LoginException;
+
+import cern.accsoft.security.rba.login.LoginPolicy;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
@@ -44,6 +47,7 @@ import cern.japc.ValueHeader;
 import cern.japc.ValueType;
 import cern.japc.factory.ParameterFactory;
 import cern.japc.factory.ParameterValueFactory;
+import cern.rba.util.relogin.RbaLoginService;
 
 /**
  * This is a specialized subclass of the general C2MON EquipmentMessageHandler. The class implements a generic
@@ -77,6 +81,30 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
     private Map<Long, ParameterValueListener> pvlistenersMap = new ConcurrentHashMap<Long, ParameterValueListener>();
 
     private static volatile TagConnectionMonitor tagConnectionMonitor;
+
+    // authentication by location is enabled
+    protected static String user = "not-used";
+    protected static String pass = "not-used";
+    protected static String rbacAppName = "JAPC-RDA-DAQ";
+
+    private static RbaLoginService rbaLoginService;
+
+    protected static final void initRbac() throws EqIOException {
+        if (null == rbaLoginService) {
+            try {
+                rbaLoginService = new RbaLoginService();
+                rbaLoginService.setUser(user);
+                rbaLoginService.setPassword(pass);
+                rbaLoginService.setLoginPolicy(LoginPolicy.LOCATION);
+                rbaLoginService.setApplicationName(rbacAppName);
+                rbaLoginService.setAutoRefresh(true);
+                rbaLoginService.startAndLogin();
+            } catch (LoginException ex) {
+                rbaLoginService = null;
+                throw new EqIOException("RBAC initialization failed! " + ex.getMessage());
+            }
+        }
+    }
 
     class JapcHandlerValueListener implements ParameterValueListener {
 
