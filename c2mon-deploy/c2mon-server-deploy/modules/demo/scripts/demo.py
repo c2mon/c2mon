@@ -221,6 +221,12 @@ print "Downloading c2mon-client-demo.properties"
 os.chdir("../conf")
 urllib.urlretrieve ("http://timweb/test/conf/c2mon-client-demo.properties", "c2mon-client.properties")
 
+print "Copying c2mon-web.properties"
+shutil.copy2('/user/timadm/dist/rep/tomcat/demo/conf/c2mon-web.properties', 'c2mon-web.properties')
+
+print "Copying chart-config.xml"
+shutil.copy2('/user/timadm/dist/rep/tomcat/demo/conf/chart-config.xml', 'chart-config.xml')
+
 print "Done"
 
 # Come back to demo/
