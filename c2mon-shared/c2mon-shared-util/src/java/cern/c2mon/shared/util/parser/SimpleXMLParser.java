@@ -33,8 +33,6 @@ public final class SimpleXMLParser implements XmlParser {
    */
   public SimpleXMLParser() throws ParserConfigurationException {
     // throws ParserConfigurationException if creation fails
-    System.setProperty("javax.xml.parsers.DocumentBuilderFactory",
-        "org.apache.xerces.jaxp.DocumentBuilderFactoryImpl");
     builder = DocumentBuilderFactoryImpl.newInstance().newDocumentBuilder();
   }
 
@@ -59,7 +57,14 @@ public final class SimpleXMLParser implements XmlParser {
     } catch (SAXException saxe) {
       throw new ParserException("Error parsing XML document", saxe);
     } finally {
-      builder.reset();
+      try {
+        builder.reset();
+      } catch (UnsupportedOperationException e) {
+        try {
+          builder = DocumentBuilderFactoryImpl.newInstance().newDocumentBuilder();
+        } catch (ParserConfigurationException e2) {
+        }
+      }
     }
     if (doc == null) {
       throw new ParserException("Null document obtained during document parsing.");
