@@ -85,8 +85,8 @@ class InstallConfig(object):
         self.__deployConfig = None
         self.__maven = False
         self.__rollback = False
-    self.__isUpdate = False
-    self.__showDiff = False
+        self.__isUpdate = False
+        self.__showDiff = False
         
 
     def setSendMail(self, flag):
@@ -234,7 +234,7 @@ class WebApp(Product):
         def getContainerType(self):
             return self.__containerType
         def setContainerType(self, webcontainer):
-        self.__containerType = webcontainer
+            self.__containerType = webcontainer
         
 
 

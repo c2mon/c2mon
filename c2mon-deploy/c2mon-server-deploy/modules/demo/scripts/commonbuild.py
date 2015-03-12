@@ -258,7 +258,7 @@ def getDefaultApplication(product):
         log.warn(tools.getDepricatedInfo("A <deployment> tag should always be in a <application>!"))
         defaultApp = Application(product, "default")
         depInfo = config.readDeploymentTag(defaultApp, oldStyleDeploymentInfo[0])
-    defaultApp.setDeploymentInfo(depInfo)
+        defaultApp.setDeploymentInfo(depInfo)
         product.addApplication(defaultApp)
 
     # check the unamed application and with name='default' and read the defaultApp

@@ -118,7 +118,7 @@ def getProductsFromConfig(confFile):
         sourceUrl = None
 
         if tag.hasProp('directory'):
-        sourceUrl = tag.hasProp('directory').getContent()
+            sourceUrl = tag.hasProp('directory').getContent()
         elif tag.hasProp('sourceUrl'):
             sourceUrl = tag.hasProp('sourceUrl').getContent()
         p = Product(name)
@@ -193,16 +193,16 @@ def getApplicationsFromConfig(file, product, appName = None):
 
 def getAttribute(tag, name):
     val = tag.xpathEval('@' + name)
-        if val != None and len(val) > 0:
-             return val[0].content
-        else:
-             return None
+    if val != None and len(val) > 0:
+         return val[0].content
+    else:
+         return None
 def getChildNodes(tag, nodeName):
     val = tag.xpathEval(nodeName)
-        if val != None and len(val) > 0:
-             return val
-        else:
-             return []
+    if val != None and len(val) > 0:
+         return val
+    else:
+         return []
 
 def checkValid(tag, expect):
     if tag == None:
@@ -757,7 +757,7 @@ def readJavaStartScript(stag, appName, inherit=None):
             raise Exception("Code error when reading <output> tag! ")
 
     if len(getChildNodes(stag, 'preExec')) > 0:
-    myScript.setPreExecutionCode(readPreExecCode(getChildNodes(stag, 'preExec')[0]))
+        myScript.setPreExecutionCode(readPreExecCode(getChildNodes(stag, 'preExec')[0]))
 
     if procName != None:
         log.debug("Setting Process Name = %s" %procName)

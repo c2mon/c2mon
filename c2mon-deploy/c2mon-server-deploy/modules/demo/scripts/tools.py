@@ -204,7 +204,7 @@ def doPostInstall(app, installConfig):
             if not simulationMode :
                 script.setInstallDir(installDir)
                 loc = script.generateStartScript()
-            targetLoc = os.path.join(installDir, 'bin', script.getProcessName())
+                targetLoc = os.path.join(installDir, 'bin', script.getProcessName())
                 shutil.copy2(loc, targetLoc)
                 os.chmod(targetLoc, 0755)
                 log.debug("Copy startscript from %s to %s" %(loc, targetLoc))
@@ -217,7 +217,7 @@ def doPostInstall(app, installConfig):
 
     replaceList = app.getDeploymentInfo().getStringReplacements()
     for r in replaceList.keys():
-    for target in replaceList[r]:
+        for target in replaceList[r]:
             log.debug("Replacing in %s '%s'=>'%s'" %(os.path.join(installDir,r), target[0], target[1]))
             if not simulationMode:
                 replaceStringInFile(os.path.join(installDir,r), target[0], target[1])
@@ -378,8 +378,8 @@ def notifyCenter(host, installPath, product, application, user, installMode, ver
 
         otherPropText = ""
         if otherProps != None and len(otherProps) > 0:
-        for a in otherProps.keys():
-        otherPropText += "%s:%s\n" %(a, otherProps[a])
+            for a in otherProps.keys():
+                otherPropText += "%s:%s\n" %(a, otherProps[a])
 
         expires = time.time() + 20
         expires = long(expires) * 1000
@@ -418,7 +418,7 @@ def notifyCenterTracing(host, installPath, product, application, user, installMo
     server = 'feedback-cfg-pro'
     port = '6205'
 
-        message = '''SEND\n\
+    message = '''SEND\n\
 destination:/queue/CERN.DEPLOYMENT\n\
 TS:%s\n\
 PID:%s\n\
@@ -431,15 +431,15 @@ MESSAGETYPE:CONFIG
 HOST:%s\n\n''' %(long(time.time()) , os.getpid(), __file__ , product, host)
 
     message += 'product=%s;application=%s;version=%s;installPath=%s;user=%s;installMode=%s;releaseDate=%s||Installation of %s' %(product,application,version,installPath,user,installMode,releaseDate,application)
-        for a in otherProps.keys():
-                message += ";%s=%s" %(a, otherProps[a])
+    for a in otherProps.keys():
+            message += ";%s=%s" %(a, otherProps[a])
     
-        message +='''\n\x00'''
+    message +='''\n\x00'''
 
-        logging.debug("Sending tracing message to %s:%s  \n%s" %(server, port,message))
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.sendto(message, (server, int(port)))
-        sock.close()
+    logging.debug("Sending tracing message to %s:%s  \n%s" %(server, port,message))
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.sendto(message, (server, int(port)))
+    sock.close()
 
 
 
@@ -450,20 +450,20 @@ def readJmxInfo(installPath):
     if not os.path.exists(installPath): return {}
     
     for f in os.listdir(installPath):
-    path = os.path.join(installPath,f)
+        path = os.path.join(installPath,f)
 
         if os.access(path, os.X_OK) and os.path.isfile(path):
-        c = open(path, "r").read()
+            c = open(path, "r").read()
         try:
-        pos1 = c.rindex("com.sun.management.jmxremote.port=")
-        if pos1 > 0:
-            pos2 = c.index(" ", pos1)
-            port = c[pos1+34:pos2].replace("\"","")
-        if c.index("com.sun.management.jmxremote.password.file=") > 0 and c.index("-Dcom.sun.management.jmxremote.authenticate=true") > 0:
-            secure = True
+            pos1 = c.rindex("com.sun.management.jmxremote.port=")
+            if pos1 > 0:
+                pos2 = c.index(" ", pos1)
+                port = c[pos1+34:pos2].replace("\"","")
+            if c.index("com.sun.management.jmxremote.password.file=") > 0 and c.index("-Dcom.sun.management.jmxremote.authenticate=true") > 0:
+                secure = True
         except ValueError, e:
-        pass
-        # IGNORE
+            pass
+            # IGNORE
     if port != None:
         return {"MPORT" : port,  "MSECURED" : secure}
     else:

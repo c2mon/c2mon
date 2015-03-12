@@ -26,7 +26,7 @@ from optparse import OptionParser
 def mkdir(dir):
     try:
         if os.path.exists(dir):
-      shutil.rmtree(dir)
+          shutil.rmtree(dir)
         os.makedirs(dir)
     except OSError, e:
         if e[0] != 17:
