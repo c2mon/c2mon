@@ -11,9 +11,9 @@ tagdaqtime        TIMESTAMP(6),
 tagstatus         INTEGER,
 tagstatusdesc     VARCHAR(1000),
 tagmode           INTEGER,
-tagdir            VARCHAR(1))
+tagdir            VARCHAR(1));
 
-create index stl_tagid_ix on shorttermlog(tagid)
+create index stl_tagid_ix on shorttermlog(tagid);
 
 CREATE TABLE SUPERVISION_LOG(
   SUL_ENTITY  VARCHAR(30) NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE SUPERVISION_LOG(
   SUL_DATE    TIMESTAMP(6) NOT NULL,
   SUL_STATUS  VARCHAR(20) NOT NULL,
   SUL_MESSAGE VARCHAR(200)
-)
+);
 
 CREATE TABLE stl_day_snapshot (
 logdate       DATE
@@ -35,7 +35,7 @@ logdate       DATE
 ,tagstatus     INTEGER
 ,tagstatusdesc VARCHAR(1000)
 ,tagmode       INTEGER
-) tablespace LOGDATA;
+);
 
 create index tdl_tagid_ix on stl_day_snapshot(tagid);
 
