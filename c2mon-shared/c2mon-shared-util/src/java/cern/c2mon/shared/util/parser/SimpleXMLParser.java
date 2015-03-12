@@ -7,9 +7,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.xerces.jaxp.DocumentBuilderFactoryImpl;
-
 import org.w3c.dom.Document;
-
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -35,6 +33,8 @@ public final class SimpleXMLParser implements XmlParser {
    */
   public SimpleXMLParser() throws ParserConfigurationException {
     // throws ParserConfigurationException if creation fails
+    System.setProperty("javax.xml.parsers.DocumentBuilderFactory",
+        "org.apache.xerces.jaxp.DocumentBuilderFactoryImpl");
     builder = DocumentBuilderFactoryImpl.newInstance().newDocumentBuilder();
   }
 
@@ -63,7 +63,7 @@ public final class SimpleXMLParser implements XmlParser {
     }
     if (doc == null) {
       throw new ParserException("Null document obtained during document parsing.");
-    }   
+    }
     return doc;
   }
 
