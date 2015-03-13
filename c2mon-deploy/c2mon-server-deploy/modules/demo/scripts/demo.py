@@ -208,11 +208,11 @@ print "Replacing context-security.xml for no rbac config"
 #os.system('jar -cvf c2mon-web-configviewer.war c2mon-web-configviewer')
 mkdir("WEB-INF")
 mkdir("WEB-INF/conf")
-shutil.copy2('/user/timadm/dist/rep/tomcat/demo/webapps/c2mon-web-configviewer/WEB-INF/cntext-security.xml', 'WEB-INF/conf/context-security.xml')
+shutil.copy2('/user/timadm/dist/rep/tomcat/demo/webapps/c2mon-web-configviewer/WEB-INF/context-security.xml', 'WEB-INF/conf/context-security.xml')
 
 # replace the datasource with the hsqldb source
 print "Replacing context-datasource.xml for hsqldb datasource"
-shutil.copy2('../../server/conf/c2mon-datasource-configviewer.xml', 'WEB-INF/conf/context-datasource.xml')
+shutil.copy2('../../server/conf/c2mon-web-configviewer-datasource.xml', 'WEB-INF/conf/context-datasource.xml')
 
 os.system('zip -r c2mon-web-configviewer.war WEB-INF/conf/context-security.xml')
 os.system('zip -r c2mon-web-configviewer.war WEB-INF/conf/context-datasource.xml')

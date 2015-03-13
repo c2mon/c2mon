@@ -60,7 +60,14 @@
       <destName>c2mon-datasource.xml</destName>
       <lineEnding>unix</lineEnding>
       <fileMode>0444</fileMode>
-    </file>	
+    </file>
+    <file>
+      <source>${basedir}/conf/demo-web-configviewer-datasource.xml</source>
+      <outputDirectory>conf/</outputDirectory>
+      <destName>c2mon-web-configviewer-datasource.xml</destName>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
     <file>
       <source>${basedir}/conf/demo-c2mon.properties</source>
       <outputDirectory>conf/</outputDirectory>
