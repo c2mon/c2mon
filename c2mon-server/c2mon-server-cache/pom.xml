@@ -4,9 +4,8 @@
   <parent>
     <groupId>cern.c2mon.c2mon-server</groupId>
     <artifactId>c2mon-server-pom</artifactId>
-    <version>1.1.6</version>
+    <version>LATEST</version>
   </parent>
-  <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-cache</artifactId>
   <version>1.5.4-SNAPSHOT</version>
   <name>c2mon-server-cache</name>
@@ -70,28 +69,32 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-shared</groupId>
       <artifactId>c2mon-shared-common</artifactId>
+      <version>LATEST</version>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-shared</groupId>
       <artifactId>c2mon-shared-daq</artifactId>
+      <version>LATEST</version>
     </dependency>
 
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-common</artifactId>
+      <version>LATEST</version>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-test</artifactId>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-cacheloading</artifactId>
+      <version>LATEST</version>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-cachedbaccess</artifactId>
+      <version>LATEST</version>
     </dependency>
 
   </dependencies>
