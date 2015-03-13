@@ -31,7 +31,7 @@
   <jdbc:embedded-database id="stlDataSource">
     <jdbc:script location="classpath:cern/c2mon/server/test/sql/shorttermlog-schema-generic.sql" />
 <!--     <jdbc:script location="classpath:cern/c2mon/server/demo/sql/config-test-data.sql" /> -->
-  </jdbc:embedded-database> -
+  </jdbc:embedded-database>
   
   
 </beans>
