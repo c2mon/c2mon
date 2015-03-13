@@ -1,3 +1,5 @@
+SET DATABASE SQL SYNTAX ORA TRUE;
+
 CREATE TABLE shorttermlog (
 logdate           DATE          NOT NULL,
 tagid             INTEGER     NOT NULL,
