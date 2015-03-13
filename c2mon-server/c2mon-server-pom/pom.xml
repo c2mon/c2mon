@@ -115,11 +115,19 @@
         <version>${org.springframework.version}</version>
       </dependency>
 
-      <!-- c2mon-server core -->
+      <!-- c2mon server core dependency -->
       <dependency>
         <groupId>cern.c2mon.c2mon-server</groupId>
         <artifactId>c2mon-server-all</artifactId>
         <version>LATEST</version>
+      </dependency>
+      
+      <!-- c2mon test dependency -->
+      <dependency>
+        <groupId>cern.c2mon.c2mon-server</groupId>
+        <artifactId>c2mon-server-test</artifactId>
+        <version>LATEST</version>
+        <scope>test</scope>
       </dependency>
 
       <!-- 3rd parties -->
