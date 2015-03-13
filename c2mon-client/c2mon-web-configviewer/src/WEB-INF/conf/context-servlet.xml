@@ -47,26 +47,6 @@
     </property>
   </bean>
   
-  <bean id="statisticsDataSource" class="org.apache.commons.dbcp.BasicDataSource">
-    <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
-    <property name="url" value="${c2mon.jdbc.statistics.url}" />
-    <property name="username" value="${c2mon.jdbc.statistics.stlog.user}" />
-    <property name="password" value="${c2mon.jdbc.statistics.stlog.password}" />
-  </bean>
-
-  <bean id="statisticsTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-    <property name="dataSource" ref="statisticsDataSource" />
-  </bean>
-
-  <tx:annotation-driven transaction-manager="statisticsTransactionManager" />
-
-  <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-    <property name="configLocation" value="classpath:cern/c2mon/web/configviewer/statistics/sqlmaps/sql-map-config.xml" />
-    <property name="dataSource" ref="statisticsDataSource" />
-  </bean>
-
-  <bean id="statisticsMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
-    <property name="sqlSessionFactory" ref="sqlSessionFactory" />
-    <property name="mapperInterface" value="cern.c2mon.web.configviewer.statistics.StatisticsMapper" />
-  </bean>
+  <import resource="file:${c2mon.web.home}/conf/context-datasource.xml"/>
+ 
 </beans>
