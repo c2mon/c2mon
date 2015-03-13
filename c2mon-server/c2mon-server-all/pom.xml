@@ -27,10 +27,14 @@ All server modules shall directly depend on this jar!</description>
 	</repositories>
 
 	<dependencies>
-		<!-- C2MON dependencies -->
+		<!-- C2MON Core dependencies -->
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-cache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-cachedbaccess</artifactId>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
@@ -38,7 +42,7 @@ All server modules shall directly depend on this jar!</description>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-cachedbaccess</artifactId>
+      <artifactId>c2mon-server-cachepersistence</artifactId>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
