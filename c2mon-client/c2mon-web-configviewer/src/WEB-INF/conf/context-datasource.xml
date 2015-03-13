@@ -19,21 +19,5 @@
     <property name="username" value="${c2mon.jdbc.statistics.stlog.user}" />
     <property name="password" value="${c2mon.jdbc.statistics.stlog.password}" />
   </bean>
-
-  <bean id="statisticsTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-    <property name="dataSource" ref="stlDataSource" />
-  </bean>
-
-  <tx:annotation-driven transaction-manager="statisticsTransactionManager" />
-
-  <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-    <property name="configLocation" value="classpath:cern/c2mon/web/configviewer/statistics/sqlmaps/sql-map-config.xml" />
-    <property name="dataSource" ref="stlDataSource" />
-  </bean>
-
-  <bean id="statisticsMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
-    <property name="sqlSessionFactory" ref="sqlSessionFactory" />
-    <property name="mapperInterface" value="cern.c2mon.web.configviewer.statistics.StatisticsMapper" />
-  </bean>
   
 </beans>
