@@ -37,7 +37,6 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-cache</artifactId>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
@@ -47,7 +46,6 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-daqcommunication-out</artifactId>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
@@ -62,14 +60,12 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-supervision</artifactId>
-      <scope>runtime</scope>
     </dependency>
 
     <!-- The following dependencies are required for using Ehcache. -->
     <dependency>
       <groupId>net.sf.ehcache</groupId>
       <artifactId>ehcache-ee</artifactId>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>log4j</groupId>
