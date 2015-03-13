@@ -28,10 +28,21 @@
   </jdbc:embedded-database>
   
   <!-- datasource for logging functionalities -->
-  <jdbc:embedded-database id="stlDataSource">
+<!--   <jdbc:embedded-database id="stlDataSource">
     <jdbc:script location="classpath:cern/c2mon/server/test/sql/shorttermlog-schema-generic.sql" />
-<!--     <jdbc:script location="classpath:cern/c2mon/server/demo/sql/config-test-data.sql" /> -->
-  </jdbc:embedded-database>
+    <jdbc:script location="classpath:cern/c2mon/server/demo/sql/config-test-data.sql" />
+  </jdbc:embedded-database> -->
+  
+  <bean class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" id="stlDataSource">
+    <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+    <property name="url" value="jdbc:hsqldb:mem:stl:sql.syntax_ora=true" />
+    <property name="username" value="sa" />
+    <property name="password" value="" />
+  </bean>
+
+  <jdbc:initialize-database data-source="stlDataSource">
+    <jdbc:script location="classpath:cern/c2mon/server/test/sql/shorttermlog-schema-generic.sql" />
+  </jdbc:initialize-database>
   
   
 </beans>
