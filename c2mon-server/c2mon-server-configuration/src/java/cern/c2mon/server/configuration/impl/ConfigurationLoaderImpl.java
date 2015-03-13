@@ -44,7 +44,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.ProcessFacade;
-import cern.c2mon.server.cachepersistence.common.BatchPersistenceManager;
 import cern.c2mon.server.configuration.ConfigProgressMonitor;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.dao.ConfigurationDAO;
@@ -93,6 +92,15 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    * Class logger.
    */
   private static final Logger LOGGER = Logger.getLogger(ConfigurationLoaderImpl.class);
+  
+  /**
+   * Avoids interfering with running cache persistence jobs.
+   * To avoid a direct dependency to the c2mon-server-cachepersistence module
+   * we decided to create a local constant, but the same String is used by the 
+   * <code>cern.c2mon.server.cachepersistence.common.BatchPersistenceManager</code>
+   * to lock on the ClusterCache.
+   */
+  private final String cachePersistenceLock = "c2mon.cachepersistence.cachePersistenceLock";
 
   int changeId = 0; //unique id for all generated changes (including those recursive ones during removal)
 
@@ -355,7 +363,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       } catch (Exception ex) {
         LOGGER.error("Exception caught while applying configuration " + configId, ex);
         if (report == null) {
-          String userName = null;
           report = new ConfigurationReport(
               configId,
               "UNKNOWN",
@@ -402,7 +409,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   private List<ProcessChange> applyConfigElement(final ConfigurationElement element,
                                                  final ConfigurationElementReport elementReport) throws IllegalAccessException {
     // Write lock needed to avoid parallel Batch persistence transactions
-    clusterCache.acquireWriteLockOnKey(BatchPersistenceManager.cachePersistenceLock);
+    clusterCache.acquireWriteLockOnKey(this.cachePersistenceLock);
     //initialize the DAQ config event
     List<ProcessChange> daqConfigEvents = new ArrayList<ProcessChange>();
     try {
@@ -499,7 +506,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         }
       }
     } finally {
-      clusterCache.releaseWriteLockOnKey(BatchPersistenceManager.cachePersistenceLock);
+      clusterCache.releaseWriteLockOnKey(this.cachePersistenceLock);
     }
 
     return daqConfigEvents;
