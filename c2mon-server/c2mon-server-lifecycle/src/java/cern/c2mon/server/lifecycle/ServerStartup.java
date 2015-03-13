@@ -118,6 +118,7 @@ public final class ServerStartup {
                                          "cern/c2mon/server/supervision/config/server-supervision.xml",
                                          "cern/c2mon/server/daqcommunication/in/config/server-daqcommunication-in.xml",
                                          "cern/c2mon/server/daqcommunication/out/config/server-daqcommunication-out.xml",
+                                         "cern/c2mon/server/rule/config/server-rule.xml",
                                          "cern/c2mon/server/configuration/config/server-configuration.xml"
                                          )); 
     
