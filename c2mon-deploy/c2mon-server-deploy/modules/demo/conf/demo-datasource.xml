@@ -27,11 +27,11 @@
     <jdbc:script location="classpath:cern/c2mon/server/test/sql/config-data.sql" />
   </jdbc:embedded-database>
   
-   <!-- datasource for logging functionalities -->
-<!--   <jdbc:embedded-database id="stlDataSource">-->
-<!--    <jdbc:script location="classpath:cern/c2mon/server/demo/sql/configuration-schema-generic.sql" />-->
-<!--    <jdbc:script location="classpath:cern/c2mon/server/demo/sql/config-test-data.sql" />-->
-<!--  </jdbc:embedded-database>-->
+  <!-- datasource for logging functionalities -->
+  <jdbc:embedded-database id="stlDataSource">
+    <jdbc:script location="classpath:cern/c2mon/server/test/sql/shorttermlog-schema-generic.sql" />
+<!--     <jdbc:script location="classpath:cern/c2mon/server/demo/sql/config-test-data.sql" /> -->
+  </jdbc:embedded-database> -
   
   
 </beans>
