@@ -203,12 +203,19 @@ else:
   urllib.urlretrieve(getLatestRelease("cern.c2mon.c2mon-client:c2mon-web-configviewer"), "c2mon-web-configviewer.war")
 
 # change the applicationContext-security.xml with rbac removed
-print "Replacing applicationContext-security.xml for no rbac config"
+print "Replacing context-security.xml for no rbac config"
 #os.system('unzip c2mon-web-configviewer.war -d c2mon-web-configviewer')
 #os.system('jar -cvf c2mon-web-configviewer.war c2mon-web-configviewer')
 mkdir("WEB-INF")
-shutil.copy2('/user/timadm/dist/rep/tomcat/demo/webapps/c2mon-web-configviewer/WEB-INF/applicationContext-security.xml', 'WEB-INF/applicationContext-security.xml')
-os.system('zip -r c2mon-web-configviewer.war WEB-INF/applicationContext-security.xml')
+mkdir("WEB-INF/conf")
+shutil.copy2('/user/timadm/dist/rep/tomcat/demo/webapps/c2mon-web-configviewer/WEB-INF/applicationContext-security.xml', 'WEB-INF/conf/context-security.xml')
+
+# replace the datasource with the hsqldb source
+print "Replacing context-datasource.xml for hsqldb datasource"
+shutil.copy2('../../server/conf/c2mon-datasource-configviewer.xml', 'WEB-INF/conf/context-datasource.xml')
+
+os.system('zip -r c2mon-web-configviewer.war WEB-INF/conf/context-security.xml')
+os.system('zip -r c2mon-web-configviewer.war WEB-INF/conf/context-datasource.xml')
 #shutil.rmtree('c2mon-web-configviewer')
 
 # add start-tomcat-demo.sh with special config for starting demo 
