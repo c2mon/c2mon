@@ -64,6 +64,12 @@
       <artifactId>c2mon-shared-client</artifactId>
       <version>LATEST</version>
     </dependency>
+    
+    <!-- Test dependency -->
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-test</artifactId>
+    </dependency>
   </dependencies>
   <developers />
   <build>
