@@ -2,12 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>cern.c2mon.c2mon-server</groupId>
     <artifactId>c2mon-server-pom</artifactId>
-    <version>1.1.6</version>
+    <version>LATEST</version>
   </parent>
-  <groupId>cern.c2mon.c2mon-server</groupId>
+
   <artifactId>c2mon-server-client</artifactId>
   <version>1.5.2-SNAPSHOT</version>
   <name>c2mon-server-client</name>
@@ -35,30 +36,11 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-alarm</artifactId>
+      <version>LATEST</version>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-configuration</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-cache</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-supervision</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-shared</groupId>
-      <artifactId>c2mon-shared-client</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-shared</groupId>
-      <artifactId>c2mon-shared-util</artifactId>
+      <artifactId>c2mon-server-all</artifactId>
     </dependency>
 
     <!-- test only -->
@@ -79,18 +61,9 @@
       <artifactId>c2mon-server-test</artifactId>
     </dependency>
     <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-daqcommunication-in</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-daqcommunication-out</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
     	<groupId>cern.c2mon.c2mon-server</groupId>
-    	<artifactId>c2mon-server-command</artifactId>    	
+    	<artifactId>c2mon-server-command</artifactId>  
+      <version>LATEST</version>  	
     </dependency>
     <dependency>
         <groupId>org.apache.activemq</groupId>

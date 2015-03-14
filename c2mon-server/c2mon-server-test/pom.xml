@@ -2,12 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>cern.c2mon.c2mon-server</groupId>
     <artifactId>c2mon-server-pom</artifactId>
-    <version>1.1.6</version>
+    <version>LATEST</version>
   </parent>
-  <groupId>cern.c2mon.c2mon-server</groupId>
+
   <artifactId>c2mon-server-test</artifactId>
   <version>1.5.3-SNAPSHOT</version>
   <name>c2mon-server-test</name>
@@ -38,11 +39,12 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-common</artifactId>
+      <version>LATEST</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
-      <version>${org.springframework.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
