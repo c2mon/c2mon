@@ -21,55 +21,18 @@
 	<dependencies>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-common</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-cache</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-cacheloading</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-cachedbaccess</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
 			<artifactId>c2mon-server-cachepersistence</artifactId>
+      <version>LATEST</version>
 		</dependency>
 		<!-- <dependency> -->
 		<!-- <groupId>cern.c2mon.c2mon-server</groupId> -->
 		<!-- <artifactId>c2mon-server-benchmark</artifactId> -->
+    <!-- <version>LATEST</version> -->
 		<!-- </dependency> -->
 		<dependency>
 			<groupId>cern.c2mon.c2mon-server</groupId>
 			<artifactId>c2mon-server-command</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-daqcommunication-in</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-daqcommunication-out</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-rule</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-supervision</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-configuration</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-lifecycle</artifactId>
+      <version>LATEST</version>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-server</groupId>
@@ -79,6 +42,7 @@
 		<dependency>
 			<groupId>cern.c2mon.c2mon-server</groupId>
 			<artifactId>c2mon-server-shorttermlog</artifactId>
+      <version>LATEST</version>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-server</groupId>
