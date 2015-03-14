@@ -77,6 +77,12 @@
       <version>LATEST</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-cachepersistence</artifactId>
+      <version>LATEST</version>
+      <scope>test</scope>
+    </dependency>
 
   </dependencies>
   <developers />
