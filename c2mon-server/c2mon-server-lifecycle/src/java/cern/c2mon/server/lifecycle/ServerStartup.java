@@ -21,7 +21,11 @@ package cern.c2mon.server.lifecycle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.xml.DOMConfigurator;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * The class containing the main method for starting a server.
@@ -126,6 +130,7 @@ public final class ServerStartup {
 
     final ClassPathXmlApplicationContext xmlContext = new ClassPathXmlApplicationContext(coreModules.toArray(new String[0])) {
 
+      @Override
       protected DefaultListableBeanFactory createBeanFactory() {
         final DefaultListableBeanFactory vResult = super.createBeanFactory();
         vResult.setAllowBeanDefinitionOverriding(false);
