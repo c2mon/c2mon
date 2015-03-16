@@ -10,7 +10,7 @@
 	</parent> 
   
 	<artifactId>c2mon-server-cachedbaccess</artifactId>
-	<version>1.5.2</version>
+	<version>1.5.3-SNAPSHOT</version>
 	<name>c2mon-server-cachedbaccess</name>
 	<packaging>jar</packaging>
 	<description>
