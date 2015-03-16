@@ -7,7 +7,7 @@
     <version>LATEST</version>
   </parent>
   <artifactId>c2mon-server-cache</artifactId>
-  <version>1.5.4</version>
+  <version>1.5.5-SNAPSHOT</version>
   <name>c2mon-server-cache</name>
   <packaging>jar</packaging>
   <description>
