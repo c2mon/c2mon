@@ -27,6 +27,9 @@ C2MON_PROPERTIES=$C2MON_HOME/conf/c2mon.properties
 # COMMON SETUP  #
 #################
 
+# Process name
+PROCESS_NAME=C2MON-TIM-PRO1
+
 #log4j configuration file (uncomment log4j.xml for a rolling appender)
 #LOG4J_CONF_FILE=$C2MON_HOME/conf/log4j.xml
 LOG4J_CONF_FILE=$C2MON_HOME/conf/log4j-standardout.xml
