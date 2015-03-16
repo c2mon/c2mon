@@ -21,16 +21,16 @@
 
   <select id="getServerLifecycleEvents" resultMap="serverLifecycleEventsResultMap" parameterType="map">
     SELECT SLL_EVENT_TYPE, SLL_SERVER_NAME, SLL_TIME FROM SERVER_LIFECYCLE_LOG
-    WHERE SLL_TIME &gt;= to_timestamp(#{from})
-    AND   SLL_TIME &lt;  to_timestamp(#{to})
+    WHERE SLL_TIME &gt;= to_timestamp(#{from}, 'YYYY-MM-DD HH:MI:SS') <!-- e.g. 2015-01-01 00:00:00.0 -->
+    AND   SLL_TIME &lt;  to_timestamp(#{to}, 'YYYY-MM-DD HH:MI:SS')
     ORDER BY SLL_TIME
   </select>
 
   <select id="getSupervisionEvents" resultMap="supervisionEventsResultMap" parameterType="map">
     SELECT SUL_ENTITY, SUL_ID, SUL_STATUS, SUL_DATE, SUL_MESSAGE FROM SUPERVISION_LOG 
     WHERE SUL_ID=#{id} 
-    AND   SUL_DATE &gt;= to_timestamp(#{from})
-    AND   SUL_DATE &lt;  to_timestamp(#{to})
+    AND   SUL_DATE &gt;= to_timestamp(#{from}, 'YYYY-MM-DD HH:MI:SS')
+    AND   SUL_DATE &lt;  to_timestamp(#{to}, 'YYYY-MM-DD HH:MI:SS')
     ORDER BY SUL_DATE
   </select>
 </mapper>
