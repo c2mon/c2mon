@@ -37,6 +37,7 @@ logdate       DATE
 ,tagstatus     INTEGER
 ,tagstatusdesc VARCHAR(1000)
 ,tagmode       INTEGER
+,tagvaluedesc  VARCHAR(1000)
 );
 
 create index tdl_tagid_ix on stl_day_snapshot(tagid);
