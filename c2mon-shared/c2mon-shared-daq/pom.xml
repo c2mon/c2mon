@@ -8,7 +8,7 @@
   </parent>
   <groupId>cern.c2mon.c2mon-shared</groupId>
   <artifactId>c2mon-shared-daq</artifactId>
-  <version>1.5.3-SNAPSHOT</version>
+  <version>1.5.3</version>
   <name>c2mon-shared-daq</name>
   <packaging>jar</packaging>
   <description>
