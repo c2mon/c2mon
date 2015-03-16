@@ -14,7 +14,7 @@
   <!-- must contain a bean with id stlDataSource of type java.sql.DataSource -->
   
   <bean id="stlDataSource" class="org.apache.commons.dbcp.BasicDataSource">
-    <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+    <property name="driverClassName" value="${c2mon.jdbc.driver}" />
     <property name="url" value="${c2mon.jdbc.statistics.url}" />
     <property name="username" value="${c2mon.jdbc.statistics.stlog.user}" />
     <property name="password" value="${c2mon.jdbc.statistics.stlog.password}" />
