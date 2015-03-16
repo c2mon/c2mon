@@ -147,10 +147,13 @@
         </HardwareAddress>
     </CommandTag>
   </CommandTags>
-</EquipmentUnit><EquipmentUnit id="160" name="E_TEST_2">
+</EquipmentUnit>
+<EquipmentUnit id="160" name="E_TEST_2">
   <handler-class-name>cern.c2mon.daq.testhandler.TestMessageHandler</handler-class-name>
   <commfault-tag-id>1241</commfault-tag-id>
   <commfault-tag-value>false</commfault-tag-value>
+  <alive-tag-id>1242</alive-tag-id>
+  <alive-interval>60000</alive-interval>
   <address>interval=1000;eventProb=0.02;inRangeProb=1;outDeadBandProb=1;switchProb=1;startIn=0.2;aliveInterval=30000</address>
   <SubEquipmentUnits>
   </SubEquipmentUnits>
@@ -158,6 +161,7 @@
   </DataTags>
   <CommandTags>
   </CommandTags>
-</EquipmentUnit>  </EquipmentUnits>
+</EquipmentUnit>
+</EquipmentUnits>
 </ProcessConfiguration>
 
