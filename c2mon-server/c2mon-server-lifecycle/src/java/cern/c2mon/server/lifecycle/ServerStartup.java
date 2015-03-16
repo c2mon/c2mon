@@ -105,7 +105,7 @@ public final class ServerStartup {
       logger.info("C2MON server running in distributed cache mode");
       cacheModeModules = new ArrayList<String>(Arrays.asList("cern/c2mon/server/lifecycle/config/server-lifecycle-multi.xml",
                                          "cern/c2mon/server/cache/config/server-cache-multi-server.xml"));
-    } else if (System.getProperty("cern.c2mon.cache.mode") != null && System.getProperty("cern.c2mon.cache.mode").equals("nonpersistent")) {
+    } else if (System.getProperty("cern.c2mon.cache.mode") != null && System.getProperty("cern.c2mon.cache.mode").equals("single-nonpersistent")) {
       logger.info("C2MON server running in nonpersistent local cache mode (not distributed)");
       cacheModeModules = new ArrayList<String>(Arrays.asList("cern/c2mon/server/lifecycle/config/server-lifecycle-single.xml",
           "cern/c2mon/server/cache/config/server-cache-nonpersistent-server.xml"));
