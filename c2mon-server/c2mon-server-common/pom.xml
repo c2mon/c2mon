@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>c2mon-server-common</artifactId>
-	<version>1.5.3-SNAPSHOT</version>
+	<version>1.5.3</version>
 	<name>c2mon-server-common</name>
 	<packaging>jar</packaging>
 	<description>
