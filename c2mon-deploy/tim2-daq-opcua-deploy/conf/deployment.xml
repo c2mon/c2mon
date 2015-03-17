@@ -21,6 +21,7 @@
         <initial-heap-size>256m</initial-heap-size>
         <max-heap-size>256m</max-heap-size>
         <property name="c2mon.process.name" value="$PROCESS_NAME" />
+        <property name="c2mon.daq.equipment.alive.filtering" value="true" />
         <property name="c2mon.log.dir" value="$DAQ_LOG_HOME" />
         <property name="JINTEGRA_LOG_ROLLOVER_LINECOUNT" value="100000" />
         <property name="JINTEGRA_LOG_FILE" value="${DAQ_LOG_HOME}/${PROCESS_NAME}.jintegra.log" />
