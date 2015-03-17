@@ -44,7 +44,7 @@ CLASSPATH=`ls $C2MON_HOME/lib/*.jar | tr -s '\n' ':'`
 
 
 HSQLDB_NAME=stl
-HSQLDB_START_CMD="$JAVA_HOME/jre/bin/java -cp "${CLASSPATH}" org.hsqldb.Server -database.0 file:$HSQLDB_NAME -dbname.0 $HSQLDB_NAME"
+HSQLDB_START_CMD="nohup $JAVA_HOME/jre/bin/java -cp "${CLASSPATH}" org.hsqldb.Server -database.0 file:$HSQLDB_NAME -dbname.0 $HSQLDB_NAME"
 
 # start hsqldb
 echo "Starting local HSQLDB instance..."
