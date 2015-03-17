@@ -77,13 +77,13 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
   /**
    * Identifier of the equipment alive-tag
    */
-  @Element(name = "alive-tag-id")
+  @Element(name = "alive-tag-id", required = false)
   private long aliveTagId;
 
   /**
    * Interval (ms) beetwen 2 equipment alive-tags
    */
-  @Element(name = "alive-interval")
+  @Element(name = "alive-interval", required = false)
   private long aliveInterval;
 
   /**
