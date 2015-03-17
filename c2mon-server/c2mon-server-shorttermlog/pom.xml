@@ -9,7 +9,7 @@
 		<version>LATEST</version>
 	</parent>
 
-	<version>1.1.3-SNAPSHOT</version>
+	<version>1.5.0</version>
 	<name>c2mon-server-shorttermlog</name>
 	<artifactId>c2mon-server-shorttermlog</artifactId>
 	<packaging>jar</packaging>
