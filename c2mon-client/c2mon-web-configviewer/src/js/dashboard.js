@@ -19,7 +19,7 @@
 /**
  * This file contains the initialisation and event handling code for the C2MON
  * web interface dashboard page.
- * 
+ *
  * @author Justin Lewis Salmon
  */
 (function() {
@@ -115,7 +115,7 @@
  * This function will request the necessary data from the server backend and
  * draw the server statistics charts that are shown on the default tab of the
  * dashboard.
- * 
+ *
  * If something goes wrong loading a chart, it will be replaced by a warning
  * div.
  */
@@ -134,7 +134,7 @@ function initialiseServerCharts() {
     $('#num-updates-yesterday').text(numberWithCommas(chart.yaxis.data[0]));
 
   }).fail(function(e) {
-    $('#server-updates').html('<div class="alert alert-warning"><strong>Oh dear!</strong> Something went wrong retrieving this chart.</div>');
+    $('#server-updates').closest('.chart-container').hide();
   });
 
   // Initialise the availability chart.
@@ -148,7 +148,7 @@ function initialiseServerCharts() {
 
   }).fail(function(e) {
     console.log(e.statusText);
-    $('#server-updates-per-daq-filtered').html('<div class="alert alert-warning"><strong>Oh dear!</strong> Something went wrong retrieving this chart.</div>');
+    $('#server-updates-per-daq-filtered').closest('.chart-container').hide();
   });
 
   // Initialise the chart that shows the number of updates (unfiltered only)
@@ -158,7 +158,7 @@ function initialiseServerCharts() {
     var updatesPerDaqChart = new Highcharts.Chart(options);
 
   }).fail(function(e) {
-    $('#server-updates-per-daq').html('<div class="alert alert-warning"><strong>Oh dear!</strong> Something went wrong retrieving this chart.</div>');
+    $('#server-updates-per-daq').closest('.chart-container').hide();
   });
 }
 
@@ -183,9 +183,9 @@ function initialiseServerAvailabilityChart() {
 /**
  * This function will request the necessary data from the server backend and
  * draw the statistics charts for a specific process.
- * 
+ *
  * If a chart is not available, then its containing div will be hidden.
- * 
+ *
  * @param process the process name
  */
 function initialiseProcessCharts(process) {
@@ -251,7 +251,7 @@ function initialiseProcessCharts(process) {
 
 /**
  * Retrieve a Highcharts options object to draw a column chart.
- * 
+ *
  * @param chart the chart data
  * @param container the div container to render to
  * @param max the maximum y-value
@@ -308,7 +308,7 @@ function getColumnChartOptions(chart, container, max) {
 
 /**
  * Retrieve a Highcharts options object to draw a stacked column chart.
- * 
+ *
  * @param chart the chart data
  * @param container the div container to render to
  * @param horizontal whether or not to render the chart horizontally or
@@ -357,7 +357,7 @@ function getStackedColumnChartOptions(chart, container, horizontal) {
 
 /**
  * Retrieve a Highcharts options object to draw a pie chart.
- * 
+ *
  * @param chart the chart data
  * @param container the div container to render to
  */
@@ -403,9 +403,9 @@ function getPieChartOptions(chart, container) {
 
 /**
  * Format a number by adding commas, e.g.:
- * 
+ *
  * 1234567 -> 1,234,567
- * 
+ *
  * @param x the number to format
  * @returns the formatted number
  */
