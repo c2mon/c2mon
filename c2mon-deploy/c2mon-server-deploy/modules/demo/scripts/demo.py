@@ -257,14 +257,24 @@ print "Done"
 os.chdir("../")
 
 ###########################
+#       tarball      
+##
+print 'Creating tarball'
+tar = tarfile.open("c2mon-demo.tar.gz", "w:gz")
+tar.add('demo', arcname='c2mon-demo')
+tar.close()
+print 'Done'
+
+
+###########################
 #       ISO      
 ##
 
-print "Creating iso"
-os.system("mkisofs -r -o demo.iso 'demo'")
-
-
-print "Cleaning directory"
+# print "Creating iso"
+# os.system("mkisofs -r -o demo.iso 'demo'")
+# 
+# 
+# print "Cleaning directory"
 #shutil.rmtree('demo')
  
 print "Done! Have a nice day."
