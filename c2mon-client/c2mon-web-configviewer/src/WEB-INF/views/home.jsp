@@ -163,7 +163,7 @@
               </div>
               <!-- /.col-lg-6 -->
 
-              <div class="col-lg-6">
+              <div class="chart-config col-lg-6">
                 <div class="panel panel-default">
                   <div class="panel-heading">
                     <i class="fa fa-bar-chart-o fa-fw"></i> Total Updates to Application Server
@@ -180,7 +180,7 @@
               </div>
               <!-- /.col-lg-6 -->
 
-              <div class="col-lg-6">
+              <div class="chart-config col-lg-6">
                 <div class="panel panel-default">
                   <div class="panel-heading">
                     <i class="fa fa-bar-chart-o fa-fw"></i> Updates per DAQ (including filtered)
@@ -197,7 +197,7 @@
               </div>
               <!-- /.col-lg-6 -->
 
-              <div class="col-lg-6">
+              <div class="chart-config col-lg-6">
                 <div class="panel panel-default">
                   <div class="panel-heading">
                     <i class="fa fa-bar-chart-o fa-fw"></i> Updates per DAQ
