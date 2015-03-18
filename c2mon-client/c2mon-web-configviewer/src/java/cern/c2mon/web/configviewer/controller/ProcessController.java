@@ -1,5 +1,6 @@
 package cern.c2mon.web.configviewer.controller;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -92,12 +94,14 @@ public class ProcessController {
    *         RAW XML format
    *
    * @param id process name
+   * @throws Exception
    */
   @RequestMapping(value = PROCESS_XML_URL + "/{id}", method = { RequestMethod.GET })
-  public String viewXml(@PathVariable final String id, final Model model) {
+  public void viewXml(@PathVariable final String id, final HttpServletResponse response) throws Exception {
     logger.info("/process/xml/{id} " + id);
-    model.addAllAttributes(getProcessModel(id));
-    return "raw/process";
+    InputStream is = IOUtils.toInputStream(service.getProcessXml(id), "UTF-8");
+    IOUtils.copy(is, response.getOutputStream());
+    response.flushBuffer();
   }
 
   /**

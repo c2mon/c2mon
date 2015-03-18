@@ -67,9 +67,9 @@ th {
                 Process Configuration: <strong>${process.processName}</strong>
               </h1>
               <span class="pull-right">
-                <a href="${xml}" class="btn btn-default btn-sm">
+                <a href="${xml}/${process.processName}" class="btn btn-default btn-sm">
                   <i class="fa fa-user fa-code"></i>
-                  View as XML
+                  Download XML
                 </a>
               </span>
             </div>
