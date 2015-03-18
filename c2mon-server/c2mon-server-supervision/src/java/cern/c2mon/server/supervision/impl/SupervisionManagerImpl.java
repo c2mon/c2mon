@@ -769,9 +769,9 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
         }
       }
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.error("Unable to locate a required element within the cache while processing control tag.", cacheEx);
+      LOGGER.error("Unable to locate a required element within the cache while processing control tag " + tagId + ".", cacheEx);
     } catch (Exception ex) {
-      LOGGER.error("Unexpected exception caught on Alive Timer expiration.", ex);
+      LOGGER.error("Unexpected exception caught on Alive Timer expiration for tag " + tagId + ".", ex);
     }
   }
 
