@@ -250,7 +250,7 @@ print "Done"
 
 # Download C2MON-Demo manual from edms
 print "Downloading C2MON-Demo manual from edms"
-urllib.urlretrieve ("https://edms.cern.ch/file/1399049/1/C2MON-demo-manual.pdf", "C2MON-demo-manual.pdf")
+urllib.urlretrieve ("https://edms.cern.ch/file/1399049/2/C2MON-demo-manual.pdf", "C2MON-demo-manual.pdf")
 print "Done"
 
 # Come back to root directory
