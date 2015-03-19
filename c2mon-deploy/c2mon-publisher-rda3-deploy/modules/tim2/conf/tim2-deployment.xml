@@ -69,6 +69,7 @@
         <property name="tim.log.path" value="${INSTALL_DIR}/log" />
         <property name="tim.process.name" value="${PROCESS_NAME}" /> <!-- Used in log4j configuration -->
         <property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/c2mon-client.properties" />
+        <property name="cmw.rda3.transport.server.multiThreadedPublisher" value="true" /> <!-- see also https://issues.cern.ch/browse/CMW-1812 -->
       </startscript>
     </application>
   </product>

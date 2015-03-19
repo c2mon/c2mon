@@ -71,7 +71,7 @@
             <property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
             <property name="c2mon.process.name" value="DMN2-RDA3-PUBLISHER-DEV" />
             <property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/client.properties" />
-
+            <property name="cmw.rda3.transport.server.multiThreadedPublisher" value="true" /> <!-- see also https://issues.cern.ch/browse/CMW-1812 --> 
          </startscript>
       </application>
 
