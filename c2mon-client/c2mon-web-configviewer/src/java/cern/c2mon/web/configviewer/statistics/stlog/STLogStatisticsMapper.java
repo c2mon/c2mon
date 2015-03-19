@@ -40,6 +40,14 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 public interface STLogStatisticsMapper {
 
   /**
+   * Retrieve a list of names of C2MON servers in the cluster. Could be one or
+   * more.
+   *
+   * @return a list of server names
+   */
+  List<String> getServerNames();
+
+  /**
    * Retrieve a list of {@link ServerLifecycleEvent} objects for a specified
    * time period.
    *

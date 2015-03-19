@@ -18,6 +18,10 @@
       <result property="eventTime" column="SUL_DATE"/>
       <result property="message" column="SUL_MESSAGE" jdbcType="VARCHAR"/>
   </resultMap>
+  
+  <select id="getServerNames" resultType="string">
+    SELECT DISTINCT SLL_SERVER_NAME FROM SERVER_LIFECYCLE_LOG
+  </select>
 
   <select id="getServerLifecycleEvents" resultMap="serverLifecycleEventsResultMap" parameterType="map">
     SELECT SLL_EVENT_TYPE, SLL_SERVER_NAME, SLL_TIME FROM SERVER_LIFECYCLE_LOG

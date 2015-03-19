@@ -133,6 +133,16 @@ public class StatisticsService {
   }
 
   /**
+   * Retrieve a list of names of C2MON servers in the cluster. Could be one or
+   * more.
+   *
+   * @return a list of server names
+   */
+  public List<String> getServerNames() {
+    return mapper.getServerNames();
+  }
+
+  /**
    * Retrieve the list of names of all currently configured processes.
    *
    * @return the list of process names
