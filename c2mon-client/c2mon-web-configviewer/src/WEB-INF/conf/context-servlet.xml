@@ -48,7 +48,7 @@
   </bean>
   
   <!-- Import the datasource configuration -->
-  <import resource="file:${c2mon.web.home}/conf/context-datasource.xml"/>
+  <import resource="context-datasource.xml"/>
  
   <bean id="statisticsTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
     <property name="dataSource" ref="stlogDataSource" />
