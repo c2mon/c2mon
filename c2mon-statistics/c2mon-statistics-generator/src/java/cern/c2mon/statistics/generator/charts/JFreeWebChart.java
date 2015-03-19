@@ -19,72 +19,75 @@ import cern.c2mon.statistics.generator.values.IChartValue;
  * This class represents a chart (JFreeChart) that will be written to the web:
  * this consists of a chart together with related display information for the
  * html page, such as a graph description, paragraph title and size of the image.
- * 
+ *
  * @author mbrightw
  *
  */
 public abstract class JFreeWebChart extends WebChart {
-   
-    
-    
+
     /**
      * The wrapped JFreeChart.
      */
     JFreeChart jFreeChart;
-    
+
     /**
      * Must be provided in implementation of abstract class.
      * Sets the jFreeChart field.
      */
+    @Override
     public abstract void configure(Element chartElement, TimChartStyles timChartStyles)
     throws GraphConfigException, SQLException, InvalidTableNameException;
-    
-    public abstract void configureMember(String memberName, WebChartCollection webChartCollection, Element chartElement, 
+
+    public abstract void configureMember(String memberName, WebChartCollection webChartCollection, Element chartElement,
             TimChartStyles timChartStyles, List<IChartValue> list)
              throws GraphConfigException, SQLException, InvalidTableNameException;
-    
+
     /**
      * Substitutes the member name in chart-specific attributes.
      * @param memberName
      */
+    @Override
     public abstract void chartSubMemberName(final String memberName);
-    
+
     /**
      * Returns an image of the chart.
-     * 
+     *
      * @return the image
-     * @throws  
+     * @throws
      */
+    @Override
     public byte[] returnImage() {
         BufferedImage bufferedImage = jFreeChart.createBufferedImage(imageXPixels, imageYPixels);
         byte[] image = null;
         try {
             image = EncoderUtil.encode(bufferedImage, ImageFormat.PNG);
-            
+
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return image;
     }
-    
+
+    @Override
     public final String getImageFormat() {
         return "png";
     }
-    
-    
-    
+
+
+
     /**
      * Checks if the chart is configured and can be deployed.
      * @return true if can be deployed
      */
+    @Override
     public final boolean canDeploy() {
-        return jFreeChart != null;           
+        return jFreeChart != null;
     }
-    
+
     /**
      * Getter method for the JFreeChart.
-     * 
+     *
      * @return the jFreeChart
      */
     public final JFreeChart getJFreeChart() {
@@ -95,6 +98,6 @@ public abstract class JFreeWebChart extends WebChart {
         jFreeChart = freeChart;
     }
 
-    
+
 
 }

@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import cern.c2mon.statistics.generator.StatisticsMapper;
 import cern.c2mon.statistics.generator.TimChartStyles;
 import cern.c2mon.statistics.generator.exceptions.GraphConfigException;
 import cern.c2mon.statistics.generator.exceptions.InvalidTableNameException;
@@ -74,6 +75,11 @@ public abstract class WebChart {
     List<String> categories;
 
     /**
+     * Reference to the {@link StatisticsMapper} bean.
+     */
+    StatisticsMapper mapper;
+
+    /**
      * Does the specific configuration for the chart at hand.
      *
      * @param chartElement the chart XML fragment
@@ -118,12 +124,13 @@ public abstract class WebChart {
      *
      * @param chartElement the XML chart element
      * @param timChartStyles a reference to the collection of standard styles for TIM charts
+     * @param mapper reference to the mybatis mapper bean
      * @return the WebChart (may be null if not recognised)
      * @throws SQLException if problem with retrieving data from database
      * @throws GraphConfigException if the graph configuration file cannot be parsed or has incorrect entrie
      * @throws InvalidTableNameException if the table (view) is not of the allowed format (alphanumeric + _)
      */
-    public static WebChart fromXML(final Element chartElement, final TimChartStyles timChartStyles)
+    public static WebChart fromXML(final Element chartElement, final TimChartStyles timChartStyles, final StatisticsMapper mapper)
     throws SQLException, GraphConfigException, InvalidTableNameException {
 
         //JFreeChart chart = null;
@@ -181,6 +188,8 @@ public abstract class WebChart {
         }
         webChart.categories = categoryList;
 
+        webChart.setMapper(mapper);
+
         // do implementation-specific configuration
         webChart.configure(chartElement, timChartStyles);
 
@@ -216,6 +225,15 @@ public abstract class WebChart {
 //        imageYPixels = yPixels;
 //        categories = categoryList;
 //    }
+
+    /**
+     * Set the reference to the {@link StatisticsMapper}
+     *
+     * @param mapper the mapper to set
+     */
+    private void setMapper(StatisticsMapper mapper) {
+      this.mapper = mapper;
+    }
 
     /**
      * Substitutes the member name in JFree-level relevant fields.

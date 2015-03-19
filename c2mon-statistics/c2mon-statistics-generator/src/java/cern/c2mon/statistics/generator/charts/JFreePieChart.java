@@ -10,7 +10,6 @@ import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.general.PieDataset;
 import org.w3c.dom.Element;
 
-import cern.c2mon.statistics.generator.SqlMapper;
 import cern.c2mon.statistics.generator.TimChartStyles;
 import cern.c2mon.statistics.generator.exceptions.GraphConfigException;
 import cern.c2mon.statistics.generator.exceptions.InvalidTableNameException;
@@ -134,10 +133,10 @@ public class JFreePieChart extends JFreeWebChart {
      * @return the dataset containing the data
      * @throws SQLException error in retrieving the data from the database
      */
-    private static PieDataset getPieChartData(final String tableName) throws SQLException {
+    private PieDataset getPieChartData(final String tableName) throws SQLException {
         //to do: escape characters in table name here to avoid SQL injection!
         //retrieve the rows of the view as a list
-        List chartValues = SqlMapper.getPieChartData(tableName);
+        List chartValues = mapper.getPieChartData(tableName);
         return toDataset(chartValues);
     }
 
