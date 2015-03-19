@@ -29,7 +29,7 @@ public final class DIPHardwareAddressImpl extends HardwareAddressImpl implements
    * If the DIP publication is a structure, this field specifies the field name
    * of the desired value within the structure.
    */
-  @Element(name = "field-name")
+  @Element(name = "field-name", required = false)
   protected String fieldName;
 
   /**
