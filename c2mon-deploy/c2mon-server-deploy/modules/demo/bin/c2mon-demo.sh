@@ -14,10 +14,12 @@ SCRIPT=`readlink -f $(which $0)`
 SCRIPTPATH=`dirname $SCRIPT`
 C2MON_HOME=$SCRIPTPATH/..
 
-# make sure JAVA_HOME is set correctly
+# check if JAVA_HOME is set
 if [ -z $JAVA_HOME ]; then
-   # use default if not
-   export JAVA_HOME=/usr/java/jdk
+   # try to find java if not
+   export JAVA="$(readlink -f $(which java))"
+else
+   export JAVA=$JAVA_HOME/jre/bin/java
 fi
 
 #.c2mon.properties location
@@ -44,7 +46,7 @@ CLASSPATH=`ls $C2MON_HOME/lib/*.jar | tr -s '\n' ':'`
 
 
 HSQLDB_NAME=stl
-HSQLDB_START_CMD="nohup $JAVA_HOME/jre/bin/java -cp "${CLASSPATH}" org.hsqldb.Server -database.0 file:$HSQLDB_NAME -dbname.0 $HSQLDB_NAME"
+HSQLDB_START_CMD="nohup $JAVA -cp "${CLASSPATH}" org.hsqldb.Server -database.0 file:$HSQLDB_NAME -dbname.0 $HSQLDB_NAME"
 
 # trap ctrl-c
 trap ctrl_c INT
@@ -67,7 +69,7 @@ CLUSTER_JAVA_ARGS="-Dcom.tc.l1.cachemanager.percentageToEvict=10 -Dcom.tc.l1.cac
 #C2MON_RECOVERY_ARG="-Dc2mon.recovery=true"
 
 C2MON_JAVA_ARGS="$COMMON_JAVA_ARGS $CLUSTER_JAVA_ARGS $C2MON_RECOVERY_ARG"
-C2MON_START_CMD="$JAVA_HOME/jre/bin/java $C2MON_JAVA_ARGS -cp "${CLASSPATH}" cern.c2mon.server.lifecycle.ServerStartup $C2MON_ARGS"
+C2MON_START_CMD="$JAVA $C2MON_JAVA_ARGS -cp "${CLASSPATH}" cern.c2mon.server.lifecycle.ServerStartup $C2MON_ARGS"
 
 echo "Starting C2MON..."
 $C2MON_START_CMD
