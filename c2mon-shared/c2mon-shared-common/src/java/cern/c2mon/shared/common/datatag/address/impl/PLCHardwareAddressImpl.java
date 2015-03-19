@@ -79,7 +79,7 @@ public class PLCHardwareAddressImpl extends HardwareAddressImpl implements PLCHa
   /**
    * Physical address of the tag, depending on PLC model used.
    */
-  @Element(name = "native-address")
+  @Element(name = "native-address", required = false)
   protected String nativeAddress = null;
 
   /**
