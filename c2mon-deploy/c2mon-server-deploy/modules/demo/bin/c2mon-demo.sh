@@ -46,6 +46,15 @@ CLASSPATH=`ls $C2MON_HOME/lib/*.jar | tr -s '\n' ':'`
 HSQLDB_NAME=stl
 HSQLDB_START_CMD="nohup $JAVA_HOME/jre/bin/java -cp "${CLASSPATH}" org.hsqldb.Server -database.0 file:$HSQLDB_NAME -dbname.0 $HSQLDB_NAME"
 
+# trap ctrl-c
+trap ctrl_c INT
+
+function ctrl_c() {
+  echo "Trapped CTRL-C"
+  # stop hsqldb
+  kill $(ps aux | grep 'hsqldb' | awk '{print $2}')
+}
+
 # start hsqldb
 echo "Starting local HSQLDB instance..."
 $HSQLDB_START_CMD &
@@ -60,4 +69,5 @@ CLUSTER_JAVA_ARGS="-Dcom.tc.l1.cachemanager.percentageToEvict=10 -Dcom.tc.l1.cac
 C2MON_JAVA_ARGS="$COMMON_JAVA_ARGS $CLUSTER_JAVA_ARGS $C2MON_RECOVERY_ARG"
 C2MON_START_CMD="$JAVA_HOME/jre/bin/java $C2MON_JAVA_ARGS -cp "${CLASSPATH}" cern.c2mon.server.lifecycle.ServerStartup $C2MON_ARGS"
 
+echo "Starting C2MON..."
 $C2MON_START_CMD
