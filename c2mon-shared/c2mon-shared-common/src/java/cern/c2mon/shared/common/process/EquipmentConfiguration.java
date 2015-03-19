@@ -92,7 +92,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
    * question, e.g. the IP address and parameters for a PLC, a URL for a SCADA
    * ...
    */
-  @Element(name = "address")
+  @Element(name = "address", required = false)
   private String equipmentAddress;
 
   /**
