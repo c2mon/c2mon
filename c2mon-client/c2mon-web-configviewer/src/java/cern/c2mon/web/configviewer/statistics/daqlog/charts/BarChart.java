@@ -1,4 +1,4 @@
-package cern.c2mon.web.configviewer.statistics.chart;
+package cern.c2mon.web.configviewer.statistics.daqlog.charts;
 
 import java.util.List;
 

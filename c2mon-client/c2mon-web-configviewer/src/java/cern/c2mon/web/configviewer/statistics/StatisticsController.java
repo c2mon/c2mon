@@ -41,8 +41,8 @@ import cern.c2mon.shared.client.lifecycle.ServerLifecycleEvent;
 import cern.c2mon.shared.client.statistics.TagStatisticsResponse;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
-import cern.c2mon.statistics.generator.charts.WebChart;
-import cern.c2mon.web.configviewer.statistics.chart.BarChart;
+import cern.c2mon.web.configviewer.statistics.daqlog.charts.BarChart;
+import cern.c2mon.web.configviewer.statistics.daqlog.charts.WebChart;
 
 /**
  * This class serves as an entry point to retrieve various statistics from the

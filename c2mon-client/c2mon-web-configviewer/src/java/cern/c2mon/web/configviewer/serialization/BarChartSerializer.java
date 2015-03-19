@@ -8,7 +8,7 @@ import org.codehaus.jackson.map.SerializerProvider;
 import org.codehaus.jackson.map.ser.std.SerializerBase;
 import org.jfree.data.category.CategoryDataset;
 
-import cern.c2mon.statistics.generator.charts.JFreeBarChart;
+import cern.c2mon.web.configviewer.statistics.daqlog.charts.JFreeBarChart;
 
 public class BarChartSerializer extends SerializerBase<JFreeBarChart> {
 

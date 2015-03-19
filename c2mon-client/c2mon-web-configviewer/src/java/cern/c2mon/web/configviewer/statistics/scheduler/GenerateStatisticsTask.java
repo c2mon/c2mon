@@ -17,7 +17,6 @@
  ******************************************************************************/
 package cern.c2mon.web.configviewer.statistics.scheduler;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
@@ -34,8 +33,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 
-import cern.c2mon.statistics.generator.GraphDeployer;
 import cern.c2mon.web.configviewer.statistics.StatisticsService;
+import cern.c2mon.web.configviewer.statistics.daqlog.GraphDeployer;
 
 /**
  * This class runs as a Spring scheduled task to generate statistics from the
@@ -57,6 +56,9 @@ class GenerateStatisticsTask {
    */
   @Autowired
   private StatisticsService service;
+
+  @Autowired
+  private GraphDeployer deployer;
 
   /**
    * System property defining the location of the XML configuration file from
@@ -83,7 +85,7 @@ class GenerateStatisticsTask {
       logger.info("Not generating statistics as \"c2mon.web.statistics.chart.config.location\" property was not supplied.");
     }
 
-    GraphDeployer deployer = new GraphDeployer();
+//    GraphDeployer deployer = new GraphDeployer();
     Document graphXMLDocument;
     DOMParser parser = new DOMParser();
 

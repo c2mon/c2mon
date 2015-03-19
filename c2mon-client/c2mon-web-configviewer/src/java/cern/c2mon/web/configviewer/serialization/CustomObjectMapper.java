@@ -5,9 +5,9 @@ import org.codehaus.jackson.map.SerializationConfig.Feature;
 import org.codehaus.jackson.map.ser.CustomSerializerFactory;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.statistics.generator.charts.JFreeBarChart;
-import cern.c2mon.statistics.generator.charts.JFreePieChart;
-import cern.c2mon.statistics.generator.charts.JFreeStackedBarChart;
+import cern.c2mon.web.configviewer.statistics.daqlog.charts.JFreeBarChart;
+import cern.c2mon.web.configviewer.statistics.daqlog.charts.JFreePieChart;
+import cern.c2mon.web.configviewer.statistics.daqlog.charts.JFreeStackedBarChart;
 
 /**
  * This class extends the default Jackson {@link ObjectMapper} in order to allow

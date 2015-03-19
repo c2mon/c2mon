@@ -13,11 +13,18 @@
 
   <!-- must contain a bean with id stlDataSource of type java.sql.DataSource -->
   
-  <bean id="stlDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+  <bean id="stlogDataSource" class="org.apache.commons.dbcp.BasicDataSource">
     <property name="driverClassName" value="${c2mon.jdbc.driver}" />
     <property name="url" value="${c2mon.jdbc.statistics.url}" />
     <property name="username" value="${c2mon.jdbc.statistics.stlog.user}" />
     <property name="password" value="${c2mon.jdbc.statistics.stlog.password}" />
+  </bean>
+  
+  <bean id="daqLogDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+    <property name="driverClassName" value="${c2mon.jdbc.driver}" />
+    <property name="url" value="${c2mon.jdbc.statistics.url}" />
+    <property name="username" value="${c2mon.jdbc.statistics.daqlog.user}" />
+    <property name="password" value="${c2mon.jdbc.statistics.daqlog.password}" />
   </bean>
   
 </beans>

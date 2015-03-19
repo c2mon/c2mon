@@ -15,7 +15,7 @@
  *
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
-package cern.c2mon.web.configviewer.statistics;
+package cern.c2mon.web.configviewer.statistics.stlog;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -26,11 +26,18 @@ import cern.c2mon.shared.client.lifecycle.ServerLifecycleEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
 /**
- * This class is a MyBatis mapper bean used to interface with the STL database.
+ * This class is a MyBatis mapper bean used to interface with the STL database
+ * to get server lifecycle and process supervision events.
+ *
+ * <p>
+ * Note: Other statistics, which rely on the c2mon-statistics-consumer being
+ * configured, are accessed via
+ * {@link cern.c2mon.statistics.generator.StatisticsMapper}.
+ * </p>
  *
  * @author Justin Lewis Salmon
  */
-public interface StatisticsMapper {
+public interface STLogStatisticsMapper {
 
   /**
    * Retrieve a list of {@link ServerLifecycleEvent} objects for a specified

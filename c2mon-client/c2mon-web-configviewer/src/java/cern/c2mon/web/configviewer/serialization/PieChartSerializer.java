@@ -9,7 +9,7 @@ import org.codehaus.jackson.map.ser.std.SerializerBase;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.data.general.PieDataset;
 
-import cern.c2mon.statistics.generator.charts.JFreePieChart;
+import cern.c2mon.web.configviewer.statistics.daqlog.charts.JFreePieChart;
 
 public class PieChartSerializer extends SerializerBase<JFreePieChart> {
 

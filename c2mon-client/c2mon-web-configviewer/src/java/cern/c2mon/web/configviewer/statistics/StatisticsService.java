@@ -33,8 +33,9 @@ import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.shared.client.lifecycle.ServerLifecycleEvent;
 import cern.c2mon.shared.client.statistics.TagStatisticsResponse;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.statistics.generator.charts.WebChart;
 import cern.c2mon.web.configviewer.service.ProcessService;
+import cern.c2mon.web.configviewer.statistics.daqlog.charts.WebChart;
+import cern.c2mon.web.configviewer.statistics.stlog.STLogStatisticsMapper;
 
 /**
  * This class acts as a service to provide statistics about the C2MON server and
@@ -46,10 +47,10 @@ import cern.c2mon.web.configviewer.service.ProcessService;
 public class StatisticsService {
 
   /**
-   * Reference to the {@link StatisticsMapper} db access bean.
+   * Reference to the {@link STLogStatisticsMapper} db access bean.
    */
   @Autowired
-  private StatisticsMapper mapper;
+  private STLogStatisticsMapper mapper;
 
   /**
    * Reference to the {@link ProcessService} bean.

@@ -51,19 +51,31 @@
   <import resource="file:${c2mon.web.home}/conf/context-datasource.xml"/>
  
   <bean id="statisticsTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-    <property name="dataSource" ref="stlDataSource" />
+    <property name="dataSource" ref="stlogDataSource" />
   </bean>
 
   <tx:annotation-driven transaction-manager="statisticsTransactionManager" />
 
-  <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-    <property name="configLocation" value="classpath:cern/c2mon/web/configviewer/statistics/sqlmaps/sql-map-config.xml" />
-    <property name="dataSource" ref="stlDataSource" />
+  <bean id="stlogSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <property name="configLocation" value="classpath:cern/c2mon/web/configviewer/statistics/sqlmap/sql-map-config.xml" />
+    <property name="dataSource" ref="stlogDataSource" />
   </bean>
 
-  <bean id="statisticsMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
-    <property name="sqlSessionFactory" ref="sqlSessionFactory" />
-    <property name="mapperInterface" value="cern.c2mon.web.configviewer.statistics.StatisticsMapper" />
+  <bean id="stlogStatisticsMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+    <property name="sqlSessionFactory" ref="stlogSqlSessionFactory" />
+    <property name="mapperInterface" value="cern.c2mon.web.configviewer.statistics.stlog.STLogStatisticsMapper" />
   </bean>
+  
+  <bean id="daqLogSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <property name="configLocation" value="classpath:cern/c2mon/web/configviewer/statistics/sqlmap/sql-map-config.xml" />
+    <property name="dataSource" ref="daqLogDataSource" />
+  </bean>
+  
+  <bean id="daqLogStatisticsMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+    <property name="sqlSessionFactory" ref="daqLogSqlSessionFactory" />
+    <property name="mapperInterface" value="cern.c2mon.web.configviewer.statistics.daqlog.DAQLogStatisticsMapper" />
+  </bean>
+  
+  <bean id="graphDeployer" class="cern.c2mon.web.configviewer.statistics.daqlog.GraphDeployer"></bean>
   
 </beans>
