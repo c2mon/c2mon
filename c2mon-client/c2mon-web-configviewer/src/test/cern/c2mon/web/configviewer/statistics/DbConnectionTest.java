@@ -2,7 +2,6 @@ package cern.c2mon.web.configviewer.statistics;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -18,13 +17,13 @@ import cern.c2mon.web.configviewer.statistics.daqlog.DAQLogStatisticsMapper;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/web/configviewer/statistics/c2mon-statistics-generator.xml"})
+@ContextConfiguration({"classpath:cern/c2mon/web/configviewer/statistics/config/c2mon-statistics-generator-test.xml"})
 public class DbConnectionTest {
 
   @Autowired
   DAQLogStatisticsMapper mapper;
 
-  @Test
+  //@Test
   public void initSqlMap() {
     assertNotNull(mapper);
     mapper.getBarChartData("VSTAT_DAQ_AS");
