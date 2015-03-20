@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>c2mon-client-jms</artifactId>
-  <version>1.5.0</version>
+  <version>1.5.1-SNAPSHOT</version>
   <name>c2mon-client-jms</name>
   <packaging>jar</packaging>
   <description>The C2MON Client module handling JMS connections.</description>
