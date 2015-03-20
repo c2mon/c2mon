@@ -139,7 +139,6 @@
               </a>
             </li>
             <li>
-            <li>
               <a href="${trendviewer}">
                 <i class="fa fa-line-chart fa-fw"></i>
                 Trend Viewer
