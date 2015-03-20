@@ -672,8 +672,6 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
   /**
    * Inner method which handles the tag statistics request.
    *
-   * TODO: rewrite this to use Ehcache search instead of stupid iteration.
-   *
    * @param tagStatisticsRequest the request sent by the client
    * @return a single-item collection containing the tag statistics response
    */
@@ -683,30 +681,17 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     int total = 0;
     int invalid = 0;
 
-    // TODO: rewrite this in a more intelligent way
-
     for (Long processId : processCache.getKeys()) {
-      try {
-        processCache.acquireReadLockOnKey(processId);
+      ProcessTagStatistics processStatistics = new ProcessTagStatistics(processCache.getNumTags(processId), processCache.getNumInvalidTags(processId));
 
-        Collection<Long> tagsForProcess = processFacade.getDataTagIds(processId);
-        total += tagsForProcess.size();
-        int processInvalid = 0;
+      total += processStatistics.getTotal();
+      invalid += processStatistics.getInvalid();
 
-        for (Long tagId : tagsForProcess) {
-          if (!tagLocationService.get(tagId).isValid()) {
-            invalid++;
-            processInvalid++;
-          }
-        }
-
-        processes.put(processCache.get(processId).getName(), new ProcessTagStatistics(tagsForProcess.size(), processInvalid));
-      } finally {
-        processCache.releaseReadLockOnKey(processId);
-      }
+      processes.put(processCache.get(processId).getName(), processStatistics);
     }
 
     tagStatistics.add(new TagStatisticsResponseImpl(total, invalid, processes));
+    LOG.debug("Finished processing tag statistics request request");
     return tagStatistics;
   }
 }

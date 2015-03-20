@@ -116,4 +116,21 @@
       SELECT COUNT(DISTINCT PROCID)
         FROM PROCESS
     </select>
+    
+    <select id="getNumTags" resultType="Integer" parameterType="Long">
+        select count(*)
+          from datatag
+    inner join equipment on equipment.eqid = datatag.tag_eqid
+    inner join process on process.procid = equipment.eq_procid
+         where process.procid = #{id}
+    </select>
+    
+    <select id="getNumInvalidTags" resultType="Integer" parameterType="Long">
+        select count(*)
+          from datatag
+    inner join equipment on equipment.eqid = datatag.tag_eqid
+    inner join process on process.procid = equipment.eq_procid
+         where process.procid = #{id}
+           and datatag.tagqualitydesc != '{}'
+    </select>
   </mapper>

@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import cern.c2mon.server.cache.dbaccess.test.TestDataHelper;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject.LocalConfig;
-import cern.c2mon.server.test.CacheObjectComparison;
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 
@@ -36,13 +35,13 @@ public class ProcessMapperTest {
    */
   @Autowired
   private ProcessMapper processMapper;
-  
+
   @Autowired
   private TestDataHelper testDataHelper;
-  
+
   private ProcessCacheObject originalProcess;
-  
-  
+
+
   @SuppressWarnings("deprecation")
   @Before
   public void insertTestProcess() {
@@ -50,26 +49,26 @@ public class ProcessMapperTest {
     testDataHelper.insertTestDataIntoDB();
     originalProcess = testDataHelper.getProcess();
   }
-  
+
   @After
   public void deleteTestProcess() {
     //processMapper.deleteProcess(Long.valueOf(100000));
     testDataHelper.removeTestData();
   }
-  
+
   /**
-   * Test does not insert associated equipment yet and test equipment retrieval 
+   * Test does not insert associated equipment yet and test equipment retrieval
    *  - add later TODO
    */
   @Test
   public void testInsertAndRetrieve() {
 //    ProcessCacheObject originalProcess = createTestProcess1();
 //    processMapper.insertProcess(originalProcess);
-    
+
     ProcessCacheObject retrievedProcess = (ProcessCacheObject) processMapper.getItem(originalProcess.getId());
-    
+
     assertNotNull(retrievedProcess);
-    
+
     assertEquals(originalProcess.getId(), retrievedProcess.getId());
     assertEquals(originalProcess.getName(), retrievedProcess.getName());
     assertEquals(originalProcess.getDescription(), retrievedProcess.getDescription());
@@ -84,12 +83,12 @@ public class ProcessMapperTest {
     assertEquals(originalProcess.getEquipmentIds(), retrievedProcess.getEquipmentIds());
     assertEquals(originalProcess.getRequiresReboot(), retrievedProcess.getRequiresReboot());
     assertEquals(originalProcess.getStatusTime(), retrievedProcess.getStatusTime());
-    assertEquals(originalProcess.getStatusDescription(), retrievedProcess.getStatusDescription());    
-    assertEquals(originalProcess.getProcessPIK(), retrievedProcess.getProcessPIK());   
-    assertEquals(originalProcess.getLocalConfig(), retrievedProcess.getLocalConfig());   
-    
+    assertEquals(originalProcess.getStatusDescription(), retrievedProcess.getStatusDescription());
+    assertEquals(originalProcess.getProcessPIK(), retrievedProcess.getProcessPIK());
+    assertEquals(originalProcess.getLocalConfig(), retrievedProcess.getLocalConfig());
+
   }
-  
+
   /**
    * Tests the result set is none empty.
    */
@@ -98,7 +97,7 @@ public class ProcessMapperTest {
     List<Cacheable> returnList = processMapper.getAll();
     assertTrue(returnList.size() > 0);
   }
-  
+
   /**
    * Tests the cache persistence method.
    */
@@ -113,27 +112,36 @@ public class ProcessMapperTest {
     originalProcess.setStatusTime(ts);
     originalProcess.setProcessPIK(67890L);
     originalProcess.setLocalConfig(LocalConfig.N);
-    
+
     processMapper.updateCacheable(originalProcess);
-    
+
     ProcessCacheObject retrievedProcess = (ProcessCacheObject) processMapper.getItem(originalProcess.getId());
     assertEquals(SupervisionStatus.RUNNING, retrievedProcess.getSupervisionStatus());
     assertEquals(ts, retrievedProcess.getStartupTime());
     assertEquals(originalProcess.getRequiresReboot(), retrievedProcess.getRequiresReboot());
     assertEquals(originalProcess.getStatusDescription(), retrievedProcess.getStatusDescription());
     assertEquals(originalProcess.getStatusTime(), retrievedProcess.getStatusTime());
-    assertEquals(originalProcess.getProcessPIK(), retrievedProcess.getProcessPIK());   
-    assertEquals(originalProcess.getLocalConfig(), retrievedProcess.getLocalConfig()); 
+    assertEquals(originalProcess.getProcessPIK(), retrievedProcess.getProcessPIK());
+    assertEquals(originalProcess.getLocalConfig(), retrievedProcess.getLocalConfig());
   }
-  
+
   @Test
   public void testIsInDB() {
     assertTrue(processMapper.isInDb(50L));
   }
-  
+
   @Test
   public void testNotInDB() {
     assertFalse(processMapper.isInDb(150L));
   }
-  
+
+  @Test
+  public void testGetNumTags() {
+    assertTrue(processMapper.getNumTags(90L).equals(2));
+  }
+
+  @Test
+  public void testGetNumInvalidTags() {
+    assertTrue(processMapper.getNumInvalidTags(90L).equals(0));
+  }
 }

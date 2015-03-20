@@ -2,6 +2,7 @@ package cern.c2mon.server.cache.loading;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
@@ -22,15 +23,15 @@ public class ProcessLoaderDAOTest {
 
   @Autowired
   private ProcessDAO processDAO;
-  
-  @Value("${c2mon.jms.daq.queue.trunk}") 
+
+  @Value("${c2mon.jms.daq.queue.trunk}")
   private String jmsDaqQueueTrunk;
-  
+
   @Test
   public void testGetItem() {
     assertNotNull(processDAO.getItem(50L));
   }
-  
+
   /**
    * Check the default property is picked up (should override that set in the
    * cache object itself).
@@ -41,22 +42,33 @@ public class ProcessLoaderDAOTest {
     assertNotNull(process);
     assertTopicSetCorrectly(process);
   }
-  
+
   @Test
   public void testGetAll() {
     assertNotNull(processDAO.getAllAsMap());
     assertEquals(2, processDAO.getAllAsMap().size());
   }
-  
+
   @Test
   public void testGetAllDoPostDbLoading() {
     for (Map.Entry<Long, Process> entry : processDAO.getAllAsMap().entrySet()) {
       assertTopicSetCorrectly(entry.getValue());
     }
   }
-  
+
+  @Test
+  public void testGetNumTags() {
+    assertTrue(processDAO.getNumTags(50L).equals(6));
+  }
+
+  @Test
+  public void testGetNumInvalidTags() {
+    // All the test tags are UNINITIALISED and hence invalid
+    assertTrue(processDAO.getNumInvalidTags(50L).equals(6));
+  }
+
   private void assertTopicSetCorrectly(Process process) {
     assertEquals(this.jmsDaqQueueTrunk + ".command." + process.getCurrentHost() + "." + process.getName() + "." + process.getProcessPIK(), process.getJmsDaqCommandQueue());
   }
-  
+
 }
