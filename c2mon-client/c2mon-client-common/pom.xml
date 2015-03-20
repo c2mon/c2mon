@@ -5,9 +5,9 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-client</groupId>
 		<artifactId>c2mon-client-pom</artifactId>
-		<version>1.5.0</version>
+		<version>RELEASE</version>
 	</parent>
-	<groupId>cern.c2mon.c2mon-client</groupId>
+
 	<artifactId>c2mon-client-common</artifactId>
 	<version>1.5.2-SNAPSHOT</version>
 	<name>c2mon-client-common</name>
@@ -20,12 +20,12 @@
 		<dependency>
 			<groupId>cern.c2mon.c2mon-shared</groupId>
 			<artifactId>c2mon-shared-client</artifactId>
-      <version>LATEST</version>
+      <version>[1.5.0, 2.0.0)</version>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-shared</groupId>
 			<artifactId>c2mon-shared-common</artifactId>
-      <version>LATEST</version>
+      <version>[1.5.0, 2.0.0)</version>
 		</dependency>
     
         <!-- test dependencies -->
