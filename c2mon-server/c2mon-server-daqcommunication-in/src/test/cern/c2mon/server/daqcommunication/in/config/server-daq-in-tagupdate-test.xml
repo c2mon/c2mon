@@ -3,7 +3,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-  <import resource="classpath:cern/c2mon/server/cache/config/server-cache-single-server.xml"/>
+  <import resource="classpath:cern/c2mon/server/cache/config/server-cache-nonpersistent-server.xml"/>
   <import resource="classpath:cern/c2mon/server/cachepersistence/config/server-cachepersistence.xml"/>
   <import resource="classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-common.xml"/>
   <import resource="classpath:cern/c2mon/server/cache/loading/config/server-cacheloading.xml"/>

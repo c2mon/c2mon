@@ -76,8 +76,6 @@
           <argLine>
             -Dc2mon.properties.location=${c2mon.properties.location}
             -Dc2mon.log.dir=${basedir}/build/log
-            <!-- Terracotta license key path -->
-            -Dcom.tc.productkey.path=${com.tc.productkey.path}
 
             <!-- for other modules -->
             -Ddatasource.persistence.connections.initial=2

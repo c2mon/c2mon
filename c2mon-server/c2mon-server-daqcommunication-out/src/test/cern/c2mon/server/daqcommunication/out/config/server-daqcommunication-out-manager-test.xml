@@ -12,7 +12,7 @@
   <bean id="jmsProcessOut" class="cern.c2mon.server.daqcommunication.out.impl.ActiveProcessOut"/>
   
   <!-- start needed core modules -->
-  <import resource="classpath:cern/c2mon/server/cache/config/server-cache-single-server.xml"/>
+  <import resource="classpath:cern/c2mon/server/cache/config/server-cache-nonpersistent-server.xml"/>
   <import resource="classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-common.xml"/>
   <import resource="classpath:cern/c2mon/server/cache/loading/config/server-cacheloading.xml"/>
   <import resource="classpath:cern/c2mon/server/test/cache/config/server-test-datasource-hsqldb.xml"/>

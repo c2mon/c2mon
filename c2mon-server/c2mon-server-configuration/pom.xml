@@ -117,8 +117,6 @@
           <argLine>
             -Dc2mon.properties.location=${c2mon.properties.location}
             -Dc2mon.log.dir=${basedir}/build/log
-            <!-- Terracotta license key path -->
-            -Dcom.tc.productkey.path=${com.tc.productkey.path}
             -Ddatasource.config.connections.initial=1
             -Ddatasource.config.connections.max=2
             -Djms.config.destination=tim.config.test
