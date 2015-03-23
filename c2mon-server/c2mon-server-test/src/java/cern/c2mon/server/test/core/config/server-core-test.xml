@@ -13,7 +13,7 @@
   Uses a in-memory HSQLDB for the cache datasource.
   -->
   
-  <import resource="classpath:cern/c2mon/server/cache/config/server-cache-single-server.xml"/>
+  <import resource="classpath:cern/c2mon/server/cache/config/server-cache-nonpersistent-server.xml"/>
   <import resource="classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-common.xml"/>
   <import resource="classpath:cern/c2mon/server/test/cache/config/server-test-datasource-hsqldb.xml"/>   
   <import resource="classpath:cern/c2mon/server/cache/loading/config/server-cacheloading.xml"/>
