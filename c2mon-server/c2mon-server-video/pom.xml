@@ -6,7 +6,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-server</groupId>
     <artifactId>c2mon-server-pom</artifactId>
-    <version>LATEST</version>
+    <version>RELEASE</version>
   </parent>
 
   <artifactId>c2mon-server-video</artifactId>
@@ -44,6 +44,11 @@
     </dependency>
 
     <!-- test only -->
+    <dependency>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache-core</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-test</artifactId>
