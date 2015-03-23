@@ -38,7 +38,7 @@ import cern.c2mon.server.cache.ProcessXMLProvider;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-@ContextConfiguration({"classpath:cern/c2mon/server/cache/config/server-cache-single-server.xml",
+@ContextConfiguration({"classpath:cern/c2mon/server/cache/config/server-cache-nonpersistent-server.xml",
                        "classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-common.xml",
                        "classpath:cern/c2mon/server/test/cache/config/server-test-datasource-hsqldb.xml",
                        "classpath:cern/c2mon/server/cache/loading/config/server-cacheloading.xml",
