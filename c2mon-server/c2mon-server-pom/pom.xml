@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>cern</groupId>
@@ -26,38 +25,6 @@
   <properties>
     <org.springframework.version>3.2.3.RELEASE</org.springframework.version>
   </properties>
-
-  <profiles>
-    <profile>
-      <id>win</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <os>
-          <family>Windows</family>
-        </os>
-      </activation>
-      <properties>
-        <c2mon.properties.location>T:\.c2mon.test.properties</c2mon.properties.location>
-        <!-- Terracotta licence key -->
-        <com.tc.productkey.path>T:\rep\c2mon\server\terracotta-license.key</com.tc.productkey.path>
-      </properties>
-    </profile>
-    <profile>
-      <id>lin</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-        <os>
-          <family>unix</family>
-        </os>
-      </activation>
-      <properties>
-        <c2mon.properties.location>/user/timtest/.c2mon.test.properties</c2mon.properties.location>
-        <!-- Terracotta licence key -->
-        <com.tc.productkey.path>/user/timtest/rep/c2mon/server/terracotta-license.key</com.tc.productkey.path>
-      </properties>
-    </profile>
-
-  </profiles>
 
   <dependencyManagement>
     <dependencies>
@@ -121,7 +88,7 @@
         <artifactId>c2mon-server-all</artifactId>
         <version>[1.5.0, 2.0.0)</version>
       </dependency>
-      
+
       <!-- c2mon test dependency -->
       <dependency>
         <groupId>cern.c2mon.c2mon-server</groupId>
@@ -197,14 +164,16 @@
         <version>2.3.2</version>
       </dependency>
 
-      <!-- 
-        The following dependencies are required for using Ehcache & BigMemory. 
-        ehcache-ee-2.7.5 is shipped together with bigmemory-4.0.5 
-      -->
+      <!-- The following dependencies are required for using Ehcache & BigMemory. ehcache-ee-2.7.5 is shipped together with bigmemory-4.0.5 -->
       <dependency>
         <groupId>net.sf.ehcache</groupId>
         <artifactId>ehcache-ee</artifactId>
         <version>2.7.5</version>
+      </dependency>
+      <dependency>
+        <groupId>net.sf.ehcache</groupId>
+        <artifactId>ehcache-core</artifactId>
+        <version>2.6.6</version>
       </dependency>
       <dependency>
         <groupId>org.terracotta.bigmemory</groupId>
@@ -224,8 +193,7 @@
     <!-- DEFINE ALL PLUGINS THAT NEED TO BE USED BY SERVER MODULS HERE -->
     <pluginManagement>
       <plugins>
-        <!-- NOTE: Unless specified directly we don't need a groupId specification 
-          because the group is org.apache.maven.plugins ...which is assumed by default. -->
+        <!-- NOTE: Unless specified directly we don't need a groupId specification because the group is org.apache.maven.plugins ...which is assumed by default. -->
         <plugin>
           <artifactId>maven-assembly-plugin</artifactId>
           <version>2.2.1</version>
@@ -238,8 +206,7 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.8.1</version>
         </plugin>
-        <!--This plugin's configuration is used to store Eclipse m2e settings 
-          only. It has no influence on the Maven build itself. -->
+        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>
@@ -280,10 +247,8 @@
             </goals>
             <configuration>
               <target>
-                <echo
-                  message="c2mon.properties configured for tests: ${c2mon.properties.location}" />
-                <echo
-                  message="Terracotta license key file (com.tc.productkey.path) configured for tests: ${com.tc.productkey.path}" />
+                <echo message="c2mon.properties configured for tests: ${c2mon.properties.location}" />
+                <echo message="Terracotta license key file (com.tc.productkey.path) configured for tests: ${com.tc.productkey.path}" />
               </target>
             </configuration>
           </execution>
@@ -292,8 +257,8 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-          <configuration>
-            <!-- Disable doclint (which comes with Java 8) as it is very strict with javadoc and causes build failures. -->
+        <configuration>
+          <!-- Disable doclint (which comes with Java 8) as it is very strict with javadoc and causes build failures. -->
           <additionalparam>-Xdoclint:none</additionalparam>
         </configuration>
       </plugin>
