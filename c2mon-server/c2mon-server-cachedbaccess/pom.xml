@@ -6,7 +6,7 @@
   <parent>
 		<groupId>cern.c2mon.c2mon-server</groupId>
 		<artifactId>c2mon-server-pom</artifactId>
-		<version>LATEST</version>
+		<version>RELEASE</version>
 	</parent> 
   
 	<artifactId>c2mon-server-cachedbaccess</artifactId>
@@ -82,22 +82,22 @@
 		<dependency>
 			<groupId>cern.c2mon.c2mon-shared</groupId>
 			<artifactId>c2mon-shared-util</artifactId>
-      <version>LATEST</version>
+      <version>[1.5.6, 2.0.0)</version>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-shared</groupId>
 			<artifactId>c2mon-shared-client</artifactId>
-      <version>LATEST</version>
+      <version>[1.5.4, 2.0.0)</version>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-shared</groupId>
 			<artifactId>c2mon-shared-common</artifactId>
-      <version>LATEST</version>
+      <version>[1.5.7, 2.0.0)</version>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-server</groupId>
 			<artifactId>c2mon-server-common</artifactId>
-      <version>LATEST</version>
+      <version>[1.5.3, 2.0.0)</version>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-server</groupId>
