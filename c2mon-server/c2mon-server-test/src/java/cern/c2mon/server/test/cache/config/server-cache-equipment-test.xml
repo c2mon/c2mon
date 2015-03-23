@@ -10,10 +10,4 @@
   <!--  loader already in XML for equipment -->
   <bean id="equipmentCache" class="cern.c2mon.server.cache.equipment.EquipmentCacheImpl" autowire="constructor"/>
   <bean id="equipmentDAO" class="cern.c2mon.server.cache.loading.impl.EquipmentDAOImpl"/>
-  
-  <!-- test specific settings (cache not in TC mode) -->
-<!--  <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">-->
-<!--    <property name="configLocation" value="classpath:resources/ehcache-notTCmode.xml"/>-->
-<!--  </bean>-->
-
 </beans>
