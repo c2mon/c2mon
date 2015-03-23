@@ -1,79 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<artifactId>c2mon-server-deploy</artifactId>
-		<groupId>cern.c2mon.c2mon-deploy</groupId>
-		<version>1.5.6-SNAPSHOT</version>
-		<relativePath>../../pom.xml</relativePath>
-	</parent>
+  <parent>
+    <artifactId>c2mon-server-deploy</artifactId>
+    <groupId>cern.c2mon.c2mon-deploy</groupId>
+    <version>1.5.6-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
 
-	<groupId>cern.c2mon.c2mon-deploy</groupId>
-	<artifactId>c2mon-srv-dmn2</artifactId>
-	<name>The DMN2 SRV module</name>
-	<version>1.5.6-SNAPSHOT</version>
+  <groupId>cern.c2mon.c2mon-deploy</groupId>
+  <artifactId>c2mon-srv-dmn2</artifactId>
+  <name>The DMN2 SRV module</name>
+  <version>1.5.6-SNAPSHOT</version>
 
-	<description>C2MON server assembling all required modules and configuration files for DMN2</description>
-	<url></url>
+  <description>C2MON server assembling all required modules and configuration files for DMN2</description>
+  <url></url>
 
-	<dependencies>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-cachepersistence</artifactId>
-      <version>LATEST</version>
-		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>cern.c2mon.c2mon-server</groupId> -->
-		<!-- <artifactId>c2mon-server-benchmark</artifactId> -->
-    <!-- <version>LATEST</version> -->
-		<!-- </dependency> -->
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-command</artifactId>
-      <version>LATEST</version>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-client</artifactId>
-			<version>LATEST</version>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-shorttermlog</artifactId>
-      <version>LATEST</version>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-laser</artifactId>
-			<version>LATEST</version>
-		</dependency>
-	</dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-cachepersistence</artifactId>
+      <version>[1.5.0, 2.0.0)</version>
+    </dependency>
+    <!-- <dependency> -->
+    <!-- <groupId>cern.c2mon.c2mon-server</groupId> -->
+    <!-- <artifactId>c2mon-server-benchmark</artifactId> -->
+    <!-- <version>[1.5.0, 2.0.0)</version> -->
+    <!-- </dependency> -->
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-command</artifactId>
+      <version>[1.5.0, 2.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-client</artifactId>
+      <version>[1.5.0, 2.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-shorttermlog</artifactId>
+      <version>[1.5.0, 2.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-laser</artifactId>
+      <version>[1.5.0, 2.0.0)</version>
+    </dependency>
 
-	<developers />
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
+    <!-- 3rd party dependencies -->
+    <dependency>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache-ee</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 
-					<descriptors>
-						<descriptor>src/assembly/dmn2-srv-assembly.xml</descriptor>
-					</descriptors>
+  <developers />
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
 
-				</configuration>
-				<executions>
-					<execution>
-						<id>create-assembly-file</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+          <descriptors>
+            <descriptor>src/assembly/dmn2-srv-assembly.xml</descriptor>
+          </descriptors>
+
+        </configuration>
+        <executions>
+          <execution>
+            <id>create-assembly-file</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
