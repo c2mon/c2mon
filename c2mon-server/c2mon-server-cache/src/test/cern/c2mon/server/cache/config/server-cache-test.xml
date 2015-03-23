@@ -8,7 +8,7 @@
 
   <!-- test specific settings (cache not in TC mode) -->
   <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
-    <property name="configLocation" value="classpath:resources/ehcache-notTCmode.xml"/>
+    <property name="configLocation" value="classpath:resources/ehcache-notTCmode-nonpersistent.xml"/>
   </bean>
   
   <!-- test data helpers - need cache-persistence package -->

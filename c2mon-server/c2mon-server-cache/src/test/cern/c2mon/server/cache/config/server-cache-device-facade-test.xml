@@ -10,12 +10,12 @@
 
   <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager"> 
     <property name="cacheManager"> <bean class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"> 
-    <property name="configLocation" value="resources/ehcache-notTCmode.xml" /> 
+    <property name="configLocation" value="resources/ehcache-notTCmode-nonpersistent.xml" /> 
     </bean> </property> </bean>
 
   <bean id="deviceEhcacheManager"
     class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
-    <property name="configLocation" value="resources/ehcache-notTCmode.xml"></property>
+    <property name="configLocation" value="resources/ehcache-notTCmode-nonpersistent.xml"></property>
   </bean>
 
   <bean id="deviceEhcache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">

@@ -54,7 +54,8 @@
     -->
     <dependency>
       <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache-ee</artifactId>
+      <artifactId>ehcache-core</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
     <groupId>org.slf4j</groupId>
@@ -69,18 +70,18 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-shared</groupId>
       <artifactId>c2mon-shared-common</artifactId>
-      <version>LATEST</version>
+      <version>[1.5.7, 2.0.0)</version>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-shared</groupId>
       <artifactId>c2mon-shared-daq</artifactId>
-      <version>LATEST</version>
+      <version>[1.5.3, 2.0.0)</version>
     </dependency>
 
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-common</artifactId>
-      <version>LATEST</version>
+      <version>[1.5.3, 2.0.0)</version>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
@@ -89,12 +90,12 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-cacheloading</artifactId>
-      <version>LATEST</version>
+      <version>[1.5.2, 2.0.0)</version>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-cachedbaccess</artifactId>
-      <version>LATEST</version>
+      <version>[1.5.2, 2.0.0)</version>
     </dependency>
 
   </dependencies>
@@ -110,8 +111,6 @@
           <argLine>
             -Dc2mon.properties.location=${c2mon.properties.location}
             -Dc2mon.log.dir=${basedir}/build/log
-            <!-- Terracotta license key path -->
-            -Dcom.tc.productkey.path=${com.tc.productkey.path}
             -Ddatasource.persistence.connections.initial=2
             -Ddatasource.persistence.connections.max=2
             -Dc2mon.jms.controltag.publication.topic=c2mon.controltag.publication.test
