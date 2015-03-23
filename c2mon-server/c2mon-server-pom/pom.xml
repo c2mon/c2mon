@@ -26,6 +26,34 @@
     <org.springframework.version>3.2.3.RELEASE</org.springframework.version>
   </properties>
 
+  <profiles>
+    <profile>
+      <id>win</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <os>
+          <family>Windows</family>
+        </os>
+      </activation>
+      <properties>
+        <c2mon.properties.location>T:\.c2mon.test.properties</c2mon.properties.location>
+      </properties>
+    </profile>
+    <profile>
+      <id>lin</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+      <properties>
+        <c2mon.properties.location>/user/timtest/.c2mon.test.properties</c2mon.properties.location>
+      </properties>
+    </profile>
+
+  </profiles>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
