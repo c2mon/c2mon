@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.tim.tim-client</groupId>
     <artifactId>tim-client-pom</artifactId>
-    <version>1.1.2</version>
+    <version>RELEASE</version>
   </parent>
 
   <groupId>cern.c2mon.c2mon-deploy</groupId>
@@ -25,7 +25,7 @@
     <dependency>
       <groupId>cern.tim.tim-client</groupId>
       <artifactId>tim-jviews-viewer</artifactId>
-      <version>LATEST</version>
+      <version>[1.2.10, 2.0.0)</version>
     </dependency>
   </dependencies>
 
