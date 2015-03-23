@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-server</groupId>
     <artifactId>c2mon-server-pom</artifactId>
-    <version>LATEST</version>
+    <version>RELEASE</version>
   </parent>
 
   <artifactId>c2mon-server-rule</artifactId>
@@ -38,12 +38,12 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-shared</groupId>
       <artifactId>c2mon-shared-rule</artifactId>
-      <version>LATEST</version>
+      <version>[1.2.9, 2.0.0)</version>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-cache</artifactId>
-      <version>LATEST</version>
+      <version>[1.5.5, 2.0.0)</version>
     </dependency>
     
     <!-- Test dependencies -->
@@ -62,25 +62,30 @@
 
     <!-- C2MON test dependencies -->
     <dependency>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-test</artifactId>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-supervision</artifactId>
-      <version>LATEST</version>
+      <version>[1.5.4, 2.0.0)</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-daqcommunication-in</artifactId>
-      <version>LATEST</version>
+      <version>[1.5.3, 2.0.0)</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-cachepersistence</artifactId>
-      <version>LATEST</version>
+      <version>[1.5.2, 2.0.0)</version>
       <scope>test</scope>
     </dependency>
 
