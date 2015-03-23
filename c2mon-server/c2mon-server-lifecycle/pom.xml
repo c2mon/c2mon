@@ -71,7 +71,8 @@
     <!-- The following dependencies are required for using Ehcache. -->
     <dependency>
       <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache-ee</artifactId>
+      <artifactId>ehcache-core</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>log4j</groupId>
