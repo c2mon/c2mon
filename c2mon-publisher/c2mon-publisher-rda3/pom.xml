@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-client</groupId>
 		<artifactId>c2mon-client-pom</artifactId>
-		<version>LATEST</version>
+		<version>RELEASE</version>
 	</parent>
 	<groupId>cern.c2mon.c2mon-publisher</groupId>
 	<artifactId>c2mon-publisher-rda3</artifactId>
@@ -20,14 +20,14 @@
 		<dependency>
 			<groupId>cern.c2mon.c2mon-publisher</groupId>
 			<artifactId>c2mon-publisher-core</artifactId>
-      <version>LATEST</version>
+      <version>[1.5.0, 2.0.0)</version>
 		</dependency>
 
 		<!-- CERN 3rd party dependencies -->
 		<dependency>
 			<groupId>cern.cmw</groupId>
 			<artifactId>cmw-rda3</artifactId>
-			<version>LATEST</version>
+			<version>[1.2.1, 2.0.0)</version>
 		</dependency>
 
 		<dependency>
