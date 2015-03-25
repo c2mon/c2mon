@@ -6,14 +6,14 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-deploy</groupId>
 		<artifactId>c2mon-publisher-rda3-deploy</artifactId>
-		<version>1.5.1-SNAPSHOT</version>
+		<version>1.5.1</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
 	<groupId>cern.c2mon.c2mon-deploy</groupId>
 	<artifactId>c2mon-publisher-rda3-tim2</artifactId>
 	<name>The TIM2 RDA3 Publisher</name>
-	<version>1.5.1-SNAPSHOT</version>
+	<version>1.5.1</version>
 	<packaging>pom</packaging>
 
 	<description>C2MON RDA publisher assembling all required modules and configuration files for TIM2</description>

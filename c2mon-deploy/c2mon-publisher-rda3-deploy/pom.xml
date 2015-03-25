@@ -11,7 +11,7 @@
   <groupId>cern.c2mon.c2mon-deploy</groupId>
   <artifactId>c2mon-publisher-rda3-deploy</artifactId>
   <name>Deploys the RDA3 publisher for C2MON</name>
-  <version>1.5.1-SNAPSHOT</version>
+  <version>1.5.1</version>
 
   <packaging>pom</packaging>
 
