@@ -4,7 +4,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-daq</groupId>
     <artifactId>c2mon-daq-pom</artifactId>
-    <version>1.1.8</version>
+    <version>RELEASE</version>
   </parent>
 
   <artifactId>c2mon-daq-japc</artifactId>
@@ -61,35 +61,35 @@
     <dependency>
       <groupId>cern.japc</groupId>
       <artifactId>japc</artifactId>
-      <version>LATEST</version>
+      <version>[3.0.4, 4.0.0)</version>
     </dependency>
 
     <dependency>
       <groupId>cern.japc</groupId>
       <artifactId>japc-ext-remote</artifactId>
-      <version>LATEST</version>
+      <version>[4.0.3, 5.0.0)</version>
     </dependency>
 
     <dependency>
       <groupId>cern.japc</groupId>
       <artifactId>japc-ext-cmwrda</artifactId>
-      <version>LATEST</version>
+      <version>[3.0.3, 4.0.0)</version>
     </dependency>
 
     <dependency>
       <groupId>cern.japc</groupId>
       <artifactId>japc-ext-cmwrda3</artifactId>
-      <version>LATEST</version>
+      <version>[2.0.4, 3.0.0)</version>
     </dependency>
     <dependency>
       <groupId>cern.japc</groupId>
       <artifactId>japc-ext-snmp</artifactId>
-      <version>LATEST</version>
+      <version>[2.0.2, 3.0.0)</version>
     </dependency>
     <dependency>
       <groupId>cern.japc</groupId>
       <artifactId>japc-ext-mockito</artifactId>
-      <version>LATEST</version>
+      <version>[0.2.0, 2.0.0)</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
