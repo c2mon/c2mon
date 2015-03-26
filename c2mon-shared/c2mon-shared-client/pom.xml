@@ -4,7 +4,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-shared</groupId>
     <artifactId>c2mon-shared-pom</artifactId>
-    <version>LATEST</version>
+    <version>RELEASE</version>
   </parent>
 
   <artifactId>c2mon-shared-client</artifactId>
