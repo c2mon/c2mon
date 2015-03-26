@@ -137,7 +137,8 @@ public class ProcessMapperTest {
 
   @Test
   public void testGetNumTags() {
-    assertTrue(processMapper.getNumTags(90L).equals(2));
+    int n = processMapper.getNumTags(90L);
+    assertTrue(processMapper.getNumTags(90L).equals(3));
   }
 
   @Test
