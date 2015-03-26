@@ -135,6 +135,6 @@
                  START WITH  eq_procid=#{id} 
                CONNECT BY NOCYCLE PRIOR equipment.eqid = equipment.eq_parent_id 
         )
-        AND datatag.tagqualitydesc != '{}';
+        AND datatag.tagqualitydesc != '{}'
     </select>
   </mapper>
