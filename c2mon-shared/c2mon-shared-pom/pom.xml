@@ -23,7 +23,7 @@
 
   <!-- Shared version number properties -->
   <properties>
-    <org.springframework.version>3.2.3.RELEASE</org.springframework.version>
+    <org.springframework.version>3.2.13.RELEASE</org.springframework.version>
   </properties>
 
   <dependencyManagement>
@@ -32,7 +32,7 @@
       <dependency>
         <groupId>cern.c2mon.c2mon-shared</groupId>
         <artifactId>c2mon-shared-util</artifactId>
-        <version>LATEST</version>
+        <version>[1.5.6, 2.0.0)</version>
         <exclusions>
           <exclusion>
             <groupId>org.springframework</groupId>
@@ -43,12 +43,12 @@
       <dependency>
         <groupId>cern.c2mon.c2mon-shared</groupId>
         <artifactId>c2mon-shared-common</artifactId>
-        <version>LATEST</version>
+        <version>[1.5.7, 2.0.0)</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-shared</groupId>
         <artifactId>c2mon-shared-daq</artifactId>
-        <version>LATEST</version>
+        <version>[1.5.3, 2.0.0)</version>
         <exclusions>
           <exclusion>
             <groupId>org.springframework</groupId>
@@ -59,24 +59,24 @@
       <dependency>
         <groupId>cern.c2mon.c2mon-shared</groupId>
         <artifactId>c2mon-shared-client</artifactId>
-        <version>LATEST</version>
+        <version>[1.5.4, 2.0.0)</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-shared</groupId>
         <artifactId>c2mon-shared-rule</artifactId>
-        <version>LATEST</version>
+        <version>[1.2.9, 2.0.0)</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-shared</groupId>
         <artifactId>c2mon-shared-persistence-manager</artifactId>
-        <version>LATEST</version>
+        <version>[1.5.0, 2.0.0)</version>
       </dependency>
 
       <!-- Other dependecies -->
       <dependency>
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
-        <version>1.2.14</version>
+        <version>[1.2.17,)</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -98,7 +98,7 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>LATEST</version>
+        <version>[4.12,)</version>
         <scope>test</scope>
       </dependency>
       <dependency>
