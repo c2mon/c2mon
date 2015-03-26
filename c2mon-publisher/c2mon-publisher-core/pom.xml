@@ -3,7 +3,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-client</groupId>
     <artifactId>c2mon-client-pom</artifactId>
-    <version>LATEST</version>
+    <version>RELEASE</version>
   </parent>
   <groupId>cern.c2mon.c2mon-publisher</groupId>
   <artifactId>c2mon-publisher-core</artifactId>
