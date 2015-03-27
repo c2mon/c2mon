@@ -4,9 +4,9 @@
   <parent>
     <groupId>cern.c2mon.c2mon-client</groupId>
     <artifactId>c2mon-client-pom</artifactId>
-    <version>1.5.0</version>
+    <version>RELEASE</version>
   </parent>
-  <groupId>cern.c2mon.c2mon-client</groupId>
+
   <artifactId>c2mon-client-ext-history</artifactId>
   <version>1.5.3-SNAPSHOT</version>
   <name>c2mon-client-ext-history</name>
@@ -19,7 +19,6 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
       <artifactId>c2mon-client-all</artifactId>
-      <version>LATEST</version>
     </dependency>
 
     <!-- 3rd party dependencies -->
