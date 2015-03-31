@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.tim.tim-client</groupId>
     <artifactId>tim-client-pom</artifactId>
-    <version>1.0.11</version>
+    <version>RELEASE</version>
   </parent>
 
   <groupId>cern.c2mon.c2mon-deploy</groupId>
@@ -27,12 +27,6 @@
       <groupId>cern.tim.tim-client</groupId>
       <artifactId>tim-view-scanner</artifactId>
       <version>[1.0.2,2.0.0)</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>spring</artifactId>
-          <groupId>org.springframework</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
   </dependencies>
   <modules>
