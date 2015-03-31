@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>c2mon-shared-client</artifactId>
-  <version>1.5.5-SNAPSHOT</version>
+  <version>1.5.5</version>
   <name>c2mon-shared-client</name>
   <packaging>jar</packaging>
   <description>
