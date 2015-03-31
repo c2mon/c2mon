@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>c2mon-client-ext-device</artifactId>
-  <version>1.5.2-SNAPSHOT</version>
+  <version>1.5.2</version>
   <name>c2mon-client-ext-device</name>
   <packaging>jar</packaging>
   <url>http://timweb.cern.ch</url>
