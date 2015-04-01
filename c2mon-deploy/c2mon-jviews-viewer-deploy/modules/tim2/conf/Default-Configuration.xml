@@ -1,6 +1,6 @@
 <config>
 	<view>
-		<property name="url" type="java.lang.String" value="http://timweb.cern.ch/Views/Production/Process_State/ProcessState.ivl"/>
+		<property name="url" type="java.lang.String" value="http://timweb.cern.ch/Views/Production/Process_State/ProcessState.idbd"/>
 		<property name="external" type="java.lang.Boolean" value="false"/>
 	</view>
 </config>
