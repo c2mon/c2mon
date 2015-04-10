@@ -49,7 +49,7 @@ public class RdaPublisherTest {
         PublisherKernel.main(new String[] {});
 
         ClientService client = null;
-        Subscription sub = null;
+//        Subscription sub = null;
 
         try {
 
@@ -58,7 +58,7 @@ public class RdaPublisherTest {
             AccessPoint accessPoint = client.getAccessPoint(System.getProperty("c2mon.publisher.rda.device.name"),
                     "EY.L04.EMD801_4R:POSITION", System.getProperty("c2mon.publisher.rda.server.name"));
 
-            sub = accessPoint.subscribe(new NotificationListener() {
+            /* sub = */ accessPoint.subscribe(new NotificationListener() {
 
                 @Override
                 public void errorReceived(Subscription subscription, RdaException exception, UpdateType updateType) {
