@@ -1,0 +1,70 @@
+
+<EquipmentUnit id="5250" name="LHC">
+	<handler-class-name>automatically-set-by-test</handler-class-name>
+	<commfault-tag-id>107211</commfault-tag-id>
+
+	<commfault-tag-value>false</commfault-tag-value>
+	<address>Protocol=3</address>
+
+	<SubEquipmentUnits>
+	</SubEquipmentUnits>
+
+	<DataTags>
+
+		<DataTag id="124149" name="LHCCOLLIMATOR:TCLA.B6L7.B2:12000" control="false">
+			<data-type>Boolean</data-type>
+
+			<DataTagAddress>
+				<HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.LASERHardwareAddressImpl">
+					<fault-family>LHCCOLLIMATOR</fault-family>
+					<fault-member>TCLA.B6L7.B2</fault-member>
+					<fault-code>22000</fault-code>
+				</HardwareAddress>
+
+				<time-to-live>3600000</time-to-live>
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>
+
+
+		<DataTag id="124150" name="DMNALMON:MKBV.UA63.SCSS.AB2:2" control="false">
+			<data-type>Boolean</data-type>
+
+			<DataTagAddress>
+				<HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.LASERHardwareAddressImpl">
+					<fault-family>DMNALMON</fault-family>
+					<fault-member>MKBV.UA63.SCSS.AB2</fault-member>
+					<fault-code>2</fault-code>
+				</HardwareAddress>
+
+				<time-to-live>3600000</time-to-live>
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>
+		
+		
+
+		<DataTag id="99999" name="LHC:HEARTBEAT" control="false">
+			<data-type>Long</data-type>
+			<DataTagAddress>
+				<HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl">
+					<address>Heartbeat</address>
+				</HardwareAddress>
+				<time-to-live>3600000</time-to-live>
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>
+
+		<alive-tag-id>99999</alive-tag-id>
+		<alive-interval>900000</alive-interval>
+
+
+
+	</DataTags>
+
+	<CommandTags />
+
+</EquipmentUnit>
