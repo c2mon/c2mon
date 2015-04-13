@@ -36,10 +36,10 @@
                      threshold="info"
                      xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
-  <renderer renderedClass="cern.c2mon.shared.daq.filter.FilteredDataTagValue"
+  <renderer renderedClass="cern.c2mon.shared.common.filter.FilteredDataTagValue"
           renderingClass="cern.c2mon.shared.daq.filter.FilteredDataTagValueRenderer" />
 
-  <renderer  renderedClass="cern.c2mon.shared.daq.datatag.SourceDataTagValue"
+  <renderer  renderedClass="cern.c2mon.shared.common.datatag.SourceDataTagValue"
              renderingClass="cern.c2mon.shared.daq.datatag.SourceDataTagValueRenderer" />
 
   <renderer  renderedClass="cern.c2mon.shared.daq.command.SourceCommandTagValue"
