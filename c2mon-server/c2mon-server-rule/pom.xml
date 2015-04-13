@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>c2mon-server-rule</artifactId>
-  <version>1.5.5-SNAPSHOT</version>
+  <version>1.5.5</version>
   <name>c2mon-server-rule</name>
   <packaging>jar</packaging>
   <description>
