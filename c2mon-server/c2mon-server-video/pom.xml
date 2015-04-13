@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>c2mon-server-video</artifactId>
-  <version>1.5.1-SNAPSHOT</version>
+  <version>1.5.1</version>
   <name>c2mon-server-video</name>
   <packaging>jar</packaging>
   <description>The C2MON server video module.</description>
