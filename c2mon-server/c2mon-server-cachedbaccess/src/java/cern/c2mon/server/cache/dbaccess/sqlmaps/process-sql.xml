@@ -118,23 +118,19 @@
     </select>
     
     <select id="getNumTags" resultType="Integer" parameterType="Long">
-       SELECT count(*) FROM datatag 
-        WHERE tag_eqid IN (
-                SELECT eqid 
-                  FROM equipment 
-                 START WITH  eq_procid=#{id} 
-               CONNECT BY NOCYCLE PRIOR equipment.eqid = equipment.eq_parent_id 
-        )
+        select count(*)
+          from datatag
+    inner join equipment on equipment.eqid = datatag.tag_eqid
+    inner join process on process.procid = equipment.eq_procid
+         where process.procid = #{id}
     </select>
     
     <select id="getNumInvalidTags" resultType="Integer" parameterType="Long">
-       SELECT count(*) FROM datatag 
-        WHERE tag_eqid IN ( 
-                SELECT eqid 
-                  FROM equipment 
-                 START WITH  eq_procid=#{id} 
-               CONNECT BY NOCYCLE PRIOR equipment.eqid = equipment.eq_parent_id 
-        )
-        AND datatag.tagqualitydesc != '{}'
+        select count(*)
+          from datatag
+    inner join equipment on equipment.eqid = datatag.tag_eqid
+    inner join process on process.procid = equipment.eq_procid
+         where process.procid = #{id}
+           and datatag.tagqualitydesc != '{}'
     </select>
   </mapper>
