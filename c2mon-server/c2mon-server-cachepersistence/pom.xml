@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>c2mon-server-cachepersistence</artifactId>
-  <version>1.5.3</version>
+  <version>1.5.4-SNAPSHOT</version>
   <name>c2mon-server-cachepersistence</name>
   <packaging>jar</packaging>
   <description>The C2MON server module managing the persistence of cache updates to the database.</description>
