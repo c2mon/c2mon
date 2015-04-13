@@ -9,7 +9,7 @@
     <version>RELEASE</version>
   </parent>
  
-  <version>1.5.5-SNAPSHOT</version>
+  <version>1.5.5</version>
   <name>c2mon-server-configuration</name>
   <artifactId>c2mon-server-configuration</artifactId>
   <packaging>jar</packaging>
