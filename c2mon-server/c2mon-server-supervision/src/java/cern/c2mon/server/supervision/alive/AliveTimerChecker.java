@@ -22,12 +22,12 @@ import cern.c2mon.server.supervision.SupervisionManager;
 /**
  * Timer that regularly checks all the active alive timers monitoring
  * the connections to the DAQs, Equipment and SubEquipment.
- * 
+ *
  * <p>Notice that an alive timer is considered expired when alive-interval
  *  + alive-interval/3 milliseconds have expired since the last alive
  *  message arrived, where alive-interval is specific to the AliveTimer
  *  object (see <code>hasExpired</code> in {@link AliveTimerFacade}).
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -43,14 +43,23 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
    * SMS logger for warnings.
    */
   private static final Logger SMS_LOGGER = Logger.getLogger("AdminSmsLogger");
-  
+
+  /**
+   * Cluster cache key to ensure that a server does not try to access
+   * LAST_ALIVE_TIMER_CHECK_LONG during instantiation if it already exists. This
+   * is because a cache loading blockage can happen if a server holds
+   * LAST_ALIVE_TIMER_CHECK_LONG while another server starts up. See
+   * https://issues.cern.ch/browse/TIMS-1037.
+   */
+  private static final String LAST_ALIVE_TIMER_CHECK_INITIALISATION_KEY = "c2mon.supervision.AliveTimerChecker.lastAliveTimerCheckInitialisationKey";
+
   /**
    * Cluster cache key for retrieving the time of last check
    * of the alives. Across server cluster it assures that
    * the alive check only takes place on a single server.
    */
   private static final String LAST_ALIVE_TIMER_CHECK_LONG = "c2mon.supervision.AliveTimerChecker.lastAliveTimerCheck";
-  
+
   /**
    * How often the timer checks whether the alive
    * timer have expired.
@@ -63,17 +72,17 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
    * alives to be processed).
    */
   private static final int INITIAL_SCAN_DELAY = 120000;
-  
+
   /**
    * Lifecycle flag.
    */
   private volatile boolean running = false;
-  
+
   /**
    * Timer object
    */
   private Timer timer;
-  
+
   /**
    * Reference to alive timer facade.
    */
@@ -83,22 +92,22 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
    * Reference to alive timer cache.
    */
   private AliveTimerCache aliveTimerCache;
-  
+
   /**
    * Reference to the SupervisionManager bean.
    */
   private SupervisionManager supervisionManager;
 
   /**
-   * Threshold of DAQ/Equipment/SubEqu. down when warning is sent to admin. 
+   * Threshold of DAQ/Equipment/SubEqu. down when warning is sent to admin.
    */
   private static final short WARNING_THRESHOLD = 50;
-  
+
   /**
    * Warning has been sent.
    */
   private boolean alarmActive = false;
-  
+
   /**
    * Count down to alarm switch off.
    */
@@ -106,9 +115,9 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
 
   /** Reference to the clusterCache to share values accross teh cluster nodes */
   private final ClusterCache clusterCache;
-  
-  private static final int SWITCH_OFF_COUNTDOWN = 60; //10mins 
-  
+
+  private static final int SWITCH_OFF_COUNTDOWN = 60; //10mins
+
   /**
    * Constructor.
    * @param cache the alive timer cache
@@ -116,7 +125,7 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
    * @param supervisionManager the supervision manager bean
    * @param clusterCache Reference to the clusterCache to share values accross teh cluster nodes
    */
-  @Autowired 
+  @Autowired
   public AliveTimerChecker(final AliveTimerCache cache,
                            final AliveTimerFacade aliveTimerFacade,
                            final SupervisionManager supervisionManager,
@@ -127,27 +136,30 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
     this.supervisionManager = supervisionManager;
     this.clusterCache = clusterCache;
   }
-  
+
   /**
    * Initialises the clustered values
    */
   @PostConstruct
   public void init() {
-    clusterCache.acquireWriteLockOnKey(LAST_ALIVE_TIMER_CHECK_LONG);
+    LOGGER.trace("Initialising AliveTimerChecker...");
+    clusterCache.acquireWriteLockOnKey(LAST_ALIVE_TIMER_CHECK_INITIALISATION_KEY);
     try {
-      if (!clusterCache.hasKey(LAST_ALIVE_TIMER_CHECK_LONG)) {
+      if (!clusterCache.hasKey(LAST_ALIVE_TIMER_CHECK_INITIALISATION_KEY)) {
+        clusterCache.put(LAST_ALIVE_TIMER_CHECK_INITIALISATION_KEY, true);
         clusterCache.put(LAST_ALIVE_TIMER_CHECK_LONG, Long.valueOf(0L));
       }
     } finally {
-      clusterCache.releaseWriteLockOnKey(LAST_ALIVE_TIMER_CHECK_LONG);
+      clusterCache.releaseWriteLockOnKey(LAST_ALIVE_TIMER_CHECK_INITIALISATION_KEY);
     }
+    LOGGER.trace("Initialisation complete.");
   }
 
   /**
    * Starts the timer. Alive timers will be checked from then on.
    */
   @Override
-  public synchronized void start() {   
+  public synchronized void start() {
     LOGGER.info("Starting the C2MON alive timer mechanism.");
     timer = new Timer("C2MON-alive-timer");
     timer.schedule(this, INITIAL_SCAN_DELAY, SCAN_INTERVAL);
@@ -157,19 +169,20 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
   /**
    * Stops the timer mechanism. No more checks are made on the
    * alive timers.
-   * 
+   *
    * <p>Can be restarted using the start method.
    */
   @Override
   public synchronized void stop() {
     LOGGER.info("Stopping the C2MON alive timer mechanism.");
-    timer.cancel();   
+    timer.cancel();
     running = false;
   }
 
   /**
    * Run method of the AliveTimerManager thread.
    */
+  @Override
   public void run() {
     clusterCache.acquireWriteLockOnKey(LAST_ALIVE_TIMER_CHECK_LONG);
     try {
@@ -179,7 +192,7 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
       } else {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("run() : checking alive timers ... ");
-        }        
+        }
         short aliveDownCount = 0;
         try {
           for (Long currentId : aliveTimerCache.getKeys()) {
@@ -187,20 +200,20 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
             boolean aliveExpiration = false;
             aliveTimerCopy = aliveTimerCache.getCopy(currentId);
 
-            if (aliveTimerCopy.isActive()) {            
+            if (aliveTimerCopy.isActive()) {
               if (aliveTimerFacade.hasExpired(currentId)) {
                 aliveTimerFacade.stop(currentId);
                 aliveExpiration = true;
                 aliveDownCount++;
-              }             
+              }
             } else {
               aliveDownCount++;
             }
-            
+
             if (aliveExpiration) {
               onAliveTimerExpiration(currentId);
             }
-            
+
           }
           if (!alarmActive && aliveDownCount > WARNING_THRESHOLD) {
             alarmActive = true;
@@ -212,29 +225,29 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
           }
         } catch (CacheElementNotFoundException cacheEx) {
           LOGGER.warn("Failed to locate alive timer in cache on expiration check (may happen exceptionally if just removed).", cacheEx);
-        } catch (Exception e) {    
+        } catch (Exception e) {
           LOGGER.error("Unexpected exception when checking the alive timers", e);
         }
         lastCheck = Long.valueOf(System.currentTimeMillis());
         clusterCache.put(LAST_ALIVE_TIMER_CHECK_LONG, lastCheck);
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("run() : finished checking alive timers ... ");
-        }        
+        }
       } // end of else block
     } finally {
       clusterCache.releaseWriteLockOnKey(LAST_ALIVE_TIMER_CHECK_LONG);
-    }       
+    }
   }
-  
+
   /**
    * Notifies the supervision manager.
-   * 
+   *
    * @param pAliveTimer the alive timer that has expired
    */
   private void onAliveTimerExpiration(final Long aliveTimerId) {
-    supervisionManager.onAliveTimerExpiration(aliveTimerId);        
+    supervisionManager.onAliveTimerExpiration(aliveTimerId);
   }
-  
+
   @Override
   public boolean isAutoStartup() {
     return false;
@@ -248,7 +261,7 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
 
   @Override
   public synchronized boolean isRunning() {
-   return running; 
+   return running;
   }
 
   @Override
