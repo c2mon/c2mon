@@ -35,7 +35,7 @@
 
   <http auto-config="true" access-decision-manager-ref="RbacAccessDecisionManager">
     <!-- no need for interceptor element here because our accessDecisionManager has this hard coded -->
-    <intercept-url pattern="/configloader/**" access="hasAnyRole('ROLE_ADMIN')" />
+    <intercept-url pattern="/configloader/progress" access="hasAnyRole('ROLE_ADMIN')" />
     <intercept-url pattern="/process/**" access="hasAnyRole('ROLE_ADMIN')" />
     <intercept-url pattern="/commandviewer/**" access="hasAnyRole('ROLE_ADMIN')" />
     <form-login login-page="/login" authentication-failure-url="/login?error=true" />
