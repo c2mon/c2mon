@@ -440,7 +440,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
   }
 
   /**
-   * Inner method which handles a request to retrive configuration reports
+   * Inner method which handles a request to retrieve configuration reports
    *
    * @param configurationRequest The request sent by the client
    * @return A collection of configuration reports
@@ -448,7 +448,11 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
   private Collection<? extends ClientRequestResult> handleRetrieveConfigurationsRequest(final ClientRequest configurationRequest,
                                                                                        final Session session,
                                                                                        final Destination replyDestination) {
-    return configurationLoader.getReports();
+    if (configurationRequest.getRequestParameter() != null) {
+      return configurationLoader.getConfigurationReports(configurationRequest.getRequestParameter());
+    } else {
+      return configurationLoader.getConfigurationReports();
+    }
   }
 
   /**

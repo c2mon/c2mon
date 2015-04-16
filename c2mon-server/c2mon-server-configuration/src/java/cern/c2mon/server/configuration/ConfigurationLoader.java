@@ -22,6 +22,7 @@ import java.util.List;
 
 import cern.c2mon.shared.client.configuration.ConfigurationException;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
 
 /**
  * Public bean that can be accessed to load configurations into
@@ -79,9 +80,22 @@ public interface ConfigurationLoader {
   void cancelCurrentConfiguration();
 
   /**
-   * Retrieve all previously applied configuration reports.
+   * Retrieve all previously applied configuration reports. Note: this only
+   * returns partial information about the configuration report. To retrieve the
+   * full report, use {@link ConfigurationLoader#getConfigurationReports(Long)}.
    *
    * @return the list of reports
    */
-  List<ConfigurationReport> getReports();
+  List<ConfigurationReportHeader> getConfigurationReports();
+
+  /**
+   * Retrieve the full configuration report(s) for a given configuration. Since
+   * a configuration may be run more than once, this method returns a collection
+   * of all historical reports for the given configuration.
+   *
+   * @param id the id of the configuration report
+   * @return the full configuration report(s) if the configuration was run more
+   *         than once
+   */
+  List<ConfigurationReport> getConfigurationReports(String id);
 }

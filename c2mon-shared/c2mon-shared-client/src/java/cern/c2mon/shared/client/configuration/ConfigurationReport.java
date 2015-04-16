@@ -33,7 +33,7 @@ import org.simpleframework.xml.Root;
 import org.simpleframework.xml.convert.Convert;
 
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
-import cern.c2mon.shared.client.configuration.report.ProcessListConverter;
+import cern.c2mon.shared.client.configuration.converter.ProcessListConverter;
 import cern.c2mon.shared.client.request.ClientRequestReport;
 
 /**
@@ -45,7 +45,7 @@ import cern.c2mon.shared.client.request.ClientRequestReport;
  *
  */
 @Root(name="ConfigurationReport")
-public class ConfigurationReport extends ClientRequestReport {
+public class ConfigurationReport extends ClientRequestReport implements Comparable<ConfigurationReport> {
 
   /**
    * The configuration id.
@@ -375,6 +375,11 @@ public class ConfigurationReport extends ClientRequestReport {
     } else {
       throw new UnsupportedOperationException("No XML report can be generated: this message is an intermediate response!");
     }
+  }
+
+  @Override
+  public int compareTo(ConfigurationReport o) {
+    return timestamp.compareTo(o.getTimestamp());
   }
 
   /**

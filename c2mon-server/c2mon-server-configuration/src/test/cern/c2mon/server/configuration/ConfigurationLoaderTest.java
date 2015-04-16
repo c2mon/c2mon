@@ -93,7 +93,8 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
-import cern.c2mon.shared.client.configuration.report.ProcessListConverter;
+import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
+import cern.c2mon.shared.client.configuration.converter.ProcessListConverter;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -1383,10 +1384,28 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   }
 
   @Test
+  public void testGetConfigurationReportHeaders() {
+    ((ConfigurationLoaderImpl) configurationLoader).setReportDirectory(".");
+    List<ConfigurationReportHeader> reports = configurationLoader.getConfigurationReports();
+    assertFalse(reports.isEmpty());
+
+    for (ConfigurationReportHeader report : reports) {
+      assertNotNull(report.getName());
+      assertNotNull(report.getId());
+      assertNotNull(report.getStatus());
+      assertNotNull(report.getStatusDescription());
+    }
+  }
+
+  @Test
   public void testGetConfigurationReports() {
     ((ConfigurationLoaderImpl) configurationLoader).setReportDirectory(".");
-    List<ConfigurationReport> reports = configurationLoader.getReports();
+    List<ConfigurationReport> reports = configurationLoader.getConfigurationReports(String.valueOf(1));
     assertFalse(reports.isEmpty());
+    assertTrue(reports.size() == 3); // Config 1 gets run 3 times
+
+    reports.addAll(configurationLoader.getConfigurationReports(String.valueOf(2)));
+    assertTrue(reports.size() == 4); // Config 2 gets run once
 
     for (ConfigurationReport report : reports) {
       assertNotNull(report.getName());

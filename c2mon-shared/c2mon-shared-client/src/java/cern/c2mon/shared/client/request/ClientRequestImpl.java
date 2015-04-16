@@ -17,6 +17,7 @@ import cern.c2mon.shared.client.command.CommandReportImpl;
 import cern.c2mon.shared.client.command.CommandTagHandle;
 import cern.c2mon.shared.client.command.CommandTagHandleImpl;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
 import cern.c2mon.shared.client.device.DeviceClassNameResponseImpl;
 import cern.c2mon.shared.client.device.DeviceInfo;
@@ -342,6 +343,9 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
       case TRANSFER_TAG_CONFIGURATION_LIST:
         collectionType = new TypeToken<Collection<TagConfigImpl>>() { } .getType();
         return getGson().fromJson(jsonReader, collectionType);
+      case TRANSFER_CONFIGURATION_REPORT_HEADER:
+        collectionType = new TypeToken<Collection<ConfigurationReportHeader>>() { } .getType();
+        return getGson().fromJson(jsonReader, collectionType);
       case TRANSFER_CONFIGURATION_REPORT:
         collectionType = new TypeToken<Collection<ConfigurationReport>>() { } .getType();
         return getGson().fromJson(jsonReader, collectionType);
@@ -385,13 +389,13 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
 
 
   /**
-   * Only supported by DAQ_XML_REQUESTS and DEVICE_REQUEST so far.
+   * Only supported by DAQ_XML_REQUEST, DEVICE_REQUEST and RETRIEVE_CONFIGURATION_REQUEST
    * @param requestParameter the requestParameter to set
    */
   public void setRequestParameter(final String requestParameter) {
-    if (!requestType.equals(RequestType.DAQ_XML_REQUEST) && !requestType.equals(RequestType.DEVICE_REQUEST)) {
-      throw new UnsupportedOperationException(
-          "This method is not supported by requests of type " + requestType);
+    if (!requestType.equals(RequestType.DAQ_XML_REQUEST) && !requestType.equals(RequestType.DEVICE_REQUEST)
+        && !requestType.equals(RequestType.RETRIEVE_CONFIGURATION_REQUEST)) {
+      throw new UnsupportedOperationException("This method is not supported by requests of type " + requestType);
     }
     this.requestParameter = requestParameter;
   }

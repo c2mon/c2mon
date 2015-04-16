@@ -20,7 +20,6 @@ package cern.c2mon.server.configuration.impl;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileWriter;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -38,7 +37,6 @@ import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
 import org.simpleframework.xml.strategy.Strategy;
 import org.simpleframework.xml.transform.RegistryMatcher;
-import org.simpleframework.xml.transform.Transform;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.server.cache.ClusterCache;
@@ -64,6 +62,9 @@ import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigurationException;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.ConfigurationReportFileFilter;
+import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
+import cern.c2mon.shared.client.configuration.converter.DateFormatConverter;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
@@ -92,11 +93,11 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    * Class logger.
    */
   private static final Logger LOGGER = Logger.getLogger(ConfigurationLoaderImpl.class);
-  
+
   /**
    * Avoids interfering with running cache persistence jobs.
    * To avoid a direct dependency to the c2mon-server-cachepersistence module
-   * we decided to create a local constant, but the same String is used by the 
+   * we decided to create a local constant, but the same String is used by the
    * <code>cern.c2mon.server.cachepersistence.common.BatchPersistenceManager</code>
    * to lock on the ClusterCache.
    */
@@ -520,7 +521,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    */
   private void archiveReport(int configId, String xmlReport) {
     try {
-      File outFile = new File(reportDirectory, "report_" + configId + ".xml");
+      File outFile = new File(reportDirectory, "report_" + configId + "_" + System.currentTimeMillis() + ".xml");
       FileWriter fileWriter;
       fileWriter = new FileWriter(outFile);
       BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
@@ -558,34 +559,38 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   }
 
   @Override
-  public List<ConfigurationReport> getReports() {
-    List<ConfigurationReport> reports = new ArrayList<>();
+  public List<ConfigurationReportHeader> getConfigurationReports() {
+    List<ConfigurationReportHeader> reports = new ArrayList<>();
 
     // Read all report files and deserialise them
     try {
-      ArrayList<File> files = new ArrayList<File>(Arrays.asList(new File(reportDirectory).listFiles(new FileFilter() {
-        @Override
-        public boolean accept(File pathname) {
-          String extension = "";
-          int i = pathname.getName().lastIndexOf('.');
-          if (i > 0) {
-              extension = pathname.getName().substring(i+1);
-          }
+      ArrayList<File> files = new ArrayList<File>(Arrays.asList(new File(reportDirectory).listFiles(new ConfigurationReportFileFilter())));
+      Serializer serializer = getSerializer();
 
-          return pathname.getName().startsWith("report_") && extension.equals("xml");
-        }
-      })));
+      for (File file : files) {
+        ConfigurationReportHeader report = serializer.read(ConfigurationReportHeader.class, file);
+        LOGGER.debug("Deserialised configuration report " + report.getId());
+        reports.add(report);
+      }
 
-      DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-      RegistryMatcher matcher = new RegistryMatcher();
-      matcher.bind(Timestamp.class, new DateFormatTransformer(format));
+    } catch (Exception e) {
+      LOGGER.error("Error deserialising configuration report", e);
+    }
 
-      Strategy strategy = new AnnotationStrategy();
-      Serializer serializer = new Persister(strategy, matcher);
+    return reports;
+  }
+
+  @Override
+  public List<ConfigurationReport> getConfigurationReports(String id) {
+    List<ConfigurationReport> reports = new ArrayList<>();
+
+    try {
+      ArrayList<File> files = new ArrayList<File>(Arrays.asList(new File(reportDirectory).listFiles(new ConfigurationReportFileFilter(id))));
+      Serializer serializer = getSerializer();
 
       for (File file : files) {
         ConfigurationReport report = serializer.read(ConfigurationReport.class, file);
-        LOGGER.debug(report);
+        LOGGER.debug("Deserialised configuration report " + report.getId());
         reports.add(report);
       }
 
@@ -597,26 +602,17 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   }
 
   /**
-   * Enables deserialisation of timestamps inside configuration reports.
+   * Retrieve a {@link Serializer} instance suitable for deserialising a
+   * {@link ConfigurationReport}.
    *
-   * @author Justin Lewis Salmon
+   * @return a new {@link Serializer} instance
    */
-  class DateFormatTransformer implements Transform<Timestamp> {
-    private DateFormat dateFormat;
-
-    public DateFormatTransformer(DateFormat dateFormat) {
-      this.dateFormat = dateFormat;
-    }
-
-    @Override
-    public Timestamp read(String value) throws Exception {
-      return new Timestamp(dateFormat.parse(value).getTime());
-    }
-
-    @Override
-    public String write(Timestamp value) throws Exception {
-      return dateFormat.format(value);
-    }
-
+  private Serializer getSerializer() {
+    DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    RegistryMatcher matcher = new RegistryMatcher();
+    matcher.bind(Timestamp.class, new DateFormatConverter(format));
+    Strategy strategy = new AnnotationStrategy();
+    Serializer serializer = new Persister(strategy, matcher);
+    return serializer;
   }
 }

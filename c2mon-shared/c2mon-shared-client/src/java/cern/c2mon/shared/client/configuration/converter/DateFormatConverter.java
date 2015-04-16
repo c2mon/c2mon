@@ -15,46 +15,33 @@
  *
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
-package cern.c2mon.shared.client.configuration.report;
+package cern.c2mon.shared.client.configuration.converter;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.sql.Timestamp;
+import java.text.DateFormat;
 
-import org.simpleframework.xml.convert.Converter;
-import org.simpleframework.xml.stream.InputNode;
-import org.simpleframework.xml.stream.OutputNode;
+import org.simpleframework.xml.transform.Transform;
 
 /**
- * TODO
+ * Enables deserialisation of timestamps inside configuration reports.
  *
  * @author Justin Lewis Salmon
  */
-public class ProcessListConverter implements Converter<Set<String>> {
+public class DateFormatConverter implements Transform<Timestamp> {
+  private DateFormat dateFormat;
 
-  @Override
-  public Set<String> read(InputNode node) throws Exception {
-    return convert(node.getValue());
+  public DateFormatConverter(DateFormat dateFormat) {
+    this.dateFormat = dateFormat;
   }
 
   @Override
-  public void write(OutputNode node, Set<String> processList) throws Exception {
+  public Timestamp read(String value) throws Exception {
+    return new Timestamp(dateFormat.parse(value).getTime());
   }
 
-  /**
-   * TODO
-   *
-   * @param list
-   * @return
-   */
-  public Set<String> convert(String list) {
-    Set<String> processList = new HashSet<>();
-
-    for (String process : list.substring(1, list.length() - 1).split(", ")) {
-      if (process.length() > 0) {
-        processList.add(process);
-      }
-    }
-
-    return processList;
+  @Override
+  public String write(Timestamp value) throws Exception {
+    return dateFormat.format(value);
   }
+
 }

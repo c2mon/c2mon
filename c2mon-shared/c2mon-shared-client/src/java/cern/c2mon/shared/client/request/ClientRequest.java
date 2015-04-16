@@ -3,6 +3,8 @@ package cern.c2mon.shared.client.request;
 import java.util.Collection;
 
 import cern.c2mon.shared.client.command.CommandExecuteRequest;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
 
 /**
  * This interface describes the request message object
@@ -63,7 +65,7 @@ public interface ClientRequest {
      */
     APPLY_CONFIGURATION_REQUEST,
     /**
-     * Used to retrieve a Configuration Report from the server.
+     * Used to retrieve historical configuration reports from the server.
      */
     RETRIEVE_CONFIGURATION_REQUEST,
     /**
@@ -116,7 +118,9 @@ public interface ClientRequest {
     TRANSFER_COMMAND_HANDLES_LIST,
     /** @see ... */
     TRANSFER_COMMAND_REPORT,
-    /** @see ... */
+    /** @see ConfigurationReportHeader */
+    TRANSFER_CONFIGURATION_REPORT_HEADER,
+    /** @see ConfigurationReport */
     TRANSFER_CONFIGURATION_REPORT,
     /** A  is returned for these request.*/
     TRANSFER_DAQ_XML,
