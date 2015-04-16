@@ -1,7 +1,12 @@
 package cern.c2mon.web.configviewer.service;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.naming.CannotProceedException;
 
@@ -11,6 +16,7 @@ import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
 import cern.c2mon.web.configviewer.util.ReportHandler;
 
@@ -34,53 +40,21 @@ public class ConfigLoaderService {
 
   /**
    * Stores the ProgressReports.
-   **/
-  private HashMap<String, ReportHandler> progressReports = new HashMap<String, ReportHandler>();
-
-  /**
-   * Stores the ConfigurationReports.
-   **/
-  private HashMap<String, ConfigurationReport> finalReports = new HashMap<String, ConfigurationReport>();
-
-  /**
-   * Gets the XML representation of the ConfigurationReport
-   *
-   * @param configurationId id
-   * @return XML representation of the ConfigurationReport
-   * @throws TagIdException if id not found or a non-numeric id was requested (
-   *           {@link TagIdException}), or any other exception thrown by the
-   *           underlying service gateway.
    */
-  public String getConfigurationReportXml(final String configurationId) throws TagIdException {
-
-    try {
-      ConfigurationReport report = getConfigurationReport(Long.parseLong(configurationId));
-      if (report != null)
-        return report.toXML();
-      else
-        throw new TagIdException("Id not found.");
-    } catch (NumberFormatException e) {
-      throw new TagIdException("Invalid configuration Id");
-    }
-  }
-
+  private Map<String, ReportHandler> progressReports = new HashMap<>();
 
   /**
-   * Retrieves a ConfigurationReport object from the service gateway tagManager
-   *
-   * @param configurationId id of the configuration
-   * @return Configuration Report
+   * Stores the partial {@link ConfigurationReportHeader} objects. Each
+   * configuration id may have multiple reports (as it may be run multiple
+   * times).
    */
-  private ConfigurationReport getConfigurationReport(final long configurationId) {
-    ConfigurationReport report = gateway.getTagManager().applyConfiguration(configurationId);
+  private Map<String, List<ConfigurationReportHeader>> configurationReportHeaders = new TreeMap<>();
 
-    logger.debug("getConfigurationReport: Received configuration report? -> " + configurationId + ": " + (report == null ? "NULL" : "SUCCESS"));
-
-    if (report == null)
-      logger.warn("Received NULL Configuration report for configuration id:" + configurationId);
-
-    return report;
-  }
+  /**
+   * Stores the full {@link ConfigurationReport} objects. Each configuration id
+   * may have multiple reports (as it may be run multiple times).
+   */
+  private Map<String, List<ConfigurationReport>> configurationReports = new HashMap<>();
 
   /**
    * Applies the specified configuration and stores the Configuration Report for
@@ -90,10 +64,10 @@ public class ConfigLoaderService {
    * @throws CannotProceedException In case a serious error occurs (for example
    *           in case a null Configuration Report is received).
    */
-  public void getConfigurationReportWithReportUpdates(final long configurationId) throws CannotProceedException {
+  public void applyConfiguration(final long configurationId) throws CannotProceedException {
 
     ReportHandler reportHandler = new ReportHandler(configurationId);
-    progressReports.put("" + configurationId, reportHandler);
+    progressReports.put(String.valueOf(configurationId), reportHandler);
 
     ConfigurationReport report = gateway.getTagManager().applyConfiguration(configurationId, reportHandler);
 
@@ -105,40 +79,79 @@ public class ConfigLoaderService {
     }
     logger.debug("getConfigurationReport: Report=" + report.toXML());
 
-    finalReports.put("" + configurationId, report); // store the report for
-                                                    // viewing later
+    if (report.getName().equals("UNKNOWN")) {
+      if (configurationReports.containsKey(String.valueOf(configurationId))) {
+        configurationReports.get(String.valueOf(configurationId)).add(report);
+      } else {
+        List<ConfigurationReport> reports = getConfigurationReports(String.valueOf(configurationId));
+        if (reports.isEmpty()) {
+          reports.add(report);
+        }
+        configurationReports.put(String.valueOf(configurationId), reports);
+      }
+    }
+
+    // store the report for viewing later
+    ConfigurationReportHeader header = new ConfigurationReportHeader(report.getId(), report.getName(), report.getUser(), report.getStatus(),
+        report.getStatusDescription(), report.getTimestamp());
+
+    Map<String, List<ConfigurationReportHeader>> headers = getConfigurationReports();
+    if (headers.containsKey(String.valueOf(configurationId))) {
+      headers.get(String.valueOf(configurationId)).add(header);
+    } else {
+
+      headers.put(String.valueOf(configurationId), new ArrayList<>(Arrays.asList(header)));
+    }
   }
 
   /**
-   * Retrieves a ConfigurationReport stored in the web server.
+   * Retrieves all full reports for a particular configuration.
    *
    * @param configurationId id of the configuration of the request
-   * @return Configuration Report
+   * @return a map of full reports
    */
-  public ConfigurationReport getStoredConfigurationReport(final String configurationId) {
+  public List<ConfigurationReport> getConfigurationReports(final String configurationId) {
+    List<ConfigurationReport> reports;
 
-    ConfigurationReport report = finalReports.get(configurationId);
+    if (configurationReports.containsKey(configurationId)) {
+      reports = configurationReports.get(configurationId);
+    }
 
-    if (report == null) {
+    else {
+      reports = new ArrayList<>(gateway.getTagManager().getConfigurationReports(Long.valueOf(configurationId)));
+      Collections.sort(reports);
+    }
+
+    if (reports == null) {
       logger.error("Could not retrieve Stored Configuration Report for configuration id:" + configurationId);
       throw new NotFoundException("Cannot find Configuration Report for configuration id:" + configurationId);
     }
     logger.debug("Succesfully retrieved Stored Configuration Report for configuration id:" + configurationId);
 
-    return report;
+    return reports;
   }
 
   /**
+   * Retrieve partial information about all previous configurations.
+   *
    * @return all the previously applied configuration reports
    */
-  public HashMap<String, ConfigurationReport> getFinalReports() {
-    if (finalReports.isEmpty()) {
-      Collection<ConfigurationReport> reports = gateway.getTagManager().getConfigurationReports();
-      for (ConfigurationReport report : reports) {
-        finalReports.put(String.valueOf(report.getId()), report);
+  public Map<String, List<ConfigurationReportHeader>> getConfigurationReports() {
+
+    if (configurationReportHeaders.isEmpty()) {
+      List<ConfigurationReportHeader> reports = new ArrayList<>(gateway.getTagManager().getConfigurationReports());
+      Collections.sort(reports);
+
+      for (ConfigurationReportHeader report : reports) {
+        if (configurationReportHeaders.containsKey(String.valueOf(report.getId()))) {
+          configurationReportHeaders.get(String.valueOf(report.getId())).add(report);
+        } else {
+          configurationReportHeaders.put(String.valueOf(report.getId()), new ArrayList<>(Arrays.asList(report)));
+        }
       }
     }
-    return finalReports;
+
+    return configurationReportHeaders;
   }
 
   /**

@@ -1,4 +1,5 @@
 <%@ attribute name="list" required="true" type="java.util.ArrayList"%>
+<%@ attribute name="uniqueId" required="true" type="java.lang.String"%>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="c2mon"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
@@ -20,7 +21,8 @@
 
       <c:forEach items="${list}" var="subReport">
 
-        <tr data-toggle="collapse" data-target="#collapseme-sub-${subReport.action}-${subReport.id}" class="accordion-toggle">
+        <tr data-toggle="collapse" data-target="#collapse-sub-${uniqueId}-${subReport.action}-${subReport.id}" 
+            class="accordion-toggle">
           <td class="button" style="text-align: center;">
             <c:if test="${subReport.statusMessage != null || fn:length(subReport.subreports) > 0}">
               <button class="btn btn-default btn-xs">
@@ -50,7 +52,7 @@
 
         <tr>
           <td colspan="5" class="hiddenRow">
-            <div class="accordian-body collapse" id="collapseme-sub-${subReport.action}-${subReport.id}">
+            <div class="accordian-body collapse" id="collapse-sub-${uniqueId}-${subReport.action}-${subReport.id}">
 
               <c:choose>
                 <c:when test="${subReport.statusMessage == null && fn:length(subReport.subreports) == 0}">
@@ -66,7 +68,7 @@
 
                     <c:if test="${fn:length(subReport.subreports) > 0}">
                       <h4>Nested reports:</h4>
-                      <c2mon:subReports list="${subReport.subreports}"></c2mon:subReports>
+                      <c2mon:subReports list="${subReport.subreports}" uniqueId="${uniqueId}"></c2mon:subReports>
                     </c:if>
                   </div>
                 </c:otherwise>

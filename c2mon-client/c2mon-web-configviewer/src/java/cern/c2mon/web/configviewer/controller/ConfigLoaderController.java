@@ -1,6 +1,7 @@
 package cern.c2mon.web.configviewer.controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -102,7 +103,7 @@ public class ConfigLoaderController {
     logger.debug(CONFIG_LOADER_PROGRESS_FINAL_REPORT_XML_URL + id);
 
     try {
-      model.addAttribute("xml", service.getStoredConfigurationReport(id).toXML());
+      model.addAttribute("xml", service.getConfigurationReports(id).get(0).toXML());
     } catch (NotFoundException e) {
       return ("redirect:" + "/configloader/errorform/" + id);
     }
@@ -121,25 +122,9 @@ public class ConfigLoaderController {
   public String viewFinalReport(@PathVariable(value = "id") final String id, final HttpServletResponse response, final Model model, final HttpServletRequest request) throws IOException {
     logger.debug(CONFIG_LOADER_PROGRESS_FINAL_REPORT_URL + "/{id} " + id);
 
-//    try {
-//      response.setContentType("text/html; charset=UTF-8");
-//      response.getWriter().println(FormUtility.getHeader("../../.."));
-//      response.getWriter().println(service.getStoredConfigurationReportHtml(id));
-//      response.getWriter().println(FormUtility.getFooter());
-//
-//    } catch (TagIdException e) {
-//      return ("redirect:" + "/configloader/errorform/" + id);
-//
-//    } catch (Exception e) {
-//      response.setStatus(400);
-//      response.getWriter().println(e.getMessage());
-//      logger.error("viewFinalReport() - Error occured whilst trying show final report.", e);
-//    }
-//    return null;
-
-    ConfigurationReport report = service.getFinalReports().get(id);
+    List<ConfigurationReport> report = service.getConfigurationReports(id);
     logger.debug(report);
-    model.addAttribute("report", report);
+    model.addAttribute("reports", report);
     model.addAttribute("title", "Configuration Report: " + id);
 
     return "config/configReport";
@@ -216,7 +201,6 @@ public class ConfigLoaderController {
     logger.debug(CONFIG_LOADER_PROGRESS_REPORT_URL);
 
     model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, "", CONFIG_LOADER_URL));
-    model.addAttribute("reports", service.getFinalReports());
     return "loadConfigForm";
   }
 
@@ -230,7 +214,7 @@ public class ConfigLoaderController {
   @RequestMapping(value = CONFIG_LOADER_PROGRESS_REPORT_URL + "/start", method = RequestMethod.POST)
   public void startConfigurationProcess(@RequestParam("configurationId") final String configurationId) throws Exception {
     logger.debug("(AJAX) Starting Configuration Request: " + configurationId);
-    service.getConfigurationReportWithReportUpdates(Integer.parseInt(configurationId));
+    service.applyConfiguration(Integer.parseInt(configurationId));
   }
 
   /**
@@ -257,8 +241,6 @@ public class ConfigLoaderController {
     }
 
     // @ResponseBody will automatically convert the returned value into JSON
-    // format
-    // (Jackson)
     return currentProgress;
   }
 
@@ -279,8 +261,6 @@ public class ConfigLoaderController {
       progressDescription = report.getProgressDescription();
     }
     // @ResponseBody will automatically convert the returned value into JSON
-    // format
-    // You must have Jackson in your classpath
     // Jackson does not work as expected in this case.. so Gson is used for this
     // case
     return getGson().toJson(progressDescription);

@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="c2mon" tagdir="/WEB-INF/tags"%>
 
 <!-- JSP variables -->
@@ -48,7 +49,7 @@ tr {
             <tr>
               <th>Configuration ID</th>
               <th>Configuration Name</th>
-              <th>Applied On</th>
+              <th>Last Applied On</th>
               <th>Applied By</th>
               <th>Status</th>
             </tr>
@@ -57,27 +58,28 @@ tr {
           <tbody>
             <c:forEach items="${cache}" var="entry">
               <c:set var="id" value="${entry.key}" />
-              <c:set var="report" value="${entry.value}" />
+              <c:set var="report" value="${entry.value[fn:length(entry.value) -1]}" />
 
-              <tr>
-                <td class="id">${id}</td>
-                <td>${report.name}</td>
-                <td>${report.timestamp}</td>
-                <td>${report.user}</td>
-                <td class="cell-label">
-                  <c:choose>
-                    <c:when test="${report.status == 'FAILURE'}">
-                      <span class="label label-danger">FAILURE</span>
-                    </c:when>
-                    <c:when test="${report.status == 'RESTART'}">
-                      <span class="label label-warning">RESTART</span>
-                    </c:when>
-                    <c:otherwise>
-                      <span class="label label-success">OK</span>
-                    </c:otherwise>
-                  </c:choose>
-                </td>
-              </tr>
+                  <tr>
+                    <td class="id">${id}</td>
+                    <td>${report.name}</td>
+                    <td>${report.timestamp}</td>
+                    <td>${report.user}</td>
+                    <td class="cell-label">
+                      <c:choose>
+                        <c:when test="${report.status == 'FAILURE'}">
+                          <span class="label label-danger">FAILURE</span>
+                        </c:when>
+                        <c:when test="${report.status == 'RESTART'}">
+                          <span class="label label-warning">RESTART</span>
+                        </c:when>
+                        <c:otherwise>
+                          <span class="label label-success">OK</span>
+                        </c:otherwise>
+                      </c:choose>
+                    </td>
+                  </tr>
+                  
             </c:forEach>
           </tbody>
         </table>

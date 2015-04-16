@@ -17,12 +17,13 @@
  ******************************************************************************/
 package cern.c2mon.web.configviewer.service;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
 
 /**
  * @author Justin Lewis Salmon
@@ -33,7 +34,7 @@ public class ConfigHistoryService {
   @Autowired
   ConfigLoaderService configLoaderService;
 
-  public Map<String, ConfigurationReport> getCachedReports() {
-    return configLoaderService.getFinalReports();
+  public Map<String, List<ConfigurationReportHeader>> getCachedReports() {
+    return configLoaderService.getConfigurationReports();
   }
 }
