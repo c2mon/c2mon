@@ -43,6 +43,7 @@ import cern.c2mon.shared.client.command.CommandExecuteRequest;
 import cern.c2mon.shared.client.command.CommandReport;
 import cern.c2mon.shared.client.command.CommandTagHandle;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.request.ClientRequest;
@@ -305,17 +306,33 @@ public class RequestHandlerImpl implements RequestHandler {
   }
 
   @Override
-  public Collection<ConfigurationReport> getConfigurationReports() throws JMSException {
+  public Collection<ConfigurationReportHeader> getConfigurationReports() throws JMSException {
+
+    ClientRequestImpl<ConfigurationReportHeader> clientRequest = new ClientRequestImpl<>(ResultType.TRANSFER_CONFIGURATION_REPORT_HEADER,
+        RequestType.RETRIEVE_CONFIGURATION_REQUEST, 10000);
+    Collection<ConfigurationReportHeader> reports = jmsProxy.sendRequest(clientRequest, defaultRequestQueue, clientRequest.getTimeout());
+
+    if (reports.isEmpty()) {
+      LOGGER.warn("getConfigurationReports() returned an empty collection");
+    }
+
+    LOGGER.trace("getConfigurationReports(): Received " + reports.size() + " configuration report headers");
+    return reports;
+  }
+
+  @Override
+  public Collection<ConfigurationReport> getConfigurationReports(Long id) throws JMSException {
 
     ClientRequestImpl<ConfigurationReport> clientRequest = new ClientRequestImpl<>(ResultType.TRANSFER_CONFIGURATION_REPORT,
         RequestType.RETRIEVE_CONFIGURATION_REQUEST, 10000);
+    clientRequest.setRequestParameter(String.valueOf(id));
     Collection<ConfigurationReport> reports = jmsProxy.sendRequest(clientRequest, defaultRequestQueue, clientRequest.getTimeout());
 
     if (reports.isEmpty()) {
       LOGGER.warn("getConfigurationReports() returned an empty collection");
     }
 
-    LOGGER.trace("getConfigurationReports(): Received " + reports.size() + " configuration reports");
+    LOGGER.trace("getConfigurationReports(): Received " + reports.size() + " reports for configuration " + id);
     return reports;
   }
 

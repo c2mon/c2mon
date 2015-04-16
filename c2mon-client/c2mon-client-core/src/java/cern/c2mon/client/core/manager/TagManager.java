@@ -38,6 +38,7 @@ import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.statistics.TagStatisticsResponse;
 import cern.c2mon.shared.client.tag.TagConfig;
@@ -405,9 +406,19 @@ public class TagManager implements CoreTagManager {
   }
 
   @Override
-  public Collection<ConfigurationReport> getConfigurationReports() {
+  public Collection<ConfigurationReportHeader> getConfigurationReports() {
     try {
       return clientRequestHandler.getConfigurationReports();
+    } catch (JMSException e) {
+      LOG.error("getConfigurationReports() - JMS connection lost -> Could not retrieve configuration reports from the C2MON server.", e);
+    }
+    return new ArrayList<>();
+  }
+
+  @Override
+  public Collection<ConfigurationReport> getConfigurationReports(Long id) {
+    try {
+      return clientRequestHandler.getConfigurationReports(id);
     } catch (JMSException e) {
       LOG.error("getConfigurationReports() - JMS connection lost -> Could not retrieve configuration reports from the C2MON server.", e);
     }

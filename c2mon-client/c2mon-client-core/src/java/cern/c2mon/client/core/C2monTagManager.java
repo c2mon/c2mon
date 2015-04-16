@@ -31,6 +31,7 @@ import cern.c2mon.client.core.manager.TagManager;
 import cern.c2mon.client.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.request.ClientRequestErrorReport;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
@@ -271,11 +272,28 @@ public interface C2monTagManager {
   ConfigurationReport applyConfiguration(final Long configurationId, final ClientRequestReportListener reportListener);
 
   /**
-   * Retrieve a list of all previously applied configuration reports from the server.
+   * Retrieve a list of all previously applied configuration reports from the
+   * server. Note that this method will only return partial information about
+   * each report. This is done to reduce the size of the message returned by the
+   * server.
+   *
+   * To get the full report(s) for a particular configuration, use
+   * {@link C2monTagManager#getConfigurationReports(Long)}.
    *
    * @return the list of previously applied configuration reports
    */
-  Collection<ConfigurationReport> getConfigurationReports();
+  Collection<ConfigurationReportHeader> getConfigurationReports();
+
+  /**
+   * Retrieve the full configuration report(s) for a given configuration. Since
+   * a configuration may be run more than once, this method returns a collection
+   * of all historical reports for the given configuration.
+   *
+   * @param id the id of the configuration report
+   * @return the full configuration report(s) if the configuration was run more
+   *         than once
+   */
+  Collection<ConfigurationReport> getConfigurationReports(Long id);
 
   /**
    * Requests the DAQ config XML for a given process.
