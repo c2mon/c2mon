@@ -11,13 +11,13 @@
 
 	<DataTags>
 
-		<DataTag id="124149" name="LHCCOLLIMATOR:TCLA.B6L7.B2:12000" control="false">
+		<DataTag id="124149" name="LHCCOLLIMATOR:TCSG.B5R7.B2:22000" control="false">
 			<data-type>Boolean</data-type>
 
 			<DataTagAddress>
 				<HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.LASERHardwareAddressImpl">
 					<fault-family>LHCCOLLIMATOR</fault-family>
-					<fault-member>TCLA.B6L7.B2</fault-member>
+					<fault-member>TCSG.B5R7.B2</fault-member>
 					<fault-code>22000</fault-code>
 				</HardwareAddress>
 

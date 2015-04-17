@@ -5,6 +5,7 @@
 package cern.c2mon.daq.laser.source;
 
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.address.LASERHardwareAddress;
 import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 
 public class EquipmentMonitor implements EquipmentMonitorMBean {
@@ -46,6 +47,28 @@ public class EquipmentMonitor implements EquipmentMonitorMBean {
             }
         }
         return i;
+    }
+
+    @Override
+    public int getNumberOfAlarms() {
+        return equipment.getSourceDataTags().size();
+    }
+    
+    @Override
+    public boolean getDataTagStatus(String faultFamily, String faultMember, int faultCode) {
+        
+        for (ISourceDataTag sourceDataTag : equipment.getSourceDataTags().values()) {
+            if(sourceDataTag.getHardwareAddress() instanceof LASERHardwareAddress) {
+                LASERHardwareAddress address = (LASERHardwareAddress) sourceDataTag.getHardwareAddress();
+                if(address.getFaultFamily().equalsIgnoreCase(faultFamily) && address.getFaultMember().equalsIgnoreCase(faultMember) && address.getFalutCode() == faultCode) {
+                    if(sourceDataTag.getCurrentValue() != null) {
+                        return (boolean) sourceDataTag.getCurrentValue().getValue();
+                    }
+                    break;
+                }
+            }
+        }
+        throw new NullPointerException("DataTag not found, please check parameters.");
     }
 
 }

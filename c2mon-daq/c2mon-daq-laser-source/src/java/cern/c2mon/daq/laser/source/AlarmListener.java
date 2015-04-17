@@ -27,6 +27,8 @@ public class AlarmListener implements AlarmConsumerInterface, AlarmMessageVisito
 
     public static LaserNativeMessageHandler handler;
 
+    public static final Object lock = new Object();
+
     @Override
     public void onMessage(AlarmMessageData alarmMessage) {
 
@@ -119,7 +121,7 @@ public class AlarmListener implements AlarmConsumerInterface, AlarmMessageVisito
      */
     public boolean isAlarmDeclared(ClientAlarmEvent alarm) {
         AlarmDefinition alarmDef = new AlarmDefinition(alarm.getAlarmId());
-
+        
         for (LASERHardwareAddress laserHardwareAddress : getHandler().getRegisteredLaserHardwareAddress().get(equipement)) {
             if (laserHardwareAddress.getFaultFamily().equalsIgnoreCase(alarmDef.getDeviceClass())) {
                 if (laserHardwareAddress.getFaultMember().equalsIgnoreCase(alarmDef.getDeviceName())) {
@@ -185,32 +187,43 @@ public class AlarmListener implements AlarmConsumerInterface, AlarmMessageVisito
                     }
                 }
                 if (isInBackup) {
-                    if (dataTag.getCurrentValue() != null && dataTag.getCurrentValue().getValue().equals(true)) {
-                        log.debug("This dataTag - " + dataTag.getName() + " - has already the good value :"
-                                + dataTag.getCurrentValue().getValue());
-
-                    } else {
+                    if (!(dataTag.getCurrentValue() != null && dataTag.getCurrentValue().getValue().equals(true))) {
                         getHandler().mbean.setDataTag(dataTag.getId());
                         equipementMessageSender.sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis());
                         getHandler().mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
-                    }
+                    } 
+//                    else {
+//                        log.debug("This dataTag - " + dataTag.getName() + " - has already the good value :"
+//                                + dataTag.getCurrentValue().getValue());
+//                    }
                 } else {
-                    if (dataTag.getCurrentValue() != null && dataTag.getCurrentValue().getValue().equals(false)) {
-                        log.debug("This dataTag - " + dataTag.getName() + " - has already the good value : "
-                                + dataTag.getCurrentValue().getValue());
-                    } else {
+                    if (!(dataTag.getCurrentValue() != null && dataTag.getCurrentValue().getValue().equals(false))) {
                         getHandler().mbean.setDataTag(dataTag.getId());
                         equipementMessageSender.sendTagFiltered(dataTag, Boolean.FALSE, System.currentTimeMillis());
                         getHandler().mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
-                    }
+                    } 
+//                    else {
+//                        log.debug("This dataTag - " + dataTag.getName() + " - has already the good value : "
+//                                + dataTag.getCurrentValue().getValue());
+//                    }
                 }
             }
         }
 
     }
+
+    public LaserNativeMessageHandler getHandler() {
+        synchronized (lock) {
+            return handler;
+        }
+    }
     
-    public synchronized static LaserNativeMessageHandler getHandler() {
-        return handler;
+    public void setEquipment(IEquipmentConfiguration configuration) {
+        equipement = configuration;
+    }
+    
+    public void setEquipmentMessage(IEquipmentMessageSender sender) {
+        equipementMessageSender = sender;
     }
 
 }

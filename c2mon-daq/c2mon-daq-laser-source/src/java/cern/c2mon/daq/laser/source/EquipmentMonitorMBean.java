@@ -4,7 +4,7 @@
 
 package cern.c2mon.daq.laser.source;
 
-import cern.c2mon.shared.common.datatag.ISourceDataTag;
+
 
 public interface EquipmentMonitorMBean {
 
@@ -19,5 +19,8 @@ public interface EquipmentMonitorMBean {
     
     public int getAlarmsOn();
     
+    public int getNumberOfAlarms();
+    
+    public boolean getDataTagStatus(String faultFamily, String faultMember, int faultCode);
     
 }
