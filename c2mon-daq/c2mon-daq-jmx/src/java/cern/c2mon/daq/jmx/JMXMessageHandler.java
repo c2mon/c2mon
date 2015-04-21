@@ -625,7 +625,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
         
         for (Entry<?,?> e : map.entrySet()) {
             
-            String valueStr = e.getKey().toString() + ":" + e.getValue().toString();
+            String valueStr = e.getKey().toString() + "=" + e.getValue().toString();
             
             if (result.length() + valueStr.length()  + cutInfoString.length() > MAX_ARRAY_TO_STRING_LENGTH) {
                 result.append(cutInfoString);
