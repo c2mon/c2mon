@@ -315,7 +315,7 @@ public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
 
         assertEquals(SourceDataQuality.OK, sdtv.getFirstValue(54675L).getQuality().getQualityCode());
         assertEquals(10, sdtv.getFirstValue(54675L).getValue());
-        assertEquals("[0,0,0,0,0,0,0,0,0,0]", sdtv.getFirstValue(54675L).getValueDescription());
+        assertEquals("[0,1,2,3,4,5,6,7,8,9]", sdtv.getFirstValue(54675L).getValueDescription());
     }
 
     @Test
