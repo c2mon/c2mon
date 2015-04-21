@@ -148,7 +148,7 @@ public class JAPCMessageHandlerTest extends GenericMessageHandlerTst {
 
         japcHandler.connectToDataSource();
 
-        Thread.sleep(5000);
+        Thread.sleep(15000);
 
         verify(messageSender);
 
