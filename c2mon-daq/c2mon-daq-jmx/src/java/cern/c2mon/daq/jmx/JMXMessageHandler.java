@@ -7,7 +7,9 @@ import static java.lang.String.format;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
@@ -66,6 +68,8 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
     static long MBEAN_CONNECTION_RETRY_TIMOUT = 30000; // ms
 
     static long CONNECTION_TEST_INTERVAL = 30000; // ms
+    
+    static int MAX_ARRAY_TO_STRING_LENGTH = 1000 * 1000;  // 10kb  
 
     static final int EQ_ADDRESS_MIN_NUMBER_OF_EXPECTED_PARAMETERS = 2;
 
@@ -538,16 +542,16 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
                 result = ((java.util.List<?>) attrVal).get(addr.getIndex());
             } else { // if the index is not set, by default return the current size of collection
                 result = ((java.util.List<?>) attrVal).size();
-                valueDescription = ((java.util.List<?>) attrVal).toString();
+                valueDescription = listToString((java.util.List<?>) attrVal);
+                //valueDescription = ((java.util.List<?>) attrVal).toString();
             }
             // check if the returned attribute of a JMX bean is a map
         } else if (attrVal instanceof java.util.Map<?, ?>) {
             if (addr.hasMapField()) {
-                Map<?, ?> map = (java.util.Map<?, ?>) attrVal;
                 result = ((java.util.Map<?, ?>) attrVal).get(addr.getMapField());
             } else { // if the field is not set, by default return the current size of the map
                 result = ((java.util.Map<?, ?>) attrVal).size();
-                valueDescription = ((java.util.Map<?, ?>) attrVal).toString();
+                valueDescription = mapToString((java.util.Map<?, ?>) attrVal);
             }
             // check if the returned attribute of a JMX bean is a set
         } else if (attrVal instanceof java.util.Set<?>) {
@@ -576,8 +580,10 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
         return result.replaceAll(xml10pattern, str);
     }
 
-    private static String arrayToString(Object array) {
+    static String arrayToString(Object array) {
 
+        String cutInfoString = "...(cut by JMX DAQ)";
+        
         if (!array.getClass().isArray()) {
             return "";
         }
@@ -586,7 +592,17 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
 
         StringBuilder result = new StringBuilder("[");
         for (int i = 0; i < length; i++) {
-            result.append(java.lang.reflect.Array.get(array, i));
+            Object o = java.lang.reflect.Array.get(array, i);
+            
+            if (o != null) {
+                // + 1 for the ']' at the end
+                
+                if (o.toString().length() + result.length() > MAX_ARRAY_TO_STRING_LENGTH  ) {
+                    result.append(cutInfoString);
+                    break;
+                }
+            }
+            result.append(o);
             if (i < length - 1) {
                 result.append(",");
             }
@@ -595,7 +611,36 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
 
         return result.toString();
     }
+    
+    static String listToString(List<?> list) {
 
+        return arrayToString(list.toArray());
+        
+    }
+    
+    static String mapToString(Map<?,?> map) {
+        StringBuilder result = new StringBuilder("{") ;
+        
+        String cutInfoString = "...(cut by JMX DAQ)";
+        
+        for (Entry<?,?> e : map.entrySet()) {
+            
+            String valueStr = e.getKey().toString() + ":" + e.getValue().toString();
+            
+            if (result.length() + valueStr.length()  + cutInfoString.length() > MAX_ARRAY_TO_STRING_LENGTH) {
+                result.append(cutInfoString);
+                break;
+            } else {
+                result.append(valueStr).append(",");
+            }
+        }
+        if (result.charAt(result.length() -1 ) == ',') {
+            return result.delete(result.length() -1, result.length()).append("}").toString();
+        } else {
+            return result.append("}").toString();
+        }
+    }
+    
     /**
      * this private method extracts a value from a given map attribute of <code>CompositeData</code> bean implementing
      * <code>TabularData</code> interface

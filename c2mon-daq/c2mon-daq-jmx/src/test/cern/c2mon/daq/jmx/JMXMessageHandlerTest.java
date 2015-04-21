@@ -12,6 +12,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -952,4 +956,55 @@ public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
         assertEquals("", sdtv.getFirstValue(54675L).getValueDescription());
     }
 
+    
+    @Test
+    @UseConf("e_jmx_list_map_length_protection.xml")
+    public void testArrayLengthProtection() throws Exception {
+        
+        messageSender.sendCommfaultTag(107211, true);
+        expectLastCall().once();
+
+        SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
+
+        messageSender.addValue(EasyMock.capture(sdtv));
+        expectLastCall().times(2);
+        
+        replay(messageSender);
+        
+        JMXMessageHandler.MAX_ARRAY_TO_STRING_LENGTH = 50;
+        
+        List<String> values = new ArrayList<String>();
+        Map<String, Integer> testMap = new HashMap<String, Integer>();
+        
+        // clearly oversize the list and map..
+        for (int i = 0; i < JMXMessageHandler.MAX_ARRAY_TO_STRING_LENGTH + 100; i ++) {
+          values.add("A");
+          testMap.put(""+ i, i);
+        }
+        
+        // change the cache value
+        ObjectName oname = new ObjectName(CACHE_BEAN_OBJ_NAME);
+        mbs.setAttribute(oname, new Attribute("Values", values));
+        mbs.setAttribute(oname, new Attribute("CacheSize", JMXMessageHandler.MAX_ARRAY_TO_STRING_LENGTH));
+        mbs.setAttribute(oname, new Attribute("TestMap", testMap));
+        
+        jmxHandler.connectToDataSource();
+
+        Thread.sleep(1000);
+
+        verify(messageSender);
+
+        // we should have here the original size, but a truncated value description
+        assertEquals(values.size(), sdtv.getFirstValue(54675L).getValue());
+        
+        // we add here 30 in order to respect the additional info which the handler sets 
+        assertTrue(JMXMessageHandler.MAX_ARRAY_TO_STRING_LENGTH + 30 > sdtv.getFirstValue(54675L).getValueDescription().length());
+        
+        assertEquals(testMap.size(), sdtv.getFirstValue(54676L).getValue());
+        assertTrue(JMXMessageHandler.MAX_ARRAY_TO_STRING_LENGTH + 30 > sdtv.getFirstValue(54676L).getValueDescription().length());
+        
+        
+    }
+    
+    
 }
