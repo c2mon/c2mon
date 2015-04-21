@@ -43,6 +43,10 @@ public class Cache extends NotificationBroadcasterSupport implements CacheMBean 
         
         testMap.put("CATEGORY1/process1/metric1", 123);
         testMap.put("CATEGORY1/process2/metric1", 128);
+        
+        for (int i=0; i< 10; i++ ) {
+            values.add("" + i);
+        }
     }
 
     /*
