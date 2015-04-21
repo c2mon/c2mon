@@ -288,7 +288,7 @@ public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
 
         assertEquals(SourceDataQuality.OK, sdtv.getFirstValue(54675L).getQuality().getQualityCode());
         assertEquals(2, sdtv.getFirstValue(54675L).getValue());
-        assertEquals("[a, b]", sdtv.getFirstValue(54675L).getValueDescription());
+        assertEquals("[a,b]", sdtv.getFirstValue(54675L).getValueDescription());
     }
 
     @Test
@@ -764,7 +764,7 @@ public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
         assertEquals(SourceDataQuality.OK, sdtv.getFirstValue(54675L).getQuality().getQualityCode());
         // the array has 10 elements
         assertEquals(10, sdtv.getFirstValue(54675L).getValue());
-        assertEquals("[0,0,0,0,0,0,0,0,0,0]", sdtv.getFirstValue(54675L).getValueDescription());
+        assertEquals("[0,1,2,3,4,5,6,7,8,9]", sdtv.getFirstValue(54675L).getValueDescription());
     }
 
     @Test
@@ -966,6 +966,8 @@ public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
 
         SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
 
+        Thread.sleep(500);
+        
         messageSender.addValue(EasyMock.capture(sdtv));
         expectLastCall().times(2);
         
