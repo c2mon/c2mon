@@ -320,11 +320,11 @@ public class JAPCMessageHandlerTest extends GenericMessageHandlerTst {
         SimpleParameterValue sval2 = ParameterValueFactory.newParameterValue(new float[] { 10.2f, 8.3f, 33.4f, 10.2f,
                 8.5f, 33.4f }, new int[] { 5, 6 });
 
-        Thread.sleep(100);
+        Thread.sleep(1000);
 
         p1.setValue(s1, sval2);
 
-        Thread.sleep(100);
+        Thread.sleep(1000);
 
         verify(messageSender);
 
