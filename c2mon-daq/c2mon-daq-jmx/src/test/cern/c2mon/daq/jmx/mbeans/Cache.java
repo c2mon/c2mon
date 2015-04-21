@@ -25,12 +25,14 @@ public class Cache extends NotificationBroadcasterSupport implements CacheMBean 
 
     private List<String> cacheListeners = new ArrayList<String>();
 
-    private int[] values = new int[10];
+    private List<String> values = new ArrayList<String>(10);
 
     private static final int DEFAULT_CACHE_SIZE = 200;
 
     static Logger log = Logger.getLogger(Cache.class);
 
+    Map<String, Integer> testMap = new HashMap<String, Integer>();
+    
     private long sequenceNumber = 1;
 
     // instance init block. put some "listeners" for tests
@@ -38,6 +40,9 @@ public class Cache extends NotificationBroadcasterSupport implements CacheMBean 
 
         cacheListeners.add("a");
         cacheListeners.add("b");
+        
+        testMap.put("CATEGORY1/process1/metric1", 123);
+        testMap.put("CATEGORY1/process2/metric1", 128);
     }
 
     /*
@@ -118,8 +123,13 @@ public class Cache extends NotificationBroadcasterSupport implements CacheMBean 
     }
 
     @Override
-    public int[] getValues() {
+    public List<String> getValues() {
         return this.values;
+    }
+    
+    @Override
+    public void setValues(List<String> newVals) {
+        this.values = newVals;
     }
 
     /*
@@ -128,10 +138,12 @@ public class Cache extends NotificationBroadcasterSupport implements CacheMBean 
      * @see ch.cern.tim.driver.jmx.CacheMBean#getTestMap()
      */
     @Override
-    public Map<String, ?> getTestMap() {
-        Map<String, Integer> testMap = new HashMap<String, Integer>();
-        testMap.put("CATEGORY1/process1/metric1", 123);
-        testMap.put("CATEGORY1/process2/metric1", 128);
+    public Map<String, Integer> getTestMap() {
         return testMap;
+    }
+    
+    @Override
+    public void setTestMap(Map<String,Integer> newElements) {
+        testMap = newElements;
     }
 }

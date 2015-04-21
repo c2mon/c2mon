@@ -11,7 +11,7 @@ public interface CacheMBean {
 
     List<String> getCacheListeners();
 
-    int[] getValues();
+    List<String> getValues();
 
     void setCachedObjects(int objects);
 
@@ -25,5 +25,9 @@ public interface CacheMBean {
 
     String test2(Integer val);
 
-    Map<String, ?> getTestMap();
+    Map<String, Integer> getTestMap();
+
+    void setValues(List<String> newVals);
+
+    void setTestMap(Map<String, Integer> newElements);
 }
