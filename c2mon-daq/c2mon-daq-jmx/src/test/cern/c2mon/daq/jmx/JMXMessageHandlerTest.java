@@ -731,7 +731,7 @@ public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
 
         assertEquals(SourceDataQuality.OK, sdtv.getFirstValue(54675L).getQuality().getQualityCode());
         assertEquals(2, sdtv.getFirstValue(54675L).getValue());
-        assertEquals("{CATEGORY1/process1/metric1=123, CATEGORY1/process2/metric1=128}", sdtv.getFirstValue(54675L)
+        assertEquals("{CATEGORY1/process1/metric1=123,CATEGORY1/process2/metric1=128}", sdtv.getFirstValue(54675L)
                 .getValueDescription());
 
         assertEquals(SourceDataQuality.OK, sdtv.getFirstValue(54676L).getQuality().getQualityCode());
