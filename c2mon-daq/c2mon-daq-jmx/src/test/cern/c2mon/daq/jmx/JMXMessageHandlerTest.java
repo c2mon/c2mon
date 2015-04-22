@@ -88,6 +88,8 @@ public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
     private static final String TEST_BEAN_OBJ_NAME = "cern.example.mbeans:type=TestBean";
     private static final String QUEUE_SAMPLER_BEAN_OBJ_NAME = "cern.example.mbeans:type=QueueSampler";
 
+    private static int MAX_ARRAY_DEFAULT_VALUE = JMXMessageHandler.MAX_ARRAY_TO_STRING_LENGTH;
+    
     @SuppressWarnings("static-access")
     @Override
     protected void beforeTest() throws Exception {
@@ -101,6 +103,8 @@ public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
 
         mbs = ManagementFactory.getPlatformMBeanServer();
 
+        JMXMessageHandler.MAX_ARRAY_TO_STRING_LENGTH = MAX_ARRAY_DEFAULT_VALUE;
+        
         // register our testing mbean
         CacheMBean mbean = new Cache();
         ObjectName oname = new ObjectName(CACHE_BEAN_OBJ_NAME);
@@ -729,10 +733,13 @@ public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
 
         verify(messageSender);
 
+        System.out.println(JMXMessageHandler.MAX_ARRAY_TO_STRING_LENGTH);
+        
         assertEquals(SourceDataQuality.OK, sdtv.getFirstValue(54675L).getQuality().getQualityCode());
         assertEquals(2, sdtv.getFirstValue(54675L).getValue());
         assertEquals("{CATEGORY1/process1/metric1=123,CATEGORY1/process2/metric1=128}", sdtv.getFirstValue(54675L)
                 .getValueDescription());
+        System.out.println(sdtv.getFirstValue(54675L).getValueDescription());
 
         assertEquals(SourceDataQuality.OK, sdtv.getFirstValue(54676L).getQuality().getQualityCode());
         assertEquals(123, sdtv.getFirstValue(54676L).getValue());
@@ -973,6 +980,7 @@ public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
         
         replay(messageSender);
         
+        int defaultValue = JMXMessageHandler.MAX_ARRAY_TO_STRING_LENGTH; 
         JMXMessageHandler.MAX_ARRAY_TO_STRING_LENGTH = 50;
         
         List<String> values = new ArrayList<String>();
