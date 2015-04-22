@@ -6,6 +6,7 @@ package cern.c2mon.daq.laser.source;
 
 
 
+
 public interface EquipmentMonitorMBean {
 
     

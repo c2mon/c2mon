@@ -209,21 +209,12 @@ public class AlarmListener implements AlarmConsumerInterface, AlarmMessageVisito
                 }
             }
         }
-
     }
 
     public LaserNativeMessageHandler getHandler() {
         synchronized (lock) {
             return handler;
         }
-    }
-    
-    public void setEquipment(IEquipmentConfiguration configuration) {
-        equipement = configuration;
-    }
-    
-    public void setEquipmentMessage(IEquipmentMessageSender sender) {
-        equipementMessageSender = sender;
     }
 
 }

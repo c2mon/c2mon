@@ -49,9 +49,12 @@ public class EquipmentMonitor implements EquipmentMonitorMBean {
         return i;
     }
 
+    /**
+     * size() - 1 because we do not take care of the heartbeat tag
+     */
     @Override
     public int getNumberOfAlarms() {
-        return equipment.getSourceDataTags().size();
+        return equipment.getSourceDataTags().size() - 1;
     }
     
     @Override
