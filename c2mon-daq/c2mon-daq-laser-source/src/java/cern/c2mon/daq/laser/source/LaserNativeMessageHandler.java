@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.jms.JMSException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
@@ -29,22 +29,53 @@ import cern.c2mon.shared.common.datatag.address.SimpleHardwareAddress;
 import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
+import cern.diamon.alarms.client.AlarmConnector;
+import cern.diamon.alarms.client.AlarmConnectorFactory;
 
 public class LaserNativeMessageHandler extends EquipmentMessageHandler implements IDataTagChanger,
         IEquipmentConfigurationChanger {
 
     private static final Logger log = LoggerFactory.getLogger(LaserNativeMessageHandler.class);
-    private static ClassPathXmlApplicationContext ctx;
 
     protected EquipmentMonitor mbean;
-    private boolean testMode = false;
 
     private ConcurrentHashMap<IEquipmentConfiguration, Collection<LASERHardwareAddress>> alarmList4Equipement = new ConcurrentHashMap<IEquipmentConfiguration, Collection<LASERHardwareAddress>>();
     private ConcurrentHashMap<String, IEquipmentConfiguration> equipementByName = new ConcurrentHashMap<String, IEquipmentConfiguration>();
     private ConcurrentHashMap<IEquipmentConfiguration, IEquipmentMessageSender> equMessageSenderList = new ConcurrentHashMap<IEquipmentConfiguration, IEquipmentMessageSender>();
     private ConcurrentHashMap<IEquipmentConfiguration, ISourceDataTag> heartbeatTag4Equipment = new ConcurrentHashMap<IEquipmentConfiguration, ISourceDataTag>();
     private ConcurrentHashMap<String, ISourceDataTag> tag4LaserHardwareAddress = new ConcurrentHashMap<String, ISourceDataTag>();
+    
+    
+    private AlarmListener listener;
+    
+    private AlarmConnector connector;
+    
+    /**
+     * @throws JMSException 
+     * 
+     */
+    public LaserNativeMessageHandler() throws Exception {
+        listener = new AlarmListener();
+        connector = AlarmConnectorFactory.getConnector("tcp://sljas2:2506,tcp://sljas3:2506");
+        connector.addListener(listener);
+        connector.setTopicRoot("CMW.ALARM_SYSTEM.ALARMS.SOURCES.");
+        connector.addSource("#");
+        connector.connect();
+    }
+    
+    public LaserNativeMessageHandler(AlarmListener listener) {
+        this.listener= listener;
+    }
 
+    @Override
+    public void shutdown() throws EqIOException {
+        super.shutdown();
+        
+        if (this.connector != null) {
+            connector.disconnect();
+        }
+    }
+    
     @Override
     public synchronized void connectToDataSource() throws EqIOException {
 
@@ -52,13 +83,6 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
         initializeMBean();
         registerTags();
-
-        if (!testMode) {
-             if (ctx == null) {
-             System.setProperty("diamon.alarms.jmsdriver", "cern.diamon.alarms.sonic.SonicConnection");
-             ctx = new ClassPathXmlApplicationContext("diamon-alarms-client-contxt.xml");
-             }
-        }
 
         log.debug("connectToDataSource - leaving connectToDataSource()");
 
@@ -69,9 +93,9 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
         if (getEquipmentLogger().isDebugEnabled()) {
             getEquipmentLogger().debug("disconnectFromDataSource - entering diconnectFromDataSource()..");
         }
-        
+
         for (LASERHardwareAddress lAddress : alarmList4Equipement.get(getEquipmentConfiguration())) {
-            if(tag4LaserHardwareAddress.containsKey(lAddress.toString())) {
+            if (tag4LaserHardwareAddress.containsKey(lAddress.toString())) {
                 tag4LaserHardwareAddress.remove(lAddress.toString());
             }
         }
@@ -79,7 +103,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
         equMessageSenderList.remove(getEquipmentConfiguration());
         equipementByName.remove(getEquipmentConfiguration().getName());
         alarmList4Equipement.remove(getEquipmentConfiguration());
-        
+
         if (getEquipmentLogger().isDebugEnabled()) {
             getEquipmentLogger().debug("disconnectFromDataSource - leaving diconnectFromDataSource()..");
         }
@@ -312,9 +336,6 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
         }
 
     }
-    
-    public void enableTestMode(boolean active) {
-        testMode=active;
-    }
 
+    
 }

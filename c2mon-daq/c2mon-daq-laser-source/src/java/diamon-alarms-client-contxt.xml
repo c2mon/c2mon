@@ -14,7 +14,7 @@ http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 		init-method="connect" destroy-method="disconnect">
 
 		<property name="url" value="tcp://sljas2:2506,tcp://sljas3:2506" />
-		<property name="destRoot" value="CMW.ALARM_SYSTEM.ALARMS.SOURCES." />
+		<property name="topicRoot" value="CMW.ALARM_SYSTEM.ALARMS.SOURCES." />
 
 		<property name="sources">
 			<list>

@@ -10,8 +10,6 @@ import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.daq.test.GenericMessageHandlerTst;
@@ -28,17 +26,13 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
 
     LaserNativeMessageHandler laserMessage;
 
-    @Before
-    public void before() {
-        laserMessage.enableTestMode(true);
+    AlarmListener listener;
+
+    public LaserNativeMessageHandlerTest() {
+        listener = new AlarmListener();
+        laserMessage = new LaserNativeMessageHandler(listener);
     }
 
-    @After
-    public void after() {
-        laserMessage.enableTestMode(false);        
-    }
-    
-    
     @Override
     protected void beforeTest() throws Exception {
         // TODO Auto-generated method stub
@@ -63,8 +57,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
 
         laserMessage.connectToDataSource();
 
-        AlarmListener alarmListener = new AlarmListener();
-        alarmListener.onMessage(MyAlarmMessageData.createUpdateMessage(true, MessageType.UPDATE, "LHC"));
+        listener.onMessage(MyAlarmMessageData.createUpdateMessage(true, MessageType.UPDATE, "LHC"));
 
         Thread.sleep(1000);
 
@@ -89,9 +82,8 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
 
         ISourceDataTag dataTag = laserMessage.getEquipmentConfiguration().getSourceDataTag((long) 124149);
         laserMessage.getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis());
-        
-        AlarmListener alarmListener = new AlarmListener();
-        alarmListener.onMessage(MyAlarmMessageData.createUpdateMessage(false, MessageType.UPDATE, "LHC"));
+
+        listener.onMessage(MyAlarmMessageData.createUpdateMessage(false, MessageType.UPDATE, "LHC"));
 
         Thread.sleep(1000);
 
@@ -102,7 +94,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
         assertEquals(true, sdtv.getValueAt(1, 124149).getValue());
         assertEquals(false, sdtv.getValueAt(2, 124149).getValue());
     }
-    
+
     @Test
     @UseConf("f_laser_test1.xml")
     public void testNoCorrespondingAlarms() throws Exception {
@@ -115,8 +107,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
 
         laserMessage.connectToDataSource();
 
-        AlarmListener alarmListener = new AlarmListener();
-        alarmListener.onMessage(MyAlarmMessageData.createUnknownAlarm(true, MessageType.UPDATE, "LHC"));
+        listener.onMessage(MyAlarmMessageData.createUnknownAlarm(true, MessageType.UPDATE, "LHC"));
 
         Thread.sleep(1000);
 
@@ -126,9 +117,9 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
         assertEquals(1, sdtv.getNumberOfCapturedValues(124150));
         assertEquals(false, sdtv.getLastValue(124149).getValue());
         assertEquals(false, sdtv.getLastValue(124150).getValue());
-        
+
     }
-    
+
     @Test
     @UseConf("f_laser_test1.xml")
     public void testBackupMessage() throws Exception {
@@ -143,9 +134,8 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
 
         ISourceDataTag dataTag = laserMessage.getEquipmentConfiguration().getSourceDataTag((long) 124150);
         laserMessage.getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis());
-        
-        AlarmListener alarmListener = new AlarmListener();
-        alarmListener.onMessage(MyAlarmMessageData.createBackupMessage(MessageType.BACKUP, "LHC"));
+
+        listener.onMessage(MyAlarmMessageData.createBackupMessage(MessageType.BACKUP, "LHC"));
 
         Thread.sleep(3000);
 
@@ -153,16 +143,15 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
 
         assertEquals(2, sdtv.getNumberOfCapturedValues(124149));
         assertEquals(3, sdtv.getNumberOfCapturedValues(124150));
-        
+
         assertEquals(false, sdtv.getValueAt(0, 124149).getValue());
         assertEquals(true, sdtv.getValueAt(1, 124149).getValue());
-        
+
         assertEquals(false, sdtv.getValueAt(0, 124150).getValue());
         assertEquals(true, sdtv.getValueAt(1, 124150).getValue());
         assertEquals(false, sdtv.getValueAt(2, 124150).getValue());
-        
+
     }
-    
 
     private static class MyAlarmMessageData extends AlarmMessageData {
 
@@ -183,7 +172,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
 
             return result;
         }
-        
+
         static AlarmMessageData createUnknownAlarm(boolean active, MessageType messageType, String sourceId) {
             MyAlarmMessageData result = new MyAlarmMessageData();
             result.setSourceHost(sourceId);
@@ -215,7 +204,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
                 result.addFault(alarm);
                 result.addFault(alarm2);
                 result.addFault(alarm3);
-            } catch(InterruptedException ie) {
+            } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
 
