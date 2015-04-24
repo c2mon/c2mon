@@ -42,6 +42,8 @@ public class MailerImpl implements Mailer {
 
     private Session session = null;
 
+    private String replyTo;
+
     /**
      * Creates a MailerImpl from a properties file: 
      * <ul>
@@ -64,7 +66,7 @@ public class MailerImpl implements Mailer {
 
         return new MailerImpl(properties.getProperty("mailer.from"), properties.getProperty("mailer.name"), properties
                 .getProperty("mailer.password"), properties.getProperty("mailer.server"), Integer.parseInt(properties
-                .getProperty("mailer.port")));
+                .getProperty("mailer.port")),properties.getProperty("mailer.replyTo"));
 
     }
 
@@ -77,7 +79,7 @@ public class MailerImpl implements Mailer {
      * @throws AddressException in case this {@link MailerImpl} instance cannot create an {@link InetAddress} object
      *             (required).
      */
-    public MailerImpl(String from, final String name, final String password, String server, int port)
+    public MailerImpl(String from, final String name, final String password, String server, int port, String replyTo)
             throws AddressException {
         Properties props = System.getProperties();
 
@@ -93,6 +95,7 @@ public class MailerImpl implements Mailer {
         // props.put("mail.debug", "true");
 
         me = new InternetAddress(from);
+        this.replyTo = replyTo;
 
         // get the session / connection to the mailserver
         session = Session.getInstance(props, new Authenticator() {
@@ -117,7 +120,7 @@ public class MailerImpl implements Mailer {
      */
     public MailerImpl(final String from, final String name, final String password, final String server)
             throws AddressException {
-        this(from, name, password, server, 25);
+        this(from, name, password, server, 25, null);
     }
 
     /**
@@ -156,6 +159,9 @@ public class MailerImpl implements Mailer {
         simpleMessage.setFrom(me);
         simpleMessage.setRecipient(RecipientType.TO, new InternetAddress(to));
         simpleMessage.setSubject(subject);
+        if (replyTo != null) {
+            simpleMessage.setReplyTo(new InternetAddress[] {new InternetAddress(replyTo)});
+        }
         // simpleMessage.setText(mailText);
 
         Transport.send(simpleMessage);
