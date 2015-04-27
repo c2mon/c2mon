@@ -9,6 +9,8 @@ import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.address.LASERHardwareAddress;
 import cern.c2mon.shared.common.process.IEquipmentConfiguration;
+import cern.diamon.alarms.client.AlarmConnector;
+import cern.diamon.alarms.client.AlarmConnectorFactory;
 import cern.diamon.alarms.client.AlarmConsumerInterface;
 import cern.diamon.alarms.client.AlarmMessageData;
 import cern.diamon.alarms.client.AlarmMessageData.AlarmMessageVisitor;
@@ -25,10 +27,38 @@ public class AlarmListener implements AlarmConsumerInterface, AlarmMessageVisito
     private IEquipmentMessageSender equipementMessageSender;
     private LASERHardwareAddress laserAddress;
 
-    public static LaserNativeMessageHandler handler;
+    private LaserNativeMessageHandler handler;
 
-    public static final Object lock = new Object();
-
+    private AlarmConnector connector;
+    
+    boolean isStarted  = false;
+    
+    /**
+     * 
+     */
+    public AlarmListener(LaserNativeMessageHandler handler) {
+        this.handler  = handler;
+    }
+    
+    public synchronized void connectToLaser() throws JMSException {
+        System.setProperty("diamon.alarms.jmsdriver", "cern.diamon.alarms.sonic.SonicConnection");
+        
+        connector = AlarmConnectorFactory.getConnector("tcp://sljas2:2506,tcp://sljas3:2506");
+        connector.addListener(this);
+        connector.setTopicRoot("CMW.ALARM_SYSTEM.ALARMS.SOURCES.");
+        connector.connect();
+        connector.addSource("#");
+        isStarted = true;
+    }
+    
+    public synchronized void disconnectFromLaser() {
+        if (this.connector != null) {
+            connector.disconnect();
+        }
+        isStarted = false;
+    }
+    
+    
     @Override
     public void onMessage(AlarmMessageData alarmMessage) {
 
@@ -192,29 +222,21 @@ public class AlarmListener implements AlarmConsumerInterface, AlarmMessageVisito
                         equipementMessageSender.sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis());
                         getHandler().mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
                     } 
-//                    else {
-//                        log.debug("This dataTag - " + dataTag.getName() + " - has already the good value :"
-//                                + dataTag.getCurrentValue().getValue());
-//                    }
                 } else {
                     if (!(dataTag.getCurrentValue() != null && dataTag.getCurrentValue().getValue().equals(false))) {
                         getHandler().mbean.setDataTag(dataTag.getId());
                         equipementMessageSender.sendTagFiltered(dataTag, Boolean.FALSE, System.currentTimeMillis());
                         getHandler().mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
                     } 
-//                    else {
-//                        log.debug("This dataTag - " + dataTag.getName() + " - has already the good value : "
-//                                + dataTag.getCurrentValue().getValue());
-//                    }
                 }
             }
         }
     }
 
     public LaserNativeMessageHandler getHandler() {
-        synchronized (lock) {
+        
             return handler;
-        }
+        
     }
 
 }

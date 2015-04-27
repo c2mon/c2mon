@@ -29,8 +29,6 @@ import cern.c2mon.shared.common.datatag.address.SimpleHardwareAddress;
 import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.diamon.alarms.client.AlarmConnector;
-import cern.diamon.alarms.client.AlarmConnectorFactory;
 
 public class LaserNativeMessageHandler extends EquipmentMessageHandler implements IDataTagChanger,
         IEquipmentConfigurationChanger {
@@ -44,42 +42,46 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
     private ConcurrentHashMap<IEquipmentConfiguration, IEquipmentMessageSender> equMessageSenderList = new ConcurrentHashMap<IEquipmentConfiguration, IEquipmentMessageSender>();
     private ConcurrentHashMap<IEquipmentConfiguration, ISourceDataTag> heartbeatTag4Equipment = new ConcurrentHashMap<IEquipmentConfiguration, ISourceDataTag>();
     private ConcurrentHashMap<String, ISourceDataTag> tag4LaserHardwareAddress = new ConcurrentHashMap<String, ISourceDataTag>();
-    
-    
+
     private AlarmListener listener;
-    
-    private AlarmConnector connector;
-    
+
     /**
-     * @throws JMSException 
-     * 
      */
-    public LaserNativeMessageHandler() throws Exception {
-        listener = new AlarmListener();
-        connector = AlarmConnectorFactory.getConnector("tcp://sljas2:2506,tcp://sljas3:2506");
-        connector.addListener(listener);
-        connector.setTopicRoot("CMW.ALARM_SYSTEM.ALARMS.SOURCES.");
-        connector.addSource("#");
-        connector.connect();
-    }
-    
-    public LaserNativeMessageHandler(AlarmListener listener) {
-        this.listener= listener;
+    public LaserNativeMessageHandler() {
+
     }
 
+    /**
+     * @param listener The new {@link AlarmListener}
+     */
+    void setAlarmListener(AlarmListener listener) {
+        if (listener != null) {
+            listener.disconnectFromLaser();
+        }
+        this.listener = listener;
+    }
+    
     @Override
     public void shutdown() throws EqIOException {
         super.shutdown();
-        
-        if (this.connector != null) {
-            connector.disconnect();
+        if (listener != null) {
+            listener.disconnectFromLaser();
         }
     }
-    
+
     @Override
     public synchronized void connectToDataSource() throws EqIOException {
 
         log.debug("connectToDataSource - entering connectToDataSource(). Creating subscriptions for all registered DataTags..");
+
+        if (listener == null) {
+            listener = new AlarmListener(this);
+            try {
+                listener.connectToLaser();
+            } catch (JMSException e) {
+                throw new EqIOException(e);
+            }
+        }
 
         initializeMBean();
         registerTags();
@@ -111,14 +113,12 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
     @Override
     public void refreshAllDataTags() {
-        // TODO Auto-generated method stub
-
+        //Nothing
     }
 
     @Override
     public void refreshDataTag(long arg0) {
-        // TODO Auto-generated method stub
-
+        //Nothing
     }
 
     //
@@ -173,10 +173,6 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
         alarmList4Equipement.put(getEquipmentConfiguration(), listLaserHaddr);
         equipementByName.put(getEquipmentConfiguration().getName(), getEquipmentConfiguration());
 
-        synchronized (AlarmListener.lock) {
-            AlarmListener.handler = this;
-        }
-
         log.info("Tags registered");
     }
 
@@ -191,9 +187,6 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
             heartbeatTag4Equipment.put(getEquipmentConfiguration(), heartbeatTag);
         }
 
-        synchronized (AlarmListener.lock) {
-            AlarmListener.handler = this;
-        }
     }
 
     synchronized public void unregisterTag(ISourceDataTag tag) {
@@ -205,9 +198,6 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
             heartbeatTag4Equipment.remove(getEquipmentConfiguration());
         }
 
-        synchronized (AlarmListener.lock) {
-            AlarmListener.handler = this;
-        }
     }
 
     //
@@ -337,5 +327,4 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
     }
 
-    
 }

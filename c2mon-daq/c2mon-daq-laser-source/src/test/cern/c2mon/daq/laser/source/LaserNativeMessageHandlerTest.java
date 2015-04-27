@@ -29,20 +29,19 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
     AlarmListener listener;
 
     public LaserNativeMessageHandlerTest() {
-        listener = new AlarmListener();
-        laserMessage = new LaserNativeMessageHandler(listener);
+        
     }
 
     @Override
     protected void beforeTest() throws Exception {
-        // TODO Auto-generated method stub
         laserMessage = (LaserNativeMessageHandler) msgHandler;
-        // laserMessage.connectToDataSource();
+        listener = new AlarmListener(laserMessage);
+        laserMessage.setAlarmListener(listener);
     }
 
     @Override
     protected void afterTest() throws Exception {
-        // TODO Auto-generated method stub
+        // NOTHING
     }
 
     @Test
