@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.mockito.Matchers;
 
 import cern.c2mon.daq.test.GenericMessageHandlerTst;
@@ -149,7 +150,7 @@ public class JAPCMessageHandlerTest extends GenericMessageHandlerTst {
 
         japcHandler.connectToDataSource();
 
-        Thread.sleep(15000);
+        Thread.sleep(1500);
 
         verify(messageSender);
 
@@ -322,11 +323,11 @@ public class JAPCMessageHandlerTest extends GenericMessageHandlerTst {
         SimpleParameterValue sval2 = ParameterValueFactory.newParameterValue(new float[] { 10.2f, 8.3f, 33.4f, 10.2f,
                 8.5f, 33.4f }, new int[] { 5, 6 });
 
-        Thread.sleep(5000);
+        Thread.sleep(1000);
 
         p1.setValue(s1, sval2);
 
-        Thread.sleep(5000);
+        Thread.sleep(1000);
 
         verify(messageSender);
 
