@@ -10,11 +10,11 @@
 	</parent>
 
 	<groupId>cern.dmn2.dmn2-daq</groupId>
-	<artifactId>dmn2-daq-native-laser-deploy</artifactId>
-	<name>DMN2 NATIVE LASER daq deployment</name>
+	<artifactId>dmn2-daq-laser-source-deploy</artifactId>
+	<name>DMN2 LASER SOURCE daq deployment</name>
 	<version>1.0.0-SNAPSHOT</version>
 
-	<description>DMN2 NATIVE LASER DAQ takes natives alarms and changes dataTags values with the description of the alarms (active or terminate)</description>
+	<description>DMN2 LASER SOURCE DAQ takes natives alarms and changes dataTags values with the description of the alarms (active or terminate)</description>
 
 	<scm>
 		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/dmn2-daq-almon-deploy</developerConnection>
