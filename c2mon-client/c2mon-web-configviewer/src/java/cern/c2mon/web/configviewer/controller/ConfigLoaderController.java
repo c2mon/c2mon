@@ -1,13 +1,19 @@
 package cern.c2mon.web.configviewer.controller;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cern.c2mon.shared.client.configuration.ConfigConstants;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.support.PagedListHolder;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
 import cern.c2mon.shared.util.json.GsonFactory;
@@ -111,20 +118,65 @@ public class ConfigLoaderController {
   }
 
   /**
-   * @return Retrieves a stored Configuration Report and displays it.
+   * Retrieves a list of stored {@link ConfigurationReport} objects for a given
+   * configuration and displays it.
    *
-   * @param id the Configuration Report id
-   * @param response we write the html result to that HttpServletResponse
-   *          response
+   * @param id the report id
+   * @param timestamp the timestamp of a specific report (used for paging)
+   * @param page the page number to display
+   * @param showSuccesses
+   * @param showWarnings
+   * @param showFailures
+   * @param model
+   *
+   * @return
    * @throws IOException
    */
   @RequestMapping(value = CONFIG_LOADER_PROGRESS_FINAL_REPORT_URL + "{id}", method = { RequestMethod.GET })
-  public String viewFinalReport(@PathVariable(value = "id") final String id, final HttpServletResponse response, final Model model, final HttpServletRequest request) throws IOException {
+  public String viewFinalReport(@PathVariable(value = "id") final String id,
+                                @RequestParam(value = "ts", required = false) Timestamp timestamp,
+                                @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+                                @RequestParam(value = "s", required = false, defaultValue = "true") boolean showSuccesses,
+                                @RequestParam(value = "w", required = false, defaultValue = "true") boolean showWarnings,
+                                @RequestParam(value = "f", required = false, defaultValue = "true") boolean showFailures,
+                                final Model model) throws IOException {
     logger.debug(CONFIG_LOADER_PROGRESS_FINAL_REPORT_URL + "/{id} " + id);
 
-    List<ConfigurationReport> report = service.getConfigurationReports(id);
-    logger.debug(report);
-    model.addAttribute("reports", report);
+    List<ConfigurationReport> reports = service.getConfigurationReports(id);
+    ConfigurationReport report = null;
+
+    if (timestamp == null) {
+      report = reports.get(0);
+    }
+
+    for (ConfigurationReport r : reports) {
+      if (r.getTimestamp().equals(timestamp)) {
+        report = r;
+      }
+    }
+
+    if (report == null) {
+      throw new NotFoundException("Report id " + id + " with timestamp " + timestamp + " was not found.");
+    }
+
+    List<ConfigurationElementReport> elementReports = new ArrayList<>();
+    for (ConfigurationElementReport elementReport : report.getElementReports()) {
+      if (elementReport.getStatus() == ConfigConstants.Status.OK && showSuccesses) elementReports.add(elementReport);
+      if (elementReport.getStatus() == ConfigConstants.Status.WARNING && showWarnings) elementReports.add(elementReport);
+      if (elementReport.getStatus() == ConfigConstants.Status.FAILURE && showFailures) elementReports.add(elementReport);
+    }
+
+    PagedListHolder<ConfigurationElementReport> pagedListHolder = new PagedListHolder<>(elementReports);
+    pagedListHolder.setPage(page);
+    pagedListHolder.setPageSize(50);
+
+    logger.debug(reports);
+    model.addAttribute("report", report);
+    model.addAttribute("allReports", reports);
+    model.addAttribute("pagedListHolder", pagedListHolder);
+    model.addAttribute("showSuccesses", showSuccesses);
+    model.addAttribute("showWarnings", showWarnings);
+    model.addAttribute("showFailures", showFailures);
     model.addAttribute("title", "Configuration Report: " + id);
 
     return "config/configReport";
@@ -139,8 +191,9 @@ public class ConfigLoaderController {
    *          it
    */
   @RequestMapping(value = "/configloader/errorform/{id}")
-  public String viewConfigLoaderErrorForm(@PathVariable(value = "id") final String errorId, @RequestParam(value = "id", required = false) final String id,
-      final Model model) {
+  public String viewConfigLoaderErrorForm(@PathVariable(value = "id") final String errorId,
+                                          @RequestParam(value = "id", required = false) final String id,
+                                          final Model model) {
     logger.debug("/configloader/errorform " + id);
 
     if (id == null) {

@@ -39,8 +39,12 @@ tr {
       </div>
 
       <div class="panel panel-default">
-        <div class="panel-heading">
-          <h3 class="panel-title">All previously applied configurations</h3>
+        <div class="panel-heading clearfix">
+          <h3 class="panel-title pull-left" style="padding-top: 7.5px;">All previously applied configurations</h3>
+          <span class="pull-right"> 
+            
+            <a href=".?refresh=true" class="btn btn-default btn-sm"><i class="fa fa-fw fa-refresh"></i>Refresh</a>
+          </span>
         </div>
         <div class="panel-body">Click on a row in the table to view the full report for that configuration.</div>
 

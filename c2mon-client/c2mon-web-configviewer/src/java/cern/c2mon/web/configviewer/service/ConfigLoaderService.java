@@ -95,7 +95,7 @@ public class ConfigLoaderService {
     ConfigurationReportHeader header = new ConfigurationReportHeader(report.getId(), report.getName(), report.getUser(), report.getStatus(),
         report.getStatusDescription(), report.getTimestamp());
 
-    Map<String, List<ConfigurationReportHeader>> headers = getConfigurationReports();
+    Map<String, List<ConfigurationReportHeader>> headers = getConfigurationReports(false);
     if (headers.containsKey(String.valueOf(configurationId))) {
       headers.get(String.valueOf(configurationId)).add(header);
     } else {
@@ -126,7 +126,7 @@ public class ConfigLoaderService {
       logger.error("Could not retrieve Stored Configuration Report for configuration id:" + configurationId);
       throw new NotFoundException("Cannot find Configuration Report for configuration id:" + configurationId);
     }
-    logger.debug("Succesfully retrieved Stored Configuration Report for configuration id:" + configurationId);
+    logger.debug("Successfully retrieved Stored Configuration Report for configuration id:" + configurationId);
 
     return reports;
   }
@@ -136,9 +136,9 @@ public class ConfigLoaderService {
    *
    * @return all the previously applied configuration reports
    */
-  public Map<String, List<ConfigurationReportHeader>> getConfigurationReports() {
+  public Map<String, List<ConfigurationReportHeader>> getConfigurationReports(boolean refresh) {
 
-    if (configurationReportHeaders.isEmpty()) {
+    if (refresh || configurationReportHeaders.isEmpty()) {
       List<ConfigurationReportHeader> reports = new ArrayList<>(gateway.getTagManager().getConfigurationReports());
       Collections.sort(reports);
 

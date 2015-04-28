@@ -24,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import cern.c2mon.web.configviewer.service.ConfigHistoryService;
 
@@ -37,8 +38,8 @@ public class ConfigHistoryController {
   ConfigHistoryService service;
 
   @RequestMapping(value = "/confighistory", method = { RequestMethod.GET })
-  public String configHistory(final HttpServletRequest request, final Model model) {
-    model.addAttribute("cache", service.getCachedReports());
+  public String configHistory(final HttpServletRequest request, final Model model, @RequestParam(required = false, defaultValue = "false") final boolean refresh) {
+    model.addAttribute("cache", service.getCachedReports(refresh));
     model.addAttribute("title", "Configuration History Viewer");
     return "config/configHistory";
   }

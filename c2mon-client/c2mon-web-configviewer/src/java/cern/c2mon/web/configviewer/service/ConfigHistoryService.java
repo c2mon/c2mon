@@ -34,7 +34,7 @@ public class ConfigHistoryService {
   @Autowired
   ConfigLoaderService configLoaderService;
 
-  public Map<String, List<ConfigurationReportHeader>> getCachedReports() {
-    return configLoaderService.getConfigurationReports();
+  public Map<String, List<ConfigurationReportHeader>> getCachedReports(boolean refresh) {
+    return configLoaderService.getConfigurationReports(refresh);
   }
 }
