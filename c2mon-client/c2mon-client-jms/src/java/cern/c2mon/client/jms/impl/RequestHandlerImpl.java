@@ -309,7 +309,7 @@ public class RequestHandlerImpl implements RequestHandler {
   public Collection<ConfigurationReportHeader> getConfigurationReports() throws JMSException {
 
     ClientRequestImpl<ConfigurationReportHeader> clientRequest = new ClientRequestImpl<>(ResultType.TRANSFER_CONFIGURATION_REPORT_HEADER,
-        RequestType.RETRIEVE_CONFIGURATION_REQUEST, 10000);
+        RequestType.RETRIEVE_CONFIGURATION_REQUEST, 30000);
     Collection<ConfigurationReportHeader> reports = jmsProxy.sendRequest(clientRequest, defaultRequestQueue, clientRequest.getTimeout());
 
     if (reports.isEmpty()) {
