@@ -754,6 +754,38 @@ public class NotifierImplTest {
         EasyMock.verify(mailer);    
     }
 	
+	@Test
+	public void testRuleTransitionWarnOkWithErrorSubscription() throws Exception {
+	    
+	    startTest("testRuleTransition");
+	 
+	    Tag toBeNotifiedFor = new Tag(1L, true);
+        Subscriber s = new Subscriber("test", "test@cern.ch", "");
+        Subscription sub = new Subscription(s.getUserName(), toBeNotifiedFor.getId());
+        sub.setNotificationLevel(Status.ERROR);
+        s.addSubscription(sub);
+	    
+        
+        Mailer mailer = mockControl.createMock(Mailer.class);
+        //mailer.sendEmail(EasyMock.isA(String.class), EasyMock.isA(String.class), EasyMock.isA(String.class));
+        //EasyMock.expectLastCall().times(1);
+        notifier.setMailer(mailer);
+        EasyMock.replay(mailer);
+        
+
+        reg.setSubscriber(s.getCopy());
+        
+        reg.setSubscriber(s.getCopy());
+        sendUpdateRuleTag(2L, Status.WARNING.toInt());
+        notifier.checkCacheForChanges();
+        sendUpdateRuleTag(2L, Status.OK.toInt());
+        notifier.checkCacheForChanges();
+        
+        s = reg.getSubscriber(s.getUserName());
+        EasyMock.verify(mailer);  
+        
+        
+	}
 	
 	
 	@Test
