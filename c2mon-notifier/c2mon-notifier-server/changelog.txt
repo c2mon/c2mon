@@ -1,6 +1,14 @@
 C2MON Notifier Changelog:
 ---------------------------
 
+30.04.2015 release 1.0.6
+===========================
+* DMN-2139 : Notifier sends OK when back from a WRN, even for users who did not subscribe to WRN
+
+24.04.2015 release 1.0.5
+===========================
+* upgraded dependencies
+
 9/2014 Release 1.0.4
 ===========================
 DMN-1856: Notifier should state the names of the missing processes
