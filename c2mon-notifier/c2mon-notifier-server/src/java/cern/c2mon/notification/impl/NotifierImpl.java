@@ -482,12 +482,21 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
             
             logger.debug("{} no child rule changed but received an update. R->M.", update.getId());
             for (Subscription s : update.getSubscribers()) {
-                logger.trace("{} Subscriber '{}' is interested in this update.", update.getId(), s.getSubscriberId());
+                Status oldStatus = s.getLastStatusForResolvedSubTag(update.getId());
+                
+                logger.trace("{} Checking if subscriber '{}' is interested in this update...", update.getId(), s.getSubscriberId());
                 try {
                     // we add ourself, as we need to report on the metrics
                     interestingChildRules.add(update);
                     
                     if (s.getTagId().longValue() != update.getId().longValue()) {
+                        
+                        if (oldStatus != null && !oldStatus.equals(update.getLatestStatus()) && !s.isInterestedInLevel(oldStatus)) {
+                            // recovery of a child rule. e.g. WARN->OK
+                            logger.debug("{} subscriber '{}' not interested in this update", update.getId(), s.getSubscriberId());
+                            continue;
+                        }
+                        
                         // an update of a rule which belongs to a higher rule
                         sendFullReportOn(update, s, interestingChildRules);
                         s.setLastStatusForResolvedTSubTag(update.getId(), update.getLatestStatus());
