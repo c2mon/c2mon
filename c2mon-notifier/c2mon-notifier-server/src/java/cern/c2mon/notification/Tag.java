@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -251,7 +252,7 @@ public class Tag {
         return children;
     }
 
-    public HashSet<Tag> getAllChildTagsRecursive() {
+    public Set<Tag> getAllChildTagsRecursive() {
         HashSet<Tag> list = new HashSet<Tag>();
         for (Tag child : children) {
             list.addAll(child.getAllChildTagsRecursive());
@@ -336,6 +337,10 @@ public class Tag {
                             + ": I cannot interprete the passed ClientDataTagValue as a status :" + update.getValue());
                 }
             }
+            
+            if (!update.getDataTagQuality().isAccessible()) {
+                newStatus = Status.UNREACHABLE.toInt();
+            } 
 
             currentHistoryPtr++;
             if (currentHistoryPtr == MAX_STATE_HISTORY_ENTRIES) {
@@ -357,11 +362,7 @@ public class Tag {
         latest = update;
         value = update.getValue();
         
-//        if (!update.getDataTagQuality().isAccessible()) {
-//            this.isSourceDown = true;
-//        } else {
-//            this.isSourceDown = false;
-//        }
+        
     }
 
     @SuppressWarnings("unchecked")
@@ -424,7 +425,7 @@ public class Tag {
                 sb.append(",DTQDescription=" + getLatestUpdate().getDataTagQuality().getDescription()).append(
                         ",Description=" + getLatestUpdate().getDescription()).append(
                         ",VDescription=" + getLatestUpdate().getValueDescription()).append(
-                        ",isValid=" + getLatestUpdate().getDataTagQuality().isValid()).append(
+                        ",isValid=" + getLatestUpdate().getDataTagQuality().getInvalidQualityStates()).append(
                         ",Value=" + getLatestUpdate().getValue());
             } else {
                 sb.append("UNKNOWN");
