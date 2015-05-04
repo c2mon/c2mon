@@ -108,6 +108,7 @@
       <constructor-arg index="1" value="${mail.userName}" />
       <constructor-arg index="2" value="${mail.password}" />
       <constructor-arg index="3" value="${mail.server}" />
+      <constructor-arg index="4" value="${mail.replyTo}" />
    </bean>
 
 
