@@ -9,6 +9,7 @@
     <version>RELEASE</version>
   </parent>
 
+  <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-client</artifactId>
   <version>1.5.7-SNAPSHOT</version>
   <name>c2mon-server-client</name>
