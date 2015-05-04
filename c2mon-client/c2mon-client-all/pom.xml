@@ -8,6 +8,7 @@
 		<version>RELEASE</version>
 	</parent>
   
+  <groupId>cern.c2mon.c2mon-client</groupId>
 	<artifactId>c2mon-client-all</artifactId>
 	<version>1.5.8-SNAPSHOT</version>
 	<name>c2mon-client-all</name>
