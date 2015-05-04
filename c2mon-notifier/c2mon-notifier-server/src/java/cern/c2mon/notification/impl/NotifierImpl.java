@@ -292,12 +292,12 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                     s.setLastNotifiedStatus(Status.UNREACHABLE);
                     
                     if (s.isSmsNotification()) {
-                        notifySms(subscriber, update.getLatestUpdate().getDataTagQuality().getDescription());
+                        notifySms(subscriber, update.getName() + " DOWN:" + update.getLatestUpdate().getDataTagQuality().getDescription());
                     }
                 }
             }
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error("Cannot send TAG DOWN message: " + ex.getMessage(), ex);
         }
         logger.trace("{} Leaving sendSourceAvailabilityReport()", update.getId());
     }
@@ -318,7 +318,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                 s.setLastNotifiedStatus(update.getLatestStatus());
                 
                 if (s.isSmsNotification()) {
-                    notifySms(subscriber, update.getLatestUpdate().getName() + " is down.");
+                    notifySms(subscriber, update.getLatestUpdate().getName() + " recovered.");
                 }
             }
         } catch (Exception ex) {
@@ -360,8 +360,8 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                             requiredtoSend = true;
                         } 
                         if (!s.isInterestedInLevel(parent.getLatestStatus())) {
-                            requiredtoSend = false;
                             logger.debug("{} '{}' is not interested in this level.", update.getId(), s.getSubscriberId());
+                            requiredtoSend = false;
                         }
                     } else {
                         // No log message for required notification 
@@ -518,31 +518,64 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                 }
             }
         } else {
+            
+            if (update.hasStatusChanged()) {
+                // no status change, but we got an update:
+                // 1. check if the quality has changed ? -> yes, send update
+            } else {
+                // status has changed:
+                // full send 
+            }
+            
             logger.debug("{} has changed its state : {} -> {}. ", update.getId(), update.getPreviousStatus(), update.getLatestStatus());
-            logger.debug("{} has child rules: R->R->M...", update.getId());
+            logger.debug("{} has child rules (R->R->M) ...", update.getId());
             logger.trace("{} children rules:", update.getAllChildRules());
             
-            Set<Tag> allChildTags = update.getAllChildTagsRecursive();
-
-            boolean metricChanged = false;
-            for (Tag child : allChildTags) {
-                if (!child.isRule() && child.hasValueChanged()) {
-                    metricChanged = true;
+            // all metrics of this rule R->M1, R->M2,.. (if any)  
+            List<Tag> changedDirectChildMetrics = update.getChangedChildMetrics();
+            List<Tag> childRecursiveRules = new ArrayList<Tag>();
+            for (Tag c : update.getAllChildTagsRecursive()) {
+                if (c.isRule()) {
+                    childRecursiveRules.add(c);
                 }
             }
+
             
             // R->R->M
             for (Subscription s : update.getSubscribers()) {
                 
+                
+                // 1. mode changed
+                // 2. quality changed
+                // 3. status changed
+                
                 try {
-                    for (Tag child : allChildTags) {
-                        if (child.isRule() && !s.getLastStatusForResolvedSubTag(child.getId()).equals(child.getLatestStatus())) {
+                    
+                    // let check the children if they have changed since last check...
+                    for (Tag child : childRecursiveRules) {
+                        if (!s.getLastStatusForResolvedSubTag(child.getId()).equals(child.getLatestStatus())) {
                             // add to interesting list.
                             logger.debug("{} Adding '{}' [{}] as interesting child.", update.getId(), child.getId(), child.getLatestStatus());
                             interestingChildRules.add(child);
                         } 
+                        //
                     }
-                    if (interestingChildRules.size() > 0 || metricChanged) {
+                    
+                    s.setLastNotifiedStatus(update.getLatestStatus());
+                    
+                    if (!s.isInterestedInLevel(update.getLatestStatus(), update.getPreviousStatus())) {
+                        continue;
+                    }
+                    
+                    // abort, if no children have changed and no direct metrics have changed.
+//                    if (interestingChildRules.size() == 0 && changedDirectChildMetrics.size() == 0) {
+//                        logger.debug("{} No interesting child for {}.", update.getId(), s.getSubscriberId());
+//                        // set the last notification timestamp and status here ?
+//                        // why should we receive an update without changes ?
+//                        continue;
+//                    }
+                    
+                    if (true) {
                         sendFullReportOn(update, s, interestingChildRules);
                         s.setLastNotification(new Timestamp(System.currentTimeMillis()));
                     
@@ -559,10 +592,10 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                         } else {
                             logger.debug("{} Setting last notified status to [{}] for Subscriber '{}'", 
                                     update.getId(), update.getLatestStatus(), s.getSubscriberId());  
-                            s.setLastNotifiedStatus(update.getLatestStatus());
-                            
                         }
                     }
+                    
+                    
                 } catch (Exception ex) {
                     logger.error(ex.getMessage(), ex);
                 }   
