@@ -10,6 +10,7 @@
 package cern.c2mon.notification.impl;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import org.junit.Test;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.notification.Tag;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
 public class TagCacheTest {
 
@@ -67,6 +69,8 @@ public class TagCacheTest {
         EasyMock.expect(dtq3.isValid()).andReturn(true).anyTimes();
         EasyMock.expect(dtq3.isAccessible()).andReturn(true).anyTimes();
         EasyMock.expect(dtq3.getDescription()).andReturn("Cool").anyTimes();
+        EasyMock.expect(dtq3.getInvalidQualityStates()).andReturn(new HashMap<TagQualityStatus,String>()).anyTimes();
+        
         EasyMock.expect(metricUpdate3.getDataTagQuality()).andReturn(dtq3).anyTimes();
         EasyMock.replay(metricUpdate3);
         
