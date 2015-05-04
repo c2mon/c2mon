@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -13,6 +14,8 @@ import org.junit.Test;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.notification.Tag;
 import cern.c2mon.notification.TextCreator;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.rule.RuleExpression;
 import cern.c2mon.shared.rule.RuleFormatException;
 import freemarker.template.TemplateException;
@@ -64,6 +67,15 @@ public class TextCreatorTest {
         EasyMock.expect(result.getUnit()).andReturn("integer").anyTimes();
         EasyMock.expect(Boolean.valueOf(result.isRuleResult())).andReturn(Boolean.TRUE).anyTimes();
         EasyMock.expect(result.getServerTimestamp()).andReturn(new Timestamp(System.currentTimeMillis())).anyTimes();
+        
+        
+        DataTagQuality dtq3 = mockControl.createMock(DataTagQuality.class);
+        EasyMock.expect(dtq3.isExistingTag()).andReturn(true).anyTimes();
+        EasyMock.expect(dtq3.isValid()).andReturn(true).anyTimes();
+        EasyMock.expect(dtq3.isAccessible()).andReturn(true).anyTimes();
+        EasyMock.expect(dtq3.getDescription()).andReturn("Cool").anyTimes();
+        EasyMock.expect(dtq3.getInvalidQualityStates()).andReturn(new HashMap<TagQualityStatus,String>()).anyTimes();
+        EasyMock.expect(result.getDataTagQuality()).andReturn(dtq3).anyTimes();
         
         RuleExpression rule = RuleExpression.createExpression("#2>50 [1],#2>100 [2], [0]");
         EasyMock.expect(result.getRuleExpression()).andReturn(rule).anyTimes();
