@@ -162,6 +162,10 @@ public class Subscription implements Comparable<Subscription> {
     public boolean isInterestedInLevel(Status toCheck) {
         return (toCheck.worserThan(level) || toCheck.equals(level) || toCheck.equals(Status.OK)) ? true : false;
     }
+    
+    public boolean isInterestedInLevel(Status newStatus, Status oldStatus) {
+        return (isInterestedInLevel(newStatus) && isInterestedInLevel(oldStatus));
+    }
 
     /**
      * @return true, in case this subscriptions triggers sending a mail.
