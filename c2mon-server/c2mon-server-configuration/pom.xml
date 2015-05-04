@@ -8,10 +8,11 @@
     <artifactId>c2mon-server-pom</artifactId>
     <version>RELEASE</version>
   </parent>
- 
+  
+  <groupId>cern.c2mon.c2mon-server</groupId>
+  <artifactId>c2mon-server-configuration</artifactId>
   <version>1.5.6-SNAPSHOT</version>
   <name>c2mon-server-configuration</name>
-  <artifactId>c2mon-server-configuration</artifactId>
   <packaging>jar</packaging>
   <description>C2MON server configuration module implementing cache runtime reconfiguration functionality</description>
   <url>http://timweb.cern.ch</url>
