@@ -15,8 +15,6 @@
         <property name="connectionFactory" ref="singleConnectionFactory" />
         <property name="destination" ref="processRequestDestination" />
         <property name="messageListener" ref="testMessageListener" />
-        <property name="maxConcurrentConsumers" value="${jms.daq.consumers}" />
-        <property name="concurrentConsumers" value="${jms.daq.consumers}" />
         <property name="sessionTransacted" value="false" />
         <property name="maxMessagesPerTask" value="1" />
         <property name="receiveTimeout" value="1000" />

@@ -68,9 +68,7 @@
 <!--          listener to resolve circular reference -->
 <bean id="secondServerRequestListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
     <property name="connectionFactory" ref="secondSingleConnectionFactory"/>
-    <property name="destinationName" value="replacedAtRuntime"/> <!-- replaced at runtime to DAQ-specific destination -->  
-    <property name="maxConcurrentConsumers" value="${jms.daq.consumers.2}"/>
-    <property name="concurrentConsumers" value="${jms.daq.consumers.2}"/>      
+    <property name="destinationName" value="replacedAtRuntime"/> <!-- replaced at runtime to DAQ-specific destination -->
     <property name="sessionTransacted" value="false"/>
     <property name="maxMessagesPerTask" value="1"/>
     <property name="receiveTimeout" value="1000"/>

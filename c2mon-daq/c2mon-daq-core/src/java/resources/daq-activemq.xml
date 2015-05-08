@@ -71,8 +71,6 @@
 <bean id="serverRequestListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
     <property name="connectionFactory" ref="singleConnectionFactory"/>
     <property name="destinationName" value="replacedAtRuntime"/> <!-- replaced at runtime to DAQ-specific destination -->  
-    <property name="maxConcurrentConsumers" value="${jms.daq.consumers}"/>
-    <property name="concurrentConsumers" value="${jms.daq.consumers}"/>      
     <property name="sessionTransacted" value="false"/>
     <property name="maxMessagesPerTask" value="1"/>
     <property name="receiveTimeout" value="1000"/>
@@ -111,7 +109,7 @@
 </bean>
 
 <bean id="filterDestination" class="org.apache.activemq.command.ActiveMQQueue">
-  <constructor-arg index="0" value="${c2mon.jms.filter.queue}"></constructor-arg>
+  <constructor-arg index="0" value="${c2mon.jms.daq.queue.trunk}.filter"></constructor-arg>
 </bean>
 
 <!-- converters are set manually for sending and receiving a response -->
