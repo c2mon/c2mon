@@ -8,7 +8,7 @@
 CLASSPATH=`ls $DAQ_HOME/lib/*.jar | tr -s '\n' ':'`
 cd $DAQ_HOME
 
-JVM_MEM="-Xms256m -Xmx256m"
+JVM_MEM="-Xms64m -Xmx64m"
 JVM_OTHER_OPTS=""
 
 # --- USER PRE-EXECUTION CODE ---
