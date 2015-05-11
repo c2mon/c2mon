@@ -27,11 +27,6 @@
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-benchmark</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-command</artifactId>
       <version>[1.5.0, 2.0.0)</version>
     </dependency>

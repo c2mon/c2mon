@@ -41,7 +41,7 @@
       <appender-ref ref="FallbackConsoleAppender"/>
     </errorHandler>
     <param name="Append" value="true" />
-    <param name="File" value="${c2mon.log.dir}/error.log" />
+    <param name="File" value="${c2mon.log.dir}/c2mon.error.log" />
     <param name="MaxBackupIndex" value="5" />
     <param name="MaxFileSize" value="20MB" />
     <param name="BufferedIO" value="false" />
@@ -61,7 +61,7 @@
       <appender-ref ref="FallbackConsoleAppender"/>
     </errorHandler>
     <param name="Append" value="true" />
-    <param name="File" value="${c2mon.log.dir}/logging.log" />
+    <param name="File" value="${c2mon.log.dir}/c2mon.shortterm.log" />
     <param name="MaxBackupIndex" value="3" />
     <param name="MaxFileSize" value="10MB" />
     <param name="BufferedIO" value="false" />
@@ -82,7 +82,7 @@
       <appender-ref ref="FallbackConsoleAppender"/>
     </errorHandler>
     <param name="Append" value="true" />
-    <param name="File" value="${c2mon.log.dir}/IncomingSourceTag.log" />
+    <param name="File" value="${c2mon.log.dir}/c2mon.tag.log" />
     <param name="MaxBackupIndex" value="10" />
     <param name="MaxFileSize" value="5MB" />
     <param name="BufferedIO" value="false" />
@@ -97,7 +97,7 @@
       <appender-ref ref="FallbackConsoleAppender"/>
     </errorHandler>
     <param name="Append" value="true" />
-    <param name="File" value="${c2mon.log.dir}/RuleTag.log" />
+    <param name="File" value="${c2mon.log.dir}/c2mon.ruletag.log" />
     <param name="MaxBackupIndex" value="1" />
     <param name="MaxFileSize" value="5MB" />
     <param name="BufferedIO" value="false" />
@@ -105,49 +105,10 @@
       <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n"/>
     </layout>
   </appender>
-  
-  <appender name="BenchmarkDataTagAppender" class="org.apache.log4j.RollingFileAppender">
-    <errorHandler class="org.apache.log4j.varia.FallbackErrorHandler">
-      <root-ref/>
-      <appender-ref ref="FallbackConsoleAppender"/>
-    </errorHandler>
-    <param name="Append" value="true" />
-    <param name="File" value="${c2mon.log.dir}/BenchmarkDataTag.log" />
-    <param name="MaxBackupIndex" value="1" />
-    <param name="MaxFileSize" value="5MB" />
-    <param name="BufferedIO" value="false" />
-    <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n"/>
-    </layout>
-  </appender>
-
-  <appender name="BenchmarkPriorityAppender" class="org.apache.log4j.RollingFileAppender">
-    <errorHandler class="org.apache.log4j.varia.FallbackErrorHandler">
-      <root-ref/>
-      <appender-ref ref="FallbackConsoleAppender"/>
-    </errorHandler>
-    <param name="Append" value="true" />
-    <param name="File" value="${c2mon.log.dir}/BenchmarkPriority.log" />
-    <param name="MaxBackupIndex" value="6" />
-    <param name="MaxFileSize" value="5MB" />
-    <param name="BufferedIO" value="false" />
-    <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n"/>
-    </layout>
-  </appender>
-  
-  
+ 
   <!-- 
     Define the loggers.
   -->
-  <logger name="BenchmarkDataTag"  additivity="false">
-    <level value="info"/>
-    <appender-ref ref="BenchmarkDataTagAppender"/>
-  </logger>
-  <logger name="BenchmarkPriority"  additivity="false">
-    <level value="info"/>
-    <appender-ref ref="BenchmarkPriorityAppender"/>
-  </logger>
   <logger name="SourceDataTagLogger"  additivity="false">
     <level value="info"/>
     <appender-ref ref="SourceDataTagAppender"/>

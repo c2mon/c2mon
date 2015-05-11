@@ -10,10 +10,8 @@
   <!-- If required, the file can be located in the server configuration directory (so not in the classpath) -->
   <import resource="classpath:cern/c2mon/server/cachepersistence/config/server-cachepersistence.xml" />
   <import resource="classpath:cern/c2mon/server/command/config/server-command.xml"/>
-  <import resource="classpath:cern/c2mon/server/benchmark/config/server-benchmark.xml" />
   <import resource="classpath:cern/c2mon/server/alarm/config/server-alarm.xml" />
   <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog.xml"/>
   <import resource="classpath:cern/c2mon/server/client/config/server-client.xml" />
   <import resource="classpath:cern/c2mon/server/test/broker/server-test-broker.xml" />
-
 </beans>

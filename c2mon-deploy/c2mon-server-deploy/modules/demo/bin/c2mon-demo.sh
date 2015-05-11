@@ -32,9 +32,9 @@ C2MON_PROPERTIES=$C2MON_HOME/conf/c2mon.properties
 # Process name
 PROCESS_NAME=C2MON-TIM-PRO1
 
-#log4j configuration file (uncomment log4j.xml for a rolling appender)
-#LOG4J_CONF_FILE=$C2MON_HOME/conf/log4j.xml
-LOG4J_CONF_FILE=$C2MON_HOME/conf/log4j-standardout.xml
+#log4j configuration file
+LOG4J_CONF_FILE=$C2MON_HOME/conf/log4j.xml
+
 #log directory (not used unless log4j config is changed)
 LOG_DIR=$C2MON_HOME/log
 
@@ -65,15 +65,13 @@ $HSQLDB_START_CMD &
 cd -
 
 
-COMMON_JAVA_ARGS="-Xms512m -Xmx512m -XX:NewRatio=3 -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100 -Dserver.process.name=$PROCESS_NAME -Dc2mon.process.name=$PROCESS_NAME -Dc2mon.home=$C2MON_HOME -Dlog4j.configuration=$LOG4J_CONF_FILE -Dc2mon.log.dir=$LOG_DIR -Dc2mon.properties.location=$C2MON_PROPERTIES -Dcern.c2mon.cache.mode=single-nonpersistent"
-
-CLUSTER_JAVA_ARGS="-Dcom.tc.l1.cachemanager.percentageToEvict=10 -Dcom.tc.l1.cachemanager.threshold=70 -Dcom.tc.l1.cachemanager.monitorOldGenOnly=false -Dterracotta.config.location=$TC_CONFIG_PATH $CACHE_MODE_PROPERTY -Dcom.tc.productkey.path=$C2MON_HOME/conf/terracotta-license.key"
+COMMON_JAVA_ARGS="-Xms512m -Xmx512m -XX:NewRatio=3 -XX:+UseParallelGC -XX:MaxGCPauseMillis=100 -Dserver.process.name=$PROCESS_NAME -Dc2mon.process.name=$PROCESS_NAME -Dc2mon.home=$C2MON_HOME -Dlog4j.configuration=$LOG4J_CONF_FILE -Dc2mon.log.dir=$LOG_DIR -Dc2mon.properties.location=$C2MON_PROPERTIES -Dcern.c2mon.cache.mode=single-nonpersistent"
 
 #uncomment for recovery start
 #C2MON_RECOVERY_ARG="-Dc2mon.recovery=true"
 
-C2MON_JAVA_ARGS="$COMMON_JAVA_ARGS $CLUSTER_JAVA_ARGS $C2MON_RECOVERY_ARG"
+C2MON_JAVA_ARGS="$COMMON_JAVA_ARGS $C2MON_RECOVERY_ARG"
 C2MON_START_CMD="$JAVA $C2MON_JAVA_ARGS -cp "${CLASSPATH}" cern.c2mon.server.lifecycle.ServerStartup $C2MON_ARGS"
 
 echo "Starting C2MON..."
-$C2MON_START_CMD
+$C2MON_START_CMD >$LOG_DIR/c2mon.stdout.log 2> $LOG_DIR/c2mon.stderr.log &
