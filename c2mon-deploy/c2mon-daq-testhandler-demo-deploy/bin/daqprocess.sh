@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# TIM. CERN. All rights reserved.
+# C2MON. CERN. All rights reserved.
 #
 # This script is used to start and stop the
 # individual DAQ message handlers locally on the specified DAQ installations.
@@ -9,7 +9,7 @@
 #
 # ------------------------------------------------------------------------------
 
-# Start/stop/restart TIM2 DAQ process
+# Start/stop/restart C2MON DAQ process
 
 
 # Setting some global variables which needs to exist for DIP DAQ
@@ -26,10 +26,10 @@ DAQ_HOST=`hostname -s`
 TIME=`date +"%F %T.%3N"`
 
 #todo needs this to change according to deployment...
-DAQ_SCRIPT=${DAQ_HOME}/bin/TIM2-DAQ-STARTUP.jvm
+DAQ_SCRIPT=${DAQ_HOME}/bin/C2MON-DAQ-STARTUP.jvm
 
 # Variables declared as global variales (export) are also
-# required by the TIM2-DAQ-STARTUP.jvm script
+# required by the C2MON-DAQ-STARTUP.jvm script
 export DAQ_LOG_HOME=${DAQ_HOME}/log
 export DAQ_CONF_HOME=$DAQ_HOME/conf
 export C2MON_PROPERTIES_FILE=$DAQ_CONF_HOME/c2mon.properties

@@ -38,21 +38,26 @@
 
   <files>
   
-  <!--  copy sthe starting script -->
+  <!--  copy the starting script -->
   <file>
-    <source>bin/daqprocess-P_TESTHANDLER03-demo.sh</source>
+    <source>bin/daqprocess.sh</source>
     <outputDirectory>bin/</outputDirectory>
-    <destName>daqprocess-P_TESTHANDLER03.sh</destName>
     <lineEnding>unix</lineEnding>
     <fileMode>0755</fileMode>
   </file>
   
   <file>
-    <source>bin/daqprocess-P_TESTHANDLER04-demo.sh</source>
+    <source>bin/C2MON-DAQ-STARTUP.jvm</source>
     <outputDirectory>bin/</outputDirectory>
-    <destName>daqprocess-P_TESTHANDLER04.sh</destName>
     <lineEnding>unix</lineEnding>
     <fileMode>0755</fileMode>
+  </file>
+  
+  <file>
+    <source>README.txt</source>
+    <outputDirectory>/</outputDirectory>
+    <lineEnding>unix</lineEnding>
+    <fileMode>0444</fileMode>
   </file>
   
   <!--  copy daq conf files --> 
@@ -77,14 +82,6 @@
       <source>conf/demo-log4j.xml</source>
       <outputDirectory>conf/</outputDirectory>
       <destName>log4j.xml</destName>
-      <lineEnding>unix</lineEnding>
-      <fileMode>0444</fileMode>
-    </file>
-    
-    <file>
-      <source>conf/demo-log4j-standardout.xml</source>
-      <outputDirectory>conf/</outputDirectory>
-      <destName>log4j-standardout.xml</destName>
       <lineEnding>unix</lineEnding>
       <fileMode>0444</fileMode>
     </file>
