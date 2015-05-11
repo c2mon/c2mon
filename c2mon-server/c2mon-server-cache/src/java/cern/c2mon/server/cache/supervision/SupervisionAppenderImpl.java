@@ -97,8 +97,6 @@ public class SupervisionAppenderImpl implements SupervisionAppender {
       break;
 
     case SUBEQUIPMENT:
-      LOGGER.error("SubEquipment supervision tag notification - taking action.");
-
       switch (event.getStatus()) {
       case DOWN:
         tagSupervisionStatus = TagQualityStatus.SUBEQUIPMENT_DOWN;
