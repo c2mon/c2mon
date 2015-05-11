@@ -97,7 +97,7 @@ runs() {
 #   1. the execution code
 #   2. the execution status
 #   3. value (not mandatory)
-TIMDAQ_EchoXMLFeedback() {
+DAQ_EchoXMLFeedback() {
   local EXEC_CODE=$1
   local EXEC_DESCR=$2
   local EXEC_VALUE=$3
@@ -111,7 +111,7 @@ TIMDAQ_EchoXMLFeedback() {
 }
 
 # This procedure starts the DAQ process only if it was not running yet.
-TIMDAQ_start() {
+DAQ_start() {
   cd ${DAQ_HOME}
 
   # Check if the DAQ process is already running
@@ -131,7 +131,7 @@ TIMDAQ_start() {
          echo_warning
          echo "DAQ Process ${PROCESS_NAME} seems to be running on host $host. Stop it first."
       else
-         TIMDAQ_EchoXMLFeedback -1 "DAQ Process ${PROCESS_NAME} seems to be running. Stop it first."
+         DAQ_EchoXMLFeedback -1 "DAQ Process ${PROCESS_NAME} seems to be running. Stop it first."
       fi
     fi
   else
@@ -170,7 +170,7 @@ really_start() {
       echo "DAQ Process ${PROCESS_NAME} could not be started."
       echo
     else
-      TIMDAQ_EchoXMLFeedback -1 "DAQ Process ${PROCESS_NAME} could not be started."
+      DAQ_EchoXMLFeedback -1 "DAQ Process ${PROCESS_NAME} could not be started."
     fi
 
   else
@@ -182,7 +182,7 @@ really_start() {
       echo_success
       echo
     else
-      TIMDAQ_EchoXMLFeedback 0 OK
+      DAQ_EchoXMLFeedback 0 OK
     fi
 
   fi
@@ -191,7 +191,7 @@ really_start() {
 
 # This procedure tries to gently kill the DAQ process. In case that the process cannot be killed in that way,
 # it will force it
-TIMDAQ_stop() {
+DAQ_stop() {
  cd ${DAQ_HOME}
 
  if [ -f $PID_FILE ] ; then
@@ -242,7 +242,7 @@ TIMDAQ_stop() {
          echo_success
          echo
        elif [ $PROCESS_COMMAND == "stop" ] ; then # could also be called by restart command
-         TIMDAQ_EchoXMLFeedback 0 OK
+         DAQ_EchoXMLFeedback 0 OK
        fi
 
        RETVAL=0
@@ -255,7 +255,7 @@ TIMDAQ_stop() {
          echo
          echo "Unable to stop DAQ Process ${PROCESS_NAME}."
        elif [ $PROCESS_COMMAND == "stop" ] ; then # could also be called by restart command
-         TIMDAQ_EchoXMLFeedback -1 "Unable to stop DAQ Process ${PROCESS_NAME}."
+         DAQ_EchoXMLFeedback -1 "Unable to stop DAQ Process ${PROCESS_NAME}."
        fi
 
        RETVAL=1
@@ -270,11 +270,11 @@ TIMDAQ_stop() {
        echo_success
        echo
      elif [ $PROCESS_COMMAND == "stop" ] ; then # could also be called by restart command
-       checkProcess=TIMDAQ_status4XML
+       checkProcess=DAQ_status4XML
        if [ $? -eq 0 ] ; then
-     	 TIMDAQ_EchoXMLFeedback 0 OK
+     	 DAQ_EchoXMLFeedback 0 OK
        else
-         TIMDAQ_EchoXMLFeedback -1 "DAQ Process ${PROCESS_NAME} does not seem to be running"
+         DAQ_EchoXMLFeedback -1 "DAQ Process ${PROCESS_NAME} does not seem to be running"
        fi
      fi
 
@@ -285,7 +285,7 @@ TIMDAQ_stop() {
    if [ $USE_XML_PROTOCOL -eq 0 ] ; then
      echo "DAQ Process ${PROCESS_NAME} does not seem to be running"
    elif [ $PROCESS_COMMAND == "stop" ] ; then # could also be called by restart command
-     TIMDAQ_EchoXMLFeedback -1 "DAQ Process ${PROCESS_NAME} does not seem to be running"
+     DAQ_EchoXMLFeedback -1 "DAQ Process ${PROCESS_NAME} does not seem to be running"
    fi
 
  fi
@@ -300,7 +300,7 @@ TIMDAQ_stop() {
 # the status of the DAQ process in the output
 # stream
 # ----------------------------------------
-TIMDAQ_status() {
+DAQ_status() {
   if [ -f $PID_FILE ]; then
     pid=`cat $PID_FILE`
     host=`cat $PID_FILE | awk {'print $2'}`
@@ -338,7 +338,7 @@ TIMDAQ_status() {
   # Checks whether the DAQ Process is running.
   # The function will return 0 if the DAQ is found and
   # running and 1 if it isn't.
-  TIMDAQ_status4XML() {
+  DAQ_status4XML() {
 
    #returns
    # 0 - RUNNING
@@ -363,14 +363,14 @@ TIMDAQ_status() {
 
 
 # Restart: stop the DAQ, the start it again
-TIMDAQ_restart() {
-  TIMDAQ_stop
-  TIMDAQ_start
+DAQ_restart() {
+  DAQ_stop
+  DAQ_start
 }
 
 # Prints some instructions for the usage of this script.
 # In particular it explains the supported arguments/options and how to use them.
-TIMDAQ_printBasicUsageInfo() {
+DAQ_printBasicUsageInfo() {
   if [ $USE_XML_PROTOCOL -eq 0 ] ; then
     echo "*****************************************************************************"
     echo " usage:                                                                      "
@@ -395,7 +395,7 @@ TIMDAQ_printBasicUsageInfo() {
     echo " e.g: $0 start P_TEST01 -testMode -c /tmp/testconf.xml                       "
     echo "*****************************************************************************"
   else
-    TIMDAQ_EchoXMLFeedback -1 "Improper entry arguments for the TIM DAQ start-up script detected. Check the configuration, please"
+    DAQ_EchoXMLFeedback -1 "Improper entry arguments for the TIM DAQ start-up script detected. Check the configuration, please"
   fi
 }
 
@@ -407,25 +407,25 @@ TIMDAQ_printBasicUsageInfo() {
   if [ -n "$PROCESS_NAME" ] ; then
     case "$PROCESS_COMMAND" in
      'start')
-         TIMDAQ_start
+         DAQ_start
      ;;
 
      'stop')
-         TIMDAQ_stop
+         DAQ_stop
      ;;
      
      'restart')
-         TIMDAQ_restart
+         DAQ_restart
      ;;
 
      'status')
-         TIMDAQ_status
+         DAQ_status
      ;;
 
      *)
-       TIMDAQ_printBasicUsageInfo
+       DAQ_printBasicUsageInfo
     esac
   else
-    TIMDAQ_printBasicUsageInfo
+    DAQ_printBasicUsageInfo
   fi
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Generated shell start script for TIM2-DAQ-STARTUP.jvm
+# Generated shell start script for C2MON-DAQ-STARTUP.jvm
 
 [[ -z $DAQ_HOME ]] && echo "DAQ_HOME not set!" && exit 1
 [[ -z "$JAVA_HOME" ]] && export JAVA_HOME=/usr/java/jdk
