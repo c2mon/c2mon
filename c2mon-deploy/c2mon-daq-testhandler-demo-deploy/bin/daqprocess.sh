@@ -11,11 +11,6 @@
 
 # Start/stop/restart C2MON DAQ process
 
-
-# Setting some global variables which needs to exist for DIP DAQ
-export DIM_DNS_NODE=dipns1,dipns2
-export DIM_DNS_PORT=2506
-
 #set home directory of script
 SCRIPT=`readlink -f $(which $0)`
 SCRIPTPATH=`dirname $SCRIPT`
@@ -25,7 +20,7 @@ DAQ_HOST=`hostname -s`
 
 TIME=`date +"%F %T.%3N"`
 
-#todo needs this to change according to deployment...
+# The DAQ script that actually starts the DAQ
 DAQ_SCRIPT=${DAQ_HOME}/bin/C2MON-DAQ-STARTUP.jvm
 
 # Variables declared as global variales (export) are also
@@ -395,7 +390,7 @@ DAQ_printBasicUsageInfo() {
     echo " e.g: $0 start P_TEST01 -testMode -c /tmp/testconf.xml                       "
     echo "*****************************************************************************"
   else
-    DAQ_EchoXMLFeedback -1 "Improper entry arguments for the TIM DAQ start-up script detected. Check the configuration, please"
+    DAQ_EchoXMLFeedback -1 "Improper entry arguments for the C2MON DAQ start-up script detected. Check the configuration, please"
   fi
 }
 
