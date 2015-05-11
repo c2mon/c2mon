@@ -17,6 +17,7 @@
     <fileSet>
       <includes>
         <include>/bin</include>
+        <include>/log</include>
         <include>/tmp</include>
         <include>/conf/local</include>
       </includes>

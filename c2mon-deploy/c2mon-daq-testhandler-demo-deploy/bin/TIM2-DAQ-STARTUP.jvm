@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Generated shell start script for TIM2-DAQ-STARTUP.jvm
+
+[[ -z $DAQ_HOME ]] && echo "DAQ_HOME not set!" && exit 1
+[[ -z "$JAVA_HOME" ]] && export JAVA_HOME=/usr/java/jdk
+
+CLASSPATH=`ls $DAQ_HOME/lib/*.jar | tr -s '\n' ':'`
+cd $DAQ_HOME
+
+JVM_MEM="-Xms256m -Xmx256m"
+JVM_OTHER_OPTS=""
+
+# --- USER PRE-EXECUTION CODE ---
+
+[[ -z $C2MON_PROPERTIES_FILE ]] && echo "C2MON_PROPERTIES_FILE not set!" && exit 1
+[[ -z $LOG4J_CONF_FILE ]] && echo "LOG4J_CONF_FILE not set!" && exit 1
+[[ -z $DAQ_CONF_HOME ]] && echo "DAQ_CONF_HOME not set!" && exit 1
+[[ -z $DAQ_LOG_HOME ]] && echo "DAQ_LOG_HOME not set!" && exit 1
+[[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
+[[ -z $ADDITIONAL_PARAMS ]] && echo "ADDITIONAL_PARAMS not set!" && exit 1
+
+# --- ---
+
+exec -a `basename $0` $JAVA_HOME/bin/java -cp "$CLASSPATH" -Dc2mon.process.name="$PROCESS_NAME" -Dc2mon.log.dir="$DAQ_LOG_HOME" $JVM_MEM $JVM_OTHER_OPTS cern.c2mon.daq.common.startup.DaqStartup -c2monProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}
