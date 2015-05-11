@@ -8,14 +8,17 @@
                      xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
 
-  <renderer  renderedClass="cern.c2mon.shared.common.datatag.SourceDataTagValue"
-             renderingClass="cern.c2mon.shared.daq.datatag.SourceDataTagValueRenderer" />
-             
-  <renderer  renderedClass="cern.c2mon.server.common.rule.RuleTag"
-             renderingClass="cern.c2mon.server.common.rule.RuleTagRenderer" />
-             
-  <renderer  renderedClass="cern.c2mon.server.common.alarm.Alarm"
-             renderingClass="cern.c2mon.server.common.alarm.renderer.AlarmRenderer" />
+  <renderer renderedClass="cern.c2mon.shared.common.filter.FilteredDataTagValue"
+            renderingClass="cern.c2mon.shared.daq.filter.FilteredDataTagValueRenderer" />
+
+  <renderer renderedClass="cern.c2mon.shared.common.datatag.SourceDataTagValue"
+            renderingClass="cern.c2mon.shared.daq.datatag.SourceDataTagValueRenderer" />
+
+  <renderer renderedClass="cern.c2mon.shared.daq.command.SourceCommandTagValue"
+            renderingClass="cern.c2mon.shared.daq.command.SourceCommandTagValueRenderer" />
+
+  <renderer renderedClass="cern.c2mon.shared.daq.command.SourceCommandTagReport"
+            renderingClass="cern.c2mon.shared.daq.command.SourceCommandReportRenderer" />
              
 <!--
     Create a ConsoleAppender.
