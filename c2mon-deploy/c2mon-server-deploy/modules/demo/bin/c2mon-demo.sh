@@ -59,9 +59,9 @@ function ctrl_c() {
 
 # start hsqldb
 echo "Starting local HSQLDB instance..."
-mkdir -p /tmp/.hsqldb
-cd /tmp/.hsqldb
-$HSQLDB_START_CMD &
+mkdir -p $C2MON_HOME/hsqldb
+cd $C2MON_HOME/hsqldb
+$HSQLDB_START_CMD >/dev/null 2>&1 &
 cd -
 
 

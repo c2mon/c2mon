@@ -11,6 +11,7 @@ Author: Nacho Vilches
 ###########################
 import urllib
 import tarfile
+import linecache
 import os
 import shutil
 import maven
@@ -111,8 +112,8 @@ parser.add_option("-s", "--snapshot",
 
 # Create the directories for server
 print "Creating directories"
-mkdir("demo")
-os.chdir("demo")
+mkdir("c2mon")
+os.chdir("c2mon")
 
 ###########################
 #       Server      
@@ -120,8 +121,8 @@ os.chdir("demo")
 
 # Create the directories for server
 print "Creating server directories"
-mkdir("server")
-os.chdir("server")
+mkdir("c2mon-server")
+os.chdir("c2mon-server")
 
 print "Downloading server"
 if (options.isAsking4Snapshot):
@@ -137,6 +138,9 @@ print "Extracting Server tarball"
 tfile.extractall('.')
 os.remove("server.demo.tar.gz")
 
+# Extract c2mon-server version
+c2monServerVersion = linecache.getline('version.txt', 1).rstrip()
+
 print "Done"
 
 # Come back to demo/
@@ -148,8 +152,8 @@ os.chdir("../")
 
 # Create the directories for daq
 print "Creating DAQ directories"
-mkdir("daq")
-os.chdir("daq")
+mkdir("c2mon-daq")
+os.chdir("c2mon-daq")
 
 print "Downloading DAQs"
 if (options.isAsking4Snapshot):
@@ -187,16 +191,16 @@ print "Extracting Tomcat server tarball"
 tfile.extractall('.')
 os.remove("apache-tomcat.tar.gz")
 
-# renaming directory "apache-tomcat-'version'" to "apache-tomcat-main"
+# renaming directory "apache-tomcat-'version'" to "apache-tomcat"
 #print os.listdir(os.getcwd())
 for fn in os.listdir(os.getcwd()):
   if 'tomcat' in fn:
-    print "Renaming %s to apache-tomcat-main" %fn
-    shutil.move(fn,"apache-tomcat-main")
+    print "Renaming %s to apache-tomcat" %fn
+    shutil.move(fn,"apache-tomcat")
 
 # add c2mon-web-configviewer.war
 print "Downloading c2mon-web-configviewer.war"
-os.chdir("apache-tomcat-main/webapps")
+os.chdir("apache-tomcat/webapps")
 if (options.isAsking4Snapshot):
   urllib.urlretrieve(getLatestSnapshot("cern.c2mon.c2mon-client:c2mon-web-configviewer"), "c2mon-web-configviewer.war")
 else:
@@ -259,9 +263,9 @@ os.chdir("../")
 ###########################
 #       tarball      
 ##
-print 'Creating tarball'
-tar = tarfile.open("c2mon-demo.tar.gz", "w:gz")
-tar.add('demo', arcname='c2mon-demo')
+print 'Creating tarball for C2MON version ' + c2monServerVersion
+tar = tarfile.open("c2mon-" + c2monServerVersion + ".tar.gz", "w:gz")
+tar.add('c2mon', arcname="c2mon-" + c2monServerVersion)
 tar.close()
 print 'Done'
 
