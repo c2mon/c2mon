@@ -135,6 +135,11 @@
 		   <artifactId>activemq-all</artifactId>
 		   <version>5.5.1-fuse-10-16</version>
 		</dependency>
+		<dependency>
+			<groupId>cern.cmw</groupId>
+			<artifactId>cmw-log-log4j</artifactId>
+			<version>1.5.8</version>
+		</dependency>
 	</dependencies>
 	
 	<build>
