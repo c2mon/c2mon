@@ -284,7 +284,7 @@ public class TextCreator {
      */
     public String getFreeTextMapForChildren(List<Tag> list, TagCache tagCache) throws IOException, TemplateException {
 
-        logger.trace("Entering getFreeTextMapForChildren()");
+        logger.debug("Entering getFreeTextMapForChildren()");
         List<HashMap<String, Object>> children = new ArrayList<HashMap<String, Object>>();
 
         /*
@@ -342,7 +342,13 @@ public class TextCreator {
                 for (Long datatagId : c.getRuleExpression().getInputTagIds()) {
                     HashMap<String, Object> cdatatag = new HashMap<String, Object>();
                     Tag datatag = tagCache.get(datatagId);
-                    cdatatag.put("tagValue", datatag.getLatestUpdate().getValue());
+                    if (datatag.getLatestUpdate().getValue() instanceof Boolean) {
+                        Boolean bool = (Boolean) datatag.getLatestUpdate().getValue();
+                        cdatatag.put("tagValue", bool.toString());
+                    } else {
+                        cdatatag.put("tagValue", datatag.getLatestUpdate().getValue());
+                    }
+                    
                     cdatatag.put("tagDescription", datatag.getLatestUpdate().getDescription());
                     cdatatag.put("tagValueDescription", datatag.getLatestUpdate().getValueDescription());
                     datatags.add(cdatatag);
