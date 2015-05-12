@@ -12,7 +12,7 @@
   <includeBaseDirectory>false</includeBaseDirectory>
 
   <fileSets>
-  
+
     <!-- create default bin and tmp folders in the assembly -->
     <fileSet>
       <includes>
@@ -37,45 +37,29 @@
   </fileSets>
 
   <files>
-  
-  <!--  copy the starting script -->
-  <file>
-    <source>bin/daqprocess.sh</source>
-    <outputDirectory>bin/</outputDirectory>
-    <lineEnding>unix</lineEnding>
-    <fileMode>0755</fileMode>
-  </file>
-  
-  <file>
-    <source>bin/C2MON-DAQ-STARTUP.jvm</source>
-    <outputDirectory>bin/</outputDirectory>
-    <lineEnding>unix</lineEnding>
-    <fileMode>0755</fileMode>
-  </file>
-  
-  <file>
-    <source>README.txt</source>
-    <outputDirectory>/</outputDirectory>
-    <lineEnding>unix</lineEnding>
-    <fileMode>0444</fileMode>
-  </file>
-  
-  <!--  copy daq conf files --> 
-  <file>
-    <source>conf/local/P_TESTHANDLER03-demo.xml</source>
-    <outputDirectory>conf/local/</outputDirectory>
-    <destName>P_TESTHANDLER03.xml</destName>
-    <lineEnding>unix</lineEnding>
-    <fileMode>0444</fileMode>
-  </file>
-  
-  <file>
-    <source>conf/local/P_TESTHANDLER04-demo.xml</source>
-    <outputDirectory>conf/local/</outputDirectory>
-    <destName>P_TESTHANDLER04.xml</destName>
-    <lineEnding>unix</lineEnding>
-    <fileMode>0444</fileMode>
-  </file>
+
+    <!-- copy the starting script -->
+    <file>
+      <source>bin/daqprocess.sh</source>
+      <outputDirectory>bin/</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0755</fileMode>
+    </file>
+
+    <file>
+      <source>bin/C2MON-DAQ-STARTUP.jvm</source>
+      <outputDirectory>bin/</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0755</fileMode>
+    </file>
+
+    <file>
+      <source>README.txt</source>
+      <outputDirectory>/</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
+
 
     <!-- log4j configuration -->
     <file>
@@ -85,7 +69,7 @@
       <lineEnding>unix</lineEnding>
       <fileMode>0444</fileMode>
     </file>
-    
+
     <!-- properties -->
     <file>
       <source>conf/demo-c2mon.properties</source>
@@ -94,7 +78,7 @@
       <lineEnding>unix</lineEnding>
       <fileMode>0444</fileMode>
     </file>
-    
+
     <file>
       <source>conf/demo-daq.conf</source>
       <outputDirectory>conf/</outputDirectory>
