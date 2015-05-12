@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -57,7 +58,7 @@ public class TextCreatorTest {
         return result;
     }
     
-    ClientDataTagValue getRuleTagMock(Long id, int status, String ruleValueDescription) throws RuleFormatException {
+    ClientDataTagValue getRuleTagMock(Long id, int status, String ruleValueDescription, long [] ruleInputTags) throws RuleFormatException {
      
         ClientDataTagValue result = mockControl.createMock(ClientDataTagValue.class);
         EasyMock.expect(result.getId()).andReturn(id).anyTimes();
@@ -77,7 +78,15 @@ public class TextCreatorTest {
         EasyMock.expect(dtq3.getInvalidQualityStates()).andReturn(new HashMap<TagQualityStatus,String>()).anyTimes();
         EasyMock.expect(result.getDataTagQuality()).andReturn(dtq3).anyTimes();
         
-        RuleExpression rule = RuleExpression.createExpression("#2>50 [1],#2>100 [2], [0]");
+        String ruleTxt = ""; 
+        for (long l : ruleInputTags) {
+            ruleTxt += "#" + l + ">50,";
+        }
+        ruleTxt = ruleTxt.substring(0,  ruleTxt.length() - 1);
+        
+        ruleTxt += " [1], [0]";
+        //"#2>50 [1],#2>100 [2], [0]"
+        RuleExpression rule = RuleExpression.createExpression(ruleTxt);
         EasyMock.expect(result.getRuleExpression()).andReturn(rule).anyTimes();
         EasyMock.expect(result.getValueDescription()).andReturn(ruleValueDescription).anyTimes();
         
@@ -86,6 +95,7 @@ public class TextCreatorTest {
         return result;
     }
     
+    @SuppressWarnings("unchecked")
     public Collection<ClientDataTagValue> getClientDataTagChildren() {
         Collection<ClientDataTagValue> children = new ArrayList<ClientDataTagValue>();
         
@@ -110,7 +120,7 @@ public class TextCreatorTest {
         TextCreator creator = new TextCreator();
         
         
-        ClientDataTagValue rule = getRuleTagMock(new Long(1), 2, "Additional info for failing rule");
+        ClientDataTagValue rule = getRuleTagMock(new Long(1), 2, "Additional info for failing rule", new long [] {2});
 
         ClientDataTagValue dataTag = getClientDataTagMock(new Long(2), new Long(4));
         mockControl.replay();
@@ -131,17 +141,13 @@ public class TextCreatorTest {
         
     }
     
-    private class MyCache extends TagCache {
-        public void put(Tag tag) {
-            super.cache.put(tag.getId(), tag);
-        }
-    }
+   
     
     
     
     
     @Test
-    public void testMetricChangeUpdate() throws RuleFormatException, IOException {
+    public void testMetricChangeUpdate() {
 //        Tag t1 = new Tag(1L, true);
 //        ClientDataTagValue value = mockControl.createMock(ClientDataTagValue.class);
 //        EasyMock.expect(value.getName()).andReturn("TheParent").once();
@@ -160,22 +166,47 @@ public class TextCreatorTest {
     }
     
     @Test
-    public void testCreateChildrenList() throws IOException, TemplateException {
+    public void testBooleanDatatag() throws Exception {
+        ClientDataTagValue rootRule = getRuleTagMock(new Long(1), 2, "root rule", new long [] {2});
+        ClientDataTagValue childRule = getRuleTagMock(new Long(2), 2, "child rule", new long [] {3});
+        ClientDataTagValue childRuleDataTag = getClientDataTagMock(new Long(3), Boolean.TRUE);
+        mockControl.replay();
+        
+        Tag root = new Tag (rootRule.getId(), true);
+        Tag child = new Tag(childRule.getId(), true);
+        Tag dataTag = new Tag(childRuleDataTag.getId(), false);
+        
+        root.addChildTag(child);
+        child.addChildTag(dataTag);
+        
+        
+        root.update(rootRule);
+        child.update(childRule);
+        dataTag.update(childRuleDataTag);
+        
+        MyCache c = new MyCache();
+        c.put(root);
+        c.put(child);
+        c.put(dataTag);
+        
+        
         TextCreator creator = new TextCreator();
-        Collection<ClientDataTagValue> children = new ArrayList<ClientDataTagValue>();
         
-//        for (int i = 0; i < 5; i++) {
-//            ClientDataTagValue value = mockControl.createMock(ClientDataTagValue.class);
-//            EasyMock.expect(value.getId()).andReturn(new Long(i)).atLeastOnce();
-//            EasyMock.expect(value.getName()).andReturn("error-child-tag-" + i).atLeastOnce();
-//            EasyMock.expect(value.getValue()).andReturn(1).atLeastOnce();
-//            EasyMock.expect(value.getType()).andReturn((Class) Integer.class).atLeastOnce();
-//            EasyMock.expect(value.isRuleResult()).andReturn(false).atLeastOnce();
-//            children.add(value);
-//        }
-//        String text = creator.getFreeTextMapForChildren(children);
-//        
-//        System.out.println(text);
+        List<Tag> interestingChildren = new ArrayList<Tag>();
+        interestingChildren.add(child);
+        String text = creator.getReportForTag(root, interestingChildren, c);
         
+     
+        System.out.println(text);
+
     }
+    
+    
+    private class MyCache extends TagCache {
+        public void put(Tag tag) {
+            super.cache.put(tag.getId(), tag);
+        }
+    }
+    
 }
+
