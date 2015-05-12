@@ -8,6 +8,9 @@
 		<dependencySet>
 			<outputDirectory>/lib</outputDirectory>
 			<fileMode>0644</fileMode>
+      <excludes>
+        <exclude>cern.c2mon.c2mon-deploy:c2mon-srv-*</exclude>
+      </excludes>
 		</dependencySet>
 
 	</dependencySets>

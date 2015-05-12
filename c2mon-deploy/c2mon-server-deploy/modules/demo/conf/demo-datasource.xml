@@ -17,27 +17,27 @@
   
   <!-- datasource for the cache persistence -->
   <jdbc:embedded-database id="cacheDataSource">
-    <jdbc:script location="classpath:cern/c2mon/server/test/sql/cache-schema-generic.sql" />
-    <jdbc:script location="classpath:cern/c2mon/server/test/sql/cache-data-insert.sql" />
+    <jdbc:script location="file:${c2mon.home}/conf/sql/cache-schema-generic.sql" />
+    <jdbc:script location="file:${c2mon.home}/conf/sql/demo-data-insert.sql" />
   </jdbc:embedded-database>
  
   
   <!-- data source for loading configurations -->
   <jdbc:embedded-database id="configurationDataSource">
-    <jdbc:script location="classpath:cern/c2mon/server/test/sql/config-schema-generic.sql" />
-    <jdbc:script location="classpath:cern/c2mon/server/test/sql/config-data.sql" />
+    <jdbc:script location="file:${c2mon.home}/conf/sql/config-schema-generic.sql" />
+    <jdbc:script location="file:${c2mon.home}/conf/sql/demo-config-data-insert.sql" />
   </jdbc:embedded-database>
   
   <!-- data source for short-term log -->
   <bean class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" id="stlDataSource">
     <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
     <property name="url" value="jdbc:hsqldb:hsql://localhost/stl;sql.syntax_ora=true" />
-    <property name="username" value="sa" />
-    <property name="password" value="" />
+    <property name="username" value="c2mon" />
+    <property name="password" value="c2mon" />
   </bean>
 
   <jdbc:initialize-database data-source="stlDataSource">
-    <jdbc:script location="classpath:cern/c2mon/server/test/sql/shorttermlog-schema-generic.sql" />
+    <jdbc:script location="file:${c2mon.home}/conf/sql/shorttermlog-schema-generic.sql" />
   </jdbc:initialize-database>
   
 </beans>
