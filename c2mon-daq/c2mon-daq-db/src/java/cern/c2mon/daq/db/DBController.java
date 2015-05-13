@@ -601,7 +601,8 @@ public class DBController {
   }
 
   /**
-   * Sets the connected flag to false. Stops sending the alive tag and confirms the incorrect state to the server.
+   * Sets the connected flag to false and optionally sends a commfault tag to the server. Used during
+   * reconfiguration.
    * */
   private void setDisconnected(boolean sendCommFault) {
       this.connected = false;
