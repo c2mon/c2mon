@@ -25,7 +25,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.log4j.Logger;
-import org.apache.xerces.parsers.DOMParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -83,11 +82,10 @@ class GenerateStatisticsTask {
 
     if (chartConfigLocation == null || chartConfigLocation.isEmpty()) {
       logger.info("Not generating statistics as \"c2mon.web.statistics.chart.config.location\" property was not supplied.");
+      return;
     }
 
-//    GraphDeployer deployer = new GraphDeployer();
     Document graphXMLDocument;
-    DOMParser parser = new DOMParser();
 
     try {
       // Parse graph XML file
