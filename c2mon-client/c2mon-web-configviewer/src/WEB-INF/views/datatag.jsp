@@ -92,6 +92,12 @@ th {
             <th>Tag Value</th>
             <td>${tag.value}</td>
           </tr>
+          <c:if test="${tag.unit != null}">
+          <tr>
+            <th>Unit</th>
+            <td>${tag.unit}</td>
+          </tr>
+          </c:if>
           <tr>
             <th>Value Description</th>
             <td>${tag.valueDescription}</td>
