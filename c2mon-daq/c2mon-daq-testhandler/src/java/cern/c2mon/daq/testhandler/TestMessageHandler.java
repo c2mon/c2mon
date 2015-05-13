@@ -619,7 +619,7 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
    */
 
   private Double generateNewDouble(final SourceDataTag sdt) {
-    double max = Double.MAX_VALUE / 2.0d;
+    double max = 10000d;
     double min = 0.0d;
     if (sdt.getMaxValue() != null && sdt.getMinValue() != null) {
       max = ((Double) sdt.getMaxValue()).doubleValue();
@@ -797,7 +797,7 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
    * @return a new Float datatag value
    */
   private Float generateNewFloat(final SourceDataTag sdt) {
-    float max = Float.MAX_VALUE / 2.0f; // default values if not set in DB
+    float max = 100f; // default values if not set in DB
     float min = 0.0f;
     if (sdt.getMaxValue() != null && sdt.getMinValue() != null) {
       max = ((Float) sdt.getMaxValue()).floatValue();
@@ -975,8 +975,8 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
    * @return a new Integer datatag value
    */
   private Integer generateNewInteger(final SourceDataTag sdt) {
-    int max = Integer.MAX_VALUE / 2; // default values if not set in DB
-    int min = Integer.MIN_VALUE / 2;
+    int max = 100; // default values if not set in DB
+    int min = -100;
     if (sdt.getMaxValue() != null && sdt.getMinValue() != null) {
       max = ((Integer) sdt.getMaxValue()).intValue();
       min = ((Integer) sdt.getMinValue()).intValue();
@@ -1173,8 +1173,8 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
    * @return a new Long datatag value
    */
   private Long generateNewLong(final SourceDataTag sdt) {
-    long max = Long.MAX_VALUE / 2l;
-    long min = Long.MIN_VALUE / 2l;
+    long max = 1000000l;
+    long min = 0;
     if (sdt.getMaxValue() != null && sdt.getMinValue() != null) {
       max = ((Long) sdt.getMaxValue()).longValue();
       min = ((Long) sdt.getMinValue()).longValue();
