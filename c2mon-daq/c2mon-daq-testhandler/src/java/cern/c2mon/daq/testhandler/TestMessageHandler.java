@@ -114,52 +114,57 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
     @Override
     public void run() {
 
-      for (ISourceDataTag sourceDataTag : getEquipmentConfiguration().getSourceDataTags().values()) {
-        SourceDataTag sdt = (SourceDataTag) sourceDataTag;
+      try {
+        for (ISourceDataTag sourceDataTag : getEquipmentConfiguration().getSourceDataTags().values()) {
+          SourceDataTag sdt = (SourceDataTag) sourceDataTag;
 
-        // Don't send updates for control tags
-        if (sdt.isControlTag()) {
-          continue;
-        }
-
-        if (rand.nextFloat() <= Float.parseFloat(((String) configurationParams.get("eventProb")))) {
-          if (getEquipmentLogger().isDebugEnabled()) {
-            getEquipmentLogger().debug("generating tag value for tag " + sdt.getId());
+          // Don't send updates for control tags
+          if (sdt.isControlTag()) {
+            continue;
           }
-          Object value = null;
-          switch (sdt.getDataTypeNumeric()) {
-          case TagDataType.TYPE_BOOLEAN:
-            value = generateNewBoolean(sdt);
-            break;
 
-          case TagDataType.TYPE_DOUBLE:
-            value = generateNewDouble(sdt);
-            break;
+          if (rand.nextFloat() <= Float.parseFloat(((String) configurationParams.get("eventProb")))) {
+            if (getEquipmentLogger().isDebugEnabled()) {
+              getEquipmentLogger().debug("generating tag value for tag " + sdt.getId());
+            }
+            Object value = null;
+            switch (sdt.getDataTypeNumeric()) {
+            case TagDataType.TYPE_BOOLEAN:
+              value = generateNewBoolean(sdt);
+              break;
 
-          case TagDataType.TYPE_FLOAT:
-            value = generateNewFloat(sdt);
-            break;
+            case TagDataType.TYPE_DOUBLE:
+              value = generateNewDouble(sdt);
+              break;
 
-          case TagDataType.TYPE_INTEGER:
-            value = generateNewInteger(sdt);
-            break;
+            case TagDataType.TYPE_FLOAT:
+              value = generateNewFloat(sdt);
+              break;
 
-          case TagDataType.TYPE_LONG:
-            value = generateNewLong(sdt);
-            break;
+            case TagDataType.TYPE_INTEGER:
+              value = generateNewInteger(sdt);
+              break;
 
-          case TagDataType.TYPE_STRING:
-            value = "some random string..." + rand.nextInt();
-            break;
+            case TagDataType.TYPE_LONG:
+              value = generateNewLong(sdt);
+              break;
 
-          default:
-            // do nothing: type not recognized
+            case TagDataType.TYPE_STRING:
+              value = "some random string..." + rand.nextInt();
+              break;
 
-          } // switch
-          getEquipmentMessageSender().sendTagFiltered(sdt, value, System.currentTimeMillis());
-        } // if
+            default:
+              // do nothing: type not recognized
 
-      } // while
+            } // switch
+            getEquipmentMessageSender().sendTagFiltered(sdt, value, System.currentTimeMillis());
+          } // if
+
+        } // while
+      }
+      catch (Exception e) {
+        getEquipmentLogger().error("Error occured at test data generation.", e);
+      }
     }
 
   }
