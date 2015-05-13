@@ -629,14 +629,13 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
       sdt.setMinValue(min);
     }
     
-    
     // step is an arbitrary small value, by which the tag value can be
     // increased or decreased (should be small, so that moving from max-step
     // to min+step is not in the value deadband)
-    double step = max - min / OUT_DEADBAND_STEP_CONST;
-
-    // with probability inRangeProb, choose a value in the min-max range
-    if (rand.nextDouble() < Float.parseFloat(((String) configurationParams.get("inRangeProb")))) {
+    double step = (max - min) / OUT_DEADBAND_STEP_CONST;
+    
+   // with probability inRangeProb, choose a value in the min-max range
+    if (rand.nextDouble() < Double.parseDouble(((String) configurationParams.get("inRangeProb")))) {
       if (getEquipmentLogger().isDebugEnabled()) {
         getEquipmentLogger().debug("choosing a value in the min-max interval");
       }
@@ -646,13 +645,14 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
           getEquipmentLogger().debug("\ttag value is currently null; setting initial value");
         }
         // choose value in range
-        return Double.valueOf(min + step);
+        return Double.valueOf((min + step));
       } else { // value is not null
         double currentValue = ((Double) sdt.getCurrentValue().getValue()).doubleValue();
         if (getEquipmentLogger().isDebugEnabled()) {
           getEquipmentLogger().debug("current datatag value is " + currentValue);
         }
         short deadbandType = sdt.getAddress().getValueDeadbandType();
+
         // if the data tag has a value deadband
         if (sdt.getAddress().isValueDeadbandEnabled()
             && (deadbandType == DataTagDeadband.DEADBAND_PROCESS_ABSOLUTE || deadbandType == DataTagDeadband.DEADBAND_PROCESS_RELATIVE)) {
@@ -668,10 +668,11 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
 
           // with probability outDeadBandProb, choose a value that
           // will be propagated to Appl.Server
-          if (rand.nextDouble() < Float.parseFloat(((String) configurationParams.get("outDeadBandProb")))) {
+          if (rand.nextDouble() < Double.parseDouble(((String) configurationParams.get("outDeadBandProb")))) {
             if (getEquipmentLogger().isDebugEnabled()) {
               getEquipmentLogger().debug("\t\tchoosing a value outside the deadband");
             }
+
             // we are assuming one of min+step or max-step are
             // outside the deadband for any current value,
             // so we choose one or the other
@@ -713,14 +714,15 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
               }
 
               // notice that move from percentage to decimal below
-              // (relative deadband value is percentage in XML
-              // config)
-              deadbandValue = deadbandValue / 100; // 100 is for moving from
+              // (relative deadband value is percentage in XML config)
+              deadbandValue = deadbandValue / 100; // 100 to move from
                                                    // percentage to decimal
-              // choose to move by half the percentage deadband
-              // value
+              // choose to move by half the percentage deadband value
               double percentageChange = deadbandValue - deadbandValue / 2;
               deadbandStep = currentValue * percentageChange;
+              if (getEquipmentLogger().isDebugEnabled()) {
+                getEquipmentLogger().debug("percentage change = " + percentageChange + " deadbandStep = " + deadbandStep);
+              }
 
               // move in direction that keeps value in range
               // (assuming that this should hold in one direction
@@ -804,6 +806,7 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
       sdt.setMaxValue(max); // set defaults
       sdt.setMinValue(min);
     }
+    
     // step is an arbitrary small value, by which the tag value can be
     // increased or decreased (should be small, so that moving from max-step
     // to min+step is not in the value deadband)
