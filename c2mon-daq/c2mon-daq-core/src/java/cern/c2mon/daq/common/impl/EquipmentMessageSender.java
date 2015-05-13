@@ -199,7 +199,16 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
   @Override
   public void sendSupervisionAlive() {
     Long supAliveTagId = Long.valueOf(this.equipmentConfiguration.getAliveTagId());
-    SourceDataTag supAliveTag = getTag(supAliveTagId);
+    
+    if (supAliveTagId == null) {
+      equipmentLogger.debug("sendSupervisionAlive() - No alive tag specified. Ignoring request.");
+      return;
+    }
+    
+    SourceDataTag supAliveTag = null;
+    if (this.equipmentConfiguration.isSourceDataTagConfigured(supAliveTagId)) {
+      supAliveTag = getTag(supAliveTagId);
+    }
 
     this.equipmentAliveSender.sendEquipmentAlive(supAliveTag);
   }

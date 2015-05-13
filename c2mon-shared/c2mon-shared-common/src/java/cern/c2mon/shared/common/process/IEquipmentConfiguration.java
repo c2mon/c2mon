@@ -111,6 +111,13 @@ public interface IEquipmentConfiguration {
      * @return SourceCommandTag map (commandTagId -> SourceCommandTag)
      */
     Map<Long, ISourceCommandTag> getSourceCommandTags();
+    
+    /**
+     * @param dataTagId The id of the data tag to look for.
+     * @return <code>true</code>, if a configuration exists for the given tag id.
+     * @see #getSourceDataTag(Long)
+     */
+    boolean isSourceDataTagConfigured(final Long dataTagId);
 
     /**
      * Gets the SourceDataTag with the specified id.

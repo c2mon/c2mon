@@ -434,7 +434,12 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
    */
   @Override
   public ISourceDataTag getSourceDataTag(final Long dataTagId) {
-    return getSourceDataTags().get(dataTagId);
+    return sourceDataTags.get(dataTagId);
+  }
+  
+  @Override
+  public boolean isSourceDataTagConfigured(final Long dataTagId) {
+    return sourceDataTags.containsKey(dataTagId);
   }
 
   /**
