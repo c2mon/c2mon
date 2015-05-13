@@ -533,7 +533,7 @@ public class DBController {
 
                     		if(a.getId() == RECONFIGURATION_TAG_ID) {
                     			// If there is a reconfiguration we subscribe again to all alerts (old+new)
-                    			setDisconnected();
+                    			//setDisconnected();
                                 unregisterAlerts();
                                 equipmentLogger.info("startAlertListener - Reconfiguration has been done. Registering again ...");
 //                            	System.out.println("startAlertListener - Reconfiguration has been done. Registering again ...");
