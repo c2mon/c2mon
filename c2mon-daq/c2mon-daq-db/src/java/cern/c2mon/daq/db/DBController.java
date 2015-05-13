@@ -533,7 +533,7 @@ public class DBController {
 
                     		if(a.getId() == RECONFIGURATION_TAG_ID) {
                     			// If there is a reconfiguration we subscribe again to all alerts (old+new)
-                    			//setDisconnected();
+                    			setDisconnected(false);
                                 unregisterAlerts();
                                 equipmentLogger.info("startAlertListener - Reconfiguration has been done. Registering again ...");
 //                            	System.out.println("startAlertListener - Reconfiguration has been done. Registering again ...");
@@ -597,9 +597,18 @@ public class DBController {
    * Sets the connected flag to false. Stops sending the alive tag and confirms the incorrect state to the server.
    * */
   private void setDisconnected() {
+      setDisconnected(true);
+  }
+
+  /**
+   * Sets the connected flag to false. Stops sending the alive tag and confirms the incorrect state to the server.
+   * */
+  private void setDisconnected(boolean sendCommFault) {
       this.connected = false;
       cancelAlive();
-      getEquipmentMessageSender().confirmEquipmentStateIncorrect("setDisconnected - The connection to the database is closed.");
+      if (sendCommFault) {
+        getEquipmentMessageSender().confirmEquipmentStateIncorrect("setDisconnected - The connection to the database is closed.");
+      }
   }
 
   /**
