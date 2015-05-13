@@ -614,9 +614,17 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
    */
 
   private Double generateNewDouble(final SourceDataTag sdt) {
-    double max = ((Double) sdt.getMaxValue()).doubleValue();
-    double min = ((Double) sdt.getMinValue()).doubleValue();
-
+    double max = Double.MAX_VALUE / 2.0d;
+    double min = 0.0d;
+    if (sdt.getMaxValue() != null && sdt.getMinValue() != null) {
+      max = ((Double) sdt.getMaxValue()).doubleValue();
+      min = ((Double) sdt.getMinValue()).doubleValue();
+    } else {
+      sdt.setMaxValue(max); // set defaults
+      sdt.setMinValue(min);
+    }
+    
+    
     // step is an arbitrary small value, by which the tag value can be
     // increased or decreased (should be small, so that moving from max-step
     // to min+step is not in the value deadband)
@@ -782,8 +790,8 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
    * @return a new Float datatag value
    */
   private Float generateNewFloat(final SourceDataTag sdt) {
-    float max = 100; // default values if not set in DB
-    float min = 0;
+    float max = Float.MAX_VALUE / 2.0f; // default values if not set in DB
+    float min = 0.0f;
     if (sdt.getMaxValue() != null && sdt.getMinValue() != null) {
       max = ((Float) sdt.getMaxValue()).floatValue();
       min = ((Float) sdt.getMinValue()).floatValue();
@@ -959,8 +967,8 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
    * @return a new Integer datatag value
    */
   private Integer generateNewInteger(final SourceDataTag sdt) {
-    int max = 100; // default values if not set in DB
-    int min = 0;
+    int max = Integer.MAX_VALUE / 2; // default values if not set in DB
+    int min = Integer.MIN_VALUE / 2;
     if (sdt.getMaxValue() != null && sdt.getMinValue() != null) {
       max = ((Integer) sdt.getMaxValue()).intValue();
       min = ((Integer) sdt.getMinValue()).intValue();
@@ -1157,9 +1165,16 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
    * @return a new Long datatag value
    */
   private Long generateNewLong(final SourceDataTag sdt) {
-    long max = ((Long) sdt.getMaxValue()).longValue();
-    long min = ((Long) sdt.getMinValue()).longValue();
-
+    long max = Long.MAX_VALUE / 2l;
+    long min = Long.MIN_VALUE / 2l;
+    if (sdt.getMaxValue() != null && sdt.getMinValue() != null) {
+      max = ((Long) sdt.getMaxValue()).longValue();
+      min = ((Long) sdt.getMinValue()).longValue();
+    } else {
+      sdt.setMaxValue(max); // set defaults
+      sdt.setMinValue(min);
+    }
+    
     // step is an arbitrary small value, by which the tag value can be
     // increased or decreased
     // (should be small, so that moving from max-step to min+step is not in
