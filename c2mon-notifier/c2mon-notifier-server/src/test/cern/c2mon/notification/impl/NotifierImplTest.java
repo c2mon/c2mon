@@ -756,7 +756,7 @@ public class NotifierImplTest {
     }
 	
 	@Test
-	public void testRuleTransitionWarnOkWithErrorSubscription() throws Exception {
+	public void test_Error_WarnOk() throws Exception {
 	    
 	    startTest("testRuleTransition");
 	 
@@ -784,9 +784,218 @@ public class NotifierImplTest {
         
         s = reg.getSubscriber(s.getUserName());
         EasyMock.verify(mailer);  
-        
-        
 	}
+	
+	@Test
+    public void test_Error_ErrorOk() throws Exception {
+        
+        startTest("testRuleTransition");
+     
+        Tag toBeNotifiedFor = new Tag(1L, true);
+        Subscriber s = new Subscriber("test", "test@cern.ch", "");
+        Subscription sub = new Subscription(s.getUserName(), toBeNotifiedFor.getId());
+        sub.setNotificationLevel(Status.ERROR);
+        s.addSubscription(sub);
+        
+        
+        Mailer mailer = mockControl.createMock(Mailer.class);
+        mailer.sendEmail(EasyMock.isA(String.class), EasyMock.isA(String.class), EasyMock.isA(String.class));
+        EasyMock.expectLastCall().times(2);
+        notifier.setMailer(mailer);
+        EasyMock.replay(mailer);
+        
+
+        reg.setSubscriber(s.getCopy());
+        
+        reg.setSubscriber(s.getCopy());
+        sendUpdateRuleTag(1L, Status.ERROR.toInt());
+        notifier.checkCacheForChanges();
+        sendUpdateRuleTag(1L, Status.OK.toInt());
+        notifier.checkCacheForChanges();
+        
+        s = reg.getSubscriber(s.getUserName());
+        EasyMock.verify(mailer);  
+    }
+	
+	
+	
+	@Test
+    public void test_Error_ErrorWarn() throws Exception {
+        
+        startTest("testRuleTransition");
+     
+        Tag toBeNotifiedFor = new Tag(1L, true);
+        Subscriber s = new Subscriber("test", "test@cern.ch", "");
+        Subscription sub = new Subscription(s.getUserName(), toBeNotifiedFor.getId());
+        sub.setNotificationLevel(Status.ERROR);
+        s.addSubscription(sub);
+        
+        
+        Mailer mailer = mockControl.createMock(Mailer.class);
+        mailer.sendEmail(EasyMock.isA(String.class), EasyMock.isA(String.class), EasyMock.isA(String.class));
+        EasyMock.expectLastCall().times(2);
+        notifier.setMailer(mailer);
+        EasyMock.replay(mailer);
+        
+
+        reg.setSubscriber(s.getCopy());
+        sendUpdateRuleTag(1L, Status.ERROR.toInt());
+        notifier.checkCacheForChanges();
+        sendUpdateRuleTag(1L, Status.WARNING.toInt());
+        notifier.checkCacheForChanges();
+        
+        s = reg.getSubscriber(s.getUserName());
+        EasyMock.verify(mailer);  
+    }
+	
+	
+	@Test
+    public void test_Error_WarnError() throws Exception {
+        
+        startTest("testRuleTransition");
+     
+        Tag toBeNotifiedFor = new Tag(1L, true);
+        Subscriber s = new Subscriber("test", "test@cern.ch", "");
+        Subscription sub = new Subscription(s.getUserName(), toBeNotifiedFor.getId());
+        sub.setNotificationLevel(Status.ERROR);
+        s.addSubscription(sub);
+        
+        
+        Mailer mailer = mockControl.createMock(Mailer.class);
+        mailer.sendEmail(EasyMock.isA(String.class), EasyMock.isA(String.class), EasyMock.isA(String.class));
+        EasyMock.expectLastCall().times(1);
+        notifier.setMailer(mailer);
+        EasyMock.replay(mailer);
+        
+
+        reg.setSubscriber(s.getCopy());
+        sendUpdateRuleTag(1L, Status.WARNING.toInt());
+        notifier.checkCacheForChanges();
+        sendUpdateRuleTag(1L, Status.ERROR.toInt());
+        notifier.checkCacheForChanges();
+        
+        s = reg.getSubscriber(s.getUserName());
+        EasyMock.verify(mailer);  
+    }
+	
+	
+	
+	
+	@Test
+    public void test_Error_OkWarn() throws Exception {
+        
+        startTest("testRuleTransition");
+     
+        Tag toBeNotifiedFor = new Tag(1L, true);
+        Subscriber s = new Subscriber("test", "test@cern.ch", "");
+        Subscription sub = new Subscription(s.getUserName(), toBeNotifiedFor.getId());
+        sub.setNotificationLevel(Status.WARNING);
+        s.addSubscription(sub);
+        
+        
+        Mailer mailer = mockControl.createMock(Mailer.class);
+        mailer.sendEmail(EasyMock.isA(String.class), EasyMock.isA(String.class), EasyMock.isA(String.class));
+        EasyMock.expectLastCall().times(2);
+        notifier.setMailer(mailer);
+        EasyMock.replay(mailer);
+        
+
+        reg.setSubscriber(s.getCopy());
+        sendUpdateRuleTag(1L, Status.ERROR.toInt());
+        notifier.checkCacheForChanges();
+        sendUpdateRuleTag(1L, Status.OK.toInt());
+        notifier.checkCacheForChanges();
+        
+        s = reg.getSubscriber(s.getUserName());
+        EasyMock.verify(mailer);  
+    }
+	
+	@Test
+    public void test_Warn_ErrorWarn() throws Exception {
+        
+        startTest("testRuleTransition");
+     
+        Tag toBeNotifiedFor = new Tag(1L, true);
+        Subscriber s = new Subscriber("test", "test@cern.ch", "");
+        Subscription sub = new Subscription(s.getUserName(), toBeNotifiedFor.getId());
+        sub.setNotificationLevel(Status.WARNING);
+        s.addSubscription(sub);
+        
+        
+        Mailer mailer = mockControl.createMock(Mailer.class);
+        mailer.sendEmail(EasyMock.isA(String.class), EasyMock.isA(String.class), EasyMock.isA(String.class));
+        EasyMock.expectLastCall().times(2);
+        notifier.setMailer(mailer);
+        EasyMock.replay(mailer);
+        
+
+        reg.setSubscriber(s.getCopy());
+        sendUpdateRuleTag(1L, Status.ERROR.toInt());
+        notifier.checkCacheForChanges();
+        sendUpdateRuleTag(1L, Status.WARNING.toInt());
+        notifier.checkCacheForChanges();
+        
+        s = reg.getSubscriber(s.getUserName());
+        EasyMock.verify(mailer);  
+    }
+	
+	
+	@Test
+    public void test_Warn_WarnOk() throws Exception {
+        
+        startTest("testRuleTransition");
+     
+        Tag toBeNotifiedFor = new Tag(1L, true);
+        Subscriber s = new Subscriber("test", "test@cern.ch", "");
+        Subscription sub = new Subscription(s.getUserName(), toBeNotifiedFor.getId());
+        sub.setNotificationLevel(Status.WARNING);
+        s.addSubscription(sub);
+        
+        
+        Mailer mailer = mockControl.createMock(Mailer.class);
+        mailer.sendEmail(EasyMock.isA(String.class), EasyMock.isA(String.class), EasyMock.isA(String.class));
+        EasyMock.expectLastCall().times(2);
+        notifier.setMailer(mailer);
+        EasyMock.replay(mailer);
+        
+
+        reg.setSubscriber(s.getCopy());
+        sendUpdateRuleTag(1L, Status.WARNING.toInt());
+        notifier.checkCacheForChanges();
+        sendUpdateRuleTag(1L, Status.OK.toInt());
+        notifier.checkCacheForChanges();
+        
+        s = reg.getSubscriber(s.getUserName());
+        EasyMock.verify(mailer);  
+    }
+	
+	
+	@Test
+    public void test_Warn_Ok() throws Exception {
+        
+        startTest("testRuleTransition");
+     
+        Tag toBeNotifiedFor = new Tag(1L, true);
+        Subscriber s = new Subscriber("test", "test@cern.ch", "");
+        Subscription sub = new Subscription(s.getUserName(), toBeNotifiedFor.getId());
+        sub.setNotificationLevel(Status.WARNING);
+        s.addSubscription(sub);
+        
+        
+        Mailer mailer = mockControl.createMock(Mailer.class);
+        notifier.setMailer(mailer);
+        EasyMock.replay(mailer);
+        
+
+        reg.setSubscriber(s.getCopy());
+        sendUpdateRuleTag(1L, Status.OK.toInt());
+        notifier.checkCacheForChanges();
+        
+        s = reg.getSubscriber(s.getUserName());
+        EasyMock.verify(mailer);  
+    }
+	
+	
 	
 	
 	@Test
