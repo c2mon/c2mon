@@ -74,7 +74,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
      * runs our worker which checks regularly if notifications should be send.
      */
     private ScheduledExecutorService updatedTagsCheckerService = Executors.newSingleThreadScheduledExecutor();
-    
+
     /**
      * the list of tags which were updated between our checks.
      */
@@ -174,7 +174,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                 throw new RuntimeException("Error while waiting for C2Mon serivce to start up.");
             }
         }
-        
+
         logger.info("Step 2 of 4: Intializing subscription registry .");
         registry.reloadConfig();
         registry.setTagCache(cache);
@@ -193,11 +193,11 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
         for (Subscription s : registry.getRegisteredSubscriptions()) {
             try {
                 cache.startSubscription(s);
-             } catch (TagNotFoundException ignore) {
-                 logger.warn("Cannot start subscription for user %s with tagid %s: %s", s.getSubscriberId(), s.getTagId(), ignore.getMessage()); 
-             }
+            } catch (TagNotFoundException ignore) {
+                logger.warn("Cannot start subscription for user %s with tagid %s: %s", s.getSubscriberId(),
+                        s.getTagId(), ignore.getMessage());
+            }
         }
-        
 
         /**
          * wait for all updates
@@ -221,11 +221,10 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
         logger.info("Notification service fully started.");
     }
 
-    
     public void checkCacheForChanges() {
 
         HashSet<Tag> leftOver = new HashSet<Tag>();
-        
+
         synchronized (updatedTags) {
             for (Tag changed : updatedTags) {
 
@@ -241,7 +240,9 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
 
             // second iteration: now notify every
             if (!leftOver.isEmpty()) {
-                logger.info("{} Tags have changed and are indirectly subscribed to. Triggering notifications (if required)", leftOver.size());
+                logger.info(
+                        "{} Tags have changed and are indirectly subscribed to. Triggering notifications (if required)",
+                        leftOver.size());
                 for (Tag changed : leftOver) {
                     if (changed.getToBeNotified()) {
                         if (changed.isRule()) {
@@ -255,44 +256,44 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                     }
                 }
             }
-            
+
             updatedTags.clear();
         }
     }
 
-
     /**
      * Marks the passed Tag as to be notified in the next round.
+     * 
      * @param newElement a {@link Tag} which was decided to send notifications for.
      */
     @Override
     public void onUpdate(Tag newElement) {
         newElement.setToBeNotified(true);
         synchronized (updatedTags) {
-             updatedTags.add(newElement); 
+            updatedTags.add(newElement);
         }
-                
+
     }
-    
+
     @Override
     public void sendSourceAvailabilityReport(Tag update) {
         logger.trace("{} Entering sendSourceAvailabilityReport()", update.getId());
         try {
             String text = textCreator.getTextForSourceDown(update);
             HashSet<Subscription> subscriptions = update.getSubscribers();
-            
+
             for (Subscription s : subscriptions) {
                 logger.debug("{} Sending TAG DOWN to Subscriber {} .", update.getId(), s.getSubscriberId());
-                
+
                 if (!s.getLastNotifiedStatus().equals(Status.UNREACHABLE)) {
-                    Subscriber subscriber  = registry.getSubscriber(s.getSubscriberId());
-                    notifyMail(subscriber, update.getLatestUpdate().getDataTagQuality()
-                            .getDescription(), text);
+                    Subscriber subscriber = registry.getSubscriber(s.getSubscriberId());
+                    notifyMail(subscriber, update.getLatestUpdate().getDataTagQuality().getDescription(), text);
                     s.setLastNotification(new Timestamp(System.currentTimeMillis()));
                     s.setLastNotifiedStatus(Status.UNREACHABLE);
-                    
+
                     if (s.isSmsNotification()) {
-                        notifySms(subscriber, update.getName() + " DOWN:" + update.getLatestUpdate().getDataTagQuality().getDescription());
+                        notifySms(subscriber, update.getName() + " DOWN:"
+                                + update.getLatestUpdate().getDataTagQuality().getDescription());
                     }
                 }
             }
@@ -304,19 +305,18 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
 
     public void sendTagRecoveredMessage(Tag update) {
         logger.trace("{} Entering sendRecoveryReport()", update.getId());
-        
+
         try {
             String text = textCreator.getTextForSourceDown(update);
             HashSet<Subscription> subscriptions = update.getSubscribers();
-            
+
             logger.debug("{} Sending TAG RECOVERED to {} Subscribers .", update.getId(), subscriptions.size());
             for (Subscription s : subscriptions) {
-                Subscriber subscriber  = registry.getSubscriber(s.getSubscriberId());
-                notifyMail(subscriber, update.getLatestUpdate().getDataTagQuality()
-                        .getDescription(), text);
+                Subscriber subscriber = registry.getSubscriber(s.getSubscriberId());
+                notifyMail(subscriber, update.getLatestUpdate().getDataTagQuality().getDescription(), text);
                 s.setLastNotification(new Timestamp(System.currentTimeMillis()));
                 s.setLastNotifiedStatus(update.getLatestStatus());
-                
+
                 if (s.isSmsNotification()) {
                     notifySms(subscriber, update.getLatestUpdate().getName() + " recovered.");
                 }
@@ -324,27 +324,27 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
         } catch (Exception ex) {
             logger.error("Cannot send RECOVERY message: " + ex.getMessage(), ex);
         }
-        
+
         logger.trace("{} Leaving sendSourceAvailabilityReport()", update.getId());
     }
-    
-    
+
     @Override
     public void sendReportOnValueChange(Tag update) {
 
         logger.trace("Entering sendReportOnValueChange()");
-        
+
         HashMap<Long, Tag> list = update.getParents();
         boolean requiredtoSend = false;
         if (update.getLatestUpdate().getName().contains("PROC.MISSING")) {
             requiredtoSend = true;
             logger.debug("This notification is required to be send to all enabled recipients.");
         }
-        
+
         for (Tag parent : list.values()) {
             if (parent.getLatestStatus().worserThan(Status.OK)) {
 
-                logger.info("{} Metric value has changed. Parent is in {}. Notification to {} subscribers is required to be send.", 
+                logger.info(
+                        "{} Metric value has changed. Parent is in {}. Notification to {} subscribers is required to be send.",
                         update.getId(), parent.getLatestStatus(), parent.getSubscribers().size());
 
                 for (Subscription s : parent.getSubscribers()) {
@@ -352,25 +352,28 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                         logger.debug("{} Subscription {} is not enabled.", update.getId(), s.getSubscriberId());
                         continue;
                     }
-                    
+
                     if (!requiredtoSend) {
                         // let do some additional checks
                         if (s.isNotifyOnMetricChange()) {
-                            logger.debug("{} '{}' wants notification for metric change.", update.getId(), s.getSubscriberId());
+                            logger.debug("{} '{}' wants notification for metric change.", update.getId(),
+                                    s.getSubscriberId());
                             requiredtoSend = true;
-                        } 
+                        }
                         if (!s.isInterestedInLevel(parent.getLatestStatus())) {
-                            logger.debug("{} '{}' is not interested in this level.", update.getId(), s.getSubscriberId());
+                            logger.debug("{} '{}' is not interested in this level.", update.getId(),
+                                    s.getSubscriberId());
                             requiredtoSend = false;
                         }
                     } else {
-                        // No log message for required notification 
+                        // No log message for required notification
                     }
-                    
+
                     if (requiredtoSend) {
                         Subscriber owner = registry.getSubscriber(s.getSubscriberId());
                         String body = textCreator.getTextForMetricUpdate(update, parent);
-                        String subject = "Value changed for " + update.getLatestUpdate().getName() + "to " + update.getLatestUpdate().getValue();
+                        String subject = "Value changed for " + update.getLatestUpdate().getName() + "to "
+                                + update.getLatestUpdate().getValue();
                         if (s.isMailNotification()) {
                             notifyMail(owner, subject, body);
                         }
@@ -390,20 +393,21 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
     @Override
     public void sendInitialReport(Tag update) {
         logger.trace("Entering sendInitialReport()");
-        
+
         List<Tag> noGood = getProblemChildRules(update);
-        logger.debug("{} Sending initial report with {} problematic children to {} subscribers ", update.getId(), noGood.size(), update.getSubscribers().size());
-        
+        logger.debug("{} Sending initial report with {} problematic children to {} subscribers ", update.getId(),
+                noGood.size(), update.getSubscribers().size());
+
         logger.debug("{} Sending initial report to {} Subscribers ", update.getId(), update.getSubscribers().size());
-        
+
         if (checkSourceDownReport(update)) {
             return;
         }
-        
+
         for (Subscription s : update.getSubscribers()) {
             try {
                 if (!s.getLastNotifiedStatus().equals(update.getLatestStatus())) {
-                    
+
                     sendFullReportOn(update, s, noGood);
                     for (Tag t : noGood) {
                         s.setLastStatusForResolvedTSubTag(t.getId(), t.getLatestStatus());
@@ -416,7 +420,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
         }
 
         logger.trace("Leaving sendInitialReport()");
-        
+
     }
 
     /**
@@ -429,20 +433,18 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
     private void sendFullReportOn(Tag update, Subscription sub, List<Tag> interestingRuleTags) throws IOException,
             TemplateException {
         logger.trace("Entering sendFullReportOn()");
-        
+
         if (sub == null) {
             throw new IllegalStateException("Passed Argument of subscription object is null!");
         }
-        
-        logger.debug("{} Sending full report to {}",update.getId(), sub.getSubscriberId());
+
+        logger.debug("{} Sending full report to {}", update.getId(), sub.getSubscriberId());
         logger.trace("{} List of interesting tags: {}", update.getId(), interestingRuleTags);
 
         String subject = textCreator.getMailSubjectForStateChange(update, interestingRuleTags);
         String text = textCreator.getReportForTag(update, interestingRuleTags, cache);
 
-        //TODO String smsText = textCreator.getSmsTextForRuleChange(update, interestingRuleTags);
-        
-        if (sub.isEnabled() && sub.isInterestedInLevel(update.getLatestStatus())) {
+        if (sub.isEnabled()) {
             Subscriber user = registry.getSubscriber(sub.getSubscriberId());
             if (sub.isMailNotification()) {
                 notifyMail(user, subject, text);
@@ -459,55 +461,59 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
 
         logger.trace("{} Entering sendReportOnRuleChange()", update.getId());
 
-        
         if (checkSourceDownReport(update)) {
             return;
         }
-        
+
         /**
          * Tag has recovered:
          */
-//        if (update.hasStatusRecovered()) {
-//            sendTagRecoveredMessage(update);
-//            return;
-//        }
+        // if (update.hasStatusRecovered()) {
+        // sendTagRecoveredMessage(update);
+        // return;
+        // }
 
         /**
-         * Check more detailed on the problem and collect info 
+         * Check more detailed on the problem and collect info
          */
         List<Tag> interestingChildRules = new ArrayList<Tag>();
         if (update.getAllChildRules().size() == 0) {
-            
+
             // R->M update
-            
+
             logger.debug("{} no child rule changed but received an update. R->M.", update.getId());
             for (Subscription s : update.getSubscribers()) {
                 Status oldStatus = s.getLastStatusForResolvedSubTag(update.getId());
-                
-                logger.trace("{} Checking if subscriber '{}' is interested in this update...", update.getId(), s.getSubscriberId());
+
+                logger.trace("{} Checking if subscriber '{}' is interested in this update...", update.getId(),
+                        s.getSubscriberId());
                 try {
                     // we add ourself, as we need to report on the metrics
                     interestingChildRules.add(update);
-                    
+
                     if (s.getTagId().longValue() != update.getId().longValue()) {
-                        
-                        if (oldStatus != null && !oldStatus.equals(update.getLatestStatus()) && !s.isInterestedInLevel(oldStatus)) {
+
+                        if (oldStatus != null && !oldStatus.equals(update.getLatestStatus())
+                                && !s.isInterestedInLevel(oldStatus)) {
                             // recovery of a child rule. e.g. WARN->OK
-                            logger.debug("{} subscriber '{}' not interested in this update", update.getId(), s.getSubscriberId());
+                            logger.debug("{} subscriber '{}' not interested in this update", update.getId(),
+                                    s.getSubscriberId());
                             continue;
                         }
-                        
+
                         // an update of a rule which belongs to a higher rule
                         sendFullReportOn(update, s, interestingChildRules);
                         s.setLastStatusForResolvedTSubTag(update.getId(), update.getLatestStatus());
                         s.setLastNotification(new Timestamp(System.currentTimeMillis()));
-                        logger.debug("{} Setting new notified state '{}' for Subscriber '{}'", 
-                                update.getId(), update.getLatestStatus(), s.getSubscriberId());
+                        logger.debug("{} Setting new notified state '{}' for Subscriber '{}'", update.getId(),
+                                update.getLatestStatus(), s.getSubscriberId());
                     } else if (!s.getLastNotifiedStatus().equals(update.getLatestStatus())) {
                         // a direct rule-metric subscription
                         sendFullReportOn(update, s, interestingChildRules);
-                        logger.debug("{} Setting new notified state '{}' for Childrule {} (state before: '{}') for Subscriber '{}'.", 
-                                update.getId(), update.getLatestStatus(), s.getTagId(), s.getLastNotifiedStatus(), s.getSubscriberId());
+                        logger.debug(
+                                "{} Setting new notified state '{}' for Childrule {} (state before: '{}') for Subscriber '{}'.",
+                                update.getId(), update.getLatestStatus(), s.getTagId(), s.getLastNotifiedStatus(),
+                                s.getSubscriberId());
                         s.setLastNotifiedStatus(update.getLatestStatus());
                         s.setLastNotification(new Timestamp(System.currentTimeMillis()));
                     } else {
@@ -518,20 +524,21 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                 }
             }
         } else {
-            
+
             if (update.hasStatusChanged()) {
                 // no status change, but we got an update:
                 // 1. check if the quality has changed ? -> yes, send update
             } else {
                 // status has changed:
-                // full send 
+                // full send
             }
-            
-            logger.debug("{} has changed its state : {} -> {}. ", update.getId(), update.getPreviousStatus(), update.getLatestStatus());
+
+            logger.debug("{} has changed its state : {} -> {}. ", update.getId(), update.getPreviousStatus(),
+                    update.getLatestStatus());
             logger.debug("{} has child rules (R->R->M) ...", update.getId());
             logger.trace("{} children rules:", update.getAllChildRules());
-            
-            // all metrics of this rule R->M1, R->M2,.. (if any)  
+
+            // all metrics of this rule R->M1, R->M2,.. (if any)
             List<Tag> changedDirectChildMetrics = update.getChangedChildMetrics();
             List<Tag> childRecursiveRules = new ArrayList<Tag>();
             for (Tag c : update.getAllChildTagsRecursive()) {
@@ -540,136 +547,142 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                 }
             }
 
-            
             // R->R->M
             for (Subscription s : update.getSubscribers()) {
-                
-                
+
                 // 1. mode changed
                 // 2. quality changed
                 // 3. status changed
-                
+
                 try {
-                    
+
                     // let check the children if they have changed since last check...
                     for (Tag child : childRecursiveRules) {
                         if (!s.getLastStatusForResolvedSubTag(child.getId()).equals(child.getLatestStatus())) {
                             // add to interesting list.
-                            logger.debug("{} Adding '{}' [{}] as interesting child.", update.getId(), child.getId(), child.getLatestStatus());
+                            logger.debug("{} Adding '{}' [{}] as interesting child.", update.getId(), child.getId(),
+                                    child.getLatestStatus());
                             interestingChildRules.add(child);
-                        } 
+                        }
                         //
                     }
-                    
+
                     s.setLastNotifiedStatus(update.getLatestStatus());
-                    
-                    if (!s.isInterestedInLevel(update.getLatestStatus(), update.getPreviousStatus())) {
-                        continue;
-                    }
-                    
+
+                    // if (update.getLatestStatus().worserThan(s.getNotificationLevel()) &&
+                    // !s.getNotificationLevel().equals(update.getPreviousStatus())) {
+                    // continue;
+                    // }
+
+                    // update for same status
+                    if (s.getNotificationLevel().equals(update.getLatestStatus())) {
+                        ///
+                    } else if (update.getLatestStatus().betterThan(s.getNotificationLevel())) {
+                        // update better than our subscription level
+                        if (!s.getNotificationLevel().betterThan(update.getPreviousStatus()) && !s.getNotificationLevel().equals(update.getPreviousStatus())) {
+                            // check if the previous state was interesting to us. Only then we send notifications
+                            continue;
+                        } 
+                    } 
+                    //
+                    // if (!s.isInterestedInLevel(update.getLatestStatus(), update.getPreviousStatus())) {
+                    // continue;
+                    // }
+
                     // abort, if no children have changed and no direct metrics have changed.
-//                    if (interestingChildRules.size() == 0 && changedDirectChildMetrics.size() == 0) {
-//                        logger.debug("{} No interesting child for {}.", update.getId(), s.getSubscriberId());
-//                        // set the last notification timestamp and status here ?
-//                        // why should we receive an update without changes ?
-//                        continue;
-//                    }
-                    
+                    // if (interestingChildRules.size() == 0 && changedDirectChildMetrics.size() == 0) {
+                    // logger.debug("{} No interesting child for {}.", update.getId(), s.getSubscriberId());
+                    // // set the last notification timestamp and status here ?
+                    // // why should we receive an update without changes ?
+                    // continue;
+                    // }
+
                     if (true) {
                         sendFullReportOn(update, s, interestingChildRules);
                         s.setLastNotification(new Timestamp(System.currentTimeMillis()));
-                    
+
                         for (Tag cR : interestingChildRules) {
-                            logger.debug("Setting status for resolved subtag '{}' to [{}] for Subscriber '{}'", 
-                                    update.getId(), cR.getId(), cR.getLatestStatus(), s.getSubscriberId()); 
+                            logger.debug("Setting status for resolved subtag '{}' to [{}] for Subscriber '{}'",
+                                    update.getId(), cR.getId(), cR.getLatestStatus(), s.getSubscriberId());
                             s.setLastStatusForResolvedTSubTag(cR.getId(), cR.getLatestStatus());
                         }
                         if (update.getId().longValue() != s.getTagId().longValue()) {
                             // a sub rule update
-                            logger.debug("{} Setting status for resolved subtag '{}' to [{}] for Subscriber '{}'", 
+                            logger.debug("{} Setting status for resolved subtag '{}' to [{}] for Subscriber '{}'",
                                     update.getId(), update.getId(), update.getLatestStatus(), s.getSubscriberId());
                             s.setLastStatusForResolvedTSubTag(update.getId(), update.getLatestStatus());
                         } else {
-                            logger.debug("{} Setting last notified status to [{}] for Subscriber '{}'", 
-                                    update.getId(), update.getLatestStatus(), s.getSubscriberId());  
+                            logger.debug("{} Setting last notified status to [{}] for Subscriber '{}'", update.getId(),
+                                    update.getLatestStatus(), s.getSubscriberId());
                         }
                     }
-                    
-                    
+
                 } catch (Exception ex) {
                     logger.error(ex.getMessage(), ex);
-                }   
-                
+                }
+
             }
         }
-        
 
         logger.trace("Leaving sendReportOnRuleChange()");
     }
 
-    
     boolean checkSourceDownReport(Tag update) {
         DataTagQuality quality = update.getLatestUpdate().getDataTagQuality();
-        
+
         //
         // quality check first
         // Should we announce this anyhow ?
         //
         if (!quality.isValid()) {
             if (quality.isInvalidStatusSet(TagQualityStatus.SERVER_HEARTBEAT_EXPIRED)
-              || quality.isInvalidStatusSet(TagQualityStatus.JMS_CONNECTION_DOWN)
-              || quality.isInvalidStatusSet(TagQualityStatus.PROCESS_DOWN)) {
-              logger.trace("{} Quality is {} . No announcement with these states: {}", 
-                      update.getId(), quality.getInvalidQualityStates());
+                    || quality.isInvalidStatusSet(TagQualityStatus.JMS_CONNECTION_DOWN)
+                    || quality.isInvalidStatusSet(TagQualityStatus.PROCESS_DOWN)) {
+                logger.trace("{} Quality is {} . No announcement with these states: {}", update.getId(),
+                        quality.getInvalidQualityStates());
                 return true;
-            }
-            else if (
-                  quality.isInvalidStatusSet(TagQualityStatus.SUBEQUIPMENT_DOWN)
-               || quality.isInvalidStatusSet(TagQualityStatus.EQUIPMENT_DOWN)
-               || quality.isInvalidStatusSet(TagQualityStatus.INACCESSIBLE)) {
+            } else if (quality.isInvalidStatusSet(TagQualityStatus.SUBEQUIPMENT_DOWN)
+                    || quality.isInvalidStatusSet(TagQualityStatus.EQUIPMENT_DOWN)
+                    || quality.isInvalidStatusSet(TagQualityStatus.INACCESSIBLE)) {
                 // tell user that the source is down
                 sendSourceAvailabilityReport(update);
                 return true;
             } else {
                 // tag is invalid, but we announce this reason to the user in the following ...
-                logger.trace("{} quality is {}. User notification required.", 
-                        update.getId(), quality.getInvalidQualityStates());
+                logger.trace("{} quality is {}. User notification required.", update.getId(),
+                        quality.getInvalidQualityStates());
             }
         }
         return false;
     }
-    
-    
-    
+
     // / --------------------------- END main Logic -------------------------------- \\\
-    
-    
+
     /**
      * @param subscriber The Subscriber to send the passed text
      * @param smsText The text to send
      */
     void notifySms(Subscriber subscriber, String smsText) {
-        
+
         String smsAddress = subscriber.getSms() + "@mail2sms.cern.ch";
         logger.debug("Notifying via SMS to {}", smsAddress);
-        
+
         try {
             mailer.sendEmail(smsAddress, "", smsText);
         } catch (Exception e) {
-            logger.error("Error when sending notification sms to " + smsAddress , e);
+            logger.error("Error when sending notification sms to " + smsAddress, e);
         }
     }
-    
+
     /**
-     * 
      * @param subscriber The Subscriber to send the passed text
      * @param subject The subject of this message
-     * @param text The body 
+     * @param text The body
      */
     void notifyMail(Subscriber subscriber, String subject, String text) {
-        
+
         logger.debug("Notifying via Mail to {} ", subscriber.getEmail());
-        
+
         try {
             mailer.sendEmail(subscriber.getEmail(), subject, text);
         } catch (Exception e) {
@@ -698,10 +711,10 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
     @Override
     public void sendReminder(Subscription sup) {
         logger.debug("Sending Reminder for {} ,User={}", sup.getTagId(), sup.getSubscriberId());
-        
+
         Subscriber user = registry.getSubscriber(sup.getSubscriberId());
         Tag toRemindeFor = cache.get(sup.getTagId());
-        
+
         try {
             String body = textCreator.getReportForTag(toRemindeFor, getProblemChildRules(toRemindeFor), cache);
             mailer.sendEmail(user.getEmail(), "REMINDER for " + toRemindeFor.getLatestUpdate().getName(), body);
@@ -710,42 +723,43 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
         }
         logger.trace("Leaving sendReminder()");
     }
-    
+
     /**
      * our c2mon server heartbeat listener.
+     * 
      * @return a {@link HeartbeatListener}
      */
     HeartbeatListener getC2MonHeartbeatListener() {
         return new HeartbeatListener() {
-            
+
             @Override
             public void onHeartbeatResumed(Heartbeat pHeartbeat) {
                 logger.info("C2MON Server Heartbeat resumed.");
                 stopUpdateChecker();
-                
+
             }
-            
+
             @Override
             public void onHeartbeatReceived(Heartbeat pHeartbeat) {
                 logger.trace("C2MON Server Heartbeat from {} received.", pHeartbeat.getHostName());
                 startUpdateChecker();
-                
+
             }
-            
+
             @Override
             public void onHeartbeatExpired(Heartbeat pHeartbeat) {
                 logger.warn("C2MON Server Heartbeat lost.");
-                
+
             }
         };
     }
-    
+
     void stopUpdateChecker() {
         updatedTagsCheckerService.shutdownNow();
     }
-    
+
     void startUpdateChecker() {
-        
+
         updatedTagsCheckerService.scheduleAtFixedRate(new Runnable() {
 
             @Override
@@ -756,8 +770,8 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                     logger.error(e.getMessage(), e);
                 }
             }
-            
+
         }, 2, 10, TimeUnit.SECONDS);
     }
-    
+
 }
