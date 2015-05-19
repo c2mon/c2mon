@@ -127,7 +127,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
     synchronized public void registerTags() throws EqIOException {
 
-        log.info("registering tags ...");
+        log.info("registering {} tags for equipment {} ...", getEquipmentConfiguration().getSourceDataTags().size(), getEquipmentConfiguration().getName());
 
         // ExecutorService service = Executors.newFixedThreadPool(2);
 
