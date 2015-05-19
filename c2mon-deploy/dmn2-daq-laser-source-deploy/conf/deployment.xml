@@ -14,7 +14,7 @@
 				<property name="c2mon.process.name" value="${PROCESS_NAME}" />
 				<property name="c2mon.log.dir" value="log" />
 				<property name="c2mon.daq.spring.context" value="file:conf/daq-core-service.xml" />
-				<java-vm-args>-Xms384m -Xmx384m -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
+				<java-vm-args>-Xms1G -Xmx1G -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
 			</startscript>
 		</application>
 
