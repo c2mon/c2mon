@@ -98,12 +98,12 @@ public class AlarmListener implements AlarmConsumerInterface, AlarmMessageVisito
                 ISourceDataTag dataTag = findDataTag(laserAddress);
                 if (dataTag != null) {
                     if (dataTag.getCurrentValue() != null && dataTag.getCurrentValue().getValue().equals(true)) {
-                        log.debug("This dataTag - " + dataTag.getName() + " - has already the good value :"
-                                + dataTag.getCurrentValue().getValue());
+                        //NOTHING
                     } else {
                         getHandler().mbean.setDataTag(dataTag.getId());
                         equipementMessageSender.sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis());
                         getHandler().mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
+                        log.info(dataTag.getId() +  "  turns to " + dataTag.getCurrentValue().getValue()  );
                     }
 
                 } else {
@@ -113,12 +113,12 @@ public class AlarmListener implements AlarmConsumerInterface, AlarmMessageVisito
                 ISourceDataTag dataTag = findDataTag(laserAddress);
                 if (dataTag != null) {
                     if (dataTag.getCurrentValue() != null && dataTag.getCurrentValue().getValue().equals(false)) {
-                        log.debug("This dataTag - " + dataTag.getName() + " - has already the good value :"
-                                + dataTag.getCurrentValue().getValue());
+                        //NOTHING
                     } else {
                         getHandler().mbean.setDataTag(dataTag.getId());
                         equipementMessageSender.sendTagFiltered(dataTag, Boolean.FALSE, System.currentTimeMillis());
                         getHandler().mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
+                        log.info(dataTag.getId() +  "  turns to " + dataTag.getCurrentValue().getValue()  );
                     }
 
                 } else {
@@ -221,12 +221,14 @@ public class AlarmListener implements AlarmConsumerInterface, AlarmMessageVisito
                         getHandler().mbean.setDataTag(dataTag.getId());
                         equipementMessageSender.sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis());
                         getHandler().mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
+                        log.info(dataTag.getId() +  "  turns to " + dataTag.getCurrentValue().getValue()  );
                     } 
                 } else {
                     if (!(dataTag.getCurrentValue() != null && dataTag.getCurrentValue().getValue().equals(false))) {
                         getHandler().mbean.setDataTag(dataTag.getId());
                         equipementMessageSender.sendTagFiltered(dataTag, Boolean.FALSE, System.currentTimeMillis());
                         getHandler().mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
+                        log.info(dataTag.getId() +  "  turns to " + dataTag.getCurrentValue().getValue()  );
                     } 
                 }
             }
