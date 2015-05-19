@@ -47,8 +47,23 @@ public class AlarmListener implements AlarmConsumerInterface, AlarmMessageVisito
         connector.addListener(this);
         connector.setTopicRoot("CMW.ALARM_SYSTEM.ALARMS.SOURCES.");
         connector.connect();
-        connector.addSource("#");
         isStarted = true;
+    }
+    
+    public void startListingToSource(String sourceName) throws JMSException {
+        if (!isStarted) {
+            connectToLaser();
+        }
+        log.info("Start listing to source {}", sourceName);
+        connector.addSource(sourceName);
+    }
+    
+    
+    public void removeListingToSource(String sourceName) throws JMSException {
+        log.info("Remove listing from source {}", sourceName);
+        if (connector != null) {
+            connector.removeSource(sourceName);
+        }
     }
     
     public synchronized void disconnectFromLaser() {

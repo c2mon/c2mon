@@ -53,20 +53,16 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
     /**
      * @param listener The new {@link AlarmListener}
+     * 
+     * Only used for testing  
      */
     void setAlarmListener(AlarmListener listener) {
-        if (listener != null) {
-            listener.disconnectFromLaser();
-        }
         this.listener = listener;
     }
     
     @Override
     public void shutdown() throws EqIOException {
         super.shutdown();
-        if (listener != null) {
-            listener.disconnectFromLaser();
-        }
     }
 
     @Override
@@ -77,7 +73,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
         if (listener == null) {
             listener = new AlarmListener(this);
             try {
-                listener.connectToLaser();
+                listener.startListingToSource(getEquipmentConfiguration().getName());
             } catch (JMSException e) {
                 throw new EqIOException(e);
             }
