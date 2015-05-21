@@ -26,7 +26,6 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
 
     LaserNativeMessageHandler laserMessage;
 
-    AlarmListener listener;
 
     public LaserNativeMessageHandlerTest() {
         
@@ -35,8 +34,6 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
     @Override
     protected void beforeTest() throws Exception {
         laserMessage = (LaserNativeMessageHandler) msgHandler;
-        listener = AlarmListener.getAlarmListener();
-        
     }
 
     @Override
@@ -54,9 +51,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
 
         replay(messageSender);
 
-        laserMessage.connectToDataSource();
-        listener.disconnectFromLaser();
-        listener.onMessage(MyAlarmMessageData.createUpdateMessage(true, MessageType.UPDATE, "LHC"));
+        laserMessage.onMessage(MyAlarmMessageData.createUpdateMessage(true, MessageType.UPDATE, "LHC"));
 
         Thread.sleep(1000);
 
@@ -78,11 +73,10 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
         replay(messageSender);
 
         laserMessage.connectToDataSource();
-        listener.disconnectFromLaser();
         ISourceDataTag dataTag = laserMessage.getEquipmentConfiguration().getSourceDataTag((long) 124149);
         laserMessage.getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis());
 
-        listener.onMessage(MyAlarmMessageData.createUpdateMessage(false, MessageType.UPDATE, "LHC"));
+        laserMessage.onMessage(MyAlarmMessageData.createUpdateMessage(false, MessageType.UPDATE, "LHC"));
 
         Thread.sleep(1000);
 
@@ -105,8 +99,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
         replay(messageSender);
 
         laserMessage.connectToDataSource();
-        listener.disconnectFromLaser();
-        listener.onMessage(MyAlarmMessageData.createUnknownAlarm(true, MessageType.UPDATE, "LHC"));
+        laserMessage.onMessage(MyAlarmMessageData.createUnknownAlarm(true, MessageType.UPDATE, "LHC"));
 
         Thread.sleep(1000);
 
@@ -130,12 +123,11 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
         replay(messageSender);
 
         laserMessage.connectToDataSource();
-        listener.disconnectFromLaser();
         
         ISourceDataTag dataTag = laserMessage.getEquipmentConfiguration().getSourceDataTag((long) 124150);
         laserMessage.getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis());
 
-        listener.onMessage(MyAlarmMessageData.createBackupMessage(MessageType.BACKUP, "LHC"));
+        laserMessage.onMessage(MyAlarmMessageData.createBackupMessage(MessageType.BACKUP, "LHC"));
 
         Thread.sleep(3000);
 
