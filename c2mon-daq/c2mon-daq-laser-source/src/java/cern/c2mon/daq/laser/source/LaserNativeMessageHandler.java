@@ -296,6 +296,9 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
                 if (dataTag.getCurrentValue() != null && dataTag.getCurrentValue().getValue().equals(Boolean.TRUE)) {
                     // NOTHING
+                    
+                    log.debug(dataTag.getId() + " - " + alarm.getAlarmId() + " - ACTIVE -> ACTIVE. alarm change ignored");
+                    
                 } else {
 
                     // udpate mbeans in another service asynchronous
@@ -303,20 +306,23 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                     getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis());
 
                     mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
-                    log.info(dataTag.getId() + " - " + alarm.getAlarmId() + " - turns to "
-                            + dataTag.getCurrentValue().getValue());
+                    
+                    
+                    log.debug(dataTag.getId() + " - " + alarm.getAlarmId() + " - TERM -> ACTIVE.");
+                    
                 }
             } else if (alarm.getDescriptor().equals(Descriptor.TERMINATE)) {
 
                 if (dataTag.getCurrentValue() != null && dataTag.getCurrentValue().getValue().equals(Boolean.FALSE)) {
                     // NOTHING
+                    log.debug(dataTag.getId() + " - " + alarm.getAlarmId() + " - TERM -> TERM. alarm change ignored");
+                    
                 } else {
                     mbean.setDataTag(dataTag.getId());
                     getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.FALSE, System.currentTimeMillis());
                     mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
 
-                    log.info(dataTag.getId() + " - " + alarm.getAlarmId() + " - turns to "
-                            + dataTag.getCurrentValue().getValue());
+                    log.debug(dataTag.getId() + " - " + alarm.getAlarmId() + " - ACTIVE -> TERM.");
                 }
 
             }
@@ -356,7 +362,15 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                     mbean.setDataTag(dataTag.getId());
                     getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.FALSE, System.currentTimeMillis());
                     mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
-                    log.info(dataTag.getId() + " TERMINATE");
+                    
+                    String alarmID = dataTag.getName();
+                    try {
+                        alarmID = getAlarmIdFromLaserHardwareAdress(dataTag);
+                    } catch (EqIOException e) {
+                        // SHOULD NEVER HAPPEN as the validation took place before
+                    }
+                    
+                    log.debug(dataTag.getId() + " - " + alarmID + " - ACTIVE -> TERM by backup.");
                 }
             }
         }
