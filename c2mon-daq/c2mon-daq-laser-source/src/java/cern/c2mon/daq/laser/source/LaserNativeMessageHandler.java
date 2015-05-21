@@ -21,7 +21,9 @@ import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.address.LASERHardwareAddress;
 import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ChangeReport;
@@ -254,6 +256,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
     @Override
     public void onException(JMSException ex) {
         log.error("Got Exception from LASER library : " + ex.getMessage(), ex);
+        getEquipmentMessageSender().confirmEquipmentStateIncorrect(ex.getMessage());
 
     }
 
@@ -303,8 +306,23 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
                     // udpate mbeans in another service asynchronous
                     mbean.setDataTag(dataTag.getId());
-                    getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis());
-
+                    
+                    // TODO 
+                    String prefix = alarm.getProperty("ASI_PREFIX");
+                    if (prefix.equals("[?]")) {
+                        //
+                    }
+                    if (prefix.equals("[T]")) {
+                        //
+                    }
+                    
+                    // extract the user properties as value description
+                    String valDescr = "";
+                    for (String key : alarm.getUserPropNames()) {
+                        valDescr += key + "=" + alarm.getProperty(key) + "\n";
+                    }
+                    
+                    getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis(), valDescr);              
                     mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
                     
                     
@@ -325,6 +343,29 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                     log.debug(dataTag.getId() + " - " + alarm.getAlarmId() + " - ACTIVE -> TERM.");
                 }
 
+            } else if (alarm.getDescriptor().equals(Descriptor.CHANGE)) {
+                // TODO 
+                
+                // update mbeans in another service asynchronous
+                mbean.setDataTag(dataTag.getId());
+                
+                // TODO 
+                String prefix = alarm.getProperty("ASI_PREFIX");
+                if (prefix.equals("[?]")) {
+                    //
+                }
+                if (prefix.equals("[T]")) {
+                    //
+                }
+                
+                // extract the user properties as value description
+                String valDescr = "";
+                for (String key : alarm.getUserPropNames()) {
+                    valDescr += key + "=" + alarm.getProperty(key) + "\n";
+                }
+                
+                getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis(), valDescr);              
+                mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
             }
         }
     }
@@ -390,7 +431,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
     @Override
     public void reset() {
-        // Dont' care..
+        getEquipmentMessageSender().confirmEquipmentStateOK();
 
     }
 
