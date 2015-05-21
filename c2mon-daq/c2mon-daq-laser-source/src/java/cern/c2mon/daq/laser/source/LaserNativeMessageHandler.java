@@ -7,9 +7,8 @@ package cern.c2mon.daq.laser.source;
 import static java.lang.String.format;
 
 import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.jms.JMSException;
 import javax.management.MBeanServer;
@@ -19,31 +18,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.common.EquipmentMessageHandler;
-import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.address.LASERHardwareAddress;
-import cern.c2mon.shared.common.datatag.address.SimpleHardwareAddress;
 import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
+import cern.diamon.alarms.client.AlarmConsumerInterface;
+import cern.diamon.alarms.client.AlarmMessageData;
+import cern.diamon.alarms.client.ClientAlarmEvent;
+import cern.diamon.alarms.shared.data.AlarmHandle.Descriptor;
+import cern.diamon.alarms.source.AlarmMessageBuilder.MessageType;
 
 public class LaserNativeMessageHandler extends EquipmentMessageHandler implements IDataTagChanger,
-        IEquipmentConfigurationChanger {
+        IEquipmentConfigurationChanger, AlarmConsumerInterface {
 
     private static final Logger log = LoggerFactory.getLogger(LaserNativeMessageHandler.class);
 
     protected EquipmentMonitor mbean;
 
-    private ConcurrentHashMap<IEquipmentConfiguration, Collection<LASERHardwareAddress>> alarmList4Equipement = new ConcurrentHashMap<IEquipmentConfiguration, Collection<LASERHardwareAddress>>();
-    private ConcurrentHashMap<String, IEquipmentConfiguration> equipementByName = new ConcurrentHashMap<String, IEquipmentConfiguration>();
-    private ConcurrentHashMap<IEquipmentConfiguration, IEquipmentMessageSender> equMessageSenderList = new ConcurrentHashMap<IEquipmentConfiguration, IEquipmentMessageSender>();
-    private ConcurrentHashMap<IEquipmentConfiguration, ISourceDataTag> heartbeatTag4Equipment = new ConcurrentHashMap<IEquipmentConfiguration, ISourceDataTag>();
-    private ConcurrentHashMap<String, ISourceDataTag> tag4LaserHardwareAddress = new ConcurrentHashMap<String, ISourceDataTag>();
-
     private AlarmListener listener;
+
+    private Map<String, ISourceDataTag> alarmToTag = new HashMap<>();
 
     /**
      */
@@ -52,14 +50,12 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
     }
 
     /**
-     * @param listener The new {@link AlarmListener}
-     * 
-     * Only used for testing  
+     * @param listener The new {@link AlarmListener} Only used for testing
      */
     void setAlarmListener(AlarmListener listener) {
         this.listener = listener;
     }
-    
+
     @Override
     public void shutdown() throws EqIOException {
         super.shutdown();
@@ -68,15 +64,16 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
     @Override
     public synchronized void connectToDataSource() throws EqIOException {
 
-        log.debug("connectToDataSource - entering connectToDataSource(). Creating subscriptions for all registered DataTags..");
+        log.debug("connectToDataSource - entering...");
 
         if (listener == null) {
-            listener = new AlarmListener(this);
-            try {
-                listener.startListingToSource(getEquipmentConfiguration().getName());
-            } catch (JMSException e) {
-                throw new EqIOException(e);
-            }
+            listener = AlarmListener.getAlarmListener();
+        }
+
+        try {
+            listener.startListingToSource(getEquipmentConfiguration().getName());
+        } catch (JMSException e) {
+            throw new EqIOException(e);
         }
 
         initializeMBean();
@@ -89,32 +86,28 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
     @Override
     public synchronized void disconnectFromDataSource() throws EqIOException {
         if (getEquipmentLogger().isDebugEnabled()) {
-            getEquipmentLogger().debug("disconnectFromDataSource - entering diconnectFromDataSource()..");
+            getEquipmentLogger().debug("disconnectFromDataSource - entering ..");
         }
 
-        for (LASERHardwareAddress lAddress : alarmList4Equipement.get(getEquipmentConfiguration())) {
-            if (tag4LaserHardwareAddress.containsKey(lAddress.toString())) {
-                tag4LaserHardwareAddress.remove(lAddress.toString());
-            }
+        if (listener != null) {
+            getEquipmentLogger().trace("disconnectFromDataSource Removing Handler from LASER listener..");
+            listener.removeHandler(this);
+            getEquipmentLogger().info("disconnectFromDataSource Handler from LASER listener removed.");
         }
-        heartbeatTag4Equipment.remove(getEquipmentConfiguration());
-        equMessageSenderList.remove(getEquipmentConfiguration());
-        equipementByName.remove(getEquipmentConfiguration().getName());
-        alarmList4Equipement.remove(getEquipmentConfiguration());
 
-        if (getEquipmentLogger().isDebugEnabled()) {
-            getEquipmentLogger().debug("disconnectFromDataSource - leaving diconnectFromDataSource()..");
+        if (getEquipmentLogger().isTraceEnabled()) {
+            getEquipmentLogger().trace("disconnectFromDataSource - leaving ..");
         }
     }
 
     @Override
     public void refreshAllDataTags() {
-        //Nothing
+        // Nothing
     }
 
     @Override
     public void refreshDataTag(long arg0) {
-        //Nothing
+        // Nothing
     }
 
     //
@@ -123,114 +116,48 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
     synchronized public void registerTags() throws EqIOException {
 
-        log.info("registering {} tags for equipment {} ...", getEquipmentConfiguration().getSourceDataTags().size(), getEquipmentConfiguration().getName());
+        log.info("registering {} tags for equipment {} ...", getEquipmentConfiguration().getSourceDataTags().size(),
+                getEquipmentConfiguration().getName());
 
         // ExecutorService service = Executors.newFixedThreadPool(2);
 
-        final Collection<LASERHardwareAddress> listLaserHaddr = new ArrayList<LASERHardwareAddress>();
         for (final ISourceDataTag dataTag : getEquipmentConfiguration().getSourceDataTags().values()) {
-            if (dataTag.getHardwareAddress() instanceof LASERHardwareAddress) {
 
-                // Runnable r = new Runnable() {
-                //
-                // @Override
-                // public void run() {
-                LASERHardwareAddress laddr = (LASERHardwareAddress) dataTag.getHardwareAddress();
-                getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.FALSE, System.currentTimeMillis());
-                tag4LaserHardwareAddress.put(laddr.toString(), dataTag);
-                listLaserHaddr.add(laddr);
-                // }
-                //
-                // };
-                //
-                // service.submit(r);
-
-                // Using toString because it takes times by using the LASERHarwareAddress type
-
-            } else if (dataTag.getHardwareAddress() instanceof SimpleHardwareAddress) {
-                ISourceDataTag heartbeatTag = getEquipmentConfiguration().getSourceDataTag(
-                        getEquipmentConfiguration().getAliveTagId());
-                heartbeatTag4Equipment.put(getEquipmentConfiguration(), heartbeatTag);
-            } else {
-                String errorMsg = "Unsupported HardwareAddress: " + dataTag.getHardwareAddress().getClass();
-                throw new EqIOException(errorMsg);
-            }
+            addDataTagAndSendUpdate(dataTag);
 
         }
 
-        // try {
-        // service.shutdown();
-        // service.awaitTermination(5, TimeUnit.MINUTES);
-        // } catch (InterruptedException e) {
-        // log.error("Timeout while waiting for sending initial datatags. Not sure all have been submitted.");
-        // }
-
-        equMessageSenderList.put(getEquipmentConfiguration(), getEquipmentMessageSender());
-        alarmList4Equipement.put(getEquipmentConfiguration(), listLaserHaddr);
-        equipementByName.put(getEquipmentConfiguration().getName(), getEquipmentConfiguration());
+        listener.addHandler(this);
 
         log.info("Tags registered");
     }
 
-    synchronized public void registerTag(ISourceDataTag tag) {
-        if (tag.getHardwareAddress() instanceof LASERHardwareAddress) {
-            LASERHardwareAddress laserHardwareAddress = (LASERHardwareAddress) tag.getHardwareAddress();
-            alarmList4Equipement.get(getEquipmentConfiguration()).add(laserHardwareAddress);
-            tag4LaserHardwareAddress.put(laserHardwareAddress.toString(), tag);
-        } else if (tag.getHardwareAddress() instanceof SimpleHardwareAddress) {
-            ISourceDataTag heartbeatTag = getEquipmentConfiguration().getSourceDataTag(
-                    getEquipmentConfiguration().getAliveTagId());
-            heartbeatTag4Equipment.put(getEquipmentConfiguration(), heartbeatTag);
+    private String getAlarmIdFromLaserHardwareAdress(ISourceDataTag dataTag) throws EqIOException {
+
+        if (dataTag.getHardwareAddress() instanceof LASERHardwareAddress) {
+            LASERHardwareAddress addr = (LASERHardwareAddress) dataTag.getHardwareAddress();
+
+            if (addr == null) {
+                throw new EqIOException("The hardware adress for Tag " + dataTag.getId() + "is null");
+            }
+
+            return addr.getFaultFamily() + ":" + addr.getFaultMember() + ":" + addr.getFalutCode();
         }
 
+        String errorMsg = "Unsupported HardwareAddress: " + dataTag.getHardwareAddress().getClass();
+        throw new EqIOException(errorMsg);
+
     }
 
-    synchronized public void unregisterTag(ISourceDataTag tag) {
-        if (tag.getHardwareAddress() instanceof LASERHardwareAddress) {
-            LASERHardwareAddress laserHardwareAddress = (LASERHardwareAddress) tag.getHardwareAddress();
-            alarmList4Equipement.get(getEquipmentConfiguration()).remove(laserHardwareAddress);
-            tag4LaserHardwareAddress.remove(laserHardwareAddress.toString());
-        } else if (tag.getHardwareAddress() instanceof SimpleHardwareAddress) {
-            heartbeatTag4Equipment.remove(getEquipmentConfiguration());
+    private void addDataTagAndSendUpdate(ISourceDataTag dataTag) throws EqIOException {
+        String alarmId = getAlarmIdFromLaserHardwareAdress(dataTag);
+
+        synchronized (alarmToTag) {
+            log.info(format("mapping DataTag (%d) -> %s", dataTag.getId(), alarmId));
+            alarmToTag.put(alarmId, dataTag);
         }
 
-    }
-
-    //
-    // --- GETTING INFORMATIONS WE NEED ---
-    //
-
-    public ConcurrentHashMap<IEquipmentConfiguration, Collection<LASERHardwareAddress>> getRegisteredLaserHardwareAddress() {
-        return alarmList4Equipement;
-    }
-
-    public Collection<LASERHardwareAddress> getHardwareAddresses4Equipement(
-            IEquipmentConfiguration equipmentConfiguration) {
-        return alarmList4Equipement.get(equipmentConfiguration);
-    }
-
-    public ArrayList<String> getEquipementsName() {
-        ArrayList<String> nameList = new ArrayList<String>();
-        for (IEquipmentConfiguration equipementConfiguration : alarmList4Equipement.keySet()) {
-            nameList.add(equipementConfiguration.getName());
-        }
-        return nameList;
-    }
-
-    public IEquipmentConfiguration getEquipementByName(String sourceName) {
-        return equipementByName.get(sourceName);
-    }
-
-    public IEquipmentMessageSender getEquipementMessageSender(IEquipmentConfiguration equipmentConfiguration) {
-        return equMessageSenderList.get(equipmentConfiguration);
-    }
-
-    public ISourceDataTag getHeartbeat4Equipement(IEquipmentConfiguration equipmentConfiguration) {
-        return heartbeatTag4Equipment.get(equipmentConfiguration);
-    }
-
-    public ISourceDataTag getTag4LaserAddress(LASERHardwareAddress laserHardwareAddress) {
-        return tag4LaserHardwareAddress.get(laserHardwareAddress.toString());
+        getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.FALSE, System.currentTimeMillis());
     }
 
     //
@@ -241,46 +168,50 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
     public synchronized void onAddDataTag(ISourceDataTag sourceDataTag, ChangeReport changeReport) {
         log.debug(format("entering onAddDataTag(%d)..", sourceDataTag.getId()));
         changeReport.setState(CHANGE_STATE.SUCCESS);
+
         try {
-            registerTag(sourceDataTag);
+            addDataTagAndSendUpdate(sourceDataTag);
         } catch (Exception ex) {
             changeReport.setState(CHANGE_STATE.FAIL);
             changeReport.appendError(ex.getMessage());
         }
-        log.debug(format("leaving onAddDataTag(%d)", sourceDataTag.getId()));
+
+        log.trace(format("leaving onAddDataTag(%d)", sourceDataTag.getId()));
     }
 
     @Override
     public synchronized void onRemoveDataTag(ISourceDataTag sourceDataTag, ChangeReport changeReport) {
         log.debug(format("entering onRemoveDataTag(%d)..", sourceDataTag.getId()));
+
         changeReport.setState(CHANGE_STATE.SUCCESS);
+
         try {
-            unregisterTag(sourceDataTag);
+            synchronized (alarmToTag) {
+                alarmToTag.remove(sourceDataTag.getName());
+            }
+
+            // no update send for this datatag
+
         } catch (Exception ex) {
             changeReport.setState(CHANGE_STATE.FAIL);
             changeReport.appendError(ex.getMessage());
         }
-        log.debug(format("leaving onRemoveDataTag(%d)", sourceDataTag.getId()));
+
+        log.trace(format("leaving onRemoveDataTag(%d)", sourceDataTag.getId()));
     }
 
     @Override
     public synchronized void onUpdateDataTag(ISourceDataTag sourceDataTag, ISourceDataTag oldSourceDataTag,
             ChangeReport changeReport) {
         log.debug(format("entering onUpdateDataTag(%d,%d)..", sourceDataTag.getId(), oldSourceDataTag.getId()));
+
         changeReport.setState(CHANGE_STATE.SUCCESS);
-        if (!oldSourceDataTag.getHardwareAddress().equals(sourceDataTag.getHardwareAddress())) {
-            try {
-                log.debug(format("calling  unregisterTag(%d)..", oldSourceDataTag.getId()));
-                unregisterTag(oldSourceDataTag);
-            } catch (Exception ex) {
-                changeReport.appendWarn(ex.getMessage());
-            }
-            log.debug(format("calling  registerTag(%d)..", sourceDataTag.getId()));
-            registerTag(sourceDataTag);
-        } else {
-            changeReport.appendInfo("No change detected in the tag hardware address. No action effected");
+
+        synchronized (alarmToTag) {
+            alarmToTag.put(sourceDataTag.getName(), sourceDataTag);
         }
-        log.debug(format("leaving onUpdateDataTag(%d,%d)", sourceDataTag.getId(), oldSourceDataTag.getId()));
+
+        log.trace(format("leaving onUpdateDataTag(%d,%d)", sourceDataTag.getId(), oldSourceDataTag.getId()));
     }
 
     @Override
@@ -320,6 +251,137 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
         } catch (Exception e) {
             log.warn("Cannot register mbean due to " + e.getMessage(), e);
         }
+
+    }
+
+    @Override
+    public void onException(JMSException ex) {
+        log.error("Got Exception from LASER library : " + ex.getMessage(), ex);
+
+    }
+
+    @Override
+    public String getName() {
+        return getEquipmentConfiguration().getName();
+    }
+
+    @Override
+    public void onMessage(AlarmMessageData alarmMessage) {
+
+        if (alarmMessage.getMt().equals(MessageType.BACKUP)) {
+
+            // a backup alarm
+
+            try {
+                getEquipmentMessageSender().sendSupervisionAlive();
+                synchronizeWithBackup(alarmMessage);
+            } catch (Exception e) {
+                log.error("Error occured while reading the backup message");
+            }
+
+        } else {
+            // normal alarm
+
+            for (ClientAlarmEvent event : alarmMessage.getFaults()) {
+                onAlarm(event);
+            }
+
+        }
+
+    }
+
+    public void onAlarm(ClientAlarmEvent alarm) {
+
+        ISourceDataTag dataTag = findDataTag(alarm.getAlarmId());
+
+        if (dataTag != null) {
+            if (alarm.getDescriptor().equals(Descriptor.ACTIVE)) {
+
+                if (dataTag.getCurrentValue() != null && dataTag.getCurrentValue().getValue().equals(true)) {
+                    // NOTHING
+                } else {
+
+                    // udpate mbeans in another service asynchronous
+                    mbean.setDataTag(dataTag.getId());
+                    getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis());
+
+                    mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
+                    log.info(dataTag.getId() + " - " + alarm.getAlarmId() + " - turns to "
+                            + dataTag.getCurrentValue().getValue());
+                }
+            } else if (alarm.getDescriptor().equals(Descriptor.TERMINATE)) {
+
+                if (dataTag.getCurrentValue() != null && dataTag.getCurrentValue().getValue().equals(Boolean.FALSE)) {
+                    // NOTHING
+                } else {
+                    mbean.setDataTag(dataTag.getId());
+                    getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.FALSE, System.currentTimeMillis());
+                    mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
+
+                    log.info(dataTag.getId() + " - " + alarm.getAlarmId() + " - turns to "
+                            + dataTag.getCurrentValue().getValue());
+                }
+
+            }
+        }
+    }
+    /**
+     * Synchronize all dataTags values with the alarms values present in the backup
+     * 
+     * <p>
+     * 1. loop over active alarms in equipment<br>
+     *    1.1 is active alarm in backup ?<br>
+     *       no: terminate alarm<br>
+     *       yes : skip<br>
+     *
+     * 3. call onAlarm for each ClientAlarmEvent in backup<br>
+     *</p>
+     * 
+     * 
+     * @param messageData
+     */
+    public void synchronizeWithBackup(AlarmMessageData messageData) {
+
+        
+        for (ISourceDataTag dataTag : getEquipmentConfiguration().getSourceDataTags().values()) {
+            
+            boolean found = false;
+            
+            if (dataTag.getCurrentValue().getValue().equals(Boolean.TRUE)) {
+                //  its a currently  active alarm
+                //  check if it is still active in the backup
+                for (ClientAlarmEvent alarm : messageData.getFaults()) {
+                    if (findDataTag(alarm.getAlarmId()).getId() == dataTag.getId()) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    // Terminate alarm
+                    mbean.setDataTag(dataTag.getId());
+                    getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.FALSE, System.currentTimeMillis());
+                    mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
+                    log.info(dataTag.getId() + " TERMINATE");
+                }
+            }
+        }
+        
+        // now activate 
+        for (ClientAlarmEvent alarm : messageData.getFaults()) {
+            onAlarm(alarm);
+        }
+        
+    }
+
+    private ISourceDataTag findDataTag(String alarmId) {
+        synchronized (alarmToTag) {
+            return alarmToTag.get(alarmId);
+        }
+    }
+
+    @Override
+    public void reset() {
+        // Dont' care..
 
     }
 
