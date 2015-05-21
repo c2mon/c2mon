@@ -294,7 +294,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
         if (dataTag != null) {
             if (alarm.getDescriptor().equals(Descriptor.ACTIVE)) {
 
-                if (dataTag.getCurrentValue() != null && dataTag.getCurrentValue().getValue().equals(true)) {
+                if (dataTag.getCurrentValue() != null && dataTag.getCurrentValue().getValue().equals(Boolean.TRUE)) {
                     // NOTHING
                 } else {
 
