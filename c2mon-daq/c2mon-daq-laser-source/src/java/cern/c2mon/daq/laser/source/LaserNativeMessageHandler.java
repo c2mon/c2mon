@@ -68,12 +68,11 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
         if (listener == null) {
             listener = AlarmListener.getAlarmListener();
-        }
-
-        try {
-            listener.startListingToSource(getEquipmentConfiguration().getName());
-        } catch (JMSException e) {
-            throw new EqIOException(e);
+            try {
+                listener.startListingToSource(getEquipmentConfiguration().getName());
+            } catch (JMSException e) {
+                throw new EqIOException(e);
+            }
         }
 
         initializeMBean();
