@@ -309,12 +309,15 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                     
                     // TODO 
                     String prefix = alarm.getProperty("ASI_PREFIX");
-                    if (prefix.equals("[?]")) {
-                        //
+                    if(prefix != null) {
+                        if (prefix.equals("[?]")) {
+                            //
+                        }
+                        if (prefix.equals("[T]")) {
+                            //
+                        }
                     }
-                    if (prefix.equals("[T]")) {
-                        //
-                    }
+                    
                     
                     // extract the user properties as value description
                     String valDescr = "";
@@ -351,11 +354,13 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                 
                 // TODO 
                 String prefix = alarm.getProperty("ASI_PREFIX");
-                if (prefix.equals("[?]")) {
-                    //
-                }
-                if (prefix.equals("[T]")) {
-                    //
+                if(prefix != null) {
+                    if (prefix.equals("[?]")) {
+                        //
+                    }
+                    if (prefix.equals("[T]")) {
+                        //
+                    }
                 }
                 
                 // extract the user properties as value description
