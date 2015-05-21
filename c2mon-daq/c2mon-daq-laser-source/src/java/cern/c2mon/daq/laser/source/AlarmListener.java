@@ -66,7 +66,7 @@ public class AlarmListener implements AlarmConsumerInterface {
         if (!isStarted) {
             connectToLaser();
         }
-        log.info("Start listing to source {}", sourceName);
+        log.info("Start listening to source {}", sourceName);
         connector.addSource(sourceName);
     }
 

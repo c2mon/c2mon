@@ -78,25 +78,21 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
         initializeMBean();
         registerTags();
 
-        log.debug("connectToDataSource - leaving connectToDataSource()");
+        log.trace("connectToDataSource - leaving connectToDataSource()");
 
     }
 
     @Override
     public synchronized void disconnectFromDataSource() throws EqIOException {
-        if (getEquipmentLogger().isDebugEnabled()) {
-            getEquipmentLogger().debug("disconnectFromDataSource - entering ..");
-        }
+        log.debug("disconnectFromDataSource - entering ..");
 
         if (listener != null) {
-            getEquipmentLogger().trace("disconnectFromDataSource Removing Handler from LASER listener..");
+            log.trace("disconnectFromDataSource Removing Handler from LASER listener..");
             listener.removeHandler(this);
-            getEquipmentLogger().info("disconnectFromDataSource Handler from LASER listener removed.");
+            log.info("disconnectFromDataSource Handler from LASER listener removed.");
         }
 
-        if (getEquipmentLogger().isTraceEnabled()) {
-            getEquipmentLogger().trace("disconnectFromDataSource - leaving ..");
-        }
+        log.trace("disconnectFromDataSource - leaving ..");
     }
 
     @Override
@@ -228,7 +224,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
             changeReport.setState(CHANGE_STATE.REBOOT);
             changeReport.appendWarn(ex.getMessage());
         } finally {
-            log.debug("leaving onUpdateEquipmentConfiguration()");
+            log.trace("leaving onUpdateEquipmentConfiguration()");
         }
 
     }
@@ -326,33 +322,31 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
             }
         }
     }
+
     /**
      * Synchronize all dataTags values with the alarms values present in the backup
-     * 
      * <p>
      * 1. loop over active alarms in equipment<br>
-     *    1.1 is active alarm in backup ?<br>
-     *       no: terminate alarm<br>
-     *       yes : skip<br>
-     *
+     * 1.1 is active alarm in backup ?<br>
+     * no: terminate alarm<br>
+     * yes : skip<br>
      * 2. call onAlarm for each ClientAlarmEvent in backup<br>
-     *</p>
-     * 
+     * </p>
      * 
      * @param messageData
      */
     public void synchronizeWithBackup(AlarmMessageData messageData) {
 
-        
         for (ISourceDataTag dataTag : getEquipmentConfiguration().getSourceDataTags().values()) {
-            
+
             boolean found = false;
-            
+
             if (dataTag.getCurrentValue().getValue().equals(Boolean.TRUE)) {
-                //  its a currently  active alarm
-                //  check if it is still active in the backup
+                // its a currently active alarm
+                // check if it is still active in the backup
                 for (ClientAlarmEvent alarm : messageData.getFaults()) {
-                    if (findDataTag(alarm.getAlarmId()) != null && findDataTag(alarm.getAlarmId()).getId() == dataTag.getId()) {
+                    if (findDataTag(alarm.getAlarmId()) != null
+                            && findDataTag(alarm.getAlarmId()).getId() == dataTag.getId()) {
                         found = true;
                         break;
                     }
@@ -366,12 +360,12 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                 }
             }
         }
-        
-        // now activate 
+
+        // now activate
         for (ClientAlarmEvent alarm : messageData.getFaults()) {
             onAlarm(alarm);
         }
-        
+
     }
 
     private ISourceDataTag findDataTag(String alarmId) {

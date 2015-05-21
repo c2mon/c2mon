@@ -25,7 +25,7 @@ import cern.diamon.alarms.source.AlarmMessageBuilder.MessageType;
 public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
 
     LaserNativeMessageHandler laserMessage;
-
+    AlarmListener listener = AlarmListener.getAlarmListener();
 
     public LaserNativeMessageHandlerTest() {
         
@@ -34,6 +34,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
     @Override
     protected void beforeTest() throws Exception {
         laserMessage = (LaserNativeMessageHandler) msgHandler;
+        laserMessage.setAlarmListener(listener);
     }
 
     @Override
@@ -51,6 +52,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
 
         replay(messageSender);
 
+        laserMessage.connectToDataSource();
         laserMessage.onMessage(MyAlarmMessageData.createUpdateMessage(true, MessageType.UPDATE, "LHC"));
 
         Thread.sleep(1000);
