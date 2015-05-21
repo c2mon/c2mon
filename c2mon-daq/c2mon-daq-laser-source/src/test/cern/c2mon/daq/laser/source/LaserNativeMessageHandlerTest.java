@@ -220,6 +220,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
             MyClientAlarmEvent alarm = new MyClientAlarmEvent(deviceClass, deviceName, faultCode);
             alarm.setActive(active);
             alarm.setUserTs(System.currentTimeMillis());
+            alarm.setProperty("ASI_PREFIX", "");
 
             return alarm;
 
