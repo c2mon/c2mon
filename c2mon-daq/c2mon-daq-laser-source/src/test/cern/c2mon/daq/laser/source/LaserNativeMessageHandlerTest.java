@@ -35,8 +35,8 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
     @Override
     protected void beforeTest() throws Exception {
         laserMessage = (LaserNativeMessageHandler) msgHandler;
-        listener = new AlarmListener(laserMessage);
-        laserMessage.setAlarmListener(listener);
+        listener = AlarmListener.getAlarmListener();
+        
     }
 
     @Override
@@ -50,12 +50,12 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
         SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
 
         messageSender.addValue(EasyMock.capture(sdtv));
-        expectLastCall().times(3);
+        expectLastCall().times(4);
 
         replay(messageSender);
 
         laserMessage.connectToDataSource();
-
+        listener.disconnectFromLaser();
         listener.onMessage(MyAlarmMessageData.createUpdateMessage(true, MessageType.UPDATE, "LHC"));
 
         Thread.sleep(1000);
@@ -78,7 +78,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
         replay(messageSender);
 
         laserMessage.connectToDataSource();
-
+        listener.disconnectFromLaser();
         ISourceDataTag dataTag = laserMessage.getEquipmentConfiguration().getSourceDataTag((long) 124149);
         laserMessage.getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis());
 
@@ -105,7 +105,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
         replay(messageSender);
 
         laserMessage.connectToDataSource();
-
+        listener.disconnectFromLaser();
         listener.onMessage(MyAlarmMessageData.createUnknownAlarm(true, MessageType.UPDATE, "LHC"));
 
         Thread.sleep(1000);
@@ -130,7 +130,8 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
         replay(messageSender);
 
         laserMessage.connectToDataSource();
-
+        listener.disconnectFromLaser();
+        
         ISourceDataTag dataTag = laserMessage.getEquipmentConfiguration().getSourceDataTag((long) 124150);
         laserMessage.getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis());
 
@@ -158,7 +159,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
 
         }
 
-        static AlarmMessageData createUpdateMessage(boolean active, MessageType messageType, String sourceId) {
+        static AlarmMessageData createUpdateMessage(boolean active, MessageType messageType, String sourceId) throws InterruptedException {
             MyAlarmMessageData result = new MyAlarmMessageData();
             result.setSourceHost(sourceId);
             result.setSourceTs(System.currentTimeMillis());
@@ -166,8 +167,11 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
             result.setSourceId(sourceId);
 
             ClientAlarmEvent alarm = MyClientAlarmEvent.createAlarm(active, "LHCCOLLIMATOR", "TCSG.B5R7.B2", 22000);
+            Thread.sleep(1000);
+            ClientAlarmEvent alarm1 = MyClientAlarmEvent.createAlarm(active, "DMNALMON", "MKBV.UA63.SCSS.AB2", 2);
 
             result.addFault(alarm);
+            result.addFault(alarm1);
 
             return result;
         }

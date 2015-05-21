@@ -123,7 +123,9 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
         for (final ISourceDataTag dataTag : getEquipmentConfiguration().getSourceDataTags().values()) {
 
-            addDataTagAndSendUpdate(dataTag);
+            if (dataTag.getHardwareAddress() instanceof LASERHardwareAddress) {
+                addDataTagAndSendUpdate(dataTag);
+            }
 
         }
 
@@ -334,7 +336,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
      *       no: terminate alarm<br>
      *       yes : skip<br>
      *
-     * 3. call onAlarm for each ClientAlarmEvent in backup<br>
+     * 2. call onAlarm for each ClientAlarmEvent in backup<br>
      *</p>
      * 
      * 
@@ -351,7 +353,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                 //  its a currently  active alarm
                 //  check if it is still active in the backup
                 for (ClientAlarmEvent alarm : messageData.getFaults()) {
-                    if (findDataTag(alarm.getAlarmId()).getId() == dataTag.getId()) {
+                    if (findDataTag(alarm.getAlarmId()) != null && findDataTag(alarm.getAlarmId()).getId() == dataTag.getId()) {
                         found = true;
                         break;
                     }
