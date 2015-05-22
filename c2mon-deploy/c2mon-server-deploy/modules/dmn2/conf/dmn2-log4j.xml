@@ -38,10 +38,10 @@
 
   <renderer  renderedClass="cern.c2mon.shared.common.datatag.SourceDataTagValue"
              renderingClass="cern.c2mon.shared.daq.datatag.SourceDataTagValueRenderer" />
-             
+
   <renderer  renderedClass="cern.c2mon.server.common.rule.RuleTag"
-             renderingClass="cern.c2mon.server.common.rule.RuleTagRenderer" />   
-  
+             renderingClass="cern.c2mon.server.common.rule.RuleTagRenderer" />
+
   <renderer  renderedClass="cern.c2mon.server.common.alarm.Alarm"
              renderingClass="cern.c2mon.server.common.alarm.renderer.AlarmRenderer" />
              
