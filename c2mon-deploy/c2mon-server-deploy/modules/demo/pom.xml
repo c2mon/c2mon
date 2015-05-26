@@ -22,6 +22,20 @@
     <!-- C2MON modules -->
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-all</artifactId>
+      <exclusions>
+        <exclusion>
+         <artifactId>ojdbc</artifactId>
+         <groupId>com.oracle</groupId>
+        </exclusion>
+        <exclusion>
+         <artifactId>orai18n</artifactId>
+         <groupId>com.oracle</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-cachepersistence</artifactId>
       <version>[1.5.0, 2.0.0)</version>
     </dependency>
@@ -34,6 +48,16 @@
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-shorttermlog</artifactId>
       <version>[1.5.0, 2.0.0)</version>
+      <exclusions>
+        <exclusion>
+         <artifactId>ojdbc</artifactId>
+         <groupId>com.oracle</groupId>
+        </exclusion>
+        <exclusion>
+         <artifactId>orai18n</artifactId>
+         <groupId>com.oracle</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
@@ -83,8 +107,41 @@
           </execution>
         </executions>
       </plugin>
-
+      
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>add-third-party</id>
+            <goals>
+              <goal>add-third-party</goal>
+            </goals>
+            <configuration>
+              <excludedGroups>cern.c2mon.c2mon-server</excludedGroups>
+              <excludedArtifacts>ojdbc|orai18n</excludedArtifacts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
-
+  
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.8</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>third-party-report</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>
