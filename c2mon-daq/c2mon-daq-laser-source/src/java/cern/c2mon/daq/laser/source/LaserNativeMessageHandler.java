@@ -21,9 +21,7 @@ import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
-import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
-import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.address.LASERHardwareAddress;
 import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ChangeReport;
@@ -76,7 +74,12 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                 throw new EqIOException(e);
             }
         }
-
+            
+        // set data tag configuration changer
+        super.getEquipmentConfigurationHandler().setDataTagChanger(this);
+        // set equipment configuration changer
+        getEquipmentConfigurationHandler().setEquipmentConfigurationChanger(this);
+        
         initializeMBean();
         registerTags();
 
