@@ -94,6 +94,14 @@
       <lineEnding>unix</lineEnding>
       <fileMode>0444</fileMode>
     </file>
+    
+    <!-- copy the Third Party license file -->
+    <file>
+      <source>${project.build.directory}/generated-sources/license/THIRD-PARTY.txt</source>
+      <outputDirectory>/</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
 
   </files>
 

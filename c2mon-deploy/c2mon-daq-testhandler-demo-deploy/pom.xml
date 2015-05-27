@@ -15,7 +15,7 @@
 
   <packaging>pom</packaging>
 
-  <description>C2MMON DAQ demo TEST Handler assembling all required libraries and configuration files for C2MON</description>
+  <description>C2MON DAQ demo TEST Handler assembling all required libraries and configuration files for C2MON</description>
   <url></url>
 
   <developers />
@@ -103,6 +103,25 @@
             <goals>
               <goal>single</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <!-- Generates version file -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>add-third-party</id>
+            <goals>
+              <goal>add-third-party</goal>
+            </goals>
+            <configuration>
+             <acceptPomPackaging>true</acceptPomPackaging>
+             <excludedGroups>cern.c2mon.c2mon-*</excludedGroups>
+            </configuration>
           </execution>
         </executions>
       </plugin>
