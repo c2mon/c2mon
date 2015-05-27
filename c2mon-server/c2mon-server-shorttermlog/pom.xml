@@ -1,110 +1,108 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>cern.c2mon.c2mon-server</groupId>
-		<artifactId>c2mon-server-pom</artifactId>
-		<version>LATEST</version>
-	</parent>
+  <parent>
+    <groupId>cern.c2mon.c2mon-server</groupId>
+    <artifactId>c2mon-server-pom</artifactId>
+    <version>RELEASE</version>
+  </parent>
 
-	<version>1.5.1-SNAPSHOT</version>
-	<name>c2mon-server-shorttermlog</name>
-	<artifactId>c2mon-server-shorttermlog</artifactId>
-	<packaging>jar</packaging>
-	<description>C2MON server module for short-term logging to the DB (of Tag updates, Commands and Supervision events)</description>
-	<url>http://timweb.cern.ch</url>
+  <version>1.5.1-SNAPSHOT</version>
+  <name>c2mon-server-shorttermlog</name>
+  <artifactId>c2mon-server-shorttermlog</artifactId>
+  <packaging>jar</packaging>
+  <description>C2MON server module for short-term logging to the DB (of Tag updates, Commands and Supervision events)</description>
+  <url>http://timweb.cern.ch</url>
 
   <scm>
     <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-shorttermlog</developerConnection>
   </scm>
-  
-	<dependencies>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>oracle</groupId>
-			<artifactId>ojdbc</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>oracle</groupId>
-			<artifactId>orai18n</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.mybatis</groupId>
-			<artifactId>mybatis-spring</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-		</dependency>
 
-		<!-- test dependencies -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymock</artifactId>
-		</dependency>
+  <dependencies>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>oracle</groupId>
+      <artifactId>ojdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>oracle</groupId>
+      <artifactId>orai18n</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis-spring</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-dbcp</groupId>
+      <artifactId>commons-dbcp</artifactId>
+    </dependency>
 
-		<!-- Spring deps -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-tx</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-		</dependency>
+    <!-- test dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
 
-		<!-- C2MON dependencies -->
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-all</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-command</artifactId>
-      <version>LATEST</version>
-		</dependency>
-    
+    <!-- Spring deps -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+    </dependency>
+
+    <!-- C2MON dependencies -->
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-all</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-command</artifactId>
+      <version>[1.5.0, 2.0.0)</version>
+    </dependency>
+
     <!-- Test dependency -->
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-test</artifactId>
     </dependency>
-	</dependencies>
+  </dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.8.1</version>
-				<configuration>
-					<argLine>
-						-Dc2mon.properties.location=${c2mon.properties.location}
-						-Ddatasource.stl.connections.initial=1
-						-Ddatasource.stl.connections.max=5
-						-Dc2mon.command.log.fallback.file=commandfallback.txt
-						-Dc2mon.tag.log.fallback.file=tagfallback.txt
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>
+            -Dc2mon.properties.location=${c2mon.properties.location}
+            -Ddatasource.stl.connections.initial=1
+            -Ddatasource.stl.connections.max=5
+            -Dc2mon.command.log.fallback.file=commandfallback.txt
+            -Dc2mon.tag.log.fallback.file=tagfallback.txt
           </argLine>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-	<developers />
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <developers />
 </project>
