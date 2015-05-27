@@ -51,7 +51,7 @@ public class DeviceCacheImpl extends AbstractCache<Long, Device> implements Devi
   private static final Logger LOG = Logger.getLogger(DeviceCacheImpl.class);
 
   @Autowired
-  public DeviceCacheImpl(final ClusterCache clusterCache,
+  public DeviceCacheImpl(@Qualifier("clusterCache") final ClusterCache clusterCache,
                          @Qualifier("deviceEhcache") final Ehcache ehcache,
                          @Qualifier("deviceEhcacheLoader") final CacheLoader cacheLoader,
                          @Qualifier("deviceCacheLoader") final C2monCacheLoader c2monCacheLoader,

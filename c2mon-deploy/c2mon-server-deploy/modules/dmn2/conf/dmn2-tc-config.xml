@@ -53,7 +53,7 @@
     </ha>
   </servers>
   <clients>
-    <logs>%(user.home)/dist/terracotta/log/client-logs-%(server.process.name)</logs>
+    <logs>%(user.home)/dist/terracotta/log/client-logs-%(c2mon.process.name)</logs>
     <modules>
 <!--      <repository>C:\Program Files\terracotta\terracotta-3.2.0\modules</repository>-->
 <!--      <repository>D:\Profiles\mbrightw\terracotta-3.2.0\modules</repository>-->

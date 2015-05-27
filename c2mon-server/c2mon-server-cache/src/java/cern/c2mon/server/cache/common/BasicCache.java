@@ -46,10 +46,10 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
   protected boolean skipCachePreloading = false;
 
   /**
-   * The cache mode is either set to "multi" or "single", depending on whether
-   * the server is running with a single or distributed cache.
+   * The cache mode is either set to "multi", "single" or "single-nonpersistent", depending on whether
+   * the server is running with a distributed or single cache.
    */
-  @Value("${cern.c2mon.cache.mode}")
+  @Value("${c2mon.cache.mode}")
   protected String cacheMode;
 
   /**

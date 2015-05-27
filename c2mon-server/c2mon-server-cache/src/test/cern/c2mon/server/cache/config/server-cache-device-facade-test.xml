@@ -63,7 +63,7 @@
     <property name="properties">
       <props>
         <prop key="c2mon.server.cache.skippreloading">true</prop>
-        <prop key="cern.c2mon.cache.mode">single</prop>
+        <prop key="c2mon.cache.mode">single-nonpersistent</prop>
       </props>
     </property>
   </bean> -->

@@ -22,6 +22,17 @@
     <!-- default values for properties should be placed below -->
     <property name="properties">  
         <props>
+            <!-- Default location of c2mon.properties file -->
+            <prop key="c2mon.properties.location">${c2mon.home}/conf/c2mon.properties</prop>
+            
+            <!-- Default server process name -->
+            <prop key="c2mon.process.name">C2MON-SERVER</prop>
+            
+            <!-- Default log directory -->
+            <prop key="c2mon.log.dir">${c2mon.home}/log</prop>
+            
+            <!-- Default log4j configuration file location -->
+            <prop key="log4j.configuration">${c2mon.home}/conf/log4j.xml</prop>
         
             <!-- JMS PROPERTIES -->            
             <prop key="jms.update.transacted">true</prop>                                                        
@@ -64,8 +75,11 @@
             <prop key="c2mon.client.jms.video.request.queue">c2mon.video.request</prop>
                        
             <!-- CACHE PROPERTIES --> 
-            <!-- the cache mode indicates if the cache is running in distributed(="multi") or single mode -->
-            <prop key="cern.c2mon.cache.mode">single</prop>
+            <!-- 
+              the cache mode indicates if the cache is running in distributed(="multi") 
+              or single (="single" or ="single-nonpersistent") mode
+            -->
+            <prop key="c2mon.cache.mode">single-nonpersistent</prop>
             <prop key="cache.loader.batch.size">100</prop>
             <prop key="cache.loader.equipment.batch.size">5</prop>
             
@@ -98,6 +112,8 @@
             
             <prop key="datasource.stl.connections.initial">1</prop>
             <prop key="datasource.stl.connections.max">2</prop>
+
+            <!-- Fallback variables -->
             <prop key="c2mon.tag.log.fallback.file">${c2mon.home}/log/tagfallback.txt</prop>
             <prop key="c2mon.command.log.fallback.file">${c2mon.home}/log/commandfallback.txt</prop>
             
@@ -107,7 +123,7 @@
             
             <!-- number of rule evaluation threads to be used -->
             <prop key="c2mon.server.rule.evaluation.threads">1</prop>
-                     
+
         </props>  
      </property>  
   </bean>

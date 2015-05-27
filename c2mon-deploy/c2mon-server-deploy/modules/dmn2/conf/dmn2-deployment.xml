@@ -16,17 +16,13 @@
 				<!-- the following property defines if C2MON server caches shall be preloaded from database at start-up -->
 				<property name="c2mon.server.cache.skippreloading" value="false" />
 
-				<property name="server.process.name" value="DMN2-SRV" />
 				<property name="c2mon.process.name" value="DMN2-SRV" />
-				<property name="c2mon.home" value="$INSTALL_PATH" />
-				<property name="c2mon.log.dir" value="log" />
-				<property name="c2mon.properties.location" value="conf/c2mon.properties" />
-				<property name="log4j.configuration" value="conf/log4j.xml" />
+				<property name="c2mon.cache.mode" value="single"/>
+				<property name="c2mon.home" value="$INSTALL_DIR" />
 				<property name="com.sun.management.jmxremote.port" value="9523" />
 				<property name="com.sun.management.jmxremote.password.file" value="conf/.jmxremote.passwd" />
 				<property name="com.sun.management.jmxremote.access.file" value="conf/.jmxremote.access" />
 				<property name="com.sun.management.jmxremote.ssl" value="false" />
-				<property name="c2mon.home" value="$INSTALL_DIR" />
 				<property name="oracle.net.tns_admin" value="/etc" />
 				<property name="com.tc.productkey.path" value="conf/terracotta-license.key" />
 
@@ -35,7 +31,7 @@
 # ***************************************************************************
 #           NOTE:					         
 #           If the c2mon.server.cache.skippreloading flag is set to "true" the server 
-#           will not preload its caches from  the database, isitead it will refer to local 
+#           will not preload its caches from  the database, instead it will refer to local 
 #           cache files, stored in: log/ehcache-diskstore  
 # ***************************************************************************
 				      

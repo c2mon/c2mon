@@ -1,40 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <products>
-    <product name="c2mon">
+  <product name="c2mon">
 
-        <!--
-            this application section is a parent configuration for both
-            c2mon-tim2-prod and c2mon-tim2-test
-        -->
-        <application name="default">
+    <!-- this application section is a parent configuration for both c2mon-tim2-prod and c2mon-tim2-test -->
+    <application name="default">
 
-            <startscript>
-                <main-class name="cern.c2mon.server.lifecycle.ServerStartup">
-                    <output>
-                        <file name="log/out.log"/>
-                    </output>
-                </main-class>
-                <initial-heap-size>2G</initial-heap-size>
-                <max-heap-size>2G</max-heap-size>
-                <java-vm-args>-XX:NewRatio=3 -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
+      <startscript>
+        <main-class name="cern.c2mon.server.lifecycle.ServerStartup">
+          <output>
+            <file name="log/c2mon.stdout.log" />
+          </output>
+        </main-class>
+        <initial-heap-size>2G</initial-heap-size>
+        <max-heap-size>2G</max-heap-size>
+        <java-vm-args>-XX:NewRatio=3 -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
 
-                <property name="c2mon.home" value="${INSTALL_DIR}"/>
-                <property name="c2mon.log.dir" value="log"/>
-                <property name="log4j.configuration" value="conf/log4j.xml"/>
-                <property name="c2mon.properties.location" value="conf/c2mon.properties"/>
-                <property name="oracle.net.tns_admin" value="/etc"/>
+        <property name="c2mon.home" value="${INSTALL_DIR}" />
+        <property name="oracle.net.tns_admin" value="/etc" />
 
-                <!-- Terracotta license key-->
-                <property name="com.tc.productkey.path" value="conf/terracotta-license.key"/>
+        <!-- Terracotta license key -->
+        <property name="com.tc.productkey.path" value="conf/terracotta-license.key" />
 
-                <!-- Cluster Java arguments -->
-                <property name="cern.c2mon.cache.mode" value="multi"/>
-                <property name="com.tc.l1.cachemanager.percentageToEvict" value="10"/>
-                <property name="com.tc.l1.cachemanager.threshold" value="70"/>
-                <property name="com.tc.l1.cachemanager.monitorOldGenOnly" value="false"/>
+        <!-- Cluster Java arguments -->
+        <property name="c2mon.cache.mode" value="multi" />
+        <property name="com.tc.l1.cachemanager.percentageToEvict" value="10" />
+        <property name="com.tc.l1.cachemanager.threshold" value="70" />
+        <property name="com.tc.l1.cachemanager.monitorOldGenOnly" value="false" />
 
 
-                <preExec>
+        <preExec>
                     <![CDATA[
 # if $REMOTE_DEBUG_ENABLED variable is set, we allow connecting to the server process with the remote debugger
 if [ -n "${REMOTE_DEBUG_ENABLED+set}" ] ; then
@@ -45,102 +39,104 @@ fi
 # if $C2MON_RECOVERY_ENABLED is set, we add C2MON recovery option
 [[ -n "${C2MON_RECOVERY_ENABLED+set}" ]] && JVM_OTHER_OPTS="${JVM_OTHER_OPTS} -Dc2mon.recovery=true"
                     ]]>
-                </preExec>
-            </startscript>
+        </preExec>
+      </startscript>
 
-            <deployment installLocation="/opt/c2mon-tim2/">
-                <backupPolicy keepBackups="2">
-                    <preserve type="dir" name="log"/>
-                    <preserve type="dir" name="tmp"/>
-                </backupPolicy>
+      <deployment installLocation="/opt/c2mon-tim2/">
+        <backupPolicy keepBackups="2">
+          <preserve type="dir" name="log" />
+          <preserve type="dir" name="tmp" />
+        </backupPolicy>
 
-            </deployment>
-        </application>
-
-        <application name="c2mon-tim2-pro1" extends="default">
-            <startscript name="C2MON-TIM-PRO">
-                <property name="c2mon.process.name" value="C2MON-TIM-PRO1"/>
-                <!-- Configuration for LASER module -->
-                <property name="laser.hosts" value="laser-test"/>
-                <property name="cmw.mom.brokerlist" value="sljas2:2506,sljas3:2506"/>
-                <!-- Terracotta configuration -->
-                <property name="terracotta.config.location" value="tim-cache-pro1:9510,tim-cache-pro2:9511"/>
-            </startscript>
-
-            <deployment installLocation="/opt/c2mon-pro1">
-                <directory name="conf">
-                    <file name="c2mon.properties" source="/user/timoper/rep/c2mon/server/c2mon.properties.pro1"
-                          mask="400"/>
-                </directory>
-                <notification>
-                    <!-- you can give more than one mail for deployment notification -->
-                    <mail address="tim-admin@cern.ch"/>
-                </notification>
-            </deployment>
-        </application>
-
-        <application name="c2mon-tim2-pro2" extends="default">
-            <startscript name="C2MON-TIM-PRO">
-                <property name="c2mon.process.name" value="C2MON-TIM-PRO2"/>
-                <!-- Configuration for LASER module -->
-                <property name="laser.hosts" value="laser-test"/>
-                <property name="cmw.mom.brokerlist" value="sljas2:2506,sljas3:2506"/>
-                <!-- Terracotta configuration -->
-                <property name="terracotta.config.location" value="tim-cache-pro1:9510,tim-cache-pro2:9511"/>
-            </startscript>
-            <deployment installLocation="/opt/c2mon-pro2">
-                <directory name="conf">
-                    <file name="c2mon.properties" source="/user/timoper/rep/c2mon/server/c2mon.properties.pro2"
-                          mask="400"/>
-                </directory>
-                <notification>
-                    <!-- you can give more than one mail for deployment notification -->
-                    <mail address="tim-admin@cern.ch"/>
-                </notification>
-            </deployment>
-        </application>
+      </deployment>
+    </application>
 
 
-        <application name="c2mon-tim2-test1" extends="default">
-            <startscript name="C2MON-TIM-TEST">
-                <property name="c2mon.process.name" value="C2MON-TIM-TEST1"/>
-                <property name="testMode" value="true"/>
-                <!-- Configuration for LASER module -->
-                <property name="laser.hosts" value="laser-test"/>
-                <property name="cmw.mom.brokerlist" value="jms-diamon-test:2506"/>
-                <!-- Terracotta configuration -->
-                <property name="terracotta.config.location" value="tim-cache-test1:9510,tim-cache-test2:9511"/>
-            </startscript>
+    <application name="c2mon-tim2-pro1" extends="default">
+     
+      <startscript name="C2MON-TIM-PRO">
+        <property name="c2mon.process.name" value="C2MON-TIM-PRO1" />
+        <!-- Configuration for LASER module -->
+        <property name="laser.hosts" value="laser-test" />
+        <property name="cmw.mom.brokerlist" value="sljas2:2506,sljas3:2506" />
+        <!-- Terracotta configuration -->
+        <property name="terracotta.config.location" value="tim-cache-pro1:9510,tim-cache-pro2:9511" />
+      </startscript>
 
-            <deployment installLocation="/opt/c2mon-test1">
-                <directory name="conf">
-                    <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.test1"
-                          mask="400"/>
-                    <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server"
-                          mask="400"/>
-                </directory>
-            </deployment>
-        </application>
+      <deployment installLocation="/opt/c2mon-pro1">
+        <directory name="conf">
+          <file name="c2mon.properties" source="/user/timoper/rep/c2mon/server/c2mon.properties.pro1" mask="400" />
+        </directory>
+        <notification>
+          <!-- you can give more than one mail for deployment notification -->
+          <mail address="tim-admin@cern.ch" />
+        </notification>
+      </deployment>
+    </application>
 
-        <application name="c2mon-tim2-test2" extends="default">
-            <startscript name="C2MON-TIM-TEST">
-                <property name="c2mon.process.name" value="C2MON-TIM-TEST2"/>
-                <property name="testMode" value="true"/>
-                <!-- Configuration for LASER module -->
-                <property name="laser.hosts" value="laser-test"/>
-                <property name="cmw.mom.brokerlist" value="jms-diamon-test:2506"/>
-                <!-- Terracotta configuration -->
-                <property name="terracotta.config.location" value="tim-cache-test1:9510,tim-cache-test2:9511"/>
-            </startscript>
-            <deployment installLocation="/opt/c2mon-test2">
-                <directory name="conf">
-                    <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.test2"
-                          mask="400"/>
-                    <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server"
-                          mask="400"/>
-                </directory>
-            </deployment>
-        </application>
 
-    </product>
+    <application name="c2mon-tim2-pro2" extends="default">
+     
+      <startscript name="C2MON-TIM-PRO">
+        <property name="c2mon.process.name" value="C2MON-TIM-PRO2" />
+        <!-- Configuration for LASER module -->
+        <property name="laser.hosts" value="laser-test" />
+        <property name="cmw.mom.brokerlist" value="sljas2:2506,sljas3:2506" />
+        <!-- Terracotta configuration -->
+        <property name="terracotta.config.location" value="tim-cache-pro1:9510,tim-cache-pro2:9511" />
+      </startscript>
+     
+      <deployment installLocation="/opt/c2mon-pro2">
+        <directory name="conf">
+          <file name="c2mon.properties" source="/user/timoper/rep/c2mon/server/c2mon.properties.pro2" mask="400" />
+        </directory>
+        <notification>
+          <!-- you can give more than one mail for deployment notification -->
+          <mail address="tim-admin@cern.ch" />
+        </notification>
+      </deployment>
+    </application>
+
+
+    <application name="c2mon-tim2-test1" extends="default">
+     
+      <startscript name="C2MON-TIM-TEST">
+        <property name="c2mon.process.name" value="C2MON-TIM-TEST1" />
+        <property name="testMode" value="true" />
+        <!-- Configuration for LASER module -->
+        <property name="laser.hosts" value="laser-test" />
+        <property name="cmw.mom.brokerlist" value="jms-diamon-test:2506" />
+        <!-- Terracotta configuration -->
+        <property name="terracotta.config.location" value="tim-cache-test1:9510,tim-cache-test2:9511" />
+      </startscript>
+
+      <deployment installLocation="/opt/c2mon-test1">
+        <directory name="conf">
+          <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.test1" mask="400" />
+          <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server" mask="400" />
+        </directory>
+      </deployment>
+    </application>
+
+    <application name="c2mon-tim2-test2" extends="default">
+      
+      <startscript name="C2MON-TIM-TEST">
+        <property name="c2mon.process.name" value="C2MON-TIM-TEST2" />
+        <property name="testMode" value="true" />
+        <!-- Configuration for LASER module -->
+        <property name="laser.hosts" value="laser-test" />
+        <property name="cmw.mom.brokerlist" value="jms-diamon-test:2506" />
+        <!-- Terracotta configuration -->
+        <property name="terracotta.config.location" value="tim-cache-test1:9510,tim-cache-test2:9511" />
+      </startscript>
+      
+      <deployment installLocation="/opt/c2mon-test2">
+        <directory name="conf">
+          <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.test2" mask="400" />
+          <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server" mask="400" />
+        </directory>
+      </deployment>
+    </application>
+
+  </product>
 </products>

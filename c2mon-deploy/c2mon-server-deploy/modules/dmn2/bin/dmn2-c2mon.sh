@@ -54,7 +54,7 @@ JARS=`ls $C2MON_LIB/*.jar | tr -s '\\n' ':'`
 # Common JVM arguments
 #
 COMMON_JAVA_ARGS="-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100 \
-                -Dserver.process.name=$PROCESS_NAME \
+                -Dc2mon.process.name=$PROCESS_NAME \
                 -Dc2mon.home=$C2MON_HOME \
                 -Dc2mon.log.dir=$C2MON_LOG \
                 -Dc2mon.properties.location=$C2MON_PROPERTIES
@@ -72,7 +72,7 @@ if [ "$2" != "single" ]; then
                    -Dcom.tc.l1.cachemanager.threshold=70 \
                    -Dcom.tc.l1.cachemanager.monitorOldGenOnly=false \
                    -Dtc.config=$TERRACOTTA_CONFIG \
-                   -Dcern.c2mon.cache.mode=multi"
+                   -Dc2mon.cache.mode=multi"
 
     JARS=$JARS:$TERRACOTTA_JARS
     JVM_OPTS="$COMMON_JAVA_ARGS CLUSTER_JAVA_ARGS"
