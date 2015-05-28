@@ -59,27 +59,47 @@ public final class ServerStartup {
    * Class logger.
    */
   private static Logger logger = Logger.getLogger(ServerStartup.class);
+  
+  private static final String LOG4J_CONF_PROPERTY = "log4j.configuration";
+  
+  private static final String C2MON_CONF_PROPERTY = "c2mon.properties.location";
 
   /**
    * Override public constructor.
    */
   private ServerStartup() {
   }
-
+  
   /**
-   * Main server start-up method
-   * @param args - ignored
+   * Checks, if the most important environment variables have been set and initializes
+   * them with default values.
+   * However, this covers only those environment variables
+   * that have to be present before the Spring context is started. The other variables
+   * are initialized by Spring. See also server-lifecycle-properties.xml
    */
-  public static void main(final String[] args) {
-
-    //initialize log4j
-    if (System.getProperty("log4j.configuration") == null) {
-      System.err.println("Please specify log4j location using Java VM argument -Dlog4j.configuration.");
+  private static void initProperties() {
+    if (System.getProperty("c2mon.home") == null) {
+      System.err.println("Please specify the C2MON home directory using Java VM argument -Dc2mon.home.");
       System.exit(-1);
     }
-
+    
+    if (System.getProperty("c2mon.log.dir") == null) {
+      final String logDir = System.getProperty("c2mon.home") + "/log";
+      System.out.println("Setting log directory to: " + logDir);
+      System.setProperty("c2mon.log.dir", logDir);
+    }
+    
+    //initialize log4j
+    if (System.getProperty(LOG4J_CONF_PROPERTY) == null) {
+      final String defaultConfigurationFile = System.getProperty("c2mon.home") + "/conf/log4j.xml";
+      System.out.println("No log4j location specified with Java VM argument -Dlog4j.configuration. Trying with default location: " + defaultConfigurationFile);
+      System.setProperty(LOG4J_CONF_PROPERTY, defaultConfigurationFile);
+    }
+    
+    
+    // File watchdog configuration for Log4j changes
     try {
-      DOMConfigurator.configureAndWatch(System.getProperty("log4j.configuration"));
+      DOMConfigurator.configureAndWatch(System.getProperty(LOG4J_CONF_PROPERTY));
     }
     catch (Exception ex) {
       ex.printStackTrace();
@@ -89,17 +109,22 @@ public final class ServerStartup {
     logger.info("C2MON server startup initiated");
 
     //set default c2mon.properties location if not specified as Dc2mon.properties.location
-    if (System.getProperty("c2mon.properties.location") == null) {
-      System.setProperty("c2mon.properties.location", System.getProperty("user.home") + "/.c2mon.properties");
+    if (System.getProperty(C2MON_CONF_PROPERTY) == null) {
+      System.setProperty(C2MON_CONF_PROPERTY, System.getProperty("c2mon.home") + "/conf/c2mon.properties");
     }
-    logger.info("Using c2mon.properties file at: " + System.getProperty("c2mon.properties.location"));
+    logger.info("Using c2mon.properties file at: " + System.getProperty(C2MON_CONF_PROPERTY));
 
     // Test Mode
     if ((System.getProperty("testMode")) != null && (System.getProperty("testMode").equals("true"))) {
       logger.info("The Server is starting in TEST mode");
     }
-
-    //by default run in single-server mode
+  }
+  
+  /**
+   * Initialized the Spring lifecycle context that will instantiate all C2MON beans
+   */
+  private static void initSpringContext() {
+  //by default run in single-server mode
     List<String> cacheModeModules;
     final String cacheMode = System.getProperty("c2mon.cache.mode");
     
@@ -107,14 +132,15 @@ public final class ServerStartup {
       logger.info("C2MON server running in distributed cache mode");
       cacheModeModules = new ArrayList<String>(Arrays.asList("cern/c2mon/server/lifecycle/config/server-lifecycle-multi.xml",
                                          "cern/c2mon/server/cache/config/server-cache-multi-server.xml"));
-    } else if (cacheMode != null && cacheMode.equalsIgnoreCase("single-nonpersistent")) {
-      logger.info("C2MON server running in nonpersistent local cache mode (not distributed)");
-      cacheModeModules = new ArrayList<String>(Arrays.asList("cern/c2mon/server/lifecycle/config/server-lifecycle-single.xml",
-          "cern/c2mon/server/cache/config/server-cache-nonpersistent-server.xml"));
-    } else {
+    } else if (cacheMode != null && cacheMode.equalsIgnoreCase("single")) {
       logger.info("C2MON server running in local cache mode (not distributed)");
       cacheModeModules = new ArrayList<String>(Arrays.asList("cern/c2mon/server/lifecycle/config/server-lifecycle-single.xml",
       "cern/c2mon/server/cache/config/server-cache-single-server.xml"));
+    } else {
+      // "single-nonpersistent" mode
+      logger.info("C2MON server running in nonpersistent local cache mode (not distributed)");
+      cacheModeModules = new ArrayList<String>(Arrays.asList("cern/c2mon/server/lifecycle/config/server-lifecycle-single.xml",
+          "cern/c2mon/server/cache/config/server-cache-nonpersistent-server.xml"));
     }
 
     //core modules (in classpath); optional modules are imported in server-startup.xml
@@ -145,6 +171,16 @@ public final class ServerStartup {
     //start all components that need manually starting
     xmlContext.start();
     xmlContext.registerShutdownHook();
+  }
+
+  /**
+   * Main server start-up method
+   * @param args - ignored
+   */
+  public static void main(final String[] args) {
+    
+    initProperties();
+    initSpringContext();
   }
 
 }

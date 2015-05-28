@@ -22,18 +22,9 @@
     <!-- default values for properties should be placed below -->
     <property name="properties">  
         <props>
-            <!-- Default location of c2mon.properties file -->
-            <prop key="c2mon.properties.location">${c2mon.home}/conf/c2mon.properties</prop>
-            
             <!-- Default server process name -->
             <prop key="c2mon.process.name">C2MON-SERVER</prop>
             
-            <!-- Default log directory -->
-            <prop key="c2mon.log.dir">${c2mon.home}/log</prop>
-            
-            <!-- Default log4j configuration file location -->
-            <prop key="log4j.configuration">${c2mon.home}/conf/log4j.xml</prop>
-        
             <!-- JMS PROPERTIES -->            
             <prop key="jms.update.transacted">true</prop>                                                        
             <prop key="jms.update.consumers.initial">1</prop>
