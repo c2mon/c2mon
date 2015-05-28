@@ -119,6 +119,8 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
         log.info("registering {} tags for equipment {} ...", getEquipmentConfiguration().getSourceDataTags().size(),
                 getEquipmentConfiguration().getName());
 
+        getEquipmentMessageSender().confirmEquipmentStateOK();
+        
         for (final ISourceDataTag dataTag : getEquipmentConfiguration().getSourceDataTags().values()) {
 
             if (dataTag.getHardwareAddress() instanceof LASERHardwareAddress) {
