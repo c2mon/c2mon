@@ -46,6 +46,9 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
     @Test
     @UseConf("f_laser_test1.xml")
     public void testAlarmTurnsTrue() throws Exception {
+        messageSender.sendCommfaultTag(107211, true);
+        expectLastCall().once();
+        
         SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
 
         messageSender.addValue(EasyMock.capture(sdtv));
@@ -67,6 +70,9 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
     @Test
     @UseConf("f_laser_test1.xml")
     public void testAlarmTurnsFalse() throws Exception {
+        messageSender.sendCommfaultTag(107211, true);
+        expectLastCall().once();
+        
         SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
 
         messageSender.addValue(EasyMock.capture(sdtv));
@@ -93,6 +99,9 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
     @UseConf("f_laser_test1.xml")
     public void testNoCorrespondingAlarms() throws Exception {
 
+        messageSender.sendCommfaultTag(107211, true);
+        expectLastCall().once();
+        
         ISourceDataTag dataTag = laserMessage.getEquipmentConfiguration().getSourceDataTag((long) 124149);
         ISourceDataTag dataTag1 = laserMessage.getEquipmentConfiguration().getSourceDataTag((long) 124150);
         
@@ -110,6 +119,9 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
     @Test
     @UseConf("f_laser_test1.xml")
     public void testBackupMessage() throws Exception {
+        messageSender.sendCommfaultTag(107211, true);
+        expectLastCall().once();
+        
         SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
 
         messageSender.addValue(EasyMock.capture(sdtv));
