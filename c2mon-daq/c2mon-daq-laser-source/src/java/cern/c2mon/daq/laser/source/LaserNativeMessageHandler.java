@@ -122,7 +122,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
         for (final ISourceDataTag dataTag : getEquipmentConfiguration().getSourceDataTags().values()) {
 
             if (dataTag.getHardwareAddress() instanceof LASERHardwareAddress) {
-                addDataTagAndSendUpdate(dataTag);
+                addDataTagAndSendUpdate(dataTag, false);
             } else {
                 log.warn("Cannot process datatag {}: the hardware address is not of type {}", dataTag.getId(), LASERHardwareAddress.class.getName());
             }
@@ -151,7 +151,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
     }
 
-    private void addDataTagAndSendUpdate(ISourceDataTag dataTag) throws EqIOException {
+    private void addDataTagAndSendUpdate(ISourceDataTag dataTag, boolean sendUpdate) throws EqIOException {
         String alarmId = getAlarmIdFromLaserHardwareAdress(dataTag);
 
         synchronized (alarmToTag) {
@@ -159,7 +159,10 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
             alarmToTag.put(alarmId, dataTag);
         }
 
-        getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.FALSE, System.currentTimeMillis());
+        if(sendUpdate) {
+            getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.FALSE, System.currentTimeMillis());
+        }
+        
     }
 
     //
@@ -172,7 +175,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
         changeReport.setState(CHANGE_STATE.SUCCESS);
 
         try {
-            addDataTagAndSendUpdate(sourceDataTag);
+            addDataTagAndSendUpdate(sourceDataTag, true);
         } catch (Exception ex) {
             changeReport.setState(CHANGE_STATE.FAIL);
             changeReport.appendError(ex.getMessage());
@@ -397,7 +400,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
             boolean found = false;
 
-            if (dataTag.getCurrentValue().getValue().equals(Boolean.TRUE)) {
+            if (dataTag.getCurrentValue() != null && dataTag.getCurrentValue().getValue().equals(Boolean.TRUE)) {
                 // its a currently active alarm
                 // check if it is still active in the backup
                 for (ClientAlarmEvent alarm : messageData.getFaults()) {

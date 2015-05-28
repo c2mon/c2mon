@@ -8,6 +8,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -48,7 +49,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
         SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
 
         messageSender.addValue(EasyMock.capture(sdtv));
-        expectLastCall().times(4);
+        expectLastCall().times(2);
 
         replay(messageSender);
 
@@ -59,9 +60,8 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
 
         verify(messageSender);
 
-        assertEquals(2, sdtv.getNumberOfCapturedValues(124149));
-        assertEquals(false, sdtv.getValueAt(0, 124149).getValue());
-        assertEquals(true, sdtv.getValueAt(1, 124149).getValue());
+        assertEquals(1, sdtv.getNumberOfCapturedValues(124149));
+        assertEquals(true, sdtv.getValueAt(0, 124149).getValue());
     }
 
     @Test
@@ -70,7 +70,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
         SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
 
         messageSender.addValue(EasyMock.capture(sdtv));
-        expectLastCall().times(4);
+        expectLastCall().times(3);
 
         replay(messageSender);
 
@@ -84,33 +84,26 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
 
         verify(messageSender);
 
-        assertEquals(3, sdtv.getNumberOfCapturedValues(124149));
-        assertEquals(false, sdtv.getValueAt(0, 124149).getValue());
-        assertEquals(true, sdtv.getValueAt(1, 124149).getValue());
-        assertEquals(false, sdtv.getValueAt(2, 124149).getValue());
+        assertEquals(2, sdtv.getNumberOfCapturedValues(124149));
+        assertEquals(true, sdtv.getValueAt(0, 124149).getValue());
+        assertEquals(false, sdtv.getValueAt(1, 124149).getValue());
     }
 
     @Test
     @UseConf("f_laser_test1.xml")
     public void testNoCorrespondingAlarms() throws Exception {
-        SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
 
-        messageSender.addValue(EasyMock.capture(sdtv));
-        expectLastCall().times(2);
-
-        replay(messageSender);
-
+        ISourceDataTag dataTag = laserMessage.getEquipmentConfiguration().getSourceDataTag((long) 124149);
+        ISourceDataTag dataTag1 = laserMessage.getEquipmentConfiguration().getSourceDataTag((long) 124150);
+        
         laserMessage.connectToDataSource();
         laserMessage.onMessage(MyAlarmMessageData.createUnknownAlarm(true, MessageType.UPDATE, "LHC"));
 
         Thread.sleep(1000);
-
-        verify(messageSender);
-
-        assertEquals(1, sdtv.getNumberOfCapturedValues(124149));
-        assertEquals(1, sdtv.getNumberOfCapturedValues(124150));
-        assertEquals(false, sdtv.getLastValue(124149).getValue());
-        assertEquals(false, sdtv.getLastValue(124150).getValue());
+        
+        assertNull(dataTag.getCurrentValue());
+        assertNull(dataTag1.getCurrentValue());
+        
 
     }
 
@@ -120,7 +113,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
         SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
 
         messageSender.addValue(EasyMock.capture(sdtv));
-        expectLastCall().times(6);
+        expectLastCall().times(4);
 
         replay(messageSender);
 
@@ -135,15 +128,13 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
 
         verify(messageSender);
 
-        assertEquals(2, sdtv.getNumberOfCapturedValues(124149));
-        assertEquals(3, sdtv.getNumberOfCapturedValues(124150));
+        assertEquals(1, sdtv.getNumberOfCapturedValues(124149));
+        assertEquals(2, sdtv.getNumberOfCapturedValues(124150));
 
-        assertEquals(false, sdtv.getValueAt(0, 124149).getValue());
-        assertEquals(true, sdtv.getValueAt(1, 124149).getValue());
+        assertEquals(true, sdtv.getValueAt(0, 124149).getValue());
 
-        assertEquals(false, sdtv.getValueAt(0, 124150).getValue());
-        assertEquals(true, sdtv.getValueAt(1, 124150).getValue());
-        assertEquals(false, sdtv.getValueAt(2, 124150).getValue());
+        assertEquals(true, sdtv.getValueAt(0, 124150).getValue());
+        assertEquals(false, sdtv.getValueAt(1, 124150).getValue());
 
     }
 
