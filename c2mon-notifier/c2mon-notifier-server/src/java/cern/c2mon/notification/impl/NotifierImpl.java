@@ -395,10 +395,8 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
         logger.trace("Entering sendInitialReport()");
 
         List<Tag> noGood = getProblemChildRules(update);
-        logger.debug("{} Sending initial report with {} problematic children to {} subscribers ", update.getId(),
-                noGood.size(), update.getSubscribers().size());
-
-        logger.debug("{} Sending initial report to {} Subscribers ", update.getId(), update.getSubscribers().size());
+        logger.debug("{} Sending initial report with {} problematic children ", update.getId(), noGood.size());
+        
 
         if (checkSourceDownReport(update)) {
             return;
@@ -409,6 +407,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                 if (!s.getLastNotifiedStatus().equals(update.getLatestStatus())) {
 
                     sendFullReportOn(update, s, noGood);
+                    
                     for (Tag t : noGood) {
                         s.setLastStatusForResolvedTSubTag(t.getId(), t.getLatestStatus());
                     }
