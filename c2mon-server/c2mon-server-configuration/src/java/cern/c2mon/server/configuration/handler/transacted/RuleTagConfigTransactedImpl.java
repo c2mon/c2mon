@@ -75,10 +75,13 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
   @Override
   @Transactional(value = "cacheTransactionManager")
   public void doCreateRuleTag(ConfigurationElement element) throws IllegalAccessException {
+
+    // TIMS-1048: Making check before write lock in order to avoid a deadlock situation
+    checkId(element.getEntityId());
+    
     tagCache.acquireWriteLockOnKey(element.getEntityId());
     try {
       LOGGER.trace("Creating RuleTag with id " + element.getEntityId());
-      checkId(element.getEntityId());
       RuleTag ruleTag = commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
       Collection<Long> tagIds = ruleTag.getRuleInputTagIds();
       try {      

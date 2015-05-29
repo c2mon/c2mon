@@ -97,10 +97,13 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
   @Override
   @Transactional(value = "cacheTransactionManager")
   public ProcessChange doCreateDataTag(final ConfigurationElement element) throws IllegalAccessException {
+
+    // TIMS-1048: Making check before write lock in order to avoid a deadlock situation
+    checkId(element.getEntityId());
+    
     tagCache.acquireWriteLockOnKey(element.getEntityId());
     try {
       LOGGER.trace("Creating DataTag " + element.getEntityId());
-      checkId(element.getEntityId());
       DataTag dataTag = (DataTag) commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
       try {
         configurableDAO.insert(dataTag);
