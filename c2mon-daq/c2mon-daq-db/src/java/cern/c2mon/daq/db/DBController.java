@@ -92,6 +92,8 @@ public class DBController {
    */
   private Timer confTimer;
 
+  private Boolean isUnRegistered = Boolean.TRUE;
+
   /**
    * The frequency with which the amount of processed dataTags is written to
    * the logs
@@ -643,15 +645,23 @@ public class DBController {
    * Registers for all alerts for the monitored datatags.
    * */
   private void registerForAlerts() {
-      this.equipmentLogger.info("registerForAlerts - Registering for alerts (" + getEquipmentConfiguration().getSourceDataTags().size() + ")");
-      for (long alertId : getEquipmentConfiguration().getSourceDataTags().keySet()) {
-          try {
-            registerForAlert(alertId);
-          } catch (DataAccessException dae) {
-              this.equipmentLogger.error("registerForAlerts - " + dae.getCause().getMessage(), dae);
-          }
-      }
-      registerForAlert(RECONFIGURATION_TAG_ID);
+      
+      synchronized (isUnRegistered) {
+        if (isUnRegistered) {
+            this.equipmentLogger.info("registerForAlerts - Registering for alerts (" + getEquipmentConfiguration().getSourceDataTags().size() + ")");
+            for (long alertId : getEquipmentConfiguration().getSourceDataTags().keySet()) {
+                try {
+                  registerForAlert(alertId);
+                } catch (DataAccessException dae) {
+                    this.equipmentLogger.error("registerForAlerts - " + dae.getCause().getMessage(), dae);
+                }
+            }
+            registerForAlert(RECONFIGURATION_TAG_ID);
+            isUnRegistered = Boolean.FALSE;
+        } else {
+            this.equipmentLogger.error("registerForAlerts - called, but already registered to all alerts. Doing nothing..");
+        }
+    }
   }
 
   /**
@@ -659,16 +669,25 @@ public class DBController {
    * connection to the database.
    * */
   private void unregisterAlerts() {
-      this.equipmentLogger.info("unregisterAlerts - Unregistering alerts (" + getEquipmentConfiguration().getSourceDataTags().size() + ")");
-      for (Long alertId : getEquipmentConfiguration().getSourceDataTags().keySet()) {
+      
+    synchronized (isUnRegistered) {
+      if (!isUnRegistered) {
+        this.equipmentLogger.info("unregisterAlerts - Unregistering alerts (" + getEquipmentConfiguration().getSourceDataTags().size() + ")");
+        for (Long alertId : getEquipmentConfiguration().getSourceDataTags().keySet()) {
           try {
             unregisterFromAlert(alertId);
           } catch (DataAccessException dae) {
               this.equipmentLogger.error("unregisterAlerts - " + dae.getCause().getMessage(), dae);
           }
+        }
+        isUnRegistered = Boolean.TRUE;
+      } else {
+          this.equipmentLogger.error("unregisterAlerts - called, but already unregistered from all alerts. Doing nothing..");
       }
 
       unregisterFromAlert(RECONFIGURATION_TAG_ID);
+    }
+      
   }
 
   /**
@@ -697,11 +716,13 @@ public class DBController {
    * Disconnects from the database and stops the DAQ process
    */
   public void disconnectFromDataSource() {
+    this.equipmentLogger.info("disconnectFromDataSource - called.");
     if (this.running && this.connected) {
       unregisterAlerts();
       setDisconnected();
     }
     this.running = false;
+    this.equipmentLogger.info("disconnectFromDataSource - Not running");
   }
 
   /**
