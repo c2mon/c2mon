@@ -85,12 +85,17 @@ public class DBController {
   /**
    * The equipment alive timer
    * */
-  private Timer timer;
+  private Timer eqAliveTimer;
 
   /**
    * Timer task for running configurations
    */
   private Timer confTimer;
+  
+  /**
+   * 
+   */
+  private Timer logTimer = new Timer();
 
   private Boolean isUnRegistered = Boolean.TRUE;
 
@@ -152,7 +157,7 @@ public class DBController {
 
     // Send reconfiguration Alert (waiting till the end of the reconfiguration process)
 //    System.out.println("Alert inserting");
-    confTimerTask(sourceDataTag.getId());
+    confTimerTask();
 
     return CHANGE_STATE.SUCCESS;
   }
@@ -160,7 +165,7 @@ public class DBController {
   /**
    * Configuration procedure timer task which sends the Reconfiguration Alert after applying it
    * */
-  private void confTimerTask(final Long tagId) {
+  private void confTimerTask() {
 
       if (this.confTimer != null)
           this.confTimer.cancel();
@@ -350,7 +355,7 @@ public class DBController {
 
 	  // Send reconfiguration Alert (waiting till the end of the reconfiguration process)
 //	  System.out.println("Alert deleting");
-	  confTimerTask(sourceDataTag.getId());
+	  confTimerTask();
 
 	  getEquipmentLogger().trace("disconnection - Exiting: " + dataTagId);
 
@@ -618,9 +623,9 @@ public class DBController {
    * Initiates sending of equipment alive tag.
    * */
   private void initAlive() {
-	  if (timer != null)
-		  timer.cancel();
-	  timer = new Timer();
+	  if (eqAliveTimer != null)
+		  eqAliveTimer.cancel();
+	  eqAliveTimer = new Timer();
 
 	  final long interval = getEquipmentConfiguration().getAliveTagInterval();
 
@@ -631,14 +636,14 @@ public class DBController {
 			  equipmentLogger.info("Equipment alive sent to server.");
 		  }
 	  };
-	  timer.schedule(task, 0, interval);
+	  eqAliveTimer.schedule(task, 0, interval);
   }
 
   /**
    * Cancels the alive tag.
    * */
   private void cancelAlive() {
-      timer.cancel();
+      eqAliveTimer.cancel();
   }
 
   /**
@@ -747,14 +752,17 @@ public class DBController {
    * (milliseconds).
    * */
   private void startLoggingSentDataTags() {
-      Timer timer = new Timer();
+      
+      logTimer.cancel();
+      logTimer = new Timer();
+      
       TimerTask task = new TimerTask() {
           @Override
           public void run() {
               showAmountOfProcessedAlerts();
           }
       };
-      timer.schedule(task, 0, LOGGING_INTERVAL);
+      logTimer.schedule(task, 0, LOGGING_INTERVAL);
   }
 
   /**
