@@ -111,7 +111,14 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
         tagCache.putQuiet(controlTag);      
         ProcessChange processChange = new ProcessChange();
         if (processFacade.getProcessIdFromControlTag(controlTag.getId()) != null) {
-          processChange = new ProcessChange(processFacade.getProcessIdFromControlTag(controlTag.getId()));
+            
+          if (controlTag.getAddress() != null) {
+            // if there is a hardware address, we need to announce it to the DAQ.
+            DataTagAdd toAdd = new DataTagAdd(element.getSequenceId(), controlTag.getEquipmentId(), ((ControlTagFacade) commonTagFacade).generateSourceDataTag(controlTag));
+            processChange = new ProcessChange(processFacade.getProcessIdFromControlTag(controlTag.getId()), toAdd);
+          } else {
+            processChange = new ProcessChange(processFacade.getProcessIdFromControlTag(controlTag.getId()));
+          }
         }
         return processChange;
       } catch (Exception e) {

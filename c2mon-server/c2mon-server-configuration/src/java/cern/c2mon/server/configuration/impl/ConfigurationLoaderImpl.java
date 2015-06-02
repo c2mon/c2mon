@@ -432,15 +432,13 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         switch (element.getEntity()) {
         case DATATAG : daqConfigEvents.add(dataTagConfigHandler.createDataTag(element)); break;
         case RULETAG : ruleTagConfigHandler.createRuleTag(element); break;
-        case CONTROLTAG: daqConfigEvents.add(controlTagConfigHandler.createControlTag(element));
-                         element.setDaqStatus(Status.RESTART); break;
+        case CONTROLTAG: daqConfigEvents.add(controlTagConfigHandler.createControlTag(element)); break;
         case COMMANDTAG : daqConfigEvents = commandTagConfigHandler.createCommandTag(element); break;
         case ALARM : alarmConfigHandler.createAlarm(element); break;
         case PROCESS : daqConfigEvents.add(processConfigHandler.createProcess(element));
                        element.setDaqStatus(Status.RESTART); break;
         case EQUIPMENT : daqConfigEvents.add(equipmentConfigHandler.createEquipment(element)); break;
-        case SUBEQUIPMENT : daqConfigEvents.add(subEquipmentConfigHandler.createSubEquipment(element));
-                            element.setDaqStatus(Status.RESTART); break;
+        case SUBEQUIPMENT : daqConfigEvents.add(subEquipmentConfigHandler.createSubEquipment(element)); break;
         case DEVICECLASS : daqConfigEvents.add(deviceClassConfigHandler.createDeviceClass(element)); break;
         case DEVICE : daqConfigEvents.add(deviceConfigHandler.createDevice(element)); break;
         default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
