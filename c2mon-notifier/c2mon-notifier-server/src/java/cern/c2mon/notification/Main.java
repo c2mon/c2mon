@@ -5,6 +5,7 @@
 package cern.c2mon.notification;
 
 
+import org.apache.log4j.PropertyConfigurator;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 
@@ -24,6 +25,9 @@ public class Main {
 
         FileSystemXmlApplicationContext context = null;
         try {
+            
+            PropertyConfigurator.configureAndWatch(System.getProperty("log4j.configuration"), 1000 * 60);
+            
             context = new FileSystemXmlApplicationContext(System.getProperty("server-context",
                     "classpath:cern/c2mon/notification/context.xml"));
             // wait until we close, die or whatever
