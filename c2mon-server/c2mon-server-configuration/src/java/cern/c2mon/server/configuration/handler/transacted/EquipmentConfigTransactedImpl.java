@@ -83,8 +83,8 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
     EquipmentUnitAdd equipmentUnitAdd = new EquipmentUnitAdd(element.getSequenceId(), equipment.getId(), processXMLProvider.getEquipmentConfigXML(equipment.getId()));
     
     List<ProcessChange> result = new ArrayList<ProcessChange>();
-    result.addAll(ensureCtrlTagsSet(element, equipment));
     result.add(new ProcessChange(equipment.getProcessId(), equipmentUnitAdd));
+    result.addAll(ensureCtrlTagsSet(element, equipment));
     
     return result;
   }
