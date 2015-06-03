@@ -238,6 +238,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
             try {
               processChanges = applyConfigElement(element, elementReport);  //never returns null
 
+              
+              
               for (ProcessChange processChange : processChanges) {
 
                 Long processId = processChange.getProcessId();
@@ -246,6 +248,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                   if (!processLists.containsKey(processId)) {
                     processLists.put(processId, new ArrayList<Change>());
                   }
+
                   processLists.get(processId).add((Change) processChange.getChangeEvent());   //cast to implementation needed as DomFactory uses this - TODO change to interface
                   daqReportPlaceholder.put(processChange.getChangeEvent().getChangeId(), elementReport);
                   elementPlaceholder.put(processChange.getChangeEvent().getChangeId(), element);
@@ -437,8 +440,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         case ALARM : alarmConfigHandler.createAlarm(element); break;
         case PROCESS : daqConfigEvents.add(processConfigHandler.createProcess(element));
                        element.setDaqStatus(Status.RESTART); break;
-        case EQUIPMENT : daqConfigEvents.add(equipmentConfigHandler.createEquipment(element)); break;
-        case SUBEQUIPMENT : daqConfigEvents.add(subEquipmentConfigHandler.createSubEquipment(element)); break;
+        case EQUIPMENT : daqConfigEvents.addAll(equipmentConfigHandler.createEquipment(element)); break;
+        case SUBEQUIPMENT : daqConfigEvents.addAll(subEquipmentConfigHandler.createSubEquipment(element)); break;
         case DEVICECLASS : daqConfigEvents.add(deviceClassConfigHandler.createDeviceClass(element)); break;
         case DEVICE : daqConfigEvents.add(deviceConfigHandler.createDevice(element)); break;
         default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());

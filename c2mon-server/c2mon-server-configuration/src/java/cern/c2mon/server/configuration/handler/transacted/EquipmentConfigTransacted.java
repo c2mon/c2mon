@@ -1,5 +1,7 @@
 package cern.c2mon.server.configuration.handler.transacted;
 
+import java.util.List;
+
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
@@ -19,7 +21,7 @@ public interface EquipmentConfigTransacted extends CommonEquipmentConfigTransact
    * @return 
    * @throws IllegalAccessException
    */
-  ProcessChange doCreateEquipment(ConfigurationElement element) throws IllegalAccessException;
+  List<ProcessChange> doCreateEquipment(ConfigurationElement element) throws IllegalAccessException;
 
   /**
    * Remove equipment in transaction.

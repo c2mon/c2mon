@@ -41,7 +41,7 @@ public interface EquipmentConfigHandler {
    *        supported by DAQ layer)
    * @throws IllegalAccessException
    */
-  ProcessChange createEquipment(ConfigurationElement element) throws IllegalAccessException;
+  List<ProcessChange> createEquipment(ConfigurationElement element) throws IllegalAccessException;
 
   /**
    * Updates an Equipment in the C2MON server.

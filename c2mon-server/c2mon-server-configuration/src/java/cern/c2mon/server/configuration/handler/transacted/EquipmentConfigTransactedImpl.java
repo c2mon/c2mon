@@ -1,5 +1,6 @@
 package cern.c2mon.server.configuration.handler.transacted;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import cern.c2mon.server.cache.AliveTimerCache;
 import cern.c2mon.server.cache.CommFaultTagCache;
 import cern.c2mon.server.cache.ControlTagCache;
+import cern.c2mon.server.cache.ControlTagFacade;
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.EquipmentFacade;
 import cern.c2mon.server.cache.ProcessXMLProvider;
@@ -24,6 +26,7 @@ import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.daq.config.DataTagAdd;
 import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
 
 /**
@@ -45,17 +48,20 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
   
   private ControlTagCache controlCache;
   
+  private ControlTagFacade controlTagFacade;
+  
   @Autowired
   public EquipmentConfigTransactedImpl(ControlTagConfigHandler controlTagConfigHandler, AliveTimerCache aliveTimerCache,
                                 CommFaultTagCache commFaultTagCache, EquipmentCache abstractEquipmentCache, 
                                 EquipmentFacade equipmentFacade, EquipmentDAO equipmentDAO, ProcessXMLProvider processXMLProvider, 
-                                ControlTagCache controlCache) {
+                                ControlTagCache controlCache, ControlTagFacade controlTagFacade) {
     super(controlTagConfigHandler, equipmentFacade, abstractEquipmentCache, equipmentDAO,
         aliveTimerCache, commFaultTagCache);
     this.equipmentFacade = equipmentFacade;
     this.equipmentDAO = equipmentDAO;
     this.processXMLProvider = processXMLProvider;
     this.controlCache = controlCache;
+    this.controlTagFacade = controlTagFacade;
   }
 
   /**
@@ -71,14 +77,16 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
    */
   @Override
   @Transactional(value = "cacheTransactionManager")
-  public ProcessChange doCreateEquipment(ConfigurationElement element) throws IllegalAccessException {
+  public List<ProcessChange> doCreateEquipment(ConfigurationElement element) throws IllegalAccessException {
     Equipment equipment = super.createAbstractEquipment(element);
     equipmentFacade.addEquipmentToProcess(equipment.getId(), equipment.getProcessId());
     EquipmentUnitAdd equipmentUnitAdd = new EquipmentUnitAdd(element.getSequenceId(), equipment.getId(), processXMLProvider.getEquipmentConfigXML(equipment.getId()));
     
-    ensureCtrlTagsSet(equipment);
+    List<ProcessChange> result = new ArrayList<ProcessChange>();
+    result.addAll(ensureCtrlTagsSet(element, equipment));
+    result.add(new ProcessChange(equipment.getProcessId(), equipmentUnitAdd));
     
-    return new ProcessChange(equipment.getProcessId(), equipmentUnitAdd);
+    return result;
   }
   
   @Override
@@ -105,12 +113,17 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
    * @param equipment 
    * @throws IllegalAccessException
    */
-  private void ensureCtrlTagsSet(final Equipment equipment) throws IllegalAccessException {
+  private List<ProcessChange> ensureCtrlTagsSet(final ConfigurationElement element, final Equipment equipment) throws IllegalAccessException {
+      
+      List<ProcessChange> changes = new ArrayList<ProcessChange>(3);
+      
       ControlTag aliveTagCopy = controlCache.getCopy(equipment.getAliveTagId());
       if (aliveTagCopy != null) {
         ((ControlTagCacheObject)aliveTagCopy).setEquipmentId(equipment.getId());
         ((ControlTagCacheObject)aliveTagCopy).setProcessId(equipment.getProcessId());
         controlCache.putQuiet(aliveTagCopy);
+        DataTagAdd toAdd = new DataTagAdd(element.getSequenceId(), equipment.getId(), controlTagFacade.generateSourceDataTag(aliveTagCopy));
+        changes.add(new ProcessChange(equipment.getProcessId(), toAdd));
       } else {
         // TODO change to ConfigurationException
         throw new IllegalArgumentException("No alive tag (" + equipment.getAliveTagId() + ") found for equipment " + equipment.getName());
@@ -121,6 +134,8 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
         ((ControlTagCacheObject)commFaultTagCopy).setEquipmentId(equipment.getId());
         ((ControlTagCacheObject)commFaultTagCopy).setProcessId(equipment.getProcessId());
         controlCache.putQuiet(commFaultTagCopy);
+        DataTagAdd toAdd = new DataTagAdd(element.getSequenceId(), equipment.getId(), controlTagFacade.generateSourceDataTag(commFaultTagCopy));
+        changes.add(new ProcessChange(equipment.getProcessId(), toAdd));
       } else {
         // TODO change to ConfigurationException
         throw new IllegalArgumentException("No commfault tag (" + equipment.getCommFaultTagId() + ") found for equipment " + equipment.getName());
@@ -131,10 +146,15 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
         ((ControlTagCacheObject)statusTagCopy).setEquipmentId(equipment.getId());
         ((ControlTagCacheObject)statusTagCopy).setProcessId(equipment.getProcessId());
         controlCache.putQuiet(statusTagCopy);
+        DataTagAdd toAdd = new DataTagAdd(element.getSequenceId(), equipment.getId(), controlTagFacade.generateSourceDataTag(statusTagCopy));
+        changes.add(new ProcessChange(equipment.getProcessId(), toAdd));
       } else {
         // TODO change to ConfigurationException
         throw new IllegalArgumentException("No status tag (" + equipment.getStateTagId() + ") found for equipment " + equipment.getName());
       }
+      
+      
+      return changes;
   }
   
 }
