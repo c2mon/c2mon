@@ -129,8 +129,8 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
   }
 
   @Override
-  public ProcessChange createSubEquipment(ConfigurationElement element) throws IllegalAccessException {
-    ProcessChange change = subEquipmentConfigTransacted.doCreateSubEquipment(element);
+  public List<ProcessChange> createSubEquipment(ConfigurationElement element) throws IllegalAccessException {
+    List<ProcessChange> change = subEquipmentConfigTransacted.doCreateSubEquipment(element);
     subEquipmentCache.lockAndNotifyListeners(element.getEntityId());
     return change;
   }

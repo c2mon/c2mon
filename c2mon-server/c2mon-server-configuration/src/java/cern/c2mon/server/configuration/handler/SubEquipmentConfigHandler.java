@@ -40,7 +40,7 @@ public interface SubEquipmentConfigHandler {
    * @return change indicating a DAQ restart
    * @throws IllegalAccessException
    */
-  ProcessChange createSubEquipment(ConfigurationElement element) throws IllegalAccessException;
+  List<ProcessChange> createSubEquipment(ConfigurationElement element) throws IllegalAccessException;
 
   /**
    * Updates an SubEquipment in the C2MON server.

@@ -30,7 +30,7 @@ public interface SubEquipmentConfigTransacted extends CommonEquipmentConfigTrans
    * @return change for DAQ
    * @throws IllegalAccessException
    */
-  ProcessChange doCreateSubEquipment(ConfigurationElement element) throws IllegalAccessException;
+  List<ProcessChange> doCreateSubEquipment(ConfigurationElement element) throws IllegalAccessException;
 
 
 }

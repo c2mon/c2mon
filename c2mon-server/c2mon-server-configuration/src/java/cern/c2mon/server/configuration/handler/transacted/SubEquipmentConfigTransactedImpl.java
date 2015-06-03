@@ -87,12 +87,14 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
    */
   @Override
   @Transactional(value = "cacheTransactionManager")
-  public ProcessChange doCreateSubEquipment(final ConfigurationElement element) throws IllegalAccessException {
+  public List<ProcessChange> doCreateSubEquipment(final ConfigurationElement element) throws IllegalAccessException {
     SubEquipment subEquipment = super.createAbstractEquipment(element);
     subEquipmentFacade.addSubEquipmentToEquipment(subEquipment.getId(), subEquipment.getParentId());
     SubEquipmentUnitAdd subEquipmentUnitAdd = new SubEquipmentUnitAdd(element.getSequenceId(), subEquipment.getId(), subEquipment.getParentId(),
         processXMLProvider.getSubEquipmentConfigXML((SubEquipmentCacheObject) subEquipment));
-    return new ProcessChange(equipmentCache.get(subEquipment.getParentId()).getProcessId(), subEquipmentUnitAdd);
+    List<ProcessChange> changes = new ArrayList<ProcessChange>();
+    changes.add(new ProcessChange(equipmentCache.get(subEquipment.getParentId()).getProcessId(), subEquipmentUnitAdd));
+    return changes;
   }
 
   @Override
