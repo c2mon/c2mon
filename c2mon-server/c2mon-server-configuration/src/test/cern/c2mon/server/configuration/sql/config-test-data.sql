@@ -186,6 +186,7 @@ insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   
 insert into timconfigval (seqid, elementfield, elementvalue) values (13,'address','serverHostName=VGTCVENTTEST');
 insert into timconfigval (seqid, elementfield, elementvalue) values (13,'stateTagId','1250');
+insert into timconfigval (seqid, elementfield, elementvalue) values (13,'aliveTagId','1251');
 insert into timconfigval (seqid, elementfield, elementvalue) values (13,'processId','50');
 insert into timconfigval (seqid, elementfield, elementvalue) values (13,'description','test description');
 insert into timconfigval (seqid, elementfield, elementvalue) values (13,'handlerClass','cern.c2mon.driver.');
