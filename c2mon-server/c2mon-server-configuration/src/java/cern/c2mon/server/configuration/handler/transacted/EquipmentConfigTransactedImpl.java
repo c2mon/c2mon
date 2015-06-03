@@ -12,11 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.cache.AliveTimerCache;
 import cern.c2mon.server.cache.CommFaultTagCache;
+import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.EquipmentFacade;
-import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.ProcessXMLProvider;
 import cern.c2mon.server.cache.loading.EquipmentDAO;
+import cern.c2mon.server.common.control.ControlTag;
+import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
@@ -39,24 +41,21 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
   
   private EquipmentDAO equipmentDAO;
   
-  private EquipmentCache equipmentCache; 
-  
-  private ProcessCache processCache;
-  
   private ProcessXMLProvider processXMLProvider;
+  
+  private ControlTagCache controlCache;
   
   @Autowired
   public EquipmentConfigTransactedImpl(ControlTagConfigHandler controlTagConfigHandler, AliveTimerCache aliveTimerCache,
                                 CommFaultTagCache commFaultTagCache, EquipmentCache abstractEquipmentCache, 
-                                EquipmentFacade equipmentFacade, EquipmentDAO equipmentDAO, EquipmentCache equipmentCache,
-                                ProcessCache processCache, ProcessXMLProvider processXMLProvider) {
+                                EquipmentFacade equipmentFacade, EquipmentDAO equipmentDAO, ProcessXMLProvider processXMLProvider, 
+                                ControlTagCache controlCache) {
     super(controlTagConfigHandler, equipmentFacade, abstractEquipmentCache, equipmentDAO,
         aliveTimerCache, commFaultTagCache);
     this.equipmentFacade = equipmentFacade;
     this.equipmentDAO = equipmentDAO;
-    this.equipmentCache = equipmentCache;
-    this.processCache = processCache;
     this.processXMLProvider = processXMLProvider;
+    this.controlCache = controlCache;
   }
 
   /**
@@ -76,6 +75,9 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
     Equipment equipment = super.createAbstractEquipment(element);
     equipmentFacade.addEquipmentToProcess(equipment.getId(), equipment.getProcessId());
     EquipmentUnitAdd equipmentUnitAdd = new EquipmentUnitAdd(element.getSequenceId(), equipment.getId(), processXMLProvider.getEquipmentConfigXML(equipment.getId()));
+    
+    ensureCtrlTagsSet(equipment);
+    
     return new ProcessChange(equipment.getProcessId(), equipmentUnitAdd);
   }
   
@@ -96,6 +98,43 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
         throw new UnexpectedRollbackException("Interrupting removal of Equipment as failed to remove it from DB - " 
             + "control tags will not be removed.", ex);      
     }              
+  }
+  
+  /**
+   * Ensures that the Alive, State and CommFault Tags are set appropriately in the {@link ControlTagCache}.
+   * @param equipment 
+   * @throws IllegalAccessException
+   */
+  private void ensureCtrlTagsSet(final Equipment equipment) throws IllegalAccessException {
+      ControlTag aliveTagCopy = controlCache.getCopy(equipment.getAliveTagId());
+      if (aliveTagCopy != null) {
+        ((ControlTagCacheObject)aliveTagCopy).setEquipmentId(equipment.getId());
+        ((ControlTagCacheObject)aliveTagCopy).setProcessId(equipment.getProcessId());
+        controlCache.putQuiet(aliveTagCopy);
+      } else {
+        // TODO change to ConfigurationException
+        throw new IllegalArgumentException("No alive tag (" + equipment.getAliveTagId() + ") found for equipment " + equipment.getName());
+      }
+      
+      ControlTag commFaultTagCopy = controlCache.getCopy(equipment.getCommFaultTagId());
+      if (commFaultTagCopy != null) {
+        ((ControlTagCacheObject)commFaultTagCopy).setEquipmentId(equipment.getId());
+        ((ControlTagCacheObject)commFaultTagCopy).setProcessId(equipment.getProcessId());
+        controlCache.putQuiet(commFaultTagCopy);
+      } else {
+        // TODO change to ConfigurationException
+        throw new IllegalArgumentException("No commfault tag (" + equipment.getCommFaultTagId() + ") found for equipment " + equipment.getName());
+      }
+      
+      ControlTag statusTagCopy = controlCache.getCopy(equipment.getStateTagId());
+      if (statusTagCopy != null) {
+        ((ControlTagCacheObject)statusTagCopy).setEquipmentId(equipment.getId());
+        ((ControlTagCacheObject)statusTagCopy).setProcessId(equipment.getProcessId());
+        controlCache.putQuiet(statusTagCopy);
+      } else {
+        // TODO change to ConfigurationException
+        throw new IllegalArgumentException("No status tag (" + equipment.getStateTagId() + ") found for equipment " + equipment.getName());
+      }
   }
   
 }
