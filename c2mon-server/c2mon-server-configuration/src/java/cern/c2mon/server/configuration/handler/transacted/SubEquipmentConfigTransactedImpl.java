@@ -13,18 +13,24 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.cache.AliveTimerCache;
 import cern.c2mon.server.cache.CommFaultTagCache;
+import cern.c2mon.server.cache.ControlTagCache;
+import cern.c2mon.server.cache.ControlTagFacade;
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.ProcessXMLProvider;
 import cern.c2mon.server.cache.SubEquipmentCache;
 import cern.c2mon.server.cache.SubEquipmentFacade;
 import cern.c2mon.server.cache.loading.SubEquipmentDAO;
+import cern.c2mon.server.common.control.ControlTag;
+import cern.c2mon.server.common.control.ControlTagCacheObject;
+import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.daq.config.DataTagAdd;
 import cern.c2mon.shared.daq.config.SubEquipmentUnitAdd;
 import cern.c2mon.shared.daq.config.SubEquipmentUnitRemove;
 
@@ -53,6 +59,10 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
   private SubEquipmentDAO subEquipmentDAO;
 
   private EquipmentCache equipmentCache;
+  
+  private ControlTagCache controlCache;
+  
+  private ControlTagFacade controlTagFacade;
 
   private ProcessXMLProvider processXMLProvider;
 
@@ -68,12 +78,16 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
                                           CommFaultTagCache commFaultTagCache,
                                           ProcessCache processCache,
                                           EquipmentCache equipmentCache,
-                                          ProcessXMLProvider processXMLProvider) {
+                                          ProcessXMLProvider processXMLProvider,
+                                          ControlTagCache controlCache, 
+                                          ControlTagFacade controlTagFacade) {
     super(controlTagConfigHandler, subEquipmentFacade, subEquipmentCache, subEquipmentDAO, aliveTimerCache, commFaultTagCache);
     this.subEquipmentFacade = subEquipmentFacade;
     this.subEquipmentDAO = subEquipmentDAO;
     this.equipmentCache = equipmentCache;
     this.processXMLProvider = processXMLProvider;
+    this.controlCache = controlCache;
+    this.controlTagFacade = controlTagFacade;
   }
 
   /**
@@ -94,6 +108,7 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
         processXMLProvider.getSubEquipmentConfigXML((SubEquipmentCacheObject) subEquipment));
     List<ProcessChange> changes = new ArrayList<ProcessChange>();
     changes.add(new ProcessChange(equipmentCache.get(subEquipment.getParentId()).getProcessId(), subEquipmentUnitAdd));
+    changes.addAll(ensureCtrlTagsSet(element, subEquipment));
     return changes;
   }
 
@@ -106,7 +121,7 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
   @Override
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
   public List<ProcessChange> doRemoveSubEquipment(final SubEquipment subEquipment, final ConfigurationElementReport subEquipmentReport) {
-    List<ProcessChange> processChanges = new ArrayList<>();
+    List<ProcessChange> processChanges = new ArrayList<ProcessChange>();
 
     try {
       subEquipmentDAO.deleteItem(subEquipment.getId());
@@ -122,5 +137,57 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
 
     return processChanges;
   }
+  
+  
+  /**
+   * Ensures that the Alive, State and CommFault Tags are set appropriately in the {@link ControlTagCache}.
+   * @param subEquipment 
+   * @throws IllegalAccessException
+   */
+  private List<ProcessChange> ensureCtrlTagsSet(final ConfigurationElement element, final SubEquipment subEquipment) throws IllegalAccessException {
+      
+      List<ProcessChange> changes = new ArrayList<ProcessChange>(3);
+      Equipment equipment = this.equipmentCache.get(subEquipment.getParentId());
+      
+      ControlTag aliveTagCopy = controlCache.getCopy(subEquipment.getAliveTagId());
+      if (aliveTagCopy != null) {
+        ((ControlTagCacheObject)aliveTagCopy).setSubEquipmentId(subEquipment.getId());
+        ((ControlTagCacheObject)aliveTagCopy).setProcessId(equipment.getProcessId());
+        controlCache.putQuiet(aliveTagCopy);
+        DataTagAdd toAdd = new DataTagAdd(element.getSequenceId(), subEquipment.getId(), controlTagFacade.generateSourceDataTag(aliveTagCopy));
+        changes.add(new ProcessChange(equipment.getProcessId(), toAdd));
+      } else {
+        // TODO change to ConfigurationException
+        throw new IllegalArgumentException("No alive tag (" + subEquipment.getAliveTagId() + ") found for subequipment " + subEquipment.getName());
+      }
+      
+      ControlTag commFaultTagCopy = controlCache.getCopy(subEquipment.getCommFaultTagId());
+      if (commFaultTagCopy != null) {
+        ((ControlTagCacheObject)commFaultTagCopy).setSubEquipmentId(subEquipment.getId());
+        ((ControlTagCacheObject)commFaultTagCopy).setProcessId(equipment.getProcessId());
+        controlCache.putQuiet(commFaultTagCopy);
+        DataTagAdd toAdd = new DataTagAdd(element.getSequenceId(), subEquipment.getId(), controlTagFacade.generateSourceDataTag(commFaultTagCopy));
+        changes.add(new ProcessChange(equipment.getProcessId(), toAdd));
+      } else {
+        // TODO change to ConfigurationException
+        throw new IllegalArgumentException("No commfault tag (" + subEquipment.getCommFaultTagId() + ") found for subequipment " + subEquipment.getName());
+      }
+      
+      ControlTag statusTagCopy = controlCache.getCopy(subEquipment.getStateTagId());
+      if (statusTagCopy != null) {
+        ((ControlTagCacheObject)statusTagCopy).setSubEquipmentId(subEquipment.getId());
+        ((ControlTagCacheObject)statusTagCopy).setProcessId(equipment.getProcessId());
+        controlCache.putQuiet(statusTagCopy);
+        DataTagAdd toAdd = new DataTagAdd(element.getSequenceId(), subEquipment.getId(), controlTagFacade.generateSourceDataTag(statusTagCopy));
+        changes.add(new ProcessChange(equipment.getProcessId(), toAdd));
+      } else {
+        // TODO change to ConfigurationException
+        throw new IllegalArgumentException("No status tag (" + subEquipment.getStateTagId() + ") found for subequipment " + subEquipment.getName());
+      }
+      
+      
+      return changes;
+  }
+  
 
 }
