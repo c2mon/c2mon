@@ -129,9 +129,9 @@ function initialiseServerCharts() {
     options.series[0].data = chart.yaxis.data;
     var serverUpdatesChart = new Highcharts.Chart(options);
 
-    // Initialise the little box whcih shows the number of updates for
+    // Initialise the little box which shows the number of updates for
     // yesterday.
-    $('#num-updates-yesterday').text(numberWithCommas(chart.yaxis.data[0]));
+    $('#num-updates-yesterday').text(numberWithCommas(chart.yaxis.data[chart.yaxis.data.length - 1]));
 
   }).fail(function(e) {
     $('#server-updates').closest('.chart-container').hide();
