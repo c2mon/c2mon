@@ -88,7 +88,7 @@ public class FileBackUpWriter implements BackupWriter {
      */
     @Override
     public ConcurrentHashMap<String, Subscriber> load() {
-        ConcurrentHashMap<String, Subscriber> newUsers = new ConcurrentHashMap<String, Subscriber>();
+        HashMap<String, Subscriber> newUsers = new HashMap<String, Subscriber>();
         // load newUsers from DB, File, etc....
         
         FileReader fr = null;
@@ -111,7 +111,7 @@ public class FileBackUpWriter implements BackupWriter {
                                                                     } .getType());
             input.close();
         } catch (Exception ex) {
-            logger.error("Cannot store to file " + fileName, ex.getMessage());
+            logger.error("Cannot store to file " + fileName + " :" + ex.getMessage(), ex);
         } finally {
             try { if (input != null) input.close(); } catch (IOException e) {
                 e.printStackTrace();
@@ -127,8 +127,8 @@ public class FileBackUpWriter implements BackupWriter {
             subs += s.getSubscribedTagIds().size();
         }
         
-        logger.info("Loaded {} users and {} subscriptions in {msec" , newUsers.size() , subs , getLastLoadTime());
-        return newUsers;
+        logger.info("Loaded {} users and {} subscriptions in {}msec" , newUsers.size() , subs , getLastLoadTime());
+        return new ConcurrentHashMap<String, Subscriber>(newUsers);
     }
     
     /**
