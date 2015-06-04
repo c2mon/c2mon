@@ -5,7 +5,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -192,7 +193,7 @@ public class TextCreatorTest {
         
         TextCreator creator = new TextCreator();
         
-        List<Tag> interestingChildren = new ArrayList<Tag>();
+        Set<Tag> interestingChildren = new HashSet<Tag>();
         interestingChildren.add(child);
         String text = creator.getReportForTag(root, interestingChildren, c);
         

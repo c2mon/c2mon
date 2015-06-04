@@ -629,6 +629,8 @@ public class NotifierImplTest {
         s2.addSubscription(new Subscription(s2.getUserName(), toBeNotifiedFor.getId()));
         reg.setSubscriber(s2.getCopy());
         
+        notifier.checkCacheForChanges();
+        
         s = reg.getSubscriber(s2.getUserName());
         System.out.println(s);
         assertTrue(s.getSubscription(toBeNotifiedFor.getId()).getLastStatusForResolvedSubTag(2L).equals(Status.ERROR));
