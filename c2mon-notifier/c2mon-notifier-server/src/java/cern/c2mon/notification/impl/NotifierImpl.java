@@ -194,8 +194,8 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
             try {
                 cache.startSubscription(s);
             } catch (TagNotFoundException ignore) {
-                logger.warn("Cannot start subscription for user %s with tagid %s: %s", s.getSubscriberId(),
-                        s.getTagId(), ignore.getMessage());
+                logger.warn("Tag {} not found subscription  user {} : {}", s.getTagId(), s.getSubscriberId(), 
+                        ignore.getMessage());
             }
         }
 
@@ -394,7 +394,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
     public void sendInitialReport(Tag update) {
         logger.trace("Entering sendInitialReport()");
 
-        List<Tag> noGood = getProblemChildRules(update);
+        Set<Tag> noGood = getProblemChildRules(update);
         logger.debug("{} Sending initial report with {} problematic children ", update.getId(), noGood.size());
         
 
@@ -429,7 +429,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
      * @throws IOException
      * @throws TemplateException
      */
-    private void sendFullReportOn(Tag update, Subscription sub, List<Tag> interestingRuleTags) throws IOException,
+    private void sendFullReportOn(Tag update, Subscription sub, Set<Tag> interestingRuleTags) throws IOException,
             TemplateException {
         logger.trace("Entering sendFullReportOn()");
 
@@ -475,12 +475,16 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
         /**
          * Check more detailed on the problem and collect info
          */
-        List<Tag> interestingChildRules = new ArrayList<Tag>();
+        Set<Tag> interestingChildRules = new HashSet<Tag>();
+        
+        logger.debug("{} has changed its state : {} -> {}. ", update.getId(), update.getPreviousStatus(),
+                update.getLatestStatus());
+        
         if (update.getAllChildRules().size() == 0) {
 
             // R->M update
-
-            logger.debug("{} no child rule changed but received an update. R->M.", update.getId());
+            logger.debug("{} has no child rules: R->M ", update.getId());
+            
             for (Subscription s : update.getSubscribers()) {
                 Status oldStatus = s.getLastStatusForResolvedSubTag(update.getId());
 
@@ -531,14 +535,13 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                 // status has changed:
                 // full send
             }
-
-            logger.debug("{} has changed its state : {} -> {}. ", update.getId(), update.getPreviousStatus(),
-                    update.getLatestStatus());
-            logger.debug("{} has child rules (R->R->M) ...", update.getId());
-            logger.trace("{} children rules:", update.getAllChildRules());
+            
+            
+            
+            logger.debug("{} has child rules: R->R1->M1, R->R2->M2, ...", update.getId());
+            logger.trace("{} children rules: ", update.getAllChildRules());
 
             // all metrics of this rule R->M1, R->M2,.. (if any)
-            List<Tag> changedDirectChildMetrics = update.getChangedChildMetrics();
             List<Tag> childRecursiveRules = new ArrayList<Tag>();
             for (Tag c : update.getAllChildTagsRecursive()) {
                 if (c.isRule()) {
@@ -681,6 +684,8 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
     void notifyMail(Subscriber subscriber, String subject, String text) {
 
         logger.debug("Notifying via Mail to {} ", subscriber.getEmail());
+        
+        logger.trace("Mail Text {} ", text);
 
         try {
             mailer.sendEmail(subscriber.getEmail(), subject, text);
@@ -696,8 +701,8 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
      * @return a list of tags which report themselfs as changed
      * @see Tag#hasStatusChanged()
      */
-    public List<Tag> getProblemChildRules(Tag t) {
-        ArrayList<Tag> result = new ArrayList<Tag>();
+    public Set<Tag> getProblemChildRules(Tag t) {
+        HashSet<Tag> result = new HashSet<Tag>();
 
         for (Tag c : t.getAllChildTagsRecursive()) {
             if (c.isRule() && c.getLatestStatus().worserThan(Status.OK)) {

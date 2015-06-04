@@ -13,10 +13,10 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,7 +128,7 @@ public class TextCreator {
      * @throws IOException
      * @throws TemplateException
      */
-    public String getReportForTag(Tag update, List<Tag> interestingChildren, TagCache cache) throws IOException, TemplateException {
+    public String getReportForTag(Tag update, Set<Tag> interestingChildren, TagCache cache) throws IOException, TemplateException {
         StringBuilder bodyBuffer = new StringBuilder();
         bodyBuffer.append(getTextForRuleUpdate(update, cache));
         
@@ -144,21 +144,30 @@ public class TextCreator {
      *            real problem.
      * @return the subject for the message
      */
-    public String getMailSubjectForStateChange(Tag update, List<Tag> interestingTags) {
+    public String getMailSubjectForStateChange(Tag update, Set<Tag> interestingTags) {
         logger.trace("TagID={} Building Mail subject..", update.getId());
 
         StringBuilder subject = new StringBuilder();
         subject.append("DMNNTFY [").append(update.getLatestStatus().toString().toUpperCase()).append("]: ");
         
-        if (interestingTags.size() == 0) {
-            subject.append(update.getLatestUpdate().getDescription());
-        } else if ((interestingTags.size() == 1 && !interestingTags.get(0).isRule()) || interestingTags.get(0).getLatestUpdate().getDescription().length() > SUBJECT_TEXT_MAXLEN) {
-            subject.append(interestingTags.get(0).getLatestUpdate().getName());
-        } else {
-            Tag single = interestingTags.get(0);
-            subject.append("DMNNTFY [").append(single.getLatestStatus().toString().toUpperCase()).append("]: ")
-                    .append(single.getLatestUpdate().getName());
+        // the title should be more descriptive if we directly point to the metric name. 
+        // For this, there must be only one metric in the interestingTags.
+        
+        Tag metric = null;
+        int metricTags = 0;
+        for (Tag t : interestingTags) {
+            if (!t.isRule()) {
+                metric = t;
+                metricTags++;
+            }
         }
+        
+        if (metricTags == 1) {
+            subject.append(metric.getLatestUpdate().getName());
+        } else {
+            subject.append(update.getLatestUpdate().getName());
+        }
+       
         logger.trace("Leaving getMailSubjectForStateChange()");
 
         return subject.toString();
@@ -282,7 +291,7 @@ public class TextCreator {
      * @throws IOException if there is a problem loading the template
      * @throws TemplateException in case there is a problem while setting the variables in the template.
      */
-    public String getFreeTextMapForChildren(List<Tag> list, TagCache tagCache) throws IOException, TemplateException {
+    public String getFreeTextMapForChildren(Set<Tag> list, TagCache tagCache) throws IOException, TemplateException {
 
         logger.debug("Entering getFreeTextMapForChildren()");
         List<HashMap<String, Object>> children = new ArrayList<HashMap<String, Object>>();
