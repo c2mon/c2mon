@@ -1,8 +1,0 @@
-<config>
-  <view>
-    <property name="url" type="java.lang.String" value="http://timweb.cern.ch/Views/Production/PS_Access_Primary_CTF/VueGenerale.CTFop.cmb" />
-    <property name="external" type="java.lang.Boolean" value="false" />
-  </view>
-  <property name="tree-open" type="java.lang.Boolean" value="false" />
-  <property name="views-navigation-tree-root-path" type="java.lang.String" value="Production/PS_Access_Primary_CTF" />
-</config>
