@@ -529,7 +529,7 @@ public class TagCache implements DataTagUpdateListener {
                 if (s.getLastNotifiedStatus().equals(Status.UNKNOWN)) {
                     s.setLastNotifiedStatus(Status.OK);
                 }
-                logger.debug("Starting subscription User={}, TagID={}", s.getSubscriberId(), s.getTagId());
+                
             
                 Tag t = get(s.getTagId());
                 
@@ -537,18 +537,27 @@ public class TagCache implements DataTagUpdateListener {
                     // unknown to the cache so far. need to resolve and 
                     // get latest values for initial notification
                     t = resolveSubTags(s.getTagId());
+                } else {
+                    // nothing to subscribe to 
                 }
+                
                 for (Tag c : t.getAllChildTagsRecursive()) {
                     if (c.isRule()) {
                         if (!s.getResolvedSubTagIds().contains(c.getId())) {
                             s.addResolvedSubTag(c.getId());
                             s.setLastStatusForResolvedTSubTag(c.getId(), Status.OK);
+                            
+                            logger.trace("User={} subscribes to TagID={}", s.getSubscriberId(), s.getTagId());
                         }
-                    } 
+                    } else {
+                        // datatag 
+                    }
+                    
                     toSubscribeTo.add(c.getId());
                     c.addSubscription(s);
                     
                 }
+                
                 t.addSubscription(s);
                 toSubscribeTo.add(t.getId());
             }
@@ -559,8 +568,6 @@ public class TagCache implements DataTagUpdateListener {
             for (Subscription s : list) {
                 notifier.sendInitialReport(get(s.getTagId()));
             }
-            
-            logger.debug("Finished initial report subscription list.");
             
             logger.debug("Starting C2MON subscription to {} tags", toSubscribeTo.size());
             startSubscriptionFor(toSubscribeTo);
