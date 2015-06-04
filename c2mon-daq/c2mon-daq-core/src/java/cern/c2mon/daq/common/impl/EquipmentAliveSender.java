@@ -22,6 +22,8 @@ package cern.c2mon.daq.common.impl;
 import static java.lang.String.format;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
@@ -56,9 +58,13 @@ class EquipmentAliveSender {
   private IProcessMessageSender processMessageSender;
 
   /**
-   * The last Equipment Alive Time Stamp
+   * Map to store the last sent Equipment or Sub-Equipment Alive timestamps for filtering purposes. <p>
+   * Key = alive tag id <br>
+   * value = timestamp in milliseconds
+   * 
+   * @see #sendEquipmentAliveFiltered(SourceDataTagValue, long)
    */
-  private Long lastEquipmentAliveTimestamp;
+  private final Map<Long, Long> lastEquipmentAlives = new HashMap<>();
 
   /**
    * The Equipment alive tag interval to be used for sending or not the
@@ -164,13 +170,13 @@ class EquipmentAliveSender {
   private boolean sendEquipmentAliveFiltered(final SourceDataTagValue aliveTagValue, final long timestamp) {
 
     if (PREVENT_TOO_FREQUENT_EQUIPMENT_ALIVES) {
-
+      Long lastEquipmentAliveTimestamp = this.lastEquipmentAlives.get(aliveTagValue.getId());
       boolean isSendEquipmentAlive = true;
-      if (this.lastEquipmentAliveTimestamp != null) {
+      if (lastEquipmentAliveTimestamp != null) {
 
         // if the time difference between the last eq. heartbeat and the current
         // one is at least half of the eq. alive interval defined
-        long diff = timestamp - this.lastEquipmentAliveTimestamp;
+        long diff = timestamp - lastEquipmentAliveTimestamp;
         long halfTime = Math.round(this.aliveTagInterval / 2.0);
 
         if (diff < halfTime) {
@@ -185,7 +191,7 @@ class EquipmentAliveSender {
 
       if (isSendEquipmentAlive) {
         doSendEquipmentAlive(aliveTagValue);
-        this.lastEquipmentAliveTimestamp = timestamp;
+        this.lastEquipmentAlives.put(aliveTagValue.getId(), timestamp);
         return true;
 
       } else {
