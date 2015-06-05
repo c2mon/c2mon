@@ -198,6 +198,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                         ignore.getMessage());
             }
         }
+        registry.updateLastModificationTime();
 
         /**
          * wait for all updates
