@@ -151,6 +151,7 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
       
       ControlTag aliveTagCopy = controlCache.getCopy(subEquipment.getAliveTagId());
       if (aliveTagCopy != null) {
+        LOGGER.trace("Setting correct aliveTag in SubEquipment " + subEquipment.getName());
         ((ControlTagCacheObject)aliveTagCopy).setSubEquipmentId(subEquipment.getId());
         ((ControlTagCacheObject)aliveTagCopy).setProcessId(equipment.getProcessId());
         controlCache.putQuiet(aliveTagCopy);
@@ -163,11 +164,10 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
       
       ControlTag commFaultTagCopy = controlCache.getCopy(subEquipment.getCommFaultTagId());
       if (commFaultTagCopy != null) {
+        LOGGER.trace("Setting correct commFaultTag in SubEquipment " + subEquipment.getName());
         ((ControlTagCacheObject)commFaultTagCopy).setSubEquipmentId(subEquipment.getId());
         ((ControlTagCacheObject)commFaultTagCopy).setProcessId(equipment.getProcessId());
         controlCache.putQuiet(commFaultTagCopy);
-        DataTagAdd toAdd = new DataTagAdd(element.getSequenceId(), subEquipment.getId(), controlTagFacade.generateSourceDataTag(commFaultTagCopy));
-        changes.add(new ProcessChange(equipment.getProcessId(), toAdd));
       } else {
         // TODO change to ConfigurationException
         throw new IllegalArgumentException("No commfault tag (" + subEquipment.getCommFaultTagId() + ") found for subequipment " + subEquipment.getName());
@@ -175,11 +175,10 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
       
       ControlTag statusTagCopy = controlCache.getCopy(subEquipment.getStateTagId());
       if (statusTagCopy != null) {
+        LOGGER.trace("Setting correct statusTagCopy in SubEquipment " + subEquipment.getName());
         ((ControlTagCacheObject)statusTagCopy).setSubEquipmentId(subEquipment.getId());
         ((ControlTagCacheObject)statusTagCopy).setProcessId(equipment.getProcessId());
         controlCache.putQuiet(statusTagCopy);
-        DataTagAdd toAdd = new DataTagAdd(element.getSequenceId(), subEquipment.getId(), controlTagFacade.generateSourceDataTag(statusTagCopy));
-        changes.add(new ProcessChange(equipment.getProcessId(), toAdd));
       } else {
         // TODO change to ConfigurationException
         throw new IllegalArgumentException("No status tag (" + subEquipment.getStateTagId() + ") found for subequipment " + subEquipment.getName());

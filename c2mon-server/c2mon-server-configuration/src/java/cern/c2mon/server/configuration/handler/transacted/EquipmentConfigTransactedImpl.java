@@ -134,8 +134,6 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
         ((ControlTagCacheObject)commFaultTagCopy).setEquipmentId(equipment.getId());
         ((ControlTagCacheObject)commFaultTagCopy).setProcessId(equipment.getProcessId());
         controlCache.putQuiet(commFaultTagCopy);
-        DataTagAdd toAdd = new DataTagAdd(element.getSequenceId(), equipment.getId(), controlTagFacade.generateSourceDataTag(commFaultTagCopy));
-        changes.add(new ProcessChange(equipment.getProcessId(), toAdd));
       } else {
         // TODO change to ConfigurationException
         throw new IllegalArgumentException("No commfault tag (" + equipment.getCommFaultTagId() + ") found for equipment " + equipment.getName());
@@ -146,8 +144,6 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
         ((ControlTagCacheObject)statusTagCopy).setEquipmentId(equipment.getId());
         ((ControlTagCacheObject)statusTagCopy).setProcessId(equipment.getProcessId());
         controlCache.putQuiet(statusTagCopy);
-        DataTagAdd toAdd = new DataTagAdd(element.getSequenceId(), equipment.getId(), controlTagFacade.generateSourceDataTag(statusTagCopy));
-        changes.add(new ProcessChange(equipment.getProcessId(), toAdd));
       } else {
         // TODO change to ConfigurationException
         throw new IllegalArgumentException("No status tag (" + equipment.getStateTagId() + ") found for equipment " + equipment.getName());
