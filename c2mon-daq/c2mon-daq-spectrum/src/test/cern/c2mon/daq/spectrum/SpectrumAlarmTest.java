@@ -5,7 +5,6 @@
 package cern.c2mon.daq.spectrum;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -17,11 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.spectrum.SpectrumEvent.SpectrumEventType;
 import cern.c2mon.daq.spectrum.listener.impl.SpectrumListenerJunit;
-import cern.c2mon.daq.spectrum.util.JsonUtils;
 import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
-import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@ContextConfiguration("/resources/dmn-spectrum-config.xml")
@@ -31,26 +28,21 @@ public class SpectrumAlarmTest extends GenericMessageHandlerTst {
 
     Logger LOG = LoggerFactory.getLogger(SpectrumAlarmTest.class);
     protected static SpectrumMessageHandler theHandler;
-    private static SpectrumEquipConfig config;
+    
+    String primaryServer = "cs-srv-44.cern.ch";
+    String secondaryServer = "cs-srv-45.cern.ch";
+    int port = 12001;
     
     //
     // --- TEST --------------------------------------------------------------------------------
-    //
-    @UseConf("spectrum_test_1.xml")
-    @Test
-    public void testConfig() {
-        assertNotNull(config.getPrimaryServer());
-        assertNotNull(config.getSecondaryServer());
-        assertTrue(config.getPort() > 1000);
-    }
-    
+    //    
     @UseConf("spectrum_test_1.xml")
     @Test
     public void testBasicInterface() {
         LOG.info("Operating test ...");
 
         // test simple on/off
-        SpectrumTestUtil.sendMessage(config.getPrimaryServer(), SpectrumEventType.SET, "acmmnr", 10009);        
+        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "acmmnr", 10009);        
         sleep(3);        
         assertTrue(SpectrumTestUtil.getValue(theHandler,  1L));
         
@@ -58,16 +50,16 @@ public class SpectrumAlarmTest extends GenericMessageHandlerTst {
         assertTrue(alarm.isAlarmOn());
         assertTrue(alarm.getAlarmCount() == 1);
         
-        SpectrumTestUtil.sendMessage(config.getPrimaryServer(), SpectrumEventType.CLR, "acmmnr", 10009);
+        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.CLR, "acmmnr", 10009);
         
         sleep(3);
         assertFalse(SpectrumTestUtil.getValue(theHandler,  1L));
         assertTrue(!alarm.isAlarmOn());
         assertTrue(alarm.getAlarmCount() == 0);
         
-        SpectrumTestUtil.sendMessage(config.getPrimaryServer(), SpectrumEventType.SET, "acmmnr", 10009);        
-        SpectrumTestUtil.sendMessage(config.getPrimaryServer(), SpectrumEventType.SET, "acmmnr", 10010);
-        SpectrumTestUtil.sendMessage(config.getPrimaryServer(), SpectrumEventType.SET, "cs-ccr-dmnp1", 10010);
+        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "acmmnr", 10009);        
+        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "acmmnr", 10010);
+        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-dmnp1", 10010);
         sleep(3);        
         assertTrue(SpectrumTestUtil.getValue(theHandler,  1L));
         assertNull(SpectrumListenerJunit.getListener().getAlarm("cs-ccr-dmnp1"));
@@ -75,12 +67,12 @@ public class SpectrumAlarmTest extends GenericMessageHandlerTst {
         assertTrue(SpectrumTestUtil.getValue(alarm.getTag()));
 
         
-        SpectrumTestUtil.sendMessage(config.getPrimaryServer(), SpectrumEventType.CLR, "acmmnr", 10009);                
+        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.CLR, "acmmnr", 10009);                
         sleep(3);
         assertTrue(SpectrumTestUtil.getValue(theHandler,  1L));
         assertTrue(alarm.getAlarmCount() == 1);
 
-        SpectrumTestUtil.sendMessage(config.getPrimaryServer(), SpectrumEventType.CLR, "acmmnr", 10010);                
+        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.CLR, "acmmnr", 10010);                
         sleep(3);
         assertFalse(SpectrumTestUtil.getValue(theHandler,  1L));
         assertFalse(SpectrumTestUtil.getValue(alarm.getTag()));
@@ -99,8 +91,8 @@ public class SpectrumAlarmTest extends GenericMessageHandlerTst {
         theHandler = (SpectrumMessageHandler) msgHandler;        
         theHandler.connectToDataSource();
                 
-        IEquipmentConfiguration eqCfg = theHandler.getEquipmentConfiguration();
-        config = JsonUtils.fromJson(eqCfg.getAddress(), SpectrumEquipConfig.class);
+//        IEquipmentConfiguration eqCfg = theHandler.getEquipmentConfiguration();
+//        config = JsonUtils.fromJson(eqCfg.getAddress(), SpectrumEquipConfig.class);
         
         LOG.info("Init done.");
     }

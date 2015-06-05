@@ -14,7 +14,6 @@ import javax.jms.TextMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cern.c2mon.daq.spectrum.SpectrumEquipConfig;
 import cern.c2mon.daq.spectrum.SpectrumEvent;
 import cern.c2mon.daq.spectrum.SpectrumEventProcessor;
 import cern.c2mon.daq.spectrum.listener.SpectrumListenerIntf;
@@ -39,7 +38,7 @@ public class SpectrumListenerJms implements SpectrumListenerIntf, MessageListene
     public void run() {
         cont = true;
         try {
-//            Class<?> cls = Class.forName(System.getProperty("diamon.jms.provider"));
+            LOG.info("Starting Spectrum JMS listener ...");
             JmsProviderIntf jms = new SonicConnector();
             Connection conn = jms.getConnection();
             conn.start();
@@ -63,16 +62,12 @@ public class SpectrumListenerJms implements SpectrumListenerIntf, MessageListene
         } catch (Exception e) {
             LOG.error("Failure in Spectrum mock thread", e);
         }                    
-        LOG.info("Spectrum mock stopped...");
+        LOG.info("Spectrum JMS listener stopped.");
     }
 
     //
     // --- Implements SpectrumListenerIntf ---------------------------------------------------------
     //
-    @Override
-    public void setConfig(SpectrumEquipConfig config) {
-//        this.config = config;
-    }
 
     @Override
     public void shutdown() {
@@ -81,13 +76,8 @@ public class SpectrumListenerJms implements SpectrumListenerIntf, MessageListene
     }
 
     @Override
-    public void setQueue(Queue<SpectrumEvent> eventQueue) {
-        this.eventQueue = eventQueue;
-    }
-
-    @Override
     public void setProcessor(SpectrumEventProcessor proc) {
-        //
+        this.eventQueue = proc.getQueue();
     }
 
     @Override

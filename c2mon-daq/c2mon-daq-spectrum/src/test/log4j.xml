@@ -17,17 +17,17 @@
 	</appender>
 
 	<logger name="org.springframework" additivity="false">
-		<level value="warn" />
+		<level value="warn"/>
 		<appender-ref ref="ConsoleAppender" />
 	</logger>
 
 	<logger name="SourceDataTagLogger" additivity="false">
-		<level value="debug" />
+		<level value="debug"/>
 		<appender-ref ref="ConsoleAppender" />
 	</logger>
 
 	<root>
-		<level value="debug" additivity="false" />
+		<level value="debug" />
 		<appender-ref ref="ConsoleAppender" />
 	</root>
 

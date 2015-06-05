@@ -16,7 +16,6 @@ import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
 import cern.c2mon.daq.spectrum.address.SpectrumHardwareAddress;
 import cern.c2mon.daq.spectrum.address.SpectrumHardwareAddressFactory;
 import cern.c2mon.daq.spectrum.listener.SpectrumListenerIntf;
-import cern.c2mon.daq.spectrum.util.JsonUtils;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataQuality;
@@ -30,9 +29,6 @@ import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
  * TODO create unit tests especially for referencing/dereferencing alarms for the same host (based on fake message
  *      added by the unit tests to the event queue and than checking for result on tag)
  * 
- * TODO change prod system to forward messages?
- *      
- * TODO create deployment project
  * TODO install and compare results to production status
  *      
  * @author mbuttner
@@ -61,18 +57,14 @@ public class SpectrumMessageHandler extends EquipmentMessageHandler
             ctx.refresh();
         }
         
-        IEquipmentConfiguration config = getEquipmentConfiguration();
-        SpectrumEquipConfig spectrumConfig = JsonUtils.fromJson(config.getAddress(), SpectrumEquipConfig.class);
-
         proc = ctx.getBean("eventProc", SpectrumEventProcessor.class);
         proc.setSender(getEquipmentMessageSender());
-        proc.setConfig(spectrumConfig);
         procThr = new Thread(proc);
 
-        spectrum = SpectrumConnector.getListener();
-        spectrum.setConfig(spectrumConfig);
-        spectrum.setQueue(proc.getQueue());
+        spectrum = ctx.getBean("eventListener", SpectrumListenerIntf.class);
         spectrum.setProcessor(proc);
+        
+        
         listenerThr = new Thread(spectrum);
 
         for (ISourceDataTag tag : getEquipmentConfiguration().getSourceDataTags().values()) {

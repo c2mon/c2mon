@@ -14,20 +14,22 @@
 
 	<context:property-placeholder ignore-resource-not-found="true" ignore-unresolvable="true" />
 
-	<bean id="eventProc" class="cern.c2mon.daq.spectrum.SpectrumEventProcessor" />
+	<bean id="eventProc" class="cern.c2mon.daq.spectrum.SpectrumEventProcessor" >
+		<property name="primaryServer" value="cs-srv-44.cern.ch" />
+		<property name="secondaryServer" value="cs-srv-45.cern.ch" />
+		<property name="port" value="12001" />
+	</bean>
 
 	<beans profile="PRO">
-
 		<context:property-placeholder location="file:${almon.properties}"
 			ignore-resource-not-found="true" ignore-unresolvable="true" />
-
+		<bean id="eventListener" class="cern.c2mon.daq.spectrum.listener.impl.SpectrumListenerJms" />
 	</beans>
 
 	<beans profile="TEST">
-
 		<context:property-placeholder location="classpath:resources/test.properties"
 			ignore-resource-not-found="true" ignore-unresolvable="true" />
-
+		<bean id="eventListener" class="cern.c2mon.daq.spectrum.listener.impl.SpectrumListenerMock" />
 	</beans>
 
 </beans>

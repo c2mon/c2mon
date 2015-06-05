@@ -76,7 +76,7 @@ import cern.c2mon.shared.common.datatag.ISourceDataTag;
 @ManagedResource(objectName = "cern.c2mon.daq.spectrum:name=SpectrumEventProcessor", 
                     description = "Spectrum alarms event processor")
 
-public class SpectrumEventProcessor implements Runnable {
+public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
         
     private static final Logger LOG = LoggerFactory.getLogger(SpectrumEventProcessor.class);
     public static final String DEFAULT_DATE_FORMAT = "dd-MMM-yyyy HH:mm:ss";
@@ -84,7 +84,6 @@ public class SpectrumEventProcessor implements Runnable {
     public static final long BACKUP_DELAY = 7 * 60 * 1000; // 5mn in reality, but let them some delay ...
     
     private IEquipmentMessageSender equipmentMessageSender;
-    private SpectrumEquipConfig config;
     private ConcurrentHashMap<String, SpectrumAlarm> monitoredHosts = new ConcurrentHashMap<String, SpectrumAlarm>();
     private boolean cont = true;
     
@@ -104,11 +103,7 @@ public class SpectrumEventProcessor implements Runnable {
     public void setSender(IEquipmentMessageSender equipmentMessageSender) {        
         this.equipmentMessageSender = equipmentMessageSender;
     }
-    
-    public void setConfig(SpectrumEquipConfig config) {        
-        this.config = config;
-    }
-    
+        
     public void shutdown()
     {
         cont = false;
@@ -164,12 +159,12 @@ public class SpectrumEventProcessor implements Runnable {
     @ManagedAttribute
     public List<String> getConnectionStatus() {
         ArrayList<String> result = new ArrayList<String>();
-        String s1 = config.getPrimaryServer() + " " + 
+        String s1 = getPrimaryServer() + " " + 
                 Boolean.valueOf(primaryOk).toString() + " " + 
                 DATE_FMT.format(new Date(this.lastEventPrimary)) + " " + 
                 DATE_FMT.format(new Date(this.lastKalPrimary));
         result.add(s1);
-        String s2 = config.getSecondaryServer() + " " + 
+        String s2 = getSecondaryServer() + " " + 
                 Boolean.valueOf(secondaryOk).toString() + " " + 
                 DATE_FMT.format(new Date(this.lastEventSecondary)) + " " + 
                 DATE_FMT.format(new Date(this.lastKalSecondary));
@@ -192,7 +187,7 @@ public class SpectrumEventProcessor implements Runnable {
         while (cont) {
             try {                
                 // if no event is available, we will sleep for 2 seconds ...
-                Thread.sleep(2 * 1000);
+                Thread.sleep(1 * 1000);
                 
                 // time check the server status here (once per 2 minutes)
                 if (loopcounter % 60 == 0) {
@@ -209,7 +204,7 @@ public class SpectrumEventProcessor implements Runnable {
                 }
 
                 loopcounter++;
-                LOG.debug("Processor loop " + loopcounter);
+                LOG.trace("Processor loop " + loopcounter);
                 
                 // ... and than process whatever is available on the event queue.
                 while (!eventQueue.isEmpty()) {
@@ -287,19 +282,19 @@ public class SpectrumEventProcessor implements Runnable {
     private void setLastKeepAliveTs(String serverName, boolean spectrumNotifierOk) {
         boolean valid = false;
         LOG.info("KAL for {} -> {}", serverName, Boolean.valueOf(spectrumNotifierOk).toString());
-        if (serverName.equals(config.getPrimaryServer())) {
+        if (serverName.equals(getPrimaryServer())) {
             this.lastKalPrimary = System.currentTimeMillis();
             primaryOk = spectrumNotifierOk;
             valid = true;
         }
-        if (serverName.equals(config.getSecondaryServer())) {
+        if (serverName.equals(getSecondaryServer())) {
             this.lastKalSecondary = System.currentTimeMillis();
             secondaryOk = spectrumNotifierOk;            
             valid = true;
         }        
         if (!valid) {
             LOG.error("Message not valid for actual configuration: (1) {} (2) {}", 
-                    config.getPrimaryServer(), config.getSecondaryServer());            
+                    getPrimaryServer(), getSecondaryServer());            
         }
     }
 
@@ -318,7 +313,7 @@ public class SpectrumEventProcessor implements Runnable {
     }
 
     private void setLastEventTs(String serverName, long uts) {
-        if (serverName.equals(config.getPrimaryServer())) {
+        if (serverName.equals(getPrimaryServer())) {
             if (uts < this.lastEventPrimary)
             {
                 LOG.warn("{} sent messages in unconsistent chronological order ...", serverName);
@@ -326,7 +321,7 @@ public class SpectrumEventProcessor implements Runnable {
             }
             this.lastEventPrimary = uts;
         }
-        if (serverName.equals(config.getSecondaryServer())) {
+        if (serverName.equals(getSecondaryServer())) {
             if (uts < this.lastEventSecondary)
             {
                 LOG.warn("{} sent messages in unconsistent chronological order ...", serverName);

@@ -9,7 +9,6 @@ import java.util.Queue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cern.c2mon.daq.spectrum.SpectrumEquipConfig;
 import cern.c2mon.daq.spectrum.SpectrumEvent;
 import cern.c2mon.daq.spectrum.SpectrumEventProcessor;
 import cern.c2mon.daq.spectrum.listener.SpectrumListenerIntf;
@@ -25,7 +24,6 @@ public class SpectrumListenerMock implements SpectrumListenerIntf {
 
     private static final Logger LOG = LoggerFactory.getLogger(SpectrumListenerMock.class);
     
-    private SpectrumEquipConfig config;     // primary and secondary server, port for listening
     private SpectrumEventProcessor proc;
     private Queue<SpectrumEvent> eventQueue;        // reference to the @see EventProcessor queue
     private boolean cont = true;            // used by shutdown for smooth interrupt
@@ -48,7 +46,7 @@ public class SpectrumListenerMock implements SpectrumListenerIntf {
                     LOG.trace("Raw:  {}", ligne);
                     LOG.trace("Trim: {}", msg);
 
-                    SpectrumEvent event = new SpectrumEvent(config.getPrimaryServer(), msg);
+                    SpectrumEvent event = new SpectrumEvent(proc.getPrimaryServer(), msg);
                     if (proc.isInteresting(event))
                     {
                         Thread.sleep(5 * 1000); // first attempt: inject one event per n seconds
@@ -79,10 +77,6 @@ public class SpectrumListenerMock implements SpectrumListenerIntf {
     //
     // --- Implements SpectrumListenerIntf ---------------------------------------------------------
     //
-    @Override
-    public void setConfig(SpectrumEquipConfig config) {
-        this.config = config;
-    }
 
     @Override
     public void shutdown() {
@@ -90,14 +84,12 @@ public class SpectrumListenerMock implements SpectrumListenerIntf {
         cont = false;
     }
 
-    @Override
-    public void setQueue(Queue<SpectrumEvent> eventQueue) {
-        this.eventQueue = eventQueue;
-    }
 
     @Override
     public void setProcessor(SpectrumEventProcessor proc) {
         this.proc = proc;
+        this.eventQueue = proc.getQueue();
+        LOG.info("Listener enabled.");
     }
 
 }

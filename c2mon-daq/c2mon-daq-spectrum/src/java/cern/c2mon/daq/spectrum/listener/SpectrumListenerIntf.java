@@ -4,10 +4,6 @@
 
 package cern.c2mon.daq.spectrum.listener;
 
-import java.util.Queue;
-
-import cern.c2mon.daq.spectrum.SpectrumEquipConfig;
-import cern.c2mon.daq.spectrum.SpectrumEvent;
 import cern.c2mon.daq.spectrum.SpectrumEventProcessor;
 
 /**
@@ -18,11 +14,7 @@ import cern.c2mon.daq.spectrum.SpectrumEventProcessor;
  */
 public interface SpectrumListenerIntf extends Runnable {
 
-    void setConfig(SpectrumEquipConfig config);
-
     void shutdown();
-
-    void setQueue(Queue<SpectrumEvent> queue);
 
     void setProcessor(SpectrumEventProcessor proc);
 

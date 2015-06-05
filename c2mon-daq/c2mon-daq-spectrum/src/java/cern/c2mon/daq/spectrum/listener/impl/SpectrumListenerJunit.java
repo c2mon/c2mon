@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.spectrum.SpectrumAlarm;
-import cern.c2mon.daq.spectrum.SpectrumEquipConfig;
 import cern.c2mon.daq.spectrum.SpectrumEvent;
 import cern.c2mon.daq.spectrum.SpectrumEventProcessor;
 import cern.c2mon.daq.spectrum.listener.SpectrumListenerIntf;
@@ -63,10 +62,6 @@ public class SpectrumListenerJunit implements SpectrumListenerIntf {
     //
     // --- Implements SpectrumListenerIntf --------------------------------------------------------
     //
-    @Override
-    public void setConfig(SpectrumEquipConfig config) {
-        //
-    }
 
     @Override
     public void shutdown() {
@@ -74,14 +69,10 @@ public class SpectrumListenerJunit implements SpectrumListenerIntf {
     }
 
     @Override
-    public void setQueue(Queue<SpectrumEvent> queue) {
-        LOG.info("Listener enabled.");
-        this.queue = queue;
-    }
-
-    @Override
     public void setProcessor(SpectrumEventProcessor proc) {
         this.proc = proc;
+        this.queue = proc.getQueue();
+        LOG.info("Listener enabled.");
     }
 
 }

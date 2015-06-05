@@ -14,7 +14,6 @@ import java.util.Queue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cern.c2mon.daq.spectrum.SpectrumEquipConfig;
 import cern.c2mon.daq.spectrum.SpectrumEvent;
 import cern.c2mon.daq.spectrum.SpectrumEventProcessor;
 import cern.c2mon.daq.spectrum.listener.SpectrumListenerIntf;
@@ -31,12 +30,11 @@ import cern.c2mon.daq.spectrum.listener.SpectrumListenerIntf;
  */
 public class SpectrumListenerTcp implements Runnable, SpectrumListenerIntf {
 
-    private static final Logger log = LoggerFactory.getLogger(SpectrumListenerTcp.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SpectrumListenerTcp.class);
     private static SpectrumListenerTcp listener;
     
-    private SpectrumEquipConfig config;
     private boolean cont = true;
-
+    private SpectrumEventProcessor proc;
     private Queue<SpectrumEvent> eventQueue;
     
     //
@@ -55,10 +53,6 @@ public class SpectrumListenerTcp implements Runnable, SpectrumListenerIntf {
     //
     // --- PUBLIC METHODS -------------------------------------------------------------------
     //
-    @Override
-    public void setConfig(SpectrumEquipConfig config) {
-        this.config = config;
-    }
     
     /**
      * Sets the "cont" flag to false, so that the thread stops after the next request.
@@ -66,11 +60,6 @@ public class SpectrumListenerTcp implements Runnable, SpectrumListenerIntf {
     @Override
     public void shutdown() {
         cont = false;
-    }
-
-    @Override
-    public void setQueue(Queue<SpectrumEvent> eventQueue) {
-        this.eventQueue = eventQueue;
     }
         
     /**
@@ -82,7 +71,7 @@ public class SpectrumListenerTcp implements Runnable, SpectrumListenerIntf {
     public void run() {
         try {
             int loopCounter = 0;
-            ServerSocket srvr = new ServerSocket(config.getPort());
+            ServerSocket srvr = new ServerSocket(proc.getPort());
             while (cont) {
                 try {
                     loopCounter++;
@@ -92,18 +81,18 @@ public class SpectrumListenerTcp implements Runnable, SpectrumListenerIntf {
                     InetAddress ia = skt.getInetAddress();
                     String serverName = ia.getHostName();
                         
-                    if (serverName.equals(config.getPrimaryServer()) || 
-                        serverName.equals(config.getSecondaryServer())) {                 
+                    if (serverName.equals(proc.getPrimaryServer()) || 
+                        serverName.equals(proc.getSecondaryServer())) {                 
                         
-                        log.info("Request " + loopCounter + " received from " + serverName);
+                        LOG.info("Request " + loopCounter + " received from " + serverName);
                         BufferedReader in = new BufferedReader(new InputStreamReader(skt.getInputStream()));
                         while (!in.ready()) { /**/ }
                         String msg = in.readLine();
                         eventQueue.add(new SpectrumEvent(serverName, msg));
                         in.close();
-                        log.info("Event " + msg + " processed.");
+                        LOG.info("Event " + msg + " processed.");
                     } else {
-                        log.error("Rejected request from " + serverName + " (this server IS NOT on the whitelist !!!)");
+                        LOG.error("Rejected request from " + serverName + " (this server IS NOT on the whitelist !!!)");
                     }
                     skt.close();
                 } catch (Exception e) {
@@ -118,7 +107,9 @@ public class SpectrumListenerTcp implements Runnable, SpectrumListenerIntf {
 
     @Override
     public void setProcessor(SpectrumEventProcessor proc) {
-        //
+        this.proc = proc;
+        this.eventQueue = proc.getQueue();
+        LOG.info("Listener enabled.");
     }
     
 }
