@@ -198,7 +198,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                         ignore.getMessage());
             }
         }
-        registry.updateLastModificationTime();
+        
 
         /**
          * wait for all updates
@@ -210,6 +210,8 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                 e.printStackTrace();
             }
         }
+        
+        registry.updateLastModificationTime();
 
         synchronized (updatedTags) {
             updatedTags.clear();
