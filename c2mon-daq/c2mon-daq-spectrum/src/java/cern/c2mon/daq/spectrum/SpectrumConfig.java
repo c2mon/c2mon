@@ -5,8 +5,8 @@
 package cern.c2mon.daq.spectrum;
 
 /**
- * Classes needing to be configured with the Spectrum connection parameters should extends this one.
- * The server names and ports can than be configured by Spring.
+ * Dataholder for configuration data, which will be initialized from the Spring context for
+ * classes extending this one (like the SpectrumEventProcessor does).
  * 
  * @author mbuttner
  */
@@ -16,6 +16,9 @@ public abstract class SpectrumConfig {
     private String secondaryServer;
     private int port;
     
+    //
+    // --- PUBLIC METHODS ---------------------------------------------------------------------
+    //
     public String getPrimaryServer() {
         return primaryServer;
     }

@@ -92,6 +92,9 @@ public class SpectrumAlarm {
         }
     }
 
+    /**
+     * That one is used to perist the situation when the DAQ is stopped.
+     */
     public Collection<Long> getAlarmIds() {
         return this.spectrumAlarmIds;
     }

@@ -26,6 +26,7 @@ public class SpectrumTestUtil {
     private SpectrumTestUtil() {        
     }
 
+    
     public static boolean getValue(ISourceDataTag iSourceDataTag) {
         SourceDataTagValue v = iSourceDataTag.getCurrentValue();
         Boolean b = (Boolean) v.getValue();
