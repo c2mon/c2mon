@@ -71,7 +71,7 @@ public class SpectrumListenerJms implements SpectrumListenerIntf, MessageListene
 
     @Override
     public void shutdown() {
-        LOG.info("Stopping the Spectrum mock ...");
+        LOG.info("Stopping the Spectrum JMS listener ...");
         cont = false;
     }
 

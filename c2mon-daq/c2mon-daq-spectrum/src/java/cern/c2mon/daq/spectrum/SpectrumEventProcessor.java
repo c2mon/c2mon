@@ -114,8 +114,43 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
         
     public void shutdown()
     {
-        cont = false;
-    }
+        SpectrumEventProcessor.LOG.warn("Going down: need to dump the buffer!");        
+        ArrayList<String> result = new ArrayList<String>();
+        for (String hostname : monitoredHosts.keySet()) {
+            SpectrumAlarm alarm = monitoredHosts.get(hostname);
+            if (alarm.isAlarmOn()) {                
+                result.add(hostname);
+            }
+        }
+        Collections.sort(result);
+
+        PrintWriter pw = null;
+        try
+        {
+            pw = new PrintWriter(SpectrumEventProcessor.BUFFER_NAME);
+            for (String hostname : result)
+            {
+                pw.print(hostname);
+                SpectrumAlarm alarm = monitoredHosts.get(hostname);
+                for (Long l : alarm.getAlarmIds())
+                {
+                    pw.print("," + l);
+                }
+                pw.println();
+            }
+        }
+        catch (IOException ie)
+        {
+            SpectrumEventProcessor.LOG.error("Failed to dump alarm buffer!", ie);
+        }
+        finally
+        {
+            if (pw != null)
+            {
+                pw.close();
+            }
+        }
+     }
     
     public Queue<SpectrumEvent> getQueue() {
         return eventQueue;
@@ -192,8 +227,6 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
         lastKalPrimary = System.currentTimeMillis();
         lastKalSecondary = System.currentTimeMillis();
 
-        Runtime.getRuntime().addShutdownHook(new DumpBuffer(this.monitoredHosts));
-        
         // attempt to read buffer and activate stuff from prior run
         loadBuffer();
         
@@ -396,55 +429,4 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
         }                
     }
 
-}
-
-class DumpBuffer extends Thread
-{
-    private ConcurrentHashMap<String, SpectrumAlarm> monitoredHosts;
-
-    public DumpBuffer(ConcurrentHashMap<String, SpectrumAlarm> monitoredHosts)
-    {
-        this.monitoredHosts = monitoredHosts;
-    }
-    
-    @Override
-    public void run()
-    {
-        SpectrumEventProcessor.LOG.warn("Going down: need to dump the buffer!");        
-        ArrayList<String> result = new ArrayList<String>();
-        for (String hostname : monitoredHosts.keySet()) {
-            SpectrumAlarm alarm = monitoredHosts.get(hostname);
-            if (alarm.isAlarmOn()) {                
-                result.add(hostname);
-            }
-        }
-        Collections.sort(result);
-
-        PrintWriter pw = null;
-        try
-        {
-            pw = new PrintWriter(SpectrumEventProcessor.BUFFER_NAME);
-            for (String hostname : result)
-            {
-                pw.print(hostname);
-                SpectrumAlarm alarm = monitoredHosts.get(hostname);
-                for (Long l : alarm.getAlarmIds())
-                {
-                    pw.print("," + l);
-                }
-                pw.println();
-            }
-        }
-        catch (IOException ie)
-        {
-            SpectrumEventProcessor.LOG.error("Failed to dump alarm buffer!", ie);
-        }
-        finally
-        {
-            if (pw != null)
-            {
-                pw.close();
-            }
-        }
-    }
 }
