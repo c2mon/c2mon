@@ -16,6 +16,29 @@
 		</layout>
 	</appender>
 
+  <appender name="FileAppender" class="org.apache.log4j.RollingFileAppender">
+    <param name="Append" value="true" />
+    <param name="File" value="${c2mon.log.dir}/TEST.log" />
+    <param name="MaxBackupIndex" value="10" />
+    <param name="MaxFileSize" value="100MB" />
+    <param name="BufferedIO" value="false" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n"/>
+    </layout>
+  </appender>
+
+  <appender name="SpectrumAppender" class="org.apache.log4j.RollingFileAppender">
+    <param name="Append" value="true" />
+    <param name="File" value="${c2mon.log.dir}/SPECTRUM.log" />
+    <param name="MaxBackupIndex" value="10" />
+    <param name="MaxFileSize" value="100MB" />
+    <param name="BufferedIO" value="false" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n"/>
+    </layout>
+  </appender>
+
+
 	<logger name="org.springframework" additivity="false">
 		<level value="warn"/>
 		<appender-ref ref="ConsoleAppender" />
@@ -26,9 +49,15 @@
 		<appender-ref ref="ConsoleAppender" />
 	</logger>
 
+	<logger name="SpectrumEventProcessor" additivity="false">
+		<level value="trace"/>
+		<appender-ref ref="SpectrumAppender" />
+	</logger>
+
 	<root>
 		<level value="debug" />
 		<appender-ref ref="ConsoleAppender" />
+		<appender-ref ref="FileAppender" />
 	</root>
 
 </log4j:configuration>

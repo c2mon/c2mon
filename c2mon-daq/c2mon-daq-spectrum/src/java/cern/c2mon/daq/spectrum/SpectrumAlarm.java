@@ -5,6 +5,7 @@
 package cern.c2mon.daq.spectrum;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 
@@ -72,6 +73,7 @@ public class SpectrumAlarm {
         alarmOn = true;
     }
 
+    
     /**
      * Remove the specified error. If after the call the list is empty, the alarms is
      * considered to be off
@@ -88,6 +90,10 @@ public class SpectrumAlarm {
         {
             alarmOn = false;
         }
+    }
+
+    public Collection<Long> getAlarmIds() {
+        return this.spectrumAlarmIds;
     }
     
 }
