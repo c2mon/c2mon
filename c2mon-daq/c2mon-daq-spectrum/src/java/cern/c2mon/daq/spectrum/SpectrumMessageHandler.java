@@ -79,14 +79,16 @@ public class SpectrumMessageHandler extends EquipmentMessageHandler
 
     @Override
     public void disconnectFromDataSource() throws EqIOException {
-       spectrum.shutdown();
-       proc.shutdown();
-       try {
-           listenerThr.join(5 * 1000);
-           procThr.join(5 * 1000);
-       } catch (Exception e) {
-           throw new EqIOException("Failed to stop connection threads for the equipment");
-       }
+        LOG.warn("Received disconnection request ...");
+        spectrum.shutdown();
+        proc.shutdown();
+        try {
+            listenerThr.join(5 * 1000);
+            procThr.join(5 * 1000);
+        } catch (Exception e) {
+            throw new EqIOException("Failed to stop connection threads for the equipment");
+        }
+        LOG.info("Disconnection request processed.");
     }
     
     @Override

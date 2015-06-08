@@ -114,7 +114,7 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
         
     public void shutdown()
     {
-        SpectrumEventProcessor.LOG.warn("Going down: need to dump the buffer!");        
+        LOG.warn("Going down: need to dump the buffer!");        
         ArrayList<String> result = new ArrayList<String>();
         for (String hostname : monitoredHosts.keySet()) {
             SpectrumAlarm alarm = monitoredHosts.get(hostname);
