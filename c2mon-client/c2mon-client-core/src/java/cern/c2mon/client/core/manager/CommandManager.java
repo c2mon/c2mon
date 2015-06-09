@@ -108,7 +108,7 @@ public class CommandManager implements C2monCommandManager {
   }
 
   
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
   public <T> Set<ClientCommandTag<T>> getCommandTags(final Set<Long> pIds) {
     Set<ClientCommandTag<T>> resultSet = new HashSet<ClientCommandTag<T>>();
@@ -146,7 +146,7 @@ public class CommandManager implements C2monCommandManager {
       Collection<CommandTagHandle> commandTagHandles = clientRequestHandler.requestCommandTagHandles(newCommandTagIds);
       if (commandTagHandles != null) {
         ClientCommandTagImpl cct = null;
-        for (CommandTagHandle<Object> tagHandle : commandTagHandles) {
+        for (CommandTagHandle tagHandle : commandTagHandles) {
           cct = this.commandCache.get(tagHandle.getId());
           // update ClientCommandTag object
           if (cct != null) { // found the ClientCommandTag object
