@@ -212,17 +212,22 @@ public class SpectrumEvent {
         if (this.ipAddress.length() > 0) {
             try {
                 java.net.InetAddress inetAdd = java.net.InetAddress.getByName(ipAddress); 
-                hostname =  inetAdd.getHostName();
-                if (hostname != null) {
+                LOG.info("Hostname is [" + inetAdd.getCanonicalHostName() + "]");
+                hostname =  inetAdd.getCanonicalHostName();
+                if (hostname != null && !hostname.equals(ipAddress)) {
                     hostname = hostname.toUpperCase();
                     int domainPos = hostname.indexOf(".CERN.CH"); 
                     if ( domainPos > 0) hostname = hostname.substring(0, domainPos);
+                }
+                else
+                {
+                    LOG.warn("Failed to convert [" + ipAddress + "] into a valid hostname");
                 }
             } catch(java.net.UnknownHostException uhe) {
                 hostname = "Unknown host for IP " + ipAddress;
             }
         } else hostname = "not specified";
-        LOG.debug("Hostname derived from " + ipAddress + " is " + hostname);
+        LOG.debug("Hostname derived from [" + ipAddress + "] is [" + hostname+ "]");
     }
     
     /**

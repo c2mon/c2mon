@@ -38,7 +38,7 @@ public class SpectrumConfigTest extends GenericMessageHandlerTst {
     public void testBasicInterface() {
         LOG.info("Operating test ...");
         if (ctx == null) {
-            ctx = new ClassPathXmlApplicationContext("classpath:resources/dmn-spectrum-config.xml");
+            ctx = new ClassPathXmlApplicationContext("classpath:dmn-spectrum-config.xml");
             ctx.getEnvironment().setDefaultProfiles("PRO");
             ctx.refresh();
         }

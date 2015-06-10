@@ -51,7 +51,7 @@ public class SpectrumMessageHandler extends EquipmentMessageHandler
     public void connectToDataSource() throws EqIOException {
         
         if (ctx == null) {
-            ctx = new ClassPathXmlApplicationContext("classpath:resources/dmn-spectrum-config.xml");
+            ctx = new ClassPathXmlApplicationContext("classpath:dmn-spectrum-config.xml");
             ctx.getEnvironment().setDefaultProfiles("PRO");
             ctx.refresh();
         }
