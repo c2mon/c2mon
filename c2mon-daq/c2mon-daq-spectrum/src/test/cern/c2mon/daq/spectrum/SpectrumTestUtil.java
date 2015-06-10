@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.spectrum.SpectrumEvent.SpectrumEventType;
-import cern.c2mon.daq.spectrum.listener.impl.SpectrumListenerJunit;
+import cern.c2mon.daq.spectrum.listener.SpectrumListenerJunit;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 

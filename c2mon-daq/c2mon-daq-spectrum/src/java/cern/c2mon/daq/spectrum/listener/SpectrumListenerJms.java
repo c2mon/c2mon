@@ -1,5 +1,5 @@
 
-package cern.c2mon.daq.spectrum.listener.impl;
+package cern.c2mon.daq.spectrum.listener;
 
 import java.util.Queue;
 
@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.spectrum.SpectrumEvent;
 import cern.c2mon.daq.spectrum.SpectrumEventProcessor;
-import cern.c2mon.daq.spectrum.listener.SpectrumListenerIntf;
 import cern.c2mon.daq.spectrum.util.JmsProviderIntf;
 import cern.c2mon.daq.spectrum.util.SonicConnector;
 

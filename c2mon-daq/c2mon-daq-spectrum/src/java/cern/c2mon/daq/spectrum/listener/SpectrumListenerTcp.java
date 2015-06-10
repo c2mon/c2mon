@@ -2,7 +2,7 @@
  * Copyright (c) 2015 European Organisation for Nuclear Research (CERN), All Rights Reserved.
  */
 
-package cern.c2mon.daq.spectrum.listener.impl;
+package cern.c2mon.daq.spectrum.listener;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.spectrum.SpectrumEvent;
 import cern.c2mon.daq.spectrum.SpectrumEventProcessor;
-import cern.c2mon.daq.spectrum.listener.SpectrumListenerIntf;
 
 /**
  * The message reception thread. The thread is waiting on a given TCP port, for each incoming request

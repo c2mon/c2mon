@@ -2,7 +2,7 @@
  * Copyright (c) 2015 European Organisation for Nuclear Research (CERN), All Rights Reserved.
  */
 
-package cern.c2mon.daq.spectrum.listener.impl;
+package cern.c2mon.daq.spectrum.listener;
 
 import java.util.Queue;
 
@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import cern.c2mon.daq.spectrum.SpectrumAlarm;
 import cern.c2mon.daq.spectrum.SpectrumEvent;
 import cern.c2mon.daq.spectrum.SpectrumEventProcessor;
-import cern.c2mon.daq.spectrum.listener.SpectrumListenerIntf;
 
 /**
  * When this listener is enabled, it is possible to write directly to the EventProcessor
