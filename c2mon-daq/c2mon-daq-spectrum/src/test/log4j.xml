@@ -18,7 +18,7 @@
 
   <appender name="FileAppender" class="org.apache.log4j.RollingFileAppender">
     <param name="Append" value="true" />
-    <param name="File" value="${c2mon.log.dir}/TEST.log" />
+    <param name="File" value="log/TEST.log" />
     <param name="MaxBackupIndex" value="10" />
     <param name="MaxFileSize" value="100MB" />
     <param name="BufferedIO" value="false" />
@@ -29,7 +29,7 @@
 
   <appender name="SpectrumAppender" class="org.apache.log4j.RollingFileAppender">
     <param name="Append" value="true" />
-    <param name="File" value="${c2mon.log.dir}/SPECTRUM.log" />
+    <param name="File" value="log/SPECTRUM.log" />
     <param name="MaxBackupIndex" value="10" />
     <param name="MaxFileSize" value="100MB" />
     <param name="BufferedIO" value="false" />

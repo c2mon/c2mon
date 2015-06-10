@@ -4,7 +4,7 @@
 
 package cern.c2mon.daq.spectrum;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -13,8 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import cern.c2mon.daq.spectrum.SpectrumEvent.SpectrumEventType;
-import cern.c2mon.daq.spectrum.listener.impl.SpectrumListenerJunit;
 import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
@@ -110,13 +108,6 @@ public class SpectrumConfigTest extends GenericMessageHandlerTst {
     //
     // --- UTIL ----------------------------------------------------------------------------------
     //
-    private void sleep(int n) {
-        try {
-            Thread.sleep(n * 1000);
-        } catch (Exception e) {
-            LOG.warn("Sleep interrupted", e);
-        }
-    }
 
     @Override
     protected void afterTest() throws Exception {

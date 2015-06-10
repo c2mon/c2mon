@@ -26,6 +26,14 @@ public class SpectrumTestUtil {
     private SpectrumTestUtil() {        
     }
 
+    public static void trySleepSec(int n) {
+        try {
+            Thread.sleep(n * 1000);
+        } catch (Exception e) {
+            LOG.warn("Sleep interrupted", e);
+        }
+    }
+
     
     public static boolean getValue(ISourceDataTag iSourceDataTag) {
         SourceDataTagValue v = iSourceDataTag.getCurrentValue();
