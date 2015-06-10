@@ -2,11 +2,11 @@
  * Copyright (c) 2015 European Organisation for Nuclear Research (CERN), All Rights Reserved.
  */
 
-package cern.c2mon.daq.spectrum.address;
+package cern.c2mon.daq.spectrum;
 
 import cern.c2mon.daq.spectrum.util.JsonUtils;
 
-public class SpectrumHardwareAddressImpl implements SpectrumHardwareAddress {
+public class SpectrumHardwareAddress {
 
     private String hostname;
     
@@ -42,7 +42,6 @@ public class SpectrumHardwareAddressImpl implements SpectrumHardwareAddress {
 */
 
 
-    @Override
     public String getHostname() {
         return hostname;
     }
@@ -55,7 +54,7 @@ public class SpectrumHardwareAddressImpl implements SpectrumHardwareAddress {
 
     public static SpectrumHardwareAddress fromJson(final String json) {
         SpectrumHardwareAddress addr = null;
-        if ((addr = SpectrumHardwareAddressImpl.fromJson(json)) == null) {
+        if ((addr = SpectrumHardwareAddress.fromJson(json)) == null) {
             throw new IllegalArgumentException("address creation failed. Check the JSON declaration");
         }
         return addr;

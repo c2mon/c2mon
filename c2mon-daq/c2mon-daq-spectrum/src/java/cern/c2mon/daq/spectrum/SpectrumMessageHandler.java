@@ -13,8 +13,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
-import cern.c2mon.daq.spectrum.address.SpectrumHardwareAddress;
-import cern.c2mon.daq.spectrum.address.SpectrumHardwareAddressImpl;
 import cern.c2mon.daq.spectrum.listener.SpectrumListenerIntf;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
@@ -172,7 +170,7 @@ public class SpectrumMessageHandler extends EquipmentMessageHandler
         LOG.info("Register tag {} ...", tag.getName());
         try {
             SimpleHardwareAddress saddr = (SimpleHardwareAddress) tag.getHardwareAddress();
-            SpectrumHardwareAddress addr = SpectrumHardwareAddressImpl.fromJson(saddr.getAddress().trim());
+            SpectrumHardwareAddress addr = SpectrumHardwareAddress.fromJson(saddr.getAddress().trim());
             proc.add(addr.getHostname(), tag); 
         } catch (Exception ex) {
             String err = format("Unable to register tag: %d. Problem description: %s", tag.getId(), ex.getMessage());
@@ -183,7 +181,7 @@ public class SpectrumMessageHandler extends EquipmentMessageHandler
     synchronized void unregisterTag(ISourceDataTag tag) throws Exception {
         try {
             SimpleHardwareAddress saddr = (SimpleHardwareAddress) tag.getHardwareAddress();
-            SpectrumHardwareAddress addr = SpectrumHardwareAddressImpl.fromJson(saddr.getAddress().trim());
+            SpectrumHardwareAddress addr = SpectrumHardwareAddress.fromJson(saddr.getAddress().trim());
             proc.del(addr.getHostname()); 
         } catch (Exception ex) {
             String err = format("Unable to unregister tag: %d. Problem description: %s", tag.getId(), ex.getMessage());
