@@ -24,12 +24,18 @@
 		<context:property-placeholder location="file:${almon.properties}"
 			ignore-resource-not-found="true" ignore-unresolvable="true" />
 		<bean id="eventListener" class="cern.c2mon.daq.spectrum.listener.impl.SpectrumListenerJms" />
+<!-- 	
+		The one for direct connection from the Spectrum servers to our DAQ ...	
+		<bean id="eventListener" class="cern.c2mon.daq.spectrum.listener.impl.SpectrumListenerTcp" />
+		... for the real production system, enable this listener. BUT is supposes that is is installed
+		on the machine used as target by the Spectrum scripts!
+-->
 	</beans>
 
 	<beans profile="TEST">
 		<context:property-placeholder location="classpath:resources/test.properties"
 			ignore-resource-not-found="true" ignore-unresolvable="true" />
-		<bean id="eventListener" class="cern.c2mon.daq.spectrum.listener.impl.SpectrumListenerMock" />
+		<bean id="eventListener" class="cern.c2mon.daq.spectrum.listener.impl.SpectrumListenerJunit" />
 	</beans>
 
 </beans>

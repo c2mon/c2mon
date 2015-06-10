@@ -4,7 +4,6 @@
 
 package cern.c2mon.daq.spectrum.address;
 
-import cern.c2mon.daq.spectrum.address.impl.SpectrumHardwareAddressImpl;
 
 public class SpectrumHardwareAddressFactory {
 
