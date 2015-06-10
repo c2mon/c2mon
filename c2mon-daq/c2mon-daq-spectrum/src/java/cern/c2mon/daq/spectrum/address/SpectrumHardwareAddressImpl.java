@@ -10,7 +10,7 @@ public class SpectrumHardwareAddressImpl implements SpectrumHardwareAddress {
 
     private String hostname;
     
-    // required by jackson as it creates objects via reflection
+/*    // required by jackson as it creates objects via reflection
     private SpectrumHardwareAddressImpl() {
     }
 
@@ -39,7 +39,7 @@ public class SpectrumHardwareAddressImpl implements SpectrumHardwareAddress {
             return false;
         return true;
     }
-
+*/
 
 
     @Override
@@ -49,19 +49,17 @@ public class SpectrumHardwareAddressImpl implements SpectrumHardwareAddress {
 
     @Override
     public String toString() {
-        return toJson();
-    }
-
-    public String toJson() {
         return JsonUtils.toJson(this);
     }
 
-    
-    public static SpectrumHardwareAddress fromJson(String json) {
-        if (json == null) {
-            return null;
+
+    public static SpectrumHardwareAddress fromJson(final String json) {
+        SpectrumHardwareAddress addr = null;
+        if ((addr = SpectrumHardwareAddressImpl.fromJson(json)) == null) {
+            throw new IllegalArgumentException("address creation failed. Check the JSON declaration");
         }
-        return JsonUtils.fromJson(json, SpectrumHardwareAddressImpl.class);
+        return addr;
     }
+    
 
 }
