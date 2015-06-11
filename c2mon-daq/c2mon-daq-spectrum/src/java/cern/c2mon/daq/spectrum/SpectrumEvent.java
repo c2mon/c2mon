@@ -49,7 +49,9 @@ public class SpectrumEvent {
     private String serverName;                  // Hostname of the Spectrum server at the origin of this event
     private String msg;                         // The raw data received over TCP socket
     private SpectrumEventType eventType;        // The event type might be CLR, SET, UPD or RESET
+    
     private String ipAddress;                   // in the form aaa.bbb.ccc.dddd sent over TCP by Spectrum 
+    
     private boolean spectrumNotifierOk = true;  // maybe false (when keep alive from Spectrum signals an error)
     private String dateString;                  // in the form yyyy/mm/dd
     private String timeString;                  // in the form hh:mi:ss
@@ -66,6 +68,9 @@ public class SpectrumEvent {
     private String problemDescription;
     private String contextURL;
     private String hostname;
+
+    public enum HostnameQuality {FOUND, UNKNOWN, NOT_FOUND, IP_NOT_SPECIFIED}
+    private HostnameQuality hqual;
 
     private Object lock = new Object();
     
@@ -152,7 +157,17 @@ public class SpectrumEvent {
                             LOG.debug("Spectrum URL is [" + contextURL + "]");
                         }
                     }
-                    if (st.hasMoreTokens()) problemDescription = st.nextToken("\"");
+                    if (st.hasMoreTokens()) 
+                    {
+                        LOG.info("Trying to retrieve the problem description ...");
+                        int fromPos = msg.indexOf('"') + 1;
+                        int toPos = msg.lastIndexOf('"');
+                        if (fromPos > 0 && toPos > fromPos)
+                        {
+//                        problemDescription = st.nextToken("\"");
+                            problemDescription = msg.substring(fromPos, toPos);
+                        }
+                    }
                 } catch (Exception e) {
                     LOG.error("Parsing of message into alarm structure failed",e);
                 }
@@ -208,25 +223,42 @@ public class SpectrumEvent {
      */
     private void setIpAddress(String ipAddress) {
         this.ipAddress = ipAddress;
-        if (ipAddress != null) this.ipAddress = ipAddress.trim();
-        if (this.ipAddress.length() > 0) {
-            try {
+        if (ipAddress != null) 
+        {
+            this.ipAddress = ipAddress.trim();
+        }
+        if (this.ipAddress.length() > 0) 
+        {
+            try 
+            {
                 java.net.InetAddress inetAdd = java.net.InetAddress.getByName(ipAddress); 
                 LOG.info("Hostname is [" + inetAdd.getCanonicalHostName() + "]");
                 hostname =  inetAdd.getCanonicalHostName();
-                if (hostname != null && !hostname.equals(ipAddress)) {
+                if (hostname != null && !hostname.equals(ipAddress)) 
+                {
                     hostname = hostname.toUpperCase();
                     int domainPos = hostname.indexOf(".CERN.CH"); 
-                    if ( domainPos > 0) hostname = hostname.substring(0, domainPos);
+                    if ( domainPos > 0) 
+                    {
+                        hostname = hostname.substring(0, domainPos);
+                    }
+                    hqual = HostnameQuality.FOUND;
                 }
                 else
                 {
                     LOG.warn("Failed to convert [" + ipAddress + "] into a valid hostname");
+                    hqual = HostnameQuality.NOT_FOUND;
                 }
-            } catch(java.net.UnknownHostException uhe) {
-                hostname = "Unknown host for IP " + ipAddress;
+            } catch(java.net.UnknownHostException uhe) 
+            {
+                hqual = HostnameQuality.UNKNOWN;
+                LOG.warn("Unknown host for IP [" + ipAddress + "]");
             }
-        } else hostname = "not specified";
+        } 
+        else 
+        {
+            hqual = HostnameQuality.IP_NOT_SPECIFIED;
+        }
         LOG.debug("Hostname derived from [" + ipAddress + "] is [" + hostname+ "]");
     }
     
@@ -235,6 +267,11 @@ public class SpectrumEvent {
      */
     public String getHostname() {
         return this.hostname;
+    }
+    
+    public HostnameQuality getHostnameQuality()
+    {
+        return this.hqual;
     }
     
     /**
