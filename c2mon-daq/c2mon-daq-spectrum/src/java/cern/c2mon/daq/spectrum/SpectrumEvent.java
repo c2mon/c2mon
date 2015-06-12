@@ -26,7 +26,7 @@ public class SpectrumEvent {
     
     public static int MESSAGE_FORMAT_VERSION = 1;
 
-    enum SpectrumEventType {     
+    public enum SpectrumEventType {     
         INVALID_MESSAGE,     // in case the code found in the message is not known
         KAL,                 // server keep-alive
         CLR,                 // alarm termination in Spectrum wording

@@ -24,8 +24,6 @@ import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 
 /**
  * 
- * TODO create unit tests especially for referencing/dereferencing alarms for the same host (based on fake message
- *      added by the unit tests to the event queue and than checking for result on tag)
  *      
  * TODO compare results to production status (alarms on/off in laser for the hosts)
  * TODO deploy
@@ -44,6 +42,8 @@ public class SpectrumMessageHandler extends EquipmentMessageHandler
     private Thread procThr;
     private SpectrumEventProcessor proc;
     
+    public static String profile = "PRO";
+    
     //
     // --- CONNECT / DISCONNECT -------------------------------------------------------------------------------
     //
@@ -52,7 +52,7 @@ public class SpectrumMessageHandler extends EquipmentMessageHandler
         
         if (ctx == null) {
             ctx = new ClassPathXmlApplicationContext("classpath:dmn-spectrum-config.xml");
-            ctx.getEnvironment().setDefaultProfiles("PRO");
+            ctx.getEnvironment().setDefaultProfiles(profile);
             ctx.refresh();
         }
         
@@ -188,6 +188,11 @@ public class SpectrumMessageHandler extends EquipmentMessageHandler
             LOG.error(err);
             throw new Exception(err);
         }
+    }
+    
+    public SpectrumEventProcessor getProcessor()
+    {
+        return this.proc;
     }
 
 }

@@ -48,44 +48,6 @@ public class SpectrumConfigTest extends GenericMessageHandlerTst {
         assertEquals(secondaryServer, proc.getSecondaryServer());
         assertEquals(port, proc.getPort());
 
-        /*
-        // test simple on/off
-        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "acmmnr", 10009);        
-        sleep(3);        
-        assertTrue(SpectrumTestUtil.getValue(theHandler,  1L));
-        
-        SpectrumAlarm alarm = SpectrumListenerJunit.getListener().getAlarm("acmmnr");
-        assertTrue(alarm.isAlarmOn());
-        assertTrue(alarm.getAlarmCount() == 1);
-        
-        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.CLR, "acmmnr", 10009);
-        
-        sleep(3);
-        assertFalse(SpectrumTestUtil.getValue(theHandler,  1L));
-        assertTrue(!alarm.isAlarmOn());
-        assertTrue(alarm.getAlarmCount() == 0);
-        
-        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "acmmnr", 10009);        
-        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "acmmnr", 10010);
-        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-dmnp1", 10010);
-        sleep(3);        
-        assertTrue(SpectrumTestUtil.getValue(theHandler,  1L));
-        assertNull(SpectrumListenerJunit.getListener().getAlarm("cs-ccr-dmnp1"));
-        assertTrue(alarm.getAlarmCount() == 2);
-        assertTrue(SpectrumTestUtil.getValue(alarm.getTag()));
-
-        
-        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.CLR, "acmmnr", 10009);                
-        sleep(3);
-        assertTrue(SpectrumTestUtil.getValue(theHandler,  1L));
-        assertTrue(alarm.getAlarmCount() == 1);
-
-        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.CLR, "acmmnr", 10010);                
-        sleep(3);
-        assertFalse(SpectrumTestUtil.getValue(theHandler,  1L));
-        assertFalse(SpectrumTestUtil.getValue(alarm.getTag()));
-        assertTrue(alarm.getAlarmCount() == 0);
-*/
         LOG.info("Test completed.");
     }
 
@@ -98,20 +60,11 @@ public class SpectrumConfigTest extends GenericMessageHandlerTst {
         System.setProperty("spectrum.mode", "junit");
         theHandler = (SpectrumMessageHandler) msgHandler;        
         theHandler.connectToDataSource();
-                
-//        IEquipmentConfiguration eqCfg = theHandler.getEquipmentConfiguration();
-//        config = JsonUtils.fromJson(eqCfg.getAddress(), SpectrumEquipConfig.class);
-        
         LOG.info("Init done.");
     }
 
-    //
-    // --- UTIL ----------------------------------------------------------------------------------
-    //
-
     @Override
     protected void afterTest() throws Exception {
-        // TODO Auto-generated method stub
-        
+        //        
     }
 }

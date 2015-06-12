@@ -5,18 +5,12 @@
 package cern.c2mon.daq.spectrum;
 
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Queue;
-import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -27,6 +21,7 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.spectrum.SpectrumEvent.SpectrumEventType;
+import cern.c2mon.daq.spectrum.util.DiskBuffer;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 
 
@@ -84,7 +79,6 @@ import cern.c2mon.shared.common.datatag.ISourceDataTag;
 
 public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
         
-    public static final String BUFFER_NAME = "/tmp/dmn-daq-spectrum.buffer";
     
     static final Logger LOG = LoggerFactory.getLogger("SpectrumEventProcessor");
     public static final String DEFAULT_DATE_FORMAT = "dd-MMM-yyyy HH:mm:ss";
@@ -115,42 +109,9 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
     public void shutdown()
     {
         LOG.warn("Going down: need to dump the buffer!");        
-        ArrayList<String> result = new ArrayList<String>();
-        for (String hostname : monitoredHosts.keySet()) {
-            SpectrumAlarm alarm = monitoredHosts.get(hostname);
-            if (alarm.isAlarmOn()) {                
-                result.add(hostname);
-            }
-        }
-        Collections.sort(result);
-
-        PrintWriter pw = null;
-        try
-        {
-            pw = new PrintWriter(SpectrumEventProcessor.BUFFER_NAME);
-            for (String hostname : result)
-            {
-                pw.print(hostname);
-                SpectrumAlarm alarm = monitoredHosts.get(hostname);
-                for (Long l : alarm.getAlarmIds())
-                {
-                    pw.print("," + l);
-                }
-                pw.println();
-            }
-        }
-        catch (IOException ie)
-        {
-            SpectrumEventProcessor.LOG.error("Failed to dump alarm buffer!", ie);
-        }
-        finally
-        {
-            if (pw != null)
-            {
-                pw.close();
-            }
-        }
+        DiskBuffer.write(monitoredHosts);
      }
+    
     
     public Queue<SpectrumEvent> getQueue() {
         return eventQueue;
@@ -228,7 +189,7 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
         lastKalSecondary = System.currentTimeMillis();
 
         // attempt to read buffer and activate stuff from prior run
-        loadBuffer();
+        DiskBuffer.loadBuffer(this, equipmentMessageSender);
         
         
         long loopcounter = 0;
@@ -323,54 +284,6 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
     //
     // --- PRIVATE METHODS -------------------------------------------------------------------------------
     //
-    private void loadBuffer()
-    {
-        BufferedReader inp = null;
-        try
-        {
-            File f = new File(BUFFER_NAME);
-            if (f.exists())
-            {
-                inp = new BufferedReader(new FileReader(f));        
-                String ligne = null;
-                long ts = System.currentTimeMillis();
-                while ((ligne = inp.readLine()) != null)
-                {
-                    StringTokenizer st = new StringTokenizer(ligne, ",");
-                    String hostname = st.nextToken();
-                    SpectrumAlarm alarm = monitoredHosts.get(hostname);
-                    if (alarm != null)
-                    {
-                        while (st.hasMoreTokens())
-                        {
-                            long alarmId = Long.parseLong(st.nextToken());
-                            alarm.activate(alarmId);
-                        }
-                        equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.TRUE, ts, "from buffer reload");
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            LOG.warn("Failed to load " + BUFFER_NAME + " (buffer from prior run)", e);
-        }
-        finally
-        {
-            try
-            {
-                if (inp != null)
-                {
-                    inp.close();                    
-                }
-            }
-            catch (IOException ie)
-            {
-                LOG.warn("Problem when closing disk buffer", ie);
-            }
-        }
-
-    }
     
     /**
      * 
