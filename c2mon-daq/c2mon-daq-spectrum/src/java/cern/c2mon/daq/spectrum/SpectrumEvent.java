@@ -112,11 +112,22 @@ public class SpectrumEvent {
                     //
                     // If this is a keepalive message, we check the status of the notifier
                     // else, the second field is the IP address of the host concerned by the alarm
-                    if (this.isKeepAlive()) {
+                    if (this.isKeepAlive()) 
+                    {
                         String status = st.nextToken();
-                        if (status.equals("OK")) this.spectrumNotifierOk = true;
-                        else this.spectrumNotifierOk = false;
-                    } else setIpAddress(st.nextToken());
+                        if (status.equals("OK")) 
+                        {
+                            this.spectrumNotifierOk = true;
+                        }
+                        else 
+                        {
+                            this.spectrumNotifierOk = false;
+                        }
+                    } 
+                    else 
+                    {
+                        setIpAddress(st.nextToken());
+                    }
                     
                     //
                     // Standard fields valid for all messages
