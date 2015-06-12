@@ -14,12 +14,16 @@ import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cern.c2mon.daq.test.GenericMessageHandlerTst;
-import cern.c2mon.daq.test.UseHandler;
-
-@UseHandler(SpectrumMessageHandler.class)
+/**
+ * Verify activating/termination mechanism of SpectrumAlarm object. The logic behind
+ * this object is to keep the alarm up as long as at least one distinct fault is known
+ * for the same target. If the alarm count is down to 0, the alarm should be terminated.
+ * 
+ * @author mbuttner
+ */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class SpectrumAlarmTest extends GenericMessageHandlerTst {
+public class SpectrumAlarmTest
+{
 
     Logger LOG = LoggerFactory.getLogger(SpectrumAlarmTest.class);
     
@@ -51,20 +55,13 @@ public class SpectrumAlarmTest extends GenericMessageHandlerTst {
         sa.terminate(1);
         assertFalse(sa.isAlarmOn());
         assertEquals(0, sa.getAlarmCount());
-    }
-    
-    
-
-    //
-    // --- SETUP --------------------------------------------------------------------------------
-    //
-    @Override
-    protected void beforeTest() throws Exception {
-        //
-    }
-
-    @Override
-    protected void afterTest() throws Exception {
-        //
+        
+        sa.terminate(3);
+        assertFalse(sa.isAlarmOn());
+        assertEquals(0, sa.getAlarmCount());
+        
+        sa.activate(1);
+        assertTrue(sa.isAlarmOn());
+        assertEquals(1, sa.getAlarmCount());
     }
 }

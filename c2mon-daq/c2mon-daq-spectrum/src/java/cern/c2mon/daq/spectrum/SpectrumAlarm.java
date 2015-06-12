@@ -10,24 +10,22 @@ import java.util.Collection;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 
 /***
- * The alarm for a given host is considered to be "on" if Spectrum signaled at least one
- * error for it. The alarm goes off only once the entire list of various errors signaled
- * by Spectrum was signaled to be terminated. For this purpose, each instance keeps a list
- * of errors actually active for a given host.
+ * The alarm for a given host is considered to be "on" if Spectrum signaled at least one error for it. The alarm goes
+ * off only once the entire list of various errors signaled by Spectrum was signaled to be terminated. For this purpose,
+ * each instance keeps a list of errors actually active for a given host.
  * 
  * @author mbuttner
  */
 public class SpectrumAlarm {
-    
-    private ArrayList<Long> spectrumAlarmIds ;
+
+    private ArrayList<Long> spectrumAlarmIds;
     private ISourceDataTag tag;
     private boolean alarmOn;
-    
+
     //
     // --- CONSTRUCTION --------------------------------------------------------------
     //
-    public SpectrumAlarm(ISourceDataTag tag)
-    {
+    public SpectrumAlarm(ISourceDataTag tag) {
         spectrumAlarmIds = new ArrayList<Long>();
         alarmOn = false;
         this.tag = tag;
@@ -36,8 +34,7 @@ public class SpectrumAlarm {
     //
     // --- PUBLIC METHODS ------------------------------------------------------------
     //
-    public int getAlarmCount()
-    {
+    public int getAlarmCount() {
         return spectrumAlarmIds.size();
     }
 
@@ -48,7 +45,7 @@ public class SpectrumAlarm {
     public boolean isAlarmOn() {
         return alarmOn;
     }
-    
+
     /**
      * When the Spectrum server operates a reset, we have to clean all known errors at once
      */
@@ -56,38 +53,30 @@ public class SpectrumAlarm {
         spectrumAlarmIds.clear();
         alarmOn = false;
     }
-    
+
     /**
-     * If the specified Spectrum error is not yet known in our list for this host, it
-     * is added. As the list contains at least one error after the call, the global
-     * alarm for us is always true.
+     * If the specified Spectrum error is not yet known in our list for this host, it is added. As the list contains at
+     * least one error after the call, the global alarm for us is always true.
      * 
      * @param spectrumAlarmId <code>long</code> id of the alarm as defined by Spectrum
      */
-    public void activate(long spectrumAlarmId)
-    {
-        if (!spectrumAlarmIds.contains(spectrumAlarmId))
-        {
+    public void activate(long spectrumAlarmId) {
+        if (!spectrumAlarmIds.contains(spectrumAlarmId)) {
             spectrumAlarmIds.add(spectrumAlarmId);
         }
         alarmOn = true;
     }
 
-    
     /**
-     * Remove the specified error. If after the call the list is empty, the alarms is
-     * considered to be off
+     * Remove the specified error. If after the call the list is empty, the alarms is considered to be off
      * 
      * @param spectrumAlarmId <code>long</code> id of the alarm as defined by Spectrum
      */
-    public void terminate(long spectrumAlarmId)
-    {
-        if (spectrumAlarmIds.contains(spectrumAlarmId))
-        {
+    public void terminate(long spectrumAlarmId) {
+        if (spectrumAlarmIds.contains(spectrumAlarmId)) {
             spectrumAlarmIds.remove(spectrumAlarmId);
-        }        
-        if (this.getAlarmCount() == 0)
-        {
+        }
+        if (this.getAlarmCount() == 0) {
             alarmOn = false;
         }
     }
@@ -98,5 +87,5 @@ public class SpectrumAlarm {
     public Collection<Long> getAlarmIds() {
         return this.spectrumAlarmIds;
     }
-    
+
 }
