@@ -15,13 +15,13 @@
 
 	<DataTags>
 
-	<DataTag id="1" name="HOST:ACMMNR:1" control="false">
+	<DataTag id="1" name="HOST:CS-CCR-DIAM1:1" control="false">
 		<data-type>Boolean</data-type>
 		<DataTagAddress>
 			<HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl">
 				<address>
 				{
-				"hostname": "acmmnr"
+				"hostname": "cs-ccr-diam1"
 				}
 				</address>
 			</HardwareAddress>

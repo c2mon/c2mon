@@ -24,7 +24,6 @@ import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 
 /**
  * 
- *      
  * TODO compare results to production status (alarms on/off in laser for the hosts)
  * TODO deploy
  *      

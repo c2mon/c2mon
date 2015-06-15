@@ -21,11 +21,22 @@ import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.spectrum.SpectrumAlarm;
 import cern.c2mon.daq.spectrum.SpectrumEventProcessor;
 
+/**
+ * Persist active alarms to a disk file in /tmp, and provide the mean to restore the status of the
+ * alarms on restart. This allows to overcome, with a good probability, a stop/start of the process
+ * without loss of data. For long interruptions, it is better to ask IT for a reset (This should
+ * be triggered automatically by them if the see that they lost connections).
+ * 
+ * @author mbuttner
+ */
 public class DiskBuffer {
 
     private static final Logger LOG = LoggerFactory.getLogger(DiskBuffer.class);
     public static final String BUFFER_NAME = "/tmp/dmn-daq-spectrum.buffer";
 
+    /**
+     * Save data to the disk file
+     */
     public static void write(ConcurrentHashMap<String, SpectrumAlarm> monitoredHosts) {
         ArrayList<String> result = new ArrayList<String>();
         for (String hostname : monitoredHosts.keySet()) {
@@ -55,7 +66,10 @@ public class DiskBuffer {
             }
         }
     }
-
+    
+    /**
+     * Update the status of the configured alarms based on the content of the disk buffer.
+     */
     public static void loadBuffer(SpectrumEventProcessor proc, IEquipmentMessageSender equipmentMessageSender) {
         LOG.info("Start to load active alarms from disk buffer ...");
         BufferedReader inp = null;
@@ -72,9 +86,12 @@ public class DiskBuffer {
                     if (alarm != null) {
                         while (st.hasMoreTokens()) {
                             long alarmId = Long.parseLong(st.nextToken());
+                            LOG.debug("<<  " + alarm.getTag().getName() + " < " + alarmId);
                             alarm.activate(alarmId);
+                            LOG.debug("" + alarm.getTag().getName() + " -> " + alarm.getAlarmCount());
                         }
-                        equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.TRUE, ts, " ... from disk buffer ...");
+                        equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.TRUE, ts,
+                                " ... from disk buffer ...");
                     }
                 }
             }
@@ -89,7 +106,7 @@ public class DiskBuffer {
                 LOG.warn("Problem when closing disk buffer", ie);
             }
         }
-
+        LOG.info("Load completed..");
     }
 
 }

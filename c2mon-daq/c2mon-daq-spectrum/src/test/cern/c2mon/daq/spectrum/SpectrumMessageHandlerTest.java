@@ -2,33 +2,21 @@
  * Copyright (c) 2015 European Organisation for Nuclear Research (CERN), All Rights Reserved.
  */
 
-package cern.c2mon.daq.spectrum.util;
+package cern.c2mon.daq.spectrum;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cern.c2mon.daq.spectrum.SpectrumAlarm;
 import cern.c2mon.daq.spectrum.SpectrumEvent.SpectrumEventType;
-import cern.c2mon.daq.spectrum.SpectrumMessageHandler;
-import cern.c2mon.daq.spectrum.SpectrumTestUtil;
+import cern.c2mon.daq.spectrum.util.DiskBufferTest;
 import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.UseConf;
-import cern.c2mon.daq.test.UseHandler;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 
-/**
- *  Check the DiskBuffer, the mechanism which perists the alarm status to disk in order to get
- *  the latest status of all configured alarms after a restart.
- */
-@UseHandler(SpectrumMessageHandler.class)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class DiskBufferTest extends GenericMessageHandlerTst {
-
+public class SpectrumMessageHandlerTest extends GenericMessageHandlerTst {
     Logger LOG = LoggerFactory.getLogger(DiskBufferTest.class);
     protected static SpectrumMessageHandler theHandler;
     
@@ -37,21 +25,28 @@ public class DiskBufferTest extends GenericMessageHandlerTst {
     
     //
     // --- TEST --------------------------------------------------------------------------------
-    //   
-    /**
-     * Send some alarm messages to generate a given status, stop the message handler and restart
-     * it in order to dump the situation to disk and reloa dit, check that the alarm status is as
-     * expected.
-     * 
-     * @throws EqIOException
-     */
+    //    
     @UseConf("spectrum_test_1.xml")
     @Test
     public void testBasicInterface() throws EqIOException {
         LOG.info("Operating test ...");
+//        if (ctx == null) {
+//            ctx = new ClassPathXmlApplicationContext("classpath:dmn-spectrum-config.xml");
+//            ctx.getEnvironment().setDefaultProfiles("TEST");
+//            ctx.refresh();
+//        }
+        
+//        SpectrumEventProcessor proc = ctx.getBean("eventProc", SpectrumEventProcessor.class);
         
         // activate an alarm
-        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-diam1", 10009);                
+        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-diam1", 10009);        
+//        SpectrumTestUtil.trySleepSec(3);        
+//        assertTrue(SpectrumTestUtil.getValue(theHandler,  1L));
+        
+//        SpectrumAlarm alarm = SpectrumListenerJunit.getListener().getAlarm("cs-ccr-diam1");
+//        assertTrue(alarm.isAlarmOn());
+//        assertTrue(alarm.getAlarmCount() == 1);
+        
         SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-diam1", 10010);
         SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-dmnp1", 10010);
         SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-dmnp2", 10010);
@@ -77,6 +72,33 @@ public class DiskBufferTest extends GenericMessageHandlerTst {
         assertEquals(1, a2.getAlarmCount());        
         assertEquals(0, a3.getAlarmCount());
         
+        
+//        SpectrumTestUtil.trySleepSec(3);
+//        assertFalse(SpectrumTestUtil.getValue(theHandler,  1L));
+//        assertTrue(!alarm.isAlarmOn());
+//        assertTrue(alarm.getAlarmCount() == 0);
+/*        
+        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-diam1", 10009);        
+        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-diam1", 10010);
+        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-dmnp1", 10010);
+        SpectrumTestUtil.trySleepSec(3);           
+        assertTrue(SpectrumTestUtil.getValue(theHandler,  1L));
+        assertNull(SpectrumListenerJunit.getListener().getAlarm("cs-ccr-dmnp1"));
+        assertTrue(alarm.getAlarmCount() == 2);
+        assertTrue(SpectrumTestUtil.getValue(alarm.getTag()));
+
+        
+        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.CLR, "cs-ccr-diam1", 10009);                
+        SpectrumTestUtil.trySleepSec(3);
+        assertTrue(SpectrumTestUtil.getValue(theHandler,  1L));
+        assertTrue(alarm.getAlarmCount() == 1);
+
+        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.CLR, "cs-ccr-diam1", 10010);                
+        SpectrumTestUtil.trySleepSec(3);
+        assertFalse(SpectrumTestUtil.getValue(theHandler,  1L));
+        assertFalse(SpectrumTestUtil.getValue(alarm.getTag()));
+        assertTrue(alarm.getAlarmCount() == 0);
+*/
         LOG.info("Test completed.");
     }
 
@@ -92,6 +114,9 @@ public class DiskBufferTest extends GenericMessageHandlerTst {
         SpectrumMessageHandler.profile = "TEST";
         theHandler.connectToDataSource();
                 
+//        IEquipmentConfiguration eqCfg = theHandler.getEquipmentConfiguration();
+//        config = JsonUtils.fromJson(eqCfg.getAddress(), SpectrumEquipConfig.class);
+        
         LOG.info("Init done.");
     }
 

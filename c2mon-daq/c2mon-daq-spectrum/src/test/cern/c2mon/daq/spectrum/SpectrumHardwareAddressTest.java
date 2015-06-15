@@ -17,13 +17,13 @@ import org.junit.Test;
 public class SpectrumHardwareAddressTest 
 {
 
-    private static final String addr = "{\n\"hostname\": \"acmmnr\"\n}\"";
+    private static final String addr = "{\n\"hostname\": \"cs-ccr-diam1\"\n}\"";
     
     @Test
     public void testHardwareAddress()
     {
         SpectrumHardwareAddress a = SpectrumHardwareAddress.fromJson(addr);
-        assertEquals("acmmnr", a.getHostname());
+        assertEquals("cs-ccr-diam1", a.getHostname());
     }
     
 }
