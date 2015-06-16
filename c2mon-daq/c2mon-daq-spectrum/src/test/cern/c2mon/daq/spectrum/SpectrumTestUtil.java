@@ -82,4 +82,28 @@ public class SpectrumTestUtil {
      // "CLR 172.18.227.106 01/29/2015 11:03:47 u2485-r-pb14-bhp42-1 21082124 10009 0x20661c0 \"DEVICE HAS ...\"");
 
     }
+    
+    public static String getConfigTag(String hostname, long id)
+    {
+        String fm = hostname.toUpperCase();
+        String host = hostname.toLowerCase();
+        StringBuilder xmlBuilder = new StringBuilder();
+        xmlBuilder.append("<DataTag id=\"" + id + "\" name=\"HOST:" + fm + ":1\" control=\"false\">\n");
+        xmlBuilder.append("  <data-type>Boolean</data-type>\n");
+        xmlBuilder.append("  <DataTagAddress>\n");
+        xmlBuilder.append("    <HardwareAddress class=\"cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl\">\n");
+        xmlBuilder.append("      <address>\n");
+        xmlBuilder.append("      {\n");
+        xmlBuilder.append("        \"hostname\": \"" + host + "\"\n");
+        xmlBuilder.append("      }\n");
+        xmlBuilder.append("      </address>\n");
+        xmlBuilder.append("    </HardwareAddress>\n");
+        xmlBuilder.append("    <time-to-live>3600000</time-to-live>\n");
+        xmlBuilder.append("    <priority>2</priority>\n");
+        xmlBuilder.append("    <guaranteed-delivery>true</guaranteed-delivery>\n");
+        xmlBuilder.append("  </DataTagAddress>\n");
+        xmlBuilder.append("</DataTag>\n");        
+        return xmlBuilder.toString();
+    }
+    
 }

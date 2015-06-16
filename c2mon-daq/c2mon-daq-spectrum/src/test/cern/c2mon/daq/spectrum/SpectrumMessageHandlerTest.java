@@ -4,23 +4,42 @@
 
 package cern.c2mon.daq.spectrum;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cern.c2mon.daq.spectrum.SpectrumEvent.SpectrumEventType;
 import cern.c2mon.daq.spectrum.util.DiskBufferTest;
 import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.UseConf;
-import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.daq.test.UseHandler;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
+
+/**
+ * Checking the registration and unregistration of tags by the MessageHandler. In the Spectrum DAQ,
+ * a big part of the specific business logic is in the SpectrumEventProcessor (test and the corresp.
+ * test class). Connection and disconnection is also checked there. In consequence, the aspects
+ * to be tests for the message handler are in register() and unregistrer();
+ * 
+ * @author mbuttner
+ */
+@UseHandler(SpectrumMessageHandler.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 
 public class SpectrumMessageHandlerTest extends GenericMessageHandlerTst {
+    
     Logger LOG = LoggerFactory.getLogger(DiskBufferTest.class);
     protected static SpectrumMessageHandler theHandler;
     
-    private static final String primaryServer = "cs-srv-44.cern.ch";
 
     
     //
@@ -28,80 +47,49 @@ public class SpectrumMessageHandlerTest extends GenericMessageHandlerTst {
     //    
     @UseConf("spectrum_test_1.xml")
     @Test
-    public void testBasicInterface() throws EqIOException {
-        LOG.info("Operating test ...");
-//        if (ctx == null) {
-//            ctx = new ClassPathXmlApplicationContext("classpath:dmn-spectrum-config.xml");
-//            ctx.getEnvironment().setDefaultProfiles("TEST");
-//            ctx.refresh();
-//        }
+    public void testRegistration() throws ParserConfigurationException {
+        SpectrumEventProcessor proc = theHandler.getProcessor();
+        ChangeReport changes = new ChangeReport(1L);
+        SimpleXMLParser parser = new SimpleXMLParser();
         
-//        SpectrumEventProcessor proc = ctx.getBean("eventProc", SpectrumEventProcessor.class);
-        
-        // activate an alarm
-        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-diam1", 10009);        
-//        SpectrumTestUtil.trySleepSec(3);        
-//        assertTrue(SpectrumTestUtil.getValue(theHandler,  1L));
-        
-//        SpectrumAlarm alarm = SpectrumListenerJunit.getListener().getAlarm("cs-ccr-diam1");
-//        assertTrue(alarm.isAlarmOn());
-//        assertTrue(alarm.getAlarmCount() == 1);
-        
-        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-diam1", 10010);
-        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-dmnp1", 10010);
-        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-dmnp2", 10010);
-        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.CLR, "cs-ccr-dmnp2", 10010);
-  
-        SpectrumTestUtil.trySleepSec(3);                   
-        theHandler.shutdown();
-        
-        SpectrumTestUtil.trySleepSec(3);           
-        theHandler.connectToDataSource();
-        
-        SpectrumTestUtil.trySleepSec(3);           
-        // now we should have two alarms for acmnnr,1 for cs-ccr-dmnp1, and none for cs-ccr-dmnp2
-        SpectrumAlarm a1 = theHandler.getProcessor().getAlarm("cs-ccr-diam1");
-        SpectrumAlarm a2 = theHandler.getProcessor().getAlarm("cs-ccr-dmnp1");
-        SpectrumAlarm a3 = theHandler.getProcessor().getAlarm("cs-ccr-dmnp2");
+        String xml = SpectrumTestUtil.getConfigTag("cs-ccr-diam1", 1L);
+        SourceDataTag t1 = SourceDataTag.fromConfigXML(parser.parse(xml).getDocumentElement());
+        theHandler.onAddDataTag(t1, changes);
+        assertTrue(changes.isSuccess());
+        SpectrumAlarm alarm = proc.getAlarm("cs-CCR-diaM1");
+        assertNotNull(alarm);
 
-        LOG.warn("" + a1.getTag().getName() + " -> " + a1.getAlarmCount());
-        LOG.warn("" + a2.getTag().getName() + " -> " + a2.getAlarmCount());
-        LOG.warn("" + a3.getTag().getName() + " -> " + a3.getAlarmCount());
-        
-        assertEquals(2, a1.getAlarmCount());        
-        assertEquals(1, a2.getAlarmCount());        
-        assertEquals(0, a3.getAlarmCount());
-        
-        
-//        SpectrumTestUtil.trySleepSec(3);
-//        assertFalse(SpectrumTestUtil.getValue(theHandler,  1L));
-//        assertTrue(!alarm.isAlarmOn());
-//        assertTrue(alarm.getAlarmCount() == 0);
-/*        
-        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-diam1", 10009);        
-        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-diam1", 10010);
-        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-dmnp1", 10010);
-        SpectrumTestUtil.trySleepSec(3);           
-        assertTrue(SpectrumTestUtil.getValue(theHandler,  1L));
-        assertNull(SpectrumListenerJunit.getListener().getAlarm("cs-ccr-dmnp1"));
-        assertTrue(alarm.getAlarmCount() == 2);
-        assertTrue(SpectrumTestUtil.getValue(alarm.getTag()));
-
-        
-        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.CLR, "cs-ccr-diam1", 10009);                
-        SpectrumTestUtil.trySleepSec(3);
-        assertTrue(SpectrumTestUtil.getValue(theHandler,  1L));
-        assertTrue(alarm.getAlarmCount() == 1);
-
-        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.CLR, "cs-ccr-diam1", 10010);                
-        SpectrumTestUtil.trySleepSec(3);
-        assertFalse(SpectrumTestUtil.getValue(theHandler,  1L));
-        assertFalse(SpectrumTestUtil.getValue(alarm.getTag()));
-        assertTrue(alarm.getAlarmCount() == 0);
-*/
+        theHandler.onRemoveDataTag(t1, changes);
+        assertTrue(changes.isSuccess());
+        alarm = proc.getAlarm("cs-CCR-diaM1");
+        assertNull(alarm);
+                
         LOG.info("Test completed.");
     }
 
+    @UseConf("spectrum_test_1.xml")
+    @Test
+    public void testReplacement() throws ParserConfigurationException {
+        SpectrumEventProcessor proc = theHandler.getProcessor();
+        ChangeReport changes = new ChangeReport(1L);
+        SimpleXMLParser parser = new SimpleXMLParser();
+        
+        String xml = SpectrumTestUtil.getConfigTag("cs-ccr-diam1", 1L);
+        SourceDataTag t1 = SourceDataTag.fromConfigXML(parser.parse(xml).getDocumentElement());
+        theHandler.onAddDataTag(t1, changes);
+        assertTrue(changes.isSuccess());
+        SpectrumAlarm alarm = proc.getAlarm("cs-CCR-diaM1");
+        assertNotNull(alarm);
+
+        xml = SpectrumTestUtil.getConfigTag("cs-ccr-dmnp1", 1L);
+        SourceDataTag t2 = SourceDataTag.fromConfigXML(parser.parse(xml).getDocumentElement());
+        theHandler.onUpdateDataTag(t2, t1, changes);
+        assertTrue(changes.isSuccess());
+        assertNull(proc.getAlarm("cs-CCR-diaM1"));
+        assertNotNull(proc.getAlarm("cs-ccr-dmnp1"));
+                
+        LOG.info("Test completed.");
+    }
     
     //
     // --- SETUP --------------------------------------------------------------------------------
@@ -112,11 +100,7 @@ public class SpectrumMessageHandlerTest extends GenericMessageHandlerTst {
         System.setProperty("spectrum.mode", "junit");
         theHandler = (SpectrumMessageHandler) msgHandler;        
         SpectrumMessageHandler.profile = "TEST";
-        theHandler.connectToDataSource();
-                
-//        IEquipmentConfiguration eqCfg = theHandler.getEquipmentConfiguration();
-//        config = JsonUtils.fromJson(eqCfg.getAddress(), SpectrumEquipConfig.class);
-        
+        theHandler.connectToDataSource();        
         LOG.info("Init done.");
     }
 
@@ -125,6 +109,7 @@ public class SpectrumMessageHandlerTest extends GenericMessageHandlerTst {
         if (theHandler != null) {
             theHandler.shutdown();
         }
+        LOG.info("Resources cleared.");
     }
 
 }

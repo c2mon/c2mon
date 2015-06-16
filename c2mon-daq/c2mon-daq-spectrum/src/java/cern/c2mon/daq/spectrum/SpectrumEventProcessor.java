@@ -19,7 +19,6 @@ import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
 import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.daq.spectrum.SpectrumEvent.SpectrumEventType;
 import cern.c2mon.daq.spectrum.util.DiskBuffer;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 
@@ -66,12 +65,28 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
     private long lastKalSecondary = System.currentTimeMillis();
     private boolean primaryOk = true;
     private boolean secondaryOk = true;
+    
+    private boolean connectionOk = true;
 
     private LinkedBlockingQueue<SpectrumEvent> eventQueue = new LinkedBlockingQueue<SpectrumEvent>();
 
+    private int backupControlFreq = 60;
+    private long bkpDelay = BACKUP_DELAY;
+    
     //
     // --- PUBLIC METHODS ---------------------------------------------------------------------------
     //
+    /**
+     * All values to be provided in seconds
+     * @param freq  <code>int</code>    default is 60 (seconds)
+     * @param delay <code>int</code>    default is 300 (seconds), or in other words 5mn
+     */
+    public void setBackupControl(int freq, int delay)
+    {
+        this.backupControlFreq = freq;
+        this.bkpDelay = delay * 1000;        
+    }
+    
     public void setSender(IEquipmentMessageSender equipmentMessageSender) {
         this.equipmentMessageSender = equipmentMessageSender;
     }
@@ -81,6 +96,11 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
         DiskBuffer.write(monitoredHosts);
     }
 
+    public boolean isConnectionOk()
+    {
+        return this.connectionOk;
+    }
+    
     public Queue<SpectrumEvent> getQueue() {
         return eventQueue;
     }
@@ -94,50 +114,8 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
         equipmentMessageSender.sendTagFiltered(tag, Boolean.FALSE, System.currentTimeMillis());
     }
 
-    public boolean isInteresting(SpectrumEvent event) {
-        if (event.getType() == SpectrumEventType.RST) {
-            return true;
-        }
-        if (event.getType() == SpectrumEventType.KAL) {
-            return false;
-        }
-        event.prepare();
-        LOG.info("Checking if event for host {} is of interest", event.getHostname());
-        if (monitoredHosts.get(event.getHostname()) != null) {
-            return true;
-        }
-        return false;
-    }
-
     public SpectrumAlarm getAlarm(String hostname) {
         return monitoredHosts.get(hostname.toUpperCase());
-    }
-
-    @ManagedAttribute
-    public List<String> getActiveTriplets() {
-        ArrayList<String> result = new ArrayList<String>();
-        for (String hostname : monitoredHosts.keySet()) {
-            SpectrumAlarm alarm = monitoredHosts.get(hostname);
-            if (alarm.isAlarmOn()) {
-                result.add(hostname + "=" + alarm.getTag().getId());
-            }
-        }
-        Collections.sort(result);
-        return result;
-    }
-
-    @ManagedAttribute
-    public List<String> getConnectionStatus() {
-        ArrayList<String> result = new ArrayList<String>();
-        String s1 = getPrimaryServer() + " " + Boolean.valueOf(primaryOk).toString() + " "
-                + DATE_FMT.format(new Date(this.lastEventPrimary)) + " "
-                + DATE_FMT.format(new Date(this.lastKalPrimary));
-        result.add(s1);
-        String s2 = getSecondaryServer() + " " + Boolean.valueOf(secondaryOk).toString() + " "
-                + DATE_FMT.format(new Date(this.lastEventSecondary)) + " "
-                + DATE_FMT.format(new Date(this.lastKalSecondary));
-        result.add(s2);
-        return result;
     }
 
     /**
@@ -161,15 +139,17 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
                 Thread.sleep(1 * 1000);
 
                 // time check the server status here (once per 2 minutes)
-                if (loopcounter % 60 == 0) {
+                if (loopcounter % backupControlFreq == 0) {
                     long now = System.currentTimeMillis();
                     if ((!this.primaryOk && !secondaryOk)
-                            || ((now - this.lastKalPrimary > BACKUP_DELAY) && (now - this.lastKalSecondary > BACKUP_DELAY))) {
+                            || ((now - this.lastKalPrimary > bkpDelay) && (now - this.lastKalSecondary > bkpDelay))) {
                         LOG.warn("Lost connecion with both Spectrum servers");
                         equipmentMessageSender.confirmEquipmentStateIncorrect();
+                        connectionOk = false;
                     } else {
                         LOG.info("Spectrum connection check OK");
                         equipmentMessageSender.confirmEquipmentStateOK();
+                        connectionOk = true;
                     }
                 }
 
@@ -221,15 +201,17 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
                                 long ts = System.currentTimeMillis();
                                 if (event.toActivate()) {
                                     LOG.info("ACTIVATE: [" + event.getServerName() + "] " + event);
-                                    alarm.activate(event.getAlarmId());
-                                    equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.TRUE, ts, descr);
+                                    if (alarm.activate(event.getAlarmId())) {
+                                        equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.TRUE, ts, descr);
+                                        LOG.debug("-> tag updated");
+                                    }
                                 }
                                 if (event.toTerminate()) {
                                     LOG.info("TERMINATE: [" + event.getServerName() + "] " + event);
-                                    alarm.terminate(event.getAlarmId());
-                                    if (!alarm.isAlarmOn()) {
-                                        equipmentMessageSender
-                                                .sendTagFiltered(alarm.getTag(), Boolean.FALSE, ts, descr);
+                                    if (alarm.terminate(event.getAlarmId())) {
+//                                    if (!alarm.isAlarmOn()) {
+                                        equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.FALSE, ts, descr);
+                                        LOG.debug("-> tag updated");
                                     }
                                 }
                             } else {
@@ -246,10 +228,43 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
     }
 
     //
+    // --- JMX ------------------------------------------------------------------------------------------
+    //
+    @ManagedAttribute
+    public List<String> getActiveTriplets() {
+        ArrayList<String> result = new ArrayList<String>();
+        for (String hostname : monitoredHosts.keySet()) {
+            SpectrumAlarm alarm = monitoredHosts.get(hostname);
+            if (alarm.isAlarmOn()) {
+                result.add(hostname + "=" + alarm.getTag().getId());
+            }
+        }
+        Collections.sort(result);
+        return result;
+    }
+
+    @ManagedAttribute
+    public List<String> getConnectionStatus() {
+        ArrayList<String> result = new ArrayList<String>();
+        String s1 = getPrimaryServer() + " " + Boolean.valueOf(primaryOk).toString() + " "
+                + DATE_FMT.format(new Date(this.lastEventPrimary)) + " "
+                + DATE_FMT.format(new Date(this.lastKalPrimary));
+        result.add(s1);
+        String s2 = getSecondaryServer() + " " + Boolean.valueOf(secondaryOk).toString() + " "
+                + DATE_FMT.format(new Date(this.lastEventSecondary)) + " "
+                + DATE_FMT.format(new Date(this.lastKalSecondary));
+        result.add(s2);
+        return result;
+    }
+
+
+    //
     // --- PRIVATE METHODS -------------------------------------------------------------------------------
     //
 
     /**
+     * Keep trace of the last keep alive message from each of the Spectrum servers.
+     * 
      * @param serverName
      * @param spectrumNotifierOk
      */
@@ -272,6 +287,10 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
         }
     }
 
+    /**
+     * In case of reset message from the client scripts, all alarms are terminated and their internal
+     * list of fautl codes is cleared. 
+     */
     private void terminateAll() {
         LOG.warn("Terminate all procedure triggered ...");
         for (SpectrumAlarm alarm : monitoredHosts.values()) {
@@ -283,6 +302,11 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
         LOG.info("Terminate all procedure completed.");
     }
 
+    /**
+     * 
+     * @param serverName <code>String</code> name of the server sending the message
+     * @param uts <code>long</code> timestamp
+     */
     private void setLastEventTs(String serverName, long uts) {
         if (serverName.equals(getPrimaryServer())) {
             if (uts < this.lastEventPrimary) {

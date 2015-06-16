@@ -42,9 +42,20 @@ public class SpectrumMessageHandler extends EquipmentMessageHandler
     private SpectrumEventProcessor proc;
     
     public static String profile = "PRO";
-    
+
     //
-    // --- CONNECT / DISCONNECT -------------------------------------------------------------------------------
+    // --- PUBLIC METHODS --------------------------------------------------------------------------------
+    //
+    /**
+     * @return <code>SpectrumEventProcess</code> used by unit tests.
+     */
+    public SpectrumEventProcessor getProcessor()
+    {
+        return this.proc;
+    }
+
+    //
+    // --- CONNECT / DISCONNECT --------------------------------------------------------------------------
     //
     @Override
     public void connectToDataSource() throws EqIOException {
@@ -88,6 +99,13 @@ public class SpectrumMessageHandler extends EquipmentMessageHandler
         LOG.info("Disconnection request processed.");
     }
     
+    //
+    // --- METHODS FOR CONFIGURATION CHANGES --------------------------------------------------------
+    //
+    /**
+     * Apart from the name, there is no parameter specific to the Spectrum equipment configuration
+     * since the Spectrum server names and the port used for communication are in the Spring context 
+     */
     @Override
     public void onUpdateEquipmentConfiguration(IEquipmentConfiguration equipmentConfiguration,
             IEquipmentConfiguration oldEquipmentConfiguration, ChangeReport changeReport) {
@@ -110,9 +128,6 @@ public class SpectrumMessageHandler extends EquipmentMessageHandler
         
     }
 
-    //
-    // --- ADD/REMOVE/UPDATE a tag --------------------------------------------------------------------------
-    //
     @Override
     public void onAddDataTag(ISourceDataTag sourceDataTag, ChangeReport changeReport) {
         LOG.debug(format("entering onAddDataTag(%d)..", sourceDataTag.getId()));
@@ -134,35 +149,32 @@ public class SpectrumMessageHandler extends EquipmentMessageHandler
         LOG.debug(format("leaving onRemoveDataTag(%d)", sourceDataTag.getId()));        
     }
 
+    /**
+     * The operation is present pas not really used. The only attribute of the tag (apart from its name)
+     * is the hostname. IF the hostname changes, the name of the tag will also change as it contains the
+     * hostname as part of the "alarm id"-triplet. Changing the hostname is equivalent to simply replace
+     * the tag. Therefore, when this method is called, we simply replace the old by the new tag
+     */
     @Override
-    public void onUpdateDataTag(ISourceDataTag sourceDataTag, ISourceDataTag oldSourceDataTag, ChangeReport changeReport) {
-        LOG.debug(format("entering onUpdateDataTag(%d,%d)..", sourceDataTag.getId(), oldSourceDataTag.getId()));
-        changeReport.setState(CHANGE_STATE.SUCCESS);
-        if (!oldSourceDataTag.getHardwareAddress().equals(sourceDataTag.getHardwareAddress())) {
+    public void onUpdateDataTag(ISourceDataTag tag, ISourceDataTag oldTag, ChangeReport changes) {
+        LOG.debug(format("entering onUpdateDataTag(%d,%d)..", tag.getId(), oldTag.getId()));
+        changes.setState(CHANGE_STATE.SUCCESS);
+        if (!oldTag.getHardwareAddress().equals(tag.getHardwareAddress())) {
             try {
-                LOG.debug(format("calling  unregisterTag(%d)..", oldSourceDataTag.getId()));
-                unregisterTag(oldSourceDataTag);
+                LOG.debug(format("calling  unregisterTag(%d)..", oldTag.getId()));
+                unregisterTag(oldTag);
             } catch (Exception ex) {
-                changeReport.appendWarn(ex.getMessage());
+                changes.appendWarn(ex.getMessage());
             }
-            LOG.debug(format("calling  registerTag(%d)..", sourceDataTag.getId()));
-            registerTag(sourceDataTag);
+            LOG.debug(format("calling  registerTag(%d)..", tag.getId()));
+            registerTag(tag);
         }
         else {
-            changeReport.appendInfo("No change detected in the tag hardware address. No action effected");
+            changes.appendInfo("No change detected in the tag hardware address. No action effected");
         }
-        LOG.debug(format("leaving onUpdateDataTag(%d,%d)", sourceDataTag.getId(), oldSourceDataTag.getId()));        
+        LOG.debug(format("leaving onUpdateDataTag(%d,%d)", tag.getId(), oldTag.getId()));        
     }
 
-    @Override
-    public void refreshAllDataTags() {
-        // WB left this one out in the alarm monitors ...
-    }
-
-    @Override
-    public void refreshDataTag(long dataTagId) {
-        // WB left this one out in the alarm monitors ...        
-    }
 
     
     synchronized void registerTag(ISourceDataTag tag) {
@@ -189,9 +201,20 @@ public class SpectrumMessageHandler extends EquipmentMessageHandler
         }
     }
     
-    public SpectrumEventProcessor getProcessor()
-    {
-        return this.proc;
+    //
+    // --- REFRESH OPs --------------------------------------------------------------------------------------
+    //
+    // This methods were left out in the example code (the "alarm monitors") used for this DAQ. For now, its
+    // the same thing here.
+    //
+    @Override
+    public void refreshAllDataTags() {
+        LOG.warn("The DAQ framework requested a refresh of all data tags: this operation is not supported.");        
+    }
+
+    @Override
+    public void refreshDataTag(long tagId) {
+        LOG.warn(format("The DAQ framework requested a refresh of tag (%d): this operation is not supported.", tagId));        
     }
 
 }

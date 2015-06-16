@@ -59,26 +59,36 @@ public class SpectrumAlarm {
      * least one error after the call, the global alarm for us is always true.
      * 
      * @param spectrumAlarmId <code>long</code> id of the alarm as defined by Spectrum
+     * @return <code>boolean</code> true if the alarm status has changed from false to true
      */
-    public void activate(long spectrumAlarmId) {
+    public boolean activate(long spectrumAlarmId) {
+        boolean changed = false;
         if (!spectrumAlarmIds.contains(spectrumAlarmId)) {
             spectrumAlarmIds.add(spectrumAlarmId);
         }
-        alarmOn = true;
+        if (!alarmOn) {                
+            alarmOn = true;
+            changed = true;
+        }
+        return changed;
     }
 
     /**
      * Remove the specified error. If after the call the list is empty, the alarms is considered to be off
      * 
      * @param spectrumAlarmId <code>long</code> id of the alarm as defined by Spectrum
+     * @return <code>boolean</code> true if the alarm status has changed from true to false
      */
-    public void terminate(long spectrumAlarmId) {
+    public boolean terminate(long spectrumAlarmId) {
+        boolean changed = false;
         if (spectrumAlarmIds.contains(spectrumAlarmId)) {
             spectrumAlarmIds.remove(spectrumAlarmId);
         }
-        if (this.getAlarmCount() == 0) {
+        if (this.getAlarmCount() == 0 && alarmOn) {
             alarmOn = false;
+            changed = true;
         }
+        return changed;
     }
 
     /**
