@@ -5,7 +5,8 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-daq</groupId>
 		<artifactId>c2mon-daq-pom</artifactId>
-		<version>1.1.8</version>
+<!-- 		<version>1.1.8</version>  -->
+ 		<version>1.1.0</version>  
 	</parent>
 
 	<artifactId>c2mon-daq-spectrum</artifactId>
@@ -115,17 +116,28 @@
 		</dependency>
 	</dependencies>
 
+
+<!-- 
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-daq-spectrum</developerConnection>
+  </scm>
+  <build>
+
+    <plugins />
+
+  </build>
+
+  <developers />
+
 	<developers>
 		<developer>
 			<name>Mark Buttner</name>
 			<email>mark.buttner@cern.ch</email>
 		</developer>
 	</developers>
-
 	<build>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -153,4 +165,5 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+	 -->
 </project>
