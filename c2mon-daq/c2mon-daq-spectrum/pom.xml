@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>c2mon-daq-spectrum</artifactId>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.3-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 	<description>C2MON DAQ component for acquisition of the GM and FESA alarms</description>
@@ -117,9 +117,8 @@
 
 	<developers>
 		<developer>
-			<name>Wojtek Buczak</name>
-			<email>Wojciech.Buczak@cern.ch</email>
-			<url>http://consult.cern.ch/xwho/people/617677</url>
+			<name>Mark Buttner</name>
+			<email>mark.buttner@cern.ch</email>
 		</developer>
 	</developers>
 
