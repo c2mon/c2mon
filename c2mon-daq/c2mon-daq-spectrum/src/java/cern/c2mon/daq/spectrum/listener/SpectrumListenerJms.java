@@ -36,30 +36,37 @@ public class SpectrumListenerJms implements SpectrumListenerIntf, MessageListene
     @Override
     public void run() {
         cont = true;
+        Connection conn = null;
+        MessageConsumer cons = null;
+        Session sess = null;
         try {
             LOG.info("Starting Spectrum JMS listener ...");
             JmsProviderIntf jms = new SonicConnector();
-            Connection conn = jms.getConnection();
+            conn = jms.getConnection();
             conn.start();
             
-            Session sess = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            sess = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Destination topic = sess.createTopic("CERN.DIAMON.SPECTRUM");
-            MessageConsumer cons = sess.createConsumer(topic);
+            cons = sess.createConsumer(topic);
             cons.setMessageListener(this);
-            
-            while (cont) {
-                try {
-                    Thread.sleep(2 * 1000); // first attempt: inject one event per n seconds
-                } catch (Exception e) {
-                    LOG.error("Sleep interrupted in main loop of JMS listener!");
-                }
-            }
-            cons.close();
-            sess.close();
-            conn.close();
-            
         } catch (Exception e) {
-            LOG.error("Failure in Spectrum mock thread", e);
+            LOG.error("Failure during Spectrum JMS boot.", e);
+        }                    
+            
+        while (cont) {
+            try {
+                Thread.sleep(2 * 1000); // first attempt: inject one event per n seconds
+                LOG.info("... waiting ...");
+            } catch (Exception e) {
+                LOG.error("Sleep interrupted in main loop of JMS listener!");
+            }
+        }
+        try {
+            if (cons != null) cons.close();
+            if (sess !=null) sess.close();
+            if (conn != null) conn.close();
+        } catch (Exception e) {
+            LOG.error("Failure during Spectrum JMS stop.", e);
         }                    
         LOG.info("Spectrum JMS listener stopped.");
     }
@@ -82,6 +89,7 @@ public class SpectrumListenerJms implements SpectrumListenerIntf, MessageListene
     @Override
     public void onMessage(Message msg) {
         try {
+            LOG.info("... data incoming ...");
             TextMessage tm = (TextMessage) msg;
             String content = tm.getText();
             String server = msg.getStringProperty("spectrum_Server");

@@ -107,52 +107,5 @@
 	</dependencies>
 
   
-  <!-- 
-  
-  <build>
-
-    <plugins />
-
-  </build>
-
-  <developers />
-
-	<developers>
-		<developer>
-			<name>Mark Buttner</name>
-			<email>mark.buttner@cern.ch</email>
-		</developer>
-	</developers>
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.codehaus.mojo</groupId>
-										<artifactId>build-helper-maven-plugin</artifactId>
-										<versionRange>[1.1,)</versionRange>
-										<goals>
-											<goal>add-test-source</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
-	 -->
   <groupId>cern.c2mon.c2mon-daq</groupId>
 </project>

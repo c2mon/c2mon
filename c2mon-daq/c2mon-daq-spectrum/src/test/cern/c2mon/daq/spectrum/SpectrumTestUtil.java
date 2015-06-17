@@ -59,8 +59,7 @@ public class SpectrumTestUtil {
         SpectrumListenerJunit.getListener().sendMessage(server, buffer.toString()); 
     }
     
-    public static void sendMessage(String server, SpectrumEventType cmd, String hostname, int causeId) {
-
+    public static String buildMessage(SpectrumEventType cmd, String hostname, int causeId) {
         StringBuffer buffer = new StringBuffer();
         buffer.append(cmd.toString() + " ");
 
@@ -78,7 +77,13 @@ public class SpectrumTestUtil {
         buffer.append(DTE_FMT.format(now) + " x 1 ");       // fake model and alarm id
         buffer.append(causeId + " ");
         buffer.append("0x20661c0 \"TEST PB DESC ...\"");    // constant model handle and pb desc
-        SpectrumListenerJunit.getListener().sendMessage(server, buffer.toString()); 
+        return buffer.toString();
+    }
+    
+    
+    public static void sendMessage(String server, SpectrumEventType cmd, String hostname, int causeId) {
+        String message = buildMessage(cmd, hostname, causeId);
+        SpectrumListenerJunit.getListener().sendMessage(server, message); 
      // "CLR 172.18.227.106 01/29/2015 11:03:47 u2485-r-pb14-bhp42-1 21082124 10009 0x20661c0 \"DEVICE HAS ...\"");
 
     }
