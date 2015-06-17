@@ -45,6 +45,7 @@ public class SpectrumEventProcessorTest extends GenericMessageHandlerTst {
     protected static SpectrumMessageHandler theHandler;
     
     private static final String primaryServer = "cs-srv-44.cern.ch";
+    private static final String secondaryServer = "cs-srv-45.cern.ch";
 
     
     //
@@ -112,7 +113,7 @@ public class SpectrumEventProcessorTest extends GenericMessageHandlerTst {
     public void testConnectionLost() {
         SpectrumEventProcessor proc = theHandler.getProcessor();
         proc.setBackupControl(10,10);       // set control to 10s freq with max. interval to 10s to make test fast
-        SpectrumTestUtil.trySleepSec(5);
+        SpectrumTestUtil.trySleepSec(3);
         assertTrue(proc.isConnectionOk());
         SpectrumTestUtil.trySleepSec(10);
         assertFalse(proc.isConnectionOk());
@@ -132,8 +133,10 @@ public class SpectrumEventProcessorTest extends GenericMessageHandlerTst {
         theHandler = (SpectrumMessageHandler) msgHandler;        
         SpectrumMessageHandler.profile = "TEST";
         theHandler.connectToDataSource();                        
+        SpectrumTestUtil.trySleepSec(3);
         LOG.info("Init done.");
-        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.RST, "cs-ccr-diam1", 1);
+        SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.RST, "-", 1);
+        SpectrumTestUtil.sendMessage(secondaryServer, SpectrumEventType.RST, "-", 1);
         SpectrumTestUtil.trySleepSec(3);
     }
 

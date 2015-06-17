@@ -22,7 +22,7 @@ public class SpectrumAlarm {
     private ISourceDataTag tag;
     private boolean alarmOn;
     private long userTimestamp;
-    private String source;
+    private String source = "-";
 
     //
     // --- CONSTRUCTION --------------------------------------------------------------

@@ -205,6 +205,7 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
                                 if (event.toActivate()) {
                                     LOG.info("ACTIVATE: [" + event.getServerName() + "] " + event);
                                     if (alarm.activate(event.getAlarmId())) {
+                                        alarm.setSource(event.getServerName());
                                         equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.TRUE, ts, descr);
                                         LOG.debug("-> tag updated");
                                     }
@@ -296,14 +297,21 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
      * @param spectrumServer 
      */
     private void terminateAll(String spectrumServer) {
-        LOG.warn("Terminate all procedure triggered ...");
+        Logger log = LoggerFactory.getLogger("special");
+        log.warn("Terminate all procedure triggered ...");
         for (SpectrumAlarm alarm : monitoredHosts.values()) {
+            // TODO remove the logging statements here!
+            // TODO release again and test in production
+            log.info("alarm:     " + alarm);
+            log.info("alarm on:  " + alarm.isAlarmOn());
+            log.info("alarm src: " + alarm.getSource());
+            log.info("server:    " + spectrumServer);
             if (alarm.isAlarmOn() && alarm.getSource().equals(spectrumServer)) {
                 equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.FALSE, System.currentTimeMillis());
                 alarm.clear();
             }
         }
-        LOG.info("Terminate all procedure completed.");
+        log.info("Terminate all procedure completed.");
     }
 
     /**
