@@ -51,8 +51,9 @@ public class DiskBuffer {
         try {
             pw = new PrintWriter(BUFFER_NAME);
             for (String hostname : result) {
-                pw.print(hostname);
                 SpectrumAlarm alarm = monitoredHosts.get(hostname);
+                pw.print(alarm.getSource());
+                pw.print("," + hostname);
                 pw.print("," + alarm.getUserTimestamp());
                 for (Long l : alarm.getAlarmIds()) {
                     pw.print("," + l);
@@ -81,9 +82,11 @@ public class DiskBuffer {
                 String ligne = null;
                 while ((ligne = inp.readLine()) != null) {
                     StringTokenizer st = new StringTokenizer(ligne, ",");
+                    String source = st.nextToken();
                     String hostname = st.nextToken();
                     SpectrumAlarm alarm = proc.getAlarm(hostname);
                     if (alarm != null) {
+                        alarm.setSource(source);
                         long ts = Long.parseLong(st.nextToken());
                         alarm.setUserTimestamp(ts);
                         while (st.hasMoreTokens()) {

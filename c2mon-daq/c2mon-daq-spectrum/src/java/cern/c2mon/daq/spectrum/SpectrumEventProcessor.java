@@ -55,6 +55,9 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
     public static final SimpleDateFormat DATE_FMT = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
     public static final long BACKUP_DELAY = 7 * 60 * 1000; // 5mn in reality, but let them some delay ...
 
+    public static final int TOLERANCE = 1000 * 60 * 1; // only if incoming message is older by more than a minute
+                                                       // compared to the previous, we "terminate all".
+    
     private IEquipmentMessageSender equipmentMessageSender;
     private ConcurrentHashMap<String, SpectrumAlarm> monitoredHosts = new ConcurrentHashMap<String, SpectrumAlarm>();
     private boolean cont = true;
@@ -166,7 +169,7 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
                     // For a "reset" event (manually sent if detected here), we have to clear all active alarms
                     if (event.toReset()) {
                         LOG.warn("Spectrum sent a RST event, terminate all active alarms...");
-                        terminateAll();
+                        terminateAll(event.getServerName());
                         LOG.warn("All alarms terminated (RESET event).");
                     } else {
                         // set attributes of the event based on the raw data stored on construction
@@ -290,11 +293,12 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
     /**
      * In case of reset message from the client scripts, all alarms are terminated and their internal
      * list of fautl codes is cleared. 
+     * @param spectrumServer 
      */
-    private void terminateAll() {
+    private void terminateAll(String spectrumServer) {
         LOG.warn("Terminate all procedure triggered ...");
         for (SpectrumAlarm alarm : monitoredHosts.values()) {
-            if (alarm.isAlarmOn()) {
+            if (alarm.isAlarmOn() && alarm.getSource().equals(spectrumServer)) {
                 equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.FALSE, System.currentTimeMillis());
                 alarm.clear();
             }
@@ -309,16 +313,20 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
      */
     private void setLastEventTs(String serverName, long uts) {
         if (serverName.equals(getPrimaryServer())) {
-            if (uts < this.lastEventPrimary) {
+            if (uts < (this.lastEventPrimary - TOLERANCE)) {
                 LOG.warn("{} sent messages in unconsistent chronological order ...", serverName);
-                terminateAll();
+                LOG.info("Previous message was: " + (new Date(this.lastEventPrimary)).toString());
+                LOG.info("Incoming:             " + (new Date(uts)).toString());
+                terminateAll(serverName);
             }
             this.lastEventPrimary = uts;
         }
         if (serverName.equals(getSecondaryServer())) {
-            if (uts < this.lastEventSecondary) {
+            if (uts < (this.lastEventSecondary - TOLERANCE)) {
                 LOG.warn("{} sent messages in unconsistent chronological order ...", serverName);
-                terminateAll();
+                LOG.info("Previous message was: " + (new Date(this.lastEventSecondary)).toString());
+                LOG.info("Incoming:             " + (new Date(uts)).toString());
+                terminateAll(serverName);
             }
             this.lastEventSecondary = uts;
         }

@@ -22,6 +22,7 @@ public class SpectrumAlarm {
     private ISourceDataTag tag;
     private boolean alarmOn;
     private long userTimestamp;
+    private String source;
 
     //
     // --- CONSTRUCTION --------------------------------------------------------------
@@ -105,6 +106,14 @@ public class SpectrumAlarm {
 
     public void setUserTimestamp(long userTimestamp) {
         this.userTimestamp = userTimestamp;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 
 }

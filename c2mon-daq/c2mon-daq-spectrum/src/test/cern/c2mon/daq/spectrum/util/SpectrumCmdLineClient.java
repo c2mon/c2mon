@@ -33,10 +33,11 @@ public class SpectrumCmdLineClient
             SpectrumEventType cmd = SpectrumEventType.valueOf(args[0]);
             String hostname = args[1];
             int causeId = Integer.parseInt(args[2]);
+            String source = args[3];
         
             String strmsg = SpectrumTestUtil.buildMessage(cmd, hostname, causeId);
             TextMessage message = sess.createTextMessage(strmsg);
-            message.setStringProperty("spectrum_Server", "cs-srv-44");
+            message.setStringProperty("spectrum_Server", source);
         
             prod.send(message);
         
@@ -45,7 +46,7 @@ public class SpectrumCmdLineClient
         }
         catch (Exception e)
         {
-            System.err.println("Usage: SpectrumCmdLineClient CLR|RST|SET|UPD|KAL hostname cause_id");
+            System.err.println("Usage: SpectrumCmdLineClient CLR|RST|SET|UPD|KAL hostname cause_id source_server");
             e.printStackTrace();
         }
         finally
