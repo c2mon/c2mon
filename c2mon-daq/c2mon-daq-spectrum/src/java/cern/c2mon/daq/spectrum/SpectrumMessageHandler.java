@@ -24,8 +24,7 @@ import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 
 /**
  * 
- * TODO compare results to production status (alarms on/off in laser for the hosts)
- * TODO deploy
+ * TODO compare with production results (retrieve the correct situation from the spectrum bridge and apply!)
  *      
  * @author mbuttner
  */
@@ -207,17 +206,19 @@ public class SpectrumMessageHandler extends EquipmentMessageHandler
     //
     // --- REFRESH OPs --------------------------------------------------------------------------------------
     //
-    // This methods were left out in the example code (the "alarm monitors") used for this DAQ. For now, its
-    // the same thing here.
-    //
     @Override
     public void refreshAllDataTags() {
+        for (ISourceDataTag tag : getEquipmentConfiguration().getSourceDataTags().values()) {
+            getEquipmentMessageSender().sendTagFiltered(tag, tag.getCurrentValue(), System.currentTimeMillis());
+        }        
         LOG.warn("The DAQ framework requested a refresh of all data tags: this operation is not supported.");        
     }
 
     @Override
     public void refreshDataTag(long tagId) {
-        LOG.warn(format("The DAQ framework requested a refresh of tag (%d): this operation is not supported.", tagId));        
+        LOG.info("... refreshing tag " + tagId + " ...");
+        ISourceDataTag tag = getEquipmentConfiguration().getSourceDataTags().get(tagId);
+        getEquipmentMessageSender().sendTagFiltered(tag, tag.getCurrentValue(), System.currentTimeMillis());
     }
 
 }

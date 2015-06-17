@@ -53,6 +53,7 @@ public class DiskBuffer {
             for (String hostname : result) {
                 pw.print(hostname);
                 SpectrumAlarm alarm = monitoredHosts.get(hostname);
+                pw.print("," + alarm.getUserTimestamp());
                 for (Long l : alarm.getAlarmIds()) {
                     pw.print("," + l);
                 }
@@ -78,20 +79,21 @@ public class DiskBuffer {
             if (f.exists()) {
                 inp = new BufferedReader(new FileReader(f));
                 String ligne = null;
-                long ts = System.currentTimeMillis();
                 while ((ligne = inp.readLine()) != null) {
                     StringTokenizer st = new StringTokenizer(ligne, ",");
                     String hostname = st.nextToken();
                     SpectrumAlarm alarm = proc.getAlarm(hostname);
                     if (alarm != null) {
+                        long ts = Long.parseLong(st.nextToken());
+                        alarm.setUserTimestamp(ts);
                         while (st.hasMoreTokens()) {
                             long alarmId = Long.parseLong(st.nextToken());
                             LOG.debug("<<  " + alarm.getTag().getName() + " < " + alarmId);
                             alarm.activate(alarmId);
                             LOG.debug("" + alarm.getTag().getName() + " -> " + alarm.getAlarmCount());
                         }
-                        equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.TRUE, ts,
-                                " ... from disk buffer ...");
+                        equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.TRUE, ts, 
+                                "Reloaded from disk after restart");
                     }
                 }
             }

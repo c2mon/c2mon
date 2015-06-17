@@ -56,7 +56,7 @@ public class SpectrumListenerJms implements SpectrumListenerIntf, MessageListene
         while (cont) {
             try {
                 Thread.sleep(2 * 1000); // first attempt: inject one event per n seconds
-                LOG.info("... waiting ...");
+                LOG.trace("... waiting ...");
             } catch (Exception e) {
                 LOG.error("Sleep interrupted in main loop of JMS listener!");
             }
@@ -89,7 +89,7 @@ public class SpectrumListenerJms implements SpectrumListenerIntf, MessageListene
     @Override
     public void onMessage(Message msg) {
         try {
-            LOG.info("... data incoming ...");
+            LOG.debug("... data incoming ...");
             TextMessage tm = (TextMessage) msg;
             String content = tm.getText();
             String server = msg.getStringProperty("spectrum_Server");

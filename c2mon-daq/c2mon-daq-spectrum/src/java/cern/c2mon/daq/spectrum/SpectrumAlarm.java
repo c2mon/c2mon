@@ -21,6 +21,7 @@ public class SpectrumAlarm {
     private ArrayList<Long> spectrumAlarmIds;
     private ISourceDataTag tag;
     private boolean alarmOn;
+    private long userTimestamp;
 
     //
     // --- CONSTRUCTION --------------------------------------------------------------
@@ -96,6 +97,14 @@ public class SpectrumAlarm {
      */
     public Collection<Long> getAlarmIds() {
         return this.spectrumAlarmIds;
+    }
+
+    public long getUserTimestamp() {
+        return userTimestamp;
+    }
+
+    public void setUserTimestamp(long userTimestamp) {
+        this.userTimestamp = userTimestamp;
     }
 
 }

@@ -111,7 +111,7 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
 
     public void add(String hostname, ISourceDataTag tag) {
         monitoredHosts.put(hostname.toUpperCase(), new SpectrumAlarm(tag));
-        equipmentMessageSender.sendTagFiltered(tag, Boolean.FALSE, System.currentTimeMillis());
+//        equipmentMessageSender.sendTagFiltered(tag, Boolean.FALSE, System.currentTimeMillis());
     }
 
     public SpectrumAlarm getAlarm(String hostname) {
