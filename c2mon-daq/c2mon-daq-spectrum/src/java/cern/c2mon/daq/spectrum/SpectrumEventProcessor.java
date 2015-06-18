@@ -55,8 +55,8 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
     public static final SimpleDateFormat DATE_FMT = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
     public static final long BACKUP_DELAY = 7 * 60 * 1000; // 5mn in reality, but let them some delay ...
 
-    public static final int TOLERANCE = 1000 * 60 * 1; // only if incoming message is older by more than a minute
-                                                       // compared to the previous, we "terminate all".
+    private int tolerance;      // only if incoming message is older by more than a minute
+                                // compared to the previous, we "terminate all".
     
     private IEquipmentMessageSender equipmentMessageSender;
     private ConcurrentHashMap<String, SpectrumAlarm> monitoredHosts = new ConcurrentHashMap<String, SpectrumAlarm>();
@@ -88,6 +88,23 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
     {
         this.backupControlFreq = freq;
         this.bkpDelay = delay * 1000;        
+    }
+    
+    /**
+     * Set value for backrolling timestamps sent by Spectrum. This is only needed for the JMS listener
+     * as usually the delivery is really in sequence. Note that the parameter value is expressed in
+     * seconds, but the internal storage is in ms!
+     * 
+     * @param tolerance <code>int</code> the number of seconds a ts can be before the one of the previous message
+     */ 
+    public void setTolerance(int tolerance)
+    {
+        this.tolerance = tolerance * 1000;
+    }
+    
+    public int getTolerance()
+    {
+        return this.tolerance;
     }
     
     public void setSender(IEquipmentMessageSender equipmentMessageSender) {
@@ -300,12 +317,6 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
         Logger log = LoggerFactory.getLogger("special");
         log.warn("Terminate all procedure triggered ...");
         for (SpectrumAlarm alarm : monitoredHosts.values()) {
-            // TODO remove the logging statements here!
-            // TODO release again and test in production
-            log.info("alarm:     " + alarm);
-            log.info("alarm on:  " + alarm.isAlarmOn());
-            log.info("alarm src: " + alarm.getSource());
-            log.info("server:    " + spectrumServer);
             if (alarm.isAlarmOn() && alarm.getSource().equals(spectrumServer)) {
                 equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.FALSE, System.currentTimeMillis());
                 alarm.clear();
@@ -321,7 +332,7 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
      */
     private void setLastEventTs(String serverName, long uts) {
         if (serverName.equals(getPrimaryServer())) {
-            if (uts < (this.lastEventPrimary - TOLERANCE)) {
+            if (uts < (this.lastEventPrimary - tolerance)) {
                 LOG.warn("{} sent messages in unconsistent chronological order ...", serverName);
                 LOG.info("Previous message was: " + (new Date(this.lastEventPrimary)).toString());
                 LOG.info("Incoming:             " + (new Date(uts)).toString());
@@ -330,7 +341,7 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
             this.lastEventPrimary = uts;
         }
         if (serverName.equals(getSecondaryServer())) {
-            if (uts < (this.lastEventSecondary - TOLERANCE)) {
+            if (uts < (this.lastEventSecondary - tolerance)) {
                 LOG.warn("{} sent messages in unconsistent chronological order ...", serverName);
                 LOG.info("Previous message was: " + (new Date(this.lastEventSecondary)).toString());
                 LOG.info("Incoming:             " + (new Date(uts)).toString());

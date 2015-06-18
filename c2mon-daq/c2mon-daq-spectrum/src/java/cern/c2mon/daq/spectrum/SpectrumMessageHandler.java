@@ -24,7 +24,6 @@ import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 
 /**
  * 
- * TODO compare with production results (retrieve the correct situation from the spectrum bridge and apply!)
  *      
  * @author mbuttner
  */

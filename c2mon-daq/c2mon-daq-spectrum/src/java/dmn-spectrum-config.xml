@@ -18,6 +18,7 @@
 		<property name="primaryServer" value="cs-srv-44.cern.ch" />
 		<property name="secondaryServer" value="cs-srv-45.cern.ch" />
 		<property name="port" value="12001" />
+		<property name="tolerance" value="30" />
 	</bean>
 
 	<beans profile="PRO">
