@@ -119,7 +119,7 @@ public class SpectrumEventProcessorTest extends GenericMessageHandlerTst {
         assertFalse(proc.isConnectionOk());
         
         SpectrumTestUtil.sendKeepAlive(primaryServer, "OK");
-        SpectrumTestUtil.trySleepSec(3);
+        SpectrumTestUtil.trySleepSec(5);
         assertTrue(proc.isConnectionOk());
     }
     
