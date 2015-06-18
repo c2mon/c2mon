@@ -23,19 +23,26 @@ public class SpectrumAlarm {
     private boolean alarmOn;
     private long userTimestamp;
     private String source = "-";
-
+    private String hostname;
+    
     //
     // --- CONSTRUCTION --------------------------------------------------------------
     //
-    public SpectrumAlarm(ISourceDataTag tag) {
+    public SpectrumAlarm(String hostname, ISourceDataTag tag) {
         spectrumAlarmIds = new ArrayList<Long>();
         alarmOn = false;
         this.tag = tag;
+        this.hostname = hostname;
     }
 
     //
     // --- PUBLIC METHODS ------------------------------------------------------------
     //
+    public String getHostname()
+    {
+        return this.hostname;
+    }
+    
     public int getAlarmCount() {
         return spectrumAlarmIds.size();
     }
@@ -63,16 +70,13 @@ public class SpectrumAlarm {
      * @param spectrumAlarmId <code>long</code> id of the alarm as defined by Spectrum
      * @return <code>boolean</code> true if the alarm status has changed from false to true
      */
-    public boolean activate(long spectrumAlarmId) {
-        boolean changed = false;
+    public void activate(long spectrumAlarmId) {
         if (!spectrumAlarmIds.contains(spectrumAlarmId)) {
             spectrumAlarmIds.add(spectrumAlarmId);
         }
         if (!alarmOn) {                
             alarmOn = true;
-            changed = true;
         }
-        return changed;
     }
 
     /**
@@ -81,16 +85,13 @@ public class SpectrumAlarm {
      * @param spectrumAlarmId <code>long</code> id of the alarm as defined by Spectrum
      * @return <code>boolean</code> true if the alarm status has changed from true to false
      */
-    public boolean terminate(long spectrumAlarmId) {
-        boolean changed = false;
+    public void terminate(long spectrumAlarmId) {
         if (spectrumAlarmIds.contains(spectrumAlarmId)) {
             spectrumAlarmIds.remove(spectrumAlarmId);
         }
         if (this.getAlarmCount() == 0 && alarmOn) {
             alarmOn = false;
-            changed = true;
         }
-        return changed;
     }
 
     /**

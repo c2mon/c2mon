@@ -70,7 +70,7 @@ public class SpectrumMessageHandler extends EquipmentMessageHandler
         proc = ctx.getBean("eventProc", SpectrumEventProcessor.class);
         proc.setSender(getEquipmentMessageSender());
         procThr = new Thread(proc);
-
+        
         spectrum = ctx.getBean("eventListener", SpectrumListenerIntf.class);
         spectrum.setProcessor(proc);
         
@@ -81,6 +81,7 @@ public class SpectrumMessageHandler extends EquipmentMessageHandler
             registerTag(tag);
         }        
     
+        proc.init();
         listenerThr.start();
         procThr.start();
         getEquipmentMessageSender().confirmEquipmentStateOK();
@@ -207,10 +208,7 @@ public class SpectrumMessageHandler extends EquipmentMessageHandler
     //
     @Override
     public void refreshAllDataTags() {
-        for (ISourceDataTag tag : getEquipmentConfiguration().getSourceDataTags().values()) {
-            getEquipmentMessageSender().sendTagFiltered(tag, tag.getCurrentValue(), System.currentTimeMillis());
-        }        
-        LOG.warn("The DAQ framework requested a refresh of all data tags: this operation is not supported.");        
+        LOG.warn("refreshAllDataTags() method is not implemented by this DAQ ... any problem related to reconfig?");
     }
 
     @Override

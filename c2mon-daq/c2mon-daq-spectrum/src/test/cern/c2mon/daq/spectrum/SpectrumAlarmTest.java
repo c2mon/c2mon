@@ -33,7 +33,7 @@ public class SpectrumAlarmTest
     @Test
     public void testSpectrumAlarm()
     {
-        SpectrumAlarm sa = new SpectrumAlarm(null);
+        SpectrumAlarm sa = new SpectrumAlarm("x", null);
         assertFalse(sa.isAlarmOn());
         
         sa.activate(1);

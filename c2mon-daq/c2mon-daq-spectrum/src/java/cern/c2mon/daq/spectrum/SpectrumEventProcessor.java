@@ -90,6 +90,19 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
         this.bkpDelay = delay * 1000;        
     }
     
+    public void refreshAll()
+    {
+        LOG.info("Start refresh tag value operation ...");
+        for (SpectrumAlarm alarm : monitoredHosts.values()) {
+            if (alarm.isAlarmOn())
+            {
+                LOG.info("Alarm on: " + alarm.getHostname());
+            }
+            equipmentMessageSender.sendTagFiltered(alarm.getTag(), alarm.isAlarmOn(), alarm.getUserTimestamp(),"from buffer");
+        }        
+        LOG.info("Refreshed all data tags.");        
+    }
+    
     /**
      * Set value for backrolling timestamps sent by Spectrum. This is only needed for the JMS listener
      * as usually the delivery is really in sequence. Note that the parameter value is expressed in
@@ -100,6 +113,7 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
     public void setTolerance(int tolerance)
     {
         this.tolerance = tolerance * 1000;
+        LOG.info("Tolerance (backward timestamped messages): " + tolerance + "s");
     }
     
     public int getTolerance()
@@ -130,14 +144,19 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
     }
 
     public void add(String hostname, ISourceDataTag tag) {
-        monitoredHosts.put(hostname.toUpperCase(), new SpectrumAlarm(tag));
-//        equipmentMessageSender.sendTagFiltered(tag, Boolean.FALSE, System.currentTimeMillis());
+        monitoredHosts.put(hostname.toUpperCase(), new SpectrumAlarm(hostname, tag));
     }
 
     public SpectrumAlarm getAlarm(String hostname) {
         return monitoredHosts.get(hostname.toUpperCase());
     }
 
+    public void init()
+    {
+        // attempt to read buffer and activate stuff from prior run
+        DiskBuffer.loadBuffer(this);        
+    }
+    
     /**
      * The event consumer thread. Spectrum events are taken from the event queue and converted as possible into LASER
      * alarms, action handled by the SpectrumServer class. The thread is a kind of buffer between the events queue and
@@ -149,8 +168,15 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
         lastKalPrimary = System.currentTimeMillis();
         lastKalSecondary = System.currentTimeMillis();
 
-        // attempt to read buffer and activate stuff from prior run
-        DiskBuffer.loadBuffer(this, equipmentMessageSender);
+        try
+        {
+            Thread.sleep(2000);
+            this.refreshAll();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
         long loopcounter = 0;
         while (cont) {
@@ -221,19 +247,16 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
                                 long ts = System.currentTimeMillis();
                                 if (event.toActivate()) {
                                     LOG.info("ACTIVATE: [" + event.getServerName() + "] " + event);
-                                    if (alarm.activate(event.getAlarmId())) {
-                                        alarm.setSource(event.getServerName());
-                                        equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.TRUE, ts, descr);
-                                        LOG.debug("-> tag updated");
-                                    }
+                                    alarm.activate(event.getAlarmId());
+                                    alarm.setSource(event.getServerName());
+                                    equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.TRUE, ts, descr);
+                                    LOG.info("-> tag updated");
                                 }
                                 if (event.toTerminate()) {
                                     LOG.info("TERMINATE: [" + event.getServerName() + "] " + event);
-                                    if (alarm.terminate(event.getAlarmId())) {
-//                                    if (!alarm.isAlarmOn()) {
-                                        equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.FALSE, ts, descr);
-                                        LOG.debug("-> tag updated");
-                                    }
+                                    alarm.terminate(event.getAlarmId());
+                                    equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.FALSE, ts, descr);
+                                    LOG.info("-> tag updated");
                                 }
                             } else {
                                 LOG.warn("No alarm definition found for host " + hostname + ", event discarded");

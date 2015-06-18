@@ -17,7 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.spectrum.SpectrumAlarm;
 import cern.c2mon.daq.spectrum.SpectrumEventProcessor;
 
@@ -72,7 +71,7 @@ public class DiskBuffer {
     /**
      * Update the status of the configured alarms based on the content of the disk buffer.
      */
-    public static void loadBuffer(SpectrumEventProcessor proc, IEquipmentMessageSender equipmentMessageSender) {
+    public static void loadBuffer(SpectrumEventProcessor proc) {
         LOG.info("Start to load active alarms from disk buffer ...");
         BufferedReader inp = null;
         try {
@@ -84,19 +83,27 @@ public class DiskBuffer {
                     StringTokenizer st = new StringTokenizer(ligne, ",");
                     String source = st.nextToken();
                     String hostname = st.nextToken();
+                    LOG.info("Work on [" + hostname + "] activated by " + source + " ...");
                     SpectrumAlarm alarm = proc.getAlarm(hostname);
                     if (alarm != null) {
                         alarm.setSource(source);
+                        LOG.info(" ... source set to " + source);
                         long ts = Long.parseLong(st.nextToken());
+                        if (ts == 0)
+                        {
+                            ts = System.currentTimeMillis();
+                        }
                         alarm.setUserTimestamp(ts);
                         while (st.hasMoreTokens()) {
                             long alarmId = Long.parseLong(st.nextToken());
                             LOG.debug("<<  " + alarm.getTag().getName() + " < " + alarmId);
                             alarm.activate(alarmId);
-                            LOG.debug("" + alarm.getTag().getName() + " -> " + alarm.getAlarmCount());
+                            LOG.info("" + alarm.getTag().getName() + " -> " + alarm.getAlarmCount());
                         }
-                        equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.TRUE, ts, 
-                                "Reloaded from disk after restart");
+                    }
+                    else
+                    {
+                        LOG.warn("Buffered alarm not found in cache!");
                     }
                 }
             }
