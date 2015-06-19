@@ -23,6 +23,8 @@ import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 /**
+ * TODO problem timestamps (buffer, update, )
+ * 
  * Check add/remove/get of a host into the internal data structure of the processr
  * Check that one minute without backup or backup with NOT OK ends in connection not ok
  * 

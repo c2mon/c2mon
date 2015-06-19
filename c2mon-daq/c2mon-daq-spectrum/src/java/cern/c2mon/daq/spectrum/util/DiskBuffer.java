@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -94,6 +95,7 @@ public class DiskBuffer {
                             ts = System.currentTimeMillis();
                         }
                         alarm.setUserTimestamp(ts);
+                        LOG.info("Alarm timestamp restored: " + (new Date(ts)).toString());
                         while (st.hasMoreTokens()) {
                             long alarmId = Long.parseLong(st.nextToken());
                             LOG.debug("<<  " + alarm.getTag().getName() + " < " + alarmId);
