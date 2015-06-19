@@ -48,6 +48,17 @@ public class DeviceCacheImpl implements DeviceCache {
   }
 
   @Override
+  public Device get(String deviceName) {
+    for (Device device : cache.values()) {
+      if (device.getName().equals(deviceName)) {
+        return device;
+      }
+    }
+
+    return null;
+  }
+
+  @Override
   public List<Device> getAllDevices(String deviceClassName) {
     List<Device> devices = new ArrayList<Device>();
 

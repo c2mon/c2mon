@@ -278,18 +278,31 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
       return;
     }
 
+    Set<Device> devices = new HashSet<>();
+
+    // Check if any of the devices are cached
+    Set<DeviceInfo> devicesToRetrieve = new HashSet<>();
+    for (DeviceInfo info : deviceInfoList) {
+      Device device = deviceCache.get(info.getDeviceName());
+      if (device == null) {
+        devicesToRetrieve.add(info);
+      } else {
+        devices.add(device);
+      }
+    }
+
     // Copy the list into a HashSet to make sure it's serialisable
-    deviceInfoList = new HashSet<>(deviceInfoList);
+    devicesToRetrieve = new HashSet<>(devicesToRetrieve);
 
     try {
       // Ask the server for the devices
-      Collection<TransferDevice> serverResponse = requestHandler.getDevices(deviceInfoList);
-      Set<Device> devices = new HashSet<>();
+      Collection<TransferDevice> serverResponse = requestHandler.getDevices(devicesToRetrieve);
+
       List<DeviceInfo> unknownDevices = new ArrayList<>();
 
       // Convert the response objects into client devices. If any were not
       // returned, add them to the list of unknown devices.
-      for (DeviceInfo deviceInfo : deviceInfoList) {
+      for (DeviceInfo deviceInfo : devicesToRetrieve) {
         Device device = null;
 
         for (TransferDevice transferDevice : serverResponse) {

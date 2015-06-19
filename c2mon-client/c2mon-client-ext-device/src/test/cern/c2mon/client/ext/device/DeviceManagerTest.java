@@ -451,6 +451,8 @@ public class DeviceManagerTest {
     Set<ClientCommandTag<Object>> returnedCommandTags = new HashSet<>();
     returnedCommandTags.add(new ClientCommandTagImpl<>(-1L));
 
+    // Expect the device manager to check the cache
+    EasyMock.expect(deviceCacheMock.get(EasyMock.<String> anyObject())).andReturn(null);
     // Expect the device manager to retrieve the devices
     expect(requestHandlerMock.getDevices(EasyMock.<Set<DeviceInfo>> anyObject())).andReturn(devicesReturnList);
     // Expect the device manager to get the command tag
@@ -518,6 +520,8 @@ public class DeviceManagerTest {
     EasyMock.reset(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
     reset(requestHandlerMock);
 
+    // Expect the device manager to check the cache
+    EasyMock.expect(deviceCacheMock.get(EasyMock.<String> anyObject())).andReturn(null);
     // Expect the device manager to retrieve the devices
     expect(requestHandlerMock.getDevices(EasyMock.<Set<DeviceInfo>> anyObject())).andReturn(new ArrayList<TransferDevice>());
 
@@ -565,6 +569,8 @@ public class DeviceManagerTest {
     DeviceInfo unknown = new DeviceInfo("test_device_class", "unknown_device");
     HashSet<DeviceInfo> infoList = new HashSet<>(Arrays.asList(known, unknown));
 
+    // Expect the device manager to check the cache
+    EasyMock.expect(deviceCacheMock.get(EasyMock.<String> anyObject())).andReturn(null).times(2);
     // Expect the device manager to retrieve the devices
     expect(requestHandlerMock.getDevices(EasyMock.<Set<DeviceInfo>> anyObject())).andReturn(devicesReturnList);
     // Expect the device manager to add the device to the cache
@@ -825,6 +831,8 @@ public class DeviceManagerTest {
     Collection<TransferDevice> transferDeviceList2 = Arrays.asList(transferDevice3);
 
     // Expectations
+    // Expect the device manager to check the cache
+    EasyMock.expect(deviceCacheMock.get(EasyMock.<String> anyObject())).andReturn(null).times(3);
     EasyMock.expect(requestHandlerMock.getDevices(EasyMock.<Set<DeviceInfo>> anyObject())).andReturn(transferDeviceList1);
     deviceCacheMock.add(EasyMock.<Device> anyObject());
     EasyMock.expectLastCall().times(5);

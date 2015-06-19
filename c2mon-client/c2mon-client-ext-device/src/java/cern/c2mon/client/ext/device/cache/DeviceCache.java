@@ -45,6 +45,14 @@ public interface DeviceCache {
   public Device get(Long deviceId);
 
   /**
+   * Retrieve a device from the cache by name
+   *
+   * @param deviceName the name of the device to retrieve
+   * @return the requested device if it exists in the cache, null otherwise
+   */
+  public Device get(String deviceName);
+
+  /**
    * @return a list of all devices currently in the cache
    */
   public List<Device> getAllDevices();
