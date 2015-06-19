@@ -33,11 +33,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
-import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monTagManager;
-import cern.c2mon.client.core.tag.ClientCommandTagImpl;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.core.tag.ClientRuleTag;
 import cern.c2mon.client.ext.device.property.Category;
@@ -47,7 +45,6 @@ import cern.c2mon.client.ext.device.property.FieldImpl;
 import cern.c2mon.client.ext.device.property.Property;
 import cern.c2mon.client.ext.device.property.PropertyImpl;
 import cern.c2mon.client.ext.device.util.DeviceTestUtils;
-import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.rule.RuleFormatException;
 import cern.c2mon.shared.rule.SimpleRuleExpression;
@@ -116,7 +113,10 @@ public class DeviceImplTest {
     deviceProperties.put("numCores", ccv2);
 
     device.setDeviceProperties(deviceProperties);
-    device.setTagManager(tagManagerMock);
+
+    for (Property property : device.getProperties()) {
+      ((PropertyImpl) property).setTagManager(tagManagerMock);
+    }
 
     // Expect the device to check if the rule tag is subscribed, but make no
     // other calls
@@ -199,7 +199,10 @@ public class DeviceImplTest {
     EasyMock.replay(tagManagerMock);
 
     device.setDeviceProperties(deviceProperties);
-    device.setTagManager(tagManagerMock);
+
+    for (Property property : device.getProperties()) {
+      ((PropertyImpl) property).setTagManager(tagManagerMock);
+    }
 
     Assert.assertTrue(device.getProperty("cpuLoadInPercent").getTag().getId().equals(cdt1.getId()));
     Assert.assertTrue(device.getProperty("responsiblePerson").getTag().getId().equals(ccv1.getId()));
@@ -288,7 +291,10 @@ public class DeviceImplTest {
     final List<DeviceProperty> deviceProperties = new ArrayList<>();
     deviceProperties.add(new DeviceProperty(1L, "test_property_rule_name", "(#234 + #345) / 2", "clientRule", "Float"));
     device.setDeviceProperties(deviceProperties);
-    device.setTagManager(tagManagerMock);
+
+    for (Property property : device.getProperties()) {
+      ((PropertyImpl) property).setTagManager(tagManagerMock);
+    }
 
     ClientRuleTag rule = (ClientRuleTag) device.getProperty("test_property_rule_name").getTag();
     Assert.assertNotNull(rule);
@@ -297,34 +303,6 @@ public class DeviceImplTest {
 
     // Verify that everything happened as expected
     EasyMock.verify(tagManagerMock);
-  }
-
-  @Test
-  public void testGetDeviceCommand() {
-    // Reset the mock
-    EasyMock.reset(commandManagerMock);
-
-    DeviceImpl device = getTestDevice();
-    ClientCommandTag cct1 = new ClientCommandTagImpl(-1L);
-    ClientCommandTag cct2 = new ClientCommandTagImpl(-2L);
-
-    // Expect the device to call the command tag manager
-    EasyMock.expect(commandManagerMock.getCommandTag(EasyMock.<Long> anyObject())).andReturn(cct1);
-    EasyMock.expect(commandManagerMock.getCommandTag(EasyMock.<Long> anyObject())).andReturn(cct2);
-
-    // Setup is finished, need to activate the mock
-    EasyMock.replay(commandManagerMock);
-
-    List<DeviceCommand> deviceCommands = new ArrayList<>();
-    deviceCommands.add(new DeviceCommand(1L, "test_command_1", "-1", "commandTagId", null));
-    deviceCommands.add(new DeviceCommand(2L, "test_command_2", "-2", "commandTagId", null));
-    device.setDeviceCommands(deviceCommands);
-
-    Assert.assertTrue(device.getCommand("test_command_1").getId().equals(-1L));
-    Assert.assertTrue(device.getCommand("test_command_2").getId().equals(-2L));
-
-    // Verify that everything happened as expected
-    EasyMock.verify(commandManagerMock);
   }
 
   @Test
@@ -355,7 +333,10 @@ public class DeviceImplTest {
     properties.put("acquisition", new PropertyImpl("acquisition", Category.MAPPED_PROPERTY, fields));
 
     device.setDeviceProperties(properties);
-    device.setTagManager(tagManagerMock);
+
+    for (Property property : device.getProperties()) {
+      ((PropertyImpl) property).setTagManager(tagManagerMock);
+    }
 
     // Expect the device to check if the rule tag is subscribed, but make no
     // other calls
@@ -417,7 +398,10 @@ public class DeviceImplTest {
     List<DeviceProperty> deviceProperties = new ArrayList<>();
     deviceProperties.add(new DeviceProperty(5L, "acquisition", "mappedProperty", deviceFields));
     device.setDeviceProperties(deviceProperties);
-    device.setTagManager(tagManagerMock);
+
+    for (Property property : device.getProperties()) {
+      ((PropertyImpl) property).setTagManager(tagManagerMock);
+    }
 
     Property fields = device.getProperty("acquisition");
 
@@ -439,6 +423,6 @@ public class DeviceImplTest {
   }
 
   private DeviceImpl getTestDevice() {
-    return new DeviceImpl(1000L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
+    return new DeviceImpl(1000L, "test_device", 1L, "test_device_class");
   }
 }

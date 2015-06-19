@@ -47,6 +47,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.common.listener.DataTagListener;
+import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monTagManager;
@@ -202,16 +203,16 @@ public class DeviceManagerTest {
     devicesReturnList.add(device1);
     devicesReturnList.add(device2);
 
-    ClientCommandTagImpl cct1 = new ClientCommandTagImpl<>(-1L);
-    ClientCommandTagImpl cct2 = new ClientCommandTagImpl<>(-2L);
+    Set<ClientCommandTag<Object>> returnedCommandTags = new HashSet<>();
+    returnedCommandTags.add(new ClientCommandTagImpl(-1L));
+    returnedCommandTags.add(new ClientCommandTagImpl(-2L));
 
     // Expect the device manager to check the cache
     EasyMock.expect(deviceCacheMock.getAllDevices("test_device_class")).andReturn(new ArrayList<Device>());
     // Expect the device manager to retrieve the devices
     expect(requestHandlerMock.getAllDevices(EasyMock.<String> anyObject())).andReturn(devicesReturnList);
     // Expect the device manager to get the command tags
-    EasyMock.expect(commandManagerMock.getCommandTag(EasyMock.<Long> anyObject())).andReturn(cct1);
-    EasyMock.expect(commandManagerMock.getCommandTag(EasyMock.<Long> anyObject())).andReturn(cct2);
+    EasyMock.expect(commandManagerMock.getCommandTags(EasyMock.<Set<Long>> anyObject())).andReturn(returnedCommandTags);
     // Expect the device manager to add the devices to the cache
     deviceCacheMock.add(EasyMock.<Device> anyObject());
     EasyMock.expectLastCall().times(2);
@@ -246,7 +247,7 @@ public class DeviceManagerTest {
     deviceProperties.put("test_property_name_1", cdt1);
     deviceProperties.put("test_property_name_2", cdt2);
 
-    final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
+    final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class");
     device1.setDeviceProperties(deviceProperties);
 
     final Map<Long, ClientDataTagValue> cacheReturnMap = getCacheReturnMap();
@@ -308,7 +309,7 @@ public class DeviceManagerTest {
     sparsePropertyMap.add(new DeviceProperty(1L, "test_property_name_1", "100000", "tagId", null));
     sparsePropertyMap.add(new DeviceProperty(2L, "test_property_name_2", "200000", "tagId", null));
 
-    final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
+    final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class");
     device1.setDeviceProperties(sparsePropertyMap);
 
     final Map<Long, ClientDataTagValue> cacheReturnMap = getCacheReturnMap();
@@ -376,9 +377,8 @@ public class DeviceManagerTest {
     HashMap<String, Property> deviceProperties = new HashMap<>();
     deviceProperties.put("test_property_name", new PropertyImpl("test_property_name", Category.MAPPED_PROPERTY, deviceFields));
 
-    final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
+    final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class");
     device1.setDeviceProperties(deviceProperties);
-    device1.setTagManager(tagManagerMock);
 
     final Map<Long, ClientDataTagValue> cacheReturnMap = new HashMap<Long, ClientDataTagValue>();
 
@@ -448,12 +448,13 @@ public class DeviceManagerTest {
     transferDevice.addDeviceCommand(new DeviceCommand(1L, "TEST_COMMAND_1", "4287", "commandTagId", null));
     devicesReturnList.add(transferDevice);
 
-    ClientCommandTagImpl cct1 = new ClientCommandTagImpl<>(-1L);
+    Set<ClientCommandTag<Object>> returnedCommandTags = new HashSet<>();
+    returnedCommandTags.add(new ClientCommandTagImpl<>(-1L));
 
     // Expect the device manager to retrieve the devices
     expect(requestHandlerMock.getDevices(EasyMock.<Set<DeviceInfo>> anyObject())).andReturn(devicesReturnList);
     // Expect the device manager to get the command tag
-    EasyMock.expect(commandManagerMock.getCommandTag(EasyMock.<Long> anyObject())).andReturn(cct1).times(1);
+    EasyMock.expect(commandManagerMock.getCommandTags(EasyMock.<Set<Long>> anyObject())).andReturn(returnedCommandTags).times(1);
     // Expect the device manager to add the device to the cache
     final Capture<Device> capturedDevice = new Capture<>();
     deviceCacheMock.add(EasyMock.capture(capturedDevice));
@@ -669,7 +670,7 @@ public class DeviceManagerTest {
     deviceProperties.put("test_property_name_1", cdt1);
     deviceProperties.put("test_property_name_2", cdt2);
 
-    final DeviceImpl device1 = new DeviceImpl(11L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
+    final DeviceImpl device1 = new DeviceImpl(11L, "test_device", 1L, "test_device_class");
     device1.setDeviceProperties(deviceProperties);
 
     final Map<Long, ClientDataTagValue> cacheReturnMap = getCacheReturnMap();
@@ -741,8 +742,8 @@ public class DeviceManagerTest {
     deviceProperties1.put("test_property_name_1", cdt1);
     deviceProperties2.put("test_property_name_2", cdt2);
 
-    final DeviceImpl device1 = new DeviceImpl(10L, "test_device_10", 1L, "test_device_class", tagManagerMock, commandManagerMock);
-    final DeviceImpl device2 = new DeviceImpl(20L, "test_device_20", 1L, "test_device_class", tagManagerMock, commandManagerMock);
+    final DeviceImpl device1 = new DeviceImpl(10L, "test_device_10", 1L, "test_device_class");
+    final DeviceImpl device2 = new DeviceImpl(20L, "test_device_20", 1L, "test_device_class");
     device1.setDeviceProperties(deviceProperties1);
     device2.setDeviceProperties(deviceProperties2);
 

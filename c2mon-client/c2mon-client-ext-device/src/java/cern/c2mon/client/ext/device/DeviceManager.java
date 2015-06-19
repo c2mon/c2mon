@@ -20,6 +20,7 @@ package cern.c2mon.client.ext.device;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.DataTagListener;
+import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.util.ConcurrentSet;
 import cern.c2mon.client.core.C2monCommandManager;
@@ -45,6 +47,7 @@ import cern.c2mon.client.ext.device.listener.ListenerWrapper;
 import cern.c2mon.client.ext.device.property.PropertyInfo;
 import cern.c2mon.client.ext.device.request.DeviceRequestHandler;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
+import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceInfo;
 import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.rule.RuleFormatException;
@@ -141,6 +144,9 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
         }
       }
 
+      // Retrieve and set all commands of the device at once
+      getDeviceCommands(Collections.singletonList(device), serverResponse);
+
     } catch (JMSException e) {
       LOG.error("subscribeDevices() - JMS connection lost -> Could not retrieve devices from the C2MON server.", e);
     }
@@ -170,6 +176,10 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
           Device device = createClientDevice(transferDevice, deviceClassName);
           devices.add(device);
         }
+
+        // Retrieve and set commands of all devices at once
+        getDeviceCommands(devices, serverResponse);
+
       } catch (JMSException e) {
         LOG.error("getAllDevices() - JMS connection lost -> Could not retrieve devices from the C2MON server.", e);
       }
@@ -184,9 +194,49 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
     return devices;
   }
 
+  /**
+   * Private helper method to bulk retrieve all commands of a set of transfer devices in one
+   * go, in order to reduce the number of server calls. The commands, once retrieved, will be
+   * inserted in-place into their respective devices.
+   *
+   * @param devices the list of devices whose commands have not yet been retrieved
+   * @param transferDevices the list of transfer devices containing the command information
+   */
+  private void getDeviceCommands(Collection<Device> devices, Collection<TransferDevice> transferDevices) {
+    Set<Long> commandTagIds = new HashSet<>();
+
+    for (TransferDevice transferDevice : transferDevices) {
+      for (DeviceCommand deviceCommand : transferDevice.getDeviceCommands()) {
+        commandTagIds.add(Long.valueOf(deviceCommand.getValue()));
+      }
+    }
+
+    if (commandTagIds.size() > 0) {
+      Set<ClientCommandTag<Object>> commandTags = commandManager.getCommandTags(commandTagIds);
+      for (ClientCommandTag<Object> commandTag : commandTags) {
+
+        // Find the device command to which this command tag belongs
+        for (TransferDevice transferDevice : transferDevices) {
+          for (DeviceCommand deviceCommand : transferDevice.getDeviceCommands()) {
+            if (commandTag.getId().equals(Long.valueOf(deviceCommand.getValue()))) {
+
+              // Find the device that maps to this transfer device
+              for (Device device : devices) {
+                if (device.getName().equals(transferDevice.getName())) {
+                  // Set the command tag on the device
+                  device.getCommands().put(deviceCommand.getName(), commandTag);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
   @Override
   public void subscribeDevice(Device device, final DeviceUpdateListener listener) {
-    subscribeDevices(new HashSet<>(Arrays.asList(device)), listener);
+    subscribeDevices(new HashSet<>(Collections.singletonList(device)), listener);
   }
 
   @Override
@@ -218,7 +268,7 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
 
   @Override
   public void subscribeDevice(DeviceInfo deviceInfo, DeviceInfoUpdateListener listener) {
-    subscribeDevices(new HashSet<>(Arrays.asList(deviceInfo)), listener);
+    subscribeDevices(new HashSet<>(Collections.singletonList(deviceInfo)), listener);
   }
 
   @Override
@@ -248,6 +298,9 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
             devices.add(device);
           }
         }
+
+        // Retrieve and set commands of all devices at once
+        getDeviceCommands(devices, serverResponse);
 
         if (device == null) {
           LOG.info("Unknown device (class: " + deviceInfo.getClassName() + " name: " + deviceInfo.getDeviceName() + " requested.");
@@ -328,7 +381,7 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
 
   @Override
   public void unsubscribeDevice(Device device, DeviceUpdateListener listener) {
-    unsubscribeDevices(new HashSet<Device>(Arrays.asList(device)), listener);
+    unsubscribeDevices(new HashSet<Device>(Collections.singletonList(device)), listener);
   }
 
   @Override
@@ -425,8 +478,7 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
    * @return the newly created device
    */
   private Device createClientDevice(TransferDevice transferDevice, String deviceClassName) {
-    DeviceImpl device = new DeviceImpl(transferDevice.getId(), transferDevice.getName(), transferDevice.getDeviceClassId(), deviceClassName, tagManager,
-        commandManager);
+    DeviceImpl device = new DeviceImpl(transferDevice.getId(), transferDevice.getName(), transferDevice.getDeviceClassId(), deviceClassName);
 
     try {
       // Set the properties
@@ -440,9 +492,6 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
       LOG.error("getAllDevices() - Received property containing incorrect result type from the server. Please check device with id " + device.getId(), e);
       throw new RuntimeException("Received property containing incorrect result type from the server for device id " + device.getId());
     }
-
-    // Set the commands
-    device.setDeviceCommands(transferDevice.getDeviceCommands());
 
     return device;
   }

@@ -29,8 +29,6 @@ import org.apache.log4j.Logger;
 
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.c2mon.client.core.C2monCommandManager;
-import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.tag.ClientRuleTag;
 import cern.c2mon.client.ext.device.listener.DeviceUpdateListener;
 import cern.c2mon.client.ext.device.property.Field;
@@ -39,7 +37,6 @@ import cern.c2mon.client.ext.device.property.Property;
 import cern.c2mon.client.ext.device.property.PropertyFactory;
 import cern.c2mon.client.ext.device.property.PropertyImpl;
 import cern.c2mon.client.ext.device.property.PropertyInfo;
-import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.rule.RuleFormatException;
 
@@ -93,21 +90,12 @@ public class DeviceImpl implements Device, Cloneable {
    * The map of command names -> commands.
    *
    * <p>
-   * Note: the behaviour of this map is equivalent to that of
-   * {@link DeviceImpl#deviceProperties}.
+   * Note: the behaviour of this map is not equivalent to that of
+   * {@link DeviceImpl#deviceProperties}. Commands will not be lazy-loaded, but
+   * instead fully instantiated when the device is initially retrieved.
    * </p>
    */
   private Map<String, ClientCommandTag> deviceCommands = new HashMap<>();
-
-  /**
-   * Reference to the <code>TagManager</code> singleton
-   */
-  private C2monTagManager tagManager;
-
-  /**
-   * Reference to the <code>CommandManager</code> singleton
-   */
-  private C2monCommandManager commandManager;
 
   /**
    * Default constructor.
@@ -115,15 +103,11 @@ public class DeviceImpl implements Device, Cloneable {
   public DeviceImpl(final Long id,
                     final String name,
                     final Long deviceClassId,
-                    final String deviceClassName,
-                    final C2monTagManager tagManager,
-                    final C2monCommandManager commandManager) {
+                    final String deviceClassName) {
     this.id = id;
     this.name = name;
     this.deviceClassId = deviceClassId;
     this.deviceClassName = deviceClassName;
-    this.tagManager = tagManager;
-    this.commandManager = commandManager;
   }
 
   @Override
@@ -296,13 +280,10 @@ public class DeviceImpl implements Device, Cloneable {
   /**
    * Manually set the commands of this device.
    *
-   * @param deviceCommands
+   * @param commands
    */
-  public void setDeviceCommands(List<DeviceCommand> deviceCommands) {
-    for (DeviceCommand deviceCommand : deviceCommands) {
-      // We don't need to lazy-load command tags, so just get them here
-      this.deviceCommands.put(deviceCommand.getName(), commandManager.getCommandTag(Long.valueOf(deviceCommand.getValue())));
-    }
+  public void setDeviceCommands(Map<String, ClientCommandTag> commands) {
+    this.deviceCommands = commands;
   }
 
   /**
@@ -374,19 +355,6 @@ public class DeviceImpl implements Device, Cloneable {
     clone.deviceCommands = (Map<String, ClientCommandTag>) ((HashMap<String, ClientCommandTag>) deviceCommands).clone();
 
     return clone;
-  }
-
-  /**
-   * Manually set the reference to the {@link C2monTagManager} inside the device
-   * and also inside all device properties. Used for testing purposes.
-   *
-   * @param tagManager the tag manager to use
-   */
-  public void setTagManager(C2monTagManager tagManager) {
-    this.tagManager = tagManager;
-    for (Property property : deviceProperties.values()) {
-      ((PropertyImpl) property).setTagManager(tagManager);
-    }
   }
 
   @Override
