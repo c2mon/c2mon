@@ -438,7 +438,7 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
             if (value instanceof Boolean) {
               onWrite(itemDefintion, !((Boolean) value));
             }
-            if (value instanceof String) {
+            else if (value instanceof String) {
               onWrite(itemDefintion, "");
             }
             else {

@@ -283,7 +283,7 @@ public class OPCEndpointTest {
     }
     
     @Test
-    public void testExecuteCommandWriteReWrite() throws ConfigurationException, InterruptedException {
+    public void testExecuteCommandWriteReWriteForBoolean() throws ConfigurationException, InterruptedException {
         OPCHardwareAddressImpl address = new OPCHardwareAddressImpl("asd", 1);
         address.setCommandType(COMMAND_TYPE.CLASSIC);
         Object value = true;
@@ -296,6 +296,52 @@ public class OPCEndpointTest {
             .andReturn(new ItemDefinition<String>(1L, "asd"));
         endpoint.onWrite(isA(ItemDefinition.class), eq(true));
         endpoint.onWrite(isA(ItemDefinition.class), eq(false));
+        
+        replay(endpoint, factory);
+        endpoint.addCommandTag(commandTag);
+        endpoint.setStateOperational();
+        endpoint.executeCommand(address, sctValue);
+        Thread.sleep(5);
+        verify(endpoint, factory);
+    }
+    
+    @Test
+    public void testExecuteCommandWriteReWriteForInteger() throws ConfigurationException, InterruptedException {
+        OPCHardwareAddressImpl address = new OPCHardwareAddressImpl("asd", 1);
+        address.setCommandType(COMMAND_TYPE.CLASSIC);
+        Integer value = 7;
+        SourceCommandTagValue sctValue =
+            new SourceCommandTagValue(1L, "asd", 1L, (short) 0, value , "Integer");
+        ISourceCommandTag commandTag =
+            new SourceCommandTag(1L, "asd", 100, 1000, address );
+        
+        expect(factory.createItemDefinition(1L, address))
+            .andReturn(new ItemDefinition<String>(1L, "asd"));
+        endpoint.onWrite(isA(ItemDefinition.class), eq(value));
+        endpoint.onWrite(isA(ItemDefinition.class), eq(Integer.valueOf(0)));
+        
+        replay(endpoint, factory);
+        endpoint.addCommandTag(commandTag);
+        endpoint.setStateOperational();
+        endpoint.executeCommand(address, sctValue);
+        Thread.sleep(5);
+        verify(endpoint, factory);
+    }
+    
+    @Test
+    public void testExecuteCommandWriteReWriteForString() throws ConfigurationException, InterruptedException {
+        OPCHardwareAddressImpl address = new OPCHardwareAddressImpl("asd", 1);
+        address.setCommandType(COMMAND_TYPE.CLASSIC);
+        String value = "Test String";
+        SourceCommandTagValue sctValue =
+            new SourceCommandTagValue(1L, "asd", 1L, (short) 0, value , "String");
+        ISourceCommandTag commandTag =
+            new SourceCommandTag(1L, "asd", 100, 1000, address );
+        
+        expect(factory.createItemDefinition(1L, address))
+            .andReturn(new ItemDefinition<String>(1L, "asd"));
+        endpoint.onWrite(isA(ItemDefinition.class), eq(value));
+        endpoint.onWrite(isA(ItemDefinition.class), eq(""));
         
         replay(endpoint, factory);
         endpoint.addCommandTag(commandTag);
