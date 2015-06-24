@@ -427,14 +427,24 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
      */
     private void writeRewrite(final ID itemDefintion,
             final int pulseLength, final Object value) {
-        onWrite(itemDefintion, Boolean.valueOf(value.toString()));
+        onWrite(itemDefintion, value);
+        
         try {
             Thread.sleep(pulseLength);
         } catch (InterruptedException e) {
             throw new OPCCriticalException("Sleep Interrupted.");
         }
         finally {
-            onWrite(itemDefintion, !Boolean.valueOf(value.toString()));
+            if (value instanceof Boolean) {
+              onWrite(itemDefintion, !((Boolean) value));
+            }
+            if (value instanceof String) {
+              onWrite(itemDefintion, "");
+            }
+            else {
+              // This applies to all numeric use cases and Bytes
+              onWrite(itemDefintion, value.getClass().cast(Integer.valueOf(0)));
+            }
         }
     }
     
