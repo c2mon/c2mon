@@ -18,6 +18,10 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.startup;
 
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,19 +133,51 @@ public final class DaqStartup {
     propertiesFactoryBean.setBeanClass(PropertiesFactoryBean.class);
     MutablePropertyValues propertyValues = new MutablePropertyValues();
     List<String> propertyList = new ArrayList<String>();
+    
     if (commandParams.hasParam("-c2monProperties")) {
       propertyList.add("file:" + commandParams.getParamValue("-c2monProperties"));
-      logger.info("Using c2mon.properties at " + commandParams.getParamValue("-c2monProperties"));
-    } else {
-      propertyList.add("file:" + System.getProperty("user.home") + "/.c2mon.properties"); 
-      logger.info("Using c2mon.properties at " + System.getProperty("user.home") + "/.c2mon.properties");
+      logger.info("Configured C2MON properties from " + commandParams.getParamValue("-c2monProperties"));
+    } 
+    else {
+      Path propertyFile = Paths.get(getDefaultConfLocation() + "/c2mon.properties");
+
+      if (propertyFile.toFile().exists()) {
+        propertyList.add("file:" + propertyFile.toString()); 
+        logger.info("Configured C2MON properties from " +  propertyFile.toString());
+      }
+      else {
+        String errMsg1 = "Default C2MON configuration file does not exist: " + propertyFile.toString();
+        String errMsg2 = "Try instead specifying the property file with the -c2monProperties option";
+        logger.fatal(errMsg1);
+        logger.info(errMsg2);
+        System.err.println(errMsg1);
+        System.err.println(errMsg2);
+        System.exit(-1);
+      }
     }
+    
     if (commandParams.hasParam("-daqConf")) {
       propertyList.add("file:" + commandParams.getParamValue("-daqConf"));  
-      logger.info("Using DAQ common properties at " + commandParams.getParamValue("-daqConf"));
-    } else {
-      logger.info("No common DAQ properties file specified.");
+      logger.info("Configured DAQ common properties from " + commandParams.getParamValue("-daqConf"));
+    } 
+    else {
+      Path daqConfFile = Paths.get(getDefaultConfLocation() + "/daq.conf");
+
+      if (daqConfFile.toFile().exists()) {
+        propertyList.add("file:" + daqConfFile.toString()); 
+        logger.info("Configured DAQ common properties from " +  daqConfFile.toString());
+      }
+      else {
+        String errMsg1 = "DAQ common properties file does not exist: " + daqConfFile.toString();
+        String errMsg2 = "Try instead specifying the property file with the -daqConf option";
+        logger.fatal(errMsg1);
+        logger.info(errMsg2);
+        System.err.println(errMsg1);
+        System.err.println(errMsg2);
+        System.exit(-1);
+      }
     }
+    
     String[] propertyLocations = propertyList.toArray(new String[0]);
     propertyValues.addPropertyValue("locations", propertyLocations);    
     
@@ -181,6 +217,43 @@ public final class DaqStartup {
     }        
   }
   
+  /**
+   * Helper method to compute the default conf path location
+   * @return The default conf/ directory path
+   */
+  private static String getDefaultConfLocation() {
+    URL location = DaqStartup.class.getProtectionDomain().getCodeSource().getLocation();
+    String locationPath = location.getFile();
+    String osAppropriatePath = System.getProperty( "os.name" ).contains( "indow" ) ? locationPath.substring(1) : locationPath;
+    
+    Path confPath = Paths.get(osAppropriatePath.concat("../conf/"));
+    if (confPath.toFile().exists()) {
+      try {
+        return confPath.toRealPath().toString();
+      }
+      catch (IOException e) {
+        String errMsg1 = "Could not generate real path to " + confPath.toString();
+        String errMsg2 = "Try instead specifying the property files with -c2monProperties and -daqConf";
+        logger.fatal(errMsg1);
+        logger.info(errMsg2);
+        System.err.println(errMsg1);
+        System.err.println(errMsg2);
+        System.exit(-1);
+      }
+    }
+    
+    String errMsg1 = "Default configuration directory does not exist: " + confPath.toString();
+    String errMsg2 = "Try instead specifying the property files with -c2monProperties and -daqConf";
+    logger.fatal(errMsg1);
+    logger.info(errMsg2);
+    System.err.println(errMsg1);
+    System.err.println(errMsg2);
+    System.exit(-1);
+    
+    // never reached
+    return null;
+  }
+  
   
   /**
    * Configure log4j from the command arguments. This method may need modifying if log4j
@@ -195,8 +268,10 @@ public final class DaqStartup {
       logger.info("[preDeploy] Configured log4j from " + commandParams.getParamValue("-log4j"));
      }
      catch (Exception ex) {
-       logger.fatal("Unable to load log4j configuration file : " + ex.getMessage());
-       ex.printStackTrace();            
+       String errMsg = "Unable to load log4j configuration file : ";
+       logger.fatal(errMsg, ex);
+       System.err.println(errMsg);
+       ex.printStackTrace();
        System.exit(-1);
      }
   }
