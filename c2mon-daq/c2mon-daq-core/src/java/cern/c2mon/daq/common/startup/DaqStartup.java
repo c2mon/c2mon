@@ -304,7 +304,7 @@ public final class DaqStartup {
       osAppropriatePath = testPath.getParent();
     }
     
-    Path daqHomePath = Paths.get(osAppropriatePath.concat("../"));
+    Path daqHomePath = Paths.get(osAppropriatePath.concat("/../"));
     if (daqHomePath.toFile().exists()) {
       try {
         return daqHomePath.toRealPath().toString();
