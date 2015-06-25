@@ -304,15 +304,19 @@ public final class DaqStartup {
       }
       catch (IOException e) {
         String errMsg1 = "Could not generate real path to DAQ HOME folder: " + daqHomePath.toString();
-        logger.fatal(errMsg1);
+        if (logger != null) {
+          logger.fatal(errMsg1);
+        }
         System.err.println(errMsg1);
       }
     }
 
     String errMsg1 = "Could not determine the DAQ HOME directory: " + daqHomePath.toString();
     String errMsg2 = "Make sure that your JARs are in the lib/ folder under the DAQ HOME directory";
-    logger.fatal(errMsg1);
-    logger.info(errMsg2);
+    if (logger != null) {
+      logger.fatal(errMsg1);
+      logger.info(errMsg2);
+    }
     System.err.println(errMsg1);
     System.err.println(errMsg2);
 
