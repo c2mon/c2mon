@@ -73,14 +73,24 @@ public class CommandParamsHandler {
      * This method checks if specified parameter is registered or not
      */
     public boolean hasParam(String paramName) {
-        return paramsTable.containsKey(paramName);
+         if (paramName.startsWith("-")) {
+           return paramsTable.containsKey(paramName);
+         }
+         else {
+           return paramsTable.containsKey("-" + paramName);
+         }
     }
 
     /**
-     * This method returns the value of the specified parameter
+     * @param paramName The parameter name
+     * @return the value of the specified parameter
      */
     public String getParamValue(String paramName) {
-        return (String) paramsTable.get(paramName);
+      if (paramName.startsWith("-")) {
+        return paramsTable.get(paramName);
+      }
+      else {
+        return paramsTable.get("-" + paramName);
+      }
     }
-
 }
