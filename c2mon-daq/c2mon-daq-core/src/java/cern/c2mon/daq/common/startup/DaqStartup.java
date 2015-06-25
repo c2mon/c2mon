@@ -18,6 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.startup;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -297,6 +298,12 @@ public final class DaqStartup {
     String locationPath = location.getPath();
     String osAppropriatePath = System.getProperty("os.name").contains("indow") ? locationPath.substring(1) : locationPath;
 
+    // The path can be a file, if we are inside a Jar
+    File testPath = new File(osAppropriatePath);
+    if (testPath.isFile()) {
+      osAppropriatePath = testPath.getParent();
+    }
+    
     Path daqHomePath = Paths.get(osAppropriatePath.concat("../"));
     if (daqHomePath.toFile().exists()) {
       try {
