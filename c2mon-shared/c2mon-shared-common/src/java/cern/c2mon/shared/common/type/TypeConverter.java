@@ -40,22 +40,32 @@ public final class TypeConverter  {
     // Do nothing
   }
   
+  /**
+   * Checks whether the given value can be casted into the given class type.
+   * @param value The object to be casted
+   * @param clazz the resulting class cast type
+   * @return <code>true</code>, if the passed object value can be casted in to the given class type
+   */
+  public static final <T> boolean isConvertible(final Object value, final Class<T> clazz) {
+    return (castToType(value, clazz) != null);
+  }
+  
   
   /**
-   * Tries to cast the given object value into the speciified class type. In case you are 
+   * Tries to cast the given object value into the specified class type. In case you are 
    * casting a Float or Double to an Integer or Short, the value will be rounded.
-   * @param pValue The object to be casted
-   * @param pTargetType the resulting class cast type
+   * @param value The object to be casted
+   * @param clazz the resulting class cast type
    * @return The resulting cast object.
    * @throws ClassCastException In case of a cast exception
    */
   @SuppressWarnings("unchecked")
-  public static final <T> T castToType(final Object pValue, final Class<T> pTargetType) {
-    return (T) cast(pValue, pTargetType);
+  public static final <T> T castToType(final Object value, final Class<T> clazz) {
+    return (T) cast(value, clazz);
   }
   
   /**
-   * Tries to cast the given object value into the speciified class type. In case you are 
+   * Tries to cast the given object value into the specified class type. In case you are 
    * casting a Float or Double to an Integer or Short, the value will be rounded.
    * @param pValue The object to be casted
    * @param pTargetType the resulting class cast type
@@ -135,11 +145,19 @@ public final class TypeConverter  {
         return new Integer((int)x);
       }
       else if (String.class.isAssignableFrom(inputType)) {
-        try {
-          return Integer.valueOf((String)inputValue);
+        if (((String)inputValue).trim().equalsIgnoreCase("false")) {
+          return Integer.valueOf(0);
         }
-        catch (Exception e) {
-          throw new ClassCastException(new StringBuffer("Cannot convert String value \"").append(inputValue).append("\" to Integer.").toString());
+        else if (((String)inputValue).trim().equalsIgnoreCase("true")) {
+          return Integer.valueOf(1);
+        }
+        else {
+          try {
+            return Integer.valueOf((String)inputValue);
+          }
+          catch (Exception e) {
+            throw new ClassCastException(new StringBuffer("Cannot convert String value \"").append(inputValue).append("\" to Integer.").toString());
+          }
         }
       }
       else if (Boolean.class.isAssignableFrom(inputType)) {
@@ -163,11 +181,19 @@ public final class TypeConverter  {
         return new Short((short)x);
       }
       else if (String.class.isAssignableFrom(inputType)) {
-        try {
-          return Short.valueOf((String)inputValue);
+        if (((String)inputValue).trim().equalsIgnoreCase("false")) {
+          return Short.valueOf((short) 0);
         }
-        catch (Exception e) {
-          throw new ClassCastException(new StringBuffer("Cannot convert String value \"").append(inputValue).append("\" to Short.").toString());
+        else if (((String)inputValue).trim().equalsIgnoreCase("true")) {
+          return Short.valueOf((short) 1);
+        }
+        else {
+          try {
+            return Short.valueOf((String)inputValue);
+          }
+          catch (Exception e) {
+            throw new ClassCastException(new StringBuffer("Cannot convert String value \"").append(inputValue).append("\" to Short.").toString());
+          }
         }
       }
       else if (Boolean.class.isAssignableFrom(inputType)) {
@@ -187,19 +213,27 @@ public final class TypeConverter  {
         return Long.valueOf(Math.round(((Number) inputValue).doubleValue()));
       }
       else if (String.class.isAssignableFrom(inputType)) {
-        try {
-          return Long.valueOf((String)inputValue);
+        if (((String)inputValue).trim().equalsIgnoreCase("false")) {
+          return Long.valueOf(0l);
         }
-        catch (Exception e) {
-          throw new ClassCastException(new StringBuffer("Cannot convert String value \"").append(inputValue).append("\" to Long.").toString());
+        else if (((String)inputValue).trim().equalsIgnoreCase("true")) {
+          return Long.valueOf(1l);
+        }
+        else {
+          try {
+            return Long.valueOf((String)inputValue);
+          }
+          catch (Exception e) {
+            throw new ClassCastException(new StringBuffer("Cannot convert String value \"").append(inputValue).append("\" to Long.").toString());
+          }
         }
       }
       else if (Boolean.class.isAssignableFrom(inputType)) {
         if (inputValue.equals(Boolean.TRUE)) {
-          return new Long(1);
+          return Long.valueOf(1l);
         }
         else {
-          return new Long(0);
+          return Long.valueOf(0l);
         }          
       }
       else {
@@ -217,11 +251,19 @@ public final class TypeConverter  {
         }
       }
       else if (String.class.isAssignableFrom(inputType)) {
-        try {
-          return Float.valueOf((String)inputValue);
+        if (((String)inputValue).trim().equalsIgnoreCase("false")) {
+          return Float.valueOf(0f);
         }
-        catch (Exception e) {
-          throw new ClassCastException(new StringBuffer("Cannot convert String value \"").append(inputValue).append("\" to Float.").toString());
+        else if (((String)inputValue).trim().equalsIgnoreCase("true")) {
+          return Float.valueOf(1f);
+        }
+        else {
+          try {
+            return Float.valueOf((String)inputValue);
+          }
+          catch (Exception e) {
+            throw new ClassCastException(new StringBuffer("Cannot convert String value \"").append(inputValue).append("\" to Float.").toString());
+          }
         }
       }
       else if (Boolean.class.isAssignableFrom(inputType)) {
@@ -259,11 +301,19 @@ public final class TypeConverter  {
         return new Double(((Number)inputValue).doubleValue());
       }
       else if (String.class.isAssignableFrom(inputType)) {
-        try {
-          return Double.valueOf((String)inputValue);
+        if (((String)inputValue).trim().equalsIgnoreCase("false")) {
+          return Double.valueOf(0d);
         }
-        catch (Exception e) {
-          throw new ClassCastException(new StringBuffer("Cannot convert String value \"").append(inputValue).append("\" to Double.").toString());
+        else if (((String)inputValue).trim().equalsIgnoreCase("true")) {
+          return Double.valueOf(1d);
+        }
+        else {
+          try {
+            return Double.valueOf((String)inputValue);
+          }
+          catch (Exception e) {
+            throw new ClassCastException(new StringBuffer("Cannot convert String value \"").append(inputValue).append("\" to Double.").toString());
+          }
         }
       }
       else if (Boolean.class.isAssignableFrom(inputType)) {
@@ -414,42 +464,49 @@ public final class TypeConverter  {
   }
 
   /**
-   * This method tries to cast any kind of string into the given raw value type. The
+   * This method tries to cast any kind of Object into the given raw value type. The
    * following type strings are supported: <code>Boolean, Integer, Float, String, 
    * Double, Long, Short</code>
-   * @param pValueString The string that shall be casted into the specific raw value type
-   * @param pTypeString The raw type class as Sting and without the <code>java.lang.</code>
+   * @param value The object that shall be casted into the specific raw value type
+   * @param className The raw type class as Sting and without the <code>java.lang.</code>
    *                    prefix
    * @return The casted object or <code>null</code>, if casting wasn't possible
    */
-  public static final Object cast(final String pValueString, final String pTypeString) {
+  public static final Object cast(final Object value, final String className) {
     Object result = null;
-    if (pValueString != null && pTypeString != null) {
+    if (value != null && className != null && !className.isEmpty()) {
       try {
-        if (pTypeString.equals("Boolean")) {
-          result = cast(pValueString, Boolean.class);
+        if (className.equals("Boolean")) {
+          result = castToType(value, Boolean.class);
         }
-        else if (pTypeString.equals("Integer")) {
-          result = cast(pValueString, Integer.class);
+        else if (className.equals("Integer")) {
+          result = castToType(value, Integer.class);
         }
-        else if (pTypeString.equals("Float")) {
-          result = cast(pValueString, Float.class);
+        else if (className.equals("Float")) {
+          result = castToType(value, Float.class);
         }
-        else if (pTypeString.equals("String")) {
-          result = pValueString;
+        else if (className.equals("String")) {
+          result = value;
         }
-        else if (pTypeString.equals("Double")) {
-          result = cast(pValueString, Double.class);
+        else if (className.equals("Double")) {
+          result = castToType(value, Double.class);
         }
-        else if (pTypeString.equals("Long")) {
-          result = cast(pValueString, Long.class);
+        else if (className.equals("Long")) {
+          result = castToType(value, Long.class);
         }
-        else if (pTypeString.equals("Short")) {
-          result = cast(pValueString, Short.class);
+        else if (className.equals("Short")) {
+          result = castToType(value, Short.class);
+        }
+        else {
+          result = castToType(value, Class.forName(className));
         }
       }
       catch (ClassCastException cce) {
         LOG.error("cast() : Conversion error", cce);
+        result = null;
+      }
+      catch (ClassNotFoundException cnf) {
+        LOG.error("cast() : Conversion error. Could not find class with name: ", cnf);
         result = null;
       }
     }

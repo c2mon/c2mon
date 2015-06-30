@@ -26,6 +26,7 @@ public class TypeConverterTest {
 
   @Test
   public void testObjectCast() {
+    // String
     castTest(Boolean.TRUE, String.class, "true");
     castTest(Boolean.FALSE, String.class, "false");  
     castTest(new Double(25), String.class, "25.0");
@@ -35,6 +36,7 @@ public class TypeConverterTest {
     castTest(new Integer(25), String.class, "25");
     castTest("25", String.class, "25");
 
+    // Boolean
     castTest(Boolean.TRUE, Boolean.class, Boolean.TRUE);
     castTest(Boolean.FALSE, Boolean.class, Boolean.FALSE);  
     castTest(new Double(0), Boolean.class, Boolean.FALSE);
@@ -50,6 +52,7 @@ public class TypeConverterTest {
     castTest("true", Boolean.class, Boolean.TRUE);
     castTest("false", Boolean.class, Boolean.FALSE);
 
+    // Integer
     castTest(Boolean.TRUE, Integer.class, new Integer(1));
     castTest(Boolean.FALSE, Integer.class, new Integer(0));  
     castTest(new Double(0), Integer.class, new Integer(0));
@@ -70,6 +73,7 @@ public class TypeConverterTest {
     castTest("0", Integer.class, new Integer(0));
     castTest("25.5", Integer.class, Integer.valueOf(26));
 
+    // Short
     castTest(Boolean.TRUE, Short.class, new Short((short)1));
     castTest(Boolean.FALSE, Short.class, new Short((short)0));  
     castTest(new Double(0), Short.class, new Short((short)0));
@@ -89,6 +93,7 @@ public class TypeConverterTest {
     castTest("0", Short.class, new Short((short)0));
     castTest("25.5", Short.class, Short.valueOf((short) 26));
 
+    // Long
     castTest(Boolean.TRUE, Long.class, new Long(1));
     castTest(Boolean.FALSE, Long.class, new Long(0));  
     castTest(new Double(0), Long.class, new Long(0));
@@ -109,6 +114,7 @@ public class TypeConverterTest {
     castTest("0", Long.class, new Long(0));
     castTest("25.5", Long.class, Long.valueOf(26L));
 
+    // Float
     castTest(Boolean.TRUE, Float.class, new Float(1));
     castTest(Boolean.FALSE, Float.class, new Float(0));  
     castTest(new Double(0), Float.class, new Float(0));
@@ -129,6 +135,7 @@ public class TypeConverterTest {
     castTest("0", Float.class, new Float(0));
     castTest("25.5", Float.class, new Float(25.5));
 
+    // Double
     castTest(Boolean.TRUE, Double.class, new Double(1));
     castTest(Boolean.FALSE, Double.class, new Double(0));  
     castTest(new Double(0), Double.class, new Double(0));
@@ -198,29 +205,34 @@ public class TypeConverterTest {
     castTest(new Long(2123190123125l), Short.class);
   }
   
-  @Test(expected=ClassCastException.class)
-  public void testStringToLongCastException() {
-    castTest("false", Long.class);
+  @Test
+  public void testBooleanStringToLongCast() {
+    assertEquals(Long.valueOf(0l), TypeConverter.castToType("false", Long.class));
+    assertEquals(Long.valueOf(1l), TypeConverter.castToType("true", Long.class));
   }
   
-  @Test(expected=ClassCastException.class)
-  public void testStringToIntegerCastException() {
-    castTest("false", Integer.class);
+  @Test
+  public void testBooleanStringToIntegerCast() {
+    assertEquals(Integer.valueOf(0), TypeConverter.castToType("false", Integer.class));
+    assertEquals(Integer.valueOf(1), TypeConverter.castToType("true", Integer.class));
   }
   
-  @Test(expected=ClassCastException.class)
-  public void testStringToFloatCastException() {
-    castTest("false", Float.class);
+  @Test
+  public void testBooleanStringToFloatCast() {
+    assertEquals(Float.valueOf(0f), TypeConverter.castToType("False", Float.class));
+    assertEquals(Float.valueOf(1f), TypeConverter.castToType("True", Float.class));
   }
   
-  @Test(expected=ClassCastException.class)
-  public void testStringToDoubleCastException() {
-    castTest("false", Double.class);
+  @Test
+  public void testBooleanStringToDoubleCast() {
+    assertEquals(Double.valueOf(0d), TypeConverter.castToType("false", Double.class));
+    assertEquals(Double.valueOf(1d), TypeConverter.castToType("true", Double.class));
   }
   
-  @Test(expected=ClassCastException.class)
-  public void testStringToShortCastException() {
-    castTest("false", Short.class);
+  @Test
+  public void testBooleanStringToShortCast() {
+    assertEquals(Short.valueOf((short) 0), TypeConverter.castToType("false", Short.class));
+    assertEquals(Short.valueOf((short) 1), TypeConverter.castToType("true", Short.class));
   }
   
   @Test(expected=ClassCastException.class)
@@ -259,9 +271,9 @@ public class TypeConverterTest {
   
   private static void castTest(final Object pValue, final Class<?> pTargetClass, Object pExpectedResult) {
     Object resultValue = null;
-    resultValue = TypeConverter.cast(pValue, pTargetClass);
+    resultValue = TypeConverter.castToType(pValue, pTargetClass);
     if (pExpectedResult != null) {
-      assertEquals("!!! ERROR: Expected result was " + pExpectedResult + " of type " + pExpectedResult.getClass().getName(), resultValue, pExpectedResult);
+      assertEquals("!!! ERROR: Expected result was " + pExpectedResult + " of type " + pExpectedResult.getClass().getName(), pExpectedResult, resultValue);
     }
     else {
       assertNull("!!! ERROR: Conversion should not have succeeded", resultValue);
