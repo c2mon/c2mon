@@ -160,7 +160,7 @@ public class AlmonMessageHandlerTest extends GenericMessageHandlerTst {
      * is supposed to subscribe to it and when it receives the valu for the new tag is should propagate it to the
      * business layer
      *
-     * @throws Exception
+     * @throws Exception x
      */
     @Test(timeout = 5000)
     @UseConf("conf-gm-one-metric.xml")
@@ -289,7 +289,7 @@ public class AlmonMessageHandlerTest extends GenericMessageHandlerTst {
      * This test verifies the Almon DAQ's behavior when a request to remove an existing DataTag is received at runtime.
      * The DAQ is expected to unregister such tag, and terminate the active alarm (if previously active)
      *
-     * @throws Exception
+     * @throws Exception x
      */
     @Test(timeout = 5000)
     @UseConf("conf-gm-one-metric.xml")

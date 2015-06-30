@@ -281,7 +281,7 @@ public class FesaJapcParameterHandlerTest {
      * The goal of this tests it to verify alarm monitor correctly handles activations/terminations of the device access
      * fault alarms.
      *
-     * @throws Exception
+     * @throws Exception x
      */
     // @Test(timeout = 4000)
     @DirtiesContext

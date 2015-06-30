@@ -91,10 +91,6 @@ public class AlarmTriplet {
         return JsonUtils.fromJson(json, AlarmTriplet.class);
     }
 
-    /**
-     * @param triplet
-     * @return
-     */
     public static AlarmTriplet fromString(String json) {
         return fromJson(json);
     }
