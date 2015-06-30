@@ -41,7 +41,7 @@ public class SonicConnector implements JmsProviderIntf
     * 
     * @param brokers <code>String</code> the connection string, typically broker:port,other_broker:port, ...
     * @return <code>javax.jms.Connection</code> a connection as provided by the vendors connection factory
-    * @throws Exception
+    * @throws JMSException when connection fails
     */
    public javax.jms.Connection getConnection(String brokers) throws JMSException
    {

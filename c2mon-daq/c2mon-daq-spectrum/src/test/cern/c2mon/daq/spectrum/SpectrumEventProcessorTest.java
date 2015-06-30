@@ -53,11 +53,10 @@ public class SpectrumEventProcessorTest extends GenericMessageHandlerTst {
     //
     // --- TEST --------------------------------------------------------------------------------
     //    
-    /**
+    /*
      * Check add and remove hosts to/from event processor, and subsequent retrieving of config
      * data
      * 
-     * @throws ParserConfigurationException
      */
     @UseConf("spectrum_test_1.xml")
     @Test
@@ -77,15 +76,14 @@ public class SpectrumEventProcessorTest extends GenericMessageHandlerTst {
         assertNull(alarm);
     }
     
-    /**
+    /*
      * Check a RST message clears all alarms from the message processor. Also verifies the correct
      * processing of a simple set and a simple clr.
      * 
-     * @throws ParserConfigurationException
      */
     @UseConf("spectrum_test_1.xml")
     @Test
-    public void testMessageProcessing() throws ParserConfigurationException {
+    public void testMessageProcessing() {
         SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-diam1", 1);
         SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-dmnp1", 1);
         SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.SET, "cs-ccr-dmnp2", 1);

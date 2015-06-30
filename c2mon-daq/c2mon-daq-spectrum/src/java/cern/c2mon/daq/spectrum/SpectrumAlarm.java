@@ -68,7 +68,6 @@ public class SpectrumAlarm {
      * least one error after the call, the global alarm for us is always true.
      * 
      * @param spectrumAlarmId <code>long</code> id of the alarm as defined by Spectrum
-     * @return <code>boolean</code> true if the alarm status has changed from false to true
      */
     public void activate(long spectrumAlarmId) {
         if (!spectrumAlarmIds.contains(spectrumAlarmId)) {
@@ -83,7 +82,6 @@ public class SpectrumAlarm {
      * Remove the specified error. If after the call the list is empty, the alarms is considered to be off
      * 
      * @param spectrumAlarmId <code>long</code> id of the alarm as defined by Spectrum
-     * @return <code>boolean</code> true if the alarm status has changed from true to false
      */
     public void terminate(long spectrumAlarmId) {
         if (spectrumAlarmIds.contains(spectrumAlarmId)) {
@@ -96,6 +94,7 @@ public class SpectrumAlarm {
 
     /**
      * That one is used to perist the situation when the DAQ is stopped.
+     * @return the list of Spectrum alarm ids attached to this LASER alarm
      */
     public Collection<Long> getAlarmIds() {
         return this.spectrumAlarmIds;

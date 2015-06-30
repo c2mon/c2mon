@@ -38,12 +38,11 @@ public class DiskBufferTest extends GenericMessageHandlerTst {
     //
     // --- TEST --------------------------------------------------------------------------------
     //   
-    /**
+    /*
      * Send some alarm messages to generate a given status, stop the message handler and restart
      * it in order to dump the situation to disk and reloa dit, check that the alarm status is as
      * expected.
      * 
-     * @throws EqIOException
      */
     @UseConf("spectrum_test_1.xml")
     @Test

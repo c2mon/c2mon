@@ -36,6 +36,7 @@ public class DiskBuffer {
 
     /**
      * Save data to the disk file
+     * @param monitoredHosts the list of hosts to monitor with their attached SpectrumAlarm
      */
     public static void write(ConcurrentHashMap<String, SpectrumAlarm> monitoredHosts) {
         ArrayList<String> result = new ArrayList<String>();
@@ -71,6 +72,7 @@ public class DiskBuffer {
     
     /**
      * Update the status of the configured alarms based on the content of the disk buffer.
+     * @param proc <code>SpectrumEventProcessor</code>
      */
     public static void loadBuffer(SpectrumEventProcessor proc) {
         LOG.info("Start to load active alarms from disk buffer ...");
