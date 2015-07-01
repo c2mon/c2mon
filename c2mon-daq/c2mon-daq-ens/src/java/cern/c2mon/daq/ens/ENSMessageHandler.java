@@ -26,7 +26,6 @@ import java.util.StringTokenizer;
 
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.ICommandRunner;
-import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.shared.common.command.ISourceCommandTag;
@@ -934,7 +933,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 //                if (debug2Cons) {
 //                    System.out.println("<dig val event> n=" + numEveDigVal);
 //                }
-                objToSend = TIMDriverSimpleTypeConverter.convert(sdt, (int) entDig.fGetValue());
+                objToSend = Integer.valueOf((int) entDig.fGetValue());
                 if (objToSend != null) {
                     // lTTag = convUtc2Local (lTTag);
                     myClassLog("   <<Update Tim Dig Value>>: ens id=" + entDig.getSxId() + " tim id=" + entDig.getOemId() + " with value =" + (int) entDig.fGetValue() + " ttag=" + lTTag);
@@ -1044,7 +1043,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 //                if (debug2Cons) {
 //                    System.out.println("<anl val event> n=" + numEveAnlVal);
 //                }
-                objToSend = TIMDriverSimpleTypeConverter.convert(sdt, entAnl.fGetValue());
+                objToSend = Float.valueOf(entAnl.fGetValue());
                 if (objToSend != null) {
                     // lTTag = convUtc2Local (lTTag);
                     myClassLog("   <<Update Tim Anl Value>>: ens id=" + entAnl.getSxId() + " tim id=" + entAnl.getOemId() + " with value =" + (int) entAnl.fGetValue() + " ttag=" + lTTag);
@@ -1150,7 +1149,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 
             if (bEventValue) {
                 numEveCntVal++;
-                objToSend = TIMDriverSimpleTypeConverter.convert(sdt, entCnt.fGetValue());
+                objToSend = Float.valueOf(entCnt.fGetValue());
                 if (objToSend != null) {
                     // lTTag = convUtc2Local (lTTag);
                     myClassLog("   <<Update Tim Cnt Value>>: ens id=" + entCnt.getSxId() + " tim id=" + entCnt.getOemId() + " with value =" + (int) entCnt.fGetValue() + " ttag=" + lTTag);
