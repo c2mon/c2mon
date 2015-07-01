@@ -15,7 +15,6 @@ import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
 import cern.japc.MapParameterValue;
@@ -33,8 +32,6 @@ public class MPVReader {
     private final MapParameterValue mpv;
     private final JAPCHardwareAddress addr;
     private final ISourceDataTag tag;
-
-    private final TIMDriverSimpleTypeConverter converter;
 
     /**
      * Log4j Logger instance used by this class.
@@ -54,8 +51,6 @@ public class MPVReader {
         this.mpv = mpv;
         this.addr = (JAPCHardwareAddress) tag.getHardwareAddress();
         this.tag = tag;
-
-        converter = new TIMDriverSimpleTypeConverter();
     }
 
     /**
@@ -96,20 +91,7 @@ public class MPVReader {
                 LOG.debug("enetring getValue()..");
 
             try {
-
-                if (valueType == ValueType.BYTE_ARRAY) {
-                    value4send = converter.convert(tag, simpleValue.getByte(index));
-                } else if (valueType == ValueType.INT_ARRAY) {
-                    value4send = converter.convert(tag, simpleValue.getInt(index));
-                } else if (valueType == ValueType.LONG_ARRAY) {
-                    value4send = converter.convert(tag, simpleValue.getLong(index));
-                } else if (valueType == ValueType.FLOAT_ARRAY) {
-                    value4send = converter.convert(tag, simpleValue.getFloat(index));
-                } else if (valueType == ValueType.DOUBLE_ARRAY) {
-                    value4send = converter.convert(tag, simpleValue.getDouble(index));
-                } else if (valueType == ValueType.STRING_ARRAY) {
-                    value4send = converter.convert(tag, simpleValue.getString(index));
-                }
+              value4send = simpleValue.getObject(index);
             } catch (java.lang.ArrayIndexOutOfBoundsException ex) {
 
                 String errMessage = "Could not determine the array index position. Field name index-field-name ["
@@ -123,21 +105,7 @@ public class MPVReader {
             }
 
         } else if (valueType.isScalar()) {
-            if (valueType == ValueType.BOOLEAN) {
-                value4send = converter.convert(tag, simpleValue.getBoolean());
-            } else if (valueType == ValueType.BYTE) {
-                value4send = converter.convert(tag, simpleValue.getByte());
-            } else if (valueType == ValueType.INT) {
-                value4send = converter.convert(tag, simpleValue.getInt());
-            } else if (valueType == ValueType.LONG) {
-                value4send = converter.convert(tag, simpleValue.getLong());
-            } else if (valueType == ValueType.FLOAT) {
-                value4send = converter.convert(tag, simpleValue.getFloat());
-            } else if (valueType == ValueType.DOUBLE) {
-                value4send = converter.convert(tag, simpleValue.getDouble());
-            } else if (valueType == ValueType.STRING) {
-                value4send = converter.convert(tag, simpleValue.getString());
-            }
+          value4send = simpleValue.getObject();
         }
 
         if (LOG.isDebugEnabled())

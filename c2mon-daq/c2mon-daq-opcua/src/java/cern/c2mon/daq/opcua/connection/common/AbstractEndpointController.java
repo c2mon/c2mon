@@ -36,7 +36,6 @@ import cern.c2mon.daq.opcua.connection.common.impl.AliveWriter;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCommunicationException;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCriticalException;
 import cern.c2mon.daq.opcua.connection.common.impl.StatusChecker;
-import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.c2mon.shared.common.command.ISourceCommandTag;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataQuality;
@@ -341,20 +340,11 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
      */
     @Override
     public void onNewTagValue(final ISourceDataTag dataTag, final long timestamp, final Object tagValue) {
-        logger.debug("onNewTagValue - New Tag value received for Tag#" + dataTag.getId());
+        logger.debug("onNewTagValue - New Tag value received for Tag #" + dataTag.getId());
         
-        Object convertedValue;
-        if (tagValue == null)
-            convertedValue = tagValue;
-        else if (tagValue instanceof Number)
-            convertedValue = TIMDriverSimpleTypeConverter.convert(
-                    dataTag, Double.valueOf(tagValue.toString()));
-        else
-            convertedValue = TIMDriverSimpleTypeConverter.convert(
-                    dataTag, tagValue.toString());
-        this.sender.sendTagFiltered(dataTag, convertedValue, timestamp);
+        this.sender.sendTagFiltered(dataTag, tagValue, timestamp);
         
-        logger.debug("onNewTagValue - Tag value " + convertedValue + " sent for Tag#" + dataTag.getId());
+        logger.debug("onNewTagValue - Tag value " + tagValue + " sent for Tag #" + dataTag.getId());
     }
 
     /**

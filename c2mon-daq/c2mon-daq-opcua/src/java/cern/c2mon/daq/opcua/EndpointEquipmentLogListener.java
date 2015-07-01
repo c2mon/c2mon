@@ -2,12 +2,12 @@ package cern.c2mon.daq.opcua;
 
 import java.util.Date;
 
-import cern.c2mon.daq.opcua.connection.common.IOPCEndpointListener;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
-import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
+import cern.c2mon.daq.opcua.connection.common.IOPCEndpointListener;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress;
+import cern.c2mon.shared.common.type.TypeConverter;
 
 /**
  * Listener for endpoint events. Makes sure all important events are logged.
@@ -43,15 +43,8 @@ public class EndpointEquipmentLogListener implements IOPCEndpointListener {
      */
     @Override
     public void onNewTagValue(final ISourceDataTag dataTag, final long timestamp, final Object tagValue) {
-        Object convertedValue;
-        if (tagValue == null)
-            convertedValue = tagValue;
-        else if (tagValue instanceof Number)
-            convertedValue = TIMDriverSimpleTypeConverter.convert(
-                        dataTag, Double.valueOf(tagValue.toString()));
-        else
-            convertedValue = TIMDriverSimpleTypeConverter.convert(
-                    dataTag, tagValue.toString());
+        Object convertedValue = TypeConverter.cast(tagValue, dataTag.getDataType());
+        
         if (equipmentLogger.isDebugEnabled()) {
             equipmentLogger.debug("Original value: '" + (tagValue != null ? tagValue.toString() : "null") + "', Tag type: '" + dataTag.getDataType() + "', Original type: '"
                     + (tagValue != null ? tagValue.getClass().getSimpleName() : "null") + "'");

@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationHandler;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
-import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 
@@ -52,11 +51,7 @@ public abstract class EquipmentMessageHandler {
 	 * The command handler to register the command runner.
 	 */
 	private IEquipmentCommandHandler equipmentCommandHandler;
-	/**
-	 * The TIM driver simple type converter helps to do common conversions
-	 * in the EquipmentMessageHandler implementations.
-	 */
-	private static final TIMDriverSimpleTypeConverter TIM_DRIVER_SIMPLE_TYPE_CONVERTER = new TIMDriverSimpleTypeConverter();
+	
 	/**
 	 * The process logger
 	 */
@@ -248,15 +243,6 @@ public abstract class EquipmentMessageHandler {
 	 */
 	public IEquipmentCommandHandler getEquipmentCommandHandler() {
 		return equipmentCommandHandler;
-	}
-
-	/**
-	 * The TIM driver simple type converter helps to do common conversions
-	 * in the EquipmentMessageHandler implementations.
-	 * @return The TIMDriverSimpleTypeConverter.
-	 */
-	public static TIMDriverSimpleTypeConverter getTimDriverSimpleTypeConverter() {
-		return TIM_DRIVER_SIMPLE_TYPE_CONVERTER;
 	}
 
 	/**

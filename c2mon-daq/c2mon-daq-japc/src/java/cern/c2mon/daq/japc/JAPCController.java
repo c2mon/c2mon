@@ -11,7 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
-import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
@@ -48,7 +47,7 @@ public class JAPCController {
 
         @SuppressWarnings("synthetic-access")
         @Override
-        public void exceptionOccured(@SuppressWarnings("unused") String parameterId, String description,
+        public void exceptionOccured(String parameterId, String description,
                 ParameterException e) {
 
             if (e instanceof SubscriptionProblemException) {
@@ -442,34 +441,8 @@ public class JAPCController {
             final ValueType valueType, final ValueHeader header) {
         getEquipmentLogger().debug("enetring sendJAPCSValueFromScalar()..");
 
-        Object value4send = null;
-
-        if (valueType == ValueType.BOOLEAN) {
-            value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getBoolean());
-        } else if (valueType == ValueType.BYTE) {
-            value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getByte());
-        } else if (valueType == ValueType.INT) {
-            value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getInt());
-        } else if (valueType == ValueType.LONG) {
-            value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getLong());
-        } else if (valueType == ValueType.FLOAT) {
-            value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getFloat());
-        } else if (valueType == ValueType.DOUBLE) {
-            value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getDouble());
-        } else if (valueType == ValueType.STRING) {
-            value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getString());
-        }
-
-        if (value4send != null) {
-            // send the value to the server
-            getEquipmentMessageSender().sendTagFiltered(tag, value4send,
-                    convertSourceTimestampToMs(header.getAcqStampMillis()));
-        } else {
-            getEquipmentLogger().info(
-                    "\tInvalidating SourceDataTagValue with quality CONVERSION_ERROR, for Tag name : " + tag.getName()
-                            + " id : " + tag.getId());
-            getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.CONVERSION_ERROR, null);
-        }
+        getEquipmentMessageSender().sendTagFiltered(tag, simpleValue.getObject(),
+            convertSourceTimestampToMs(header.getAcqStampMillis()));
 
         getEquipmentLogger().debug("leaving sendJAPCSValueFromScalar()");
     }
@@ -478,36 +451,10 @@ public class JAPCController {
             final ValueType valueType, final ValueHeader header, final int index) {
         getEquipmentLogger().debug("enetring sendJAPCSValueFromArray()..");
 
-        Object value4send = null;
-
         try {
-
-            if (valueType == ValueType.BOOLEAN_ARRAY) {
-                value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getBoolean(index));
-            } else if (valueType == ValueType.BYTE_ARRAY) {
-                value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getByte(index));
-            } else if (valueType == ValueType.INT_ARRAY) {
-                value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getInt(index));
-            } else if (valueType == ValueType.LONG_ARRAY) {
-                value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getLong(index));
-            } else if (valueType == ValueType.FLOAT_ARRAY) {
-                value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getFloat(index));
-            } else if (valueType == ValueType.DOUBLE_ARRAY) {
-                value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getDouble(index));
-            } else if (valueType == ValueType.STRING_ARRAY) {
-                value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getString(index));
-            }
-
-            if (value4send != null) {
-                // send the value to the server
-                getEquipmentMessageSender().sendTagFiltered(tag, value4send,
-                        convertSourceTimestampToMs(header.getAcqStampMillis()));
-            } else {
-                getEquipmentLogger().info(
-                        "\tInvalidating SourceDataTagValue with quality CONVERSION_ERROR, for Tag name : "
-                                + tag.getName() + " id : " + tag.getId());
-                getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.CONVERSION_ERROR, null);
-            }
+          // send the value to the server
+          getEquipmentMessageSender().sendTagFiltered(tag, simpleValue.getObject(index),
+                  convertSourceTimestampToMs(header.getAcqStampMillis()));
 
         } catch (java.lang.ArrayIndexOutOfBoundsException ex) {
             getEquipmentLogger().warn("could not read data from an array at index : " + index);
@@ -531,26 +478,19 @@ public class JAPCController {
         try {
 
             if (valueType == ValueType.BOOLEAN_ARRAY_2D) {
-                value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getArray2D().getBoolean(rowIndex,
-                        colIndex));
+                value4send = simpleValue.getArray2D().getBoolean(rowIndex, colIndex);
             } else if (valueType == ValueType.BYTE_ARRAY_2D) {
-                value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getArray2D().getByte(rowIndex,
-                        colIndex));
+                value4send = simpleValue.getArray2D().getByte(rowIndex, colIndex);
             } else if (valueType == ValueType.INT_ARRAY_2D) {
-                value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getArray2D().getInt(rowIndex,
-                        colIndex));
+                value4send = simpleValue.getArray2D().getInt(rowIndex, colIndex);
             } else if (valueType == ValueType.LONG_ARRAY_2D) {
-                value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getArray2D().getLong(rowIndex,
-                        colIndex));
+                value4send = simpleValue.getArray2D().getLong(rowIndex, colIndex);
             } else if (valueType == ValueType.FLOAT_ARRAY_2D) {
-                value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getArray2D().getFloat(rowIndex,
-                        colIndex));
+                value4send = simpleValue.getArray2D().getFloat(rowIndex, colIndex);
             } else if (valueType == ValueType.DOUBLE_ARRAY_2D) {
-                value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getArray2D().getDouble(rowIndex,
-                        colIndex));
+                value4send = simpleValue.getArray2D().getDouble(rowIndex, colIndex);
             } else if (valueType == ValueType.STRING_ARRAY_2D) {
-                value4send = TIMDriverSimpleTypeConverter.convert(tag, simpleValue.getArray2D().getString(rowIndex,
-                        colIndex));
+                value4send = simpleValue.getArray2D().getString(rowIndex, colIndex);
             }
 
             if (value4send != null) {
