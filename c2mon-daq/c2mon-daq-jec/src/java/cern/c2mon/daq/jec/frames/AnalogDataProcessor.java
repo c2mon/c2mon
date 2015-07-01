@@ -17,18 +17,17 @@
  *****************************************************************************/
 package cern.c2mon.daq.jec.frames;
 
-import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.jec.PLCObjectFactory;
-import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
+import cern.c2mon.daq.jec.address.AnalogJECAddressSpace;
+import cern.c2mon.daq.jec.plc.StdConstants;
+import cern.c2mon.daq.jec.tools.JECBinaryHelper;
+import cern.c2mon.daq.jec.tools.JECConversionHelper;
 import cern.c2mon.shared.common.datatag.DataTagDeadband;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.address.PLCHardwareAddress;
-import cern.c2mon.daq.jec.address.AnalogJECAddressSpace;
-import cern.c2mon.daq.jec.tools.JECBinaryHelper;
-import cern.c2mon.daq.jec.tools.JECConversionHelper;
-import cern.c2mon.daq.jec.plc.StdConstants;
 
 /**
  * Data processor for all analog frames (which means containing 16 and 32 Bit floats)
@@ -180,18 +179,14 @@ public class AnalogDataProcessor<T extends AnalogJECAddressSpace> extends Abstra
         PLCHardwareAddress hardwareAddress = (PLCHardwareAddress) sourceDataTag.getHardwareAddress();
         if (JECConversionHelper.checkSHRTValues(hardwareAddress.getResolutionFactor())) {
             float floatValue = JECConversionHelper.convertPLCValueToFloat(actWord, hardwareAddress);
-            Object timValue = TIMDriverSimpleTypeConverter.convert(
-                    sourceDataTag, floatValue);
-            if (timValue != null) {
-                if (revalidate)
-                    revalidate(timValue, sourceDataTag, timestamp);
-                else
-                    send(timValue, sourceDataTag, timestamp);
-                getEquipmentLogger().debug("ANALOG DATA TAG VALUE SENT: " + sourceDataTag.getName() + " ID:" + sourceDataTag.getId());
-            } else {
-                getEquipmentLogger().debug("\tSending INVALIDATE SourceDataTagValue with quality CONVERSION_ERROR, for Tag name : " + sourceDataTag.getName() + " tag id : " + sourceDataTag.getId());
-                sendInvalid(sourceDataTag, SourceDataQuality.CONVERSION_ERROR, null, timestamp);
+            Object timValue = Float.valueOf(floatValue);
+            if (revalidate) {
+              revalidate(timValue, sourceDataTag, timestamp);
+            } 
+            else {
+              send(timValue, sourceDataTag, timestamp);
             }
+            getEquipmentLogger().debug("ANALOG DATA TAG VALUE SENT: " + sourceDataTag.getName() + " ID:" + sourceDataTag.getId());
         }
     }
 
@@ -205,18 +200,18 @@ public class AnalogDataProcessor<T extends AnalogJECAddressSpace> extends Abstra
     public void sendFiltered(final int value, final ISourceDataTag sourceDataTag, final long timestamp) {
         PLCHardwareAddress hardwareAddress = (PLCHardwareAddress) sourceDataTag.getHardwareAddress();
         if (JECConversionHelper.checkSHRTValues(hardwareAddress.getResolutionFactor())) {
-            float convertedValue = JECConversionHelper.convertPLCValueToFloat(value, hardwareAddress);
+            float floatValue = JECConversionHelper.convertPLCValueToFloat(value, hardwareAddress);
             if (getEquipmentLogger().isTraceEnabled()) {
               getEquipmentLogger().trace("INCOMING VAL FROM TABLE: " + value);
-              getEquipmentLogger().trace("INCOMING HRF: " + convertedValue);                              
+              getEquipmentLogger().trace("INCOMING HRF: " + floatValue);                              
           }
-            if (isChangeOutOfDeadband(Float.valueOf(convertedValue), sourceDataTag)) {              
-                Object timValue = TIMDriverSimpleTypeConverter.convert(
-                        sourceDataTag, convertedValue);                
+            if (isChangeOutOfDeadband(Float.valueOf(floatValue), sourceDataTag)) {              
+                Object timValue = Float.valueOf(floatValue);                
                 if (timValue != null) {                    
                     send(timValue, sourceDataTag, timestamp);
                     getEquipmentLogger().debug("ANALOG DATA TAG VALUE SENT: " + sourceDataTag.getName() + " ID:" + sourceDataTag.getId());
-                } else {
+                } 
+                else {
                     getEquipmentLogger().debug("\tSending INVALIDATE SourceDataTagValue with quality CONVERSION_ERROR, for Tag name : " + sourceDataTag.getName() + " tag id : " + sourceDataTag.getId());
                     sendInvalid(sourceDataTag, SourceDataQuality.CONVERSION_ERROR, "Error when converting value in JEC DAQ.", timestamp);
                 }
