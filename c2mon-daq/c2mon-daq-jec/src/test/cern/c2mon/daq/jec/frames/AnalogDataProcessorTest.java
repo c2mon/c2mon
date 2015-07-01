@@ -70,7 +70,7 @@ public class AnalogDataProcessorTest {
         jecpFrames.SetDataStartNumber((short) 0);
         jecpFrames.SetDataOffset((short) 1);
         
-        equipmentMessageSender.sendTagFiltered(sourceDataTag, 1, jecpFrames.GetJECCurrTimeMilliseconds());
+        equipmentMessageSender.sendTagFiltered(sourceDataTag, 1f, jecpFrames.GetJECCurrTimeMilliseconds());
         expectLastCall().andReturn(true);
         
         replay(equipmentMessageSender);
@@ -83,7 +83,7 @@ public class AnalogDataProcessorTest {
      */
     @Test
     public void testSendTag() {
-        equipmentMessageSender.sendTagFiltered(eq(sourceDataTag), eq(0), geq(System.currentTimeMillis()));
+        equipmentMessageSender.sendTagFiltered(eq(sourceDataTag), eq(0.0f), geq(System.currentTimeMillis()));
         expectLastCall().andReturn(true);
         
         replay(equipmentMessageSender);
@@ -95,9 +95,9 @@ public class AnalogDataProcessorTest {
     
     @Test
     public void testRevalidateTag() {
-        equipmentMessageSender.sendTagFiltered(eq(sourceDataTag), eq(0), geq(System.currentTimeMillis()));
+        equipmentMessageSender.sendTagFiltered(eq(sourceDataTag), eq(0.0f), geq(System.currentTimeMillis()));
         expectLastCall().andReturn(true);
-        equipmentMessageSender.sendTagFiltered(eq(sourceDataTag), eq(0), geq(System.currentTimeMillis()));
+        equipmentMessageSender.sendTagFiltered(eq(sourceDataTag), eq(0.0f), geq(System.currentTimeMillis()));
         expectLastCall().andReturn(true);
         
         replay(equipmentMessageSender);
