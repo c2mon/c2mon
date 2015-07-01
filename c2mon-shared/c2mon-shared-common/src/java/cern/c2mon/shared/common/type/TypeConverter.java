@@ -49,7 +49,19 @@ public final class TypeConverter  {
   public static final <T> boolean isConvertible(final Object value, final Class<T> clazz) {
     return (castToType(value, clazz) != null);
   }
-  
+
+  /**
+   * Checks whether the given value can be casted into the given class type. The
+   * following shortcut type strings are supported: <code>Boolean, Integer, Float, String, 
+   * Double, Long, Short</code>
+   * @param value The object to be casted
+   * @param className the class cast type as name
+   * @return <code>true</code>, if the passed object value can be casted in to the given class type
+   * @see #cast(Object, String)
+   */
+  public static final boolean isConvertible(final Object value, final String className) {
+    return (cast(value, className) != null);
+  }
   
   /**
    * Tries to cast the given object value into the specified class type. In case you are 
@@ -465,7 +477,7 @@ public final class TypeConverter  {
 
   /**
    * This method tries to cast any kind of Object into the given raw value type. The
-   * following type strings are supported: <code>Boolean, Integer, Float, String, 
+   * following shortcut type strings are supported: <code>Boolean, Integer, Float, String, 
    * Double, Long, Short</code>
    * @param value The object that shall be casted into the specific raw value type
    * @param className The raw type class as Sting and without the <code>java.lang.</code>

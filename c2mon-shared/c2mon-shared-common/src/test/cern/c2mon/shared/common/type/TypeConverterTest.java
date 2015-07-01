@@ -211,6 +211,10 @@ public class TypeConverterTest {
     assertEquals(Long.valueOf(1l), TypeConverter.castToType("true", Long.class));
     assertEquals(true, TypeConverter.isConvertible("false", Long.class));
     assertEquals(true, TypeConverter.isConvertible("true", Long.class));
+    assertEquals(true, TypeConverter.isConvertible("false", "Long"));
+    assertEquals(true, TypeConverter.isConvertible("true", "Long"));
+    assertEquals(true, TypeConverter.isConvertible("false", "java.lang.Long"));
+    assertEquals(true, TypeConverter.isConvertible("true", "java.lang.Long"));
   }
   
   @Test
@@ -219,6 +223,10 @@ public class TypeConverterTest {
     assertEquals(Integer.valueOf(1), TypeConverter.castToType("true", Integer.class));
     assertEquals(true, TypeConverter.isConvertible("false", Integer.class));
     assertEquals(true, TypeConverter.isConvertible("true", Integer.class));
+    assertEquals(true, TypeConverter.isConvertible("false", "Integer"));
+    assertEquals(true, TypeConverter.isConvertible("true", "Integer"));
+    assertEquals(true, TypeConverter.isConvertible("false", "java.lang.Integer"));
+    assertEquals(true, TypeConverter.isConvertible("true", "java.lang.Integer"));
   }
   
   @Test
@@ -227,6 +235,10 @@ public class TypeConverterTest {
     assertEquals(Float.valueOf(1f), TypeConverter.castToType("True", Float.class));
     assertEquals(true, TypeConverter.isConvertible("False", Float.class));
     assertEquals(true, TypeConverter.isConvertible("True", Float.class));
+    assertEquals(true, TypeConverter.isConvertible("false", "Float"));
+    assertEquals(true, TypeConverter.isConvertible("true", "Float"));
+    assertEquals(true, TypeConverter.isConvertible("false", "java.lang.Float"));
+    assertEquals(true, TypeConverter.isConvertible("true", "java.lang.Float"));
   }
   
   @Test
@@ -235,6 +247,10 @@ public class TypeConverterTest {
     assertEquals(Double.valueOf(1d), TypeConverter.castToType("true", Double.class));
     assertEquals(true, TypeConverter.isConvertible("false", Double.class));
     assertEquals(true, TypeConverter.isConvertible("true", Double.class));
+    assertEquals(true, TypeConverter.isConvertible("false", "Double"));
+    assertEquals(true, TypeConverter.isConvertible("true", "Double"));
+    assertEquals(true, TypeConverter.isConvertible("false", "java.lang.Double"));
+    assertEquals(true, TypeConverter.isConvertible("true", "java.lang.Double"));
   }
   
   @Test
@@ -243,6 +259,10 @@ public class TypeConverterTest {
     assertEquals(Short.valueOf((short) 1), TypeConverter.castToType("true", Short.class));
     assertEquals(true, TypeConverter.isConvertible("false", Short.class));
     assertEquals(true, TypeConverter.isConvertible("true", Short.class));
+    assertEquals(true, TypeConverter.isConvertible("false", "Short"));
+    assertEquals(true, TypeConverter.isConvertible("true", "Short"));
+    assertEquals(true, TypeConverter.isConvertible("false", "java.lang.Short"));
+    assertEquals(true, TypeConverter.isConvertible("true", "java.lang.Short"));
   }
   
   @Test(expected=ClassCastException.class)
