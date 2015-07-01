@@ -209,30 +209,40 @@ public class TypeConverterTest {
   public void testBooleanStringToLongCast() {
     assertEquals(Long.valueOf(0l), TypeConverter.castToType("false", Long.class));
     assertEquals(Long.valueOf(1l), TypeConverter.castToType("true", Long.class));
+    assertEquals(true, TypeConverter.isConvertible("false", Long.class));
+    assertEquals(true, TypeConverter.isConvertible("true", Long.class));
   }
   
   @Test
   public void testBooleanStringToIntegerCast() {
     assertEquals(Integer.valueOf(0), TypeConverter.castToType("false", Integer.class));
     assertEquals(Integer.valueOf(1), TypeConverter.castToType("true", Integer.class));
+    assertEquals(true, TypeConverter.isConvertible("false", Integer.class));
+    assertEquals(true, TypeConverter.isConvertible("true", Integer.class));
   }
   
   @Test
   public void testBooleanStringToFloatCast() {
     assertEquals(Float.valueOf(0f), TypeConverter.castToType("False", Float.class));
     assertEquals(Float.valueOf(1f), TypeConverter.castToType("True", Float.class));
+    assertEquals(true, TypeConverter.isConvertible("False", Float.class));
+    assertEquals(true, TypeConverter.isConvertible("True", Float.class));
   }
   
   @Test
   public void testBooleanStringToDoubleCast() {
     assertEquals(Double.valueOf(0d), TypeConverter.castToType("false", Double.class));
     assertEquals(Double.valueOf(1d), TypeConverter.castToType("true", Double.class));
+    assertEquals(true, TypeConverter.isConvertible("false", Double.class));
+    assertEquals(true, TypeConverter.isConvertible("true", Double.class));
   }
   
   @Test
   public void testBooleanStringToShortCast() {
     assertEquals(Short.valueOf((short) 0), TypeConverter.castToType("false", Short.class));
     assertEquals(Short.valueOf((short) 1), TypeConverter.castToType("true", Short.class));
+    assertEquals(true, TypeConverter.isConvertible("false", Short.class));
+    assertEquals(true, TypeConverter.isConvertible("true", Short.class));
   }
   
   @Test(expected=ClassCastException.class)
