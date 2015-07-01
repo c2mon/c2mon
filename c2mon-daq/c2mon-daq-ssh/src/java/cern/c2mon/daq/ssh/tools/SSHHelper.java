@@ -36,7 +36,6 @@ import org.xml.sax.InputSource;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
-import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqDataTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqException;
@@ -302,7 +301,7 @@ public class SSHHelper {
         }
       }
 
-      this.equipmentMessageSender.sendTagFiltered(sdt, TIMDriverSimpleTypeConverter.convert(sdt, feedback), System.currentTimeMillis());
+      this.equipmentMessageSender.sendTagFiltered(sdt, feedback, System.currentTimeMillis());
 
       /*
        * Disconnect the transport layer gracefully
