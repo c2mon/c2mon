@@ -267,8 +267,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+boolValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+boolValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, boolValue);
                   }
 
                   break;
@@ -294,8 +293,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+boolValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+boolValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, boolValue);
                   }
 
                   break;
@@ -319,8 +317,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+byteValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+byteValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, byteValue);
                   }
 
                   break;
@@ -347,8 +344,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+byteValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+byteValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, byteValue);
                   }
 
                   break;
@@ -373,8 +369,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+shortValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+shortValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, shortValue);
                   }
 
                   break;
@@ -400,8 +395,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+shortValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+shortValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, shortValue);
                   }
 
                   break;
@@ -426,8 +420,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+intValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+intValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, intValue);
                   }
 
                   break;
@@ -453,8 +446,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+intValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+intValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, intValue);
                   }
 
                   break;
@@ -479,8 +471,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+longValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+longValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, longValue);
                   }
 
                   break;
@@ -507,8 +498,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+longValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+longValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, longValue);
                   }
 
                   break;
@@ -533,8 +523,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+floatValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+floatValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, floatValue);
                   }
 
                   break;
@@ -561,8 +550,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+floatValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+floatValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, floatValue);
                   }
 
                   break;
@@ -587,8 +575,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+doubleValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+doubleValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, doubleValue);
                   }
 
                   break;
@@ -612,8 +599,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+doubleValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+doubleValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, doubleValue);
                   }
 
                   break;
@@ -636,8 +622,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("\tNew value ("+stringValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("\tProblems sending new value ("+stringValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, stringValue);
                   }
 
                   break;
@@ -661,8 +646,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+stringValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+stringValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, stringValue);
                   }
 
                   break;
@@ -709,8 +693,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+boolValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+boolValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, boolValue);
                   }
 
                   break;
@@ -731,8 +714,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+boolValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+boolValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, boolValue);
                   }
 
                   break;
@@ -752,8 +734,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+boolValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+boolValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, boolValue);
                   }
 
                   break;
@@ -774,8 +755,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+boolValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+boolValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, boolValue);
                   }
 
                   break;
@@ -795,8 +775,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+shortValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+shortValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, shortValue);
                   }
 
                   break;
@@ -817,8 +796,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+shortValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+shortValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, shortValue);
                   }
 
                   break;
@@ -839,8 +817,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+intValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+intValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, intValue);
                   }
 
                   break;
@@ -861,8 +838,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+intValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+intValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, intValue);
                   }
 
                   break;
@@ -882,8 +858,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+longValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+longValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, longValue);
                   }
 
                   break;
@@ -905,8 +880,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+longValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+longValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, longValue);
                   }
 
                   break;
@@ -926,8 +900,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+floatValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+floatValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, floatValue);
                   }
 
                   break;
@@ -949,8 +922,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+floatValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+floatValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, floatValue);
                   }
 
                   break;
@@ -970,8 +942,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+doubleValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+doubleValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, doubleValue);
                   }
 
                   break;
@@ -993,8 +964,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+doubleValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+doubleValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, doubleValue);
                   }
 
                   break;
@@ -1014,8 +984,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+stringValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+stringValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, stringValue);
                   }
 
                   break;
@@ -1036,8 +1005,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     getEquipmentLogger().debug("	New value ("+stringValue+") sent to the server for Tag name : "
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    getEquipmentLogger().debug("	Problems sending new value ("+stringValue+") to the server for Tag name : "
-                        + sdt.getName() + " tag id : " + sdt.getId());
+                    sendDebugLogForUnsuccessfulSending(sdt, stringValue);
                   }
 
                   break;
@@ -1120,6 +1088,16 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
     if (getEquipmentLogger().isDebugEnabled()) {
       getEquipmentLogger().debug("disconnected - exiting disconnected()..");
     }
+  }
+  
+  /**
+   * Inner method for creating a log message that explains why the newValue could not be send to the server.
+   * @param sdt SourceDataTag
+   * @param newValue The new value received by DIP
+   */
+  private void sendDebugLogForUnsuccessfulSending(final ISourceDataTag sdt, final Object newValue) {
+    getEquipmentLogger().debug("  The new value update (" + newValue + ") for Tag name : "
+        + sdt.getName() + " tag id : " + sdt.getId() + " was filtered out or invalidated before sending to the server.");
   }
 
   /**
