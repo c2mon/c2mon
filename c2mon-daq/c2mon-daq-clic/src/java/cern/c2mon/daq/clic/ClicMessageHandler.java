@@ -16,7 +16,6 @@ import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
-import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.shared.common.command.ISourceCommandTag;
@@ -399,20 +398,13 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
         Object value4send = null;
 
         if (sValue instanceof Number) {
-            value4send = TIMDriverSimpleTypeConverter.convert(tag, (Number) sValue);
+            value4send = sValue;
         } else {
-            value4send = TIMDriverSimpleTypeConverter.convert(tag, sValue.toString());
+            value4send = sValue.toString();
         }
 
-        if (value4send != null) {
-            // send the value to the server
-            getEquipmentMessageSender().sendTagFiltered(tag, value4send, sourceTimestamp, valueDescription);
-        } else {
-            getEquipmentLogger().info(
-                    "\tInvalidating SourceDataTagValue with quality CONVERSION_ERROR, for Tag name : " + tag.getName()
-                            + " id : " + tag.getId());
-            getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.CONVERSION_ERROR, null);
-        }
+        // send the value to the server
+        getEquipmentMessageSender().sendTagFiltered(tag, value4send, sourceTimestamp, valueDescription);
 
         logger.trace("leaving convertAndSend()");
     }
