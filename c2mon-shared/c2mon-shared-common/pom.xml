@@ -8,7 +8,7 @@
   </parent>
   <groupId>cern.c2mon.c2mon-shared</groupId>
   <artifactId>c2mon-shared-common</artifactId>
-  <version>1.5.10</version>
+  <version>1.5.11-SNAPSHOT</version>
   <name>c2mon-shared-common</name>
   <packaging>jar</packaging>
   <description>
