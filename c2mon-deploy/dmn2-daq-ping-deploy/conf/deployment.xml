@@ -9,14 +9,11 @@
       <application>
          <startscript name="DMN2-DAQ-PING_01" >
             <main-class name="cern.c2mon.daq.common.startup.DaqStartup">
-               <arg>-c2monProperties conf/daq.properties -log4j conf/log4j.xml -daqConf conf/daq.conf -processName ${PROCESS_NAME} -noDeadband </arg>
+               <arg>-processName ${PROCESS_NAME} -noDeadband </arg>
                <output>
                   <file name="${DAQ_LOG_HOME}/${PROCESS_NAME}.out.log" />
                </output>
             </main-class>
-            <property name="c2mon.process.name" value="${PROCESS_NAME}" />
-            <property name="c2mon.log.dir" value="log" />
-            <property name="c2mon.daq.spring.context" value="file:conf/daq-core-service.xml" />
             <property name="japc.ext.yami.subscription.checkPeriodMs" value="30000"/>
             <property name="c2mon.daq.equipment.alive.filtering" value="true"/>
             <java-vm-args>-Xms256m -Xmx256m -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
@@ -27,9 +24,9 @@
       <application name="dmn2-daq-ping-pro">
          <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-ping-dev">
             <directory name="conf">
-               <file name="daq.properties" sourceDir="~diamonop/c2mon/daq" mask="400" />
+               <file name="c2mon.properties" source="~diamonop/c2mon/daq/daq.properties" mask="400" />
                <file name="log4j.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
-               <file name="daq-core-service.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
+               
             </directory>
             <notification>
                <mail address="diamon-developers@cern.ch" />
@@ -40,9 +37,9 @@
       <application name="dmn2-daq-ping-dev">
          <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-ping-dev">
             <directory name="conf">
-               <file name="daq.properties" sourceDir="~dmndev/c2mon/daq" mask="400" />
+               <file name="c2mon.properties" source="~dmndev/c2mon/daq/daq.properties" mask="400" />
                <file name="log4j.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
-               <file name="daq-core-service.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
+               
             </directory>
          </deployment>
       </application>
