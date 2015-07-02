@@ -210,8 +210,9 @@ public final class DaqStartup {
           xmlContext = new FileSystemXmlApplicationContext(new String[] { System.getProperty("c2mon.daq.spring.context") }, ctx);
         }
         else {
-          logger.info("Loading default Spring context configuration file from classpath");
-          xmlContext = new ClassPathXmlApplicationContext(new String[] { "resources/daq-core-service.xml" }, ctx);
+          String defaultConfiguration = "resources/daq-core-service.xml";
+          logger.info("Loading default Spring context configuration file from classpath: " + defaultConfiguration);
+          xmlContext = new ClassPathXmlApplicationContext(new String[] { defaultConfiguration }, ctx);
         }
       }
     }
