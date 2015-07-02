@@ -204,8 +204,8 @@ public class DeviceManagerTest {
     devicesReturnList.add(device2);
 
     Set<ClientCommandTag<Object>> returnedCommandTags = new HashSet<>();
-    returnedCommandTags.add(new ClientCommandTagImpl(-1L));
-    returnedCommandTags.add(new ClientCommandTagImpl(-2L));
+    returnedCommandTags.add(new ClientCommandTagImpl(4287L));
+    returnedCommandTags.add(new ClientCommandTagImpl(4288L));
 
     // Expect the device manager to check the cache
     EasyMock.expect(deviceCacheMock.getAllDevices("test_device_class")).andReturn(new ArrayList<Device>());
@@ -227,6 +227,8 @@ public class DeviceManagerTest {
 
     for (Device device : devices) {
       Assert.assertTrue(device.getDeviceClassName().equals("test_device_class"));
+      Assert.assertTrue(device.getProperties().size() == 1);
+      Assert.assertTrue(device.getCommands().size() == 1);
     }
 
     // Verify that everything happened as expected
