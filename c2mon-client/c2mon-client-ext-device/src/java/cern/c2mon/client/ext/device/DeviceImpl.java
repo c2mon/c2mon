@@ -169,6 +169,11 @@ public class DeviceImpl implements Device, Cloneable {
 
     return deviceCommands;
   }
+  
+  @Override
+  public void addCommand(String name, ClientCommandTag command) {
+    this.deviceCommands.put(name, command);
+  }
 
   /**
    * Get the ID of the device class to which this device belongs.

@@ -224,7 +224,7 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
               for (Device device : devices) {
                 if (device.getName().equals(transferDevice.getName())) {
                   // Set the command tag on the device
-                  device.getCommands().put(deviceCommand.getName(), commandTag);
+                  device.addCommand(deviceCommand.getName(), commandTag);
                 }
               }
             }

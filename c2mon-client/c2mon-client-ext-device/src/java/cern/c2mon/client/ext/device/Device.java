@@ -124,4 +124,12 @@ public interface Device {
    * @see ClientCommandTag
    */
   Map<String, ClientCommandTag> getCommands();
+  
+  /**
+   * Add a command to this device.
+   * 
+   * @param name the command name
+   * @param command the {@link ClientCommandTag} object
+   */
+  void addCommand(String name, ClientCommandTag command);
 }
