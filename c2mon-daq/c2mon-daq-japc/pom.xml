@@ -10,7 +10,7 @@
   <groupId>cern.c2mon.c2mon-daq</groupId>
   <artifactId>c2mon-daq-japc</artifactId>
   <name>c2mon-daq-japc</name>
-  <version>1.5.1-SNAPSHOT</version>
+  <version>1.5.1</version>
 
   <packaging>jar</packaging>
   <description>C2MON data acquisition component for JAPC.</description>
