@@ -7,6 +7,8 @@ PARAMS="\
 -Dc2mon.log.filename=spectrum \
 -Dapp.name=c2mon_spectrum_monitor \
 -Dapp.version=0.1 \
+-Dmgt.jmx.accessFile=classpath://jmxaccess.properties \
+-Dmgt.jmx.port=17010 \
 -Dc2mon.daq.spring.context=file:conf/daq-core-service.xml \
 "
 
