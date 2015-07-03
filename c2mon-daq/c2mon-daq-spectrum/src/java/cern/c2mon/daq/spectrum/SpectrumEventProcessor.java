@@ -16,6 +16,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
+import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
 import cern.c2mon.daq.common.IEquipmentMessageSender;
@@ -274,10 +275,11 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
     //
     // --- JMX ------------------------------------------------------------------------------------------
     //
-    @ManagedAttribute
+    @ManagedOperation
     public void clearAlarm(String hostname) {
         SpectrumAlarm alarm = monitoredHosts.get(hostname);
         if (alarm != null && alarm.isAlarmOn()) {
+            equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.FALSE, System.currentTimeMillis());
             alarm.clear();
         }
     }
