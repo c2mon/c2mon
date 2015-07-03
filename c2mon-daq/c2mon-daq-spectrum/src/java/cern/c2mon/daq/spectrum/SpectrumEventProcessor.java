@@ -275,6 +275,14 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
     // --- JMX ------------------------------------------------------------------------------------------
     //
     @ManagedAttribute
+    public void clearAlarm(String hostname) {
+        SpectrumAlarm alarm = monitoredHosts.get(hostname);
+        if (alarm != null && alarm.isAlarmOn()) {
+            alarm.clear();
+        }
+    }
+    
+    @ManagedAttribute
     public List<String> getActiveTriplets() {
         ArrayList<String> result = new ArrayList<String>();
         for (String hostname : monitoredHosts.keySet()) {
