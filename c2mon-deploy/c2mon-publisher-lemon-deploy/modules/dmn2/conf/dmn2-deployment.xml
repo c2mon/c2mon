@@ -52,6 +52,8 @@
             <property name="c2mon.process.name" value="DMN2-LEMON-PUBLISHER" />
             <property name="c2mon.client.conf.url"
                value="file://${INSTALL_DIR}/conf/client.properties" />
+            <property name="c2mon.publisher.spring.configuration.location" 
+            	value="classpath:/cern/c2mon/publisher/lemon/lemon-publisher.xml" />
             <property name="cern.c2mon.publisher.lemon.template"
                value="file://${INSTALL_DIR}/conf/lemonids.template" />
 
