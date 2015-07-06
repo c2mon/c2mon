@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:c="http://www.springframework.org/schema/c" default-autowire="byName"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+	<!-- enable spring annotations scanning -->
+	<context:component-scan base-package="cern.c2mon.publisher.lemon" />
+	<context:mbean-export registration="ignoreExisting" />
+
+ 	<bean id="jmxBootstrap" class="cern.accsoft.commons.jmxdirectory.client.JmxBootstrap">
+		<constructor-arg value="cern.c2mon.alarms.archiver" />
+	</bean>
+
+	<bean id="PublishedEventsVCM" class="cern.c2mon.publisher.lemon.VCM">
+		<property name="vcmSeconds" value="180"/>
+	</bean>
+	
+</beans>

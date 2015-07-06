@@ -21,6 +21,9 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
@@ -69,6 +72,11 @@ public class LemonPublisher implements Publisher
 	// Prepare scheduler
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(POOL_SIZE);
 
+	// for JMX bean
+	private VCM monitor;
+	@Autowired private ApplicationContext applicationContext;
+	
+	
 	private class LemonPacketSender implements Runnable
 	{
 
@@ -224,6 +232,7 @@ public class LemonPublisher implements Publisher
 								LEMON_SERVER_PORT);
 						clientSocket.send(sendPacket);
 						clientSocket.close();
+						monitor.increment();
 
 					} catch (SocketException e)
 					{
@@ -282,6 +291,7 @@ public class LemonPublisher implements Publisher
 	@PostConstruct
 	void init()
 	{
+        monitor = applicationContext.getBean("PublishedEventsVCM", VCM.class);
 		String template = System.getProperty("cern.c2mon.publisher.lemon.template");
 		if (template == null)
 		{
@@ -298,7 +308,7 @@ public class LemonPublisher implements Publisher
 				System.exit(-1);
 			}
 		}
-
+		
 	}
 
 	/*
@@ -671,6 +681,7 @@ public class LemonPublisher implements Publisher
 				sf.cancel(false);
 			}
 		}
+
 
 	} // shutdown
 
