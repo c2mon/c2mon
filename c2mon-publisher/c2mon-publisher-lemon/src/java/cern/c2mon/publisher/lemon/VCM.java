@@ -21,7 +21,7 @@ import org.springframework.jmx.export.annotation.ManagedResource;
  * total. The corresponding setters are sync'd to make the VCM thread safe.
  * 
  * After the first period, the total will be the same as the difference. Until there, both values
- * will be 0. After further periods, total will always be >= the vcm value
+ * will be 0. After further periods, total will always be gt the vcm value
  * 
  * @author mbuttner
  */
