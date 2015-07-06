@@ -99,6 +99,7 @@
                value="file://${INSTALL_DIR}/conf/client.properties" />
             <property name="cern.c2mon.publisher.lemon.template"
                value="file://${INSTALL_DIR}/conf/lemonids.template" />
+            <property name="mgt.jmx.port" value="17001" />
 
          </startscript>
 
