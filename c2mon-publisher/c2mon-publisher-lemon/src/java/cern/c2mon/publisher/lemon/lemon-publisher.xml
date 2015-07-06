@@ -16,7 +16,7 @@
 	</bean>
 
 	<bean id="PublishedEventsVCM" class="cern.c2mon.publisher.lemon.VCM">
-		<property name="vcmSeconds" value="180"/>
+		<property name="vcmSeconds" value="60"/>
 	</bean>
 	
 </beans>

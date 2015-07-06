@@ -25,7 +25,7 @@ import org.springframework.jmx.export.annotation.ManagedResource;
  * 
  * @author mbuttner
  */
-@ManagedResource(objectName = "cern.c2mon.leomn.publisher:name=VCM", description = "Published events")
+@ManagedResource(objectName = "cern.c2mon.publisher.lemon:name=VCM", description = "Published events")
 public class VCM extends TimerTask {
     
     private long currentCounter;        // track of the increments during the current period
