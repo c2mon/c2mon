@@ -238,7 +238,7 @@ class EquipmentSenderValid {
           // New quality needed for comparing
           SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.OK, "");
 
-          // Cast the value to the proper type before sending it (we know it has passed the isConvertible flter)
+          // Cast the value to the proper type before sending it (we know it has passed the isConvertible filter)
           Object newValueCasted = TypeConverter.cast(newTagValue.toString(), currentSourceDataTag.getDataType());
 
           // is Candidate for filtering?
@@ -274,14 +274,14 @@ class EquipmentSenderValid {
             }
 
             // send filtered message to statistics module
-            this.equipmentSenderFilterModule.sendToFilterModule(currentSourceDataTag, newTagValue, sourceTimestamp, pValueDescr,
+            this.equipmentSenderFilterModule.sendToFilterModule(currentSourceDataTag, newValueCasted, sourceTimestamp, pValueDescr,
                 filterType.getNumber());
 
             // NO_FILTERING => TimeDeadband for the current Data Tag (Static or Dynamic since this variable can be enabled
             // at runtime when the Dynamic filter gets enabled)
           } else if (currentSourceDataTag.getAddress().isTimeDeadbandEnabled()) {
             this.equipmentLogger.debug("sendTagFiltered - passing update to time-deadband scheduler for tag " + currentSourceDataTag.getId());
-            this.equipmentTimeDeadband.addToTimeDeadband(currentSourceDataTag, newTagValue, sourceTimestamp, pValueDescr);
+            this.equipmentTimeDeadband.addToTimeDeadband(currentSourceDataTag, newValueCasted, sourceTimestamp, pValueDescr);
             // NO_FILTERING and NO Time Deadband => Send to the server
           } else {
             if (this.equipmentTimeDeadband.getSdtTimeDeadbandSchedulers().containsKey(currentSourceDataTag.getId())) {
@@ -290,7 +290,7 @@ class EquipmentSenderValid {
             }
 
             // All checks and filters are done
-            sendTag(newTagValue, sourceTimestamp, pValueDescr, currentSourceDataTag);
+            sendTag(newValueCasted, sourceTimestamp, pValueDescr, currentSourceDataTag);
 
             // Checks if the dynamic TimeDeadband filter is enabled, Static disable and record it depending on the priority
             this.dynamicTimeDeadbandFilterer.recordTag(currentSourceDataTag);
