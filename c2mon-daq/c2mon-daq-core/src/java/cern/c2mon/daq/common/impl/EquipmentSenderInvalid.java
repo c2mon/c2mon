@@ -174,23 +174,18 @@ class EquipmentSenderInvalid {
         
         // Cast the value to the proper type before sending it 
         // NOTE: if it comes from a isConvertible filter to be invalidate because it did not pass it the new value will be null
-        if(newValue != null) {
-          Object newValueCasted = TypeConverter.cast(newValue.toString(), sourceDataTag.getDataType());
-       
-          // We check first is the new value has to be filtered out or not
-          filterType = this.dataTagValueFilter.isCandidateForFiltering(sourceDataTag, newValueCasted, newTagValueDesc, 
-              newSDQuality, timestamp.getTime());
-        } else {
-          filterType = this.dataTagValueFilter.isCandidateForFiltering(sourceDataTag, newValue, newTagValueDesc, 
-              newSDQuality, timestamp.getTime());
-        }
+        Object newValueCasted = TypeConverter.cast(newValue, sourceDataTag.getDataType());
+        
+        // We check first is the new value has to be filtered out or not
+        filterType = this.dataTagValueFilter.isCandidateForFiltering(sourceDataTag, newValueCasted, newTagValueDesc, 
+            newSDQuality, timestamp.getTime());
         
         this.equipmentLogger.debug("sendInvalidTag - Filter Type: " + filterType);
         
         // The new value will not be filtered out
         if(filterType == FilterType.NO_FILTERING) {
           // Send the value
-          sendValueWithTimeDeadbandCheck(sourceDataTag, newValue, newTagValueDesc, newSDQuality, timestamp);
+          sendValueWithTimeDeadbandCheck(sourceDataTag, newValueCasted, newTagValueDesc, newSDQuality, timestamp);
         }
         // The new value will be filtered out
         else {
@@ -210,12 +205,12 @@ class EquipmentSenderInvalid {
            * value object is still null, but the currentValue object is not anymore) in this case, we choose not
            * to send it to the filter path
            */
-          if (newValue != null) {
+          if (newValueCasted != null) {
             // send a corresponding INVALID tag to the statistics module
             this.equipmentLogger.debug("sendInvalidTag - sending an invalid tag ["+sourceDataTag.getId()+"] to the statistics module");
 
             // send filtered message to statistics module
-            this.equipmentSenderFilterModule.sendToFilterModule(sourceDataTag, newSDQuality, newValue, timestamp.getTime(), 
+            this.equipmentSenderFilterModule.sendToFilterModule(sourceDataTag, newSDQuality, newValueCasted, timestamp.getTime(), 
                 newTagValueDesc, filterType.getNumber());
 
           } else if (this.equipmentLogger.isDebugEnabled()) {
@@ -233,14 +228,14 @@ class EquipmentSenderInvalid {
      * This method checks the time deadband and according to the result it sends the updated value to the server
      * 
      * @param sourceDataTag SourceDataTag object
-     * @param newValue The new update value that we want set to the tag 
+     * @param newCastedValue The new update value that we want set to the tag and which has already been casted before to the right type 
      * @param newTagValueDesc The new value description
      * @param newSDQuality the new SourceDataTag see {@link SourceDataQuality}
      * @param timestamp time when the SourceDataTag's value has become invalid; if null the source timestamp and DAQ
      *            timestamp will be set to the current DAQ system time
      */
     private void sendValueWithTimeDeadbandCheck(final SourceDataTag sourceDataTag, 
-                                                final Object newValue, 
+                                                final Object newCastedValue, 
                                                 final String newTagValueDesc, 
                                                 final SourceDataQuality newSDQuality,
                                                 final Timestamp timestamp) {
@@ -249,7 +244,7 @@ class EquipmentSenderInvalid {
       // filter gets enabled)
       if (sourceDataTag.getAddress().isTimeDeadbandEnabled()) {
         this.equipmentLogger.debug("sendInvalidTag - passing update to time-deadband scheduler for tag " + sourceDataTag.getId());
-        this.equipmentTimeDeadband.addToTimeDeadband(sourceDataTag, newValue, timestamp.getTime(), newTagValueDesc, newSDQuality);
+        this.equipmentTimeDeadband.addToTimeDeadband(sourceDataTag, newCastedValue, timestamp.getTime(), newTagValueDesc, newSDQuality);
       } else {
         if (this.equipmentTimeDeadband.getSdtTimeDeadbandSchedulers().containsKey(sourceDataTag.getId())) {
           this.equipmentLogger.debug("sendInvalidTag - remove time-deadband scheduler for tag " + sourceDataTag.getId());
@@ -259,7 +254,7 @@ class EquipmentSenderInvalid {
         // All checks and filters are done
         this.equipmentLogger.debug(format("sendInvalidTag - invalidating and sending invalid tag (%d) update to the server", sourceDataTag.getId()));
 
-        SourceDataTagValue newSDValue = sourceDataTag.update(newSDQuality, newValue, newTagValueDesc, timestamp);
+        SourceDataTagValue newSDValue = sourceDataTag.update(newSDQuality, newCastedValue, newTagValueDesc, timestamp);
         // Special case Quality OK     
         if (newSDValue == null) {
           // this means we have a valid quality code 0 (OK)
