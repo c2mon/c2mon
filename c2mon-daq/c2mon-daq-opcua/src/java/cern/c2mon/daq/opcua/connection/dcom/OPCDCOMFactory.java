@@ -152,7 +152,7 @@ public final class OPCDCOMFactory {
             break;
         case 0x06:
             reason = "Communication Failure: Communications have failed. There is no " 
-                + "last known value is available.";
+                + "last known value available on the OPC server.";
             break;
         case 0x07:
             reason = "Out of service: The block is off scan or otherwise locked This "
