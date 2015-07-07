@@ -17,6 +17,8 @@
       
       <startscript>
         <env name="LD_LIBRARY_PATH" value="$INSTALL_DIR/lib_so"/>
+        <env name="DIM_DNS_NODE" value="dipns1,dipns2"/>
+        <env name="DIM_DNS_PORT" value="2506"/>
       
         <main-class name="cern.c2mon.daq.common.startup.DaqStartup">
           <arg>-processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
