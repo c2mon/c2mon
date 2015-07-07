@@ -122,14 +122,18 @@ public class CounterTimeDeadbandActivator extends TimerTask implements IDynamicT
             DataTagAddress address = tag.getAddress();
             long tagID = tag.getId();
             CounterMovingAverage counterMovingAverage = movingAverages.get(tagID);
+            
             if (counterMovingAverage == null) {
                 counterMovingAverage = new CounterMovingAverage(numberOfCounters);
                 movingAverages.put(tagID, counterMovingAverage);
             }
-            if (LOGGER.isDebugEnabled())
+            
+            if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Tag '" + tag.getId() + "' average incomming tags: "
                         + counterMovingAverage.getCurrentAverage() + " - Array: "
                         + counterMovingAverage);
+            }
+            
             if (address.isTimeDeadbandEnabled()) {
                 if (counterMovingAverage.getCurrentAverage() < deactivationNumberOfTags) {
                     address.setTimeDeadband(0);
@@ -141,6 +145,7 @@ public class CounterTimeDeadbandActivator extends TimerTask implements IDynamicT
                     tag.getAddress().setTimeDeadband(timeDeadbandTime);
                 }
             }
+            
             counterMovingAverage.switchCurrentCounter();
         }
         LOGGER.debug("Finished printing current Tag stats.\n");

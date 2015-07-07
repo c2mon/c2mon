@@ -118,12 +118,16 @@ class EquipmentAliveSender {
 
     if (aliveTag != null) {
       Object value = null;
-      if (aliveTag.getDataType().equalsIgnoreCase("Long")) {
-        value = TypeConverter.cast(Long.valueOf(currentTimestamp).toString(), aliveTag.getDataType());
-      } else if (aliveTag.getDataType().equalsIgnoreCase("Integer")) {
+      
+      if (aliveTag.getDataType().equalsIgnoreCase("Integer")) {
         value = TypeConverter.cast(Long.valueOf(currentTimestamp % Integer.MAX_VALUE).toString(), aliveTag.getDataType());
       } else {
-        this.equipmentLogger.warn("sendEquipmentAlive() - Equipment alive value is neither of type Long nor Integer => value set to null!");
+        value = TypeConverter.cast(currentTimestamp, aliveTag.getDataType());
+      }
+      
+      if (value == null) {
+        this.equipmentLogger.warn("sendEquipmentAlive() - Could not cast current timestamp to value type " 
+            + aliveTag.getDataType() + " of alive tag #" + aliveTag.getId() + " => value set to null!");
       }
 
       aliveTagValue = aliveTag.update(value, "Alive tag for Equipment set as current timestamp", new Timestamp(currentTimestamp));
@@ -154,9 +158,19 @@ class EquipmentAliveSender {
    * @return true if the alive was sent, false otherwise
    */
   public boolean sendEquipmentAlive(final SourceDataTag aliveTag, final Object tagValue, final long sourceTimestamp, final String valueDescription) {
-    SourceDataTagValue aliveTagValue = aliveTag.update(tagValue, valueDescription, new Timestamp(sourceTimestamp));
-    this.equipmentLogger.debug("sendEquipmentAlive() - Sending equipment alive message with source timestamp " + sourceTimestamp);
-    return sendEquipmentAliveFiltered(aliveTagValue, sourceTimestamp);
+    if (TypeConverter.isConvertible(tagValue, aliveTag.getDataType())) {
+      Object convertedTagValue = TypeConverter.cast(tagValue, aliveTag.getDataType());
+      SourceDataTagValue aliveTagValue = aliveTag.update(convertedTagValue, valueDescription, new Timestamp(sourceTimestamp));
+      this.equipmentLogger.debug("sendEquipmentAlive() - Sending equipment alive message with source timestamp " + sourceTimestamp);
+      return sendEquipmentAliveFiltered(aliveTagValue, sourceTimestamp);
+    }
+    else {
+      this.equipmentLogger.warn("sendEquipmentAlive() - Value [" 
+        + tagValue + "] received for alive tag #" + aliveTag.getId() 
+        + " is not convertible to data type "
+        + aliveTag.getDataType() + ". Trying to send the current timestamp as number instead.");
+      return sendEquipmentAlive(aliveTag);
+    }
   }
 
   /**

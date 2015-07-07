@@ -143,6 +143,7 @@ class EquipmentTimeDeadband {
       long tagID = currentTag.getId();
       // Scheduler for the Static TimeDeadband
       SDTTimeDeadbandScheduler tagScheduler = this.sdtTimeDeadbandSchedulers.get(tagID);
+      
       if (tagScheduler == null) {          
         tagScheduler = createTagScheduler(currentTag);
         startSDTtimeDeadbandScheduler(tagScheduler);
