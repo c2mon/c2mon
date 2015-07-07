@@ -9,7 +9,7 @@
 
   <groupId>cern.c2mon.c2mon-daq</groupId>
   <artifactId>c2mon-daq-core</artifactId>
-  <version>1.5.12-SNAPSHOT</version>
+  <version>1.5.12</version>
   <name>c2mon-daq-core</name>
   <packaging>jar</packaging>
   <description>
