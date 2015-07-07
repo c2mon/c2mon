@@ -481,7 +481,7 @@ public class EquipmentMessageSenderTest {
      */
     public void testSendInvalidTagDifValue() {
       // Add value to the SourceDatTag
-      this.sdt2.update(true);
+      this.sdt1.update(true);
 
       // One value is added
       this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
@@ -489,7 +489,7 @@ public class EquipmentMessageSenderTest {
 
       replay(this.processMessageSenderMock, this.filterMessageSenderMock);
 
-      SourceDataTagValue sourceDTValue = this.sdt2.getCurrentValue();
+      SourceDataTagValue sourceDTValue = this.sdt1.getCurrentValue();
       // Get the source data quality from the quality code and description
       SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.DATA_UNAVAILABLE,
           sourceDTValue.getQuality().getDescription());
@@ -501,13 +501,13 @@ public class EquipmentMessageSenderTest {
       // - same Quality Description
       //
       // Should not be filtered
-      this.equipmentMessageSender.sendInvalidTag(this.sdt2, false, sourceDTValue.getValueDescription(), newSDQuality,
+      this.equipmentMessageSender.sendInvalidTag(this.sdt1, false, sourceDTValue.getValueDescription(), newSDQuality,
           new Timestamp(System.currentTimeMillis() + 1L));
 
       // The Value has changed
-      assertEquals(false, this.sdt2.getCurrentValue().getValue());
+      assertEquals(false, this.sdt1.getCurrentValue().getValue());
       // The Quality Code has changed
-      assertEquals(SourceDataQuality.DATA_UNAVAILABLE, this.sdt2.getCurrentValue().getQuality().getQualityCode());
+      assertEquals(SourceDataQuality.DATA_UNAVAILABLE, this.sdt1.getCurrentValue().getQuality().getQualityCode());
 
       verify(this.processMessageSenderMock, this.filterMessageSenderMock);
     }
