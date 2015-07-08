@@ -7,6 +7,7 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.sql.Timestamp;
 
@@ -477,7 +478,7 @@ public class EquipmentMessageSenderTest {
 
     @Test
     /**
-     * Note: Value-based deadband filtering is enabled for the process (we use sdt2)
+     * Note: Value-based deadband filtering is enabled for the process (we use sdt1)
      */
     public void testSendInvalidTagDifValue() {
       // Add value to the SourceDatTag
@@ -508,6 +509,115 @@ public class EquipmentMessageSenderTest {
       assertEquals(false, this.sdt1.getCurrentValue().getValue());
       // The Quality Code has changed
       assertEquals(SourceDataQuality.DATA_UNAVAILABLE, this.sdt1.getCurrentValue().getQuality().getQualityCode());
+
+      verify(this.processMessageSenderMock, this.filterMessageSenderMock);
+    }
+    
+    @Test
+    public void testSendInvalidTagWithValueConversionFloat2Boolean() {
+      // Add value to the SourceDatTag
+      this.sdt1.update(true);
+
+      // One value is added
+      this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+      expectLastCall().times(1);
+
+      replay(this.processMessageSenderMock, this.filterMessageSenderMock);
+
+      SourceDataTagValue sourceDTValue = this.sdt1.getCurrentValue();
+      // Get the source data quality from the quality code and description
+      SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.DATA_UNAVAILABLE,
+          sourceDTValue.getQuality().getDescription());
+
+      // It has:
+      // - different currentSDValue and new value (true vs false)
+      // - same Value Description
+      // - different Quality Code (OK vs DATA_UNAVAILABLE)
+      // - same Quality Description
+      //
+      // Should not be filtered
+      this.equipmentMessageSender.sendInvalidTag(this.sdt1, Float.valueOf(0f), sourceDTValue.getValueDescription(), newSDQuality,
+          new Timestamp(System.currentTimeMillis() + 1L));
+
+      // The Value has changed
+      assertEquals(false, this.sdt1.getCurrentValue().getValue());
+      assertTrue(this.sdt1.getCurrentValue().getValue().getClass() == Boolean.class);
+      // The Quality Code has changed
+      assertEquals(SourceDataQuality.DATA_UNAVAILABLE, this.sdt1.getCurrentValue().getQuality().getQualityCode());
+
+      verify(this.processMessageSenderMock, this.filterMessageSenderMock);
+    }
+    
+    
+    /**
+     * Note: Value-based deadband filtering is enabled for the process (we use sdt2)
+     */
+    @Test
+    public void testSendInvalidTagWithValueConversionBoolean2Float() {
+      // Add value to the SourceDatTag
+      this.sdt2.update(Float.valueOf(0f));
+
+      // One value is added
+      this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+      expectLastCall().times(1);
+
+      replay(this.processMessageSenderMock, this.filterMessageSenderMock);
+
+      SourceDataTagValue sourceDTValue = this.sdt2.getCurrentValue();
+      // Get the source data quality from the quality code and description
+      SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.DATA_UNAVAILABLE,
+          sourceDTValue.getQuality().getDescription());
+
+      // It has:
+      // - different currentSDValue and new value (true vs false)
+      // - same Value Description
+      // - different Quality Code (OK vs DATA_UNAVAILABLE)
+      // - same Quality Description
+      //
+      // Should not be filtered
+      this.equipmentMessageSender.sendInvalidTag(this.sdt2, true, sourceDTValue.getValueDescription(), newSDQuality,
+          new Timestamp(System.currentTimeMillis() + 1L));
+
+      // The Value has changed
+      assertEquals(Float.valueOf(1f), this.sdt2.getCurrentValue().getValue());
+      assertTrue(this.sdt2.getCurrentValue().getValue().getClass() == Float.class);
+      // The Quality Code has changed
+      assertEquals(SourceDataQuality.DATA_UNAVAILABLE, this.sdt2.getCurrentValue().getQuality().getQualityCode());
+
+      verify(this.processMessageSenderMock, this.filterMessageSenderMock);
+    }
+    
+    @Test
+    public void testSendInvalidTagWithValueConversionShort2Integer() {
+      // Add value to the SourceDatTag
+      this.sdt3.update(Integer.valueOf(5));
+
+      // One value is added
+      this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+      expectLastCall().times(1);
+
+      replay(this.processMessageSenderMock, this.filterMessageSenderMock);
+
+      SourceDataTagValue sourceDTValue = this.sdt3.getCurrentValue();
+      // Get the source data quality from the quality code and description
+      SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.DATA_UNAVAILABLE,
+          sourceDTValue.getQuality().getDescription());
+
+      // It has:
+      // - different currentSDValue and new value (true vs false)
+      // - same Value Description
+      // - different Quality Code (OK vs DATA_UNAVAILABLE)
+      // - same Quality Description
+      //
+      // Should not be filtered
+      this.equipmentMessageSender.sendInvalidTag(this.sdt3, Short.valueOf((short) 33), sourceDTValue.getValueDescription(), newSDQuality,
+          new Timestamp(System.currentTimeMillis() + 1L));
+
+      // The Value has changed
+      assertEquals(Integer.valueOf(33), this.sdt3.getCurrentValue().getValue());
+      assertTrue(this.sdt3.getCurrentValue().getValue().getClass() == Integer.class);
+      // The Quality Code has changed
+      assertEquals(SourceDataQuality.DATA_UNAVAILABLE, this.sdt3.getCurrentValue().getQuality().getQualityCode());
 
       verify(this.processMessageSenderMock, this.filterMessageSenderMock);
     }
@@ -1075,6 +1185,61 @@ public class EquipmentMessageSenderTest {
       // Should be filtered out since the value is the same as the one just updated
       this.equipmentMessageSender.sendTagFiltered(sdt1, false, System.currentTimeMillis() + 1L);
       assertEquals(false, this.sdt1.getCurrentValue().getValue());
+
+      verify(this.processMessageSenderMock, this.filterMessageSenderMock);
+    }
+    
+    @Test
+    public void testSendTagFilteredWithValueConversionShort2Boolean() {
+      // update the value
+      this.sdt1.update(false);
+
+      this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+      expectLastCall().times(1);
+
+      replay(this.processMessageSenderMock, this.filterMessageSenderMock);
+
+      // Should be filtered out since the value is the same as the one just updated
+      this.equipmentMessageSender.sendTagFiltered(sdt1, Float.valueOf(1.0f), System.currentTimeMillis() + 1L);
+      assertEquals(true, this.sdt1.getCurrentValue().getValue());
+      assertTrue(this.sdt1.getCurrentValue().getValue().getClass() == Boolean.class);
+
+      verify(this.processMessageSenderMock, this.filterMessageSenderMock);
+    }
+    
+    @Test
+    public void testSendTagFilteredWithValueConversionShort2Float() {
+      // update the value
+      this.sdt2.update(Float.valueOf(10f));
+
+      this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+      expectLastCall().times(1);
+
+      replay(this.processMessageSenderMock, this.filterMessageSenderMock);
+
+      // Should be filtered out since the value is the same as the one just updated
+      this.equipmentMessageSender.sendTagFiltered(sdt2, (short) 100, System.currentTimeMillis() + 1L);
+      assertEquals(Float.valueOf(100), this.sdt2.getCurrentValue().getValue());
+      assertTrue(this.sdt2.getCurrentValue().getValue().getClass() == Float.class);
+
+      verify(this.processMessageSenderMock, this.filterMessageSenderMock);
+    }
+    
+    
+    @Test
+    public void testSendTagFilteredWithValueConversionFloat2Integer() {
+      // update the value
+      this.sdt3.update(Integer.valueOf(10));
+
+      this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+      expectLastCall().times(1);
+
+      replay(this.processMessageSenderMock, this.filterMessageSenderMock);
+
+      // Should be filtered out since the value is the same as the one just updated
+      this.equipmentMessageSender.sendTagFiltered(sdt3, Float.valueOf(100.3f), System.currentTimeMillis() + 1L);
+      assertEquals(Integer.valueOf(100), this.sdt3.getCurrentValue().getValue());
+      assertTrue(this.sdt3.getCurrentValue().getValue().getClass() == Integer.class);
 
       verify(this.processMessageSenderMock, this.filterMessageSenderMock);
     }
