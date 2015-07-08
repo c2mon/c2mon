@@ -204,7 +204,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
 
             // Cast the value to the proper type before sending it 
             if(currentSDValue.getValue() != null) {
-              Object newValueCasted = TypeConverter.cast(currentSDValue.getValue().toString(), this.lastSourceDataTag.getDataType());
+              Object newValueCasted = TypeConverter.cast(currentSDValue.getValue(), this.lastSourceDataTag.getDataType());
 
               filterType = this.dataTagValueFilter.isCandidateForFiltering(this.lastSourceDataTag, newValueCasted,
                   currentSDValue.getValueDescription(), currentSDValue.getQuality(), 
@@ -224,6 +224,8 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
           if (filterType == FilterType.NO_FILTERING) {
             // Clone the last value sent to the server
             this.lastSourceDataTag = this.sourceDataTag.clone();
+            
+            currentSDValue.setValueDescription("Time-deadband filtering enabled. " + currentSDValue.getValueDescription());
             // Add the value sent
             this.processMessageSender.addValue(currentSDValue);
             
