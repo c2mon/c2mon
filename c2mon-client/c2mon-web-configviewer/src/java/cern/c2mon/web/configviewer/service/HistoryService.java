@@ -393,7 +393,7 @@ public class HistoryService {
           formatToDygraphCompatibleDate(q.getServerTimestamp())
           + "," + value + "," + q.getValueDescription());
 
-      historyCSV.append("," + q.getDataTagQuality().getDescription());
+      historyCSV.append("," + q.getDataTagQuality().getDescription().replace('\n', ' '));
 
       historyCSV.append("\\n\"");
 
