@@ -512,6 +512,11 @@ public final class TypeConverter  {
         else {
           result = castToType(value, Class.forName(className));
         }
+        
+        if (result == null) {
+          LOG.error("cast() : Conversion error. Could not cast input value [" + value + "] of type " 
+              + value.getClass().getName() + " to resulting type " + className);
+        }
       }
       catch (ClassCastException cce) {
         LOG.error("cast() : Conversion error", cce);
@@ -522,9 +527,7 @@ public final class TypeConverter  {
         result = null;
       }
     }
-    if (result == null) {
-      LOG.warn("cast() returning null.");
-    }
+    
     return result;
   }
 }
