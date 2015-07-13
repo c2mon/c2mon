@@ -15,7 +15,6 @@ import cern.c2mon.server.cache.AliveTimerCache;
 import cern.c2mon.server.cache.CommFaultTagCache;
 import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.cache.ControlTagFacade;
-import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.ProcessXMLProvider;
 import cern.c2mon.server.cache.SubEquipmentCache;
@@ -23,14 +22,17 @@ import cern.c2mon.server.cache.SubEquipmentFacade;
 import cern.c2mon.server.cache.loading.SubEquipmentDAO;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
-import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.DataTagAdd;
+import cern.c2mon.shared.daq.config.IChange;
 import cern.c2mon.shared.daq.config.SubEquipmentUnitAdd;
 import cern.c2mon.shared.daq.config.SubEquipmentUnitRemove;
 
@@ -58,8 +60,6 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
    */
   private SubEquipmentDAO subEquipmentDAO;
 
-  private EquipmentCache equipmentCache;
-  
   private ControlTagCache controlCache;
   
   private ControlTagFacade controlTagFacade;
@@ -77,14 +77,12 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
                                           AliveTimerCache aliveTimerCache,
                                           CommFaultTagCache commFaultTagCache,
                                           ProcessCache processCache,
-                                          EquipmentCache equipmentCache,
                                           ProcessXMLProvider processXMLProvider,
                                           ControlTagCache controlCache, 
                                           ControlTagFacade controlTagFacade) {
     super(controlTagConfigHandler, subEquipmentFacade, subEquipmentCache, subEquipmentDAO, aliveTimerCache, commFaultTagCache);
     this.subEquipmentFacade = subEquipmentFacade;
     this.subEquipmentDAO = subEquipmentDAO;
-    this.equipmentCache = equipmentCache;
     this.processXMLProvider = processXMLProvider;
     this.controlCache = controlCache;
     this.controlTagFacade = controlTagFacade;
@@ -105,10 +103,12 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
     SubEquipment subEquipment = super.createAbstractEquipment(element);
     subEquipmentFacade.addSubEquipmentToEquipment(subEquipment.getId(), subEquipment.getParentId());
     SubEquipmentUnitAdd subEquipmentUnitAdd = new SubEquipmentUnitAdd(element.getSequenceId(), subEquipment.getId(), subEquipment.getParentId(),
-        processXMLProvider.getSubEquipmentConfigXML((SubEquipmentCacheObject) subEquipment));
+    processXMLProvider.getSubEquipmentConfigXML((SubEquipmentCacheObject) subEquipment));
+    
     List<ProcessChange> changes = new ArrayList<ProcessChange>();
-    changes.add(new ProcessChange(equipmentCache.get(subEquipment.getParentId()).getProcessId(), subEquipmentUnitAdd));
-    changes.addAll(ensureCtrlTagsSet(element, subEquipment));
+    changes.add(new ProcessChange(subEquipmentFacade.getProcessIdForAbstractEquipment(subEquipment.getId()), subEquipmentUnitAdd));
+    changes.addAll(updateControlTagInformation(element, subEquipment));
+    
     return changes;
   }
 
@@ -125,7 +125,7 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
 
     try {
       subEquipmentDAO.deleteItem(subEquipment.getId());
-      Long processId = equipmentCache.get(subEquipment.getParentId()).getProcessId();
+      Long processId = this.subEquipmentFacade.getProcessIdForAbstractEquipment(subEquipment.getId());
 
       SubEquipmentUnitRemove subEquipmentUnitRemove = new SubEquipmentUnitRemove(0L, subEquipment.getId(), subEquipment.getParentId());
       processChanges.add(new ProcessChange(processId, subEquipmentUnitRemove));
@@ -140,52 +140,65 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
   
   
   /**
-   * Ensures that the Alive, State and CommFault Tags are set appropriately in the {@link ControlTagCache}.
+   * Ensures that the Alive-, Status- and CommFault Tags are set appropriately in the {@link ControlTagCache}.
    * @param subEquipment 
    * @throws IllegalAccessException
    */
-  private List<ProcessChange> ensureCtrlTagsSet(final ConfigurationElement element, final SubEquipment subEquipment) throws IllegalAccessException {
+  private List<ProcessChange> updateControlTagInformation(final ConfigurationElement element, final SubEquipment subEquipment) throws IllegalAccessException {
       
       List<ProcessChange> changes = new ArrayList<ProcessChange>(3);
-      Equipment equipment = this.equipmentCache.get(subEquipment.getParentId());
+      final Long processId = subEquipmentFacade.getProcessIdForAbstractEquipment(subEquipment.getId());
       
       ControlTag aliveTagCopy = controlCache.getCopy(subEquipment.getAliveTagId());
       if (aliveTagCopy != null) {
-        LOGGER.trace("Setting correct aliveTag in SubEquipment " + subEquipment.getName());
-        ((ControlTagCacheObject)aliveTagCopy).setSubEquipmentId(subEquipment.getId());
-        ((ControlTagCacheObject)aliveTagCopy).setProcessId(equipment.getProcessId());
-        controlCache.putQuiet(aliveTagCopy);
-        DataTagAdd toAdd = new DataTagAdd(element.getSequenceId(), subEquipment.getId(), controlTagFacade.generateSourceDataTag(aliveTagCopy));
-        changes.add(new ProcessChange(equipment.getProcessId(), toAdd));
+        setSubEquipmentId((ControlTagCacheObject) aliveTagCopy, subEquipment.getId(), processId);
+        
+        if (aliveTagCopy.getAddress() != null) {
+          // Inform Process about newly added alive tag
+          IChange toAdd = new DataTagAdd(element.getSequenceId(), subEquipment.getId(), controlTagFacade.generateSourceDataTag(aliveTagCopy));
+          ConfigurationElementReport report = new ConfigurationElementReport(Action.CREATE, Entity.CONTROLTAG, aliveTagCopy.getId());
+          ProcessChange change = new ProcessChange(processId, toAdd);
+          change.setNestedSubReport(report);
+          changes.add(change);
+        }
+        else {
+          throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+              String.format("Alive tag #%d (%s) for sub-equipment #%d (%s) must by definition have a hardware address defined.", aliveTagCopy.getId(), aliveTagCopy.getName(), subEquipment.getId(), subEquipment.getName()));
+        }
+      
       } else {
-        // TODO change to ConfigurationException
-        throw new IllegalArgumentException("No alive tag (" + subEquipment.getAliveTagId() + ") found for subequipment " + subEquipment.getName());
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+            String.format("No Alive tag (%s) found for sub-equipment #%d (%s).", subEquipment.getAliveTagId(), subEquipment.getId(), subEquipment.getName()));
       }
+      
       
       ControlTag commFaultTagCopy = controlCache.getCopy(subEquipment.getCommFaultTagId());
       if (commFaultTagCopy != null) {
-        LOGGER.trace("Setting correct commFaultTag in SubEquipment " + subEquipment.getName());
-        ((ControlTagCacheObject)commFaultTagCopy).setSubEquipmentId(subEquipment.getId());
-        ((ControlTagCacheObject)commFaultTagCopy).setProcessId(equipment.getProcessId());
-        controlCache.putQuiet(commFaultTagCopy);
+        setSubEquipmentId((ControlTagCacheObject) commFaultTagCopy, subEquipment.getId(), processId);
       } else {
-        // TODO change to ConfigurationException
-        throw new IllegalArgumentException("No commfault tag (" + subEquipment.getCommFaultTagId() + ") found for subequipment " + subEquipment.getName());
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+            String.format("No CommFault tag (%s) found for sub-equipment #%d (%s).", subEquipment.getCommFaultTagId(), subEquipment.getId(), subEquipment.getName()));
       }
+      
       
       ControlTag statusTagCopy = controlCache.getCopy(subEquipment.getStateTagId());
       if (statusTagCopy != null) {
-        LOGGER.trace("Setting correct statusTagCopy in SubEquipment " + subEquipment.getName());
-        ((ControlTagCacheObject)statusTagCopy).setSubEquipmentId(subEquipment.getId());
-        ((ControlTagCacheObject)statusTagCopy).setProcessId(equipment.getProcessId());
-        controlCache.putQuiet(statusTagCopy);
+        setSubEquipmentId((ControlTagCacheObject) statusTagCopy, subEquipment.getId(), processId);
       } else {
-        // TODO change to ConfigurationException
-        throw new IllegalArgumentException("No status tag (" + subEquipment.getStateTagId() + ") found for subequipment " + subEquipment.getName());
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+            String.format("No Status tag (%s) found for sub-equipment #%d (%s).", subEquipment.getStateTagId(), subEquipment.getId(), subEquipment.getName()));
       }
       
       
       return changes;
+  }
+  
+  private void setSubEquipmentId(ControlTagCacheObject copy, Long subEquipmentId, Long processId) {
+    String logMsg = String.format("Adding sub-equipment id #%s to control tag #%s", subEquipmentId, copy.getId()); 
+    LOGGER.trace(logMsg);
+    copy.setSubEquipmentId(subEquipmentId);
+    copy.setProcessId(processId);
+    controlCache.putQuiet(copy);
   }
   
 

@@ -18,8 +18,6 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -105,26 +103,26 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
   }
 
   @Override
-  public List<ProcessChange> removeDataTag(Long id, ConfigurationElementReport tagReport) {
+  public ProcessChange removeDataTag(Long id, ConfigurationElementReport tagReport) {
     LOGGER.trace("Removing DataTag " + id);
     try {
-      List<ProcessChange> changes = dataTagConfigTransacted.doRemoveDataTag(id, tagReport);
+      ProcessChange change = dataTagConfigTransacted.doRemoveDataTag(id, tagReport);
       DataTag dataTag = dataTagCache.get(id);
       dataTagCache.remove(id); //only removed from cache if no exception is thrown
+      
       //remove from Equipment list only once definitively removed from DB & cache (o.w. remove/recreate Process/Equipment cannot reach it)
       if (dataTag.getEquipmentId() != null) {
         equipmentFacade.removeTagFromEquipment(dataTag.getEquipmentId(), dataTag.getId());
       }
-
       // TIMS-951: Allow attachment of DataTags to SubEquipments
       else if (dataTag.getSubEquipmentId() != null) {
         subEquipmentFacade.removeTagFromSubEquipment(dataTag.getSubEquipmentId(), dataTag.getId());
       }
 
-      return changes;
+      return change;
     } catch (CacheElementNotFoundException e) {
       tagReport.setWarning(e.getMessage());
-      return new ArrayList<ProcessChange>(); //no changes for DAQ layer
+      return new ProcessChange(); //no changes for DAQ layer
     }
   }
 

@@ -1,5 +1,6 @@
 package cern.c2mon.server.configuration.handler.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -69,26 +70,53 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
    * are removed in the following order: Alive tag, CommFaultTag, State tag.
    *
    * @param abstractEquipment the AbstracEquipment to remove
-   * @param equipmentReport for adding the subreports to
+   * @param equipmentReport for adding the sub-reports to
    */
-  protected void removeEquipmentControlTags(final T abstractEquipment, final ConfigurationElementReport equipmentReport) {
+  protected List<ProcessChange> removeEquipmentControlTags(final T abstractEquipment, final ConfigurationElementReport equipmentReport) {
+    List<ProcessChange> changes = new ArrayList<>();
+    
     LOGGER.debug("Removing (Sub-)Equipment control tags.");
     Long aliveTagId = abstractEquipment.getAliveTagId();
+    
     if (aliveTagId != null) {
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.CONTROLTAG, aliveTagId);
-      equipmentReport.addSubReport(tagReport);
-      controlTagConfigHandler.removeControlTag(aliveTagId, tagReport);
+      
+      ProcessChange change = controlTagConfigHandler.removeControlTag(aliveTagId, tagReport);
+      if (change.processActionRequired()) {
+        change.setNestedSubReport(tagReport);
+        changes.add(change);
+      }
+      else {
+        equipmentReport.addSubReport(tagReport);
+      }
     }
+    
     Long commTagId = abstractEquipment.getCommFaultTagId();
     if (commTagId != null) {
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.CONTROLTAG, commTagId);
-      equipmentReport.addSubReport(tagReport);
-      controlTagConfigHandler.removeControlTag(commTagId, tagReport);
+    
+      ProcessChange change = controlTagConfigHandler.removeControlTag(commTagId, tagReport);
+      if (change.processActionRequired()) {
+        change.setNestedSubReport(tagReport);
+        changes.add(change);
+      }
+      else {
+        equipmentReport.addSubReport(tagReport);
+      }
     }
+    
     Long stateTagId = abstractEquipment.getStateTagId();
     ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.CONTROLTAG, stateTagId);
-    equipmentReport.addSubReport(tagReport);
-    controlTagConfigHandler.removeControlTag(stateTagId, tagReport);
+    
+    ProcessChange change = controlTagConfigHandler.removeControlTag(stateTagId, tagReport);
+    if (change.processActionRequired()) {
+      change.setNestedSubReport(tagReport);
+      changes.add(change);
+    }
+    else {
+      equipmentReport.addSubReport(tagReport);
+    }
+    return changes;
   }
 
   /**

@@ -1,10 +1,9 @@
 package cern.c2mon.server.configuration.handler.transacted;
 
-import java.util.List;
 import java.util.Properties;
 
-import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 
@@ -22,7 +21,7 @@ public interface DataTagConfigTransacted extends TagConfigTransacted<DataTag>{
    * @param elementReport report on success
    * @return the change event
    */
-  List<ProcessChange> doRemoveDataTag(Long id, ConfigurationElementReport elementReport);
+  ProcessChange doRemoveDataTag(Long id, ConfigurationElementReport elementReport);
   
   /**
    * Creates a DataTag in the C2MON server.

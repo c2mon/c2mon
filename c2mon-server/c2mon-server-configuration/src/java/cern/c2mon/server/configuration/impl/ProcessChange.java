@@ -18,6 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.impl;
 
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.daq.config.IChange;
 
 /**
@@ -46,8 +47,14 @@ public class ProcessChange {
    * Flag indicating that this change requires a process reboot.   
    */
   private boolean requiresReboot = false;
-
   
+  /**
+   * Nested report can be set, if the ProcessChange event gets triggered by a
+   * nested child action. Example: Remove Sub-Equipment triggers also a
+   * Remove Alive tag on the process.
+   */
+  private ConfigurationElementReport nestedSubReport;
+
   /**
    * When no action should be taken on the DAQ layer use this
    * constructor (i.e. not reconfiguration, no reboot).
@@ -75,6 +82,32 @@ public class ProcessChange {
     super();
     this.processId = processId;
     this.changeEvent = changeEvent;
+  }
+  
+  /**
+   * Nested report can be set, if the ProcessChange event gets triggered by a
+   * nested child action. Example: Remove Sub-Equipment triggers also a
+   * Remove Alive tag on the process.
+   * 
+   * @return <code>true</code>, if a nested configuration element report
+   * was attached to this ProcessChange request.
+   */
+  public boolean hasNestedSubReport() {
+    return nestedSubReport != null;
+  }
+  
+  /**
+   * @return the nestedSubReport
+   */
+  public final ConfigurationElementReport getNestedSubReport() {
+    return nestedSubReport;
+  }
+
+  /**
+   * @param nestedSubReport the nestedSubReport to set
+   */
+  public final void setNestedSubReport(ConfigurationElementReport nestedConfigurationElementReport) {
+    this.nestedSubReport = nestedConfigurationElementReport;
   }
 
   /**

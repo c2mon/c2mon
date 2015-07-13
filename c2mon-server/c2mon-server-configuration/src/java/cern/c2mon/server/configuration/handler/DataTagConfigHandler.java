@@ -18,12 +18,11 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler;
 
-import java.util.List;
 import java.util.Properties;
 
+import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.configuration.handler.impl.TagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 
@@ -58,11 +57,7 @@ public interface DataTagConfigHandler extends TagConfigHandler<DataTag> {
    * @param id the id of the Tag to remove
    * @param tagReport the report for this event; 
    *         is passed as parameter so cascaded action can attach subreports
-   * @return a list of changes to send to the DAQ layer; can be null
+   * @return a list of changes to send to the DAQ layer
    */
-  List<ProcessChange> removeDataTag(Long id, ConfigurationElementReport tagReport);
-
-  
-  
-  
+  ProcessChange removeDataTag(Long id, ConfigurationElementReport tagReport);
 }

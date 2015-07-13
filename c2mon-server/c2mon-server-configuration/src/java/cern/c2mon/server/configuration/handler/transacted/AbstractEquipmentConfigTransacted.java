@@ -25,16 +25,15 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.springframework.transaction.UnexpectedRollbackException;
 
-import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
-import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.cache.AliveTimerCache;
-import cern.c2mon.server.cache.CommFaultTagCache;
 import cern.c2mon.server.cache.C2monCache;
+import cern.c2mon.server.cache.CommFaultTagCache;
 import cern.c2mon.server.cache.equipment.CommonEquipmentFacade;
 import cern.c2mon.server.cache.loading.ConfigurableDAO;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
+import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
+import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
-import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
 
 /**

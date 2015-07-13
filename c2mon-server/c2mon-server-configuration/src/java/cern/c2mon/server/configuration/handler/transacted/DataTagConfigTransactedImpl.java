@@ -2,7 +2,6 @@ package cern.c2mon.server.configuration.handler.transacted;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -203,8 +202,8 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
 
   @Override
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
-  public List<ProcessChange> doRemoveDataTag(final Long id, final ConfigurationElementReport elementReport) {
-    ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
+  public ProcessChange doRemoveDataTag(final Long id, final ConfigurationElementReport elementReport) {
+    ProcessChange processChange = new ProcessChange();
     try {
       DataTag dataTag = tagCache.get(id);
       Collection<Long> ruleIds = dataTag.getCopyRuleIds();
@@ -240,26 +239,28 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
           tagCache.releaseWriteLockOnKey(id);
         }
       }
-      //if successful so far add remove event for DAQ layer
+      
+      // if successful so far add remove event for DAQ layer
       DataTagRemove removeEvent = new DataTagRemove();
       removeEvent.setDataTagId(id);
 
       if (dataTag.getEquipmentId() != null) {
         removeEvent.setEquipmentId(dataTag.getEquipmentId());
-        processChanges.add(new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(dataTag.getEquipmentId()), removeEvent));
+        processChange = new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(dataTag.getEquipmentId()), removeEvent); 
       }
-
       // TIMS-951: Allow attachment of DataTags to SubEquipments
       else if (dataTag.getSubEquipmentId() != null) {
-        removeEvent.setEquipmentId(dataTag.getSubEquipmentId());
-        processChanges.add(new ProcessChange(subEquipmentFacade.getProcessIdForAbstractEquipment(dataTag.getSubEquipmentId()), removeEvent));
+        removeEvent.setEquipmentId(subEquipmentFacade.getEquipmentIdForSubEquipment(dataTag.getSubEquipmentId()));
+        processChange = new ProcessChange(subEquipmentFacade.getProcessIdForAbstractEquipment(dataTag.getSubEquipmentId()), removeEvent);
       }
-
+      else {
+        LOGGER.warn("doRemoveDataTag() - data tag #" + dataTag.getId() + " is not attached to any Equipment or Sub-Equipment. This should normally never happen.");
+      }
     } catch (CacheElementNotFoundException e) {
-      LOGGER.warn("Attempting to remove a non-existent DataTag - no action taken.");
+      LOGGER.warn("doRemoveDataTag() - Attempting to remove a non-existent DataTag - no action taken.");
       throw new CacheElementNotFoundException("Attempting to remove a non-existent DataTag - no action taken", e);
     }
-    return processChanges;
+    return processChange;
   }
 
 }

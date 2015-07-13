@@ -238,8 +238,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
             try {
               processChanges = applyConfigElement(element, elementReport);  //never returns null
 
-              
-              
               for (ProcessChange processChange : processChanges) {
 
                 Long processId = processChange.getProcessId();
@@ -250,7 +248,15 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                   }
 
                   processLists.get(processId).add((Change) processChange.getChangeEvent());   //cast to implementation needed as DomFactory uses this - TODO change to interface
-                  daqReportPlaceholder.put(processChange.getChangeEvent().getChangeId(), elementReport);
+                  
+                  if (processChange.hasNestedSubReport()) {
+                    elementReport.addSubReport(processChange.getNestedSubReport());
+                    daqReportPlaceholder.put(processChange.getChangeEvent().getChangeId(), processChange.getNestedSubReport());
+                  }
+                  else {
+                    daqReportPlaceholder.put(processChange.getChangeEvent().getChangeId(), elementReport);
+                  }
+                  
                   elementPlaceholder.put(processChange.getChangeEvent().getChangeId(), element);
                   element.setDaqStatus(Status.RESTART); //default to restart; if successful on DAQ layer switch to OK
                 } else if (processChange.requiresReboot()) {
@@ -324,7 +330,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                     }
                   }
                 } catch (Exception e) {
-                  String errorMessage = "Error during DAQ reconfiguration: unsuccessful application of configuration to Process (possible timeout)" + processCache.get(processId).getName();
+                  String errorMessage = "Error during DAQ reconfiguration: unsuccessful application of configuration (possible timeout) to Process " + processCache.get(processId).getName();
                   LOGGER.error(errorMessage, e);
                   processFacade.requiresReboot(processId, true);
                   report.addProcessToReboot(processCache.get(processId).getName());
@@ -362,6 +368,9 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         //mark the Configuration as applied in the DB table, with timestamp set
         configurationDAO.markAsApplied(configId);
         LOGGER.info("Finished applying configuraton " + configId);
+        
+        report.normalize();
+        
         return report;
 
       } catch (Exception ex) {
@@ -395,8 +404,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
           "Your configuration request has been rejected since another configuration is still running. Please try again later.");
     }
   }
-
-
+  
 
   /**
    * Applies a single configuration element. On the DB level, this action should
@@ -478,7 +486,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         break;
       case REMOVE :
         switch (element.getEntity()) {
-        case DATATAG : daqConfigEvents.addAll(dataTagConfigHandler.removeDataTag(element.getEntityId(), elementReport)); break;
+        case DATATAG : daqConfigEvents.add(dataTagConfigHandler.removeDataTag(element.getEntityId(), elementReport)); break;
         case CONTROLTAG : daqConfigEvents.add(controlTagConfigHandler.removeControlTag(element.getEntityId(), elementReport)); break;
         case RULETAG : ruleTagConfigHandler.removeRuleTag(element.getEntityId(), elementReport); break;
         case COMMANDTAG : daqConfigEvents.addAll(commandTagConfigHandler.removeCommandTag(element.getEntityId(), elementReport)); break;

@@ -42,7 +42,6 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
-import cern.c2mon.shared.daq.config.DataTagRemove;
 
 /**
  * See interface documentation.
@@ -104,7 +103,7 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
         changes.addAll(subEquipmentConfigTransacted.doRemoveSubEquipment(subEquipment, subEquipmentReport));
 
         subEquipmentCache.releaseWriteLockOnKey(subEquipmentId);
-        removeEquipmentControlTags(subEquipment, subEquipmentReport); //must be after removal of subequipment from DB
+        changes.addAll(removeEquipmentControlTags(subEquipment, subEquipmentReport)); //must be after removal of subequipment from DB
         subEquipmentFacade.removeAliveTimer(subEquipmentId);
         subEquipmentFacade.removeCommFault(subEquipmentId);
         subEquipmentCache.remove(subEquipmentId);
@@ -145,7 +144,7 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
   }
 
   /**
-   * Removes the tags for this subequipment. The DAQ is not informed as this
+   * Removes the tags for this sub-equipment. The DAQ is not informed as this
    * method is only called when the whole Equipment is removed.
    *
    * Call within equipment lock.
@@ -161,11 +160,15 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.DATATAG, dataTagId);
       subEquipmentReport.addSubReport(tagReport);
 
-      // Add removal events for the DataTags attached to this SubEquipment
-      DataTagRemove dataTagRemove = new DataTagRemove(0L, dataTagId, subEquipment.getParentId());
-      processChanges.add(new ProcessChange(subEquipmentFacade.getProcessIdForAbstractEquipment(subEquipment.getId()), dataTagRemove));
-
-      dataTagConfigHandler.removeDataTag(dataTagId, tagReport);
+      ProcessChange change = dataTagConfigHandler.removeDataTag(dataTagId, tagReport);
+      
+      if (change.processActionRequired()) {
+        change.setNestedSubReport(tagReport);
+        processChanges.add(dataTagConfigHandler.removeDataTag(dataTagId, tagReport));
+      }
+      else {
+        subEquipmentReport.addSubReport(tagReport);
+      }
     }
 
     return processChanges;
