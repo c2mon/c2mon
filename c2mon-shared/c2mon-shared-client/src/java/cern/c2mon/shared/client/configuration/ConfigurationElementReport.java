@@ -21,7 +21,9 @@ package cern.c2mon.shared.client.configuration;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
@@ -39,6 +41,9 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 @Root(name = "ConfigurationElementReport")
 public class ConfigurationElementReport {
 
+  /** log4j logger instance */
+  private static final Logger LOG = Logger.getLogger(ConfigurationElementReport.class);
+  
   /**
    * The action of the {@link ConfigurationElement}.
    */
@@ -151,6 +156,13 @@ public class ConfigurationElementReport {
   public String getStatusMessage() {
     return this.statusMessage;
   }
+  
+  /**
+   * Set a message describing why the configuration operation failed.
+   */
+  protected void setStatusMessage(final String statusMessage) {
+    this.statusMessage = statusMessage;
+  }
 
  /**
   * XML representation of the report, used for sending and displaying
@@ -183,11 +195,11 @@ public class ConfigurationElementReport {
       str.append("]]></status-message>\n");
     }
 
-    int numSubReports = this.subreports.size();
-    if (numSubReports > 0) {
+    if (!subreports.isEmpty()) {
       str.append("<sub-reports>\n");
-      for (int i = 0; i != numSubReports; i++) {
-        str.append(((ConfigurationElementReport) this.subreports.get(i)).toXML());
+      for (ConfigurationElementReport subReport : subreports) {
+//        LOG.trace(String.format("subReport of report (%d): action=%s, entity=%s, id=%s", this.id, subReport.getAction(), subReport.getEntity(), subReport.getId()));
+        str.append(((ConfigurationElementReport) subReport).toXML());
       }
       str.append("</sub-reports>\n");
     }
@@ -300,7 +312,7 @@ public class ConfigurationElementReport {
    * Getter method.
    * @return the subreports
    */
-  public ArrayList<ConfigurationElementReport> getSubreports() {
+  public List<ConfigurationElementReport> getSubreports() {
     return subreports;
   }
 

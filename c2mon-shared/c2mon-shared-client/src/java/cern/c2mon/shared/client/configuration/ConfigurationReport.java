@@ -37,14 +37,14 @@ import cern.c2mon.shared.client.configuration.converter.ProcessListConverter;
 import cern.c2mon.shared.client.request.ClientRequestReport;
 
 /**
- * Top level report for a single C2MON (re-)configuration. Contains
- * a list of {@link ConfigurationElementReport}s, one for each
+ * Top level report for a single C2MON (re-)configuration. Contains a list of
+ * {@link ConfigurationElementReport}s, one for each
  * {@link ConfigurationElement} linked to this configuration.
  *
  * @author Mark Brightwell
  *
  */
-@Root(name="ConfigurationReport")
+@Root(name = "ConfigurationReport")
 public class ConfigurationReport extends ClientRequestReport implements Comparable<ConfigurationReport> {
 
   /**
@@ -66,9 +66,8 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
   private String user = null;
 
   /**
-   * The overall status of the configuration after attempting
-   * to apply it (is a success only if all elements were successfully
-   * applied.
+   * The overall status of the configuration after attempting to apply it (is a
+   * success only if all elements were successfully applied.
    */
   @Element
   private ConfigConstants.Status status = null;
@@ -92,8 +91,8 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
   private ArrayList<ConfigurationElementReport> elementReports = new ArrayList<ConfigurationElementReport>();
 
   /**
-   * A list of the DAQs that need restarting for the configuration to take effect
-   * (a single configuration can apply changes across many DAQs).
+   * A list of the DAQs that need restarting for the configuration to take
+   * effect (a single configuration can apply changes across many DAQs).
    */
   @Element(name = "daq-reboot")
   @Convert(ProcessListConverter.class)
@@ -108,30 +107,30 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Constructor.
-   * @param pTotalOperations How many operations to expect for this progress report.
+   * 
+   * @param pTotalOperations How many operations to expect for this progress
+   *          report.
    * @param pCurrentOperation The current operation.
-   * @param pTotalProgressParts How many parts to expect for this progress report.
+   * @param pTotalProgressParts How many parts to expect for this progress
+   *          report.
    * @param pCurrentProgressPart The current progress
    * @param pDescriptionMessage a description of what is happening
    */
-  public ConfigurationReport(
-      final int pTotalOperations,
-      final int pCurrentOperation,
-      final int pTotalProgressParts,
-      final int pCurrentProgressPart,
-      final String pDescriptionMessage
-  ) {
+  public ConfigurationReport(final int pTotalOperations, final int pCurrentOperation, final int pTotalProgressParts, final int pCurrentProgressPart,
+      final String pDescriptionMessage) {
 
     super(pTotalOperations, pCurrentOperation, pTotalProgressParts, pCurrentProgressPart, pDescriptionMessage);
   }
 
-
   /**
-   * Constructor. Needs specifying whether the request executed successfully or not.
-   * @param pExecutedSuccessfully True if the client request was executed successfully,
-   * false otherwise.
+   * Constructor. Needs specifying whether the request executed successfully or
+   * not.
+   * 
+   * @param pExecutedSuccessfully True if the client request was executed
+   *          successfully, false otherwise.
    * @param pErrorMessage Describes the error that occured in the server side.
-   * In case the execution was successfull, the error message can be left null.
+   *          In case the execution was successfull, the error message can be
+   *          left null.
    * @see RequestExecutionStatus
    */
   public ConfigurationReport(final boolean pExecutedSuccessfully, final String pErrorMessage) {
@@ -141,25 +140,22 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Constructor.
+   * 
    * @param pId id
    * @param pName name
    * @param pUser user
    * @param pConfigurationStatus status
    * @param pStatusDescription text description
    */
-  public ConfigurationReport(
-      final long pId,
-      final String pName,
-      final String pUser,
-      final ConfigConstants.Status pConfigurationStatus,
+  public ConfigurationReport(final long pId, final String pName, final String pUser, final ConfigConstants.Status pConfigurationStatus,
       final String pStatusDescription) {
 
     super();
 
-    this.id                = pId;
-    this.status            = pConfigurationStatus;
+    this.id = pId;
+    this.status = pConfigurationStatus;
     this.statusDescription = pStatusDescription;
-    this.timestamp         = new Timestamp(System.currentTimeMillis());
+    this.timestamp = new Timestamp(System.currentTimeMillis());
 
     if (pName != null) {
       this.name = pName;
@@ -178,20 +174,18 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Constructor creating successful successful report.
+   * 
    * @param pId id
    * @param pName name
    * @param pUser user
    */
-  public ConfigurationReport(
-      final long pId,
-      final String pName,
-      final String pUser
-  ) {
-    this (pId, pName, pUser, ConfigConstants.Status.OK, "Configuration applied successfully");
+  public ConfigurationReport(final long pId, final String pName, final String pUser) {
+    this(pId, pName, pUser, ConfigConstants.Status.OK, "Configuration applied successfully");
   }
 
   /**
    * Getter.
+   * 
    * @return the configuration id
    */
   public long getId() {
@@ -200,6 +194,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Getter.
+   * 
    * @return the configuration name
    */
   public String getName() {
@@ -208,6 +203,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Getter.
+   * 
    * @return the user who applied the configuration
    */
   public String getUser() {
@@ -216,6 +212,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Getter.
+   * 
    * @return the status
    */
   public ConfigConstants.Status getStatus() {
@@ -224,6 +221,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Setter method.
+   * 
    * @param pStatus the status
    */
   public void setStatus(final ConfigConstants.Status pStatus) {
@@ -231,10 +229,10 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
   }
 
   /**
-   * Adjusts the top-level status of the report according
-   * to the passed status. If the passed status is more severe
-   * than the current one, the top-level status will be overwritten
-   * (e.g. failure overrides restart).
+   * Adjusts the top-level status of the report according to the passed status.
+   * If the passed status is more severe than the current one, the top-level
+   * status will be overwritten (e.g. failure overrides restart).
+   * 
    * @param status
    */
   public void addStatus(final ConfigConstants.Status pStatus) {
@@ -245,6 +243,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Getter.
+   * 
    * @return the status description
    */
   public String getStatusDescription() {
@@ -253,6 +252,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Setter.
+   * 
    * @param pStatusDescription the status description
    */
   public void setStatusDescription(final String pStatusDescription) {
@@ -268,6 +268,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Adds the Exception trace to the description.
+   * 
    * @param e the Exception
    */
   public void setExceptionTrace(final Exception e) {
@@ -284,29 +285,31 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
     }
   }
 
-
-
   /**
-   * Adds the element report to the global report and adjusts
-   * the overall success flag.
+   * Adds the element report to the global report and adjusts the overall
+   * success flag.
+   * 
    * @param pReport the report to add
    */
   public void addElementReport(final ConfigurationElementReport pReport) {
     if (pReport != null) {
       this.elementReports.add(pReport);
     }
-    //adjust success (only set to restart if not already set to failure
+    // adjust success (only set to restart if not already set to failure
     if (pReport.isFailure()) {
       this.status = Status.FAILURE;
       this.statusDescription = "Configuration failed: see detailed report below.";
-    } else if (this.status != Status.FAILURE && pReport.requiresReboot()) {
+    }
+    else if (this.status != Status.FAILURE && pReport.requiresReboot()) {
       this.status = Status.RESTART;
       this.statusDescription = "Some DAQs need restarting for the configuration to take full effect: see details below.";
     }
   }
 
   /**
-   * Adds this process to those the list of those that should be rebooted (manually).
+   * Adds this process to those the list of those that should be rebooted
+   * (manually).
+   * 
    * @param processName the name of the process
    */
   public void addProcessToReboot(final String processName) {
@@ -315,6 +318,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Getter.
+   * 
    * @return a list of element reports
    */
   public List<ConfigurationElementReport> getElementReports() {
@@ -326,8 +330,9 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
   }
 
   /**
-   * Encodes the report in XML, ready for sending and displaying in a web browser
-   * on the client application (use provided xsl).
+   * Encodes the report in XML, ready for sending and displaying in a web
+   * browser on the client application (use provided xsl).
+   * 
    * @return the XML as String
    */
   public String toXML() {
@@ -372,7 +377,8 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
       str.append("</ConfigurationReport>\n");
       return str.toString();
-    } else {
+    }
+    else {
       throw new UnsupportedOperationException("No XML report can be generated: this message is an intermediate response!");
     }
   }
@@ -383,47 +389,70 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
   }
 
   /**
+   * This method will recursively analyse the attached 
+   * {@link ConfigurationElementReport} list and will remove
+   * all nested sub reports that equal to their parent. This can 
+   * occur when receiving a DAQ response back.
+   */
+  public void normalize() {
+    for (ConfigurationElementReport report : elementReports) {
+      normalizeReport(report);
+    }
+
+  }
+
+  /**
+   * Recursive method to remove double reports.
+   * @param parentReport The parent report
+   */
+  private void normalizeReport(ConfigurationElementReport parentReport) {
+    int subReportSize = parentReport.getSubreports().size();
+     
+    if (subReportSize > 1) {
+      for (ConfigurationElementReport subReport : parentReport.getSubreports()) {
+        normalizeReport(subReport);
+      }
+    }
+    else if (subReportSize == 1) {
+      ConfigurationElementReport subReport = parentReport.getSubreports().get(0);
+      
+      if (   parentReport.getAction().equals(subReport.getAction()) 
+          && parentReport.getEntity().equals(subReport.getEntity()) 
+          && parentReport.getId().equals(subReport.getId())
+          && parentReport.getStatus().equals(subReport.getStatus())) {
+        
+          parentReport.setStatusMessage(subReport.getStatusMessage());
+          parentReport.getSubreports().clear();
+      }
+      
+      subReport = null;
+    }
+  }
+
+  /**
    * For testing.
+   * 
    * @param args not used
    */
   public static void main(String[] args) {
     ConfigurationReport report = new ConfigurationReport(12, "my.name", "any_user");
     try {
-      for (int i= 0; i != 15; i++) {
-        if (i%3 == 0 ) {
-          report.addElementReport(
-              new ConfigurationElementReport(
-                  ConfigConstants.Action.CREATE,
-                  ConfigConstants.Entity.ALARM,
-                  new Long(i)
-              )
-          );
+      for (int i = 0; i != 15; i++) {
+        if (i % 3 == 0) {
+          report.addElementReport(new ConfigurationElementReport(ConfigConstants.Action.CREATE, ConfigConstants.Entity.ALARM, new Long(i)));
         }
-        else if (i%3 == 1) {
-          report.addElementReport(
-              new ConfigurationElementReport(
-                  ConfigConstants.Action.CREATE,
-                  ConfigConstants.Entity.ALARM,
-                  new Long(i),
-                  ConfigConstants.Status.WARNING,
-                  "Just a little warning"
-              )
-          );
+        else if (i % 3 == 1) {
+          report.addElementReport(new ConfigurationElementReport(ConfigConstants.Action.CREATE, ConfigConstants.Entity.ALARM, new Long(i),
+              ConfigConstants.Status.WARNING, "Just a little warning"));
         }
         else {
-          report.addElementReport(
-              new ConfigurationElementReport(
-                  ConfigConstants.Action.CREATE,
-                  ConfigConstants.Entity.ALARM,
-                  new Long(i),
-                  ConfigConstants.Status.FAILURE,
-                  "That sucks"
-              )
-          );
+          report.addElementReport(new ConfigurationElementReport(ConfigConstants.Action.CREATE, ConfigConstants.Entity.ALARM, new Long(i),
+              ConfigConstants.Status.FAILURE, "That sucks"));
         }
       }
       throw new IllegalArgumentException("nonsense argument in configuration");
-    }catch (Exception e) {
+    }
+    catch (Exception e) {
       report.setExceptionTrace(e);
     }
     System.out.println(report.getStatusDescription());
