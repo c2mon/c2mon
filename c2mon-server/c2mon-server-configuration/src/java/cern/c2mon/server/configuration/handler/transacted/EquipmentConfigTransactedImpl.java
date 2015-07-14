@@ -84,11 +84,16 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
   public List<ProcessChange> doCreateEquipment(ConfigurationElement element) throws IllegalAccessException {
     Equipment equipment = super.createAbstractEquipment(element);
     equipmentFacade.addEquipmentToProcess(equipment.getId(), equipment.getProcessId());
+    
+    // Please note, that the Equipment XML configuration is also containing the Alive tag configuration.
+    // It's therefore not required to send an additional ProcessChange object for creating it.
     EquipmentUnitAdd equipmentUnitAdd = new EquipmentUnitAdd(element.getSequenceId(), equipment.getId(), processXMLProvider.getEquipmentConfigXML(equipment.getId()));
     
     List<ProcessChange> result = new ArrayList<ProcessChange>();
     result.add(new ProcessChange(equipment.getProcessId(), equipmentUnitAdd));
-    result.addAll(updateControlTagInformation(element, equipment));
+
+    // ProcessChange events are ignored (see explanation above)
+    updateControlTagInformation(element, equipment);
     
     return result;
   }
