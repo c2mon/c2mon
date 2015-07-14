@@ -696,6 +696,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     EquipmentCacheObject expectedObject = new EquipmentCacheObject(110L);
     expectedObject.setName("E_CONFIG_TEST");
     expectedObject.setAddress("serverHostName=VGTCVENTTEST");
+    expectedObject.setAliveTagId(1251L);
     expectedObject.setStateTagId(1250L);
     expectedObject.setCommFaultTagId(1252L);
     expectedObject.setHandlerClassName("cern.c2mon.driver.");
@@ -726,7 +727,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertEquals(topList.get(0).getEntity(), Entity.CONTROLTAG);
     assertEquals(topList.get(1).getEntity(), Entity.EQUIPMENT);
     assertEquals(0, topList.get(0).getSubreports().size());
-    assertEquals(1, topList.get(1).getSubreports().size());
+    // 2 sub-reports: One for Equipment alive tag creation and another for the actual equipment
+    assertEquals(2, topList.get(1).getSubreports().size());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     // should contain both a controltag update and equipment update
     // (note the DAQ response is generated automatically by the mock)

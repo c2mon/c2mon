@@ -33,7 +33,10 @@ import cern.c2mon.server.cache.loading.ConfigurableDAO;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
 
 /**
@@ -204,6 +207,8 @@ public abstract class AbstractEquipmentConfigTransacted<T extends AbstractEquipm
       // null if this alive does not have an Address -> is not in list of
       // DataTags on DAQ
       if (processChange != null) {
+        ConfigurationElementReport subReport = new ConfigurationElementReport(Action.CREATE, Entity.CONTROLTAG, equipmentUpdate.getAliveTagId());
+        processChange.setNestedSubReport(subReport);
         processChanges.add(processChange);
       }
     }

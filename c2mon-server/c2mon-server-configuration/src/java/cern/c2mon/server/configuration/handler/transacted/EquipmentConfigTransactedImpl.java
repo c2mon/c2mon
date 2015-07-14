@@ -26,8 +26,12 @@ import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
+import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.DataTagAdd;
 import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
+import cern.c2mon.shared.daq.config.IChange;
 
 /**
  * Equipment configuration transacted methods.
@@ -84,7 +88,7 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
     
     List<ProcessChange> result = new ArrayList<ProcessChange>();
     result.add(new ProcessChange(equipment.getProcessId(), equipmentUnitAdd));
-    result.addAll(ensureCtrlTagsSet(element, equipment));
+    result.addAll(updateControlTagInformation(element, equipment));
     
     return result;
   }
@@ -109,48 +113,56 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
   }
   
   /**
-   * Ensures that the Alive, State and CommFault Tags are set appropriately in the {@link ControlTagCache}.
-   * @param equipment 
-   * @throws IllegalAccessException
+   * Ensures that the Alive-, Status- and CommFault Tags have appropriately the equipment id set.
+   * @param equipment The equipment to which the control tags are assigned
    */
-  private List<ProcessChange> ensureCtrlTagsSet(final ConfigurationElement element, final Equipment equipment) throws IllegalAccessException {
+  private List<ProcessChange> updateControlTagInformation(final ConfigurationElement element, final Equipment equipment) {
       
       List<ProcessChange> changes = new ArrayList<ProcessChange>(3);
+      Long processId = equipment.getProcessId();
+      Long equipmentId = equipment.getId();
       
       ControlTag aliveTagCopy = controlCache.getCopy(equipment.getAliveTagId());
       if (aliveTagCopy != null) {
-        ((ControlTagCacheObject)aliveTagCopy).setEquipmentId(equipment.getId());
-        ((ControlTagCacheObject)aliveTagCopy).setProcessId(equipment.getProcessId());
-        controlCache.putQuiet(aliveTagCopy);
-        DataTagAdd toAdd = new DataTagAdd(element.getSequenceId(), equipment.getId(), controlTagFacade.generateSourceDataTag(aliveTagCopy));
-        changes.add(new ProcessChange(equipment.getProcessId(), toAdd));
+        setEquipmentId((ControlTagCacheObject) aliveTagCopy, equipmentId, processId);
+        
+        if (aliveTagCopy.getAddress() != null) {
+          IChange toAdd = new DataTagAdd(element.getSequenceId(), equipmentId, controlTagFacade.generateSourceDataTag(aliveTagCopy));
+          ConfigurationElementReport report = new ConfigurationElementReport(Action.CREATE, Entity.CONTROLTAG, aliveTagCopy.getId());
+          ProcessChange change = new ProcessChange(processId, toAdd);
+          change.setNestedSubReport(report);
+          changes.add(change);
+        }
       } else {
-        // TODO change to ConfigurationException
-        throw new IllegalArgumentException("No alive tag (" + equipment.getAliveTagId() + ") found for equipment " + equipment.getName());
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+            String.format("No Alive tag (%s) found for equipment #%d (%s).", equipment.getAliveTagId(), equipment.getId(), equipment.getName()));
       }
       
       ControlTag commFaultTagCopy = controlCache.getCopy(equipment.getCommFaultTagId());
       if (commFaultTagCopy != null) {
-        ((ControlTagCacheObject)commFaultTagCopy).setEquipmentId(equipment.getId());
-        ((ControlTagCacheObject)commFaultTagCopy).setProcessId(equipment.getProcessId());
-        controlCache.putQuiet(commFaultTagCopy);
+        setEquipmentId((ControlTagCacheObject) commFaultTagCopy, equipmentId, processId);
       } else {
-        // TODO change to ConfigurationException
-        throw new IllegalArgumentException("No commfault tag (" + equipment.getCommFaultTagId() + ") found for equipment " + equipment.getName());
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+            String.format("No CommFault tag (%s) found for equipment #%d (%s).", equipment.getCommFaultTagId(), equipment.getId(), equipment.getName()));
       }
       
       ControlTag statusTagCopy = controlCache.getCopy(equipment.getStateTagId());
       if (statusTagCopy != null) {
-        ((ControlTagCacheObject)statusTagCopy).setEquipmentId(equipment.getId());
-        ((ControlTagCacheObject)statusTagCopy).setProcessId(equipment.getProcessId());
-        controlCache.putQuiet(statusTagCopy);
+        setEquipmentId((ControlTagCacheObject) statusTagCopy, equipmentId, processId);
       } else {
-        // TODO change to ConfigurationException
-        throw new IllegalArgumentException("No status tag (" + equipment.getStateTagId() + ") found for equipment " + equipment.getName());
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+            String.format("No Status tag (%s) found for equipment #%d (%s).", equipment.getStateTagId(), equipment.getId(), equipment.getName()));
       }
       
-      
       return changes;
+  }
+  
+  private void setEquipmentId(ControlTagCacheObject copy, Long equipmentId, Long processId) {
+    String logMsg = String.format("Adding equipment id #%s to control tag #%s", equipmentId, copy.getId()); 
+    LOGGER.trace(logMsg);
+    copy.setEquipmentId(equipmentId);
+    copy.setProcessId(processId);
+    controlCache.putQuiet(copy);
   }
   
 }
