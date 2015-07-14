@@ -13,7 +13,7 @@
   <commfault-tag-value>false</commfault-tag-value>
   <alive-tag-id>1224</alive-tag-id>
   <alive-interval>60000</alive-interval>
-  <address>interval=1000;eventProb=0.02;inRangeProb=1;outDeadBandProb=1;switchProb=1;startIn=0.2;aliveInterval=30000</address>
+  <address>interval=20;eventProb=0.25;inRangeProb=1;outDeadBandProb=1;switchProb=1;startIn=0.2;aliveInterval=30000</address>
   <SubEquipmentUnits>
     <SubEquipmentUnit id="250" name="SUB_E_TESTHANDLER_TESTHANDLER03">
       <commfault-tag-id>1232</commfault-tag-id>
