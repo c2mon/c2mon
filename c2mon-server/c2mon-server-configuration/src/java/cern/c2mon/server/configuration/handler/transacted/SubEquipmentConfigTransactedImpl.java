@@ -140,11 +140,10 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
   
   
   /**
-   * Ensures that the Alive-, Status- and CommFault Tags are set appropriately in the {@link ControlTagCache}.
-   * @param subEquipment 
-   * @throws IllegalAccessException
+   * Ensures that the Alive-, Status- and CommFault Tags have appropriately the sub-equipment id set.
+   * @param subEquipment The sub-equipment to which the control tags are assigned
    */
-  private List<ProcessChange> updateControlTagInformation(final ConfigurationElement element, final SubEquipment subEquipment) throws IllegalAccessException {
+  private List<ProcessChange> updateControlTagInformation(final ConfigurationElement element, final SubEquipment subEquipment) {
       
       List<ProcessChange> changes = new ArrayList<ProcessChange>(3);
       final Long processId = subEquipmentFacade.getProcessIdForAbstractEquipment(subEquipment.getId());
@@ -188,7 +187,6 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
             String.format("No Status tag (%s) found for sub-equipment #%d (%s).", subEquipment.getStateTagId(), subEquipment.getId(), subEquipment.getName()));
       }
-      
       
       return changes;
   }
