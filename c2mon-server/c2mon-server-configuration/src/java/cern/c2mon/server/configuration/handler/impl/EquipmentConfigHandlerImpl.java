@@ -45,6 +45,7 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
+import cern.c2mon.shared.daq.config.IChange;
 
 /**
  * See interface documentation.
@@ -93,27 +94,31 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
   public ProcessChange removeEquipment(final Long equipmentid, final ConfigurationElementReport equipmentReport) {
     LOGGER.debug("Removing Equipment " + equipmentid);
     try {
-      Equipment equipment = equipmentCache.get(equipmentid);
+      Equipment equipmentCopy = equipmentCache.getCopy(equipmentid);
       //WARNING: outside equipment lock, as all these use methods that access a Process (to create ProcessChange object)!
-      removeEquipmentTags(equipment, equipmentReport);
-      removeEquipmentCommands(equipment, equipmentReport);
-      removeSubEquipments(new ArrayList<Long>(equipment.getSubEquipmentIds()), equipmentReport);
+      removeEquipmentTags(equipmentCopy, equipmentReport);
+      removeEquipmentCommands(equipmentCopy, equipmentReport);
+      removeSubEquipments(new ArrayList<Long>(equipmentCopy.getSubEquipmentIds()), equipmentReport);
+
       equipmentCache.acquireWriteLockOnKey(equipmentid);
       try {
-        equipmentConfigTransacted.doRemoveEquipment(equipment, equipmentReport);
-        equipmentCache.releaseWriteLockOnKey(equipmentid);
-        removeEquipmentControlTags(equipment, equipmentReport); //must be removed last as equipment references them; when this returns are removed from cache and DB permanently
-        //remove alive & commfault after control tags, or could be pulled back in from DB to cache!
-        equipmentFacade.removeAliveTimer(equipmentid);
-        equipmentFacade.removeCommFault(equipmentid);
-        processConfigHandler.removeEquipmentFromProcess(equipmentid, equipment.getProcessId());
-        equipmentCache.remove(equipmentid);
-        EquipmentUnitRemove equipmentUnitRemove = new EquipmentUnitRemove(0L, equipmentid); //id is reset
-        return new ProcessChange(equipment.getProcessId(), equipmentUnitRemove);
+        equipmentConfigTransacted.doRemoveEquipment(equipmentCopy, equipmentReport);
       } finally {
-        if (equipmentCache.isWriteLockedByCurrentThread(equipmentid))
-          equipmentCache.releaseWriteLockOnKey(equipmentid);
+        equipmentCache.releaseWriteLockOnKey(equipmentid);
       }
+      
+      // must be removed last as equipment references them; when this returns are removed from cache and DB permanently
+      removeEquipmentControlTags(equipmentCopy, equipmentReport);
+      
+      // remove alive & commfault after control tags, or could be pulled back in from DB to cache!
+      equipmentFacade.removeAliveTimer(equipmentid);
+      equipmentFacade.removeCommFault(equipmentid);
+      processConfigHandler.removeEquipmentFromProcess(equipmentid, equipmentCopy.getProcessId());
+      equipmentCache.remove(equipmentid);
+      IChange equipmentUnitRemove = new EquipmentUnitRemove(0L, equipmentid); //id is reset
+      
+      return new ProcessChange(equipmentCopy.getProcessId(), equipmentUnitRemove);
+      
     } catch (CacheElementNotFoundException cacheEx) {
       LOGGER.debug("Equipment not found in cache - unable to remove it.");
       equipmentReport.setWarning("Equipment not found in cache so cannot be removed.");
