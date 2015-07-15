@@ -18,6 +18,7 @@ import cern.c2mon.server.cache.ControlTagFacade;
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.EquipmentFacade;
 import cern.c2mon.server.cache.ProcessXMLProvider;
+import cern.c2mon.server.cache.loading.ConfigurableDAO;
 import cern.c2mon.server.cache.loading.EquipmentDAO;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
@@ -44,28 +45,37 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
 
   private static final Logger LOGGER = Logger.getLogger(EquipmentConfigTransactedImpl.class); 
   
-  private EquipmentFacade equipmentFacade;
+  private final EquipmentFacade equipmentFacade;
   
-  private EquipmentDAO equipmentDAO;
+  private final EquipmentDAO equipmentDAO;
   
-  private ProcessXMLProvider processXMLProvider;
+  private final ProcessXMLProvider processXMLProvider;
   
-  private ControlTagCache controlCache;
+  private final ControlTagCache controlCache;
   
-  private ControlTagFacade controlTagFacade;
+  private final ControlTagFacade controlTagFacade;
+
+  private final ConfigurableDAO<ControlTag> controlTagDAO;
   
   @Autowired
-  public EquipmentConfigTransactedImpl(ControlTagConfigHandler controlTagConfigHandler, AliveTimerCache aliveTimerCache,
-                                CommFaultTagCache commFaultTagCache, EquipmentCache abstractEquipmentCache, 
-                                EquipmentFacade equipmentFacade, EquipmentDAO equipmentDAO, ProcessXMLProvider processXMLProvider, 
-                                ControlTagCache controlCache, ControlTagFacade controlTagFacade) {
-    super(controlTagConfigHandler, equipmentFacade, abstractEquipmentCache, equipmentDAO,
-        aliveTimerCache, commFaultTagCache);
+  public EquipmentConfigTransactedImpl(ControlTagConfigHandler controlTagConfigHandler, 
+                                       EquipmentFacade equipmentFacade, 
+                                       EquipmentCache abstractEquipmentCache,
+                                       EquipmentDAO equipmentDAO, 
+                                       AliveTimerCache aliveTimerCache,
+                                       CommFaultTagCache commFaultTagCache,  
+                                       ProcessXMLProvider processXMLProvider, 
+                                       ControlTagCache controlCache, 
+                                       ControlTagFacade controlTagFacade,
+                                       ConfigurableDAO<ControlTag> controlTagDAO) {
+    super(controlTagConfigHandler, equipmentFacade, abstractEquipmentCache, equipmentDAO, aliveTimerCache, commFaultTagCache);
+    
     this.equipmentFacade = equipmentFacade;
     this.equipmentDAO = equipmentDAO;
     this.processXMLProvider = processXMLProvider;
     this.controlCache = controlCache;
     this.controlTagFacade = controlTagFacade;
+    this.controlTagDAO = controlTagDAO;
   }
 
   /**
@@ -167,6 +177,7 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
     LOGGER.trace(logMsg);
     copy.setEquipmentId(equipmentId);
     copy.setProcessId(processId);
+    controlTagDAO.updateConfig(copy);
     controlCache.putQuiet(copy);
   }
   

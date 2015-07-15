@@ -218,6 +218,11 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
     String logMsg = String.format("Adding process id #%s to control tag #%s", processId, copy.getId()); 
     LOGGER.trace(logMsg);
     copy.setProcessId(processId);
+    // TODO: TIMS-1053 solved setting equipment IDs to newly created tag. However, the DATATAG table
+    //       had at the time of writing no column to store the process ID. We decided to leave this
+    //       open since it's a minor issue only affecting Process control tags. One day this should
+    //       be fixed.
+    //controlTagDAO.updateConfig(copy);
     controlCache.putQuiet(copy);
   }
 }

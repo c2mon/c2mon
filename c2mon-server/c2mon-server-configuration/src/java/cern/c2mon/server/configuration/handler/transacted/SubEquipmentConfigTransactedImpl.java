@@ -19,6 +19,7 @@ import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.ProcessXMLProvider;
 import cern.c2mon.server.cache.SubEquipmentCache;
 import cern.c2mon.server.cache.SubEquipmentFacade;
+import cern.c2mon.server.cache.loading.ConfigurableDAO;
 import cern.c2mon.server.cache.loading.SubEquipmentDAO;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
@@ -53,18 +54,20 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
   /**
    * Facade.
    */
-  private SubEquipmentFacade subEquipmentFacade;
+  private final SubEquipmentFacade subEquipmentFacade;
 
   /**
    * DAO.
    */
-  private SubEquipmentDAO subEquipmentDAO;
+  private final SubEquipmentDAO subEquipmentDAO;
 
-  private ControlTagCache controlCache;
+  private final ControlTagCache controlCache;
   
-  private ControlTagFacade controlTagFacade;
+  private final ControlTagFacade controlTagFacade;
+  
+  private final ConfigurableDAO<ControlTag> controlTagDAO;
 
-  private ProcessXMLProvider processXMLProvider;
+  private final ProcessXMLProvider processXMLProvider;
 
   /**
    * Autowired constructor.
@@ -79,13 +82,15 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
                                           ProcessCache processCache,
                                           ProcessXMLProvider processXMLProvider,
                                           ControlTagCache controlCache, 
-                                          ControlTagFacade controlTagFacade) {
+                                          ControlTagFacade controlTagFacade,
+                                          ConfigurableDAO<ControlTag> controlTagDAO) {
     super(controlTagConfigHandler, subEquipmentFacade, subEquipmentCache, subEquipmentDAO, aliveTimerCache, commFaultTagCache);
     this.subEquipmentFacade = subEquipmentFacade;
     this.subEquipmentDAO = subEquipmentDAO;
     this.processXMLProvider = processXMLProvider;
     this.controlCache = controlCache;
     this.controlTagFacade = controlTagFacade;
+    this.controlTagDAO = controlTagDAO;
   }
 
   /**
@@ -196,6 +201,7 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
     LOGGER.trace(logMsg);
     copy.setSubEquipmentId(subEquipmentId);
     copy.setProcessId(processId);
+    controlTagDAO.updateConfig(copy);
     controlCache.putQuiet(copy);
   }
   
