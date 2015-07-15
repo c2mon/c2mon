@@ -138,8 +138,8 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
     tagCache.acquireWriteLockOnKey(id);
     try {      
       ControlTag controlTag = tagCache.get(id);
-      configurableDAO.updateConfig(controlTag);
       controlTagUpdate = commonTagFacade.updateConfig(controlTag, elementProperties); //sets id of controlTagUpdate also     
+      configurableDAO.updateConfig(controlTag);
       if (((ControlTagFacade) commonTagFacade).isInProcessList(controlTag)) {
         tagCache.releaseWriteLockOnKey(id);
         return getProcessChanges((DataTagUpdate) controlTagUpdate, id);  
