@@ -19,7 +19,7 @@ import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.ProcessXMLProvider;
 import cern.c2mon.server.cache.SubEquipmentCache;
 import cern.c2mon.server.cache.SubEquipmentFacade;
-import cern.c2mon.server.cache.loading.ConfigurableDAO;
+import cern.c2mon.server.cache.loading.ControlTagLoaderDAO;
 import cern.c2mon.server.cache.loading.SubEquipmentDAO;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
@@ -65,7 +65,7 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
   
   private final ControlTagFacade controlTagFacade;
   
-  private final ConfigurableDAO<ControlTag> controlTagDAO;
+  private final ControlTagLoaderDAO controlTagDAO;
 
   private final ProcessXMLProvider processXMLProvider;
 
@@ -83,7 +83,7 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
                                           ProcessXMLProvider processXMLProvider,
                                           ControlTagCache controlCache, 
                                           ControlTagFacade controlTagFacade,
-                                          ConfigurableDAO<ControlTag> controlTagDAO) {
+                                          ControlTagLoaderDAO controlTagDAO) {
     super(controlTagConfigHandler, subEquipmentFacade, subEquipmentCache, subEquipmentDAO, aliveTimerCache, commFaultTagCache);
     this.subEquipmentFacade = subEquipmentFacade;
     this.subEquipmentDAO = subEquipmentDAO;

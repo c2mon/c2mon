@@ -18,17 +18,17 @@ import cern.c2mon.server.cache.ControlTagFacade;
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.EquipmentFacade;
 import cern.c2mon.server.cache.ProcessXMLProvider;
-import cern.c2mon.server.cache.loading.ConfigurableDAO;
+import cern.c2mon.server.cache.loading.ControlTagLoaderDAO;
 import cern.c2mon.server.cache.loading.EquipmentDAO;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.c2mon.shared.client.configuration.ConfigurationElement;
-import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.DataTagAdd;
 import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
@@ -55,7 +55,7 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
   
   private final ControlTagFacade controlTagFacade;
 
-  private final ConfigurableDAO<ControlTag> controlTagDAO;
+  private final ControlTagLoaderDAO controlTagDAO;
   
   @Autowired
   public EquipmentConfigTransactedImpl(ControlTagConfigHandler controlTagConfigHandler, 
@@ -67,7 +67,7 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
                                        ProcessXMLProvider processXMLProvider, 
                                        ControlTagCache controlCache, 
                                        ControlTagFacade controlTagFacade,
-                                       ConfigurableDAO<ControlTag> controlTagDAO) {
+                                       ControlTagLoaderDAO controlTagDAO) {
     super(controlTagConfigHandler, equipmentFacade, abstractEquipmentCache, equipmentDAO, aliveTimerCache, commFaultTagCache);
     
     this.equipmentFacade = equipmentFacade;

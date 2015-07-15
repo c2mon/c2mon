@@ -31,7 +31,9 @@
   </bean>
   <bean id="configurationDAO" class="cern.c2mon.server.configuration.mybatis.ConfigurationDAOImpl"/>
   
-   <bean id="configurationUpdate" class="cern.c2mon.server.configuration.impl.ConfigurationUpdateImpl"/>
+  <bean id="configurationUpdate" class="cern.c2mon.server.configuration.impl.ConfigurationUpdateImpl"/>
+  
+  <bean id="controlTagLoaderDAO" class="cern.c2mon.server.cache.loading.impl.ControlTagLoaderDAOImpl" autowire="constructor"/>
     
   <bean id="dataTagConfigHandler" class="cern.c2mon.server.configuration.handler.impl.DataTagConfigHandlerImpl" autowire="constructor"/>
   <bean id="controlTagConfigHandler" class="cern.c2mon.server.configuration.handler.impl.ControlTagConfigHandlerImpl" autowire="constructor"/>
