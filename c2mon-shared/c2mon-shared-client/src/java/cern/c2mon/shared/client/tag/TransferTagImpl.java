@@ -63,6 +63,12 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
 
   /** In case of a rule tag this field should not be null */
   private String ruleExpressionStr = null;
+  
+  /** In case of a Control tag update, this field is set to <code>true</code> */
+  private boolean controlTag = false;
+  
+  /** In case of an Alive Control tag update, this field is set to <code>true</code> */
+  private boolean aliveTag = false;
 
   /**
    * Private default constructor needed for JSON
@@ -243,5 +249,43 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
    */
   public static TagUpdate fromJson(final String json) {
     return getGson().fromJson(json, TransferTagImpl.class);
+  }
+
+  @Override
+  public boolean isControlTag() {
+    return controlTag;
+  }
+
+  @Override
+  public boolean isAliveTag() {
+    return aliveTag;
+  }
+
+  /**
+   * @param controlTag the controlTag flag is set to <code>true</code>,
+   *        if the update is from a Alive-, CommFault- or Status tag.
+   *        In case this flag is set to <code>false</code>, the aliveTag
+   *        flag will automatically also be set to <code>false</code>.
+   */
+  public final void setControlTagFlag(boolean controlTag) {
+    this.controlTag = controlTag;
+    
+    if (!controlTag) {
+      this.aliveTag = false;
+    }
+  }
+
+  /**
+   * @param aliveTag the aliveTag flag is set to <code>true</code>,
+   *        if the update is from an Alive Control tag. Please note, 
+   *        that for <code>true</code>, the controlTag flag will automatically
+   *        also be set to <code>true</code>.
+   */
+  public final void setAliveTagFlag(boolean aliveTag) {
+    this.aliveTag = aliveTag;
+    
+    if (aliveTag) {
+      this.controlTag = true;
+    }
   }
 }

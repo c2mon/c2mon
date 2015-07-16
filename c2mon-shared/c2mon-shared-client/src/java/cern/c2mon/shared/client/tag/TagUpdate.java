@@ -88,4 +88,16 @@ public interface TagUpdate extends TagValueUpdate {
    *         is published on change.
    */
   String getTopicName();
+  
+  /**
+   * Will return <code>true</code>, if the tag update is for a 
+   * Control (Alive-, Status- or CommFault) tag 
+   * @return <code>true</code>, if the given tag update belongs to a Control tag
+   */
+  boolean isControlTag();
+  
+  /**
+   * @return <code>true</code>, if the given tag update belongs to an Alive Control tag
+   */
+  boolean isAliveTag();
 }
