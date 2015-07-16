@@ -192,4 +192,14 @@ public interface ClientDataTagValue extends RuleInputValue {
    */
   TypeNumeric getTypeNumeric();
 
+  /**
+   * @return  <code>true</code>, if tag represents an Alive Control tag
+   */
+  boolean isAliveTag();
+
+  /**
+   * @return <code>true</code>, if tag represents a CommFault-, Alive- or Status tag
+   */
+  boolean isControlTag();
+
 }

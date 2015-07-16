@@ -221,7 +221,10 @@ public class ClientDataTagCacheImplTest {
   private ClientDataTagImpl prepareClientDataTagCreateMock(final Long tagId) throws RuleFormatException, JMSException {
     ClientDataTagImpl cdtMock = new ClientDataTagImpl(tagId);
     cdtMock.update(createValidTransferTag(tagId));
-    supervisionManagerMock.addSupervisionListener(cdtMock, cdtMock.getProcessIds(), cdtMock.getEquipmentIds(), cdtMock.getSubEquipmentIds());
+    // In case of a CommFault- or Status control tag, we don't register to supervision invalidations
+    if (!cdtMock.isControlTag() || cdtMock.isAliveTag()) {
+      supervisionManagerMock.addSupervisionListener(cdtMock, cdtMock.getProcessIds(), cdtMock.getEquipmentIds(), cdtMock.getSubEquipmentIds());
+    }
     EasyMock.expect(jmsProxyMock.isRegisteredListener(cdtMock)).andReturn(false);
     jmsProxyMock.registerUpdateListener(cdtMock, cdtMock);
 

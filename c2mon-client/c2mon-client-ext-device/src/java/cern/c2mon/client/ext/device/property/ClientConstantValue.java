@@ -180,7 +180,27 @@ public class ClientConstantValue<T> implements ClientDataTagValue {
 
   @Override
   public TypeNumeric getTypeNumeric() {
-    return null;
+    Class< ? > type = getType();
+    if (type != null) {
+      int typeNumeric = type.hashCode();
+      for (TypeNumeric t : TypeNumeric.values()) {
+        if (t.getCode() == typeNumeric) {
+          return t;
+        }
+      }
+    }
+    
+    return TypeNumeric.TYPE_UNKNOWN;
+  }
+
+  @Override
+  public boolean isAliveTag() {
+    return false;
+  }
+
+  @Override
+  public boolean isControlTag() {
+    return false;
   }
 
 }

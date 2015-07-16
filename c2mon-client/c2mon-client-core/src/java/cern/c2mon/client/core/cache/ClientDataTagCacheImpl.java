@@ -369,7 +369,10 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
           for (Long tagId : newTagIds) {
             cdt = controller.getActiveCache().get(tagId);
             if (cdt != null) {
-              supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
+              // In case of a CommFault- or Status control tag, we don't register to supervision invalidations
+              if (!cdt.isControlTag() || cdt.isAliveTag()) {
+                supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
+              }
               
               if (sendInitialUpdateSeperately) {
                 initialUpdates.put(tagId, cdt.clone());

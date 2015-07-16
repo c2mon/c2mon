@@ -129,6 +129,12 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   @Element(required = false)
   private DataTagQuality tagQuality =
     new DataTagQualityImpl(TagQualityStatus.UNINITIALISED, DEFAULT_DESCRIPTION);
+  
+  /** <code>true</code>, if tag represents an Alive Control tag */
+  private boolean aliveTagFlag = false;
+  
+  /** <code>true</code>, if tag represents a CommFault-, Alive- or Status tag */
+  private boolean controlTagFlag = false;
 
   /** The alarm objects associated to this data tag */
   @ElementList
@@ -149,6 +155,16 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   /** Unit of the tag */
   @Element(required = false)
   private String unit = null;
+
+  @Override
+  public final boolean isAliveTag() {
+    return aliveTagFlag;
+  }
+
+  @Override
+  public final boolean isControlTag() {
+    return controlTagFlag;
+  }
 
   /** The description of the Tag */
   @Element(required = false)
@@ -734,6 +750,9 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
         tagName = tagUpdate.getName();
         topicName = tagUpdate.getTopicName();
         unit = tagUpdate.getUnit();
+        
+        aliveTagFlag = tagUpdate.isAliveTag();
+        controlTagFlag = tagUpdate.isControlTag();
 
         // Notify all listeners of the update
         clone = this.clone();
@@ -1125,6 +1144,10 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   @Override
   public void onSupervisionUpdate(SupervisionEvent supervisionEvent) {
     if (supervisionEvent == null) {
+      return;
+    }
+    // In case of a CommFault- or Status control tag, we ignore supervision events
+    if (!isControlTag() || isAliveTag()) {
       return;
     }
     

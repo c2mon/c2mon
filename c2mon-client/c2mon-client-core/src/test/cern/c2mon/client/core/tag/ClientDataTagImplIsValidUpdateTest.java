@@ -715,5 +715,17 @@ public class ClientDataTagImplIsValidUpdateTest {
     public String getTopicName() {
       return null;
     }
+
+    @Override
+    public boolean isControlTag() {
+      // TODO Auto-generated method stub
+      return false;
+    }
+
+    @Override
+    public boolean isAliveTag() {
+      // TODO Auto-generated method stub
+      return false;
+    }
   }
 }

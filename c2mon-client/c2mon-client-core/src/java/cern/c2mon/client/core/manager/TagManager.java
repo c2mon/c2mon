@@ -313,11 +313,17 @@ public class TagManager implements CoreTagManager {
           try {
             ClientDataTagImpl cdt = new ClientDataTagImpl(tagUpdate.getId());
             cdt.update(tagUpdate);
-            supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
-
+            
+            // In case of a CommFault- or Status control tag, we don't register to supervision invalidations
+            if (!tagUpdate.isControlTag() || tagUpdate.isAliveTag()) {
+              supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
+            }
+            
             resultList.add(cdt.clone());
 
-            supervisionManager.removeSupervisionListener(cdt);
+            if (!tagUpdate.isControlTag() || tagUpdate.isAliveTag()) {
+              supervisionManager.removeSupervisionListener(cdt);
+            }
           } catch (RuleFormatException e) {
             LOG.error("getDataTags() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
             throw new RuntimeException("Received an incorrect rule tag from the server for tag id " + tagUpdate.getId());

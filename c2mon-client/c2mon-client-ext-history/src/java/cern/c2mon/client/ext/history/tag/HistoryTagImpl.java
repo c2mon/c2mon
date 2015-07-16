@@ -549,4 +549,14 @@ public class HistoryTagImpl implements HistoryTag {
   public String getExpression() {
     return expression;
   }
+
+  @Override
+  public boolean isAliveTag() {
+    return false;
+  }
+
+  @Override
+  public boolean isControlTag() {
+    return false;
+  }
 }

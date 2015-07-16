@@ -597,4 +597,14 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   public boolean isValid() {
     return this.ruleQuality.isValid();
   }
+
+  @Override
+  public boolean isAliveTag() {
+    return false;
+  }
+
+  @Override
+  public boolean isControlTag() {
+    return false;
+  }
 }
