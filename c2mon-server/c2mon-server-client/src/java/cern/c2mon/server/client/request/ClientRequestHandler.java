@@ -26,10 +26,10 @@ import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.AliveTimerFacade;
 import cern.c2mon.server.cache.DeviceClassFacade;
 import cern.c2mon.server.cache.DeviceFacade;
 import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.ProcessFacade;
 import cern.c2mon.server.cache.ProcessXMLProvider;
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.TagLocationService;
@@ -104,9 +104,6 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    */
   private final ProcessCache processCache;
 
-  /** Reference to the Process facade */
-  private final ProcessFacade processFacade;
-
   /** Reference to the Device facade */
   private final DeviceFacade deviceFacade;
 
@@ -122,6 +119,9 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
   /** Ref to the the bean providing DAQ XML */
   private final ProcessXMLProvider processXMLProvider;
 
+  /** Used to determine whether a Control Tag is an Alive tag */
+  private final AliveTimerFacade aliveTimerFacade;
+
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();
 
@@ -133,6 +133,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
   /**
    * Default Constructor
    *
+   * @param pAliveTimerFacade Used to determine whether a given tag is an Alive tag
    * @param pTagLocationService Reference to the tag location service singleton
    * @param pTagFacadeGateway Reference to the tag facade gateway singleton
    * @param pSupervisionFacade Reference to the supervision facade singleton
@@ -141,11 +142,11 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * @param pConfigurationLoader Reference to the ConfigurationLoader
    * @param pCommandExecutionManager Reference to the CommandExecutionManager
    * @param pProcessCache Reference to the ProcessCache
-   * @param pProcessFacade Reference to the ProcessFacade
    * @param pDeviceFacade Reference to the DeviceFacade
    */
   @Autowired
-  public ClientRequestHandler(final TagLocationService pTagLocationService,
+  public ClientRequestHandler(final AliveTimerFacade pAliveTimerFacade,
+                              final TagLocationService pTagLocationService,
                               final TagFacadeGateway pTagFacadeGateway,
                               final SupervisionFacade pSupervisionFacade,
                               final ProcessXMLProvider pProcessXMLProvider,
@@ -153,9 +154,9 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
                               final ConfigurationLoader pConfigurationLoader,
                               final CommandExecutionManager pCommandExecutionManager,
                               final ProcessCache pProcessCache,
-                              final ProcessFacade pProcessFacade,
                               final DeviceFacade pDeviceFacade,
                               final DeviceClassFacade pDeviceClassFacade) {
+    aliveTimerFacade = pAliveTimerFacade;
     tagLocationService = pTagLocationService;
     tagFacadeGateway = pTagFacadeGateway;
     supervisionFacade = pSupervisionFacade;
@@ -164,7 +165,6 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     configurationLoader = pConfigurationLoader;
     commandExecutionManager = pCommandExecutionManager;
     processCache = pProcessCache;
-    processFacade = pProcessFacade;
     deviceFacade = pDeviceFacade;
     deviceClassFacade = pDeviceClassFacade;
   }
@@ -611,7 +611,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
         switch (tagRequest.getResultType()) {
         case TRANSFER_TAG_LIST:
-          transferTags.add(TransferObjectFactory.createTransferTag(tagWithAlarms));
+          transferTags.add(TransferObjectFactory.createTransferTag(tagWithAlarms, aliveTimerFacade.isRegisteredAliveTimer(tagId)));
           break;
         case TRANSFER_TAG_VALUE_LIST:
           transferTags.add(TransferObjectFactory.createTransferTagValue(tagWithAlarms));

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.alarm.AlarmAggregator;
 import cern.c2mon.server.alarm.AlarmAggregatorListener;
+import cern.c2mon.server.cache.AliveTimerFacade;
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.client.util.TransferObjectFactory;
@@ -78,10 +79,14 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
 
   /** Reference to the tag location service */
   private TagLocationService tagLocationService;
+
+  /** Used to determine, whether a given tag is an AliveTag */
+  private AliveTimerFacade aliveTimerFacade;
   
   /**
    * Default Constructor
    * @param jmsSender Used for sending JMS messages and waiting for a response
+   * @param aliveTimerFacade Used to determine, whether a given tag is an AliveTag
    * @param alarmAggregator Used to register this <code>AlarmAggregatorListener</code>
    * @param configurationUpdate Used to register this <code>ConfigurationUpdateListener</code>
    * @param pTagFacadeGateway Reference to the tag facade gateway singleton
@@ -90,9 +95,11 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
   @Autowired
   public TagValuePublisher(@Qualifier("clientTopicPublisher") final JmsSender jmsSender, 
                            final AlarmAggregator alarmAggregator, 
+                           final AliveTimerFacade aliveTimerFacade,
                            final ConfigurationUpdate configurationUpdate,
                            final TagFacadeGateway pTagFacadeGateway,
                            final TagLocationService tagLocationService) {
+    this.aliveTimerFacade = aliveTimerFacade;
     this.jmsSender = jmsSender;
     this.alarmAggregator = alarmAggregator;   
     this.configurationUpdate = configurationUpdate;
@@ -165,7 +172,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
     try {
       TagWithAlarms tagWithAlarms = this.tagFacadeGateway.getTagWithAlarms(tagId);
       try {
-        TransferTagImpl tag = TransferObjectFactory.createTransferTag(tagWithAlarms);
+        TransferTagImpl tag = TransferObjectFactory.createTransferTag(tagWithAlarms, aliveTimerFacade.isRegisteredAliveTimer(tagId));
         if (LOGGER.isTraceEnabled()) {
           LOGGER.trace("notifyOnConfigurationUpdate - Publishing configuration update to client: " + tag.toJson());
         }

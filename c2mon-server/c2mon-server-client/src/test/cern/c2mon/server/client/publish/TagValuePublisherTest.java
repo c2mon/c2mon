@@ -26,6 +26,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.alarm.AlarmAggregator;
+import cern.c2mon.server.cache.AliveTimerFacade;
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.common.alarm.Alarm;
@@ -67,6 +68,7 @@ public class TagValuePublisherTest {
    * Mocks of other modules.
    */
   private AlarmAggregator alarmAggregator;
+  private AliveTimerFacade aliveTimerFacade;
   private ConfigurationUpdate configurationUpdate;
   private TagFacadeGateway tagFacadeGateway;
   private TagLocationService tagLocationService;
@@ -92,11 +94,12 @@ public class TagValuePublisherTest {
   @Before
   public void setUp() {
     this.alarmAggregator = control.createMock(AlarmAggregator.class);
+    this.aliveTimerFacade = control.createMock(AliveTimerFacade.class);
     this.configurationUpdate =  control.createMock(ConfigurationUpdate.class);
     this.tagFacadeGateway = this.control.createMock(TagFacadeGateway.class);
     this.tagLocationService = this.control.createMock(TagLocationService.class);
     //alarmAggregator.registerForTagUpdates(tagValuePublisher);
-    this.tagValuePublisher = new TagValuePublisher(this.jmsSender, this.alarmAggregator, this.configurationUpdate, this.tagFacadeGateway, this.tagLocationService);
+    this.tagValuePublisher = new TagValuePublisher(this.jmsSender, this.alarmAggregator, this.aliveTimerFacade, this.configurationUpdate, this.tagFacadeGateway, this.tagLocationService);
     this.tagValuePublisher.setRepublicationDelay(1000);
     this.tagValuePublisher.init();
   }

@@ -42,9 +42,10 @@ public abstract class TransferObjectFactory {
     /**
      * Creates a <code>TransferTagImpl</code> object for the given parameters
      * @param tagWithAlarms A tag from the cache
+     * @param Set to <code>true</code>, if tag is an Alive tag
      * @return The resulting <code>TransferTagImpl</code>
      */
-    public static TransferTagImpl createTransferTag(final TagWithAlarms tagWithAlarms) {
+    public static TransferTagImpl createTransferTag(final TagWithAlarms tagWithAlarms, boolean aliveTag) {
         Tag tag = tagWithAlarms.getTag();
         TransferTagImpl transferTag = null;
         if (tag != null) {
@@ -70,6 +71,10 @@ public abstract class TransferObjectFactory {
             transferTag.addProcessIds(tag.getProcessIds());
             if (tag instanceof RuleTag) {
               transferTag.setRuleExpression(((RuleTag) tag).getRuleExpression());
+            }
+            else if (tag instanceof ControlTag) {
+              transferTag.setControlTagFlag(true);
+              transferTag.setAliveTagFlag(aliveTag);
             }
         }
 
