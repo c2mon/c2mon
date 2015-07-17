@@ -52,7 +52,7 @@ public class MonitMessageHandler extends EquipmentMessageHandler
     // --- PUBLIC METHODS --------------------------------------------------------------------------------
     //
     /**
-     * @return <code>SpectrumEventProcess</code> used by unit tests.
+     * @return <code>MonitEventProcessor</code> used by unit tests.
      */
     public MonitEventProcessor getProcessor()
     {
@@ -65,7 +65,7 @@ public class MonitMessageHandler extends EquipmentMessageHandler
     @Override
     public void connectToDataSource() throws EqIOException {
         
-        LOG.info("Connecting data source for SpectrumMessageHandler version [" + VERSION + "]");
+        LOG.info("Connecting data source for MonitMessageHandler version [" + VERSION + "]");
         if (ctx == null) {
             ctx = new ClassPathXmlApplicationContext("classpath:dmn-monit-config.xml");
             ctx.getEnvironment().setDefaultProfiles(profile);
@@ -105,10 +105,6 @@ public class MonitMessageHandler extends EquipmentMessageHandler
     //
     // --- METHODS FOR CONFIGURATION CHANGES --------------------------------------------------------
     //
-    /**
-     * Apart from the name, there is no parameter specific to the Spectrum equipment configuration
-     * since the Spectrum server names and the port used for communication are in the Spring context 
-     */
     @Override
     public void onUpdateEquipmentConfiguration(IEquipmentConfiguration equipmentConfiguration,
             IEquipmentConfiguration oldEquipmentConfiguration, ChangeReport changeReport) {

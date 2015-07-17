@@ -24,7 +24,7 @@ import cern.c2mon.shared.common.datatag.ISourceDataTag;
  * 
  * @author mbuttner
  */
-@ManagedResource(objectName = "cern.c2mon.daq.spectrum:name=MonitEventProcessor", description = "Spectrum alarms event processor")
+@ManagedResource(objectName = "cern.c2mon.daq.monit:name=MonitEventProcessor", description = "Monit data processor")
 public class MonitEventProcessor implements Runnable {
 
     static final Logger LOG = LoggerFactory.getLogger("MonitEventProcessor");

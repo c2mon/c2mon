@@ -6,7 +6,7 @@
 <EquipmentUnits>
 
 <EquipmentUnit id="5250" name="MONIT">
-	<handler-class-name>cern.c2mon.daq.spectrum.SpectrumMessageHandler</handler-class-name>
+	<handler-class-name>cern.c2mon.daq.monit.MonitMessageHandler</handler-class-name>
 	<commfault-tag-id>107211</commfault-tag-id>
 	<commfault-tag-value>false</commfault-tag-value>
 	<address>
@@ -39,6 +39,8 @@
 
 	</DataTags>
 	<CommandTags />
+
 </EquipmentUnit>
+
 </EquipmentUnits>
 </ProcessConfiguration>

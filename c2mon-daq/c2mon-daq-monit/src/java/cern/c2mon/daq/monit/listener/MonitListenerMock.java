@@ -47,7 +47,7 @@ public class MonitListenerMock implements MonitListenerIntf {
         
 
     //
-    // --- Implements SpectrumListenerIntf --------------------------------------------------------
+    // --- Implements MonitListenerIntf --------------------------------------------------------
     //
     @Override
     public void connect() {

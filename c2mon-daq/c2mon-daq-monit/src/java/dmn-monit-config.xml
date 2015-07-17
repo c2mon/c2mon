@@ -29,7 +29,7 @@
 		</bean>
 
  		<bean id="jmxBootstrap" class="cern.accsoft.commons.jmxdirectory.client.JmxBootstrap">
-			<constructor-arg value="cern.c2mon.daq.spectrum" />
+			<constructor-arg value="cern.c2mon.daq.monit" />
 		</bean>
 	</beans>
 

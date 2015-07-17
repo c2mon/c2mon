@@ -9,7 +9,7 @@ import cern.c2mon.daq.monit.util.JsonUtils;
 public class MonitHardwareAddress {
 
     private String hostname;
-    private String metric;
+    private String metricname;
     
     //
     // --- CONSTRUCTION ----------------------------------------------------------------------
@@ -37,7 +37,7 @@ public class MonitHardwareAddress {
     }
 
     public String getMetricName() {
-        return this.metric;
+        return this.metricname;
     }
     
     //
