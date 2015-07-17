@@ -18,6 +18,11 @@
     factory-method="createMock">
     <constructor-arg value="cern.c2mon.server.supervision.SupervisionFacade" />
   </bean>
+  
+  <bean id="aliveTimeFacade" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.server.cache.AliveTimerFacade" />
+  </bean>
 
   <bean id="processXMLProvider" class="org.easymock.EasyMock"
     factory-method="createMock">
