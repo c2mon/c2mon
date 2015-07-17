@@ -23,8 +23,9 @@ import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 
 /**
+ * TODO run locally a monit agent and send notifications to the new DAQ (data analysis)
+ * 
  * TODO adapt configuration files
- * TODO put to SVN
  * TODO create deployment project
  * TODO install application on cs-ccr-dmnt1
  * 
