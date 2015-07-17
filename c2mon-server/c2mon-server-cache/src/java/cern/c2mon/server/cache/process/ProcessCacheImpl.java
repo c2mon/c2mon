@@ -33,6 +33,7 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.ClusterCache;
+import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.common.AbstractCache;
 import cern.c2mon.server.cache.common.C2monCacheLoader;
@@ -40,7 +41,10 @@ import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.ProcessDAO;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.common.config.C2monCacheName;
+import cern.c2mon.server.common.control.ControlTag;
+import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.process.Process;
+import cern.c2mon.shared.common.ConfigurationException;
 
 /**
  * Implementation of the Process cache.
@@ -59,16 +63,22 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process> implements Pr
   /**
    * Reference to the {@link ProcessDAO} bean.
    */
-  private ProcessDAO processDAO;
+  private final ProcessDAO processDAO;
+
+  /** Used to post configure the associated control tags */
+  private final ControlTagCache controlCache;
 
   @Autowired
   public ProcessCacheImpl(final ClusterCache clusterCache,
                           @Qualifier("processEhcache") final Ehcache ehcache,
                           @Qualifier("processEhcacheLoader") final CacheLoader cacheLoader,
                           @Qualifier("processCacheLoader") final C2monCacheLoader c2monCacheLoader,
-                          @Qualifier("processDAO") final SimpleCacheLoaderDAO<Process> cacheLoaderDAO) {
+                          @Qualifier("processDAO") final SimpleCacheLoaderDAO<Process> cacheLoaderDAO,
+                          final ControlTagCache controlCache) {
+
     super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
     this.processDAO = (ProcessDAO) cacheLoaderDAO;
+    this.controlCache = controlCache;
   }
 
   /**
@@ -91,9 +101,29 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process> implements Pr
     return getCopy(key);
   }
 
+  /**
+   * Ensures that the Alive-, Status- and CommFault Tags have appropriately the Process id set.
+   * @param process The equipment to which the control tags are assigned
+   */
   @Override
-  protected void doPostDbLoading(final Process cacheObject) {
-    //do nothing
+  protected void doPostDbLoading(final Process process) {
+    Long processId = process.getId();
+    
+    ControlTag aliveTagCopy = controlCache.getCopy(process.getAliveTagId());
+    if (aliveTagCopy != null) {
+      setProcessId((ControlTagCacheObject) aliveTagCopy, processId);
+    } else {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+          String.format("No Alive tag (%s) found for process #%d (%s).", process.getAliveTagId(), process.getId(), process.getName()));
+    }
+    
+    ControlTag statusTagCopy = controlCache.getCopy(process.getStateTagId());
+    if (statusTagCopy != null) {
+      setProcessId((ControlTagCacheObject) statusTagCopy, processId);
+    } else {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+          String.format("No Status tag (%s) found for process #%d (%s).", process.getStateTagId(), process.getId(), process.getName()));
+    }
   }
 
   @Override
@@ -148,5 +178,13 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process> implements Pr
   @Override
   public Integer getNumInvalidTags(Long processId) {
     return processDAO.getNumInvalidTags(processId);
+  }
+  
+  
+  private void setProcessId(ControlTagCacheObject copy, Long processId) {
+    String logMsg = String.format("Adding process id #%s to control tag #%s", processId, copy.getId()); 
+    LOGGER.trace(logMsg);
+    copy.setProcessId(processId);
+    controlCache.putQuiet(copy);
   }
 }

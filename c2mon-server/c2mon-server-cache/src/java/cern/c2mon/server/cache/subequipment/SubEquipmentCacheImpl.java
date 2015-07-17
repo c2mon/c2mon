@@ -30,12 +30,17 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.ClusterCache;
+import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
+import cern.c2mon.server.cache.SubEquipmentFacade;
 import cern.c2mon.server.cache.common.AbstractCache;
 import cern.c2mon.server.cache.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.common.config.C2monCacheName;
+import cern.c2mon.server.common.control.ControlTag;
+import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipment;
+import cern.c2mon.shared.common.ConfigurationException;
 
 /**
  * Implementation of the SubEquipment cache.
@@ -52,13 +57,23 @@ public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> imp
    */
   private static final Logger LOGGER = Logger.getLogger(SubEquipmentCacheImpl.class);
   
+  /** Used to post configure the associated control tags */
+  private final ControlTagCache controlCache;
+
+  private final SubEquipmentFacade subEquipmentFacade;
+  
   @Autowired
   public SubEquipmentCacheImpl(final ClusterCache clusterCache, 
                           @Qualifier("subEquipmentEhcache") final Ehcache ehcache,
                           @Qualifier("subEquipmentEhcacheLoader") final CacheLoader cacheLoader, 
                           @Qualifier("subEquipmentCacheLoader") final C2monCacheLoader c2monCacheLoader,
-                          @Qualifier("subEquipmentDAO") final SimpleCacheLoaderDAO<SubEquipment> cacheLoaderDAO) {
+                          @Qualifier("subEquipmentDAO") final SimpleCacheLoaderDAO<SubEquipment> cacheLoaderDAO,
+                          final SubEquipmentFacade subEquipmentFacade,
+                          final ControlTagCache controlCache) {
+
     super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);    
+    this.subEquipmentFacade = subEquipmentFacade;
+    this.controlCache = controlCache;
   }
 
   /**
@@ -71,9 +86,39 @@ public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> imp
     LOGGER.info("... SubEquipment cache initialization complete.");
   }
 
+  /**
+   * Ensures that the Alive-, Status- and CommFault Tags have appropriately the sub-equipment id set.
+   * @param subEquipment the cache object
+   */
   @Override
-  protected void doPostDbLoading(SubEquipment cacheObject) {
-    //do nothing
+  protected void doPostDbLoading(SubEquipment subEquipment) {
+    final Long processId = subEquipmentFacade.getProcessIdForAbstractEquipment(subEquipment.getId());
+    
+    ControlTag aliveTagCopy = controlCache.getCopy(subEquipment.getAliveTagId());
+    if (aliveTagCopy != null) {
+      setSubEquipmentId((ControlTagCacheObject) aliveTagCopy, subEquipment.getId(), processId);
+    } else {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+          String.format("No Alive tag (%s) found for sub-equipment #%d (%s).", subEquipment.getAliveTagId(), subEquipment.getId(), subEquipment.getName()));
+    }
+    
+    
+    ControlTag commFaultTagCopy = controlCache.getCopy(subEquipment.getCommFaultTagId());
+    if (commFaultTagCopy != null) {
+      setSubEquipmentId((ControlTagCacheObject) commFaultTagCopy, subEquipment.getId(), processId);
+    } else {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+          String.format("No CommFault tag (%s) found for sub-equipment #%d (%s).", subEquipment.getCommFaultTagId(), subEquipment.getId(), subEquipment.getName()));
+    }
+    
+    
+    ControlTag statusTagCopy = controlCache.getCopy(subEquipment.getStateTagId());
+    if (statusTagCopy != null) {
+      setSubEquipmentId((ControlTagCacheObject) statusTagCopy, subEquipment.getId(), processId);
+    } else {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+          String.format("No Status tag (%s) found for sub-equipment #%d (%s).", subEquipment.getStateTagId(), subEquipment.getId(), subEquipment.getName()));
+    }
   }
 
   @Override
@@ -84,6 +129,14 @@ public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> imp
   @Override
   protected String getCacheInitializedKey() {
     return cacheInitializedKey;
+  }
+  
+  private void setSubEquipmentId(ControlTagCacheObject copy, Long subEquipmentId, Long processId) {
+    String logMsg = String.format("Adding sub-equipment id #%s to control tag #%s", subEquipmentId, copy.getId()); 
+    LOGGER.trace(logMsg);
+    copy.setSubEquipmentId(subEquipmentId);
+    copy.setProcessId(processId);
+    controlCache.putQuiet(copy);
   }
 
 }

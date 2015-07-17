@@ -30,23 +30,28 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.ClusterCache;
+import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.common.AbstractCache;
 import cern.c2mon.server.cache.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.common.config.C2monCacheName;
+import cern.c2mon.server.common.control.ControlTag;
+import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.shared.common.ConfigurationException;
 
 /**
- * Implementation of the Equipment cache. 
+ * Implementation of the Equipment cache.
  * 
- * <p>Contains initialization logic.
+ * <p>
+ * Contains initialization logic.
  * 
  * @author Mark Brightwell
  *
  */
 @Service("equipmentCache")
-@ManagedResource(objectName="cern.c2mon:type=cache,name=equipmentCache")
+@ManagedResource(objectName = "cern.c2mon:type=cache,name=equipmentCache")
 public class EquipmentCacheImpl extends AbstractCache<Long, Equipment> implements EquipmentCache {
 
   /**
@@ -54,13 +59,19 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment> implement
    */
   private static final Logger LOGGER = Logger.getLogger(EquipmentCacheImpl.class);
 
+  /** Used to post configure the associated control tags */
+  private final ControlTagCache controlCache;
+
   @Autowired
   public EquipmentCacheImpl(final ClusterCache clusterCache, 
-                          @Qualifier("equipmentEhcache") final Ehcache ehcache,
-                          @Qualifier("equipmentEhcacheLoader") final CacheLoader cacheLoader, 
-                          @Qualifier("equipmentCacheLoader") final C2monCacheLoader c2monCacheLoader,
-                          @Qualifier("equipmentDAO") final SimpleCacheLoaderDAO<Equipment> cacheLoaderDAO) {
-    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);    
+                            @Qualifier("equipmentEhcache") final Ehcache ehcache,
+                            @Qualifier("equipmentEhcacheLoader") final CacheLoader cacheLoader, 
+                            @Qualifier("equipmentCacheLoader") final C2monCacheLoader c2monCacheLoader,
+                            @Qualifier("equipmentDAO") final SimpleCacheLoaderDAO<Equipment> cacheLoaderDAO, 
+                            final ControlTagCache controlCache) {
+
+    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
+    this.controlCache = controlCache;
   }
 
   /**
@@ -69,41 +80,80 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment> implement
   @PostConstruct
   public void init() {
     LOGGER.info("Initializing Equipment cache...");
-    
+
     commonInit();
-      
+
     try {
       getCache().setNodeBulkLoadEnabled(false);
-    } catch (UnsupportedOperationException ex) {
-      LOGGER.warn("setNodeBulkLoadEnabled() method threw an exception when "
-          + "loading the cache (UnsupportedOperationException) - this is "
-          + "normal behaviour in a single-server mode and can be ignored");
-    }        
-   
-    try {
-      getCache().setNodeCoherent(true);
-    } catch (UnsupportedOperationException ex) {
-      LOGGER.warn("setNodeCoherent() method threw an exception when "
-          + "loading the cache (UnsupportedOperationException) - this is "
-          + "normal behaviour in a single-server mode and can be ignored");      
     }
-        
+    catch (UnsupportedOperationException ex) {
+      LOGGER.warn("setNodeBulkLoadEnabled() method threw an exception when " + "loading the cache (UnsupportedOperationException) - this is "
+          + "normal behaviour in a single-server mode and can be ignored");
+    }
+
+    try {
+      getCache().setNodeBulkLoadEnabled(true);
+    }
+    catch (UnsupportedOperationException ex) {
+      LOGGER.warn("setNodeBulkLoadEnabled() method threw an exception when " + "loading the cache (UnsupportedOperationException) - this is "
+          + "normal behaviour in a single-server mode and can be ignored");
+    }
+
     LOGGER.info("Equipment cache initialization complete.");
   }
 
+  /**
+   * Ensures that the Alive-, Status- and CommFault Tags have appropriately the equipment id set.
+   */
   @Override
-  protected void doPostDbLoading(Equipment cacheObject) {
-    //do nothing
+  protected void doPostDbLoading(Equipment equipment) {
+    Long processId = equipment.getProcessId();
+    Long equipmentId = equipment.getId();
+
+    ControlTag aliveTagCopy = controlCache.getCopy(equipment.getAliveTagId());
+    if (aliveTagCopy != null) {
+      setEquipmentId((ControlTagCacheObject) aliveTagCopy, equipmentId, processId);
+    }
+    else {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, String.format("No Alive tag (%s) found for equipment #%d (%s).",
+          equipment.getAliveTagId(), equipment.getId(), equipment.getName()));
+    }
+
+    ControlTag commFaultTagCopy = controlCache.getCopy(equipment.getCommFaultTagId());
+    if (commFaultTagCopy != null) {
+      setEquipmentId((ControlTagCacheObject) commFaultTagCopy, equipmentId, processId);
+    }
+    else {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, String.format("No CommFault tag (%s) found for equipment #%d (%s).",
+          equipment.getCommFaultTagId(), equipment.getId(), equipment.getName()));
+    }
+
+    ControlTag statusTagCopy = controlCache.getCopy(equipment.getStateTagId());
+    if (statusTagCopy != null) {
+      setEquipmentId((ControlTagCacheObject) statusTagCopy, equipmentId, processId);
+    }
+    else {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, String.format("No Status tag (%s) found for equipment #%d (%s).",
+          equipment.getStateTagId(), equipment.getId(), equipment.getName()));
+    }
   }
 
   @Override
   protected C2monCacheName getCacheName() {
     return C2monCacheName.EQUIPMENT;
   }
-  
+
   @Override
   protected String getCacheInitializedKey() {
     return cacheInitializedKey;
+  }
+
+  private void setEquipmentId(ControlTagCacheObject copy, Long equipmentId, Long processId) {
+    String logMsg = String.format("Adding equipment id #%s to control tag #%s", equipmentId, copy.getId());
+    LOGGER.trace(logMsg);
+    copy.setEquipmentId(equipmentId);
+    copy.setProcessId(processId);
+    controlCache.putQuiet(copy);
   }
 
 }
