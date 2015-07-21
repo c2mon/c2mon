@@ -66,19 +66,12 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 		</dependency>
-
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.5</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.5</version>
-			<scope>test</scope>
-		</dependency>
+  		
+<dependency>
+    <groupId>org.eclipse.jetty</groupId>
+    <artifactId>jetty-servlet</artifactId>
+    <version>9.2.2.v20140723</version>
+</dependency>  		
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -90,19 +83,16 @@
   			<groupId>cern.accsoft.commons</groupId>
   			<artifactId>accsoft-commons-jmxdirectory-registration-client</artifactId>
   			<version>1.1.8</version>
-  		</dependency>
+		</dependency>
+
   		
 		<dependency>
     		<groupId>org.apache.httpcomponents</groupId>
     		<artifactId>httpclient</artifactId>
     		<version>4.3.5</version>
 		</dependency>
-  		
-		<dependency>
-	  		<groupId>org.eclipse.jetty.aggregate</groupId>
-  			<artifactId>jetty</artifactId>
-  			<version>9.2.11</version>
-  		</dependency>
+		
+
 	</dependencies>
 
   

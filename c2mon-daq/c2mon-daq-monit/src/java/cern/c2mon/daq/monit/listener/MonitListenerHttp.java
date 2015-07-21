@@ -1,18 +1,19 @@
 
 package cern.c2mon.daq.monit.listener;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.CharBuffer;
+import java.util.Enumeration;
 import java.util.Queue;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 
-import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -26,6 +27,7 @@ import cern.c2mon.daq.monit.MonitUpdateEvent;
  * 
  * @author mbuttner
  */
+@SuppressWarnings("serial")
 public class MonitListenerHttp extends HttpServlet implements MonitListenerIntf {
 
     private static final Logger LOG = LoggerFactory.getLogger(MonitListenerHttp.class);
@@ -56,7 +58,8 @@ public class MonitListenerHttp extends HttpServlet implements MonitListenerIntf 
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().println("<h1>Hello World</h1>");
         response.getWriter().println("session=" + request.getSession(true).getId());
-        LOG.info("GET target: {}", request.getQueryString());
+        LOG.info("GET target: {}", request.getPathInfo());
+        printParams(request);
     }
 
     @Override
@@ -66,7 +69,32 @@ public class MonitListenerHttp extends HttpServlet implements MonitListenerIntf 
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().println("<h1>Hello World</h1>");
         response.getWriter().println("session=" + request.getSession(true).getId());
-        LOG.info("POST target: {}", request.getQueryString());
+        
+        InputStreamReader reader = new InputStreamReader(request.getInputStream());
+        char[] cbuf = new char[1024];
+        StringBuffer buf = new StringBuffer();
+        while (reader.read(cbuf) != -1) {
+            String s = new String(cbuf);
+            buf.append(s);
+        }
+        LOG.info(">" + buf.toString());            
+        LOG.info("=>" + request.getAttribute("msg"));            
+        printParams(request);
+    }
+    
+    private void printParams(HttpServletRequest request) {
+        Enumeration<String> anames = request.getAttributeNames();
+        while (anames.hasMoreElements())
+        {
+            String aname = anames.nextElement();
+            LOG.info("attribute {} = {}", aname, request.getAttribute(aname));
+        }
+        Enumeration<String> pnames = request.getParameterNames();
+        while (pnames.hasMoreElements())
+        {
+            String pname = pnames.nextElement();
+            LOG.info("Param {} = {}", pname, request.getParameter(pname));
+        }
     }
 
     //
@@ -76,13 +104,14 @@ public class MonitListenerHttp extends HttpServlet implements MonitListenerIntf 
     public void connect() {
         webServer = new Server(port);
         try {
-            webServer.start();
-            
             ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
             context.setContextPath("/");
             webServer.setHandler(context);
      
             context.addServlet(new ServletHolder(this),"/*");
+
+            webServer.start();
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

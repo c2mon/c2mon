@@ -34,6 +34,7 @@ public class JsonUtils {
     }
 
     public static <T> T fromJson(final String json, Class<T> clazz) {
+        LOG.debug(json);
         try {
             return getObjectMapper().readValue(new ByteArrayInputStream(json.getBytes()), clazz);
         } catch (Exception ex) {

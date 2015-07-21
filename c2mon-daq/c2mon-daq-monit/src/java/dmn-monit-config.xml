@@ -14,10 +14,10 @@
 
 
 	<bean id="eventProc" class="cern.c2mon.daq.monit.MonitEventProcessor" >
-		<property name="primaryServer" value="cs-srv-44.cern.ch" />
+<!-- 		<property name="primaryServer" value="cs-srv-44.cern.ch" />
 		<property name="secondaryServer" value="cs-srv-45.cern.ch" />
 		<property name="port" value="12001" />
-		<property name="tolerance" value="30" />
+		<property name="tolerance" value="30" />  -->
 	</bean>
 
 
@@ -28,7 +28,7 @@
 			<property name="port" value="13001" />
 		</bean>
 
- 		<bean id="jmxBootstrap" class="cern.accsoft.commons.jmxdirectory.client.JmxBootstrap">
+  		<bean id="jmxBootstrap" class="cern.accsoft.commons.jmxdirectory.client.JmxBootstrap">
 			<constructor-arg value="cern.c2mon.daq.monit" />
 		</bean>
 	</beans>

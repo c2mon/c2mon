@@ -22,6 +22,7 @@ import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 
+
 /**
  * TODO run locally a monit agent and send notifications to the new DAQ (data analysis)
  * 
@@ -51,6 +52,10 @@ public class MonitMessageHandler extends EquipmentMessageHandler
     //
     // --- PUBLIC METHODS --------------------------------------------------------------------------------
     //
+    public MonitMessageHandler() {
+        LOG.info("Constructor of cern.c2mon.daq.monit.MonitMessageHandler called");
+    }
+    
     /**
      * @return <code>MonitEventProcessor</code> used by unit tests.
      */
@@ -181,7 +186,7 @@ public class MonitMessageHandler extends EquipmentMessageHandler
         try {
             SimpleHardwareAddress saddr = (SimpleHardwareAddress) tag.getHardwareAddress();
             MonitHardwareAddress addr = MonitHardwareAddress.fromJson(saddr.getAddress().trim());
-            proc.add(addr.getHostname(), addr.getMetricName(), tag); 
+            proc.add(addr.getHostname(), addr.getMetricname(), tag); 
         } catch (Exception ex) {
             String err = format("Unable to register tag: %d. Problem description: %s", tag.getId(), ex.getMessage());
             getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS, err);

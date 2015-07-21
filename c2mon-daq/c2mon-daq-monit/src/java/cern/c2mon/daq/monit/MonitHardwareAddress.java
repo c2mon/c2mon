@@ -36,7 +36,7 @@ public class MonitHardwareAddress {
         return hostname;
     }
 
-    public String getMetricName() {
+    public String getMetricname() {
         return this.metricname;
     }
     
