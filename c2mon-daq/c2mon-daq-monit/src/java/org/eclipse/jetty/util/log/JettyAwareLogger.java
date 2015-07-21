@@ -19,11 +19,16 @@
 package org.eclipse.jetty.util.log;
 
 import org.slf4j.Marker;
-import org.slf4j.helpers.MessageFormatter;
 
 /**
  * JettyAwareLogger is used to fix a FQCN bug that arises from how Jetty
  * Log uses an indirect slf4j implementation.
+ *
+ * ---
+ * PATCHED to overcome some problems with the slf4j implementations used by
+ * C2mon and accsoft commons projects.
+ * @author mbuttner
+ * ---
  *
  * https://bugs.eclipse.org/bugs/show_bug.cgi?id=276670
  */
