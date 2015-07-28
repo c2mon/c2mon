@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>c2mon-daq-spectrum</artifactId>
-	<version>1.0.9-SNAPSHOT</version>
+	<version>1.0.9</version>
 
 	<packaging>jar</packaging>
 	<description>C2MON DAQ component for acquisition of the Spectrum alarms</description>
