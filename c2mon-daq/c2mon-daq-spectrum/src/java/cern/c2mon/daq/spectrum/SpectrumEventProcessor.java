@@ -283,7 +283,17 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
             alarm.clear();
         }
     }
+
+    @ManagedOperation
+    public void setEquipDown() {
+        equipmentMessageSender.confirmEquipmentStateOK("Equipment manually disconnected by JMX backdoor");
+    }
     
+    @ManagedOperation
+    public void setEquipUp() {
+        equipmentMessageSender.confirmEquipmentStateOK();        
+    }
+
     @ManagedAttribute
     public List<String> getActiveTriplets() {
         ArrayList<String> result = new ArrayList<String>();
