@@ -1,0 +1,83 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.c2mon.c2mon-client</groupId>
+    <artifactId>c2mon-client-pom</artifactId>
+    <version>1.1.2</version>
+  </parent>
+  <groupId>cern.c2mon.c2mon-publisher</groupId>
+  <artifactId>c2mon-publisher-rda-alarms</artifactId>
+  <name>The C2MON RDA Publisher for alarms</name>
+  <version>0.0.1-SNAPSHOT</version>
+  <description>This project is used to publish data from C2MON to RDA</description>
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-publisher/c2mon-publisher-rda-alarms</developerConnection>
+  </scm>
+  <dependencies>
+
+    <!-- C2MON Client API dependencies -->
+    <dependency>
+      <groupId>cern.c2mon.c2mon-client</groupId>
+      <artifactId>c2mon-client-all</artifactId>
+    </dependency>
+
+    <!-- CERN 3rd party dependencies -->
+	<dependency>
+		<groupId>cern.cmw</groupId>
+		<artifactId>cmw-rda3</artifactId>
+		<version>[1.2.1, 2.0.0)</version>
+	</dependency>
+	<dependency>
+		<groupId>cern.cmw</groupId>
+		<artifactId>cmw-rda3-cern</artifactId>
+		<version>[1.2.1, 2.0.0)</version>
+	</dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+	<dependency>
+  		<groupId>cern.accsoft.commons</groupId>
+  		<artifactId>accsoft-commons-jmxdirectory-registration-client</artifactId>
+  		<version>1.1.8</version>
+  	</dependency>
+	<dependency>
+		<groupId>cern.diamon</groupId>
+		<artifactId>alarm-dataprovider-client-jms</artifactId>
+		<version>[1.0.0,2.0.0]</version>
+	</dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+		<groupId>org.slf4j</groupId>
+		<artifactId>slf4j-log4j12</artifactId>
+     	 <version>1.7.5</version>
+		<scope>test</scope>
+	</dependency>
+		<dependency>
+			<groupId>cern.japc</groupId>
+			<artifactId>japc</artifactId>
+			<version>[2.23.16,3.0.0)</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>cern.japc</groupId>
+			<artifactId>japc-ext-cmwrda</artifactId>
+			<version>[2.16.1,3.0.0)</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>cern.japc</groupId>
+			<artifactId>japc-ext-cmwrda3</artifactId>
+			<version>[1.0.2,2.0.0)</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+</project>
