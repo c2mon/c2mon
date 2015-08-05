@@ -21,6 +21,7 @@ import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.shared.common.datatag.DataTagValueDictionary;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.address.LASERHardwareAddress;
 import cern.c2mon.shared.common.process.IEquipmentConfiguration;
@@ -42,6 +43,8 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
     private AlarmListener listener;
 
     private Map<String, ISourceDataTag> alarmToTag = new HashMap<>();
+    
+    private DataTagValueDictionary valueDictionary = new DataTagValueDictionary();
 
     /**
      */
@@ -299,7 +302,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
     public void onAlarm(ClientAlarmEvent alarm, boolean isBackup) {
 
         ISourceDataTag dataTag = findDataTag(alarm.getAlarmId());
-
+        
         String suffix = isBackup? " by backup" : "";
         
         if (dataTag != null) {
@@ -316,16 +319,16 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                     // udpate mbeans in another service asynchronous
                     mbean.setDataTag(dataTag.getId());
 
-                    // TODO
-                    String prefix = alarm.getProperty("ASI_PREFIX");
-                    if (prefix != null) {
-                        if (prefix.equals("[?]")) {
-                            //
-                        }
-                        if (prefix.equals("[T]")) {
-                            //
-                        }
-                    }
+//                    // TODO
+//                    String prefix = alarm.getProperty("ASI_PREFIX");
+//                    if (prefix != null) {
+//                        if (prefix.equals("[?]")) {
+//                            //
+//                        }
+//                        if (prefix.equals("[T]")) {
+//                            //
+//                        }
+//                    }
 
                     // extract the user properties as value description
                     String valDescr = "";
@@ -333,9 +336,12 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                         valDescr += key + "=" + alarm.getProperty(key) + "\n";
                     }
 
-                    getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis(),
+
+                    valueDictionary.addDescription(dataTag, valDescr);
+                    
+                    getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.TRUE, alarm.getUserTs(),
                             valDescr);
-                    mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
+                    mbean.setValue(Boolean.TRUE);
 
                     log.debug(dataTag.getId() + " - " + alarm.getAlarmId() + " - TERM -> ACTIVE {}.", suffix);
 
@@ -348,8 +354,8 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
                 } else {
                     mbean.setDataTag(dataTag.getId());
-                    getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.FALSE, System.currentTimeMillis());
-                    mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
+                    getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.FALSE, alarm.getUserTs());
+                    mbean.setValue(Boolean.FALSE);
 
                     log.debug(dataTag.getId() + " - " + alarm.getAlarmId() + " - ACTIVE -> TERM {}.", suffix);
                 }
@@ -360,26 +366,28 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                 // update mbeans in another service asynchronous
                 mbean.setDataTag(dataTag.getId());
 
-                // TODO
-                String prefix = alarm.getProperty("ASI_PREFIX");
-                if (prefix != null) {
-                    if (prefix.equals("[?]")) {
-                        //
-                    }
-                    if (prefix.equals("[T]")) {
-                        //
-                    }
-                }
+//                // TODO
+//                String prefix = alarm.getProperty("ASI_PREFIX");
+//                if (prefix != null) {
+//                    if (prefix.equals("[?]")) {
+//                        //
+//                    }
+//                    if (prefix.equals("[T]")) {
+//                        //
+//                    }
+//                }
 
                 // extract the user properties as value description
                 String valDescr = "";
                 for (String key : alarm.getUserPropNames()) {
                     valDescr += key + "=" + alarm.getProperty(key) + "\n";
                 }
+                
+                valueDictionary.addDescription(dataTag, valDescr);
 
                 getEquipmentMessageSender()
-                        .sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis(), valDescr);
-                mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
+                        .sendTagFiltered(dataTag, Boolean.TRUE, alarm.getUserTs(), valDescr);
+                mbean.setValue(Boolean.TRUE);
             }
         }
     }
@@ -415,8 +423,8 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                 if (!found) {
                     // Terminate alarm
                     mbean.setDataTag(dataTag.getId());
-                    getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.FALSE, System.currentTimeMillis());
-                    mbean.setValue((boolean) dataTag.getCurrentValue().getValue());
+                    getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.FALSE, messageData.getSourceTs());
+                    mbean.setValue(Boolean.FALSE);
 
                     String alarmID = dataTag.getName();
                     try {
