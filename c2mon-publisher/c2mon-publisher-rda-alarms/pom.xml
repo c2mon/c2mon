@@ -8,7 +8,7 @@
   <groupId>cern.c2mon.c2mon-publisher</groupId>
   <artifactId>c2mon-publisher-rda-alarms</artifactId>
   <name>The C2MON RDA Publisher for alarms</name>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
   <description>This project is used to publish data from C2MON to RDA</description>
   <scm>
     <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-publisher/c2mon-publisher-rda-alarms</developerConnection>
