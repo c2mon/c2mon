@@ -27,6 +27,8 @@ import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.cmw.data.Data;
+import cern.cmw.data.Entry;
 import cern.cmw.rda3.common.data.AcquiredData;
 import cern.cmw.rda3.common.exception.ServerException;
 import cern.cmw.rda3.common.request.Request;
@@ -177,6 +179,15 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
                 request.requestFailed(new ServerException("Property '" + request.getPropertyName() + "' not found"));
             } else {
                 LOG.debug("Request completed for property {}", request.getPropertyName());
+                
+                
+                Data filters = request.getContext().getFilters();
+                
+                // TODO apply property filter here!
+                for (Entry e : filters.getEntries()) {
+                    LOG.info(e.getString());
+                }
+                
                 request.requestCompleted(new AcquiredData(property.get()));
             }
         }
@@ -210,7 +221,10 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
             RdaAlarmProperty property = findProperty(request.getPropertyName());
             LOG.debug("subscribe: {}", request.getId());
             SubscriptionCreator creator = request.accept();
+            
+            // TODO apply property filter here!
             creator.firstUpdate(new AcquiredData(property.get()));
+            
             creator.startPublishing();
         }
 

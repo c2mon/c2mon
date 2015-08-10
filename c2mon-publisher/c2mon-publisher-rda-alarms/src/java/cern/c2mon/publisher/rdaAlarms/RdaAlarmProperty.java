@@ -98,6 +98,8 @@ public class RdaAlarmProperty {
 
         // check, because there might not be any RDA3 clients subscribed yet
         if (subscriptionSource != null) {
+            // TODO apply property filter here!
+            // subscriptionSource.getContext().getFilters()
             subscriptionSource.notify(new AcquiredData(newValue));
         }
         currentValue = newValue;

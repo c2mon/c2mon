@@ -9,6 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
+/**
+ * TODO unit testing
+ * 
+ * @author mbuttner
+ */
 public class RdaAlarmsMain extends Thread {
 
     private static Logger log; 
