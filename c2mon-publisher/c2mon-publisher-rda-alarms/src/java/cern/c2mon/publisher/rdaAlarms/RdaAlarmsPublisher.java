@@ -10,11 +10,14 @@
  ******************************************************************************/
 package cern.c2mon.publisher.rdaAlarms;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.jms.JMSException;
+import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +28,6 @@ import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.cmw.rda3.common.data.AcquiredData;
-import cern.cmw.rda3.common.exception.RdaException;
 import cern.cmw.rda3.common.exception.ServerException;
 import cern.cmw.rda3.common.request.Request;
 import cern.cmw.rda3.server.core.GetRequest;
@@ -37,9 +39,6 @@ import cern.cmw.rda3.server.subscription.SubscriptionCallback;
 import cern.cmw.rda3.server.subscription.SubscriptionCreator;
 import cern.cmw.rda3.server.subscription.SubscriptionRequest;
 import cern.cmw.rda3.server.subscription.SubscriptionSource;
-import cern.phoenix.core.Alarm;
-import cern.phoenix.remote.AlarmDataProvider;
-import cern.phoenix.remote.RemoteModuleFactory;
 
 /**
  */
@@ -54,20 +53,28 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
      * map.
      */
     private static final Map<String, RdaAlarmProperty> properties = new HashMap<String, RdaAlarmProperty>();
-    private ConcurrentHashMap<String, String> alarmEquip = new ConcurrentHashMap<String,String>();
-    private RemoteModuleFactory alarmProviderFactory;
-    private AlarmDataProvider provider;
+    private ConcurrentHashMap<String, String> alarmEquip = new ConcurrentHashMap<String, String>();
+    // private RemoteModuleFactory alarmProviderFactory;
+    // private AlarmDataProvider provider;
     private long rejected;
-    
+
     private Thread daemonThread;
     private Server server;
     private String serverName;
-    
+    private PreparedStatement pstmt;
+
     //
     // --- CONSTRUCTION ----------------------------------------------------------------
     //
-    public RdaAlarmsPublisher(String serverName){
+    public RdaAlarmsPublisher(String serverName, DataSource ds) {
         this.serverName = serverName;
+        String sql = "select source_id from alarm_definition where alarm_id=?";
+        try {
+            pstmt = ds.getConnection().prepareStatement(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     //
@@ -92,11 +99,11 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
             server = builder.build();
             LOG.info("Creatied RDA3 server " + serverName);
 
-            alarmProviderFactory = new RemoteModuleFactory();
-            alarmProviderFactory.init();
-            
-            provider = alarmProviderFactory.getDataProvider();
-            
+            // alarmProviderFactory = new RemoteModuleFactory();
+            // alarmProviderFactory.init();
+
+            // provider = alarmProviderFactory.getDataProvider();
+
             C2monServiceGateway.startC2monClient();
 
             C2monConnectionMonitor mon = new C2monConnectionMonitor();
@@ -119,7 +126,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
                 this.onAlarmUpdate(av);
             }
             LOG.info("Started with initial selection of " + count + " alarms (" + rejected + " rejected)");
-            
+
             server.start();
             LOG.info("Server now on");
         } catch (Exception e) {
@@ -130,6 +137,13 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
 
     public void join() throws InterruptedException {
         this.daemonThread.join();
+        if (pstmt != null) {
+            try {
+                pstmt.close();
+            } catch (Exception e) {
+                LOG.warn("Failed to close preparedStatement", e);
+            }            
+        }
     }
 
     public void shutdown() {
@@ -155,14 +169,14 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
 
         @Override
         public void get(GetRequest request) {
-            LOG.info("GET - " + request.getPropertyName());
+            LOG.trace("GET - " + request.getPropertyName());
             RdaAlarmProperty property = findProperty(request.getPropertyName());
 
             if (null == property) {
-                System.out.println("Do not know ..." + request.getPropertyName());
+                LOG.warn("Property {} unknown.", request.getPropertyName());
                 request.requestFailed(new ServerException("Property '" + request.getPropertyName() + "' not found"));
             } else {
-                System.out.println("Request completed for " + request.getPropertyName());
+                LOG.debug("Request completed for property {}", request.getPropertyName());
                 request.requestCompleted(new AcquiredData(property.get()));
             }
         }
@@ -202,7 +216,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
 
         @Override
         public void unsubscribe(Request request) {
-            System.out.println("unsubscribed: " + request.getHeader().getId());
+            LOG.info("unsubscribed: " + request.getHeader().getId());
         }
 
         @Override
@@ -221,10 +235,8 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
     }
 
     /**
-     * Updates the corresponding {@link RdaAlarmProperty} instance about the value update. In case of a new (yet) unknown
-     * tag a new {@link RdaAlarmProperty} instance is first of all created.
-     * 
-     * 
+     * Updates the corresponding {@link RdaAlarmProperty} instance about the value update. In case of a new (yet)
+     * unknown tag a new {@link RdaAlarmProperty} instance is first of all created.
      */
     @Override
     public void onAlarmUpdate(AlarmValue av) {
@@ -234,24 +246,27 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
 
         String alarmId = av.getFaultFamily() + ":" + av.getFaultMember() + ":" + av.getFaultCode();
         LOG.info(" RECEIVED    > " + alarmId + " is active:" + av.isActive());
-
         ClientDataTagValue cdt = C2monServiceGateway.getTagManager().getDataTag(av.getTagId());
         if (!cdt.getDataTagQuality().isValid()) {
             LOG.warn(" INVALIDATION > " + alarmId + " is active:" + av.isActive());
-        } 
-        
-        String source = this.getEquip(alarmId);
-        if (source == null)
-        {
-            Alarm alarm = provider.getAlarmDefinition(alarmId);
-            if (alarm != null)
-            {
-                source = alarm.getSourceName();
-                alarmEquip.put(alarmId,  source);
-            }
         }
 
-        if (source != null) {            
+        String source = alarmEquip.get(alarmId);
+        if (source == null) {
+            try {
+                // Alarm alarm = provider.getAlarmDefinition(alarmId);
+                // if (alarm != null) {
+                // source = alarm.getSourceName();
+                source = getSource(alarmId);
+                alarmEquip.put(alarmId, source);
+                // }
+
+            } catch (Exception e) {
+                LOG.warn(alarmId + " not found by data provider, ignored. (" + e.getMessage() + ")");
+                rejected++;
+            }
+        }
+        if (source != null) {
             if (!properties.containsKey(source)) {
                 LOG.info("Adding for tag " + alarmId + " new RDA publication property: " + source);
                 RdaAlarmProperty property = new RdaAlarmProperty(source);
@@ -264,9 +279,9 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
             }
         } else {
             LOG.warn("Alarm " + alarmId + " discarded, could not find a source for it");
-            rejected++;
         }
-              
+        LOG.info(" PROCESSED    > " + alarmId);
+
     }
 
     //
@@ -281,10 +296,18 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
     private static RdaAlarmProperty findProperty(final String name) {
         return properties.get(name);
     }
-    
-    private String getEquip(String alarmId) {
-        return alarmEquip.get(alarmId);
+
+
+    private String getSource(String alarmId) throws Exception {
+        LOG.info("Query source name for " + alarmId + " ...");
+        String sourceId = "?";
+        pstmt.setString(1,  alarmId);
+        try (ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                sourceId = rs.getString(1);
+            }
+        } 
+        LOG.info("Source name for " + alarmId + " -> " + sourceId);
+        return sourceId;
     }
-
 }
-

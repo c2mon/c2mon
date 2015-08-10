@@ -7,9 +7,9 @@ package cern.c2mon.publisher.rdaAlarms;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.japc.AcquiredParameterValue;
 import cern.japc.MapParameterValue;
@@ -41,7 +41,7 @@ public class DemoGetJapc {
      * The alarm as identified in the alarm system. The alarm will only be correctly received
      * if it is sent by the source used to subscribe.
      */
-    static final String laserAlarmId = "SECU_FEU_MEY:SFDEI-08643:6043";
+    static final String laserAlarmId = "SECU_FEU_LHC:SFDIN-00279:1663";
         
     /**
      * The internal id in your application.
@@ -51,7 +51,7 @@ public class DemoGetJapc {
     /**
      * The URL used to create the JAPC parameter.
      */
-    static final String paramUrl = "rda:///DMN.RDA.ALARMS/" + sourceId;
+    static final String paramUrl = "rda3:///DMN.RDA.ALARMS/" + sourceId;
         
     /**
      * @param args
@@ -69,8 +69,8 @@ public class DemoGetJapc {
         // standard logging setup stuff
         String log4jConfigFile = System.getProperty("log4j.configuration", "log4j.properties");
         PropertyConfigurator.configureAndWatch(log4jConfigFile, 60 * 1000);   
-        Log log = LogFactory.getLog(DemoGet.class);
-        log.info("Starting " + DemoGet.class.getName() + " ...");
+        Logger log = LoggerFactory.getLogger(DemoGetJapc.class);
+        log.info("Starting " + DemoGetJapc.class.getName() + " ...");
             
         // create the filter parameter: This is a list of pairs internal alarm id / alarm sys alarm id
         Map<String, SimpleParameterValue> filterParams = new HashMap<String, SimpleParameterValue>();        
@@ -86,17 +86,18 @@ public class DemoGetJapc {
             //
             // create the parameter, do the GET operation and extract the status of the alarm
             // from the result.
-            Parameter param = ParameterFactory.newInstance().newParameter(paramUrl);
+//            Parameter param = ParameterFactory.newInstance().newParameter(paramUrl);
+            Parameter param = ParameterFactory.newInstance().newParameter("DMN.RDA.ALARMS","TIMOPALARM");
             AcquiredParameterValue avalue = param.getValue(selector);
             MapParameterValue value = (MapParameterValue)avalue.getValue();
-            SimpleParameterValue spv = value.get(clientAlarmId);           
-            log.info("Initial status of alarm " + clientAlarmId + ":" + spv.getString());
+//            SimpleParameterValue spv = value.get(clientAlarmId);           
+            log.info("Initial status of alarm " + clientAlarmId + ":" + value.toString());
         }
         catch ( ParameterException e )
         {
             e.printStackTrace();
         }
-        log.info(DemoGet.class.getName()  + " completed");
+        log.info("Completed");
         System.exit(0);
     }
 

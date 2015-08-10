@@ -14,8 +14,41 @@
 
 	<bean id="publisher" class="cern.c2mon.publisher.rdaAlarms.RdaAlarmsPublisher">
 		<constructor-arg value="DMN-RDA-ALARMS" />
+		<constructor-arg ref="dataSource" />		
 	</bean>
 
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="properties">
+			<props>
+				<prop key="alarm.jdbc.user"></prop>
+				<prop key="alarm.jdbc.password"></prop>
+				<prop key="alarm.jdbc.url"></prop>
+				<prop key="alarm.jdbc.driverClass"></prop>
+			</props>
+		</property>
+		<property name="locations">
+			<value>${provider.properties}</value>
+		</property>
+
+		<property name="ignoreResourceNotFound">
+			<!-- we require the properties file -->
+			<value>false</value>
+		</property>
+	</bean>
+
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${alarm.jdbc.driverClass}" />
+		<property name="url" value="${alarm.jdbc.url}" />
+		<property name="username" value="${alarm.jdbc.user}" />
+		<property name="password" value="${alarm.jdbc.password}" />
+		<property name="maxActive" value="1" />
+		<property name="validationQuery" value="SELECT 0 FROM DUAL" />
+		<property name="testWhileIdle" value="true" />
+		<property name="timeBetweenEvictionRunsMillis" value="3600000" />
+		<property name="initialSize" value="1" />
+	</bean>
+
+	
 <!--  	<bean id="jmxBootstrap" class="cern.accsoft.commons.jmxdirectory.client.JmxBootstrap">
 		<constructor-arg value="cern.c2mon.alarms.archiver" />
 	</bean>

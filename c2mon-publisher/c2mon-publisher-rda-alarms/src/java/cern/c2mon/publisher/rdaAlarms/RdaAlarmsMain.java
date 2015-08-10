@@ -4,7 +4,9 @@
 
 package cern.c2mon.publisher.rdaAlarms;
 
+import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 public class RdaAlarmsMain extends Thread {
@@ -14,6 +16,11 @@ public class RdaAlarmsMain extends Thread {
     
     public static void main(String[] args)
     {
+        String log4jConfigFile = System.getProperty("log4j.configuration", "log4j-diamon.properties");
+        PropertyConfigurator.configureAndWatch(log4jConfigFile, 60 * 1000);
+        log = LoggerFactory.getLogger(RdaAlarmsMain.class);
+        log.info("Logging system ready ({})...", log4jConfigFile);
+
         Runtime.getRuntime().addShutdownHook(new RdaAlarmsMain());
         FileSystemXmlApplicationContext context = null;
         try
