@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+	<product name="c2mon-alarm-archiver">
+
+		<!-- this application section is a parent configuration for both PROD and TEST -->
+		<application>
+			<startscript>
+				<main-class name="cern.c2mon.alarms.archiver.Main">
+					<arg></arg>
+				</main-class>
+				<property name="log4j.configuration" value="file:log4j.xml" />
+				<java-vm-args>-Xms384m -Xmx384m -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
+			</startscript>
+		</application>
+
+		<application name="dmn2-alarm-archiver-pro">
+			<deployment installLocation="/opt/dmn2/dmn2-alarms/dmn2-alarm-archiver">
+				<directory name="conf">
+				</directory>
+				<notification>
+					<mail address="diamon-developers@cern.ch" />
+				</notification>
+			</deployment>
+			<startscript name="DMN2-ALARM-ARCHIVER">
+			</startscript>
+		</application>
+
+		<application name="dmn2-alarm-archiver-dev">
+			<deployment installLocation="/opt/dmn2/dmn2-alarms/dmn2-alarm-archiver-dev">
+				<directory name="conf">
+				</directory>
+			</deployment>
+			<startscript name="DMN2-ALARM-ARCHIVER-DEV">
+			</startscript>
+		</application>
+
+	</product>
+</products>
