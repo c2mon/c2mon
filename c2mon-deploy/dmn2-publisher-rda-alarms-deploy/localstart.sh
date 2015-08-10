@@ -2,12 +2,12 @@
 #!/bin/bash
 cd deploy
 
-MAIN=cern.c2mon.publisher.rdaAlarm.RdaAlarmsMain
+MAIN=cern.c2mon.publisher.rdaAlarms.RdaAlarmsMain
 
 PARAMS="\
--Dlog4j.configuration=file:conf/log4j.properties \
+-Dlog4j.configuration=file:log4j.properties \
 -XX:+UnlockCommercialFeatures -XX:+FlightRecorder \
--Dc2mon.client.conf.url=file:conf/client.properties \
+-Dc2mon.client.conf.url=file:client.properties \
 -Dprovider.properties=file:provider.properties \
 -Dmgt.jmx.port=17017 \
 -Dspring.profiles.active=PROD \
