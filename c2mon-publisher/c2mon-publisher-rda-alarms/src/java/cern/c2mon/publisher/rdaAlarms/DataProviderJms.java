@@ -6,6 +6,8 @@ package cern.c2mon.publisher.rdaAlarms;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,15 +54,17 @@ public class DataProviderJms implements DataProviderInterface {
     }
     
     @Override
-    public void initSourceMap(Map<String, String> smap) {
+    public ConcurrentHashMap<String, String> initSourceMap(Set<String> alarmIds) {
         LOG.info("Preparing the alarmEquip map ...");
         int counter = 0;
-        Map<String, Alarm> alarmDefs = provider.getAlarmDefinitions(smap.keySet());
-        for (String alarmId : alarmDefs.keySet()) {
+        ConcurrentHashMap<String,String> result = new ConcurrentHashMap<String,String>();
+        Map<String, Alarm> alarmDefs = provider.getAlarmDefinitions(alarmIds);
+        for (String alarmId : alarmIds) {
             counter++;
-            smap.put(alarmId, alarmDefs.get(alarmId).getSourceName());
+            result.put(alarmId, alarmDefs.get(alarmId).getSourceName());
         }            
         LOG.info("Cached source name for {} alarms.", counter);
+        return result;
     }
     
     @Override

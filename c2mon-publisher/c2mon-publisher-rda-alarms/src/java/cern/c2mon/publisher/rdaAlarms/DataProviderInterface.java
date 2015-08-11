@@ -5,7 +5,8 @@
 package cern.c2mon.publisher.rdaAlarms;
 
 import java.util.Collection;
-import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The dataprovider is used only to find the source name for an incoming alarm. 
@@ -22,6 +23,6 @@ public interface DataProviderInterface {
     String getSource(String alarmId) throws Exception;
     void close();
 
-    void initSourceMap(Map<String, String> smap);
     Collection<String> getSourceNames() throws Exception;
+    ConcurrentHashMap<String, String> initSourceMap(Set<String> alarmIds) throws Exception;
 }

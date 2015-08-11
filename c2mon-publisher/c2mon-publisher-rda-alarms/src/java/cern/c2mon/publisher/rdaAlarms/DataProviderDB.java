@@ -4,12 +4,13 @@
 
 package cern.c2mon.publisher.rdaAlarms;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
@@ -24,21 +25,25 @@ import org.slf4j.LoggerFactory;
  */
 public class DataProviderDB implements DataProviderInterface {
 
+    private DataSource ds;
     private PreparedStatement pstmt;
-    private Statement getSourcesStmt;
     private static final Logger LOG = LoggerFactory.getLogger(DataProviderDB.class);
 
     //
     // --- CONSTRUCTION --------------------------------------------------------------------------
     //
     public DataProviderDB(DataSource ds) {
+        LOG.info("Create data provider based on DB ..");
         String sql = "select source_id from alarm_definition where alarm_id=?";
         try {
+            LOG.info("Prepare statement ...");
             pstmt = ds.getConnection().prepareStatement(sql);
-            getSourcesStmt = ds.getConnection().createStatement();
+            this.ds = ds;
         } catch (Exception e) {
+            LOG.error("Failed to create data provider, HALT!", e);
             throw new RuntimeException(e);
         }   
+        LOG.info("Ready.");
     }
     
     //
@@ -47,7 +52,7 @@ public class DataProviderDB implements DataProviderInterface {
     @Override
     public String getSource(String alarmId) throws Exception {
         LOG.trace("Query source name for " + alarmId + " ...");
-        String sourceId = "?";
+        String sourceId = null;
         pstmt.setString(1,  alarmId);
         try (ResultSet rs = pstmt.executeQuery()) {
             if (rs.next()) {
@@ -70,31 +75,42 @@ public class DataProviderDB implements DataProviderInterface {
                 LOG.warn("Failed to close preparedStatement", e);
             }            
         }
-        if (getSourcesStmt != null) {
-            try {
-                getSourcesStmt.close();
-                LOG.info("Statement successfully closed.");
-            } catch (Exception e) {
-                LOG.warn("Failed to close preparedStatement", e);
-            }            
-        }
-    }
-
-    @Override
-    public void initSourceMap(Map<String, String> smap) {
-        // do not know how to this efficiently in DB, skip
     }
 
     @Override
     public Collection<String> getSourceNames() throws Exception {
-        String sql = "select source_id from source_definition";
         ArrayList<String> sourceNames = new ArrayList<String>();
-        try (ResultSet rs = getSourcesStmt.executeQuery(sql)) {
+        String sql = "select source_id from alarm_sources_v";
+        LOG.info("Retrieve the connection ...");
+        Connection conn = ds.getConnection();
+        LOG.trace("Prepare the statement for [{}] ... ", sql);
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        LOG.trace("Execute ...");
+        try ( ResultSet rs = stmt.executeQuery()) { 
+            LOG.trace("Process result set ...");
             while (rs.next()) {
-                sourceNames.add(rs.getString(1));
+                String sourceName = rs.getString(1);
+                LOG.debug("Adding {} ...", sourceName);
+                sourceNames.add(sourceName);
+            }
+            LOG.trace("Closing ResultSet ...");
+        }
+        LOG.trace("Closing Statement ...");
+        stmt.close();
+        LOG.info("Returning {} records.", sourceNames.size());
+        return sourceNames;
+    }
+
+    @Override
+    public ConcurrentHashMap<String, String> initSourceMap(Set<String> alarmIds) throws Exception {
+        ConcurrentHashMap<String,String> result = new ConcurrentHashMap<String,String>();
+        for (String aid : alarmIds) {
+            String sourceId = getSource(aid); 
+            if (sourceId != null) {
+                result.put(aid, sourceId);
             }
         }
-        return sourceNames;
+        return result;
     }
     
 }

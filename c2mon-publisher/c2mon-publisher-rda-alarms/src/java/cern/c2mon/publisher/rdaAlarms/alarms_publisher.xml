@@ -53,7 +53,7 @@
 		<property name="validationQuery" value="SELECT 0 FROM DUAL" />
 		<property name="testWhileIdle" value="true" />
 		<property name="timeBetweenEvictionRunsMillis" value="3600000" />
-		<property name="initialSize" value="1" />
+		<property name="initialSize" value="3" />
 	</bean>
 
 	

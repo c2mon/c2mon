@@ -12,7 +12,9 @@ package cern.c2mon.publisher.rdaAlarms;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.jms.JMSException;
@@ -121,12 +123,13 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
             
             int count = 0;
             Collection<AlarmValue> activeAlarms = C2monServiceGateway.getTagManager().getAllActiveAlarms();
+            Set<String> alarmIds = new HashSet<String>();
             for (AlarmValue av : activeAlarms) {
                 // on startup we know that we do not know the source!
                 count++;
-                alarmEquip.put(getAlarmId(av), "?");
+                alarmIds.add(getAlarmId(av));
             }
-            dpi.initSourceMap(alarmEquip);
+            alarmEquip = dpi.initSourceMap(alarmIds);
             for (AlarmValue av : activeAlarms) {
                 this.onAlarmUpdate(av);
             }
@@ -271,9 +274,11 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
         String source = alarmEquip.get(alarmId);
         if (source == null) {
             try {
-                LOG.warn("Source for {} not yet known, asking data provider ... ", alarmId);
+                LOG.info("Source for {} not yet known, asking data provider ... ", alarmId);
                 source = dpi.getSource(alarmId);
-                alarmEquip.put(alarmId, source);
+                if (source != null) {
+                    alarmEquip.put(alarmId, source);
+                }
             } catch (Exception e) {
                 LOG.warn(alarmId + " not found by data provider, ignored. (" + e.getMessage() + ")");
                 rejected++;
