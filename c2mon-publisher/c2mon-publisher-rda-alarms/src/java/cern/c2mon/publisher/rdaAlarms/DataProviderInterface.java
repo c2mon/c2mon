@@ -4,6 +4,9 @@
 
 package cern.c2mon.publisher.rdaAlarms;
 
+import java.util.Collection;
+import java.util.Map;
+
 /**
  * The dataprovider is used only to find the source name for an incoming alarm. 
  * If the implementation requires a connection (like for DB), the class must 
@@ -18,4 +21,7 @@ public interface DataProviderInterface {
 
     String getSource(String alarmId) throws Exception;
     void close();
+
+    void initSourceMap(Map<String, String> smap);
+    Collection<String> getSourceNames();
 }

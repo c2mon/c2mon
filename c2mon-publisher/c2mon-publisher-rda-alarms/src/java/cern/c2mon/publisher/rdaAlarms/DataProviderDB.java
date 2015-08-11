@@ -6,6 +6,8 @@ package cern.c2mon.publisher.rdaAlarms;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Collection;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -64,6 +66,17 @@ public class DataProviderDB implements DataProviderInterface {
                 LOG.warn("Failed to close preparedStatement", e);
             }            
         }
+    }
+
+    @Override
+    public void initSourceMap(Map<String, String> smap) {
+        // do not know how to this efficiently in DB, skip
+    }
+
+    @Override
+    public Collection<String> getSourceNames() {
+        // TODO Auto-generated method stub
+        return null;
     }
     
 }

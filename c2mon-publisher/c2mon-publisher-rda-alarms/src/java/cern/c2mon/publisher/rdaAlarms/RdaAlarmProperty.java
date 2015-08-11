@@ -41,6 +41,7 @@ public class RdaAlarmProperty {
     //
     RdaAlarmProperty(final String pRdaPropertyName) {
         this.rdaPropertyName = pRdaPropertyName;
+        currentValue = DataFactory.createData();
     }
 
     //
@@ -61,29 +62,34 @@ public class RdaAlarmProperty {
      */
     public synchronized void onUpdate(AlarmValue av) {
         String tagName = av.getFaultFamily() + ":" + av.getFaultMember() + ":" + av.getFaultCode();
-        Data newValue = DataFactory.createData();
+//        Data newValue = DataFactory.createData();
 
-        if (currentValue != null) {
-            newValue = currentValue.clone();
-        }
+ //       if (currentValue != null) {
+ //           newValue = currentValue.clone();
+ //       }
 
-        if (newValue.exists(tagName)) {
-            newValue.remove(tagName);
+//        if (newValue.exists(tagName)) {
+//            newValue.remove(tagName);
+//        }
+
+        if (currentValue.exists(tagName)) {
+            currentValue.remove(tagName);
         }
 
         String status = "TERMINATE";
         if (av.isActive()) {
             status = "ACTIVE";
         }
-        newValue.append(tagName, status);
-        LOG.debug("Value update received for RDA property " + rdaPropertyName + " " + newValue.size());
+//        newValue.append(tagName, status);
+        currentValue.append(tagName, status);
+        LOG.debug("Value update received for RDA property " + rdaPropertyName + " " + currentValue.size());
 
         // check, because there might not be any RDA3 clients subscribed yet
         if (subscriptionSource != null) {
             Data filters = subscriptionSource.getContext().getFilters();
-            subscriptionSource.notify(getValue(newValue, filters));
+            subscriptionSource.notify(getValue(currentValue, filters));
         }
-        currentValue = newValue;
+//        currentValue = newValue;
     }
 
     //

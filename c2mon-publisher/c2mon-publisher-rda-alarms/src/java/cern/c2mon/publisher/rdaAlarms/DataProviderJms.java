@@ -4,6 +4,9 @@
 
 package cern.c2mon.publisher.rdaAlarms;
 
+import java.util.Collection;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +46,23 @@ public class DataProviderJms implements DataProviderInterface {
         LOG.info("Closed.");
     }
 
+    @Override
+    public Collection<String> getSourceNames() {
+        return provider.getSourceNames();        
+    }
+    
+    @Override
+    public void initSourceMap(Map<String, String> smap) {
+        LOG.info("Preparing the alarmEquip map ...");
+        int counter = 0;
+        Map<String, Alarm> alarmDefs = provider.getAlarmDefinitions(smap.keySet());
+        for (String alarmId : alarmDefs.keySet()) {
+            counter++;
+            smap.put(alarmId, alarmDefs.get(alarmId).getSourceName());
+        }            
+        LOG.info("Cached source name for {} alarms.", counter);
+    }
+    
     @Override
     public String getSource(String alarmId) throws Exception {
         LOG.trace("Request source name for alarm {} ...", alarmId);

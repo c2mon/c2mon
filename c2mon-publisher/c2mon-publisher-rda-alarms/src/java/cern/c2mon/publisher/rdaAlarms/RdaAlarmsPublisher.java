@@ -10,6 +10,7 @@
  ******************************************************************************/
 package cern.c2mon.publisher.rdaAlarms;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -109,9 +110,23 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
             C2monServiceGateway.getTagManager().addAlarmListener(this);
             LOG.info("... ready.");
 
+            int sourceCounter = 0;
+            for (String source : dpi.getSourceNames()) {
+                RdaAlarmProperty property = new RdaAlarmProperty(source);
+                properties.put(source, property);
+                sourceCounter++;
+            }
+            LOG.info("Declared {} sources.", sourceCounter);
+            
             int count = 0;
-            for (AlarmValue av : C2monServiceGateway.getTagManager().getAllActiveAlarms()) {
+            Collection<AlarmValue> activeAlarms = C2monServiceGateway.getTagManager().getAllActiveAlarms();
+            for (AlarmValue av : activeAlarms) {
+                // on startup we know that we do not know the source!
                 count++;
+                alarmEquip.put(getAlarmId(av), "?");
+            }
+            dpi.initSourceMap(alarmEquip);
+            for (AlarmValue av : activeAlarms) {
                 this.onAlarmUpdate(av);
             }
             LOG.info("Started with initial selection of " + count + " alarms (" + rejected + " rejected)");
@@ -120,7 +135,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
             LOG.info("Server now on");
         } catch (Exception e) {
             LOG.error("A major problem occured while running the RDA server. Stopping publisher!", e);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -192,13 +207,18 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
         @Override
         public void subscribe(SubscriptionRequest request) {
             RdaAlarmProperty property = findProperty(request.getPropertyName());
-            LOG.debug("subscribe: {}", request.getId());
-            SubscriptionCreator creator = request.accept();
-            
-            Data filters = request.getContext().getFilters();
-            creator.firstUpdate(property.getValue(filters));
-            
-            creator.startPublishing();
+            if (property != null) {
+                LOG.info("subscribe: {}", request.getId());
+                SubscriptionCreator creator = request.accept();
+                
+                Data filters = request.getContext().getFilters();
+                creator.firstUpdate(property.getValue(filters));
+                
+                creator.startPublishing();
+            } else {
+                LOG.error("Subscribe(): Cannot subscribe to non-existing property {}", request.getPropertyName());
+                request.reject(new ServerException("No property " + request.getPropertyName()));
+            }            
         }
 
         @Override
@@ -208,16 +228,25 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
 
         @Override
         public void subscriptionSourceAdded(SubscriptionSource subscription) {
-            LOG.debug("subscriptionSourceAdded: {}", subscription.getId());
+            LOG.info("subscriptionSourceAdded: {}", subscription.getId());
             RdaAlarmProperty property = findProperty(subscription.getPropertyName());
-            property.setSubscriptionSource(subscription);
+            if (property != null) {
+                property.setSubscriptionSource(subscription);
+                LOG.info("Subscription to {} accepted", subscription.getPropertyName());                
+            } else {
+                LOG.error("Cannot subscribe to non-existing property {}", subscription.getPropertyName());
+                subscription.notify(new ServerException("No property " + subscription.getPropertyName()));                
+            }
+            
         }
 
         @Override
         public void subscriptionSourceRemoved(SubscriptionSource subscription) {
             LOG.debug("subscriptionSourceRemoved: {}", subscription.getId());
             RdaAlarmProperty property = findProperty(subscription.getPropertyName());
-            property.removeSubscriptionSource();
+            if (property != null) {
+                property.removeSubscriptionSource();
+            }
         }
     }
 
@@ -231,8 +260,8 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
         Logger logger = LoggerFactory.getLogger("ClientDataTagLogger");
         logger.debug(av.toString());
 
-        String alarmId = av.getFaultFamily() + ":" + av.getFaultMember() + ":" + av.getFaultCode();
-        LOG.info(" RECEIVED    > " + alarmId + " is active:" + av.isActive());
+        String alarmId = getAlarmId(av);
+        LOG.debug(" RECEIVED    > " + alarmId + " is active:" + av.isActive());
         ClientDataTagValue cdt = C2monServiceGateway.getTagManager().getDataTag(av.getTagId());
         if (!cdt.getDataTagQuality().isValid()) {
             LOG.warn(" INVALIDATION > " + alarmId + " is active:" + av.isActive());
@@ -241,6 +270,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
         String source = alarmEquip.get(alarmId);
         if (source == null) {
             try {
+                LOG.warn("Source for {} not yet known, asking data provider ... ", alarmId);
                 source = dpi.getSource(alarmId);
                 alarmEquip.put(alarmId, source);
             } catch (Exception e) {
@@ -262,13 +292,17 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
         } else {
             LOG.warn("Alarm " + alarmId + " discarded, could not find a source for it");
         }
-        LOG.info(" PROCESSED    > " + alarmId);
+        LOG.debug(" PROCESSED    > " + alarmId);
 
     }
 
     //
     // --- PRIVATE METHODS -------------------------------------------------------------------------
     //
+    private String getAlarmId(AlarmValue av) {
+        return av.getFaultFamily() + ":" + av.getFaultMember() + ":" + av.getFaultCode();
+    }
+    
     /**
      * Private method to find a property by its property name
      * 
