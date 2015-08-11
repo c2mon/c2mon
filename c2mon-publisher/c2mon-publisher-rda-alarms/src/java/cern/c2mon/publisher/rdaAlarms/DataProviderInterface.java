@@ -23,5 +23,5 @@ public interface DataProviderInterface {
     void close();
 
     void initSourceMap(Map<String, String> smap);
-    Collection<String> getSourceNames();
+    Collection<String> getSourceNames() throws Exception;
 }

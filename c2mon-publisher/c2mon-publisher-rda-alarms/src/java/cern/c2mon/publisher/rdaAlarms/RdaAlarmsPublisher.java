@@ -106,9 +106,6 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
                 Thread.sleep(1000);
             }
 
-            LOG.info("Connecting alarm listener ...");
-            C2monServiceGateway.getTagManager().addAlarmListener(this);
-            LOG.info("... ready.");
 
             int sourceCounter = 0;
             for (String source : dpi.getSourceNames()) {
@@ -117,6 +114,10 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
                 sourceCounter++;
             }
             LOG.info("Declared {} sources.", sourceCounter);
+            
+            LOG.info("Connecting alarm listener ...");
+            C2monServiceGateway.getTagManager().addAlarmListener(this);
+            LOG.info("... ready.");
             
             int count = 0;
             Collection<AlarmValue> activeAlarms = C2monServiceGateway.getTagManager().getAllActiveAlarms();

@@ -14,7 +14,7 @@
 
 	<bean id="publisher" class="cern.c2mon.publisher.rdaAlarms.RdaAlarmsPublisher">
 		<constructor-arg value="DMN-RDA-ALARMS" />
- 		<constructor-arg ref="dataprovider" />
+ 		<constructor-arg ref="database" />
 <!-- from JMS: 	<constructor-arg ref="dataprovider" /> --> 	
 <!-- from DB: 	<constructor-arg ref="database" /> --> 	
 	</bean>

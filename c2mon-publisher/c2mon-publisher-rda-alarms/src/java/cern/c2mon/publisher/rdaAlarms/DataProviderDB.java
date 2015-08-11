@@ -6,6 +6,8 @@ package cern.c2mon.publisher.rdaAlarms;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
@@ -23,6 +25,7 @@ import org.slf4j.LoggerFactory;
 public class DataProviderDB implements DataProviderInterface {
 
     private PreparedStatement pstmt;
+    private Statement getSourcesStmt;
     private static final Logger LOG = LoggerFactory.getLogger(DataProviderDB.class);
 
     //
@@ -32,6 +35,7 @@ public class DataProviderDB implements DataProviderInterface {
         String sql = "select source_id from alarm_definition where alarm_id=?";
         try {
             pstmt = ds.getConnection().prepareStatement(sql);
+            getSourcesStmt = ds.getConnection().createStatement();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }   
@@ -66,6 +70,14 @@ public class DataProviderDB implements DataProviderInterface {
                 LOG.warn("Failed to close preparedStatement", e);
             }            
         }
+        if (getSourcesStmt != null) {
+            try {
+                getSourcesStmt.close();
+                LOG.info("Statement successfully closed.");
+            } catch (Exception e) {
+                LOG.warn("Failed to close preparedStatement", e);
+            }            
+        }
     }
 
     @Override
@@ -74,9 +86,15 @@ public class DataProviderDB implements DataProviderInterface {
     }
 
     @Override
-    public Collection<String> getSourceNames() {
-        // TODO Auto-generated method stub
-        return null;
+    public Collection<String> getSourceNames() throws Exception {
+        String sql = "select source_id from source_definition";
+        ArrayList<String> sourceNames = new ArrayList<String>();
+        try (ResultSet rs = getSourcesStmt.executeQuery(sql)) {
+            while (rs.next()) {
+                sourceNames.add(rs.getString(1));
+            }
+        }
+        return sourceNames;
     }
     
 }
