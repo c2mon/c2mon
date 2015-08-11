@@ -10,13 +10,13 @@
  ******************************************************************************/
 package cern.c2mon.publisher.rdaAlarms;
 
-import org.omg.CORBA.DynAnyPackage.TypeMismatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.cmw.data.Data;
 import cern.cmw.data.DataFactory;
+import cern.cmw.data.Entry;
 import cern.cmw.rda3.common.data.AcquiredData;
 import cern.cmw.rda3.common.exception.ServerException;
 import cern.cmw.rda3.server.core.SetRequest;
@@ -32,37 +32,20 @@ public class RdaAlarmProperty {
 
     private static final Logger LOG = LoggerFactory.getLogger(RdaAlarmProperty.class);
 
-    /** The current tag value of the device */
     private Data currentValue = null;
-
-    /** a subscription source reference **/
     private SubscriptionSource subscriptionSource;
-
-    /** The RDA property name for which this class has been instantiated for */
     private final String rdaPropertyName;
 
-    /**
-     * Default Constructor
-     */
+    //
+    // --- CONSTRUCTION ---------------------------------------------------------------------------
+    //
     RdaAlarmProperty(final String pRdaPropertyName) {
         this.rdaPropertyName = pRdaPropertyName;
     }
 
-    synchronized Data get() {
-        return currentValue;
-    }
-
-    /**
-     * @param request 
-     * @throws ServerException
-     */
-    synchronized void set(final SetRequest request) throws ServerException {
-        throw new ServerException("SET is not supported by the server");
-    }
-
-    /**
-     * @param subscription x
-     */
+    //
+    // --- PUBLIC METHODS --------------------------------------------------------------------------
+    //
     public synchronized void setSubscriptionSource(SubscriptionSource subscription) {
         this.subscriptionSource = subscription;
     }
@@ -83,25 +66,57 @@ public class RdaAlarmProperty {
         if (currentValue != null) {
             newValue = currentValue.clone();
         }
-        
-        if (newValue.exists(tagName))
-        {
+
+        if (newValue.exists(tagName)) {
             newValue.remove(tagName);
         }
-        
+
         String status = "TERMINATE";
         if (av.isActive()) {
             status = "ACTIVE";
         }
         newValue.append(tagName, status);
-        LOG.debug("Value update received for RDA property " +  rdaPropertyName + " " + newValue.size());
+        LOG.debug("Value update received for RDA property " + rdaPropertyName + " " + newValue.size());
 
         // check, because there might not be any RDA3 clients subscribed yet
         if (subscriptionSource != null) {
-            // TODO apply property filter here!
-            // subscriptionSource.getContext().getFilters()
-            subscriptionSource.notify(new AcquiredData(newValue));
+            Data filters = subscriptionSource.getContext().getFilters();
+            subscriptionSource.notify(getValue(newValue, filters));
         }
         currentValue = newValue;
     }
+
+    //
+    // --- PACKAGE METHODS ------------------------------------------------------------------------
+    //
+    protected synchronized AcquiredData getValue(Data filters) {
+        return getValue(currentValue, filters);
+    }
+
+    synchronized Data get() {
+        return currentValue;
+    }
+
+    /**
+     * @param request not used as the action is not implemented. 
+     */
+    synchronized void set(final SetRequest request) throws ServerException {
+        throw new ServerException("SET is not supported by the server");
+    }
+
+    //
+    // --- PRIVATE METHODS -------------------------------------------------------------------------
+    //
+    private AcquiredData getValue(Data value, Data filters) {
+        if (filters != null && filters.getAllEntriesSize() > 0) {            
+            Data filteredValue = DataFactory.createData();
+
+            for (Entry e : filters.getEntries()) {
+                filteredValue.append(e.getString(), value.getString(e.getString()));
+            }
+            return new AcquiredData(filteredValue);
+        }
+        return new AcquiredData(value);
+    }
+
 }

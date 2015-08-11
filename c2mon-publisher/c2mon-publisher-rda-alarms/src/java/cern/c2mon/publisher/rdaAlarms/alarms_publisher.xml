@@ -14,7 +14,15 @@
 
 	<bean id="publisher" class="cern.c2mon.publisher.rdaAlarms.RdaAlarmsPublisher">
 		<constructor-arg value="DMN-RDA-ALARMS" />
-		<constructor-arg ref="dataSource" />		
+ 		<constructor-arg ref="dataprovider" />
+<!-- from JMS: 	<constructor-arg ref="dataprovider" /> --> 	
+<!-- from DB: 	<constructor-arg ref="database" /> --> 	
+	</bean>
+
+	<bean id="database" class="cern.c2mon.publisher.rdaAlarms.DataProviderDB">
+ 		<constructor-arg ref="dataSource" />
+	</bean>
+	<bean id="dataprovider" class="cern.c2mon.publisher.rdaAlarms.DataProviderJms">
 	</bean>
 
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -49,8 +57,7 @@
 	</bean>
 
 	
-<!--  	<bean id="jmxBootstrap" class="cern.accsoft.commons.jmxdirectory.client.JmxBootstrap">
-		<constructor-arg value="cern.c2mon.alarms.archiver" />
+  	<bean id="jmxBootstrap" class="cern.accsoft.commons.jmxdirectory.client.JmxBootstrap">
+		<constructor-arg value="cern.c2mon.publisher.rdaAlarms" />
 	</bean>
- -->
 </beans>

@@ -48,10 +48,6 @@ public class DemoGetJapc {
      */
     static final String clientAlarmId = "MY_ALARM";
 
-    /**
-     * The URL used to create the JAPC parameter.
-     */
-    static final String paramUrl = "rda3:///DMN.RDA.ALARMS/" + sourceId;
         
     /**
      * @param args
@@ -79,7 +75,7 @@ public class DemoGetJapc {
         MapParameterValue filter = ParameterValueFactory.newParameterValue(filterParams);
             
         // selector The id value is used as dely to re-publish (!?)
-        Selector selector = ParameterValueFactory.newSelector("5000", filter);           
+        Selector selector = ParameterValueFactory.newSelector("5000", null);           
 
         try
         {
@@ -89,6 +85,7 @@ public class DemoGetJapc {
 //            Parameter param = ParameterFactory.newInstance().newParameter(paramUrl);
             Parameter param = ParameterFactory.newInstance().newParameter("DMN.RDA.ALARMS","TIMOPALARM");
             AcquiredParameterValue avalue = param.getValue(selector);
+//            AcquiredParameterValue avalue = param.getValue(null);
             MapParameterValue value = (MapParameterValue)avalue.getValue();
 //            SimpleParameterValue spv = value.get(clientAlarmId);           
             log.info("Initial status of alarm " + clientAlarmId + ":" + value.toString());

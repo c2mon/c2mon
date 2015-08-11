@@ -11,6 +11,7 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 /**
  * TODO unit testing
+ * TODO JMX instrumentation of RDA publisher class
  * 
  * @author mbuttner
  */
