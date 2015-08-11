@@ -48,6 +48,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
 
     /** Log4j logger instance */
     private static final Logger LOG = LoggerFactory.getLogger(RdaAlarmsPublisher.class);
+    static DataProviderInterface dpi;
 
     /**
      * Maps the RDA properties to the tag names. For each tag subscription there is exactly one entry registered in this
@@ -56,7 +57,6 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
     private static final Map<String, RdaAlarmProperty> properties = new HashMap<String, RdaAlarmProperty>();
     private ConcurrentHashMap<String, String> alarmEquip = new ConcurrentHashMap<String, String>();
     
-    private DataProviderInterface dpi;
     private long rejected;
 
     private Thread daemonThread;
@@ -68,7 +68,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
     //
     public RdaAlarmsPublisher(String serverName, DataProviderInterface dpi) {
         this.serverName = serverName;
-        this.dpi = dpi;
+        RdaAlarmsPublisher.dpi = dpi;
     }
 
     //

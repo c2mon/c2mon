@@ -111,8 +111,27 @@ public class RdaAlarmProperty {
         if (filters != null && filters.getAllEntriesSize() > 0) {            
             Data filteredValue = DataFactory.createData();
 
-            for (Entry e : filters.getEntries()) {
-                filteredValue.append(e.getString(), value.getString(e.getString()));
+            for (Entry filterEntry : filters.getEntries()) {
+                if (value.exists(filterEntry.getString())) {
+                    filteredValue.append(filterEntry.getString(), value.getString(filterEntry.getString()));
+                } else {
+                    try {
+                        String source = RdaAlarmsPublisher.dpi.getSource(filterEntry.getString());
+                        if (source == null) {
+                            filteredValue.append(filterEntry.getString(), "UNDEFINED");                    
+                        } else {
+                            if (source.equals(this.rdaPropertyName)) {
+                                filteredValue.append(filterEntry.getString(), "TERMINATE");                                            
+                            } else {
+                                filteredValue.append(filterEntry.getString(), "WRONG_SOURCE");                                                                        
+                            }
+                        }
+                    } catch (Exception e) {
+                        filteredValue.append(filterEntry.getString(), "UNDEFINED");                                            
+                        LOG.warn("Failed to retrieve data for alarm " + filterEntry.getString(), e);
+                    }
+                }
+                
             }
             return new AcquiredData(filteredValue);
         }

@@ -11,7 +11,11 @@ import cern.cmw.rda3.common.data.AcquiredData;
 import cern.cmw.rda3.common.exception.RdaException;
 
  
-public class DemoGet {
+public class GetUsingRda {
+    
+    public static final String DEVICE = "DMN.RDA.ALARMS";
+    public static final String ALARM_SOURCE = "TIMOPALARM";
+    
     public static void main(final String[] args) {
         ClientService client = null;
         try {
@@ -25,7 +29,7 @@ public class DemoGet {
             // Create the access point which is an handle to a device/property. Access points are cached within the
             // client service so it is not needed to keep access point instances.
             System.out.println("Create access point ...");
-            AccessPoint accessPoint = client.getAccessPoint("DMN.RDA.ALARMS", "TIMOPALARM");
+            AccessPoint accessPoint = client.getAccessPoint(DEVICE, ALARM_SOURCE);
  
             // Perform a get call on the access point. This will throw an exception if the server is down or the
             // equipment cannot acquire the data. The result contains the data and meta information (cycle, timestamps).

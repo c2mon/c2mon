@@ -21,17 +21,23 @@ import cern.japc.factory.ParameterFactory;
 import cern.japc.factory.ParameterValueFactory;
 
 /**
- * Demonstrates a simple GET operation on japc-ext-laser based JAPC parameter
+ * Demonstrates a simple "alarm GET" operation using JAPC
  *
- * TODO create a mean to redirect dataserver to the localhost, so that we can test compat with new server!!!
- * TODO same of course for monitor and multiparam!
- *
-//TODO to test new instance, redirect using this system prop        diamon.alarms.service
+ * Notes:
+ * - if you do not provide a selector with filter, all alarms with an event since startup of the publisher
+ *   will be returned.
+ * - if you do provide a selector with filter, only the alarms matching the ids in the filter list will 
+ *   be returned, and this only if they really belong to the alarm source specified as property name.
  * 
  * @author mbuttner 
  */
-public class DemoGetJapc {
+public class GetUsingJapc {
 
+    /**
+     * The RDA device publishing the alarms
+     */
+    static final String DEVICE = "DMN.RDA.ALARMS";
+    
     /**
      * The source. This is something you need to take from the alarm system configuration
      */
@@ -39,56 +45,50 @@ public class DemoGetJapc {
         
     /**
      * The alarm as identified in the alarm system. The alarm will only be correctly received
-     * if it is sent by the source used to subscribe.
+     * if it is sent by the source. The alarm id acts as a filter on the property, which  contains
+     * all (at least the active) alarms sent by the source. 
      */
     static final String laserAlarmId = "SECU_FEU_LHC:SFDIN-00279:1663";
         
     /**
-     * The internal id in your application.
+     * The internal alarm id in your application.
      */
     static final String clientAlarmId = "MY_ALARM";
 
-        
-    /**
-     * @param args
-     */
+
+    //
+    // --- MAIN -------------------------------------------------------------------------------------
+    //
     public static void main(String[] args)
     {        
         System.setProperty("app.name", "japc-ext-laser DemoGet");
         System.setProperty("app.version", "0.0.1");
-
-        // default
-        // System.setProperty("diamon.alarms.service",  "http://cs-ccr-dmnp2:19001/data/");
-        // test
-        // System.setProperty("diamon.alarms.service",  "http://localhost:19001/data/");
         
         // standard logging setup stuff
         String log4jConfigFile = System.getProperty("log4j.configuration", "log4j.properties");
         PropertyConfigurator.configureAndWatch(log4jConfigFile, 60 * 1000);   
-        Logger log = LoggerFactory.getLogger(DemoGetJapc.class);
-        log.info("Starting " + DemoGetJapc.class.getName() + " ...");
+        Logger log = LoggerFactory.getLogger(GetUsingJapc.class);
+        log.info("Starting " + GetUsingJapc.class.getName() + " ...");
             
         // create the filter parameter: This is a list of pairs internal alarm id / alarm sys alarm id
         Map<String, SimpleParameterValue> filterParams = new HashMap<String, SimpleParameterValue>();        
         filterParams.put(clientAlarmId, ParameterValueFactory.newParameterValue(laserAlarmId));        
+        filterParams.put("MY_FAKE", ParameterValueFactory.newParameterValue("FF:FM:FC"));        
         // ... add others as needed ...
         MapParameterValue filter = ParameterValueFactory.newParameterValue(filterParams);
             
         // selector The id value is used as dely to re-publish (!?)
-        Selector selector = ParameterValueFactory.newSelector("5000", null);           
+        Selector selector = ParameterValueFactory.newSelector("5000", filter);           
 
         try
         {
             //
             // create the parameter, do the GET operation and extract the status of the alarm
             // from the result.
-//            Parameter param = ParameterFactory.newInstance().newParameter(paramUrl);
             Parameter param = ParameterFactory.newInstance().newParameter("DMN.RDA.ALARMS","TIMOPALARM");
             AcquiredParameterValue avalue = param.getValue(selector);
-//            AcquiredParameterValue avalue = param.getValue(null);
             MapParameterValue value = (MapParameterValue)avalue.getValue();
-//            SimpleParameterValue spv = value.get(clientAlarmId);           
-            log.info("Initial status of alarm " + clientAlarmId + ":" + value.toString());
+            log.info("Initial status of alarm " + clientAlarmId + "= " + value.toString());
         }
         catch ( ParameterException e )
         {
