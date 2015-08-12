@@ -14,7 +14,7 @@
 
 	<bean id="publisher" class="cern.c2mon.publisher.rdaAlarms.RdaAlarmsPublisher">
 		<constructor-arg value="DMN-RDA-ALARMS" />
- 		<constructor-arg ref="database" />
+ 		<constructor-arg ref=database />
 <!-- from JMS: 	<constructor-arg ref="dataprovider" /> --> 	
 <!-- from DB: 	<constructor-arg ref="database" /> --> 	
 	</bean>
@@ -49,7 +49,7 @@
 		<property name="url" value="${alarm.jdbc.url}" />
 		<property name="username" value="${alarm.jdbc.user}" />
 		<property name="password" value="${alarm.jdbc.password}" />
-		<property name="maxActive" value="1" />
+		<property name="maxActive" value="2" />
 		<property name="validationQuery" value="SELECT 0 FROM DUAL" />
 		<property name="testWhileIdle" value="true" />
 		<property name="timeBetweenEvictionRunsMillis" value="3600000" />

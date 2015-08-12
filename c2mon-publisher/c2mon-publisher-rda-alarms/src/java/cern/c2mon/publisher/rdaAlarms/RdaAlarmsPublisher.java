@@ -21,6 +21,7 @@ import javax.jms.JMSException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
@@ -32,6 +33,8 @@ import cern.c2mon.client.jms.ConnectionListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.cmw.data.Data;
+import cern.cmw.data.DataFactory;
+import cern.cmw.rda3.common.data.AcquiredData;
 import cern.cmw.rda3.common.exception.ServerException;
 import cern.cmw.rda3.common.request.Request;
 import cern.cmw.rda3.server.core.GetRequest;
@@ -59,8 +62,10 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
      */
     private static final Map<String, RdaAlarmProperty> properties = new HashMap<String, RdaAlarmProperty>();
     private ConcurrentHashMap<String, String> alarmEquip = new ConcurrentHashMap<String, String>();
-    
+    private AcquiredData sources;
+
     private long rejected;
+    private int sourceCount;
 
     private Thread daemonThread;
     private Server server;
@@ -72,6 +77,25 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
     public RdaAlarmsPublisher(String serverName, DataProviderInterface dpi) {
         this.serverName = serverName;
         RdaAlarmsPublisher.dpi = dpi;
+    }
+
+    //
+    // --- JMX -------------------------------------------------------------------------
+    //
+    @ManagedAttribute
+    public String getServerName() {
+        return this.serverName;
+    }
+
+    @ManagedAttribute
+    public long getRejected() {
+        return this.rejected;
+    }
+
+    @ManagedAttribute
+    public int getSourceCount()
+    {
+        return this.sourceCount;
     }
 
     //
@@ -108,24 +132,29 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
                 Thread.sleep(1000);
             }
 
-
             int sourceCounter = 0;
+            Data sd = DataFactory.createData();
             for (String source : dpi.getSourceNames()) {
                 RdaAlarmProperty property = new RdaAlarmProperty(source);
                 properties.put(source, property);
                 sourceCounter++;
+                sd.append(source, System.currentTimeMillis());
             }
+            sources = new AcquiredData(sd);
             LOG.info("Declared {} sources.", sourceCounter);
-            
+
             LOG.info("Connecting alarm listener ...");
             C2monServiceGateway.getTagManager().addAlarmListener(this);
             LOG.info("... ready.");
-            
+
+            // process initial selection:
+            // - take the list of active alarms
+            // - fetch the sources for all these alarms using an array call
+            // - process the list as activations
             int count = 0;
             Collection<AlarmValue> activeAlarms = C2monServiceGateway.getTagManager().getAllActiveAlarms();
             Set<String> alarmIds = new HashSet<String>();
             for (AlarmValue av : activeAlarms) {
-                // on startup we know that we do not know the source!
                 count++;
                 alarmIds.add(getAlarmId(av));
             }
@@ -134,12 +163,13 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
                 this.onAlarmUpdate(av);
             }
             LOG.info("Started with initial selection of " + count + " alarms (" + rejected + " rejected)");
-
+            //
+            
+            // everything ready, start the RDA server for publishung
             server.start();
             LOG.info("Server now on");
         } catch (Exception e) {
             LOG.error("A major problem occured while running the RDA server. Stopping publisher!", e);
-//            System.exit(1);
         }
     }
 
@@ -172,15 +202,21 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
         @Override
         public void get(GetRequest request) {
             LOG.trace("GET - " + request.getPropertyName());
-            RdaAlarmProperty property = findProperty(request.getPropertyName());
 
-            if (null == property) {
-                LOG.warn("Property {} unknown.", request.getPropertyName());
-                request.requestFailed(new ServerException("Property '" + request.getPropertyName() + "' not found"));
+            if (request.getPropertyName().equals("_SOURCES")) {
+                request.requestCompleted(sources);
+                LOG.debug("Request completed for property {}", request.getPropertyName());
             } else {
-                LOG.debug("Request completed for property {}", request.getPropertyName());                                
-                Data filters = request.getContext().getFilters();
-                request.requestCompleted(property.getValue(filters));
+                RdaAlarmProperty property = findProperty(request.getPropertyName());
+
+                if (null == property) {
+                    LOG.warn("Property {} unknown.", request.getPropertyName());
+                    request.requestFailed(new ServerException("Property '" + request.getPropertyName() + "' not found"));
+                } else {
+                    LOG.debug("Request completed for property {}", request.getPropertyName());
+                    Data filters = request.getContext().getFilters();
+                    request.requestCompleted(property.getValue(filters));
+                }
             }
         }
 
@@ -214,15 +250,15 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
             if (property != null) {
                 LOG.info("subscribe: {}", request.getId());
                 SubscriptionCreator creator = request.accept();
-                
+
                 Data filters = request.getContext().getFilters();
                 creator.firstUpdate(property.getValue(filters));
-                
+
                 creator.startPublishing();
             } else {
                 LOG.error("Subscribe(): Cannot subscribe to non-existing property {}", request.getPropertyName());
                 request.reject(new ServerException("No property " + request.getPropertyName()));
-            }            
+            }
         }
 
         @Override
@@ -236,12 +272,12 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
             RdaAlarmProperty property = findProperty(subscription.getPropertyName());
             if (property != null) {
                 property.setSubscriptionSource(subscription);
-                LOG.info("Subscription to {} accepted", subscription.getPropertyName());                
+                LOG.info("Subscription to {} accepted", subscription.getPropertyName());
             } else {
                 LOG.error("Cannot subscribe to non-existing property {}", subscription.getPropertyName());
-                subscription.notify(new ServerException("No property " + subscription.getPropertyName()));                
+                subscription.notify(new ServerException("No property " + subscription.getPropertyName()));
             }
-            
+
         }
 
         @Override
@@ -308,7 +344,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
     private String getAlarmId(AlarmValue av) {
         return av.getFaultFamily() + ":" + av.getFaultMember() + ":" + av.getFaultCode();
     }
-    
+
     /**
      * Private method to find a property by its property name
      * 
@@ -323,35 +359,34 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
 
         @Override
         public void onConnection() {
-            LOG.info("C2MON server -> onConnection()");        
+            LOG.info("C2MON server -> onConnection()");
         }
 
         @Override
         public void onDisconnection() {
-            LOG.warn("C2MON server -> onDisConnection()");        
+            LOG.warn("C2MON server -> onDisConnection()");
         }
 
         @Override
         public void onSlowUpdateListener(String diagnosticMessage) {
-            LOG.warn("C2MON server detected slow client: " + diagnosticMessage);        
+            LOG.warn("C2MON server detected slow client: " + diagnosticMessage);
         }
 
         @Override
         public void onHeartbeatReceived(Heartbeat pHeartbeat) {
-            LOG.debug("C2MON server -> onHeartbeatReceived()");                
+            LOG.debug("C2MON server -> onHeartbeatReceived()");
         }
 
         @Override
         public void onHeartbeatExpired(Heartbeat pHeartbeat) {
-            LOG.warn("C2MON server -> onHeartbeatExpired()");        
+            LOG.warn("C2MON server -> onHeartbeatExpired()");
         }
 
         @Override
         public void onHeartbeatResumed(Heartbeat pHeartbeat) {
-            LOG.info("C2MON server -> onHeartbeatResumed()");        
+            LOG.info("C2MON server -> onHeartbeatResumed()");
         }
 
     }
-
 
 }

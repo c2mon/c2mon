@@ -28,6 +28,8 @@ import cern.japc.factory.ParameterValueFactory;
  *   will be returned.
  * - if you do provide a selector with filter, only the alarms matching the ids in the filter list will 
  *   be returned, and this only if they really belong to the alarm source specified as property name.
+ * - the use of the filter also allows the renaming of alarms (see "client alarm id" vs "laser alarm id")
+ *   for internal use by the application.
  * 
  * @author mbuttner 
  */

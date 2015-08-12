@@ -30,6 +30,8 @@ import cern.cmw.rda3.server.subscription.SubscriptionSource;
  */
 public class RdaAlarmProperty {
 
+    public enum AlarmState {ACTIVE, TERMINATE, UNDEFINED, WRONG_SOURCE}
+    
     private static final Logger LOG = LoggerFactory.getLogger(RdaAlarmProperty.class);
 
     private Data currentValue = null;
@@ -62,26 +64,16 @@ public class RdaAlarmProperty {
      */
     public synchronized void onUpdate(AlarmValue av) {
         String tagName = av.getFaultFamily() + ":" + av.getFaultMember() + ":" + av.getFaultCode();
-//        Data newValue = DataFactory.createData();
-
- //       if (currentValue != null) {
- //           newValue = currentValue.clone();
- //       }
-
-//        if (newValue.exists(tagName)) {
-//            newValue.remove(tagName);
-//        }
 
         if (currentValue.exists(tagName)) {
             currentValue.remove(tagName);
         }
 
-        String status = "TERMINATE";
+        AlarmState status = AlarmState.TERMINATE;
         if (av.isActive()) {
-            status = "ACTIVE";
+            status = AlarmState.ACTIVE;
         }
-//        newValue.append(tagName, status);
-        currentValue.append(tagName, status);
+        currentValue.append(tagName, status.toString());
         LOG.debug("Value update received for RDA property " + rdaPropertyName + " " + currentValue.size());
 
         // check, because there might not be any RDA3 clients subscribed yet
@@ -89,7 +81,6 @@ public class RdaAlarmProperty {
             Data filters = subscriptionSource.getContext().getFilters();
             subscriptionSource.notify(getValue(currentValue, filters));
         }
-//        currentValue = newValue;
     }
 
     //
@@ -125,16 +116,16 @@ public class RdaAlarmProperty {
                     try {
                         String source = RdaAlarmsPublisher.dpi.getSource(filterEntry.getString());
                         if (source == null) {
-                            filteredValue.append(id, "UNDEFINED");                    
+                            filteredValue.append(id, AlarmState.UNDEFINED.toString());                    
                         } else {
                             if (source.equals(this.rdaPropertyName)) {
-                                filteredValue.append(id, "TERMINATE");                                            
+                                filteredValue.append(id, AlarmState.TERMINATE.toString());                                            
                             } else {
-                                filteredValue.append(id, "WRONG_SOURCE->" + source);                                                                        
+                                filteredValue.append(id, AlarmState.WRONG_SOURCE.toString() + "->" + source);                                                                        
                             }
                         }
                     } catch (Exception e) {
-                        filteredValue.append(id, "UNDEFINED");                                            
+                        filteredValue.append(id, AlarmState.UNDEFINED.toString());                    
                         LOG.warn("Failed to retrieve data for alarm " + filterEntry.getString(), e);
                     }
                 }

@@ -10,8 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 /**
- * TODO unit testing
  * TODO JMX instrumentation of RDA publisher class
+ * TODO add garbage collector/source list updater to allow for infinite run
+ * TODO unit testing
+ * TODO documentation, announcement, deployment
  * 
  * @author mbuttner
  */

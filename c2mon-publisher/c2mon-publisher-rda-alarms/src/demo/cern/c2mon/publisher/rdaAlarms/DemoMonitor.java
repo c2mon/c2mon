@@ -58,9 +58,6 @@ public class DemoMonitor implements ParameterValueListener
     
     private static Log log;
     
-    /**
-     * @param args
-     */
     public static void main(String[] args)
     {        
         System.setProperty("app.name", "japc-ext-laser DemoMonitor");
