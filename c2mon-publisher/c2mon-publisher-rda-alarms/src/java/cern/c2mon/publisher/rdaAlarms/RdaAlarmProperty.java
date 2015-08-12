@@ -10,16 +10,18 @@
  ******************************************************************************/
 package cern.c2mon.publisher.rdaAlarms;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.cmw.data.Data;
 import cern.cmw.data.DataFactory;
 import cern.cmw.data.Entry;
 import cern.cmw.rda3.common.data.AcquiredData;
-import cern.cmw.rda3.common.exception.ServerException;
-import cern.cmw.rda3.server.core.SetRequest;
 import cern.cmw.rda3.server.subscription.SubscriptionSource;
 
 /**
@@ -30,7 +32,7 @@ import cern.cmw.rda3.server.subscription.SubscriptionSource;
  */
 public class RdaAlarmProperty {
 
-    public enum AlarmState {ACTIVE, TERMINATE, UNDEFINED, WRONG_SOURCE}
+    public enum AlarmState {ACTIVE, TERMINATE, INVALID_A, INVALID_T, UNDEFINED, WRONG_SOURCE}
     
     private static final Logger LOG = LoggerFactory.getLogger(RdaAlarmProperty.class);
 
@@ -38,6 +40,8 @@ public class RdaAlarmProperty {
     private SubscriptionSource subscriptionSource;
     private final String rdaPropertyName;
 
+    private ConcurrentHashMap<String,Long> updates = new ConcurrentHashMap<String, Long>();
+    
     //
     // --- CONSTRUCTION ---------------------------------------------------------------------------
     //
@@ -63,20 +67,45 @@ public class RdaAlarmProperty {
      * @param av -
      */
     public synchronized void onUpdate(AlarmValue av) {
-        String tagName = av.getFaultFamily() + ":" + av.getFaultMember() + ":" + av.getFaultCode();
+        String alarmId = RdaAlarmsPublisher.getAlarmId(av);
 
-        if (currentValue.exists(tagName)) {
-            currentValue.remove(tagName);
+        // 1. make sure we do not override with older stuff!
+        Long updateTs = updates.get(alarmId);
+        if (updateTs == null) {
+            updates.put(alarmId, av.getTimestamp().getTime());
+        } else {
+            if (updateTs.longValue() > av.getTimestamp().getTime()) {
+                return;
+            }
+        }
+            
+        
+        // 2. we can not update. If an existing value must be updated, first remove it
+        //    and add it with its new value later on.
+        if (currentValue.exists(alarmId)) {
+            currentValue.remove(alarmId);
         }
 
-        AlarmState status = AlarmState.TERMINATE;
-        if (av.isActive()) {
-            status = AlarmState.ACTIVE;
+        // 3. merge alarm state and C2MON data quality into string provided by the device
+        ClientDataTagValue cdt = C2monServiceGateway.getTagManager().getDataTag(av.getTagId());
+        if (!cdt.getDataTagQuality().isExistingTag()) {
+            LOG.info(" TAG_DELETED  > " + alarmId);
+        } else {
+            AlarmState status = AlarmState.TERMINATE;
+            if (!cdt.getDataTagQuality().isValid()) {
+                status = AlarmState.INVALID_T;
+            }
+            if (av.isActive()) {
+                status = AlarmState.ACTIVE;
+                if (!cdt.getDataTagQuality().isValid()) {
+                    status = AlarmState.INVALID_A;
+                }
+            }
+            currentValue.append(alarmId, status.toString());
+            LOG.debug("Value update received for RDA property " + rdaPropertyName + " " + currentValue.size());
         }
-        currentValue.append(tagName, status.toString());
-        LOG.debug("Value update received for RDA property " + rdaPropertyName + " " + currentValue.size());
-
-        // check, because there might not be any RDA3 clients subscribed yet
+        
+        // 4. if we have subscribers, tell them about the update
         if (subscriptionSource != null) {
             Data filters = subscriptionSource.getContext().getFilters();
             subscriptionSource.notify(getValue(currentValue, filters));
@@ -94,13 +123,7 @@ public class RdaAlarmProperty {
         return currentValue;
     }
 
-    /**
-     * @param request not used as the action is not implemented. 
-     */
-    synchronized void set(final SetRequest request) throws ServerException {
-        throw new ServerException("SET is not supported by the server");
-    }
-
+ 
     //
     // --- PRIVATE METHODS -------------------------------------------------------------------------
     //
@@ -114,7 +137,7 @@ public class RdaAlarmProperty {
                     filteredValue.append(filterEntry.getString(), value.getString(filterEntry.getString()));
                 } else {
                     try {
-                        String source = RdaAlarmsPublisher.dpi.getSource(filterEntry.getString());
+                        String source = SourceManager.getSourceManager().getSourceNameForAlarm(filterEntry.getString());
                         if (source == null) {
                             filteredValue.append(id, AlarmState.UNDEFINED.toString());                    
                         } else {

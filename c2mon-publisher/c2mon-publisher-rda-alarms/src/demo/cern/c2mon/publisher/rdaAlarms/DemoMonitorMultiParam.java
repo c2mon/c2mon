@@ -33,10 +33,10 @@ public class DemoMonitorMultiParam implements ParameterValueListener
     
     private static String alarmId_1 = "PSBS:DE1.STP26:1000";
     private static String sourceId_1 = "CPS";
-    
-    /**
-     * @param args
-     */
+
+    //
+    // --- MAIN -----------------------------------------------------------------------------------
+    //
     public static void main(String[] args)
     {        
         System.setProperty("app.name", "japc-ext-laser DemoMonitor");
