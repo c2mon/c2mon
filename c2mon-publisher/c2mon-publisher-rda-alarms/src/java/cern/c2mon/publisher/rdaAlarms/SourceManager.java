@@ -44,11 +44,14 @@ public class SourceManager extends TimerTask {
     //
     // --- CONSTRUCTION -----------------------------------------------------------------------
     //
+    // really a singleton
     private SourceManager() {
         timer = new Timer();
         timer.scheduleAtFixedRate(this, FREQ, FREQ);
     }
     
+    // factory method used by other classes to find the reference, and by the spring config
+    // to create the instance
     public static SourceManager getSourceManager() {
         if (sourceMgr == null) {
             sourceMgr = new SourceManager();
@@ -56,13 +59,14 @@ public class SourceManager extends TimerTask {
         return sourceMgr;
     }
 
+    // property setter used by the Spring config
     public void setDataProvider(DataProviderInterface dpi) {
         this.dpi = dpi;        
     }
-    
+
     //
-    // --- PUBLIC METHODS ---------------------------------------------------------------------
-    //
+    // --- JMX --------------------------------------------------------------------------------
+    //    
     @ManagedAttribute
     public int getSourceCount() {
         return sourceCount;
@@ -72,16 +76,28 @@ public class SourceManager extends TimerTask {
     public long getAlarmCount() {
         return alarmCount;
     }
-    
-    public DataProviderInterface getDataProvider() {
-        return dpi;
-    }
-    
+
+    //
+    // --- PUBLIC METHODS ---------------------------------------------------------------------
+    //    
+    /**
+     * @return <code>AcquiredData</code> for RDA publishing 
+     */
     AcquiredData getSources() {
         return sources;
     }
     
-
+    /**
+     * @param name of the alarm source for which the RDA property is looked for.
+     * @return <code>RdaAlarmPropery</code> providing all known alarms for the source
+     */
+    public RdaAlarmProperty findProperty(final String name) {
+        return properties.get(name);
+    }
+    
+    /**
+     * To be called when application closes to properly release resources.
+     */
     public void close() {
         dpi.close();
         timer.cancel();
@@ -91,39 +107,37 @@ public class SourceManager extends TimerTask {
         return alarmEquip.get(alarmId);
     }
     
-    public RdaAlarmProperty findOrCreateProp(String alarmId) {
+    /**
+     * The method allows the RdaAlarmsPublisher to find the property corresponding to a given
+     * alarm. The properties for all sources are supposed to exist, because they are either
+     * created on startup or during periodic update.
+     * 
+     * @param alarmId <code>String</code> alarm identifier (triplet)
+     * @return <code>RdaAlarmPropery</code> providing all known alarms for the source of the alarm
+     */
+    public RdaAlarmProperty findProp(String alarmId) {
         String sourceName = alarmEquip.get(alarmId);
-        if (sourceName == null) {
-            try {
-                LOG.info("Source for {} not yet known, asking data provider ... ", alarmId);
-                sourceName = dpi.getSource(alarmId);
-                if (sourceName != null) {
-                    alarmEquip.put(alarmId, sourceName);
-                    if (!exists(sourceName)) {
-                        return addSource(sourceName);
-                    }
-                }
-            } catch (Exception e) {
-                LOG.warn(alarmId + " not found by data provider, ignored. (" + e.getMessage() + ")");
-            }
+        if (sourceName != null) {
+            return properties.get(sourceName);
         }
-        return properties.get(sourceName);
+        return null;
     }
     
-    public RdaAlarmProperty findProperty(final String name) {
-        return properties.get(name);
-    }
 
-    
+    /**
+     * For efficiency: the method loads all source definitions and updates internal strucutres
+     * accordingly. For the active alarms, the mapping to their source is also filled in. This
+     * allows to use array calls on startup rather than a 1 by one query.
+     * 
+     * @param activeAlarms <code>Collection<AlarmValue></code> list of active alarms
+     * @throws Exception if the call to the dataprovider fails
+     */
     public void initialize(Collection<AlarmValue> activeAlarms) throws Exception { 
         Data sd = DataFactory.createData();
-        for (String source : dpi.getSourceNames()) {
-            RdaAlarmProperty property = new RdaAlarmProperty(source);
-            properties.put(source, property);
-            sourceCount++;
-            sd.append(source, System.currentTimeMillis());
-        }        
         sources = new AcquiredData(sd);
+        for (String source : dpi.getSourceNames()) {
+            addSource(source);
+        }        
         LOG.info("Declared {} sources.", sourceCount);
         
         // Use arraycall to init the alarm/source map
@@ -145,6 +159,8 @@ public class SourceManager extends TimerTask {
     private RdaAlarmProperty addSource(String source) {
         RdaAlarmProperty property = new RdaAlarmProperty(source);
         properties.put(source, property);        
+        sources.getData().append(source, System.currentTimeMillis());
+        sourceCount++;
         return property;
     }
 
@@ -161,10 +177,7 @@ public class SourceManager extends TimerTask {
             // 1. add new stuff
             for (String sourceId : sourceDefs) {
                 if (!this.exists(sourceId)) {
-                    RdaAlarmProperty property = new RdaAlarmProperty(sourceId);
-                    properties.put(sourceId, property);
-                    sourceCount++;
-                    sources.getData().append(sourceId, System.currentTimeMillis());
+                    addSource(sourceId);
                 }
             }
             
@@ -172,9 +185,9 @@ public class SourceManager extends TimerTask {
             for (String sourceId : properties.keySet()) {
                 if (!sourceDefs.contains(sourceId)) {
                     sources.getData().remove(sourceId);
-                    sourceCount--;
                     properties.remove(sourceId);
                     alarmEquip.remove(sourceId);
+                    sourceCount--;
                 }
             }
             

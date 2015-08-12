@@ -61,11 +61,6 @@ public class RdaAlarmProperty {
         this.subscriptionSource = null;
     }
 
-    /**
-     * Generates a new {@link Data} object from the received tag update and propagates it to all the listeners.
-     * 
-     * @param av -
-     */
     public synchronized void onUpdate(AlarmValue av) {
         String alarmId = RdaAlarmsPublisher.getAlarmId(av);
 

@@ -7,11 +7,33 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
 
-	<!-- enable spring annotations scanning -->
-<!-- 	<context:component-scan base-package="cern.c2mon.publisher.rdaAlarms" /> -->
+<!-- enable spring annotations scanning ===================================================== -->
+	<context:component-scan base-package="cern.c2mon.publisher.rdaAlarms" />
 	<context:mbean-export registration="ignoreExisting" />
 	<context:property-placeholder ignore-resource-not-found="true" ignore-unresolvable="true" />
 
+<!--  PROPERTY SETUP ======================================================================== -->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="properties">
+			<props>
+				<prop key="alarm.jdbc.user"></prop>
+				<prop key="alarm.jdbc.password"></prop>
+				<prop key="alarm.jdbc.url"></prop>
+				<prop key="alarm.jdbc.driverClass"></prop>
+			</props>
+		</property>
+		<property name="locations">
+			<value>${provider.properties}</value>
+		</property>
+
+		<property name="ignoreResourceNotFound">
+			<!-- we require the properties file -->
+			<value>false</value>
+		</property>
+	</bean>
+
+
+<!--   BEAN DECLARATION ====================================================================== -->
 	<bean id="publisher" class="cern.c2mon.publisher.rdaAlarms.RdaAlarmsPublisher">
 		<constructor-arg value="DMN-RDA-ALARMS" />
  		<constructor-arg ref="sourceMgr" />
@@ -35,29 +57,9 @@
 	<bean id="database" class="cern.c2mon.publisher.rdaAlarms.DataProviderDB">
  		<constructor-arg ref="dataSource" />
 	</bean>
-	<!-- 
 	<bean id="dataprovider" class="cern.c2mon.publisher.rdaAlarms.DataProviderJms">
 	</bean>
- 	-->
  
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="properties">
-			<props>
-				<prop key="alarm.jdbc.user"></prop>
-				<prop key="alarm.jdbc.password"></prop>
-				<prop key="alarm.jdbc.url"></prop>
-				<prop key="alarm.jdbc.driverClass"></prop>
-			</props>
-		</property>
-		<property name="locations">
-			<value>${provider.properties}</value>
-		</property>
-
-		<property name="ignoreResourceNotFound">
-			<!-- we require the properties file -->
-			<value>false</value>
-		</property>
-	</bean>
 
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
 		<property name="driverClassName" value="${alarm.jdbc.driverClass}" />
@@ -71,8 +73,9 @@
 		<property name="initialSize" value="3" />
 	</bean>
 
-	
+	<!-- Apparently already done by some JAPC component ? 
   	<bean id="jmxBootstrap" class="cern.accsoft.commons.jmxdirectory.client.JmxBootstrap">
 		<constructor-arg value="cern.c2mon.publisher.rdaAlarms" />
 	</bean>
-</beans>
+	 -->
+ </beans>

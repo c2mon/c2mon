@@ -56,7 +56,8 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
     private Thread daemonThread;
     private Server server;
     private String serverName;
-
+    private boolean cont = true;
+    
     //
     // --- CONSTRUCTION ----------------------------------------------------------------
     //
@@ -141,7 +142,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
 
             C2monServiceGateway.startC2monClient();
             C2monConnectionMonitor.start();
-            while (!C2monServiceGateway.getSupervisionManager().isServerConnectionWorking()) {
+            while (!C2monServiceGateway.getSupervisionManager().isServerConnectionWorking() && cont) {
                 LOG.info("Awaiting connection ...");
                 Thread.sleep(1000);
             }
@@ -172,6 +173,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
     }
 
     public void shutdown() {
+        cont = false;
         LOG.debug("Stopping the C2MON client...");
         try {
             C2monServiceGateway.getTagManager().removeAlarmListener(this);
@@ -279,7 +281,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
         LOG.debug(" RECEIVED    > " + alarmId + " is active:" + av.isActive());
         received.increment();
 
-        RdaAlarmProperty sourceProp = sm.findOrCreateProp(alarmId);
+        RdaAlarmProperty sourceProp = sm.findProp(alarmId);
         if (sourceProp == null) {
             rejected++;
             LOG.warn("Alarm " + alarmId + " discarded, could not find a source for it");

@@ -10,8 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 /**  
- * TODO unit testing
  * TODO check content of status string in JAPC ext laser
+ * TODO finalize demo code
+ * TODO unit testing
  * TODO documentation, announcement, deployment
  * 
  * @author mbuttner
