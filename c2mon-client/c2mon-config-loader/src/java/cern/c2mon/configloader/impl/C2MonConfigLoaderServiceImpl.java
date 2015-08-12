@@ -18,6 +18,7 @@ import cern.c2mon.configloader.C2MonConfigLoaderService;
 import cern.c2mon.configloader.Configuration;
 import cern.c2mon.configloader.dao.ConfigLoaderDAO;
 import cern.c2mon.configloader.requestor.ServerReconfigurationRequestor;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 
 /**
@@ -60,11 +61,21 @@ public class C2MonConfigLoaderServiceImpl implements C2MonConfigLoaderService {
 
     private void log(Configuration conf, ConfigurationReport report) {
 
+        
+        
         if (report != null) {
-            APPLIED_CONFIG_LOG.info(
+            
+            if (report.getStatus().equals(Status.FAILURE)) {
+                APPLIED_CONFIG_LOG.warn("{} [ {} ]  status={} : \"{}\" descr={} author={}", 
+                   new Object [] {userName, conf.getId(), report.getStatus().toString(), report.getStatusDescription(), conf.getDescription(), conf.getAuthor()});
+                
+            } else  {
+            
+                APPLIED_CONFIG_LOG.info(
                     "{} [ {} ]  {} {} {} {} {} {}",
                     new Object[] { userName, conf.getId(), report.getStatus().toString(), daqsToRestart(report),
                             conf.getName(), conf.getDescription(), conf.getAuthor(), conf.getCreateTimestampStr() });
+            }
         } else {
             APPLIED_CONFIG_LOG.info(
                     "{} [ {} ]  {} {} {} {} {} {}",

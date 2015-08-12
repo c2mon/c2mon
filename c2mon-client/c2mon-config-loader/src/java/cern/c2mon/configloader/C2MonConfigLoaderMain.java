@@ -6,10 +6,6 @@ package cern.c2mon.configloader;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PreDestroy;
 
@@ -37,9 +33,9 @@ public class C2MonConfigLoaderMain {
 
     private C2MonConfigLoaderService service;
 
-    private ScheduledExecutorService executor;
-
-    private ScheduledFuture<?> pollerFuture;
+    private Thread pollerFuture;
+    
+    private boolean stopRequested = false;
 
     @Autowired
     public void setDAO(ConfigLoaderDAO dao) {
@@ -64,16 +60,15 @@ public class C2MonConfigLoaderMain {
             JmxBootstrap.start("c2mon-config-loader", new HashMap<String, String>());
         }
 
-        executor = Executors.newSingleThreadScheduledExecutor();
-
-        pollerFuture = executor.scheduleAtFixedRate(new DbPollerExecutorTask(), 0, config.getDbPollingPeriod(),
-                TimeUnit.SECONDS);
+        pollerFuture = new Thread(new DbPollerExecutorTask(), "ConfigCheckerTask");
+        pollerFuture.setDaemon(true);
+        pollerFuture.start();
+                
     }
 
     @PreDestroy
     public void predestroy() {
-        pollerFuture.cancel(true);
-        executor.shutdownNow();
+        stopRequested = true;
     }
 
     class DbPollerExecutorTask implements Runnable {
@@ -81,21 +76,32 @@ public class C2MonConfigLoaderMain {
         @Override
         public void run() {
 
-            LOG.debug("executing db poller task");
-
-            try {
-                // get the list of not-yet-applied configurations
-                List<Configuration> configs = dao.getConfigurationsForLoading();
-
-                LOG.debug("number of configurations to be applied in this iteration: {}", configs.size());
-
-                for (Configuration c : configs) {
-                    service.applyConfiguration(c);
+            while (!stopRequested) {
+            
+                try {
+                    Thread.sleep(config.getDbPollingPeriod() * 1000);
+                } catch (InterruptedException e) {
+                    LOG.info("config poller task cancelled");
+                    break;
                 }
-            } catch (Exception ex) {
-                LOG.error("exception caught trying to apply configuration", ex);
-            }
+                
+                LOG.debug("executing db poller task");
+    
+                try {
+                    // get the list of not-yet-applied configurations
+                    List<Configuration> configs = dao.getConfigurationsForLoading();
+    
+                    LOG.debug("number of configurations to be applied in this iteration: {}", configs.size());
+    
+                    for (Configuration c : configs) {
+                        service.applyConfiguration(c);
+                    }
+                } catch (Exception ex) {
+                    LOG.error("exception caught trying to apply configuration", ex);
+                }
+                
 
+            }
         }// run
 
     }
