@@ -32,6 +32,7 @@ import cern.cmw.rda3.server.subscription.SubscriptionSource;
  */
 public class RdaAlarmProperty {
 
+    // Note: in japc-ext-laser, we had only ACTIVE, TERMINATE, UNKNOWN_STATE (?) and CHANGE (?)
     public enum AlarmState {ACTIVE, TERMINATE, INVALID_A, INVALID_T, UNDEFINED, WRONG_SOURCE}
     
     private static final Logger LOG = LoggerFactory.getLogger(RdaAlarmProperty.class);
