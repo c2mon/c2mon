@@ -10,8 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 /**  
- * TODO finalize demo code
- * TODO unit testing
+ * TODO prepare some integration tests: real config, script to automate and run from deployment project before release!
  * TODO documentation, announcement, deployment
  * 
  * @author mbuttner
@@ -23,6 +22,8 @@ public class RdaAlarmsMain extends Thread {
     
     public static void main(String[] args)
     {
+        System.setProperty("spring.profiles.default", "PROD");
+        
         String log4jConfigFile = System.getProperty("log4j.configuration", "log4j-diamon.properties");
         PropertyConfigurator.configureAndWatch(log4jConfigFile, 60 * 1000);
         log = LoggerFactory.getLogger(RdaAlarmsMain.class);

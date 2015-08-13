@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author mbuttner
  */
-public class DataProviderDB implements DataProviderInterface {
+public class DataProviderDB implements DataProviderIntf {
 
     private DataSource ds;
     private PreparedStatement pstmt;

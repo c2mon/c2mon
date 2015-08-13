@@ -37,16 +37,11 @@
 	<bean id="publisher" class="cern.c2mon.publisher.rdaAlarms.RdaAlarmsPublisher">
 		<constructor-arg value="DMN-RDA-ALARMS" />
  		<constructor-arg ref="sourceMgr" />
+ 		<constructor-arg ref="c2mon" />
 		<property name="received" ref="VCMreceived" /> 
 		<property name="processed" ref="VCMprocessed" /> 
 	</bean>
 
-	<bean id="sourceMgr" class="cern.c2mon.publisher.rdaAlarms.SourceManager" factory-method = "getSourceManager" >
- 		<property name="dataProvider" ref="database" />
-<!-- from JMS: 	<constructor-arg ref="dataprovider" /> --> 	
-<!-- from DB: 	<constructor-arg ref="database" /> --> 	
-	</bean>
-	
 	<bean id="VCMreceived" class="cern.c2mon.publisher.rdaAlarms.VCM">
 		<property name="vcmSeconds" value="60" /> 
 	</bean>
@@ -54,30 +49,37 @@
 		<property name="vcmSeconds" value="60" /> 
 	</bean>
 
-	<bean id="database" class="cern.c2mon.publisher.rdaAlarms.DataProviderDB">
- 		<constructor-arg ref="dataSource" />
+	<bean id="sourceMgr" class="cern.c2mon.publisher.rdaAlarms.SourceManager" factory-method = "getSourceManager" >
+ 		<property name="dataProvider" ref="dataProvider" />
 	</bean>
+	
+	
+	<beans profile="PROD">
+		<bean id="c2mon" class="cern.c2mon.publisher.rdaAlarms.C2monConnection"></bean> 
+		<bean id="dataProvider" class="cern.c2mon.publisher.rdaAlarms.DataProviderJms"></bean>
+	</beans>
+	
+	<beans profile="PROD-DB">
+		<bean id="c2mon" class="cern.c2mon.publisher.rdaAlarms.C2monConnection"></bean> 
+		<bean id="dataProvider" class="cern.c2mon.publisher.rdaAlarms.DataProviderDB">
+ 			<constructor-arg ref="dataSource" />
+		</bean>
+	
+		<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+			<property name="driverClassName" value="${alarm.jdbc.driverClass}" />
+			<property name="url" value="${alarm.jdbc.url}" />
+			<property name="username" value="${alarm.jdbc.user}" />
+			<property name="password" value="${alarm.jdbc.password}" />
+			<property name="maxActive" value="2" />
+			<property name="validationQuery" value="SELECT 0 FROM DUAL" />
+			<property name="testWhileIdle" value="true" />
+			<property name="timeBetweenEvictionRunsMillis" value="3600000" />
+			<property name="initialSize" value="3" />
+		</bean>
+	</beans>
+	<beans profile="TEST">
+		<bean id="c2mon" class="cern.c2mon.publisher.rdaAlarms.C2monConnectionMock"></bean> 
+		<bean id="dataProvider" class="cern.c2mon.publisher.rdaAlarms.DataProviderMock"></bean>
+	</beans>
 
-<!-- 
-	<bean id="dataprovider" class="cern.c2mon.publisher.rdaAlarms.DataProviderJms">
-	</bean>
-  -->
-
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
-		<property name="driverClassName" value="${alarm.jdbc.driverClass}" />
-		<property name="url" value="${alarm.jdbc.url}" />
-		<property name="username" value="${alarm.jdbc.user}" />
-		<property name="password" value="${alarm.jdbc.password}" />
-		<property name="maxActive" value="2" />
-		<property name="validationQuery" value="SELECT 0 FROM DUAL" />
-		<property name="testWhileIdle" value="true" />
-		<property name="timeBetweenEvictionRunsMillis" value="3600000" />
-		<property name="initialSize" value="3" />
-	</bean>
-
-	<!-- Apparently already done by some JAPC component ? 
-  	<bean id="jmxBootstrap" class="cern.accsoft.commons.jmxdirectory.client.JmxBootstrap">
-		<constructor-arg value="cern.c2mon.publisher.rdaAlarms" />
-	</bean>
-	 -->
  </beans>

@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 
  * @author mbuttner
  */
-public interface DataProviderInterface {
+public interface DataProviderIntf {
 
     String getSource(String alarmId) throws Exception;
     void close();

@@ -21,7 +21,7 @@ import cern.phoenix.remote.RemoteModuleFactory;
  * 
  * @author mbuttner
  */
-public class DataProviderJms implements DataProviderInterface {
+public class DataProviderJms implements DataProviderIntf {
 
     private static final Logger LOG = LoggerFactory.getLogger(DataProviderJms.class);
 

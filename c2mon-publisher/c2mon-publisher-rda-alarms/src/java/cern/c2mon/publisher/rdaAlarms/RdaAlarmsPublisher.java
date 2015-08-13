@@ -16,14 +16,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.jms.JMSException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
-import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.cmw.data.Data;
@@ -56,14 +53,16 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
     private Thread daemonThread;
     private Server server;
     private String serverName;
-    private boolean cont = true;
+    private C2monConnectionIntf c2mon;
     
     //
     // --- CONSTRUCTION ----------------------------------------------------------------
     //
-    public RdaAlarmsPublisher(String serverName, SourceManager sm) {
+    public RdaAlarmsPublisher(String serverName, SourceManager sm, C2monConnectionIntf c2mon) {
         this.serverName = serverName;
         this.sm = sm;
+        this.c2mon = c2mon;
+        this.c2mon.setListener(this);
     }
 
     public void setReceived(VCM received) {
@@ -140,16 +139,8 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
             server = builder.build();
             LOG.info("Created RDA3 server {}, connecting now to C2MON ..." + serverName);
 
-            C2monServiceGateway.startC2monClient();
-            C2monConnectionMonitor.start();
-            while (!C2monServiceGateway.getSupervisionManager().isServerConnectionWorking() && cont) {
-                LOG.info("Awaiting connection ...");
-                Thread.sleep(1000);
-            }
-            LOG.info("Connecting alarm listener ...");
-            
-            C2monServiceGateway.getTagManager().addAlarmListener(this);
-            Collection<AlarmValue> activeAlarms = C2monServiceGateway.getTagManager().getAllActiveAlarms();
+            c2mon.start();
+            Collection<AlarmValue> activeAlarms = c2mon.getActiveAlarms();
             LOG.info("... now listening to incoming alarms.");
             
             sm.initialize(activeAlarms);    // load all sources declared at startup
@@ -168,25 +159,24 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
     }
 
     public void join() throws InterruptedException {
+        LOG.info("Waiting for RDA server thread to stop ...");
         this.daemonThread.join();
+        LOG.info("... ok, stopping the SourceManager ...");
         sm.close();
+        LOG.info("... ok, SourceManager stopped.");
     }
 
-    public void shutdown() {
-        cont = false;
-        LOG.debug("Stopping the C2MON client...");
-        try {
-            C2monServiceGateway.getTagManager().removeAlarmListener(this);
-        } catch (JMSException e) {
-            LOG.warn("?", e);
-        }
-        LOG.info("C2MON client stopped.");
+    public void shutdown() {        
+        LOG.info("Stopping C2MON ...");
+        c2mon.stop();
+        LOG.info("Stopping RDA ...");
         server.shutdown();
         try {
             daemonThread.join();
         } catch (InterruptedException e) {
             LOG.warn("InterruptedException caught", e);
         }
+        LOG.info("RDA publisher stopped.");
     }
 
     //
@@ -202,7 +192,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
                 request.requestCompleted(sm.getSources());
                 LOG.debug("Request completed for property {}", request.getPropertyName());
             } else {
-                RdaAlarmProperty property = sm.findProperty(request.getPropertyName());
+                RdaAlarmProperty property = sm.findProp(request.getPropertyName());
 
                 if (null == property) {
                     LOG.warn("Property {} unknown.", request.getPropertyName());
@@ -226,7 +216,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
 
         @Override
         public void subscribe(SubscriptionRequest request) {
-            RdaAlarmProperty property = sm.findProperty(request.getPropertyName());
+            RdaAlarmProperty property = sm.findProp(request.getPropertyName());
             if (property != null) {
                 LOG.debug("subscribe: {}", request.getId());
                 SubscriptionCreator creator = request.accept();
@@ -249,7 +239,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
         @Override
         public void subscriptionSourceAdded(SubscriptionSource subscription) {
             LOG.debug("subscriptionSourceAdded: {}", subscription.getId());
-            RdaAlarmProperty property = sm.findProperty(subscription.getPropertyName());
+            RdaAlarmProperty property = sm.findProp(subscription.getPropertyName());
             if (property != null) {
                 property.setSubscriptionSource(subscription);
                 LOG.info("Subscription to {} accepted", subscription.getPropertyName());
@@ -263,7 +253,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
         @Override
         public void subscriptionSourceRemoved(SubscriptionSource subscription) {
             LOG.debug("subscriptionSourceRemoved: {}", subscription.getId());
-            RdaAlarmProperty property = sm.findProperty(subscription.getPropertyName());
+            RdaAlarmProperty property = sm.findProp(subscription.getPropertyName());
             if (property != null) {
                 property.removeSubscriptionSource();
             }

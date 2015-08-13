@@ -38,7 +38,7 @@ public class SourceManager extends TimerTask {
     private int sourceCount;
     private long alarmCount;
     
-    private DataProviderInterface dpi;
+    private DataProviderIntf dpi;
     private Timer timer;
     
     //
@@ -60,7 +60,7 @@ public class SourceManager extends TimerTask {
     }
 
     // property setter used by the Spring config
-    public void setDataProvider(DataProviderInterface dpi) {
+    public void setDataProvider(DataProviderIntf dpi) {
         this.dpi = dpi;        
     }
 
@@ -86,15 +86,7 @@ public class SourceManager extends TimerTask {
     AcquiredData getSources() {
         return sources;
     }
-    
-    /**
-     * @param name of the alarm source for which the RDA property is looked for.
-     * @return <code>RdaAlarmPropery</code> providing all known alarms for the source
-     */
-    public RdaAlarmProperty findProperty(final String name) {
-        return properties.get(name);
-    }
-    
+        
     /**
      * To be called when application closes to properly release resources.
      */
@@ -142,9 +134,11 @@ public class SourceManager extends TimerTask {
         
         // Use arraycall to init the alarm/source map
         Set<String> alarmIds = new HashSet<String>();
-        for (AlarmValue av : activeAlarms) {    
-            alarmCount++;
-            alarmIds.add(RdaAlarmsPublisher.getAlarmId(av));
+        if (activeAlarms != null) {
+            for (AlarmValue av : activeAlarms) {    
+                alarmCount++;
+                alarmIds.add(RdaAlarmsPublisher.getAlarmId(av));
+            }
         }
         alarmEquip = dpi.initSourceMap(alarmIds);
     }
