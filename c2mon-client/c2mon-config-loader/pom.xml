@@ -115,4 +115,5 @@
 		   <version>1.7.5</version>
 		</dependency>
    </dependencies>
+   <groupId>cern.c2mon</groupId>
 </project>
