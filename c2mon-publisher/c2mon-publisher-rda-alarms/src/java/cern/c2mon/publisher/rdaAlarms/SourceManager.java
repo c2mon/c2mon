@@ -129,7 +129,7 @@ public class SourceManager extends TimerTask {
      * accordingly. For the active alarms, the mapping to their source is also filled in. This
      * allows to use array calls on startup rather than a 1 by one query.
      * 
-     * @param activeAlarms <code>Collection<AlarmValue></code> list of active alarms
+     * @param activeAlarms collection of active alarms
      * @throws Exception if the call to the dataprovider fails
      */
     public void initialize(Collection<AlarmValue> activeAlarms) throws Exception { 
