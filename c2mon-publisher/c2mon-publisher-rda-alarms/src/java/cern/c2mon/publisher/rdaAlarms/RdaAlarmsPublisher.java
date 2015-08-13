@@ -50,12 +50,12 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
     private VCM received;
     private VCM processed;
     private long rejected;
-    private int sourceCount;
 
     private Thread daemonThread;
     private Server server;
     private String serverName;
     private C2monConnectionIntf c2mon;
+    private volatile boolean running = false;
     
     //
     // --- CONSTRUCTION ----------------------------------------------------------------
@@ -114,9 +114,9 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
     }
 
     @ManagedAttribute
-    public int getSourceCount()
+    public boolean isRunning()
     {
-        return this.sourceCount;
+        return this.running;
     }
 
     @ManagedAttribute
@@ -174,11 +174,9 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
                 this.onAlarmUpdate(av);
             }
             LOG.info("Started with initial selection of " + activeAlarms.size() + " alarms.");
-            //
-            
             // everything ready, start the RDA server for publishung
+            running = true;
             server.start();
-            LOG.info("Server now on");
         } catch (Exception e) {
             LOG.error("A major problem occured while running the RDA server. Stopping publisher!", e);
         }
@@ -199,6 +197,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
         server.shutdown();
         try {
             daemonThread.join();
+            running = false;
         } catch (InterruptedException e) {
             LOG.warn("InterruptedException caught", e);
         }
