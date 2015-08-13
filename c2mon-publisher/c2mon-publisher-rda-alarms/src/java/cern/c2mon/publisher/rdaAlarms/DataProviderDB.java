@@ -34,7 +34,7 @@ public class DataProviderDB implements DataProviderInterface {
     //
     public DataProviderDB(DataSource ds) {
         LOG.info("Create data provider based on DB ..");
-        String sql = "select source_id from alarm_definition where alarm_id=?";
+        String sql = "select source_name from alarm_definition_v where alarm_id=?";
         try {
             LOG.info("Prepare statement ...");
             pstmt = ds.getConnection().prepareStatement(sql);
@@ -80,7 +80,7 @@ public class DataProviderDB implements DataProviderInterface {
     @Override
     public Collection<String> getSourceNames() throws Exception {
         ArrayList<String> sourceNames = new ArrayList<String>();
-        String sql = "select source_id from alarm_sources_v";
+        String sql = "select source_name from alarm_sources_v";
         LOG.info("Retrieve the connection ...");
         Connection conn = ds.getConnection();
         LOG.trace("Prepare the statement for [{}] ... ", sql);

@@ -42,7 +42,7 @@
 	</bean>
 
 	<bean id="sourceMgr" class="cern.c2mon.publisher.rdaAlarms.SourceManager" factory-method = "getSourceManager" >
- 		<property name="dataProvider" ref="dataprovider" />
+ 		<property name="dataProvider" ref="database" />
 <!-- from JMS: 	<constructor-arg ref="dataprovider" /> --> 	
 <!-- from DB: 	<constructor-arg ref="database" /> --> 	
 	</bean>
@@ -57,9 +57,11 @@
 	<bean id="database" class="cern.c2mon.publisher.rdaAlarms.DataProviderDB">
  		<constructor-arg ref="dataSource" />
 	</bean>
+
+<!-- 
 	<bean id="dataprovider" class="cern.c2mon.publisher.rdaAlarms.DataProviderJms">
 	</bean>
- 
+  -->
 
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
 		<property name="driverClassName" value="${alarm.jdbc.driverClass}" />

@@ -27,7 +27,7 @@ import cern.japc.factory.ParameterValueFactory;
  *
  * @author mbuttner 
  */
-public class DemoMonitorMultiParam implements ParameterValueListener
+public class SubscribeMultipleFiltered implements ParameterValueListener
 {    
     private static Log log;
     
@@ -45,8 +45,8 @@ public class DemoMonitorMultiParam implements ParameterValueListener
         // standard logging setup stuff
         String log4jConfigFile = System.getProperty("log4j.configuration", "log4j.properties");
         PropertyConfigurator.configureAndWatch(log4jConfigFile, 60 * 1000);   
-        log = LogFactory.getLog(DemoMonitorMultiParam.class);
-        log.info("Starting " + DemoMonitorMultiParam.class.getName() + " ...");
+        log = LogFactory.getLog(SubscribeMultipleFiltered.class);
+        log.info("Starting " + SubscribeMultipleFiltered.class.getName() + " ...");
         
         // create the filter parameter: This is a list of pairs internal alarm id / alarm sys alarm id
         Map<String, SimpleParameterValue> psbFilterParams = new HashMap<String, SimpleParameterValue>();        
@@ -61,12 +61,12 @@ public class DemoMonitorMultiParam implements ParameterValueListener
 
         try
         {
-            DemoMonitorMultiParam mon = new DemoMonitorMultiParam();
-            Parameter p1 = ParameterFactory.newInstance().newParameter("laser:///laser/" + sourceId_1);
+            SubscribeMultipleFiltered mon = new SubscribeMultipleFiltered();
+            Parameter p1 = ParameterFactory.newInstance().newParameter("rda3:///DMN.RDA.ALARMS/" + sourceId_1);
             SubscriptionHandle sh1 = p1.createSubscription(psbSelector, mon);            
             sh1.startMonitoring();            
 
-            Parameter p2 = ParameterFactory.newInstance().newParameter("laser:///laser/LEI");
+            Parameter p2 = ParameterFactory.newInstance().newParameter("rda3:///DMN.RDA.ALARMS/LEI");
             SubscriptionHandle sh2 = p2.createSubscription(leiSelector, mon);            
             sh2.startMonitoring();            
                         
@@ -79,7 +79,7 @@ public class DemoMonitorMultiParam implements ParameterValueListener
         {
             e.printStackTrace();
         }
-        log.info(DemoMonitorMultiParam.class.getName()  + " completed");
+        log.info(SubscribeMultipleFiltered.class.getName()  + " completed");
         System.exit(0);
     }
 
