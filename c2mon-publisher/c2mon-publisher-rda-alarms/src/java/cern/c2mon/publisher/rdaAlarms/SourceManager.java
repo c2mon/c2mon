@@ -7,6 +7,7 @@ package cern.c2mon.publisher.rdaAlarms;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
@@ -28,7 +29,6 @@ public class SourceManager extends TimerTask {
 
     public static final long FREQ = 15 * 60 * 1000; // run once per 15mn
     
-    private static SourceManager sourceMgr;    
     private static final Logger LOG = LoggerFactory.getLogger(SourceManager.class);
     
     private ConcurrentHashMap<String, String> alarmEquip = new ConcurrentHashMap<String, String>();
@@ -36,7 +36,6 @@ public class SourceManager extends TimerTask {
     private AcquiredData sources;
 
     private int sourceCount;
-    private long alarmCount;
     
     private DataProviderIntf dpi;
     private Timer timer;
@@ -44,21 +43,11 @@ public class SourceManager extends TimerTask {
     //
     // --- CONSTRUCTION -----------------------------------------------------------------------
     //
-    // really a singleton
-    private SourceManager() {
+    public SourceManager() {
         timer = new Timer();
         timer.scheduleAtFixedRate(this, FREQ, FREQ);
     }
     
-    // factory method used by other classes to find the reference, and by the spring config
-    // to create the instance
-    public static SourceManager getSourceManager() {
-        if (sourceMgr == null) {
-            sourceMgr = new SourceManager();
-        }
-        return sourceMgr;
-    }
-
     // property setter used by the Spring config
     public void setDataProvider(DataProviderIntf dpi) {
         this.dpi = dpi;        
@@ -73,8 +62,8 @@ public class SourceManager extends TimerTask {
     }
 
     @ManagedAttribute
-    public long getAlarmCount() {
-        return alarmCount;
+    public int getAlarmCount() {
+        return alarmEquip.size();
     }
 
     //
@@ -111,6 +100,21 @@ public class SourceManager extends TimerTask {
         String sourceName = alarmEquip.get(alarmId);
         if (sourceName != null) {
             return properties.get(sourceName);
+        } else {
+            try {
+                sourceName = dpi.getSource(alarmId);
+                if (sourceName != null) {
+                    alarmEquip.put(alarmId, sourceName);
+                    RdaAlarmsProperty sourceProp = properties.get(sourceName);
+                    if (sourceProp != null) {
+                        return sourceProp;
+                    } else {
+                        return this.addSource(sourceName);
+                    }
+                }
+            } catch (Exception e) {
+                LOG.error("Call to dataprovider failed", e);
+            }
         }
         return null;
     }
@@ -136,15 +140,15 @@ public class SourceManager extends TimerTask {
         Set<String> alarmIds = new HashSet<String>();
         if (activeAlarms != null) {
             for (AlarmValue av : activeAlarms) {    
-                alarmCount++;
                 alarmIds.add(RdaAlarmsPublisher.getAlarmId(av));
             }
         }
         alarmEquip = dpi.initSourceMap(alarmIds);
     }
     
+    
     //
-    // --- PRIVAE METHODS ---------------------------------------------------------------------
+    // --- PRIVATE METHODS ---------------------------------------------------------------------
     //
     private boolean exists(String sourceId) {
         return properties.containsKey(sourceId);
@@ -156,6 +160,20 @@ public class SourceManager extends TimerTask {
         sources.getData().append(source, System.currentTimeMillis());
         sourceCount++;
         return property;
+    }
+    
+    private void removeSource(String sourceId) {
+        sources.getData().remove(sourceId);
+        properties.remove(sourceId);
+        
+        Iterator<Map.Entry<String, String>> entries = alarmEquip.entrySet().iterator();
+        while (entries.hasNext()) {
+            Map.Entry<String, String> entry = entries.next();
+            if (entry.getValue().equals(sourceId)) {
+                entries.remove();
+            }
+        }        
+        sourceCount--;
     }
 
     //
@@ -178,10 +196,7 @@ public class SourceManager extends TimerTask {
             // 2. remove old stuff
             for (String sourceId : properties.keySet()) {
                 if (!sourceDefs.contains(sourceId)) {
-                    sources.getData().remove(sourceId);
-                    properties.remove(sourceId);
-                    alarmEquip.remove(sourceId);
-                    sourceCount--;
+                    removeSource(sourceId);
                 }
             }
             

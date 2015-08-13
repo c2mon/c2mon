@@ -25,4 +25,5 @@ public interface DataProviderIntf {
 
     Collection<String> getSourceNames() throws Exception;
     ConcurrentHashMap<String, String> initSourceMap(Set<String> alarmIds) throws Exception;
+    
 }

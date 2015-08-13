@@ -11,6 +11,7 @@ import javax.jms.JMSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
@@ -58,5 +59,20 @@ public class C2monConnection implements C2monConnectionIntf {
     @Override
     public Collection<AlarmValue> getActiveAlarms() {
         return C2monServiceGateway.getTagManager().getAllActiveAlarms();
+    }
+
+    @Override
+    public int getQuality(long alarmTagId) {
+        int qual = 0;
+        ClientDataTagValue cdt = C2monServiceGateway.getTagManager().getDataTag(alarmTagId);
+        if (cdt != null) {
+            if (cdt.getDataTagQuality().isValid()) {
+                qual = qual | Quality.VALID;
+            }
+            if (cdt.getDataTagQuality().isExistingTag()) {
+                qual = qual | Quality.EXISTING;
+            }
+        }
+        return qual;
     }
 }

@@ -34,10 +34,10 @@
 
 
 <!--   BEAN DECLARATION ====================================================================== -->
-	<bean id="publisher" class="cern.c2mon.publisher.rdaAlarms.RdaAlarmsPublisher">
-		<constructor-arg value="DMN-RDA-ALARMS" />
- 		<constructor-arg ref="sourceMgr" />
- 		<constructor-arg ref="c2mon" />
+	<bean id="publisher" class="cern.c2mon.publisher.rdaAlarms.RdaAlarmsPublisher" factory-method = "getPublisher" >
+		<property name="serverName" value="DMN-RDA-ALARMS" />
+ 		<property name="sourceMgr" ref="sourceMgr" />
+ 		<property name="c2mon" ref="c2mon" />
 		<property name="received" ref="VCMreceived" /> 
 		<property name="processed" ref="VCMprocessed" /> 
 	</bean>
@@ -49,7 +49,7 @@
 		<property name="vcmSeconds" value="60" /> 
 	</bean>
 
-	<bean id="sourceMgr" class="cern.c2mon.publisher.rdaAlarms.SourceManager" factory-method = "getSourceManager" >
+	<bean id="sourceMgr" class="cern.c2mon.publisher.rdaAlarms.SourceManager" >
  		<property name="dataProvider" ref="dataProvider" />
 	</bean>
 	

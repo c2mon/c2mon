@@ -16,6 +16,12 @@ public class TestBaseClass {
     public static final String EXISTING_ALARM_ID = "FF:FM:1";
     public static final String EXISTING_SOURCE_ID = "TSOURCE";
     public static final String NOT_EXISTING_ALARM_ID = "XX:YY:Z";
+    public static final String EXISTING_SOURCE_ID_2 = "TSOURCE_2";
+    
+    public static final String SAMPLE_FF = "FF";
+    public static final String SAMPLE_FM = "FM";
+    public static final int SAMPLE_FC = 2;
+    public static final String EXISTING_ALARM_ID_2 = SAMPLE_FF + ":" + SAMPLE_FM + ":" + SAMPLE_FC;
     
     protected Logger log;
     

@@ -16,13 +16,32 @@ public class DataProviderMock implements DataProviderIntf {
     private ArrayList<String> sources = new ArrayList<String>();
     
     public DataProviderMock() {
-        sources.add("TSOURCE");
-        alarmSources.put("FF:FM:1", "TSOURCE");
+        sources.add(TestBaseClass.EXISTING_SOURCE_ID);
+        sources.add(TestBaseClass.EXISTING_SOURCE_ID_2);
+        alarmSources.put(TestBaseClass.EXISTING_ALARM_ID, TestBaseClass.EXISTING_SOURCE_ID);
+        
+        // this one comes on the fly!
+        // alarmSources.put(TestBaseClass.EXISTING_ALARM_ID_2, TestBaseClass.EXISTING_SOURCE_ID_2);
     }
+
+    public void removeSource(String sourceId) {
+        sources.remove(sourceId);
+        alarmSources.remove(sourceId);
+    }
+
+
     
     @Override
     public String getSource(String alarmId) throws Exception {
-        return alarmSources.get(alarmId);
+        // use case 1.: find the source in the cache
+        String sourceId = alarmSources.get(alarmId);
+        
+        // use case 2.: find it in the external source (DB or JMS)
+        if (sourceId == null && alarmId.equals(TestBaseClass.EXISTING_ALARM_ID_2)) {
+            sourceId = TestBaseClass.EXISTING_SOURCE_ID_2;
+            alarmSources.put(alarmId, sourceId);            
+        }
+        return sourceId;
     }
 
     @Override

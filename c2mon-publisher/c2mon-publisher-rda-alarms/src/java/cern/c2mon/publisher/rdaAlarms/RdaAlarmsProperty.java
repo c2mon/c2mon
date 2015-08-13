@@ -5,8 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.c2mon.client.core.C2monServiceGateway;
+import cern.c2mon.publisher.rdaAlarms.C2monConnectionIntf.Quality;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.cmw.data.Data;
 import cern.cmw.data.DataFactory;
@@ -73,17 +72,18 @@ public class RdaAlarmsProperty {
         }
 
         // 3. merge alarm state and C2MON data quality into string provided by the device
-        ClientDataTagValue cdt = C2monServiceGateway.getTagManager().getDataTag(av.getTagId());
-        if (!cdt.getDataTagQuality().isExistingTag()) {
+        C2monConnectionIntf c2mon = RdaAlarmsPublisher.getPublisher().getC2mon();
+        int qual = c2mon.getQuality(av.getTagId());
+        if ((qual & Quality.EXISTING) != Quality.EXISTING) {
             LOG.info(" TAG_DELETED  > " + alarmId);
         } else {
             AlarmState status = AlarmState.TERMINATE;
-            if (!cdt.getDataTagQuality().isValid()) {
+            if ((qual & Quality.VALID) != Quality.VALID) {
                 status = AlarmState.INVALID_T;
             }
             if (av.isActive()) {
                 status = AlarmState.ACTIVE;
-                if (!cdt.getDataTagQuality().isValid()) {
+                if ((qual & Quality.VALID) != Quality.VALID) {
                     status = AlarmState.INVALID_A;
                 }
             }
@@ -123,7 +123,7 @@ public class RdaAlarmsProperty {
                     filteredValue.append(filterEntry.getString(), value.getString(filterEntry.getString()));
                 } else {
                     try {
-                        String source = SourceManager.getSourceManager().getSourceNameForAlarm(filterEntry.getString());
+                        String source = RdaAlarmsPublisher.getPublisher().getSourceMgr().getSourceNameForAlarm(filterEntry.getString());
                         if (source == null) {
                             filteredValue.append(id, AlarmState.UNDEFINED.toString());                    
                         } else {

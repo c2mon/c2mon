@@ -43,6 +43,8 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
 
     static final Logger LOG = LoggerFactory.getLogger(RdaAlarmsPublisher.class);
     private static final SimpleDateFormat df = new SimpleDateFormat("dd.MM.YYYY HH:MM:SS");
+
+    private static RdaAlarmsPublisher publisher;
     
     private SourceManager sm;
     private VCM received;
@@ -58,13 +60,37 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
     //
     // --- CONSTRUCTION ----------------------------------------------------------------
     //
-    public RdaAlarmsPublisher(String serverName, SourceManager sm, C2monConnectionIntf c2mon) {
-        this.serverName = serverName;
-        this.sm = sm;
+    private RdaAlarmsPublisher() {
+    }
+
+    public static RdaAlarmsPublisher getPublisher() {
+        if (publisher == null) {
+            publisher = new RdaAlarmsPublisher();
+        }
+        return publisher;
+    }
+
+    public void setC2mon(C2monConnectionIntf c2mon) {
         this.c2mon = c2mon;
         this.c2mon.setListener(this);
     }
-
+    
+    public C2monConnectionIntf getC2mon() {
+        return this.c2mon;
+    }
+    
+    public void setSourceMgr(SourceManager sourceMgr) {
+        this.sm = sourceMgr;
+    }
+    
+    public SourceManager getSourceMgr() {
+        return this.sm;
+    }
+    
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+    
     public void setReceived(VCM received) {
         this.received = received;
     }

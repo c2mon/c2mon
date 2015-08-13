@@ -12,7 +12,6 @@ import cern.c2mon.client.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 
-// TODO add a thread to generate some test events
 public class C2monConnectionMock implements C2monConnectionIntf{
 
     AlarmListener listener;
@@ -40,4 +39,16 @@ public class C2monConnectionMock implements C2monConnectionIntf{
         return activeAlarms;
     }
 
+    public void sendAlarm(String ff, String fm, int fc) {
+        AlarmValue av = new AlarmValueImpl(1L, fc, fm, ff, "Activation", 1L, new Timestamp(System.currentTimeMillis()), true);
+        listener.onAlarmUpdate(av);
+    }
+
+    @Override
+    public int getQuality(long alarmTagId) {
+        int qual = Quality.EXISTING | Quality.VALID;
+        return qual;
+    }
+    
+    
 }
