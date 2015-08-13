@@ -32,7 +32,7 @@ public class SourceManager extends TimerTask {
     private static final Logger LOG = LoggerFactory.getLogger(SourceManager.class);
     
     private ConcurrentHashMap<String, String> alarmEquip = new ConcurrentHashMap<String, String>();
-    private Map<String, RdaAlarmProperty> properties = new HashMap<String, RdaAlarmProperty>();    
+    private Map<String, RdaAlarmsProperty> properties = new HashMap<String, RdaAlarmsProperty>();    
     private AcquiredData sources;
 
     private int sourceCount;
@@ -107,7 +107,7 @@ public class SourceManager extends TimerTask {
      * @param alarmId <code>String</code> alarm identifier (triplet)
      * @return <code>RdaAlarmPropery</code> providing all known alarms for the source of the alarm
      */
-    public RdaAlarmProperty findProp(String alarmId) {
+    public RdaAlarmsProperty findProp(String alarmId) {
         String sourceName = alarmEquip.get(alarmId);
         if (sourceName != null) {
             return properties.get(sourceName);
@@ -150,8 +150,8 @@ public class SourceManager extends TimerTask {
         return properties.containsKey(sourceId);
     }
 
-    private RdaAlarmProperty addSource(String source) {
-        RdaAlarmProperty property = new RdaAlarmProperty(source);
+    private RdaAlarmsProperty addSource(String source) {
+        RdaAlarmsProperty property = new RdaAlarmsProperty(source);
         properties.put(source, property);        
         sources.getData().append(source, System.currentTimeMillis());
         sourceCount++;

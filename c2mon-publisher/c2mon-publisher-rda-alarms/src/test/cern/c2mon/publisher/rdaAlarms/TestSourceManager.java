@@ -15,7 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:cern/c2mon/publisher/rdaAlarms/alarms_publisher.xml")
 @ActiveProfiles(profiles = "TEST")
-public class TestSourceManager extends TestUtil {
+public class TestSourceManager extends TestBaseClass {
 
     @Test
     public void testSourceCount() throws Exception {
@@ -27,11 +27,11 @@ public class TestSourceManager extends TestUtil {
 
         assertTrue(1 <= smgr.getSourceCount());
         
-        assertEquals(TestUtil.EXISTING_SOURCE_ID, smgr.getSourceNameForAlarm(TestUtil.EXISTING_ALARM_ID));
-        assertNull(smgr.getSourceNameForAlarm(TestUtil.NOT_EXISTING_ALARM_ID));
+        assertEquals(TestBaseClass.EXISTING_SOURCE_ID, smgr.getSourceNameForAlarm(TestBaseClass.EXISTING_ALARM_ID));
+        assertNull(smgr.getSourceNameForAlarm(TestBaseClass.NOT_EXISTING_ALARM_ID));
         
-        assertNotNull(smgr.findProp(TestUtil.EXISTING_ALARM_ID));
-        assertNull(smgr.findProp(TestUtil.NOT_EXISTING_ALARM_ID));
+        assertNotNull(smgr.findProp(TestBaseClass.EXISTING_ALARM_ID));
+        assertNull(smgr.findProp(TestBaseClass.NOT_EXISTING_ALARM_ID));
         getLogger().info("Completed testSourceCount() ---------------- ");
     }
 
@@ -39,10 +39,6 @@ public class TestSourceManager extends TestUtil {
     // TODO check the alarm count, including after some activation
     // TODO test the garbage collector 
     
-    // TODO test a VCM
     
-    // TODO test RdaProperty (updating and filtered/unfiltered get)
-    // TODO test RdaPublisher lifecycle (start, stop)
-    // TODO test RdaPublisher update of values (subscribe, get, set, use demo code for that)
     
 }

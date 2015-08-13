@@ -8,7 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.PropertyConfigurator;
 
-import cern.c2mon.publisher.rdaAlarms.RdaAlarmProperty.AlarmState;
+import cern.c2mon.publisher.rdaAlarms.RdaAlarmsProperty.AlarmState;
 import cern.japc.AcquiredParameterValue;
 import cern.japc.MapParameterValue;
 import cern.japc.Parameter;

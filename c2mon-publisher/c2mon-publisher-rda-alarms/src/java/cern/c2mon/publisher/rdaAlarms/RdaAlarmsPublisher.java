@@ -192,7 +192,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
                 request.requestCompleted(sm.getSources());
                 LOG.debug("Request completed for property {}", request.getPropertyName());
             } else {
-                RdaAlarmProperty property = sm.findProp(request.getPropertyName());
+                RdaAlarmsProperty property = sm.findProp(request.getPropertyName());
 
                 if (null == property) {
                     LOG.warn("Property {} unknown.", request.getPropertyName());
@@ -216,7 +216,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
 
         @Override
         public void subscribe(SubscriptionRequest request) {
-            RdaAlarmProperty property = sm.findProp(request.getPropertyName());
+            RdaAlarmsProperty property = sm.findProp(request.getPropertyName());
             if (property != null) {
                 LOG.debug("subscribe: {}", request.getId());
                 SubscriptionCreator creator = request.accept();
@@ -239,7 +239,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
         @Override
         public void subscriptionSourceAdded(SubscriptionSource subscription) {
             LOG.debug("subscriptionSourceAdded: {}", subscription.getId());
-            RdaAlarmProperty property = sm.findProp(subscription.getPropertyName());
+            RdaAlarmsProperty property = sm.findProp(subscription.getPropertyName());
             if (property != null) {
                 property.setSubscriptionSource(subscription);
                 LOG.info("Subscription to {} accepted", subscription.getPropertyName());
@@ -253,7 +253,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
         @Override
         public void subscriptionSourceRemoved(SubscriptionSource subscription) {
             LOG.debug("subscriptionSourceRemoved: {}", subscription.getId());
-            RdaAlarmProperty property = sm.findProp(subscription.getPropertyName());
+            RdaAlarmsProperty property = sm.findProp(subscription.getPropertyName());
             if (property != null) {
                 property.removeSubscriptionSource();
             }
@@ -261,8 +261,8 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
     }
 
     /**
-     * Updates the corresponding {@link RdaAlarmProperty} instance about the value update. In case of a new (yet)
-     * unknown tag a new {@link RdaAlarmProperty} instance is first of all created.
+     * Updates the corresponding {@link RdaAlarmsProperty} instance about the value update. In case of a new (yet)
+     * unknown tag a new {@link RdaAlarmsProperty} instance is first of all created.
      */
     @Override
     public void onAlarmUpdate(AlarmValue av) {
@@ -271,7 +271,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
         LOG.debug(" RECEIVED    > " + alarmId + " is active:" + av.isActive());
         received.increment();
 
-        RdaAlarmProperty sourceProp = sm.findProp(alarmId);
+        RdaAlarmsProperty sourceProp = sm.findProp(alarmId);
         if (sourceProp == null) {
             rejected++;
             LOG.warn("Alarm " + alarmId + " discarded, could not find a source for it");

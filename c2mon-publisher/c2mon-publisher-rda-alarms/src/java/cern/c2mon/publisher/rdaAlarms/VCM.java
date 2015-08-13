@@ -31,7 +31,7 @@ public class VCM {
     private long currentCounter;        // track of the increments during the current period
     private long lastValue;             // value observed during last complete period
     private long totalValue;            // value observed since the start of the VCM timer
-
+    private Timer timer;
     
     //
     // --- CONSTRUCTION -----------------------------------------------------------------
@@ -41,7 +41,10 @@ public class VCM {
      * @param seconds in between two acquisitions of the vcm value
      */
     public void setVcmSeconds(int seconds) {
-        Timer timer = new Timer() ;
+        if (timer != null) {
+            timer.cancel();
+        }
+        timer = new Timer() ;
         long millis = seconds * 1000;
         timer.schedule(new Updater(), millis, millis) ;            
     }

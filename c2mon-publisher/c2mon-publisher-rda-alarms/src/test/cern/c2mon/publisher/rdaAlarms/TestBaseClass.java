@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
-public class TestUtil {
+public class TestBaseClass {
 
     public static final String EXISTING_ALARM_ID = "FF:FM:1";
     public static final String EXISTING_SOURCE_ID = "TSOURCE";
