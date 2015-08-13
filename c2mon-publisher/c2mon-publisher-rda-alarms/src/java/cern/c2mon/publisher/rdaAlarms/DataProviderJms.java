@@ -36,7 +36,7 @@ public class DataProviderJms implements DataProviderInterface {
         alarmProviderFactory = new RemoteModuleFactory();
         alarmProviderFactory.init();
 
-        provider = alarmProviderFactory.getDataProvider();
+        provider = alarmProviderFactory.getAlarmDataProvider();
         LOG.info("Ready.");
     }
 
@@ -61,7 +61,10 @@ public class DataProviderJms implements DataProviderInterface {
         Map<String, Alarm> alarmDefs = provider.getAlarmDefinitions(alarmIds);
         for (String alarmId : alarmIds) {
             counter++;
-            result.put(alarmId, alarmDefs.get(alarmId).getSourceName());
+            Alarm alarm = alarmDefs.get(alarmId);
+            if (alarm != null) {
+                result.put(alarmId, alarm.getSourceName());
+            }
         }            
         LOG.info("Cached source name for {} alarms.", counter);
         return result;

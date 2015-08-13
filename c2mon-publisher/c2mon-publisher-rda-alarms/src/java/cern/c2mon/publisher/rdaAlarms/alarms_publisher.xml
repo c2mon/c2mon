@@ -42,7 +42,7 @@
 	</bean>
 
 	<bean id="sourceMgr" class="cern.c2mon.publisher.rdaAlarms.SourceManager" factory-method = "getSourceManager" >
- 		<property name="dataProvider" ref="database" />
+ 		<property name="dataProvider" ref="dataprovider" />
 <!-- from JMS: 	<constructor-arg ref="dataprovider" /> --> 	
 <!-- from DB: 	<constructor-arg ref="database" /> --> 	
 	</bean>
