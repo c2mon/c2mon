@@ -13,7 +13,6 @@
 	<artifactId>c2mon-config-loader-deploy</artifactId>
 	<name>C2MON Configuration Loader deployment module</name>
 	<version>1.0.3-SNAPSHOT</version>
-
 	<packaging>pom</packaging>
 
 	<description>
