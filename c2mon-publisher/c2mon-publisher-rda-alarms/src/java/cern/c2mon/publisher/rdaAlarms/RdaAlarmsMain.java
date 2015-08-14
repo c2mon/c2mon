@@ -10,8 +10,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 /**  
+ * The RDA alarms publisher acts as a C2MON client working with all alarm tags in the server.
+ * Based on configuration data, a property is created for each of the alarm sources, an alarm
+ * becomes an entry in the internal storage of the property (a String/String map).
+ * 
+ * See demo code in this project for more information about how to subscribe and use the data
+ * provided by the publisher
+ * 
  * TODO prepare some integration tests: real config, script to automate and run from deployment project before release!
- * TODO documentation, announcement, deployment
+ * TODO announcement, deployment
  * 
  * @author mbuttner
  */

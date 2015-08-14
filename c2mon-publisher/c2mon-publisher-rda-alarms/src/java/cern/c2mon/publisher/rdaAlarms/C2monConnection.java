@@ -16,6 +16,12 @@ import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 
+/**
+ * Implementation of C2monConnectionIntf for the real C2MON connection. This is the class
+ * to be used in the Spring configuration for production purpose.
+ * 
+ * @author mbuttner
+ */
 public class C2monConnection implements C2monConnectionIntf {
 
     private static final Logger LOG = LoggerFactory.getLogger(C2monConnection.class);

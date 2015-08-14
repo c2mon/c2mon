@@ -58,15 +58,6 @@ public class VCM {
             switchValues();
         }
     }
-    //
-    // --- PRIVATE METHODS ---------------------------------------------------------------
-    //
-    private synchronized void switchValues()
-    {
-        lastValue = currentCounter;
-        totalValue += currentCounter;
-        currentCounter = 0;
-    }
     
     //
     // --- PUBLIC METHODS ----------------------------------------------------------------
@@ -84,4 +75,15 @@ public class VCM {
     public synchronized void increment() {
         currentCounter++;
     }
+    
+    //
+    // --- PRIVATE METHODS ---------------------------------------------------------------
+    //
+    private synchronized void switchValues()
+    {
+        lastValue = currentCounter;
+        totalValue += currentCounter;
+        currentCounter = 0;
+    }
+
 }

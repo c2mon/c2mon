@@ -24,6 +24,13 @@ import cern.cmw.data.Data;
 import cern.cmw.data.DataFactory;
 import cern.cmw.rda3.common.data.AcquiredData;
 
+/***
+ * The SourceManager holds the list of known alarm sources, allows to find the RDA property
+ * containing all known alarms for a given source, and periodically refreshes the list of 
+ * sources (once per 15 minutes).
+ * 
+ * @author mbuttner
+ */
 @ManagedResource(objectName = "cern.c2mon.publisher.rdaAlarms:name=SourceManager", description = "Alarm Soure Manager")
 public class SourceManager extends TimerTask {
 
@@ -33,7 +40,9 @@ public class SourceManager extends TimerTask {
     
     private ConcurrentHashMap<String, String> alarmEquip = new ConcurrentHashMap<String, String>();
     private Map<String, RdaAlarmsProperty> properties = new HashMap<String, RdaAlarmsProperty>();    
-    private AcquiredData sources;
+    
+    // for special RDA property exposing the list of source
+    private AcquiredData sources;   
 
     private int sourceCount;
     
@@ -66,6 +75,11 @@ public class SourceManager extends TimerTask {
     @ManagedAttribute
     public int getAlarmCount() {
         return alarmEquip.size();
+    }
+
+    @ManagedAttribute
+    public Set<String> getSourceName() {
+        return properties.keySet();
     }
 
     //
@@ -162,10 +176,6 @@ public class SourceManager extends TimerTask {
     //
     // --- PRIVATE METHODS ---------------------------------------------------------------------
     //
-    private boolean exists(String sourceId) {
-        return properties.containsKey(sourceId);
-    }
-
     private RdaAlarmsProperty addSource(String source) {
         LOG.info("Adding source {} ..." , source);
         RdaAlarmsProperty property = new RdaAlarmsProperty(source);
@@ -203,7 +213,7 @@ public class SourceManager extends TimerTask {
             
             // 1. add new stuff
             for (String sourceId : sourceDefs) {
-                if (!this.exists(sourceId)) {
+                if (!properties.containsKey(sourceId)) {
                     addSource(sourceId);
                 }
             }

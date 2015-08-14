@@ -14,8 +14,18 @@ import cern.cmw.rda3.common.data.AcquiredData;
 import cern.cmw.rda3.server.subscription.SubscriptionSource;
 
 /**
- * This class represents a RDA property. For each tag which is published via RDA an instance of this class is created.
- * It handles the registration of the listeners and is responsible of notifiying all subscribers about value updates.
+ * This class represents a RDA property. For each alarm source, an instance of this class is created
+ * and holds entries for all alarms sent by this source (in the for of String ALARM_ID = String STATUS).
+ * 
+ * To query the RDA publisher, one needs to:
+ * - subscribe to the property with the name SOURCE_NAME
+ * - find the entry with name ALARM_ID
+ * - process the value following the values of AlarmState enum in this class
+ * 
+ * It is possible to find the list of known sources by a GET call to the special property "_SOURCES"
+ * 
+ * The class handles the registration of the listeners and is responsible of notifying all subscribers 
+ * about value updates.
  *
  * @author Mark Buttner
  */
@@ -26,9 +36,9 @@ public class RdaAlarmsProperty {
     
     private static final Logger LOG = LoggerFactory.getLogger(RdaAlarmsProperty.class);
 
+    private final String rdaPropertyName;
     private Data currentValue = null;
     private SubscriptionSource subscriptionSource;
-    private final String rdaPropertyName;
 
     private ConcurrentHashMap<String,Long> updates = new ConcurrentHashMap<String, Long>();
     
@@ -51,6 +61,36 @@ public class RdaAlarmsProperty {
         this.subscriptionSource = null;
     }
 
+    /**
+     * Get without filtering. The whole content is returned, i.e. all alarms
+     * @return <code>Data</code> the list of all known alarms for the source with their status
+     */
+    public synchronized Data get() {
+        return currentValue;
+    }
+    
+    /**
+     * Get with filters. Only the entries matching the filter entries are returned and
+     * translated (the id in the returned structure is no longer the alarm id, but the filter name
+     * provided by the caller).
+     * @param filters the list of elements to return, if present
+     * @return <code>AcquiredData</code> the list of alarms matching the filter entries
+     */
+    public synchronized AcquiredData getValue(Data filters) {
+        return getValue(currentValue, filters);
+    }
+
+    /**
+     * When a new value for an alarm linked to this property is received:
+     * - if the update is older than the previous known, it is discarded
+     * - if the alarm is known, we remove its entry (updates are not supported by RDA Data objects)
+     * - in case the underlying datatag does not exist anymore, we stop there (the alarm is
+     *      no longer in the data of the property)
+     * - otherwise, the status is computed out of the alarm and datatag information, 
+     *      added to the internal storage, subscribers are notified.
+     * 
+     * @param av <code>AlarmValue</code> the new value for an alarm coming from the source
+     */
     public synchronized void onUpdate(AlarmValue av) {
         String alarmId = RdaAlarmsPublisher.getAlarmId(av);
 
@@ -62,6 +102,7 @@ public class RdaAlarmsProperty {
             if (updateTs.longValue() > av.getTimestamp().getTime()) {
                 return;
             }
+            updateTs = av.getTimestamp().getTime();
         }
             
         
@@ -97,22 +138,24 @@ public class RdaAlarmsProperty {
             subscriptionSource.notify(getValue(currentValue, filters));
         }
     }
-
-    //
-    // --- PACKAGE METHODS ------------------------------------------------------------------------
-    //
-    protected synchronized AcquiredData getValue(Data filters) {
-        return getValue(currentValue, filters);
-    }
-
-    synchronized Data get() {
-        return currentValue;
-    }
-
  
     //
     // --- PRIVATE METHODS -------------------------------------------------------------------------
     //
+    /**
+     * Internal method to build the result for a GET with filter. The simplest case is when the
+     * requested alarm is present in the cache, it is just added to the result with the filtername
+     * as key (instead of alarm id GETs without filters). 
+     * 
+     * If the alarm is not present, we must first ask the dataprovider to check if it belongs to
+     * the source represented by this property. If yes, the request is valid, we simply did not
+     * receive any activation since startup. Otherwise, the filter is added to the result set with
+     * a status value explaining what is wrong.
+     * 
+     * @param value <code>Data</code> the current value of the properts
+     * @param filters   <code>Data</code> the list of filter elements
+     * @return <code>AcquiredData</code> the result set
+     */
     private AcquiredData getValue(Data value, Data filters) {
         if (filters != null && filters.getAllEntriesSize() > 0) {            
             Data filteredValue = DataFactory.createData();

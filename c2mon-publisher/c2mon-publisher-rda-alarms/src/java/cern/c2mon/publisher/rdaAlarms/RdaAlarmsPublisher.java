@@ -65,15 +65,15 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
     }
 
     public static RdaAlarmsPublisher getPublisher() {
-        LOG.warn("Publisher factory method called ...");
         if (publisher == null) {
-            LOG.warn("... create a new publisher instance ...");
             publisher = new RdaAlarmsPublisher();
-            LOG.warn(".Ok.");
         }
         return publisher;
     }
 
+    //
+    // --- PUBLIC GETTERS / SETTERS ----------------------------------------------------
+    // ... some of them are used by Spring at bean construction time ...
     public void setC2mon(C2monConnectionIntf c2mon) {
         this.c2mon = c2mon;
         this.c2mon.setListener(this);
@@ -103,6 +103,9 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
         this.processed = processed;
     }
     
+    static String getAlarmId(AlarmValue av) {
+        return av.getFaultFamily() + ":" + av.getFaultMember() + ":" + av.getFaultCode();
+    }
     
     //
     // --- JMX -------------------------------------------------------------------------
@@ -209,7 +212,38 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
     }
 
     //
-    // --- PUBLIC METHODS -------------------------------------------------------------------------
+    // --- Implements AlarmListener -----------------------------------------------------------
+    //
+    /**
+     * Updates the corresponding {@link RdaAlarmsProperty} instance about the value update. 
+     * In case of a new (yet) unknown tag a new {@link RdaAlarmsProperty} instance is first 
+     * of all created.
+     */
+    @Override
+    public void onAlarmUpdate(AlarmValue av) {
+
+        String alarmId = getAlarmId(av);
+        LOG.debug(" RECEIVED    > " + alarmId + " is active:" + av.isActive());
+        received.increment();
+
+        RdaAlarmsProperty sourceProp = sm.findPropForAlarm(alarmId);
+        if (sourceProp == null) {
+            rejected++;
+            LOG.warn("Alarm " + alarmId + " discarded, could not find a source for it");
+        } else {
+            try {
+                sourceProp.onUpdate(av);
+                processed.increment();
+            } catch (Exception e) {
+                LOG.error("Failed to publish " + alarmId, e);
+            }
+        }
+        LOG.debug(" PROCESSED    > " + alarmId);
+
+    }
+
+    //
+    // --- RDA calls  -------------------------------------------------------------------------
     //
     class RRCallback implements RequestReplyCallback {
 
@@ -289,38 +323,5 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
         }
     }
 
-    /**
-     * Updates the corresponding {@link RdaAlarmsProperty} instance about the value update. In case of a new (yet)
-     * unknown tag a new {@link RdaAlarmsProperty} instance is first of all created.
-     */
-    @Override
-    public void onAlarmUpdate(AlarmValue av) {
-
-        String alarmId = getAlarmId(av);
-        LOG.debug(" RECEIVED    > " + alarmId + " is active:" + av.isActive());
-        received.increment();
-
-        RdaAlarmsProperty sourceProp = sm.findPropForAlarm(alarmId);
-        if (sourceProp == null) {
-            rejected++;
-            LOG.warn("Alarm " + alarmId + " discarded, could not find a source for it");
-        } else {
-            try {
-                sourceProp.onUpdate(av);
-                processed.increment();
-            } catch (Exception e) {
-                LOG.error("Failed to publish " + alarmId, e);
-            }
-        }
-        LOG.debug(" PROCESSED    > " + alarmId);
-
-    }
-
-    //
-    // --- PRIVATE METHODS -------------------------------------------------------------------------
-    //
-    static String getAlarmId(AlarmValue av) {
-        return av.getFaultFamily() + ":" + av.getFaultMember() + ":" + av.getFaultCode();
-    }
 
 }

@@ -13,6 +13,14 @@ import cern.c2mon.client.jms.ClientHealthListener;
 import cern.c2mon.client.jms.ConnectionListener;
 import cern.c2mon.shared.client.supervision.Heartbeat;
 
+/**
+ * Logger for the events on the C2MON connection. There is no logic or actions attached to this,
+ * but in case of problems, a trace will appear in the log files. 
+ * 
+ * Usage: call C2monConnectionMonitor.start(); (just once, further calls will be ignored)
+ * 
+ * @author mbuttner
+ */
 class C2monConnectionMonitor implements ClientHealthListener, ConnectionListener, HeartbeatListener {
 
     private static C2monConnectionMonitor instance;

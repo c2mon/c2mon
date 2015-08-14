@@ -53,6 +53,11 @@ public class DataProviderJms implements DataProviderIntf {
         return provider.getSourceNames();        
     }
     
+    /**
+     * Caching. This method is used at startup when a large number of alarms are coming in.
+     * We use the array call of the dataprovider to get all data at once, rather than 
+     * asking for each alarm individually.
+     */
     @Override
     public ConcurrentHashMap<String, String> initSourceMap(Set<String> alarmIds) {
         LOG.info("Preparing the alarmEquip map ...");
