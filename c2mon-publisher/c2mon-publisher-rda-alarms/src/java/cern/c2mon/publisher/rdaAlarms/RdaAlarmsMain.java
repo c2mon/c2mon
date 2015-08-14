@@ -17,9 +17,6 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
  * See demo code in this project for more information about how to subscribe and use the data
  * provided by the publisher
  * 
- * TODO prepare some integration tests: real config, script to automate and run from deployment project before release!
- * TODO announcement, deployment
- * 
  * @author mbuttner
  */
 public class RdaAlarmsMain extends Thread {
