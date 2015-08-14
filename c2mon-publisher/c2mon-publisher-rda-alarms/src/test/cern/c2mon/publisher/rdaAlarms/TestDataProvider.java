@@ -26,8 +26,8 @@ public class TestDataProvider extends TestBaseClass {
         getLogger().info("Starting testGetSource() ----------------- ");
 
         DataProviderIntf dpi = applicationContext.getBean("dataProvider", DataProviderIntf.class);
-        assertNotNull(dpi.getSource(TestBaseClass.EXISTING_ALARM_ID));
-        assertNull(dpi.getSource(TestBaseClass.NOT_EXISTING_ALARM_ID));
+        assertNotNull(dpi.getSource(TestBaseClass.ALARM_ID));
+        assertNull(dpi.getSource(TestBaseClass.MISSING_ALARM_ID));
                 
         getLogger().info("Completed testGetSource() ---------------- ");
     }
@@ -38,7 +38,7 @@ public class TestDataProvider extends TestBaseClass {
         DataProviderIntf dpi = applicationContext.getBean("dataProvider", DataProviderIntf.class);
         Collection<String> sourceNames = dpi.getSourceNames();
         assertTrue(1 <= sourceNames.size());
-        assertTrue(sourceNames.contains(TestBaseClass.EXISTING_SOURCE_ID));
+        assertTrue(sourceNames.contains(TestBaseClass.SOURCE_ID));
 
         getLogger().info("Completed testGetSourceNames() ---------------- ");
     }
@@ -48,11 +48,11 @@ public class TestDataProvider extends TestBaseClass {
         getLogger().info("Starting testInitSourceMap() ----------------- ");
         DataProviderIntf dpi = applicationContext.getBean("dataProvider", DataProviderIntf.class);
         HashSet<String> alarmIds = new HashSet<String>();
-        alarmIds.add(TestBaseClass.EXISTING_ALARM_ID);
-        alarmIds.add(TestBaseClass.NOT_EXISTING_ALARM_ID);
+        alarmIds.add(TestBaseClass.ALARM_ID);
+        alarmIds.add(TestBaseClass.MISSING_ALARM_ID);
         Map<String,String> alarmSource = dpi.initSourceMap(alarmIds);
-        assertEquals(TestBaseClass.EXISTING_SOURCE_ID, alarmSource.get(TestBaseClass.EXISTING_ALARM_ID));
-        assertNull(alarmSource.get(TestBaseClass.NOT_EXISTING_ALARM_ID));
+        assertEquals(TestBaseClass.SOURCE_ID, alarmSource.get(TestBaseClass.ALARM_ID));
+        assertNull(alarmSource.get(TestBaseClass.MISSING_ALARM_ID));
 
         getLogger().info("Completed testInitSourceMap() ---------------- ");
     }

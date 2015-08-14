@@ -34,7 +34,7 @@ public class TestRdaAlarmsProperty extends TestBaseClass {
     public void testUpdateProp() {
         getLogger().info("Starting testUpdateProp() ----------------- ");
 
-        prop = new RdaAlarmsProperty(TestBaseClass.EXISTING_SOURCE_ID);
+        prop = new RdaAlarmsProperty(TestBaseClass.SOURCE_ID);
         assertEquals(0, prop.get().getEntries().size());
         
         // update with AlarmValue object
@@ -46,16 +46,16 @@ public class TestRdaAlarmsProperty extends TestBaseClass {
                         
         // check unfiltered value result, all alarms (i.e.) should be there
         assertEquals(2, prop.get().getEntries().size());
-        assertEquals(AlarmState.ACTIVE.toString(), prop.get().getString(EXISTING_ALARM_ID));
+        assertEquals(AlarmState.ACTIVE.toString(), prop.get().getString(ALARM_ID));
 
         av = new AlarmValueImpl(1L, 1, "FM", "FF", "Activation", 1L, ts, false);
         prop.onUpdate(av);
         assertEquals(2, prop.get().getEntries().size());
-        assertEquals(AlarmState.TERMINATE.toString(), prop.get().getString(EXISTING_ALARM_ID));
+        assertEquals(AlarmState.TERMINATE.toString(), prop.get().getString(ALARM_ID));
             
         // check filtered value result
         Data filter = DataFactory.createData();
-        filter.append("F1", TestBaseClass.EXISTING_ALARM_ID);
+        filter.append("F1", TestBaseClass.ALARM_ID);
         assertEquals(1, prop.getValue(filter).getData().getEntries().size());
         assertNotNull("F1", prop.getValue(filter).getData().getString("F1"));   // make sure the filter key is now the id!
         printProp(filter);

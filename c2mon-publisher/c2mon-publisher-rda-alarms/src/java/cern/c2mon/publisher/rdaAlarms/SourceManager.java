@@ -40,7 +40,7 @@ public class SourceManager extends TimerTask {
     private DataProviderIntf dpi;
     private Timer timer;
 
-    private boolean initialized;    // flag to allow initialization only once.
+    private boolean initialized=false;    // flag to allow initialization only once.
     
     //
     // --- CONSTRUCTION -----------------------------------------------------------------------
@@ -98,7 +98,7 @@ public class SourceManager extends TimerTask {
      * @param alarmId <code>String</code> alarm identifier (triplet)
      * @return <code>RdaAlarmPropery</code> providing all known alarms for the source of the alarm
      */
-    public RdaAlarmsProperty findProp(String alarmId) {
+    public RdaAlarmsProperty findPropForAlarm(String alarmId) {
         String sourceName = alarmEquip.get(alarmId);
         if (sourceName != null) {
             return properties.get(sourceName);
@@ -121,7 +121,10 @@ public class SourceManager extends TimerTask {
         return null;
     }
     
-
+    public RdaAlarmsProperty findPropForSource(String sourceName) {
+        return properties.get(sourceName);
+    }
+    
     /**
      * For efficiency: the method loads all source definitions and updates internal strucutres
      * accordingly. For the active alarms, the mapping to their source is also filled in. This
@@ -132,6 +135,7 @@ public class SourceManager extends TimerTask {
      */
     public void initialize(Collection<AlarmValue> activeAlarms) throws Exception { 
         if (!initialized) {
+            LOG.info("Initializing ...");
             Data sd = DataFactory.createData();
             sources = new AcquiredData(sd);
             for (String source : dpi.getSourceNames()) {
@@ -148,6 +152,7 @@ public class SourceManager extends TimerTask {
             }
             alarmEquip = dpi.initSourceMap(alarmIds);
             initialized=true;
+            LOG.info("Init completed.");
         } else {
             LOG.warn("Already initialized, this attempt is ignored");
         }
@@ -162,10 +167,13 @@ public class SourceManager extends TimerTask {
     }
 
     private RdaAlarmsProperty addSource(String source) {
+        LOG.info("Adding source {} ..." , source);
         RdaAlarmsProperty property = new RdaAlarmsProperty(source);
         properties.put(source, property);        
+        LOG.debug("... property for source {} created and registered..." , source);
         sources.getData().append(source, System.currentTimeMillis());
         sourceCount++;
+        LOG.debug("... source {} listed in position {}." , sourceCount);
         return property;
     }
     

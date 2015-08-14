@@ -39,11 +39,11 @@ public class TestSourceManager extends TestBaseClass {
 
         assertTrue(1 <= smgr.getSourceCount());
         
-        assertEquals(TestBaseClass.EXISTING_SOURCE_ID, smgr.getSourceNameForAlarm(TestBaseClass.EXISTING_ALARM_ID));
-        assertNull(smgr.getSourceNameForAlarm(TestBaseClass.NOT_EXISTING_ALARM_ID));
+        assertEquals(TestBaseClass.SOURCE_ID, smgr.getSourceNameForAlarm(TestBaseClass.ALARM_ID));
+        assertNull(smgr.getSourceNameForAlarm(TestBaseClass.MISSING_ALARM_ID));
         
-        assertNotNull(smgr.findProp(TestBaseClass.EXISTING_ALARM_ID));
-        assertNull(smgr.findProp(TestBaseClass.NOT_EXISTING_ALARM_ID));
+        assertNotNull(smgr.findPropForAlarm(TestBaseClass.ALARM_ID));
+        assertNull(smgr.findPropForAlarm(TestBaseClass.MISSING_ALARM_ID));
         getLogger().info("Completed testSourceCount() ---------------- ");
     }
     
@@ -60,13 +60,13 @@ public class TestSourceManager extends TestBaseClass {
         assertTrue(2 == smgr.getSourceCount());
         
         // now send an alarm and check that we have 2!
-        c2mon.sendAlarm(TestBaseClass.SAMPLE_FF, TestBaseClass.SAMPLE_FM, TestBaseClass.SAMPLE_FC);
+        c2mon.activateAlarm(TestBaseClass.SAMPLE_FF, TestBaseClass.SAMPLE_FM, TestBaseClass.SAMPLE_FC);
         assertTrue(2 == smgr.getAlarmCount());
         assertTrue(2 == smgr.getSourceCount());
         
         // now run the garbage collector and check that some dissappeared
         DataProviderMock dpi = applicationContext.getBean("dataProvider", DataProviderMock.class);
-        dpi.removeSource(TestBaseClass.EXISTING_SOURCE_ID_2);
+        dpi.removeSource(TestBaseClass.SOURCE_ID_bis);
         smgr.run();
         assertTrue(1 == smgr.getAlarmCount());
         assertTrue(1 == smgr.getSourceCount());

@@ -16,10 +16,10 @@ public class DataProviderMock implements DataProviderIntf {
     private ArrayList<String> sources = new ArrayList<String>();
     
     public DataProviderMock() {
-        sources.add(TestBaseClass.EXISTING_SOURCE_ID);
-        sources.add(TestBaseClass.EXISTING_SOURCE_ID_2);
-        alarmSources.put(TestBaseClass.EXISTING_ALARM_ID, TestBaseClass.EXISTING_SOURCE_ID);
-        alarmSources.put(TestBaseClass.EXISTING_ALARM_ID_3, TestBaseClass.EXISTING_SOURCE_ID);
+        sources.add(TestBaseClass.SOURCE_ID);
+        sources.add(TestBaseClass.SOURCE_ID_bis);
+        alarmSources.put(TestBaseClass.ALARM_ID, TestBaseClass.SOURCE_ID);
+        alarmSources.put(TestBaseClass.ALARM_ID_bis, TestBaseClass.SOURCE_ID);
         
         // this one comes on the fly!
         // alarmSources.put(TestBaseClass.EXISTING_ALARM_ID_2, TestBaseClass.EXISTING_SOURCE_ID_2);
@@ -38,8 +38,8 @@ public class DataProviderMock implements DataProviderIntf {
         String sourceId = alarmSources.get(alarmId);
         
         // use case 2.: find it in the external source (DB or JMS)
-        if (sourceId == null && alarmId.equals(TestBaseClass.EXISTING_ALARM_ID_2)) {
-            sourceId = TestBaseClass.EXISTING_SOURCE_ID_2;
+        if (sourceId == null && alarmId.equals(TestBaseClass.SAMPLE_ALARM_ID)) {
+            sourceId = TestBaseClass.SOURCE_ID_bis;
             alarmSources.put(alarmId, sourceId);            
         }
         return sourceId;

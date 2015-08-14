@@ -61,11 +61,15 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
     // --- CONSTRUCTION ----------------------------------------------------------------
     //
     private RdaAlarmsPublisher() {
+        LOG.warn("Publisher instance created ...");
     }
 
     public static RdaAlarmsPublisher getPublisher() {
+        LOG.warn("Publisher factory method called ...");
         if (publisher == null) {
+            LOG.warn("... create a new publisher instance ...");
             publisher = new RdaAlarmsPublisher();
+            LOG.warn(".Ok.");
         }
         return publisher;
     }
@@ -163,13 +167,14 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
             builder.setRequestReplyCallback(new RRCallback());
             builder.setSubscriptionCallback(new SubCallback());
             server = builder.build();
-            LOG.info("Created RDA3 server {}, connecting now to C2MON ..." + serverName);
+            LOG.info("Created RDA3 server {}, connecting now to C2MON ...", serverName);
 
             c2mon.start();
             Collection<AlarmValue> activeAlarms = c2mon.getActiveAlarms();
             LOG.info("... now listening to incoming alarms.");
             
             sm.initialize(activeAlarms);    // load all sources declared at startup
+            c2mon.connectListener();
             for (AlarmValue av : activeAlarms) {
                 this.onAlarmUpdate(av);
             }
@@ -183,7 +188,6 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
     }
 
     public void join() throws InterruptedException {
-        LOG.info("Waiting for RDA server thread to stop ...");
         this.daemonThread.join();
         LOG.info("... ok, stopping the SourceManager ...");
         sm.close();
@@ -217,7 +221,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
                 request.requestCompleted(sm.getSources());
                 LOG.debug("Request completed for property {}", request.getPropertyName());
             } else {
-                RdaAlarmsProperty property = sm.findProp(request.getPropertyName());
+                RdaAlarmsProperty property = sm.findPropForSource(request.getPropertyName());
 
                 if (null == property) {
                     LOG.warn("Property {} unknown.", request.getPropertyName());
@@ -241,7 +245,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
 
         @Override
         public void subscribe(SubscriptionRequest request) {
-            RdaAlarmsProperty property = sm.findProp(request.getPropertyName());
+            RdaAlarmsProperty property = sm.findPropForSource(request.getPropertyName());
             if (property != null) {
                 LOG.debug("subscribe: {}", request.getId());
                 SubscriptionCreator creator = request.accept();
@@ -264,7 +268,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
         @Override
         public void subscriptionSourceAdded(SubscriptionSource subscription) {
             LOG.debug("subscriptionSourceAdded: {}", subscription.getId());
-            RdaAlarmsProperty property = sm.findProp(subscription.getPropertyName());
+            RdaAlarmsProperty property = sm.findPropForSource(subscription.getPropertyName());
             if (property != null) {
                 property.setSubscriptionSource(subscription);
                 LOG.info("Subscription to {} accepted", subscription.getPropertyName());
@@ -278,7 +282,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
         @Override
         public void subscriptionSourceRemoved(SubscriptionSource subscription) {
             LOG.debug("subscriptionSourceRemoved: {}", subscription.getId());
-            RdaAlarmsProperty property = sm.findProp(subscription.getPropertyName());
+            RdaAlarmsProperty property = sm.findPropForSource(subscription.getPropertyName());
             if (property != null) {
                 property.removeSubscriptionSource();
             }
@@ -296,7 +300,7 @@ public final class RdaAlarmsPublisher implements Runnable, AlarmListener {
         LOG.debug(" RECEIVED    > " + alarmId + " is active:" + av.isActive());
         received.increment();
 
-        RdaAlarmsProperty sourceProp = sm.findProp(alarmId);
+        RdaAlarmsProperty sourceProp = sm.findPropForAlarm(alarmId);
         if (sourceProp == null) {
             rejected++;
             LOG.warn("Alarm " + alarmId + " discarded, could not find a source for it");

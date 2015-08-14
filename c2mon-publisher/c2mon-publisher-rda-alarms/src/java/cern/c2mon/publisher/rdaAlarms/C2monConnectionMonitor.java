@@ -4,6 +4,9 @@
 
 package cern.c2mon.publisher.rdaAlarms;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.listener.HeartbeatListener;
 import cern.c2mon.client.jms.ClientHealthListener;
@@ -13,7 +16,7 @@ import cern.c2mon.shared.client.supervision.Heartbeat;
 class C2monConnectionMonitor implements ClientHealthListener, ConnectionListener, HeartbeatListener {
 
     private static C2monConnectionMonitor instance;
-    
+    private static final Logger LOG = LoggerFactory.getLogger(C2monConnectionMonitor.class);
     //
     // --- CONSTRUCTION -----------------------------------------------------------------------------
     //
@@ -34,12 +37,12 @@ class C2monConnectionMonitor implements ClientHealthListener, ConnectionListener
     //
     @Override
     public void onConnection() {
-        RdaAlarmsPublisher.LOG.info("C2MON server -> onConnection()");
+        LOG.info("C2MON server -> onConnection()");
     }
 
     @Override
     public void onDisconnection() {
-        RdaAlarmsPublisher.LOG.warn("C2MON server -> onDisConnection()");
+        LOG.warn("C2MON server -> onDisConnection()");
     }
 
     //
@@ -47,7 +50,7 @@ class C2monConnectionMonitor implements ClientHealthListener, ConnectionListener
     //
     @Override
     public void onSlowUpdateListener(String diagnosticMessage) {
-        RdaAlarmsPublisher.LOG.warn("C2MON server detected slow client: " + diagnosticMessage);
+        LOG.warn("C2MON server detected slow client: " + diagnosticMessage);
     }
 
     //
@@ -55,17 +58,17 @@ class C2monConnectionMonitor implements ClientHealthListener, ConnectionListener
     //
     @Override
     public void onHeartbeatReceived(Heartbeat pHeartbeat) {
-        RdaAlarmsPublisher.LOG.debug("C2MON server -> onHeartbeatReceived()");
+        LOG.debug("C2MON server -> onHeartbeatReceived()");
     }
 
     @Override
     public void onHeartbeatExpired(Heartbeat pHeartbeat) {
-        RdaAlarmsPublisher.LOG.warn("C2MON server -> onHeartbeatExpired()");
+        LOG.warn("C2MON server -> onHeartbeatExpired()");
     }
 
     @Override
     public void onHeartbeatResumed(Heartbeat pHeartbeat) {
-        RdaAlarmsPublisher.LOG.info("C2MON server -> onHeartbeatResumed()");
+        LOG.info("C2MON server -> onHeartbeatResumed()");
     }
 
 }

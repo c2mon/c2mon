@@ -39,8 +39,12 @@ public class C2monConnection implements C2monConnectionIntf {
             LOG.info("Awaiting connection ...");
             Thread.sleep(1000);
         }
+    }
+    
+    @Override
+    public void connectListener() throws JMSException {
         LOG.info("Connecting alarm listener ...");
-        C2monServiceGateway.getTagManager().addAlarmListener(listener);
+        C2monServiceGateway.getTagManager().addAlarmListener(listener);        
     }
     
     @Override
