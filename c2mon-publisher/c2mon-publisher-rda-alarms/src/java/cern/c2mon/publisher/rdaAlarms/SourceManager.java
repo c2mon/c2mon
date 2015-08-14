@@ -4,7 +4,9 @@
 
 package cern.c2mon.publisher.rdaAlarms;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -78,8 +80,11 @@ public class SourceManager extends TimerTask {
     }
 
     @ManagedAttribute
-    public Set<String> getSourceName() {
-        return properties.keySet();
+    public Collection<String> getSourceNames() {
+        ArrayList<String> nameList = new ArrayList<String>();
+        nameList.addAll(properties.keySet());
+        Collections.sort(nameList);
+        return nameList;
     }
 
     //
