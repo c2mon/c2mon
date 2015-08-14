@@ -56,10 +56,10 @@
 			<fileMode>0444</fileMode>
 		</file>
 		<file>
-			<source>provider.properties</source>
+			<source>/user/dmndev/repo/c2mon/provider/provider.properties</source>
 			<outputDirectory>/</outputDirectory>
 			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
+			<fileMode>0600</fileMode>
 		</file>
 		<file>
 			<source>/user/dmndev/repo/c2mon/client/client.properties</source>
