@@ -24,7 +24,7 @@ public interface C2monConnectionIntf {
 
     /**
      * Use this to check hte return value of getQuality()
-     * Ex.: if (qual & Quality.EXISTING == Quality.EXISTING) is true if the data tag is existing
+     * Ex.: if (qual &amp; Quality.EXISTING == Quality.EXISTING) is true if the data tag is existing
      */
     public static class Quality {
         public static final int EXISTING =1;

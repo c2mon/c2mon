@@ -4,14 +4,13 @@
 
 package cern.c2mon.publisher.rdaAlarms;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.sql.Timestamp;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.publisher.rdaAlarms.RdaAlarmsProperty.AlarmState;
@@ -23,9 +22,6 @@ import cern.cmw.data.Entry;
 import cern.cmw.rda3.common.data.AcquiredData;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:cern/c2mon/publisher/rdaAlarms/alarms_publisher.xml")
-@ActiveProfiles(profiles = "TEST")
-
 public class TestRdaAlarmsProperty extends TestBaseClass {
 
     private RdaAlarmsProperty prop;
