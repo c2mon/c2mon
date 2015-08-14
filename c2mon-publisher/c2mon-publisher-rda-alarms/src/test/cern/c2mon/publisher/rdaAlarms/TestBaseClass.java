@@ -14,6 +14,7 @@ import org.springframework.context.ApplicationContext;
 public class TestBaseClass {
 
     public static final String EXISTING_ALARM_ID = "FF:FM:1";
+    public static final String EXISTING_ALARM_ID_3 = "FF:FM:3";
     public static final String EXISTING_SOURCE_ID = "TSOURCE";
     public static final String NOT_EXISTING_ALARM_ID = "XX:YY:Z";
     public static final String EXISTING_SOURCE_ID_2 = "TSOURCE_2";

@@ -19,6 +19,7 @@ public class DataProviderMock implements DataProviderIntf {
         sources.add(TestBaseClass.EXISTING_SOURCE_ID);
         sources.add(TestBaseClass.EXISTING_SOURCE_ID_2);
         alarmSources.put(TestBaseClass.EXISTING_ALARM_ID, TestBaseClass.EXISTING_SOURCE_ID);
+        alarmSources.put(TestBaseClass.EXISTING_ALARM_ID_3, TestBaseClass.EXISTING_SOURCE_ID);
         
         // this one comes on the fly!
         // alarmSources.put(TestBaseClass.EXISTING_ALARM_ID_2, TestBaseClass.EXISTING_SOURCE_ID_2);

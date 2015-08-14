@@ -21,7 +21,9 @@ public class TestRdaAlarmsPublisher extends TestBaseClass {
 
     @Test
     public void testLifeCycle() throws InterruptedException {
-        getLogger().info("Retrieving th epublisher instance ...");
+        getLogger().info("Starting testLifeCycle() ----------------- ");
+
+        getLogger().info("Retrieving the publisher instance ...");
         RdaAlarmsPublisher publisher = RdaAlarmsPublisher.getPublisher();
         getLogger().info("Boot ...");
         publisher.start();
@@ -37,6 +39,7 @@ public class TestRdaAlarmsPublisher extends TestBaseClass {
         
         getLogger().info("halt.");        
         assertFalse(publisher.isRunning());
+        getLogger().info("Completed testLifeCycle() ---------------- ");
     }
     
 }

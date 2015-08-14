@@ -120,7 +120,7 @@ public class RdaAlarmsProperty {
             for (Entry filterEntry : filters.getEntries()) {
                 String id = filterEntry.getName();
                 if (value.exists(filterEntry.getString())) {
-                    filteredValue.append(filterEntry.getString(), value.getString(filterEntry.getString()));
+                    filteredValue.append(id, value.getString(filterEntry.getString()));
                 } else {
                     try {
                         String source = RdaAlarmsPublisher.getPublisher().getSourceMgr().getSourceNameForAlarm(filterEntry.getString());

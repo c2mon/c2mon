@@ -39,6 +39,8 @@ public class SourceManager extends TimerTask {
     
     private DataProviderIntf dpi;
     private Timer timer;
+
+    private boolean initialized;    // flag to allow initialization only once.
     
     //
     // --- CONSTRUCTION -----------------------------------------------------------------------
@@ -129,21 +131,26 @@ public class SourceManager extends TimerTask {
      * @throws Exception if the call to the dataprovider fails
      */
     public void initialize(Collection<AlarmValue> activeAlarms) throws Exception { 
-        Data sd = DataFactory.createData();
-        sources = new AcquiredData(sd);
-        for (String source : dpi.getSourceNames()) {
-            addSource(source);
-        }        
-        LOG.info("Declared {} sources.", sourceCount);
-        
-        // Use arraycall to init the alarm/source map
-        Set<String> alarmIds = new HashSet<String>();
-        if (activeAlarms != null) {
-            for (AlarmValue av : activeAlarms) {    
-                alarmIds.add(RdaAlarmsPublisher.getAlarmId(av));
+        if (!initialized) {
+            Data sd = DataFactory.createData();
+            sources = new AcquiredData(sd);
+            for (String source : dpi.getSourceNames()) {
+                addSource(source);
+            }        
+            LOG.info("Declared {} sources.", sourceCount);
+            
+            // Use arraycall to init the alarm/source map
+            Set<String> alarmIds = new HashSet<String>();
+            if (activeAlarms != null) {
+                for (AlarmValue av : activeAlarms) {    
+                    alarmIds.add(RdaAlarmsPublisher.getAlarmId(av));
+                }
             }
+            alarmEquip = dpi.initSourceMap(alarmIds);
+            initialized=true;
+        } else {
+            LOG.warn("Already initialized, this attempt is ignored");
         }
-        alarmEquip = dpi.initSourceMap(alarmIds);
     }
     
     

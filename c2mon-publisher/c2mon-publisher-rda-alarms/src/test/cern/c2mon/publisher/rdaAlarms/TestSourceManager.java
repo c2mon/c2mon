@@ -56,6 +56,7 @@ public class TestSourceManager extends TestBaseClass {
     public void testAlarmCount() throws Exception {
         getLogger().info("Starting testAlarmCount() ----------------- ");
         assertTrue(1 == smgr.getAlarmCount());
+        getLogger().info("getSourceCount(): {}", smgr.getSourceCount());
         assertTrue(2 == smgr.getSourceCount());
         
         // now send an alarm and check that we have 2!
