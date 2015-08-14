@@ -17,5 +17,5 @@ PARAMS="\
 -Doracle.net.tns_admin=/etc"
 
 echo ${PARAMS}
-exec -a pub-alarm java ${PARAMS} -cp ".:../../c2mon-publisher-rda-alarms/build/classes:lib/*" ${MAIN}
+exec -a alarm-publisher java ${PARAMS} -cp ".:../../c2mon-publisher-rda-alarms/build/classes:lib/*" ${MAIN}
 
