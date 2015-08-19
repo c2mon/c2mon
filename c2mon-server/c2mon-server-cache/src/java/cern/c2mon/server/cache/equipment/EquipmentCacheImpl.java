@@ -18,9 +18,13 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.equipment;
 
+import java.util.Iterator;
+import java.util.Map;
+
 import javax.annotation.PostConstruct;
 
 import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
 import net.sf.ehcache.loader.CacheLoader;
 
 import org.apache.log4j.Logger;
@@ -39,6 +43,7 @@ import cern.c2mon.server.common.config.C2monCacheName;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.common.process.Process;
 import cern.c2mon.shared.common.ConfigurationException;
 
 /**
@@ -80,7 +85,16 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment> implement
   @PostConstruct
   public void init() {
     LOGGER.info("Initializing Equipment cache...");
-
+    
+    try {
+      getCache().setNodeBulkLoadEnabled(true);
+    }
+    catch (UnsupportedOperationException ex) {
+      LOGGER.warn("setNodeBulkLoadEnabled() method threw an exception when " + "loading the cache (UnsupportedOperationException) - this is "
+          + "normal behaviour in a single-server mode and can be ignored");
+    }
+    
+    // common initialization (other than preload, which needs synch below)
     commonInit();
 
     try {
@@ -90,16 +104,23 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment> implement
       LOGGER.warn("setNodeBulkLoadEnabled() method threw an exception when " + "loading the cache (UnsupportedOperationException) - this is "
           + "normal behaviour in a single-server mode and can be ignored");
     }
-
-    try {
-      getCache().setNodeBulkLoadEnabled(true);
-    }
-    catch (UnsupportedOperationException ex) {
-      LOGGER.warn("setNodeBulkLoadEnabled() method threw an exception when " + "loading the cache (UnsupportedOperationException) - this is "
-          + "normal behaviour in a single-server mode and can be ignored");
-    }
+    
+    doPostConfigurationOfEquipmentControlTags();
 
     LOGGER.info("Equipment cache initialization complete.");
+  }
+  
+  /**
+   * Ensures that the Alive-, Status- and CommFault Tags have the
+   * Equipment id set.
+   */
+  private void doPostConfigurationOfEquipmentControlTags() {
+    final Map<Object, Element> mapElements = cache.getAll(cache.getKeys());
+
+    Iterator<Element> iter = mapElements.values().iterator();
+    while (iter.hasNext()) {
+      doPostDbLoading((Equipment) iter.next().getObjectValue());
+    }
   }
 
   /**

@@ -18,13 +18,10 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.process;
 
-import javax.annotation.PostConstruct;
+import java.util.Iterator;
+import java.util.Map;
 
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.loader.CacheLoader;
-import net.sf.ehcache.search.Attribute;
-import net.sf.ehcache.search.Query;
-import net.sf.ehcache.search.Results;
+import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +42,12 @@ import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.shared.common.ConfigurationException;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
+import net.sf.ehcache.loader.CacheLoader;
+import net.sf.ehcache.search.Attribute;
+import net.sf.ehcache.search.Query;
+import net.sf.ehcache.search.Results;
 
 /**
  * Implementation of the Process cache.
@@ -52,8 +55,8 @@ import cern.c2mon.shared.common.ConfigurationException;
  * @author Mark Brightwell
  */
 @Service("processCache")
-@ManagedResource(objectName="cern.c2mon:type=cache,name=processTagCache")
-public class ProcessCacheImpl extends AbstractCache<Long, Process> implements ProcessCache {
+@ManagedResource(objectName = "cern.c2mon:type=cache,name=processTagCache")
+public class ProcessCacheImpl extends AbstractCache<Long, Process>implements ProcessCache {
 
   /**
    * Private class logger.
@@ -69,12 +72,9 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process> implements Pr
   private final ControlTagCache controlCache;
 
   @Autowired
-  public ProcessCacheImpl(final ClusterCache clusterCache,
-                          @Qualifier("processEhcache") final Ehcache ehcache,
-                          @Qualifier("processEhcacheLoader") final CacheLoader cacheLoader,
-                          @Qualifier("processCacheLoader") final C2monCacheLoader c2monCacheLoader,
-                          @Qualifier("processDAO") final SimpleCacheLoaderDAO<Process> cacheLoaderDAO,
-                          @Qualifier("controlTagCache") final ControlTagCache controlCache) {
+  public ProcessCacheImpl(final ClusterCache clusterCache, @Qualifier("processEhcache") final Ehcache ehcache,
+      @Qualifier("processEhcacheLoader") final CacheLoader cacheLoader, @Qualifier("processCacheLoader") final C2monCacheLoader c2monCacheLoader,
+      @Qualifier("processDAO") final SimpleCacheLoaderDAO<Process> cacheLoaderDAO, @Qualifier("controlTagCache") final ControlTagCache controlCache) {
 
     super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
     this.processDAO = (ProcessDAO) cacheLoaderDAO;
@@ -82,18 +82,29 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process> implements Pr
   }
 
   /**
-   * Run on bean initialization. Sets the Ehcache field to the appropriate cache and calls
-   * the preload routine if necessary.
+   * Run on bean initialization. Sets the Ehcache field to the appropriate cache
+   * and calls the preload routine if necessary.
    */
   @PostConstruct
   public void init() {
     LOGGER.info("Initializing Process cache...");
-
     commonInit();
-
+    doPostConfigurationOfProcessControlTags();
     LOGGER.info("... Process cache initialization complete.");
   }
 
+  /**
+   * Ensures that the Alive-, Status- and CommFault Tags have the
+   * Process id set.
+   */
+  private void doPostConfigurationOfProcessControlTags() {
+    final Map<Object, Element> mapElements = cache.getAll(cache.getKeys());
+
+    Iterator<Element> iter = mapElements.values().iterator();
+    while (iter.hasNext()) {
+      doPostDbLoading((Process) iter.next().getObjectValue());
+    }
+  }
 
   @Override
   public Process getCopy(final String name) {
@@ -102,26 +113,30 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process> implements Pr
   }
 
   /**
-   * Ensures that the Alive-, Status- and CommFault Tags have appropriately the Process id set.
+   * Ensures that the Alive-, Status- and CommFault Tags have appropriately the
+   * Process id set.
+   * 
    * @param process The equipment to which the control tags are assigned
    */
   @Override
   protected void doPostDbLoading(final Process process) {
     Long processId = process.getId();
-    
+
     ControlTag aliveTagCopy = controlCache.getCopy(process.getAliveTagId());
     if (aliveTagCopy != null) {
       setProcessId((ControlTagCacheObject) aliveTagCopy, processId);
-    } else {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+    }
+    else {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
           String.format("No Alive tag (%s) found for process #%d (%s).", process.getAliveTagId(), process.getId(), process.getName()));
     }
-    
+
     ControlTag statusTagCopy = controlCache.getCopy(process.getStateTagId());
     if (statusTagCopy != null) {
       setProcessId((ControlTagCacheObject) statusTagCopy, processId);
-    } else {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+    }
+    else {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
           String.format("No Status tag (%s) found for process #%d (%s).", process.getStateTagId(), process.getId(), process.getName()));
     }
   }
@@ -147,8 +162,10 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process> implements Pr
 
     try {
       Attribute<String> processName = getCache().getSearchAttribute("processName");
-      // By limiting the query result list to 1 it is up to the administrator to make
-      // sure that the process name is unique. Otherwise this will result in an unpredictable behaviour.
+      // By limiting the query result list to 1 it is up to the administrator to
+      // make
+      // sure that the process name is unique. Otherwise this will result in an
+      // unpredictable behaviour.
       Query query = getCache().createQuery();
       results = query.includeKeys().addCriteria(processName.eq(name)).maxResults(1).execute();
 
@@ -179,10 +196,9 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process> implements Pr
   public Integer getNumInvalidTags(Long processId) {
     return processDAO.getNumInvalidTags(processId);
   }
-  
-  
+
   private void setProcessId(ControlTagCacheObject copy, Long processId) {
-    String logMsg = String.format("Adding process id #%s to control tag #%s", processId, copy.getId()); 
+    String logMsg = String.format("Adding process id #%s to control tag #%s", processId, copy.getId());
     LOGGER.trace(logMsg);
     copy.setProcessId(processId);
     controlCache.putQuiet(copy);

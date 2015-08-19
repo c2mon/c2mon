@@ -18,6 +18,9 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.subequipment;
 
+import java.util.Iterator;
+import java.util.Map;
+
 import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
@@ -40,6 +43,7 @@ import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.shared.common.ConfigurationException;
 import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
 import net.sf.ehcache.loader.CacheLoader;
 
 /**
@@ -83,7 +87,21 @@ public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> imp
   public void init() {
     LOGGER.info("Initializing SubEquipment cache...");    
     commonInit();
+    doPostConfigurationOfSubEquipmentControlTags();
     LOGGER.info("... SubEquipment cache initialization complete.");
+  }
+  
+  /**
+   * Ensures that the Alive-, Status- and CommFault Tags have the
+   * Equipment id set.
+   */
+  private void doPostConfigurationOfSubEquipmentControlTags() {
+    final Map<Object, Element> mapElements = cache.getAll(cache.getKeys());
+
+    Iterator<Element> iter = mapElements.values().iterator();
+    while (iter.hasNext()) {
+      doPostDbLoading((SubEquipment) iter.next().getObjectValue());
+    }
   }
 
   /**
