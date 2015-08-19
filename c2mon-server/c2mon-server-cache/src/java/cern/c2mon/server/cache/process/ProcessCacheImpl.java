@@ -74,7 +74,7 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process> implements Pr
                           @Qualifier("processEhcacheLoader") final CacheLoader cacheLoader,
                           @Qualifier("processCacheLoader") final C2monCacheLoader c2monCacheLoader,
                           @Qualifier("processDAO") final SimpleCacheLoaderDAO<Process> cacheLoaderDAO,
-                          final ControlTagCache controlCache) {
+                          @Qualifier("controlTagCache") final ControlTagCache controlCache) {
 
     super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
     this.processDAO = (ProcessDAO) cacheLoaderDAO;

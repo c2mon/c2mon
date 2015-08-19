@@ -20,9 +20,6 @@ package cern.c2mon.server.cache.subequipment;
 
 import javax.annotation.PostConstruct;
 
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.loader.CacheLoader;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,16 +28,19 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.ControlTagCache;
+import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
-import cern.c2mon.server.cache.SubEquipmentFacade;
 import cern.c2mon.server.cache.common.AbstractCache;
 import cern.c2mon.server.cache.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.common.config.C2monCacheName;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
+import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.shared.common.ConfigurationException;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.loader.CacheLoader;
 
 /**
  * Implementation of the SubEquipment cache.
@@ -59,21 +59,21 @@ public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> imp
   
   /** Used to post configure the associated control tags */
   private final ControlTagCache controlCache;
-
-  private final SubEquipmentFacade subEquipmentFacade;
+  
+  private final EquipmentCache equipmentCache;
   
   @Autowired
   public SubEquipmentCacheImpl(final ClusterCache clusterCache, 
-                          @Qualifier("subEquipmentEhcache") final Ehcache ehcache,
-                          @Qualifier("subEquipmentEhcacheLoader") final CacheLoader cacheLoader, 
-                          @Qualifier("subEquipmentCacheLoader") final C2monCacheLoader c2monCacheLoader,
-                          @Qualifier("subEquipmentDAO") final SimpleCacheLoaderDAO<SubEquipment> cacheLoaderDAO,
-                          final SubEquipmentFacade subEquipmentFacade,
-                          final ControlTagCache controlCache) {
+                               @Qualifier("subEquipmentEhcache") final Ehcache ehcache,
+                               @Qualifier("subEquipmentEhcacheLoader") final CacheLoader cacheLoader, 
+                               @Qualifier("subEquipmentCacheLoader") final C2monCacheLoader c2monCacheLoader,
+                               @Qualifier("subEquipmentDAO") final SimpleCacheLoaderDAO<SubEquipment> cacheLoaderDAO,
+                               final ControlTagCache controlCache,
+                               final EquipmentCache equipmentCache) {
 
     super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);    
-    this.subEquipmentFacade = subEquipmentFacade;
     this.controlCache = controlCache;
+    this.equipmentCache = equipmentCache;
   }
 
   /**
@@ -92,7 +92,11 @@ public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> imp
    */
   @Override
   protected void doPostDbLoading(SubEquipment subEquipment) {
-    final Long processId = subEquipmentFacade.getProcessIdForAbstractEquipment(subEquipment.getId());
+    Equipment parent = equipmentCache.get(subEquipment.getParentId());
+    Long processId = parent.getProcessId();
+    if (processId == null) {
+      throw new NullPointerException(String.format("Equipment %s (%d) has no associated Process id - this should never happen!", parent.getName(), parent.getId()));
+    }
     
     ControlTag aliveTagCopy = controlCache.getCopy(subEquipment.getAliveTagId());
     if (aliveTagCopy != null) {

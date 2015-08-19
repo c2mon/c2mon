@@ -30,11 +30,9 @@ import cern.c2mon.server.cache.AliveTimerFacade;
 import cern.c2mon.server.cache.CommFaultTagCache;
 import cern.c2mon.server.cache.CommFaultTagFacade;
 import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
 import cern.c2mon.server.cache.SubEquipmentFacade;
 import cern.c2mon.server.cache.equipment.AbstractEquipmentFacade;
-import cern.c2mon.server.cache.loading.SubEquipmentDAO;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
@@ -55,32 +53,22 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
   private static final Logger LOGGER = Logger.getLogger(SubEquipmentFacadeImpl.class);
 
   /**
-   * DAO, still necessary for code ported from TIM1.
-   */
-  private SubEquipmentDAO subEquipmentDAO;
-
-  /**
    * Equipment cache bean.
    */
   private EquipmentCache equipmentCache;
 
   /**
-   * Process cache bean.
-   */
-  private ProcessCache processCache;
-
-  /**
    * Autowired constructor.
    */
   @Autowired
-  public SubEquipmentFacadeImpl(final SubEquipmentDAO subEquipmentDAO, final SubEquipmentCache subEquipmentCache,
-                                final EquipmentCache equipmentCache, final AliveTimerFacade aliveTimerFacade,
-                                final AliveTimerCache aliveTimerCache, final CommFaultTagCache commFaultTagCache,
-                                final CommFaultTagFacade commFaultTagFacade, final ProcessCache processCache) {
+  public SubEquipmentFacadeImpl(final SubEquipmentCache subEquipmentCache,
+                                final EquipmentCache equipmentCache,
+                                final AliveTimerFacade aliveTimerFacade,
+                                final AliveTimerCache aliveTimerCache,
+                                final CommFaultTagCache commFaultTagCache,
+                                final CommFaultTagFacade commFaultTagFacade) {
     super(subEquipmentCache, aliveTimerFacade, aliveTimerCache, commFaultTagCache, commFaultTagFacade);
-    this.subEquipmentDAO = subEquipmentDAO;
     this.equipmentCache = equipmentCache;
-    this.processCache = processCache;
   }
 
   @Override
