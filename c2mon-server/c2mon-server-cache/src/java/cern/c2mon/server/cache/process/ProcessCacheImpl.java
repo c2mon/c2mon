@@ -18,9 +18,6 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.process;
 
-import java.util.Iterator;
-import java.util.Map;
-
 import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
@@ -43,7 +40,6 @@ import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.shared.common.ConfigurationException;
 import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
 import net.sf.ehcache.loader.CacheLoader;
 import net.sf.ehcache.search.Attribute;
 import net.sf.ehcache.search.Query;
@@ -98,11 +94,8 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process>implements Pro
    * Process id set.
    */
   private void doPostConfigurationOfProcessControlTags() {
-    final Map<Object, Element> mapElements = cache.getAll(cache.getKeys());
-
-    Iterator<Element> iter = mapElements.values().iterator();
-    while (iter.hasNext()) {
-      doPostDbLoading((Process) iter.next().getObjectValue());
+    for (Long key : getKeys()) {
+      doPostDbLoading(get(key));
     }
   }
 
@@ -122,22 +115,40 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process>implements Pro
   protected void doPostDbLoading(final Process process) {
     Long processId = process.getId();
 
-    ControlTag aliveTagCopy = controlCache.getCopy(process.getAliveTagId());
-    if (aliveTagCopy != null) {
-      setProcessId((ControlTagCacheObject) aliveTagCopy, processId);
+    Long aliveTagId = process.getAliveTagId();
+    if (aliveTagId != null) {
+      
+      ControlTag aliveTagCopy = controlCache.getCopy(aliveTagId);
+      if (aliveTagCopy != null) {
+        setProcessId((ControlTagCacheObject) aliveTagCopy, processId);
+      }
+      else {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
+            String.format("No Alive tag (%d) found for Process %s (#%d).", aliveTagId, process.getName(), process.getId()));
+      }
+      
     }
     else {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-          String.format("No Alive tag (%s) found for process #%d (%s).", process.getAliveTagId(), process.getId(), process.getName()));
+          String.format("No Alive tag for Process %s (#%d) defined.", process.getName(), process.getId()));
     }
 
-    ControlTag statusTagCopy = controlCache.getCopy(process.getStateTagId());
-    if (statusTagCopy != null) {
-      setProcessId((ControlTagCacheObject) statusTagCopy, processId);
+    Long statusTagId = process.getStateTagId();
+    if (statusTagId != null) {
+      
+      ControlTag statusTagCopy = controlCache.getCopy(statusTagId);
+      if (statusTagCopy != null) {
+        setProcessId((ControlTagCacheObject) statusTagCopy, processId);
+      }
+      else {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
+            String.format("No Status tag (%d) found for Process %s (#%d).", statusTagId, process.getName(), process.getId()));
+      }
+      
     }
     else {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-          String.format("No Status tag (%s) found for process #%d (%s).", process.getStateTagId(), process.getId(), process.getName()));
+          String.format("No Status tag for Process %s (#%d) defined.", process.getName(), process.getId()));
     }
   }
 

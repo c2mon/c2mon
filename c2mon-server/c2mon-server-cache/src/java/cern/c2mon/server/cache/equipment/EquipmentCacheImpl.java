@@ -18,14 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.equipment;
 
-import java.util.Iterator;
-import java.util.Map;
-
 import javax.annotation.PostConstruct;
-
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.loader.CacheLoader;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +36,9 @@ import cern.c2mon.server.common.config.C2monCacheName;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.equipment.Equipment;
-import cern.c2mon.server.common.process.Process;
 import cern.c2mon.shared.common.ConfigurationException;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.loader.CacheLoader;
 
 /**
  * Implementation of the Equipment cache.
@@ -57,7 +51,7 @@ import cern.c2mon.shared.common.ConfigurationException;
  */
 @Service("equipmentCache")
 @ManagedResource(objectName = "cern.c2mon:type=cache,name=equipmentCache")
-public class EquipmentCacheImpl extends AbstractCache<Long, Equipment> implements EquipmentCache {
+public class EquipmentCacheImpl extends AbstractCache<Long, Equipment>implements EquipmentCache {
 
   /**
    * Static class logger.
@@ -68,12 +62,9 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment> implement
   private final ControlTagCache controlCache;
 
   @Autowired
-  public EquipmentCacheImpl(final ClusterCache clusterCache, 
-                            @Qualifier("equipmentEhcache") final Ehcache ehcache,
-                            @Qualifier("equipmentEhcacheLoader") final CacheLoader cacheLoader, 
-                            @Qualifier("equipmentCacheLoader") final C2monCacheLoader c2monCacheLoader,
-                            @Qualifier("equipmentDAO") final SimpleCacheLoaderDAO<Equipment> cacheLoaderDAO, 
-                            final ControlTagCache controlCache) {
+  public EquipmentCacheImpl(final ClusterCache clusterCache, @Qualifier("equipmentEhcache") final Ehcache ehcache,
+      @Qualifier("equipmentEhcacheLoader") final CacheLoader cacheLoader, @Qualifier("equipmentCacheLoader") final C2monCacheLoader c2monCacheLoader,
+      @Qualifier("equipmentDAO") final SimpleCacheLoaderDAO<Equipment> cacheLoaderDAO, final ControlTagCache controlCache) {
 
     super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
     this.controlCache = controlCache;
@@ -85,7 +76,7 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment> implement
   @PostConstruct
   public void init() {
     LOGGER.info("Initializing Equipment cache...");
-    
+
     try {
       getCache().setNodeBulkLoadEnabled(true);
     }
@@ -93,7 +84,7 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment> implement
       LOGGER.warn("setNodeBulkLoadEnabled() method threw an exception when " + "loading the cache (UnsupportedOperationException) - this is "
           + "normal behaviour in a single-server mode and can be ignored");
     }
-    
+
     // common initialization (other than preload, which needs synch below)
     commonInit();
 
@@ -104,58 +95,73 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment> implement
       LOGGER.warn("setNodeBulkLoadEnabled() method threw an exception when " + "loading the cache (UnsupportedOperationException) - this is "
           + "normal behaviour in a single-server mode and can be ignored");
     }
-    
+
     doPostConfigurationOfEquipmentControlTags();
 
     LOGGER.info("Equipment cache initialization complete.");
   }
-  
+
   /**
-   * Ensures that the Alive-, Status- and CommFault Tags have the
-   * Equipment id set.
+   * Ensures that the Alive-, Status- and CommFault Tags have the Equipment id
+   * set.
    */
   private void doPostConfigurationOfEquipmentControlTags() {
-    final Map<Object, Element> mapElements = cache.getAll(cache.getKeys());
-
-    Iterator<Element> iter = mapElements.values().iterator();
-    while (iter.hasNext()) {
-      doPostDbLoading((Equipment) iter.next().getObjectValue());
+    for (Long key : getKeys()) {
+      doPostDbLoading(get(key));
     }
   }
 
   /**
-   * Ensures that the Alive-, Status- and CommFault Tags have appropriately the equipment id set.
+   * Ensures that the Alive-, Status- and CommFault Tags have appropriately the
+   * equipment id set.
    */
   @Override
   protected void doPostDbLoading(Equipment equipment) {
     Long processId = equipment.getProcessId();
     Long equipmentId = equipment.getId();
 
-    ControlTag aliveTagCopy = controlCache.getCopy(equipment.getAliveTagId());
-    if (aliveTagCopy != null) {
-      setEquipmentId((ControlTagCacheObject) aliveTagCopy, equipmentId, processId);
+    Long aliveTagId = equipment.getAliveTagId();
+    if (aliveTagId != null) {
+      ControlTag aliveTagCopy = controlCache.getCopy(aliveTagId);
+      if (aliveTagCopy != null) {
+        setEquipmentId((ControlTagCacheObject) aliveTagCopy, equipmentId, processId);
+      }
+      else {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
+            String.format("No Alive tag (%s) found for Equipment %s (#%d).", aliveTagId, equipment.getName(), equipment.getId()));
+      }
+    } // alive tag is not mandatory for an Equipment
+
+    Long commFaultTagId = equipment.getCommFaultTagId();
+    if (commFaultTagId != null) {
+      ControlTag commFaultTagCopy = controlCache.getCopy(commFaultTagId);
+      if (commFaultTagCopy != null) {
+        setEquipmentId((ControlTagCacheObject) commFaultTagCopy, equipmentId, processId);
+      }
+      else {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
+            String.format("No CommFault tag (%s) found for Equipment %s (#%d).", commFaultTagId, equipment.getName(), equipment.getId()));
+      }
     }
     else {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, String.format("No Alive tag (%s) found for equipment #%d (%s).",
-          equipment.getAliveTagId(), equipment.getId(), equipment.getName()));
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
+          String.format("No CommFault tag for Equipment %s (#%d) defined.", equipment.getName(), equipment.getId()));
     }
 
-    ControlTag commFaultTagCopy = controlCache.getCopy(equipment.getCommFaultTagId());
-    if (commFaultTagCopy != null) {
-      setEquipmentId((ControlTagCacheObject) commFaultTagCopy, equipmentId, processId);
+    Long statusTag = equipment.getStateTagId();
+    if (statusTag != null) {
+      ControlTag statusTagCopy = controlCache.getCopy(statusTag);
+      if (statusTagCopy != null) {
+        setEquipmentId((ControlTagCacheObject) statusTagCopy, equipmentId, processId);
+      }
+      else {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
+            String.format("No Status tag (%s) found for Equipment %s (#%d).", statusTag, equipment.getName(), equipment.getId()));
+      }
     }
     else {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, String.format("No CommFault tag (%s) found for equipment #%d (%s).",
-          equipment.getCommFaultTagId(), equipment.getId(), equipment.getName()));
-    }
-
-    ControlTag statusTagCopy = controlCache.getCopy(equipment.getStateTagId());
-    if (statusTagCopy != null) {
-      setEquipmentId((ControlTagCacheObject) statusTagCopy, equipmentId, processId);
-    }
-    else {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, String.format("No Status tag (%s) found for equipment #%d (%s).",
-          equipment.getStateTagId(), equipment.getId(), equipment.getName()));
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
+          String.format("No Status tag for Equipment %s (#%d) defined.", equipment.getName(), equipment.getId()));
     }
   }
 

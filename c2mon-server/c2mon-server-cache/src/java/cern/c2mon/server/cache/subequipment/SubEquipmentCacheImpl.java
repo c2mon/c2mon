@@ -18,9 +18,6 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.subequipment;
 
-import java.util.Iterator;
-import java.util.Map;
-
 import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
@@ -43,7 +40,6 @@ import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.shared.common.ConfigurationException;
 import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
 import net.sf.ehcache.loader.CacheLoader;
 
 /**
@@ -96,11 +92,8 @@ public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> imp
    * Equipment id set.
    */
   private void doPostConfigurationOfSubEquipmentControlTags() {
-    final Map<Object, Element> mapElements = cache.getAll(cache.getKeys());
-
-    Iterator<Element> iter = mapElements.values().iterator();
-    while (iter.hasNext()) {
-      doPostDbLoading((SubEquipment) iter.next().getObjectValue());
+    for (Long key : getKeys()) {
+      doPostDbLoading(get(key));
     }
   }
 
@@ -116,30 +109,49 @@ public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> imp
       throw new NullPointerException(String.format("Equipment %s (%d) has no associated Process id - this should never happen!", parent.getName(), parent.getId()));
     }
     
-    ControlTag aliveTagCopy = controlCache.getCopy(subEquipment.getAliveTagId());
-    if (aliveTagCopy != null) {
-      setSubEquipmentId((ControlTagCacheObject) aliveTagCopy, subEquipment.getId(), processId);
-    } else {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
-          String.format("No Alive tag (%s) found for sub-equipment #%d (%s).", subEquipment.getAliveTagId(), subEquipment.getId(), subEquipment.getName()));
+    Long aliveTagId = subEquipment.getAliveTagId();
+    if (aliveTagId != null) {
+      ControlTag aliveTagCopy = controlCache.getCopy(aliveTagId);
+      if (aliveTagCopy != null) {
+        setSubEquipmentId((ControlTagCacheObject) aliveTagCopy, subEquipment.getId(), processId);
+      } else {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+            String.format("No Alive tag (#%d) found for Sub-Equipment %s (#%d).", aliveTagId, subEquipment.getName(), subEquipment.getId()));
+      }
+    } // alive tag is not mandatory for a Sub-Equipment
+    
+    Long commFaultTagId = subEquipment.getCommFaultTagId();
+    if (commFaultTagId != null) {
+      
+      ControlTag commFaultTagCopy = controlCache.getCopy(commFaultTagId);
+      if (commFaultTagCopy != null) {
+        setSubEquipmentId((ControlTagCacheObject) commFaultTagCopy, subEquipment.getId(), processId);
+      } else {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+            String.format("No CommFault tag (%s) found for sub-equipment #%d (%s).", commFaultTagId, subEquipment.getId(), subEquipment.getName()));
+      }
+      
+    } 
+    else {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, String.format("No CommFault tag for Sub-Equipment %s (#%d) defined.",
+          subEquipment.getName(), subEquipment.getId()));
     }
     
-    
-    ControlTag commFaultTagCopy = controlCache.getCopy(subEquipment.getCommFaultTagId());
-    if (commFaultTagCopy != null) {
-      setSubEquipmentId((ControlTagCacheObject) commFaultTagCopy, subEquipment.getId(), processId);
-    } else {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
-          String.format("No CommFault tag (%s) found for sub-equipment #%d (%s).", subEquipment.getCommFaultTagId(), subEquipment.getId(), subEquipment.getName()));
+    Long statusTagId = subEquipment.getStateTagId();
+    if (statusTagId != null) {
+      
+      ControlTag statusTagCopy = controlCache.getCopy(statusTagId);
+      if (statusTagCopy != null) {
+        setSubEquipmentId((ControlTagCacheObject) statusTagCopy, subEquipment.getId(), processId);
+      } else {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+            String.format("No Status tag (%s) found for Sub-Equipment %s (#%d).", statusTagId, subEquipment.getName(), subEquipment.getId()));
+      }
+      
     }
-    
-    
-    ControlTag statusTagCopy = controlCache.getCopy(subEquipment.getStateTagId());
-    if (statusTagCopy != null) {
-      setSubEquipmentId((ControlTagCacheObject) statusTagCopy, subEquipment.getId(), processId);
-    } else {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
-          String.format("No Status tag (%s) found for sub-equipment #%d (%s).", subEquipment.getStateTagId(), subEquipment.getId(), subEquipment.getName()));
+    else {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, String.format("No Status tag for Sub-Equipment %s (#%d) defined.",
+          subEquipment.getName(), subEquipment.getId()));
     }
   }
 
