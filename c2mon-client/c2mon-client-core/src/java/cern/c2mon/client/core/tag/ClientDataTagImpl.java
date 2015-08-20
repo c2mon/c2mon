@@ -1147,7 +1147,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
       return;
     }
     // In case of a CommFault- or Status control tag, we ignore supervision events
-    if (!isControlTag() || isAliveTag()) {
+    if (isControlTag() && !isAliveTag()) {
       return;
     }
     
