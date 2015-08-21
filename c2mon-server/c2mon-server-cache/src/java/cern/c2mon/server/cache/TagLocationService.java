@@ -2,7 +2,6 @@ package cern.c2mon.server.cache;
 
 import java.util.Collection;
 
-import cern.c2mon.server.cache.exception.TagLocationException;
 import cern.c2mon.server.common.tag.Tag;
 
 /**
