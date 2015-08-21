@@ -4,10 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +24,7 @@ import cern.c2mon.server.cache.dbaccess.test.TestDataHelper;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.test.CacheObjectComparison;
 
 /**
@@ -37,7 +40,6 @@ import cern.c2mon.server.test.CacheObjectComparison;
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
 @ContextConfiguration({"classpath:cern/c2mon/server/cache/config/server-cache-datatag-test.xml"})
-
 public class DataTagCacheTest {
 
   @Autowired
@@ -151,5 +153,49 @@ public class DataTagCacheTest {
     //reset t.s. for comparison method to succeed
     objectInDb.setCacheTimestamp(cacheObject.getCacheTimestamp());
     CacheObjectComparison.equals(cacheObject, objectInDb);
+  }
+  
+  @Test
+  @DirtiesContext
+  public void testGetTagByName() {
+    Assert.assertNull(dataTagCache.get("does not exist"));
+    
+    DataTag tag = dataTagCache.get("D_FIELD_TEST_1");
+    Assert.assertNotNull(tag);
+    Assert.assertEquals(Long.valueOf(210009L), tag.getId());
+    Assert.assertEquals("Integer", tag.getDataType());
+    
+  }
+  
+  @Test
+  @DirtiesContext
+  public void testSearchWithNameWildcard() {
+    Collection<DataTag> resultList = dataTagCache.searchWithNameWildcard("does_not_exist*");
+    Assert.assertNotNull(resultList);
+    Assert.assertEquals(0, resultList.size());
+    
+    resultList = dataTagCache.searchWithNameWildcard("D_FIELD_TEST_1");
+    Assert.assertNotNull(resultList);
+    Assert.assertEquals(1, resultList.size());
+    Tag tag = resultList.iterator().next();
+    Assert.assertEquals(Long.valueOf(210009L), tag.getId());
+    Assert.assertEquals("Integer", tag.getDataType());
+    
+    String regex = "D_FIELD_TEST*";
+    resultList = dataTagCache.searchWithNameWildcard(regex);
+    Assert.assertNotNull(resultList);
+    Assert.assertEquals(2, resultList.size());
+    for (Tag dataTag : resultList) {
+      Assert.assertTrue(dataTag.getName().toLowerCase().startsWith(regex.substring(0, regex.lastIndexOf('*')).toLowerCase()));
+    }
+    
+    
+    String regex2 = "*PROPERTY_test*";
+    resultList = dataTagCache.searchWithNameWildcard(regex2);
+    Assert.assertNotNull(resultList);
+    Assert.assertEquals(5, resultList.size());
+    for (Tag dataTag : resultList) {
+      Assert.assertTrue(dataTag.getName().toLowerCase().contains("PROPERTY_test".toLowerCase()));
+    }
   }
 }

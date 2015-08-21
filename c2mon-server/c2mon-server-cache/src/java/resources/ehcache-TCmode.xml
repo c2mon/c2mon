@@ -8,6 +8,7 @@
     maxElementsInMemory="500"
     maxEntriesInCache="1000"
     memoryStoreEvictionPolicy="LRU" />
+    
   <cache
     name="tagCache"
     eternal="true"
@@ -15,7 +16,11 @@
     maxEntriesInCache="600000">
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
+    <searchable keys="false" values="false">
+        <searchAttribute name="tagName" expression="value.getName()"/>
+    </searchable>
   </cache>
+  
   <cache
     name="controlCache"
     eternal="true"
@@ -23,7 +28,11 @@
     maxEntriesInCache="20000">
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
+    <searchable keys="false" values="false">
+        <searchAttribute name="tagName" expression="value.getName()"/>
+    </searchable>
   </cache>
+  
   <cache
     name="ruleCache"
     eternal="true"
@@ -31,7 +40,11 @@
     maxEntriesInCache="600000">
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
+    <searchable keys="false" values="false">
+        <searchAttribute name="tagName" expression="value.getName()"/>
+    </searchable>
   </cache>
+  
   <cache
     name="commandCache"
     eternal="true"
@@ -40,17 +53,19 @@
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
   </cache>
+  
   <cache
     name="processCache"
     eternal="true"
     maxElementsInMemory="500"
     maxEntriesInCache="1000">
     <persistence strategy="distributed" />
-    <searchable>
+    <searchable keys="false" values="false">
       <searchAttribute name="processName" expression="value.getName()" />
     </searchable>
     <terracotta clustered="true" consistency="strong" />
   </cache>
+  
   <cache
     name="equipmentCache"
     eternal="true"
@@ -59,6 +74,7 @@
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
   </cache>
+  
   <cache
     name="subEquipmentCache"
     eternal="true"
@@ -67,6 +83,7 @@
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
   </cache>
+  
   <cache
     name="aliveTimerCache"
     eternal="true"
@@ -75,6 +92,7 @@
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
   </cache>
+  
   <cache
     name="commFaultTagCache"
     eternal="true"
@@ -83,6 +101,7 @@
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
   </cache>
+  
   <cache
     name="alarmCache"
     eternal="true"
@@ -91,6 +110,7 @@
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
   </cache>
+  
   <cache
     name="clusterCache"
     eternal="true"
@@ -130,6 +150,7 @@
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
   </cache>
+  
   <cache
     name="equipmentEventCache"
     eternal="true"
@@ -138,6 +159,7 @@
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
   </cache>
+  
   <cache
     name="subEquipmentEventCache"
     eternal="true"

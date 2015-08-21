@@ -16,17 +16,11 @@
       name="tagCache" 
       eternal="true" 
       maxElementsInMemory="500000"
-            statistics="true"
-            transactionalMode="off"       
+      statistics="true"
+      transactionalMode="off"       
       memoryStoreEvictionPolicy="FIFO">
-      <!-- 
-        Enables the RestartStore and copies all cache entries (on-heap and/or off-heap) to disk. 
-        This option provides fast restartability with fault tolerant cache persistence on disk.
-        This option is available for BigMemory Go only.
-      -->
-     <!--  <persistence strategy="localRestartable"/> -->
-      <searchable>
-        <searchAttribute name="isValid" expression="value.dataTagQuality.isValid()"/>
+      <searchable keys="false" values="false">
+        <searchAttribute name="tagName" expression="value.getName()"/>
       </searchable>
     </cache>
         
@@ -37,7 +31,9 @@
       statistics="true"
       transactionalMode="off"        
       memoryStoreEvictionPolicy="LFU">
-      <!-- <persistence strategy="localRestartable" synchronousWrites="false"/> -->
+      <searchable keys="false" values="false">
+        <searchAttribute name="tagName" expression="value.getName()"/>
+      </searchable>
     </cache>
       
     <cache 
@@ -47,7 +43,6 @@
       statistics="true"
       transactionalMode="off"       
       memoryStoreEvictionPolicy="LFU">
-      <!-- <persistence strategy="localRestartable" synchronousWrites="false"/> -->
     </cache>
           
     <cache 
@@ -57,7 +52,9 @@
       statistics="true"        
       transactionalMode="off"
       memoryStoreEvictionPolicy="LFU">
-      <!-- <persistence strategy="localRestartable" synchronousWrites="false"/> -->
+      <searchable keys="false" values="false">
+        <searchAttribute name="tagName" expression="value.getName()"/>
+      </searchable>
     </cache>
 
     <cache 
@@ -67,8 +64,7 @@
       statistics="true"        
       transactionalMode="off"      
       memoryStoreEvictionPolicy="LFU">
-      <!-- <persistence strategy="localRestartable" synchronousWrites="false"/> -->
-      <searchable>
+      <searchable keys="false" values="false">
         <searchAttribute name="processName" expression="value.getName()"/>
       </searchable>
     </cache>
@@ -80,7 +76,6 @@
       statistics="true"       
       transactionalMode="off"      
       memoryStoreEvictionPolicy="LFU">
-      <!-- <persistence strategy="localRestartable" synchronousWrites="false"/> -->
     </cache>
       
     <cache 
@@ -90,7 +85,6 @@
       statistics="true"  
       transactionalMode="off"           
       memoryStoreEvictionPolicy="LFU">
-      <!-- <persistence strategy="localRestartable" synchronousWrites="false"/> -->
     </cache>
       
     <cache 
@@ -100,7 +94,6 @@
       statistics="true"      
       transactionalMode="off"       
       memoryStoreEvictionPolicy="LFU">
-      <!-- <persistence strategy="localRestartable" synchronousWrites="false"/> -->
     </cache>
       
     <cache 
@@ -109,7 +102,6 @@
       maxElementsInMemory="50000"   
       transactionalMode="off"          
       memoryStoreEvictionPolicy="LFU">
-      <!-- <persistence strategy="localRestartable" synchronousWrites="false"/> -->
     </cache>
       
     <cache 
@@ -119,7 +111,6 @@
       statistics="true"        
       transactionalMode="off"      
       memoryStoreEvictionPolicy="FIFO">
-      <!-- <persistence strategy="localRestartable" synchronousWrites="false"/> -->
     </cache>
       
     <cache 
@@ -129,7 +120,6 @@
       statistics="true"     
       transactionalMode="off"         
       memoryStoreEvictionPolicy="FIFO">
-      <!-- <persistence strategy="localRestartable" synchronousWrites="false"/> -->
     </cache>
 
     <cache
@@ -139,7 +129,6 @@
       statistics="true"
       transactionalMode="off"
       memoryStoreEvictionPolicy="FIFO">
-      <!-- <persistence strategy="localRestartable" synchronousWrites="false"/> -->
     </cache>
 
     <cache
@@ -149,7 +138,6 @@
       statistics="true"
       transactionalMode="off"
       memoryStoreEvictionPolicy="FIFO">
-      <!-- <persistence strategy="localRestartable" synchronousWrites="false"/> -->
       <searchable>
         <searchAttribute name="deviceClassName" expression="value.getName()"/>
       </searchable>

@@ -4,9 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
+import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.test.CacheObjectComparison;
 
 /**
@@ -108,5 +111,62 @@ public class RuleTagCacheTest {
     assertTrue(rule.getProcessIds().contains(51L));
     assertTrue(rule.getEquipmentIds().contains(150L));
     assertTrue(rule.getEquipmentIds().contains(170L));
+  }
+  
+  @Test
+  @DirtiesContext
+  public void testGetTagByName() {
+    Assert.assertNull(ruleTagCache.get("does not exist"));
+    
+    Tag tag = ruleTagCache.get("DIAMON_clic_CS-CCR-DEV3");
+    Assert.assertNotNull(tag);
+    Assert.assertEquals(Long.valueOf(60000L), tag.getId());
+    Assert.assertEquals("Integer", tag.getDataType());
+    
+    tag = ruleTagCache.get("RULE_WITH_MuLtIpLe_PARENTS");
+    Assert.assertNotNull(tag);
+    Assert.assertEquals(Long.valueOf(60011L), tag.getId());
+    Assert.assertEquals("Integer", tag.getDataType()); 
+  }
+  
+  @Test
+  @DirtiesContext
+  public void testSearchWithNameWildcard() {
+    Collection<RuleTag> resultList = ruleTagCache.searchWithNameWildcard("does not exist");
+    Assert.assertNotNull(resultList);
+    Assert.assertEquals(0, resultList.size());
+    
+    resultList = ruleTagCache.searchWithNameWildcard("DIAMON_clic_CS-CCR-DEV3");
+    Assert.assertNotNull(resultList);
+    Assert.assertEquals(1, resultList.size());
+    RuleTag tag = resultList.iterator().next();
+    Assert.assertEquals(Long.valueOf(60000L), tag.getId());
+    Assert.assertEquals("Integer", tag.getDataType());
+    
+    String regex = "DIAMON_clic_CS-CCR-*";
+    resultList = ruleTagCache.searchWithNameWildcard(regex);
+    Assert.assertNotNull(resultList);
+    Assert.assertEquals(11, resultList.size());
+    for (RuleTag ruleTag : resultList) {
+      Assert.assertTrue(ruleTag.getName().toLowerCase().startsWith(regex.substring(0, regex.lastIndexOf('*')).toLowerCase()));
+    }
+    
+    
+    String regex2 = "DIAMON_*_CS-CCR-*";
+    resultList = ruleTagCache.searchWithNameWildcard(regex2);
+    Assert.assertNotNull(resultList);
+    Assert.assertEquals(11, resultList.size());
+    for (RuleTag ruleTag : resultList) {
+      Assert.assertTrue(ruleTag.getName().toLowerCase().startsWith(regex2.substring(0, regex2.indexOf('*')).toLowerCase()));
+    }
+    
+    
+    String regex3 = "*_PARENTS";
+    resultList = ruleTagCache.searchWithNameWildcard(regex3);
+    Assert.assertNotNull(resultList);
+    Assert.assertEquals(1, resultList.size());
+    for (RuleTag ruleTag : resultList) {
+      Assert.assertTrue(ruleTag.getName().toLowerCase().endsWith(regex3.substring(regex3.lastIndexOf('*') + 1).toLowerCase()));
+    }
   }
 }

@@ -19,22 +19,26 @@
 package cern.c2mon.server.cache.tag;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.loader.CacheLoader;
-
 import org.apache.log4j.Logger;
 
+import cern.c2mon.server.cache.C2monCacheWithSupervision;
 import cern.c2mon.server.cache.CacheSupervisionListener;
 import cern.c2mon.server.cache.ClusterCache;
-import cern.c2mon.server.cache.C2monCacheWithSupervision;
 import cern.c2mon.server.cache.common.AbstractCache;
 import cern.c2mon.server.cache.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.loader.CacheLoader;
+import net.sf.ehcache.search.Attribute;
+import net.sf.ehcache.search.Query;
+import net.sf.ehcache.search.Result;
+import net.sf.ehcache.search.Results;
 
 /**
  * Common methods used by all tag caches (data, control and rule tags).
@@ -54,6 +58,9 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
    * Class logger.
    */
   private static final Logger LOGGER = Logger.getLogger(AbstractTagCache.class);
+  
+  /** The max result size should avoid to run into an OutOfMemory Exception when doing a wildcard search */
+  private static final int MAX_RESULT_SIZE = 100000;
   
   /**
    * Synchronized list.
@@ -112,4 +119,69 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
     }    
   }
 
+  @Override
+  public T get(String name) {
+    Results results = null;
+
+    if (name == null || name.equalsIgnoreCase("")) {
+      throw new IllegalArgumentException("Attempting to retrieve a Tag from the cache with a NULL or empty name parameter.");
+    }
+
+    try {
+      Ehcache ehcache = getCache();
+      Attribute<String> tagName = ehcache.getSearchAttribute("tagName");
+      // By limiting the query result list to 1 it is up to the administrator to
+      // make sure that the tag name is unique. Otherwise this will result in an
+      // unpredictable behaviour.
+      Query query = ehcache.createQuery();
+      results = query.includeValues().addCriteria(tagName.ilike(name)).maxResults(1).execute();
+
+      // Find the number of results -- the number of hits.
+      int size = results.size();
+      if (size == 0) {
+        return null;
+      }
+      else {
+        return (T) results.all().get(0).getValue();
+      }
+    }
+    finally {
+      if (results != null) {
+        // Discard the results when done to free up cache resources.
+        results.discard();
+      }
+    }
+  }
+  
+  @Override
+  public Collection<T> searchWithNameWildcard(String regex) {
+    Results results = null;
+    Collection<T> resultList = new ArrayList<>();
+
+    if (regex == null || regex.equalsIgnoreCase("")) {
+      throw new IllegalArgumentException("Attempting to retrieve a Tag from the cache with a NULL or empty name parameter.");
+    }
+
+    try {
+      Ehcache ehcache = getCache();
+      Attribute<String> tagName = ehcache.getSearchAttribute("tagName");
+      // By limiting the query result list to 1 it is up to the administrator to
+      // make sure that the tag name is unique. Otherwise this will result in an
+      // unpredictable behaviour.
+      Query query = ehcache.createQuery();
+      results = query.includeValues().addCriteria(tagName.ilike(regex)).maxResults(MAX_RESULT_SIZE).execute();
+
+      for (Result result : results.all()) {
+        resultList.add((T) result.getValue());
+      }
+    }
+    finally {
+      if (results != null) {
+        // Discard the results when done to free up cache resources.
+        results.discard();
+      }
+    }
+    
+    return resultList;
+  }
 }

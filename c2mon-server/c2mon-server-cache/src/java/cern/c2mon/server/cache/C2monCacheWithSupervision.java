@@ -1,5 +1,7 @@
 package cern.c2mon.server.cache;
 
+import java.util.Collection;
+
 import cern.c2mon.server.common.tag.Tag;
 
 /**
@@ -49,4 +51,35 @@ public interface C2monCacheWithSupervision<K, T extends Tag> extends C2monCacheW
    */
   void notifyListenersOfSupervisionChange(T tag);
   
+  /**
+   * A {@link Tag} can also be retrieved with its unique name
+   * that has to correspond to {@link Tag#getName()}. Please
+   * note that the query is case insensitive.
+   * @param name The unique name of a tag
+   * @return The corresponding cache object
+   * @see #get(Object)
+   * @see #searchWithNameWildcard(String)
+   * @see Tag#getName()
+   */
+  T get(String name);
+  
+  /**
+   * Searches for all {@link Tag} instances in the given cache, where
+   * the {@link Tag#getName()} attribute matches the given regular
+   * Expression.
+   * <p>
+   * A regular expression matcher. '?' and '*' may be used.
+   * The search is always case insensitive.
+   * <p>
+   * WARN: Expressions starting with a leading wildcard character are
+   * potentially very expensive (ie. full scan) for indexed caches 
+   * 
+   * @param regex The regular expression including '?' and '*'
+   * @return All tags where the tag name is matching the regular expression.
+   * Please note, that the result is limited to 100'000 in order to avoid a
+   * OutOfMemory exception!
+   * @see net.sf.ehcache.search.expression.ILike
+   * @see #get(String)
+   */
+  Collection<T> searchWithNameWildcard(String regex);
 }

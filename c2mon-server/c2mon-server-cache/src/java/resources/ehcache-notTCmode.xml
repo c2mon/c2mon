@@ -7,7 +7,7 @@
 			eternal="true" 
 			maxElementsInMemory="500" 
 			memoryStoreEvictionPolicy="LRU"
-            transactionalMode="off">
+      transactionalMode="off">
       <persistence strategy="localRestartable"/>
     </defaultCache>
 			
@@ -16,8 +16,8 @@
 			name="tagCache" 
 			eternal="true" 
 			maxElementsInMemory="500000"
-            statistics="true"
-            transactionalMode="off"  			
+      statistics="true"
+      transactionalMode="off"  			
 			memoryStoreEvictionPolicy="FIFO">
       <!-- 
         Enables the RestartStore and copies all cache entries (on-heap and/or off-heap) to disk. 
@@ -25,6 +25,9 @@
         This option is available for BigMemory Go only.
       -->
       <persistence strategy="localRestartable"/>
+      <searchable keys="false" values="false">
+        <searchAttribute name="tagName" expression="value.getName()"/>
+      </searchable>
     </cache>
 				
 		<cache 
@@ -35,6 +38,9 @@
       transactionalMode="off"        
       memoryStoreEvictionPolicy="LFU">
       <persistence strategy="localRestartable" synchronousWrites="false"/>
+      <searchable keys="false" values="false">
+        <searchAttribute name="tagName" expression="value.getName()"/>
+      </searchable>
     </cache>
       
     <cache 
@@ -55,6 +61,9 @@
       transactionalMode="off"
       memoryStoreEvictionPolicy="LFU">
       <persistence strategy="localRestartable" synchronousWrites="false"/>
+      <searchable keys="false" values="false">
+        <searchAttribute name="tagName" expression="value.getName()"/>
+      </searchable>
     </cache>
 
     <cache 
@@ -65,7 +74,7 @@
       transactionalMode="off"      
       memoryStoreEvictionPolicy="LFU">
       <persistence strategy="localRestartable" synchronousWrites="false"/>
-      <searchable>
+      <searchable keys="false" values="false>
         <searchAttribute name="processName" expression="value.getName()"/>
       </searchable>
     </cache>
