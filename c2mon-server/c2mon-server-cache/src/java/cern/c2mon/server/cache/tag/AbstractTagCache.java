@@ -118,32 +118,31 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
       listenerLock.writeLock().unlock();
     }    
   }
-
+  
   @Override
-  public T get(String name) {
-    Results results = null;
-
+  public boolean hasTagWithName(String name) {
     if (name == null || name.equalsIgnoreCase("")) {
       throw new IllegalArgumentException("Attempting to retrieve a Tag from the cache with a NULL or empty name parameter.");
     }
+    
+    // This will prevent wildcard searches
+    if (name.contains("*")) {
+      name = name.replace("*", "\\*");
+    }
+    if (name.contains("?")) {
+      name = name.replace("?", "\\?");
+    }
+    
+    Results results = null;
 
     try {
       Ehcache ehcache = getCache();
       Attribute<String> tagName = ehcache.getSearchAttribute("tagName");
-      // By limiting the query result list to 1 it is up to the administrator to
-      // make sure that the tag name is unique. Otherwise this will result in an
-      // unpredictable behaviour.
-      Query query = ehcache.createQuery();
-      results = query.includeValues().addCriteria(tagName.ilike(name)).maxResults(1).execute();
 
-      // Find the number of results -- the number of hits.
-      int size = results.size();
-      if (size == 0) {
-        return null;
-      }
-      else {
-        return (T) results.all().get(0).getValue();
-      }
+      Query query = ehcache.createQuery();
+      results = query.includeKeys().addCriteria(tagName.ilike(name)).maxResults(1).execute();
+
+      return results.hasKeys();
     }
     finally {
       if (results != null) {
@@ -151,10 +150,55 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
         results.discard();
       }
     }
+    
+  }
+
+  @Override
+  public T get(String name) {
+    if (name == null || name.equalsIgnoreCase("")) {
+      throw new IllegalArgumentException("Attempting to retrieve a Tag from the cache with a NULL or empty name parameter.");
+    }
+    
+    // This will prevent wildcard searches
+    if (name.contains("*")) {
+      name = name.replace("*", "\\*");
+    }
+    if (name.contains("?")) {
+      name = name.replace("?", "\\?");
+    }
+
+    Collection<T> results = searchWithNameWildcard(name, 1);
+    for (T tag : results) {
+      return tag;
+    }
+    
+    return null;
   }
   
   @Override
   public Collection<T> searchWithNameWildcard(String regex) {
+    return searchWithNameWildcard(regex, MAX_RESULT_SIZE);
+  }
+  
+  /**
+   * Searches for all {@link Tag} instances in the given cache, where
+   * the {@link Tag#getName()} attribute matches the given regular
+   * Expression.
+   * <p>
+   * A regular expression matcher. '?' and '*' may be used.
+   * The search is always case insensitive.
+   * <p>
+   * WARN: Expressions starting with a leading wildcard character are
+   * potentially very expensive (ie. full scan) for indexed caches 
+   * 
+   * @param regex The regular expression including '?' and '*'
+   * @param maxResults the maximum amount of results that shall be returned
+   * @return All tags where the tag name is matching the regular expression.
+   * Please note, that the result is limited by {@code maxResults}
+   * @see net.sf.ehcache.search.expression.ILike
+   * @see #get(String)
+   */
+  private Collection<T> searchWithNameWildcard(String regex, int maxResults) {
     Results results = null;
     Collection<T> resultList = new ArrayList<>();
 
@@ -165,11 +209,9 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
     try {
       Ehcache ehcache = getCache();
       Attribute<String> tagName = ehcache.getSearchAttribute("tagName");
-      // By limiting the query result list to 1 it is up to the administrator to
-      // make sure that the tag name is unique. Otherwise this will result in an
-      // unpredictable behaviour.
+
       Query query = ehcache.createQuery();
-      results = query.includeValues().addCriteria(tagName.ilike(regex)).maxResults(MAX_RESULT_SIZE).execute();
+      results = query.includeValues().addCriteria(tagName.ilike(regex)).maxResults(maxResults).execute();
 
       for (Result result : results.all()) {
         resultList.add((T) result.getValue());

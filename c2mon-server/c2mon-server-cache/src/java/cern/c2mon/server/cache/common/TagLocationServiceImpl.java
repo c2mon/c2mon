@@ -1,5 +1,8 @@
 package cern.c2mon.server.cache.common;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,6 +13,7 @@ import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.C2monCache;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.cache.exception.TagLocationException;
 import cern.c2mon.server.common.tag.Tag;
 
 /**
@@ -71,6 +75,19 @@ public class TagLocationServiceImpl implements TagLocationService {
     }
   }
   
+  @SuppressWarnings("unchecked")
+  private <T extends Tag> C2monCache<Long, T> getCache(String tagName) {
+    if (dataTagCache.hasTagWithName(tagName)) {       
+      return (C2monCache<Long, T>) dataTagCache;
+    } else if (ruleTagCache.hasTagWithName(tagName)) {
+      return (C2monCache<Long, T>) ruleTagCache;
+    } else if (controlTagCache.hasTagWithName(tagName)) {
+      return (C2monCache<Long, T>) controlTagCache;
+    } else {
+      throw new CacheElementNotFoundException("TagLocationService failed to locate tag with name " + tagName + " in any of the rule, control or datatag caches.");
+    }
+  }
+  
   @Override
   public Tag getCopy(final Long id) {
     return getCache(id).getCopy(id);    
@@ -79,6 +96,30 @@ public class TagLocationServiceImpl implements TagLocationService {
   @Override
   public Tag get(final Long id) {
     return getCache(id).get(id);
+  }
+  
+  @Override
+  public Tag get(final String tagName) {
+    if (dataTagCache.hasTagWithName(tagName)) {       
+      return dataTagCache.get(tagName);
+    } else if (ruleTagCache.hasTagWithName(tagName)) {
+      return ruleTagCache.get(tagName);
+    } else if (controlTagCache.hasTagWithName(tagName)) {
+      return controlTagCache.get(tagName);
+    } else {
+      throw new CacheElementNotFoundException("TagLocationService failed to locate tag with name " + tagName + " in any of the rule, control or datatag caches.");
+    }
+  }
+  
+  @Override
+  public Collection<Tag> searchWithNameWildcard(String regex) {
+    Collection<Tag> resultList = new ArrayList<>();
+    
+    resultList.addAll(dataTagCache.searchWithNameWildcard(regex));
+    resultList.addAll(ruleTagCache.searchWithNameWildcard(regex));
+    resultList.addAll(controlTagCache.searchWithNameWildcard(regex));
+    
+    return resultList;
   }
   
   @Override
