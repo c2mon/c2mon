@@ -7,13 +7,12 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.server.cache.C2monCache;
 import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.cache.TagLocationService;
-import cern.c2mon.server.cache.C2monCache;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.cache.exception.TagLocationException;
 import cern.c2mon.server.common.tag.Tag;
 
 /**
