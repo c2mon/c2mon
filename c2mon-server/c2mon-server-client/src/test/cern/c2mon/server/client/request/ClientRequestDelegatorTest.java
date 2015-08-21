@@ -16,7 +16,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -33,12 +32,12 @@ import cern.c2mon.shared.client.request.ClientRequestImpl;
  * @author Justin Lewis Salmon
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:cern/c2mon/server/client/config/server-client-requesthandler-test.xml" })
-public class ClientRequestHandlerTest {
+@ContextConfiguration({ "classpath:cern/c2mon/server/client/config/server-client-requestdelegator-test.xml" })
+public class ClientRequestDelegatorTest {
 
   /** Component to test */
   @Autowired
-  ClientRequestHandler clientRequestHandler;
+  ClientRequestDelegator clientRequestDelegator;
 
   /** Mocked components */
   @Autowired
@@ -51,8 +50,6 @@ public class ClientRequestHandlerTest {
   private String requestQueue;
 
   private static TestBrokerService testBrokerService = new TestBrokerService();
-
-  private ApplicationContext applicationContext;
 
   @BeforeClass
   public static void startJmsBroker() throws Exception {
@@ -93,7 +90,7 @@ public class ClientRequestHandlerTest {
     EasyMock.replay(deviceFacadeMock, deviceClassFacadeMock);
 
     // Pass in a dummy message
-    clientRequestHandler.onMessage(message, session);
+    clientRequestDelegator.onMessage(message, session);
 
     // Verify that everything happened as expected
     EasyMock.verify(deviceFacadeMock, deviceClassFacadeMock);
@@ -132,7 +129,7 @@ public class ClientRequestHandlerTest {
     EasyMock.replay(deviceFacadeMock);
 
     // Pass in a dummy message
-    clientRequestHandler.onMessage(message, session);
+    clientRequestDelegator.onMessage(message, session);
 
     // Verify that everything happened as expected
     EasyMock.verify(deviceFacadeMock);

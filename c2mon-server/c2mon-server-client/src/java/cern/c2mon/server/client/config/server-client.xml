@@ -100,7 +100,7 @@ Request from clients
       <!-- include exception listener here? -->    
       <property name="connectionFactory" ref="clientSingleConnectionFactory"/>
       <property name="destination" ref="clientRequestDestination"/>
-      <property name="messageListener" ref="clientRequestHandler" />
+      <property name="messageListener" ref="clientRequestDelegator" />
       <property name="concurrentConsumers" value="${c2mon.jms.client.consumers.min}"/>
       <property name="maxConcurrentConsumers" value="${c2mon.jms.client.consumers.max}"/> 
       <property name="maxMessagesPerTask" value="1"/>
@@ -120,7 +120,7 @@ Request from clients
       <!-- include exception listener here? -->    
       <property name="connectionFactory" ref="adminSingleConnectionFactory"/>
       <property name="destination" ref="adminRequestDestination"/>
-      <property name="messageListener" ref="clientRequestHandler" />
+      <property name="messageListener" ref="clientRequestDelegator" />
       <property name="concurrentConsumers" value="1"/>
       <property name="maxConcurrentConsumers" value="2"/> 
       <property name="maxMessagesPerTask" value="1"/>

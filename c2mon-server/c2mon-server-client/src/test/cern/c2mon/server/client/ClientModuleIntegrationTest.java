@@ -33,6 +33,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -69,9 +70,7 @@ public class ClientModuleIntegrationTest implements ApplicationContextAware {
 
   @Autowired
   private ConfigurationLoader configurationLoader;
-  @Autowired
-  private CommandExecutionManager commandExecutionManager;
-
+  
   private ApplicationContext applicationContext;
 
   private static TestBrokerService testBrokerService = new TestBrokerService();
@@ -143,6 +142,7 @@ public class ClientModuleIntegrationTest implements ApplicationContextAware {
   }
 
   @Test
+  @DirtiesContext
   public void testHandleDeviceClassNamesRequest() {
     // Reset the mock
     control.reset();
@@ -186,6 +186,7 @@ public class ClientModuleIntegrationTest implements ApplicationContextAware {
   }
 
   @Test
+  @DirtiesContext
   public void testHandleDeviceRequest() throws JMSException {
     // Reset the mock
     control.reset();
