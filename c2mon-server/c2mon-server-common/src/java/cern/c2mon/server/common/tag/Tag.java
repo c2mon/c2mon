@@ -44,11 +44,14 @@ public interface Tag extends RuleInputValue, Cacheable {
    * @return returns the id
    **/
   Long getId();
+  
+  /**
+   * Get the unique tag name
+   * @return the name of the cache object
+   */
+  String getName();
 
   Object clone() throws CloneNotSupportedException;
-  
-  /** Get the (unique) tag name */
-  String getName();
 
   /** Get a free-text description of the tag */
   String getDescription();  
