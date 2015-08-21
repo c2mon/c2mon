@@ -52,17 +52,26 @@ public interface C2monCacheWithSupervision<K, T extends Tag> extends C2monCacheW
   void notifyListenersOfSupervisionChange(T tag);
   
   /**
+   * Check whether the cache contains a tag with
+   * the given tag name. The call is always case insensitive.
+   * @param name name of the tag
+   * @return <code>true</code>, if a tag with the given name exists.
+   */
+  boolean hasTagWithName(String name);
+  
+  /**
    * A {@link Tag} can also be retrieved with its unique name
    * that has to correspond to {@link Tag#getName()}. Please
    * note that the query is case insensitive.
    * @param name The unique name of a tag
-   * @return The corresponding cache object
+   * @return The corresponding cache object or <code>null</code>, if
+   *         the cache does not contain any tag with this name
    * @see #get(Object)
    * @see #searchWithNameWildcard(String)
    * @see Tag#getName()
    */
   T get(String name);
-  
+
   /**
    * Searches for all {@link Tag} instances in the given cache, where
    * the {@link Tag#getName()} attribute matches the given regular
