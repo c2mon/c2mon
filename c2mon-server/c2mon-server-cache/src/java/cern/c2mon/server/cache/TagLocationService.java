@@ -55,7 +55,7 @@ public interface TagLocationService {
    * @return The corresponding cache object or <code>null</code>, if
    *         the cache does not contain any tag with this name
    * @see #get(Object)
-   * @see #searchWithNameWildcard(String)
+   * @see #findByNameWildcard(String)
    * @see Tag#getName()
    */
   Tag get(String name);
@@ -78,7 +78,7 @@ public interface TagLocationService {
    * @see net.sf.ehcache.search.expression.ILike
    * @see #get(String)
    */
-  Collection<Tag> searchWithNameWildcard(String regex);
+  Collection<Tag> findByNameWildcard(String regex);
   
   /**
    * Determines whether one of the tag caches already contains
@@ -90,6 +90,16 @@ public interface TagLocationService {
    */
   Boolean isInTagCache(Long id);
   
+  /**
+   * Determines whether one of the tag caches already contains
+   * an element with the specified tag name (looks in rule, control
+   * and tag cache in that order).
+   * 
+   * @param name the tag name to search for
+   * @return true if the tag name corresponds to some tag
+   */
+  Boolean isInTagCache(String name);
+
   /**
    * Removes the Tag from the cache in which it is found.
    * @param id id of the Tag cache element

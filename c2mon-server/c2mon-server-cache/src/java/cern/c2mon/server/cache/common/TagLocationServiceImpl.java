@@ -74,19 +74,6 @@ public class TagLocationServiceImpl implements TagLocationService {
     }
   }
   
-  @SuppressWarnings("unchecked")
-  private <T extends Tag> C2monCache<Long, T> getCache(String tagName) {
-    if (dataTagCache.hasTagWithName(tagName)) {       
-      return (C2monCache<Long, T>) dataTagCache;
-    } else if (ruleTagCache.hasTagWithName(tagName)) {
-      return (C2monCache<Long, T>) ruleTagCache;
-    } else if (controlTagCache.hasTagWithName(tagName)) {
-      return (C2monCache<Long, T>) controlTagCache;
-    } else {
-      throw new CacheElementNotFoundException("TagLocationService failed to locate tag with name " + tagName + " in any of the rule, control or datatag caches.");
-    }
-  }
-  
   @Override
   public Tag getCopy(final Long id) {
     return getCache(id).getCopy(id);    
@@ -111,12 +98,12 @@ public class TagLocationServiceImpl implements TagLocationService {
   }
   
   @Override
-  public Collection<Tag> searchWithNameWildcard(String regex) {
+  public Collection<Tag> findByNameWildcard(String regex) {
     Collection<Tag> resultList = new ArrayList<>();
     
-    resultList.addAll(dataTagCache.searchWithNameWildcard(regex));
-    resultList.addAll(ruleTagCache.searchWithNameWildcard(regex));
-    resultList.addAll(controlTagCache.searchWithNameWildcard(regex));
+    resultList.addAll(dataTagCache.findByNameWildcard(regex));
+    resultList.addAll(ruleTagCache.findByNameWildcard(regex));
+    resultList.addAll(controlTagCache.findByNameWildcard(regex));
     
     return resultList;
   }
@@ -134,6 +121,11 @@ public class TagLocationServiceImpl implements TagLocationService {
   @Override
   public Boolean isInTagCache(Long id) {
     return ruleTagCache.hasKey(id) || controlTagCache.hasKey(id) || dataTagCache.hasKey(id); 
+  }
+  
+  @Override
+  public Boolean isInTagCache(String name) {
+    return ruleTagCache.hasTagWithName(name) || controlTagCache.hasTagWithName(name) || dataTagCache.hasTagWithName(name); 
   }
 
   @Override
