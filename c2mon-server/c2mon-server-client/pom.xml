@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -20,7 +19,7 @@
   <scm>
     <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-client</developerConnection>
   </scm>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.jencks</groupId>
@@ -30,6 +29,14 @@
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
     </dependency>
+    <dependencies>
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>1.16.6</version>
+        <scope>provided</scope>
+      </dependency>
+    </dependencies>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
@@ -67,14 +74,14 @@
       <artifactId>c2mon-server-test</artifactId>
     </dependency>
     <dependency>
-    	<groupId>cern.c2mon.c2mon-server</groupId>
-    	<artifactId>c2mon-server-command</artifactId>  
-      <version>[1.5.0, 2.0.0)</version>  	
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-command</artifactId>
+      <version>[1.5.0, 2.0.0)</version>
     </dependency>
     <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-all</artifactId>
-      </dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-all</artifactId>
+    </dependency>
   </dependencies>
 
   <developers />
@@ -88,20 +95,16 @@
           <argLine>
             -Dc2mon.properties.location=${c2mon.properties.location}
             -Dc2mon.log.dir=${basedir}/build/log
-            
-            <!--
-              module properties
-            -->
+
+            <!-- module properties -->
             -Djms.client.user=not-used
-            -Djms.client.password=not-used           
+            -Djms.client.password=not-used
             -Djms.client.supervision.topic=tim.client.supervision.test
             -Djms.client.request.queue=tim.client.request.test
             -Dc2mon.jms.client.consumers.min=1
-            -Dc2mon.jms.client.consumers.max=2    
-            
-            <!--
-              server core properties for integration testing
-            -->
+            -Dc2mon.jms.client.consumers.max=2
+
+            <!-- server core properties for integration testing -->
             -Ddatasource.persistence.connections.initial=2
             -Ddatasource.persistence.connections.max=2
             -Dcache.loader.batch.size=10000
@@ -109,20 +112,18 @@
             -Dcache.loader.queue.size=1000
             -Dcache.loader.equipment.batch.size=5
             -Dcache.loader.equipment.threads.max=2
-            -Dcache.loader.equipment.queue.size=1000  
+            -Dcache.loader.equipment.queue.size=1000
 
             <!-- supervision -->
             -Dc2mon.heartbeat.interval=60000
             -Dc2mon.jms.heartbeat.topic=test.tim.sys.hearbeat
             -Dc2mon.jms.heartbeat.user=not-used
-            -Dc2mon.jms.heartbeat.password=not-used  
-            
+            -Dc2mon.jms.heartbeat.password=not-used
+
             <!-- alarm topic -->
-            -Djms.client.alarm.topic=tim.client.alarm        
-              
-            <!--
-              daq communication in
-            -->
+            -Djms.client.alarm.topic=tim.client.alarm
+
+            <!-- daq communication in -->
             -Djms.daq.in.connections=1
             -Djms.update.consumers.max=1
             -Djms.update.consumers.initial=1
@@ -137,7 +138,7 @@
             -Dc2mon.jms.update.task.idle.limit=1
             -Dc2mon.jms.update.task.max.messages=1
             -Dc2mon.jms.update.executor.threads=1
-            -Dc2mon.jms.update.task.timeout=50  
+            -Dc2mon.jms.update.task.timeout=50
 
             <!-- daq out -->
             -Djms.daq.out.connections=1
