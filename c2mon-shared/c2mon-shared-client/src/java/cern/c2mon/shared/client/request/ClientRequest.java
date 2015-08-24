@@ -135,6 +135,8 @@ public interface ClientRequest {
   };
 
   /**
+   * @deprecated Please use {@link #getIds()} instead
+   * 
    * Returns a list of tag Ids for which a client wants to
    * receive the <code>TransferTag</code> or <code>TransferTagValue</code>
    * objects.
@@ -142,7 +144,24 @@ public interface ClientRequest {
    * This is actually used to return Alarm, Configuration and Command Ids as well.
    * @return A list of tag ids
    */
+  @Deprecated
   Collection<Long> getTagIds();
+  
+  /**
+   * Returns a list of ids
+   *
+   * This is actually used to return Alarm, Configuration and Command Ids.
+   * @return A list of ids
+   */
+  Collection<Long> getIds();
+  
+  /**
+   * Returns a list of string and/or regular expressions
+   *
+   * This is actually used to search for tags by their tag name.
+   * @return A list of strings which is either the tag name or a regular expression
+   */
+  Collection<String> getRegexList();
 
   /**
    * This method returns the type of the client request

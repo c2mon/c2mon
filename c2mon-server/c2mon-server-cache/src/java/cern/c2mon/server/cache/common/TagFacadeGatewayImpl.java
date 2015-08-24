@@ -19,6 +19,7 @@
 package cern.c2mon.server.cache.common;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -145,6 +146,29 @@ public class TagFacadeGatewayImpl implements TagFacadeGateway {
   public TagWithAlarms getTagWithAlarms(Long id) {
     Tag tag = tagLocationService.get(id);
     return getFacade(tag).getTagWithAlarms(id);    
+  }
+  
+  @Override
+  public Collection<TagWithAlarms> getTagsWithAlarms(String regex) {
+    boolean isRegex = true;
+    Collection<TagWithAlarms> tagWithAlarms = new ArrayList<>();
+    
+    // Remove escaped wildcards and then check if there are any left
+    String test = regex.replace("\\*", "").replace("\\?", "");
+    isRegex = test.contains("*") || test.contains("?");
+    
+    if (isRegex) {
+      Collection<Tag> tags = tagLocationService.findByNameWildcard(regex);
+      for (Tag tag : tags) {
+        tagWithAlarms.add(getFacade(tag).getTagWithAlarms(tag.getId()));
+      }
+    }
+    else {
+      Tag tag = tagLocationService.get(regex);
+      tagWithAlarms.add(getFacade(tag).getTagWithAlarms(tag.getId()));    
+    }
+    
+    return tagWithAlarms;
   }
 
   @Override

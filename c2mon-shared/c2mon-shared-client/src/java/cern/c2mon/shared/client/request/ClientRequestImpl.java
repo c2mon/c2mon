@@ -1,5 +1,6 @@
 package cern.c2mon.shared.client.request;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -8,6 +9,11 @@ import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
@@ -38,11 +44,7 @@ import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import cern.c2mon.shared.util.json.GsonFactory;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
+import lombok.Getter;
 
 /**
  * This class implements the <code>ClientRequest</code> interface
@@ -59,11 +61,11 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
   private static transient Gson gson = null;
 
   /** The request type */
-  @NotNull
+  @NotNull @Getter
   private final RequestType requestType;
 
   /** The expected result type */
-  @NotNull
+  @NotNull @Getter
   private final ResultType resultType;
 
   /** Requests from the Client API to the C2MON server have different timeouts depending on their type.
@@ -71,14 +73,20 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
    **/
   private int requestTimeout;
 
-  /** List of ids */
-  @Size(min = 0)
+  /** List of ids. Please note this field should one day be renamed to ids. */
+  @Size(min = 0) @Getter(onMethod=@__({@Deprecated}))
   private final Collection<Long> tagIds = new HashSet<Long>();
+  
+  /** List of regular expressions, which is e.g. used to search via tag name */
+  @Size(min = 0) @Getter
+  private final Collection<String> regexList = new HashSet<String>();
 
   /** Request parameter */
+  @Getter
   private String requestParameter;
 
   /** Object parameter. Only used by EXECUTE_COMMAND_REQUEST and DEVICE_REQUEST so far */
+  @Getter
   private Object objectParameter;
 
   /**
@@ -172,6 +180,11 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
           "The result type " + clazz + " is not supported by this class.");
     }
   }
+  
+  
+  public Collection<Long> getIds() {
+    return this.tagIds;
+  }
 
   /**
    * This constructor can be used when the ResultType of the request is not
@@ -211,11 +224,6 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
    *         specified tag id and if the tag id is bigger than <code>zero</code>.
    */
   public boolean addTagId(final Long tagId) {
-    if (requestType.equals(RequestType.SUPERVISION_REQUEST)) {
-      throw new UnsupportedOperationException(
-      "This method is not supported by a SUPERVISION_REQUEST");
-    }
-
     if (tagId != null && tagId > 0) {
       return tagIds.add(tagId);
     }
@@ -241,37 +249,37 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
       }
     }
   }
-
-
-  /* (non-Javadoc)
-   * @see cern.c2mon.shared.client.tag.TransferTagRequest#getTagIds()
+  
+  /**
+   * Adds (tag) name or a regular search expression 
+   * @param regex (tag) name or a regular search expression
+   * @return <code>true</code>, if the request did not already contain the
+   *         specified string.
    */
-  @Override
-  public Collection<Long> getTagIds() {
-    return tagIds;
+  public boolean addRegex(final String regex) {
+    if (regex != null && !regex.isEmpty()) {
+      return regexList.add(regex);
+    }
+
+    return false;
   }
 
 
   /**
-   * This method returns the type of the client request
-   * @return The type of request
-   * @see RequestType
+   * Adds the given tag ids to this request.
+   *
+   * <br><br><b>Please note</b>, that the list is only considered for a
+   * <code>TAG_REQUEST</code>. When requesting the full actual list of
+   * <code>SupervisionEvent</code> objects this list of tag ids is ignored.
+   *
+   * @param tagIds A list of tag ids
+   * @see ClientRequestImpl#addTagId(Long)
    */
-  @Override
-  public RequestType getRequestType() {
-    return requestType;
+  public void addRegexList(final Collection<String> regexList) {
+    if (regexList != null) {
+      this.regexList.addAll(regexList);
+    }
   }
-
-
-  /**
-   * @return The expected <code>ResultType</code> of the response message
-   * @see ResultType
-   */
-  @Override
-  public ResultType getResultType() {
-    return resultType;
-  }
-
 
   /* (non-Javadoc)
    * @see cern.c2mon.shared.client.request.JsonRequest#toJson()
@@ -291,7 +299,6 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
    * @return A <code>ClientRequest</code> instance
    * @throws UnsupportedOperationException In case the object is not a supported <code>objectParameter</code>
    */
-  @SuppressWarnings("unchecked")
   public static final ClientRequest fromObject(final Object object) {
     if (object instanceof CommandExecuteRequest) {
       ClientRequestImpl<CommandReport> clientRequest = new ClientRequestImpl<CommandReport>(CommandReport.class);
@@ -327,66 +334,61 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
     JsonReader jsonReader = new JsonReader(new StringReader(jsonString));
     jsonReader.setLenient(true);
 
-    switch (resultType) {
-      case TRANSFER_TAG_LIST:
-        collectionType = new TypeToken<Collection<TransferTagImpl>>() { } .getType();
-        return TransferTagImpl.getGson().fromJson(jsonReader, collectionType);
-      case TRANSFER_TAG_VALUE_LIST:
-        collectionType = new TypeToken<Collection<TransferTagValueImpl>>() { } .getType();
-        return TransferTagValueImpl.getGson().fromJson(jsonReader, collectionType);
-      case SUPERVISION_EVENT_LIST:
-        collectionType = new TypeToken<Collection<SupervisionEventImpl>>() { } .getType();
-        return getGson().fromJson(jsonReader, collectionType);
-      case TRANSFER_DAQ_XML:
-        collectionType = new TypeToken<Collection<ProcessXmlResponseImpl>>() { } .getType();
-        return getGson().fromJson(jsonReader, collectionType);
-      case TRANSFER_TAG_CONFIGURATION_LIST:
-        collectionType = new TypeToken<Collection<TagConfigImpl>>() { } .getType();
-        return getGson().fromJson(jsonReader, collectionType);
-      case TRANSFER_CONFIGURATION_REPORT_HEADER:
-        collectionType = new TypeToken<Collection<ConfigurationReportHeader>>() { } .getType();
-        return getGson().fromJson(jsonReader, collectionType);
-      case TRANSFER_CONFIGURATION_REPORT:
-        collectionType = new TypeToken<Collection<ConfigurationReport>>() { } .getType();
-        return getGson().fromJson(jsonReader, collectionType);
-      case TRANSFER_ACTIVE_ALARM_LIST:
-        collectionType = new TypeToken<Collection<AlarmValueImpl>>() { } .getType();
-        return getGson().fromJson(jsonReader, collectionType);
-      case TRANSFER_ALARM_LIST:
-        collectionType = new TypeToken<Collection<AlarmValueImpl>>() { } .getType();
-        return getGson().fromJson(jsonReader, collectionType);
-      case TRANSFER_COMMAND_HANDLES_LIST:
-        collectionType = new TypeToken<Collection<CommandTagHandleImpl>>() { } .getType();
-        return getGson().fromJson(jsonReader, collectionType);
-      case TRANSFER_COMMAND_REPORT:
-        collectionType = new TypeToken<Collection<CommandReportImpl>>() { } .getType();
-        return getGson().fromJson(jsonReader, collectionType);
-      case TRANSFER_PROCESS_NAMES:
-        collectionType = new TypeToken<Collection<ProcessNameResponseImpl>>() { } .getType();
-        return getGson().fromJson(jsonReader, collectionType);
-      case TRANSFER_DEVICE_CLASS_NAMES:
-        collectionType = new TypeToken<Collection<DeviceClassNameResponseImpl>>() { } .getType();
-        return getGson().fromJson(jsonReader, collectionType);
-      case TRANSFER_DEVICE_LIST:
-        collectionType = new TypeToken<Collection<TransferDeviceImpl>>() { } .getType();
-        return getGson().fromJson(jsonReader, collectionType);
-      case TRANSFER_TAG_STATISTICS:
-        collectionType = new TypeToken<Collection<TagStatisticsResponseImpl>>() { } .getType();
-        return getGson().fromJson(jsonReader, collectionType);
-      default:
-        throw new JsonSyntaxException("Unknown result type specified");
+    try {
+      switch (resultType) {
+        case TRANSFER_TAG_LIST:
+          collectionType = new TypeToken<Collection<TransferTagImpl>>() { } .getType();
+          return TransferTagImpl.getGson().fromJson(jsonReader, collectionType);
+        case TRANSFER_TAG_VALUE_LIST:
+          collectionType = new TypeToken<Collection<TransferTagValueImpl>>() { } .getType();
+          return TransferTagValueImpl.getGson().fromJson(jsonReader, collectionType);
+        case SUPERVISION_EVENT_LIST:
+          collectionType = new TypeToken<Collection<SupervisionEventImpl>>() { } .getType();
+          return getGson().fromJson(jsonReader, collectionType);
+        case TRANSFER_DAQ_XML:
+          collectionType = new TypeToken<Collection<ProcessXmlResponseImpl>>() { } .getType();
+          return getGson().fromJson(jsonReader, collectionType);
+        case TRANSFER_TAG_CONFIGURATION_LIST:
+          collectionType = new TypeToken<Collection<TagConfigImpl>>() { } .getType();
+          return getGson().fromJson(jsonReader, collectionType);
+        case TRANSFER_CONFIGURATION_REPORT_HEADER:
+          collectionType = new TypeToken<Collection<ConfigurationReportHeader>>() { } .getType();
+          return getGson().fromJson(jsonReader, collectionType);
+        case TRANSFER_CONFIGURATION_REPORT:
+          collectionType = new TypeToken<Collection<ConfigurationReport>>() { } .getType();
+          return getGson().fromJson(jsonReader, collectionType);
+        case TRANSFER_ACTIVE_ALARM_LIST:
+          collectionType = new TypeToken<Collection<AlarmValueImpl>>() { } .getType();
+          return getGson().fromJson(jsonReader, collectionType);
+        case TRANSFER_ALARM_LIST:
+          collectionType = new TypeToken<Collection<AlarmValueImpl>>() { } .getType();
+          return getGson().fromJson(jsonReader, collectionType);
+        case TRANSFER_COMMAND_HANDLES_LIST:
+          collectionType = new TypeToken<Collection<CommandTagHandleImpl>>() { } .getType();
+          return getGson().fromJson(jsonReader, collectionType);
+        case TRANSFER_COMMAND_REPORT:
+          collectionType = new TypeToken<Collection<CommandReportImpl>>() { } .getType();
+          return getGson().fromJson(jsonReader, collectionType);
+        case TRANSFER_PROCESS_NAMES:
+          collectionType = new TypeToken<Collection<ProcessNameResponseImpl>>() { } .getType();
+          return getGson().fromJson(jsonReader, collectionType);
+        case TRANSFER_DEVICE_CLASS_NAMES:
+          collectionType = new TypeToken<Collection<DeviceClassNameResponseImpl>>() { } .getType();
+          return getGson().fromJson(jsonReader, collectionType);
+        case TRANSFER_DEVICE_LIST:
+          collectionType = new TypeToken<Collection<TransferDeviceImpl>>() { } .getType();
+          return getGson().fromJson(jsonReader, collectionType);
+        case TRANSFER_TAG_STATISTICS:
+          collectionType = new TypeToken<Collection<TagStatisticsResponseImpl>>() { } .getType();
+          return getGson().fromJson(jsonReader, collectionType);
+        default:
+          throw new JsonSyntaxException("Unknown result type specified");
+      }
+    }
+    finally  {
+      try { jsonReader.close(); } catch (IOException e) {}
     }
   }
-
-
-  /**
-   * @return the request parameter
-   */
-  @Override
-  public String getRequestParameter() {
-    return requestParameter;
-  }
-
 
   /**
    * Only supported by DAQ_XML_REQUEST, DEVICE_REQUEST and RETRIEVE_CONFIGURATION_REQUEST
@@ -424,12 +426,6 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
     }
 
     this.objectParameter = objectParameter;
-  }
-
-  @Override
-  public Object getObjectParameter() {
-
-    return objectParameter;
   }
 
   @Override

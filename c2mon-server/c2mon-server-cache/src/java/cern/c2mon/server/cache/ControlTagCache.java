@@ -60,7 +60,7 @@ public interface ControlTagCache extends C2monCacheWithListeners<Long, ControlTa
    * @return The corresponding cache object or <code>null</code>, if
    *         the cache does not contain any tag with this name
    * @see #get(Object)
-   * @see #searchWithNameWildcard(String)
+   * @see #findByNameWildcard(String)
    * @see Tag#getName()
    */
   ControlTag get(String name);
@@ -83,5 +83,5 @@ public interface ControlTagCache extends C2monCacheWithListeners<Long, ControlTa
    * @see net.sf.ehcache.search.expression.ILike
    * @see #get(String)
    */
-  Collection<ControlTag> searchWithNameWildcard(String regex);
+  Collection<ControlTag> findByNameWildcard(String regex);
 }

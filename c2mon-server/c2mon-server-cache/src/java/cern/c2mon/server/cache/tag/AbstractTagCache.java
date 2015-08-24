@@ -167,7 +167,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
       name = name.replace("?", "\\?");
     }
 
-    Collection<T> results = searchWithNameWildcard(name, 1);
+    Collection<T> results = findByNameWildcard(name, 1);
     for (T tag : results) {
       return tag;
     }
@@ -176,8 +176,8 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
   }
   
   @Override
-  public Collection<T> searchWithNameWildcard(String regex) {
-    return searchWithNameWildcard(regex, MAX_RESULT_SIZE);
+  public Collection<T> findByNameWildcard(String regex) {
+    return findByNameWildcard(regex, MAX_RESULT_SIZE);
   }
   
   /**
@@ -198,7 +198,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
    * @see net.sf.ehcache.search.expression.ILike
    * @see #get(String)
    */
-  private Collection<T> searchWithNameWildcard(String regex, int maxResults) {
+  private Collection<T> findByNameWildcard(String regex, int maxResults) {
     Results results = null;
     Collection<T> resultList = new ArrayList<>();
 

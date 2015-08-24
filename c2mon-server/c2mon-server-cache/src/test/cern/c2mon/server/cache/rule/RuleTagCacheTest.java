@@ -132,11 +132,11 @@ public class RuleTagCacheTest {
   @Test
   @DirtiesContext
   public void testSearchWithNameWildcard() {
-    Collection<RuleTag> resultList = ruleTagCache.searchWithNameWildcard("does not exist");
+    Collection<RuleTag> resultList = ruleTagCache.findByNameWildcard("does not exist");
     Assert.assertNotNull(resultList);
     Assert.assertEquals(0, resultList.size());
     
-    resultList = ruleTagCache.searchWithNameWildcard("DIAMON_clic_CS-CCR-DEV3");
+    resultList = ruleTagCache.findByNameWildcard("DIAMON_clic_CS-CCR-DEV3");
     Assert.assertNotNull(resultList);
     Assert.assertEquals(1, resultList.size());
     RuleTag tag = resultList.iterator().next();
@@ -144,7 +144,7 @@ public class RuleTagCacheTest {
     Assert.assertEquals("Integer", tag.getDataType());
     
     String regex = "DIAMON_clic_CS-CCR-*";
-    resultList = ruleTagCache.searchWithNameWildcard(regex);
+    resultList = ruleTagCache.findByNameWildcard(regex);
     Assert.assertNotNull(resultList);
     Assert.assertEquals(11, resultList.size());
     for (RuleTag ruleTag : resultList) {
@@ -153,7 +153,7 @@ public class RuleTagCacheTest {
     
     
     String regex2 = "DIAMON_*_CS-CCR-*";
-    resultList = ruleTagCache.searchWithNameWildcard(regex2);
+    resultList = ruleTagCache.findByNameWildcard(regex2);
     Assert.assertNotNull(resultList);
     Assert.assertEquals(11, resultList.size());
     for (RuleTag ruleTag : resultList) {
@@ -162,7 +162,7 @@ public class RuleTagCacheTest {
     
     
     String regex3 = "*_PARENTS";
-    resultList = ruleTagCache.searchWithNameWildcard(regex3);
+    resultList = ruleTagCache.findByNameWildcard(regex3);
     Assert.assertNotNull(resultList);
     Assert.assertEquals(1, resultList.size());
     for (RuleTag ruleTag : resultList) {

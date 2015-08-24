@@ -67,7 +67,7 @@ public interface C2monCacheWithSupervision<K, T extends Tag> extends C2monCacheW
    * @return The corresponding cache object or <code>null</code>, if
    *         the cache does not contain any tag with this name
    * @see #get(Object)
-   * @see #searchWithNameWildcard(String)
+   * @see #findByNameWildcard(String)
    * @see Tag#getName()
    */
   T get(String name);
@@ -90,5 +90,5 @@ public interface C2monCacheWithSupervision<K, T extends Tag> extends C2monCacheW
    * @see net.sf.ehcache.search.expression.ILike
    * @see #get(String)
    */
-  Collection<T> searchWithNameWildcard(String regex);
+  Collection<T> findByNameWildcard(String regex);
 }

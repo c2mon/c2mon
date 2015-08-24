@@ -33,6 +33,7 @@ import cern.c2mon.server.cache.AliveTimerFacade;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.process.Process;
@@ -94,16 +95,34 @@ class ClientTagRequestHelper {
   }
   
   /**
-   * Inner method which handles the tag requests
+   * Handles the tag requests
    *
    * @param tagRequest The tag request sent from the client
    * @return Collection of
    */
-  protected Collection<? extends ClientRequestResult> handleTagRequest(final ClientRequest tagRequest) {
+  Collection<? extends ClientRequestResult> handleTagRequest(final ClientRequest tagRequest) {
 
-    final Collection<TagValueUpdate> transferTags = new ArrayList<>(tagRequest.getTagIds().size());
+    final Collection<TagValueUpdate> transferTags = new ArrayList<>(tagRequest.getIds().size());
 
-    for (Long tagId : tagRequest.getTagIds()) {
+    transferTags.addAll(getTagsById(tagRequest));
+    transferTags.addAll(getTagsByRegex(tagRequest));
+    
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Finished processing Tag request (values only): returning " + transferTags.size() + " Tags");
+    }
+    
+    return transferTags;
+  }
+  
+  /**
+   * Retrieves all tags specified by the tag id list in the tag request
+   * @param tagRequest request containing the list of tag ids to return
+   * @return List of {@link TagValueUpdate}
+   */
+  private Collection<TagValueUpdate> getTagsById(final ClientRequest tagRequest) {
+    final Collection<TagValueUpdate> transferTags = new ArrayList<>(tagRequest.getIds().size());
+    
+    for (Long tagId : tagRequest.getIds()) {
       if (tagLocationService.isInTagCache(tagId)) {
         final TagWithAlarms tagWithAlarms = tagFacadeGateway.getTagWithAlarms(tagId);
 
@@ -115,31 +134,63 @@ class ClientTagRequestHelper {
           transferTags.add(TransferObjectFactory.createTransferTagValue(tagWithAlarms));
           break;
         default:
-          LOG.error("handleTagRequest() - Could not generate response message. Unknown enum ResultType " + tagRequest.getResultType());
+          LOG.error("getTagsById() - Could not generate response message. Unknown enum ResultType " + tagRequest.getResultType());
         }
       } else {
-        LOG.warn("Received client request (TagRequest) for unrecognized Tag with id " + tagId);
+        LOG.warn("getTagsById() - Received client request (TagRequest) for unrecognized Tag with id " + tagId);
       }
     } // end while
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Finished processing Tag request (values only): returning " + transferTags.size() + " Tags");
-    }
+    
     return transferTags;
   }
   
   /**
-   * Inner method which handles the Tag Configuration Requests
+   * Retrieves all tags which are matching the given regular expressions
+   * @param tagRequest the request containing the regular expressions
+   * @return List of tag updates matching the provided regular expressions
+   */
+  private Collection<TagValueUpdate> getTagsByRegex(final ClientRequest tagRequest) {
+    final Collection<TagValueUpdate> transferTags = new ArrayList<>(tagRequest.getRegexList().size());
+    
+    for (String regex : tagRequest.getRegexList()) {
+
+      try {
+        final Collection<TagWithAlarms> tagsWithAlarms = tagFacadeGateway.getTagsWithAlarms(regex);
+
+        for (TagWithAlarms tagWithAlarms : tagsWithAlarms) {
+          switch (tagRequest.getResultType()) {
+          case TRANSFER_TAG_LIST:
+            transferTags.add(TransferObjectFactory.createTransferTag(tagWithAlarms, aliveTimerFacade.isRegisteredAliveTimer(tagWithAlarms.getTag().getId())));
+            break;
+          case TRANSFER_TAG_VALUE_LIST:
+            transferTags.add(TransferObjectFactory.createTransferTagValue(tagWithAlarms));
+            break;
+          default:
+            LOG.error("getTagsByRegex() - Could not generate response message. Unknown enum ResultType " + tagRequest.getResultType());
+          }
+        }
+      }
+      catch (CacheElementNotFoundException ex) {
+        LOG.warn(String.format("getTagsByRegex() - Received client request (TagRequest) where the requested name \"%s\" is not matching to any Tag cache entry.", regex));
+      }
+
+    } // end for loop
+    
+    return transferTags;
+  }
+  
+  /**
+   * Handles the Tag Configuration Requests
    *
    * @param tagConfigurationRequest The configuration request sent from the
    *          client
    * @return A tag configuration list
    */
-  protected Collection<? extends ClientRequestResult> handleTagConfigurationRequest(final ClientRequest tagConfigurationRequest) {
+  Collection<? extends ClientRequestResult> handleTagConfigurationRequest(final ClientRequest tagConfigurationRequest) {
     
-    final Collection<TagConfig> transferTags = new ArrayList<TagConfig>(tagConfigurationRequest.getTagIds().size());
-
-    // !!! TagId field is also used for Configuration Ids
-    for (Long tagId : tagConfigurationRequest.getTagIds()) {
+    final Collection<TagConfig> transferTags = new ArrayList<TagConfig>(tagConfigurationRequest.getIds().size());
+    
+    for (Long tagId : tagConfigurationRequest.getIds()) {
 
       if (tagLocationService.isInTagCache(tagId)) {
         final TagWithAlarms tagWithAlarms = tagFacadeGateway.getTagWithAlarms(tagId);
@@ -155,11 +206,11 @@ class ClientTagRequestHelper {
           LOG.error("handleConfigurationRequest() - Could not generate response message. Unknown enum ResultType " + tagConfigurationRequest.getResultType());
         }
       } else {
-        LOG.warn("Received client request (TagConfigRequest) for unrecognized Tag with id " + tagId);
+        LOG.warn("handleConfigurationRequest() - Received client request (TagConfigRequest) for unrecognized Tag with id " + tagId);
       }
     } // end while
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Finished processing Tag request (with config info): returning " + transferTags.size() + " Tags");
+      LOG.debug("handleConfigurationRequest() - Finished processing Tag request (with config info): returning " + transferTags.size() + " Tags");
     }
     return transferTags;
   }

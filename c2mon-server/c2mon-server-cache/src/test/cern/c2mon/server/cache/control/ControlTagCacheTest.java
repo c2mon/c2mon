@@ -86,11 +86,11 @@ public class ControlTagCacheTest {
   @Test
   @DirtiesContext
   public void testSearchWithNameWildcard() {
-    Collection<ControlTag> resultList = controlTagCache.searchWithNameWildcard("*does_not_exist*");
+    Collection<ControlTag> resultList = controlTagCache.findByNameWildcard("*does_not_exist*");
     Assert.assertNotNull(resultList);
     Assert.assertEquals(0, resultList.size());
     
-    resultList = controlTagCache.searchWithNameWildcard("P_TESTHANDLER03:ALIVE");
+    resultList = controlTagCache.findByNameWildcard("P_TESTHANDLER03:ALIVE");
     Assert.assertNotNull(resultList);
     Assert.assertEquals(1, resultList.size());
     Tag tag = resultList.iterator().next();
@@ -98,7 +98,7 @@ public class ControlTagCacheTest {
     Assert.assertEquals("Integer", tag.getDataType());
     
     String regex = "P_TESTHANDLER03:*";
-    resultList = controlTagCache.searchWithNameWildcard(regex);
+    resultList = controlTagCache.findByNameWildcard(regex);
     Assert.assertNotNull(resultList);
     Assert.assertEquals(2, resultList.size());
     for (Tag controlTag : resultList) {
@@ -107,7 +107,7 @@ public class ControlTagCacheTest {
     
     
     String regex2 = "*TESTHANDLER03*";
-    resultList = controlTagCache.searchWithNameWildcard(regex2);
+    resultList = controlTagCache.findByNameWildcard(regex2);
     Assert.assertNotNull(resultList);
     Assert.assertEquals(8, resultList.size());
     for (Tag controlTag : resultList) {

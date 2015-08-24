@@ -170,11 +170,11 @@ public class DataTagCacheTest {
   @Test
   @DirtiesContext
   public void testSearchWithNameWildcard() {
-    Collection<DataTag> resultList = dataTagCache.searchWithNameWildcard("does_not_exist*");
+    Collection<DataTag> resultList = dataTagCache.findByNameWildcard("does_not_exist*");
     Assert.assertNotNull(resultList);
     Assert.assertEquals(0, resultList.size());
     
-    resultList = dataTagCache.searchWithNameWildcard("D_FIELD_TEST_1");
+    resultList = dataTagCache.findByNameWildcard("D_FIELD_TEST_1");
     Assert.assertNotNull(resultList);
     Assert.assertEquals(1, resultList.size());
     Tag tag = resultList.iterator().next();
@@ -182,7 +182,7 @@ public class DataTagCacheTest {
     Assert.assertEquals("Integer", tag.getDataType());
     
     String regex = "D_FIELD_TEST*";
-    resultList = dataTagCache.searchWithNameWildcard(regex);
+    resultList = dataTagCache.findByNameWildcard(regex);
     Assert.assertNotNull(resultList);
     Assert.assertEquals(2, resultList.size());
     for (Tag dataTag : resultList) {
@@ -191,7 +191,7 @@ public class DataTagCacheTest {
     
     
     String regex2 = "*PROPERTY_test*";
-    resultList = dataTagCache.searchWithNameWildcard(regex2);
+    resultList = dataTagCache.findByNameWildcard(regex2);
     Assert.assertNotNull(resultList);
     Assert.assertEquals(5, resultList.size());
     for (Tag dataTag : resultList) {
