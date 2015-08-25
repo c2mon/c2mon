@@ -192,7 +192,7 @@ public class ClientRequestDelegator implements SessionAwareMessageListener<Messa
     case TAG_REQUEST:
       if (LOG.isDebugEnabled()) {
         if (clientRequest.getIds().isEmpty()) {
-          LOG.debug(String.format("handleClientRequest() - Received a TAG_REQUEST with %d wildcard(s) for tag name search: %s", clientRequest.getRegexList(), clientRequest.getRegexList()));
+          LOG.debug(String.format("handleClientRequest() - Received a TAG_REQUEST with %d wildcard(s) for tag name search: %s", clientRequest.getRegexList().size(), clientRequest.getRegexList()));
         }
         else {
           LOG.debug("handleClientRequest() - Received a TAG_REQUEST for " + clientRequest.getIds().size() + " tags.");
