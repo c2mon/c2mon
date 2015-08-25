@@ -175,13 +175,13 @@ public class ClientRequestDelegator implements SessionAwareMessageListener<Messa
 
     case TAG_CONFIGURATION_REQUEST:
       if (LOG.isDebugEnabled()) {
-        LOG.debug("handleClientRequest() - Received a TAG_CONFIGURATION_REQUEST for " + clientRequest.getTagIds().size() + " tag (with configuration details).");
+        LOG.debug(String.format("handleClientRequest() - Received a TAG_CONFIGURATION_REQUEST for %d tags (with configuration details).", clientRequest.getIds().size()));
       }
       return tagrequestHelper.handleTagConfigurationRequest(clientRequest);
 
     case APPLY_CONFIGURATION_REQUEST:
       if (LOG.isDebugEnabled()) {
-        LOG.debug("handleClientRequest() - Received an APPLY_CONFIGURATION_REQUEST with " + clientRequest.getTagIds().size() + " configurations.");
+        LOG.debug("handleClientRequest() - Received an APPLY_CONFIGURATION_REQUEST with " + clientRequest.getIds().size() + " configurations.");
       }
       return clientConfigurationRequestHandler.handleApplyConfigurationRequest(clientRequest, session, replyDestination);
     case RETRIEVE_CONFIGURATION_REQUEST:
@@ -191,13 +191,18 @@ public class ClientRequestDelegator implements SessionAwareMessageListener<Messa
       return clientConfigurationRequestHandler.handleRetrieveConfigurationsRequest(clientRequest, session, replyDestination);
     case TAG_REQUEST:
       if (LOG.isDebugEnabled()) {
-        LOG.debug("handleClientRequest() - Received a TAG_REQUEST for " + clientRequest.getTagIds().size() + " tags.");
+        if (clientRequest.getIds().isEmpty()) {
+          LOG.debug(String.format("handleClientRequest() - Received a TAG_REQUEST with %d wildcard(s) for tag name search: %s", clientRequest.getRegexList(), clientRequest.getRegexList()));
+        }
+        else {
+          LOG.debug("handleClientRequest() - Received a TAG_REQUEST for " + clientRequest.getIds().size() + " tags.");
+        }
       }
       return tagrequestHelper.handleTagRequest(clientRequest);
     case ALARM_REQUEST:
       if (LOG.isDebugEnabled()) {
         // ! TagId field is also used for Alarm ids
-        LOG.debug("handleClientRequest() - Received an ALARM_REQUEST for " + clientRequest.getTagIds().size() + " alarms.");
+        LOG.debug("handleClientRequest() - Received an ALARM_REQUEST for " + clientRequest.getIds().size() + " alarms.");
       }
       return clientAlarmRequestHandler.handleAlarmRequest(clientRequest);
     case ACTIVE_ALARMS_REQUEST:
@@ -212,7 +217,7 @@ public class ClientRequestDelegator implements SessionAwareMessageListener<Messa
       return supervisionFacade.getAllSupervisionStates();
     case COMMAND_HANDLE_REQUEST:
       if (LOG.isDebugEnabled()) {
-        LOG.debug("handleClientRequest() - Received a COMMAND_HANDLE_REQUEST for " + clientRequest.getTagIds().size() + " commands.");
+        LOG.debug("handleClientRequest() - Received a COMMAND_HANDLE_REQUEST for " + clientRequest.getIds().size() + " commands.");
       }
       return clientCommandRequestHandler.handleCommandHandleRequest(clientRequest);
     case EXECUTE_COMMAND_REQUEST:
