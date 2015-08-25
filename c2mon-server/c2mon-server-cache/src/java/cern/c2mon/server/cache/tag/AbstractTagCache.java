@@ -21,6 +21,7 @@ package cern.c2mon.server.cache.tag;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
@@ -34,6 +35,7 @@ import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
 import net.sf.ehcache.loader.CacheLoader;
 import net.sf.ehcache.search.Attribute;
 import net.sf.ehcache.search.Query;
@@ -205,24 +207,41 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
     if (regex == null || regex.equalsIgnoreCase("")) {
       throw new IllegalArgumentException("Attempting to retrieve a Tag from the cache with a NULL or empty name parameter.");
     }
-
-    try {
-      Ehcache ehcache = getCache();
-      Attribute<String> tagName = ehcache.getSearchAttribute("tagName");
-
-      Query query = ehcache.createQuery();
-      results = query.includeValues().addCriteria(tagName.ilike(regex)).maxResults(maxResults).execute();
-
-      for (Result result : results.all()) {
-        resultList.add((T) result.getValue());
+    
+    if (regex.equals("*")) {
+      Map<Object, Element> allElements = getCache().getAll(getCache().getKeys());
+      int counter = 0;
+      for (Element element : allElements.values()) {
+        resultList.add((T) element.getObjectValue());
+        
+        counter++;
+        if (counter >= maxResults) {
+          LOGGER.warn(String.format("findByNameWildcard() - Reached maximum result size %d when retrieving all (*) entries of cache %s", maxResults, getCacheName()));
+          break;
+        }
       }
     }
-    finally {
-      if (results != null) {
-        // Discard the results when done to free up cache resources.
-        results.discard();
+    else {
+      try {
+        Ehcache ehcache = getCache();
+        Attribute<String> tagName = ehcache.getSearchAttribute("tagName");
+  
+        Query query = ehcache.createQuery();
+        results = query.includeValues().addCriteria(tagName.ilike(regex)).maxResults(maxResults).execute();
+  
+        for (Result result : results.all()) {
+          resultList.add((T) result.getValue());
+        }
+      }
+      finally {
+        if (results != null) {
+          // Discard the results when done to free up cache resources.
+          results.discard();
+        }
       }
     }
+    
+    LOGGER.debug(String.format("findByNameWildcard() - Found %d (maxResultSize = %d) tags in %s cache where tag names are matching wildcard \"%s\"", resultList.size(), maxResults, getCacheName(), regex));
     
     return resultList;
   }
