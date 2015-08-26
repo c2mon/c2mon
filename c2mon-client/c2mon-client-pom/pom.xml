@@ -81,6 +81,12 @@
         <artifactId>log4j</artifactId>
         <version>[1.2.17,)</version>
       </dependency>
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>[1.16.6,)</version>
+        <scope>provided</scope>
+      </dependency>
 
       <!-- test dependencies -->
       <dependency>
