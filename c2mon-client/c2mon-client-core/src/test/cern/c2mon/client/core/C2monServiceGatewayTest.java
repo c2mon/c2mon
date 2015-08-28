@@ -50,9 +50,9 @@ public class C2monServiceGatewayTest {
   public void startClient() throws InterruptedException, MBeanRegistrationException, InstanceNotFoundException, MalformedObjectNameException,
       NullPointerException {
     C2monServiceGateway.startC2monClient();
-    assertNotNull(C2monServiceGateway.getCommandManager());
-    assertNotNull(C2monServiceGateway.getSupervisionManager());
-    assertNotNull(C2monServiceGateway.getTagManager());
+    assertNotNull(C2monServiceGateway.getCommandService());
+    assertNotNull(C2monServiceGateway.getSupervisionService());
+    assertNotNull(C2monServiceGateway.getTagService());
   }
 
   /**
@@ -65,9 +65,9 @@ public class C2monServiceGatewayTest {
   public void startClientWithProperties() throws InterruptedException {
     System.setProperty("c2mon.client.conf.url", "classpath:cern/c2mon/client/core/test-properties.txt");
     C2monServiceGateway.startC2monClient();
-    assertNotNull(C2monServiceGateway.getCommandManager());
-    assertNotNull(C2monServiceGateway.getSupervisionManager());
-    assertNotNull(C2monServiceGateway.getTagManager());
+    assertNotNull(C2monServiceGateway.getCommandService());
+    assertNotNull(C2monServiceGateway.getSupervisionService());
+    assertNotNull(C2monServiceGateway.getTagService());
   }
 
   /**
@@ -98,7 +98,7 @@ public class C2monServiceGatewayTest {
         e.printStackTrace();
       }
 
-      C2monTagManager tagManager = C2monServiceGateway.getTagManager();
+      TagService tagManager = C2monServiceGateway.getTagService();
       tagManager.subscribeDataTags(tagIds, new DataTagUpdateListener() {
         @Override
         public void onUpdate(ClientDataTagValue tagUpdate) {

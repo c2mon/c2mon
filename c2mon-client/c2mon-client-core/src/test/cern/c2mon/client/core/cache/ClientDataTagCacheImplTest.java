@@ -163,7 +163,6 @@ public class ClientDataTagCacheImplTest {
     }
     EasyMock.expect(requestHandlerMock.requestTags(tagIds)).andReturn(serverUpdates);
     EasyMock.expect(requestHandlerMock.requestTagValues(tagIds)).andReturn(new ArrayList<TagValueUpdate>(serverUpdates));
-    supervisionManagerMock.refreshSupervisionStatus();
     EasyMock.expectLastCall();
     DataTagUpdateListener listener = EasyMock.createMock(DataTagUpdateListener.class);
 

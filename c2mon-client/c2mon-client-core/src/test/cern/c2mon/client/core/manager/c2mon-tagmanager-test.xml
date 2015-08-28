@@ -22,6 +22,9 @@
   <bean id="cacheController" class="cern.c2mon.client.core.cache.CacheControllerImpl">
   </bean>
   
+  <bean id="tagSubscriptionHandler" class="cern.c2mon.client.core.cache.TagSubscriptionHandler">
+  </bean>
+  
   <bean id="cacheSynchronizer" class="cern.c2mon.client.core.cache.CacheSynchronizerImpl">
     <constructor-arg value="jmsProxy"/>
     <constructor-arg value="requestHandler"/>
@@ -32,6 +35,7 @@
   <bean id="clientDataTagCache" class="cern.c2mon.client.core.cache.ClientDataTagCacheImpl">
     <constructor-arg value="cacheController"/>
     <constructor-arg value="cacheSynchronizer"/>
+    <constructor-arg value="tagSubscriptionHandler"/>
   </bean>
   
   <bean id="tagManager" class="cern.c2mon.client.core.manager.TagManager">
