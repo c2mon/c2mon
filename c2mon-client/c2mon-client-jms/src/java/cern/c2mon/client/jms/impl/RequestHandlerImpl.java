@@ -139,6 +139,14 @@ public class RequestHandlerImpl implements RequestHandler {
   }
 
   @Override
+  public Collection<TagUpdate> requestTagsByRegex(final Collection<String> regexList) throws JMSException {
+    if (regexList == null) {
+      throw new NullPointerException("requestTags(..) method called with null parameter.");
+    }
+    return executeNameRequest(regexList, TagUpdate.class, null, defaultRequestQueue);
+  }
+
+  @Override
   public Collection<AlarmValue> requestAlarms(final Collection<Long> alarmIds) throws JMSException {
     if (alarmIds == null) {
       throw new NullPointerException("requestAlarms(..) method called with null parameter.");
@@ -238,6 +246,52 @@ public class RequestHandlerImpl implements RequestHandler {
     while (it.hasNext()) {
       while (it.hasNext() && counter < maxRequestSize) {
         clientRequest.addTagId(it.next());
+        counter++;
+      }
+      RequestValuesTask<T> task = new RequestValuesTask<T>(clientRequest, reportListener, requestQueue);
+      results.add(executor.submit(task));
+      clientRequest = new ClientRequestImpl<T>(clazz);
+      counter = 0;
+    }
+    Collection<T> finalCollection = new ArrayList<T>();
+    for (Future<Collection<T>> result : results) {
+      try {
+        finalCollection.addAll(result.get());
+      } catch (InterruptedException e) {
+        LOGGER.error("InterruptedException caught while executing RequestValuesTask.", e);
+        throw new RuntimeException(e);
+      } catch (ExecutionException e) {
+        LOGGER.error("ExecutionException caught while executing RequestValuesTask.", e);
+        throw new RuntimeException(e);
+      }
+    }
+    LOGGER.debug("Client request completed.");
+    return finalCollection;
+  }
+  
+  /**
+   * Splits and executes a id-base request, splitting the collection into
+   * smaller requests.
+   *
+   * @param <T>
+   *          type of request result
+   * @param regexList
+   *          collection of names or regular expression to request
+   * @param clazz
+   *          type of request result
+   * @return the result of the request
+   */
+  private <T extends ClientRequestResult> Collection<T> executeNameRequest(
+      final Collection<String> regexList, final Class<T> clazz, final ClientRequestReportListener reportListener, final String requestQueue) {
+
+    LOGGER.debug("Initiating client request.");
+    ClientRequestImpl<T> clientRequest = new ClientRequestImpl<T>(clazz);
+    Iterator<String> it = regexList.iterator();
+    Collection<Future<Collection<T>>> results = new ArrayList<Future<Collection<T>>>();
+    int counter = 0;
+    while (it.hasNext()) {
+      while (it.hasNext() && counter < maxRequestSize) {
+        clientRequest.addRegex(it.next());
         counter++;
       }
       RequestValuesTask<T> task = new RequestValuesTask<T>(clientRequest, reportListener, requestQueue);

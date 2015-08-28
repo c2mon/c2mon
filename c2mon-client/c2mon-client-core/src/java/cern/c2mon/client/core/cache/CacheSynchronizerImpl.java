@@ -191,7 +191,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
     final Set<Long> newTags = new HashSet<>();
 
     try {
-      Collection<TagUpdate> tagUpdates = tagRequestHandler.requestTagsByName(regexList);
+      Collection<TagUpdate> tagUpdates = tagRequestHandler.requestTagsByRegex(regexList);
       
       for (TagUpdate tagUpdate : tagUpdates) {
         

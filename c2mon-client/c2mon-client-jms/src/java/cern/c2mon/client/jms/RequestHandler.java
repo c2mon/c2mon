@@ -127,6 +127,21 @@ public interface RequestHandler {
   Collection<TagUpdate> requestTags(Collection<Long> tagIds) throws JMSException;
 
   /**
+   * Queries the server for the latest values and configuration
+   * details for the request tags.
+   *
+   * <p>If called with an empty collection returns an empty collection.
+   *
+   * @param regexList list of tag names or regular expressions which shall be used to
+   *                  find the matching tags
+   * @return a collection of transfer objects with the values/configuration information
+   * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
+   * @throws NullPointerException if called with a null argument
+   * @throws RuntimeException if the response from the server is null (probable timeout)
+   */
+  Collection<TagUpdate> requestTagsByRegex(final Collection<String> regexList) throws JMSException;
+  
+  /**
    * Queries the server for the latest values for the request tags.
    *
    * <p>If called with an empty collection returns an empty collection.

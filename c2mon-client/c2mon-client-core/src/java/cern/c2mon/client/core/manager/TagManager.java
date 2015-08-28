@@ -608,7 +608,7 @@ public class TagManager implements CoreTagManager, TagService, AlarmService, Con
     Collection<ClientDataTagValue> resultList = new ArrayList<ClientDataTagValue>();
     
     try {
-      Collection<TagUpdate> tagUpdates = clientRequestHandler.requestTagsByName(regexList);
+      Collection<TagUpdate> tagUpdates = clientRequestHandler.requestTagsByRegex(regexList);
       for (TagUpdate tagUpdate : tagUpdates) {
         try {
           ClientDataTagImpl cdt = new ClientDataTagImpl(tagUpdate.getId());
