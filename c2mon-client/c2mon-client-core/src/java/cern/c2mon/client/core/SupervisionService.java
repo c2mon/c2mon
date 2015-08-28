@@ -28,11 +28,9 @@ import cern.c2mon.client.jms.ConnectionListener;
  * the connection state to the JMS brokers and the heartbeat
  * of the C2MON server.
  *
- * @deprecated Please use {@link SupervisionService} instead
  * @author Matthias Braeger
  */
-@Deprecated
-public interface C2monSupervisionManager {
+public interface SupervisionService {
   /**
    * Registers a heartbeat listener in order to receive event notifications from
    * the heartbeat manager.

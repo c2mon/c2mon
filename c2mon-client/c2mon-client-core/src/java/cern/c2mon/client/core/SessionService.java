@@ -24,19 +24,17 @@ import cern.c2mon.shared.common.command.AuthorizationDetails;
 
 /**
  * This interface describes the methods which are provided by
- * the C2MON session manager singleton. The session manager
+ * the C2MON session service singleton. The session service
  * handles the user authentication and allows registering
  * <code>SessionListener</code>.
  *
- * @deprecated Please use {@link SessionService} instead
  * @author Matthias Braeger
  */
-@Deprecated
-public interface C2monSessionManager {
+public interface SessionService {
   
   /**
    * Registers a listener for receiving event updates from the
-   * <code>C2monSessionManager</code> about users that have logged
+   * <code>SessionService</code> about users that have logged
    * in or out. <p>
    * In case that somebody is already logged, the new listener will
    * directly be informed. This might for instance happen at startup
@@ -81,7 +79,7 @@ public interface C2monSessionManager {
   /**
    * Performs a user logout. Please notice that this method should only
    * be used in combination with the {@link #login(String, String, String)}
-   * method provided by the {@link C2monSessionManager}. If a user did login
+   * method provided by the {@link SessionService}. If a user did login
    * through the RBAC GUI tool bar it should also use this way to log out. 
    * @param userName The user to be logged out
    * @return <code>true</code>, if log out was unsuccessful

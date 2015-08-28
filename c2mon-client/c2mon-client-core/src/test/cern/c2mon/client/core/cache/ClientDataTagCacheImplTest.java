@@ -97,7 +97,7 @@ public class ClientDataTagCacheImplTest {
     EasyMock.replay(jmsProxyMock, requestHandlerMock);
     Collection<ClientDataTag> cachedTags = cache.getAllSubscribedDataTags();
     assertEquals(0, cachedTags.size());
-    cache.addDataTagUpdateListener(tagIds, listener);
+    cache.subscribe(tagIds, listener);
 
     cachedTags = cache.getAllSubscribedDataTags();
     assertEquals(2, cachedTags.size());
@@ -130,7 +130,7 @@ public class ClientDataTagCacheImplTest {
 
     // run test
     EasyMock.replay(jmsProxyMock, requestHandlerMock);
-    cache.addDataTagUpdateListener(tagIds, listener1);
+    cache.subscribe(tagIds, listener1);
     Collection<ClientDataTag> cachedTags = cache.getAllSubscribedDataTags();
     assertEquals(2, cachedTags.size());
     // NOT Registered listener
@@ -169,7 +169,7 @@ public class ClientDataTagCacheImplTest {
 
     // run test
     EasyMock.replay(jmsProxyMock, supervisionManagerMock, requestHandlerMock);
-    cache.addDataTagUpdateListener(tagIds, listener);
+    cache.subscribe(tagIds, listener);
     assertTrue(cache.containsTag(1L));
     assertTrue(cache.containsTag(2L));
     assertFalse(cache.containsTag(23423L));
@@ -198,7 +198,7 @@ public class ClientDataTagCacheImplTest {
 
     // run test
     EasyMock.replay(jmsProxyMock, requestHandlerMock);
-    cache.addDataTagUpdateListener(tagIds, listener);
+    cache.subscribe(tagIds, listener);
     cache.setHistoryMode(true);
     for (Long tagId : tagIds) {
       assertTrue(cache.containsTag(tagId));
@@ -206,7 +206,7 @@ public class ClientDataTagCacheImplTest {
     assertFalse(cache.containsTag(23423L));
 
     assertTrue(cache.isHistoryModeEnabled());
-    cache.addDataTagUpdateListener(tagIds, listener);
+    cache.subscribe(tagIds, listener);
     Collection<ClientDataTag> cachedTags = cache.getAllSubscribedDataTags();
     assertEquals(2, cachedTags.size());
 

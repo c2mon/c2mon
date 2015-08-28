@@ -16,7 +16,7 @@ import cern.c2mon.client.common.tag.ClientDataTag;
  */
 public interface BasicCacheHandler {
   /**
-   * Returns a reference to the <code>CLientDataTag</code> object in the
+   * Returns a reference to the <code>ClientDataTag</code> object in the
    * cache.
    * @param tagId The tag id
    * @return The <code>ClientDataTag</code> reference or <code>null</code>,
@@ -24,6 +24,16 @@ public interface BasicCacheHandler {
    * @throws NullPointerException When the parameter is <code>null</code>
    */
   ClientDataTag get(Long tagId);
+  
+  /**
+   * Returns a reference to the <code>ClientDataTag</code> object in the
+   * cache matching exactly the given tag name.
+   * @param tagName The tag name
+   * @return The <code>ClientDataTag</code> reference or <code>null</code>,
+   *         if the cache does not contain the specific tag.
+   * @throws NullPointerException When the parameter is <code>null</code>
+   */
+  ClientDataTag getByName(final String tagName);
   
   /**
    * Returns a reference map to to those <code>ClientDataTag</code> objects in the
@@ -35,6 +45,17 @@ public interface BasicCacheHandler {
    * @throws NullPointerException When the parameter is <code>null</code>
    */
   Map<Long, ClientDataTag> get(Set<Long> tagIds);
+  
+  /**
+   * Returns a reference map to to those <code>ClientDataTag</code> objects in the
+   * cache which have been specified with the entry set. If the the cache is missing
+   * an entry the returning map will contain a <code>null</code> pointer value for that
+   * id.  
+   * @param tagNames list of tag names.
+   * @return Map of <code>ClientDataTag</code> references.
+   * @throws NullPointerException When the parameter is <code>null</code>
+   */
+  Map<String, ClientDataTag> getByNames(Set<String> tagNames);
   
   /**
    * Returns all <code>ClientDataTag</code> references in the cache which have

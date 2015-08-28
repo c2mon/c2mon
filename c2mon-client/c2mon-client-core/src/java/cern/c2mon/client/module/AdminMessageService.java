@@ -27,11 +27,9 @@ import cern.c2mon.client.jms.AdminMessageListener;
  * listeners to get informed about new administrator messages, and does also
  * have a method for sending admin messages.
  * 
- * @deprecated Use {@link AdminMessageService} instead
  * @author vdeila
  */
-@Deprecated
-public interface C2monAdminMessageManager {
+public interface AdminMessageService {
   /**
    * Registers a admin message listener to the admin message manager in order to
    * receive messages sent by the administrators

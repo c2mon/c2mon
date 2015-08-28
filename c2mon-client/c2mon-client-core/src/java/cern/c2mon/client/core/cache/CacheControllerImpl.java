@@ -104,7 +104,7 @@ class CacheControllerImpl implements CacheController {
         return;
       }
       
-      cacheLock.writeLock().lock();
+      cacheLock.readLock().lock();
       try {
         if (enable) {
           enableHistoryMode();
@@ -114,7 +114,7 @@ class CacheControllerImpl implements CacheController {
         }
       }
       finally {
-        cacheLock.writeLock().unlock();
+        cacheLock.readLock().unlock();
       }
       
       historyMode = enable;
@@ -148,6 +148,7 @@ class CacheControllerImpl implements CacheController {
     }
     
     activeCache = liveCache;
+    historyCache.clear();
   }
   
   /**

@@ -49,7 +49,23 @@ public interface ClientDataTagCache extends BasicCacheHandler {
    *         server during the refresh process.
    * @see #getHistoryModeSyncLock();
    */
-  <T extends DataTagUpdateListener> void addDataTagUpdateListener(Set<Long> tagIds, T listener) throws CacheSynchronizationException;
+  <T extends DataTagUpdateListener> void subscribe(Set<Long> tagIds, T listener) throws CacheSynchronizationException;
+  
+  /**
+   * Adds the given listener to the tags matching the regular expression. 
+   * If the tag is not yet known to the client API it will fetch it from the server.
+   * <p>
+   * <b>Please note, that this method is synchronizing on the history lock.</b>
+   * @param regexList List of regular expressions
+   * @param listener The listener to be added to the <code>ClientDataTag</code> references
+   * @throws NullPointerException If one of the parameter is <code>null</code> or if one of 
+   *                              the tags is not present in the cache
+   * @throws CacheSynchronizationException In case of communication problems with the C2MON
+   *         server during the refresh process.
+   * @see #getHistoryModeSyncLock();
+   */
+  <T extends DataTagUpdateListener> void subscribeByRegex(Set<String> regexList, T listener) throws CacheSynchronizationException;
+  
   
   /**
    * This method synchronizes subscribed data tags with the server.

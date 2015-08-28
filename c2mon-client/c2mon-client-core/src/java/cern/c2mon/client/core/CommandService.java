@@ -7,14 +7,12 @@ import cern.c2mon.shared.client.command.CommandReport;
 import cern.c2mon.shared.client.command.CommandTagValueException;
 
 /**
- * The <code>C2monCommandManager</code> allows to retrieve command
- * information from the server and to send an execute request. Please
+ * The C2MON <code>CommandService</code> allows to retrieve command
+ * information from the server and to send an execute request.
  *
- * @deprecated Please use {@link CommandService} instead
  * @author Matthias Braeger
  */
-@Deprecated
-public interface C2monCommandManager {
+public interface CommandService {
   /**
    * Creates a Collection of ClientCommandTags from a Collection of identifiers
    * 

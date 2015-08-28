@@ -11,6 +11,7 @@
 package cern.c2mon.client.core.manager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -29,6 +30,10 @@ import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.core.AlarmService;
+import cern.c2mon.client.core.ConfigurationService;
+import cern.c2mon.client.core.StatisticsService;
+import cern.c2mon.client.core.TagService;
 import cern.c2mon.client.core.cache.CacheSynchronizationException;
 import cern.c2mon.client.core.cache.ClientDataTagCache;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
@@ -56,7 +61,7 @@ import cern.c2mon.shared.rule.RuleFormatException;
  * @author Matthias Braeger
  */
 @Service
-public class TagManager implements CoreTagManager {
+public class TagManager implements CoreTagManager, TagService, AlarmService, ConfigurationService, StatisticsService {
 
   /** Log4j Logger for this class */
   private static final Logger LOG = Logger.getLogger(TagManager.class);
@@ -205,7 +210,7 @@ public class TagManager implements CoreTagManager {
 
     try {
       // add listener to tags and subscribe them to the live topics
-      cache.addDataTagUpdateListener(tagIds, listener);
+      cache.subscribe(tagIds, listener);
       // Add listener to set
       tagUpdateListeners.add(listener);
     }
@@ -213,6 +218,50 @@ public class TagManager implements CoreTagManager {
       // Rollback the subscription
       LOG.error("doTagSubscription() : Cache error occured while subscribing to data tags ==> Rolling back subscription.", cse);
       cache.unsubscribeDataTags(tagIds, listener);
+      throw cse;
+    }
+  }
+  
+  /**
+   * Inner method that handles the tag subscription.
+   * @param regexList List of tag ids
+   * @param listener The listener to be added to the <code>ClientDataTag</code> references
+   * @param sendInitialValuesToListener if set to <code>true</code>, the listener will receive the
+   *                                    current value of the tag.
+   * @return The initial values of the subscribed tags.
+   */
+  private synchronized <T extends DataTagUpdateListener> void doTagSubscriptionByName(final Set<String> regexList, final T listener) {
+    if (regexList == null) {
+      String error = "Called with null parameter (regex list). Ignoring request.";
+      LOG.warn("doTagSubscription() : " + error);
+      throw new IllegalArgumentException(error);
+    }
+
+    if (listener == null) {
+      String error = "Called with null parameter (DataTagUpdateListener). Ignoring request.";
+      LOG.warn("doTagSubscription() : " + error);
+      throw new IllegalArgumentException(error);
+    }
+
+    if (regexList.isEmpty()) {
+      String info = "Called with empty regex list. Ignoring request.";
+      LOG.info("doTagSubscription() : " + info);
+      return;
+    }
+
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(new StringBuilder("doTagSubscription() : called for ").append(regexList.size()).append(" tags."));
+    }
+
+    try {
+      // add listener to tags and subscribe them to the live topics
+      cache.subscribeByRegex(regexList, listener);
+      // Add listener to set
+      tagUpdateListeners.add(listener);
+    }
+    catch (CacheSynchronizationException cse) {
+      // Rollback the subscription
+      LOG.error("doTagSubscription() : Cache error occured while subscribing to data tags.", cse);
       throw cse;
     }
   }
@@ -491,5 +540,110 @@ public class TagManager implements CoreTagManager {
     }
 
     return null;
+  }
+
+  /**
+   * TODO: Call could be optimized by filtering out all strings without
+   */
+  @Override
+  public void subscribeDataTagsByName(String regex, DataTagUpdateListener listener) throws CacheSynchronizationException {
+    subscribeDataTagsByName(new HashSet<>(Arrays.asList(new String[]{regex})), listener);
+  }
+
+  @Override
+  public void subscribeDataTagsByName(String regex, DataTagListener listener) throws CacheSynchronizationException {
+    subscribeDataTagsByName(new HashSet<>(Arrays.asList(new String[]{regex})), listener);
+  }
+
+  @Override
+  public void subscribeDataTagsByName(Set<String> regexList, DataTagUpdateListener listener) throws CacheSynchronizationException {
+    doTagSubscriptionByName(regexList, listener);
+  }
+
+  @Override
+  public void subscribeDataTagsByName(Set<String> regexList, DataTagListener listener) throws CacheSynchronizationException {
+    doTagSubscriptionByName(regexList, listener);
+  }
+
+  private Collection<ClientDataTagValue> getDataTagsByName(final Collection<String> tagNames) {
+    
+    Collection<ClientDataTagValue> resultList = new ArrayList<>();
+    Set<String> missingTags = new HashSet<>();
+    Map<String, ClientDataTag> cachedValues = cache.getByNames(new HashSet<>(tagNames));
+
+    try {
+      for (Entry<String, ClientDataTag> cacheEntry : cachedValues.entrySet()) {
+        if (cacheEntry.getValue() != null) {
+          resultList.add(cacheEntry.getValue().clone());
+        } else {
+          missingTags.add(cacheEntry.getKey());
+        }
+      }
+    } catch (CloneNotSupportedException e) {
+      LOG.error("getDataTags() - Unable to clone ClientDataTag! Please check the code.", e);
+      throw new UnsupportedOperationException("Unable to clone ClientDataTag! Please check the code.", e);
+    }
+    
+    if (!missingTags.isEmpty()) {
+      resultList.addAll(findDataTagsByName(missingTags));
+    }
+    
+    return resultList;
+  }
+
+  @Override
+  public Collection<ClientDataTagValue> findDataTagsByName(String regex) {
+    if (hasWildcard(regex)) {
+      Set<String> regexList = new HashSet<>();
+      regexList.add(regex);
+      return findDataTagsByName(regexList);
+    }
+    else {
+      return getDataTagsByName(Arrays.asList(new String[]{regex}));
+    }
+  }
+
+  @Override
+  public Collection<ClientDataTagValue> findDataTagsByName(Set<String> regexList) {
+    Collection<ClientDataTagValue> resultList = new ArrayList<ClientDataTagValue>();
+    
+    try {
+      Collection<TagUpdate> tagUpdates = clientRequestHandler.requestTagsByName(regexList);
+      for (TagUpdate tagUpdate : tagUpdates) {
+        try {
+          ClientDataTagImpl cdt = new ClientDataTagImpl(tagUpdate.getId());
+          cdt.update(tagUpdate);
+          
+          // In case of a CommFault- or Status control tag, we don't register to supervision invalidations
+          if (!tagUpdate.isControlTag() || tagUpdate.isAliveTag()) {
+            supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
+          }
+          
+          resultList.add(cdt.clone());
+
+          if (!tagUpdate.isControlTag() || tagUpdate.isAliveTag()) {
+            supervisionManager.removeSupervisionListener(cdt);
+          }
+        } catch (RuleFormatException e) {
+          LOG.error("getDataTags() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
+          throw new RuntimeException("Received an incorrect rule tag from the server for tag id " + tagUpdate.getId());
+        }
+
+      }
+    } catch (JMSException e) {
+      LOG.error("getDataTags() - JMS connection lost -> Could not retrieve missing tags from the C2MON server.", e);
+    }
+
+    return resultList;
+  }
+  
+  /**
+   * Checks whether the string contains un-escaped * or ? characters
+   * @param s string to scan
+   * @return <code>true</code>, if the string has wildcards
+   */
+  private static final boolean hasWildcard(String s) {
+    String test = s.replace("\\*", "").replace("\\?", "");
+    return (test.contains("*") || test.contains("?"));
   }
 }

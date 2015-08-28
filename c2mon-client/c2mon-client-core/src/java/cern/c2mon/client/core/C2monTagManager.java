@@ -45,7 +45,15 @@ import cern.c2mon.shared.client.tag.TagConfig;
  * and to get informed when a new update has been sent.
  *
  * @author Matthias Braeger
+ * @deprecated This interface got replaced by the new Service interfaces:
+ * <ul>
+ * <li> TagService: All tag related requests </li>
+ * <li> AlarmService: All alarm related requests </li>
+ * <li> ConfigurationService: All configuration related requests </li>
+ * <li> StatisticsService: All requests related to statistics</li>
+ * </ul>
  */
+@Deprecated
 public interface C2monTagManager {
 
   /**

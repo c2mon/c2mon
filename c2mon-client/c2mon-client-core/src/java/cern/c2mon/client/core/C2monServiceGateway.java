@@ -23,7 +23,13 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import cern.c2mon.client.core.manager.CommandManager;
+import cern.c2mon.client.core.manager.SessionManager;
+import cern.c2mon.client.core.manager.SupervisionManager;
+import cern.c2mon.client.core.manager.TagManager;
+import cern.c2mon.client.module.AdminMessageService;
 import cern.c2mon.client.module.C2monAdminMessageManager;
+import cern.c2mon.client.module.adminmessage.AdminMessageManager;
 
 /**
  * This class is the main facade for all applications using the
@@ -56,19 +62,19 @@ public class C2monServiceGateway {
   private static final Long MAX_INITIALIZATION_TIME = 60000L;
   
   /** Static reference to the <code>C2monSessionManager</code> singleton instance */
-  private static C2monSessionManager sessionManager = null;
+  private static SessionManager sessionManager = null;
   
   /** Static reference to the <code>C2monCommandManager</code> singleton instance */
-  private static C2monCommandManager commandManager = null;
+  private static CommandManager commandManager = null;
   
   /** Static reference to the <code>C2monTagManager</code> singleton instance */
-  private static C2monTagManager tagManager = null;
+  private static TagManager tagManager = null;
   
   /** Static reference to the <code>C2monSupervisionManager</code> singleton instance */
-  private static C2monSupervisionManager supervisionManager = null;
+  private static SupervisionManager supervisionManager = null;
   
   /** Static reference to the {@link C2monAdminMessageManager} singleton instance */
-  private static C2monAdminMessageManager adminMessageManager = null;
+  private static AdminMessageManager adminMessageManager = null;
   
   /**
    * Protected default constructor
@@ -87,42 +93,119 @@ public class C2monServiceGateway {
   }
 
   /**
+   * @deprecated Please use {@link #getSessionService()} instead
    * @return The C2MON tag manager, which is managing
-   *         the command tags
+   *         authentication and authorization
    */
+  @Deprecated
   public static C2monSessionManager getSessionManager() {
     return sessionManager;
   }
   
   /**
-   * @return The C2MON tag manager, which is managing
-   *         the command tags
+   * @return The C2MON session service, which is handling
+   *         authentication and authorization
    */
+  public static SessionService getSessionService() {
+    return sessionManager;
+  }
+  
+  /**
+   * @deprecated Please use {@link #getCommandService()} instead
+   * @return The C2MON command service, which shall be used
+   *         for executing commands
+   */
+  @Deprecated
   public static C2monCommandManager getCommandManager() {
     return commandManager;
   }
   
+  /**
+   * @return The C2MON command service, which shall be used
+   *         for executing commands
+   */
+  public static CommandService getCommandService() {
+    return commandManager;
+  }
   
   /**
+   * @deprecated Use {@link #getTagService()} instead
    * @return The C2MON tag manager, which is managing
-   *         the tag subscribtion and unsubscription.
+   *         the tag subscription and unsubscription.
    */
+  @Deprecated 
   public static C2monTagManager getTagManager() {
     return tagManager;
   }
-
+ 
+  /**
+   * @return The C2MON alarm service, which provides
+   *         methods for alarm subscription and unsubscription.
+   */
+  public static AlarmService getAlarmService() {
+    return tagManager;
+  }
   
   /**
+   * @return The C2MON statistics service, which allows
+   *         to retrieve the statistics report.
+   */
+  public static StatisticsService getStatisticsService() {
+    return tagManager;
+  }
+  
+  /**
+   * @return The C2MON configuration service, which allows
+   *         to manage the server configuration
+   */
+  public static ConfigurationService getConfigurationService() {
+    return tagManager;
+  }
+  
+
+  /**
+   * @return The C2MON tag service, which provides
+   *         methods for tag subscription and unsubscription.
+   */
+  public static TagService getTagService() {
+    return tagManager;
+  }
+  
+  /**
+   * @deprecated Please use {@link #getSupervisionService()} instead
    * @return the supervision manager
    */
+  @Deprecated
   public static C2monSupervisionManager getSupervisionManager() {
     return supervisionManager;
   }
   
   /**
+   * The supervision service allows registering listeners to get informed
+   * about the connection state to the JMS brokers and the heart beat of 
+   * the C2MON server.
+   * @return Instance of the {@link SupervisionService}
+   */
+  public static SupervisionService getSupervisionService() {
+    return supervisionManager;
+  }
+  
+  /**
+   * @deprecated use {@link #getAdminMessageService()} instead
    * @return the admin message manager
    */
+  @Deprecated
   public static C2monAdminMessageManager getAdminMessageManager() {
+    if (adminMessageManager == null) {
+      throw new RuntimeException("The admin message module is not enabled. When starting the C2mon client, please specify in the parameters to enable the admin message module.");
+    }
+    return adminMessageManager;
+  }
+  
+  /**
+   * @return the admin message service
+   */
+  public static AdminMessageService getAdminMessageService() {
     if (adminMessageManager == null) {
       throw new RuntimeException("The admin message module is not enabled. When starting the C2mon client, please specify in the parameters to enable the admin message module.");
     }
@@ -213,10 +296,10 @@ public class C2monServiceGateway {
    * @param xmlContext the application context
    */
   private static void initiateGatewayFields(final ClassPathXmlApplicationContext xmlContext) {
-    sessionManager = xmlContext.getBean(C2monSessionManager.class);
-    tagManager = xmlContext.getBean(C2monTagManager.class);
-    supervisionManager = xmlContext.getBean(C2monSupervisionManager.class);
-    commandManager = xmlContext.getBean(C2monCommandManager.class);
+    sessionManager = xmlContext.getBean(SessionManager.class);
+    tagManager = xmlContext.getBean(TagManager.class);
+    supervisionManager = xmlContext.getBean(SupervisionManager.class);
+    commandManager = xmlContext.getBean(CommandManager.class);
   }
   
   /**
@@ -229,7 +312,7 @@ public class C2monServiceGateway {
     for (Module module : modules) {
       switch (module) {
       case ADMIN_MESSAGE:
-        adminMessageManager = xmlContext.getBean(C2monAdminMessageManager.class);
+        adminMessageManager = xmlContext.getBean(AdminMessageManager.class);
         break;
       default:
         throw new RuntimeException(String.format("The Spring module '%s' is unknown.", module.toString()));

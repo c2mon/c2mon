@@ -26,7 +26,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +36,7 @@ import cern.c2mon.client.common.util.ConcurrentSet;
 import cern.c2mon.client.common.util.RbacAuthorizationDetailsParser;
 import cern.c2mon.client.core.C2monSessionManager;
 import cern.c2mon.client.jms.AdminMessageListener;
+import cern.c2mon.client.module.AdminMessageService;
 import cern.c2mon.client.module.C2monAdminMessageManager;
 import cern.c2mon.client.module.adminmessage.handler.AdminMessageHandler;
 import cern.c2mon.shared.common.command.AuthorizationDetails;
@@ -49,7 +49,7 @@ import cern.c2mon.shared.common.command.AuthorizationDetails;
  * @author vdeila
  */
 @Service
-public class AdminMessageManager implements C2monAdminMessageManager, AdminMessageListener {
+public class AdminMessageManager implements C2monAdminMessageManager, AdminMessageService, AdminMessageListener {
 
   /** Log4j logger instance */
   private static final Logger LOG = Logger.getLogger(AdminMessageManager.class);

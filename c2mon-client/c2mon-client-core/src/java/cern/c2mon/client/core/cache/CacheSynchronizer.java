@@ -31,24 +31,34 @@ import cern.c2mon.client.common.listener.DataTagUpdateListener;
 interface CacheSynchronizer {
 
   /**
-   * Creates a <code>ClientDataTag</code> object and adds it to the cache.
-   * If the cache has already an entry for that tag it does not create a
-   * new one but returns the existing <b>live tag</b> reference.
+   * Checks if all tags in the list are present in the cache. Otherwise it will fetch
+   * it from the server.
    * <p>
-   * This method is used by the
-   * {@link ClientDataTagCache#addDataTagUpdateListener(Set, DataTagUpdateListener)}
-   * method to create new tags in the cache.
-   * This method is called before adding the {@link DataTagUpdateListener} references
-   * to the <code>ClientDataTag</code>.
    *
    * @param tagIds The ids of the <code>ClientDataTag</code> objects that shall be
    *                      added to the cache.
-   * @see ClientDataTagCache#addDataTagUpdateListener(Set, DataTagUpdateListener)
+   * @see ClientDataTagCache#subscribe(Set, DataTagUpdateListener)
+   * @return id list of all tags, which were newly created.
    * @throws CacheSynchronizationException In case of communication problems with
    *         the C2MON server during the tag creation.
    */
-  void createTags(final Set<Long> tagIds) throws CacheSynchronizationException;
+  Set<Long> initTags(final Set<Long> tagIds) throws CacheSynchronizationException;
 
+  /**
+   * Checks if all tags known by the server and matching one or more of the given regular
+   * expressions are present in the local cache. Otherwise it will fetch
+   * it from the server.
+   * 
+   * @param regexList List of wildcard expression to fetch all tags where the 
+   *                  tag name is matching into one of the expressions.
+   * @param allMatchingTags A list of all tag ids in the cache, where the name is matching to
+   *         one or more of the given wildcard expressions.
+   * @return id list of all tags, which were newly created.
+   * @throws CacheSynchronizationException In case of communication problems with
+   *         the C2MON server during the tag creation.
+   */
+  Set<Long> initTags(final Set<String> regexList, Set<Long> allMatchingTags) throws CacheSynchronizationException;
+  
   /**
    * This method handles the subscription of the <code>ClientDataTag</code> to
    * the <code>JmsProxy</code> and <code>SupervisionManager</code>.

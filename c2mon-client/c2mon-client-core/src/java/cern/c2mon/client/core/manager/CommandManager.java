@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monSessionManager;
+import cern.c2mon.client.core.CommandService;
 import cern.c2mon.client.core.tag.ClientCommandTagImpl;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.command.CommandExecuteRequest;
@@ -26,7 +27,7 @@ import cern.c2mon.shared.client.command.CommandTagHandle;
 import cern.c2mon.shared.client.command.CommandTagValueException;
 
 @Service
-public class CommandManager implements C2monCommandManager {
+public class CommandManager implements C2monCommandManager, CommandService {
 
   /** Log4j Logger for this class */
   private static final Logger LOG = Logger.getLogger(CommandManager.class);

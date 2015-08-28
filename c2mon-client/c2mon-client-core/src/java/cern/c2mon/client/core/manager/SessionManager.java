@@ -26,6 +26,7 @@ import cern.c2mon.client.auth.AuthenticationManager;
 import cern.c2mon.client.auth.AuthorizationManager;
 import cern.c2mon.client.common.listener.SessionListener;
 import cern.c2mon.client.core.C2monSessionManager;
+import cern.c2mon.client.core.SessionService;
 import cern.c2mon.shared.common.command.AuthorizationDetails;
 
 /**
@@ -34,7 +35,7 @@ import cern.c2mon.shared.common.command.AuthorizationDetails;
  * @author Matthias Braeger
  */
 @Service
-public class SessionManager implements C2monSessionManager, AuthenticationListener {
+public class SessionManager implements C2monSessionManager, SessionService, AuthenticationListener {
 
     /** Log4j instance */
     private static final Logger LOG = Logger.getLogger(SessionManager.class);

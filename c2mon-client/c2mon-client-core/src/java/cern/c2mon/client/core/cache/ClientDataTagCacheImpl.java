@@ -23,22 +23,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
-import cern.c2mon.client.core.manager.CoreSupervisionManager;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 
 /**
@@ -63,8 +58,8 @@ import cern.c2mon.client.core.tag.ClientDataTagImpl;
 @Service
 public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
-  /** Log4j Logger for this class */
-  private static final Logger LOG = Logger.getLogger(ClientDataTagCacheImpl.class);
+  /** Used to subscribe/unsubscribe listeners from tags */
+  private final TagSubscriptionHandler tagSubscriptionHandler;
 
   /** The cache controller manages the cache references */
   private final CacheController controller;
@@ -72,45 +67,27 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   /** The cache Synchronizer */
   private final CacheSynchronizer cacheSynchronizer;
 
-  /** Reference to the supervision manager singleton */
-  private final CoreSupervisionManager supervisionManager;
-  
-  /** Lock for accessing the <code>listeners</code> variable */
-  private ReentrantReadWriteLock listenersLock = new ReentrantReadWriteLock();
-  
-  /** List of subscribed listeners */
-  private final Set<TagSubscriptionListener> tagSubscriptionListeners = new HashSet<TagSubscriptionListener>();
-
-  /**
-   * <code>Map</code> reference containing all subscribed data tags which are
-   * updated via the <code>JmsProxy</code>
-   */
-  private Map<Long, ClientDataTagImpl> liveCache = null;
-
   /** Reference to the cache read lock */
   private ReadLock cacheReadLock = null;
 
-  /** Reference to the cache write lock */
-  private WriteLock cacheWriteLock = null;
 
   /**
    * Default Constructor used by Spring to wire in the references to other
    * Services.
    *
-   * @param pCacheController Provides access to the different cache instances
+   * @param tagSubscriptionHandler Used to subscribe/unsubscribe listeners from tags
+   * @param cacheController Provides access to the different cache instances
    *          and to the thread locks.
-   * @param pCacheSynchronizer Handles the cache synchronization with the C2MON
+   * @param cacheSynchronizer Handles the cache synchronization with the C2MON
    *          server
-   * @param pSupervisionManager Handles registration of supervision listeners on
-   *          data tags
    */
   @Autowired
-  protected ClientDataTagCacheImpl(final CacheController pCacheController,
-                                   final CacheSynchronizer pCacheSynchronizer,
-                                   final CoreSupervisionManager pSupervisionManager) {
-    this.controller = pCacheController;
-    this.cacheSynchronizer = pCacheSynchronizer;
-    this.supervisionManager = pSupervisionManager;
+  protected ClientDataTagCacheImpl(final CacheController cacheController,
+                                   final CacheSynchronizer cacheSynchronizer,
+                                   final TagSubscriptionHandler tagSubscriptionHandler) {
+    this.controller = cacheController;
+    this.cacheSynchronizer = cacheSynchronizer;
+    this.tagSubscriptionHandler = tagSubscriptionHandler;
   }
 
   /**
@@ -119,8 +96,6 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   @PostConstruct
   protected void init() {
     cacheReadLock = controller.getReadLock();
-    cacheWriteLock = controller.getWriteLock();
-    liveCache = controller.getLiveCache();
   }
 
   @Override
@@ -135,6 +110,23 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     }
 
     return cdt;
+  }
+  
+  @Override
+  public ClientDataTag getByName(final String tagName) {
+    cacheReadLock.lock();
+    try {
+      Collection<ClientDataTagImpl> values = controller.getActiveCache().values();
+      for (ClientDataTag cdt : values) {
+        if (cdt.getName().equalsIgnoreCase(tagName)) {
+          return cdt;
+        }
+      }
+    } finally {
+      cacheReadLock.unlock();
+    }
+
+    return null;
   }
 
   @Override
@@ -239,50 +231,12 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
   @Override
   public void unsubscribeAllDataTags(final DataTagUpdateListener listener) {
-    Set<Long> tagsToRemove = new HashSet<Long>();
-    cacheWriteLock.lock();
-    try {
-      for (ClientDataTagImpl cdt : controller.getActiveCache().values()) {
-        if (cdt.isUpdateListenerRegistered(listener)) {
-          cdt.removeUpdateListener(listener);
-          if (!cdt.hasUpdateListeners()) {
-            tagsToRemove.add(cdt.getId());
-          }
-        }
-      }
-
-      // Remove from cache
-      cacheSynchronizer.removeTags(tagsToRemove);
-    } finally {
-      cacheWriteLock.unlock();
-    }
-    
-    fireOnUnsubscribeEvent(tagsToRemove);
+    tagSubscriptionHandler.unsubscribeAllTags(listener);
   }
 
   @Override
   public void unsubscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener) {
-    Set<Long> tagsToRemove = new HashSet<Long>();
-    cacheWriteLock.lock();
-    try {
-      ClientDataTagImpl cdt = null;
-      for (Long tagId : dataTagIds) {
-        cdt = controller.getActiveCache().get(tagId);
-        if (cdt != null) {
-          cdt.removeUpdateListener(listener);
-          if (!cdt.hasUpdateListeners()) {
-            tagsToRemove.add(tagId);
-          }
-        }
-      }
-
-      // Remove from cache
-      cacheSynchronizer.removeTags(tagsToRemove);
-    } finally {
-      cacheWriteLock.unlock();
-    }
-    
-    fireOnUnsubscribeEvent(tagsToRemove);
+    tagSubscriptionHandler.unsubscribeTags(dataTagIds, listener);
   }
 
   @Override
@@ -292,6 +246,32 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     try {
       for (Long tagId : tagIds) {
         resultMap.put(tagId, controller.getActiveCache().get(tagId));
+      }
+    } finally {
+      cacheReadLock.unlock();
+    }
+
+    return resultMap;
+  }
+  
+  @Override
+  public Map<String, ClientDataTag> getByNames(final Set<String> tagNames) {
+    Map<String, ClientDataTag> resultMap = new HashMap<>(tagNames.size());
+
+    // Initialize result map
+    for (String tagName : tagNames) {
+      resultMap.put(tagName, null);
+    }
+    
+    cacheReadLock.lock();
+    try {
+      Collection<ClientDataTagImpl> values = controller.getActiveCache().values();
+      for (ClientDataTag cdt : values) {
+        for (String tagName : tagNames) {
+          if (cdt.getName().equalsIgnoreCase(tagName)) {
+            resultMap.put(tagName, cdt);
+          }
+        }
       }
     } finally {
       cacheReadLock.unlock();
@@ -321,159 +301,28 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public <T extends DataTagUpdateListener> void addDataTagUpdateListener(final Set<Long> tagIds, final T listener) throws CacheSynchronizationException {
-    doAddDataTagUpdateListener(tagIds, listener, (listener instanceof DataTagListener));
+  public <T extends DataTagUpdateListener> void subscribe(final Set<Long> tagIds, final T listener) throws CacheSynchronizationException {
+    tagSubscriptionHandler.subscribe(tagIds, listener, (listener instanceof DataTagListener));
   }
   
-  /**
-   * Inner method for subscribing the given listener to the list of tags. In case a tag is not yet in the
-   * client cache, it is going to be fetched from the server and all the topic subscription will handled.
-   * @param tagIds list of tags ids to which the listener shall be subscribed
-   * @param listener the listener to subscribe.
-   * @param sendInitialUpdateSeperately {@code true}, if the {@link DataTagUpdateListener} is in fact a
-   *        {@link DataTagListener} which allows sending the initial updates on a separate method.
-   * @throws CacheSynchronizationException In case of errors during the subscription.
-   */
-  private void doAddDataTagUpdateListener(final Set<Long> tagIds, final DataTagUpdateListener listener, final boolean sendInitialUpdateSeperately) throws CacheSynchronizationException {
-    
-    // tags which are not yet subscribed
-    final Set<Long> newTagIds = new HashSet<Long>();
-    // Needed if, the initial values shall be sent on the separate #onInitialUpdate() method
-    final Map<Long, ClientDataTagValue> initialUpdates = new HashMap<>(tagIds.size());
-    
-    synchronized (getHistoryModeSyncLock()) {
-      cacheWriteLock.lock();
-      try {
-        ClientDataTagImpl cdt = null;
-        
-        // filter all tag ids, which have not been subscribed, yet.
-        for (Long tagId : tagIds) {
-          
-          if (liveCache.containsKey(tagId)) {
-            
-            if (sendInitialUpdateSeperately) {
-              cdt = controller.getActiveCache().get(tagId);
-              initialUpdates.put(tagId, cdt.clone());
-            }
-            
-          } else {
-            newTagIds.add(tagId);
-          }
-        } // for loop
-
-        if (!newTagIds.isEmpty()) {
-          // Create the uninitialised tags
-          cacheSynchronizer.createTags(newTagIds);
-            
-          // Add the supervision listeners
-          for (Long tagId : newTagIds) {
-            cdt = controller.getActiveCache().get(tagId);
-            if (cdt != null) {
-              // In case of a CommFault- or Status control tag, we don't register to supervision invalidations
-              if (!cdt.isControlTag() || cdt.isAliveTag()) {
-                supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
-              }
-              
-              if (sendInitialUpdateSeperately) {
-                initialUpdates.put(tagId, cdt.clone());
-              }
-              
-            }
-          } // end for
-            
-        } // end if
-          
-        // Before subscribing to the update topics we send the initial values,
-        // if the listener is of type DataTagListener
-        if (sendInitialUpdateSeperately && listener instanceof DataTagListener) {
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("doAddDataTagUpdateListener() - Sending initial values to DataTagListener");
-          }
-          ((DataTagListener) listener).onInitialUpdate(initialUpdates.values());
-        }
-        
-        // Add the listener to all tags
-        for (Long tagId : tagIds) {
-          cdt = controller.getActiveCache().get(tagId);
-          cdt.addUpdateListener(listener, initialUpdates.get(tagId));
-        }
-        
-        if (!newTagIds.isEmpty()) {
-          // Asynchronously subscribe to the topics and get the latest values again
-          cacheSynchronizer.subscribeTags(newTagIds);
-        }
-      	 
-      } 
-      finally {
-        cacheWriteLock.unlock();
-      }
-    }
-
-    if (!newTagIds.isEmpty()) {
-      // Inform listeners (e.g. HistoryManager) about new subscriptions
-      fireOnNewTagSubscriptionsEvent(newTagIds);
-    }
-  }
 
   @Override
   public int getCacheSize() {
-    return liveCache.size();
+    return controller.getLiveCache().size();
   }
   
   @Override
   public void addTagSubscriptionListener(final TagSubscriptionListener listener) {
-    listenersLock.writeLock().lock();
-    try {
-      tagSubscriptionListeners.add(listener);
-    } finally {
-      listenersLock.writeLock().unlock();
-    }
+    tagSubscriptionHandler.addSubscriptionListener(listener);
   }
 
   @Override
   public void removeTagSubscriptionListener(final TagSubscriptionListener listener) {
-    listenersLock.writeLock().lock();
-    try {
-      tagSubscriptionListeners.remove(listener);
-    } finally {
-      listenersLock.writeLock().unlock();
-    }
-  }
-  
-  /**
-   * Fires an <code>onNewTagSubscriptions()</code> event to all registered <code>TagSubscriptionListener</code>
-   * listeners.
-   *
-   * @param tagIds list of new subscribed tags
-   */
-  private void fireOnNewTagSubscriptionsEvent(final Set<Long> tagIds) {
-    if (!tagIds.isEmpty()) {
-      listenersLock.readLock().lock();
-      try {
-        Set<Long> copyList = new HashSet<Long>(tagIds);
-        for (TagSubscriptionListener listener : tagSubscriptionListeners) {
-          listener.onNewTagSubscriptions(copyList);
-        }
-      } finally {
-        listenersLock.readLock().unlock();
-      }
-    }
+    tagSubscriptionHandler.removeSubscriptionListener(listener);
   }
 
-  /**
-   * Fires an <code>onUnsubscribe()</code> event to all registered <code>TagSubscriptionListener</code> listeners.
-   *
-   * @param tagIds list of tags that have been removed from the cache
-   */
-  private void fireOnUnsubscribeEvent(final Set<Long> tagIds) {
-    listenersLock.readLock().lock();
-    try {
-      Set<Long> copyList = new HashSet<Long>(tagIds);
-      for (TagSubscriptionListener listener : tagSubscriptionListeners) {
-        listener.onUnsubscribe(copyList);
-      }
-    } finally {
-      listenersLock.readLock().unlock();
-    }
+  @Override
+  public <T extends DataTagUpdateListener> void subscribeByRegex(Set<String> regexList, T listener) throws CacheSynchronizationException {
+    tagSubscriptionHandler.subscribeByRegex(regexList, listener, (listener instanceof DataTagListener));
   }
 }
