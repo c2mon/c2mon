@@ -215,6 +215,26 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   public ClientDataTagImpl(final Long tagId) {
     id = tagId;
   }
+  
+  /**
+   * Constructor
+   * Creates a ClientDataTag with a tagID and a javax.jms.TopicSession
+   * object to be used for subscriptions.
+   * Sets the tag name to "Not.initialized" and the quality to UNINITIALIZED.
+   * @param tagId the unique identifier for the DataTag
+   * @param If true, it will set the quality to UNDEFINED_TAG instead of UNINITIALIZED
+   */
+  public ClientDataTagImpl(final Long tagId, boolean unknown) {
+    id = tagId;
+    
+    if (unknown) {
+      setUnknown();
+    }
+  }
+  
+  private void setUnknown() {
+    tagQuality.setInvalidStatus(TagQualityStatus.UNDEFINED_TAG, "Tag is not known by the system");
+  }
 
   @org.simpleframework.xml.core.Persist
   public void prepare() {

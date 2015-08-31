@@ -22,7 +22,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
@@ -41,7 +40,7 @@ public class TagManagerTest {
    * Component to test
    */
   @Autowired
-  private C2monTagManager tagManager;
+  private TagManager tagManager;
 
   @Autowired
   private RequestHandler requestHandlerMock;
@@ -217,10 +216,11 @@ public class TagManagerTest {
       }
     };
     // Test setup
+    EasyMock.reset(requestHandlerMock, jmsProxyMock);
     Set<Long> tagId = new HashSet<Long>();
     tagId.add(1L);
     EasyMock.expect(requestHandlerMock.requestTags(tagId)).andReturn(new ArrayList<TagUpdate>(0));
-    ClientDataTagImpl cdt = new ClientDataTagImpl(1L);
+    ClientDataTagImpl cdt = new ClientDataTagImpl(1L, true);
     EasyMock.expect(jmsProxyMock.isRegisteredListener(cdt)).andReturn(false);
     EasyMock.replay(requestHandlerMock, jmsProxyMock);
     

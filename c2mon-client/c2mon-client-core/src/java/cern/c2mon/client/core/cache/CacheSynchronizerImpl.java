@@ -157,8 +157,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
       ClientDataTagImpl cdt = null;
       for (Long tagId : tagIds) {
         if (!liveCache.containsKey(tagId)) {
-          cdt = new ClientDataTagImpl(tagId);
-          cdt.getDataTagQuality().setInvalidStatus(TagQualityStatus.UNDEFINED_TAG, "Tag is not known by the system");
+          cdt = new ClientDataTagImpl(tagId, true);
           liveCache.put(cdt.getId(), cdt);
           newTags.add(tagId);
         }
@@ -333,8 +332,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
               }
             }
             supervisionManager.removeSupervisionListener(liveTag);
-            final ClientDataTagImpl unkownTag = new ClientDataTagImpl(tagId);
-            unkownTag.getDataTagQuality().setInvalidStatus(TagQualityStatus.UNDEFINED_TAG, "Tag is not known by the system");
+            final ClientDataTagImpl unkownTag = new ClientDataTagImpl(tagId, true);
             unkownTag.addUpdateListeners(liveTag.getUpdateListeners());
             liveCache.put(tagId, unkownTag);
           }
