@@ -216,7 +216,6 @@ public class TagManagerTest {
       }
     };
     // Test setup
-    EasyMock.reset(requestHandlerMock, jmsProxyMock);
     Set<Long> tagId = new HashSet<Long>();
     tagId.add(1L);
     EasyMock.expect(requestHandlerMock.requestTags(tagId)).andReturn(new ArrayList<TagUpdate>(0));
@@ -226,6 +225,7 @@ public class TagManagerTest {
     
     // run test
     tagManager.subscribeDataTag(1L, listener);
+    Thread.sleep(200);
     Assert.assertEquals(1, check.size());
     Assert.assertTrue(check.get(0));
     Assert.assertEquals(1, tagManager.getAllSubscribedDataTagIds(listener).size());
