@@ -284,6 +284,7 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
     this.tagDescription = tagDescription;
   }
 
+  @Deprecated
   @Override
   public String getTagDescription() {
     return tagDescription;
