@@ -278,7 +278,8 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
     
     return this.getTimestamp().after(alarm.getTimestamp());
   }
-  
+
+  @Deprecated
   public void setTagDescription(String tagDescription) {
     this.tagDescription = tagDescription;
   }
