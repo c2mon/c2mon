@@ -209,10 +209,9 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
     }
     
     if (regex.equals("*")) {
-      Map<Object, Element> allElements = getCache().getAll(getCache().getKeys());
       int counter = 0;
-      for (Element element : allElements.values()) {
-        resultList.add((T) element.getObjectValue());
+      for (Long  key : getKeys()) {
+        resultList.add(get(key));
         
         counter++;
         if (counter >= maxResults) {
@@ -227,18 +226,18 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
         Attribute<String> tagName = ehcache.getSearchAttribute("tagName");
   
         Query query = ehcache.createQuery();
-        results = query.includeValues().addCriteria(tagName.ilike(regex)).maxResults(maxResults).execute();
+        results = query.includeKeys().addCriteria(tagName.ilike(regex)).maxResults(maxResults).execute();
   
         LOGGER.debug(String.format("findByNameWildcard() - Got %d results for regex \"%s\"", results.size(), regex));
         
-        T value;
+        Long key;
         for (Result result : results.all()) {
-          value = (T) result.getValue();
-          if (value != null) {
-            resultList.add(value);
+          key = (Long) result.getKey();
+          if (key != null) {
+            resultList.add(get(key));
           }
           else {
-            LOGGER.warn(String.format("findByNameWildcard() - Regex \"%s\" returned a null value for cache %s", regex, getCacheName()));
+            LOGGER.warn(String.format("findByNameWildcard() - Regex \"%s\" returned a null key for cache %s", regex, getCacheName()));
           }
         }
       }
