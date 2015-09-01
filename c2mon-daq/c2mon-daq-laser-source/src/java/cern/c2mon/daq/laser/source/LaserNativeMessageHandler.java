@@ -46,6 +46,8 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
     
     private DataTagValueDictionary valueDictionary = new DataTagValueDictionary();
 
+    private static final String backupIndicator = "isBackup";
+    
     /**
      */
     public LaserNativeMessageHandler() {
@@ -335,7 +337,11 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                     for (String key : alarm.getUserPropNames()) {
                         valDescr += key + "=" + alarm.getProperty(key) + "\n";
                     }
-
+                    
+                    if (isBackup) {
+                        valDescr += backupIndicator + "=true\n";
+                    }
+                    
 
                     valueDictionary.addDescription(dataTag, valDescr);
                     
@@ -383,6 +389,10 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                     valDescr += key + "=" + alarm.getProperty(key) + "\n";
                 }
                 
+                if (isBackup) {
+                    valDescr += backupIndicator + "=true\n";
+                }
+                
                 valueDictionary.addDescription(dataTag, valDescr);
 
                 getEquipmentMessageSender()
@@ -423,7 +433,8 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                 if (!found) {
                     // Terminate alarm
                     mbean.setDataTag(dataTag.getId());
-                    getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.FALSE, messageData.getSourceTs());
+                    
+                    getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.FALSE, messageData.getSourceTs(), backupIndicator + "=true\n");
                     mbean.setValue(Boolean.FALSE);
 
                     String alarmID = dataTag.getName();
