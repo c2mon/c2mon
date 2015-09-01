@@ -229,8 +229,17 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
         Query query = ehcache.createQuery();
         results = query.includeValues().addCriteria(tagName.ilike(regex)).maxResults(maxResults).execute();
   
+        LOGGER.debug(String.format("findByNameWildcard() - Got %d results for regex \"%s\"", results.size(), regex));
+        
+        T value;
         for (Result result : results.all()) {
-          resultList.add((T) result.getValue());
+          value = (T) result.getValue();
+          if (value != null) {
+            resultList.add(value);
+          }
+          else {
+            LOGGER.warn(String.format("findByNameWildcard() - Regex \"%s\" returned a null value for cache %s", regex, getCacheName()));
+          }
         }
       }
       finally {
