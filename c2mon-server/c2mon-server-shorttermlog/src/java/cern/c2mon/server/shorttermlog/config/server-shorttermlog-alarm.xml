@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+  
+  <!-- LoggerDAOs contain the logic for storing data into the STL, including batch processing -->
+  <bean id="alarmLoggerDAO" class="cern.c2mon.server.shorttermlog.dao.LoggerDAO">
+    <constructor-arg ref="stlSqlSessionFactory"/>
+    <constructor-arg value="cern.c2mon.server.shorttermlog.mapper.AlarmLogMapper"/>
+    <constructor-arg value="${jdbc.stl.url}"/>
+  </bean>
+  
+  <bean id="alarmLogger" class="cern.c2mon.server.shorttermlog.logger.DefaultLogger">
+    <constructor-arg>
+      <bean class="cern.c2mon.server.shorttermlog.structure.AlarmLogConverter"/>
+    </constructor-arg>
+    <constructor-arg>
+      <bean class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
+        <constructor-arg ref="tagLoggerDAO"/>
+        <constructor-arg value="${c2mon.tag.log.fallback.file}"/>
+        <constructor-arg>
+          <bean class="cern.c2mon.server.shorttermlog.alarm.AlarmListener"/>
+        </constructor-arg>
+        <constructor-arg><bean class="cern.c2mon.server.shorttermlog.structure.AlarmLogConverter"/></constructor-arg>
+      </bean>
+    </constructor-arg>
+  </bean>
+
+</beans>

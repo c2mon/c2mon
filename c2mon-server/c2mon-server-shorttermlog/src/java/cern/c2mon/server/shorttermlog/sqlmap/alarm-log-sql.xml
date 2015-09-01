@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+  <!--
+    take "namespace=Mapper interface" for the mapper SQL statements to
+    be picked up automatically
+  -->
+<mapper namespace="cern.c2mon.server.shorttermlog.mapper.AlarmLogMapper">
+
+  <!--
+    Inserts a new row in the ShortTermLog table that represents some log
+    information for a given dataTag. The values for the inserted row are
+    stored in the DataTagShortTermLog object
+  -->
+  <insert id="insertLog" parameterType="DataTagSTLog">
+    INSERT INTO alarmlog (LOGDATE, TAGID, ALARMID, ISACTIVE, FAULTFAMILY, FAULTMEMBER, FAULTCODE, SERVERTIME, ADDINFO)
+    VALUES (
+    <!-- The logDate is not null, because is a dataTag read from the fallback file -->
+    <if test="logDate != null">SYS_EXTRACT_UTC(from_tz(#{logDate,jdbcType=TIMESTAMP},'${timezone}'))</if>
+    <!-- The logDate is null, what means that comes from a DAQ -->
+    <if test="logDate == null">SYS_EXTRACT_UTC(SYSTIMESTAMP)</if>
+    
+    ,#{tagId,jdbcType=NUMERIC},#{alarmid,jdbcType=NUMERIC}
+    ,<if test="isActive == true">Y</if><if test="isActive == false">N</if>
+    ,#{faultfamily,jdbcType=VARCHAR}
+    ,#{faultmember,jdbcType=VARCHAR}
+    ,#{faultcode,jdbcType=NUMERIC}
+    ,#{SYS_EXTRACT_UTC(#{servertime,jdbcType=TIMESTAMP})}
+    ,#{addinfo,jdbcType=VARCHAR}
+    ,#{tagMode,jdbcType=NUMERIC})
+  </insert>
+  
+  <!-- only used to remove inserts done during testing -->
+  <delete id="deleteAlarmLog" parameterType="Long">
+    DELETE FROM alarmlog WHERE alarmid = #{id}
+  </delete>
+  
+</mapper>

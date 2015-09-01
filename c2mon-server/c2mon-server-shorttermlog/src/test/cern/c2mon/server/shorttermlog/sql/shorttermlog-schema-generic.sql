@@ -53,6 +53,19 @@ cmdreportstatus VARCHAR(50),
 cmdreportdesc   VARCHAR(100)
 );
 
+CREATE TABLE alarmlog (
+logdate         DATE,
+tagid           INTEGER       NOT NULL,
+alarmid         INTEGER       NOT NULL,
+faultfamily     VARCHAR(60)   NOT NULL,
+faultmember     VARCHAR(60)   NOT NULL,
+faultcode       INTEGER       NOT NULL,
+isactive        INTEGER       NOT NULL,
+servertime      TIMESTAMP(6)  NOT NULL,
+addinfo         VARCHAR(100)  NOT NULL
+);
+
+
 CREATE TABLE SERVER_LIFECYCLE_LOG (
     SLL_EVENT_TYPE      VARCHAR(10) NOT NULL,
     SLL_SERVER_NAME     VARCHAR(20) NOT NULL,
