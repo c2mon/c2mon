@@ -42,19 +42,19 @@
 				</directory>
 			</deployment>
 			
-			<startscript name="DMN2-DAQ-LASER-ELEC">
+			<startscript name="DMN2-DAQ-LASER-ELEC.jvm">
 				<env name="PROCESS_NAME" value="P_ALARM_ELEC" />
 			</startscript>
-			<startscript name="DMN2-DAQ-LASER-MISC">
+			<startscript name="DMN2-DAQ-LASER-MISC.jvm">
 				<env name="PROCESS_NAME" value="P_ALARM_MISC" />
 			</startscript>
-			<startscript name="DMN2-DAQ-LASER-POFGC">
+			<startscript name="DMN2-DAQ-LASER-POFGC.jvm">
 				<env name="PROCESS_NAME" value="P_ALARM_POFGC" />
 			</startscript>
-			<startscript name="DMN2-DAQ-LASER-TIMOP">
+			<startscript name="DMN2-DAQ-LASER-TIMOP.jvm">
 				<env name="PROCESS_NAME" value="P_ALARM_TIMOP" />
 			</startscript>
-			<startscript name="DMN2-DAQ-LASER-VACUUM">
+			<startscript name="DMN2-DAQ-LASER-VACUUM.jvm">
 				<env name="PROCESS_NAME" value="P_ALARM_VACUUM" />
 			</startscript>
 		</application>
