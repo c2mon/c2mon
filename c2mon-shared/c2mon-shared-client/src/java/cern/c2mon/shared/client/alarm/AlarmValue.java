@@ -57,6 +57,7 @@ public interface AlarmValue extends ClientRequestResult {
   /** 
    * @return The description of the Tag 
    */
+  @Deprecated
   String getTagDescription();
   
   /**
