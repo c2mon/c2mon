@@ -10,6 +10,12 @@ import cern.c2mon.shared.client.request.ClientRequestErrorReport;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
 import cern.c2mon.shared.client.tag.TagConfig;
 
+/**
+ * The Configuration Service allows applying new configurations to the server and to
+ * fetch the configuration for the configured DAQ Processes.
+ * 
+ * @author Matthias Braeger
+ */
 public interface ConfigurationService {
 
   /**
