@@ -15,7 +15,7 @@
     stored in the DataTagShortTermLog object
   -->
   <insert id="insertLog" parameterType="AlarmSTLog">
-    INSERT INTO alarmlog (LOGDATE, TAGID, ALARMID, ISACTIVE, FAULTFAMILY, FAULTMEMBER, FAULTCODE, SERVERTIME, INFO)
+    INSERT INTO alarmlog (LOGDATE, TAGID, ALARMID, ACTIVE, FAULTFAMILY, FAULTMEMBER, FAULTCODE, SERVERTIME, INFO)
     VALUES (
     <!-- The logDate is not null, because is a dataTag read from the fallback file -->
     <if test="logDate != null">SYS_EXTRACT_UTC(from_tz(#{logDate,jdbcType=TIMESTAMP},'${timezone}'))</if>
