@@ -74,3 +74,5 @@ active          INTEGER       NOT NULL,
 servertime      TIMESTAMP(6)  NOT NULL,
 info            VARCHAR(100)  NOT NULL
 );
+
+
