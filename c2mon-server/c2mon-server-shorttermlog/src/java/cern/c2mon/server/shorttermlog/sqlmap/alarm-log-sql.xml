@@ -23,7 +23,7 @@
     <if test="logDate == null">SYS_EXTRACT_UTC(SYSTIMESTAMP)</if>
     
     ,#{tagId,jdbcType=NUMERIC},#{alarmid,jdbcType=NUMERIC}
-    ,<if test="isActive == true">Y</if><if test="isActive == false">N</if>
+    ,<if test="active == true">Y</if><if test="active == false">N</if>
     ,#{faultfamily,jdbcType=VARCHAR}
     ,#{faultmember,jdbcType=VARCHAR}
     ,#{faultcode,jdbcType=NUMERIC}
