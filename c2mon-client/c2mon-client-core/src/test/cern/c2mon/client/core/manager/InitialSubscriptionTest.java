@@ -23,7 +23,7 @@ public class InitialSubscriptionTest {
     tagIds.add(187200L);
     
         
-    tagManager.subscribeTags(tagIds, new Listener());
+    tagManager.subscribe(tagIds, new Listener());
     try {
       Thread.sleep(10000);
     }
@@ -33,7 +33,7 @@ public class InitialSubscriptionTest {
     }
     System.out.println("Registering second listener");
     tagIds.add(187201L);
-    tagManager.subscribeTags(tagIds, new Listener());
+    tagManager.subscribe(tagIds, new Listener());
     System.out.println("Registering second listener - DONE!");
     
     try {

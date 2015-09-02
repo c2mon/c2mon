@@ -71,58 +71,58 @@ public class TagManager implements CoreTagManager {
   
   @Override
   public void subscribeDataTags(Set<Long> dataTagIds, DataTagUpdateListener listener) throws CacheSynchronizationException {
-    tagService.subscribeTags(dataTagIds, listener);
+    tagService.subscribe(dataTagIds, listener);
   }
 
   @Override
   public void subscribeDataTag(Long dataTagId, DataTagUpdateListener listener) throws CacheSynchronizationException {
-    tagService.subscribeTag(dataTagId, listener);
+    tagService.subscribe(dataTagId, listener);
     
   }
 
   @Override
   public void subscribeDataTags(Set<Long> dataTagIds, DataTagListener listener) throws CacheSynchronizationException {
-    tagService.subscribeTags(dataTagIds, listener);
+    tagService.subscribe(dataTagIds, listener);
   }
 
   @Override
   public void subscribeDataTag(Long dataTagId, DataTagListener listener) throws CacheSynchronizationException {
-    tagService.subscribeTag(dataTagId, listener);
+    tagService.subscribe(dataTagId, listener);
   }
 
   @Override
   public void unsubscribeDataTags(Set<Long> dataTagIds, DataTagUpdateListener listener) {
-    tagService.unsubscribeTags(dataTagIds, listener);
+    tagService.unsubscribe(dataTagIds, listener);
   }
 
   @Override
   public void unsubscribeDataTag(Long dataTagId, DataTagUpdateListener listener) {
-    tagService.unsubscribeTag(dataTagId, listener); 
+    tagService.unsubscribe(dataTagId, listener); 
   }
 
   @Override
   public void unsubscribeAllDataTags(DataTagUpdateListener listener) {
-    tagService.unsubscribeAllTags(listener); 
+    tagService.unsubscribe(listener); 
   }
 
   @Override
   public Collection<ClientDataTagValue> getAllSubscribedDataTags(DataTagUpdateListener listener) {
-    return tagService.getAllSubscribedTags(listener);
+    return tagService.getSubscriptions(listener);
   }
 
   @Override
   public Set<Long> getAllSubscribedDataTagIds(DataTagUpdateListener listener) {
-    return tagService.getAllSubscribedTagIds(listener);
+    return tagService.getSubscriptionIds(listener);
   }
 
   @Override
   public ClientDataTagValue getDataTag(Long tagId) {
-    return tagService.getTag(tagId);
+    return tagService.get(tagId);
   }
 
   @Override
   public Collection<ClientDataTagValue> getDataTags(Collection<Long> tagIds) {
-    return tagService.getTags(tagIds);
+    return tagService.get(tagIds);
   }
 
   @Override
@@ -182,12 +182,12 @@ public class TagManager implements CoreTagManager {
 
   @Override
   public void refreshDataTags() throws CacheSynchronizationException {
-    tagService.refreshTags(); 
+    tagService.refresh(); 
   }
 
   @Override
   public void refreshDataTags(Collection<Long> tagIds) throws CacheSynchronizationException {
-    tagService.refreshTags(tagIds);
+    tagService.refresh(tagIds);
   }
 
   @Override

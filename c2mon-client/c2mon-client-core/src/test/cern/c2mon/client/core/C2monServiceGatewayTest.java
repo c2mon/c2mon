@@ -106,7 +106,7 @@ public class C2monServiceGatewayTest {
       }
 
       TagService tagManager = C2monServiceGateway.getTagService();
-      tagManager.subscribeTags(tagIds, new DataTagUpdateListener() {
+      tagManager.subscribe(tagIds, new DataTagUpdateListener() {
         @Override
         public void onUpdate(ClientDataTagValue tagUpdate) {
           System.out.println("Update received for tag " + tagUpdate.getId() + ":");

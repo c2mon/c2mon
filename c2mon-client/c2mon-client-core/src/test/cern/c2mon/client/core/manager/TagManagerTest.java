@@ -86,19 +86,19 @@ public class TagManagerTest {
     EasyMock.replay(requestHandlerMock, jmsProxyMock);
 
     // run test
-    tagService.subscribeTags(tagIds1, listener1);
-    Collection<ClientDataTagValue> cdtValues = tagService.getAllSubscribedTags(listener1);
+    tagService.subscribe(tagIds1, listener1);
+    Collection<ClientDataTagValue> cdtValues = tagService.getSubscriptions(listener1);
     Assert.assertEquals(tagIds1.size(), cdtValues.size());
-    Assert.assertEquals(tagIds1.size(), tagService.getAllSubscribedTagIds(listener1).size());
+    Assert.assertEquals(tagIds1.size(), tagService.getSubscriptionIds(listener1).size());
 
     // Wait for onUpdate() to be called for all tags
     latch1.await();
 
     // second call for second listener
-    tagService.subscribeTags(tagIds2, listener2);
-    cdtValues = tagService.getAllSubscribedTags(listener2);
+    tagService.subscribe(tagIds2, listener2);
+    cdtValues = tagService.getSubscriptions(listener2);
     Assert.assertEquals(tagIds2.size(), cdtValues.size());
-    Assert.assertEquals(tagIds2.size(), tagService.getAllSubscribedTagIds(listener2).size());
+    Assert.assertEquals(tagIds2.size(), tagService.getSubscriptionIds(listener2).size());
 
     // Wait for onUpdate() to be called for all tags
     latch2.await();
@@ -160,13 +160,13 @@ public class TagManagerTest {
     EasyMock.replay(requestHandlerMock, jmsProxyMock);
 
     // run test
-    tagService.subscribeTags(tagIds1, listener1);
-    Assert.assertEquals(tagIds1.size(), tagService.getAllSubscribedTagIds(listener1).size());
+    tagService.subscribe(tagIds1, listener1);
+    Assert.assertEquals(tagIds1.size(), tagService.getSubscriptionIds(listener1).size());
 
     // second call for second listener
-    tagService.subscribeTags(tagIds2, listener2); 
+    tagService.subscribe(tagIds2, listener2); 
     
-    Assert.assertEquals(tagIds2.size(), tagService.getAllSubscribedTagIds(listener2).size());
+    Assert.assertEquals(tagIds2.size(), tagService.getSubscriptionIds(listener2).size());
     Assert.assertEquals(2, check.size());
     
     Thread.sleep(1000);
@@ -187,12 +187,12 @@ public class TagManagerTest {
     EasyMock.replay(requestHandlerMock, jmsProxyMock);
     
     // run test
-    tagService.subscribeTags(tagIds1, listener1);
-    Collection<ClientDataTagValue> cdtValues = tagService.getAllSubscribedTags(listener1);
+    tagService.subscribe(tagIds1, listener1);
+    Collection<ClientDataTagValue> cdtValues = tagService.getSubscriptions(listener1);
     Assert.assertEquals(tagIds1.size(), cdtValues.size());
     // unsubscribe
-    tagService.unsubscribeTags(tagIds1, listener1);
-    cdtValues = tagService.getAllSubscribedTags(listener1);
+    tagService.unsubscribe(tagIds1, listener1);
+    cdtValues = tagService.getSubscriptions(listener1);
     Assert.assertEquals(0, cdtValues.size());
     
     // check test success
@@ -225,11 +225,11 @@ public class TagManagerTest {
     EasyMock.replay(requestHandlerMock, jmsProxyMock);
     
     // run test
-    tagService.subscribeTag(1L, listener);
+    tagService.subscribe(1L, listener);
     Thread.sleep(200);
     Assert.assertEquals(1, check.size());
     Assert.assertTrue(check.get(0));
-    Assert.assertEquals(1, tagService.getAllSubscribedTagIds(listener).size());
+    Assert.assertEquals(1, tagService.getSubscriptionIds(listener).size());
     
     
     // check test success

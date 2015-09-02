@@ -82,7 +82,7 @@ public class TagServiceImpl implements AdvancedTagService {
   }
 
   @Override
-  public Collection<ClientDataTagValue> getAllSubscribedTags(final DataTagUpdateListener listener) {
+  public Collection<ClientDataTagValue> getSubscriptions(final DataTagUpdateListener listener) {
     Collection<ClientDataTag> cacheTagList = cache.getAllTagsForListener(listener);
     Collection<ClientDataTagValue> clonedDataTags = new ArrayList<ClientDataTagValue>(cacheTagList.size());
 
@@ -99,22 +99,22 @@ public class TagServiceImpl implements AdvancedTagService {
   }
 
   @Override
-  public Set<Long> getAllSubscribedTagIds(final DataTagUpdateListener listener) {
+  public Set<Long> getSubscriptionIds(final DataTagUpdateListener listener) {
     return cache.getAllTagIdsForListener(listener);
   }
 
   @Override
-  public void refreshTags() {
+  public void refresh() {
     cache.refresh();
   }
 
   @Override
-  public void refreshTags(final Collection<Long> tagIds) {
+  public void refresh(final Collection<Long> tagIds) {
     cache.refresh(new HashSet<Long>(tagIds));
   }
 
   @Override
-  public void subscribeTag(final Long dataTagId, final DataTagUpdateListener listener) throws CacheSynchronizationException {
+  public void subscribe(final Long dataTagId, final DataTagUpdateListener listener) throws CacheSynchronizationException {
     if (dataTagId == null) {
       String error = "Called with null parameter (id collection).";
       log.warn("subscribeDataTag() : " + error);
@@ -123,16 +123,16 @@ public class TagServiceImpl implements AdvancedTagService {
 
     Set<Long> id = new HashSet<>(1);
     id.add(dataTagId);
-    subscribeTags(id, listener);
+    subscribe(id, listener);
   }
 
   @Override
-  public void subscribeTags(final Set<Long> tagIds, final DataTagUpdateListener listener) throws CacheSynchronizationException {
-    doTagSubscription(tagIds, listener);
+  public void subscribe(final Set<Long> tagIds, final DataTagUpdateListener listener) throws CacheSynchronizationException {
+    doSubscription(tagIds, listener);
   }
 
   @Override
-  public void subscribeTag(final Long dataTagId, final DataTagListener listener) throws CacheSynchronizationException {
+  public void subscribe(final Long dataTagId, final DataTagListener listener) throws CacheSynchronizationException {
     if (dataTagId == null) {
       String error = "Called with null parameter (id collection).";
       log.warn("subscribeDataTagUpdate() : " + error);
@@ -141,7 +141,7 @@ public class TagServiceImpl implements AdvancedTagService {
 
     Set<Long> id = new HashSet<>(1);
     id.add(dataTagId);
-    subscribeTags(id, listener);
+    subscribe(id, listener);
   }
 
   /**
@@ -149,8 +149,8 @@ public class TagServiceImpl implements AdvancedTagService {
    * with a request to the C2MON server and afterwards registered for the listener.
    */
   @Override
-  public void subscribeTags(final Set<Long> tagIds, final DataTagListener listener) {
-    doTagSubscription(tagIds, listener);
+  public void subscribe(final Set<Long> tagIds, final DataTagListener listener) {
+    doSubscription(tagIds, listener);
   }
 
   /**
@@ -161,7 +161,7 @@ public class TagServiceImpl implements AdvancedTagService {
    *                                    current value of the tag.
    * @return The initial values of the subscribed tags.
    */
-  private synchronized <T extends DataTagUpdateListener> void doTagSubscription(final Set<Long> tagIds, final T listener) {
+  private synchronized <T extends DataTagUpdateListener> void doSubscription(final Set<Long> tagIds, final T listener) {
     if (tagIds == null) {
       String error = "Called with null parameter (id collection). Ignoring request.";
       log.warn("doTagSubscription() : " + error);
@@ -206,7 +206,7 @@ public class TagServiceImpl implements AdvancedTagService {
    *                                    current value of the tag.
    * @return The initial values of the subscribed tags.
    */
-  private synchronized <T extends DataTagUpdateListener> void doTagSubscriptionByName(final Set<String> regexList, final T listener) {
+  private synchronized <T extends DataTagUpdateListener> void doSubscriptionByName(final Set<String> regexList, final T listener) {
     if (regexList == null) {
       String error = "Called with null parameter (regex list). Ignoring request.";
       log.warn("doTagSubscription() : " + error);
@@ -243,7 +243,7 @@ public class TagServiceImpl implements AdvancedTagService {
   }
 
   @Override
-  public void unsubscribeTag(Long dataTagId, DataTagUpdateListener listener) {
+  public void unsubscribe(Long dataTagId, DataTagUpdateListener listener) {
     if (dataTagId == null) {
       String error = "Called with null parameter (id collection).";
       log.warn("unsubscribeDataTag() : " + error);
@@ -252,17 +252,17 @@ public class TagServiceImpl implements AdvancedTagService {
 
     Set<Long> id = new HashSet<>(1);
     id.add(dataTagId);
-    unsubscribeTags(id, listener);
+    unsubscribe(id, listener);
   }
 
   @Override
-  public void unsubscribeAllTags(final DataTagUpdateListener listener) {
+  public void unsubscribe(final DataTagUpdateListener listener) {
     cache.unsubscribeAllDataTags(listener);
     tagUpdateListeners.remove(listener);
   }
 
   @Override
-  public void unsubscribeTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener) {
+  public void unsubscribe(final Set<Long> dataTagIds, final DataTagUpdateListener listener) {
     cache.unsubscribeDataTags(dataTagIds, listener);
     tagUpdateListeners.remove(listener);
   }
@@ -282,7 +282,7 @@ public class TagServiceImpl implements AdvancedTagService {
 
 
   @Override
-  public Collection<ClientDataTagValue> getTags(final Collection<Long> tagIds) {
+  public Collection<ClientDataTagValue> get(final Collection<Long> tagIds) {
     Collection<ClientDataTagValue> resultList = new ArrayList<ClientDataTagValue>();
     Collection<Long> missingTags = new ArrayList<Long>();
     Map<Long, ClientDataTag> cachedValues = cache.get(new HashSet<Long>(tagIds));
@@ -296,7 +296,7 @@ public class TagServiceImpl implements AdvancedTagService {
         }
       }
     } catch (CloneNotSupportedException e) {
-      log.error("getDataTags() - Unable to clone ClientDataTag! Please check the code.", e);
+      log.error("get() - Unable to clone ClientDataTag! Please check the code.", e);
       throw new UnsupportedOperationException("Unable to clone ClientDataTag! Please check the code.", e);
     }
 
@@ -320,13 +320,13 @@ public class TagServiceImpl implements AdvancedTagService {
               supervisionManager.removeSupervisionListener(cdt);
             }
           } catch (RuleFormatException e) {
-            log.error("getDataTags() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
+            log.error("get() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
             throw new RuntimeException("Received an incorrect rule tag from the server for tag id " + tagUpdate.getId());
           }
 
         }
       } catch (JMSException e) {
-        log.error("getDataTags() - JMS connection lost -> Could not retrieve missing tags from the C2MON server.", e);
+        log.error("get() - JMS connection lost -> Could not retrieve missing tags from the C2MON server.", e);
       }
     }
 
@@ -334,14 +334,14 @@ public class TagServiceImpl implements AdvancedTagService {
   }
 
   @Override
-  public ClientDataTagValue getTag(final Long tagId) {
+  public ClientDataTagValue get(final Long tagId) {
     if (tagId == null) {
       throw new NullPointerException("The tagId parameter cannot be null");
     }
 
     Collection<Long> coll = new ArrayList<Long>(1);
     coll.add(tagId);
-    Collection<ClientDataTagValue> resultColl = getTags(coll);
+    Collection<ClientDataTagValue> resultColl = get(coll);
     for(ClientDataTagValue cdt : resultColl) {
       return cdt;
     }
@@ -364,26 +364,26 @@ public class TagServiceImpl implements AdvancedTagService {
    * TODO: Call could be optimized by filtering out all strings without
    */
   @Override
-  public void subscribeTagsByName(String regex, DataTagUpdateListener listener) throws CacheSynchronizationException {
-    subscribeTagsByName(new HashSet<>(Arrays.asList(new String[]{regex})), listener);
+  public void subscribeByName(String regex, DataTagUpdateListener listener) throws CacheSynchronizationException {
+    subscribeByName(new HashSet<>(Arrays.asList(new String[]{regex})), listener);
   }
 
   @Override
-  public void subscribeTagsByName(String regex, DataTagListener listener) throws CacheSynchronizationException {
-    subscribeTagsByName(new HashSet<>(Arrays.asList(new String[]{regex})), listener);
+  public void subscribeByName(String regex, DataTagListener listener) throws CacheSynchronizationException {
+    subscribeByName(new HashSet<>(Arrays.asList(new String[]{regex})), listener);
   }
 
   @Override
-  public void subscribeTagsByName(Set<String> regexList, DataTagUpdateListener listener) throws CacheSynchronizationException {
-    doTagSubscriptionByName(regexList, listener);
+  public void subscribeByName(Set<String> regexList, DataTagUpdateListener listener) throws CacheSynchronizationException {
+    doSubscriptionByName(regexList, listener);
   }
 
   @Override
-  public void subscribeTagsByName(Set<String> regexList, DataTagListener listener) throws CacheSynchronizationException {
-    doTagSubscriptionByName(regexList, listener);
+  public void subscribeByName(Set<String> regexList, DataTagListener listener) throws CacheSynchronizationException {
+    doSubscriptionByName(regexList, listener);
   }
 
-  private Collection<ClientDataTagValue> getDataTagsByName(final Collection<String> tagNames) {
+  private Collection<ClientDataTagValue> getByName(final Collection<String> tagNames) {
     
     Collection<ClientDataTagValue> resultList = new ArrayList<>();
     Set<String> missingTags = new HashSet<>();
@@ -398,31 +398,31 @@ public class TagServiceImpl implements AdvancedTagService {
         }
       }
     } catch (CloneNotSupportedException e) {
-      log.error("getDataTags() - Unable to clone ClientDataTag! Please check the code.", e);
+      log.error("get() - Unable to clone ClientDataTag! Please check the code.", e);
       throw new UnsupportedOperationException("Unable to clone ClientDataTag! Please check the code.", e);
     }
     
     if (!missingTags.isEmpty()) {
-      resultList.addAll(findTagsByName(missingTags));
+      resultList.addAll(findByName(missingTags));
     }
     
     return resultList;
   }
 
   @Override
-  public Collection<ClientDataTagValue> findTagsByName(String regex) {
+  public Collection<ClientDataTagValue> findByName(String regex) {
     if (hasWildcard(regex)) {
       Set<String> regexList = new HashSet<>();
       regexList.add(regex);
-      return findTagsByName(regexList);
+      return findByName(regexList);
     }
     else {
-      return getDataTagsByName(Arrays.asList(new String[]{regex}));
+      return getByName(Arrays.asList(new String[]{regex}));
     }
   }
 
   @Override
-  public Collection<ClientDataTagValue> findTagsByName(Set<String> regexList) {
+  public Collection<ClientDataTagValue> findByName(Set<String> regexList) {
     Collection<ClientDataTagValue> resultList = new ArrayList<ClientDataTagValue>();
     
     try {
@@ -443,13 +443,13 @@ public class TagServiceImpl implements AdvancedTagService {
             supervisionManager.removeSupervisionListener(cdt);
           }
         } catch (RuleFormatException e) {
-          log.error("getDataTags() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
+          log.error("findByName() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
           throw new RuntimeException("Received an incorrect rule tag from the server for tag id " + tagUpdate.getId());
         }
 
       }
     } catch (JMSException e) {
-      log.error("getDataTags() - JMS connection lost -> Could not retrieve missing tags from the C2MON server.", e);
+      log.error("findByName() - JMS connection lost -> Could not retrieve missing tags from the C2MON server.", e);
     }
 
     return resultList;
