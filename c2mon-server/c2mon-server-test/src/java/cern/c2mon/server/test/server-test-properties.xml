@@ -98,6 +98,7 @@
             <prop key="datasource.stl.connections.initial">1</prop>
             <prop key="datasource.stl.connections.max">2</prop>
             <prop key="c2mon.tag.log.fallback.file">./log/tagfallback.txt</prop>
+            <prop key="c2mon.alarm.log.fallback.file">./log/alarmfallback.txt</prop>
             <prop key="c2mon.command.log.fallback.file">./log/commandfallback.txt</prop>
             
             <!-- LASER module -->
