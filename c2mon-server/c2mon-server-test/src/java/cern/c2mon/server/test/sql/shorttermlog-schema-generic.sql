@@ -61,3 +61,16 @@ CREATE TABLE if not exists SERVER_LIFECYCLE_LOG (
     SLL_SERVER_NAME     VARCHAR(20) NOT NULL,
     SLL_TIME            TIMESTAMP(6) NOT NULL   
 );
+
+
+CREATE TABLE alarmlog (
+logdate         DATE,
+tagid           INTEGER       NOT NULL,
+alarmid         INTEGER       NOT NULL,
+faultfamily     VARCHAR(60)   NOT NULL,
+faultmember     VARCHAR(60)   NOT NULL,
+faultcode       INTEGER       NOT NULL,
+isactive        INTEGER       NOT NULL,
+servertime      TIMESTAMP(6)  NOT NULL,
+addinfo         VARCHAR(100)  NOT NULL
+);
