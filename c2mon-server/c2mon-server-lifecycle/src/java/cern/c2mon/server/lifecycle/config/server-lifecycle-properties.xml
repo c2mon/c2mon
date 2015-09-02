@@ -105,6 +105,7 @@
             <prop key="datasource.stl.connections.max">2</prop>
 
             <!-- Fallback variables -->
+            <prop key="c2mon.alarm.log.fallback.file">${c2mon.home}/log/alarmfallback.txt</prop>
             <prop key="c2mon.tag.log.fallback.file">${c2mon.home}/log/tagfallback.txt</prop>
             <prop key="c2mon.command.log.fallback.file">${c2mon.home}/log/commandfallback.txt</prop>
             
