@@ -15,11 +15,10 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
-package cern.c2mon.client.core.manager;
+package cern.c2mon.client.core.service;
 
-import cern.c2mon.client.core.C2monTagManager;
+import cern.c2mon.client.core.TagService;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
-import cern.c2mon.client.core.service.AdvancedTagService;
 
 /**
  * This interface extends the <code>C2monTagManager</code>
@@ -27,11 +26,9 @@ import cern.c2mon.client.core.service.AdvancedTagService;
  * the <code>TagServiceImpl</code>. This interface is only
  * visible for other manager classes.
  *
- * @deprecated Use {@link AdvancedTagService} instead
  * @author Matthias Braeger
  */
-@Deprecated
-public interface CoreTagManager extends C2monTagManager {
+public interface AdvancedTagService extends TagService {
   
   /**
    * Registers a <code>TagSubscriptionListener</code> to the <code>TagServiceImpl</code>. 

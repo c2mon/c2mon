@@ -10,7 +10,7 @@ import cern.c2mon.shared.client.alarm.AlarmValue;
 public interface AlarmService {
 
   /**
-   * Registers an <code>AlarmListener</code> to the <code>TagManager</code>.
+   * Registers an <code>AlarmListener</code> to the <code>TagServiceImpl</code>.
    * @param listener The listener to be registered
    * @throws JMSException
    */
@@ -36,7 +36,7 @@ public interface AlarmService {
   Collection<AlarmValue> getAllActiveAlarms();
   
   /**
-   * Unregisters an <code>AlarmListener</code> from the <code>TagManager</code>.
+   * Unregisters an <code>AlarmListener</code> from the <code>TagServiceImpl</code>.
    * @param listener The listener to be unregistered
    * @throws JMSException
    */

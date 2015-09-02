@@ -53,6 +53,11 @@ public class C2monServiceGatewayTest {
     assertNotNull(C2monServiceGateway.getCommandService());
     assertNotNull(C2monServiceGateway.getSupervisionService());
     assertNotNull(C2monServiceGateway.getTagService());
+    assertNotNull(C2monServiceGateway.getAlarmService());
+    assertNotNull(C2monServiceGateway.getConfigurationService());
+    assertNotNull(C2monServiceGateway.getSessionService());
+    assertNotNull(C2monServiceGateway.getStatisticsService());
+    assertNotNull(C2monServiceGateway.getTagManager());
   }
 
   /**
@@ -99,7 +104,7 @@ public class C2monServiceGatewayTest {
       }
 
       TagService tagManager = C2monServiceGateway.getTagService();
-      tagManager.subscribeDataTags(tagIds, new DataTagUpdateListener() {
+      tagManager.subscribeTags(tagIds, new DataTagUpdateListener() {
         @Override
         public void onUpdate(ClientDataTagValue tagUpdate) {
           System.out.println("Update received for tag " + tagUpdate.getId() + ":");

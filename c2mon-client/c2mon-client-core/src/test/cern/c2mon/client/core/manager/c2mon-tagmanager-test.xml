@@ -38,7 +38,8 @@
     <constructor-arg value="tagSubscriptionHandler"/>
   </bean>
   
-  <bean id="tagManager" class="cern.c2mon.client.core.manager.TagManager">
+  <bean id="advancedTagService" class="cern.c2mon.client.core.service.TagServiceImpl">
+    <constructor-arg value="supervisionManager"/>
     <constructor-arg value="clientDataTagCache"/>
     <constructor-arg value="requestHandler"/>
   </bean>

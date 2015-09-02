@@ -7,13 +7,13 @@ import java.util.Set;
 import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.C2monServiceGateway;
-import cern.c2mon.client.core.C2monTagManager;
+import cern.c2mon.client.core.TagService;
 
 public class InitialSubscriptionTest {
   
   public InitialSubscriptionTest() {
     C2monServiceGateway.startC2monClientSynchronous();
-    C2monTagManager tagManager = C2monServiceGateway.getTagManager();
+    TagService tagManager = C2monServiceGateway.getTagService();
     
     Set<Long> tagIds = new HashSet<Long>();
     tagIds.add(165479L);
@@ -23,7 +23,7 @@ public class InitialSubscriptionTest {
     tagIds.add(187200L);
     
         
-    tagManager.subscribeDataTags(tagIds, new Listener());
+    tagManager.subscribeTags(tagIds, new Listener());
     try {
       Thread.sleep(10000);
     }
@@ -33,7 +33,7 @@ public class InitialSubscriptionTest {
     }
     System.out.println("Registering second listener");
     tagIds.add(187201L);
-    tagManager.subscribeDataTags(tagIds, new Listener());
+    tagManager.subscribeTags(tagIds, new Listener());
     System.out.println("Registering second listener - DONE!");
     
     try {

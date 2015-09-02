@@ -69,7 +69,7 @@ public interface C2monTagManager {
    * @return A collection with initial values for all tags to which the listener got subscribed.
    *         Please note, that also the listener is receiving the initial values.
    * @throws CacheSynchronizationException In case a communication problem with the C2MON server
-   *         occurs while subscribing to the tags. In that case the {@link TagManager} will
+   *         occurs while subscribing to the tags. In that case the {@link TagServiceImpl} will
    *         rollback the subscription.
    * @see #subscribeDataTags(Set, DataTagListener)
    * @see C2monSupervisionManager#isServerConnectionWorking()
@@ -88,7 +88,7 @@ public interface C2monTagManager {
    * @return The initial value of the subscribed tag. Please note, that also the listener is
    *         receiving the initial value!
    * @throws CacheSynchronizationException In case a communication problem with the C2MON server
-   *         occurs while subscribing to the tag. In that case the {@link TagManager} will
+   *         occurs while subscribing to the tag. In that case the {@link TagServiceImpl} will
    *         rollback the subscription.
    * @see #subscribeDataTag(Long, DataTagListener)
    * @see C2monSupervisionManager#isServerConnectionWorking();
@@ -108,7 +108,7 @@ public interface C2monTagManager {
    * @param dataTagIds A collection of data tag IDs
    * @param listener the listener which shall be registered
    * @throws CacheSynchronizationException In case a communication problem with the C2MON server
-   *         occurs while subscribing to the tags. In that case the {@link TagManager} will
+   *         occurs while subscribing to the tags. In that case the {@link TagServiceImpl} will
    *         rollback the subscription.
    * @see #subscribeDataTags(Set, DataTagUpdateListener)
    * @see C2monSupervisionManager#isServerConnectionWorking()
@@ -129,7 +129,7 @@ public interface C2monTagManager {
    * @return The initial value of the subscribed tag. Please note, that the listener is not
    *         receiving the initial value!
    * @throws CacheSynchronizationException In case a communication problem with the C2MON server
-   *         occurs while subscribing to the tag. In that case the {@link TagManager} will
+   *         occurs while subscribing to the tag. In that case the {@link TagServiceImpl} will
    *         rollback the subscription.
    * @see #subscribeDataTag(Long, DataTagUpdateListener)
    * @see C2monSupervisionManager#isServerConnectionWorking()
@@ -357,14 +357,14 @@ public interface C2monTagManager {
   void refreshDataTags(Collection<Long> tagIds) throws CacheSynchronizationException;
 
   /**
-   * Unregisters an <code>AlarmListener</code> from the <code>TagManager</code>.
+   * Unregisters an <code>AlarmListener</code> from the <code>TagServiceImpl</code>.
    * @param listener The listener to be unregistered
    * @throws JMSException
    */
   void removeAlarmListener(AlarmListener listener) throws JMSException;
 
   /**
-   * Registers an <code>AlarmListener</code> to the <code>TagManager</code>.
+   * Registers an <code>AlarmListener</code> to the <code>TagServiceImpl</code>.
    * @param listener The listener to be registered
    * @throws JMSException
    */

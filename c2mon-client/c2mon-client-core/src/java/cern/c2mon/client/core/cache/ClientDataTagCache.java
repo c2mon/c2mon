@@ -27,7 +27,7 @@ import cern.c2mon.client.core.manager.TagManager;
  * This interface describes the methods which are provided manipulate
  * the references in the client data tag cache.
  * <p>
- * <b>Please note</b>, that only the {@link TagManager} should use this
+ * <b>Please note</b>, that only the {@link TagServiceImpl} should use this
  * interface face! If your class needs absolutely to access the cache
  * it should use the {@link BasicCacheHandler} instead. 
  *

@@ -70,6 +70,18 @@ public class C2monServiceGateway {
   /** Static reference to the <code>C2monTagManager</code> singleton instance */
   private static TagManager tagManager = null;
   
+  /** Static reference to the <code>TagService</code> singleton instance */
+  private static TagService tagService = null;
+  
+  /** Static reference to the <code>ConfigurationService</code> singleton instance */
+  private static ConfigurationService configurationService = null;
+  
+  /** Static reference to the <code>AlarmService</code> singleton instance */
+  private static AlarmService alarmService = null;
+  
+  /** Static reference to the <code>StatisticsService</code> singleton instance */
+  private static StatisticsService statisticsService = null;
+  
   /** Static reference to the <code>C2monSupervisionManager</code> singleton instance */
   private static SupervisionManager supervisionManager = null;
   
@@ -143,7 +155,7 @@ public class C2monServiceGateway {
    *         methods for alarm subscription and unsubscription.
    */
   public static AlarmService getAlarmService() {
-    return tagManager;
+    return alarmService;
   }
   
   /**
@@ -151,7 +163,7 @@ public class C2monServiceGateway {
    *         to retrieve the statistics report.
    */
   public static StatisticsService getStatisticsService() {
-    return tagManager;
+    return statisticsService;
   }
   
   /**
@@ -159,7 +171,7 @@ public class C2monServiceGateway {
    *         to manage the server configuration
    */
   public static ConfigurationService getConfigurationService() {
-    return tagManager;
+    return configurationService;
   }
   
 
@@ -168,7 +180,7 @@ public class C2monServiceGateway {
    *         methods for tag subscription and unsubscription.
    */
   public static TagService getTagService() {
-    return tagManager;
+    return tagService;
   }
   
   /**
@@ -300,6 +312,11 @@ public class C2monServiceGateway {
     tagManager = xmlContext.getBean(TagManager.class);
     supervisionManager = xmlContext.getBean(SupervisionManager.class);
     commandManager = xmlContext.getBean(CommandManager.class);
+    
+    alarmService = xmlContext.getBean(AlarmService.class);
+    configurationService = xmlContext.getBean(ConfigurationService.class);
+    statisticsService = xmlContext.getBean(StatisticsService.class);
+    tagService = xmlContext.getBean(TagService.class);
   }
   
   /**

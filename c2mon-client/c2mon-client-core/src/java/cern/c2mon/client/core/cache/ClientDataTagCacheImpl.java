@@ -39,13 +39,13 @@ import cern.c2mon.client.core.tag.ClientDataTagImpl;
 /**
  * This class implements the cache of the C2MON client API. The public method
  * provided by this class are never accessed directly by the application layer.
- * Only the <code>TagManager</code> has a reference to the cache service and is
+ * Only the <code>TagServiceImpl</code> has a reference to the cache service and is
  * controlling the access to it.
  * <p>
  * The cache provides a <code>create()</code> method for creating a new
  * <code>ClientDataTag</code> cache entry. In the background it handles also the
  * subscription to the incoming live events. Only the initialization of the tag
- * is performed by the <code>TagManager</code>.
+ * is performed by the <code>TagServiceImpl</code>.
  * <p>
  * It is possible to switch the <code>ClientDataTagCache</code> from live mode
  * into history mode and back. Therefore this class manages internally two

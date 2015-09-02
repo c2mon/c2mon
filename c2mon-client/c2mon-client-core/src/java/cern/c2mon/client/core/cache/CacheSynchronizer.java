@@ -72,7 +72,7 @@ interface CacheSynchronizer {
    * Removes all <code>ClientDataTag</code> references
    * with the given id from the cache. At the same time it unsubscribes the
    * live tags from the <code>JmsProxy</code> where they were formerly
-   * registered as <code>ServerUpdateListener</code> by the <code>TagManager</code>.
+   * registered as <code>ServerUpdateListener</code> by the <code>TagServiceImpl</code>.
    *
    * @param tagIds list of <code>ClientDataTag</code> id's
    * @throws NullPointerException When the parameter is <code>null</code>

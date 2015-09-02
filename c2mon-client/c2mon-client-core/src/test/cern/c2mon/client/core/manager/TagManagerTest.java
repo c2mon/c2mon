@@ -22,6 +22,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.core.TagService;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
@@ -40,7 +41,7 @@ public class TagManagerTest {
    * Component to test
    */
   @Autowired
-  private TagManager tagManager;
+  private TagService tagService;
 
   @Autowired
   private RequestHandler requestHandlerMock;
@@ -85,19 +86,19 @@ public class TagManagerTest {
     EasyMock.replay(requestHandlerMock, jmsProxyMock);
 
     // run test
-    tagManager.subscribeDataTags(tagIds1, listener1);
-    Collection<ClientDataTagValue> cdtValues = tagManager.getAllSubscribedDataTags(listener1);
+    tagService.subscribeTags(tagIds1, listener1);
+    Collection<ClientDataTagValue> cdtValues = tagService.getAllSubscribedTags(listener1);
     Assert.assertEquals(tagIds1.size(), cdtValues.size());
-    Assert.assertEquals(tagIds1.size(), tagManager.getAllSubscribedDataTagIds(listener1).size());
+    Assert.assertEquals(tagIds1.size(), tagService.getAllSubscribedTagIds(listener1).size());
 
     // Wait for onUpdate() to be called for all tags
     latch1.await();
 
     // second call for second listener
-    tagManager.subscribeDataTags(tagIds2, listener2);
-    cdtValues = tagManager.getAllSubscribedDataTags(listener2);
+    tagService.subscribeTags(tagIds2, listener2);
+    cdtValues = tagService.getAllSubscribedTags(listener2);
     Assert.assertEquals(tagIds2.size(), cdtValues.size());
-    Assert.assertEquals(tagIds2.size(), tagManager.getAllSubscribedDataTagIds(listener2).size());
+    Assert.assertEquals(tagIds2.size(), tagService.getAllSubscribedTagIds(listener2).size());
 
     // Wait for onUpdate() to be called for all tags
     latch2.await();
@@ -159,13 +160,13 @@ public class TagManagerTest {
     EasyMock.replay(requestHandlerMock, jmsProxyMock);
 
     // run test
-    tagManager.subscribeDataTags(tagIds1, listener1);
-    Assert.assertEquals(tagIds1.size(), tagManager.getAllSubscribedDataTagIds(listener1).size());
+    tagService.subscribeTags(tagIds1, listener1);
+    Assert.assertEquals(tagIds1.size(), tagService.getAllSubscribedTagIds(listener1).size());
 
     // second call for second listener
-    tagManager.subscribeDataTags(tagIds2, listener2); 
+    tagService.subscribeTags(tagIds2, listener2); 
     
-    Assert.assertEquals(tagIds2.size(), tagManager.getAllSubscribedDataTagIds(listener2).size());
+    Assert.assertEquals(tagIds2.size(), tagService.getAllSubscribedTagIds(listener2).size());
     Assert.assertEquals(2, check.size());
     
     Thread.sleep(1000);
@@ -186,12 +187,12 @@ public class TagManagerTest {
     EasyMock.replay(requestHandlerMock, jmsProxyMock);
     
     // run test
-    tagManager.subscribeDataTags(tagIds1, listener1);
-    Collection<ClientDataTagValue> cdtValues = tagManager.getAllSubscribedDataTags(listener1);
+    tagService.subscribeTags(tagIds1, listener1);
+    Collection<ClientDataTagValue> cdtValues = tagService.getAllSubscribedTags(listener1);
     Assert.assertEquals(tagIds1.size(), cdtValues.size());
     // unsubscribe
-    tagManager.unsubscribeDataTags(tagIds1, listener1);
-    cdtValues = tagManager.getAllSubscribedDataTags(listener1);
+    tagService.unsubscribeTags(tagIds1, listener1);
+    cdtValues = tagService.getAllSubscribedTags(listener1);
     Assert.assertEquals(0, cdtValues.size());
     
     // check test success
@@ -224,11 +225,11 @@ public class TagManagerTest {
     EasyMock.replay(requestHandlerMock, jmsProxyMock);
     
     // run test
-    tagManager.subscribeDataTag(1L, listener);
+    tagService.subscribeTag(1L, listener);
     Thread.sleep(200);
     Assert.assertEquals(1, check.size());
     Assert.assertTrue(check.get(0));
-    Assert.assertEquals(1, tagManager.getAllSubscribedDataTagIds(listener).size());
+    Assert.assertEquals(1, tagService.getAllSubscribedTagIds(listener).size());
     
     
     // check test success

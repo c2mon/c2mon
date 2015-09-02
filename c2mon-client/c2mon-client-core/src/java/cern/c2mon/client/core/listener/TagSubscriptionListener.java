@@ -23,7 +23,7 @@ import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.core.manager.TagManager;
 
 /**
- * Is used by {@link TagManager} to notify listeners about new tag subscriptions
+ * Is used by {@link TagServiceImpl} to notify listeners about new tag subscriptions
  * or unsubscriptions.
  * 
  * @author Matthias Braeger

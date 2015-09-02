@@ -49,10 +49,10 @@ public interface TagService {
    * @throws CacheSynchronizationException In case a communication problem with the C2MON server
    *         occurs while subscribing to the tags. In that case the {@link TagService} will
    *         rollback the subscription.
-   * @see #subscribeDataTags(Set, DataTagListener)
+   * @see #subscribeTags(Set, DataTagListener)
    * @see C2monSupervisionManager#isServerConnectionWorking()
    */
-  void subscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener) throws CacheSynchronizationException;
+  void subscribeTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener) throws CacheSynchronizationException;
 
   /**
    * Registers a listener to receive the current (initial) value and updates for one specific data tag.<p>
@@ -66,10 +66,10 @@ public interface TagService {
    * @throws CacheSynchronizationException In case a communication problem with the C2MON server
    *         occurs while subscribing to the tag. In that case the {@link TagService} will
    *         rollback the subscription.
-   * @see #subscribeDataTag(Long, DataTagListener)
+   * @see #subscribeTag(Long, DataTagListener)
    * @see C2monSupervisionManager#isServerConnectionWorking();
    */
-  void subscribeDataTag(final Long tagId, final DataTagUpdateListener listener) throws CacheSynchronizationException;
+  void subscribeTag(final Long tagId, final DataTagUpdateListener listener) throws CacheSynchronizationException;
   
   /**
    * Registers a listener to receive the current (initial) values and updates for all tags where the
@@ -102,10 +102,10 @@ public interface TagService {
    * @throws CacheSynchronizationException In case a communication problem with the C2MON server
    *         occurs while subscribing to the tag. In that case the {@link TagService} will
    *         rollback the subscription.
-   * @see #subscribeDataTag(String, DataTagListener)
+   * @see #subscribeTag(String, DataTagListener)
    * @see C2monSupervisionManager#isServerConnectionWorking();
    */
-  void subscribeDataTagsByName(final String regex, final DataTagUpdateListener listener) throws CacheSynchronizationException;
+  void subscribeTagsByName(final String regex, final DataTagUpdateListener listener) throws CacheSynchronizationException;
 
   /**
    * Registers a listener to receive the current (initial) values and updates for all tags where the
@@ -142,10 +142,10 @@ public interface TagService {
    * @throws CacheSynchronizationException In case a communication problem with the C2MON server
    *         occurs while subscribing to the tag. In that case the {@link TagService} will
    *         rollback the subscription.
-   * @see #subscribeDataTag(String, DataTagListener)
+   * @see #subscribeTag(String, DataTagListener)
    * @see C2monSupervisionManager#isServerConnectionWorking();
    */
-  void subscribeDataTagsByName(final String regex, final DataTagListener listener) throws CacheSynchronizationException;
+  void subscribeTagsByName(final String regex, final DataTagListener listener) throws CacheSynchronizationException;
 
   
   /**
@@ -178,10 +178,10 @@ public interface TagService {
    * @throws CacheSynchronizationException In case a communication problem with the C2MON server
    *         occurs while subscribing to the tag. In that case the {@link TagService} will
    *         rollback the subscription.
-   * @see #subscribeDataTag(String, DataTagListener)
+   * @see #subscribeTag(String, DataTagListener)
    * @see C2monSupervisionManager#isServerConnectionWorking();
    */
-  void subscribeDataTagsByName(final Set<String> regexList, final DataTagUpdateListener listener) throws CacheSynchronizationException;
+  void subscribeTagsByName(final Set<String> regexList, final DataTagUpdateListener listener) throws CacheSynchronizationException;
 
   /**
    * Registers a listener to receive the current (initial) values and updates for all tags, where the
@@ -216,10 +216,10 @@ public interface TagService {
    * @throws CacheSynchronizationException In case a communication problem with the C2MON server
    *         occurs while subscribing to the tag. In that case the {@link TagService} will
    *         rollback the subscription.
-   * @see #subscribeDataTag(String, DataTagListener)
+   * @see #subscribeTag(String, DataTagListener)
    * @see C2monSupervisionManager#isServerConnectionWorking();
    */
-  void subscribeDataTagsByName(final Set<String> regexList, final DataTagListener listener) throws CacheSynchronizationException;
+  void subscribeTagsByName(final Set<String> regexList, final DataTagListener listener) throws CacheSynchronizationException;
 
   
   /**
@@ -237,10 +237,10 @@ public interface TagService {
    * @throws CacheSynchronizationException In case a communication problem with the C2MON server
    *         occurs while subscribing to the tags. In that case the {@link TagService} will
    *         rollback the subscription.
-   * @see #subscribeDataTags(Set, DataTagUpdateListener)
+   * @see #subscribeTags(Set, DataTagUpdateListener)
    * @see C2monSupervisionManager#isServerConnectionWorking()
    */
-  void subscribeDataTags(final Set<Long> dataTagIds, final DataTagListener listener) throws CacheSynchronizationException;
+  void subscribeTags(final Set<Long> dataTagIds, final DataTagListener listener) throws CacheSynchronizationException;
 
   /**
    * Registers a listener to receive updates for a specific data tag.
@@ -258,10 +258,10 @@ public interface TagService {
    * @throws CacheSynchronizationException In case a communication problem with the C2MON server
    *         occurs while subscribing to the tag. In that case the {@link TagService} will
    *         rollback the subscription.
-   * @see #subscribeDataTag(Long, DataTagUpdateListener)
+   * @see #subscribeTag(Long, DataTagUpdateListener)
    * @see C2monSupervisionManager#isServerConnectionWorking()
    */
-  void subscribeDataTag(final Long tagId, final DataTagListener listener) throws CacheSynchronizationException;
+  void subscribeTag(final Long tagId, final DataTagListener listener) throws CacheSynchronizationException;
 
   
   
@@ -271,7 +271,7 @@ public interface TagService {
    * @param dataTagIds A collection of data tag id's
    * @param listener the listener which shall be registered
    */
-  void unsubscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener);
+  void unsubscribeTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener);
 
   /**
    * Unregisters a listener from receiving updates for specific data tag.
@@ -279,14 +279,14 @@ public interface TagService {
    * @param dataTagId The unique identifier of the data tag from which we want to unsubscribe
    * @param listener the listener which shall be registered
    */
-  void unsubscribeDataTag(final Long dataTagId, final DataTagUpdateListener listener);
+  void unsubscribeTag(final Long dataTagId, final DataTagUpdateListener listener);
 
 
   /**
    * Use this method to unsubscribe from all previously registered data tags.
    * @param listener the listener which shall be registered
    */
-  void unsubscribeAllDataTags(final DataTagUpdateListener listener);
+  void unsubscribeAllTags(final DataTagUpdateListener listener);
 
 
   /**
@@ -297,7 +297,7 @@ public interface TagService {
    *        subscriptions
    * @return A collection of <code>ClientDataTag</code> objects
    */
-  Collection<ClientDataTagValue> getAllSubscribedDataTags(final DataTagUpdateListener listener);
+  Collection<ClientDataTagValue> getAllSubscribedTags(final DataTagUpdateListener listener);
 
   /**
    * Returns for a given listener a list of all subscribed data tags ids.
@@ -306,7 +306,7 @@ public interface TagService {
    *        subscriptions
    * @return A collection of tag ids
    */
-  Set<Long> getAllSubscribedDataTagIds(final DataTagUpdateListener listener);
+  Set<Long> getAllSubscribedTagIds(final DataTagUpdateListener listener);
 
   /**
    * Returns for the given id a copy of the cached data tag.
@@ -322,11 +322,11 @@ public interface TagService {
    * @return A <code>ClientDataTag</code> object
    * @throws RuntimeException In case a communication problems with JMS or the C2MON server
    *         occurs while trying to retrieve tag information.
-   * @see #getDataTags(Collection)
-   * @see #subscribeDataTags(Set, DataTagUpdateListener)
+   * @see #getTags(Collection)
+   * @see #subscribeTags(Set, DataTagUpdateListener)
    * @see C2monSupervisionManager#isServerConnectionWorking()
    */
-  ClientDataTagValue getDataTag(final Long tagId);
+  ClientDataTagValue getTag(final Long tagId);
 
   /**
    * Returns for every valid id of the list a copy of the cached data tag.
@@ -341,14 +341,14 @@ public interface TagService {
    * @return A collection of all <code>ClientDataTag</code> objects
    * @throws RuntimeException In case a communication problems with JMS or the C2MON server
    *         occurs while trying to retrieve tag information.
-   * @see #subscribeDataTags(Set, DataTagUpdateListener)
+   * @see #subscribeTags(Set, DataTagUpdateListener)
    * @see C2monSupervisionManager#isServerConnectionWorking();
    */
-  Collection<ClientDataTagValue> getDataTags(final Collection<Long> tagIds);
+  Collection<ClientDataTagValue> getTags(final Collection<Long> tagIds);
   
   /**
    * Returns a list of tags which match the given wilcard expression. Different to
-   * {@link #getDataTags(Collection)} this call will always result in a server request.
+   * {@link #getTags(Collection)} this call will always result in a server request.
    * <p />
    * Expressions are always case insensitive
    * <p />
@@ -365,14 +365,14 @@ public interface TagService {
    * @return A collection of all <code>ClientDataTag</code> objects
    * @throws RuntimeException In case a communication problems with JMS or the C2MON server
    *         occurs while trying to retrieve tag information.
-   * @see #subscribeDataTags(Set, DataTagUpdateListener)
+   * @see #subscribeTags(Set, DataTagUpdateListener)
    * @see C2monSupervisionManager#isServerConnectionWorking();
    */
-  Collection<ClientDataTagValue> findDataTagsByName(final String regex);
+  Collection<ClientDataTagValue> findTagsByName(final String regex);
   
   /**
    * Returns a list of all tags which match the given list of wilcard expressions. Different to
-   * {@link #getDataTags(Collection)} this call will always result in a server request.
+   * {@link #getTags(Collection)} this call will always result in a server request.
    * <p />
    * Expressions are always case insensitive
    * <p />
@@ -389,10 +389,10 @@ public interface TagService {
    * @return A collection of all <code>ClientDataTag</code> objects
    * @throws RuntimeException In case a communication problems with JMS or the C2MON server
    *         occurs while trying to retrieve tag information.
-   * @see #subscribeDataTags(Set, DataTagUpdateListener)
+   * @see #subscribeTags(Set, DataTagUpdateListener)
    * @see C2monSupervisionManager#isServerConnectionWorking();
    */
-  Collection<ClientDataTagValue> findDataTagsByName(final Set<String> regexList);
+  Collection<ClientDataTagValue> findTagsByName(final Set<String> regexList);
 
   /**
    * Returns the total number of subscribed tags in the local cache (cache size).
@@ -408,7 +408,7 @@ public interface TagService {
    * @throws CacheSynchronizationException In case a communicatin problem with the C2MON server
    *         occurs while refreshing to the tags.
    */
-  void refreshDataTags() throws CacheSynchronizationException;
+  void refreshTags() throws CacheSynchronizationException;
 
   /**
    * This method is used to synchronize a list subscribed data tags with the
@@ -421,7 +421,7 @@ public interface TagService {
    * @throws CacheSynchronizationException In case a communicatin problem with the C2MON server
    *         occurs while refreshing to the tags.
    */
-  void refreshDataTags(Collection<Long> tagIds) throws CacheSynchronizationException;
+  void refreshTags(Collection<Long> tagIds) throws CacheSynchronizationException;
 
   /**
    * Checks whether the given listener is subscribed to any data tags.

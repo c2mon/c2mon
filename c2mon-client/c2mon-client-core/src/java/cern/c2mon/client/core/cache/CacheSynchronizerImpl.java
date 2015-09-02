@@ -237,7 +237,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
    * Inner method to which removes all <code>ClientDataTag</code> references
    * with the given id from the cache. At the same time it unsubscribes the live
    * tags from the <code>JmsProxy</code> where they were formerly registered as
-   * <code>ServerUpdateListener</code> by the <code>TagManager</code>.
+   * <code>ServerUpdateListener</code> by the <code>TagServiceImpl</code>.
    *
    * @param tagIds list of <code>ClientDataTag</code> id's
    * @throws NullPointerException When the parameter is <code>null</code>
@@ -511,7 +511,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
    * cache with the cloned tags from the live cache, but only if the cache is
    * currently set to history mode.
    * 
-   * @param historyCacheUpdateList When the cache is in history mode, the <code>TagManager</code> still needs
+   * @param historyCacheUpdateList When the cache is in history mode, the <code>TagServiceImpl</code> still needs
    *        to initialize new tags with the static information which it requests from
    *        the C2MON server. Those information are also used for the tags in the
    *        history cache. To remember the tags which still need to be created in the
