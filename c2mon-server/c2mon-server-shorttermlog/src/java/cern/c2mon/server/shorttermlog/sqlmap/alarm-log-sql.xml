@@ -22,14 +22,15 @@
     <!-- The logDate is null, what means that comes from a DAQ -->
     <if test="logDate == null">SYS_EXTRACT_UTC(SYSTIMESTAMP)</if>
     
-    ,#{tagId,jdbcType=NUMERIC},#{alarmid,jdbcType=NUMERIC}
-    ,<if test="active == true">Y</if><if test="active == false">N</if>
-    ,#{faultfamily,jdbcType=VARCHAR}
-    ,#{faultmember,jdbcType=VARCHAR}
-    ,#{faultcode,jdbcType=NUMERIC}
-    ,#{SYS_EXTRACT_UTC(#{servertime,jdbcType=TIMESTAMP})}
-    ,#{addinfo,jdbcType=VARCHAR}
-    ,#{tagMode,jdbcType=NUMERIC})
+    ,#{tagId,jdbcType=NUMERIC}
+    ,#{id,jdbcType=NUMERIC}
+    ,<if test="active == true">'Y'</if>
+     <if test="active == false">'N'</if>
+    ,#{faultFamily,jdbcType=VARCHAR}
+    ,#{faultMember,jdbcType=VARCHAR}
+    ,#{faultCode,jdbcType=NUMERIC}
+    ,SYS_EXTRACT_UTC(#{serverTimestamp,jdbcType=TIMESTAMP})
+    ,#{info,jdbcType=VARCHAR})
   </insert>
   
   <!-- only used to remove inserts done during testing -->

@@ -62,6 +62,8 @@ public class AlarmLog implements IFallback, Loggable {
 
     private Timestamp logDate = null;
 
+    private String timezone;
+    
     @Override
     public String getValue() {
         return Boolean.toString(active);
