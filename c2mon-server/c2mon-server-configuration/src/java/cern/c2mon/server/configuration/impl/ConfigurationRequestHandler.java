@@ -87,13 +87,20 @@ public class ConfigurationRequestHandler implements SessionAwareMessageListener<
       throw jmse;
     }
     if (replyDestination != null) {
-      MessageProducer messageProducer = session.createProducer(replyDestination);      
-      TextMessage replyMessage = session.createTextMessage();
-      replyMessage.setText(configurationReport.toXML());
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Sending reconfiguration report to client.");
+      MessageProducer messageProducer = null;
+      try {
+        messageProducer = session.createProducer(replyDestination);      
+        TextMessage replyMessage = session.createTextMessage();
+        replyMessage.setText(configurationReport.toXML());
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Sending reconfiguration report to client.");
+        }
+        messageProducer.send(replyMessage);
+      } finally {
+        if (messageProducer != null) {
+            messageProducer.close();
+        }
       }
-      messageProducer.send(replyMessage);
     } else {
       LOGGER.error("onMessage(): JMSReplyTo destination is null - cannot send reply.");
       throw new MessageConversionException("JMS reply queue could not be extracted (returned null).");
