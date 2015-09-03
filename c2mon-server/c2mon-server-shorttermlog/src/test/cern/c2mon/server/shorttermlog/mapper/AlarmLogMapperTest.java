@@ -19,6 +19,7 @@
 package cern.c2mon.server.shorttermlog.mapper;
 
 import java.sql.Timestamp;
+import java.util.TimeZone;
 
 import org.junit.After;
 import org.junit.Before;
@@ -101,8 +102,20 @@ public class AlarmLogMapperTest {
   @Test
   public void testInsertDataTagLogFromFallback() {
     AlarmLog alarmToLog = new AlarmLog();
-    alarmToLog.setTagId(ALARM_ID);
-    // TODO
+    alarmToLog.setTagId(999L);
+    alarmToLog.setActive(true);
+    alarmToLog.setFaultFamily("FF");
+    alarmToLog.setFaultFamily("FM");
+    alarmToLog.setFaultCode(2);
+    alarmToLog.setPriority(1);
+    alarmToLog.setId(String.valueOf(ALARM_ID));
+    alarmToLog.setServerTimestamp(new Timestamp(System.currentTimeMillis()));
+    
+    
+    // additional the log date to indicate that it came from the fallback file
+    alarmToLog.setLogDate(new Timestamp(System.currentTimeMillis()));
+    alarmToLog.setTimezone(TimeZone.getDefault().getID());
+    
     alarmLogMapper.insertLog(alarmToLog);
   }
 }
