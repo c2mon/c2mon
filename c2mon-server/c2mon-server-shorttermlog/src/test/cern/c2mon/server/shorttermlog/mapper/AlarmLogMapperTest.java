@@ -85,7 +85,7 @@ public class AlarmLogMapperTest {
     alarmToLog.setTagId(999L);
     alarmToLog.setActive(true);
     alarmToLog.setFaultFamily("FF");
-    alarmToLog.setFaultFamily("FM");
+    alarmToLog.setFaultMember("FM");
     alarmToLog.setFaultCode(2);
     alarmToLog.setPriority(1);
     alarmToLog.setId(String.valueOf(ALARM_ID));
@@ -105,7 +105,7 @@ public class AlarmLogMapperTest {
     alarmToLog.setTagId(999L);
     alarmToLog.setActive(true);
     alarmToLog.setFaultFamily("FF");
-    alarmToLog.setFaultFamily("FM");
+    alarmToLog.setFaultMember("FM");
     alarmToLog.setFaultCode(2);
     alarmToLog.setPriority(1);
     alarmToLog.setId(String.valueOf(ALARM_ID));
