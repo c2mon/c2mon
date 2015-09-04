@@ -26,7 +26,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.cache.ClientDataTagCache;
 
 /**
@@ -40,7 +40,7 @@ import cern.c2mon.client.core.cache.ClientDataTagCache;
 class UnknownTagsRefreshTask {
   
   /**
-   * The cache instance which is managing all <code>ClientDataTag</code> objects
+   * The cache instance which is managing all <code>Tag</code> objects
    */
   private final ClientDataTagCache cache;
   
@@ -50,7 +50,7 @@ class UnknownTagsRefreshTask {
   
   /**
    * Default Constructor
-   * @param cache The cache instance which is managing all <code>ClientDataTag</code> objects
+   * @param cache The cache instance which is managing all <code>Tag</code> objects
    */
   @Autowired
   public UnknownTagsRefreshTask(final ClientDataTagCache cache) {
@@ -70,7 +70,7 @@ class UnknownTagsRefreshTask {
     
     try {
       if (!cache.isHistoryModeEnabled()) {
-        for (ClientDataTag cdt : cache.getAllSubscribedDataTags()) {
+        for (Tag cdt : cache.getAllSubscribedDataTags()) {
           if (!cdt.getDataTagQuality().isExistingTag()) {
             unknownTags.add(cdt.getId());
           }

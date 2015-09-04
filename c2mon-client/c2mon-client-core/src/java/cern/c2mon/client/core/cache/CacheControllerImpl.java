@@ -28,7 +28,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
+import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 
 @Service
@@ -137,7 +137,7 @@ class CacheControllerImpl implements CacheController {
    */
   private void disableHistoryMode() {
     ClientDataTagImpl historyTag = null;
-    Collection<DataTagUpdateListener> listeners = null;
+    Collection<BaseListener> listeners = null;
     
     for (Entry<Long, ClientDataTagImpl> entry : historyCache.entrySet()) {
       historyTag = entry.getValue();
@@ -159,7 +159,7 @@ class CacheControllerImpl implements CacheController {
     historyCache.clear();
     ClientDataTagImpl liveTag = null;
     ClientDataTagImpl historyTag = null;
-    Collection<DataTagUpdateListener> listeners = null;
+    Collection<BaseListener> listeners = null;
     
     for (Entry<Long, ClientDataTagImpl> entry : liveCache.entrySet()) {
       liveTag = entry.getValue();

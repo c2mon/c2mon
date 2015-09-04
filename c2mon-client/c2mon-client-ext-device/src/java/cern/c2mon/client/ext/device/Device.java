@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import cern.c2mon.client.common.tag.ClientCommandTag;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.ext.device.property.Property;
 
 /**
@@ -67,7 +67,7 @@ public interface Device {
    * <p>
    * In the case of data tags/rules/constant values, the
    * {@link Property#getTag()} method will return you a
-   * {@link ClientDataTagValue} object. The field accessor methods (
+   * {@link Tag} object. The field accessor methods (
    * {@link Property#getField(String)} and {@link Property#getFields()}) will
    * return null and empty list, respectively.
    * </p>

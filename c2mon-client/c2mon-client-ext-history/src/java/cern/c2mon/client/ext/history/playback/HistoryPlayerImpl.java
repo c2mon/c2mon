@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 
 import cern.c2mon.client.common.listener.TagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.ext.history.common.HistoryPlayer;
 import cern.c2mon.client.ext.history.common.HistoryPlayerEvents;
 import cern.c2mon.client.ext.history.common.HistoryProvider;
@@ -335,7 +335,7 @@ public class HistoryPlayerImpl
    * @see #beginLoading()
    */
   @Override
-  public void registerTagUpdateListener(final TagUpdateListener tagUpdateListener, final Long tagId, final ClientDataTagValue currentRealtimeValue) {
+  public void registerTagUpdateListener(final TagUpdateListener tagUpdateListener, final Long tagId, final Tag currentRealtimeValue) {
     if (isHistoryPlayerActive()) {
       // Registers the listener
       this.publisher.getTagListenersManager().add(tagId, tagUpdateListener);

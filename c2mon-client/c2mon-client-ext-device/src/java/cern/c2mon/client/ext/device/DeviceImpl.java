@@ -28,7 +28,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import cern.c2mon.client.common.tag.ClientCommandTag;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.tag.ClientRuleTag;
 import cern.c2mon.client.ext.device.listener.DeviceUpdateListener;
 import cern.c2mon.client.ext.device.property.Field;
@@ -234,7 +234,7 @@ public class DeviceImpl implements Device, Cloneable {
    * <p>
    * If any of the given properties are client rules, the appropriate
    * {@link ClientRuleTag} object will be created and the rule will be evaluated
-   * here (fetching dependent {@link ClientDataTagValue}s if necessary).
+   * here (fetching dependent {@link Tag}s if necessary).
    * However, the dependent data tags will not be subscribed to until the entire
    * device is subscribed to (via
    * {@link DeviceManager#subscribeDevices(Set, DeviceUpdateListener)}.
@@ -258,8 +258,8 @@ public class DeviceImpl implements Device, Cloneable {
    *
    * @param deviceProperties the properties to set
    */
-  protected void setDeviceProperties(Map<String, ClientDataTagValue> deviceProperties) {
-    for (Map.Entry<String, ClientDataTagValue> entry : deviceProperties.entrySet()) {
+  protected void setDeviceProperties(Map<String, Tag> deviceProperties) {
+    for (Map.Entry<String, Tag> entry : deviceProperties.entrySet()) {
       this.deviceProperties.put(entry.getKey(), PropertyFactory.createProperty(entry.getKey(), entry.getValue()));
     }
   }
@@ -293,13 +293,13 @@ public class DeviceImpl implements Device, Cloneable {
 
   /**
    * Update the property that corresponds to the given
-   * {@link ClientDataTagValue}.
+   * {@link Tag}.
    *
-   * @param tag the updated {@link ClientDataTagValue}
+   * @param tag the updated {@link Tag}
    * @param info a {@link PropertyInfo} object describing the property/field
    *          that was updated
    */
-  protected PropertyInfo updateProperty(ClientDataTagValue tag) {
+  protected PropertyInfo updateProperty(Tag tag) {
     PropertyInfo info = getPropertyInfoForTag(tag);
 
     if (info.getPropertyName() != null) {
@@ -319,13 +319,13 @@ public class DeviceImpl implements Device, Cloneable {
 
   /**
    * Search the list of properties of this device to find the one that
-   * corresponds to the given {@link ClientDataTagValue}.
+   * corresponds to the given {@link Tag}.
    *
-   * @param tag the updated {@link ClientDataTagValue}
+   * @param tag the updated {@link Tag}
    * @return info a {@link PropertyInfo} object describing the property/field
    *         that was updated
    */
-  private PropertyInfo getPropertyInfoForTag(ClientDataTagValue tag) {
+  private PropertyInfo getPropertyInfoForTag(Tag tag) {
     String propertyName = null;
     String fieldName = null;
 

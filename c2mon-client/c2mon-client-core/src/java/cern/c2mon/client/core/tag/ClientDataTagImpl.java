@@ -38,10 +38,12 @@ import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
 
+import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TypeNumeric;
 import cern.c2mon.client.common.util.ConcurrentIdentitySet;
 import cern.c2mon.client.jms.SupervisionListener;
@@ -60,17 +62,17 @@ import cern.c2mon.shared.rule.RuleFormatException;
 
 /**
  * A client representation of the DataTag object.
- * <code>ClientDataTag</code> objects are created by the
+ * <code>Tag</code> objects are created by the
  * <code>TagFactory</code>. The object connects to its update topic
  * and receives tag updates from the TIM server.
- * When the ClientDataTag value or quality changes it notifies its registered
+ * When the Tag value or quality changes it notifies its registered
  * <code>DataTagUpdateListeners</code>
  * @see TagFactory
  * @see DataTagUpdateListener
  * @author Matthias Braeger
  */
-@Root(name="ClientDataTag")
-public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetails, SupervisionListener {
+@Root(name="Tag")
+public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateListener, TopicRegistrationDetails, SupervisionListener, Cloneable {
 
   /** Log4j instance */
   private static final Logger LOG = Logger.getLogger(ClientDataTagImpl.class);
@@ -192,7 +194,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    * Concurrent modifiable collection of DataTagUpdateListeners registered for
    * updates on this DataTag
    */
-  private Set<DataTagUpdateListener> listeners = new ConcurrentIdentitySet<DataTagUpdateListener>();
+  private Set<BaseListener> listeners = new ConcurrentIdentitySet<>();
 
   /** Lock to prevent more than one thread at a time to update the value */
   private ReentrantReadWriteLock updateTagLock = new ReentrantReadWriteLock();
@@ -207,7 +209,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
 
   /**
    * Constructor
-   * Creates a ClientDataTag with a tagID and a javax.jms.TopicSession
+   * Creates a Tag with a tagID and a javax.jms.TopicSession
    * object to be used for subscriptions.
    * Sets the tag name to "Not.initialized" and the quality to uninitialized.
    * @param tagId the unique identifier for the DataTag
@@ -218,7 +220,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   
   /**
    * Constructor
-   * Creates a ClientDataTag with a tagID and a javax.jms.TopicSession
+   * Creates a Tag with a tagID and a javax.jms.TopicSession
    * object to be used for subscriptions.
    * Sets the tag name to "Not.initialized" and the quality to UNINITIALIZED.
    * @param tagId the unique identifier for the DataTag
@@ -245,7 +247,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
 
 
   /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#getId()
+   * @see cern.c2mon.client.tag.Tag#getId()
    */
   @Override
   public Long getId() {
@@ -253,7 +255,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   }
 
   /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#getName()
+   * @see cern.c2mon.client.tag.Tag#getName()
    */
   @Override
   public String getName() {
@@ -422,7 +424,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    * @param statusToRemove The invalid quality status to be removed from this tag.
    */
   public void validate(final TagQualityStatus statusToRemove) {
-    ClientDataTag clone = null;
+    Tag clone = null;
     updateTagLock.writeLock().lock();
     try {
       if (LOG.isTraceEnabled()) {
@@ -452,7 +454,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    * @param description the quality description
    */
   public void invalidate(final TagQualityStatus status, final String description) {
-    ClientDataTag clone = null;
+    Tag clone = null;
     updateTagLock.writeLock().lock();
     try {
       if (LOG.isTraceEnabled()) {
@@ -478,9 +480,9 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    * candidate for risking a deadlocks.
    * @param Please only provide a clone of this tag
    */
-  private synchronized void notifyListeners(final ClientDataTag clone) {
-    for (DataTagUpdateListener updateListener : listeners) {
-      try {
+  private synchronized void notifyListeners(final Tag clone) {
+    for (BaseListener updateListener : listeners) {
+      try { 
         updateListener.onUpdate(clone);
       }
       catch (Exception e) {
@@ -489,28 +491,27 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     }
   }
 
-
   /**
-   * Adds a <code>DataTagUpdateListener</code> to the ClientDataTag and
+   * Adds a <code>DataTagUpdateListener</code> to the Tag and
    * generates an initial update event, in case that the initalValue parameter
    * is not specified (null) or different to the current value.<p>
-   * Any change to the ClientDataTag value or quality attributes will trigger
+   * Any change to the Tag value or quality attributes will trigger
    * an update event to all <code>DataTagUpdateListener</code> objects registered.
    *
    * @param listener the DataTagUpdateListener that will receive value updates message for this tag
    * @param initialValue In case the user subscribed with a {@link DataTagListener} provide here 
    *                     the initial value which was sent through {@link DataTagListener#onInitialUpdate(Collection)}
    *                     method. Otherwise, pass {@code null} as parameter, if the initial update shall be sent via the
-   *                     {@link DataTagUpdateListener#onUpdate(ClientDataTagValue)}
+   *                     {@link DataTagUpdateListener#onUpdate(Tag)}
    * @see #removeUpdateListener(DataTagUpdateListener)
    */
-  public void addUpdateListener(final DataTagUpdateListener listener, final ClientDataTagValue initialValue) {
+  public void addUpdateListener(final BaseListener<Tag> listener, final Tag initialValue) {
     if (LOG.isTraceEnabled()) {
       LOG.trace("addUpdateListener() called.");
     }
     listeners.add(listener);
 
-    ClientDataTag clone = null;
+    Tag clone = null;
     updateTagLock.readLock().lock();
     try {
       boolean sendInitialUpdate = !TagComparator.compare(this, initialValue);
@@ -524,27 +525,32 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     }
     
     if (clone != null) {
-      listener.onUpdate(clone);
+      try { 
+        listener.onUpdate(clone);
+      }
+      catch (Exception e) {
+        LOG.error("addUpdateListener() : error notifying listener", e);
+      }
     }
   }
   
   /**
-   * Adds a <code>DataTagUpdateListener</code> to the ClientDataTag and
+   * Adds a <code>DataTagUpdateListener</code> to the Tag and
    * generates an initial update event for that listener. Any change to the
-   * ClientDataTag value or quality attributes will trigger an update event to
+   * Tag value or quality attributes will trigger an update event to
    * all <code>DataTagUpdateListener</code> objects registered.
    *
    * @param listener the DataTagUpdateListener that will receive value updates message for this tag
    * @see #removeUpdateListener(DataTagUpdateListener)
    */
-  public void addUpdateListener(final DataTagUpdateListener listener) {
+  public void addUpdateListener(final BaseListener listener) {
     addUpdateListener(listener, null);
   }
 
   /**
-   * Adds all <code>DataTagUpdateListener</code> of the list to the ClientDataTag and
+   * Adds all <code>DataTagUpdateListener</code> of the list to the Tag and
    * generates an initial update event for those listeners.
-   * Any change to the ClientDataTag value or quality attributes will trigger
+   * Any change to the Tag value or quality attributes will trigger
    * an update event to all <code>DataTagUpdateListener</code> objects
    * registered.
    * @param listeners the DataTagUpdateListeners that will receive value updates message for this tag
@@ -552,8 +558,8 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    *                                    current value of the tag.
    * @see #removeUpdateListener(DataTagUpdateListener)
    */
-  public void addUpdateListeners(final Collection<DataTagUpdateListener> listeners) {
-    for (DataTagUpdateListener listener : listeners) {
+  public void addUpdateListeners(final Collection<BaseListener> listeners) {
+    for (BaseListener listener : listeners) {
       addUpdateListener(listener);
     }
   }
@@ -561,8 +567,8 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   /**
    * @return All listeners registered to this data tag
    */
-  public Collection<DataTagUpdateListener> getUpdateListeners() {
-    return new ArrayList<DataTagUpdateListener>(listeners);
+  public Collection<BaseListener> getUpdateListeners() {
+    return new ArrayList<BaseListener>(listeners);
   }
 
   /**
@@ -572,7 +578,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    * @return <code>true</code>, if the given listener is registered
    * for receiving updates of that tag.
    */
-  public boolean isUpdateListenerRegistered(final DataTagUpdateListener pListener) {
+  public boolean isUpdateListenerRegistered(final BaseListener<? extends Tag> pListener) {
     boolean isRegistered = listeners.contains(pListener);
     return isRegistered;
   }
@@ -582,7 +588,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    * @see #addUpdateListener
    * @param pListener The listener that shall be unregistered
    */
-  public void removeUpdateListener(final DataTagUpdateListener pListener) {
+  public void removeUpdateListener(final BaseListener<? extends Tag> pListener) {
     listeners.remove(pListener);
   }
 
@@ -596,7 +602,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   /**
    * Returns information whether the tag has any update listeners registered
    * or not
-   * @return <code>true</code>, if this <code>ClientDataTag</code> instance has
+   * @return <code>true</code>, if this <code>Tag</code> instance has
    *         update listeners registered.
    */
   public boolean hasUpdateListeners() {
@@ -701,9 +707,22 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     }
   }
 
-  @Override
+  /**
+   * This thread safe method updates the given <code>ClientDataTag</code> object.
+   * It copies every single field of the <code>TransferTagValue</code> object and notifies
+   * then the registered listener about the update by providing a copy of the
+   * <code>ClientDataTag</code> object.
+   * <p>
+   * Please note that the <code>ClientDataTag</code> gets only updated, if the tag id's
+   * matches and if the server time stamp of the update is older than the current time
+   * stamp set.
+   * 
+   * @param transferTag The object that contains the updates.
+   * @return <code>true</code>, if the update was successful, otherwise
+   *         <code>false</code>
+   */
   public boolean update(final TagValueUpdate tagValueUpdate) {
-    ClientDataTag clone = null;
+    Tag clone = null;
     boolean valid = false;
     
     updateTagLock.writeLock().lock();
@@ -727,12 +746,24 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     return valid;
   }
 
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#update(cern.c2mon.shared.client.tag.TransferTag)
+  /**
+   * This thread safe method updates the given <code>ClientDataTag</code> object.
+   * It copies every single field of the <code>TransferTag</code> object and notifies
+   * then the registered listener about the update by providing a copy of the
+   * <code>ClientDataTag</code> object.
+   * <p>
+   * Please note that the <code>ClientDataTag</code> gets only updated, if the tag id's
+   * matches and if the server time stamp of the update is older thatn the current time
+   * stamp set.
+   * 
+   * @param tagUpdate The object that contains the updates.
+   * @return <code>true</code>, if the update was successful, otherwise
+   *         <code>false</code>
+   * @throws RuleFormatException In case that the <code>TransferTag</code>
+   *         parameter contains a invalid rule expression.
    */
-  @Override
   public boolean update(final TagUpdate tagUpdate) throws RuleFormatException {
-    ClientDataTag clone = null;
+    Tag clone = null;
     boolean valid = false;
     
     updateTagLock.writeLock().lock();
@@ -881,7 +912,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
 
   /**
    * Inner method for updating the all value fields from this
-   * <code>ClientDataTag</code> instance
+   * <code>Tag</code> instance
    *
    * @param tagValueUpdate Reference to the object containing the updates
    */
@@ -902,7 +933,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   }
 
   /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#getTopicName()
+   * @see cern.c2mon.client.tag.Tag#getTopicName()
    */
   @Override
   public String getTopicName() {
@@ -919,7 +950,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   }
 
   /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#isRuleResult()
+   * @see cern.c2mon.client.tag.Tag#isRuleResult()
    */
   @Override
   public boolean isRuleResult() {
@@ -933,7 +964,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   }
 
   /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#getRuleExpression()
+   * @see cern.c2mon.client.tag.Tag#getRuleExpression()
    */
   @Override
   public RuleExpression getRuleExpression() {
@@ -963,7 +994,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   }
 
   /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#getAlarms()
+   * @see cern.c2mon.client.tag.Tag#getAlarms()
    */
   @Override
   public final Collection<AlarmValue> getAlarms() {
@@ -977,7 +1008,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   }
 
   /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#hashCode()
+   * @see cern.c2mon.client.tag.Tag#hashCode()
    */
   @Override
   public int hashCode() {
@@ -985,7 +1016,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   }
 
   /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#equals(java.lang.Object)
+   * @see cern.c2mon.client.tag.Tag#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object pRight) {
@@ -999,7 +1030,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   }
 
   /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#getDescription()
+   * @see cern.c2mon.client.tag.Tag#getDescription()
    */
   @Override
   public String getDescription() {
@@ -1095,7 +1126,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
       if (ruleExpression != null) {
         clone.ruleExpression = (RuleExpression) ruleExpression.clone();
       }
-      clone.listeners = new ConcurrentIdentitySet<DataTagUpdateListener>();
+      clone.listeners = new ConcurrentIdentitySet<>();
 
       return clone;
     }
@@ -1129,7 +1160,11 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     return new ArrayList<Long>(processSupervisionStatus.keySet());
   }
 
-  @Override
+  /**
+   * Removes all information from the object.
+   * This is in particular interesting for the history mode which sometimes just
+   * uses the static information from the live tag object. 
+   */
   public void clean() {
     updateTagLock.writeLock().lock();
     try {
@@ -1154,9 +1189,9 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
 
   /**
   * This thread safe method updates the accessible state of the given
-  * <code>ClientDataTag</code> object. Once the accessibility has been updated
+  * <code>Tag</code> object. Once the accessibility has been updated
   * it notifies the registered listener about the update by providing a copy of
-  * the <code>ClientDataTag</code> object.
+  * the <code>Tag</code> object.
   *
   * @param supervisionEvent The supervision event which contains the current
   *                         status of the process or the equipment.
@@ -1171,7 +1206,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
       return;
     }
     
-    ClientDataTag clone = null;
+    Tag clone = null;
     
     updateTagLock.writeLock().lock();
     try {

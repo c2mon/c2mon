@@ -20,7 +20,7 @@ package cern.c2mon.client.ext.device.property;
 import java.util.HashMap;
 import java.util.Map;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.tag.ClientRuleTag;
 import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.rule.RuleExpression;
@@ -86,13 +86,13 @@ public class PropertyFactory {
 
   /**
    * Factory method to create an appropriate {@link Property} instance from a
-   * {@link ClientDataTagValue}, based on its type.
+   * {@link Tag}, based on its type.
    *
    * @param name the name of the property
    * @param tag the data tag
    * @return the appropriate client device property
    */
-  public static Property createProperty(String name, ClientDataTagValue tag) {
+  public static Property createProperty(String name, Tag tag) {
     Category category;
 
     if (tag instanceof ClientRuleTag<?>) {
@@ -108,13 +108,13 @@ public class PropertyFactory {
 
   /**
    * Factory method to create an appropriate {@link Field} instance from a
-   * {@link ClientDataTagValue}, based on its type.
+   * {@link Tag}, based on its type.
    *
    * @param name the name of the field
    * @param tag the data tag
    * @return the newly created {@link Field} instance
    */
-  public static Field createField(String name, ClientDataTagValue tag) {
+  public static Field createField(String name, Tag tag) {
     Property property = createProperty(name, tag);
     return new FieldImpl(property.getName(), property.getCategory(), ((BasePropertyImpl) property).getValue());
   }

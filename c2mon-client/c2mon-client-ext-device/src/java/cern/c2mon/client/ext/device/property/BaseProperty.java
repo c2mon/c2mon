@@ -18,7 +18,7 @@
 package cern.c2mon.client.ext.device.property;
 
 import cern.c2mon.client.common.tag.ClientDataTag;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.tag.ClientRuleTag;
 
 /**
@@ -51,7 +51,7 @@ public interface BaseProperty {
    * {@link ClientConstantValue}s.
    *
    * @return the tagId the ID of the corresponding tag or null if the property
-   *         does not correspond to a {@link ClientDataTagValue}
+   *         does not correspond to a {@link Tag}
    */
   Long getTagId();
 
@@ -60,7 +60,7 @@ public interface BaseProperty {
    *
    * <p>
    * In the case of data tags/rules/constant values, this method will return you
-   * a {@link ClientDataTagValue} object. The field accessor methods (
+   * a {@link Tag} object. The field accessor methods (
    * {@link #getField(String)} and {@link #getFields()}) will return null and
    * empty list, respectively.
    * </p>
@@ -73,9 +73,9 @@ public interface BaseProperty {
    * </p>
    *
    * @return the device property value or null if the property does not
-   *         correspond to a {@link ClientDataTagValue}
+   *         correspond to a {@link Tag}
    *
    * @see #getField(String)
    */
-  ClientDataTagValue getTag();
+  Tag getTag();
 }

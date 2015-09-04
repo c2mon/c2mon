@@ -30,8 +30,10 @@ import cern.c2mon.shared.rule.RuleFormatException;
  * of the C2MON client API should make directly changes on a
  * <code>ClientDataTag</code> object.
  *
+ * @deprecated Got replaced by {@link Tag}
  * @author Matthias Braeger
  */
+@Deprecated
 public interface ClientDataTag extends ClientDataTagValue, TagUpdateListener, Cloneable {
   
   /**

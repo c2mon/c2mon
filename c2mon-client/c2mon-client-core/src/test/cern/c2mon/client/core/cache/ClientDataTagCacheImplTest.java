@@ -22,7 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.manager.CoreSupervisionManager;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.jms.JmsProxy;
@@ -95,7 +95,7 @@ public class ClientDataTagCacheImplTest {
 
     // run test
     EasyMock.replay(jmsProxyMock, requestHandlerMock);
-    Collection<ClientDataTag> cachedTags = cache.getAllSubscribedDataTags();
+    Collection<Tag> cachedTags = cache.getAllSubscribedDataTags();
     assertEquals(0, cachedTags.size());
     cache.subscribe(tagIds, listener);
 
@@ -131,7 +131,7 @@ public class ClientDataTagCacheImplTest {
     // run test
     EasyMock.replay(jmsProxyMock, requestHandlerMock);
     cache.subscribe(tagIds, listener1);
-    Collection<ClientDataTag> cachedTags = cache.getAllSubscribedDataTags();
+    Collection<Tag> cachedTags = cache.getAllSubscribedDataTags();
     assertEquals(2, cachedTags.size());
     // NOT Registered listener
     cache.unsubscribeAllDataTags(listener2);
@@ -206,7 +206,7 @@ public class ClientDataTagCacheImplTest {
 
     assertTrue(cache.isHistoryModeEnabled());
     cache.subscribe(tagIds, listener);
-    Collection<ClientDataTag> cachedTags = cache.getAllSubscribedDataTags();
+    Collection<Tag> cachedTags = cache.getAllSubscribedDataTags();
     assertEquals(2, cachedTags.size());
 
     Thread.sleep(500);

@@ -1,8 +1,8 @@
 /*******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- *
- * Copyright (C) 2004 - 2015 CERN. This program is free software; you can
+ * 
+ * Copyright (C) 2004 - 2011 CERN. This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version. This program is distributed
@@ -12,41 +12,38 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- *
+ * 
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
-package cern.c2mon.client.ext.device.property;
+ 
+package cern.c2mon.client.common.listener;
 
 import cern.c2mon.client.common.tag.Tag;
+import cern.c2mon.client.common.tag.Tag;
+;
 
 /**
- * Implementation of the {@link Field} interface.
- *
- * @author Justin Lewis Salmon
+ * An update event gets fired when a <code>Tag</code> 
+ * changes either its value or its quality property.
+ * 
+ * You can register a <code>DataTagUpdateListener</code> with a 
+ * <code>Tag</code> so as to be notified of these property changes.
+ * @see Tag
+ * @see DataTagListener
+ * @author Matthias Braeger
  */
-public class FieldImpl extends BasePropertyImpl implements Field {
+public interface BaseTagListener extends BaseListener<Tag> {
 
   /**
-   * Constructor for a field whose internal {@link Tag} will be
-   * lazily loaded in the future.
-   *
-   * @param name the name of the field
-   * @param category the field category
-   * @param tagId the id of the data tag corresponding to this field
+   * This method gets called when the value or quality property of a
+   * <code>Tag</code> has changed. It receives then a <b>copy</b>
+   * of the updated object in the C2MON client cache.<p>
+   * Please note that this method will also receive initial tag values, if you
+   * did not subscribe with the {@link DataTagListener} interface.
+   * 
+   * @param tagUpdate A copy of the <code>Tag</code> object with the 
+   *                  updated properties
    */
-  public FieldImpl(String name, Category category, Long tagId) {
-    super(name, category, tagId);
-  }
-
-  /**
-   * Constructor for a field whose internal {@link Tag} does not
-   * need to be lazily loaded.
-   *
-   * @param name the name of the field
-   * @param category the field category
-   * @param clientDataTag the internal data tag of the field
-   */
-  public FieldImpl(String name, Category category, Tag clientDataTag) {
-    super(name, category, clientDataTag);
-  }
+  @Override
+  void onUpdate(Tag tagUpdate);
 }

@@ -32,7 +32,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.core.listener.HeartbeatListener;
 import cern.c2mon.client.core.manager.CoreSupervisionManager;
 import cern.c2mon.client.core.manager.SupervisionManager;
@@ -234,12 +233,12 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
   }
 
   /**
-   * Inner method to which removes all <code>ClientDataTag</code> references
+   * Inner method to which removes all <code>Tag</code> references
    * with the given id from the cache. At the same time it unsubscribes the live
    * tags from the <code>JmsProxy</code> where they were formerly registered as
    * <code>ServerUpdateListener</code> by the <code>TagServiceImpl</code>.
    *
-   * @param tagIds list of <code>ClientDataTag</code> id's
+   * @param tagIds list of <code>Tag</code> id's
    * @throws NullPointerException When the parameter is <code>null</code>
    */
   @Override
@@ -455,14 +454,14 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
     
     /**
      * Inner method that updates a second time in case an update was sent before
-     * the ClientDataTag was subscribed to the topic.
+     * the Tag was subscribed to the topic.
      *
      * @param newTags List of new registered tags
      * @throws JMSException In case of a JMS problem
      */
     private void synchronizeTagValues(final Set<Long> newTags) throws JMSException {
       if (!newTags.isEmpty()) {
-        ClientDataTag newTag = null;
+        ClientDataTagImpl newTag = null;
         Collection<TagValueUpdate> requestedTagValues = tagRequestHandler.requestTagValues(newTags);
         for (TagValueUpdate tagValueUpdate : requestedTagValues) {
           newTag = liveCache.get(tagValueUpdate.getId());

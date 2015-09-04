@@ -28,7 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.ext.history.common.HistoryLoadingManager;
 import cern.c2mon.client.ext.history.common.HistoryProvider;
 import cern.c2mon.client.ext.history.common.HistoryTagValueUpdate;
@@ -188,8 +188,8 @@ public class HistoryLoadingManagerImpl extends HistoryLoadingManagerAbs implemen
       else {
         // Load tags one by one, in order to respect the
         // maximum amount of records per tag
-        Map<Long, ClientDataTag> entryMap = null;
-        for (Entry<Long, ClientDataTag> entry : getTagsToLoad().entrySet()) {
+        Map<Long, Tag> entryMap = null;
+        for (Entry<Long, Tag> entry : getTagsToLoad().entrySet()) {
           entryMap = new HashMap<>(1);
           entryMap.put(entry.getKey(), entry.getValue());
 
@@ -318,7 +318,7 @@ public class HistoryLoadingManagerImpl extends HistoryLoadingManagerAbs implemen
      *
      * @param tags The tags to load
      */
-    private void loadRecordsFromSTL(final Map<Long, ClientDataTag> tags) {
+    private void loadRecordsFromSTL(final Map<Long, Tag> tags) {
       
       boolean loadingTimesReached = false;
       boolean numberOfDaysReached = false;

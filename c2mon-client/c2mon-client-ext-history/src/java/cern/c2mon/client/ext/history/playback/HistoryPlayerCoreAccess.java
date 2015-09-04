@@ -20,7 +20,7 @@ package cern.c2mon.client.ext.history.playback;
 import java.util.Collection;
 
 import cern.c2mon.client.common.listener.TagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.ext.history.common.HistoryPlayer;
 import cern.c2mon.client.ext.history.common.HistoryPlayerEvents;
 import cern.c2mon.client.ext.history.common.HistoryProvider;
@@ -71,7 +71,7 @@ public interface HistoryPlayerCoreAccess extends HistoryPlayer, HistoryPlayerEve
    * 
    * @see #beginLoading()
    */
-  void registerTagUpdateListener(TagUpdateListener tagUpdateListener, Long tagId, ClientDataTagValue currentRealtimeValue);
+  void registerTagUpdateListener(TagUpdateListener tagUpdateListener, Long tagId, Tag currentRealtimeValue);
 
   /**
    * Registers the listener to the given set of supervision events

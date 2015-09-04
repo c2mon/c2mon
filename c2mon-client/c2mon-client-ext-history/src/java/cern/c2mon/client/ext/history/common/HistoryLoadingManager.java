@@ -20,7 +20,7 @@ package cern.c2mon.client.ext.history.common;
 import java.sql.Timestamp;
 import java.util.Collection;
 
-import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.ext.history.common.event.HistoryLoadingManagerListener;
 import cern.c2mon.client.ext.history.common.exception.LoadingParameterException;
 import cern.c2mon.client.ext.history.common.id.SupervisionEventId;
@@ -91,7 +91,7 @@ public interface HistoryLoadingManager {
    *          the tag to add, a copy, as this instance will be used for combining it with 
    *          the supervision events.
    */
-  void addClientDataTagForLoading(ClientDataTag tag);
+  void addClientDataTagForLoading(Tag tag);
   
   /**
    * Adds the tags AND all the supervision events connected to them<br/>
@@ -103,7 +103,7 @@ public interface HistoryLoadingManager {
    *          the tags to add, copies, as these instances will be used for
    *          combining it with the supervision events.
    */
-  void addClientDataTagsForLoading(Collection<ClientDataTag> tags);
+  void addClientDataTagsForLoading(Collection<Tag> tags);
 
   /**
    * 

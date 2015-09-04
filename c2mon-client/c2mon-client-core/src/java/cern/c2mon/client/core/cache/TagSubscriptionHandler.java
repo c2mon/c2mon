@@ -19,6 +19,8 @@
  ******************************************************************************/
 package cern.c2mon.client.core.cache;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,9 +30,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.common.listener.DataTagListener;
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
+import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -70,11 +74,11 @@ class TagSubscriptionHandler {
    * client cache, it is going to be fetched from the server and all the topic subscription will handled.
    * @param tagIds list of tags ids to which the listener shall be subscribed
    * @param listener the listener to subscribe.
-   * @param sendInitialUpdateSeperately {@code true}, if the {@link DataTagUpdateListener} is in fact a
+   * @param sendInitialUpdateSeperately {@code true}, if the {@link BaseListener} is in fact a
    *        {@link DataTagListener} which allows sending the initial updates on a separate method.
    * @throws CacheSynchronizationException In case of errors during the subscription.
    */
-  void subscribe(final Set<Long> tagIds, final DataTagUpdateListener listener, final boolean sendInitialUpdateSeperately) throws CacheSynchronizationException {
+  void subscribe(final Set<Long> tagIds, final BaseListener listener, final boolean sendInitialUpdateSeperately) throws CacheSynchronizationException {
     // Creates the uninitialised tags
     Set<Long> newTagIds = cacheSynchronizer.initTags(tagIds);
       
@@ -87,11 +91,11 @@ class TagSubscriptionHandler {
    * subscription will handled.
    * @param regexList list of regular expressions
    * @param listener the listener to subscribe.
-   * @param sendInitialUpdateSeperately {@code true}, if the {@link DataTagUpdateListener} is in fact a
+   * @param sendInitialUpdateSeperately {@code true}, if the {@link BaseListener} is in fact a
    *        {@link DataTagListener} which allows sending the initial updates on a separate method.
    * @throws CacheSynchronizationException In case of errors during the subscription.
    */
-  void subscribeByRegex(final Set<String> regexList, final DataTagUpdateListener listener, final boolean sendInitialUpdateSeperately) throws CacheSynchronizationException {    
+  void subscribeByRegex(final Set<String> regexList, final BaseListener listener, final boolean sendInitialUpdateSeperately) throws CacheSynchronizationException {    
     // list of all matching tags, filled during createMissingTags
     final Set<Long> allMatchingTags = new HashSet<Long>();
     
@@ -106,12 +110,12 @@ class TagSubscriptionHandler {
    * @param subscriptionList list of tag ids to which the listner shall be subscribed to
    * @param newTagIds Newly created tags during the subscription process
    * @param listener The tag listener to subscribe
-   * @param sendInitialUpdateSeperately {@code true}, if the {@link DataTagUpdateListener} is in fact a
+   * @param sendInitialUpdateSeperately {@code true}, if the {@link BaseListener} is in fact a
    *        {@link DataTagListener} which allows sending the initial updates on a separate method.
    */
-  private void handleTagSubscription(Set<Long> subscriptionList, Set<Long> newTagIds, final DataTagUpdateListener listener, boolean sendInitialUpdateSeperately) {
+  private void handleTagSubscription(Set<Long> subscriptionList, Set<Long> newTagIds, final BaseListener listener, boolean sendInitialUpdateSeperately) {
     // Needed if, the initial values shall be sent on the separate #onInitialUpdate() method
-    final Map<Long, ClientDataTagValue> initialUpdates = new HashMap<>(subscriptionList.size());
+    final Map<Long, Tag> initialUpdates = new HashMap<>(subscriptionList.size());
     
     ClientDataTagImpl cdt = null;
     for (Long tagId : subscriptionList) {
@@ -126,9 +130,22 @@ class TagSubscriptionHandler {
     // if the listener is of type DataTagListener
     if (sendInitialUpdateSeperately && listener instanceof DataTagListener) {
       if (log.isDebugEnabled()) {
-        log.debug("doAddDataTagUpdateListener() - Sending initial values to DataTagListener");
+        log.debug("handleTagSubscription() - Sending initial values to DataTagListener");
       }
-      ((DataTagListener) listener).onInitialUpdate(initialUpdates.values());
+      
+      Collection<ClientDataTagValue> oldFormat = new ArrayList<>(initialUpdates.size());
+      for (Tag value : initialUpdates.values()) {
+        oldFormat.add((ClientDataTagValue) value);
+      }
+      ((DataTagListener) listener).onInitialUpdate(oldFormat);
+    }
+    else if (sendInitialUpdateSeperately && listener instanceof TagListener) {
+      if (log.isDebugEnabled()) {
+        log.debug("handleTagSubscription() - Sending initial values to DataTagListener");
+      }
+      
+      Collection<Tag> values = initialUpdates.values();
+      ((TagListener) listener).onInitialUpdate(values);
     }
     
     // Add the listener to all tags
@@ -147,7 +164,7 @@ class TagSubscriptionHandler {
 
   }
   
-  void unsubscribeAllTags(final DataTagUpdateListener listener) {
+  void unsubscribeAllTags(final BaseListener listener) {
     Set<Long> tagsToRemove = new HashSet<Long>();
     controller.getWriteLock().lock();
     try {
@@ -169,7 +186,7 @@ class TagSubscriptionHandler {
     fireOnUnsubscribeEvent(tagsToRemove);
   }
 
-  void unsubscribeTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener) {
+  void unsubscribeTags(final Set<Long> dataTagIds, final BaseListener listener) {
     Set<Long> tagsToRemove = new HashSet<Long>();
     controller.getWriteLock().lock();
     try {

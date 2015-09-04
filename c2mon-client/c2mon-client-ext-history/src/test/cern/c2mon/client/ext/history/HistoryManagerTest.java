@@ -45,12 +45,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.client.common.tag.ClientDataTag;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.core.manager.CoreSupervisionManager;
 import cern.c2mon.client.core.manager.CoreTagManager;
-import cern.c2mon.client.core.manager.TagManager;
+import cern.c2mon.client.core.service.TagServiceImpl;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.ext.history.common.HistoryPlayer;
 import cern.c2mon.client.ext.history.common.HistoryProvider;
@@ -189,10 +189,10 @@ public class HistoryManagerTest {
     final Object historyModeSyncLock = new Object();
     
     // The "real time" tags which is already subscribed to when starting the history player 
-    final List<ClientDataTag> subscribedTags = new ArrayList<ClientDataTag>();
+    final List<Tag> subscribedTags = new ArrayList<>();
     
     // The "real time" tags which is subscribed to AFTER starting the history player
-    final Map<Long, ClientDataTag> subscribedTagsAddedLater = new HashMap<Long, ClientDataTag>();
+    final Map<Long, Tag> subscribedTagsAddedLater = new HashMap<Long, Tag>();
     
     // The tag ids of the tags which already subscribed to when starting the history player,
     // exluding the tag ids which are filtered because of the server time of the real time value 
@@ -410,11 +410,11 @@ public class HistoryManagerTest {
     EasyMock.expect(cacheMock.isHistoryModeEnabled()).andStubReturn(true);
 
     EasyMock.expect(tagManagerMock.getDataTags(EasyMock.<Collection<Long>>anyObject()))
-      .andDelegateTo(new TagManager(null, null, null, null) {
+      .andDelegateTo(new TagServiceImpl(null, null, null) {
         @Override
-        public Collection<ClientDataTagValue> getDataTags(final Collection<Long> tagIds) {
-          final List<ClientDataTagValue> result = new ArrayList<ClientDataTagValue>();
-          for (ClientDataTag cdt : subscribedTags) {
+        public Collection<Tag> get(final Collection<Long> tagIds) {
+          final List<Tag> result = new ArrayList<Tag>();
+          for (Tag cdt : subscribedTags) {
             if (tagIds.contains(cdt.getId())) {
               result.add(cdt);
             }
@@ -423,7 +423,7 @@ public class HistoryManagerTest {
         }
       }).anyTimes();
     
-    //Arrays.asList(subscribedTags.toArray(new ClientDataTagValue[0]))
+    //Arrays.asList(subscribedTags.toArray(new Tag[0]))
     
     //
     // Replay

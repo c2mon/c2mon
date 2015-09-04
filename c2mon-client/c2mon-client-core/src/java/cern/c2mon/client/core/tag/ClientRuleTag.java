@@ -28,8 +28,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 
+import cern.c2mon.client.common.listener.BaseListener;
+import cern.c2mon.client.common.listener.BaseTagListener;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TypeNumeric;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.tag.TagMode;
@@ -49,7 +53,7 @@ import cern.c2mon.shared.rule.RuleExpression;
  *
  * @author Matthias Braeger
  */
-public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagValue {
+public class ClientRuleTag<T> implements BaseTagListener, Tag, ClientDataTagValue {
   /** Log4j Logger for this class */
   private static final Logger LOG = Logger.getLogger(ClientRuleTag.class);
 
@@ -72,10 +76,10 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   private Long id;
 
   /** List of unique update listeners */
-  private final List<DataTagUpdateListener> listeners = new ArrayList<DataTagUpdateListener>();;
+  private final List<BaseListener> listeners = new ArrayList<>();;
 
   /** The actual list of rule input values, that was received by onUpdate() method */
-  private final Map<Long, ClientDataTagValue> ruleInputValues = new Hashtable<Long, ClientDataTagValue>();
+  private final Map<Long, Tag> ruleInputValues = new Hashtable<Long, Tag>();
 
   /** Thread synchronization lock for the rule input Values map */
   private final ReentrantReadWriteLock ruleMapLock = new ReentrantReadWriteLock();
@@ -116,7 +120,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   /**
    * Empty alarm collection instance that is returned, if another class
    * wants to know whether there are alarms registered for this
-   * <code>ClientDataTagValue</code> instance. By definition a client rule cannot
+   * <code>Tag</code> instance. By definition a client rule cannot
    * have any related alarms.
    */
   private static final Collection<AlarmValue> EMPTY_ALARM_LIST = new ArrayList<AlarmValue>();
@@ -267,7 +271,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
       try {
         if (ruleInputValues.size() == rule.getInputTagIds().size()) {
           // Iterate of input tags and compute the state of the client rule
-          for (ClientDataTagValue inputValue : ruleInputValues.values()) {
+          for (Tag inputValue : ruleInputValues.values()) {
             // compute simulated flag
             this.simulated |= inputValue.isSimulated();
             // Compute rule mode
@@ -339,7 +343,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
     DataTagQuality invalidRuleQuality = new DataTagQualityImpl();
     invalidRuleQuality.validate();
 
-    for (ClientDataTagValue inputValue : ruleInputValues.values()) {
+    for (Tag inputValue : ruleInputValues.values()) {
       // Check, if value tag is valid or not
       if (!inputValue.isValid()) {
         // Add Invalidations flags to the the rule
@@ -434,7 +438,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   }
 
   @Override
-  public void onUpdate(final ClientDataTagValue cdt) {
+  public void onUpdate(final Tag cdt) {
     ruleMapLock.writeLock().lock();
     try {
       ruleInputValues.put(cdt.getId(), cdt);
@@ -479,7 +483,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
       listenersLock.writeLock().lock();
       boolean isRegistered = false;
       // Search for pListener by reference
-      for (DataTagUpdateListener listener : listeners) {
+      for (BaseListener listener : listeners) {
         if (listener == pListener) {
           isRegistered = true;
           retval = true;
@@ -523,7 +527,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   private void fireUpdateReceivedEvent() {
     try {
       listenersLock.readLock().lock();
-      for (DataTagUpdateListener listener : listeners) {
+      for (BaseListener listener : listeners) {
         listener.onUpdate(this);
       }
     }

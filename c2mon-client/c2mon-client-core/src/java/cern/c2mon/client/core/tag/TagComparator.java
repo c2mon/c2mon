@@ -17,7 +17,7 @@
  ******************************************************************************/
 package cern.c2mon.client.core.tag;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 
 /**
  * Helper class used by {@link ClientDataTagImpl} to 
@@ -34,7 +34,7 @@ class TagComparator {
    * @param tag2 the second tag to compare against
    * @return true, if the two tags are equal, otherwise false
    */
-  static boolean compare(ClientDataTagValue tag1, ClientDataTagValue tag2) {
+  static boolean compare(Tag tag1, Tag tag2) {
     if (tag1 == tag2) {
       return true;
     }

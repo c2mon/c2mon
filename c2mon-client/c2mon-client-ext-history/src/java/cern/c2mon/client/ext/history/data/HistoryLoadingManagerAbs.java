@@ -32,6 +32,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.apache.log4j.Logger;
 
 import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.common.tag.Tag;
+import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.ext.history.common.HistoryLoadingConfiguration;
 import cern.c2mon.client.ext.history.common.HistoryLoadingManager;
 import cern.c2mon.client.ext.history.common.HistorySupervisionEvent;
@@ -73,7 +75,7 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
   private KeyForValuesMap<Long, SupervisionEventId> tagToSupervisionIds;
 
   /** List of the tags that should be loaded */
-  private Map<Long, ClientDataTag> tagsToLoad;
+  private Map<Long, Tag> tagsToLoad;
 
   /** List of the supervision events that should be loaded */
   private Set<SupervisionEventId> supervisionEventsToLoad;
@@ -101,7 +103,7 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
     this.listenerManager = new ListenersManager<HistoryLoadingManagerListener>();
     this.configuration = null;
     this.tagToSupervisionIds = new KeyForValuesMap<Long, SupervisionEventId>();
-    this.tagsToLoad = new HashMap<Long, ClientDataTag>();
+    this.tagsToLoad = new HashMap<>();
     this.supervisionEventsToLoad = new HashSet<SupervisionEventId>();
     
     this.loadedHistoryTagValueUpdates = new HashMap<Long, List<HistoryTagValueUpdate>>();
@@ -118,7 +120,7 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
   }
 
   @Override
-  public void addClientDataTagForLoading(final ClientDataTag tag) {
+  public void addClientDataTagForLoading(final Tag tag) {
     tagsToLoad.put(tag.getId(), tag);
     
     connectTagToSupervision(tag.getId(), SupervisionEntity.PROCESS, tag.getProcessIds());
@@ -184,28 +186,28 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
     // Sorts by execution time, ascending
     Arrays.sort(historyUpdates, sortByExecutionTime);
     
-    final ClientDataTag clientDataTag = tagsToLoad.get(tagId);
-    if (clientDataTag == null) {
+    final Tag clientTag = tagsToLoad.get(tagId);
+    if (clientTag == null) {
       // Shouldn't happen
       throw new RuntimeException("The client data tag have been removed!");
     }
     
     final SupervisionListener clientDataTagSupervision;
-    if (clientDataTag instanceof SupervisionListener) {
-      clientDataTagSupervision = (SupervisionListener) clientDataTag;
+    if (clientTag instanceof SupervisionListener) {
+      clientDataTagSupervision = (SupervisionListener) clientTag;
     }
     else {
       clientDataTagSupervision = null;
-      if (clientDataTag.getProcessIds() != null || clientDataTag.getProcessIds().size() != 0
-          || clientDataTag.getEquipmentIds() != null || clientDataTag.getEquipmentIds().size() != 0) {
+      if (clientTag.getProcessIds() != null || clientTag.getProcessIds().size() != 0
+          || clientTag.getEquipmentIds() != null || clientTag.getEquipmentIds().size() != 0) {
         throw new RuntimeException("The client data tag must be an instance of SupervisionListener!");
       }
     }
     
     // Setting the data type
     String dataType = "String";
-    if (clientDataTag != null && clientDataTag.getType() != null) {
-      dataType = clientDataTag.getType().getSimpleName();
+    if (clientTag != null && clientTag.getType() != null) {
+      dataType = clientTag.getType().getSimpleName();
     }
     for (HistoryUpdate historyUpdate : historyUpdates) {
       if (historyUpdate instanceof HistoryTagValueUpdate) {
@@ -214,7 +216,7 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
       }
     }
     
-    clientDataTag.clean();
+    ((ClientDataTagImpl) clientTag).clean();
     
     final boolean removeRedundantData = configuration.isRemoveRedundantData();
     
@@ -227,23 +229,23 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
       if (historyUpdate instanceof HistoryTagValueUpdate) {
         
         final HistoryTagValueUpdate historyTagValueUpdate = (HistoryTagValueUpdate) historyUpdate;
-        final boolean wasUpdatedSuccesfully = clientDataTag.onUpdate(historyTagValueUpdate);
+        final boolean wasUpdatedSuccesfully = ((ClientDataTagImpl) clientTag).onUpdate(historyTagValueUpdate);
         
         if (!wasUpdatedSuccesfully) // only Valid updates should be added in the history
           continue; // => the rest are ignored
         
         try {
           final HistoryTagValueUpdateImpl update = new HistoryTagValueUpdateImpl(
-              clientDataTag.getId(), 
-              clientDataTag.getDataTagQuality().clone(), 
-              clientDataTag.getValue(), 
+              clientTag.getId(), 
+              clientTag.getDataTagQuality().clone(), 
+              clientTag.getValue(), 
               historyTagValueUpdate.getSourceTimestamp(), 
               historyTagValueUpdate.getDaqTimestamp(), 
-              clientDataTag.getServerTimestamp(), 
+              clientTag.getServerTimestamp(), 
               historyTagValueUpdate.getLogTimestamp(), 
-              clientDataTag.getDescription(), 
-              clientDataTag.getAlarms().toArray(new AlarmValue[0]), 
-              clientDataTag.getMode());
+              clientTag.getDescription(), 
+              clientTag.getAlarms().toArray(new AlarmValue[0]), 
+              clientTag.getMode());
           update.setInitialValue(historyTagValueUpdate.isInitialValue());
           update.setDataType(dataType);
           update.setDaqTimestamp(historyTagValueUpdate.getDaqTimestamp());
@@ -259,19 +261,19 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
         clientDataTagSupervision.onSupervisionUpdate(historyEvent);
         
         // Adds the client data tag only if it is initialized.
-        if (clientDataTag.getDataTagQuality().isInitialised()) {
+        if (clientTag.getDataTagQuality().isInitialised()) {
           try {
             final HistoryTagValueUpdateImpl update = new HistoryTagValueUpdateImpl(
-                clientDataTag.getId(), 
-                clientDataTag.getDataTagQuality().clone(), 
-                clientDataTag.getValue(), 
+                clientTag.getId(), 
+                clientTag.getDataTagQuality().clone(), 
+                clientTag.getValue(), 
                 null, 
                 null, 
                 historyEvent.getEventTime(), 
                 null, 
-                clientDataTag.getDescription(), 
-                clientDataTag.getAlarms().toArray(new AlarmValue[0]), 
-                clientDataTag.getMode());
+                clientTag.getDescription(), 
+                clientTag.getAlarms().toArray(new AlarmValue[0]), 
+                clientTag.getMode());
             update.setInitialValue(historyEvent.isInitialValue());
             update.setDataType(dataType);
             if (!removeRedundantData || !isRedundantData(previousAddedValue, update)) {
@@ -456,8 +458,8 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
   }
   
   @Override
-  public void addClientDataTagsForLoading(final Collection<ClientDataTag> tags) {
-    for (ClientDataTag cdt : tags) {
+  public void addClientDataTagsForLoading(final Collection<Tag> tags) {
+    for (Tag cdt : tags) {
       addClientDataTagForLoading(cdt);
     }
   }
@@ -521,8 +523,8 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
   /**
    * @return a list of tags to load
    */
-  protected Map<Long, ClientDataTag> getTagsToLoad() {
-    return new HashMap<Long, ClientDataTag>(tagsToLoad);
+  protected Map<Long, Tag> getTagsToLoad() {
+    return new HashMap<Long, Tag>(tagsToLoad);
   }
   
   /**

@@ -23,10 +23,11 @@ import javax.jms.JMSException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.common.listener.DataTagListener;
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.common.listener.BaseListener;
+import cern.c2mon.client.common.listener.BaseTagListener;
+import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.cache.CacheSynchronizationException;
 import cern.c2mon.client.core.cache.ClientDataTagCache;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
@@ -51,7 +52,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TagServiceImpl implements AdvancedTagService {
 
   /**
-   * The cache instance which is managing all <code>ClientDataTag</code> objects
+   * The cache instance which is managing all <code>Tag</code> objects
    */
   private ClientDataTagCache cache;
 
@@ -62,13 +63,13 @@ public class TagServiceImpl implements AdvancedTagService {
   private final RequestHandler clientRequestHandler;
 
   /** List of subscribed data tag update listeners */
-  private final Set<DataTagUpdateListener> tagUpdateListeners = new HashSet<>();
+  private final Set<BaseListener> tagUpdateListeners = new HashSet<>();
 
   /**
    * Default Constructor, used by Spring to instantiate the Singleton service
    *
    * @param supervisionManager Needed to compute the tag quality before passing the tag value to the caller
-   * @param cache The cache instance which is managing all <code>ClientDataTag</code> objects
+   * @param cache The cache instance which is managing all <code>Tag</code> objects
    * @param requestHandler Provides methods for requesting tag information from the C2MON server
    */
   @Autowired
@@ -80,26 +81,38 @@ public class TagServiceImpl implements AdvancedTagService {
     this.cache = cache;
     this.clientRequestHandler = requestHandler;
   }
+  
+  @Deprecated
+  public Collection<ClientDataTagValue> getSubscriptions(final BaseListener listener) {
+    Collection<Tag> cacheTagList = cache.getAllTagsForListener(listener);
+    Collection<ClientDataTagValue> clonedDataTags = new ArrayList<>(cacheTagList.size());
 
-  @Override
-  public Collection<ClientDataTagValue> getSubscriptions(final DataTagUpdateListener listener) {
-    Collection<ClientDataTag> cacheTagList = cache.getAllTagsForListener(listener);
-    Collection<ClientDataTagValue> clonedDataTags = new ArrayList<ClientDataTagValue>(cacheTagList.size());
-
-    for (ClientDataTag cdt : cacheTagList) {
-      try {
-        clonedDataTags.add(cdt.clone());
-      } catch (CloneNotSupportedException e) {
-        log.error("Unable to clone ClientDataTag with id " + cdt.getId(), e);
-        throw new UnsupportedOperationException("Unable to clone ClientDataTag with id " + cdt.getId(), e);
-      }
+    for (Tag cdt : cacheTagList) {
+      clonedDataTags.add((ClientDataTagValue) ((ClientDataTagImpl) cdt).clone());
     }
 
     return clonedDataTags;
   }
 
   @Override
-  public Set<Long> getSubscriptionIds(final DataTagUpdateListener listener) {
+  public Collection<Tag> getSubscriptions(final BaseTagListener listener) {
+    Collection<Tag> cacheTagList = cache.getAllTagsForListener(listener);
+    Collection<Tag> clonedDataTags = new ArrayList<Tag>(cacheTagList.size());
+
+    for (Tag cdt : cacheTagList) {
+      clonedDataTags.add(((ClientDataTagImpl) cdt).clone());
+    }
+
+    return clonedDataTags;
+  }
+  
+  @Deprecated
+  public Set<Long> getAllSubscribedDataTagIds(final BaseListener listener) {
+    return cache.getAllTagIdsForListener(listener);
+  }
+
+  @Override
+  public Set<Long> getSubscriptionIds(final BaseTagListener listener) {
     return cache.getAllTagIdsForListener(listener);
   }
 
@@ -114,10 +127,10 @@ public class TagServiceImpl implements AdvancedTagService {
   }
 
   @Override
-  public void subscribe(final Long dataTagId, final DataTagUpdateListener listener) throws CacheSynchronizationException {
+  public void subscribe(final Long dataTagId, final BaseTagListener listener) throws CacheSynchronizationException {
     if (dataTagId == null) {
       String error = "Called with null parameter (id collection).";
-      log.warn("subscribeDataTag() : " + error);
+      log.warn("subscribe() : " + error);
       throw new IllegalArgumentException(error);
     }
 
@@ -127,15 +140,15 @@ public class TagServiceImpl implements AdvancedTagService {
   }
 
   @Override
-  public void subscribe(final Set<Long> tagIds, final DataTagUpdateListener listener) throws CacheSynchronizationException {
+  public void subscribe(final Set<Long> tagIds, final BaseTagListener listener) throws CacheSynchronizationException {
     doSubscription(tagIds, listener);
   }
 
   @Override
-  public void subscribe(final Long dataTagId, final DataTagListener listener) throws CacheSynchronizationException {
+  public void subscribe(final Long dataTagId, final TagListener listener) throws CacheSynchronizationException {
     if (dataTagId == null) {
       String error = "Called with null parameter (id collection).";
-      log.warn("subscribeDataTagUpdate() : " + error);
+      log.warn("subscribe() : " + error);
       throw new IllegalArgumentException(error);
     }
 
@@ -149,34 +162,34 @@ public class TagServiceImpl implements AdvancedTagService {
    * with a request to the C2MON server and afterwards registered for the listener.
    */
   @Override
-  public void subscribe(final Set<Long> tagIds, final DataTagListener listener) {
+  public void subscribe(final Set<Long> tagIds, final TagListener listener) {
     doSubscription(tagIds, listener);
   }
 
   /**
    * Inner method that handles the tag subscription.
    * @param tagIds List of tag ids
-   * @param listener The listener to be added to the <code>ClientDataTag</code> references
+   * @param listener The listener to be added to the <code>Tag</code> references
    * @param sendInitialValuesToListener if set to <code>true</code>, the listener will receive the
    *                                    current value of the tag.
    * @return The initial values of the subscribed tags.
    */
-  private synchronized <T extends DataTagUpdateListener> void doSubscription(final Set<Long> tagIds, final T listener) {
+  public synchronized <T extends BaseListener> void doSubscription(final Set<Long> tagIds, final T listener) {
     if (tagIds == null) {
       String error = "Called with null parameter (id collection). Ignoring request.";
-      log.warn("doTagSubscription() : " + error);
+      log.warn("doSubscription() : " + error);
       throw new IllegalArgumentException(error);
     }
 
     if (listener == null) {
-      String error = "Called with null parameter (DataTagUpdateListener). Ignoring request.";
-      log.warn("doTagSubscription() : " + error);
+      String error = "Called with null parameter (BaseTagListener). Ignoring request.";
+      log.warn("doSubscription() : " + error);
       throw new IllegalArgumentException(error);
     }
 
     if (tagIds.isEmpty()) {
       String info = "Called with empty tag id list. Ignoring request.";
-      log.info("doTagSubscription() : " + info);
+      log.info("doSubscription() : " + info);
       return;
     }
 
@@ -201,12 +214,12 @@ public class TagServiceImpl implements AdvancedTagService {
   /**
    * Inner method that handles the tag subscription.
    * @param regexList List of tag ids
-   * @param listener The listener to be added to the <code>ClientDataTag</code> references
+   * @param listener The listener to be added to the <code>Tag</code> references
    * @param sendInitialValuesToListener if set to <code>true</code>, the listener will receive the
    *                                    current value of the tag.
    * @return The initial values of the subscribed tags.
    */
-  private synchronized <T extends DataTagUpdateListener> void doSubscriptionByName(final Set<String> regexList, final T listener) {
+  private synchronized <T extends BaseTagListener> void doSubscriptionByName(final Set<String> regexList, final T listener) {
     if (regexList == null) {
       String error = "Called with null parameter (regex list). Ignoring request.";
       log.warn("doTagSubscription() : " + error);
@@ -214,7 +227,7 @@ public class TagServiceImpl implements AdvancedTagService {
     }
 
     if (listener == null) {
-      String error = "Called with null parameter (DataTagUpdateListener). Ignoring request.";
+      String error = "Called with null parameter (BaseTagListener). Ignoring request.";
       log.warn("doTagSubscription() : " + error);
       throw new IllegalArgumentException(error);
     }
@@ -243,10 +256,10 @@ public class TagServiceImpl implements AdvancedTagService {
   }
 
   @Override
-  public void unsubscribe(Long dataTagId, DataTagUpdateListener listener) {
+  public void unsubscribe(Long dataTagId, BaseTagListener listener) {
     if (dataTagId == null) {
       String error = "Called with null parameter (id collection).";
-      log.warn("unsubscribeDataTag() : " + error);
+      log.warn("unsubscribe() : " + error);
       throw new IllegalArgumentException(error);
     }
 
@@ -254,15 +267,27 @@ public class TagServiceImpl implements AdvancedTagService {
     id.add(dataTagId);
     unsubscribe(id, listener);
   }
-
-  @Override
-  public void unsubscribe(final DataTagUpdateListener listener) {
+  
+  @Deprecated
+  public void unsubscribeAllDataTags(final BaseListener listener) {
     cache.unsubscribeAllDataTags(listener);
     tagUpdateListeners.remove(listener);
   }
 
   @Override
-  public void unsubscribe(final Set<Long> dataTagIds, final DataTagUpdateListener listener) {
+  public void unsubscribe(final BaseTagListener listener) {
+    cache.unsubscribeAllDataTags(listener);
+    tagUpdateListeners.remove(listener);
+  }
+  
+  @Deprecated
+  public void unsubscribeDataTags(final Set<Long> dataTagIds, final BaseListener listener) {
+    cache.unsubscribeDataTags(dataTagIds, listener);
+    tagUpdateListeners.remove(listener);
+  }
+
+  @Override
+  public void unsubscribe(final Set<Long> dataTagIds, final BaseTagListener listener) {
     cache.unsubscribeDataTags(dataTagIds, listener);
     tagUpdateListeners.remove(listener);
   }
@@ -282,22 +307,17 @@ public class TagServiceImpl implements AdvancedTagService {
 
 
   @Override
-  public Collection<ClientDataTagValue> get(final Collection<Long> tagIds) {
-    Collection<ClientDataTagValue> resultList = new ArrayList<ClientDataTagValue>();
+  public Collection<Tag> get(final Collection<Long> tagIds) {
+    Collection<Tag> resultList = new ArrayList<Tag>();
     Collection<Long> missingTags = new ArrayList<Long>();
-    Map<Long, ClientDataTag> cachedValues = cache.get(new HashSet<Long>(tagIds));
+    Map<Long, Tag> cachedValues = cache.get(new HashSet<Long>(tagIds));
 
-    try {
-      for (Entry<Long, ClientDataTag> cacheEntry : cachedValues.entrySet()) {
-        if (cacheEntry.getValue() != null) {
-          resultList.add(cacheEntry.getValue().clone());
-        } else {
-          missingTags.add(cacheEntry.getKey());
-        }
+    for (Entry<Long, Tag> cacheEntry : cachedValues.entrySet()) {
+      if (cacheEntry.getValue() != null) {
+        resultList.add(((ClientDataTagImpl) cacheEntry.getValue()).clone());
+      } else {
+        missingTags.add(cacheEntry.getKey());
       }
-    } catch (CloneNotSupportedException e) {
-      log.error("get() - Unable to clone ClientDataTag! Please check the code.", e);
-      throw new UnsupportedOperationException("Unable to clone ClientDataTag! Please check the code.", e);
     }
 
     // If there are missing values fetch them from the server
@@ -334,15 +354,15 @@ public class TagServiceImpl implements AdvancedTagService {
   }
 
   @Override
-  public ClientDataTagValue get(final Long tagId) {
+  public Tag get(final Long tagId) {
     if (tagId == null) {
       throw new NullPointerException("The tagId parameter cannot be null");
     }
 
     Collection<Long> coll = new ArrayList<Long>(1);
     coll.add(tagId);
-    Collection<ClientDataTagValue> resultColl = get(coll);
-    for(ClientDataTagValue cdt : resultColl) {
+    Collection<Tag> resultColl = get(coll);
+    for(Tag cdt : resultColl) {
       return cdt;
     }
 
@@ -354,9 +374,14 @@ public class TagServiceImpl implements AdvancedTagService {
 
     return cache.getCacheSize();
   }
+  
+  @Deprecated
+  public boolean isSubscribed(BaseListener listener) {
+    return tagUpdateListeners.contains(listener);
+  }
 
   @Override
-  public boolean isSubscribed(DataTagUpdateListener listener) {
+  public boolean isSubscribed(BaseTagListener listener) {
     return tagUpdateListeners.contains(listener);
   }
 
@@ -364,44 +389,40 @@ public class TagServiceImpl implements AdvancedTagService {
    * TODO: Call could be optimized by filtering out all strings without
    */
   @Override
-  public void subscribeByName(String regex, DataTagUpdateListener listener) throws CacheSynchronizationException {
+  public void subscribeByName(String regex, BaseTagListener listener) throws CacheSynchronizationException {
     subscribeByName(new HashSet<>(Arrays.asList(new String[]{regex})), listener);
   }
 
   @Override
-  public void subscribeByName(String regex, DataTagListener listener) throws CacheSynchronizationException {
+  public void subscribeByName(String regex, TagListener listener) throws CacheSynchronizationException {
     subscribeByName(new HashSet<>(Arrays.asList(new String[]{regex})), listener);
   }
 
   @Override
-  public void subscribeByName(Set<String> regexList, DataTagUpdateListener listener) throws CacheSynchronizationException {
+  public void subscribeByName(Set<String> regexList, BaseTagListener listener) throws CacheSynchronizationException {
     doSubscriptionByName(regexList, listener);
   }
 
   @Override
-  public void subscribeByName(Set<String> regexList, DataTagListener listener) throws CacheSynchronizationException {
+  public void subscribeByName(Set<String> regexList, TagListener listener) throws CacheSynchronizationException {
     doSubscriptionByName(regexList, listener);
   }
 
-  private Collection<ClientDataTagValue> getByName(final Collection<String> tagNames) {
+  private Collection<Tag> getByName(final Collection<String> tagNames) {
     
-    Collection<ClientDataTagValue> resultList = new ArrayList<>();
+    Collection<Tag> resultList = new ArrayList<>();
     Set<String> missingTags = new HashSet<>();
-    Map<String, ClientDataTag> cachedValues = cache.getByNames(new HashSet<>(tagNames));
+    Map<String, Tag> cachedValues = cache.getByNames(new HashSet<>(tagNames));
 
-    try {
-      for (Entry<String, ClientDataTag> cacheEntry : cachedValues.entrySet()) {
-        if (cacheEntry.getValue() != null) {
-          resultList.add(cacheEntry.getValue().clone());
-        } else {
-          missingTags.add(cacheEntry.getKey());
-        }
-      }
-    } catch (CloneNotSupportedException e) {
-      log.error("get() - Unable to clone ClientDataTag! Please check the code.", e);
-      throw new UnsupportedOperationException("Unable to clone ClientDataTag! Please check the code.", e);
-    }
     
+    for (Entry<String, Tag> cacheEntry : cachedValues.entrySet()) {
+      if (cacheEntry.getValue() != null) {
+        resultList.add(((ClientDataTagImpl) cacheEntry.getValue()).clone());
+      } else {
+        missingTags.add(cacheEntry.getKey());
+      }
+    }
+  
     if (!missingTags.isEmpty()) {
       resultList.addAll(findByName(missingTags));
     }
@@ -410,7 +431,7 @@ public class TagServiceImpl implements AdvancedTagService {
   }
 
   @Override
-  public Collection<ClientDataTagValue> findByName(String regex) {
+  public Collection<Tag> findByName(String regex) {
     if (hasWildcard(regex)) {
       Set<String> regexList = new HashSet<>();
       regexList.add(regex);
@@ -422,8 +443,8 @@ public class TagServiceImpl implements AdvancedTagService {
   }
 
   @Override
-  public Collection<ClientDataTagValue> findByName(Set<String> regexList) {
-    Collection<ClientDataTagValue> resultList = new ArrayList<ClientDataTagValue>();
+  public Collection<Tag> findByName(Set<String> regexList) {
+    Collection<Tag> resultList = new ArrayList<Tag>();
     
     try {
       Collection<TagUpdate> tagUpdates = clientRequestHandler.requestTagsByRegex(regexList);

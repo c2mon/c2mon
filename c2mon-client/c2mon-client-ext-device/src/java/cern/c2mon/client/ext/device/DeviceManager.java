@@ -31,12 +31,12 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.common.listener.DataTagListener;
+import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.common.tag.ClientCommandTag;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.util.ConcurrentSet;
-import cern.c2mon.client.core.C2monCommandManager;
-import cern.c2mon.client.core.C2monTagManager;
+import cern.c2mon.client.core.CommandService;
+import cern.c2mon.client.core.TagService;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.core.tag.ClientRuleTag;
 import cern.c2mon.client.ext.device.cache.DeviceCache;
@@ -60,16 +60,16 @@ import cern.c2mon.shared.rule.RuleFormatException;
  * @author Justin Lewis Salmon
  */
 @Service
-public class DeviceManager implements C2monDeviceManager, DataTagListener {
+public class DeviceManager implements C2monDeviceManager, TagListener {
 
   /** Log4j logger for this class */
   private static final Logger LOG = Logger.getLogger(DeviceManager.class);
 
   /** Reference to the <code>TagManager</code> singleton */
-  private final C2monTagManager tagManager;
+  private final TagService tagService;
 
   /** Reference to the <code>TagManager</code> singleton */
-  private final C2monCommandManager commandManager;
+  private final CommandService commandService;
 
   /** Reference to the <code>BasicCacheHandler</code> singleton */
   private final BasicCacheHandler dataTagCache;
@@ -89,23 +89,23 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
   /**
    * Default Constructor, used by Spring to instantiate the Singleton service.
    *
-   * @param pTagManager the TagManager singleton reference
+   * @param tagService the TagService singleton reference
    * @param pDataTagCache the data tag cache handler singleton reference
    * @param pDeviceCache the device cache handler singleton reference
    * @param pRequestHandler provides methods for requesting information from the
    *          C2MON server
    */
   @Autowired
-  protected DeviceManager(final C2monTagManager pTagManager,
+  protected DeviceManager(final TagService tagService,
                           final BasicCacheHandler pDataTagCache,
                           final DeviceCache pDeviceCache,
                           final DeviceRequestHandler pRequestHandler,
-                          final C2monCommandManager pCommandManager) {
-    this.tagManager = pTagManager;
+                          final CommandService commandService) {
+    this.tagService = tagService;
     this.dataTagCache = pDataTagCache;
     this.deviceCache = pDeviceCache;
     this.requestHandler = pRequestHandler;
-    this.commandManager = pCommandManager;
+    this.commandService = commandService;
   }
 
   @Override
@@ -212,7 +212,7 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
     }
 
     if (commandTagIds.size() > 0) {
-      Set<ClientCommandTag<Object>> commandTags = commandManager.getCommandTags(commandTagIds);
+      Set<ClientCommandTag<Object>> commandTags = commandService.getCommandTags(commandTagIds);
       for (ClientCommandTag<Object> commandTag : commandTags) {
 
         // Find the device command to which this command tag belongs
@@ -255,7 +255,7 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
       // If the device contains properties that are client rules, also subscribe
       // to the tags contained within those rules
       for (ClientRuleTag<?> ruleTag : deviceImpl.getRuleTags()) {
-        tagManager.subscribeDataTags(ruleTag.getRuleExpression().getInputTagIds(), ruleTag);
+        tagService.subscribe(ruleTag.getRuleExpression().getInputTagIds(), ruleTag);
       }
     }
 
@@ -263,7 +263,7 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
     deviceUpdateListeners.add(new ListenerWrapper(listener, new HashSet<>(devices)));
 
     // Use TagManager to subscribe to all properties of the device
-    tagManager.subscribeDataTags(dataTagIds, this);
+    tagService.subscribe(dataTagIds, this);
   }
 
   @Override
@@ -344,11 +344,11 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
   }
 
   @Override
-  public void onInitialUpdate(Collection<ClientDataTagValue> initialValues) {
+  public void onInitialUpdate(Collection<Tag> initialValues) {
     List<Device> devices = deviceCache.getAllDevices();
     Set<Device> updatedDevices = new HashSet<>();
 
-    for (ClientDataTagValue tag : initialValues) {
+    for (Tag tag : initialValues) {
       // Find the device(s) that use this tag
       for (Device device : devices) {
         DeviceImpl deviceImpl = (DeviceImpl) device;
@@ -372,7 +372,7 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
   }
 
   @Override
-  public void onUpdate(ClientDataTagValue tag) {
+  public void onUpdate(Tag tag) {
     List<Device> devices = deviceCache.getAllDevices();
 
     // Find the device(s) that use this tag
@@ -428,7 +428,7 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
     deviceUpdateListeners.removeAll(listenersToRemove);
 
     // Use TagManager to unsubscribe from all properties of the device
-    tagManager.unsubscribeDataTags(dataTagIds, this);
+    tagService.unsubscribe(dataTagIds, this);
   }
 
   @Override

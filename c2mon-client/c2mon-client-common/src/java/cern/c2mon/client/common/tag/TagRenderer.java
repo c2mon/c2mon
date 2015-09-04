@@ -20,16 +20,14 @@ import org.apache.log4j.or.ObjectRenderer;
  * <PRE>
  * 651	nzmey.test33.xs11	2004-02-23 13:14:19.505	2004-02-23 13:13:01.505 null	false	Aliv of Process Driver.TDSexpired
  * </PRE>
- * 
- * @deprecated Got replaced by {@link TagRenderer}
  */
- @Deprecated
-public class ClientDataTagValueRenderer implements ObjectRenderer {
+ 
+public class TagRenderer implements ObjectRenderer {
 
   /**
    * Default constructor.
    */
-  public ClientDataTagValueRenderer() {/* Nothing to do */}
+  public TagRenderer() {/* Nothing to do */}
 
   /**
    * Implementation of the ObjectRenderer interface

@@ -20,7 +20,7 @@ package cern.c2mon.client.ext.device.property;
 import java.sql.Timestamp;
 import java.util.Collection;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TypeNumeric;
 import cern.c2mon.client.ext.device.Device;
 import cern.c2mon.shared.client.alarm.AlarmValue;
@@ -35,7 +35,7 @@ import cern.c2mon.shared.rule.RuleExpression;
  *
  * @author Justin Lewis Salmon
  */
-public class ClientConstantValue<T> implements ClientDataTagValue {
+public class ClientConstantValue<T> implements Tag {
 
   /**
    * The ID of this tag.

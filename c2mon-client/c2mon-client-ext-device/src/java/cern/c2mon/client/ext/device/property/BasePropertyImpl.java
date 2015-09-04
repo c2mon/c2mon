@@ -20,11 +20,13 @@ package cern.c2mon.client.ext.device.property;
 import java.util.Collection;
 import java.util.Set;
 
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
+import cern.c2mon.client.common.listener.BaseTagListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.C2monTagManager;
+import cern.c2mon.client.core.TagService;
+import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.core.tag.ClientRuleTag;
 
 /**
@@ -54,12 +56,12 @@ public class BasePropertyImpl implements BaseProperty {
    * The actual value (may be null if the property is a {@link ClientDataTag}
    * and has not yet been lazily loaded).
    */
-  private ClientDataTagValue tag;
+  private Tag tag;
 
   /**
    * Reference to the {@link C2monTagManager}, used to lazy-load data tags.
    */
-  protected C2monTagManager tagManager;
+  protected TagService tagService;
 
   /**
    * Constructor used to create an instance containing only a tag ID, to be
@@ -74,7 +76,7 @@ public class BasePropertyImpl implements BaseProperty {
     this.name = name;
     this.category = category;
     this.tagId = tagId;
-    this.tagManager = C2monServiceGateway.getTagManager();
+    this.tagService = C2monServiceGateway.getTagService();
   }
 
   /**
@@ -86,14 +88,14 @@ public class BasePropertyImpl implements BaseProperty {
    * @param category the category of this property
    * @param clientDataTag the client device property to set
    */
-  public BasePropertyImpl(final String name, final Category category, final ClientDataTagValue clientDataTag) {
+  public BasePropertyImpl(final String name, final Category category, final Tag clientDataTag) {
     this.name = name;
     this.category = category;
     this.tag = clientDataTag;
     if (isDataTag()) {
       this.tagId = clientDataTag.getId();
     }
-    this.tagManager = C2monServiceGateway.getTagManager();
+    this.tagService = C2monServiceGateway.getTagService();
   }
 
   @Override
@@ -112,7 +114,7 @@ public class BasePropertyImpl implements BaseProperty {
   }
 
   @Override
-  public ClientDataTagValue getTag() {
+  public Tag getTag() {
     // Load the value (either lazy-load the data tag or evaluate the rule)
     setTag(loadTag());
     return this.tag;
@@ -121,10 +123,10 @@ public class BasePropertyImpl implements BaseProperty {
   /**
    * Retrieve the internal value of this property (may be null).
    *
-   * @return the internal {@link ClientDataTagValue} instance, or null if it has
+   * @return the internal {@link Tag} instance, or null if it has
    *         not yet been loaded
    */
-  public ClientDataTagValue getValue() {
+  public Tag getValue() {
     return tag;
   }
 
@@ -134,7 +136,7 @@ public class BasePropertyImpl implements BaseProperty {
    * @return true if this property is a data tag, false otherwise
    */
   public boolean isDataTag() {
-    return tag instanceof ClientDataTag || tagId != null;
+    return tag instanceof ClientDataTagImpl || tagId != null;
   }
 
   /**
@@ -157,41 +159,41 @@ public class BasePropertyImpl implements BaseProperty {
   }
 
   /**
-   * Set the internal {@link ClientDataTagValue}.
+   * Set the internal {@link Tag}.
    *
-   * @param value the {@link ClientDataTagValue} to set
+   * @param value the {@link Tag} to set
    */
-  protected void setTag(ClientDataTagValue value) {
+  protected void setTag(Tag value) {
     this.tag = value;
   }
 
   /**
    * Perform the necessary tasks to fully instantiate the value of the property.
    * In the case of a data tag, this means lazy-loading its
-   * {@link ClientDataTagValue} from the server (if it hasn't already been
+   * {@link Tag} from the server (if it hasn't already been
    * subscribed to). In the case of a {@link ClientRuleTag}, the dependent tags
    * will be retrieved from the server and the rule will be evaluated.
    *
    * @return the new value
    */
-  private ClientDataTagValue loadTag() {
-    ClientDataTagValue value = this.tag;
+  private Tag loadTag() {
+    Tag value = this.tag;
 
     // If the internal value is a Long, then we lazy load the data tag
     if (isDataTag() && !isValueLoaded()) {
-      value = tagManager.getDataTag(getTagId());
+      value = tagService.get(getTagId());
     }
 
     // If it is a rule tag, we evaluate the rule (if it isn't subscribed)
-    else if (isRuleTag() && !tagManager.isSubscribed((DataTagUpdateListener) this.tag)) {
+    else if (isRuleTag() && !tagService.isSubscribed((BaseTagListener) this.tag)) {
 
       // Get the data tag values from inside the rule
       Set<Long> tagIds = value.getRuleExpression().getInputTagIds();
-      Collection<ClientDataTagValue> dataTagValues = tagManager.getDataTags(tagIds);
+      Collection<Tag> dataTagValues = tagService.get(tagIds);
 
       // Update the rule tag
-      for (ClientDataTagValue tagValue : dataTagValues) {
-        ((ClientRuleTag<?>) value).onUpdate(tagValue);
+      for (Tag tagValue : dataTagValues) {
+        ((ClientRuleTag) value).onUpdate((ClientDataTag)tagValue);
       }
     }
 
@@ -204,7 +206,7 @@ public class BasePropertyImpl implements BaseProperty {
    *
    * @param tagManager the tag manager to use
    */
-  public void setTagManager(C2monTagManager tagManager) {
-    this.tagManager = tagManager;
+  public void setTagManager(TagService tagManager) {
+    this.tagService = tagManager;
   }
 }

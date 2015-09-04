@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.c2mon.client.core.C2monTagManager;
+import cern.c2mon.client.common.tag.Tag;
+import cern.c2mon.client.core.TagService;
 
 /**
  * This class implements the {@link Property} interface and provides
@@ -39,7 +39,7 @@ public class PropertyImpl extends BasePropertyImpl implements Property {
   private Map<String, Field> fields = new HashMap<>();
 
   /**
-   * Constructor for a property whose internal {@link ClientDataTagValue} will
+   * Constructor for a property whose internal {@link Tag} will
    * be lazily loaded in the future.
    *
    * @param name the name of the property
@@ -51,14 +51,14 @@ public class PropertyImpl extends BasePropertyImpl implements Property {
   }
 
   /**
-   * Constructor for a property whose internal {@link ClientDataTagValue} does
+   * Constructor for a property whose internal {@link Tag} does
    * not need to be lazily loaded.
    *
    * @param name the name of the property
    * @param category the property category
    * @param clientDataTag the internal data tag of the property
    */
-  public PropertyImpl(String name, Category category, ClientDataTagValue dataTag) {
+  public PropertyImpl(String name, Category category, Tag dataTag) {
     super(name, category, dataTag);
   }
 
@@ -131,13 +131,13 @@ public class PropertyImpl extends BasePropertyImpl implements Property {
    * Manually set the reference to the {@link C2monTagManager} on the property
    * and all its fields. Used for testing purposes.
    *
-   * @param tagManager the tag manager to use
+   * @param tagService the tag manager to use
    */
   @Override
-  public void setTagManager(C2monTagManager tagManager) {
-    this.tagManager = tagManager;
+  public void setTagManager(TagService tagService) {
+    this.tagService = tagService;
     for (Field field : fields.values()) {
-      ((FieldImpl) field).setTagManager(tagManager);
+      ((FieldImpl) field).setTagManager(tagService);
     }
   }
 }

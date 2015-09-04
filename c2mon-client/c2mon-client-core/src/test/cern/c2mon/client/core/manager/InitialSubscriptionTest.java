@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import cern.c2mon.client.common.listener.DataTagListener;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.listener.TagListener;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.TagService;
 
@@ -49,17 +49,17 @@ public class InitialSubscriptionTest {
     new InitialSubscriptionTest();
   }
   
-  class Listener implements DataTagListener {
+  class Listener implements TagListener {
     
     @Override
-    public void onUpdate(ClientDataTagValue cdt) {
+    public void onUpdate(Tag cdt) {
       System.out.println(cdt.getId() + ": timestamp[" + cdt.getTimestamp() + "] value[" + cdt.getValue() + "]");
     }
 
     @Override
-    public void onInitialUpdate(Collection<ClientDataTagValue> initialValues) {
+    public void onInitialUpdate(Collection<Tag> initialValues) {
       System.out.println("********* onInitialValues START **********");
-      for (ClientDataTagValue cdt : initialValues) {
+      for (Tag cdt : initialValues) {
         System.out.println(cdt.getId() + ": timestamp[" + cdt.getTimestamp() + "] value[" + cdt.getValue() + "]");
       }
       System.out.println("********* onInitialValues END **********");

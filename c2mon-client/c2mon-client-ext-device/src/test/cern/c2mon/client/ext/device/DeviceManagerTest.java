@@ -48,7 +48,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.tag.ClientCommandTag;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
@@ -245,14 +245,14 @@ public class DeviceManagerTest {
     ClientDataTagImpl cdt1 = new ClientDataTagImpl(100000L);
     ClientDataTagImpl cdt2 = new ClientDataTagImpl(200000L);
 
-    Map<String, ClientDataTagValue> deviceProperties = new HashMap<String, ClientDataTagValue>();
+    Map<String, Tag> deviceProperties = new HashMap<String, Tag>();
     deviceProperties.put("test_property_name_1", cdt1);
     deviceProperties.put("test_property_name_2", cdt2);
 
     final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class");
     device1.setDeviceProperties(deviceProperties);
 
-    final Map<Long, ClientDataTagValue> cacheReturnMap = getCacheReturnMap();
+    final Map<Long, Tag> cacheReturnMap = getCacheReturnMap();
 
     // Expect the tag manager to subscribe to the tags
     tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagListener> anyObject());
@@ -282,7 +282,7 @@ public class DeviceManagerTest {
 /*    new Thread(new Runnable() {
       @Override
       public void run() {*/
-        for (ClientDataTagValue tag : cacheReturnMap.values()) {
+        for (Tag tag : cacheReturnMap.values()) {
           deviceManager.onUpdate(tag);
         }
 /*      }
@@ -314,7 +314,7 @@ public class DeviceManagerTest {
     final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class");
     device1.setDeviceProperties(sparsePropertyMap);
 
-    final Map<Long, ClientDataTagValue> cacheReturnMap = getCacheReturnMap();
+    final Map<Long, Tag> cacheReturnMap = getCacheReturnMap();
 
     // Expect the device to not call getDataTags() but instead to
     // get the tags from the cache
@@ -382,7 +382,7 @@ public class DeviceManagerTest {
     final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class");
     device1.setDeviceProperties(deviceProperties);
 
-    final Map<Long, ClientDataTagValue> cacheReturnMap = new HashMap<Long, ClientDataTagValue>();
+    final Map<Long, Tag> cacheReturnMap = new HashMap<Long, Tag>();
 
     for (int i = 0; i < 1000; i++) {
       ClientDataTagImpl cdt = new ClientDataTagImpl(new Long(i));
@@ -427,7 +427,7 @@ public class DeviceManagerTest {
     Property propertyWithFields = device.getProperty("test_property_name");
     Assert.assertTrue(propertyWithFields.getCategory().equals(Category.MAPPED_PROPERTY));
     for (int i = 0; i < 1000; i++) {
-      ClientDataTagValue tag = propertyWithFields.getField("test_field_name_" + i).getTag();
+      Tag tag = propertyWithFields.getField("test_field_name_" + i).getTag();
       Assert.assertTrue(tag.getId().equals(new Long(i)));
       Assert.assertTrue(tag.getValue() != null);
       Assert.assertTrue(tag.getValue().equals("test_value_" + i));
@@ -471,7 +471,7 @@ public class DeviceManagerTest {
     EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
       @Override
       public Boolean answer() throws Throwable {
-        deviceManager.onInitialUpdate(Arrays.asList((ClientDataTagValue) new ClientDataTagImpl(100430L)));
+        deviceManager.onInitialUpdate(Arrays.asList((Tag) new ClientDataTagImpl(100430L)));
         return true;
       }
     }).once();
@@ -589,7 +589,7 @@ public class DeviceManagerTest {
     EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
       @Override
       public Boolean answer() throws Throwable {
-        deviceManager.onInitialUpdate(Arrays.asList((ClientDataTagValue) new ClientDataTagImpl(100430L)));
+        deviceManager.onInitialUpdate(Arrays.asList((Tag) new ClientDataTagImpl(100430L)));
         return true;
       }
     }).once();
@@ -649,8 +649,8 @@ public class DeviceManagerTest {
   // cdt1.update(DeviceTestUtils.createValidTransferTag(cdt1.getId(),
   // "test_tag_name", 1L));
   //
-  // Map<String, ClientDataTagValue> deviceProperties = new HashMap<String,
-  // ClientDataTagValue>();
+  // Map<String, Tag> deviceProperties = new HashMap<String,
+  // Tag>();
   // deviceProperties.put("test_property_name", cdt1);
   // device.setDeviceProperties(deviceProperties);
   //
@@ -674,14 +674,14 @@ public class DeviceManagerTest {
     ClientDataTagImpl cdt1 = new ClientDataTagImpl(100000L);
     ClientDataTagImpl cdt2 = new ClientDataTagImpl(200000L);
 
-    final Map<String, ClientDataTagValue> deviceProperties = new HashMap<String, ClientDataTagValue>();
+    final Map<String, Tag> deviceProperties = new HashMap<String, Tag>();
     deviceProperties.put("test_property_name_1", cdt1);
     deviceProperties.put("test_property_name_2", cdt2);
 
     final DeviceImpl device1 = new DeviceImpl(11L, "test_device", 1L, "test_device_class");
     device1.setDeviceProperties(deviceProperties);
 
-    final Map<Long, ClientDataTagValue> cacheReturnMap = getCacheReturnMap();
+    final Map<Long, Tag> cacheReturnMap = getCacheReturnMap();
 
     // Expect the tag manager to subscribe to the tags
     tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagListener> anyObject());
@@ -745,8 +745,8 @@ public class DeviceManagerTest {
 
     final ClientDataTagImpl cdt1 = new ClientDataTagImpl(100000L);
     final ClientDataTagImpl cdt2 = new ClientDataTagImpl(200000L);
-    Map<String, ClientDataTagValue> deviceProperties1 = new HashMap<String, ClientDataTagValue>();
-    Map<String, ClientDataTagValue> deviceProperties2 = new HashMap<String, ClientDataTagValue>();
+    Map<String, Tag> deviceProperties1 = new HashMap<String, Tag>();
+    Map<String, Tag> deviceProperties2 = new HashMap<String, Tag>();
     deviceProperties1.put("test_property_name_1", cdt1);
     deviceProperties2.put("test_property_name_2", cdt2);
 
@@ -759,7 +759,7 @@ public class DeviceManagerTest {
     devices.add(device1);
     devices.add(device2);
 
-    Map<Long, ClientDataTagValue> cacheReturnMap = getCacheReturnMap();
+    Map<Long, Tag> cacheReturnMap = getCacheReturnMap();
 
     // Expect the tag manager to subscribe to the tags
     tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagListener> anyObject());
@@ -922,8 +922,8 @@ public class DeviceManagerTest {
     }
   }
 
-  private Map<Long, ClientDataTagValue> getCacheReturnMap() {
-    Map<Long, ClientDataTagValue> cacheReturnMap = new HashMap<>();
+  private Map<Long, Tag> getCacheReturnMap() {
+    Map<Long, Tag> cacheReturnMap = new HashMap<>();
     ClientDataTagImpl cdt1 = new ClientDataTagImpl(100000L);
     ClientDataTagImpl cdt2 = new ClientDataTagImpl(200000L);
 

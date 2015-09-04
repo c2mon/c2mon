@@ -11,6 +11,7 @@
 package cern.c2mon.client.core.manager;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.jms.JMSException;
@@ -22,12 +23,13 @@ import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.AlarmService;
 import cern.c2mon.client.core.ConfigurationService;
 import cern.c2mon.client.core.StatisticsService;
 import cern.c2mon.client.core.cache.CacheSynchronizationException;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
-import cern.c2mon.client.core.service.AdvancedTagService;
+import cern.c2mon.client.core.service.TagServiceImpl;
 import cern.c2mon.client.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
@@ -35,6 +37,7 @@ import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.statistics.TagStatisticsResponse;
 import cern.c2mon.shared.client.tag.TagConfig;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The tag manager implements the <code>C2monTagManager</code> interface. It's main job is to delegate cache requests
@@ -47,10 +50,10 @@ import cern.c2mon.shared.client.tag.TagConfig;
  * @deprecated Use directly the new Service implementations instead
  * @author Matthias Braeger
  */
-@Service @Deprecated
+@Service @Deprecated @Slf4j
 public class TagManager implements CoreTagManager {
 
-  private final AdvancedTagService tagService;
+  private final TagServiceImpl tagService;
   
   private final AlarmService alarmService;
   
@@ -59,7 +62,7 @@ public class TagManager implements CoreTagManager {
   private final StatisticsService statisticsService;
   
   @Autowired
-  public TagManager(final AdvancedTagService tagService,
+  public TagManager(final TagServiceImpl tagService,
                     final AlarmService alarmService,
                     final ConfigurationService configurationService,
                     final StatisticsService statisticsService) {
@@ -71,38 +74,61 @@ public class TagManager implements CoreTagManager {
   
   @Override
   public void subscribeDataTags(Set<Long> dataTagIds, DataTagUpdateListener listener) throws CacheSynchronizationException {
-    tagService.subscribe(dataTagIds, listener);
+    tagService.doSubscription(dataTagIds, listener);
   }
 
   @Override
   public void subscribeDataTag(Long dataTagId, DataTagUpdateListener listener) throws CacheSynchronizationException {
-    tagService.subscribe(dataTagId, listener);
-    
+    if (dataTagId == null) {
+      String error = "Called with null parameter (id collection).";
+      log.warn("subscribeDataTag() : " + error);
+      throw new IllegalArgumentException(error);
+    }
+
+    Set<Long> id = new HashSet<>(1);
+    id.add(dataTagId);
+    subscribeDataTags(id, listener);
   }
 
   @Override
   public void subscribeDataTags(Set<Long> dataTagIds, DataTagListener listener) throws CacheSynchronizationException {
-    tagService.subscribe(dataTagIds, listener);
+    tagService.doSubscription(dataTagIds, listener);
   }
 
   @Override
   public void subscribeDataTag(Long dataTagId, DataTagListener listener) throws CacheSynchronizationException {
-    tagService.subscribe(dataTagId, listener);
+    if (dataTagId == null) {
+      String error = "Called with null parameter (id collection).";
+      log.warn("subscribeDataTag() : " + error);
+      throw new IllegalArgumentException(error);
+    }
+
+    Set<Long> id = new HashSet<>(1);
+    id.add(dataTagId);
+    subscribeDataTags(id, listener);
   }
 
   @Override
   public void unsubscribeDataTags(Set<Long> dataTagIds, DataTagUpdateListener listener) {
-    tagService.unsubscribe(dataTagIds, listener);
+    tagService.unsubscribeDataTags(dataTagIds, listener);
   }
 
   @Override
   public void unsubscribeDataTag(Long dataTagId, DataTagUpdateListener listener) {
-    tagService.unsubscribe(dataTagId, listener); 
+    if (dataTagId == null) {
+      String error = "Called with null parameter (id collection).";
+      log.warn("unsubscribeDataTag() : " + error);
+      throw new IllegalArgumentException(error);
+    }
+
+    Set<Long> id = new HashSet<>(1);
+    id.add(dataTagId);
+    unsubscribeDataTags(id, listener);
   }
 
   @Override
   public void unsubscribeAllDataTags(DataTagUpdateListener listener) {
-    tagService.unsubscribe(listener); 
+    tagService.unsubscribeAllDataTags(listener); 
   }
 
   @Override
@@ -112,17 +138,18 @@ public class TagManager implements CoreTagManager {
 
   @Override
   public Set<Long> getAllSubscribedDataTagIds(DataTagUpdateListener listener) {
-    return tagService.getSubscriptionIds(listener);
+    return tagService.getAllSubscribedDataTagIds(listener);
   }
 
   @Override
   public ClientDataTagValue getDataTag(Long tagId) {
-    return tagService.get(tagId);
+    return (ClientDataTagValue) tagService.get(tagId);
   }
 
   @Override
   public Collection<ClientDataTagValue> getDataTags(Collection<Long> tagIds) {
-    return tagService.get(tagIds);
+    Collection<? extends Tag> result =  tagService.get(tagIds);
+    return (Collection<ClientDataTagValue>) result;
   }
 
   @Override

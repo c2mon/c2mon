@@ -30,9 +30,10 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.common.listener.DataTagListener;
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.common.listener.TagListener;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 
@@ -43,13 +44,13 @@ import cern.c2mon.client.core.tag.ClientDataTagImpl;
  * controlling the access to it.
  * <p>
  * The cache provides a <code>create()</code> method for creating a new
- * <code>ClientDataTag</code> cache entry. In the background it handles also the
+ * <code>Tag</code> cache entry. In the background it handles also the
  * subscription to the incoming live events. Only the initialization of the tag
  * is performed by the <code>TagServiceImpl</code>.
  * <p>
  * It is possible to switch the <code>ClientDataTagCache</code> from live mode
  * into history mode and back. Therefore this class manages internally two
- * <code>ClientDataTag</code> map instances, one for live tag updates and the
+ * <code>Tag</code> map instances, one for live tag updates and the
  * other for historical events. Depending on the cache mode the getter methods
  * return either references to the live tags or to the history tags.
  *
@@ -99,8 +100,8 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public ClientDataTag get(final Long tagId) {
-    ClientDataTag cdt = null;
+  public Tag get(final Long tagId) {
+    Tag cdt = null;
 
     cacheReadLock.lock();
     try {
@@ -113,11 +114,11 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
   
   @Override
-  public ClientDataTag getByName(final String tagName) {
+  public Tag getByName(final String tagName) {
     cacheReadLock.lock();
     try {
       Collection<ClientDataTagImpl> values = controller.getActiveCache().values();
-      for (ClientDataTag cdt : values) {
+      for (Tag cdt : values) {
         if (cdt.getName().equalsIgnoreCase(tagName)) {
           return cdt;
         }
@@ -130,8 +131,8 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public Collection<ClientDataTag> getAllSubscribedDataTags() {
-    Collection<ClientDataTag> list = new ArrayList<ClientDataTag>(controller.getActiveCache().size());
+  public Collection<Tag> getAllSubscribedDataTags() {
+    Collection<Tag> list = new ArrayList<Tag>(controller.getActiveCache().size());
 
     cacheReadLock.lock();
     try {
@@ -148,12 +149,12 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public Collection<ClientDataTag> getAllTagsForEquipment(final Long equipmentId) {
-    Collection<ClientDataTag> list = new ArrayList<ClientDataTag>();
+  public Collection<Tag> getAllTagsForEquipment(final Long equipmentId) {
+    Collection<Tag> list = new ArrayList<Tag>();
 
     cacheReadLock.lock();
     try {
-      for (ClientDataTag cdt : controller.getActiveCache().values()) {
+      for (Tag cdt : controller.getActiveCache().values()) {
         if (cdt.getEquipmentIds().contains(equipmentId)) {
           list.add(cdt);
         }
@@ -166,8 +167,8 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public Collection<ClientDataTag> getAllTagsForListener(final DataTagUpdateListener listener) {
-    Collection<ClientDataTag> list = new ArrayList<ClientDataTag>();
+  public Collection<Tag> getAllTagsForListener(final BaseListener listener) {
+    Collection<Tag> list = new ArrayList<Tag>();
 
     cacheReadLock.lock();
     try {
@@ -184,7 +185,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public Set<Long> getAllTagIdsForListener(final DataTagUpdateListener listener) {
+  public Set<Long> getAllTagIdsForListener(final BaseListener listener) {
     Set<Long> list = new HashSet<Long>();
 
     cacheReadLock.lock();
@@ -202,12 +203,12 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public Collection<ClientDataTag> getAllTagsForProcess(final Long processId) {
-    Collection<ClientDataTag> list = new ArrayList<ClientDataTag>();
+  public Collection<Tag> getAllTagsForProcess(final Long processId) {
+    Collection<Tag> list = new ArrayList<Tag>();
 
     cacheReadLock.lock();
     try {
-      for (ClientDataTag cdt : controller.getActiveCache().values()) {
+      for (Tag cdt : controller.getActiveCache().values()) {
         if (cdt.getProcessIds().contains(processId)) {
           list.add(cdt);
         }
@@ -230,18 +231,18 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public void unsubscribeAllDataTags(final DataTagUpdateListener listener) {
+  public void unsubscribeAllDataTags(final BaseListener listener) {
     tagSubscriptionHandler.unsubscribeAllTags(listener);
   }
 
   @Override
-  public void unsubscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener) {
+  public void unsubscribeDataTags(final Set<Long> dataTagIds, final BaseListener listener) {
     tagSubscriptionHandler.unsubscribeTags(dataTagIds, listener);
   }
 
   @Override
-  public Map<Long, ClientDataTag> get(final Set<Long> tagIds) {
-    Map<Long, ClientDataTag> resultMap = new HashMap<Long, ClientDataTag>(tagIds.size());
+  public Map<Long, Tag> get(final Set<Long> tagIds) {
+    Map<Long, Tag> resultMap = new HashMap<Long, Tag>(tagIds.size());
     cacheReadLock.lock();
     try {
       for (Long tagId : tagIds) {
@@ -255,8 +256,8 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
   
   @Override
-  public Map<String, ClientDataTag> getByNames(final Set<String> tagNames) {
-    Map<String, ClientDataTag> resultMap = new HashMap<>(tagNames.size());
+  public Map<String, Tag> getByNames(final Set<String> tagNames) {
+    Map<String, Tag> resultMap = new HashMap<>(tagNames.size());
 
     // Initialize result map
     for (String tagName : tagNames) {
@@ -266,7 +267,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     cacheReadLock.lock();
     try {
       Collection<ClientDataTagImpl> values = controller.getActiveCache().values();
-      for (ClientDataTag cdt : values) {
+      for (Tag cdt : values) {
         for (String tagName : tagNames) {
           if (cdt.getName().equalsIgnoreCase(tagName)) {
             resultMap.put(tagName, cdt);
@@ -301,8 +302,8 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public <T extends DataTagUpdateListener> void subscribe(final Set<Long> tagIds, final T listener) throws CacheSynchronizationException {
-    tagSubscriptionHandler.subscribe(tagIds, listener, (listener instanceof DataTagListener));
+  public <T extends BaseListener> void subscribe(final Set<Long> tagIds, final T listener) throws CacheSynchronizationException {
+    tagSubscriptionHandler.subscribe(tagIds, listener, (listener instanceof DataTagListener) || (listener instanceof TagListener));
   }
   
 
@@ -322,7 +323,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public <T extends DataTagUpdateListener> void subscribeByRegex(Set<String> regexList, T listener) throws CacheSynchronizationException {
+  public <T extends BaseListener> void subscribeByRegex(Set<String> regexList, T listener) throws CacheSynchronizationException {
     tagSubscriptionHandler.subscribeByRegex(regexList, listener, (listener instanceof DataTagListener));
   }
 }

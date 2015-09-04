@@ -30,12 +30,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.TagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.manager.CoreSupervisionManager;
-import cern.c2mon.client.core.manager.CoreTagManager;
+import cern.c2mon.client.core.service.AdvancedTagService;
+import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.ext.history.common.HistoryLoadingManager;
 import cern.c2mon.client.ext.history.common.HistoryPlayer;
 import cern.c2mon.client.ext.history.common.HistoryPlayerEvents;
@@ -51,7 +52,6 @@ import cern.c2mon.client.ext.history.playback.HistoryPlayerImpl;
 import cern.c2mon.client.ext.history.util.KeyForValuesMap;
 import cern.c2mon.client.jms.ConnectionListener;
 import cern.c2mon.client.jms.SupervisionListener;
-
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 
 @Service
@@ -61,7 +61,7 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   private static final Logger LOG = Logger.getLogger(HistoryManager.class);
   
   /** Reference to the <code>TagManager</code> singleton */
-  private final CoreTagManager tagManager;
+  private final AdvancedTagService tagService;
 
   /** Reference to the <code>ClientDataTagCache</code> */
   private final BasicCacheHandler cache;
@@ -86,10 +86,10 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   private ConnectionListener jmsConnectionListener = null;
  
   @Autowired
-  protected HistoryManager(final CoreTagManager pTagManager, final BasicCacheHandler pCache,
+  protected HistoryManager(final AdvancedTagService tagService, final BasicCacheHandler pCache,
       final CoreSupervisionManager pSupervisionManager, final HistoryTagManager historyTagManager) {
     
-    this.tagManager = pTagManager;
+    this.tagService = tagService;
     this.cache = pCache;
     this.supervisionManager = pSupervisionManager;
     this.historyTagManager = historyTagManager;
@@ -101,7 +101,7 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   @SuppressWarnings("unused")
   @PostConstruct
   private void init() {
-    tagManager.addTagSubscriptionListener(this);
+    tagService.addTagSubscriptionListener(this);
   }
 
   @Override
@@ -201,29 +201,24 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
    * @param clientDataTags
    *          The tags to subscribes
    */
-  private void subscribeTagsToHistory(final Collection<ClientDataTag> clientDataTags) {
+  private void subscribeTagsToHistory(final Collection<Tag> clientDataTags) {
     if (cache.isHistoryModeEnabled()
         && this.historyPlayer != null 
         && this.historyPlayer.isHistoryPlayerActive()) {
       
       // Registers all the tag update listeners and supervision listeners  
-      for (final ClientDataTag cdt : clientDataTags) {
+      for (final Tag cdt : clientDataTags) {
         
-        ClientDataTag realtimeValue;
-        try {
-          realtimeValue = cdt.clone();
-        }
-        catch (CloneNotSupportedException e) {
-          realtimeValue = null;
-          LOG.warn("Could not clone the ClientDataTag, it will be retrieved from the database.", e);
-        }
+        Tag realtimeValue;
+        realtimeValue = ((ClientDataTagImpl) cdt).clone();
+        
         if (realtimeValue != null) {
           if (realtimeValue.getServerTimestamp().getTime() == 0) {
             realtimeValue = null;
           }
         }
         
-        cdt.clean();
+        ((ClientDataTagImpl) cdt).clean();
         
         // Registers to tag updates
         this.historyPlayer.registerTagUpdateListener(
@@ -338,14 +333,14 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   @Override
   public HistoryLoadingManager createHistoryLoadingManager(final HistoryProvider historyProvider, final Collection<Long> tagIds) {
     final HistoryLoadingManager manager = new HistoryLoadingManagerImpl(historyProvider);
-    final Collection<ClientDataTagValue> cdtValues = this.tagManager.getDataTags(tagIds);
-    final List<ClientDataTag> cdts = new ArrayList<ClientDataTag>();
-    for (final ClientDataTagValue cdtValue : cdtValues) {
-      if (cdtValue instanceof ClientDataTag) {
-        cdts.add((ClientDataTag) cdtValue);
+    final Collection<Tag> cdtValues = this.tagService.get(tagIds);
+    final List<Tag> cdts = new ArrayList<Tag>();
+    for (final Tag cdtValue : cdtValues) {
+      if (cdtValue instanceof Tag) {
+        cdts.add((Tag) cdtValue);
       }
       else {
-        throw new RuntimeException(String.format("The '%s' must be of type '%s'", ClientDataTagValue.class.getName(), ClientDataTag.class.getName()));
+        throw new RuntimeException(String.format("The '%s' must be of type '%s'", Tag.class.getName(), Tag.class.getName()));
       }
     }
     manager.addClientDataTagsForLoading(cdts);
@@ -356,11 +351,11 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   class ClientDataTagRequester implements ClientDataTagRequestCallback {
     @Override
     public ClientDataTagValue getClientDataTagValue(final long tagId) {
-      final Collection<ClientDataTagValue> tagValues = tagManager.getDataTags(Arrays.asList(tagId));
+      final Collection<Tag> tagValues = tagService.get(Arrays.asList(tagId));
       if (tagValues == null || tagValues.size() == 0) {
         throw new RuntimeException("Cannot get the client data tag value for the tag id " + tagId);
       }
-      return tagValues.iterator().next();
+      return (ClientDataTagValue) tagValues.iterator().next();
     }
   }
 

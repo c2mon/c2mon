@@ -18,6 +18,7 @@
  
 package cern.c2mon.client.common.listener;
 
+import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 ;
 
@@ -31,7 +32,7 @@ import cern.c2mon.client.common.tag.ClientDataTagValue;
  * @see DataTagListener
  * @author Matthias Braeger
  */
-public interface DataTagUpdateListener {
+public interface DataTagUpdateListener extends BaseListener<ClientDataTagValue> {
 
   /**
    * This method gets called when the value or quality property of a
@@ -43,5 +44,6 @@ public interface DataTagUpdateListener {
    * @param tagUpdate A copy of the <code>ClientDataTagValue</code> object with the 
    *                  updated properties
    */
+  @Override
   void onUpdate(ClientDataTagValue tagUpdate);
 }

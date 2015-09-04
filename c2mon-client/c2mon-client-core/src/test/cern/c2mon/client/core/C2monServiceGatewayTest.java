@@ -30,8 +30,8 @@ import javax.management.MalformedObjectNameException;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.listener.BaseTagListener;
+import cern.c2mon.client.common.tag.Tag;
 
 /**
  * Integration test of Client API modules.
@@ -106,9 +106,9 @@ public class C2monServiceGatewayTest {
       }
 
       TagService tagManager = C2monServiceGateway.getTagService();
-      tagManager.subscribe(tagIds, new DataTagUpdateListener() {
+      tagManager.subscribe(tagIds, new BaseTagListener() {
         @Override
-        public void onUpdate(ClientDataTagValue tagUpdate) {
+        public void onUpdate(Tag tagUpdate) {
           System.out.println("Update received for tag " + tagUpdate.getId() + ":");
           System.out.println("\ttag name           : " + tagUpdate.getName());
           System.out.println("\tvalue              : " + tagUpdate.getValue());

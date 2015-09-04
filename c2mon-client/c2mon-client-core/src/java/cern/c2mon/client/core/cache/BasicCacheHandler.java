@@ -4,67 +4,69 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 
 /**
  * This interface provides basic access methods to the client cache and
  * should be used by all core classes who needs to get directly access
- * to the cached <code>ClientDataTag</code> references.
+ * to the cached <code>Tag</code> references.
  *
  * @author Matthias Braeger
  */
 public interface BasicCacheHandler {
   /**
-   * Returns a reference to the <code>ClientDataTag</code> object in the
+   * Returns a reference to the <code>Tag</code> object in the
    * cache.
    * @param tagId The tag id
-   * @return The <code>ClientDataTag</code> reference or <code>null</code>,
+   * @return The <code>Tag</code> reference or <code>null</code>,
    *         if the cache does not contain the specific tag.
    * @throws NullPointerException When the parameter is <code>null</code>
    */
-  ClientDataTag get(Long tagId);
+  Tag get(Long tagId);
   
   /**
-   * Returns a reference to the <code>ClientDataTag</code> object in the
+   * Returns a reference to the <code>Tag</code> object in the
    * cache matching exactly the given tag name.
    * @param tagName The tag name
-   * @return The <code>ClientDataTag</code> reference or <code>null</code>,
+   * @return The <code>Tag</code> reference or <code>null</code>,
    *         if the cache does not contain the specific tag.
    * @throws NullPointerException When the parameter is <code>null</code>
    */
-  ClientDataTag getByName(final String tagName);
+  Tag getByName(final String tagName);
   
   /**
-   * Returns a reference map to to those <code>ClientDataTag</code> objects in the
+   * Returns a reference map to to those <code>Tag</code> objects in the
    * cache which have been specified with the entry set. If the the cache is missing
    * an entry the returning map will contain a <code>null</code> pointer value for that
    * id.  
    * @param tagIds list of tag ids.
-   * @return Map of <code>ClientDataTag</code> references.
+   * @return Map of <code>Tag</code> references.
    * @throws NullPointerException When the parameter is <code>null</code>
    */
-  Map<Long, ClientDataTag> get(Set<Long> tagIds);
+  Map<Long, Tag> get(Set<Long> tagIds);
   
   /**
-   * Returns a reference map to to those <code>ClientDataTag</code> objects in the
+   * Returns a reference map to to those <code>Tag</code> objects in the
    * cache which have been specified with the entry set. If the the cache is missing
    * an entry the returning map will contain a <code>null</code> pointer value for that
    * id.  
    * @param tagNames list of tag names.
-   * @return Map of <code>ClientDataTag</code> references.
+   * @return Map of <code>Tag</code> references.
    * @throws NullPointerException When the parameter is <code>null</code>
    */
-  Map<String, ClientDataTag> getByNames(Set<String> tagNames);
+  Map<String, Tag> getByNames(Set<String> tagNames);
   
   /**
-   * Returns all <code>ClientDataTag</code> references in the cache which have
+   * Returns all <code>Tag</code> references in the cache which have
    * the given <code>DataTagUpdateListener</code> registered.
    * @param listener The listener for which all registered tags shall be returned
-   * @return A collection of <code>ClientDataTag</code> references
+   * @return A collection of <code>Tag</code> references
    * @throws NullPointerException When the parameter is <code>null</code>
    */
-  Collection<ClientDataTag> getAllTagsForListener(DataTagUpdateListener listener);
+  Collection<Tag> getAllTagsForListener(BaseListener<?> listener);
   
   /**
    * Returns all tag ids for which the given <code>DataTagUpdateListener</code>
@@ -73,33 +75,33 @@ public interface BasicCacheHandler {
    * @return A collection of tag ids
    * @throws NullPointerException When the parameter is <code>null</code>
    */
-  Set<Long> getAllTagIdsForListener(DataTagUpdateListener listener);
+  Set<Long> getAllTagIdsForListener(BaseListener<?> listener);
   
   /**
-   * Returns all <code>ClientDataTag</code> references in the cache which are linked
+   * Returns all <code>Tag</code> references in the cache which are linked
    * to the given equipment id.
    * @param equipmentId The equipment id
-   * @return A collection of <code>ClientDataTag</code> references
+   * @return A collection of <code>Tag</code> references
    * @throws NullPointerException When the parameter is <code>null</code>
    */
-  Collection<ClientDataTag> getAllTagsForEquipment(Long equipmentId);
+  Collection<Tag> getAllTagsForEquipment(Long equipmentId);
   
   /**
-   * Returns all <code>ClientDataTag</code> references in the cache which are linked
+   * Returns all <code>Tag</code> references in the cache which are linked
    * to the given DAQ process id.
    * @param processId The process id
-   * @return A collection of <code>ClientDataTag</code> references
+   * @return A collection of <code>Tag</code> references
    * @throws NullPointerException When the parameter is <code>null</code>
    */
-  Collection<ClientDataTag> getAllTagsForProcess(Long processId);
+  Collection<Tag> getAllTagsForProcess(Long processId);
   
   
   /**
-   * @return A reference list to all <code>ClientDataTag</code> objects
+   * @return A reference list to all <code>Tag</code> objects
    *         which have at least one <code>DataTagUpdateListener</code>
    *         listener subscribed.
    */
-  Collection<ClientDataTag> getAllSubscribedDataTags();
+  Collection<Tag> getAllSubscribedDataTags();
   
   
   /**
