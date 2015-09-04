@@ -74,7 +74,7 @@
       transactionalMode="off"      
       memoryStoreEvictionPolicy="LFU">
       <persistence strategy="localRestartable" synchronousWrites="false"/>
-      <searchable keys="false" values="false>
+      <searchable keys="false" values="false">
         <searchAttribute name="processName" expression="value.getName()"/>
       </searchable>
     </cache>
