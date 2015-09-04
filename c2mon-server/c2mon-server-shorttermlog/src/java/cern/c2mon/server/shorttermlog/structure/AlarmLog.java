@@ -44,7 +44,7 @@ public class AlarmLog implements IFallback, Loggable {
     
     private long tagId;
     
-    private String id;
+    private long alarmId;
     
     private String faultFamily;
     
@@ -80,5 +80,8 @@ public class AlarmLog implements IFallback, Loggable {
         return GSON.toJson(this);
     }
 
-   
+    @Override
+    public String getId() {
+        return String.valueOf(getAlarmId());
+    }
 }

@@ -70,9 +70,9 @@ alarmid         INTEGER       NOT NULL,
 faultfamily     VARCHAR(60)   NOT NULL,
 faultmember     VARCHAR(60)   NOT NULL,
 faultcode       INTEGER       NOT NULL,
-active          INTEGER       NOT NULL,
+active          VARCHAR(1)       NOT NULL,
 servertime      TIMESTAMP(6)  NOT NULL,
-info            VARCHAR(100)  NOT NULL
+info            VARCHAR(100)  DEFAULT NULL
 );
 
 

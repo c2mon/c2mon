@@ -38,7 +38,7 @@ public final class AlarmLogConverter implements LoggerConverter<Alarm> {
       AlarmLog alarmLog = new AlarmLog();
       
       alarmLog.setTagId(alarm.getTagId());
-      alarmLog.setId(String.valueOf(alarm.getId()));
+      alarmLog.setAlarmId(alarm.getId());
       
       alarmLog.setActive(alarm.isActive());
       
