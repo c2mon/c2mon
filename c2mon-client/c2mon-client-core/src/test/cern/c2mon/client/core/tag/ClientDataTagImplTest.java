@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
+import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
@@ -161,7 +162,7 @@ public class ClientDataTagImplTest {
     //test setup
     ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
     ((ClientDataTagImpl) cdt).onUpdate(createValidTransferTag(1234L));
-    DataTagUpdateListener mockUpdateListener = EasyMock.createMock(DataTagUpdateListener.class);
+    BaseListener<Tag> mockUpdateListener = EasyMock.createMock(BaseListener.class);
     mockUpdateListener.onUpdate(EasyMock.and(EasyMock.not(EasyMock.same(cdt)), EasyMock.eq(cdt)));
 
     //run test
