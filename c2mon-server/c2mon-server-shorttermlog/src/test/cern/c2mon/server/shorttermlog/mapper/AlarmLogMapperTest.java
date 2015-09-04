@@ -88,9 +88,9 @@ public class AlarmLogMapperTest {
     alarmToLog.setFaultMember("FM");
     alarmToLog.setFaultCode(2);
     alarmToLog.setPriority(1);
-    alarmToLog.setId(String.valueOf(ALARM_ID));
+    alarmToLog.setAlarmId(ALARM_ID);
     alarmToLog.setServerTimestamp(new Timestamp(System.currentTimeMillis()));
-    
+    System.out.println(alarmToLog);
     alarmLogMapper.insertLog(alarmToLog);
   }
   
@@ -108,9 +108,9 @@ public class AlarmLogMapperTest {
     alarmToLog.setFaultMember("FM");
     alarmToLog.setFaultCode(2);
     alarmToLog.setPriority(1);
-    alarmToLog.setId(String.valueOf(ALARM_ID));
+    alarmToLog.setAlarmId(ALARM_ID);
     alarmToLog.setServerTimestamp(new Timestamp(System.currentTimeMillis()));
-    
+    System.out.println(alarmToLog);
     
     // additional the log date to indicate that it came from the fallback file
     alarmToLog.setLogDate(new Timestamp(System.currentTimeMillis()));

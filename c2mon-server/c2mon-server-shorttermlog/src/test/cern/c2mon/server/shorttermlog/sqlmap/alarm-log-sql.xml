@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+  <!--
+    take "namespace=Mapper interface" for the mapper SQL statements to
+    be picked up automatically
+  -->
+<mapper namespace="cern.c2mon.server.shorttermlog.mapper.AlarmLogMapper">
+
+  <!--
+    Inserts a new row in the ShortTermLog table that represents some log
+    information for a given dataTag. The values for the inserted row are
+    stored in the DataTagShortTermLog object
+  -->
+  <insert id="insertLog" parameterType="AlarmSTLog">
+    INSERT INTO alarmlog (
+    	LOGDATE, TAGID, ALARMID, ACTIVE, FAULTFAMILY, FAULTMEMBER, FAULTCODE, SERVERTIME, INFO)
+    VALUES (
+    #{logDate,jdbcType=TIMESTAMP}
+    ,#{tagId,jdbcType=NUMERIC}
+    ,#{alarmId,jdbcType=NUMERIC}
+    ,<if test="active == true">'Y'</if>
+     <if test="active == false">'N'</if>
+    ,#{faultFamily,jdbcType=VARCHAR}
+    ,#{faultMember,jdbcType=VARCHAR}
+    ,#{faultCode,jdbcType=NUMERIC}
+    ,#{serverTimestamp,jdbcType=TIMESTAMP}
+    ,#{info,jdbcType=VARCHAR})
+  </insert>
+  
+  <!-- only used to remove inserts done during testing -->
+  <delete id="deleteAlarmLog" parameterType="Long">
+    DELETE FROM alarmlog WHERE alarmid = #{id}
+  </delete>
+  
+</mapper>

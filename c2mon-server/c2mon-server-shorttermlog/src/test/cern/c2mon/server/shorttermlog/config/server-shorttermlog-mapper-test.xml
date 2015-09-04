@@ -8,8 +8,8 @@
 	                    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
     
   <!-- DB datasource and beans -->  
+  <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-localdb.xml"/>  
   <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-mybatis.xml"/>  
-  <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-oracle.xml"/>  
   
   <!-- import properties -->
   <import resource="classpath:cern/c2mon/server/test/server-test-properties.xml" />

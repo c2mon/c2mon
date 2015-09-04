@@ -48,7 +48,7 @@ public class AlarnLogConverterTest {
 
         AlarmLog al = getAlarmLog();
         al.setActive(true);
-        al.setId("1234");
+        al.setAlarmId(1234L);
         al.setServerTimestamp(new Timestamp(System.currentTimeMillis()));
         al.setInfo("!@#$%^&*(}{[]\\  \"  |");
         al.setTagId(10L);

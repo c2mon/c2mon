@@ -9,7 +9,7 @@
   <import resource="classpath:cern/c2mon/server/test/server-test-properties.xml" />
   
   <!-- datasource & other DB beans -->
-  <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-oracle.xml"/>
+  <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-localdb.xml"/>
   <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-mybatis.xml"/>
   
   <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-tag.xml"/>
