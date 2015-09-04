@@ -25,6 +25,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
@@ -77,7 +78,7 @@ public class TagLogCacheListener implements BufferedTimCacheListener<Tag>, Smart
    * @param tagLogger for logging cache objects to the STL
    */
   @Autowired
-  public TagLogCacheListener(final CacheRegistrationService cacheRegistrationService, final BatchLogger<Tag> tagLogger) {
+  public TagLogCacheListener(final CacheRegistrationService cacheRegistrationService, @Qualifier("tagLogger") final BatchLogger<Tag> tagLogger) {
     super();
     this.cacheRegistrationService = cacheRegistrationService;
     this.tagLogger = tagLogger;

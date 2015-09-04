@@ -24,6 +24,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
@@ -76,7 +77,7 @@ public class AlarmLogListener implements C2monCacheListener<Alarm>, SmartLifecyc
    * @param tagLogger for logging cache objects to the STL
    */
   @Autowired
-  public AlarmLogListener(final CacheRegistrationService cacheRegistrationService, final BatchLogger<Alarm> tagLogger) {
+  public AlarmLogListener(final CacheRegistrationService cacheRegistrationService, @Qualifier("alarmLogger") final BatchLogger<Alarm> tagLogger) {
     super();
     this.cacheRegistrationService = cacheRegistrationService;
     this.tagLogger = tagLogger;
