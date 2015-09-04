@@ -21,7 +21,7 @@
         <constructor-arg>
           <bean class="cern.c2mon.server.shorttermlog.alarm.AlarmListener"/>
         </constructor-arg>
-        <constructor-arg><bean class="cern.c2mon.server.shorttermlog.structure.AlarmLogConverter"/></constructor-arg>
+        <constructor-arg><bean class="cern.c2mon.server.shorttermlog.structure.AlarmLog"/></constructor-arg>
       </bean>
     </constructor-arg>
   </bean>
