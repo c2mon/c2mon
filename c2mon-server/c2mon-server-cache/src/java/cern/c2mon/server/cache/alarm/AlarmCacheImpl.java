@@ -18,10 +18,16 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import javax.annotation.PostConstruct;
 
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
+import net.sf.ehcache.search.Attribute;
+import net.sf.ehcache.search.Query;
+import net.sf.ehcache.search.Result;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,14 +36,14 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.AlarmCache;
-import cern.c2mon.server.cache.BufferedTimCacheListener;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.common.AbstractCache;
 import cern.c2mon.server.cache.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.AlarmLoaderDAO;
 import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.component.Lifecycle;
+import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.config.C2monCacheName;
+import cern.c2mon.shared.client.alarm.AlarmQuery;
 
 /**
  * Implementation of the TIM Alarm cache.
@@ -89,6 +95,42 @@ public class AlarmCacheImpl extends AbstractCache<Long, Alarm> implements AlarmC
   @Override
   protected String getCacheInitializedKey() {
     return cacheInitializedKey;
+  }
+
+  @Override
+  public Collection<Long> findAlarm(AlarmQuery query) {
+
+    Ehcache ehcache = getCache();
+    ArrayList<Long> result = new ArrayList<Long>();
+    
+    Query cacheQuery = ehcache.createQuery();
+    
+    if (query.getFaultCode() != 0) {
+        Attribute<Integer> fc = ehcache.getSearchAttribute("faultCode");
+        cacheQuery.addCriteria(fc.eq(query.getFaultCode()));
+    }
+    if (query.getFaultFamily() != null && !"".equals(query.getFaultFamily())) {
+        Attribute<String> ff = ehcache.getSearchAttribute("faultFamily");
+        cacheQuery.addCriteria(ff.ilike(query.getFaultFamily()));
+    }
+    if (query.getFaultMember() != null && !"".equals(query.getFaultMember())) {
+        Attribute<String> fm = ehcache.getSearchAttribute("faultMember");
+        cacheQuery.addCriteria(fm.ilike(query.getFaultMember()));
+    }
+    if (query.getPriority() != 0) {
+        Attribute<Integer> prio = ehcache.getSearchAttribute("priority");
+        cacheQuery.addCriteria(prio.eq(query.getPriority()));
+    }
+    if (query.getActive() != null) {
+      Attribute<Boolean> active = ehcache.getSearchAttribute("isActive");
+      cacheQuery.addCriteria(active.eq(query.getActive()));
+    }
+    
+    for (Result res: cacheQuery.maxResults(query.getMaxResultSize()).includeKeys().execute().all()) {
+        result.add((Long) res.getKey());
+    }
+      
+    return result;
   }
 
 }

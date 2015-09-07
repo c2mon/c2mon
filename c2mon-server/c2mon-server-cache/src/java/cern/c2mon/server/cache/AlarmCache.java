@@ -18,7 +18,10 @@
  *****************************************************************************/
 package cern.c2mon.server.cache;
 
+import java.util.Collection;
+
 import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.shared.client.alarm.AlarmQuery;
 
 /**
  * Interface to the Alarm cache.
@@ -36,5 +39,7 @@ import cern.c2mon.server.common.alarm.Alarm;
 public interface AlarmCache extends C2monCacheWithListeners<Long, Alarm> {
 
   String cacheInitializedKey = "c2mon.cache.alarm.initialized";
+  
+  Collection<Long> findAlarm(AlarmQuery query);
   
 }

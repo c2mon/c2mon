@@ -20,7 +20,9 @@ package cern.c2mon.server.cache.alarm;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -30,11 +32,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.dbaccess.AlarmMapper;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.common.alarm.AlarmCondition;
+import cern.c2mon.server.common.alarm.AlarmCacheObject.AlarmChangeState;
 import cern.c2mon.server.test.CacheObjectComparison;
+import cern.c2mon.shared.client.alarm.AlarmQuery;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -91,5 +97,38 @@ public class AlarmCacheTest {
     AlarmCacheObject objectInDb = (AlarmCacheObject) alarmMapper.getItem(350000L);
     CacheObjectComparison.equals(cacheObject, objectInDb);
   }
+  
+  @Test
+  public void testFindAlarms() {
+      AlarmQuery query = AlarmQuery.builder().faultFamily("TEST_*").build();
+      
+      Collection<Long> result = alarmCache.findAlarm(query);
+      assertNotNull(result);
+      assertEquals("Search result != 2", 2, result.size());
+  }
+  
+  @Test
+  @DirtiesContext
+  public void testGetActiveAlarms() {
+      AlarmQuery query = AlarmQuery.builder().active(true).build();
+      AlarmCacheObject toChange = (AlarmCacheObject)alarmCache.get(350000L);
+      toChange.setState("ACTIVE");
+      
+      alarmCache.putQuiet(toChange);
+      Collection<Long> result = alarmCache.findAlarm(query);
+      assertNotNull(result);
+      assertEquals("Search result != 1", 1, result.size());
+  }
+  
+  @Test
+  public void testGetAlarmsByCodeAndFamily() {
+      AlarmQuery query = AlarmQuery.builder().faultFamily("TEST_*").faultCode(20).build();
+      Collection<Long> result = alarmCache.findAlarm(query);
+      assertNotNull(result);
+      assertEquals("Search result != 2", 2, result.size());
+      System.out.println(result.size());
+  }
+  
+  
   
 }

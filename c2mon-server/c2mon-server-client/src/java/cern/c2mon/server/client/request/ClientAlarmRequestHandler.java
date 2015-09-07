@@ -32,6 +32,7 @@ import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.shared.client.alarm.AlarmQuery;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestResult;
@@ -72,24 +73,21 @@ class ClientAlarmRequestHandler {
   Collection<? extends ClientRequestResult> handleActiveAlarmRequest(final ClientRequest alarmRequest) {
 
     final Collection<AlarmValue> activeAlarms = new ArrayList<>();
-    List<Long> alarmKeys = alarmCache.getKeys();
 
-    for (Long alarmKey : alarmKeys) {
-
-      final Alarm alarm = alarmCache.getCopy(alarmKey);
-
-      if (alarm.isActive()) {
-
-        Long tagId = alarm.getTagId();
-        if (tagLocationService.isInTagCache(tagId)) {
-          Tag tag = tagLocationService.getCopy(tagId);
-          activeAlarms.add(TransferObjectFactory.createAlarmValue(alarm, tag));
+    AlarmQuery query = AlarmQuery.builder().active(true).build();
+    
+    Collection<Long> result = alarmCache.findAlarm(query);
+    
+    for (Long alarmId : result) {
+        Alarm alarm = alarmCache.getCopy(alarmId);
+        Tag tag = tagLocationService.getCopy(alarm.getTagId());
+        if (tag == null) {
+            LOG.warn("No tag found for TagID = " + alarm.getTagId() + ". This may be a configuration issue for alarm " + alarm.getId());
         } else {
-          LOG.warn("handleActiveAlarmRequest() - unrecognized Tag with id " + tagId);
-          activeAlarms.add(TransferObjectFactory.createAlarmValue(alarm));
+            activeAlarms.add(TransferObjectFactory.createAlarmValue(alarm, tag));
         }
-      }
     }
+
     if (LOG.isDebugEnabled()) {
       LOG.debug("Finished processing ACTIVE alarms request: returning " + activeAlarms.size() + " active alarms");
     }

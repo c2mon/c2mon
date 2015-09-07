@@ -109,6 +109,12 @@
     maxEntriesInCache="600000">
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
+    <searchable keys="false" values="false">
+        <searchAttribute name="isActive" expression="value.isActive()"/>
+        <searchAttribute name="faultFamily" expression="value.getFaultFamily()"/>
+        <searchAttribute name="faultMember" expression="value.getFaultMember()"/>
+        <searchAttribute name="faultCode" expression="value.getFaultCode()"/>
+    </searchable>
   </cache>
   
   <cache
