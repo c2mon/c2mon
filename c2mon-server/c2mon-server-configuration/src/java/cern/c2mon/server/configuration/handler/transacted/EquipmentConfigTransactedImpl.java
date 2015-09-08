@@ -133,20 +133,22 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
       Long processId = equipment.getProcessId();
       Long equipmentId = equipment.getId();
       
-      ControlTag aliveTagCopy = controlCache.getCopy(equipment.getAliveTagId());
-      if (aliveTagCopy != null) {
-        setEquipmentId((ControlTagCacheObject) aliveTagCopy, equipmentId, processId);
-        
-        if (aliveTagCopy.getAddress() != null) {
-          IChange toAdd = new DataTagAdd(element.getSequenceId(), equipmentId, controlTagFacade.generateSourceDataTag(aliveTagCopy));
-          ConfigurationElementReport report = new ConfigurationElementReport(Action.CREATE, Entity.CONTROLTAG, aliveTagCopy.getId());
-          ProcessChange change = new ProcessChange(processId, toAdd);
-          change.setNestedSubReport(report);
-          changes.add(change);
-        }
-      } else {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
-            String.format("No Alive tag (%s) found for equipment #%d (%s).", equipment.getAliveTagId(), equipment.getId(), equipment.getName()));
+      if (equipment.getAliveTagId() != null) {
+          ControlTag aliveTagCopy = controlCache.getCopy(equipment.getAliveTagId());
+          if (aliveTagCopy != null) {
+            setEquipmentId((ControlTagCacheObject) aliveTagCopy, equipmentId, processId);
+            
+            if (aliveTagCopy.getAddress() != null) {
+              IChange toAdd = new DataTagAdd(element.getSequenceId(), equipmentId, controlTagFacade.generateSourceDataTag(aliveTagCopy));
+              ConfigurationElementReport report = new ConfigurationElementReport(Action.CREATE, Entity.CONTROLTAG, aliveTagCopy.getId());
+              ProcessChange change = new ProcessChange(processId, toAdd);
+              change.setNestedSubReport(report);
+              changes.add(change);
+            }
+          } else {
+            throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+                String.format("No Alive tag (%s) found for equipment #%d (%s).", equipment.getAliveTagId(), equipment.getId(), equipment.getName()));
+          }
       }
       
       ControlTag commFaultTagCopy = controlCache.getCopy(equipment.getCommFaultTagId());
