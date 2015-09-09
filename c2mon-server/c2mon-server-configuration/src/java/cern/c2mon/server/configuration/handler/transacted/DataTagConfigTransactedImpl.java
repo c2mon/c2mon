@@ -205,8 +205,8 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
   public ProcessChange doRemoveDataTag(final Long id, final ConfigurationElementReport elementReport) {
     ProcessChange processChange = new ProcessChange();
     try {
-      DataTag dataTag = tagCache.get(id);
-      Collection<Long> ruleIds = dataTag.getCopyRuleIds();
+      DataTag tagCopy = tagCache.getCopy(id);
+      Collection<Long> ruleIds = tagCopy.getCopyRuleIds();
       if (!ruleIds.isEmpty()) {
         LOGGER.trace("Removing Rules dependent on DataTag " + id);
         for (Long ruleId : new ArrayList<Long>(ruleIds)) {
@@ -219,7 +219,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
       }
       tagCache.acquireWriteLockOnKey(id);
       try {
-        Collection<Long> alarmIds = dataTag.getCopyAlarmIds();
+        Collection<Long> alarmIds = tagCopy.getCopyAlarmIds();
         if (!alarmIds.isEmpty()) {
           LOGGER.trace("Removing Alarms dependent on DataTag " + id);
           for (Long alarmId : new ArrayList<Long>(alarmIds)) {
@@ -228,7 +228,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
             alarmConfigHandler.removeAlarm(alarmId, alarmReport);
           }
         }
-        configurableDAO.deleteItem(dataTag.getId());
+        configurableDAO.deleteItem(tagCopy.getId());
       } catch (Exception ex) {
         //commonTagFacade.setStatus(dataTag, Status.RECONFIGURATION_ERROR);
         elementReport.setFailure("Exception caught while removing datatag", ex);
@@ -244,17 +244,17 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
       DataTagRemove removeEvent = new DataTagRemove();
       removeEvent.setDataTagId(id);
 
-      if (dataTag.getEquipmentId() != null) {
-        removeEvent.setEquipmentId(dataTag.getEquipmentId());
-        processChange = new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(dataTag.getEquipmentId()), removeEvent); 
+      if (tagCopy.getEquipmentId() != null) {
+        removeEvent.setEquipmentId(tagCopy.getEquipmentId());
+        processChange = new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(tagCopy.getEquipmentId()), removeEvent); 
       }
       // TIMS-951: Allow attachment of DataTags to SubEquipments
-      else if (dataTag.getSubEquipmentId() != null) {
-        removeEvent.setEquipmentId(subEquipmentFacade.getEquipmentIdForSubEquipment(dataTag.getSubEquipmentId()));
-        processChange = new ProcessChange(subEquipmentFacade.getProcessIdForAbstractEquipment(dataTag.getSubEquipmentId()), removeEvent);
+      else if (tagCopy.getSubEquipmentId() != null) {
+        removeEvent.setEquipmentId(subEquipmentFacade.getEquipmentIdForSubEquipment(tagCopy.getSubEquipmentId()));
+        processChange = new ProcessChange(subEquipmentFacade.getProcessIdForAbstractEquipment(tagCopy.getSubEquipmentId()), removeEvent);
       }
       else {
-        LOGGER.warn("doRemoveDataTag() - data tag #" + dataTag.getId() + " is not attached to any Equipment or Sub-Equipment. This should normally never happen.");
+        LOGGER.warn("doRemoveDataTag() - data tag #" + tagCopy.getId() + " is not attached to any Equipment or Sub-Equipment. This should normally never happen.");
       }
     } catch (CacheElementNotFoundException e) {
       LOGGER.warn("doRemoveDataTag() - Attempting to remove a non-existent DataTag - no action taken.");

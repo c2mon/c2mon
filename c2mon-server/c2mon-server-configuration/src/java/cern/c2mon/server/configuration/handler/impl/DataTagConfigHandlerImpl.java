@@ -106,17 +106,17 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
   public ProcessChange removeDataTag(Long id, ConfigurationElementReport tagReport) {
     LOGGER.trace("Removing DataTag " + id);
     try {
+      DataTag tagCopy = dataTagCache.getCopy(id);
       ProcessChange change = dataTagConfigTransacted.doRemoveDataTag(id, tagReport);
-      DataTag dataTag = dataTagCache.get(id);
       dataTagCache.remove(id); //only removed from cache if no exception is thrown
       
       //remove from Equipment list only once definitively removed from DB & cache (o.w. remove/recreate Process/Equipment cannot reach it)
-      if (dataTag.getEquipmentId() != null) {
-        equipmentFacade.removeTagFromEquipment(dataTag.getEquipmentId(), dataTag.getId());
+      if (tagCopy.getEquipmentId() != null) {
+        equipmentFacade.removeTagFromEquipment(tagCopy.getEquipmentId(), tagCopy.getId());
       }
       // TIMS-951: Allow attachment of DataTags to SubEquipments
-      else if (dataTag.getSubEquipmentId() != null) {
-        subEquipmentFacade.removeTagFromSubEquipment(dataTag.getSubEquipmentId(), dataTag.getId());
+      else if (tagCopy.getSubEquipmentId() != null) {
+        subEquipmentFacade.removeTagFromSubEquipment(tagCopy.getSubEquipmentId(), tagCopy.getId());
       }
 
       return change;
