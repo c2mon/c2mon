@@ -341,7 +341,9 @@ public class NotifierImplTest {
 		 */
 	    Tag toBeNotifiedFor = new Tag(1L, true);
 		Subscriber s = new Subscriber("test", "test@cern.ch", "");
-		s.addSubscription(new Subscription(s.getUserName(), toBeNotifiedFor.getId()));
+		Subscription sub = new Subscription(s.getUserName(), toBeNotifiedFor.getId());
+		sub.setNotificationLevel(Status.WARNING);
+		s.addSubscription(sub);
 		reg.setSubscriber(s);
 		
 		printToSubmitNicely(toBeNotifiedFor.getId());
@@ -353,7 +355,7 @@ public class NotifierImplTest {
         sendUpdateMetricTag(3L, 3d);
 	    
 	    /*
-	     * Rule update 2
+	     * Rule update 2 & 1
 	     */
 	    sendUpdateRuleTag(2L, Status.WARNING.toInt());
 	    sendUpdateRuleTag(1L, Status.WARNING.toInt());
@@ -394,6 +396,51 @@ public class NotifierImplTest {
         EasyMock.verify(mailer);       
 	}
 
+	@Test
+	public void testNoNotificatioOnWarnChildRuleWithErrorSubscription() throws Exception {
+	    
+	    startTest("testRuleRuleMetric");
+
+        /*
+         * we expect to have a mail notification send for our test at the end of the last update() call.
+         */
+        Mailer mailer = mockControl.createMock(Mailer.class);
+        //mailer.sendEmail(EasyMock.isA(String.class), EasyMock.isA(String.class), EasyMock.isA(String.class));
+        //EasyMock.expectLastCall().times(0);
+        notifier.setMailer(mailer);
+        EasyMock.replay(mailer);
+        
+        
+        /*
+         * create a subscription to tagid=1
+         */
+        Tag toBeNotifiedFor = new Tag(1L, true);
+        Subscriber s = new Subscriber("test", "test@cern.ch", "");
+        Subscription sub = new Subscription(s.getUserName(), toBeNotifiedFor.getId());
+        sub.setNotificationLevel(Status.ERROR);
+        s.addSubscription(sub);
+        reg.setSubscriber(s);
+        
+        printToSubmitNicely(toBeNotifiedFor.getId());
+        
+        
+        /*
+         * Rule update 2 & 1
+         */
+        sendUpdateRuleTag(2L, Status.WARNING.toInt());
+        sendUpdateRuleTag(10L, Status.WARNING.toInt());
+        notifier.checkCacheForChanges();
+        
+        sendUpdateRuleTag(2L, Status.OK.toInt());
+        sendUpdateRuleTag(10L, Status.OK.toInt());
+        notifier.checkCacheForChanges();
+        
+        // EXPECT : No notification sent.
+        
+        
+	    
+	}
+	
 	/**
 	 * 
      * @throws Exception in case of an error
