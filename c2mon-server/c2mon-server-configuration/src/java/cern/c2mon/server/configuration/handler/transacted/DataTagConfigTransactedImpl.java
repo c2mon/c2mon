@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
+import javax.naming.ConfigurationException;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -119,13 +121,18 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
               ((DataTagFacade) commonTagFacade).generateSourceDataTag(dataTag));
           return new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(dataTag.getEquipmentId()), dataTagAdd);
         }
-
-        // TIMS-951: Allow attachment of DataTags to SubEquipments
-        subEquipmentFacade.addTagToSubEquipment(dataTag.getSubEquipmentId(), dataTag.getId());
-        DataTagAdd dataTagAdd = new DataTagAdd(element.getSequenceId(), dataTag.getSubEquipmentId(),
+        
+        if (dataTag.getSubEquipmentId() != null) {
+          // TIMS-951: Allow attachment of DataTags to SubEquipments
+          subEquipmentFacade.addTagToSubEquipment(dataTag.getSubEquipmentId(), dataTag.getId());
+          DataTagAdd dataTagAdd = new DataTagAdd(element.getSequenceId(), subEquipmentFacade.getEquipmentIdForSubEquipment(dataTag.getSubEquipmentId()),
             ((DataTagFacade) commonTagFacade).generateSourceDataTag(dataTag));
-        return new ProcessChange(subEquipmentFacade.getProcessIdForAbstractEquipment(dataTag.getSubEquipmentId()), dataTagAdd);
+          return new ProcessChange(subEquipmentFacade.getProcessIdForAbstractEquipment(dataTag.getSubEquipmentId()), dataTagAdd);
+        }
 
+        throw new IllegalArgumentException("No (sub)equipment id set in datatag (" + dataTag.getId() + ") configuration.");
+        
+        
       } catch (Exception ex) {
         LOGGER.error("Exception caught when attempting to create a DataTag - rolling back the DB transaction and undoing cache changes.");
         tagCache.remove(dataTag.getId());
