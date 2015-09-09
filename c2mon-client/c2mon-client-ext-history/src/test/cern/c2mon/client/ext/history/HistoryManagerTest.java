@@ -46,10 +46,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.common.tag.Tag;
-import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.core.manager.CoreSupervisionManager;
-import cern.c2mon.client.core.manager.CoreTagManager;
+import cern.c2mon.client.core.service.AdvancedTagService;
 import cern.c2mon.client.core.service.TagServiceImpl;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.ext.history.common.HistoryPlayer;
@@ -103,7 +102,7 @@ public class HistoryManagerTest {
   private HistoryProvider historyProviderMock;
   
   @Autowired
-  private CoreTagManager tagManagerMock;
+  private AdvancedTagService tagServiceMock;
   
   @Autowired
   private CoreSupervisionManager supervisionManagerMock;  
@@ -409,7 +408,7 @@ public class HistoryManagerTest {
     EasyMock.expect(cacheMock.getHistoryModeSyncLock()).andStubReturn(historyModeSyncLock);
     EasyMock.expect(cacheMock.isHistoryModeEnabled()).andStubReturn(true);
 
-    EasyMock.expect(tagManagerMock.getDataTags(EasyMock.<Collection<Long>>anyObject()))
+    EasyMock.expect(tagServiceMock.get(EasyMock.<Collection<Long>>anyObject()))
       .andDelegateTo(new TagServiceImpl(null, null, null) {
         @Override
         public Collection<Tag> get(final Collection<Long> tagIds) {
@@ -432,7 +431,7 @@ public class HistoryManagerTest {
     final AtomicBoolean finishedLoading = new AtomicBoolean(false);
     final CountDownLatch initializingCountDownLatch = new CountDownLatch(1);
     
-    EasyMock.replay(cacheMock, historyProviderMock, historyPlayerListenerMock, tagManagerMock, supervisionManagerMock);
+    EasyMock.replay(cacheMock, historyProviderMock, historyPlayerListenerMock, tagServiceMock, supervisionManagerMock);
     historyManager.getHistoryPlayerEvents().addHistoryPlayerListener(historyPlayerListenerMock);
      
     // Event to know when the history is finish loading
