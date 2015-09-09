@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.Set;
 
 import cern.c2mon.client.common.listener.BaseTagListener;
-import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.C2monTagManager;
@@ -48,12 +47,12 @@ public class BasePropertyImpl implements BaseProperty {
   private Category category;
 
   /**
-   * The ID of the {@link ClientDataTag} (if applicable).
+   * The ID of the {@link Tag} (if applicable).
    */
   private Long tagId;
 
   /**
-   * The actual value (may be null if the property is a {@link ClientDataTag}
+   * The actual value (may be null if the property is a {@link Tag}
    * and has not yet been lazily loaded).
    */
   private Tag tag;
@@ -69,7 +68,7 @@ public class BasePropertyImpl implements BaseProperty {
    *
    * @param name the name of the property
    * @param category the category of this property
-   * @param tagId the ID of the {@link ClientDataTag} corresponding to this
+   * @param tagId the ID of the {@link Tag} corresponding to this
    *          property
    */
   public BasePropertyImpl(final String name, final Category category, final Long tagId) {
@@ -86,14 +85,14 @@ public class BasePropertyImpl implements BaseProperty {
    *
    * @param name the name of the property
    * @param category the category of this property
-   * @param clientDataTag the client device property to set
+   * @param Tag the client device property to set
    */
-  public BasePropertyImpl(final String name, final Category category, final Tag clientDataTag) {
+  public BasePropertyImpl(final String name, final Category category, final Tag Tag) {
     this.name = name;
     this.category = category;
-    this.tag = clientDataTag;
+    this.tag = Tag;
     if (isDataTag()) {
-      this.tagId = clientDataTag.getId();
+      this.tagId = Tag.getId();
     }
     this.tagService = C2monServiceGateway.getTagService();
   }
@@ -131,7 +130,7 @@ public class BasePropertyImpl implements BaseProperty {
   }
 
   /**
-   * Check if this property points to a {@link ClientDataTag}.
+   * Check if this property points to a {@link Tag}.
    *
    * @return true if this property is a data tag, false otherwise
    */
@@ -150,7 +149,7 @@ public class BasePropertyImpl implements BaseProperty {
 
   /**
    * Check if the data tag corresponding to this property has been subscribed to
-   * (not applicable for tags other than {@link ClientDataTag}.
+   * (not applicable for tags other than {@link Tag}.
    *
    * @return true if the property tag has been subscribed to, false otherwise
    */
@@ -193,7 +192,7 @@ public class BasePropertyImpl implements BaseProperty {
 
       // Update the rule tag
       for (Tag tagValue : dataTagValues) {
-        ((ClientRuleTag) value).onUpdate((ClientDataTag)tagValue);
+        ((ClientRuleTag) value).onUpdate(tagValue);
       }
     }
 
