@@ -24,8 +24,9 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
+import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
 /**
@@ -92,17 +93,12 @@ class TagSimulatorImpl implements C2monTagSimulator {
     boolean retval = false;
     synchronized (cache.getHistoryModeSyncLock()) {
       if (isSimulationModeEnabled()) {
-        ClientDataTag cdt = cache.get(tagId);
+        Tag cdt = cache.get(tagId);
         if (cdt != null) {
-          try {
-            SimulatedTagValueUpdate update = new SimulatedTagValueUpdate(cdt);
-            update.setValue(value);
-            cdt.update(update);
-            retval = true;
-          }
-          catch (CloneNotSupportedException e) {
-            LOG.error("changeValue() - Could not do simulated update for tag " + tagId + ". ClientDataTag not clonable.", e);
-          }
+          SimulatedTagValueUpdate update = new SimulatedTagValueUpdate(cdt);
+          update.setValue(value);
+          ((ClientDataTagImpl) cdt).update(update);
+          retval = true;
         }
       }
     }
@@ -115,18 +111,14 @@ class TagSimulatorImpl implements C2monTagSimulator {
     boolean allOk = true;
     synchronized (cache.getHistoryModeSyncLock()) {
       if (isSimulationModeEnabled()) {
-        ClientDataTag cdt;
+        Tag cdt;
         for (Long tagId : tagValues.keySet()) {
           cdt = cache.get(tagId);
           if (cdt != null) {
             try {
               SimulatedTagValueUpdate update = new SimulatedTagValueUpdate(cdt);
               update.setValue(tagValues.get(tagId));
-              cdt.update(update);
-            }
-            catch (CloneNotSupportedException e) {
-              LOG.error("changeValues() - Could not do simulated update for tag " + tagId + ". ClientDataTag not clonable.", e);
-              allOk = false;
+              ((ClientDataTagImpl) cdt).update(update);
             }
             catch (Exception ex) {
               LOG.error("changeValues() - A problem occured whilst updating tag " + tagId, ex);
@@ -152,17 +144,12 @@ class TagSimulatorImpl implements C2monTagSimulator {
     
     synchronized (cache.getHistoryModeSyncLock()) {
       if (isSimulationModeEnabled()) {
-        ClientDataTag cdt = cache.get(tagId);
+        Tag cdt = cache.get(tagId);
         if (cdt != null) {
-          try {
-            SimulatedTagValueUpdate update = new SimulatedTagValueUpdate(cdt);
-            update.invalidateTag(status);
-            cdt.update(update);
-            retval = true;
-          }
-          catch (CloneNotSupportedException e) {
-            LOG.error("invalidateTag() - Could not do simulated update for tag " + tagId + ". ClientDataTag not clonable.", e);
-          }
+          SimulatedTagValueUpdate update = new SimulatedTagValueUpdate(cdt);
+          update.invalidateTag(status);
+          ((ClientDataTagImpl) cdt).update(update);
+          retval = true;
         }
       }
     }
@@ -175,18 +162,14 @@ class TagSimulatorImpl implements C2monTagSimulator {
     boolean allOk = true;
     synchronized (cache.getHistoryModeSyncLock()) {
       if (isSimulationModeEnabled()) {
-        ClientDataTag cdt;
+        Tag cdt;
         for (Long tagId : tagIds) {
           cdt = cache.get(tagId);
           if (cdt != null) {
             try {
               SimulatedTagValueUpdate update = new SimulatedTagValueUpdate(cdt);
               update.invalidateTag(status);
-              cdt.update(update);
-            }
-            catch (CloneNotSupportedException e) {
-              LOG.error("invalidateTags() - Could not do simulated update for tag " + tagId + ". ClientDataTag not clonable.", e);
-              allOk = false;
+              ((ClientDataTagImpl) cdt).update(update);
             }
             catch (Exception ex) {
               LOG.error("invalidateTags() - A problem occured whilst updating tag " + tagId, ex);

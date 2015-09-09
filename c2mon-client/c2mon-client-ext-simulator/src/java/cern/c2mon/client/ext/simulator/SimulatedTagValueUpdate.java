@@ -21,8 +21,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import cern.c2mon.client.common.tag.ClientDataTag;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
+import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
@@ -40,7 +40,7 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
 class SimulatedTagValueUpdate implements TagValueUpdate {
   
   /** The client data tag clone */
-  private ClientDataTag tag;
+  private Tag tag;
   
   /** The simulated quality object */
   private final DataTagQualityImpl quality = new DataTagQualityImpl();
@@ -55,11 +55,11 @@ class SimulatedTagValueUpdate implements TagValueUpdate {
    * Copy constructor
    * 
    * @param cdt The tag that will receive a simulated value
-   * @throws CloneNotSupportedException In case that the ClientDataTag instance is not 
+   * @throws CloneNotSupportedException In case that the Tag instance is not 
    *         clonable.
    */
-  protected SimulatedTagValueUpdate(final ClientDataTag cdt) throws CloneNotSupportedException {
-    this.tag = cdt.clone();
+  protected SimulatedTagValueUpdate(final Tag cdt) {
+    this.tag = ((ClientDataTagImpl) cdt).clone();
     quality.validate();
   }
   
@@ -68,7 +68,7 @@ class SimulatedTagValueUpdate implements TagValueUpdate {
    * @param value The simulated value
    * @exception UnsupportedOperationException In case the value update object is not from the same
    *            type as the tag.
-   * @see ClientDataTagValue#getType()
+   * @see Tag#getType()
    */
   void setValue(final Object value) throws ClassCastException {
     boolean setValue = false;
