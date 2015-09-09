@@ -506,11 +506,13 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                                     s.getSubscriberId());
                             continue;
                         }
+                        if (s.isInterestedInLevel(update.getLatestStatus())) {
+                            // an update of a rule which belongs to a higher rule
+                            sendFullReportOn(update, s, interestingChildRules);
+                            s.setLastNotification(new Timestamp(System.currentTimeMillis()));
+                        }
 
-                        // an update of a rule which belongs to a higher rule
-                        sendFullReportOn(update, s, interestingChildRules);
                         s.setLastStatusForResolvedTSubTag(update.getId(), update.getLatestStatus());
-                        s.setLastNotification(new Timestamp(System.currentTimeMillis()));
                         logger.debug("{} Setting new notified state '{}' for Subscriber '{}'", update.getId(),
                                 update.getLatestStatus(), s.getSubscriberId());
                     } else if (!s.getLastNotifiedStatus().equals(update.getLatestStatus())) {
