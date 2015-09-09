@@ -159,7 +159,7 @@
              TAGDESC = SUBSTR(#{description,jdbcType=VARCHAR}, 1, 100),
              TAGMODE = #{mode},
              TAGDATATYPE = #{dataType},
-             TAG_EQID = #{equipmentId,jdbcType=NUMERIC},
+             TAG_EQID = <if test="equipmentId != null">#{equipmentId,jdbcType=NUMERIC}</if><if test="subEquipmentId != null">#{subEquipmentId,jdbcType=NUMERIC}</if>,
              TAGMINVAL = #{minValue,javaType=java.lang.Comparable,jdbcType=BLOB},
              TAGMAXVAL = #{maxValue,javaType=java.lang.Comparable,jdbcType=BLOB},
              TAGUNIT =  #{unit,jdbcType=VARCHAR},
