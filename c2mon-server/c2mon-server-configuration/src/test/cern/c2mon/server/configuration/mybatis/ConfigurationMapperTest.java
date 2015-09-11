@@ -51,7 +51,7 @@ public class ConfigurationMapperTest {
     
     //first element
     assertEquals(Action.CREATE, elementFirst.getAction());
-    assertEquals(8, elementFirst.getElementProperties().size());
+    assertEquals(9, elementFirst.getElementProperties().size());
     assertEquals(Entity.CONTROLTAG, elementFirst.getEntity());
     assertEquals(new Long(25), elementFirst.getConfigId());
     
