@@ -7,8 +7,8 @@
 
   <context:annotation-config/>
   
+  <import resource="classpath:cern/c2mon/server/test/cache/config/server-test-datasource-hsqldb.xml"/>
   <import resource="classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess.xml"/>
-  <import resource="classpath:cern/c2mon/server/test/cache/config/server-test-datasource-hsqldb.xml"/>    
   <import resource="classpath:cern/c2mon/server/test/server-test-properties.xml"/>
   
   <bean id="deviceDAO" class="cern.c2mon.server.cache.loading.impl.DeviceDAOImpl"/>
