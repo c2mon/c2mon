@@ -9,9 +9,8 @@
 
 	<!-- <context:annotation-config/> -->
 	<!-- <context:component-scan base-package="cern.c2mon.server.cachedbaccess"/> -->
-
+	<import resource="classpath:cern/c2mon/server/test/cache/config/server-test-datasource-hsqldb.xml" />	
 	<import resource="classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-common.xml" />
-	<import resource="classpath:cern/c2mon/server/test/cache/config/server-test-datasource-hsqldb.xml" />
 	
 	<bean id="testDataHelper" class="cern.c2mon.server.cache.dbaccess.test.TestDataHelper" />
 
