@@ -81,8 +81,19 @@
     <!-- Copy SQL files -->
     <fileSet>
       <includes>
-        <include>${basedir}/conf/sql/</include>
+        <include>*</include>
       </includes>
+      <directory>${basedir}/conf/sql/</directory>
+      <outputDirectory>conf/sql</outputDirectory>
+      <fileMode>0444</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <includes>
+        <include>*</include>
+      </includes>
+      <directory>${project.build.directory}/conf/sql/cern/c2mon/server/test/sql/</directory>
+      <outputDirectory>conf/sql</outputDirectory>
       <fileMode>0444</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>

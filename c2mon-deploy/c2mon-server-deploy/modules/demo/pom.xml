@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -25,12 +24,12 @@
       <artifactId>c2mon-server-all</artifactId>
       <exclusions>
         <exclusion>
-         <artifactId>ojdbc</artifactId>
-         <groupId>com.oracle</groupId>
+          <artifactId>ojdbc</artifactId>
+          <groupId>com.oracle</groupId>
         </exclusion>
         <exclusion>
-         <artifactId>orai18n</artifactId>
-         <groupId>com.oracle</groupId>
+          <artifactId>orai18n</artifactId>
+          <groupId>com.oracle</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -50,12 +49,12 @@
       <version>[1.5.0, 2.0.0)</version>
       <exclusions>
         <exclusion>
-         <artifactId>ojdbc</artifactId>
-         <groupId>com.oracle</groupId>
+          <artifactId>ojdbc</artifactId>
+          <groupId>com.oracle</groupId>
         </exclusion>
         <exclusion>
-         <artifactId>orai18n</artifactId>
-         <groupId>com.oracle</groupId>
+          <artifactId>orai18n</artifactId>
+          <groupId>com.oracle</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -69,7 +68,7 @@
       <artifactId>c2mon-server-test</artifactId>
       <scope>runtime</scope>
     </dependency>
-    
+
     <!-- 3rd party dependencies -->
     <dependency>
       <groupId>org.hsqldb</groupId>
@@ -83,11 +82,33 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
-  
+
 
   <developers />
   <build>
     <plugins>
+
+      <!-- Used to extract the sql schemas from c2mon-server-test -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <excludeArtifactIds>*</excludeArtifactIds>
+              <includeArtifactIds>c2mon-server-test</includeArtifactIds>
+              <includes>cern/c2mon/server/test/sql/*-schema-generic.sql, cern/c2mon/server/test/sql/config-data.sql</includes>
+              <outputDirectory>${project.build.directory}/conf/sql</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
@@ -107,7 +128,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
@@ -127,7 +148,7 @@
       </plugin>
     </plugins>
   </build>
-  
+
   <reporting>
     <plugins>
       <plugin>
