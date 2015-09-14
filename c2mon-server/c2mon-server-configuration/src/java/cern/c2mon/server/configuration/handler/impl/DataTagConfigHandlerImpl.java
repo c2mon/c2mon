@@ -117,7 +117,7 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
       }
       // TIMS-951: Allow attachment of DataTags to SubEquipments
       else if (tagCopy.getSubEquipmentId() != null) {
-        subEquipmentFacade.removeTagFromSubEquipment(subEquipmentFacade.getEquipmentIdForSubEquipment(tagCopy.getSubEquipmentId()), tagCopy.getId());
+        subEquipmentFacade.removeTagFromSubEquipment(tagCopy.getSubEquipmentId(), tagCopy.getId());
       }
 
       return change;
