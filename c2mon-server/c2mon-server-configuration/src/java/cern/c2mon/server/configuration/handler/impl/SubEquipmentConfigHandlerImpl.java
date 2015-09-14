@@ -164,7 +164,7 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
       
       if (change.processActionRequired()) {
         change.setNestedSubReport(tagReport);
-        processChanges.add(dataTagConfigHandler.removeDataTag(dataTagId, tagReport));
+        processChanges.add(change);
       }
       else {
         subEquipmentReport.addSubReport(tagReport);
