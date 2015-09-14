@@ -111,12 +111,13 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
       dataTagCache.remove(id); //only removed from cache if no exception is thrown
       
       //remove from Equipment list only once definitively removed from DB & cache (o.w. remove/recreate Process/Equipment cannot reach it)
+      
       if (tagCopy.getEquipmentId() != null) {
         equipmentFacade.removeTagFromEquipment(tagCopy.getEquipmentId(), tagCopy.getId());
       }
       // TIMS-951: Allow attachment of DataTags to SubEquipments
       else if (tagCopy.getSubEquipmentId() != null) {
-        subEquipmentFacade.removeTagFromSubEquipment(tagCopy.getSubEquipmentId(), tagCopy.getId());
+        subEquipmentFacade.removeTagFromSubEquipment(subEquipmentFacade.getEquipmentIdForSubEquipment(tagCopy.getSubEquipmentId()), tagCopy.getId());
       }
 
       return change;
