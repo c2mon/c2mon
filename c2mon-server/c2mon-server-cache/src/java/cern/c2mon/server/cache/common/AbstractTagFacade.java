@@ -416,16 +416,6 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
 //  }
 
   @Override
-  public void addAlarm(final T tag, final Long alarmId) {
-    tagCache.acquireWriteLockOnKey(tag.getId());
-    try {
-      tag.getAlarmIds().add(alarmId);
-    } finally {
-      tagCache.releaseWriteLockOnKey(tag.getId());
-    }
-  }
-
-  @Override
   public void setQuality(final Long tagId, final Collection<TagQualityStatus> flagsToAdd, final Collection<TagQualityStatus> flagsToRemove,
                          final Map<TagQualityStatus, String> qualityDescription, final Timestamp timestamp) {
     tagCache.acquireWriteLockOnKey(tagId);

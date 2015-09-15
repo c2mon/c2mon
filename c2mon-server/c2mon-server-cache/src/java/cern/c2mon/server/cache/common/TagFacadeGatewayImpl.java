@@ -111,11 +111,6 @@ public class TagFacadeGatewayImpl implements TagFacadeGateway {
       tagLocationService.releaseWriteLockOnKey(tagId);
     }    
   }
- 
-  @Override
-  public void addAlarm(final Tag tag, final Long alarmId) {
-    getFacade(tag).addAlarm(tag, alarmId);    
-  }
 
   @Override
   public void addDependentRuleToTag(final Tag tag, final Long ruleId) {

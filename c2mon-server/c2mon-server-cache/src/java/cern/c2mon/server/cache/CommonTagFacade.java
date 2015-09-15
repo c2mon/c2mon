@@ -61,14 +61,6 @@ public interface CommonTagFacade<T extends Tag> extends ConfigurableCacheFacade<
   void addDependentRuleToTag(final T tag, final Long ruleId);
   
   /**
-   * Adds the alarm to the list of alarms for this tag cache object.
-   * 
-   * @param tag the tag on which the alarm is set
-   * @param alarmId the id of the alarm
-   */
-  void addAlarm(T tag, Long alarmId);
-  
-  /**
    * Update all the alarms in the cache associated to this given Tag.
    * 
    * <p>A returned empty list of alarms indicates that the Alarm updates
