@@ -48,14 +48,14 @@ import cern.c2mon.server.common.alarm.AlarmCondition;
 public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacade {
   
   /**
-   * Used to validate the alarm object at runtime configuration.
+   * Default max length for fault family
    */
-  private static final int MAX_FAULT_FAMILY_LENGTH = 20;
+  public static final int MAX_FAULT_FAMILY_LENGTH = 64;
   
   /**
-   * Used to validate the alarm object at runtime configuration.
+   * Default max length for fault member
    */
-  private static final int MAX_FAULT_MEMBER_LENGTH = 64;
+  public static final int MAX_FAULT_MEMBER_LENGTH = 64;
   
   /**
    * Private class logger.
@@ -66,6 +66,16 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
    * Reference to the Alarm cache.
    */
   private AlarmCache alarmCache;
+  
+  /**
+   * Used to validate the alarm object at runtime configuration.
+   */
+  private int maxFaultFamily = MAX_FAULT_FAMILY_LENGTH;
+  
+  /**
+   * Used to validate the alarm object at runtime configuration.
+   */
+  private int maxFaultMemberLength = MAX_FAULT_MEMBER_LENGTH;
   
   private TagLocationService tagLocationService;
   
@@ -106,6 +116,34 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
   }
 
   /**
+   * @return the maximum allowed length for the fault member
+   */
+  public int getMaxFaultMemberLength() {
+    return maxFaultMemberLength;
+  }
+  
+  /**
+   * @param maxFaultMemberLength the maximum allowed length for the fault member
+   */
+  public void setMaxFaultMemberLength(int maxFaultMemberLength) {
+    this.maxFaultMemberLength = maxFaultMemberLength;
+  }
+
+  /**
+   * @return the maximum allowed length for the fault family
+   */
+  public int getMaxFaultFamily() {
+    return maxFaultFamily;
+  }
+
+  /**
+   * @param maxFaultFamily the maximum allowed length for the fault family
+   */
+  public void setMaxFaultFamily(int maxFaultFamily) {
+    this.maxFaultFamily = maxFaultFamily;
+  }
+
+/**
    * Create an AlarmCacheObject from a collection of named properties.
    * The following properties are expected in the collection:
    * <ul>
@@ -130,6 +168,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
    * @param properties the properties containing the values for the alarm fields
    * @return the alarm object created
    */
+  @Override
   public Alarm createCacheObject(final Long id, final Properties properties) {
     AlarmCacheObject alarm = new AlarmCacheObject(id);
     configureCacheObject(alarm, properties);
@@ -152,6 +191,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
    * @return always returns null, as no alarm change needs propagating to the DAQ layer
    * @throws ConfigurationException if cannot configure the Alarm from the properties
    */
+  @Override
   protected Change configureCacheObject(final Alarm alarm, final Properties alarmProperties) throws ConfigurationException {
     AlarmCacheObject alarmCacheObject = (AlarmCacheObject) alarm;
     String tmpStr = null;        
@@ -353,6 +393,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
    * @param alarm the alarm object to validate
    * @throws ConfigurationException if one of the consistency checks fails
    */
+  @Override
   protected void validateConfig(final Alarm alarm) throws ConfigurationException {
     if (alarm.getId() == null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"id\" cannot be null");
