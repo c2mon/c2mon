@@ -8,9 +8,10 @@
     <version>RELEASE</version>
   </parent>
 
+  <groupId>cern.c2mon.c2mon-server</groupId>
+  <artifactId>c2mon-server-shorttermlog</artifactId>
   <version>1.5.1-SNAPSHOT</version>
   <name>c2mon-server-shorttermlog</name>
-  <artifactId>c2mon-server-shorttermlog</artifactId>
   <packaging>jar</packaging>
   <description>C2MON server module for short-term logging to the DB (of Tag updates, Commands and Supervision events)</description>
   <url>http://timweb.cern.ch</url>
