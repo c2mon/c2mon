@@ -41,7 +41,6 @@ import cern.c2mon.server.cache.common.AbstractCache;
 import cern.c2mon.server.cache.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.AlarmLoaderDAO;
 import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.config.C2monCacheName;
 import cern.c2mon.shared.client.alarm.AlarmQuery;
 
