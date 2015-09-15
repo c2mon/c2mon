@@ -149,13 +149,6 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
           }
         }
         
-        // we also need to remove the old one
-        try {
-          configurableDAO.deleteItem(dataTag.getId());
-        } catch (Exception e) {
-          LOGGER.info("Couldn't rollback the creation of the datatag " + dataTag.getId());
-        }
-
         throw new UnexpectedRollbackException("Unexpected exception while creating a DataTag: rolling back the change", ex);
       }
     } finally {
