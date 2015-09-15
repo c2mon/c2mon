@@ -66,6 +66,12 @@
         <artifactId>slf4j-api</artifactId>
         <version>1.7.5</version>
       </dependency>
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>[1.16.6,)</version>
+        <scope>provided</scope>
+      </dependency>
 
       <!-- spring libraries -->
       <dependency>
