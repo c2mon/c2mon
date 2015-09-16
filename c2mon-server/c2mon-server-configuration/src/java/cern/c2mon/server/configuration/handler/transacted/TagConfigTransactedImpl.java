@@ -130,7 +130,7 @@ abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransa
     tagCache.acquireWriteLockOnKey(tagId);
     try {
       T tag = tagCache.get(tagId);
-      commonTagFacade.addAlarm(tag, alarmId);
+      tag.getAlarmIds().add(alarmId);
       tagCache.putQuiet(tag);
     } finally {
       tagCache.releaseWriteLockOnKey(tagId);
