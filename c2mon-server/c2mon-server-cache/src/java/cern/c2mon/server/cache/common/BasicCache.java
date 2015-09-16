@@ -55,7 +55,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
   /**
    * Length of time (in milliseconds) to wait for a lock to be acquired.
    */
-  private int lockTimeout = 1000;
+  private int lockTimeout = 500;
 
   /**
    * Number of times to attempt to lock a key before reporting that a deadlock
@@ -226,6 +226,12 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace(cache.getName() + " Acquiring READ lock for id=" + String.valueOf(id));
     }
+    
+    if (cache.isWriteLockedByCurrentThread(id)) {
+      LOGGER.warn(String.format(
+                      "acquireReadLockOnKey() - Trying to acquire read lock for key %s in cache %s, but the same thread owns already the write lock. "
+                      + "This can potentially cause deadlock situation for Ehcache!", id, cache.getName()));
+    }
 
     cache.acquireReadLockOnKey(id);
 
@@ -286,6 +292,10 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
     }
   }
 
+  /**
+   * Acquires the proper write lock for a given cache key
+   * @param id The key that retrieves a value that you want to protect via locking
+   */
   public void acquireWriteLockOnKey(K id) {
     if (id == null) {
       LOGGER.error("Trying to acquire write lock with a NULL key - throwing an exception!");
@@ -294,6 +304,12 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
 
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace(cache.getName() + " Acquiring WRITE lock for id=" + String.valueOf(id));
+    }
+    
+    if (cache.isReadLockedByCurrentThread(id)) {
+      LOGGER.warn(String.format(
+                      "acquireWriteLockOnKey() - Trying to acquire write lock for key %s in cache %s, but the same thread owns already the read lock. "
+                      + "This can potentially cause a deadlock situation for Ehcache!", id, cache.getName()));
     }
 
     cache.acquireWriteLockOnKey(id);
@@ -341,6 +357,10 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
 //    }
   }
 
+  /**
+   * Release a held write lock for the passed in key
+   * @param id The key that retrieves a value that you want to protect via locking
+   */
   public void releaseWriteLockOnKey(K id) {
     if (id != null) {
       cache.releaseWriteLockOnKey(id);
@@ -363,6 +383,14 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
     return cache.isReadLockedByCurrentThread(id);
   }
 
+  /**
+   * Try to get a read lock on a given key.
+   * If can't get it in timeout millis then return a boolean telling that it didn't get the lock
+   * 
+   * @param id The key that retrieves a value that you want to protect via locking
+   * @param timeout millis until giveup on getting the lock
+   * @return whether the lock was awarded
+   */
   public boolean tryReadLockOnKey(K id, Long timeout) {
     try {
       return cache.tryReadLockOnKey(id, timeout);
@@ -372,6 +400,13 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
     }
   }
 
+  /**
+   * Try to get a write lock on a given key.
+   * If can't get it in timeout millis then return a boolean telling that it didn't get the lock
+   * @param id The key that retrieves a value that you want to protect via locking
+   * @param timeout millis until giveup on getting the lock
+   * @return whether the lock was awarded
+   */
   public boolean tryWriteLockOnKey(K id, Long timeout) {
     try {
       return cache.tryWriteLockOnKey(id, timeout);
