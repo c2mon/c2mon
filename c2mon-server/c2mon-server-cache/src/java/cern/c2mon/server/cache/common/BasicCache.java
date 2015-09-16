@@ -226,12 +226,6 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace(cache.getName() + " Acquiring READ lock for id=" + String.valueOf(id));
     }
-    
-    if (cache.isWriteLockedByCurrentThread(id)) {
-      LOGGER.warn(String.format(
-                      "acquireReadLockOnKey() - Trying to acquire read lock for key %s in cache %s, but the same thread owns already the write lock. "
-                      + "This can potentially cause deadlock situation for Ehcache!", id, cache.getName()));
-    }
 
     cache.acquireReadLockOnKey(id);
 
@@ -304,12 +298,6 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
 
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace(cache.getName() + " Acquiring WRITE lock for id=" + String.valueOf(id));
-    }
-    
-    if (cache.isReadLockedByCurrentThread(id)) {
-      LOGGER.warn(String.format(
-                      "acquireWriteLockOnKey() - Trying to acquire write lock for key %s in cache %s, but the same thread owns already the read lock. "
-                      + "This can potentially cause a deadlock situation for Ehcache!", id, cache.getName()));
     }
 
     cache.acquireWriteLockOnKey(id);
