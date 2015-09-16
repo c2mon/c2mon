@@ -373,12 +373,9 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     alarmCache.acquireWriteLockOnKey(alarmId);
     try {
       Alarm alarm = alarmCache.get(alarmId);
-      tagLocationService.acquireReadLockOnKey(alarm.getTagId());
-      try {
-        Tag tag = tagLocationService.get(alarm.getTagId());
+      Tag tag = tagLocationService.getCopy(alarm.getTagId());      
+      if (tag.getDataTagQuality().isInitialised()) {
         update(alarm, tag);
-      } finally {
-        tagLocationService.releaseReadLockOnKey(alarm.getTagId());
       }
     } finally {
       alarmCache.releaseWriteLockOnKey(alarmId);
