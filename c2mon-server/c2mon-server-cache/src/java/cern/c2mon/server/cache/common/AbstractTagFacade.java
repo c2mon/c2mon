@@ -34,7 +34,6 @@ import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.cache.C2monCacheWithListeners;
 import cern.c2mon.server.cache.CommonTagFacade;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
@@ -79,11 +78,6 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
   private static final Logger LOGGER = Logger.getLogger(AbstractTagFacade.class);
 
   /**
-   * Mail logger.
-   */
-  private static final Logger EMAILLOGGER = Logger.getLogger("AdministratorEmail");
-
-  /**
    * The cache for objects of type T.
    */
   protected C2monCacheWithListeners<Long, T> tagCache;
@@ -112,39 +106,6 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
   }
 
   protected abstract void invalidateQuietly(T tag, TagQualityStatus statusToAdd, String statusDescription, Timestamp timestamp);
-  /**
-   * As for the other invalidate method, but the Tag is passed instead of this id.
-   *
-   * <p>If the invalidation causes no changes, the cache object is not updated (see filterout method).
-   *
-   * @param tag the Tag to invalidate
-   * @param statusToAdd status flag to add
-   * @param statusDescription description associated to this flag; leave as null if no description is required
-   * @param timestamp time of the invalidation
-   */
-  private void invalidate(T tag, final TagQualityStatus statusToAdd, final String statusDescription, Timestamp timestamp) {
-    if (!filteroutInvalidation(tag, statusToAdd, statusDescription, timestamp)) {
-      invalidateQuietly(tag, statusToAdd, statusDescription, timestamp);
-      tagCache.notifyListenersOfUpdate(tag);
-    } else {
-      if (LOGGER.isTraceEnabled()){
-        LOGGER.trace("Filtering out repeated invalidation for tag " + tag.getId());
-      }
-    }
-  }
-
-  @Override
-  public void invalidate(Long tagId, final TagQualityStatus statusToAdd, final String statusDescription, Timestamp timestamp) {
-    tagCache.acquireWriteLockOnKey(tagId);
-    try {
-      T tag = tagCache.get(tagId);
-      invalidate(tag, statusToAdd, statusDescription, timestamp);
-    } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.error("Unable to locate tag in cache (id " + tagId + ") - no invalidation performed (cache is " + tagCache.getClass() + ")");
-    } finally {
-      tagCache.releaseWriteLockOnKey(tagId);
-    }
-  }
 
   @Override
   public List<Alarm> evaluateAlarms(final T tag) {
@@ -586,6 +547,11 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
    */
   public boolean filteroutValid(T tag, Object value, String valueDescription, Timestamp timestamp) {
     return filterout(tag, value, valueDescription, null, null, timestamp);
+  }
+  
+  @Override
+  public boolean isInTagCache(Long id) {
+    return this.tagCache.hasKey(id);
   }
 
 }

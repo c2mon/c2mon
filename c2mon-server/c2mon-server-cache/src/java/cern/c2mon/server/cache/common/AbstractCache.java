@@ -243,13 +243,8 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
     notifyListenersOfUpdate(value);
   }
 
-  public void lockAndNotifyListeners(final K id) {
-    acquireReadLockOnKey(id);
-    try {
-      notifyListenersOfUpdate(this.get(id));
-    } finally {
-      releaseReadLockOnKey(id);
-    }
+  public void notifyListenersOfUpdate(final K id) {
+    notifyListenersOfUpdate(this.getCopy(id));
   }
 
   /**

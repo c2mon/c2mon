@@ -39,20 +39,6 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
 public interface CommonTagFacade<T extends Tag> extends ConfigurableCacheFacade<T> {
 
   /**
-   * Adds an invalid status to the Tag, together with an associated desription. If this status
-   * is already set, it remains set and the description is overwritten with the new one (if none
-   * is provided, the old description is simply removed).
-   * 
-   * <p>If the invalidation causes no changes, the cache object is not updated (see filterout method).
-   * 
-   * @param tagId id of the Tag
-   * @param statusToAdd status flag to add
-   * @param statusDescription description associated to this flag; leave as null if no description is required
-   * @param timestamp time of the invalidation
-   */
-  void invalidate(Long tagId, TagQualityStatus statusToAdd, String statusDescription, Timestamp timestamp);
-  
-  /**
    * Adds the rule to the list of rules that need evaluating when
    * this tag is updated.
    * @param tag the tag
@@ -74,6 +60,13 @@ public interface CommonTagFacade<T extends Tag> extends ConfigurableCacheFacade<
    *          the list is empty if the Alarm updates were filtered out
    */
   List<Alarm> evaluateAlarms(T tag);
+  
+  /**
+   * Determines whether the managed cache contains an element with the specified id.
+   * @param id The tag id to search for
+   * @return true, if the key exists in the the given cache
+   */
+  boolean isInTagCache(Long id);
 
 //TODO is this method too complicated below: maybe we never need to have more then one flag in the lists  
   /**

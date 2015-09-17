@@ -23,4 +23,16 @@ public interface TagFacadeGateway extends CommonTagFacade<Tag> {
    * @return A list of Tags and Alarms, with corresponding values (no longer residing in cache)
    */
   Collection<TagWithAlarms> getTagsWithAlarms(String regex);
+  
+  /**
+   * Determines whether one of the tag caches already contains
+   * an element with the specified id (looks in rule, control
+   * and tag cache in that order).
+   * 
+   * @param id the id to search for
+   * @return true if the id corresponds to some tag
+   * @see TagLocationService#isInTagCache(Long)
+   */
+  @Override
+  public boolean isInTagCache(Long id);
 }

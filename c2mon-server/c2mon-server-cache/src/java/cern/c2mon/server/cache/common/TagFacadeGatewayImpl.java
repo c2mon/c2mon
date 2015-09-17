@@ -96,20 +96,20 @@ public class TagFacadeGatewayImpl implements TagFacadeGateway {
       return (CommonTagFacade<T>) ruleTagFacade;
     } else if (tag instanceof ControlTag) {
       return (CommonTagFacade<T>) controlTagFacade;
-    } else {       
+    } else {
       return (CommonTagFacade<T>) dataTagFacade;
     }
   }
-
-  @Override
-  public void invalidate(final Long tagId, final TagQualityStatus statusToAdd, final String statusDescription, final Timestamp timestamp) {
-    tagLocationService.acquireWriteLockOnKey(tagId);
-    try {
-      Tag tag = tagLocationService.get(tagId);
-      getFacade(tag).invalidate(tag.getId(), statusToAdd, statusDescription, timestamp);
-    } finally {
-      tagLocationService.releaseWriteLockOnKey(tagId);
-    }    
+  
+  @SuppressWarnings("unchecked")
+  private <T extends Tag> CommonTagFacade<T> getFacade(final Long id) {
+    if (ruleTagFacade.isInTagCache(id)) {
+      return (CommonTagFacade<T>) ruleTagFacade;
+    } else if (controlTagFacade.isInTagCache(id)) {
+      return (CommonTagFacade<T>) controlTagFacade;
+    } else {
+      return (CommonTagFacade<T>) dataTagFacade;
+    }
   }
 
   @Override
@@ -139,8 +139,7 @@ public class TagFacadeGatewayImpl implements TagFacadeGateway {
 
   @Override
   public TagWithAlarms getTagWithAlarms(Long id) {
-    Tag tag = tagLocationService.get(id);
-    return getFacade(tag).getTagWithAlarms(id);    
+    return getFacade(id).getTagWithAlarms(id);    
   }
   
   @Override
@@ -169,8 +168,13 @@ public class TagFacadeGatewayImpl implements TagFacadeGateway {
   @Override
   public void setQuality(Long tagId, Collection<TagQualityStatus> flagsToAdd,
       Collection<TagQualityStatus> flagsToRemove, Map<TagQualityStatus, String> qualityDescriptions, Timestamp timestamp) {
-    Tag tag = tagLocationService.get(tagId);
-    getFacade(tag).setQuality(tagId, flagsToAdd, flagsToRemove, qualityDescriptions, timestamp);
+    
+    getFacade(tagId).setQuality(tagId, flagsToAdd, flagsToRemove, qualityDescriptions, timestamp);
+  }
+
+  @Override
+  public boolean isInTagCache(Long id) {
+    return ruleTagFacade.isInTagCache(id) || controlTagFacade.isInTagCache(id) || dataTagFacade.isInTagCache(id);
   }
 
   

@@ -5,13 +5,6 @@ import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.shared.common.Cacheable;
 
 public interface C2monCacheWithListeners<K, T extends Cacheable> extends C2monCache<K, T> {
-
-  /**
-   * Identical to the {@link #notifyListenersOfUpdate(Cacheable)} method but first locks the object internally.
-   * @param id the id of the object in cache that was updated
-   * @see #notifyListenersOfUpdate(Cacheable)
-   */
-  void lockAndNotifyListeners(K id);
   
   /**
    * Notifies all registered listeners of the current status
@@ -80,14 +73,22 @@ public interface C2monCacheWithListeners<K, T extends Cacheable> extends C2monCa
   Lifecycle registerThreadedListener(C2monCacheListener< ? super T> timCacheListener, int queueCapacity, int threadPoolSize);
 
   /**
+   * Identical to the {@link #notifyListenersOfUpdate(Cacheable)} method but fetches first for you
+   * the Cacheable object and makes a copy.
+   * @param id the id of the object in cache that was updated
+   * @see #notifyListenersOfUpdate(Cacheable)
+   */
+  void notifyListenersOfUpdate(K id);
+  
+  /**
    * Call this method to inform cache listeners that an update has
    * been performed for the given object of type T (is not automatic if the
    * cache object is not "put" back in the cache).
    * 
    * <p>(update = existing cache value is modified)
    * 
-   * <p>This method should be called within a lock on the cache object,
-   * so that no modification to this object is made until
+   * <p>This method should be called within a lock on the cache object or
+   * with a copy so that no modification to this object is made until
    * the object has been cloned and passed to the listeners. This is taken care of
    * by the {@link DataTagFacade} bean, which should preferably be used
    * for making updates to the cache.
