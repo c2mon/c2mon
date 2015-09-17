@@ -119,16 +119,12 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
    * Name of the JMS topic on which the alarm will be distributed to clients.
    * TODO remove because single topic now for alarm publication?
    */
-  private String topic;
+  private String topic = "c2mon.client.alarm";
   
   /**
    * Default constructor.
    */
   public AlarmCacheObject() {
-    //topic is the same for all alarms so moved here 
-    //TODO could set this as static constant if confirmed as constant!
-    this.topic = "tim.alarm";
-    
     // Initialise run-time parameters with default values 
     // (overwritten on loading if DB has none null values)
     this.state = AlarmCondition.TERMINATE;
