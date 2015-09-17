@@ -74,7 +74,7 @@ public class CommandTagConfigHandler {
       commandTagCache.putQuiet(commandTag);
       equipmentFacade.addCommandToEquipment(commandTag.getEquipmentId(), commandTag.getId());
 
-      commandTagCache.lockAndNotifyListeners(commandTag.getId());
+      commandTagCache.notifyListenersOfUpdate(commandTag.getId());
 
       CommandTagAdd commandTagAdd = new CommandTagAdd(element.getSequenceId(),
                                                       commandTag.getEquipmentId(),

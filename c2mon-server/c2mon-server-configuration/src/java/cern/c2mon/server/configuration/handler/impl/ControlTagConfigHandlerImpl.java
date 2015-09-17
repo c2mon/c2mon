@@ -88,7 +88,7 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
     } finally {
       releaseEquipmentWriteLockForElement(controlTagId, element.getElementProperties());
     }
-    controlTagCache.lockAndNotifyListeners(controlTagId);
+    controlTagCache.notifyListenersOfUpdate(controlTagId);
     return change;
   }
 

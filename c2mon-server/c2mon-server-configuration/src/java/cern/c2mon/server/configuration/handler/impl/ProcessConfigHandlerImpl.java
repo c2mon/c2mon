@@ -169,7 +169,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
       process = processCache.get(element.getEntityId());
       jmsContainerManager.subscribe(process);
       processFacade.loadAndStartAliveTag(element.getEntityId());
-      processCache.lockAndNotifyListeners(element.getEntityId());
+      processCache.notifyListenersOfUpdate(element.getEntityId());
       return change;
     } catch (RuntimeException ex) {
       LOGGER.error("Exception caught while creating a new Process - rolling back DB changes and removing from cache.");

@@ -129,7 +129,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
   @Override
   public List<ProcessChange> createEquipment(ConfigurationElement element) throws IllegalAccessException {
     List<ProcessChange> change = equipmentConfigTransacted.doCreateEquipment(element);
-    equipmentCache.lockAndNotifyListeners(element.getEntityId());
+    equipmentCache.notifyListenersOfUpdate(element.getEntityId());
     return change;
   }
 
