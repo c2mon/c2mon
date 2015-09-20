@@ -59,7 +59,7 @@ public class OPCUAMessageHandler extends AbstractOPCUAMessageHandler {
             throw new EqIOException(
                     "The configured protocol(s) could not be matched to an endpoint implementation.", e);
         } catch (OPCCriticalException e) {
-            throw new EqIOException("Endpoint creation failed.", e);
+            throw new EqIOException("Endpoint creation failed. Reason: " + e.getMessage(), e);
         }
         getEquipmentCommandHandler().setCommandRunner(this);
         getEquipmentConfigurationHandler().setCommandTagChanger(controller);

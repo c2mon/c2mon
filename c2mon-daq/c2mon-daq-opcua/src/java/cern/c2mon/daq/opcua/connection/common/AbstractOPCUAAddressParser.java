@@ -94,8 +94,8 @@ public abstract class AbstractOPCUAAddressParser {
      */
     protected void getProperties (final Properties properties) {
         this.uris = properties.getProperty(URI_KEY).split(",");
-        this.usersAtDomains = properties.getProperty(USER_KEY).split(",");
-        this.passwords = properties.getProperty(PASSWORD_KEY).split(",");
+        this.usersAtDomains = properties.getProperty(USER_KEY,"").split(",");
+        this.passwords = properties.getProperty(PASSWORD_KEY,"").split(",");
         this.serverTimeout = Integer.valueOf(properties.getProperty(SERVER_TIMEOUT_KEY));
         this.serverRetryTimeout = Integer.valueOf(properties.getProperty(SERVER_RETRY_TIMEOUT_KEY));
         this.aliveWriter = Boolean.valueOf(properties.getProperty(ALIVE_WRITER_KEY, "true"));
