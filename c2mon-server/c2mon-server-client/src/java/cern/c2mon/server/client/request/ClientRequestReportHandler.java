@@ -86,33 +86,40 @@ public class ClientRequestReportHandler implements ConfigProgressMonitor {
    */
   private void sendJsonResponse(final String jsonResponse) {
 
-    if (replyDestination != null) {
-
-      MessageProducer messageProducer;
-      try {
-        messageProducer = session.createProducer(replyDestination);
-
-        messageProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-        messageProducer.setTimeToLive(defaultReplyTTL);
-
-        Message replyMessage = null;
-
-        // Send response as Json message
-        replyMessage = session.createTextMessage(jsonResponse);
-        messageProducer.send(replyMessage);
-
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("ClientRequestReportHandler() : Report sent.");
-        }
-
-      } catch (JMSException e) {
-        LOG.warn("daqTotalParts(): Failed to send Progress report.");
-      }
-    } 
-    else {
+    if (replyDestination == null) {
       LOG.error("sendJsonResponse() : JMSReplyTo destination is null - cannot send reply.");
+      return;
     }
-  }
+
+    MessageProducer messageProducer = null;
+    try {
+      messageProducer = session.createProducer(replyDestination);
+      messageProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+      messageProducer.setTimeToLive(defaultReplyTTL);
+
+      Message replyMessage = null;
+
+      // Send response as Json message
+      replyMessage = session.createTextMessage(jsonResponse);
+      messageProducer.send(replyMessage);
+
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("ClientRequestReportHandler() : Report sent.");
+      }
+
+    } catch (Throwable e) {
+      LOG.warn("daqTotalParts(): Failed to send Progress report :" + e.getMessage(), e);
+    } finally {
+      if (messageProducer != null) {
+        try {
+          messageProducer.close();
+        } catch (JMSException ignore) { // IGNORE
+        }
+      }
+    }
+  } 
+    
+  
 
   /**
    * Helper method. Encodes the progress report in JSON format.
