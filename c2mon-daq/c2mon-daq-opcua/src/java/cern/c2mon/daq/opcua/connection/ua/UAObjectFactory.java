@@ -68,15 +68,17 @@ public final class UAObjectFactory {
      * @throws ServiceException Might throw a service exception.
      * @throws StatusException Might throw a status exception.
      */
-    public static MonitoredItem createMonitoredItem(final NodeId nodeId,
+    public static MonitoredDataItem createMonitoredItem(final NodeId nodeId,
             final float valueDeadband, final int timeDeadband) 
             throws ServiceException, StatusException {
         MonitoredDataItem monitoredItem = createMonitoredDataItem(nodeId);
         monitoredItem.setSamplingInterval(timeDeadband);
-        DataChangeFilter filter = new DataChangeFilter();
-        filter.setDeadbandType(UnsignedInteger.valueOf(2));
-        filter.setDeadbandValue(Double.valueOf(valueDeadband));
-        monitoredItem.setDataChangeFilter(filter);
+        if (valueDeadband > 0) {
+          DataChangeFilter filter = new DataChangeFilter();
+          filter.setDeadbandType(UnsignedInteger.valueOf(2));
+          filter.setDeadbandValue(Double.valueOf(valueDeadband));
+          monitoredItem.setDataChangeFilter(filter);
+        }
         return monitoredItem;
     }
     
