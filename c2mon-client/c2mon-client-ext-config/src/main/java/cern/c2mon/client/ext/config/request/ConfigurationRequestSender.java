@@ -43,9 +43,9 @@ public class ConfigurationRequestSender {
   private JmsSender jmsSender;
 
   /**
-   *
    * @param configuration
    * @param listener
+   *
    * @return
    */
   public ConfigurationReport applyConfiguration(Configuration configuration, ConfigurationListener listener) {
@@ -83,8 +83,7 @@ public class ConfigurationRequestSender {
 
     private JsonElement get(final JsonObject wrapper, String memberName) {
       final JsonElement elem = wrapper.get(memberName);
-      if (elem == null)
-        throw new JsonParseException("no '" + memberName + "' member found in what was expected to be an interface wrapper");
+      if (elem == null) throw new JsonParseException("no '" + memberName + "' member found in what was expected to be an interface wrapper");
       return elem;
     }
   }

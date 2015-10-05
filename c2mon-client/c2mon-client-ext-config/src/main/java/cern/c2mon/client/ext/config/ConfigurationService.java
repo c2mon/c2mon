@@ -10,9 +10,9 @@ import cern.c2mon.shared.client.configuration.configuration.ConfigurationListene
 public interface ConfigurationService {
 
   /**
-   *
    * @param configuration
    * @param listener
+   *
    * @return
    */
   ConfigurationReport applyConfiguration(Configuration configuration, ConfigurationListener listener);
