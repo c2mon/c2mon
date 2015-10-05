@@ -94,6 +94,8 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
+import cern.c2mon.shared.client.configuration.configuration.Configuration;
+import cern.c2mon.shared.client.configuration.configuration.tag.DataTag;
 import cern.c2mon.shared.client.configuration.converter.ProcessListConverter;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
@@ -103,8 +105,10 @@ import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.DataTagValueDictionary;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
+import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
@@ -1435,5 +1439,45 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     list = "[]";
     processList = converter.convert(list);
     assertTrue(processList.size() == 0);
+  }
+
+  @Test
+  public void testNewConfiguration() throws Exception {
+    Configuration configuration = new Configuration("test create tag", "test", "test");
+
+    cern.c2mon.shared.client.configuration.configuration.process.Process process = new cern.c2mon.shared.client.configuration.configuration.process.Process(50L);
+    configuration.addProcess(process);
+    cern.c2mon.shared.client.configuration.configuration.equipment.Equipment equipment = new cern.c2mon.shared.client.configuration.configuration.equipment.Equipment(150L, process.getId());
+    configuration.addEquipment(process.getId(), equipment);
+    HardwareAddress hardwareAddress = new PLCHardwareAddressImpl(1, 0, 0, 0, 0f, 0f, "");
+    DataTagAddress address = new DataTagAddress(hardwareAddress, 99999);
+    DataTag tag = new DataTag(1L, "test_tag", "tag for testing", equipment.getId(), "Boolean", false, address);
+    configuration.addDataTag(tag);
+
+    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport()).times(2);
+    replay(mockManager);
+
+    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
+    assertNotNull(report.getName());
+    assertNotNull(report.getId());
+    assertNotNull(report.getStatus());
+    assertNotNull(report.getStatusDescription());
+    assertTrue(report.getStatus() == Status.OK);
+
+    configuration = new Configuration("test remove tag", "test", "test");
+    configuration.addProcess(process);
+    configuration.addEquipment(process.getId(), equipment);
+    tag.setDelete(true);
+    configuration.addDataTag(tag);
+
+    //expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport()).times(2);
+    //replay(mockManager);
+
+    report = configurationLoader.applyConfiguration(configuration);
+    assertNotNull(report.getName());
+    assertNotNull(report.getId());
+    assertNotNull(report.getStatus());
+    assertNotNull(report.getStatusDescription());
+    assertTrue(report.getStatus() == Status.OK);
   }
 }

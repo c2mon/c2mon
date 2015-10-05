@@ -23,6 +23,7 @@ import java.util.List;
 import cern.c2mon.shared.client.configuration.ConfigurationException;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
+import cern.c2mon.shared.client.configuration.configuration.Configuration;
 
 /**
  * Public bean that can be accessed to load configurations into
@@ -72,6 +73,14 @@ public interface ConfigurationLoader {
    * @return report
    */
   ConfigurationReport applyConfiguration(int configId);
+
+  /**
+   * Super awesome new configuration method!
+   *
+   * @param configuration
+   * @return
+   */
+  ConfigurationReport applyConfiguration(Configuration configuration);
 
   /**
    * Will cancel the configuration that is currently running, once the element currently
