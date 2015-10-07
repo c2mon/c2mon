@@ -349,6 +349,10 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         try {
           processChanges = applyConfigElement(element, elementReport);  //never returns null
 
+          if (processChanges == null) {
+            continue;
+          }
+          
           for (ProcessChange processChange : processChanges) {
 
             Long processId = processChange.getProcessId();
