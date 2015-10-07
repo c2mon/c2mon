@@ -11,7 +11,7 @@
 						<file name="${DAQ_LOG_HOME}/${PROCESS_NAME}.out.log" />
 					</output>
 				</main-class>
-				<java-vm-args>-Xms1G -Xmx1G -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
+				
 			</startscript>
 		</application>
 
@@ -30,6 +30,7 @@
 			
 			<startscript name="DMN2-DAQ-LASER-SOURCE">
 				<env name="PROCESS_NAME" value="P_ALARM" />
+				<java-vm-args>-Xms1G -Xmx1G -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
 			</startscript>
 		</application>
 
@@ -44,12 +45,14 @@
 			
 			<startscript name="DMN2-DAQ-LASER-ELEC">
 				<env name="PROCESS_NAME" value="P_ALARM_ELEC" />
+				<java-vm-args>-Xms2G -Xmx2G -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
 			</startscript>
 			<startscript name="DMN2-DAQ-LASER-MISC">
 				<env name="PROCESS_NAME" value="P_ALARM_MISC" />
 			</startscript>
 			<startscript name="DMN2-DAQ-LASER-POFGC">
 				<env name="PROCESS_NAME" value="P_ALARM_POFGC" />
+				<java-vm-args>-Xms2G -Xmx2G -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
 			</startscript>
 			<startscript name="DMN2-DAQ-LASER-TIMOP">
 				<env name="PROCESS_NAME" value="P_ALARM_TIMOP" />
