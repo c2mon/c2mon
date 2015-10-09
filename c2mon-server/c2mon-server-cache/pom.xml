@@ -93,8 +93,8 @@
 
     <dependency>
     	<groupId>org.slf4j</groupId>
-    	<artifactId>log4j-over-slf4j</artifactId>
-    	<version>1.7.11</version>
+    	<artifactId>slf4j-log4j12</artifactId>
+    	<version>1.7.5</version>
     	<scope>test</scope>
     </dependency>
   </dependencies>
