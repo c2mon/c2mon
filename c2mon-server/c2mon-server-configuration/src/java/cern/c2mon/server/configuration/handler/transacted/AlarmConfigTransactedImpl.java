@@ -145,7 +145,6 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
     try {
       Alarm alarm = alarmCache.get(alarmId);
       alarmDAO.deleteItem(alarmId);
-      alarmCache.releaseWriteLockOnKey(alarmId); //unlock before locking tag
       try {
         removeDataTagReference(alarm);
       } catch (CacheElementNotFoundException e) {
@@ -159,9 +158,7 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
       alarmReport.setFailure("Unable to remove Alarm with id " + alarmId);
       throw new UnexpectedRollbackException("Exception caught while attempting to remove an alarm", ex);
     } finally {
-      if (alarmCache.isWriteLockedByCurrentThread(alarmId)) {
-        alarmCache.releaseWriteLockOnKey(alarmId);
-      }
+      alarmCache.releaseWriteLockOnKey(alarmId);
     }
   }
 

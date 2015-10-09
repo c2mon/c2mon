@@ -1223,13 +1223,13 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     replay(mockManager);
 
-//    // we  expect to notify the cache listeners about a TERM alarm.
-//    C2monCacheListener<Alarm> checker = EasyMock.createMock(C2monCacheListener.class);
-//    checker.notifyElementUpdated(EasyMock.isA(Alarm.class));
-//    EasyMock.expectLastCall().once();
-//    EasyMock.replay(checker);
-//    alarmCache.registerSynchronousListener(checker);
-//    
+    // we  expect to notify the cache listeners about a TERM alarm.
+    C2monCacheListener<Alarm> checker = EasyMock.createMock(C2monCacheListener.class);
+    checker.notifyElementUpdated(EasyMock.isA(Alarm.class));
+    EasyMock.expectLastCall().once();
+    EasyMock.replay(checker);
+    alarmCache.registerSynchronousListener(checker);
+    
     ConfigurationReport report = configurationLoader.applyConfiguration(24);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -1238,7 +1238,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     Tag tag = tagLocationService.get(alarm.getTagId());
     assertFalse(tag.getAlarmIds().contains(alarm.getId()));
     verify(mockManager);
-//    verify(checker);
+    verify(checker);
   }
 
   @Override

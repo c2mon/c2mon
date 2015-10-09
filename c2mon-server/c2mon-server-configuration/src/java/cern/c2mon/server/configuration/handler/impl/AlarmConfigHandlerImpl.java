@@ -18,6 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
+import java.sql.Timestamp;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -27,6 +28,8 @@ import org.springframework.transaction.UnexpectedRollbackException;
 
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
+import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.AlarmConfigTransacted;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
@@ -79,8 +82,15 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
    */
   @Override
   public void removeAlarm(final Long alarmId, final ConfigurationElementReport alarmReport) {
+    AlarmCacheObject alarm = (AlarmCacheObject) alarmCache.get(alarmId);
     alarmConfigTransacted.doRemoveAlarm(alarmId, alarmReport);
-    alarmCache.remove(alarmId); //will be skipped if rollback exception thrown in do method    
+    alarmCache.remove(alarmId); //will be skipped if rollback exception thrown in do method
+      
+    alarm.setState(AlarmCondition.TERMINATE);
+    alarm.setInfo("alarm was removed");
+    alarm.setTimestamp(new Timestamp(System.currentTimeMillis()));
+      
+    alarmCache.notifyListenersOfUpdate(alarm);
   }
 
   @Override
