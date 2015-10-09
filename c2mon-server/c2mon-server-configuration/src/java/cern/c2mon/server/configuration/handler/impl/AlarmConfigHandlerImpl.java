@@ -25,11 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 
-import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
-import cern.c2mon.server.configuration.handler.transacted.AlarmConfigTransacted;
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
-import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
+import cern.c2mon.server.configuration.handler.transacted.AlarmConfigTransacted;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 
@@ -80,7 +79,7 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
    */
   @Override
   public void removeAlarm(final Long alarmId, final ConfigurationElementReport alarmReport) {
-    alarmConfigTransacted.doRemoveAlarm(alarmId, alarmReport);    
+    alarmConfigTransacted.doRemoveAlarm(alarmId, alarmReport);
     alarmCache.remove(alarmId); //will be skipped if rollback exception thrown in do method    
   }
 
@@ -88,7 +87,6 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
   public void createAlarm(ConfigurationElement element) throws IllegalAccessException {
     alarmConfigTransacted.doCreateAlarm(element);
     alarmFacade.evaluateAlarm(element.getEntityId());
-    alarmCache.notifyListenersOfUpdate(element.getEntityId());
   }
 
   @Override

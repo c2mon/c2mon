@@ -245,6 +245,18 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     } 
   }
   
+  @Override
+  public void evaluateAlarm(Long alarmId) {
+    alarmCache.acquireWriteLockOnKey(alarmId);
+    try {
+      Alarm alarm = alarmCache.get(alarmId);
+      Tag tag = tagLocationService.getCopy(alarm.getTagId());
+      update(alarm, tag);
+    } finally {
+      alarmCache.releaseWriteLockOnKey(alarmId);
+    }
+  }
+  
   /**
    * Logic kept the same as in TIM1 (see {@link AlarmFacade}).
    * The locking of the objets is done in the public class.
@@ -262,6 +274,12 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
       LOGGER.debug("Alarm update called with null Tag value - leaving Alarm status unchanged at " + alarm.getState());
       return alarm;
     }
+    
+    if (!tag.getDataTagQuality().isInitialised()) {
+      LOGGER.debug("Alarm update called with uninitialised Tag - leaving Alarm status unchanged.");
+      return alarm;
+    }
+    
     // timestamp should never be null
     if (tag.getTimestamp() == null) {
       LOGGER.warn("update() : tag value or timestamp null -> no update");      
@@ -367,20 +385,6 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     //this.alarmChange = CHANGE_NONE;
     return alarmCacheObject;
   } 
-  
-  @Override
-  public void evaluateAlarm(Long alarmId) {
-    alarmCache.acquireWriteLockOnKey(alarmId);
-    try {
-      Alarm alarm = alarmCache.get(alarmId);
-      Tag tag = tagLocationService.getCopy(alarm.getTagId());      
-      if (tag.getDataTagQuality().isInitialised()) {
-        update(alarm, tag);
-      }
-    } finally {
-      alarmCache.releaseWriteLockOnKey(alarmId);
-    }
-  }
   
   /**
    * Perform a series of consistency checks on the AlarmCacheObject. This method

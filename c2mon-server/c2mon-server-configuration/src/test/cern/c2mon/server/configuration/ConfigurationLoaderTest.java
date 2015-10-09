@@ -41,6 +41,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AliveTimerCache;
+import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.CommFaultTagCache;
 import cern.c2mon.server.cache.CommandTagCache;
 import cern.c2mon.server.cache.ControlTagCache;
@@ -63,6 +64,7 @@ import cern.c2mon.server.cache.dbaccess.EquipmentMapper;
 import cern.c2mon.server.cache.dbaccess.ProcessMapper;
 import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
 import cern.c2mon.server.cache.dbaccess.SubEquipmentMapper;
+import cern.c2mon.server.cache.listener.CacheListener;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
@@ -94,8 +96,6 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
-import cern.c2mon.shared.client.configuration.configuration.Configuration;
-import cern.c2mon.shared.client.configuration.configuration.tag.DataTag;
 import cern.c2mon.shared.client.configuration.converter.ProcessListConverter;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
@@ -103,12 +103,12 @@ import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.NoSimpleValueParseException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.DataTagValueDictionary;
-import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
-import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
@@ -1145,9 +1145,42 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
    */
   @DirtiesContext
   @Test
+  public void testCreateAlarmWithExistingDatatag() {
+    replay(mockManager);
+
+    // we  expect to send the alarm as the datatag is initialized.
+    C2monCacheListener<Alarm> checker = EasyMock.createMock(C2monCacheListener.class);
+    checker.notifyElementUpdated(EasyMock.isA(Alarm.class));
+    EasyMock.expectLastCall().once();
+    EasyMock.replay(checker);
+    
+    alarmCache.registerSynchronousListener(checker);
+    
+    DataTagCacheObject toInit = (DataTagCacheObject)dataTagCache.getCopy(200003L);
+    toInit.setValue(Boolean.TRUE);
+    toInit.getDataTagQuality().validate();
+    dataTagCache.putQuiet(toInit);
+    
+    ConfigurationReport report = configurationLoader.applyConfiguration(22);
+    verify(checker);
+  }
+  
+  
+  /**
+   * Test the creation, update and removal of alarm.
+   */
+  @DirtiesContext
+  @Test
   public void testCreateUpdateAlarm() {
     replay(mockManager);
 
+    
+    // we do not expect to send the alarm as the datatag is unitialized.
+    C2monCacheListener<Alarm> checker = EasyMock.createMock(C2monCacheListener.class);
+    EasyMock.replay(checker);
+    
+    alarmCache.registerSynchronousListener(checker);
+    
     ConfigurationReport report = configurationLoader.applyConfiguration(22);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -1177,6 +1210,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     ObjectEqualityComparison.assertAlarmEquals(expectedObject, cacheObject);
 
     verify(mockManager);
+    verify(checker);
   }
 
   @Test
@@ -1189,6 +1223,13 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     replay(mockManager);
 
+//    // we  expect to notify the cache listeners about a TERM alarm.
+//    C2monCacheListener<Alarm> checker = EasyMock.createMock(C2monCacheListener.class);
+//    checker.notifyElementUpdated(EasyMock.isA(Alarm.class));
+//    EasyMock.expectLastCall().once();
+//    EasyMock.replay(checker);
+//    alarmCache.registerSynchronousListener(checker);
+//    
     ConfigurationReport report = configurationLoader.applyConfiguration(24);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -1197,6 +1238,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     Tag tag = tagLocationService.get(alarm.getTagId());
     assertFalse(tag.getAlarmIds().contains(alarm.getId()));
     verify(mockManager);
+//    verify(checker);
   }
 
   @Override
