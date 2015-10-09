@@ -23,10 +23,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
@@ -95,6 +91,12 @@
       <version>[1.5.2, 2.0.0)</version>
     </dependency>
 
+    <dependency>
+    	<groupId>org.slf4j</groupId>
+    	<artifactId>log4j-over-slf4j</artifactId>
+    	<version>1.7.11</version>
+    	<scope>test</scope>
+    </dependency>
   </dependencies>
 
   <developers />
