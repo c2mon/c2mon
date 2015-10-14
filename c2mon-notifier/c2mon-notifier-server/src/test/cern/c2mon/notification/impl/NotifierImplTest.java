@@ -1045,6 +1045,31 @@ public class NotifierImplTest {
     }
 	
 	
+	@Test
+	public void testFastUpdate() throws Exception {
+	    startTest("testFastUpdate");
+	    
+	    
+	    Tag toBeNotifiedFor = new Tag(1L, true);
+        Subscriber s = new Subscriber("test", "test@cern.ch", "");
+        Subscription sub = new Subscription(s.getUserName(), toBeNotifiedFor.getId());
+        sub.setNotificationLevel(Status.WARNING);
+        s.addSubscription(sub);
+        
+        Mailer mailer = mockControl.createMock(Mailer.class);
+        mailer.sendEmail(EasyMock.isA(String.class), EasyMock.isA(String.class), EasyMock.isA(String.class));
+        EasyMock.expectLastCall().times(2);
+        notifier.setMailer(mailer);
+        EasyMock.replay(mailer);
+	 
+        reg.setSubscriber(s.getCopy());
+        sendUpdateRuleTag(1L, Status.WARNING.toInt());
+        sendUpdateRuleTag(1L, Status.OK.toInt());
+        notifier.checkCacheForChanges();
+        
+        EasyMock.verify(mailer);  
+	}
+	
 	
 	
 	@Test

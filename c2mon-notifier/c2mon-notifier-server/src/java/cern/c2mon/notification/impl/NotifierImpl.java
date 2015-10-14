@@ -78,7 +78,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
     /**
      * the list of tags which were updated between our checks.
      */
-    private HashSet<Tag> updatedTags = new HashSet<Tag>();
+    private ArrayList<Tag> updatedTags = new ArrayList<Tag>();
 
     /**
      * Constructor. starts also {@link C2monServiceGateway}
