@@ -286,7 +286,7 @@ public class SpectrumEventProcessor extends SpectrumConfig implements Runnable {
 
     @ManagedOperation
     public void setEquipDown() {
-        equipmentMessageSender.confirmEquipmentStateOK("Equipment manually disconnected by JMX backdoor");
+        equipmentMessageSender.confirmEquipmentStateIncorrect("Equipment manually disconnected by JMX backdoor");
     }
     
     @ManagedOperation
