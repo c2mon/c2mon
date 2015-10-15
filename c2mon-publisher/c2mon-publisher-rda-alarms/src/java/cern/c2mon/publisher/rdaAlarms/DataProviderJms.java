@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import cern.phoenix.core.Alarm;
 import cern.phoenix.remote.AlarmDataProvider;
-import cern.phoenix.remote.RemoteDataConfigManager;
 import cern.phoenix.remote.RemoteModuleFactory;
 
 /**
@@ -28,11 +27,7 @@ public class DataProviderJms implements DataProviderIntf {
 
     private RemoteModuleFactory alarmProviderFactory;
     private AlarmDataProvider provider;
-    
-    
-    @SuppressWarnings("unused")
-    private RemoteDataConfigManager rdcm;
-    
+        
     //
     // --- CONSTRUCTION --------------------------------------------------------------------------
     //
@@ -42,7 +37,6 @@ public class DataProviderJms implements DataProviderIntf {
         alarmProviderFactory.init();
 
         provider = alarmProviderFactory.getAlarmDataProvider();
-        rdcm = new RemoteDataConfigManager(provider);
         LOG.info("Ready.");
     }
 
@@ -69,7 +63,6 @@ public class DataProviderJms implements DataProviderIntf {
         LOG.info("Preparing the alarmEquip map ...");
         int counter = 0;
         ConcurrentHashMap<String,String> result = new ConcurrentHashMap<String,String>();
-//        Map<String, Alarm> alarmDefs = rdcm.getAlarmDefinitions(alarmIds);
         Map<String, Alarm> alarmDefs = provider.getAlarmDefinitions(alarmIds);
         for (String alarmId : alarmIds) {
             counter++;
