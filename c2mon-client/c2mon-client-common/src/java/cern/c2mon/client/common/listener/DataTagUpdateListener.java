@@ -20,7 +20,6 @@ package cern.c2mon.client.common.listener;
 
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
-;
 
 /**
  * An update event gets fired when a <code>ClientDataTag</code> 
