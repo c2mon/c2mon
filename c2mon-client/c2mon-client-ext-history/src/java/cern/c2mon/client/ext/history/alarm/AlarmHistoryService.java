@@ -19,4 +19,6 @@ public interface AlarmHistoryService {
    * @return all alarms between the start and end points
    */
   List<Alarm> findByTimestampBetween(Timestamp start, Timestamp end);
+
+  List<Alarm> findBy(HistoricAlarmQuery query);
 }
