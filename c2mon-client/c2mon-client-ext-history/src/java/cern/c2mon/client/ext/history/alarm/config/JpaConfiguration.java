@@ -20,7 +20,7 @@ import java.util.Collections;
  * @author Justin Lewis Salmon
  */
 @Configuration
-@EnableJpaRepositories
+@EnableJpaRepositories("cern.c2mon.client.ext.history")
 public class JpaConfiguration {
 
   @Autowired
