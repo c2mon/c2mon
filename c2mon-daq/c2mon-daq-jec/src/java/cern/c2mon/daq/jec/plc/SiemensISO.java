@@ -466,7 +466,7 @@ public class SiemensISO implements PLCDriver
             debug_msg.append(Integer.toHexString((int)ConnRequest[j] & 0xff));
           }
           // DEBUG message that will appear in the logger
-          logger.debug(debug_msg);
+          logger.debug(debug_msg.toString());
         }
 
   // Get the size of data to send and to receive. Initializes the number of received bytes = 0

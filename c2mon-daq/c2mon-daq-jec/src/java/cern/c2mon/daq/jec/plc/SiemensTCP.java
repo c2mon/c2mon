@@ -349,7 +349,7 @@ public class SiemensTCP implements PLCDriver
             debugStr.append(Integer.toHexString((int)recv_frame_data[j] & 0xff));
           }
           // DEBUG message that will appear in the logger
-          logger.debug(debugStr);
+          logger.debug(debugStr.toString());
         }
 
         // INFO message that will appear in the logger
