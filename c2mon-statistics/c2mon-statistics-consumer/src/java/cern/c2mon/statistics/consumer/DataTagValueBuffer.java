@@ -26,7 +26,8 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.pmanager.IAlarmListener;
 import cern.c2mon.pmanager.IDBPersistenceHandler;
@@ -57,7 +58,7 @@ public class DataTagValueBuffer implements SynchroBufferListener {
     /**
      * The local logger.
      */
-    private final Logger logger = Logger.getLogger(DataTagValueBuffer.class);;
+    private final Logger logger = LoggerFactory.getLogger(DataTagValueBuffer.class);;
 
     /**
      * The class managing the fallback mechanism.

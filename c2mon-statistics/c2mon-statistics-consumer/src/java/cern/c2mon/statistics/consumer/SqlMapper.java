@@ -25,7 +25,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue;
@@ -50,12 +51,12 @@ public final class SqlMapper {
     /**
      * The general logger.
      */
-    private static final Logger LOGGER = Logger.getLogger(SqlMapper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SqlMapper.class);
 
     /**
      * The tag logger.
      */
-    private static final Logger TAGLOGGER = Logger.getLogger("SourceDataTagLogger");
+    private static final Logger TAGLOGGER = LoggerFactory.getLogger("SourceDataTagLogger");
 
     /**
      * The SqlMapClient that this class is wrapping.
@@ -94,7 +95,7 @@ public final class SqlMapper {
             try {
                 properties.load(timPropertiesFile);
             } catch (java.io.IOException ex) {
-                LOGGER.fatal("IOException caught : " + ex.getMessage());
+                LOGGER.error("IOException caught : " + ex.getMessage());
                 ex.printStackTrace();
             }
 
@@ -146,7 +147,7 @@ public final class SqlMapper {
                     // insert the tags into the database in max batches of INSERTS_PER_BATCH
                     while (it.hasNext() && counter < INSERTS_PER_BATCH) {
                         FilteredDataTagValue filteredDataTagValue = ((FilterPersistenceObject) it.next()).getFilteredDataTagValue();
-                        TAGLOGGER.info(filteredDataTagValue);
+                        TAGLOGGER.info("{}", filteredDataTagValue);
                         SQLMAP.insert("insertTagValue", filteredDataTagValue);
                         counter++;
                     }
