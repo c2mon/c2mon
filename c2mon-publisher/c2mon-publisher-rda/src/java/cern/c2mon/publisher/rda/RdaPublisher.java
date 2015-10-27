@@ -1,7 +1,7 @@
 /*******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2004 - 2012 CERN. This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
@@ -12,7 +12,7 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
 package cern.c2mon.publisher.rda;
@@ -22,7 +22,8 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,7 @@ import cern.cmw.rda.server.ValueChangeListener;
 /**
  * This class is based on the {@link SimpleServer} that is provided with the RDA package.
  * It creates and registeres a new RDA server and is able to publish data tags as RDA
- * data. The property name corresponds the name of the data tag.  
+ * data. The property name corresponds the name of the data tag.
  *
  * @author Matthias Braeger
  */
@@ -51,8 +52,8 @@ import cern.cmw.rda.server.ValueChangeListener;
 public final class RdaPublisher extends DeviceServerBase implements Publisher {
 
   /** Log4j logger instance */
-  private static final Logger LOG = Logger.getLogger(RdaPublisher.class);
-  
+  private static final Logger LOG = LoggerFactory.getLogger(RdaPublisher.class);
+
   /**
    * Maps the RDA properties to the tag names. For each tag subscription there is
    * exactly one entry registered in this map.
@@ -70,8 +71,8 @@ public final class RdaPublisher extends DeviceServerBase implements Publisher {
     super(serverName);
     LOG.info("Starting RDA server " + serverName);
   }
-  
-  
+
+
   /**
    * This method has to be called in order to start the RDA publisher
    */
@@ -84,7 +85,7 @@ public final class RdaPublisher extends DeviceServerBase implements Publisher {
           runServer();
         }
         catch (Exception e) {
-          LOG.fatal("A major problem occured while running the RDA server. Stopping publisher!", e);
+          LOG.error("A major problem occured while running the RDA server. Stopping publisher!", e);
           System.exit(1);
         }
       }
@@ -146,16 +147,16 @@ public final class RdaPublisher extends DeviceServerBase implements Publisher {
    * Updates the corresponding {@link SimpleProperty} instance about the value
    * update. In case of a new (yet) unknown tag a new {@link SimpleProperty} instance
    * is first of all created.
-   * 
+   *
    * @param cdt An new tag update received by the {@link Gateway}
    * @param cdtConfig The tag configuration which is belonging to this tag update
    */
   @Override
   public void onUpdate(final ClientDataTagValue cdt, final TagConfig cdtConfig) {
     // Saves the received value into a separate file
-    Logger logger = Logger.getLogger("ClientDataTagLogger");
-    logger.debug(cdt);
-    
+    Logger logger = LoggerFactory.getLogger("ClientDataTagLogger");
+    logger.debug("{}", cdt);
+
     if (cdt.getDataTagQuality().isExistingTag() && cdtConfig != null) {
       try {
         String propertyName = getRdaProperty(cdtConfig.getJapcPublication());
@@ -164,11 +165,11 @@ public final class RdaPublisher extends DeviceServerBase implements Publisher {
           SimpleProperty property = new SimpleProperty(propertyName);
           properties.put(propertyName, property);
         }
-        
+
         properties.get(propertyName).onUpdate(cdt);
       }
       catch (IllegalArgumentException iae) {
-        LOG.warn("Error while parsing JAPC address for updating tag " 
+        LOG.warn("Error while parsing JAPC address for updating tag "
             + cdt.getId() + " ==> No RDA property update possible! Reason: " + iae.getMessage());
       }
     }
@@ -177,22 +178,22 @@ public final class RdaPublisher extends DeviceServerBase implements Publisher {
           + cdt.getId() + " ==> No RDA property update possible!");
     }
   }
-  
+
   /**
-   * Internal helper method for parsing the japc publication string and 
-   * @param japcPublication the japc publication address as it is defined by 
+   * Internal helper method for parsing the japc publication string and
+   * @param japcPublication the japc publication address as it is defined by
    *         the {@link TagConfig#getJapcPublication()} method
    * @return The property name without the leading device name
    * @throws IllegalArgumentException In case of an empty or badly defined publication address.
    */
   private static String getRdaProperty(final String japcPublication) throws IllegalArgumentException {
-    if (japcPublication == null 
-        || japcPublication.equalsIgnoreCase("") 
+    if (japcPublication == null
+        || japcPublication.equalsIgnoreCase("")
         || !japcPublication.contains("/")
-        || japcPublication.split("/").length != 2) {      
+        || japcPublication.split("/").length != 2) {
       throw new IllegalArgumentException("JAPC publication address has wrong format! Expected <device>/<property>");
     }
-    
+
     return japcPublication.split("/")[1];
   }
 

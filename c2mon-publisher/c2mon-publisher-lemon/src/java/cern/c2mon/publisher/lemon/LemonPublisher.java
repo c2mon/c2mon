@@ -20,7 +20,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -35,7 +36,7 @@ import cern.c2mon.shared.client.tag.TagConfig;
  * computer we are collecting the individual metric updates by scheduling a
  * packet sender. The current version implements only the non-authenticated
  * LEMON protocol
- * 
+ *
  * @author Peter Jurcso
  */
 
@@ -44,9 +45,9 @@ public class LemonPublisher implements Publisher
 {
 
 	// Setup simple logger
-	private static final Logger log = Logger.getLogger(LemonPublisher.class);
+	private static final Logger log = LoggerFactory.getLogger(LemonPublisher.class);
 
-	private static final Logger taglogger = Logger.getLogger("ClientDataTagLogger");
+	private static final Logger taglogger = LoggerFactory.getLogger("ClientDataTagLogger");
 
 	// Set this to something else to block real udp communication
 	static int LEMON_SERVER_NONET = Integer.getInteger("cern.c2mon.publisher.lemon.noNet", 0);
@@ -75,8 +76,8 @@ public class LemonPublisher implements Publisher
 	// for JMX bean
 	private VCM monitor;
 	@Autowired private ApplicationContext applicationContext;
-	
-	
+
+
 	private class LemonPacketSender implements Runnable
 	{
 
@@ -295,7 +296,7 @@ public class LemonPublisher implements Publisher
 		String template = System.getProperty("cern.c2mon.publisher.lemon.template");
 		if (template == null)
 		{
-			log.fatal("Template file is not defined");
+			log.error("Template file is not defined");
 			System.exit(-1);
 		} else
 		{
@@ -304,17 +305,17 @@ public class LemonPublisher implements Publisher
 				loadLemonTemplate(new URL(template));
 			} catch (Exception e)
 			{
-				log.fatal("Could not load template file " + template);
+				log.error("Could not load template file " + template);
 				System.exit(-1);
 			}
 		}
-		
+
 	}
 
 	/*
 	 * Loads Lemon template from local file or from web server with the
 	 * following format:
-	 * 
+	 *
 	 * lemon id (number), comma separated list of metrics short names
 	 */
 	void loadLemonTemplate(final URL url) throws IOException
@@ -373,7 +374,7 @@ public class LemonPublisher implements Publisher
 	/*
 	 * Loads Lemon Static data from local file or from web server with the
 	 * following format:
-	 * 
+	 *
 	 * host name, comma separated list of the following elements:
 	 */
 	void loadLemonStaticData(final URL url) throws IOException
@@ -542,7 +543,7 @@ public class LemonPublisher implements Publisher
 		// Saves the received value into a separate file
 		if (taglogger != null)
 		{
-			taglogger.info(cdt);
+			taglogger.info("{}", cdt);
 		}
 
 		// Just taking into account valid updates

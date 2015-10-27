@@ -21,7 +21,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
@@ -43,7 +44,7 @@ import cern.cmw.rda.server.ValueChangeListener;
 final class SimpleProperty implements DataTagUpdateListener {
   
   /** Log4j logger instance */
-  private static final Logger LOG = Logger.getLogger(SimpleProperty.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SimpleProperty.class);
   
   /** The current tag value of the device */
   private Data currentValue = null;

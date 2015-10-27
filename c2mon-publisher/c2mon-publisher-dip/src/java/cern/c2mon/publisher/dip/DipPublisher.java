@@ -1,7 +1,7 @@
 /*******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2004 - 2012 CERN. This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
@@ -12,7 +12,7 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
 package cern.c2mon.publisher.dip;
@@ -22,7 +22,8 @@ import java.nio.charset.CharsetEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -56,12 +57,12 @@ import cern.dip.DipTimestamp;
 public class DipPublisher implements Publisher {
 
   /** Log4j logger instance */
-  private static final Logger LOG = Logger.getLogger(DipPublisher.class);
-  
+  private static final Logger LOG = LoggerFactory.getLogger(DipPublisher.class);
+
   /** The DIP Wiki URL */
   private static final String DIP_WIKI_URL = "http://cern.ch/c2monwiki/DIP+Publisher";
-  
-  /** 
+
+  /**
    * A URL that provides for information about a given point. The URL must be specified
    * in such a way, that it is enough to append the point ID to the end, e.g: <br>
    * <code>http://cern.ch/tim-helpalarm?p_pointid1=</code>
@@ -71,33 +72,33 @@ public class DipPublisher implements Publisher {
    */
   @Value("${c2mon.publisher.dip.pointdetails.url:}")
   private String pointDetailsURL = "";
-  
+
   /** The value field name which is used within a DIP publication */
   public static final String VALUE_FIELD_NAME = "value";
-  
+
   /**
    * Maps the {@link DipPublication} objects to the tag id. For each tag subscription there is
    * exactly one entry registered in this map.
    */
   private final Map<Long, DipPublication> publications = new HashMap<Long, DipPublication>();
-  
+
   /**
    * Allows to manage the life cycle management of publications and subscriptions.
    */
   private final DipFactory dipFactory;
-  
+
   @Autowired
   public DipPublisher(@Value("${c2mon.publisher.dip.server.name}") final String serverName) {
     dipFactory = Dip.create(serverName);
     LOG.info("Created new DIP publisher: " + serverName);
   }
-  
+
   @Override
   public void onUpdate(final ClientDataTagValue cdt, final TagConfig cdtConfig) {
     // Saves the received value into a separate file
-    Logger logger = Logger.getLogger("ClientDataTagLogger");
-    logger.debug(cdt);
-    
+    Logger logger = LoggerFactory.getLogger("ClientDataTagLogger");
+    logger.debug("{}", cdt);
+
     if (LOG.isDebugEnabled()) {
       StringBuffer str = new StringBuffer("received tag update [\n");
       str.append(" id          : " + cdt.getId() + "\n");
@@ -110,12 +111,12 @@ public class DipPublisher implements Publisher {
       str.append(" qdescription: " + cdt.getDataTagQuality().getDescription() + "\n");
       str.append(" qcode       : " + cdt.getDataTagQuality().toString() + "\n]");
 
-      LOG.debug(str.toString());        
+      LOG.debug(str.toString());
     }
-    
+
     if (cdt.getDataTagQuality().isExistingTag() && cdtConfig != null) {
       String dipAddress = cdtConfig.getDipPublication();
-      
+
       if (dipAddress == null) {
         LOG.error("No DIP publication address defined for tag " + cdt.getId() + " ==> No DIP publication possible!");
       }
@@ -124,7 +125,7 @@ public class DipPublisher implements Publisher {
           if (!publications.containsKey(cdt.getId())) {
             publications.put(cdt.getId(), createDipPublication(dipAddress.trim()));
           }
-          
+
           DipPublication publication = publications.get(cdt.getId());
           // Check, if address has changed
           if (!dipAddress.trim().equalsIgnoreCase(publication.getTopicName())) {
@@ -133,7 +134,7 @@ public class DipPublisher implements Publisher {
             publication = createDipPublication(dipAddress.trim());
             publications.put(cdt.getId(), publication);
           }
-          
+
           publishTag(cdt, publication);
         }
         catch (DipException ex) {
@@ -159,9 +160,9 @@ public class DipPublisher implements Publisher {
       }
     }
   }
-  
+
   /**
-   * Creates a new DIP publication object. 
+   * Creates a new DIP publication object.
    * @param dipAddress The dip publication topic
    * @return A new DIP publication object
    * @throws DipException In case of errors during the creation
@@ -169,11 +170,11 @@ public class DipPublisher implements Publisher {
   private DipPublication createDipPublication(final String dipAddress) throws DipException {
     return dipFactory.createDipPublication(dipAddress, new DIPErrHandler());
   }
-  
+
   /**
    * Inner method which publishes the tag value. We assume that stage we have a valid
    * {@link DipPublication} object for this tag.
-   * 
+   *
    * @param cdt The tag update value
    * @param pub DIP publication address
    */
@@ -217,48 +218,48 @@ public class DipPublisher implements Publisher {
 
       if (cdt.getDataTagQuality().isExistingTag()) {
         data.insert("id", cdt.getId().longValue());
-        
+
         if (isASCII(cdt.getValueDescription())) {
           data.insert("valueDescription", cdt.getValueDescription());
         }
         else {
-          LOG.warn("valueDescription of tag " + cdt.getId() + " is not compatible to US-ASCII: " 
+          LOG.warn("valueDescription of tag " + cdt.getId() + " is not compatible to US-ASCII: "
               + cdt.getValueDescription() + " ==> valueDescription field won't be send!");
           data.insert("valueDescription", "");
         }
-        
+
         data.insert("timestamp", cdt.getServerTimestamp().getTime());
         data.insert("sourceTimestamp", cdt.getTimestamp().getTime());
-        
+
         if (isASCII(cdt.getUnit())) {
           data.insert("unit", cdt.getUnit());
         }
         else {
-          LOG.warn("Unit of tag " + cdt.getId() + " is not compatible to US-ASCII: " 
+          LOG.warn("Unit of tag " + cdt.getId() + " is not compatible to US-ASCII: "
               + cdt.getUnit() + " ==> Unit field won't be send!");
           data.insert("unit", "");
         }
-        
+
         data.insert("name", cdt.getName());
-        
+
         if (isASCII(cdt.getDescription())) {
           data.insert("description", cdt.getDescription());
         }
         else {
-          LOG.warn("Description of tag " + cdt.getId() + " is not compatible to US-ASCII: " 
+          LOG.warn("Description of tag " + cdt.getId() + " is not compatible to US-ASCII: "
               + cdt.getDescription() + " ==> Decription field won't be send!");
           data.insert("description", "");
         }
-        
+
         data.insert("mode", cdt.getMode().toString());
         data.insert("simulated", cdt.isSimulated());
         data.insert("wiki", DIP_WIKI_URL);
-        // We only add point details URL, if it was specified 
+        // We only add point details URL, if it was specified
         if (!pointDetailsURL.equalsIgnoreCase("")) {
           data.insert("pointDetails", pointDetailsURL + cdt.getId().toString());
         }
-      
-      
+
+
         if (cdt.isValid()) {
           if (LOG.isDebugEnabled()) {
             LOG.debug("\ttag's type: " + cdt.getType().getName());
@@ -298,9 +299,9 @@ public class DipPublisher implements Publisher {
     catch (Exception ex) {
       LOG.error("An exception was caught whilst updating tag " + cdt.getId(), ex);
     }
-    
+
   }
-  
+
   /**
    * Checks whether the given text is <b>US-ASCII</b> compatible or not.
    * @param text the text that shall be checked
@@ -308,16 +309,16 @@ public class DipPublisher implements Publisher {
    */
   protected static boolean isASCII(final String text) {
     try {
-      final CharsetEncoder asciiEncoder = Charset.forName("US-ASCII").newEncoder(); 
+      final CharsetEncoder asciiEncoder = Charset.forName("US-ASCII").newEncoder();
       return asciiEncoder.canEncode(text);
     }
     catch (Exception e) {
       return false;
     }
   }
-  
-  
-  
+
+
+
   /**
    * This class implements DIP error handler
    */
@@ -328,5 +329,5 @@ public class DipPublisher implements Publisher {
     public void handleException(final DipPublication dp, final DipException de) {
       LOG.error("Publication source " + dp.getTopicName() + " has error: " + de.getMessage());
     }
-  } 
+  }
 }

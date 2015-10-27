@@ -30,7 +30,8 @@ import java.util.Set;
 
 import javax.annotation.PreDestroy;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +52,7 @@ import cern.c2mon.shared.client.tag.TagConfig;
 @Service
 public class Gateway implements DataTagUpdateListener {
   /**  The Log4j's logger  */
-  private static final Logger LOG = Logger.getLogger(Gateway.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Gateway.class);
   
   /** The C2MON tag manager */
   private final C2monTagManager tagManager;

@@ -1,7 +1,7 @@
 /*******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2004 - 2012 CERN. This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
@@ -12,7 +12,7 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
 package cern.c2mon.publisher.core;
@@ -29,28 +29,28 @@ import org.springframework.stereotype.Service;
 /**
  * A File watchdog process which checks every 60 seconds if the file with
  * provides the list of tag ids has changed.
- * 
+ *
  * @author Matthias Braeger
  */
 @Service
 class TidWatchdog extends FileWatchdog {
-  
+
   /** Environment variable that defines the location of the tid file as URL */
-  private static final String PUBLISHER_TID_FILE = 
+  private static final String PUBLISHER_TID_FILE =
     System.getProperty("c2mon.publisher.tid.location", "conf/publisher.tid");
-  
+
   /** The Log4j's logger */
   private static Logger logger = Logger.getLogger(FileWatchdog.class);
-  
+
   /** The publisher core gateway service */
   private final Gateway gateway;
-  
+
   /**
    * Default Constructor
-   * 
+   *
    * Initializes the TID watchdag to scan for the default file "conf/publisher.tid".
    * Alternatively, the default location can be overwritten with the following Java
-   * environment variable: 
+   * environment variable:
    * <p>
    * <code>-Dpublisher.tid.location</code>
    * @param gateway The publisher core gateway
@@ -60,7 +60,7 @@ class TidWatchdog extends FileWatchdog {
     super(PUBLISHER_TID_FILE);
     this.gateway = gateway;
   }
-  
+
   /**
    * Starts the watchdog thread
    */
@@ -71,7 +71,7 @@ class TidWatchdog extends FileWatchdog {
     doOnChange();
     super.start();
   }
-  
+
   /**
    * Tests if the TID file exists, otherwise it throws a runtime exception.
    * @throws RuntimeException In case the TID file does not exists
@@ -89,7 +89,7 @@ class TidWatchdog extends FileWatchdog {
   @Override
   protected void doOnChange() {
     logger.info("TID file has changed!");
-    
+
     if (gateway != null && !this.gateway.subscribeDataTags(new File(PUBLISHER_TID_FILE))) {
       logger.error("Unable to successfully parse data tag file " + PUBLISHER_TID_FILE);
     }

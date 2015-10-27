@@ -61,14 +61,14 @@ public final class RdaPublisher implements Publisher {
 
     /**
      * Default constructor
-     * 
+     *
      * @param serverName The device name that is used for creating the RDA3 server
      * @throws RdaException In case of a problem at creation time of the RDA3 server
      */
     @Autowired
     public RdaPublisher(@Value("${c2mon.publisher.rda.server.name}") final String serverName) throws RdaException {
         log4jObjectRenderer = new ClientDataTagValueRenderer();
-      
+
         ServerBuilder builder = ServerBuilder.newInstance();
         builder.setServerName(serverName);
         builder.setRequestReplyCallback(new RRCallback());
@@ -100,7 +100,7 @@ public final class RdaPublisher implements Publisher {
 
     /**
      * Private method to find a property by its property name
-     * 
+     *
      * @param name The name of the device which corresponds to the data tag name
      * @return A reference to the device or null if not found
      */
@@ -187,7 +187,7 @@ public final class RdaPublisher implements Publisher {
     /**
      * Updates the corresponding {@link SimpleProperty} instance about the value update. In case of a new (yet) unknown
      * tag a new {@link SimpleProperty} instance is first of all created.
-     * 
+     *
      * @param cdt An new tag update received by the {@link Gateway}
      * @param cdtConfig The tag configuration which is belonging to this tag update
      */
@@ -218,7 +218,7 @@ public final class RdaPublisher implements Publisher {
 
     /**
      * Internal helper method for parsing the japc publication string and
-     * 
+     *
      * @param japcPublication the japc publication address as it is defined by the
      *            {@link TagConfig#getJapcPublication()} method
      * @return The property name without the leading device name

@@ -17,7 +17,8 @@
  *****************************************************************************/
 package cern.c2mon.japc.publisher;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.japc.Selector;
 import cern.japc.SimpleParameterValue;
@@ -37,7 +38,7 @@ import cern.c2mon.client.core.C2monServiceGateway;
 public class JAPCPublisher {
 
   /** The Log4j's logger */
-  private static Logger logger = Logger.getLogger(JAPCPublisher.class);
+  private static Logger logger = LoggerFactory.getLogger(JAPCPublisher.class);
 
   private ServerRemoteFactory serverRemoteFactory;
   

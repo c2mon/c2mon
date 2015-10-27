@@ -27,7 +27,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
@@ -43,7 +44,7 @@ import cern.c2mon.shared.client.supervision.Heartbeat;
  */
 public class JAPCGateway  implements DataTagUpdateListener, HeartbeatListener {
   /**  The Log4j's logger  */
-  private static final Logger LOG = Logger.getLogger(JAPCGateway.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JAPCGateway.class);
   
   /** Used to remember when the last heartbeat was received */
   private Timestamp lastHartbeat = null;

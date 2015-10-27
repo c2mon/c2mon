@@ -1,6 +1,7 @@
 package cern.c2mon.publisher.test;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
@@ -11,7 +12,7 @@ import cern.c2mon.shared.client.tag.TagConfig;
 public class TestPublisher implements Publisher {
 
   /** LOG4J logger instance */
-  private static final Logger LOG = Logger.getLogger(TestPublisher.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TestPublisher.class);
   
   /** tag update counter */
   private static int counter = 0;
