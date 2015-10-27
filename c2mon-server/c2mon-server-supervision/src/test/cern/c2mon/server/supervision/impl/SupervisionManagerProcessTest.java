@@ -360,7 +360,7 @@ public class SupervisionManagerProcessTest {
   public void onProcessConfiguration() {
     LOGGER.info("onProcessConfiguration - Configuration");
 
-    LOGGER.info(this.processConfigurationRequest.toString());
+    LOGGER.info("{}", this.processConnectionRequest);
 
     String xmlProcessConfigurationResponse = this.supervisionManager.onProcessConfiguration(this.processConfigurationRequest);
     assertNotNull(xmlProcessConfigurationResponse);
@@ -382,7 +382,7 @@ public class SupervisionManagerProcessTest {
   public void onProcessDisconnection() {
     LOGGER.info("Disconnection");
 
-    LOGGER.info(processDisconnectionRequest.toString());
+    LOGGER.info("{}", this.processConnectionRequest);
 
     this.supervisionManager.onProcessDisconnection(this.processDisconnectionRequest);
   }
