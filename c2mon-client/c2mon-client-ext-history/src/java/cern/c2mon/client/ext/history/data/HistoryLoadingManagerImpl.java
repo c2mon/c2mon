@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.ext.history.common.HistoryLoadingManager;
@@ -53,7 +54,7 @@ import cern.c2mon.client.ext.history.data.utilities.DateUtil;
 public class HistoryLoadingManagerImpl extends HistoryLoadingManagerAbs implements HistoryLoadingManager {
 
   /** Log4j logger for this class */
-  private static final Logger LOG = Logger.getLogger(HistoryLoadingManagerImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HistoryLoadingManagerImpl.class);
 
   /** The timeout for waiting for the loading to stop */
   private static final long STOP_LOADING_TIMEOUT = 20000;

@@ -12,7 +12,8 @@ package cern.c2mon.client.ext.history.dbaccess.util;
 
 import java.sql.Timestamp;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.ext.history.ClientDataTagRequestCallback;
@@ -35,7 +36,7 @@ import cern.c2mon.shared.common.type.TypeConverter;
 public final class BeanConverterUtil {
 
     /** Log4j logger for this class */
-    private static final Logger LOG = Logger.getLogger(BeanConverterUtil.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BeanConverterUtil.class);
 
     /**
      * Converts a {@link HistoryRecordBean} object to a {@link TagValueUpdate}

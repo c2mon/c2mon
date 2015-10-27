@@ -24,7 +24,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.ext.history.common.HistoryUpdate;
 import cern.c2mon.client.ext.history.common.event.PlaybackControlAdapter;
@@ -43,7 +44,7 @@ import cern.c2mon.client.ext.history.util.HistoryGroup;
 public class HistoryScheduler {
 
   /** Log4j logger for this class */
-  private static final Logger LOG = Logger.getLogger(HistoryScheduler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HistoryScheduler.class);
 
   /** The amount of milliseconds that it can be behind schedule (in real time) */
   public static final long BEHIND_SCHEDULE_THRESHOLD = 200;

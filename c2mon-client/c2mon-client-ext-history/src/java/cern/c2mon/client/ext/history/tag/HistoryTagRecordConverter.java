@@ -25,7 +25,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.nfunk.jep.JEP;
 import org.nfunk.jep.ParseException;
 import org.nfunk.jep.function.PostfixMathCommand;
@@ -48,7 +49,7 @@ import cern.c2mon.shared.common.type.TypeConverter;
 final class HistoryTagRecordConverter {
 
   /** Log4j Logger for this class */
-  private static final Logger LOG = Logger.getLogger(HistoryTagRecordConverter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HistoryTagRecordConverter.class);
 
   /** The history tag that this convertion is for */
   private final HistoryTag historyTag;

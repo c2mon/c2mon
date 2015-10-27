@@ -29,7 +29,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.Tag;
@@ -60,7 +61,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEnti
 abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
 
   /** Log4j logger for this class */
-  private static final Logger LOG = Logger.getLogger(HistoryLoadingManagerAbs.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HistoryLoadingManagerAbs.class);
   
   /** <code>true</code> if currently loading */
   private boolean loading;

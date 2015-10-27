@@ -3,7 +3,8 @@ package cern.c2mon.client.ext.history.playback.publish;
 import java.sql.Timestamp;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
@@ -33,7 +34,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStat
 public class HistoryPublisher {
 
   /** Log4j logger for this class */
-  private static final Logger LOG = Logger.getLogger(HistoryPublisher.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HistoryPublisher.class);
   
   /** Manages the listeners of the tags */
   private final TagListenersManager tagListenersManager;

@@ -18,7 +18,8 @@
 package cern.c2mon.client.ext.history;
 
 import cern.c2mon.client.ext.history.alarm.AlarmHistoryService;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -27,7 +28,7 @@ import cern.c2mon.client.core.C2monServiceGateway;
 public class C2monHistoryGateway {
 
   /** Class logger */
-  private static final Logger LOG = Logger.getLogger(C2monHistoryGateway.class);
+  private static final Logger LOG = LoggerFactory.getLogger(C2monHistoryGateway.class);
 
   /** The path to the core Spring XML */
   private static final String APPLICATION_SPRING_XML_PATH

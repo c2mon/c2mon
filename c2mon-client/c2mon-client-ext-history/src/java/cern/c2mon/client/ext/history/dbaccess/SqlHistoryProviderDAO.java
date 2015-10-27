@@ -24,7 +24,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.ext.history.ClientDataTagRequestCallback;
@@ -56,7 +57,7 @@ import cern.c2mon.shared.client.tag.TagValueUpdate;
 class SqlHistoryProviderDAO extends HistoryProviderAbs {
 
   /** The logger instance */
-  private static final Logger LOG = Logger.getLogger(SqlHistoryProviderDAO.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SqlHistoryProviderDAO.class);
 
   /** The number of days available from the database */
   private static final int NUMBER_OF_DAYS_AVAILABLE = 30;

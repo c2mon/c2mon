@@ -25,7 +25,8 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +59,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEnti
 public class HistoryManager implements C2monHistoryManager, TagSubscriptionListener {
 
   /** Log4j logger for this class */
-  private static final Logger LOG = Logger.getLogger(HistoryManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HistoryManager.class);
   
   /** Reference to the <code>TagManager</code> singleton */
   private final AdvancedTagService tagService;

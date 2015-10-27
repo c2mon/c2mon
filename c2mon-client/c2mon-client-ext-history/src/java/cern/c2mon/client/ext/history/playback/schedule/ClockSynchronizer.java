@@ -19,7 +19,8 @@ package cern.c2mon.client.ext.history.playback.schedule;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.ext.history.common.event.PlaybackControlAdapter;
 import cern.c2mon.client.ext.history.playback.PlaybackSynchronizeControl;
@@ -35,7 +36,7 @@ import cern.c2mon.client.ext.history.playback.schedule.event.TimerQueueListener;
 public class ClockSynchronizer implements TimerQueueListener {
 
   /** Log4j logger for this class */
-  private static final Logger LOG = Logger.getLogger(ClockSynchronizer.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClockSynchronizer.class);
 
   /** The thread used to delay the clock when the tag updates is taking too long */
   private Thread timerBehindScheduleThread = null;

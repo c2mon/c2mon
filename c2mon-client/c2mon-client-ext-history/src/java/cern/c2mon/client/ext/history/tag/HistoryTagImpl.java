@@ -25,7 +25,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
@@ -59,7 +60,7 @@ import cern.c2mon.shared.rule.RuleExpression;
 public class HistoryTagImpl implements HistoryTag {
 
   /** Log4j Logger for this class */
-  private static final Logger LOG = Logger.getLogger(HistoryTagImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HistoryTagImpl.class);
 
   /** The data which is shown to the user. */
   private ArrayList<HistoryTagRecord> data = null;

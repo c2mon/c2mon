@@ -22,7 +22,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Keeps a count of all running thread.
@@ -33,7 +34,7 @@ import org.apache.log4j.Logger;
 public class ThreadManager {
 
   /** Log4j logger for this class */
-  private static final Logger LOG = Logger.getLogger(ThreadManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ThreadManager.class);
   
   /** The list of threads */
   private final List<Thread> threads;

@@ -19,7 +19,8 @@ package cern.c2mon.client.ext.history.playback.player;
 
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.ext.history.common.PlaybackControl;
 import cern.c2mon.client.ext.history.common.event.PlaybackControlListener;
@@ -40,7 +41,7 @@ import cern.c2mon.client.ext.history.playback.player.event.ClockListener;
 public class PlaybackControlImpl implements PlaybackControl, PlaybackSynchronizeControl {
 
   /** Log4j logger for this class */
-  private static final Logger LOG = Logger.getLogger(HistoryPlayerImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HistoryPlayerImpl.class);
 
   /** A manager which keeps track of the listeners */
   private final ListenersManager<PlaybackControlListener> listenersManager = new ListenersManager<PlaybackControlListener>();

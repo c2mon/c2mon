@@ -9,7 +9,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.ext.history.ClientDataTagRequestCallback;
@@ -34,7 +35,7 @@ import cern.c2mon.client.ext.history.util.KeyForValuesMap;
 class SqlHistoryEventsProviderDAO extends SqlHistoryProviderDAO {
 
   /** The logger instance */
-  private static final Logger LOG = Logger.getLogger(SqlHistoryEventsProviderDAO.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SqlHistoryEventsProviderDAO.class);
 
   /**
    * ORA-01795: maximum number of expressions in a list is 1000

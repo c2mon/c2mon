@@ -26,7 +26,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.common.tag.Tag;
@@ -82,7 +83,7 @@ public class HistoryPlayerImpl
     implements HistoryPlayer, HistoryPlayerInternal, HistoryPlayerCoreAccess, HistoryPlayerEvents {
 
   /** Log4j logger for this class */
-  private static final Logger LOG = Logger.getLogger(HistoryPlayerImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HistoryPlayerImpl.class);
   
   /** A manager which keeps track of the listeners */
   private final ListenersManager<HistoryPlayerListener> historyPlayerListeners;

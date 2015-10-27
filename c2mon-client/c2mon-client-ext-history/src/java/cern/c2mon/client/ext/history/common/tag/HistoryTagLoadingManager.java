@@ -31,7 +31,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.ext.history.C2monHistoryGateway;
@@ -53,7 +54,7 @@ import cern.c2mon.client.ext.history.common.tag.HistoryTagConfigurationStatus.Lo
 public final class HistoryTagLoadingManager {
 
   /** Log4j instance */
-  private static final Logger LOG = Logger.getLogger(HistoryTagLoadingManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HistoryTagLoadingManager.class);
   
   /** The instance, if any */
   private static HistoryTagLoadingManager instance = null;

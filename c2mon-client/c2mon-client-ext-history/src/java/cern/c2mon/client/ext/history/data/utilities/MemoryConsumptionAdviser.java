@@ -20,7 +20,8 @@ package cern.c2mon.client.ext.history.data.utilities;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is used to check the memory consumption. Is used by the
@@ -34,7 +35,7 @@ import org.apache.log4j.Logger;
 public class MemoryConsumptionAdviser {
 
   /** Log4j logger for this class */
-  private static final Logger LOG = Logger.getLogger(MemoryConsumptionAdviser.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MemoryConsumptionAdviser.class);
 
   /** The default value of {@link #maximumMemoryConsumption} */
   private static final double DEFAULT_MAXIMUM_MEMORY_CONSUMPTION_PERCENT = 0.75;

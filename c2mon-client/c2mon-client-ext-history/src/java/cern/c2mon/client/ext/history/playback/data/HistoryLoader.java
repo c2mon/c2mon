@@ -31,7 +31,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.ext.history.common.HistoryProvider;
 import cern.c2mon.client.ext.history.common.HistorySupervisionEvent;
@@ -61,7 +62,7 @@ import cern.c2mon.client.ext.history.util.DataIdUtil;
 public class HistoryLoader {
 
   /** Log4j logger for this class */
-  private static final Logger LOG = Logger.getLogger(HistoryLoader.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HistoryLoader.class);
   
   /**
    * The maximum memory consumption in percent of the total memory available
