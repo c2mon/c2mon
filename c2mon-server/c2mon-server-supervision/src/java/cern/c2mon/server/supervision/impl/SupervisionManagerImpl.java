@@ -23,7 +23,8 @@ import java.util.Collection;
 
 import javax.annotation.Resource;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
@@ -85,7 +86,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
   /**
    * Private class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(SupervisionManagerImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SupervisionManagerImpl.class);
 
   @Resource
   private ProcessCache processCache;
@@ -263,7 +264,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       str.append(", ");
       str.append(processDisconnectionRequest.getProcessStartupTime());
       str.append("]) called.");
-      LOGGER.debug(str);
+      LOGGER.debug(str.toString());
     }
     //TODO remove inaccessible once fixed on client
     //int invalidationFlags = DataTagQuality.INACCESSIBLE + DataTagQuality.PROCESS_DOWN;
@@ -410,7 +411,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       str.append(", ");
       str.append(processConfigurationRequest.getProcessPIK());
       str.append("]) called.");
-      LOGGER.debug(str);
+      LOGGER.debug(str.toString());
     }
 
     // Retrieve the cache object for the process as well as its state tag
@@ -433,7 +434,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           + processConfigurationRequest.getProcessName() + ") - unable to accept connection request.", cacheEx);
       processConfigurationResponse.setConfigurationXML(ProcessConfigurationResponse.CONF_REJECTED);
     } catch (Exception e) {
-      LOGGER.error(new StringBuffer("onProcessConfiguration - An unexpected Exception occurred."), e);
+      LOGGER.error(new StringBuffer("onProcessConfiguration - An unexpected Exception occurred.").toString(), e);
       processConfigurationResponse.setConfigurationXML(ProcessConfigurationResponse.CONF_REJECTED);
     }
 
@@ -466,7 +467,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     msg.append(") has expired.");
 
     // Log the message
-    LOGGER.debug(msg);
+    LOGGER.debug(msg.toString());
 
     if (aliveTimer.getRelatedId() == null) {
       LOGGER.error("AliveTimer has not relatedId - unable to take any action on alive reception.");
@@ -549,7 +550,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       str.append(timestamp);
       str.append(", ");
       str.append(message);
-      LOGGER.debug(str);
+      LOGGER.debug(str.toString());
     }
 
     equipmentFacade.suspend(equipmentId, timestamp, message);
@@ -581,7 +582,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       str.append(timestamp);
       str.append(", ");
       str.append(message);
-      LOGGER.debug(str);
+      LOGGER.debug(str.toString());
     }
     subEquipmentFacade.suspend(subEquipmentId, timestamp, message);
     Long stateTagId = subEquipmentCopy.getStateTagId();
@@ -614,7 +615,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       str.append(pTimestamp);
       str.append(", ");
       str.append(pMessage);
-      LOGGER.debug(str);
+      LOGGER.debug(str.toString());
     }
 
     processFacade.suspend(processId, pTimestamp, pMessage);
@@ -709,7 +710,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           StringBuilder str = new StringBuilder("processControlTag() : tag ");
           str.append(tagId);
           str.append(" is a commfault tag.");
-          LOGGER.debug(str);
+          LOGGER.debug(str.toString());
         }
 
         if (equipmentCache.hasKey(commFaultTagCopy.getEquipmentId())) { //check if equipment
@@ -805,7 +806,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       str.append(", ");
       str.append(pTimestamp);
       str.append(") called.");
-      LOGGER.debug(str);
+      LOGGER.debug(str.toString());
     }
     processFacade.resume(processId, pTimestamp, pMessage);
 
@@ -857,7 +858,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       str.append(pTimestamp);
       str.append(", ");
       str.append(pMessage);
-      LOGGER.debug(str);
+      LOGGER.debug(str.toString());
     }
     // Try to obtain a copy of the state tag with its current value
     try {
@@ -911,7 +912,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       str.append(pTimestamp);
       str.append(", ");
       str.append(pMessage);
-      LOGGER.debug(str);
+      LOGGER.debug(str.toString());
     }
 
     try {
@@ -997,7 +998,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       str.append(", ");
       str.append(processConnectionRequest.getProcessStartupTime());
       str.append("]) called.");
-      LOGGER.debug(str);
+      LOGGER.debug(str.toString());
     }
 
     // Retrieve the cache object for the process as well
@@ -1066,7 +1067,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           + processConnectionRequest.getProcessName() + ") - unable to accept connection request.", cacheEx);
       processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
     } catch (Exception e) {
-      LOGGER.error(new StringBuffer("onProcessConnection - An unexpected Exception occurred."), e);
+      LOGGER.error(new StringBuffer("onProcessConnection - An unexpected Exception occurred.").toString(), e);
       processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
     }
 

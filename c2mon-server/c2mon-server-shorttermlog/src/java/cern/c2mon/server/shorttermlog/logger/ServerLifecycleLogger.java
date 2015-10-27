@@ -5,7 +5,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.ibatis.exceptions.PersistenceException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.SmartLifecycle;
@@ -33,7 +34,7 @@ public class ServerLifecycleLogger implements SmartLifecycle {
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ServerLifecycleLogger.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ServerLifecycleLogger.class);
   
   /**
    * Lifecycle flag.

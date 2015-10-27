@@ -19,7 +19,8 @@ package cern.c2mon.server.configuration.handler.impl;
 
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -42,7 +43,7 @@ public class DeviceClassConfigHandlerImpl implements DeviceClassConfigHandler {
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(DeviceClassConfigHandlerImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DeviceClassConfigHandlerImpl.class);
 
   /**
    * Transacted bean.

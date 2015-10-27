@@ -21,7 +21,8 @@ package cern.c2mon.server.cache.command;
 import java.lang.reflect.Field;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,7 +54,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
   /**
    * Private class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(CommandTagFacadeImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CommandTagFacadeImpl.class);
   
   /**
    * Reference to the cache.

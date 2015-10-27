@@ -22,7 +22,8 @@ import java.util.Collection;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;
 
 import cern.c2mon.server.cache.BufferedTimCacheListener;
@@ -48,7 +49,7 @@ public class PersistenceSynchroListener implements BufferedTimCacheListener<Long
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(PersistenceSynchroListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(PersistenceSynchroListener.class);
   
   /**
    * SynchroBuffer max time.

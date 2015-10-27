@@ -8,14 +8,15 @@ import java.util.Properties;
 
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PropertiesTypeHandler implements TypeHandler {
 
   /**
    * Private class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(PropertiesTypeHandler.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesTypeHandler.class);
 
   @Override
   public Object getResult(ResultSet rs, String arg1) throws SQLException {

@@ -32,7 +32,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
@@ -97,7 +98,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ConfigurationLoaderImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationLoaderImpl.class);
 
   /**
    * Avoids interfering with running cache persistence jobs.

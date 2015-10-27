@@ -24,7 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.cache.C2monCacheWithSupervision;
 import cern.c2mon.server.cache.CacheSupervisionListener;
@@ -59,7 +60,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(AbstractTagCache.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTagCache.class);
   
   /** The max result size should avoid to run into an OutOfMemory Exception when doing a wildcard search */
   private static final int MAX_RESULT_SIZE = 100000;

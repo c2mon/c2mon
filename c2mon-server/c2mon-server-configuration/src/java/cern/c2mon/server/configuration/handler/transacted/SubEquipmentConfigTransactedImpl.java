@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -48,7 +49,7 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(SubEquipmentConfigTransactedImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SubEquipmentConfigTransactedImpl.class);
 
   /**
    * Facade.

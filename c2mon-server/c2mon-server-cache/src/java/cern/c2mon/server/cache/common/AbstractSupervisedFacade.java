@@ -20,7 +20,8 @@ package cern.c2mon.server.cache.common;
 
 import java.sql.Timestamp;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.cache.AliveTimerCache;
 import cern.c2mon.server.cache.AliveTimerFacade;
@@ -48,7 +49,7 @@ public abstract class AbstractSupervisedFacade<T extends Supervised> extends Abs
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(AbstractSupervisedFacade.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSupervisedFacade.class);
 
   /**
    * Reference to the cache.

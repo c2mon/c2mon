@@ -22,7 +22,8 @@ package cern.c2mon.server.configuration.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.configuration.ConfigurationUpdate;
@@ -45,7 +46,7 @@ public class ConfigurationUpdateImpl implements ConfigurationUpdate {
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ConfigurationUpdateImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationUpdateImpl.class);
 
   /**
    * List of registered listeners.

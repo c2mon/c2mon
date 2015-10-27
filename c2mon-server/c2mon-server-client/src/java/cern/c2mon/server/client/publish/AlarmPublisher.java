@@ -2,7 +2,8 @@ package cern.c2mon.server.client.publish;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
@@ -44,7 +45,7 @@ import com.google.gson.Gson;
 public class AlarmPublisher implements C2monCacheListener<Alarm>, SmartLifecycle, Publisher<AlarmValue>  {
   
   /** Class logger */
-  private static final Logger LOGGER = Logger.getLogger(AlarmPublisher.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AlarmPublisher.class);
   
   /** Bean providing for sending JMS messages and waiting for a response */
   private final JmsSender jmsSender;

@@ -1,6 +1,7 @@
 package cern.c2mon.server.configuration.handler.transacted;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +41,7 @@ abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransa
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(TagConfigTransactedImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(TagConfigTransactedImpl.class);
   
   protected C2monCache<Long, T> tagCache;
   

@@ -22,7 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
@@ -67,8 +68,8 @@ import cern.c2mon.server.common.config.ServerConstants;
 @Service
 public class CacheConsistencyChecker implements SmartLifecycle {
 
-  private static final Logger LOG = Logger.getLogger(CacheConsistencyChecker.class);
-  private static final Logger EMAIL_LOG = Logger.getLogger("AdminEmailLogger");
+  private static final Logger LOG = LoggerFactory.getLogger(CacheConsistencyChecker.class);
+  private static final Logger EMAIL_LOG = LoggerFactory.getLogger("AdminEmailLogger");
 
   /**
    * Lifecycle flag.
@@ -153,7 +154,7 @@ public class CacheConsistencyChecker implements SmartLifecycle {
           email.append(message).append("\n");
         }
 
-        EMAIL_LOG.error(email);
+        EMAIL_LOG.error(email.toString());
       }
 
       LOG.info("Finished cache consistency check.");

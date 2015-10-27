@@ -20,7 +20,8 @@ package cern.c2mon.server.shorttermlog.listener;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,7 @@ public class LogSupervisionListener implements SupervisionListener, SmartLifecyc
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(LogSupervisionListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(LogSupervisionListener.class);
   
   /**
    * Notifier of supervision module.

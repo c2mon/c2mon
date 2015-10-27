@@ -8,7 +8,8 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.SmartLifecycle;
@@ -40,7 +41,7 @@ import cern.c2mon.shared.rule.RuleEvaluationException;
 @Service
 public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycle, RuleEvaluator {
 
-  private static final Logger LOGGER = Logger.getLogger(RuleEvaluatorImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RuleEvaluatorImpl.class);
 
   private final RuleTagCache ruleTagCache;
 
@@ -134,7 +135,7 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
   public final void evaluateRule(final Long pRuleId) {
     if (LOGGER.isTraceEnabled()) {
       StringBuffer str = new StringBuffer("").append(pRuleId).append(" evaluateRule() called");
-      LOGGER.trace(str);
+      LOGGER.trace(str.toString());
     }
 
     final Timestamp ruleResultTimestamp = new Timestamp(System.currentTimeMillis());

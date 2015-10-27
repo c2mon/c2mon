@@ -18,7 +18,7 @@ public class AlarmRenderer implements ObjectRenderer {
 
     /**
      * Implementation of the ObjectRenderer interface
-     * 
+     *
      * @param o the DataTagCacheObject to be rendered
      * @return a string representation of the DataTagCacheObject, null if the object passed as a parameter is null.
      */

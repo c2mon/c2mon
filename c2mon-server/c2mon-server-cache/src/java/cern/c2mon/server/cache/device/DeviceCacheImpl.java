@@ -22,7 +22,8 @@ import javax.annotation.PostConstruct;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -48,7 +49,7 @@ public class DeviceCacheImpl extends AbstractCache<Long, Device> implements Devi
   /**
    * Static class logger.
    */
-  private static final Logger LOG = Logger.getLogger(DeviceCacheImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DeviceCacheImpl.class);
 
   @Autowired
   public DeviceCacheImpl(@Qualifier("clusterCache") final ClusterCache clusterCache,

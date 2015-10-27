@@ -21,7 +21,8 @@ package cern.c2mon.server.cache.datatag;
 import java.sql.Timestamp;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -61,12 +62,12 @@ public class DataTagFacadeImpl extends AbstractDataTagFacade<DataTag> implements
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(DataTagFacadeImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DataTagFacadeImpl.class);
 
   /**
    * Logger for logging updates to tags.
    */
-  private static final Logger TAGLOG = Logger.getLogger("DataTagLogger");
+  private static final Logger TAGLOG = LoggerFactory.getLogger("DataTagLogger");
 
   /**
    * Interface to cache module.
@@ -211,7 +212,7 @@ public class DataTagFacadeImpl extends AbstractDataTagFacade<DataTag> implements
   public void log(final DataTagCacheObject dataTagCacheObject) {
     tagCache.acquireReadLockOnKey(dataTagCacheObject.getId());
     try {
-      TAGLOG.info(dataTagCacheObject);
+      TAGLOG.info(dataTagCacheObject.toString());
     } finally {
       tagCache.releaseReadLockOnKey(dataTagCacheObject.getId());
   }

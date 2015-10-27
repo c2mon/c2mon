@@ -6,14 +6,15 @@ import java.io.InputStreamReader;
 
 import javax.sql.DataSource;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 public class TestDataInserterImpl implements TestDataInserter {
   
-  private Logger LOGGER = Logger.getLogger(TestDataInserterImpl.class);
+  private Logger LOGGER = LoggerFactory.getLogger(TestDataInserterImpl.class);
   
   private JdbcTemplate jdbcTemplate;
   

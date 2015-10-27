@@ -23,7 +23,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +56,7 @@ public class CommandExecutionManagerImpl implements CommandExecutionManager {
   /**
    * Private class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(CommandExecutionManagerImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutionManagerImpl.class);
   
   /**
    * Reference to the bean for sending to the DAQ layer.

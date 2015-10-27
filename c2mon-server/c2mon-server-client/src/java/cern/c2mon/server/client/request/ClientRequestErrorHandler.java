@@ -1,6 +1,7 @@
 package cern.c2mon.server.client.request;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ErrorHandler;
 
@@ -14,7 +15,7 @@ import org.springframework.util.ErrorHandler;
 public class ClientRequestErrorHandler implements ErrorHandler {
 
   /** Log4j logger */
-  private static final Logger LOG = Logger.getLogger(ClientRequestErrorHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientRequestErrorHandler.class);
   
   @Override
   public void handleError(final Throwable exception) {

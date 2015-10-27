@@ -20,7 +20,8 @@ package cern.c2mon.server.cache.equipment;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -56,7 +57,7 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment>implements
   /**
    * Static class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(EquipmentCacheImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(EquipmentCacheImpl.class);
 
   /** Used to post configure the associated control tags */
   private final ControlTagCache controlCache;

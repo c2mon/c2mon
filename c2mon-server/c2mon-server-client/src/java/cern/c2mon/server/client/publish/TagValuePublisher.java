@@ -5,7 +5,8 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.JmsException;
@@ -54,7 +55,7 @@ import cern.c2mon.shared.util.jms.JmsSender;
 @ManagedResource(description = "Bean publishing tag updates to the clients")
 public class TagValuePublisher implements AlarmAggregatorListener, ConfigurationUpdateListener, Publisher<TagWithAlarms> {
 
-  private static final Logger LOGGER = Logger.getLogger(TagValuePublisher.class); 
+  private static final Logger LOGGER = LoggerFactory.getLogger(TagValuePublisher.class); 
   
   /** Bean providing for sending JMS messages and waiting for a response */
   private final JmsSender jmsSender;

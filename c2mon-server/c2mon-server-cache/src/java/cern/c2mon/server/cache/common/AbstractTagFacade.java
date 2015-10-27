@@ -28,7 +28,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
@@ -75,7 +76,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(AbstractTagFacade.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTagFacade.class);
 
   /**
    * The cache for objects of type T.

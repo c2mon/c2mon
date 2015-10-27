@@ -2,7 +2,8 @@ package cern.c2mon.server.configuration.handler.impl;
 
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -32,7 +33,7 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ControlTagConfigHandlerImpl.class);  
+  private static final Logger LOGGER = LoggerFactory.getLogger(ControlTagConfigHandlerImpl.class);  
   
   /** Variable definition in configuration element for equipment ID */
   private static final String EQUIPMENT_ID = "equipmentId";

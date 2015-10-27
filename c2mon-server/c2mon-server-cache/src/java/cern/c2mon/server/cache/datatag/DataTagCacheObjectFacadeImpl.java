@@ -2,7 +2,8 @@ package cern.c2mon.server.cache.datatag;
 
 import java.sql.Timestamp;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.tag.AbstractTagObjectFacade;
@@ -18,7 +19,7 @@ public class DataTagCacheObjectFacadeImpl extends AbstractTagObjectFacade<DataTa
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(DataTagCacheObjectFacadeImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DataTagCacheObjectFacadeImpl.class);
   
   /**
    * Update the DataTag object held in the cache with the provided values. 

@@ -22,7 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.UnexpectedRollbackException;
 
 import cern.c2mon.server.cache.AliveTimerCache;
@@ -52,7 +53,7 @@ public abstract class AbstractEquipmentConfigTransacted<T extends AbstractEquipm
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(AbstractEquipmentConfigTransacted.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEquipmentConfigTransacted.class);
 
   /**
    * The ConfigHandler for ControlTags.

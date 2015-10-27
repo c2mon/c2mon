@@ -6,7 +6,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
@@ -37,12 +38,12 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
   /**
    * Log4j Logger for this class.
    */
-  private static final Logger LOGGER = Logger.getLogger(AliveTimerChecker.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AliveTimerChecker.class);
 
   /**
    * SMS logger for warnings.
    */
-  private static final Logger SMS_LOGGER = Logger.getLogger("AdminSmsLogger");
+  private static final Logger SMS_LOGGER = LoggerFactory.getLogger("AdminSmsLogger");
 
   /**
    * Cluster cache key to ensure that a server does not try to access

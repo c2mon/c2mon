@@ -18,7 +18,8 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loading.impl;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class ProcessDAOImpl extends AbstractDefaultLoaderDAO<Process> implements
   /**
    * LOG4J Logger for this class.
    */
-  private static final Logger LOGGER = Logger.getLogger(ProcessDAOImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessDAOImpl.class);
 
   private ProcessMapper processMapper;
 

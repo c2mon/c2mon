@@ -21,7 +21,8 @@ package cern.c2mon.server.cache.datatag;
 import java.sql.Timestamp;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
@@ -58,7 +59,7 @@ import cern.c2mon.shared.daq.config.DataTagUpdate;
 public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractTagFacade<T> {
 
   /** Class logger. */
-  private static final Logger LOGGER = Logger.getLogger(DataTagFacadeImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DataTagFacadeImpl.class);
 
   /**
    * Interface to cache module.

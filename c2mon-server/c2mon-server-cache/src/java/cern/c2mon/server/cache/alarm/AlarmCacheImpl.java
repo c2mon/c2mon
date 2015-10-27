@@ -29,7 +29,8 @@ import net.sf.ehcache.search.Attribute;
 import net.sf.ehcache.search.Query;
 import net.sf.ehcache.search.Result;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -57,7 +58,7 @@ public class AlarmCacheImpl extends AbstractCache<Long, Alarm> implements AlarmC
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(AlarmCacheImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AlarmCacheImpl.class);
 
   @Autowired
   public AlarmCacheImpl(@Qualifier("clusterCache") final ClusterCache clusterCache, 

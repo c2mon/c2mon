@@ -24,7 +24,8 @@ import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.pmanager.IDBPersistenceHandler;
 import cern.c2mon.pmanager.IFallback;
@@ -45,7 +46,7 @@ public class LoggerDAO<T extends IFallback> implements IDBPersistenceHandler {
   /**
    * Private class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(LoggerDAO.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(LoggerDAO.class);
 
   /**
    * Maximum number of statements that will be executed in each SQL batch

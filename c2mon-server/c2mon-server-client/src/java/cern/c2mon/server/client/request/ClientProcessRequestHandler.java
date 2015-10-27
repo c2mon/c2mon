@@ -22,7 +22,8 @@ package cern.c2mon.server.client.request;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,7 @@ import cern.c2mon.shared.client.request.ClientRequestResult;
 class ClientProcessRequestHandler {
   
   /** Private class logger */
-  private static final Logger LOG = Logger.getLogger(ClientProcessRequestHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientProcessRequestHandler.class);
 
   /**
    * Reference to the Process cache that provides a list of all the process

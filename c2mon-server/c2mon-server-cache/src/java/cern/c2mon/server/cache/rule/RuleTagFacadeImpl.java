@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2011 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,7 +13,7 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.server.cache.rule;
@@ -22,7 +22,8 @@ import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,7 @@ import cern.c2mon.shared.rule.RuleExpression;
 
 /**
  * Facade object for manipulating server rules.
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -55,16 +56,16 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
    * Used for tracking nb of rule evaluations in testing. TODO remove once no longer necessary
    */
   private volatile int updateCount = 0; //not completely exact as no locking
-  
+
   /**
    * Logger for logging updates made to rules.
    */
-  private static final Logger RULELOG = Logger.getLogger("RuleTagLogger");
-  
+  private static final Logger RULELOG = LoggerFactory.getLogger("RuleTagLogger");
+
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(RuleTagFacadeImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RuleTagFacadeImpl.class);
 
   /**
    * Property that will by used as trunk. Should
@@ -72,23 +73,23 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
    */
   @Value("${c2mon.jms.tag.publication.topic}")
   private String tagPublicationTrunk = "c2mon.client.tag.default";
-  
+
   /**
    * Reference to the low level Rule Facade bean.
    */
   private RuleTagCacheObjectFacade ruleTagCacheObjectFacade;
-  
+
   /**
    * Reference to the DataTag cache.
    */
   private DataTagCache dataTagCache;
-  
+
   /**
    * Constructor.
-   * 
+   *
    * @param ruleTagCache the RuleTag cache
    * @param ruleTagCacheObjectFacade the low level Rule Facade
-   * @param alarmFacade the Alarm Facade    
+   * @param alarmFacade the Alarm Facade
    * @param alarmCache the Alarm cache
    * @param dataTagCache the DataTag cache
    */
@@ -99,7 +100,7 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
     this.ruleTagCacheObjectFacade = ruleTagCacheObjectFacade;
     this.dataTagCache = dataTagCache;
   }
-  
+
   @Override
   public void setParentSupervisionIds(final Long ruleTagId) {
     tagCache.acquireWriteLockOnKey(ruleTagId);
@@ -111,35 +112,35 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
       tagCache.releaseWriteLockOnKey(ruleTagId);
     }
   }
-  
+
   /**
    * Sets the parent process and equipment fields for RuleTags.
-   * Please notice that the caller method should first make a write lock 
+   * Please notice that the caller method should first make a write lock
    * on the RuleTag reference.
-   * 
+   *
    * @param ruleTag the RuleTag for which the fields should be set
    */
   @Override
   public void setParentSupervisionIds(final RuleTag ruleTag) {
     ((RuleTagCache) tagCache).setParentSupervisionIds(ruleTag);
-  } 
-  
+  }
+
   /**
    * Logs the rule in the specific log4j log, using the log4j renderer in the configuration file
    * (done after every update).
    * @param ruleTagCacheObject the cache object to log
    * TODO not used
-   */  
+   */
   private void log(final RuleTagCacheObject ruleTagCacheObject) {
     if (RULELOG.isInfoEnabled()) {
-      RULELOG.info(ruleTagCacheObject);
-    } else if (updateCount % 10000 == 0) {      
+      RULELOG.info(ruleTagCacheObject.toString());
+    } else if (updateCount % 10000 == 0) {
       RULELOG.warn("Total rule updates to the cache so far: " + updateCount);
-    }              
+    }
   }
 
 //  @Override
-//  public void invalidate(Long id, DataTagQuality dataTagQuality, Timestamp timestamp) {      
+//  public void invalidate(Long id, DataTagQuality dataTagQuality, Timestamp timestamp) {
 //    try {
 //      RuleTag ruleTag = (RuleTag) tagCache.get(id);
 //      ruleTag.getWriteLock().lock();
@@ -147,13 +148,13 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
 //        ruleTagCacheObjectFacade.invalidate(ruleTag, dataTagQuality, timestamp);
 //        tagCache.put(ruleTag.getId, ruleTag);
 //        updateCount++;
-//        log((RuleTagCacheObject) ruleTag);        
+//        log((RuleTagCacheObject) ruleTag);
 //      } finally {
 //        ruleTag.getWriteLock().unlock();
 //      }
-//    } catch (CacheElementNotFoundException cacheEx) {      
+//    } catch (CacheElementNotFoundException cacheEx) {
 //      LOGGER.error("Unable to locate rule in cache (id " + id + ") - no invalidation performed.", cacheEx);
-//    }        
+//    }
 //  }
 
   @Override
@@ -161,7 +162,7 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
     tagCache.acquireWriteLockOnKey(id);
     try {
       RuleTag ruleTag = tagCache.get(id);
-      if (!filterout(ruleTag, value, valueDescription, null, null, timestamp)) {          
+      if (!filterout(ruleTag, value, valueDescription, null, null, timestamp)) {
         ruleTagCacheObjectFacade.validate(ruleTag);
         ruleTagCacheObjectFacade.update(ruleTag, value, valueDescription, timestamp);
         tagCache.put(id, ruleTag);
@@ -172,25 +173,25 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
           LOGGER.trace("Filtering out repeated update for rule " + id);
         }
       }
-    } catch (CacheElementNotFoundException cacheEx) {      
+    } catch (CacheElementNotFoundException cacheEx) {
       LOGGER.error("Unable to locate rule in cache (id " + id + ") - no update performed.", cacheEx);
     } finally {
       tagCache.releaseWriteLockOnKey(id);
-    }  
+    }
   }
 
   /**
    * For rules, sets the rule text field (which in turn parses the rule expression and
    * set the corresponding field). Also sets the parent equipments and processes for this
    * rule.
-   * 
+   *
    * @param ruleTag fields are modified in this RuleTag
    * @param properties the properties used to set the fields.
    * @return always returns null as no changes to rules need propagating to the DAQ
    * @throws ConfigurationException if an exception occurs during reconfiguration
    */
   @Override
-  public Change configureCacheObject(final RuleTag ruleTag, final Properties properties) throws ConfigurationException {    
+  public Change configureCacheObject(final RuleTag ruleTag, final Properties properties) throws ConfigurationException {
     setCommonProperties((RuleTagCacheObject) ruleTag, properties);
     // TAG rule text
     String tmpStr = properties.getProperty("ruleText");
@@ -208,15 +209,15 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
     RuleTagCacheObject ruleTag = new RuleTagCacheObject(id);
     setCommonProperties(ruleTag, properties);
     configureCacheObject(ruleTag, properties);
-    setDefaultRuntimeProperties(ruleTag); 
+    setDefaultRuntimeProperties(ruleTag);
     validateConfig(ruleTag);
     return ruleTag;
   }
-  
+
   /**
    * Checks that a RuleTagCacheObject has a valid configuration. Is
    * used after creating or reconfiguring a tag.
-   * 
+   *
    * @param ruleTag the RuleTag that needs validating
    * @throws ConfigurationException if an error occurs during validation
    */
@@ -232,10 +233,10 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
         exp = ruleTag.getRuleExpression();
       } catch (Exception e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"ruleText\" is not a gramatically correct rule expression");
-      }      
+      }
       if (exp == null) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"ruleText\" is not a gramatically correct rule expression (Expression is null)");
-      }      
+      }
     } else {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"ruleText\" is null for rule " + ruleTag.getId() + " - unable to configure it correctly.");
     }

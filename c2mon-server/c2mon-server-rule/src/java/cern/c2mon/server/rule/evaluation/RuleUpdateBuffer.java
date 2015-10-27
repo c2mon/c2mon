@@ -27,7 +27,8 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +52,7 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
 public final class RuleUpdateBuffer {
 
   /** LOG4J logger instance */
-  private static final Logger LOG = Logger.getLogger(RuleUpdateBuffer.class);    
+  private static final Logger LOG = LoggerFactory.getLogger(RuleUpdateBuffer.class);    
   
   /** The initial buffer size */
   private static final int INITIAL_BUFFER_SIZE = 1000;

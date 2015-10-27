@@ -5,7 +5,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -44,7 +45,7 @@ import cern.c2mon.shared.daq.config.ITagChange;
 @Service
 public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<ControlTag> implements ControlTagConfigTransacted {
 
-  private static final Logger LOGGER = Logger.getLogger(ControlTagConfigTransactedImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ControlTagConfigTransactedImpl.class);
   
   private DataTagFacade dataTagFacade;
   

@@ -9,7 +9,8 @@ import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -30,7 +31,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
   /**
    * Private class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(BasicCache.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(BasicCache.class);
 
   /**
    * Reference to the wrapped Ehcache.

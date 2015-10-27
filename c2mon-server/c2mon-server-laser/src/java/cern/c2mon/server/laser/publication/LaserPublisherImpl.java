@@ -11,7 +11,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Required;
@@ -38,9 +39,9 @@ import cern.c2mon.server.common.config.ServerConstants;
  */
 @ManagedResource(objectName = "cern.c2mon:type=LaserPublisher,name=LaserPublisher")
 public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifecycle, LaserPublisherMBean, LaserPublisher {
-  
+
   private ClusterCache clusterCache;
-  
+
   /**
    * Time between connection attempts at start-up (in millis)
    */
@@ -72,13 +73,13 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
   /**
    * Our Logger
    */
-  private Logger log = Logger.getLogger(LaserPublisherImpl.class);
-  
+  private Logger log = LoggerFactory.getLogger(LaserPublisherImpl.class);
+
   /**
    * For SMS messages on disconnection.
    */
-  private static final Logger SMS_LOGGER = Logger.getLogger("AdminSmsLogger");
-  
+  private static final Logger SMS_LOGGER = LoggerFactory.getLogger("AdminSmsLogger");
+
   /**
    * Has an SMS warning being sent for current problem.
    */
@@ -88,7 +89,7 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
    * yet another logger, that will be configured to output to a file every alarm
    * pushed to LASER
    */
-  private Logger laserLog = Logger.getLogger("LaserAlarmsLogger");
+  private Logger laserLog = LoggerFactory.getLogger("LaserAlarmsLogger");
 
   /** Reference to the LASER alarm system interface. */
   private AlarmSystemInterface asi = null;
@@ -97,17 +98,17 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
    * Is the connect thread already running?
    */
   private volatile boolean connectThreadRunning = false;
-  
+
   /**
    * Flag for lifecycle calls.
    */
   private volatile boolean running = false;
-  
+
   /**
    * Was the initial connection successful at startup.
    */
   private volatile boolean initialConnection = false;
-  
+
   /**
    * Module shutdown request (on server shutdown f.eg.)
    */
@@ -117,34 +118,34 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
    * Service for registering as listener to C2MON caches.
    */
   private CacheRegistrationService cacheRegistrationService;
-  
+
   /**
    * Reference to cache.
    */
   private AlarmCache alarmCache;
-  
+
   /**
    * For persisting changes to alarm publication details in cache object.
    */
   private BatchPersistenceManager alarmPersistenceManager;
-  
+
   /**
    * Timer that re-publishes alarms that failed to publish successfully to LASER.
    */
   private Timer republishTimer;
-  
+
   /**
    * Task run on timer.
    */
   private TimerTask republishTask;
-  
+
   /**
    * Ids of alarms that need re-publishing as publication failed (map is used as set)
    */
   private ConcurrentHashMap<Long, Long> toBePublished = new ConcurrentHashMap<Long, Long>();
 
   private StatisticsModule stats = new StatisticsModule();
-  
+
   /**
    * Listener container for stop/starting;
    */
@@ -152,7 +153,7 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
 
   /**
    * Autowired constructor.
-   * 
+   *
    * @param cacheRegistrationService the C2MON cache registration service bean
    */
   @Autowired
@@ -187,12 +188,12 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
 
   /**
    * Called at server startup.
-   * 
+   *
    * @throws Exception in case the underlying alarm system could not be initiated.
    */
   @PostConstruct
   public void init() throws Exception {
-    listenerContainer = cacheRegistrationService.registerToAlarms(this);    
+    listenerContainer = cacheRegistrationService.registerToAlarms(this);
   }
 
 
@@ -200,14 +201,14 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
    * Only uses the id of the passed alarm: fresh copy is accessed in cache.
    */
   @Override
-  public void notifyElementUpdated(Alarm alarmCopy) {  
+  public void notifyElementUpdated(Alarm alarmCopy) {
     if (running && initialConnection) {
       clusterCache.acquireReadLockOnKey(LaserPublisher.backupLock);
       try {
-        //get most recent alarm in cache and lock access        
+        //get most recent alarm in cache and lock access
         alarmCache.acquireWriteLockOnKey(alarmCopy.getId());
         try {
-          Alarm alarm = alarmCache.get(alarmCopy.getId());        
+          Alarm alarm = alarmCache.get(alarmCopy.getId());
           if (!alarm.isPublishedToLaser()) {
             try {
               publishToLaser(alarm);
@@ -217,8 +218,8 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
               }
             } catch (Exception e) {
               if (smsWarningSent.compareAndSet(false, true)) {
-                SMS_LOGGER.error("Laser connection lost: alarm not published");                
-              }              
+                SMS_LOGGER.error("Laser connection lost: alarm not published");
+              }
               StringBuilder str = new StringBuilder("Exception caught while publishing alarm to LASER: ");
               str.append(alarm.getTimestamp());
               str.append("\t");
@@ -232,9 +233,9 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
               if (alarm.getInfo() != null) {
                 str.append('\t');
                 str.append(alarm.getInfo());
-              }             
-              log.error(str, e);
-              toBePublished.put(alarm.getId(), alarm.getId());              
+              }
+              log.error(str.toString(), e);
+              toBePublished.put(alarm.getId(), alarm.getId());
             }
           } else {
             toBePublished.remove(alarm.getId()); //remove in case re-publicaton thread attempts a publication but other server has already published it
@@ -242,25 +243,25 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
           alarmCache.putQuiet(alarm);
         } finally {
           alarmCache.releaseWriteLockOnKey(alarmCopy.getId());
-        }         
+        }
       } finally {
         clusterCache.releaseReadLockOnKey(LaserPublisher.backupLock);
       }
     } else {
       log.warn("Unable to publish alarm as LASER publisher module not running/connected - adding to re-publication list (alarm id " + alarmCopy.getId() + ")");
       toBePublished.put(alarmCopy.getId(), alarmCopy.getId());
-    }                       
+    }
   }
 
   /**
    * Call within write lock.
    * @param alarm in cache
-   * @throws ASIException 
+   * @throws ASIException
    */
   private void publishToLaser(Alarm alarm) throws ASIException {
-    FaultState fs = null;    
+    FaultState fs = null;
     fs = AlarmSystemInterfaceFactory.createFaultState(alarm.getFaultFamily(), alarm.getFaultMember(), alarm.getFaultCode());
-    Timestamp laserPublicationTime = new Timestamp(System.currentTimeMillis());        
+    Timestamp laserPublicationTime = new Timestamp(System.currentTimeMillis());
     stats.update(alarm);
 
     if (alarm.getAlarmChangeState() == AlarmChangeState.CHANGE_STATE) {
@@ -270,7 +271,7 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
       fs.setDescriptor(FaultState.CHANGE);
     }
     fs.setUserTimestamp(laserPublicationTime);
-    
+
     if (alarm.getInfo() != null) {
       Properties prop = fs.getUserProperties();
       prop.put(FaultState.ASI_PREFIX_PROPERTY, alarm.getInfo());
@@ -279,10 +280,10 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
 
     if (log.isDebugEnabled()) {
       log.debug("Pushing alarm to LASER :\n" + fs);
-    }          
-    getAsi().push(fs);    
-    log(alarm);  
-    alarm.hasBeenPublished(laserPublicationTime); 
+    }
+    getAsi().push(fs);
+    log(alarm);
+    alarm.hasBeenPublished(laserPublicationTime);
     alarmPersistenceManager.addElementToPersist(alarm.getId());
   }
 
@@ -318,24 +319,24 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
           @Override
           public void run() {
             log.info("Starting " + LaserPublisherImpl.class.getName() + " (in own thread)");
-            try {            
+            try {
               while (!initialConnection && !shutdownRequested) {
                 try {
                   log.info("Attempting LASER connection.");
-                  setAsi(AlarmSystemInterfaceFactory.createSource(getSourceName()));                  
-                  initialConnection = true;                
+                  setAsi(AlarmSystemInterfaceFactory.createSource(getSourceName()));
+                  initialConnection = true;
                 } catch (ASIException e) {
                   log.error("Failed to start LASER publisher - will try again in 5 seconds", e);
                   try {
                     Thread.sleep(SLEEP_BETWEEN_CONNECT);
                   } catch (InterruptedException e1) {
                     log.error("Interrupted during sleep", e1);
-                  }            
+                  }
                 }
               }
             } finally {
               connectThreadRunning = false;
-            }                  
+            }
           }
         }).start();
         short waited = 0;
@@ -346,21 +347,21 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
           } catch (InterruptedException e) {
             log.error("Interrupted during start-up check");
           }
-        }                
+        }
         running = true;
         listenerContainer.start();
       }
     }
-             
+
   }
 
   @Override
   @ManagedOperation(description = "Stops the alarm publisher.")
-  public void stop() {    
-    if (running) {          
+  public void stop() {
+    if (running) {
       log.info("Stopping LASER publisher " + LaserPublisherImpl.class.getName());
       listenerContainer.stop();
-      shutdownRequested = true; 
+      shutdownRequested = true;
       while (!toBePublished.isEmpty()) {
         log.warn("Unpublished alarms at shutdown - be sure to restart server in recovery mode to guarantee all alarm publications! (or run 'republish alarms' in Jconsole RecoveryManager)");
         log.warn("If LASER connection is not re-established, the C2MON server will need killing!");
@@ -370,21 +371,21 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
           log.error("Interrupted while shutting down LASER publisher.", e);
         }
       }
-      republishTimer.cancel();           
+      republishTimer.cancel();
       //wait for connect thread to end
       if (connectThreadRunning) {
         try {
           Thread.sleep(SLEEP_BETWEEN_CONNECT);
         } catch (InterruptedException e) {
           log.error("Interrupted during sleep", e);
-        } 
-      }      
-      if (getAsi() != null) { 
+        }
+      }
+      if (getAsi() != null) {
         getAsi().close();
-      }      
-      running = false;      
+      }
+      running = false;
       initialConnection = false;
-    }    
+    }
   }
 
   @Override
@@ -437,20 +438,20 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
 
   private void log(final Alarm alarm) {
     if (laserLog != null && laserLog.isInfoEnabled()) {
-      laserLog.info(alarm);
+      laserLog.info(alarm.toString());
     }
   }
 
   public void confirmStatus(Alarm cacheable) {
     notifyElementUpdated(cacheable);
   }
-  
+
   @ManagedOperation(description = "Does this publisher have failed publications waiting to be published again?")
   @Override
   public boolean hasUnpublishedAlarms() {
     return !toBePublished.isEmpty();
   }
-  
+
   @Override
   public void setRepublishDelay(long republishDelay) {
     this.republishDelay = republishDelay;
@@ -458,34 +459,34 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
 
   /**
    * Checks if un-published alarms need publishing. If so, will publish them.
-   * 
+   *
    * @author Mark Brightwell
    *
    */
   private class PublicationTask extends TimerTask {
-        
+
     /**
      * Constructor
      * @param alarmCopy alarm to republish (only id is used as latest alarm is accessed)
      */
     public PublicationTask() {
-      super();      
+      super();
     }
 
     @Override
     public void run() {
       try {
-        log.debug("Checking for LASER re-publications");      
+        log.debug("Checking for LASER re-publications");
         if (!toBePublished.isEmpty()) {
           log.info("Detected alarms that failed to be published - will attempt republication of these.");
-          for (Long alarmId : new ArrayList<Long>(toBePublished.keySet())) {  //take copy as these tasks also add to this map if publication fails again        
+          for (Long alarmId : new ArrayList<Long>(toBePublished.keySet())) {  //take copy as these tasks also add to this map if publication fails again
             notifyElementUpdated(alarmCache.getCopy(alarmId));
           }
         }
       } catch (Exception e) {
         log.error("Unexpected exception caught while checking for failed LASER publications", e);
-      }      
-    }    
+      }
+    }
   }
 
   /**
@@ -502,7 +503,7 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
   private synchronized void setAsi(AlarmSystemInterface asi) {
     this.asi = asi;
   }
-  
-  
+
+
 
 }

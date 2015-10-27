@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
@@ -37,7 +38,7 @@ public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
   /**
    * Log4j Logger for this class.
    */
-  private static final Logger LOG = Logger.getLogger(HeartbeatManagerImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HeartbeatManagerImpl.class);
 
   /**
    * Gson that is reused.

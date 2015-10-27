@@ -23,7 +23,8 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
@@ -42,7 +43,7 @@ import cern.c2mon.server.common.config.ServerConstants;
 @ManagedResource(objectName="cern.c2mon:type=datasource,name=cacheDbLifecycle")
 public class CacheDbLifecycle implements SmartLifecycle {
 
-  private static final Logger LOGGER = Logger.getLogger(CacheDbLifecycle.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CacheDbLifecycle.class);
   
   /**
    * The cache datasource to close down.

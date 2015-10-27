@@ -26,7 +26,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
@@ -45,7 +46,7 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
     /**
      * Private class logger.
      */
-    private static final Logger LOGGER = Logger.getLogger(AbstractTagCacheObject.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTagCacheObject.class);
   
     // TODO remove UID if not needed
    /**

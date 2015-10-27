@@ -5,14 +5,14 @@ import org.apache.log4j.or.ObjectRenderer;
 /**
  * Log4j renderer class for formatting RuleTags in the log
  * files.
- * 
+ *
  * @author Mark Brightwell
  *
  */
 public class RuleTagRenderer implements ObjectRenderer {
 
   @Override
-  public String doRender(Object object) {    
+  public String doRender(Object object) {
       if (object instanceof RuleTag) {
         RuleTag ruleTag = (RuleTag) object;
         StringBuffer str = new StringBuffer();
@@ -26,10 +26,10 @@ public class RuleTagRenderer implements ObjectRenderer {
         str.append(ruleTag.getValue());
         if (!ruleTag.isValid()) {
           str.append('\t');
-          str.append(ruleTag.getDataTagQuality().getInvalidQualityStates());          
+          str.append(ruleTag.getDataTagQuality().getInvalidQualityStates());
         }
-        return str.toString(); 
-      } else {        
+        return str.toString();
+      } else {
         return object.toString();
       }
   }

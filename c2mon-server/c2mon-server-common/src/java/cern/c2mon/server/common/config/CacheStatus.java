@@ -20,7 +20,8 @@ package cern.c2mon.server.common.config;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Shared object used to record the status of the caches
@@ -35,7 +36,7 @@ public class CacheStatus {
   /**
    * Class logger
    */
-  private static final Logger LOGGER = Logger.getLogger(CacheStatus.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CacheStatus.class);
   
   /**
    * Flag recording if the DataTagCache

@@ -25,7 +25,8 @@ import java.util.Collection;
 import javax.jms.Destination;
 import javax.jms.Session;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +46,7 @@ import cern.c2mon.shared.client.request.ClientRequestResult;
 class ClientConfigurationRequestHandler {
   
   /** Private class logger */
-  private static final Logger LOG = Logger.getLogger(ClientConfigurationRequestHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientConfigurationRequestHandler.class);
   
   /**
    * Default TTL of replies to client requests

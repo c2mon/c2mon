@@ -10,7 +10,8 @@ import javax.jms.TemporaryTopic;
 import javax.jms.TextMessage;
 
 import org.apache.activemq.command.ActiveMQQueue;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.core.JmsTemplate;
@@ -32,7 +33,7 @@ public class ActiveProcessOut implements JmsProcessOut {
   /**
    * Private class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ActiveProcessOut.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ActiveProcessOut.class);
   
   /**
    * Reference to the JmsTemplate, instantiated in the Spring XML.

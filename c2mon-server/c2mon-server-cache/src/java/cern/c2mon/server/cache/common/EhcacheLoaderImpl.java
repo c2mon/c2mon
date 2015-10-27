@@ -21,7 +21,8 @@ package cern.c2mon.server.cache.common;
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.cache.C2monCache;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
@@ -48,7 +49,7 @@ public class EhcacheLoaderImpl<T extends Cacheable> implements CacheLoader {
   /**
    * Private logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(EhcacheLoaderImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(EhcacheLoaderImpl.class);
     
   /**
    * Reference to the cache that needs loading

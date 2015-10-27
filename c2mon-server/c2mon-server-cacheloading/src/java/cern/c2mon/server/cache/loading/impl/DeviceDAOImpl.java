@@ -17,7 +17,8 @@
  ******************************************************************************/
 package cern.c2mon.server.cache.loading.impl;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +38,7 @@ import cern.c2mon.shared.client.device.DeviceProperty;
 @Service("deviceDAO")
 public class DeviceDAOImpl extends AbstractDefaultLoaderDAO<Device> implements DeviceDAO {
 
-  private static Logger LOGGER = Logger.getLogger(DeviceDAOImpl.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(DeviceDAOImpl.class);
 
   /**
    * Reference to the MyBatis Device mapper.

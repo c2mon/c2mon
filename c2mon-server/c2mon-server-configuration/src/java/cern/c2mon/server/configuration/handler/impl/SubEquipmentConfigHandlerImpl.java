@@ -22,7 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -52,7 +53,7 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 @Service
 public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<SubEquipment> implements SubEquipmentConfigHandler {
 
-  private static final Logger LOGGER = Logger.getLogger(SubEquipmentConfigHandlerImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SubEquipmentConfigHandlerImpl.class);
 
   private SubEquipmentConfigTransacted subEquipmentConfigTransacted;
 
@@ -141,12 +142,12 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
       LOGGER.warn("Attempting to change the parent equipment id of a subequipment - this is not currently supported!");
       elementProperties.remove("parent_equip_id");
     }
-    
+
     if (elementProperties.containsKey("equipmentId")) {
       LOGGER.warn("Attempting to change the parent equipment id of a subequipment - this is not currently supported!");
       elementProperties.remove("equipmentId");
     }
-    
+
     return commonUpdate(subEquipmentId, elementProperties);
   }
 
@@ -168,7 +169,7 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
       subEquipmentReport.addSubReport(tagReport);
 
       ProcessChange change = dataTagConfigHandler.removeDataTag(dataTagId, tagReport);
-      
+
       if (change.processActionRequired()) {
         change.setNestedSubReport(tagReport);
         processChanges.add(change);

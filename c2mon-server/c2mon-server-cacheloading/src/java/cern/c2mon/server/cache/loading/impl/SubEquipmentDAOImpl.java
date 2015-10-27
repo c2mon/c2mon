@@ -20,7 +20,8 @@ package cern.c2mon.server.cache.loading.impl;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,7 @@ public class SubEquipmentDAOImpl extends AbstractDefaultLoaderDAO<SubEquipment> 
   /**
    * Private logger.
    */
-  private Logger LOGGER = Logger.getLogger(SubEquipmentDAOImpl.class);
+  private Logger LOGGER = LoggerFactory.getLogger(SubEquipmentDAOImpl.class);
 
   /**
    * Reference to iBatis mapper.

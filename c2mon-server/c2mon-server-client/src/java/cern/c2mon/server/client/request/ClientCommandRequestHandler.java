@@ -22,7 +22,8 @@ package cern.c2mon.server.client.request;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +43,7 @@ import cern.c2mon.shared.client.request.ClientRequestResult;
 class ClientCommandRequestHandler {
   
   /** Private class logger */
-  private static final Logger LOG = Logger.getLogger(ClientCommandRequestHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientCommandRequestHandler.class);
   
   
   /** Reference to the CommandExecutionManager */

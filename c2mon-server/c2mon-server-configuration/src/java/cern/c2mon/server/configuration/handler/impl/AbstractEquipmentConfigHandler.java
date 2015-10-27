@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.cache.AliveTimerCache;
 import cern.c2mon.server.cache.C2monCache;
@@ -27,7 +28,7 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
  */
 public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment> {
 
-  private static final Logger LOGGER = Logger.getLogger(AbstractEquipmentConfigHandler.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEquipmentConfigHandler.class);
 
   private ControlTagConfigHandler controlTagConfigHandler;
 

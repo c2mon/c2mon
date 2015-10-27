@@ -30,7 +30,8 @@ import java.util.concurrent.TimeUnit;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.server.cache.ClusterCache;
@@ -62,7 +63,7 @@ public class SimpleC2monCacheLoader<T extends Cacheable> implements C2monCacheLo
   /**
    * Private logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(SimpleC2monCacheLoader.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SimpleC2monCacheLoader.class);
   
   /**
    * Reference to the distributed parameters (used to lock server start up).

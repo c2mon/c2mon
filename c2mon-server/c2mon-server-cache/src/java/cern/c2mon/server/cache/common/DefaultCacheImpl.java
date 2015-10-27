@@ -10,7 +10,8 @@ import javax.annotation.PostConstruct;
 
 import net.sf.ehcache.Ehcache;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.cache.C2monCache;
 import cern.c2mon.server.cache.ClusterCache;
@@ -35,7 +36,7 @@ public class DefaultCacheImpl<K, V extends Serializable> extends BasicCache<K, V
   /**
    * Private class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(DefaultCacheImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCacheImpl.class);
   
   
   public DefaultCacheImpl(final Ehcache ehcache) {

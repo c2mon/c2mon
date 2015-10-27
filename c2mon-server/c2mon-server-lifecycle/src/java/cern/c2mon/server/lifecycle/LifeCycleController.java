@@ -20,7 +20,8 @@ package cern.c2mon.server.lifecycle;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultLifecycleProcessor;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -54,7 +55,7 @@ public class LifeCycleController {
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(LifeCycleController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(LifeCycleController.class);
   
   /**
    * Spring's lifecycle management bean.

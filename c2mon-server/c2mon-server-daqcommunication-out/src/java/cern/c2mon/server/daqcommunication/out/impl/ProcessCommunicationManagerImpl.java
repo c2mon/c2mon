@@ -24,7 +24,8 @@ import javax.jms.ConnectionFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,7 +68,7 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ProcessCommunicationManagerImpl.class); 
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessCommunicationManagerImpl.class); 
   
   /**
    * Time spent waiting for a DAQ to send a response when reconfiguration.

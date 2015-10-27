@@ -34,7 +34,8 @@ import javax.jms.ConnectionFactory;
 import javax.jms.Message;
 
 import org.apache.activemq.command.ActiveMQQueue;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
@@ -61,7 +62,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(JmsContainerManagerImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(JmsContainerManagerImpl.class);
   
   /**
    * Milliseconds before an idle consumer thread is closed (not used by any Process container).

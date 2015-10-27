@@ -22,7 +22,8 @@ import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.shared.common.Cacheable;
@@ -47,7 +48,7 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
    /**
     * Log4j logger instance
     **/
-   private static final Logger LOGGER = Logger.getLogger(DataTagCacheObject.class);
+   private static final Logger LOGGER = LoggerFactory.getLogger(DataTagCacheObject.class);
 
   /**
    * Version number of the class used during serialization/deserialization. This

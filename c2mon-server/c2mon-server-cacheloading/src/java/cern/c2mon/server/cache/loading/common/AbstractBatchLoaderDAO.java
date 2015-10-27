@@ -23,7 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.cache.dbaccess.BatchLoaderMapper;
 import cern.c2mon.server.cache.dbaccess.structure.DBBatch;
@@ -40,7 +41,7 @@ import cern.c2mon.shared.common.Cacheable;
  */
 public abstract class AbstractBatchLoaderDAO<T extends Cacheable> extends AbstractSimpleLoaderDAO<T> implements BatchCacheLoaderDAO<T> {
 
-  private static Logger LOGGER = Logger.getLogger(AbstractBatchLoaderDAO.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(AbstractBatchLoaderDAO.class);
   
   /**
    * Mapper required for batch loading.

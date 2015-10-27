@@ -25,7 +25,8 @@ import java.sql.SQLException;
 
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.common.alarm.AlarmCondition;
 
@@ -38,7 +39,7 @@ import cern.c2mon.server.common.alarm.AlarmCondition;
 public class AlarmConditionTypeHandler implements TypeHandler {
 
 
-  private static final Logger LOGGER = Logger.getLogger(AlarmConditionTypeHandler.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AlarmConditionTypeHandler.class);
 
   @Override
   public Object getResult(final ResultSet rs, final String columnName) throws SQLException {

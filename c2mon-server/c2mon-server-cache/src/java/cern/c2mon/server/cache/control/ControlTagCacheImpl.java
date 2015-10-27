@@ -23,7 +23,8 @@ import javax.annotation.PostConstruct;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -51,7 +52,7 @@ public class ControlTagCacheImpl extends AbstractTagCache<ControlTag> implements
   /**
    * Private class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ControlTagCacheImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ControlTagCacheImpl.class);
    
   @Autowired
   public ControlTagCacheImpl(@Qualifier("clusterCache") final ClusterCache clusterCache, 

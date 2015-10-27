@@ -30,7 +30,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -76,7 +77,7 @@ public class SupervisionNotifierImpl implements SupervisionNotifier, C2monCacheL
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(SupervisionNotifierImpl.class); 
+  private static final Logger LOGGER = LoggerFactory.getLogger(SupervisionNotifierImpl.class); 
   
   /**
    * Default size of task queue for a listener executor.

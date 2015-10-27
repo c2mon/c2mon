@@ -10,7 +10,8 @@ import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.configuration.ConfigProgressMonitor;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
@@ -32,7 +33,7 @@ import com.google.gson.Gson;
 public class ClientRequestReportHandler implements ConfigProgressMonitor {
 
   /** Private class logger */
-  private static final Logger LOG = Logger.getLogger(ClientRequestReportHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientRequestReportHandler.class);
 
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();

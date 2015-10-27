@@ -15,7 +15,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.SmartLifecycle;
@@ -43,7 +44,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(LaserBackupPublisher.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(LaserBackupPublisher.class);
   
   /**
    * Time between connection attempts at start-up (in millis)

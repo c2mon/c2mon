@@ -25,7 +25,8 @@ import net.sf.ehcache.search.Attribute;
 import net.sf.ehcache.search.Query;
 import net.sf.ehcache.search.Results;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -52,7 +53,7 @@ public class DeviceClassCacheImpl extends AbstractCache<Long, DeviceClass> imple
   /**
    * Static class logger.
    */
-  private static final Logger LOG = Logger.getLogger(DeviceCacheImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DeviceCacheImpl.class);
 
   @Autowired
   public DeviceClassCacheImpl(final ClusterCache clusterCache,

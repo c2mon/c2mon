@@ -18,7 +18,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.shared.rule.RuleExpression;
@@ -36,7 +37,7 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
     /**
      * Private class logger.
      */
-    private static final Logger LOGGER = Logger.getLogger(RuleTagCacheObject.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RuleTagCacheObject.class);
 
     /**
      * The rule as a String. Should never be null for a RuleTag (set as empty String if necessary).

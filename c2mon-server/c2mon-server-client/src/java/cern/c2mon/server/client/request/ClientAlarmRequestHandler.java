@@ -23,7 +23,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +48,7 @@ import cern.c2mon.shared.client.request.ClientRequestResult;
 class ClientAlarmRequestHandler {
   
   /** Private class logger */
-  private static final Logger LOG = Logger.getLogger(ClientAlarmRequestHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientAlarmRequestHandler.class);
   
   /** Reference to the tag location service to check whether a tag exists */
   private final TagLocationService tagLocationService;

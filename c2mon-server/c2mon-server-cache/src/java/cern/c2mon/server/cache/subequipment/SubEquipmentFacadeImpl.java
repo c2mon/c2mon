@@ -21,7 +21,8 @@ package cern.c2mon.server.cache.subequipment;
 import java.util.Collection;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +51,7 @@ import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
 @Service
 public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment> implements SubEquipmentFacade {
 
-  private static final Logger LOGGER = Logger.getLogger(SubEquipmentFacadeImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SubEquipmentFacadeImpl.class);
 
   /**
    * Equipment cache bean.
@@ -89,7 +90,7 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
   protected Change configureCacheObject(SubEquipment subEquipment, Properties properties) {
     SubEquipmentCacheObject subEquipmentCacheObject = (SubEquipmentCacheObject) subEquipment;
     String tmpStr = properties.getProperty("equipmentId");
-    
+
     // TODO: Remove obsolete parent_equip_id property
     if (tmpStr == null) {
       tmpStr = properties.getProperty("parent_equip_id");
@@ -102,7 +103,7 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"parentId\" to Long: " + tmpStr);
       }
     }
-    
+
     return null;
   }
 
@@ -132,12 +133,12 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Reconfiguration of "
           + "SubEquipment does not currently allow it to be reassigned to a different Equipment!");
     }
-    
+
     if ((properties.getProperty("equipmentId")) != null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Reconfiguration of "
           + "SubEquipment does not currently allow it to be reassigned to a different Equipment!");
     }
-    
+
     super.updateConfig(subEquipment, properties);
     return new EquipmentConfigurationUpdate();
   }

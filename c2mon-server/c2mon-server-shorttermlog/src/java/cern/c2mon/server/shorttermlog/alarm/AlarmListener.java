@@ -2,7 +2,8 @@ package cern.c2mon.server.shorttermlog.alarm;
 
 import java.io.File;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.pmanager.IAlarmListener;
 
@@ -17,12 +18,12 @@ public class AlarmListener implements IAlarmListener {
   /**
    * Mail logger.
    */
-  private final static Logger EMAIL_LOGGER = Logger.getLogger("AdminMailLogger");
+  private final static Logger EMAIL_LOGGER = LoggerFactory.getLogger("AdminMailLogger");
   
   /**
    * SMS logger.
    */
-  private final static Logger SMS_LOGGER = Logger.getLogger("AdminSmsLogger");
+  private final static Logger SMS_LOGGER = LoggerFactory.getLogger("AdminSmsLogger");
   
   /**
    * Flags for not sending repeated error messages.

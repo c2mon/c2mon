@@ -1,6 +1,7 @@
 package cern.c2mon.server.lifecycle;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -34,7 +35,7 @@ public class RecoveryManager implements SmartLifecycle {
   /**
    * Class logger.
    */
-  public static final Logger LOGGER = Logger.getLogger(RecoveryManager.class);
+  public static final Logger LOGGER = LoggerFactory.getLogger(RecoveryManager.class);
   
   /**
    * Delay at server start-up before current supervision status saved to the DB.

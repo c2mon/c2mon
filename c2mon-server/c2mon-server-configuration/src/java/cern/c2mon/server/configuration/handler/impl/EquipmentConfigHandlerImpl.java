@@ -23,7 +23,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -56,7 +57,7 @@ import cern.c2mon.shared.daq.config.IChange;
 @Service
 public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<Equipment> implements EquipmentConfigHandler {
 
-  private static final Logger LOGGER = Logger.getLogger(EquipmentConfigHandlerImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(EquipmentConfigHandlerImpl.class);
 
   private EquipmentConfigTransacted equipmentConfigTransacted;
 

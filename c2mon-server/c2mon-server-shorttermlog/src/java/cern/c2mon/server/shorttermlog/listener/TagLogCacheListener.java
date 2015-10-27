@@ -23,7 +23,8 @@ import java.util.Collection;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
@@ -49,7 +50,7 @@ public class TagLogCacheListener implements BufferedTimCacheListener<Tag>, Smart
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(TagLogCacheListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(TagLogCacheListener.class);
   
   /**
    * Reference to registration service.

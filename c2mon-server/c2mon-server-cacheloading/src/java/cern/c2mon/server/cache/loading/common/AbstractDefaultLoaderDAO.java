@@ -23,7 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.cache.loading.CacheLoaderDAO;
@@ -40,7 +41,7 @@ import cern.c2mon.shared.common.Cacheable;
  */
 public abstract class AbstractDefaultLoaderDAO<T extends Cacheable> extends AbstractSimpleLoaderDAO<T> implements CacheLoaderDAO<T> {
 
-  private static Logger LOGGER = Logger.getLogger(AbstractDefaultLoaderDAO.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(AbstractDefaultLoaderDAO.class);
   
   /**
    * The initial size of the Map used to store the cache object loaded from the DB.

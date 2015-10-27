@@ -18,7 +18,8 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.impl;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
@@ -34,7 +35,7 @@ public final class ConfigurationReportConverter {
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ConfigurationReportConverter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationReportConverter.class);
   
   /**
    * Cannot be instantiated.

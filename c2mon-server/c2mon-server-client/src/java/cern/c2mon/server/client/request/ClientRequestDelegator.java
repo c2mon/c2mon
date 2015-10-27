@@ -12,7 +12,8 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.validation.Valid;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.jms.support.converter.MessageConversionException;
@@ -41,7 +42,7 @@ import cern.c2mon.shared.util.json.GsonFactory;
 public class ClientRequestDelegator implements SessionAwareMessageListener<Message> {
 
   /** Private class logger */
-  private static final Logger LOG = Logger.getLogger(ClientRequestDelegator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientRequestDelegator.class);
   
   private final ClientAlarmRequestHandler clientAlarmRequestHandler;
   

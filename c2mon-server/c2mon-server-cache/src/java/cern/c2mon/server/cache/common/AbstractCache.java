@@ -31,7 +31,8 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.event.RegisteredEventListeners;
 import net.sf.ehcache.loader.CacheLoader;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 
 import cern.c2mon.server.cache.BufferedTimCacheListener;
@@ -70,7 +71,7 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
   /**
    * Private class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(AbstractCache.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCache.class);
 
   /**
    * Contains properties distributed across the server cluster.

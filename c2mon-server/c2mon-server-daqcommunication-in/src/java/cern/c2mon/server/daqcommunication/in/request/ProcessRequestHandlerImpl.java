@@ -24,7 +24,8 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.jms.support.converter.MessageConversionException;
@@ -51,7 +52,7 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ProcessRequestHandlerImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessRequestHandlerImpl.class);
 
   /**
    * Reference to the {@link SupervisionManager} bean.

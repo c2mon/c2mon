@@ -22,7 +22,8 @@ import java.util.ArrayList;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
@@ -48,7 +49,7 @@ public class AlarmLogListener implements C2monCacheListener<Alarm>, SmartLifecyc
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(AlarmLogListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AlarmLogListener.class);
   
   /**
    * Reference to registration service.

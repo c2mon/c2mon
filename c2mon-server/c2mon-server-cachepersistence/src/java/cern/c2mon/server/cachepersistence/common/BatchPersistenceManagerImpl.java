@@ -36,7 +36,8 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.ibatis.exceptions.PersistenceException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -69,7 +70,7 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
   /**
    * Private class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(BatchPersistenceManagerImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(BatchPersistenceManagerImpl.class);
   
   /**
    * Size of the batches between database commits. Also corresponds

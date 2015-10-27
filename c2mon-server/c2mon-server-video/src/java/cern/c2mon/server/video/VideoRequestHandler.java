@@ -32,7 +32,8 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.management.RuntimeErrorException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.jms.support.converter.MessageConversionException;
@@ -60,15 +61,15 @@ import cern.c2mon.shared.util.json.GsonFactory;
 public class VideoRequestHandler implements SessionAwareMessageListener<Message> {
 
   /** Log4j Logger for this class */
-  private static final Logger LOG = Logger.getLogger(VideoRequestHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(VideoRequestHandler.class);
 
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();
 
   /**
-   * The hashcode will allow us to uniquely link requests to responses in the 
+   * The hashcode will allow us to uniquely link requests to responses in the
    * log files. Seeing that one bean instance can only process one request at
-   * a time but that several instances of the bean can process requests in 
+   * a time but that several instances of the bean can process requests in
    * parallel, this kind of link is necessary.
    */
   private int hashCode = hashCode();
@@ -93,18 +94,18 @@ public class VideoRequestHandler implements SessionAwareMessageListener<Message>
 
   /**
    * Inner method for handling video requests. Responses are sent back as JSON messages.
-   * 
+   *
    * @param videoRequest The request. Can either be an AUTHORIZATION_DETAILS_REQUEST or a
    * VIDEO_CONNECTION_PROPERTIES_REQUEST.
-   * @return The response that shall be transfered back to the video client. 
-   * In case of an AUTHORIZATION_DETAILS_REQUEST the response is <code>RbacAuthorizationDetails</code>. 
-   * In case of an VIDEO_CONNECTION_PROPERTIES_REQUEST the response is <code>VideoConnectionPropertiesCollection</code>. 
+   * @return The response that shall be transfered back to the video client.
+   * In case of an AUTHORIZATION_DETAILS_REQUEST the response is <code>RbacAuthorizationDetails</code>.
+   * In case of an VIDEO_CONNECTION_PROPERTIES_REQUEST the response is <code>VideoConnectionPropertiesCollection</code>.
    * @throws SQLException In case an error occurs during the query
    * @throws ServerRequestException In case a null VideoRequest is received
    */
   public String handleVideoRequest(final VideoRequest videoRequest) throws SQLException, ServerRequestException {
-    
-    if (videoRequest == null) {      
+
+    if (videoRequest == null) {
       final String errorMessage = "videoRequest is null - cannot send reply";
       LOG.error("onMessage() -> handleVideoRequest()" + errorMessage);
       throw new ServerRequestException(errorMessage);
@@ -118,7 +119,7 @@ public class VideoRequestHandler implements SessionAwareMessageListener<Message>
     }
     else if (videoRequest.getRequestType() == RequestType.VIDEO_CONNECTION_PROPERTIES_REQUEST) {
       Collection<VideoConnectionProperties> p = handleVideoConnectionRequest(videoRequest);
-      messageText = GSON.toJson(p); 
+      messageText = GSON.toJson(p);
     }
 
     return messageText;
@@ -126,7 +127,7 @@ public class VideoRequestHandler implements SessionAwareMessageListener<Message>
 
   /**
    * Inner method for handling AUTHORIZATION_DETAILS_REQUEST.
-   * 
+   *
    * @param videoRequest A AUTHORIZATION_DETAILS_REQUEST.
    * @return a VideoConnectionPropertiesCollection
    * @throws SQLException In case an error occurs during the query
@@ -141,7 +142,7 @@ public class VideoRequestHandler implements SessionAwareMessageListener<Message>
 
   /**
    * Inner method for handling VIDEO_CONNECTION_PROPERTIES_REQUEST.
-   * 
+   *
    * @param videoRequest A VIDEO_CONNECTION_PROPERTIES_REQUEST.
    * @return a collection of VideoConnectionProperties
    * @throws SQLException In case an error occurs during the query
@@ -156,7 +157,7 @@ public class VideoRequestHandler implements SessionAwareMessageListener<Message>
 
   /**
    * This method is called when the Video client is sending a Video Request
-   * to the server. The server retrieves the information 
+   * to the server. The server retrieves the information
    * and sends them back.
    * @param message the JMS message which contains the Json Video Request
    * @param session The JMS session
@@ -176,26 +177,26 @@ public class VideoRequestHandler implements SessionAwareMessageListener<Message>
     } catch (MessageConversionException e) {
       ClientRequestErrorReport errorReport = new ClientRequestErrorReportImpl(false, e.getMessage());
       sendMessage(message, session, GSON.toJson(errorReport));
-      return;      
-    } 
+      return;
+    }
 
     String result = null;
     try {
       result = handleVideoRequest(videoRequest);
-    } 
+    }
     catch (Exception e) {
       final String errorMessage = "Runtime exception on the server! " + e.getMessage();
       LOG.error("onMessage() : handleVideoRequest():" + errorMessage + " :", e);
       ClientRequestErrorReport errorReport = new ClientRequestErrorReportImpl(false, errorMessage);
       sendMessage(message, session, GSON.toJson(errorReport));
       return;
-    } 
+    }
 
     // No error occured => Sent the response
 
     // sent the error report first
     ClientRequestErrorReport errorReport = new ClientRequestErrorReportImpl(true, null);
-    sendMessage(message, session, GSON.toJson(errorReport));    
+    sendMessage(message, session, GSON.toJson(errorReport));
     if (LOG.isDebugEnabled()) {
       LOG.debug("Error report sent (no errors).");
     }
@@ -226,19 +227,19 @@ public class VideoRequestHandler implements SessionAwareMessageListener<Message>
       try {
         messageProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
         messageProducer.setTimeToLive(DEFAULT_REPLY_TTL);
-        TextMessage replyMessage = session.createTextMessage();      
+        TextMessage replyMessage = session.createTextMessage();
 
         replyMessage.setText(messageText);
         if (LOG.isDebugEnabled()) {
-          LOG.debug(new StringBuffer("onMessage() : Video connection response sent : ").append(hashCode));
+          LOG.debug(new StringBuffer("onMessage() : Video connection response sent : ").append(hashCode).toString());
         }
         messageProducer.send(replyMessage);
       } finally {
         messageProducer.close();
-      }      
+      }
     } else {
       LOG.error("onMessage() : JMSReplyTo destination is null - cannot send reply.");
       throw new MessageConversionException("JMS reply queue could not be extracted (returned null).");
-    }    
+    }
   }
 }

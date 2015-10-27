@@ -20,7 +20,8 @@ package cern.c2mon.server.cache.tag;
 
 import java.sql.Timestamp;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
@@ -37,7 +38,7 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
 public abstract class AbstractTagObjectFacade<T extends Tag> implements CommonTagObjectFacade<T> {
 
   /** Log4j logger instance */
-  private static final Logger LOGGER = Logger.getLogger(AbstractTagObjectFacade.class); 
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTagObjectFacade.class); 
   
   @Override
   public void validate(T tag) {

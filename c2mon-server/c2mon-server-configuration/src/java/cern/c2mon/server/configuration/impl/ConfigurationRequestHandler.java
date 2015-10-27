@@ -27,7 +27,8 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.jms.support.converter.MessageConversionException;
@@ -66,7 +67,7 @@ public class ConfigurationRequestHandler implements SessionAwareMessageListener<
   /**
    * Private class logger.
    */
-  private static final Logger log = Logger.getLogger(ConfigurationRequestHandler.class);
+  private static final Logger log = LoggerFactory.getLogger(ConfigurationRequestHandler.class);
 
   /**
    * Reference to the configuration loader.

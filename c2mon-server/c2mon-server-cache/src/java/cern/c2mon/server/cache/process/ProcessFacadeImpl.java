@@ -25,7 +25,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -57,7 +58,7 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ProcessFacadeImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessFacadeImpl.class);
   
   /** PIK numbers limit (max) */
   private static final int PIK_MAX = 999999;

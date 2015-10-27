@@ -25,7 +25,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +56,7 @@ import cern.c2mon.shared.client.tag.TagValueUpdate;
 class ClientTagRequestHelper {
   
   /** Private class logger */
-  private static final Logger LOG = Logger.getLogger(ClientTagRequestHelper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientTagRequestHelper.class);
 
   /**
    * Reference to the tag facade gateway to retrieve a tag copies with the

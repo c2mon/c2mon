@@ -20,7 +20,8 @@ package cern.c2mon.server.cachepersistence.impl;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.cache.C2monCache;
@@ -44,7 +45,7 @@ public class CachePersistenceDAOImpl<T extends Cacheable> implements CachePersis
   /**
    * Private class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(CachePersistenceDAOImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CachePersistenceDAOImpl.class);
   
   /**
    * Mapper for persisting cache updates. Needs setting in

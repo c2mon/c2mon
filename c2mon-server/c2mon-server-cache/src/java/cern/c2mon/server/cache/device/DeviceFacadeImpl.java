@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +62,7 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
   /**
    * Static class logger.
    */
-  private static final Logger LOG = Logger.getLogger(DeviceCacheImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DeviceCacheImpl.class);
 
   /**
    * Reference to the <code>Device</code> cache

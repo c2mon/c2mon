@@ -1,6 +1,7 @@
 package cern.c2mon.server.cache.supervision;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +26,7 @@ public class SupervisionAppenderImpl implements SupervisionAppender {
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(SupervisionAppenderImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SupervisionAppenderImpl.class);
 
   /**
    * Process and Equipment bean interfaces.

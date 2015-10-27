@@ -11,7 +11,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +46,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ProcessXMLProviderImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessXMLProviderImpl.class);
 
   /**
    * Required facade, cache and DAO beans.
@@ -210,7 +211,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
       StringBuffer str = new StringBuffer("getSubEquipmentUnitsConfigXML([MonitoringEquipment: ");
       str.append(equipment.getId());
       str.append("]) called.");
-      LOGGER.debug(str);
+      LOGGER.debug(str.toString());
     }
 
     // Initialise buffer for the XML structure to be generated
@@ -239,7 +240,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
       StringBuffer str = new StringBuffer("getConfigXML([EquipmentId: ");
       str.append(equipmentId.toString());
       str.append("]) called.");
-      LOGGER.debug(str);
+      LOGGER.debug(str.toString());
     }
 
     // Initialise buffer for the XML structure to be generated
@@ -311,7 +312,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
       StringBuffer str = new StringBuffer("getDataTagsConfigXML([MonitoringEquipment: ");
       str.append(pEquipment.getId());
       str.append("]) called.");
-      LOGGER.debug(str);
+      LOGGER.debug(str.toString());
     }
 
     // Initialise buffer for the XML structure to be generated
@@ -419,7 +420,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
       StringBuffer str = new StringBuffer("getCommandTagsConfigXML([Equipment: ");
       str.append(pEquipment.getId());
       str.append("]) called.");
-      LOGGER.debug(str);
+      LOGGER.debug(str.toString());
     }
     StringBuffer str = new StringBuffer();
     Collection<Long> commandTagIds = pEquipment.getCommandTagIds();

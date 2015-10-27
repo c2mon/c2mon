@@ -9,7 +9,8 @@ import net.sf.ehcache.cluster.CacheCluster;
 import net.sf.ehcache.cluster.ClusterNode;
 import net.sf.ehcache.cluster.ClusterScheme;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -29,9 +30,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ClusterTopologyListener implements net.sf.ehcache.cluster.ClusterTopologyListener {
 
-  private static final Logger LOGGER = Logger.getLogger(ClusterTopologyListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ClusterTopologyListener.class);
 
-  private final static Logger SMS_LOGGER = Logger.getLogger("AdminSmsLogger");
+  private final static Logger SMS_LOGGER = LoggerFactory.getLogger("AdminSmsLogger");
 
   @Autowired
   public CacheManager cacheManager;

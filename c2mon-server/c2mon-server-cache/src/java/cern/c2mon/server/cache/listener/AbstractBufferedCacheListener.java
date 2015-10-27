@@ -21,7 +21,8 @@ package cern.c2mon.server.cache.listener;
 import java.util.LinkedList;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.cache.BufferedTimCacheListener;
 import cern.c2mon.server.cache.C2monCacheListener;
@@ -42,7 +43,7 @@ public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> impl
   /**
    * Private class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(AbstractBufferedCacheListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBufferedCacheListener.class);
 
   /**
    * Max number of objects passed to the listener.

@@ -6,7 +6,8 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jms.JmsException;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -27,7 +28,7 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 @ManagedResource
 class RepublisherImpl<T> implements Republisher<T> {
 
-  private static final Logger LOGGER = Logger.getLogger(RepublisherImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RepublisherImpl.class);
   
   private int republicationDelay = 10000;
   

@@ -20,7 +20,8 @@ package cern.c2mon.server.cache.process;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -57,7 +58,7 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process>implements Pro
   /**
    * Private class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ProcessCacheImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessCacheImpl.class);
 
   /**
    * Reference to the {@link ProcessDAO} bean.

@@ -2,7 +2,8 @@ package cern.c2mon.server.daqcommunication.out.impl;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -34,7 +35,7 @@ public class DataRefreshManagerImpl implements DataRefreshManager {
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(DataRefreshManagerImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DataRefreshManagerImpl.class);
   
   /**
    * For locating tags in caches.

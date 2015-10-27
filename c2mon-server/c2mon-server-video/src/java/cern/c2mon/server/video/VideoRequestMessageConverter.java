@@ -4,7 +4,8 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jms.support.converter.MessageConversionException;
 
 import cern.c2mon.shared.video.VideoRequest;
@@ -15,17 +16,17 @@ import com.google.gson.JsonSyntaxException;
 
 /**
  * This abstract class provides a static method for converting a VideoRequest.
- * 
+ *
  * @author ekoufaki
  */
 public abstract class VideoRequestMessageConverter {
-  
+
   /** Class logger */
-  private static final Logger LOG = Logger.getLogger(VideoRequestMessageConverter.class);
-  
+  private static final Logger LOG = LoggerFactory.getLogger(VideoRequestMessageConverter.class);
+
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();
-  
+
   /**
    * Hidden default constructor
    */
@@ -41,10 +42,10 @@ public abstract class VideoRequestMessageConverter {
    * @throws MessageConversionException In case of problems while deserializing the JMS message
    */
   public static final VideoRequest fromMessage(final Message message) throws JMSException, MessageConversionException {
-    
+
     if (message instanceof TextMessage) {
       String json = ((TextMessage) message).getText();
-      
+
       try {
         return GSON.fromJson(json, VideoRequest.class);
       }
@@ -52,15 +53,15 @@ public abstract class VideoRequestMessageConverter {
         StringBuffer str = new StringBuffer("fromMessage() : Unsupported JSON message (");
         str.append(json);
         str.append(") : Message discarded.");
-        LOG.error(str); 
+        LOG.error(str.toString());
         throw new MessageConversionException("Unsupported JSON message received on tag request connection.");
-      }   
-    } 
+      }
+    }
     else {
       StringBuffer str = new StringBuffer("fromMessage() : Unsupported message type(");
       str.append(message.getClass().getName());
       str.append(") : Message discarded.");
-      LOG.error(str); 
+      LOG.error(str.toString());
       throw new MessageConversionException("Unsupported JMS message type received on tag request connection.");
     }
   }

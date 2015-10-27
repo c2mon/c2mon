@@ -8,7 +8,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ import cern.c2mon.server.common.rule.RuleTag;
 @Service
 public class RuleTagPostLoaderProcessor {
 
-  private static final Logger LOGGER = Logger.getLogger(RuleTagPostLoaderProcessor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RuleTagPostLoaderProcessor.class);
 
   private RuleTagFacade ruleTagFacade;
 

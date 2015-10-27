@@ -7,7 +7,8 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
@@ -73,7 +74,7 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(SupervisionTagNotifier.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SupervisionTagNotifier.class);
 
   /**
    * Register for notifications from the SupervisionNotifier bean.

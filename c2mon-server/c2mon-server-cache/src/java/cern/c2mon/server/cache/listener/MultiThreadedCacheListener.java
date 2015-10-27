@@ -23,7 +23,8 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.cache.C2monCacheListener;
@@ -52,7 +53,7 @@ public class MultiThreadedCacheListener<T extends Cacheable> implements C2monCac
   /**
    * Private class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(MultiThreadedCacheListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MultiThreadedCacheListener.class);
   
   /**
    * The number of milliseconds a thread waits between checking for shutdown requests.

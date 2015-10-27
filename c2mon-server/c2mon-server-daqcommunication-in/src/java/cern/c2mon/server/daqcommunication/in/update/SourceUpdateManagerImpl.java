@@ -26,7 +26,8 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.jms.support.converter.MessageConversionException;
@@ -62,17 +63,17 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
   /**
    * Logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(SourceUpdateManagerImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SourceUpdateManagerImpl.class);
   
   /**
    * SMS logger.
    */
-  private static final Logger SMSLOGGER = Logger.getLogger("AdminSmsLogger");
+  private static final Logger SMSLOGGER = LoggerFactory.getLogger("AdminSmsLogger");
   
   /**
    * Email logger.
    */
-  private static final Logger EMAILLOGGER = Logger.getLogger("AdminEmailLogger");
+  private static final Logger EMAILLOGGER = LoggerFactory.getLogger("AdminEmailLogger");
   
   /**
    * Time of last email log. Will only send every 10min.

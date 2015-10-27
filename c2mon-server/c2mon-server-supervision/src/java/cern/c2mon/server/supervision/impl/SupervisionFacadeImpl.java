@@ -23,7 +23,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -60,7 +61,7 @@ public class SupervisionFacadeImpl implements SupervisionFacade {
   /**
    * Class logger.
    */
-  public static final Logger LOGGER = Logger.getLogger(SupervisionFacadeImpl.class);
+  public static final Logger LOGGER = LoggerFactory.getLogger(SupervisionFacadeImpl.class);
   
   /**
    * Delay at server start-up before current supervision status saved to the DB.

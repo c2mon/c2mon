@@ -7,7 +7,8 @@ import javax.annotation.PostConstruct;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -37,7 +38,7 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(RuleTagCacheImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RuleTagCacheImpl.class);
 
   /**
    * DataTagCache for rule parent id loading.

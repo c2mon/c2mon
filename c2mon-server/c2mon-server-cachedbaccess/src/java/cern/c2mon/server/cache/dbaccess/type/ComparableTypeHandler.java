@@ -11,7 +11,8 @@ import java.sql.SQLException;
 
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * iBatis TypeHandler used to convert between Comparable Java objects (used for
@@ -26,7 +27,7 @@ public class ComparableTypeHandler implements TypeHandler {
   /**
    * Private class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ComparableTypeHandler.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ComparableTypeHandler.class);
 
   @Override
   public Object getResult(ResultSet rs, String columnName) throws SQLException {

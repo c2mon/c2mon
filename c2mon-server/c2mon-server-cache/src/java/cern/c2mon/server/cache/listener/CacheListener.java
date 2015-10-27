@@ -18,7 +18,8 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.listener;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ApplicationObjectSupport;
 
 import cern.c2mon.server.cache.C2monCacheListener;
@@ -47,7 +48,7 @@ public final class CacheListener<T extends Cacheable> extends ApplicationObjectS
   /**
    * Logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(CacheListener.class);  
+  private static final Logger LOGGER = LoggerFactory.getLogger(CacheListener.class);  
   
   /**
    * The threads dealing with updates.

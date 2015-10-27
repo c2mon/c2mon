@@ -15,7 +15,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.common.equipment.AbstractSupervisedCacheObject;
 import cern.c2mon.shared.common.Cacheable;
@@ -49,7 +50,7 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
   /**
    * LOG4J Logger for this class.
    */
-  private static final Logger LOGGER = Logger.getLogger(ProcessCacheObject.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessCacheObject.class);
 
   /**
    * A description of the process.

@@ -23,7 +23,8 @@ package cern.c2mon.server.shorttermlog.structure;
 import java.sql.Timestamp;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
@@ -36,7 +37,7 @@ import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
  */
 public class TagShortTermLog implements IFallback, Loggable {
 
-    private static Logger LOG = Logger.getLogger(TagShortTermLog.class);
+    private static Logger LOG = LoggerFactory.getLogger(TagShortTermLog.class);
     
     /** Data tag value */
     private String tagValue;
