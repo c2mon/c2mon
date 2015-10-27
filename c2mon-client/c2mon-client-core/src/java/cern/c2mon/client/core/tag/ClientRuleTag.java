@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.common.listener.BaseTagListener;
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.Tag;
@@ -478,7 +477,7 @@ public class ClientRuleTag<T> implements BaseTagListener, Tag, ClientDataTagValu
    * @param pListener Listener to be registered for updates
    * @return <code>true</code>, if the listener was not already registered
    */
-  public boolean addClientDataTagUpdateListener(final DataTagUpdateListener pListener) {
+  public boolean addClientDataTagUpdateListener(final BaseListener pListener) {
     boolean retval = false;
     try {
       listenersLock.writeLock().lock();
@@ -510,7 +509,7 @@ public class ClientRuleTag<T> implements BaseTagListener, Tag, ClientDataTagValu
    * @return <code>true</code>, if the listener successfully removed from
    *         the listeners list
    */
-  public boolean removeClientDataTagUpdateListener(final DataTagUpdateListener listener) {
+  public boolean removeClientDataTagUpdateListener(final BaseListener listener) {
     boolean retval = false;
     try {
       listenersLock.writeLock().lock();
