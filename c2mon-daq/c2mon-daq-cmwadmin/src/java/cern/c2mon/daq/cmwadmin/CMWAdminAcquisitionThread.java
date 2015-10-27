@@ -6,10 +6,10 @@ package cern.c2mon.daq.cmwadmin;
 import static java.lang.String.format;
 import cern.c2mon.daq.cmwadmin.CMWServerHandler.TagType;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
-import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.type.TypeConverter;
 import cern.cmw.rda3.client.admin.ServerAdmin;
 import cern.cmw.rda3.common.exception.RdaException;
 import cern.cmw.rda3cern.client.admin.CernServerAdminFactory;
@@ -164,14 +164,7 @@ public class CMWAdminAcquisitionThread extends Thread {
      * @throws Exception
      */
     void updateValue(final ISourceDataTag tag, final String userValueDescription, Object o) /* throws Exception */{
-        Object v = null;
-        if (o instanceof Number) {
-            v = TIMDriverSimpleTypeConverter.convert(tag, (Number) o);
-        } else if (o instanceof String) {
-            v = TIMDriverSimpleTypeConverter.convert(tag, (String) o);
-        } else if (o instanceof Boolean) {
-            v = TIMDriverSimpleTypeConverter.convert(tag, (Boolean) o);
-        }
+        Object v = TypeConverter.cast(o, tag.getDataType());
 
         if (null != v) {
             if (log.isDebugEnabled()) {
