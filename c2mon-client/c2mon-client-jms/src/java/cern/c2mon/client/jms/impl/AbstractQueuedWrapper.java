@@ -13,7 +13,8 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.Lifecycle;
 
 /**
@@ -33,7 +34,7 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(AbstractQueuedWrapper.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractQueuedWrapper.class);
   
   /**
    * Queue of events waiting to be processed. If this is full, incoming thread will

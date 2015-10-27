@@ -21,7 +21,8 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
@@ -43,7 +44,7 @@ class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
     /**
      * Class logger.
      */
-    private static final Logger LOGGER = Logger.getLogger(MessageListenerWrapper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageListenerWrapper.class);
 
     /**
      * Wrapped listener. Methods accessing this field are synchronized.

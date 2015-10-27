@@ -6,7 +6,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class TagService {
   /**
    * TagService logger
    */
-  private static Logger logger = Logger.getLogger(TagService.class);
+  private static Logger logger = LoggerFactory.getLogger(TagService.class);
 
   /**
    * Gateway to C2monService

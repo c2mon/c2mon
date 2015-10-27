@@ -10,7 +10,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -53,7 +54,7 @@ public class ProcessController {
   /**
    * ProcessControler logger
    */
-  private static Logger logger = Logger.getLogger(ProcessController.class);
+  private static Logger logger = LoggerFactory.getLogger(ProcessController.class);
 
   /**
    * Displays configuration of a process with the given process name
@@ -186,7 +187,7 @@ public class ProcessController {
 
     } catch (TagIdException e) {
       model.put("tagErr", e.getMessage());
-      logger.error(e);
+      logger.error(e.toString());
     } catch (Exception e) {
       model.put("tagErr", "Unexpected problem occured. Try again or contact C2MON support");
       logger.error("Unexpected problem occured while getting the XML:", e);

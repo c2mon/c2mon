@@ -20,7 +20,8 @@ package cern.c2mon.client.core.scheduler;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -45,7 +46,7 @@ class UnknownTagsRefreshTask {
   private final ClientDataTagCache cache;
   
   /** Logger instance */
-  private static final Logger LOG = Logger.getLogger(UnknownTagsRefreshTask.class);
+  private static final Logger LOG = LoggerFactory.getLogger(UnknownTagsRefreshTask.class);
   
   
   /**

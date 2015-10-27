@@ -8,7 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,33 +31,33 @@ import cern.c2mon.shared.client.command.CommandTagValueException;
 public class CommandManager implements C2monCommandManager, CommandService {
 
   /** Log4j Logger for this class */
-  private static final Logger LOG = Logger.getLogger(CommandManager.class);
-  
+  private static final Logger LOG = LoggerFactory.getLogger(CommandManager.class);
+
   /** Default for an uninitialized unknown tag id  */
   private static final Long UNKNOWN_TAG_ID = -1L;
-  
+
   /**
    * The local cache for commands that have already been retrieved from the
    * server.
    */
-  private final Map<Long, ClientCommandTagImpl<Object>> commandCache = 
+  private final Map<Long, ClientCommandTagImpl<Object>> commandCache =
     new ConcurrentHashMap<Long, ClientCommandTagImpl<Object>>();
-  
+
   /**
    * The C2MON session manager
    */
   private final C2monSessionManager sessionManager;
-  
-  /** 
+
+  /**
    * Provides methods for requesting commands information and sending
    * an execute request to the C2MON server.
    */
   private final RequestHandler clientRequestHandler;
 
-  
+
   /**
    * Default Constructor, used by Spring to instantiate the Singleton service
-   * 
+   *
    * @param pSessionManager The session Manager which is needed for checking the
    *                        user authorization.
    * @param pRequestHandler
@@ -68,32 +69,32 @@ public class CommandManager implements C2monCommandManager, CommandService {
     this.sessionManager = pSessionManager;
     this.clientRequestHandler = pRequestHandler;
   }
-  
+
   @Override
   public CommandReport executeCommand(final String userName, final Long commandId, final Object value) throws CommandTagValueException {
     if (!sessionManager.isUserLogged(userName)) {
-      return new CommandReportImpl(commandId, 
+      return new CommandReportImpl(commandId,
           CommandExecutionStatus.STATUS_AUTHORISATION_FAILED, "No user is logged-in.");
     }
-    
+
     if (!commandCache.containsKey(commandId)) {
       getCommandTag(commandId);
     }
-        
+
     ClientCommandTagImpl<Object> cct = commandCache.get(commandId);
-    
+
     if (!cct.isExistingCommand()) {
         return new CommandReportImpl(commandId, CommandExecutionStatus.STATUS_CMD_UNKNOWN, "The command with tagId '" + commandId + "' is not known to the server");
     }
-    
+
     CommandExecuteRequest<Object> executeRequest = createCommandExecuteRequest(cct, value);
-    
+
     if (!isAuthorized(userName, commandId)) {
         return new CommandReportImpl(commandId,
             CommandExecutionStatus.STATUS_AUTHORISATION_FAILED,
             "The logged user has not the priviledges to execute command " + commandId + ".");
     }
-    
+
     try {
       LOG.info("executeCommand() - Executing command " + commandId + " for authorized user " + userName);
       return clientRequestHandler.executeCommand(executeRequest);
@@ -102,13 +103,13 @@ public class CommandManager implements C2monCommandManager, CommandService {
       LOG.error("executeCommand() - Catched JMS execption while trying to execute command "
                 + commandId + ". ", e);
       return new CommandReportImpl(commandId,
-          CommandExecutionStatus.STATUS_SERVER_ERROR, 
+          CommandExecutionStatus.STATUS_SERVER_ERROR,
           "Could not execute the command due to a communication error with the server. Error: " + e.getMessage());
     }
-    
+
   }
 
-  
+
   @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
   public <T> Set<ClientCommandTag<T>> getCommandTags(final Set<Long> pIds) {
@@ -119,7 +120,7 @@ public class CommandManager implements C2monCommandManager, CommandService {
       StringBuilder str = new StringBuilder("getCommandTags() - creating ");
       str.append(pIds.size());
       str.append(" command tags.");
-      LOG.debug(str);
+      LOG.debug(str.toString());
     }
 
     // Create ClientDataTags for all IDs and keep in hash table
@@ -132,7 +133,7 @@ public class CommandManager implements C2monCommandManager, CommandService {
           commandTag = new ClientCommandTagImpl(commandId);
           // Add the new tag to the global store
           this.commandCache.put(commandId, commandTag);
-          
+
           // Add this id to the list to request
           newCommandTagIds.add(commandId);
         }
@@ -141,9 +142,9 @@ public class CommandManager implements C2monCommandManager, CommandService {
 
     if (newCommandTagIds.size() > 0) {
       if (LOG.isDebugEnabled()) {
-        LOG.debug(new StringBuilder("getCommandTags() - ").append(newCommandTagIds.size()).append(" commands to be requested."));
+        LOG.debug(new StringBuilder("getCommandTags() - ").append(newCommandTagIds.size()).append(" commands to be requested.").toString());
       }
-      
+
       Collection<CommandTagHandle> commandTagHandles = clientRequestHandler.requestCommandTagHandles(newCommandTagIds);
       if (commandTagHandles != null) {
         ClientCommandTagImpl cct = null;
@@ -162,7 +163,7 @@ public class CommandManager implements C2monCommandManager, CommandService {
     else {
       LOG.debug("getCommandTags() - No commands to be requested from the server.");
     }
-    
+
     // Clone command tags for result set
     for (Long commandId : pIds) {
       // skip all fake tags
@@ -176,11 +177,11 @@ public class CommandManager implements C2monCommandManager, CommandService {
         }
       }
     }
- 
+
     return resultSet;
   }
 
-  
+
 
   /**
    * Inner method for creating a command execution request.
@@ -195,11 +196,11 @@ public class CommandManager implements C2monCommandManager, CommandService {
     if (value == null) {
       throw new CommandTagValueException("Null value : command values cannot be set to null");
     }
-    
+
     if (!commandTag.isExistingCommand()) {
         throw new CommandTagValueException("Unknown command : " + commandTag.getId() + " is not known to the server.");
     }
-    
+
     if (commandTag.getValueType() == null) {
         throw new CommandTagValueException("Null value : command value type cannot be set to null");
     }
@@ -227,7 +228,7 @@ public class CommandManager implements C2monCommandManager, CommandService {
       throw new CommandTagValueException("CONFIGURATION ERROR: The minValue for the command is of type " + commandTag.getValueType().getName()
           + ". It cannot be compared to a value of type " + value.getClass().getName() + ". Contact the configuration responsible for correcting this problem");
     }
-    
+
     String hostname;
     try {
       hostname = InetAddress.getLocalHost().getHostName();
@@ -235,8 +236,8 @@ public class CommandManager implements C2monCommandManager, CommandService {
       LOG.warn("UnknownHostException caught while creating command request - set to unknown", e);
       hostname = "unknown-host";
     }
-    
-    return new CommandExecuteRequestImpl<T>(commandTag.getId(), value, 
+
+    return new CommandExecuteRequestImpl<T>(commandTag.getId(), value,
                                   commandTag.getClientTimeout(), System.getProperty("user.home"), hostname);
   }
 
@@ -245,7 +246,7 @@ public class CommandManager implements C2monCommandManager, CommandService {
     Set<Long> commandTagIds = new HashSet<Long>();
     commandTagIds.add(commandId);
     Set<ClientCommandTag<T>> commandTags = getCommandTags(commandTagIds);
-    
+
     return commandTags.iterator().next();
   }
 
@@ -254,7 +255,7 @@ public class CommandManager implements C2monCommandManager, CommandService {
     if (!commandCache.containsKey(commandId)) {
       getCommandTag(commandId);
     }
-    
+
     if (sessionManager.isUserLogged(userName)) {
       ClientCommandTagImpl<Object> cct = commandCache.get(commandId);
       if (cct.isExistingCommand()) {
@@ -267,10 +268,10 @@ public class CommandManager implements C2monCommandManager, CommandService {
         }
       }
     }
-    
+
     return false;
   }
-  
+
   @Override
   public void refreshCommandCache() {
     Set<Long> commandIds = commandCache.keySet();

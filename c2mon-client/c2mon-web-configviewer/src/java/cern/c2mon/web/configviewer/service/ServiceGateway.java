@@ -2,7 +2,8 @@ package cern.c2mon.web.configviewer.service;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.core.C2monCommandManager;
@@ -20,7 +21,7 @@ public class ServiceGateway {
   /**
    * ServiceGateway logger
    */
-  private static Logger logger = Logger.getLogger(TagService.class);
+  private static Logger logger = LoggerFactory.getLogger(TagService.class);
 
   /**
    * Tag manager

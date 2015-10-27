@@ -20,7 +20,8 @@ package cern.c2mon.client.ext.simulator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +44,7 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
 class TagSimulatorImpl implements C2monTagSimulator {
   
   /** Log4j instance */
-  private static final Logger LOG = Logger.getLogger(TagSimulatorImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TagSimulatorImpl.class);
   
   /** Reference to the <code>ClientDataTagCache</code> */
   private final BasicCacheHandler cache;

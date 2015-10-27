@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ public class ProcessService {
   /**
    * ProcessService logger
    */
-  private static Logger logger = Logger.getLogger(ProcessService.class);
+  private static Logger logger = LoggerFactory.getLogger(ProcessService.class);
 
   /**
    * Gateway to ConfigLoaderService

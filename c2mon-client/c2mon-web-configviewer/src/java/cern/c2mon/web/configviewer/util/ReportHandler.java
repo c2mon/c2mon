@@ -1,6 +1,7 @@
 package cern.c2mon.web.configviewer.util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.shared.client.request.ClientRequestErrorReport;
@@ -27,7 +28,7 @@ public class ReportHandler implements ClientRequestReportListener {
   /**
    * ReportHandler logger
    */
-  private static Logger logger = Logger.getLogger(ReportHandler.class);
+  private static Logger logger = LoggerFactory.getLogger(ReportHandler.class);
   
   public ReportHandler(final Long id) {
     

@@ -27,7 +27,8 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -68,7 +69,7 @@ import cern.c2mon.web.configviewer.statistics.daqlog.charts.WebChart;
 @RequestMapping("/statistics")
 public class StatisticsController {
 
-  private static final Logger logger = Logger.getLogger(StatisticsController.class);
+  private static final Logger logger = LoggerFactory.getLogger(StatisticsController.class);
 
   private static final Integer FIRST_YEAR_OF_SERVER_LIFECYCLE_DATA = 2012;
 

@@ -27,7 +27,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.security.auth.login.LoginException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import cern.accsoft.security.rba.RBAToken;
@@ -50,7 +51,7 @@ import cern.rba.util.holder.ClientTierSubjectHolder;
 public class RbacAuthenticationManager implements AuthenticationManager, RbaTokenManager, ClientTierRbaTokenChangeListener {
   
   /** Log4j logger instance */
-  private static final Logger LOG = Logger.getLogger(RbacAuthenticationManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RbacAuthenticationManager.class);
   
   /** Used to synchronize login and logout requests */
   private static final Object SYNC_LOCK = new Object(); 

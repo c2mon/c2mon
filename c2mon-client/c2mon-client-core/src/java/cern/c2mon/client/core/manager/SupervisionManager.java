@@ -26,7 +26,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,7 +54,7 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 public class SupervisionManager implements CoreSupervisionManager, SupervisionListener, ConnectionListener, HeartbeatListener {
 
   /** Log4j logger instance */
-  private static final Logger LOG = Logger.getLogger(SupervisionManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SupervisionManager.class);
 
   /** Set to <code>true</code>, if the supervision  cache is correctly initialized */
   private volatile boolean c2monConnectionEstablished = false;

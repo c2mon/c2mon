@@ -25,7 +25,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.BaseListener;
@@ -34,7 +35,7 @@ import cern.c2mon.client.core.tag.ClientDataTagImpl;
 @Service
 class CacheControllerImpl implements CacheController {
   /** Logger instance */
-  private static final Logger LOG = Logger.getLogger(CacheControllerImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CacheControllerImpl.class);
   
   /**
    * Pointer to the actual used cache instance (live or history)

@@ -4,7 +4,8 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -59,7 +60,7 @@ public class CommandController {
   /**
    * CommandController logger
    */
-  private static Logger logger = Logger.getLogger(CommandController.class);
+  private static Logger logger = LoggerFactory.getLogger(CommandController.class);
 
   /**
    * @return Redirects to the form

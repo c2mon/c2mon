@@ -17,7 +17,8 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +39,7 @@ import cern.c2mon.shared.common.command.AuthorizationDetails;
 public class SessionManager implements C2monSessionManager, SessionService, AuthenticationListener {
 
     /** Log4j instance */
-    private static final Logger LOG = Logger.getLogger(SessionManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SessionManager.class);
 
     /**
      * Collection of listeners that will be notified whenever a login/logout action completes successfully.

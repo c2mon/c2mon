@@ -2,8 +2,10 @@ package cern.c2mon.client.common.util;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper class.
@@ -12,29 +14,29 @@ import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
  * @author ekoufaki
  */
 public final class RbacAuthorizationDetailsParser {
-  
+
   /** Private Constructor! */
   private RbacAuthorizationDetailsParser() {
   }
-  
+
   /**
    * RbacAuthorizationDetailsParser logger
    * */
-  private static Logger logger = Logger.getLogger(RbacAuthorizationDetailsParser.class);
-  
+  private static Logger logger = LoggerFactory.getLogger(RbacAuthorizationDetailsParser.class);
+
   /**
    * RbacAuthorizationDetails are provided as one string for convenience (instead of 3).
    * Given that string this method returns an RbacAuthorizationDetails Object.
-   * @param encodedDetails a String that contains the RbacAuthorizationDetails. 
+   * @param encodedDetails a String that contains the RbacAuthorizationDetails.
    * The details should be provided as 3 comma seperated strings in the following order: "Class,Device,Property"
-   * Example: "TIM_APPLICATIONS,TIM_WEBCONFIG,RUN" 
+   * Example: "TIM_APPLICATIONS,TIM_WEBCONFIG,RUN"
    * @return an RbacAuthorizationDetails Object
    * @throws IOException In case the encodedDetails are null or encoded in a non-supported format.
    */
   public static RbacAuthorizationDetails parseRbacDetails(final String encodedDetails) throws IOException {
-    
+
     if (encodedDetails == null)  {
-      logger.error(new Error("parseRbacDetails(): RbacAuthorizationDetails == null!"));
+      logger.error(new Error("parseRbacDetails(): RbacAuthorizationDetails == null!").toString());
       throw new IOException("Not able to fetch RbacAuthorizationDetails.");
     }
 
@@ -44,11 +46,11 @@ public final class RbacAuthorizationDetailsParser {
     if (splitedDetails.length != 3) { // RbacAuthorizationDetails should be provided as 3 comma seperated strings
       logger.error(new Error("parseRbacDetails(): error splitting details!:"
           + encodedDetails
-      ));
+      ).toString());
       throw new IOException("Not able to fetch RbacAuthorizationDetails.");
     }
     else {
-      
+
       authDetails = new RbacAuthorizationDetails();
       authDetails.setRbacClass(splitedDetails[0]);
       authDetails.setRbacDevice(splitedDetails[1]);

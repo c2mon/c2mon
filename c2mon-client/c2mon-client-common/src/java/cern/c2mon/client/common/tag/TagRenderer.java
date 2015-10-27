@@ -8,7 +8,7 @@ import org.apache.log4j.or.ObjectRenderer;
  * Log4j ObjectRenderer for the DataTagObject class.
  *
  * The purpose of an object render is to log objects of a certain class
- * in a uniform way. 
+ * in a uniform way.
  *
  * <PRE>
  * Logger log = Logger.getLogger( ... );
@@ -16,12 +16,12 @@ import org.apache.log4j.or.ObjectRenderer;
  * log.info(tag);
  * </PRE>
  *
- * The output in the log file will be (for example) : 
+ * The output in the log file will be (for example) :
  * <PRE>
  * 651	nzmey.test33.xs11	2004-02-23 13:14:19.505	2004-02-23 13:13:01.505 null	false	Aliv of Process Driver.TDSexpired
  * </PRE>
  */
- 
+
 public class TagRenderer implements ObjectRenderer {
 
   /**
@@ -54,14 +54,14 @@ public class TagRenderer implements ObjectRenderer {
           str.append('\t');
           str.append(tag.getDataTagQuality().getDescription());
         }
-        return str.toString(); 
+        return str.toString();
       } else {
         // if some jerk passed an object other than a DataTagCacheObject
         return o.toString();
       }
     } else {
       // if somebody decided to pass a null parameter
-      return null;      
+      return null;
     }
   }
 }

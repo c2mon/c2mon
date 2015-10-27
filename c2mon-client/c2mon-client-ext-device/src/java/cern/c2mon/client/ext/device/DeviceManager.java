@@ -27,7 +27,8 @@ import java.util.Set;
 
 import javax.jms.JMSException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,7 +64,7 @@ import cern.c2mon.shared.rule.RuleFormatException;
 public class DeviceManager implements C2monDeviceManager, TagListener {
 
   /** Log4j logger for this class */
-  private static final Logger LOG = Logger.getLogger(DeviceManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DeviceManager.class);
 
   /** Reference to the <code>TagManager</code> singleton */
   private final TagService tagService;

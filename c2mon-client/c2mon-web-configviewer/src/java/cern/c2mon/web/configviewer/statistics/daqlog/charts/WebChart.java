@@ -11,7 +11,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -41,7 +42,7 @@ public abstract class WebChart {
     /**
      * The logger;
      */
-    protected static Logger logger = Logger.getLogger(WebChart.class);
+    protected static Logger logger = LoggerFactory.getLogger(WebChart.class);
 
     /**
      * The id of the web chart.

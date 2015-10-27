@@ -30,7 +30,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.jms.JMSException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -70,7 +71,7 @@ public class RequestHandlerImpl implements RequestHandler {
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(RequestHandlerImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RequestHandlerImpl.class);
 
   /**
    * The maximum number of tags in a single request. Each request runs in its

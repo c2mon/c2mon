@@ -2,7 +2,8 @@ package cern.c2mon.client.apitest.service.impl;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +17,7 @@ import cern.c2mon.client.apitest.service.C2MonClientApiTestService;
 @Service
 public class C2MonClientApiTestServiceImpl implements C2MonClientApiTestService {
 
-    private static Logger log = Logger.getLogger(C2MonClientApiTestServiceImpl.class);
+    private static Logger log = LoggerFactory.getLogger(C2MonClientApiTestServiceImpl.class);
 
     private C2MonClientApiTestDao dao;
 

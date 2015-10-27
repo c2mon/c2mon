@@ -24,7 +24,8 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
@@ -41,7 +42,7 @@ import com.google.gson.Gson;
 class AlarmListenerWrapper extends AbstractListenerWrapper<AlarmListener, AlarmValue> {
   
   /** Class logger. */
-  private static final Logger LOGGER = Logger.getLogger(AlarmListenerWrapper.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AlarmListenerWrapper.class);
   
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();

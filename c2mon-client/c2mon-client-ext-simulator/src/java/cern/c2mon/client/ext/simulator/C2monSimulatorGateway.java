@@ -17,7 +17,8 @@
  ******************************************************************************/
 package cern.c2mon.client.ext.simulator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -26,7 +27,7 @@ import cern.c2mon.client.core.C2monServiceGateway.Module;
 
 public class C2monSimulatorGateway {
   /** Class logger */
-  private static final Logger LOG = Logger.getLogger(C2monSimulatorGateway.class);
+  private static final Logger LOG = LoggerFactory.getLogger(C2monSimulatorGateway.class);
   
   /** The path to the core Spring XML */
   private static final String APPLICATION_SPRING_XML_PATH = "cern/c2mon/client/ext/simulator/config/c2mon-client-ext-simulator.xml";

@@ -1,6 +1,7 @@
 package cern.c2mon.client.apitest.db;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import cern.c2mon.client.apitest.service.C2MonClientApiTestService;
 
@@ -8,7 +9,7 @@ import cern.c2mon.client.apitest.service.C2MonClientApiTestService;
 public class Dmn2DbServiceGateway {
 
     /** Class logger */
-    private static final Logger LOGGER = Logger.getLogger(Dmn2DbServiceGateway.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Dmn2DbServiceGateway.class);
 
     private static Dmn2DbServiceGateway theInstance = null;
 

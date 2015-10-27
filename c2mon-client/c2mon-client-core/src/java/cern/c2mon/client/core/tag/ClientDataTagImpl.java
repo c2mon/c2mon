@@ -29,7 +29,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
@@ -75,7 +76,7 @@ import cern.c2mon.shared.rule.RuleFormatException;
 public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateListener, TopicRegistrationDetails, SupervisionListener, Cloneable {
 
   /** Log4j instance */
-  private static final Logger LOG = Logger.getLogger(ClientDataTagImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientDataTagImpl.class);
 
   /** Default description when the object is not yet initialized */
   private static final String DEFAULT_DESCRIPTION = "Tag not initialised.";
@@ -131,10 +132,10 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
   @Element(required = false)
   private DataTagQuality tagQuality =
     new DataTagQualityImpl(TagQualityStatus.UNINITIALISED, DEFAULT_DESCRIPTION);
-  
+
   /** <code>true</code>, if tag represents an Alive Control tag */
   private boolean aliveTagFlag = false;
-  
+
   /** <code>true</code>, if tag represents a CommFault-, Alive- or Status tag */
   private boolean controlTagFlag = false;
 
@@ -217,7 +218,7 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
   public ClientDataTagImpl(final Long tagId) {
     id = tagId;
   }
-  
+
   /**
    * Constructor
    * Creates a Tag with a tagID and a javax.jms.TopicSession
@@ -228,12 +229,12 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
    */
   public ClientDataTagImpl(final Long tagId, boolean unknown) {
     id = tagId;
-    
+
     if (unknown) {
       setUnknown();
     }
   }
-  
+
   private void setUnknown() {
     tagQuality.setInvalidStatus(TagQualityStatus.UNDEFINED_TAG, "Tag is not known by the system");
   }
@@ -439,7 +440,7 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
     finally {
       updateTagLock.writeLock().unlock();
     }
-    
+
     if (clone != null) {
       notifyListeners(clone);
     }
@@ -468,7 +469,7 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
     finally {
       updateTagLock.writeLock().unlock();
     }
-    
+
     if (clone != null) {
       notifyListeners(clone);
     }
@@ -482,7 +483,7 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
    */
   private synchronized void notifyListeners(final Tag clone) {
     for (BaseListener updateListener : listeners) {
-      try { 
+      try {
         updateListener.onUpdate(clone);
       }
       catch (Exception e) {
@@ -499,7 +500,7 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
    * an update event to all <code>DataTagUpdateListener</code> objects registered.
    *
    * @param listener the DataTagUpdateListener that will receive value updates message for this tag
-   * @param initialValue In case the user subscribed with a {@link DataTagListener} provide here 
+   * @param initialValue In case the user subscribed with a {@link DataTagListener} provide here
    *                     the initial value which was sent through {@link DataTagListener#onInitialUpdate(Collection)}
    *                     method. Otherwise, pass {@code null} as parameter, if the initial update shall be sent via the
    *                     {@link DataTagUpdateListener#onUpdate(Tag)}
@@ -515,7 +516,7 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
     updateTagLock.readLock().lock();
     try {
       boolean sendInitialUpdate = !TagComparator.compare(this, initialValue);
-      
+
       if (sendInitialUpdate) {
         clone = this.clone();
       }
@@ -523,9 +524,9 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
     finally {
       updateTagLock.readLock().unlock();
     }
-    
+
     if (clone != null) {
-      try { 
+      try {
         listener.onUpdate(clone);
       }
       catch (Exception e) {
@@ -533,7 +534,7 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
       }
     }
   }
-  
+
   /**
    * Adds a <code>DataTagUpdateListener</code> to the Tag and
    * generates an initial update event for that listener. Any change to the
@@ -716,7 +717,7 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
    * Please note that the <code>ClientDataTag</code> gets only updated, if the tag id's
    * matches and if the server time stamp of the update is older than the current time
    * stamp set.
-   * 
+   *
    * @param transferTag The object that contains the updates.
    * @return <code>true</code>, if the update was successful, otherwise
    *         <code>false</code>
@@ -724,7 +725,7 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
   public boolean update(final TagValueUpdate tagValueUpdate) {
     Tag clone = null;
     boolean valid = false;
-    
+
     updateTagLock.writeLock().lock();
     try {
       valid = isValidUpdate(tagValueUpdate);
@@ -738,11 +739,11 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
     finally {
       updateTagLock.writeLock().unlock();
     }
-    
+
     if (clone != null) {
       notifyListeners(clone);
     }
-    
+
     return valid;
   }
 
@@ -755,7 +756,7 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
    * Please note that the <code>ClientDataTag</code> gets only updated, if the tag id's
    * matches and if the server time stamp of the update is older thatn the current time
    * stamp set.
-   * 
+   *
    * @param tagUpdate The object that contains the updates.
    * @return <code>true</code>, if the update was successful, otherwise
    *         <code>false</code>
@@ -765,7 +766,7 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
   public boolean update(final TagUpdate tagUpdate) throws RuleFormatException {
     Tag clone = null;
     boolean valid = false;
-    
+
     updateTagLock.writeLock().lock();
     try {
       valid = isValidUpdate(tagUpdate);
@@ -801,7 +802,7 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
         tagName = tagUpdate.getName();
         topicName = tagUpdate.getTopicName();
         unit = tagUpdate.getUnit();
-        
+
         aliveTagFlag = tagUpdate.isAliveTag();
         controlTagFlag = tagUpdate.isControlTag();
 
@@ -812,11 +813,11 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
     finally {
       updateTagLock.writeLock().unlock();
     }
-    
+
     if (clone != null) {
       notifyListeners(clone);
     }
-    
+
     return valid;
   }
 
@@ -1131,7 +1132,7 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
       return clone;
     }
     catch (CloneNotSupportedException cloneException) {
-      LOG.fatal(
+      LOG.error(
           "clone() - Cloning the ClientDataTagImpl object failed! No update sent to the client.");
       throw new RuntimeException(cloneException);
     }
@@ -1163,7 +1164,7 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
   /**
    * Removes all information from the object.
    * This is in particular interesting for the history mode which sometimes just
-   * uses the static information from the live tag object. 
+   * uses the static information from the live tag object.
    */
   public void clean() {
     updateTagLock.writeLock().lock();
@@ -1205,9 +1206,9 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
     if (isControlTag() && !isAliveTag()) {
       return;
     }
-    
+
     Tag clone = null;
-    
+
     updateTagLock.writeLock().lock();
     try {
       boolean validUpdate = false;
@@ -1245,7 +1246,7 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
     finally {
       updateTagLock.writeLock().unlock();
     }
-    
+
     if (clone != null) {
       notifyListeners(clone);
     }

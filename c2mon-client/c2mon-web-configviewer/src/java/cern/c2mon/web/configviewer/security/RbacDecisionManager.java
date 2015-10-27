@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
@@ -46,7 +47,7 @@ public class RbacDecisionManager implements AccessDecisionManager {
   /**
    * RbacDecisionManager logger
    */
-  private static Logger logger = Logger.getLogger(RbacDecisionManager.class);
+  private static Logger logger = LoggerFactory.getLogger(RbacDecisionManager.class);
 
   @Override
   public void decide(final Authentication authentication, final Object secureObject,

@@ -9,7 +9,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -85,7 +86,7 @@ public class TrendViewController {
   private TagService tagService;
 
   /** TrendViewController logger */
-  private static Logger logger = Logger.getLogger(TrendViewController.class);
+  private static Logger logger = LoggerFactory.getLogger(TrendViewController.class);
 
   /**
    * @return Model with the default values added (values that are the same for

@@ -1,6 +1,7 @@
 package cern.c2mon.web.configviewer.security;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,7 +24,7 @@ public class CustomAuthenticationProvider  implements AuthenticationProvider  {
   /**
    * CustomAuthenticationProvider logger
    */
-  private static Logger logger = Logger.getLogger(CustomAuthenticationProvider.class);
+  private static Logger logger = LoggerFactory.getLogger(CustomAuthenticationProvider.class);
 
   /**
    * Our own custom authentication method.

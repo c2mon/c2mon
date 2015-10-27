@@ -10,7 +10,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.ext.history.C2monHistoryGateway;
@@ -33,7 +34,7 @@ public class HistoryService {
   /**
    * HistoryService logger
    */
-  private static Logger logger = Logger.getLogger(HistoryService.class);
+  private static Logger logger = LoggerFactory.getLogger(HistoryService.class);
 
   /** Date format used in our trend views */
   private static final String CHART_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";

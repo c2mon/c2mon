@@ -35,7 +35,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.jms.JMSException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
@@ -82,7 +83,7 @@ import cern.c2mon.shared.rule.RuleFormatException;
 @ContextConfiguration({ "classpath:cern/c2mon/client/ext/device/config/c2mon-devicemanager-test.xml" })
 public class DeviceManagerTest {
 
-  private Logger LOG = Logger.getLogger(DeviceManagerTest.class);
+  private Logger LOG = LoggerFactory.getLogger(DeviceManagerTest.class);
 
   /** Component to test */
   @Autowired

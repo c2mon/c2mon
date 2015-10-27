@@ -11,7 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import cern.c2mon.shared.client.configuration.ConfigConstants;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.support.PagedListHolder;
 import org.springframework.security.acls.model.NotFoundException;
@@ -86,7 +87,7 @@ public class ConfigLoaderController {
   /**
    * ConfigLoaderController logger
    */
-  private static Logger logger = Logger.getLogger(ConfigLoaderController.class);
+  private static Logger logger = LoggerFactory.getLogger(ConfigLoaderController.class);
 
   /**
    * @return Redirects to the form
@@ -170,7 +171,7 @@ public class ConfigLoaderController {
     pagedListHolder.setPage(page);
     pagedListHolder.setPageSize(50);
 
-    logger.debug(reports);
+    logger.debug(reports.toString());
     model.addAttribute("report", report);
     model.addAttribute("allReports", reports);
     model.addAttribute("pagedListHolder", pagedListHolder);

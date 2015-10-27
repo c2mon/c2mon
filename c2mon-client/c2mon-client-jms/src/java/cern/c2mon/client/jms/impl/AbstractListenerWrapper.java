@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract message listener implementation to be registered to
@@ -40,7 +41,7 @@ public abstract class AbstractListenerWrapper<T, U> extends AbstractQueuedWrappe
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(AbstractListenerWrapper.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractListenerWrapper.class);
   
   /**
    * Listeners registered for receiving events.  

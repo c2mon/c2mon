@@ -25,7 +25,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.common.tag.Tag;
@@ -50,7 +51,7 @@ import cern.c2mon.shared.rule.RuleFormatException;
 public class DeviceImpl implements Device, Cloneable {
 
   /** Log4j logger for this class */
-  private static final Logger LOG = Logger.getLogger(DeviceImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DeviceImpl.class);
 
   /**
    * The unique ID of the device.

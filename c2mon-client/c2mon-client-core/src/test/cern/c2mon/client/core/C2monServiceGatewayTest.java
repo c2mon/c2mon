@@ -27,7 +27,8 @@ import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MalformedObjectNameException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.Test;
 
 import cern.c2mon.client.common.listener.BaseTagListener;
@@ -44,7 +45,7 @@ public class C2monServiceGatewayTest {
   /**
    * Log4j instance
    */
-  private static final Logger LOG = Logger.getLogger(C2monServiceGatewayTest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(C2monServiceGatewayTest.class);
 
   @Test
   public void startClient() throws InterruptedException, MBeanRegistrationException, InstanceNotFoundException, MalformedObjectNameException,

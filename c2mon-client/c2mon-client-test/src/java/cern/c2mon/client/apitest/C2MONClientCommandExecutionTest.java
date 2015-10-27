@@ -12,7 +12,8 @@ import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.accsoft.security.rba.RBASubject;
 import cern.accsoft.security.rba.login.DefaultCallbackHandler;
@@ -28,7 +29,7 @@ import cern.c2mon.shared.client.command.CommandReport;
 
 public class C2MONClientCommandExecutionTest {
 
-    private static Logger log = Logger.getLogger(C2MONClientCommandExecutionTest.class);
+    private static Logger log = LoggerFactory.getLogger(C2MONClientCommandExecutionTest.class);
 
     private static final String APP_NAME = "DMN2";
 
@@ -41,7 +42,7 @@ public class C2MONClientCommandExecutionTest {
 
     /**
      * Performs login from the command line.
-     * 
+     *
      * @return RBAToken if login is successful or throw an exception if it fails
      * @throws LoginException if authentication fails
      */
@@ -61,29 +62,29 @@ public class C2MONClientCommandExecutionTest {
     /**
      * Log4j Logger
      */
-    protected static final Logger TAG_LOG = Logger.getLogger(C2MONClientCommandExecutionTest.class);
+    protected static final Logger TAG_LOG = LoggerFactory.getLogger(C2MONClientCommandExecutionTest.class);
 
     public static void main(String[] args) {
 
         try {
-            
+
             console = System.console();
             if (console == null) {
                 log.error("No console, can not read username and passwd from the command line.");
                 System.exit(1);
-            }            
-            
+            }
+
             if (args.length < 1) {
                log.error("No console, can not read username and passwd from the command line.");
                console.printf("computer name expected!");
                System.exit(1);
             }
-            
+
             log.debug("db.properties: " + System.getProperty("db.properties"));
             log.debug("jms.properties: " + System.getProperty("jms.properties"));
 
             log.info("before Dmn2DbServiceGateway.init()");
-            
+
             Dmn2DbServiceGateway.init();
             log.info("after Dmn2DbServiceGateway.init()");
 
@@ -98,7 +99,7 @@ public class C2MONClientCommandExecutionTest {
 
             sessionManager = C2monServiceGateway.getSessionManager();
 
-            if (!sessionManager.getLoggedUserNames().isEmpty())             
+            if (!sessionManager.getLoggedUserNames().isEmpty())
               log.info(format("sessionManager user: %s isLogged: %s", sessionManager.getLoggedUserNames().iterator().next(), sessionManager
                     .isUserLogged(sessionManager.getLoggedUserNames().iterator().next())));
 
@@ -163,7 +164,7 @@ public class C2MONClientCommandExecutionTest {
             }
 
         } catch (Exception e) {
-            log.error(e);
+            log.error(e.toString());
             System.exit(-1);
         }
 

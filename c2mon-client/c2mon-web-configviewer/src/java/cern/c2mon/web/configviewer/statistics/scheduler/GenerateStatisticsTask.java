@@ -24,7 +24,8 @@ import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -47,7 +48,7 @@ import cern.c2mon.web.configviewer.statistics.daqlog.GraphDeployer;
 @EnableScheduling
 class GenerateStatisticsTask {
 
-  private static final Logger logger = Logger.getLogger(GenerateStatisticsTask.class);
+  private static final Logger logger = LoggerFactory.getLogger(GenerateStatisticsTask.class);
 
   /**
    * Reference to the {@link StatisticsService} bean, into which we will inject
@@ -96,11 +97,11 @@ class GenerateStatisticsTask {
       // Generate the charts from the XML
       deployer.configure(graphXMLDocument);
     } catch (IOException e) {
-      logger.fatal("Graph configuration file could not be read", e);
+      logger.error("Graph configuration file could not be read", e);
     } catch (org.xml.sax.SAXException e) {
-      logger.fatal("Error in parsing web configuration XML document", e);
+      logger.error("Error in parsing web configuration XML document", e);
     } catch (Exception e) {
-      logger.fatal("Unidentified exception caught", e);
+      logger.error("Unidentified exception caught", e);
     }
 
     service.setCharts(deployer.getWebCharts());

@@ -5,7 +5,8 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -77,7 +78,7 @@ public class DataTagController {
   /**
    * DataTagController logger
    */
-  private static Logger logger = Logger.getLogger(DataTagController.class);
+  private static Logger logger = LoggerFactory.getLogger(DataTagController.class);
 
 
   /**

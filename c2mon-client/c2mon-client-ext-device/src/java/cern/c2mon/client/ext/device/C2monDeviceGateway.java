@@ -18,7 +18,8 @@
 
 package cern.c2mon.client.ext.device;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -33,7 +34,7 @@ import cern.c2mon.client.core.C2monServiceGateway.Module;
 public class C2monDeviceGateway {
 
   /** Class logger */
-  private static final Logger LOG = Logger.getLogger(C2monDeviceGateway.class);
+  private static final Logger LOG = LoggerFactory.getLogger(C2monDeviceGateway.class);
 
   /** The path to the core Spring XML */
   private static final String APPLICATION_SPRING_XML_PATH = "cern/c2mon/client/ext/device/config/c2mon-client-ext-device.xml";

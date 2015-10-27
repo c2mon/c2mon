@@ -20,7 +20,8 @@ package cern.c2mon.client.core;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import cern.c2mon.client.core.manager.CommandManager;
@@ -46,7 +47,7 @@ import cern.c2mon.client.module.adminmessage.AdminMessageManager;
 public class C2monServiceGateway {
   
   /** Class logger */
-  private static final Logger LOG = Logger.getLogger(C2monServiceGateway.class);
+  private static final Logger LOG = LoggerFactory.getLogger(C2monServiceGateway.class);
   
   /** The path to the core Spring XML */
   private static final String APPLICATION_SPRING_XML_PATH = 

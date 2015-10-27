@@ -17,9 +17,11 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+
 import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.xerces.parsers.DOMParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -64,7 +66,7 @@ public class GraphDeployer {
   /**
    * The log4j process logger.
    */
-  private static Logger logger = Logger.getLogger(GraphDeployer.class);
+  private static Logger logger = LoggerFactory.getLogger(GraphDeployer.class);
 
   /**
    * The deployment system directory. Must be at least MIN_DIR_LENGTH characters
@@ -161,8 +163,8 @@ public class GraphDeployer {
       } catch (InvalidTableNameException tableEx) {
         // if bad table name used, stop the package to prevent SQL injection
         // errors
-        logger.fatal("Detected table name with unauthorized characters (non-alphanumeric + _");
-        logger.fatal("Terminating...");
+        logger.error("Detected table name with unauthorized characters (non-alphanumeric + _");
+        logger.error("Terminating...");
         System.err.println("Detected table name with unauthorized characters (non-alphanumeric + _");
         System.err.println("Statistics generator was terminated.");
         tableEx.printStackTrace();
@@ -201,8 +203,8 @@ public class GraphDeployer {
       } catch (InvalidTableNameException tableEx) {
         // if bad table name used, stop the package to prevent SQL injection
         // errors
-        logger.fatal("Detected table name with unauthorized characters (non-alphanumeric + _");
-        logger.fatal("Terminating...");
+        logger.error("Detected table name with unauthorized characters (non-alphanumeric + _");
+        logger.error("Terminating...");
         System.err.println("Detected table name with unauthorized characters (non-alphanumeric + _");
         System.err.println("Statistics generator was terminated.");
         tableEx.printStackTrace();
@@ -228,9 +230,9 @@ public class GraphDeployer {
     } catch (IOException ioEx) {
       // if any IOException caught, stop execution immediately as serious
       // problem accessing disc
-      logger.fatal("IOException caught in writing charts or html to disc: " + ioEx);
+      logger.error("IOException caught in writing charts or html to disc: " + ioEx);
       ioEx.printStackTrace();
-      logger.fatal("exiting...");
+      logger.error("exiting...");
       throw new RuntimeException(ioEx);
     }
 
@@ -288,7 +290,7 @@ public class GraphDeployer {
       }
 
     } catch (IOException ioEx) {
-      logger.fatal("IOException caught when removing deploy directories: " + ioEx.getMessage());
+      logger.error("IOException caught when removing deploy directories: " + ioEx.getMessage());
       ioEx.printStackTrace();
       throw new RuntimeException(ioEx);
     }
@@ -397,8 +399,8 @@ public class GraphDeployer {
         logger.info("[preDeploy] Configured log4j from " + loggerConfig);
       }
     } catch (Exception ex) { // logger configuration fails
-      logger.fatal("Unable to load log4j configuration file : " + ex.getMessage());
-      logger.fatal("exiting...");
+      logger.error("Unable to load log4j configuration file : " + ex.getMessage());
+      logger.error("exiting...");
       ex.printStackTrace();
       System.exit(1);
     }
@@ -411,20 +413,20 @@ public class GraphDeployer {
       graphXMLDocument = parser.getDocument();
       deployer.configure(graphXMLDocument);
     } catch (IOException ioEx) {
-      logger.fatal("Graph configuration file could not be read: " + ioEx);
+      logger.error("Graph configuration file could not be read: " + ioEx);
       ioEx.printStackTrace();
-      logger.fatal("exiting...");
+      logger.error("exiting...");
       System.exit(1);
     } catch (org.xml.sax.SAXException saxEx) {
-      logger.fatal("Error in parsing web configuration XML document: " + saxEx);
+      logger.error("Error in parsing web configuration XML document: " + saxEx);
       saxEx.printStackTrace();
-      logger.fatal("exiting...");
+      logger.error("exiting...");
       System.exit(1);
     } catch (Exception otherEx) {
       // exit and notify if any other exception is caught
-      logger.fatal("Unidentified exception caught: " + otherEx);
+      logger.error("Unidentified exception caught: " + otherEx);
       otherEx.printStackTrace();
-      logger.fatal("exiting...");
+      logger.error("exiting...");
       System.exit(1);
     }
 

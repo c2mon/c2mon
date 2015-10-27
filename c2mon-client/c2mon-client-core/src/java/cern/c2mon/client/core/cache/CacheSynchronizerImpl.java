@@ -28,7 +28,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,7 +58,7 @@ import cern.c2mon.shared.rule.RuleFormatException;
 public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListener, ConnectionListener {
 
   /** Log4j Logger for this class */
-  private static final Logger LOG = Logger.getLogger(CacheSynchronizerImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CacheSynchronizerImpl.class);
 
   /**
    * Synchronization lock object to avoid several thread refreshing at the same

@@ -28,7 +28,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +51,7 @@ import cern.c2mon.shared.client.supervision.Heartbeat;
 class HeartbeatManager extends TimerTask implements cern.c2mon.client.jms.HeartbeatListener, HeartbeatListenerManager {
 
   /** Logger instance of this class */
-  private static final Logger LOG = Logger.getLogger(HeartbeatManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HeartbeatManager.class);
   
   /** TimerTask thread synchronization Object */
   private final Object timerSync = new Object();

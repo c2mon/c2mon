@@ -41,7 +41,8 @@ import javax.jms.Topic;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.activemq.spring.ActiveMQConnectionFactory;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -96,7 +97,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(JmsProxyImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(JmsProxyImpl.class);
 
   /**
    * Time between reconnection attempts if the first attempt fails (in

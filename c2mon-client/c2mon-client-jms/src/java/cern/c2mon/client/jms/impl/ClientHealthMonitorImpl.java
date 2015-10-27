@@ -3,7 +3,8 @@ package cern.c2mon.client.jms.impl;
 import java.util.HashSet;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.jms.ClientHealthListener;
@@ -12,7 +13,7 @@ import cern.c2mon.client.jms.ClientHealthMonitor;
 @Service
 public class ClientHealthMonitorImpl implements ClientHealthMonitor, SlowConsumerListener {
 
-  private static final Logger LOGGER = Logger.getLogger("CentralLogger");
+  private static final Logger LOGGER = LoggerFactory.getLogger("CentralLogger");
   
   /**
    * Listeners.

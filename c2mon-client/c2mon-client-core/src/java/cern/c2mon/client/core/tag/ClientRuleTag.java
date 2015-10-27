@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.common.listener.BaseTagListener;
@@ -55,7 +56,7 @@ import cern.c2mon.shared.rule.RuleExpression;
  */
 public class ClientRuleTag<T> implements BaseTagListener, Tag, ClientDataTagValue {
   /** Log4j Logger for this class */
-  private static final Logger LOG = Logger.getLogger(ClientRuleTag.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientRuleTag.class);
 
   /** The rule expression of the client rule */
   private final RuleExpression rule;

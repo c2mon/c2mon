@@ -1,43 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>cern.c2mon.c2mon-client</groupId>
-		<artifactId>c2mon-client-pom</artifactId>
-		<version>1.5.3</version>
-	</parent>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.c2mon.c2mon-client</groupId>
+    <artifactId>c2mon-client-pom</artifactId>
+    <version>1.5.3</version>
+  </parent>
 
   <groupId>cern.c2mon.c2mon-client</groupId>
-	<artifactId>c2mon-client-common</artifactId>
-	<version>1.6.1-SNAPSHOT</version>
-	<name>c2mon-client-common</name>
-	<packaging>jar</packaging>
-	<description>
-    	Classes shared across the C2MON client API.
-    </description>
-	<url>http://timweb.cern.ch</url>
-	<dependencies>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-shared</groupId>
-			<artifactId>c2mon-shared-client</artifactId>
+  <artifactId>c2mon-client-common</artifactId>
+  <version>1.6.1-SNAPSHOT</version>
+  <name>c2mon-client-common</name>
+  <packaging>jar</packaging>
+  <description>
+    Classes shared across the C2MON client API.
+  </description>
+  <url>http://timweb.cern.ch</url>
+
+  <dependencies>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <artifactId>c2mon-shared-client</artifactId>
       <version>[1.5.0, 2.0.0)</version>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-shared</groupId>
-			<artifactId>c2mon-shared-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <artifactId>c2mon-shared-common</artifactId>
       <version>[1.5.0, 2.0.0)</version>
-		</dependency>
-    
-        <!-- test dependencies -->
-        <dependency>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-        </dependency>
-	</dependencies>
-	<developers />
-	
-	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-common</developerConnection>
-	</scm>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.12</version>
+    </dependency>
+
+
+    <!-- test dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+  </dependencies>
+  <developers/>
+
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-common</developerConnection>
+  </scm>
 </project>

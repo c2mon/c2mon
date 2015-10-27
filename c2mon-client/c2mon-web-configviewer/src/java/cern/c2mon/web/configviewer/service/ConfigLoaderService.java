@@ -10,7 +10,8 @@ import java.util.TreeMap;
 
 import javax.naming.CannotProceedException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class ConfigLoaderService {
   /**
    * ConfigLoaderService logger
    */
-  private static Logger logger = Logger.getLogger(ConfigLoaderService.class);
+  private static Logger logger = LoggerFactory.getLogger(ConfigLoaderService.class);
 
   /**
    * Gateway to ConfigLoaderService
