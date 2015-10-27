@@ -5,7 +5,9 @@ import cern.c2mon.client.ext.history.alarm.AlarmHistoryService;
 import cern.c2mon.client.ext.history.alarm.HistoricAlarmQuery;
 import cern.c2mon.client.ext.history.alarm.repository.AlarmRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,8 +28,8 @@ public class AlarmHistoryServiceImpl implements AlarmHistoryService {
   }
 
   @Override
-  public List<Alarm> findBy(HistoricAlarmQuery query, int max) {
-    return toList(alarmRepository.findAll(query.getPredicate(), new PageRequest(0, max)));
+  public Page<Alarm> findBy(HistoricAlarmQuery query, PageRequest page) {
+    return alarmRepository.findAll(query.getPredicate(), page);
   }
 
   /**

@@ -1,5 +1,9 @@
 package cern.c2mon.client.ext.history.alarm;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 /**
@@ -19,12 +23,17 @@ public interface AlarmHistoryService {
   List<Alarm> findBy(HistoricAlarmQuery query);
 
   /**
-   * Returns the first maxResults results matching the given {@link HistoricAlarmQuery}.
+   * Returns a {@link Page} of entities meeting the paging restriction provided in the {@code PageRequest} object and matching the given {@link
+   * HistoricAlarmQuery}.
+   * *
+   * <p>
+   * Note: pages are 0-based, i.e. asking for the 0th page will get you the first page.
+   * </p>
    *
-   * @param query      the {@link HistoricAlarmQuery} to match
-   * @param maxResults the result limit
+   * @param query the {@link HistoricAlarmQuery} to match
+   * @param page  the paging restriction specifier
    *
-   * @return the matched results
+   * @return a page of matched results
    */
-  List<Alarm> findBy(HistoricAlarmQuery query, int maxResults);
+  Page<Alarm> findBy(HistoricAlarmQuery query, PageRequest page);
 }
