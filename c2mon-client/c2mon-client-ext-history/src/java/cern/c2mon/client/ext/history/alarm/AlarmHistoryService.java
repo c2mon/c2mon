@@ -1,6 +1,5 @@
 package cern.c2mon.client.ext.history.alarm;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -11,14 +10,21 @@ import java.util.List;
 public interface AlarmHistoryService {
 
   /**
-   * Retrieve all historic alarms between the given start and end points in time.
+   * Returns all results matching the given {@link HistoricAlarmQuery}.
    *
-   * @param start the starting point in time
-   * @param end   the end point in time
+   * @param query the {@link HistoricAlarmQuery} to match
    *
-   * @return all alarms between the start and end points
+   * @return the matched results
    */
-  List<Alarm> findByTimestampBetween(Timestamp start, Timestamp end);
-
   List<Alarm> findBy(HistoricAlarmQuery query);
+
+  /**
+   * Returns the first maxResults results matching the given {@link HistoricAlarmQuery}.
+   *
+   * @param query      the {@link HistoricAlarmQuery} to match
+   * @param maxResults the result limit
+   *
+   * @return the matched results
+   */
+  List<Alarm> findBy(HistoricAlarmQuery query, int maxResults);
 }

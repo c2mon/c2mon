@@ -6,13 +6,14 @@ import com.mysema.query.types.Predicate;
 import java.sql.Timestamp;
 
 /**
- * TODO
+ * This class is a simple builder for creating queries on historical alarms.
  *
  * @author Justin Lewis Salmon
  */
 public class HistoricAlarmQuery {
 
   BooleanBuilder builder = new BooleanBuilder();
+
 
   public HistoricAlarmQuery id(Long id) {
     builder.and(QAlarm.alarm.id.eq(id));
@@ -59,8 +60,13 @@ public class HistoricAlarmQuery {
     return this;
   }
 
-  public Predicate toPredicate() {
-    return builder;
+  public HistoricAlarmQuery operational() {
+    builder.and(QAlarm.alarm.info.isNull().or(QAlarm.alarm.info.contains("[T]").not()));
+    return this;
+  }
+
+  public Predicate getPredicate() {
+    return builder.getValue();
   }
 
 }

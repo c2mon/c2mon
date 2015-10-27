@@ -5,9 +5,9 @@ import cern.c2mon.client.ext.history.alarm.AlarmHistoryService;
 import cern.c2mon.client.ext.history.alarm.HistoricAlarmQuery;
 import cern.c2mon.client.ext.history.alarm.repository.AlarmRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,17 +21,17 @@ public class AlarmHistoryServiceImpl implements AlarmHistoryService {
   private AlarmRepository alarmRepository;
 
   @Override
-  public List<Alarm> findByTimestampBetween(Timestamp start, Timestamp end) {
-    return alarmRepository.findByTimestampBetween(start, end);
+  public List<Alarm> findBy(HistoricAlarmQuery query) {
+    return toList(alarmRepository.findAll(query.getPredicate()));
   }
 
   @Override
-  public List<Alarm> findBy(HistoricAlarmQuery query) {
-    return toList(alarmRepository.findAll(query.toPredicate()));
+  public List<Alarm> findBy(HistoricAlarmQuery query, int max) {
+    return toList(alarmRepository.findAll(query.getPredicate(), new PageRequest(0, max)));
   }
 
   /**
-   * Convert an {@link Iterable} to an {@link ArrayList}
+   * Convert an {@link Iterable} to an {@link ArrayList}.
    *
    * @param iterable
    * @param <E>
