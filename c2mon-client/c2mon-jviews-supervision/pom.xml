@@ -21,12 +21,6 @@
       <artifactId>c2mon-client-all</artifactId>
     </dependency>
 
-    <!-- 3rd party dependencies -->
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-    </dependency>
-
     <!-- test dependencies -->
     <dependency>
       <groupId>junit</groupId>

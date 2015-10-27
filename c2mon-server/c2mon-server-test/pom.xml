@@ -25,10 +25,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <!--
@@ -58,7 +54,7 @@
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>spring-tx</artifactId>   
+      <artifactId>spring-tx</artifactId>
     </dependency>
     <dependency>
       <groupId>org.easymock</groupId>

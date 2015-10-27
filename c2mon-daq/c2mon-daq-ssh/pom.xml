@@ -17,16 +17,12 @@
      e.g. for restarting DAQ modules, OPC servers etc. via simple commands sent from the TIM Viewer.
      Adapted for C2MON shared libraries.</description>
 	<url>http://timweb.cern.ch</url>
-	
+
 	<scm>
 		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-daq-ssh</developerConnection>
 	</scm>
-		
+
 	<dependencies>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>com.cryptzone</groupId>
 			<artifactId>mindterm</artifactId>

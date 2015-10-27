@@ -2,11 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
   <parent>
 		<groupId>cern.c2mon.c2mon-server</groupId>
 		<artifactId>c2mon-server-pom</artifactId>
-		<version>RELEASE</version>		
+		<version>RELEASE</version>
 	</parent>
 
   <groupId>cern.c2mon.c2mon-server</groupId>
@@ -37,10 +37,6 @@
     </dependency>
 
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
 		</dependency>
@@ -67,7 +63,7 @@
 		<dependency>
 			<groupId>cern.c2mon.c2mon-shared</groupId>
 			<artifactId>c2mon-shared-client</artifactId>
-      <version>[1.6.0, 2.0.0)</version> 
+      <version>[1.6.0, 2.0.0)</version>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-shared</groupId>

@@ -12,7 +12,7 @@
 	<version>1.5.2-SNAPSHOT</version>
 	<name>c2mon-daq-ens</name>
 	<packaging>jar</packaging>
-	<description>This is a C2MON ENS DAQ. It lets C2MON to acquiring data from and sending commands to the Electrical Network Supervisor (ENS), 
+	<description>This is a C2MON ENS DAQ. It lets C2MON to acquiring data from and sending commands to the Electrical Network Supervisor (ENS),
 	 which is used for monitoring electrical installations.
     </description>
 	<url />
@@ -53,10 +53,6 @@
 			<groupId>org.easymock</groupId>
 			<artifactId>easymockclassextension</artifactId>
       <scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
 		</dependency>
 
 	</dependencies>

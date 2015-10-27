@@ -50,10 +50,6 @@
 			<artifactId>easymockclassextension</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>cern.dmn2</groupId>
 			<artifactId>dmn2-agentlib-java</artifactId>
 			<version>[1.0.0,2.0.0)</version>

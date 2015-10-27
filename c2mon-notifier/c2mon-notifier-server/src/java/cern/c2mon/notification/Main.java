@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright CERN 2013, All Rights Reserved.
  */
 package cern.c2mon.notification;
@@ -14,10 +14,10 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
  */
 public class Main {
 
-    /** Starts the notifier spring context. 
-     * 
+    /** Starts the notifier spring context.
+     *
      * You can override the default one (classpath) by specifying the JVM option 'server-context'.
-     *   
+     *
      * @param args cmd args.
      */
     public static void main(String[] args) {
@@ -25,9 +25,9 @@ public class Main {
 
         FileSystemXmlApplicationContext context = null;
         try {
-            
+
             PropertyConfigurator.configureAndWatch(System.getProperty("log4j.configuration"), 1000 * 60);
-            
+
             context = new FileSystemXmlApplicationContext(System.getProperty("server-context",
                     "classpath:cern/c2mon/notification/context.xml"));
             // wait until we close, die or whatever

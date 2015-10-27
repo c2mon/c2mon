@@ -41,11 +41,6 @@
     </dependency>
 
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>cern.c2mon.c2mon-daq</groupId>
       <artifactId>c2mon-daq-test</artifactId>
     </dependency>

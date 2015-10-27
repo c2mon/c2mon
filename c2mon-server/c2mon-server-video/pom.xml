@@ -15,19 +15,15 @@
   <packaging>jar</packaging>
   <description>The C2MON server video module.</description>
   <url>http://timweb.cern.ch</url>
-  
+
   <scm>
     <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-video</developerConnection>
   </scm>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.jencks</groupId>
       <artifactId>jencks-amqpool</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -67,8 +63,8 @@
     </dependency>
     <dependency>
       <groupId>org.mybatis</groupId>
-      <artifactId>mybatis-spring</artifactId>      
-    </dependency>    
+      <artifactId>mybatis-spring</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
@@ -94,14 +90,14 @@
           <argLine>
             -Dc2mon.properties.location=${c2mon.properties.location}
             -Dc2mon.log.dir=${basedir}/build/log
-            
+
             <!--
               module properties
-            -->           
+            -->
             -Dc2mon.client.jms.video.request.queue=tim.video.request
             -Dc2mon.jms.client.consumers.min=1
-            -Dc2mon.jms.client.consumers.max=2            
-            
+            -Dc2mon.jms.client.consumers.max=2
+
             <!--
               server core properties for integration testing
             -->
@@ -112,14 +108,14 @@
             -Dcache.loader.queue.size=1000
             -Dcache.loader.equipment.batch.size=5
             -Dcache.loader.equipment.threads.max=2
-            -Dcache.loader.equipment.queue.size=1000  
+            -Dcache.loader.equipment.queue.size=1000
 
             <!-- supervision -->
             -Dc2mon.heartbeat.interval=60000
             -Dc2mon.jms.heartbeat.topic=test.tim.sys.hearbeat
             -Dc2mon.jms.heartbeat.user=not-used
-            -Dc2mon.jms.heartbeat.password=not-used  
-              
+            -Dc2mon.jms.heartbeat.password=not-used
+
             <!--
               daq communication in
             -->
@@ -137,7 +133,7 @@
             -Dc2mon.jms.update.task.idle.limit=1
             -Dc2mon.jms.update.task.max.messages=1
             -Dc2mon.jms.update.executor.threads=1
-            -Dc2mon.jms.update.task.timeout=50  
+            -Dc2mon.jms.update.task.timeout=50
 
             <!-- daq out -->
             -Djms.daq.out.connections=1

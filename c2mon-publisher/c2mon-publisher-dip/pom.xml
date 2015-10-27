@@ -13,7 +13,7 @@
   <scm>
   	<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-publisher/c2mon-publisher-dip</developerConnection>
   </scm>
-  
+
   <!-- This is needed to retrieve the DIP dependencies -->
   <repositories>
     <repository>
@@ -28,32 +28,28 @@
     <dip.native.libs.dir.rel>dip-${dip.version}/lib64</dip.native.libs.dir.rel>
     <dip.native.libs.dir.abs>${project.build.directory}/lib_so/${dip.native.libs.dir.rel}</dip.native.libs.dir.abs>
   </properties>
-  
+
   <dependencies>
-  
+
     <!-- C2MON Client API dependencies -->
     <dependency>
       <groupId>cern.c2mon.c2mon-publisher</groupId>
       <artifactId>c2mon-publisher-core</artifactId>
     </dependency>
-  	
+
   	<!-- CERN 3rd party dependencies -->
     <dependency>
       <groupId>cern.dip</groupId>
       <artifactId>dip</artifactId>
       <version>${dip.version}</version>
     </dependency>
-    
+
   	<!-- 3rd party dependencies -->
-  	<dependency>
-  		<groupId>log4j</groupId>
-  		<artifactId>log4j</artifactId>
-  	</dependency>
   	<dependency>
   		<groupId>org.springframework</groupId>
   		<artifactId>spring-context</artifactId>
   	</dependency>
-    
+
     <!-- Test dependencies -->
   	<dependency>
   		<groupId>junit</groupId>

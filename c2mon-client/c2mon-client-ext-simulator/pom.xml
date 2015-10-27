@@ -19,11 +19,7 @@
       <groupId>cern.c2mon.c2mon-client</groupId>
       <artifactId>c2mon-client-all</artifactId>
     </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-    </dependency>
-    
+
     <!-- test dependencies -->
     <dependency>
       <groupId>junit</groupId>
@@ -31,7 +27,7 @@
     </dependency>
 	</dependencies>
 	<developers />
-	
+
 	<scm>
 		<developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-ext-simulator</developerConnection>
 	</scm>

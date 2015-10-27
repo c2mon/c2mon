@@ -24,10 +24,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
@@ -57,7 +53,7 @@
 			<artifactId>c2mon-server-cache</artifactId>
       <version>[1.5.5, 2.0.0)</version>
 		</dependency>
-    
+
     <!-- C2MON test dependencies -->
     <dependency>
       <groupId>net.sf.ehcache</groupId>
@@ -69,7 +65,7 @@
       <artifactId>c2mon-server-test</artifactId>
     </dependency>
 	</dependencies>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -78,7 +74,7 @@
         <version>2.8.1</version>
         <configuration>
           <argLine>
-            -Dc2mon.log.dir=${basedir}/build/log           
+            -Dc2mon.log.dir=${basedir}/build/log
           </argLine>
         </configuration>
       </plugin>

@@ -13,20 +13,20 @@
 	<packaging>jar</packaging>
 	<description>C2MON testing module for DAQs</description>
 	<url />
-	
+
     <scm>
 		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-daq-test</developerConnection>
 	</scm>
-		
+
 	<dependencies>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-daq</groupId>
-			<artifactId>c2mon-daq-core</artifactId>			
+			<artifactId>c2mon-daq-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-shared</groupId>
 			<artifactId>c2mon-shared-common</artifactId>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -41,10 +41,6 @@
 			<groupId>org.easymock</groupId>
 			<artifactId>easymockclassextension</artifactId>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
 		</dependency>
 	</dependencies>
 

@@ -23,11 +23,6 @@
 			<groupId>cern.c2mon.c2mon-publisher</groupId>
 			<artifactId>c2mon-publisher-core</artifactId>
 		</dependency>
-		<!-- 3rd party dependencies -->
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
 
 		<!-- Test dependencies -->
 		<dependency>

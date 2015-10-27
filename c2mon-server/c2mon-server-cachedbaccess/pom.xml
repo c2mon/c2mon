@@ -2,13 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
   <parent>
 		<groupId>cern.c2mon.c2mon-server</groupId>
 		<artifactId>c2mon-server-pom</artifactId>
 		<version>RELEASE</version>
-	</parent> 
-  
+	</parent>
+
   <groupId>cern.c2mon.c2mon-server</groupId>
 	<artifactId>c2mon-server-cachedbaccess</artifactId>
 	<version>1.6.1-SNAPSHOT</version>
@@ -25,17 +25,13 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
     <dependency>
       <groupId>org.hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
-      <scope>test</scope>      
+      <scope>test</scope>
     </dependency>
 		<dependency>
 			<groupId>oracle</groupId>
@@ -129,7 +125,7 @@
 						-Ddatasource.persistence.connections.initial=2
 						-Ddatasource.persistence.connections.max=2
 						-Dc2mon.jms.controltag.publication.topic=c2mon.controltag.publication.test
-						-Dc2mon.jms.tag.publication.topic=c2mon.tag.publication.test		
+						-Dc2mon.jms.tag.publication.topic=c2mon.tag.publication.test
 					</argLine>
 				</configuration>
 			</plugin>

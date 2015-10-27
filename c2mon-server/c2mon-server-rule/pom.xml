@@ -23,10 +23,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
     </dependency>
@@ -45,7 +41,7 @@
       <artifactId>c2mon-server-cache</artifactId>
       <version>[1.5.5, 2.0.0)</version>
     </dependency>
-    
+
     <!-- Test dependencies -->
     <dependency>
       <groupId>junit</groupId>
@@ -100,10 +96,10 @@
         <configuration>
          <!--  use in-memory broker (overrite the default test broker urls defined in c2mon.properties -->
           <argLine>
-            -Djms.broker.url=tcp://localhost:61620   
-            -Djms.broker.client.url=tcp://localhost:61620          
+            -Djms.broker.url=tcp://localhost:61620
+            -Djms.broker.client.url=tcp://localhost:61620
             -Dc2mon.properties.location=${c2mon.properties.location}
-            -Dc2mon.log.dir=${basedir}/build/log               
+            -Dc2mon.log.dir=${basedir}/build/log
           </argLine>
         </configuration>
       </plugin>

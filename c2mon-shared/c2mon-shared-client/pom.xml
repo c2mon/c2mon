@@ -30,24 +30,6 @@
       <groupId>cern.c2mon.c2mon-shared</groupId>
       <artifactId>c2mon-shared-common</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>log4j</groupId>-->
-      <!--<artifactId>log4j</artifactId>-->
-    <!--</dependency>-->
-    <!-- add slf4j interfaces to classpath -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.5</version>
-    </dependency>
-    <!-- add log4j binding to classpath -->
-    <!-- routes slf4j calls to log4j -->
-    <!--<dependency>-->
-      <!--<groupId>org.slf4j</groupId>-->
-      <!--<artifactId>slf4j-log4j12</artifactId>-->
-      <!--<version>1.7.5</version>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

@@ -20,7 +20,7 @@
   <scm>
     <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-supervision</developerConnection>
   </scm>
-  
+
   <dependencies>
     <!-- test -->
     <dependency>
@@ -42,10 +42,6 @@
 
     <!-- 3rd party -->
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
     </dependency>
@@ -65,7 +61,7 @@
       <artifactId>c2mon-shared-client</artifactId>
       <version>[1.5.4, 2.0.0)</version>
     </dependency>
-    
+
     <!-- Test dependency -->
     <dependency>
       <groupId>net.sf.ehcache</groupId>
@@ -82,18 +78,18 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>     
-        <version>2.8.1</version>   
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.8.1</version>
         <configuration>
           <argLine>
             -Dc2mon.properties.location=${c2mon.properties.location}
             -Dc2mon.log.dir=${basedir}/build/log
-                                   
+
             <!-- module properties -->
             -Dc2mon.jms.heartbeat.topic=test.tim.sys.hearbeat
             -Dc2mon.jms.heartbeat.user=not-used
-            -Dc2mon.jms.heartbeat.password=not-used   
-            
+            -Dc2mon.jms.heartbeat.password=not-used
+
             <!-- cache module -->
             -Ddatasource.persistence.connections.initial=2
             -Ddatasource.persistence.connections.max=2
@@ -102,14 +98,14 @@
             -Dcache.loader.queue.size=1000
             -Dcache.loader.equipment.batch.size=5
             -Dcache.loader.equipment.threads.max=2
-            -Dcache.loader.equipment.queue.size=1000  
+            -Dcache.loader.equipment.queue.size=1000
 
             <!-- supervision -->
             -Dc2mon.heartbeat.interval=60000
             -Dc2mon.jms.heartbeat.topic=test.tim.sys.hearbeat
             -Dc2mon.jms.heartbeat.user=not-used
-            -Dc2mon.jms.heartbeat.password=not-used  
-              
+            -Dc2mon.jms.heartbeat.password=not-used
+
             <!--
               daq communication in
             -->
@@ -118,7 +114,7 @@
             -Djms.update.consumers.initial=1
             -Djms.update.consumers.warmuptime=1
             -Dc2mon.jms.daqin.connections.max=1
-            -Djms.update.transacted=true 
+            -Djms.update.transacted=true
             -Dc2mon.jms.daq.queue.trunk=test.tim.process
             -Djms.request.connections.max=1
             -Djms.request.consumers.initial=1
@@ -126,7 +122,7 @@
             -Djms.request.transacted=false
 
             <!-- daq out -->
-            -Djms.daq.out.connections=1            
+            -Djms.daq.out.connections=1
           </argLine>
         </configuration>
       </plugin>

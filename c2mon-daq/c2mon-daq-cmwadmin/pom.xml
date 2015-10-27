@@ -60,11 +60,6 @@
 			<artifactId>cmw-rda3-admin</artifactId>
 			<version>[0.4.3,1.0.0)</version>
 		</dependency>
-
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
 	</dependencies>
 
 	<build>
