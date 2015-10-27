@@ -4,7 +4,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCommunicationException;
 import cern.c2mon.daq.opcua.connection.common.impl.SubscriptionGroup;
@@ -22,7 +23,7 @@ public class DefaultSoapLongPollExceptionHandler
      * Logger of this class.
      */
     private static final Logger logger =
-        Logger.getLogger(DefaultSoapLongPollExceptionHandler.class);
+        LoggerFactory.getLogger(DefaultSoapLongPollExceptionHandler.class);
 
     /**
      * The default delay before the restart is done in ms.

@@ -20,7 +20,8 @@ package cern.c2mon.daq.opcua.connection.common.impl;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
@@ -44,7 +45,7 @@ public class EndpointControllerSiemens extends AbstractEndpointController {
     /**
      * Private class logger.
      */
-    private static final Logger logger = Logger.getLogger(EndpointControllerSiemens.class);
+    private static final Logger logger = LoggerFactory.getLogger(EndpointControllerSiemens.class);
     
     /**
      * fake Data Tag ID use for reading the Redundant Server State 

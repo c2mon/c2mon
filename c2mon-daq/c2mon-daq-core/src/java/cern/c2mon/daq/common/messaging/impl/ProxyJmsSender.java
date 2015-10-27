@@ -5,7 +5,8 @@ import java.util.Iterator;
 import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 
 import cern.c2mon.daq.common.jmx.JmsSenderMXBean;
@@ -36,7 +37,7 @@ public class ProxyJmsSender implements JmsSender, JmsSenderMXBean {
   /**
    * The logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ProxyJmsSender.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProxyJmsSender.class);
   
   /**
    * The JMSSender to wrap.

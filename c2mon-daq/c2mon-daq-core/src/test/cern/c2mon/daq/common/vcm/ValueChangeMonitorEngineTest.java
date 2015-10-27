@@ -17,7 +17,8 @@ import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static cern.c2mon.shared.common.datatag.ValueChangeMonitor.OPERATOR;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
@@ -46,7 +47,7 @@ public class ValueChangeMonitorEngineTest extends GenericMessageHandlerTst {
 
     DriverKernel kernel;
 
-    static Logger log = Logger.getLogger(ValueChangeMonitorEngineTest.class);
+    static Logger log = LoggerFactory.getLogger(ValueChangeMonitorEngineTest.class);
 
     static {
         System.setProperty("dmn2.daq.esp.interval", "1");

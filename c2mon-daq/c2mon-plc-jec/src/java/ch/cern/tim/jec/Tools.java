@@ -15,7 +15,8 @@
 
 package ch.cern.tim.jec;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.lang.*;
 import java.util.Date;
@@ -30,7 +31,7 @@ public class Tools
 Log4j logger instance - One instance is created only if there is no other one created
  */
   // Instanciate, if not created, Log4J logger
-  static Logger logger = Logger.getLogger(Tools.class);                         
+  static Logger logger = LoggerFactory.getLogger(Tools.class);                         
 
 /**
 Maximum value that ca be achieved by a byte value. We need this change because Java

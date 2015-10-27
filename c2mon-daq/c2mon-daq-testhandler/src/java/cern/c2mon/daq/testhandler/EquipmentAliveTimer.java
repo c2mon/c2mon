@@ -5,7 +5,8 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
@@ -51,7 +52,7 @@ public class EquipmentAliveTimer extends Timer {
    *          associated to
    */
   public EquipmentAliveTimer(final EquipmentMessageHandler pEquipmentMessageHandler) {
-    logger = Logger.getLogger(EquipmentAliveTimer.class);
+    logger = LoggerFactory.getLogger(EquipmentAliveTimer.class);
     this.equipmentMessageHandler = pEquipmentMessageHandler;
   }
 

@@ -9,7 +9,8 @@ import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.BeforeClass;
@@ -34,7 +35,7 @@ import cern.c2mon.shared.common.datatag.SourceDataQuality;
 @UseHandler(CMWServerHandler.class)
 public class CMWServerHandlerTest extends GenericMessageHandlerTst {
 
-    static Logger log = Logger.getLogger(CMWServerHandlerTest.class);
+    static Logger log = LoggerFactory.getLogger(CMWServerHandlerTest.class);
 
     CMWServerHandler handler;
 

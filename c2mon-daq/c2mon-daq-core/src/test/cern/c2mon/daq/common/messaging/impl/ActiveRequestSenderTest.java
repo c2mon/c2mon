@@ -32,7 +32,8 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
@@ -76,7 +77,7 @@ public class ActiveRequestSenderTest {
   /**
    * The system's logger
    */
-  private static final Logger LOGGER = Logger.getLogger(ActiveRequestSenderTest.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ActiveRequestSenderTest.class);
 
   /**
    * Constant of the PIK request time out

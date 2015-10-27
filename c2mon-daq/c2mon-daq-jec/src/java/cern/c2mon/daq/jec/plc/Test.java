@@ -8,10 +8,10 @@ import java.util.Date;
 import java.util.ArrayList;
 import java.io.IOException;
 
-public class Test 
+public class Test
 {
   static Logger logger = Logger.getLogger(Test.class);                          // Instanciate, if not created, Log4J logger
-  
+
   public Test()
   {
   }
@@ -28,7 +28,7 @@ public class Test
    * Just a Test class to invoke created classes and methods.
    */
 
-      PropertyConfigurator.configure("c:\\log4j.conf");                         // Receives as parameter the log filename to dump info  
+      PropertyConfigurator.configure("c:\\log4j.conf");                         // Receives as parameter the log filename to dump info
 
 int connectionAttempts = 0;
 // Calculates the range (human readable format)
@@ -62,14 +62,14 @@ int connectionAttempts = 0;
     while(true)
     {
       s1.Receive(jpr);                                                  // Receive data from PLC and put it in a JEC frame
-      try 
+      try
       {
         Thread.sleep((int)(r.nextFloat()*1000));
       }
-      catch (InterruptedException ex) 
-      {  
+      catch (InterruptedException ex)
+      {
       }
-      
+
     }
 //      jpr.GetDateToString();                                                    // Read the date received and convert it to sting
 

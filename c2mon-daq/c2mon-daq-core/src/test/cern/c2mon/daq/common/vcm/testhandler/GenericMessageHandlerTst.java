@@ -11,7 +11,8 @@ import static org.junit.Assert.fail;
 
 import java.lang.reflect.Method;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.xerces.parsers.DOMParser;
 import org.junit.After;
 import org.junit.Before;
@@ -65,7 +66,7 @@ public abstract class GenericMessageHandlerTst {
     
     protected ConfigurationController configurationController;
    
-    static Logger log = Logger.getLogger(GenericMessageHandlerTst.class); 
+    static Logger log = LoggerFactory.getLogger(GenericMessageHandlerTst.class); 
 
     @Rule
     public TestName testName = new TestName();

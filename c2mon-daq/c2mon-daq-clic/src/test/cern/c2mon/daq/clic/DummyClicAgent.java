@@ -19,7 +19,8 @@ import javax.jms.TextMessage;
 import javax.jms.Topic;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.dmn2.agentlib.AgentMessage;
 import cern.dmn2.agentlib.AgentMessageException;
@@ -29,12 +30,12 @@ import cern.dmn2.agentlib.impl.AgentMessageImpl;
 
 /**
  * This class implements a dummy CLIC agent. It is used for test purposes only.
- * 
+ *
  * @author wbuczak
  */
 public class DummyClicAgent {
 
-    private static final Logger log = Logger.getLogger(DummyClicAgent.class);
+    private static final Logger log = LoggerFactory.getLogger(DummyClicAgent.class);
 
     private final String brokerUrl;
 
@@ -136,14 +137,14 @@ public class DummyClicAgent {
         this.metrics.add("test.property.3");
     }
 
-    public synchronized int getReconfigurationCounter() {        
+    public synchronized int getReconfigurationCounter() {
         return this.reconfigurationCounter;
     }
-    
+
     public synchronized void incrementReconfigurationCouinter() {
         this.reconfigurationCounter++;
     }
-   
+
 
     public void startHeartbeat() {
         hbSenderThread = new Thread(new HeartbeatSender());
@@ -221,7 +222,7 @@ public class DummyClicAgent {
         try {
             am = new AgentMessageImpl((TextMessage) requestMessage);
         } catch (AgentMessageException e) {
-            log.error(e);
+            log.error(e.toString());
             return;
         }
 
@@ -267,7 +268,7 @@ public class DummyClicAgent {
         try {
             am = new AgentMessageImpl((TextMessage) requestMessage);
         } catch (AgentMessageException e) {
-            log.error(e);
+            log.error(e.toString());
             return;
         }
 

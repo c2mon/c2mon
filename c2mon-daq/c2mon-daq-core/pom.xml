@@ -4,7 +4,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-daq</groupId>
     <artifactId>c2mon-daq-pom</artifactId>
-    <version>RELEASE</version>
+    <version>1.6.0</version>
   </parent>
 
   <groupId>cern.c2mon.c2mon-daq</groupId>
@@ -13,7 +13,7 @@
   <name>c2mon-daq-core</name>
   <packaging>jar</packaging>
   <description>
-     This module is a core component of the C2MON Data Acqisition Modules (DAQs)
+     This module is a core component of the C2MON Data Acquisition Modules (DAQs)
   </description>
   <url>https://wikis/display/C2MON/C2MON+DAQ+core</url>
 

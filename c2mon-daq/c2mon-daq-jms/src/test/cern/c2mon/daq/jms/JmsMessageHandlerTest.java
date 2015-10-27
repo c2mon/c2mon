@@ -17,7 +17,8 @@ import java.net.URI;
 
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.network.NetworkConnector;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -32,7 +33,7 @@ import cern.c2mon.shared.common.datatag.SourceDataQuality;
 @UseHandler(JMSMessageHandler.class)
 public class JmsMessageHandlerTest extends GenericMessageHandlerTst {
 
-    static Logger log = Logger.getLogger(JmsMessageHandlerTest.class);
+    static Logger log = LoggerFactory.getLogger(JmsMessageHandlerTest.class);
 
     JMSMessageHandler jmsHandler;
 

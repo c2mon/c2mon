@@ -23,7 +23,8 @@ import javax.jms.Topic;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -57,12 +58,12 @@ public abstract class ProcessMessageReceiver {
   /**
    * The logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ProcessMessageReceiver.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessMessageReceiver.class);
 
   /**
    * Reconfiguration logger to log the reconfiguration separately.
    */
-  private static final Logger RECONF_LOGGER = Logger.getLogger("ReconfigurationLogger");
+  private static final Logger RECONF_LOGGER = LoggerFactory.getLogger("ReconfigurationLogger");
 
   /**
    * Constant indicating a unknown message.
@@ -252,7 +253,7 @@ public abstract class ProcessMessageReceiver {
         }
       }
 
-      RECONF_LOGGER.info(configurationReport);
+      RECONF_LOGGER.info(configurationReport.toString());
 
       try {
         LOGGER.debug("onReconfigureProcess - sendConfigurationReport");

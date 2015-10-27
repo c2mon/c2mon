@@ -20,7 +20,8 @@ package cern.c2mon.daq.common.conf.core;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.daq.tools.CommandParamsHandler;
@@ -41,7 +42,7 @@ public class RunOptions {
     /**
      * The logger.
      */
-    private static final Logger LOGGER = Logger.getLogger(RunOptions.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RunOptions.class);
 
     /**
      * Reference to the command line parameter object.

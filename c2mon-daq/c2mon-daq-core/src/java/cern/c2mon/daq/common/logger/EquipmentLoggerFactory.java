@@ -1,7 +1,7 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2010 CERN This program is free software; you can redistribute
  * it and/or modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 2 of the License,
@@ -12,7 +12,7 @@
  * copy of the GNU General Public License along with this program; if not, write
  * to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.daq.common.logger;
@@ -58,7 +58,7 @@ public class EquipmentLoggerFactory {
 
     /**
      * Creates a new EquipmentLogger.
-     * 
+     *
      * @param econf
      *            The configuration of the equipment.
      * @param pconf
@@ -73,16 +73,16 @@ public class EquipmentLoggerFactory {
 
     /**
      * Returns a new equipment logger.
-     * 
+     *
      * @return The new equipment logger.
      */
     public EquipmentLogger getEquipmentLogger() {
         return this.getEquipmentLogger("");
     }
-    
+
     /**
      * Returns a new equipment logger.
-     * 
+     *
      * @param clazz Class to add more information to the log.
      * @return The new equipment logger.
      */
@@ -90,10 +90,10 @@ public class EquipmentLoggerFactory {
         String className = clazz.getName();
         return this.getEquipmentLogger(className);
     }
-    
+
     /**
      * Returns a new equipment logger.
-     * 
+     *
      * @param loggerName Logger name to add more information to the log.
      * @return The new equipment logger.
      */
@@ -115,7 +115,7 @@ public class EquipmentLoggerFactory {
 
     /**
      * Creates a new EquipmentLoggerFactory.
-     * 
+     *
      * @param handlerClassName
      *            The name of the handler class.
      * @param equipmentId
@@ -159,10 +159,10 @@ public class EquipmentLoggerFactory {
             }
         }
     }
-    
+
     /**
      * Sets the logging level for an equipment.
-     * 
+     *
      * @param eqName The equipment name.
      * @param level The log level.
      */

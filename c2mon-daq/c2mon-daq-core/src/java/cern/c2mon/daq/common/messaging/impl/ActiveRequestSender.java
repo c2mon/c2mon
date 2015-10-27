@@ -8,7 +8,8 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.core.JmsTemplate;
@@ -38,7 +39,7 @@ public class ActiveRequestSender implements ProcessRequestSender {
     /**
      * Class logger.
      */
-    private static final Logger LOGGER = Logger.getLogger(ActiveRequestSender.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActiveRequestSender.class);
     
     /**
      * Constant of the PIK request time out

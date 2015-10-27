@@ -7,7 +7,8 @@
  */
 package cern.c2mon.daq.common.conf.core;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -48,7 +49,7 @@ public class EquipmentConfigurationFactory extends XMLTagValueExtractor implemen
   /**
    * The logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(EquipmentConfigurationFactory.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(EquipmentConfigurationFactory.class);
 
   /**
    * Creates the equipment configuration from the matching subelement in the DOM

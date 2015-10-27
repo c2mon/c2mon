@@ -30,7 +30,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.activemq.command.ActiveMQQueue;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
@@ -65,7 +66,7 @@ public class ActiveMessageReceiver extends ProcessMessageReceiver implements Ses
     /**
      * Class logger.
      */
-    private static final Logger LOGGER = Logger.getLogger(ActiveMessageReceiver.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActiveMessageReceiver.class);
 
     /**
      * Reference to the unique XML parser (singleton).

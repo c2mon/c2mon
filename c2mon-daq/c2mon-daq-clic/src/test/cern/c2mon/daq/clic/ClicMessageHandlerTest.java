@@ -11,7 +11,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.apache.activemq.broker.BrokerService;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
@@ -38,7 +39,7 @@ import cern.dmn2.agentlib.AgentClientConstants;
 @UseHandler(ClicMessageHandler.class)
 public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
 
-    static Logger log = Logger.getLogger(ClicMessageHandlerTest.class);
+    static Logger log = LoggerFactory.getLogger(ClicMessageHandlerTest.class);
 
     ClicMessageHandler clicMsgHandler;
 

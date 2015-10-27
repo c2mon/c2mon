@@ -2,7 +2,8 @@ package cern.c2mon.daq.opcua.connection.dcom;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.opcua.jintegraInterface.IOPCAutoServer;
 import cern.c2mon.daq.opcua.jintegraInterface.IOPCGroup;
@@ -26,7 +27,7 @@ public final class OPCDCOMFactory {
     /**
      * logger of this class.
      */
-    private final static Logger logger = Logger.getLogger(OPCDCOMFactory.class);
+    private final static Logger logger = LoggerFactory.getLogger(OPCDCOMFactory.class);
   
     /**
      * There should be no instances of this class. This is why it is made 

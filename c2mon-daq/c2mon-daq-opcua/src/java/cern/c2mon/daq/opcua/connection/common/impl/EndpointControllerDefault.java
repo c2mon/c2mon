@@ -20,7 +20,8 @@ package cern.c2mon.daq.opcua.connection.common.impl;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
@@ -39,7 +40,7 @@ public class EndpointControllerDefault extends AbstractEndpointController {
     /**
      * Private class logger.
      */
-    private static final Logger logger = Logger.getLogger(EndpointControllerDefault.class);
+    private static final Logger logger = LoggerFactory.getLogger(EndpointControllerDefault.class);
     
     /**
      * Creates a new default EndpointController

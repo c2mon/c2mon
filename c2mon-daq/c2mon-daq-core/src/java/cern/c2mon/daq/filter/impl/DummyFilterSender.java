@@ -1,7 +1,8 @@
 package cern.c2mon.daq.filter.impl;
 
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.common.messaging.JmsLifecycle;
 import cern.c2mon.daq.filter.IFilterMessageSender;
@@ -14,17 +15,17 @@ import cern.c2mon.shared.common.filter.FilteredDataTagValue;
  * by all implementations yet, so TODO : connect is not called in this case, but
  * disconnect and addValue still are, and this should not be the case so as to
  * be implementation independent...).
- * 
+ *
  * @author mbrightw
- * 
+ *
  */
 public class DummyFilterSender implements IFilterMessageSender, JmsLifecycle {
 
    /*
     * The system logger.
     */
-    private static final Logger LOGGER = Logger.getLogger("FilteredDataTagLogger");    
-    
+    private static final Logger LOGGER = LoggerFactory.getLogger("FilteredDataTagLogger");
+
     @Override
     public void connect() {
         // TODO Auto-generated method stub
@@ -38,8 +39,8 @@ public class DummyFilterSender implements IFilterMessageSender, JmsLifecycle {
     }
 
     @Override
-    public void addValue(FilteredDataTagValue dataTagValue) {        
-        LOGGER.info(dataTagValue);
+    public void addValue(FilteredDataTagValue dataTagValue) {
+        LOGGER.info(dataTagValue.toString());
     }
 
 }

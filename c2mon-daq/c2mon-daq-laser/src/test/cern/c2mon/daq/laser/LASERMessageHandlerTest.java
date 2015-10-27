@@ -5,7 +5,8 @@ package cern.c2mon.daq.laser;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.Test;
 
 import cern.c2mon.daq.laser.LASERMessageHandler;
@@ -25,7 +26,7 @@ import cern.c2mon.daq.test.UseHandler;
 @UseHandler(LASERMessageHandler.class)
 public class LASERMessageHandlerTest extends GenericMessageHandlerTst {
   
-    static Logger log = Logger.getLogger(LASERMessageHandlerTest.class);
+    static Logger log = LoggerFactory.getLogger(LASERMessageHandlerTest.class);
 
     LASERMessageHandler laserHandler;
 

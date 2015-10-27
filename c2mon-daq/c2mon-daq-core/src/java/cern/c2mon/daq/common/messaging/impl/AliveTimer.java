@@ -20,7 +20,8 @@ package cern.c2mon.daq.common.messaging.impl;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 
@@ -49,7 +50,7 @@ class AliveTimer {
     /**
      * A reference to the static driver's logger
      */
-    private static final Logger LOGGER = Logger.getLogger(AliveTimer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AliveTimer.class);
 
     /**
      * This class models the action/task that is taken each timer's 'tick'

@@ -17,7 +17,8 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
@@ -32,7 +33,7 @@ class SourceCommandExecutor extends Thread {
     /**
      * Log4j Logger for this class
      */
-    private final Logger logger = Logger.getLogger(SourceCommandExecutor.class);
+    private final Logger logger = LoggerFactory.getLogger(SourceCommandExecutor.class);
 
     /**
      * The command runner to actually run the command on implementation level.

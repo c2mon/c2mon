@@ -22,7 +22,8 @@ package cern.c2mon.daq.common.impl;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
@@ -42,7 +43,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
   /**
    * Log4j Logger for this class
    */
-  private static final Logger LOGGER = Logger.getLogger(SDTTimeDeadbandScheduler.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SDTTimeDeadbandScheduler.class);
 
   /**
    * The process message sender takes the messages actually send to the server.

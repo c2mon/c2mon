@@ -5,7 +5,8 @@ import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.core.JmsTemplate;
@@ -29,7 +30,7 @@ public class ActiveFilterSender extends FilterMessageSender implements IFilterMe
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ActiveFilterSender.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ActiveFilterSender.class);
   
   /**
    * The Spring template for sending the updates (creates a session for each call!). 

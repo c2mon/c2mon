@@ -25,7 +25,8 @@ import javax.management.ObjectName;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXServiceURL;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Ignore;
@@ -75,7 +76,7 @@ public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
      * -Djmx.daq.passwd.file="src/test/cern/c2mon/daq/jmx/pcache-passwords.txt"
      */
 
-    static Logger log = Logger.getLogger(JMXMessageHandlerTest.class);
+    static Logger log = LoggerFactory.getLogger(JMXMessageHandlerTest.class);
 
     JMXMessageHandler jmxHandler;
 

@@ -27,7 +27,8 @@ import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper class for delegating all Jmx MBean Registration
@@ -39,7 +40,7 @@ public class JmxRegistrationMXBean {
   /**
    * The logger
    */
-  private static final Logger LOGGER = Logger.getLogger(JmxRegistrationMXBean.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(JmxRegistrationMXBean.class);
   
   /**
    * MBean Type enum (for the JConsole path)

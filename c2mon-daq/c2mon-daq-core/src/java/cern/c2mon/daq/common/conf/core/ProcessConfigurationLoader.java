@@ -16,7 +16,8 @@ import java.net.UnknownHostException;
 import javax.jms.TextMessage;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.xerces.parsers.DOMParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,14 +42,14 @@ import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 /**
  * Loads the configuration from the server or from a file.
- * 
+ *
  * @author Andreas Lang
  */
 public class ProcessConfigurationLoader extends XMLTagValueExtractor implements ConfigurationXMLConstants {
   /**
    * The logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ProcessConfigurationLoader.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessConfigurationLoader.class);
 
   /**
    * JMS DAq queue trunk
@@ -75,7 +76,7 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
   public void setEquipmentConfigurationFactory(EquipmentConfigurationFactory eqConfFactory) {
     this.equipmentConfigurationFactory = eqConfFactory;
   }
-  
+
   @Autowired
   public void setJmsDaqQueueTrunk(String jmsDaqQueueTrunk) {
     this.jmsDaqQueueTrunk = jmsDaqQueueTrunk;
@@ -84,10 +85,10 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
   /**
    * Gets the Process configuration from the server and saves it to the provided location.
    * If ProcessConfigurationResponse returned null the DAQ start up process is stopped.
-   * 
+   *
    * @param saveLocation The location to save the object.
 
-   * 
+   *
    * @return The Process Configuration Response. It will never return null.
    */
   public ProcessConfigurationResponse getProcessConfiguration() {
@@ -106,9 +107,9 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
   }
 
   /**
-   * Gets the Process Connection from the server and return it. If there is a TimeOut and 
+   * Gets the Process Connection from the server and return it. If there is a TimeOut and
    * there is no processConnectionResponse returned (null process PIK)the DAQ start up process is stopped.
-   * 
+   *
    * @return The PIK as ProcessPIK class. It will never return null.
    */
   public final ProcessConnectionResponse getProcessConnection() {
@@ -129,7 +130,7 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
 
   /**
    * Loads the configuration from the file system.
-   * 
+   *
    * @param file The location of the configuration xml on the file system.
    * @return The configuration as DOM Document.
    */
@@ -154,8 +155,8 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
   }
 
   /**
-   * Loads the configuration from the XML file given by the server and stored in the 
-   * 
+   * Loads the configuration from the XML file given by the server and stored in the
+   *
    * @param xml The xml configuration.
    * @return The configuration as DOM Document.
    */
@@ -171,19 +172,19 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
     } catch (ParserConfigurationException e) {
       LOGGER.error("fromXMLtoDOC - Error creating instance of SimpleXMLParser");
       return null;
-    } catch (ParserException ex) {        
+    } catch (ParserException ex) {
       LOGGER.error("fromXMLtoDOC - Exception caught in DOM parsing processConfiguration XML");
-      LOGGER.trace("fromXMLtoDOC - processConfiguration XML was: " + xml);          
+      LOGGER.trace("fromXMLtoDOC - processConfiguration XML was: " + xml);
       return null;
-    }   
+    }
 
     LOGGER.trace("fromXMLtoDOC - Configuration XML loaded and parsed");
     return confXMLDoc;
   }
-  
+
   /**
    * Takes the configuration DOM document and returns an ProcessConfiguration.
-   * 
+   *
    * @param processName The name of the process.
    * @param processPIK The process PIK.
    * @param confXMLDoc the configuration XML document
@@ -193,7 +194,7 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
    * @throws ConfUnknownTypeException Thrown if the configuration has the type 'unknown'.
    * @throws ConfRejectedTypeException Thrown if the configuration has the type 'rejected'.
    */
-  public ProcessConfiguration createProcessConfiguration(final String processName, final Long processPIK, 
+  public ProcessConfiguration createProcessConfiguration(final String processName, final Long processPIK,
       final Document confXMLDoc, final boolean localConfiguration, String jmsDaqQueueTrunk) throws ConfUnknownTypeException, ConfRejectedTypeException {
     this.jmsDaqQueueTrunk = jmsDaqQueueTrunk;
     return createProcessConfiguration(processName, processPIK, confXMLDoc, localConfiguration);
@@ -201,7 +202,7 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
 
   /**
    * Takes the configuration DOM document and returns an ProcessConfiguration.
-   * 
+   *
    * @param processName The name of the process.
    * @param processPIK The process PIK.
    * @param confXMLDoc the configuration XML document
@@ -210,7 +211,7 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
    * @throws ConfUnknownTypeException Thrown if the configuration has the type 'unknown'.
    * @throws ConfRejectedTypeException Thrown if the configuration has the type 'rejected'.
    */
-  public ProcessConfiguration createProcessConfiguration(final String processName, final Long processPIK, 
+  public ProcessConfiguration createProcessConfiguration(final String processName, final Long processPIK,
       final Document confXMLDoc, final boolean localConfiguration) throws ConfUnknownTypeException, ConfRejectedTypeException {
     ProcessConfiguration processConfiguration = new ProcessConfiguration();
     // get the root element of the document
@@ -233,13 +234,13 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
       processConfiguration.setProcessID(Long.parseLong((rootElem.getAttribute(PROCESS_ID_ATTRIBUTE))));
       processConfiguration.setProcessName(processName);
       processConfiguration.setprocessPIK(processPIK);
-      
+
       try {
         processConfiguration.setHostName(InetAddress.getLocalHost().getHostName());
       } catch (UnknownHostException e) {
         processConfiguration.setHostName("NOHOST");
       }
-      
+
       String pik;
       if (processConfiguration.getprocessPIK() == ProcessConfigurationRequest.NO_PIK) {
         pik = "NOPIK";
@@ -247,8 +248,8 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
       else {
         pik = processConfiguration.getprocessPIK().toString();
       }
-      
-      String jmsDaqQueue = this.jmsDaqQueueTrunk + ".command." + processConfiguration.getHostName() + "." 
+
+      String jmsDaqQueue = this.jmsDaqQueueTrunk + ".command." + processConfiguration.getHostName() + "."
           + processConfiguration.getProcessName() + "." + pik;
       processConfiguration.setJmsDaqCommandQueue(jmsDaqQueue);
       LOGGER.trace("createProcessConfiguration - jms Daq Queue: " + jmsDaqQueue);
@@ -278,14 +279,14 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
       }
     } // try
     catch (NullPointerException ex) {
-      LOGGER.fatal("NullPointerException caught while trying to configure the process. Ex. message = "
+      LOGGER.error("NullPointerException caught while trying to configure the process. Ex. message = "
           + ex.getMessage());
-      LOGGER.fatal("The structure of ProcessConfiguration XML might contain some mistakes !");
+      LOGGER.error("The structure of ProcessConfiguration XML might contain some mistakes !");
       throw ex;
     } catch (NumberFormatException ex) {
-      LOGGER.fatal("NumberFormatException caught while trying to configure the process. Ex. message = "
+      LOGGER.error("NumberFormatException caught while trying to configure the process. Ex. message = "
           + ex.getMessage());
-      LOGGER.fatal("The structure of ProcessConfiguration XML might contain some mistakes !");
+      LOGGER.error("The structure of ProcessConfiguration XML might contain some mistakes !");
       throw ex;
     }
     return processConfiguration;

@@ -13,7 +13,8 @@ import javax.management.MBeanNotificationInfo;
 import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author wbuczak
@@ -29,7 +30,7 @@ public class Cache extends NotificationBroadcasterSupport implements CacheMBean 
 
     private static final int DEFAULT_CACHE_SIZE = 200;
 
-    static Logger log = Logger.getLogger(Cache.class);
+    static Logger log = LoggerFactory.getLogger(Cache.class);
 
     Map<String, Integer> testMap = new HashMap<String, Integer>();
     

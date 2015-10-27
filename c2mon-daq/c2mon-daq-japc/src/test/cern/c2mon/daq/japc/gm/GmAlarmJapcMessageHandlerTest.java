@@ -22,7 +22,8 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Ignore;
@@ -49,7 +50,7 @@ import cern.japc.ext.mockito.answers.DefaultParameterAnswer;
 @Ignore("test temporarly disabled")
 public class GmAlarmJapcMessageHandlerTest extends AbstractGenericJapcMessageHandlerTst {
 
-    static Logger log = Logger.getLogger(GmAlarmJapcMessageHandlerTest.class);
+    static Logger log = LoggerFactory.getLogger(GmAlarmJapcMessageHandlerTest.class);
 
     @Test
     @UseConf("e_japc_test2.xml")

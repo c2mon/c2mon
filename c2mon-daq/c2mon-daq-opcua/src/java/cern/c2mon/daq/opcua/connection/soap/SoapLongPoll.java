@@ -8,7 +8,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.axis2.AxisFault;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.opcfoundation.xmlda.ItemValue;
 import org.opcfoundation.xmlda.OPCXML_DataAccessStub;
 import org.opcfoundation.xmlda.SubscribePolledRefreshReplyItemList;
@@ -34,7 +35,7 @@ public class SoapLongPoll {
     /**
      * Logger of this class.
      */
-    private Logger logger = Logger.getLogger(SoapLongPoll.class);
+    private Logger logger = LoggerFactory.getLogger(SoapLongPoll.class);
 
     /**
      * Exception Handler if the polling is interrupted.

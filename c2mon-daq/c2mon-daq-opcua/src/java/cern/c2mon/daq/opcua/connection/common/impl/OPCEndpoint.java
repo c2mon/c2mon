@@ -9,7 +9,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.opcua.connection.common.AbstractOPCUAAddress;
 import cern.c2mon.daq.opcua.connection.common.IGroupProvider;
@@ -37,7 +38,7 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
     /**
      * logger of this class.
      */
-    private final static Logger LOG = Logger.getLogger(OPCEndpoint.class);
+    private final static Logger LOG = LoggerFactory.getLogger(OPCEndpoint.class);
   
     /**
      * Collection of endpoint listeners registered at this endpoint.
@@ -74,7 +75,7 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
     /**
      * logger of this class.
      */
-    private final static Logger logger = Logger.getLogger(OPCEndpoint.class);
+    private final static Logger logger = LoggerFactory.getLogger(OPCEndpoint.class);
 
     /**
      * Creates a new OPCEndpoint.

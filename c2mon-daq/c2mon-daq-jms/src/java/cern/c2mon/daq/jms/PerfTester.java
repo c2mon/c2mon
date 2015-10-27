@@ -21,7 +21,8 @@ import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQSession;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author ${user}
@@ -32,7 +33,7 @@ public class PerfTester {
     private ActiveMQConnectionFactory producerfactory;
     private ActiveMQConnectionFactory consumerfactory;
     
-    private static Logger log = Logger.getLogger(PerfTester.class);
+    private static Logger log = LoggerFactory.getLogger(PerfTester.class);
     
 
     public PerfTester(String brokerUrl) {

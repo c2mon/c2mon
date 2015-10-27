@@ -10,7 +10,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.opcua.connection.common.AbstractOPCUAAddress;
 import cern.c2mon.daq.opcua.connection.common.IGroupProvider;
@@ -92,7 +93,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
     /**
      * logger of this class.
      */
-    private final static Logger logger = Logger.getLogger(DADCOMEndpoint.class);
+    private final static Logger logger = LoggerFactory.getLogger(DADCOMEndpoint.class);
 
     /**
      * Creates a new DADCOMEndpoint.

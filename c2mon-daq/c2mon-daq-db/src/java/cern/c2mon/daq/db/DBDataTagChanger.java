@@ -20,7 +20,8 @@ package cern.c2mon.daq.db;
 
 import static java.lang.String.format;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;

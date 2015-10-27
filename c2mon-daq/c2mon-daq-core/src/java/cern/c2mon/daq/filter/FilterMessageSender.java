@@ -22,7 +22,8 @@ import java.util.Iterator;
 import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.common.conf.core.CommonConfiguration;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
@@ -52,7 +53,7 @@ public abstract class FilterMessageSender implements IFilterMessageSender, JmsLi
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(FilterMessageSender.class); 
+  private static final Logger LOGGER = LoggerFactory.getLogger(FilterMessageSender.class); 
   
   /**
    * The SynchroBuffer minimum window size.

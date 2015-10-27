@@ -39,7 +39,7 @@ import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
  */
 public class DirectoryMessageReceiver extends ProcessMessageReceiver 
         implements ConfigurationXMLConstants {
-//    private static final Logger LOGGER = Logger.getLogger(DirectoryMessageReceiver.class);
+//    private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryMessageReceiver.class);
     
     private static final String USER_HOME_ENV = "user.home";
     

@@ -12,7 +12,8 @@ import java.util.Map;
 
 import javax.management.remote.JMXServiceURL;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.easymock.EasyMock;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -40,7 +41,7 @@ public class JMXVCMIntegrationTest extends GenericMessageHandlerTst {
 
     DriverKernel kernel;
     JMXMessageHandler jmxHandler;
-    static Logger log = Logger.getLogger(JMXVCMIntegrationTest.class);
+    static Logger log = LoggerFactory.getLogger(JMXVCMIntegrationTest.class);
 
     @Override
     protected void beforeTest() throws Exception {

@@ -5,7 +5,8 @@ package cern.c2mon.daq.ens;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.Test;
 
 import cern.c2mon.daq.ens.ENSMessageHandler;
@@ -25,7 +26,7 @@ import cern.c2mon.daq.test.UseHandler;
 @UseHandler(ENSMessageHandler.class)
 public class ENSMessageHandlerTest extends GenericMessageHandlerTst {
   
-    static Logger log = Logger.getLogger(ENSMessageHandlerTest.class);
+    static Logger log = LoggerFactory.getLogger(ENSMessageHandlerTest.class);
 
     ENSMessageHandler ensHandler;
 

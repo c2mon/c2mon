@@ -2,7 +2,8 @@ package cern.c2mon.daq.jec.config;
 
 import static org.junit.Assert.assertEquals;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;

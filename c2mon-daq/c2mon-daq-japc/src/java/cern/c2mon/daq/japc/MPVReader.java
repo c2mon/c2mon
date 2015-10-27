@@ -13,7 +13,8 @@ package cern.c2mon.daq.japc;
 
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
@@ -36,7 +37,7 @@ public class MPVReader {
     /**
      * Log4j Logger instance used by this class.
      */
-    protected static final Logger LOG = Logger.getLogger(MPVReader.class);
+    protected static final Logger LOG = LoggerFactory.getLogger(MPVReader.class);
 
     protected static final String DEFAULT_FIELD_NAME = "value";
 

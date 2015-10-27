@@ -20,7 +20,8 @@ package cern.c2mon.daq.common.messaging.impl;
 
 import javax.jms.JMSException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Required;
@@ -46,7 +47,7 @@ public class ActiveJmsSender implements JmsSender, JmsSenderMXBean {
     /**
      * The class logger.
      */
-    private static final Logger LOGGER = Logger.getLogger(ActiveJmsSender.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActiveJmsSender.class);
 
     /**
      * The Spring JmsTemplate managing the calls to JMS.

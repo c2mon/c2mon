@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.daq.common.ICommandRunner;
@@ -51,7 +52,7 @@ public class RequestController {
     /**
      * The logger of this class.
      */
-    private static final Logger LOGGER = Logger.getLogger(RequestController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RequestController.class);
     /**
      * The configuration controller as central access to all the configuration.
      */

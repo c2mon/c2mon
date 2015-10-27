@@ -20,7 +20,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.easymock.EasyMock;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -59,7 +60,7 @@ import cern.japc.ext.mockito.answers.DefaultParameterAnswer;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class AlmonMessageHandlerTest extends GenericMessageHandlerTst {
 
-    static Logger LOG = Logger.getLogger(AlmonMessageHandlerTest.class);
+    static Logger LOG = LoggerFactory.getLogger(AlmonMessageHandlerTest.class);
 
     static final Selector GM_DEVICE_SELECTOR = sel(AlmonHardwareAddress.GM_JAPC_ALARM_SELECTOR);
     static final String ERROR_SERVER_DOWN = "Server is down";

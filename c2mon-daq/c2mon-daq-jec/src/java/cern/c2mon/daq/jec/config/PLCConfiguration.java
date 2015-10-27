@@ -20,7 +20,8 @@ package cern.c2mon.daq.jec.config;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * This is the class which contains the parsed PLC equipment address String.
  * 
@@ -36,7 +37,7 @@ public class PLCConfiguration {
     /**
      * Logger to use while parsing the configuration.
      */
-    private static final Logger LOGGER = Logger.getLogger(PLCConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PLCConfiguration.class);
     
     /**
      * String to store PLC name eg. "PLCSTAA03"

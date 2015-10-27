@@ -31,7 +31,8 @@ import static org.mockito.Mockito.doThrow;
 
 import java.util.Calendar;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -70,7 +71,7 @@ public class JAPCMessageHandlerTest extends GenericMessageHandlerTst {
 
     JAPCMessageHandler japcHandler;
 
-    static Logger log = Logger.getLogger(JAPCMessageHandlerTest.class);
+    static Logger log = LoggerFactory.getLogger(JAPCMessageHandlerTest.class);
 
     SuperCycle spsSupercycle;
     SuperCycle lhcSuperCycle;

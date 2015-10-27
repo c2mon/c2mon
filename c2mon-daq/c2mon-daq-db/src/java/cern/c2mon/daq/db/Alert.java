@@ -4,7 +4,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class represents an alert event received from the database via the dbms_alert package.
@@ -34,7 +35,7 @@ public class Alert {
     /**
      * Logger for the Alert class
      * */
-    private Logger logger = Logger.getLogger(this.getClass());
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
     /**
      * Id of the alert == id of the registered datatag == name of the alert in dbms_alert package
      * */

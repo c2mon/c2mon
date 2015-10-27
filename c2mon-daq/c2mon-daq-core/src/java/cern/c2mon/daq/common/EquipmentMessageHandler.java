@@ -18,7 +18,8 @@
  *****************************************************************************/
 package cern.c2mon.daq.common;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationHandler;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
@@ -55,7 +56,7 @@ public abstract class EquipmentMessageHandler {
 	/**
 	 * The process logger
 	 */
-	private static final Logger COMMON_LOGGER = Logger.getLogger(EquipmentMessageHandler.class);
+	private static final Logger COMMON_LOGGER = LoggerFactory.getLogger(EquipmentMessageHandler.class);
 
 	/**
 	 * This static method is used to create an instance of appropriate

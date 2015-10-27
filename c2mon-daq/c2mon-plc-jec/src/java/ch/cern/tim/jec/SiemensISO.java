@@ -17,7 +17,8 @@ package ch.cern.tim.jec;
 
 import java.io.*;
 import java.net.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -33,7 +34,7 @@ public class SiemensISO implements PLCDriver
  * This logger allows to register the StdConstants.ERRORs, infos and debugs into a log file
  */
    // Instanciate, if not created, Log4J logger
-   static Logger logger = Logger.getLogger(SiemensISO.class);                   
+   static Logger logger = LoggerFactory.getLogger(SiemensISO.class);                   
 
 /**
  * Instance of Socket class to establish a connection to the PLC

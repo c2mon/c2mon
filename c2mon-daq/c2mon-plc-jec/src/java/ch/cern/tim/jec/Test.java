@@ -1,7 +1,9 @@
 package ch.cern.tim.jec;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.Date;
@@ -10,7 +12,7 @@ import java.io.IOException;
 
 public class Test 
 {
-  static Logger logger = Logger.getLogger(Test.class);                          // Instanciate, if not created, Log4J logger
+  static Logger logger = LoggerFactory.getLogger(Test.class);                          // Instanciate, if not created, Log4J logger
   
   public Test()
   {

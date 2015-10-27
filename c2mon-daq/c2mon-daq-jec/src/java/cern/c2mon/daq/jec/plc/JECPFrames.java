@@ -16,7 +16,8 @@ package cern.c2mon.daq.jec.plc;
 
 import java.util.*;
 import java.lang.Math;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Enumeration;
 import java.util.Vector;
 import java.lang.Cloneable;
@@ -33,7 +34,7 @@ public class JECPFrames
  * This logger allows to register the errors, infos and debugs into a log file
  */
   // Instanciate, if not created, Log4J logger
-  static Logger logger = Logger.getLogger(JECPFrames.class);                    
+  static Logger logger = LoggerFactory.getLogger(JECPFrames.class);                    
   // Instantiate stdConstants to access JEC protocol predefined constants
 
 

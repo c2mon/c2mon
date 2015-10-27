@@ -11,7 +11,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
@@ -37,7 +38,7 @@ public class ClicConfigurationTask implements Runnable {
 
     private static Map<String, Long> lastReconfigurred = new ConcurrentHashMap<String, Long>();
 
-    private static final Logger logger = Logger.getLogger(ClicConfigurationTask.class);
+    private static final Logger logger = LoggerFactory.getLogger(ClicConfigurationTask.class);
 
     private static AgentClient client = AgentClient.getInstance();
 

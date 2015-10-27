@@ -20,7 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,7 +86,7 @@ public class ConfigurationController {
   /**
    * The logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ConfigurationController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationController.class);
   /**
    * Reference to the command line parameter object.
    */
@@ -191,7 +192,7 @@ public class ConfigurationController {
       this.loadProcessConfiguration();
 
     } catch (Exception ex) {
-      LOGGER.error(ex);
+      LOGGER.error(ex.toString());
       LOGGER.info("initProcess - Stopping the DAQ start up process...");
       System.exit(0);
     }
@@ -280,7 +281,7 @@ public class ConfigurationController {
       sendDisconnectionNotification();
       System.exit(0);
     } catch (Exception ex) {
-      LOGGER.fatal("loadProcessConfiguration - Exception caught while trying to configure the driver! Ex. message =", ex);
+      LOGGER.error("loadProcessConfiguration - Exception caught while trying to configure the driver! Ex. message =", ex);
       LOGGER.info("loadProcessConfiguration - The ProcessConfiguration XML might contain some errors ! Check it please.");
       sendDisconnectionNotification();
       System.exit(0);

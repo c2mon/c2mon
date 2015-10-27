@@ -15,7 +15,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.opcfoundation.ua.builtintypes.DataValue;
 import org.opcfoundation.ua.builtintypes.DateTime;
 import org.opcfoundation.ua.builtintypes.LocalizedText;
@@ -66,7 +67,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
   /**
    * logger of this class.
    */
-  private final static Logger LOG = Logger.getLogger(UAEndpoint.class);
+  private final static Logger LOG = LoggerFactory.getLogger(UAEndpoint.class);
 
   /**
    * Map of UA subscriptions

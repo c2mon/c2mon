@@ -21,7 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
@@ -38,7 +39,7 @@ public class TimeDifferenceMovingAverageTimeDeadbandActivator implements IDynami
     /**
      * The logger for this class.
      */
-    private static final Logger LOGGER = Logger.getLogger(TimeDifferenceMovingAverageTimeDeadbandActivator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimeDifferenceMovingAverageTimeDeadbandActivator.class);
     
     /**
      * The table with the data tags managed by this class.

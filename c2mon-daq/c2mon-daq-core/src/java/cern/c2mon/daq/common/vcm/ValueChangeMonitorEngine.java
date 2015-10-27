@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,7 @@ public class ValueChangeMonitorEngine implements UpdateListener {
 
     private Map<Long, List<EPStatement>> registeredStatements = new ConcurrentHashMap<Long, List<EPStatement>>();
 
-    private static final Logger logger = Logger.getLogger(ValueChangeMonitorEngine.class);
+    private static final Logger logger = LoggerFactory.getLogger(ValueChangeMonitorEngine.class);
 
     static EPServiceProvider epService;
 

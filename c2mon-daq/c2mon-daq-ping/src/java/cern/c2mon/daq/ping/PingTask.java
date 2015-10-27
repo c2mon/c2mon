@@ -12,7 +12,8 @@ import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 
@@ -30,7 +31,7 @@ public class PingTask implements Runnable {
 
     private static Map<String, Long> runCountMap = new ConcurrentHashMap<String, Long>();
 
-    private static final Logger log = Logger.getLogger(PingTask.class);
+    private static final Logger log = LoggerFactory.getLogger(PingTask.class);
 
     public PingTask(final PingMessageHandler handler, final ISourceDataTag tag, final Target target) {
         this.handler = handler;

@@ -23,7 +23,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Timer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
@@ -54,7 +55,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
     /**
      * Private class logger.
      */
-    private static final Logger logger = Logger.getLogger(AbstractEndpointController.class);
+    private static final Logger logger = LoggerFactory.getLogger(AbstractEndpointController.class);
     
     /**
      * Properties for the opc endpoint.

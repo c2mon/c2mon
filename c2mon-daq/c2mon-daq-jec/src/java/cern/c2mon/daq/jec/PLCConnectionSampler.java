@@ -1,6 +1,7 @@
 package cern.c2mon.daq.jec;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 
@@ -17,7 +18,7 @@ public class PLCConnectionSampler extends Thread {
     /**
      * Private logger.
      */
-    private static Logger LOGGER = Logger.getLogger(PLCConnectionSampler.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(PLCConnectionSampler.class);
     /**
      * The message handler to control.
      */

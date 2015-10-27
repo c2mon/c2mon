@@ -5,7 +5,8 @@ package cern.c2mon.daq.dip;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.easymock.Capture;
 import org.junit.Test;
 
@@ -26,7 +27,7 @@ import cern.c2mon.daq.test.UseHandler;
 @UseHandler(DIPMessageHandler.class)
 public class DIPMessageHandlerTest extends GenericMessageHandlerTst {
   
-    static Logger log = Logger.getLogger(DIPMessageHandlerTest.class);
+    static Logger log = LoggerFactory.getLogger(DIPMessageHandlerTest.class);
 
     DIPMessageHandler dipHandler;
 

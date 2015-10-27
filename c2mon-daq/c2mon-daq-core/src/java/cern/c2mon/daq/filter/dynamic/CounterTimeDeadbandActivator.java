@@ -23,7 +23,8 @@ import java.util.TimerTask;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
@@ -37,7 +38,7 @@ public class CounterTimeDeadbandActivator extends TimerTask implements IDynamicT
     /**
      * The logger of this class.
      */
-    private static final Logger LOGGER = Logger.getLogger(CounterTimeDeadbandActivator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CounterTimeDeadbandActivator.class);
     /**
      * Table with the source data tags managed by this class.
      */

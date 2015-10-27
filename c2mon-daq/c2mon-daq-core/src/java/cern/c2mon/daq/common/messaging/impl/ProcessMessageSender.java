@@ -23,7 +23,8 @@ import java.util.Iterator;
 import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
@@ -80,7 +81,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
   /**
    * The system's logger
    */
-  private static final Logger LOGGER = Logger.getLogger(ProcessMessageSender.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessMessageSender.class);
 
   /**
    * The reference for the ConfigurationController object.

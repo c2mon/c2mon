@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2013 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,7 +13,7 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: C2MON team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.daq.common.startup;
@@ -44,12 +44,12 @@ import cern.c2mon.daq.tools.CommandParamsHandler;
  * file, and loads the Spring context. The main Spring XML file can be specified
  * using the c2mon.daq.spring.context Java property. If not specified, the
  * default daq-service-core.xml is used in the classpath.
- * 
+ *
  * TODO should unify all start up class in a single class, with a start up
  * option passed as command line argument. Will do this once we have a clearer
  * picture of the different start up options that are required. Currently only
  * support the usual and test web.
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -69,11 +69,11 @@ public final class DaqStartup {
   /**
    * The DAQ main start up method. Accesses the required command line arguments,
    * parses the properties file and loads the Spring context.
-   * 
+   *
    * The properties are loaded from .c2mon.properties in the user home directory
    * unless specified otherwise with the -c2monProperties command line argument.
    * Further properties can also be loaded using the optional -daqConf option.
-   * 
+   *
    * @param args the required start up arguments are -log4j and -processName
    */
   public static void main(final String[] args) {
@@ -224,13 +224,13 @@ public final class DaqStartup {
 
   /**
    * Helper method to compute the default conf path location
-   * 
+   *
    * @return The default conf/ directory path
    */
   private static String getDefaultConfPath() {
     Path confPath = Paths.get(getHomePath().concat("/conf/"));
     String errMsg2 = "Try instead specifying the property files with -c2monProperties and -daqConf";
-    
+
     if (confPath.toFile().exists()) {
       try {
         return confPath.toRealPath().toString();
@@ -259,10 +259,10 @@ public final class DaqStartup {
     // never reached
     return null;
   }
-  
+
   /**
    * Helper method to compute the default conf path location
-   * 
+   *
    * @return The default conf/ directory path
    */
   private static String getDefaultLogPath() {
@@ -291,7 +291,7 @@ public final class DaqStartup {
 
   /**
    * Helper method to HOME path location of the DAQ process
-   * 
+   *
    * @return The default conf/ directory path
    */
   private static String getHomePath() {
@@ -304,7 +304,7 @@ public final class DaqStartup {
     if (testPath.isFile()) {
       osAppropriatePath = testPath.getParent();
     }
-    
+
     Path daqHomePath = Paths.get(osAppropriatePath.concat("/../"));
     if (daqHomePath.toFile().exists()) {
       try {
@@ -336,7 +336,7 @@ public final class DaqStartup {
    * Configure log4j from the command arguments. This method may need modifying
    * if log4j is already configured elsewhere. It should always initialize the
    * local logger.
-   * 
+   *
    * @param commandParams the command line arguments object
    */
   private static void configureLogging(final CommandParamsHandler commandParams) {
@@ -359,13 +359,13 @@ public final class DaqStartup {
       }
     }
     System.out.println("Using log4j configuration file from " + log4jConfFile);
-    
+
     if (!System.getProperties().containsKey("c2mon.log.dir")) {
       System.setProperty("c2mon.log.dir", getDefaultLogPath());
     }
     System.out.println("Setting log directory to " + System.getProperty("c2mon.log.dir"));
-    
-    
+
+
     try {
       // Load the log4j configuration
       DOMConfigurator.configureAndWatch(log4jConfFile);
