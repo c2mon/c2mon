@@ -194,7 +194,7 @@ public class TagServiceImpl implements AdvancedTagService {
     }
 
     if (log.isDebugEnabled()) {
-      log.debug(String.format("doTagSubscription() : called for %d tags.", tagIds.size()));
+      log.debug(String.format("doSubscription() : called for %d tags.", tagIds.size()));
     }
 
     try {
@@ -205,7 +205,7 @@ public class TagServiceImpl implements AdvancedTagService {
     }
     catch (CacheSynchronizationException cse) {
       // Rollback the subscription
-      log.error("doTagSubscription() : Cache error occured while subscribing to data tags ==> Rolling back subscription.", cse);
+      log.error("doSubscription() : Cache error occured while subscribing to data tags ==> Rolling back subscription.", cse);
       cache.unsubscribeDataTags(tagIds, listener);
       throw cse;
     }
@@ -222,19 +222,19 @@ public class TagServiceImpl implements AdvancedTagService {
   private synchronized <T extends BaseTagListener> void doSubscriptionByName(final Set<String> regexList, final T listener) {
     if (regexList == null) {
       String error = "Called with null parameter (regex list). Ignoring request.";
-      log.warn("doTagSubscription() : " + error);
+      log.warn("doSubscriptionByName() : " + error);
       throw new IllegalArgumentException(error);
     }
 
     if (listener == null) {
       String error = "Called with null parameter (BaseTagListener). Ignoring request.";
-      log.warn("doTagSubscription() : " + error);
+      log.warn("doSubscriptionByName() : " + error);
       throw new IllegalArgumentException(error);
     }
 
     if (regexList.isEmpty()) {
       String info = "Called with empty regex list. Ignoring request.";
-      log.info("doTagSubscription() : " + info);
+      log.info("doSubscriptionByName() : " + info);
       return;
     }
 
@@ -250,7 +250,7 @@ public class TagServiceImpl implements AdvancedTagService {
     }
     catch (CacheSynchronizationException cse) {
       // Rollback the subscription
-      log.error("doTagSubscription() : Cache error occured while subscribing to data tags.", cse);
+      log.error("doSubscriptionByName() : Cache error occured while subscribing to data tags.", cse);
       throw cse;
     }
   }
