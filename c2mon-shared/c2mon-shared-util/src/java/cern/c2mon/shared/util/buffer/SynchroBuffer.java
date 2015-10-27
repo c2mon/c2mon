@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** A buffering utility class.
  * @author F.Calderini
@@ -16,7 +17,7 @@ import org.apache.log4j.Logger;
 public class SynchroBuffer {
 
 
-  private static final Logger LOGGER = Logger.getLogger(SynchroBuffer.class.getName());
+  private static final Logger LOGGER = LoggerFactory.getLogger(SynchroBuffer.class.getName());
   
   private long minWindowSize;
   private long maxWindowSize;

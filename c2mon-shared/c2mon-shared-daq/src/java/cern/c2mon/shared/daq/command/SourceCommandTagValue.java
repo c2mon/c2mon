@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2010 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,7 +13,7 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.shared.daq.command;
@@ -23,7 +23,8 @@ import java.io.Serializable;
 
 import javax.jms.Topic;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -34,10 +35,10 @@ import cern.c2mon.shared.common.type.TagDataType;
 /**
  * The SourceCommandTagValue is a data transfer object. Every time the server
  * asks a DAQ process to execute a command, it creates a SourceCommandTagValue
- * object and sends it to the DAQ process concerned as an XML message 
+ * object and sends it to the DAQ process concerned as an XML message
  * (using the object's toXML method). The DAQ process decodes the XML message
  * and tries to execute the command.
- * 
+ *
  * @author Jan Stowisek
  * @version $Revision: 1.13 $ ($Date: 2006/04/21 13:06:30 $ - $State: Exp $)
  */
@@ -57,7 +58,7 @@ public class SourceCommandTagValue implements Serializable, Cloneable {
    * Identifier of the equipment unit to which the command tag is attached.
    */
   protected Long equipmentId;
-  
+
   /**
    * Value of the command tag.
    */
@@ -71,7 +72,7 @@ public class SourceCommandTagValue implements Serializable, Cloneable {
   /**
    * Numeric representation of the data type of the command tag's value
    */
-  protected int dataTypeNumeric; 
+  protected int dataTypeNumeric;
 
   /**
    * Mode of the command tag.
@@ -82,14 +83,14 @@ public class SourceCommandTagValue implements Serializable, Cloneable {
   /**
    * Log4j Logger for this class.
    */
-  protected static final Logger log = Logger.getLogger(SourceCommandTagValue.class);
+  protected static final Logger log = LoggerFactory.getLogger(SourceCommandTagValue.class);
 
   /**
    * Log4j Logger for logging DataTag values.
    */
-  protected static final Logger cmdlog = Logger.getLogger("SourceCommandTagLogger");
-  
-  
+  protected static final Logger cmdlog = LoggerFactory.getLogger("SourceCommandTagLogger");
+
+
   /**
    * Default constructor
    */
@@ -105,7 +106,7 @@ public class SourceCommandTagValue implements Serializable, Cloneable {
    * @param pDataType    data type of the command tag's current value
    */
   public SourceCommandTagValue(
-      final Long pId, final String pName, final Long pEquipmentId, 
+      final Long pId, final String pName, final Long pEquipmentId,
       final short pMode, final Object pValue, final String pDataType) {
     this.id = pId;
     this.name = pName;
@@ -193,14 +194,14 @@ public class SourceCommandTagValue implements Serializable, Cloneable {
       str.append(this.value);
       str.append("</value>\n");
     }
-    
+
     // <mode> ... </mode>
     str.append("  <mode>");
     str.append(this.mode);
     str.append("</mode>\n");
-    
+
     str.append("</CommandTag>\n");
-    return str.toString();      
+    return str.toString();
   }
 
   /**
@@ -211,16 +212,16 @@ public class SourceCommandTagValue implements Serializable, Cloneable {
    */
   public synchronized static SourceCommandTagValue fromXML(Element domElement) {
     SourceCommandTagValue cmd = new SourceCommandTagValue();
-    // extract attributes 
+    // extract attributes
     try {
       cmd.id = Long.valueOf(domElement.getAttribute("id"));
       cmd.name = domElement.getAttribute("name");
       cmd.equipmentId = Long.valueOf(domElement.getAttribute("equipment-id"));
     } catch (NumberFormatException nfe) {
-      log.error(nfe);
+      log.error(nfe.toString());
       return null;
     } catch (Exception ex) {
-      log.error(ex);
+      log.error(ex.toString());
       return null;
     }
 
@@ -239,7 +240,7 @@ public class SourceCommandTagValue implements Serializable, Cloneable {
         if (fieldName.equals("value")) {
           cmd.dataType = fieldNode.getAttributes().item(0).getNodeValue();
           cmd.dataTypeNumeric = TagDataType.getDataTypeNumeric(cmd.dataType);
-          
+
           if (cmd.dataType.equals("Integer")) {
             cmd.value = Integer.valueOf(fieldValueString);
           } else if (cmd.dataType.equals("Float")) {
@@ -263,13 +264,13 @@ public class SourceCommandTagValue implements Serializable, Cloneable {
             return null;
           }
         }
-      }// if      
+      }// if
     }// for
     return cmd;
   }
-  
-  
+
+
   public void log() {
-    cmdlog.info(this);
-  }    
+    cmdlog.info(this.toString());
+  }
 }

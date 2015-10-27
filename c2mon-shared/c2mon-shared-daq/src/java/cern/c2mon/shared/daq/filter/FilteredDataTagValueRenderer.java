@@ -1,7 +1,7 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2009 CERN This program is free software; you can redistribute
  * it and/or modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 2 of the License,
@@ -12,7 +12,7 @@
  * copy of the GNU General Public License along with this program; if not, write
  * to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 
@@ -25,7 +25,7 @@ import cern.c2mon.shared.common.filter.FilteredDataTagValue;
 /**
  * The renderer class of the FilteredDataTagValue class, used by
  * log4j.
- * 
+ *
  * @author mbrightw
  *
  */
@@ -40,7 +40,7 @@ public class FilteredDataTagValueRenderer implements ObjectRenderer {
 
     /**
      * Returns the String representation of the object used in the log file.
-     * 
+     *
      * @param o the object to render
      * @return the string that appears in the file
      */

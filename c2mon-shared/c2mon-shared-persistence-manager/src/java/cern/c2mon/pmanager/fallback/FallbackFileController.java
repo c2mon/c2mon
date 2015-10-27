@@ -30,7 +30,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract class that holds all the common functionality to the different
@@ -42,7 +43,7 @@ import org.apache.log4j.Logger;
 public class FallbackFileController {
 
     /** Log4j Logger for tags that cannot be logged to the database */
-    public static final Logger LOG = Logger.getLogger("ShortTermLogFallbackLogger");
+    public static final Logger LOG = LoggerFactory.getLogger("ShortTermLogFallbackLogger");
 
     /** The file storing the datatags */
     private File dataFile;

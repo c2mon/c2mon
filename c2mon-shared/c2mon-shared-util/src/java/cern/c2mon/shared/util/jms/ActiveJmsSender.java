@@ -29,7 +29,8 @@ import javax.jms.TextMessage;
 
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.jms.core.SessionCallback;
@@ -49,7 +50,7 @@ public class ActiveJmsSender implements JmsSender {
   /**
    * Private class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ActiveJmsSender.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ActiveJmsSender.class);
   
   /**
    * Reference to the JmsTemplate. Could be instantiated in a Spring XML.

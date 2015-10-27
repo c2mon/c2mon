@@ -25,7 +25,8 @@ import java.io.StringWriter;
 import javax.jms.MessageFormatException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
@@ -44,7 +45,7 @@ import cern.c2mon.shared.util.parser.SimpleXMLParser;
  */
 public class XMLConverter {
   /** Log4j instance */
-  private static final Logger LOGGER = Logger.getLogger(ProcessMessageConverter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessMessageConverter.class);
   
   /**
    * Simple DOM parser for parsing XML message content

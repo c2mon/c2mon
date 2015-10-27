@@ -24,7 +24,8 @@ import javax.jms.MessageFormatException;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.jms.support.converter.MessageConverter;
 
@@ -36,7 +37,7 @@ import org.springframework.jms.support.converter.MessageConverter;
  */
 public final class ProcessMessageConverter implements MessageConverter {
   /** Log4j instance */
-  private static final Logger LOGGER = Logger.getLogger(ProcessMessageConverter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessMessageConverter.class);
   
   /**
    * XML Converter helper class

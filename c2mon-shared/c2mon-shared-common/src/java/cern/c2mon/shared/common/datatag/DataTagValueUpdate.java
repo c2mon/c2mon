@@ -10,7 +10,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.xerces.jaxp.DocumentBuilderFactoryImpl;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -43,7 +44,7 @@ public final class DataTagValueUpdate {
   /**
    * Log4j Logger for the DataTagValueUpdate class.
    */
-  protected static final Logger log = Logger.getLogger(DataTagValueUpdate.class);
+  protected static final Logger log = LoggerFactory.getLogger(DataTagValueUpdate.class);
   
   // ----------------------------------------------------------------------------
   // MEMBERS

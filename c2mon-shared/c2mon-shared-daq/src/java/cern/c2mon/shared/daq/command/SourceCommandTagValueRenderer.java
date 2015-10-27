@@ -9,22 +9,22 @@ import org.apache.log4j.or.ObjectRenderer;
  * Log4j ObjectRenderer for the SourceCommandTagValue class.
  *
  * The purpose of an object render is to log objects of a certain class
- * in a uniform way. 
+ * in a uniform way.
  *
  * <PRE>
- * Logger log = Logger.getLogger( ... );
+ * Logger log = LoggerFactory.getLogger( ... );
  * SourceCommandTagValue command =  ... ;
  * log.info(command);
  * ...
  * tag.log();
  * </PRE>
  *
- * The output in the log file will be (for example) : 
+ * The output in the log file will be (for example) :
  * <PRE>
- * 
+ *
  * </PRE>
  */
- 
+
 public class SourceCommandTagValueRenderer implements ObjectRenderer {
 
   /**
@@ -40,23 +40,23 @@ public class SourceCommandTagValueRenderer implements ObjectRenderer {
    */
   public String doRender(Object o) {
     if (o != null) {
-  
+
       if (o instanceof SourceCommandTagValue) {
         SourceCommandTagValue command = (SourceCommandTagValue) o;
         StringBuffer str = new StringBuffer();
         str.append("COMMAND");
         str.append('\t');
         str.append(command.getId());
-        str.append('\t');    
+        str.append('\t');
         str.append(command.getName());
         str.append('\t');
         //str.append(command.getMode());
         //str.append('\t');
         str.append(command.getDataType());
-        str.append('\t');  
+        str.append('\t');
         str.append(command.getValue());
-                              
-        return str.toString(); 
+
+        return str.toString();
       }
       else {
         // if someone passed an object other than SourceCommandTagValue
@@ -65,7 +65,7 @@ public class SourceCommandTagValueRenderer implements ObjectRenderer {
     }
     else {
       // if somebody decided to pass a null parameter
-      return null;        
+      return null;
     }
   }
 }

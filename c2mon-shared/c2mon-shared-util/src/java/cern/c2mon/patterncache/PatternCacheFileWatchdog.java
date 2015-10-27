@@ -7,17 +7,18 @@ package cern.c2mon.patterncache;
 import static java.lang.String.format;
 import java.io.File;
 
-import org.apache.log4j.Logger;
 import org.apache.log4j.helpers.FileWatchdog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The <code>PatternCacheWatchdog</code> class implements a pattern-cache file watchdog
- * 
+ *
  * @author wbuczak
  */
 public class PatternCacheFileWatchdog<T extends Cachable> extends FileWatchdog {
 
-    private static Logger LOG = Logger.getLogger(PatternCacheFileWatchdog.class);
+    private static Logger LOG = LoggerFactory.getLogger(PatternCacheFileWatchdog.class);
 
     private PatternCache<T> pcache;
 
@@ -30,7 +31,7 @@ public class PatternCacheFileWatchdog<T extends Cachable> extends FileWatchdog {
         super.setDelay(delay);
         this.pcache = pcache;
         // initialize cache
-        reloadCache();    
+        reloadCache();
     }
 
     @Override

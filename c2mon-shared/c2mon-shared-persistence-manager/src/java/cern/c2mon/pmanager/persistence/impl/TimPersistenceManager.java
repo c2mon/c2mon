@@ -4,7 +4,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.pmanager.IAlarmListener;
 import cern.c2mon.pmanager.IDBPersistenceHandler;
@@ -28,9 +29,9 @@ import cern.c2mon.pmanager.persistence.util.DataRecoveryThread;
  * activated and deactivated. The deactivation will take place as soon as it is
  * detected that the DB issues have been sorted out. At that same time the data
  * stored in the file will be committed back to the DB.
- * 
+ *
  * @author mruizgar
- * 
+ *
  */
 public class TimPersistenceManager implements IPersistenceManager, FallbackAlarmsInterface {
 
@@ -69,7 +70,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
     private DataRecoveryThread dataRecovery = new DataRecoveryThread(this);
 
     /** Log4j Logger for this class */
-    private static final Logger LOG = Logger.getLogger(TimPersistenceManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TimPersistenceManager.class);
 
     /**
      * The minimal amount of space in MB that always shall be left free on the
@@ -79,7 +80,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
     private int minFreeDiscSpace = FallbackProperties.getInstance().getMinimunDiscFreeSpace();
 
     /** Log4j logger for the fallback related debug and error messages */
-    private static final Logger FALLBACK_LOG = Logger.getLogger("ShortTermLogFallbackLogger");
+    private static final Logger FALLBACK_LOG = LoggerFactory.getLogger("ShortTermLogFallbackLogger");
 
     /**
      * @return the dbHandler
@@ -127,7 +128,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
 
     /**
      * Creates a new TimPersistenceManager object.
-     * 
+     *
      * @param dbHandler
      *            IDBPersistenceHandler instance indicating which implementation
      *            will be used to write the data to the DB
@@ -156,7 +157,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
      * be temporarily stored into a fallback file, from which the data will be
      * read and committed back to the DB as soon as it detects that the DB
      * connection is up again
-     * 
+     *
      * @param data
      *            List of IFallback objects to be written to the DB. It is up to
      *            the caller to ensure that all objects in the list are of type
@@ -177,14 +178,14 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
      * unavailable. If there is data temporarily stored in the fallback file it
      * will start a new thread which will independently deal with the task of
      * reading back the data from the file to the DB.
-     * 
+     *
      * @param object
      *            IFallback object to be stored
      */
     public final void storeData(final IFallback object) {
         if (log(object) && !fallbackManager.isFallbackFileEmpty()) {
             if (!this.dataRecovery.isRunning()) {
-              dataRecovery.setPersistenceManager(this);  
+              dataRecovery.setPersistenceManager(this);
                 new Thread(dataRecovery).start();
             }
         }
@@ -195,7 +196,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
      * the DB becomes unavailable during the logging process the IFallback
      * object will be temporarily stored into a fallback log file, which will
      * avoid losing that data
-     * 
+     *
      * @param data
      *            The list of IFallback objects to be logged in the shorttermlog
      *            database
@@ -229,15 +230,15 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
             StringBuffer str = new StringBuffer("log([Collection]) : ");
             str.append(size);
             str.append(" data to be logged.");
-            LOG.debug(str);
+            LOG.debug(str.toString());
         }
 
         try {
-            dbHandler.storeData(data);            
+            dbHandler.storeData(data);
             LOG.info("log([Collection]) : " + size + " tags have been successfuly logged into the DB");
             alarmSender.dbUnavailable(DOWN, null, dbHandler.getDBInfo());
         } catch (IDBPersistenceException e) {
-            connectionDown = true;           
+            connectionDown = true;
             commitedTags = e.getCommited();
             if (size > commitedTags) {
                 List temp = data.subList(commitedTags, size);
@@ -254,7 +255,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
               LOG.debug("log([Collection]) : Sending an alarm for warning about the DB problems " + e.getMessage());
             // Send an ALARM to warn that the DB is down
             alarmSender.dbUnavailable(ACTIVATED, e.getMessage(), dbHandler.getDBInfo());
-        }        
+        }
         return !connectionDown;
     }
 
@@ -263,7 +264,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
      * becomes unavailable during the logging process the IFallback object will
      * be temporarily stored into a fallback log file, which will avoid losing
      * that data
-     * 
+     *
      * @param object
      *            The IFallback object to be stored in the DB
      * @return A boolean value indicating whether the DB is available (true) or
@@ -282,7 +283,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
             dbHandler.storeData(object);
             alarmSender.dbUnavailable(DOWN, null, dbHandler.getDBInfo());
         } catch (IDBPersistenceException e) {
-            dbConnectionUp = false;            
+            dbConnectionUp = false;
             synchronized (fallbackManager.getFallbackFileController()) {
                 ArrayList temp = new ArrayList();
                 temp.add(object);
@@ -304,7 +305,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
      * and a notification will be sent to warn about the problem. On the same
      * way, a notification will be sent when the file to which the data is
      * trying to be logged is not accessible
-     * 
+     *
      * @param temp
      *            List of IFallback objects
      * @return A boolean indicating whether data should be logged to log4j

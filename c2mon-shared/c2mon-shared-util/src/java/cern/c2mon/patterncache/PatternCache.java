@@ -19,12 +19,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The pattern cache class implements a cache which holds in memory objects associated with string (java regexp)
  * patterns The cache can be initialize both from a string buffer or from an external file
- * 
+ *
  * @author wbuczak
  */
 public class PatternCache<T extends Cachable> {
@@ -33,7 +34,7 @@ public class PatternCache<T extends Cachable> {
     private List<T> cachables;
     private Map<String, T> cache;
 
-    private static final Logger LOG = Logger.getLogger(PatternCache.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PatternCache.class);
 
     private Class<T> clazz;
 
@@ -55,7 +56,7 @@ public class PatternCache<T extends Cachable> {
 
     /**
      * This method is synchronized - only one thread should be able to load cache at a time
-     * 
+     *
      * @param dataTagList
      * @return
      */
@@ -76,7 +77,7 @@ public class PatternCache<T extends Cachable> {
 
     /**
      * checks if there is a match in the cache between the passed string key and registered patterns
-     * 
+     *
      * @param text
      * @return instance of the <code>Cachable</code> if match is found, null otherwise
      */
@@ -190,7 +191,7 @@ public class PatternCache<T extends Cachable> {
                                 patterns.add(pattern);
                                 cachables.add(instance);
                             } catch (Exception ex) {
-                                LOG.warn(ex);
+                                LOG.warn(ex.toString());
                             }
                         }// if
 

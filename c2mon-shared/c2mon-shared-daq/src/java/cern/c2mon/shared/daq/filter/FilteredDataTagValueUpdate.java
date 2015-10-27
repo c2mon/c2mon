@@ -23,7 +23,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -64,7 +65,7 @@ public class FilteredDataTagValueUpdate {
     /**
      * Log4j Logger for the FilteredDataTagValueUpdate class.
      */
-    private static final Logger LOG = Logger.getLogger(FilteredDataTagValueUpdate.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FilteredDataTagValueUpdate.class);
 
     // ----------------------------------------------------------------------------
     // MEMBERS

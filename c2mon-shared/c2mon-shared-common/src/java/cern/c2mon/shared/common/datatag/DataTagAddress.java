@@ -4,7 +4,8 @@ import java.io.Serializable;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.simpleframework.xml.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -40,7 +41,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
     /**
      * Log4j Logger for this class
      */
-    private static final Logger LOG = Logger.getLogger(DataTagAddress.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DataTagAddress.class);
 
     /**
      * XML parser for this class (initialised in static initialiser)

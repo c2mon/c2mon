@@ -19,7 +19,8 @@ package cern.c2mon.pmanager.fallback.manager;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.pmanager.fallback.FallbackFileController;
@@ -40,7 +41,7 @@ import cern.c2mon.pmanager.fallback.util.SystemResourcesParameters;
 public class FallbackFileManager {
 
     /** Log4j Logger for tags that cannot be logged to the database (emergency) */
-    public static final Logger LOG = Logger.getLogger("ShortTermLogFallbackLogger");
+    public static final Logger LOG = LoggerFactory.getLogger("ShortTermLogFallbackLogger");
 
     /** FallbackFileController instance */
     private final FallbackFileController fFileController;

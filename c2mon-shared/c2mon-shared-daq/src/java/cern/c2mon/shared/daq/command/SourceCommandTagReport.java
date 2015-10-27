@@ -1,7 +1,7 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005 - 2011 CERN This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
@@ -12,12 +12,13 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.shared.daq.command;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -28,7 +29,7 @@ import org.w3c.dom.NodeList;
  * and sends it to the server (as an XML message using the object's toXML()
  * method). The server reads the object back from the XML message and sends an
  * appropriate command report back to the client.
- * 
+ *
  * @author Jan Stowisek
  * @version $Revision: 1.15 $ ($Date: 2006/05/15 15:43:13 $ - $State: Exp $)
  */
@@ -116,7 +117,7 @@ public final class SourceCommandTagReport {
     /**
      * Log4j Logger for logging DataTag values.
      */
-    protected static final Logger cmdlog = Logger.getLogger("SourceCommandTagLogger");
+    protected static final Logger cmdlog = LoggerFactory.getLogger("SourceCommandTagLogger");
 
     /**
      * Default Constructor. Creates a SourceCommandReport object indicating
@@ -128,7 +129,7 @@ public final class SourceCommandTagReport {
 
     /**
      * Constructor.
-     * 
+     *
      * @param pStatus
      *            execution status
      * @param pStatusDesc
@@ -140,7 +141,7 @@ public final class SourceCommandTagReport {
 
     /**
      * Constructor.
-     * 
+     *
      * @param pStatus
      *            execution status
      * @param pStatusDesc
@@ -152,7 +153,7 @@ public final class SourceCommandTagReport {
 
     /**
      * Constructor.
-     * 
+     *
      * @param pStatus
      *            execution status
      * @param pStatusDesc
@@ -166,7 +167,7 @@ public final class SourceCommandTagReport {
 
     /**
      * Constructor.
-     * 
+     *
      * @param pId
      *            - command's id
      * @param pName
@@ -193,7 +194,7 @@ public final class SourceCommandTagReport {
 
     /**
      * Get an XML representation of this object.
-     * 
+     *
      * @return an XML representation of this object
      */
     public String toXML() {
@@ -225,7 +226,7 @@ public final class SourceCommandTagReport {
 
     /**
      * Get the command execution status.
-     * 
+     *
      * @return the command execution status.
      */
     public int getStatus() {
@@ -234,7 +235,7 @@ public final class SourceCommandTagReport {
 
     /**
      * Get optional free-text information about command execution.
-     * 
+     *
      * @return optional free-text information about command execution
      */
     public String getDescription() {
@@ -243,7 +244,7 @@ public final class SourceCommandTagReport {
 
     /**
      * Returns the id of the command tag belonging to this report.
-     * 
+     *
      * @return The id of the command tag.
      */
     public Long getId() {
@@ -252,7 +253,7 @@ public final class SourceCommandTagReport {
 
     /**
      * Returns the name of the command tag belonging to this report.
-     * 
+     *
      * @return The name of the command tag.
      */
     public String getName() {
@@ -263,7 +264,7 @@ public final class SourceCommandTagReport {
      * Get a complete textual description of the command execution status. The
      * complete description contains the predefined description of the execution
      * status as well as an optional user-defined part.
-     * 
+     *
      * @return a complete textual description of the command execution status.
      */
     public String getFullDescription() {
@@ -276,7 +277,7 @@ public final class SourceCommandTagReport {
 
     /**
      * Create a SourceCommandTagReport object from an XML element.
-     * 
+     *
      * @param pElement
      *            Root element of the XML document representing the
      *            SourceCommandTagReport object.
@@ -318,7 +319,7 @@ public final class SourceCommandTagReport {
     }
 
     public void log() {
-        cmdlog.info(this);
+        cmdlog.info(this.toString());
     }
 
     /**

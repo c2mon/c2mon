@@ -4,7 +4,8 @@ package cern.c2mon.shared.common.datatag;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -42,12 +43,12 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
   /**
    * Log4j Logger for the DataTagValueUpdate class.
    */
-  protected static final Logger LOG = Logger.getLogger(DataTagValueUpdate.class);
+  protected static final Logger LOG = LoggerFactory.getLogger(DataTagValueUpdate.class);
 
   /**
    * Log4j Logger for logging DataTag values.
    */
-  protected static final Logger TAG_LOG = Logger.getLogger("SourceDataTagLogger");
+  protected static final Logger TAG_LOG = LoggerFactory.getLogger("SourceDataTagLogger");
 
   // ----------------------------------------------------------------------------
   // MEMBERS
@@ -648,7 +649,7 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
 
   public void log() {
     if (TAG_LOG.isInfoEnabled()) {
-      TAG_LOG.info(this);
+      TAG_LOG.info(this.toString());
     }
   }
 

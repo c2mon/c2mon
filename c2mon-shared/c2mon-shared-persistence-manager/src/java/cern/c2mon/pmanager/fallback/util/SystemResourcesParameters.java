@@ -19,7 +19,8 @@ package cern.c2mon.pmanager.fallback.util;
 
 import java.io.File;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -35,7 +36,7 @@ public final class SystemResourcesParameters {
     public static final String[] CMD_FREE_SPACE = {"sh", "-c", "df -m . | tail -n 1 | awk '{print $4}'"};
     
     /** Log4j logger for this class*/
-    private static final Logger LOGGER = Logger.getLogger(SystemResourcesParameters.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SystemResourcesParameters.class);
     
     /** 
      * Private constructor to prevent the class from being instantiated

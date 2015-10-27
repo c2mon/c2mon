@@ -11,7 +11,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
@@ -38,7 +39,7 @@ import com.google.gson.stream.JsonReader;
 public class TransferTagValueImpl extends ClientRequestReport implements TagValueUpdate {
   
   /** LOG4J logger instance */
-  private static final transient Logger LOG = Logger.getLogger(TransferTagValueImpl.class);
+  private static final transient Logger LOG = LoggerFactory.getLogger(TransferTagValueImpl.class);
   
   /** Gson parser singleton */
   private static transient Gson gson = null;

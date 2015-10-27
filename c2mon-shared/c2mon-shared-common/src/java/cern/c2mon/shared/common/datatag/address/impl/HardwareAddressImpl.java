@@ -5,7 +5,8 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -18,7 +19,7 @@ import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 /**
  * Implementation of the HardwareAddress interface and of the abstract HardwareAddressFactory class.
- * 
+ *
  * @author J. Stowisek
  * @version $Revision: 1.4 $ ($Date: 2009/04/02 16:54:50 $ - $State: Exp $)
  */
@@ -27,7 +28,7 @@ public class HardwareAddressImpl extends HardwareAddressFactory implements Hardw
     /** Serial UID */
     private static final long serialVersionUID = -7336624461787666236L;
 
-    private static final Logger LOG = Logger.getLogger(HardwareAddressImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HardwareAddressImpl.class);
 
     private static SimpleXMLParser xmlParser = null;
 
@@ -84,7 +85,7 @@ public class HardwareAddressImpl extends HardwareAddressFactory implements Hardw
 
     /**
      * Create a HardwareAddress object from its XML representation.
-     * 
+     *
      * @param pElement DOM element containing the XML representation of a HardwareAddress object, as created by the
      *            toConfigXML() method.
      * @see cern.c2mon.shared.common.datatag.address.HardwareAddress#toConfigXML(Element)
@@ -208,7 +209,7 @@ public class HardwareAddressImpl extends HardwareAddressFactory implements Hardw
 
     /**
      * Returns an XML representation of the HardwareAddress object.
-     * 
+     *
      * @throws RuntimeException if Illegal access to fields
      */
     public final synchronized String toConfigXML() {
@@ -353,7 +354,7 @@ public class HardwareAddressImpl extends HardwareAddressFactory implements Hardw
                         }
 
                 } catch (Exception e) {
-                    LOG.error(e);
+                    LOG.error(e.toString());
                     throw new RuntimeException("Exception caught while calculating HardwareAddress hashcode.", e);
                 }
             }

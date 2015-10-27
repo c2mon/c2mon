@@ -10,7 +10,8 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.shared.util.mail.MailSender;
 import cern.c2mon.shared.util.mail.bean.MailDetailsBean;
@@ -25,7 +26,7 @@ import cern.c2mon.shared.util.mail.exception.MailSenderException;
 
 public class SMTPMailSender implements MailSender {
     /* STMPMailSender logger */
-    private static final Logger LOG = Logger.getLogger(SMTPMailSender.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SMTPMailSender.class);
 
     /* It holds the session that has been created within the mail server */
     private Session session;

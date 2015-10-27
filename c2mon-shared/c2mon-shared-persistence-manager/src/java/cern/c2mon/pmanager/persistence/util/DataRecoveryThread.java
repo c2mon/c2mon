@@ -2,7 +2,8 @@ package cern.c2mon.pmanager.persistence.util;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.pmanager.alarm.FallbackAlarmsInterface;
 import cern.c2mon.pmanager.fallback.FallbackProperties;
@@ -27,10 +28,10 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
     private boolean stopped = true;
 
     /** Log4j Logger for this class (debug and error messages) */
-    private static final Logger LOG = Logger.getLogger(DataRecoveryThread.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DataRecoveryThread.class);
 
     /** Log4j logger for the fallback related debug and error messages */
-    private static final Logger FALLBACK_LOG = Logger.getLogger("ShortTermLogFallbackLogger");
+    private static final Logger FALLBACK_LOG = LoggerFactory.getLogger("ShortTermLogFallbackLogger");
 
     /**
      * Number of miliseconds that the thread will sleep after each iteration by

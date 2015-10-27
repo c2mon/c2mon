@@ -28,7 +28,8 @@ import cern.c2mon.pmanager.mock.FallbackImpl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -45,7 +46,7 @@ import junit.framework.TestCase;
 public class FallbackFileManagerTest extends TestCase {
    
     /** Log4j logger for the class*/ 
-    private static final Logger LOG = Logger.getLogger(FallbackFileManagerTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FallbackFileManagerTest.class);
     
     /** Number of lines to be read/deleted from the fallback log file*/
     private static final int NUMBER_OF_LINES = 3;

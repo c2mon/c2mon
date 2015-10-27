@@ -5,7 +5,8 @@ import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -36,7 +37,7 @@ public class ThreadHandler extends Thread {
   /**
    * private logger.
    */
-  private final static Logger LOGGER = Logger.getLogger(ThreadHandler.class); 
+  private final static Logger LOGGER = LoggerFactory.getLogger(ThreadHandler.class); 
   
   
   /**

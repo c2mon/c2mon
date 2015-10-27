@@ -7,7 +7,8 @@ import java.util.Iterator;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -35,7 +36,7 @@ public class DataTagValueDictionary implements Serializable, Cloneable {
   /**
    * Log4j Logger for this class.
    */
-  private static final Logger LOG = Logger.getLogger(DataTagValueDictionary.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DataTagValueDictionary.class);
 
   private static final long serialVersionUID = -4306034447960538021L;
 

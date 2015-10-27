@@ -1,7 +1,7 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2009 CERN This program is free software; you can redistribute
  * it and/or modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 2 of the License,
@@ -12,7 +12,7 @@
  * copy of the GNU General Public License along with this program; if not, write
  * to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 
@@ -20,7 +20,8 @@ package cern.c2mon.shared.common.filter;
 
 import java.sql.Timestamp;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -29,20 +30,20 @@ import cern.c2mon.shared.common.datatag.SourceDataQuality;
 
 /**
  * does not allow null values for attributes (empty strings only)
- * 
+ *
  * Notice these filter classes are all shared between the DAQ layer and the Statistics Consumer
  * process, not the server.
- * 
+ *
  * @author mbrightw
- * 
+ *
  */
 public class FilteredDataTagValue {
 
     /**
      * The general logger.
      */
-    private static final Logger LOGGER = Logger.getLogger(FilteredDataTagValue.class);
-    
+    private static final Logger LOGGER = LoggerFactory.getLogger(FilteredDataTagValue.class);
+
     /**
      * Filter Type enum
      */
@@ -51,26 +52,26 @@ public class FilteredDataTagValue {
        * Tag value was filtered out as the previously received
        * value had a similar value, quality flag and quality description.
        */
-      REPEATED_INVALID((short)0), 
+      REPEATED_INVALID((short)0),
       /*
        * Tag value was filtered out as the value was in the value deadband.
        */
-      VALUE_DEADBAND((short)1), 
+      VALUE_DEADBAND((short)1),
       /*
        *  Filtering occurred because the value received was the same as the current value.
        */
-      REPEATED_VALUE((short)2), 
+      REPEATED_VALUE((short)2),
       /*
        * Filtering occurred because the value was received during the time deadband.
        */
       TIME_DEADBAND((short)3),
       /*
        * Filtering occurred while checking current TS vs New TS and current Quality vs new Quality
-       * 
+       *
        * Filter when:
-       * - New TS <= Current TS + Current Good Quality 
+       * - New TS <= Current TS + Current Good Quality
        * - New TS <= Current TS + Current Bad Quality + New Bad Quality
-       * 
+       *
        * No filter when:
        * - New TS <= Current TS + New Good Quality + Current Bad Quality
        * - New TS > Current TS
@@ -88,7 +89,7 @@ public class FilteredDataTagValue {
 
       /**
        * The Filter type number
-       * 
+       *
        * @param number The Filter type number
        */
       FilterType(final short number) {
@@ -106,21 +107,21 @@ public class FilteredDataTagValue {
     /**
      * The log of all tag values sent to the filter module.
      */
-    private static final Logger TAGLOGGER = Logger.getLogger("FilteredDataTagLogger");
+    private static final Logger TAGLOGGER = LoggerFactory.getLogger("FilteredDataTagLogger");
 
     // Constants for creating the XML representation of the object
     /**
      * The root element in the XML encoding of the object.
      */
     public static final String XML_ROOT_ELEMENT = "FilteredDataTag";
-    
+
     /**
      * The id attribute in the XML encoding of the object.
      */
     private static final String XML_ATTRIBUTE_ID = "id";
-    
+
     /**
-     * The name attribute in the XML encoding of the object. 
+     * The name attribute in the XML encoding of the object.
      */
     private static final String XML_ATTRIBUTE_NAME = "name";
 
@@ -166,7 +167,7 @@ public class FilteredDataTagValue {
 
     /**
      * Constructor.
-     * 
+     *
      * @param pId the tag id
      * @param pName the tag name
      */
@@ -185,7 +186,7 @@ public class FilteredDataTagValue {
 
     /**
      * Constructor.
-     * 
+     *
      * @param pId the tag id
      * @param pName the tag name
      * @param pValue the tag value
@@ -214,7 +215,7 @@ public class FilteredDataTagValue {
      * logs the FilteredDataTag in the appropriate log file
      */
     public final void log() {
-        TAGLOGGER.info(this);
+        TAGLOGGER.info(this.toString());
     }
 
     // METHODS FOR TRANSFORMATION TO AND FROM XML
@@ -222,7 +223,7 @@ public class FilteredDataTagValue {
     /**
      * Encodes the FilteredDataTag value as XML. This encoding is used for
      * sending the data tag value to the Statistics module via JMS.
-     * 
+     *
      * @return the XML as string
      */
     public final String toXML() {
@@ -310,7 +311,7 @@ public class FilteredDataTagValue {
 
     /**
      * Decodes the XML into the FilteredDataTagValue object.
-     * 
+     *
      * @param domElement the XML document element
      * @return the tag value object
      */
@@ -387,7 +388,7 @@ public class FilteredDataTagValue {
     /**
      * Get the data type of the DataTag's current value as a string. This method
      * will return null if the tag's current value is null.
-     * 
+     *
      * @return the datatype of the value
      */
     public final String getDataType() {
@@ -396,7 +397,7 @@ public class FilteredDataTagValue {
 
     /**
      * Sets the value description of the value object.
-     * 
+     *
      * @param pValueDescription the description
      */
     public final void setValueDescription(final String pValueDescription) {
@@ -405,7 +406,7 @@ public class FilteredDataTagValue {
 
     /**
      * Set the quality description of the object.
-     * 
+     *
      * @param pQualityDescription the quality description
      */
     public final void setQualityDescription(final String pQualityDescription) {
@@ -414,7 +415,7 @@ public class FilteredDataTagValue {
 
     /**
      * Gets the tag id.
-     * 
+     *
      * @return the id
      */
     public final Long getId() {

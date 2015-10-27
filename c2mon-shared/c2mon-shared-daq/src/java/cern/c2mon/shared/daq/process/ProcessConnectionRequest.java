@@ -23,7 +23,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.Timestamp;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
@@ -45,7 +46,7 @@ import org.simpleframework.xml.Root;
 public class ProcessConnectionRequest implements ProcessRequest {
   
   /** Log4j instance */
-  private static final Logger LOGGER = Logger.getLogger(ProcessConnectionRequest.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessConnectionRequest.class);
   
   /**
    * Constant of NO_PROCESS as default value for process name

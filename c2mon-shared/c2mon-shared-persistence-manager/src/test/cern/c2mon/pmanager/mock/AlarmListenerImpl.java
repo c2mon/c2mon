@@ -20,7 +20,8 @@ package cern.c2mon.pmanager.mock;
 import java.io.File;
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.pmanager.IAlarmListener;
 import cern.c2mon.pmanager.alarm.FallbackAlarmsInterface;
@@ -37,7 +38,7 @@ public class AlarmListenerImpl implements IAlarmListener {
 
     
     /** Log4j logger for the class*/ 
-    private static final Logger LOG = Logger.getLogger(AlarmListenerImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AlarmListenerImpl.class);
     
     /**
      * Sends an email warning about the DB problems

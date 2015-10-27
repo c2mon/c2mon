@@ -22,7 +22,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This helper class provides methods to cast a given raw type object into
@@ -31,7 +32,7 @@ import org.apache.log4j.Logger;
  * @author Matthias Braeger
  */
 public final class TypeConverter  {
-  private static final Logger LOG = Logger.getLogger(TypeConverter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TypeConverter.class);
   
   /**
    * Hidden default constructor

@@ -7,22 +7,22 @@ import org.apache.log4j.or.ObjectRenderer;
  * Log4j ObjectRenderer for the SourceCommandTagReport class.
  *
  * The purpose of an object render is to log objects of a certain class
- * in a uniform way. 
+ * in a uniform way.
  *
  * <PRE>
- * Logger log = Logger.getLogger( ... );
+ * Logger log = LoggerFactory.getLogger( ... );
  * CommandReport rep =  ... ;
  * log.info(rep);
  * ...
  * tag.log();
  * </PRE>
  *
- * The output in the log file will be (for example) : 
+ * The output in the log file will be (for example) :
  * <PRE>
- * 
+ *
  * </PRE>
  */
- 
+
 public class SourceCommandReportRenderer implements ObjectRenderer {
 
   /**
@@ -52,17 +52,17 @@ public class SourceCommandReportRenderer implements ObjectRenderer {
         str.append(rep.getFullDescription());
         str.append('\t');
         str.append(rep.getReturnValue());
-        str.append('\t');                      
-        return str.toString(); 
-      }       
+        str.append('\t');
+        return str.toString();
+      }
       else {
         // if someone passed an object other than CommandReport
         return o.toString();
-      }  
-    } 
+      }
+    }
     else {
       // if somebody decided to pass a null parameter
-      return null;      
+      return null;
     }
   }
 }

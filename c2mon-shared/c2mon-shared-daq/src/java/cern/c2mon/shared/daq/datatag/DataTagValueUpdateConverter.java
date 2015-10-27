@@ -25,7 +25,8 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.jms.support.converter.MessageConverter;
 import org.w3c.dom.Document;
@@ -47,7 +48,7 @@ public class DataTagValueUpdateConverter implements MessageConverter {
   /**
    * Private Logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(DataTagValueUpdateConverter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DataTagValueUpdateConverter.class);
   
   /** 
    * Simple DOM parser for parsing XML message content 

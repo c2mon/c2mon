@@ -20,51 +20,52 @@
 
 package cern.c2mon.pmanager.fallback;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 /**
- * It reads and stores the values of the properties defined in the "fallback.properties" file 
+ * It reads and stores the values of the properties defined in the "fallback.properties" file
  * @author mruizgar
  *
  */
 
 public final class FallbackProperties {
-        
+
     /** Logger for the FallbackProperties class*/
-    private static final Logger LOG = Logger.getLogger(FallbackProperties.class);
-        
-    /** It indicates the frequency (counted in number of lines in the file) for which the disc free space in the system will be checked**/   
+    private static final Logger LOG = LoggerFactory.getLogger(FallbackProperties.class);
+
+    /** It indicates the frequency (counted in number of lines in the file) for which the disc free space in the system will be checked**/
     private static final String FREE_SPACE_CHECK_FREQUENCY = "10000";
-    
-    /** It indicates the minimum free disc space allowed in the system*/ 
+
+    /** It indicates the minimum free disc space allowed in the system*/
     private static final String DISC_SIZE_CHECK = "1024";
-    
-    /** It indicates the number of lines that can be read from the fallback file at each time*/  
+
+    /** It indicates the number of lines that can be read from the fallback file at each time*/
     public static final String NUMBER_LINES_FROM_FILE = "2000";
-    
+
     /** It indicates with which frequency (each number of lines) the check for the disc size should be done*/
     private int freeSpaceCheckFrequency = Integer.parseInt(FREE_SPACE_CHECK_FREQUENCY);
-    
+
     /** Minimum free space that should exist in the disc in megabytes*/
     private int minimunDiscFreeSpace = Integer.parseInt(DISC_SIZE_CHECK);
-    
+
     /** Number of lines that will be read in each go from the fallback file */
     private int numberLinesToReadFromFile = Integer.parseInt(NUMBER_LINES_FROM_FILE);
-    
+
     /** It indicates that an error while getting the free space in the system's disc has occurred*/
     public static final int CMD_FREE_SPACE_ERROR = -1;
-    
+
     /** Name of the property file holding all fallback related properties*/
     public static final String PROPERTY_FILE_NAME = "fallback.properties";
-    
-    /** Unique instance of this class*/ 
+
+    /** Unique instance of this class*/
     private static FallbackProperties fProperties;
-    
-    /** 
+
+    /**
      * Gets the unique instance of the FallbackProperties class
      * @return The unique instance of the class
      */
@@ -74,17 +75,17 @@ public final class FallbackProperties {
         }
         return fProperties;
     }
-    
-    /** 
-     * Class constructor. It loads all the properties defined in the "fallback.properties" file 
+
+    /**
+     * Class constructor. It loads all the properties defined in the "fallback.properties" file
      */
     private FallbackProperties() {
         // Load client properties from file
         if (LOG.isDebugEnabled()) {
-          LOG.debug(new StringBuffer("init() : loading properties from file ").append(PROPERTY_FILE_NAME));
+          LOG.debug(new StringBuffer("init() : loading properties from file ").append(PROPERTY_FILE_NAME).toString());
         }
         try {
-          Properties fallbackProperties = new Properties(); 
+          Properties fallbackProperties = new Properties();
           InputStream fps = getClass().getClassLoader().getResourceAsStream(PROPERTY_FILE_NAME);
           if (fps != null) {
             fallbackProperties.load(fps);
@@ -92,27 +93,27 @@ public final class FallbackProperties {
             this.freeSpaceCheckFrequency = Integer.parseInt(fallbackProperties.getProperty("fallback.discsize.check", DISC_SIZE_CHECK));
             this.numberLinesToReadFromFile = Integer.parseInt(fallbackProperties.getProperty("fallback.read.lines.per.iteration", NUMBER_LINES_FROM_FILE));
           } else {
-              LOG.warn(new StringBuffer("init() : Unable to find/read properties file ").append(PROPERTY_FILE_NAME));
+              LOG.warn(new StringBuffer("init() : Unable to find/read properties file ").append(PROPERTY_FILE_NAME).toString());
               LOG.info("init() : Using default values for the fallback parameters");
           }
        } catch (FileNotFoundException fnfe) {
-          LOG.warn(new StringBuffer("init() : Unable to find properties file ").append(PROPERTY_FILE_NAME));
+          LOG.warn(new StringBuffer("init() : Unable to find properties file ").append(PROPERTY_FILE_NAME).toString());
           LOG.info("init() : Using default values as fallback parameters.");
         }
         catch (IOException ioe) {
-          LOG.warn(new StringBuffer("init() : Unable to read properties file ").append(PROPERTY_FILE_NAME));
+          LOG.warn(new StringBuffer("init() : Unable to read properties file ").append(PROPERTY_FILE_NAME).toString());
           LOG.info("init() : Using default values for the fallback properties.");
-        }     
-    }  
-    
-    
+        }
+    }
+
+
     /**
      * @param minDiscFreeSpace the minimunDiscFreeSpace to set
      */
     public void setMinimunDiscFreeSpace(final int minDiscFreeSpace) {
         this.minimunDiscFreeSpace = minDiscFreeSpace;
     }
-        
+
     /**
      * @return the freeSpaceCheckFrequency
      */
@@ -125,8 +126,8 @@ public final class FallbackProperties {
      */
     public int getMinimunDiscFreeSpace() {
         return minimunDiscFreeSpace;
-    }    
-    
+    }
+
     /**
      * @return the numberLinesReadFromFile
      */

@@ -23,7 +23,8 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
@@ -42,7 +43,7 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 public class ConfigurationElementReport {
 
   /** log4j logger instance */
-  private static final Logger LOG = Logger.getLogger(ConfigurationElementReport.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ConfigurationElementReport.class);
   
   /**
    * The action of the {@link ConfigurationElement}.

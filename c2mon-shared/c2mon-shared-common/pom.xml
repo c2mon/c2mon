@@ -26,8 +26,9 @@
       <artifactId>c2mon-shared-util</artifactId>
     </dependency>
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.5</version>
     </dependency>
     <dependency>
       <groupId>commons-lang</groupId>

@@ -15,7 +15,8 @@ package cern.c2mon.shared.daq.datatag;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -33,7 +34,7 @@ import cern.c2mon.shared.util.parser.SimpleXMLParser;
  */
 public class SourceDataTagValueResponse implements java.io.Serializable {
 
-  private static final Logger LOG = Logger.getLogger(SourceDataTagValueRequest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SourceDataTagValueRequest.class);
 
   private String status;
   

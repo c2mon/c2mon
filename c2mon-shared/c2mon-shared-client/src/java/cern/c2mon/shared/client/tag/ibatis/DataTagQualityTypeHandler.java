@@ -27,7 +27,8 @@ import java.util.Map;
 
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
@@ -56,7 +57,7 @@ public class DataTagQualityTypeHandler implements TypeHandler {
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(DataTagQualityTypeHandler.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DataTagQualityTypeHandler.class);
 
   /**
    * Gson object for Json serialization/deserialization.
