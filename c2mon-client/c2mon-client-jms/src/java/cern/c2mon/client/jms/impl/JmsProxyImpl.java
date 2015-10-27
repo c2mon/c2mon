@@ -541,11 +541,13 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       }
       listenerLock.lock();
       try {
-        if (!isRegisteredListener(serverUpdateListener)) { // throw exception if
+        boolean refreshSubscriptions = refreshLock.isWriteLocked();
+
+        if (refreshSubscriptions || !isRegisteredListener(serverUpdateListener)) { // throw exception if
           // TagUpdateListener
           // null
           try {
-            if (connected) {
+            if (refreshSubscriptions || connected) {
               String topicName = topicRegistrationDetails.getTopicName();
               if (topicToWrapper.containsKey(topicName)) {
                 topicToWrapper.get(topicName).addListener(serverUpdateListener, topicRegistrationDetails.getId());
@@ -560,13 +562,18 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
                 topicToWrapper.put(topicName, wrapper);
                 sessions.put(wrapper, session);
               }
-              registeredListeners.put(serverUpdateListener, topicRegistrationDetails);
+              
+              if (!refreshSubscriptions) {
+                registeredListeners.put(serverUpdateListener, topicRegistrationDetails);
+              }
             } else {
               throw new JMSException("Not currently connected - will attempt to subscribe on reconnection. Attempting to reconnect.");
             }
           } catch (JMSException e) {
             LOGGER.error("Failed to subscribe to topic - will do so on reconnection.", e);
-            registeredListeners.put(serverUpdateListener, topicRegistrationDetails);
+            if (!refreshSubscriptions) {
+              registeredListeners.put(serverUpdateListener, topicRegistrationDetails);
+            }
             throw e;
           }
         } else {
