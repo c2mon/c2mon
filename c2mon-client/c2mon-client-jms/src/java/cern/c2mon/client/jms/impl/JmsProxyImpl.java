@@ -450,6 +450,11 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
           registerUpdateListener(entry.getKey(), entry.getValue());
         }
       }
+      
+      if (alarmListenerWrapper.getListenerCount() > 0) {
+        subscribeToAlarmTopic();
+      }
+      
       // refresh supervision subscription
       subscribeToSupervisionTopic();
       subscribeToHeartbeatTopic();
