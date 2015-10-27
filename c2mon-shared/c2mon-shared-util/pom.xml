@@ -23,10 +23,6 @@
   </scm>
 
   <dependencies>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
     <!-- Gson: Java to Json conversion -->
     <dependency>
       <groupId>com.google.code.gson</groupId>

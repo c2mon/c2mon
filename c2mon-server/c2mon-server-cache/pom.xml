@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>cern.c2mon.c2mon-server</groupId>
     <artifactId>c2mon-server-pom</artifactId>
     <version>RELEASE</version>
   </parent>
-  
+
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-cache</artifactId>
   <version>1.6.2-SNAPSHOT</version>
   <name>c2mon-server-cache</name>
   <packaging>jar</packaging>
   <description>
-    	C2MON server cache module
-    </description>
+    C2MON server cache module
+  </description>
   <url>http://timweb.cern.ch</url>
 
   <scm>
@@ -46,8 +47,8 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-context-support</artifactId>
     </dependency>
-    
-    <!-- 
+
+    <!--
       The following dependencies are required for using Ehcache.
     -->
     <dependency>
@@ -55,11 +56,7 @@
       <artifactId>ehcache-core</artifactId>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-    <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-    
+
     <dependency>
       <groupId>cern.c2mon.c2mon-shared</groupId>
       <artifactId>c2mon-shared-common</artifactId>
@@ -90,16 +87,9 @@
       <artifactId>c2mon-server-cachedbaccess</artifactId>
       <version>[1.5.2, 2.0.0)</version>
     </dependency>
-
-    <dependency>
-    	<groupId>org.slf4j</groupId>
-    	<artifactId>slf4j-log4j12</artifactId>
-    	<version>1.7.5</version>
-    	<scope>test</scope>
-    </dependency>
   </dependencies>
 
-  <developers />
+  <developers/>
   <build>
     <plugins>
       <plugin>
@@ -119,7 +109,7 @@
             -Dcache.loader.queue.size=1000
             -Dcache.loader.equipment.batch.size=5
             -Dcache.loader.equipment.threads.max=2
-            -Dcache.loader.equipment.queue.size=1000      
+            -Dcache.loader.equipment.queue.size=1000
           </argLine>
         </configuration>
       </plugin>
