@@ -23,7 +23,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.ext.history.C2monHistoryGateway;
 import cern.c2mon.client.ext.history.common.event.PlaybackControlListener;
@@ -43,7 +44,7 @@ public class ResumeButton extends StandardButton implements PlaybackControlListe
   private static final long serialVersionUID = -1287455560920408796L;
 
   /** Log4j logger for this class */
-  private static final Logger LOG = Logger.getLogger(ResumeButton.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ResumeButton.class);
 
   /** The icon for the play button */
   private static final ImageIcon PLAY_ICON = new ImageIcon(Toolkit.getDefaultToolkit().getImage(TimHistoryPlayerToolBar.class.getResource("play.gif")));

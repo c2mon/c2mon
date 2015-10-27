@@ -14,7 +14,8 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.admin.AdminMessage;
 import cern.c2mon.client.common.admin.AdminMessageImpl;
@@ -27,7 +28,7 @@ public class AdminMessageSenderDialog extends JDialog {
      */
     private static final long serialVersionUID = 4356945784884369516L;
 
-  private static final Logger LOG = Logger.getLogger(AdminMessageSenderDialog.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AdminMessageSenderDialog.class);
   
   private boolean sendMessage = false;
   

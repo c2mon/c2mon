@@ -21,7 +21,8 @@ import java.awt.Component;
 
 import javax.swing.JToolBar;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.ext.history.C2monHistoryGateway;
 import cern.c2mon.client.ext.history.common.HistoryPlayer;
@@ -41,7 +42,7 @@ import cern.c2mon.client.history.gui.toolbars.TimHistoryPlayerToolBar;
 public final class HistoryGuiProvider {
 
   /** Log4j logger for this class */
-  private static final Logger LOG = Logger.getLogger(HistoryGuiProvider.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HistoryGuiProvider.class);
 
   /**
    * 

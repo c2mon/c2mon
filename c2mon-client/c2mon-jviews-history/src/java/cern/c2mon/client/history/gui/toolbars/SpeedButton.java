@@ -25,7 +25,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.ext.history.C2monHistoryGateway;
@@ -43,7 +44,7 @@ public class SpeedButton extends StandardButton implements PlaybackControlListen
   private static final long serialVersionUID = 5687175488785601842L;
 
   /** Log4j logger for this class */
-  private static final Logger LOG = Logger.getLogger(SpeedButton.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SpeedButton.class);
 
   /** When pressing the speed button it uses these intervals */
   private static final double[] CLOCK_SPEEDS = new double[] {

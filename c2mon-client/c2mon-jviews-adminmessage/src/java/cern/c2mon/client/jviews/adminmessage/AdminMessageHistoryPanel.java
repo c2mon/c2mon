@@ -16,7 +16,8 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.admin.AdminMessage;
 import cern.c2mon.client.common.admin.AdminMessageImpl;
@@ -35,7 +36,7 @@ public class AdminMessageHistoryPanel extends JPanel {
   private JLabel labelHeader = new JLabel();
   private JTable tableMessages = new JTable();
   private JTableHeader jTableHeader1 = new JTableHeader();
-  private static final Logger LOG = Logger.getLogger(AdminMessageHistoryPanel.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AdminMessageHistoryPanel.class);
 
   private static final int TIMESTAMP_COLUMN = 0;
   private static final int MESSAGE_CONTENT_COLUMN = 1;

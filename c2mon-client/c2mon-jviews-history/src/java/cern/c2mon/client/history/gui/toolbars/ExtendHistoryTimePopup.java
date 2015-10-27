@@ -36,7 +36,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.ext.history.C2monHistoryGateway;
 import cern.c2mon.client.ext.history.C2monHistoryManager;
@@ -58,7 +59,7 @@ import cern.c2mon.client.history.gui.dialogs.generic.ProgressDialog;
 public class ExtendHistoryTimePopup {
 
   /** Log4j logger for this class */
-  private static final Logger LOG = Logger.getLogger(ExtendHistoryTimePopup.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ExtendHistoryTimePopup.class);
 
   /** The date format used for the time span chooser */
   private static String DATE_FORMAT = "dd.MM.yyyy HH:mm:ss";

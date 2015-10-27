@@ -35,7 +35,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.admin.AdminMessage;
 import cern.c2mon.client.common.admin.AdminMessageDeliveryException;
@@ -53,7 +54,7 @@ import cern.c2mon.client.module.C2monAdminMessageManager;
 public class AdminMessageToolbar extends JToolBar {
   /** Serial Version UID for the AdminMessageToolbar class */
   private static final long serialVersionUID = -5430124941232684390L;
-  private static final Logger LOG = Logger.getLogger(AdminMessageToolbar.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AdminMessageToolbar.class);
   
   private Frame parent = null;
   

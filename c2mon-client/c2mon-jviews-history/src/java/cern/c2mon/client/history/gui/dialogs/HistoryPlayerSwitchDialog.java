@@ -32,7 +32,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.ext.history.C2monHistoryGateway;
 import cern.c2mon.client.ext.history.common.HistoryProvider;
@@ -51,7 +52,7 @@ import cern.c2mon.client.history.gui.dialogs.generic.ProgressDialog;
 public class HistoryPlayerSwitchDialog {
 
   /** Log4j Logger for this class */
-  private static final Logger LOG = Logger.getLogger(HistoryPlayerSwitchDialog.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HistoryPlayerSwitchDialog.class);
 
   /** The margins for the controls */
   private static final int PANEL_MARGIN = 12;

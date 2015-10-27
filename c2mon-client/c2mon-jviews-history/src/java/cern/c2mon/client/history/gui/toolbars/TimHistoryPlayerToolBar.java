@@ -33,7 +33,8 @@ import javax.swing.JToolBar;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.ext.history.C2monHistoryGateway;
@@ -58,7 +59,7 @@ public final class TimHistoryPlayerToolBar extends JToolBar {
   private static final long serialVersionUID = 3434359226623834230L;
   
   /** Log4j logger for this class */
-  private static final Logger LOG = Logger.getLogger(TimHistoryPlayerToolBar.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TimHistoryPlayerToolBar.class);
   
   /**
    * When moving one tick on the time slider, it moves this amount in time
