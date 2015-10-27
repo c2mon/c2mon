@@ -337,7 +337,7 @@ public class SupervisionManagerProcessTest {
   public void onProcessConnection() {
     LOGGER.info("onProcessConnection - Connection");
 
-    LOGGER.info(this.processConnectionRequest.toString());
+    LOGGER.info("{}", this.processConnectionRequest);
 
     String xmlprocessConnectionResponse = this.supervisionManager.onProcessConnection(this.processConnectionRequest);
     assertNotNull(xmlprocessConnectionResponse);
