@@ -88,15 +88,21 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
   @Override
   protected Change configureCacheObject(SubEquipment subEquipment, Properties properties) {
     SubEquipmentCacheObject subEquipmentCacheObject = (SubEquipmentCacheObject) subEquipment;
-    String tmpStr = null;
+    String tmpStr = properties.getProperty("equipmentId");
+    
+    // TODO: Remove obsolete parent_equip_id property
+    if (tmpStr == null) {
+      tmpStr = properties.getProperty("parent_equip_id");
+    }
 
-    if ((tmpStr = properties.getProperty("parent_equip_id")) != null) {
+    if (tmpStr != null) {
       try {
         subEquipmentCacheObject.setParentId(Long.valueOf(tmpStr));
       } catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"parentId\" to Long: " + tmpStr);
       }
     }
+    
     return null;
   }
 
@@ -121,10 +127,17 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
    */
   @Override
   public EquipmentConfigurationUpdate updateConfig(final SubEquipment subEquipment, final Properties properties) throws IllegalAccessException {
+    // TODO: Remove obsolete parent_equip_id property
     if ((properties.getProperty("parent_equip_id")) != null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Reconfiguration of "
           + "SubEquipment does not currently allow it to be reassigned to a different Equipment!");
     }
+    
+    if ((properties.getProperty("equipmentId")) != null) {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Reconfiguration of "
+          + "SubEquipment does not currently allow it to be reassigned to a different Equipment!");
+    }
+    
     super.updateConfig(subEquipment, properties);
     return new EquipmentConfigurationUpdate();
   }

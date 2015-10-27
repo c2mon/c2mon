@@ -136,10 +136,17 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
 
   @Override
   public List<ProcessChange> updateSubEquipment(Long subEquipmentId, Properties elementProperties) throws IllegalAccessException {
+    // TODO: Remove obsolete parent_equip_id property
     if (elementProperties.containsKey("parent_equip_id")) {
       LOGGER.warn("Attempting to change the parent equipment id of a subequipment - this is not currently supported!");
       elementProperties.remove("parent_equip_id");
     }
+    
+    if (elementProperties.containsKey("equipmentId")) {
+      LOGGER.warn("Attempting to change the parent equipment id of a subequipment - this is not currently supported!");
+      elementProperties.remove("equipmentId");
+    }
+    
     return commonUpdate(subEquipmentId, elementProperties);
   }
 
