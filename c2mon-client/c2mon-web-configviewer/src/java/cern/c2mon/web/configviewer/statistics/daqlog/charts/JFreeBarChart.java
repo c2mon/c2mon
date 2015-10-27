@@ -177,7 +177,7 @@ public class JFreeBarChart extends JFreeWebChart {
         throw new InvalidTableNameException();
       }
     } catch (NullPointerException ex) {
-      logger.fatal("Nullpointer exception caught when retrieving XML data - check no fields are missing!");
+      logger.error("Nullpointer exception caught when retrieving XML data - check no fields are missing!");
       ex.printStackTrace();
       throw ex;
     }
