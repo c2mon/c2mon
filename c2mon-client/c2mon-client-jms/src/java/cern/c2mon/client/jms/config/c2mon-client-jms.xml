@@ -10,11 +10,13 @@
   <context:component-scan base-package="cern.c2mon.client.jms"/>
   <context:annotation-config/>
   
-  <bean id="jmsConnectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory">
+  <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
     <property name="brokerURL" value="${c2mon.client.jms.url}"/>
     <property name="userName" value="${c2mon.client.jms.user}"/>
     <property name="password" value="${c2mon.client.jms.password}"/>   
-    <property name="watchTopicAdvisories" value="false"/>  
+    <property name="watchTopicAdvisories" value="false"/>
+    <property name="copyMessageOnSend" value="false"/>
+    <property name="clientIDPrefix" value="c2mon-client"  />
   </bean>
   
   <bean id="supervisionTopic" class="org.apache.activemq.command.ActiveMQTopic">
