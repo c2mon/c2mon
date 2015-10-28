@@ -1,83 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>cern.c2mon.c2mon-client</groupId>
-		<artifactId>c2mon-client-pom</artifactId>
-		<version>1.5.3</version>
-	</parent>
-  
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.c2mon.c2mon-client</groupId>
+    <artifactId>c2mon-client-pom</artifactId>
+    <version>1.5.5</version>
+  </parent>
+
   <groupId>cern.c2mon.c2mon-client</groupId>
-	<artifactId>c2mon-client-all</artifactId>
-	<version>1.6.1-SNAPSHOT</version>
-	<name>c2mon-client-all</name>
-	<packaging>jar</packaging>
-	<description>The C2MON Client API which handles the communication to the C2MON server.</description>
-	<url>http://timweb.cern.ch</url>
-	
-	<!-- This is needed to retrieve the CERN parent-pom dependency -->
-	<repositories>
-	  <repository>
-        <id>parent-poms</id>
-        <name>parent-poms-local</name>
-        <url>http://artifactory/parent-poms-local</url>
-      </repository>
-	</repositories>
+  <artifactId>c2mon-client-all</artifactId>
+  <version>1.6.1-SNAPSHOT</version>
+  <name>c2mon-client-all</name>
+  <packaging>jar</packaging>
+  <description>The C2MON Client API which handles the communication to the C2MON server.</description>
+  <url>http://timweb.cern.ch</url>
 
-	<dependencies>
-		<!-- C2MON dependencies -->
-		<dependency>
-			<groupId>cern.c2mon.c2mon-client</groupId>
-			<artifactId>c2mon-client-core</artifactId>
+  <!-- This is needed to retrieve the CERN parent-pom dependency -->
+  <repositories>
+    <repository>
+      <id>parent-poms</id>
+      <name>parent-poms-local</name>
+      <url>http://artifactory/parent-poms-local</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <!-- C2MON dependencies -->
+    <dependency>
+      <groupId>cern.c2mon.c2mon-client</groupId>
+      <artifactId>c2mon-client-core</artifactId>
       <version>[1.5.7, 2.0.0)</version>
-		</dependency>
-	</dependencies>
+    </dependency>
 
-	<developers />
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.2</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<promoteTransitiveDependencies>true</promoteTransitiveDependencies>
-							<createSourcesJar>true</createSourcesJar>
-							<artifactSet>
-								<includes>
-									<include>cern.c2mon.c2mon-client:*</include>
-									<include>cern.c2mon.c2mon-shared:*</include>
-								</includes>
-								<excludes>
-									<!-- Excludes all C2MON client API extensions, for example: c2mon-client-ext-simulator -->
-									<exclude>cern.c2mon.c2mon-client:*-ext-*</exclude>
-								</excludes>
-							</artifactSet>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+    </dependency>
+  </dependencies>
+
+  <developers/>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.2</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+              <createSourcesJar>true</createSourcesJar>
+              <artifactSet>
+                <includes>
+                  <include>cern.c2mon.c2mon-client:*</include>
+                  <include>cern.c2mon.c2mon-shared:*</include>
+                </includes>
+                <excludes>
+                  <!-- Excludes all C2MON client API extensions, for example: c2mon-client-ext-simulator -->
+                  <exclude>cern.c2mon.c2mon-client:*-ext-*</exclude>
+                </excludes>
+              </artifactSet>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-          <configuration>
-            <!-- Disable doclint (which comes with Java 8) as it is very strict with javadoc and causes build failures. -->
-            <!-- TODO: Fix all the javadoc so we can re-enable doclint. -->
+        <configuration>
+          <!-- Disable doclint (which comes with Java 8) as it is very strict with javadoc and causes build failures. -->
+          <!-- TODO: Fix all the javadoc so we can re-enable doclint. -->
           <additionalparam>-Xdoclint:none</additionalparam>
         </configuration>
       </plugin>
-		</plugins>
-	</build>
+    </plugins>
+  </build>
 
-	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-all</developerConnection>
-	</scm>
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-all</developerConnection>
+  </scm>
 
 </project>
