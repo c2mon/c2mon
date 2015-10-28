@@ -29,10 +29,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.common.listener.BaseTagListener;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TypeNumeric;
 import cern.c2mon.shared.client.alarm.AlarmValue;
@@ -53,7 +50,7 @@ import cern.c2mon.shared.rule.RuleExpression;
  *
  * @author Matthias Braeger
  */
-public class ClientRuleTag<T> implements BaseTagListener, Tag, ClientDataTagValue {
+public class ClientRuleTag<T> implements Tag, BaseTagListener {
   /** Log4j Logger for this class */
   private static final Logger LOG = LoggerFactory.getLogger(ClientRuleTag.class);
 
@@ -76,7 +73,7 @@ public class ClientRuleTag<T> implements BaseTagListener, Tag, ClientDataTagValu
   private Long id;
 
   /** List of unique update listeners */
-  private final List<BaseListener> listeners = new ArrayList<>();;
+  private final List<BaseTagListener> listeners = new ArrayList<>();;
 
   /** The actual list of rule input values, that was received by onUpdate() method */
   private final Map<Long, Tag> ruleInputValues = new Hashtable<Long, Tag>();
@@ -477,13 +474,13 @@ public class ClientRuleTag<T> implements BaseTagListener, Tag, ClientDataTagValu
    * @param pListener Listener to be registered for updates
    * @return <code>true</code>, if the listener was not already registered
    */
-  public boolean addClientDataTagUpdateListener(final BaseListener pListener) {
+  public boolean addUpdateListener(final BaseTagListener pListener) {
     boolean retval = false;
     try {
       listenersLock.writeLock().lock();
       boolean isRegistered = false;
       // Search for pListener by reference
-      for (BaseListener listener : listeners) {
+      for (BaseTagListener listener : listeners) {
         if (listener == pListener) {
           isRegistered = true;
           retval = true;
@@ -509,7 +506,7 @@ public class ClientRuleTag<T> implements BaseTagListener, Tag, ClientDataTagValu
    * @return <code>true</code>, if the listener successfully removed from
    *         the listeners list
    */
-  public boolean removeClientDataTagUpdateListener(final BaseListener listener) {
+  public boolean removeClientDataTagUpdateListener(final BaseTagListener listener) {
     boolean retval = false;
     try {
       listenersLock.writeLock().lock();
@@ -527,7 +524,7 @@ public class ClientRuleTag<T> implements BaseTagListener, Tag, ClientDataTagValu
   private void fireUpdateReceivedEvent() {
     try {
       listenersLock.readLock().lock();
-      for (BaseListener listener : listeners) {
+      for (BaseTagListener listener : listeners) {
         listener.onUpdate(this);
       }
     }
