@@ -4,7 +4,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-client</groupId>
     <artifactId>c2mon-client-pom</artifactId>
-    <version>1.5.3</version>
+    <version>1.5.4</version>
   </parent>
 
   <groupId>cern.c2mon.c2mon-client</groupId>
@@ -116,6 +116,11 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>2.3.2</version>
     </dependency>
   </dependencies>
   <developers />
