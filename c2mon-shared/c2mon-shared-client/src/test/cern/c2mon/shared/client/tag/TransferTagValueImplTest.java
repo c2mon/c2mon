@@ -6,8 +6,6 @@ import static junit.framework.Assert.assertTrue;
 
 import java.sql.Timestamp;
 
-import org.apache.log4j.BasicConfigurator;
-import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
@@ -16,12 +14,6 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
 public class TransferTagValueImplTest {
-
-  @Before
-  public void init() {
-    // Set up a simple configuration that logs on the console.
-    BasicConfigurator.configure();
-  }
 
   /**
    * Helper method to create a <code>TransferTagValueImpl</code> test object

@@ -6,8 +6,6 @@ import static junit.framework.Assert.assertTrue;
 import java.sql.Timestamp;
 import java.util.Arrays;
 
-import org.apache.log4j.BasicConfigurator;
-import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
@@ -17,12 +15,6 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
  * @author Matthias Braeger
  */
 public class TransferTagImplTest {
-
-  @Before
-  public void init() {
-    // Set up a simple configuration that logs on the console.
-    BasicConfigurator.configure();
-  }
 
   /**
    * Helper method to create a <code>TransferTagImpl</code> test object
