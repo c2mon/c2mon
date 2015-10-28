@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-client</groupId>
     <artifactId>c2mon-client-pom</artifactId>
-    <version>1.5.3</version>
+    <version>1.5.4</version>
   </parent>
 
   <groupId>cern.c2mon.c2mon-client</groupId>
@@ -28,6 +28,12 @@
       <groupId>cern.c2mon.c2mon-shared</groupId>
       <artifactId>c2mon-shared-common</artifactId>
       <version>[1.5.0, 2.0.0)</version>
+    </dependency>
+
+    <!-- We need log4j directly here because we use ObjectRenderers -->
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
     </dependency>
 
     <!-- test dependencies -->
