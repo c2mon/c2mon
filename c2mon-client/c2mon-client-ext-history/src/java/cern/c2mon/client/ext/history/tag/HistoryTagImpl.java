@@ -28,10 +28,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.listener.BaseTagListener;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TypeNumeric;
-import cern.c2mon.client.core.C2monTagManager;
+import cern.c2mon.client.core.TagService;
 import cern.c2mon.client.ext.history.common.tag.HistoryTag;
 import cern.c2mon.client.ext.history.common.tag.HistoryTagConfiguration;
 import cern.c2mon.client.ext.history.common.tag.HistoryTagExpressionException;
@@ -53,7 +53,7 @@ import cern.c2mon.shared.rule.RuleExpression;
  * and for history data.
  *
  * @see HistoryTagManager#subscribe(HistoryTagImpl)
- * @see C2monTagManager#subscribeDataTags(java.util.Set, DataTagUpdateListener)
+ * @see TagService#subscribe(java.util.Set, BaseTagListener)
  *
  * @author vdeila
  */
@@ -72,7 +72,7 @@ public class HistoryTagImpl implements HistoryTag {
   private Object value;
 
   /** The list of update listeners */
-  private List<DataTagUpdateListener> dataTagUpdateListeners;
+  private List<BaseTagListener> dataTagUpdateListeners;
 
   /** The quality of the history tag */
   private DataTagQuality dataTagQuality;
@@ -106,8 +106,8 @@ public class HistoryTagImpl implements HistoryTag {
    * data.
    *
    * @see HistoryTagManager#subscribe(HistoryTagImpl)
-   * @see C2monTagManager#subscribeDataTags(java.util.Set,
-   *      DataTagUpdateListener)
+   * @see TagService#subscribe(java.util.Set,
+   *      BaseTagListener)
    *
    * @param expression
    *          an expression created with the
@@ -122,8 +122,8 @@ public class HistoryTagImpl implements HistoryTag {
    * data.
    *
    * @see HistoryTagManager#subscribe(HistoryTagImpl)
-   * @see C2monTagManager#subscribeDataTags(java.util.Set,
-   *      DataTagUpdateListener)
+   * @see TagService#subscribe(java.util.Set,
+   *      BaseTagListener)
    * @param expression
    *          an expression created with the
    *          {@link HistoryTagConfiguration#createExpression()}
@@ -152,7 +152,7 @@ public class HistoryTagImpl implements HistoryTag {
   public HistoryTagImpl(final HistoryTagConfiguration historyTagConfiguration, final String expression
        , final boolean allowNullValues) {
 
-    this.dataTagUpdateListeners = new ArrayList<DataTagUpdateListener>();
+    this.dataTagUpdateListeners = new ArrayList<BaseTagListener>();
     this.data = null;
     this.value = null;
     this.timestamp = new Timestamp(System.currentTimeMillis());
@@ -261,7 +261,7 @@ public class HistoryTagImpl implements HistoryTag {
   }
 
   @Override
-  public void onUpdate(final ClientDataTagValue tagUpdate) {
+  public void onUpdate(final Tag tagUpdate) {
     // When a new tag update comes from the c2mon server.
     this.dataLock.writeLock().lock();
     try {
@@ -499,7 +499,7 @@ public class HistoryTagImpl implements HistoryTag {
    * @param listener the listener to add
    */
   @Override
-  public synchronized void addDataTagUpdateListener(final DataTagUpdateListener listener) {
+  public synchronized void addDataTagUpdateListener(final BaseTagListener listener) {
     dataTagUpdateListeners.add(listener);
     listener.onUpdate(this);
   }
@@ -508,15 +508,15 @@ public class HistoryTagImpl implements HistoryTag {
    * @param listener the listener to remove
    */
   @Override
-  public synchronized void removeDataTagUpdateListener(final DataTagUpdateListener listener) {
+  public synchronized void removeDataTagUpdateListener(final BaseTagListener listener) {
     dataTagUpdateListeners.remove(listener);
   }
 
   /**
    * @return a copy of the list of listeners
    */
-  public synchronized Collection<DataTagUpdateListener> getDataTagUpdateListeners() {
-   return new ArrayList<DataTagUpdateListener>(this.dataTagUpdateListeners);
+  public synchronized Collection<BaseTagListener> getDataTagUpdateListeners() {
+   return new ArrayList<BaseTagListener>(this.dataTagUpdateListeners);
   }
 
   /**
@@ -527,10 +527,10 @@ public class HistoryTagImpl implements HistoryTag {
   }
 
   /**
-   * Fires the {@link DataTagUpdateListener#onUpdate(ClientDataTagValue)} on all the listeners
+   * Fires the {@link BaseTagListener#onUpdate(Tag)} on all the listeners
    */
   private void fireDataTagUpdateListeners() {
-    for (DataTagUpdateListener listener : getDataTagUpdateListeners()) {
+    for (BaseTagListener listener : getDataTagUpdateListeners()) {
       listener.onUpdate(this);
     }
   }

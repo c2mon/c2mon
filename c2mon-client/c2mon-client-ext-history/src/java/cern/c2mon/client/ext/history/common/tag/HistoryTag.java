@@ -19,8 +19,10 @@ package cern.c2mon.client.ext.history.common.tag;
 
 import java.util.Collection;
 
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.listener.BaseTagListener;
+import cern.c2mon.client.common.listener.BaseTagListener;
+import cern.c2mon.client.common.tag.Tag;
+import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
 /**
@@ -28,11 +30,11 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
  * take an expression, and get history data based on it.
  * 
  * @see HistoryTagManager#subscribe(HistoryTag)
- * @see C2monTagManager#subscribeDataTags(java.util.Set, DataTagUpdateListener)
+ * @see C2monTagManager#subscribeDataTags(java.util.Set, BaseTagListener)
  * 
  * @author vdeila
  */
-public interface HistoryTag extends ClientDataTagValue, DataTagUpdateListener, HistoryTagManagerListener {
+public interface HistoryTag extends Tag, BaseTagListener, HistoryTagManagerListener {
 
   /** The quality status for the history data is loading */
   TagQualityStatus QUALITY_STATUS_LOADING = TagQualityStatus.UNINITIALISED;
@@ -61,11 +63,11 @@ public interface HistoryTag extends ClientDataTagValue, DataTagUpdateListener, H
   /** 
    * @param listener the listener to add
    */
-  void addDataTagUpdateListener(DataTagUpdateListener listener);
+  void addDataTagUpdateListener(BaseTagListener listener);
   
   /**
    * @param listener the listener to remove
    */
-  void removeDataTagUpdateListener(DataTagUpdateListener listener);
+  void removeDataTagUpdateListener(BaseTagListener listener);
 
 }

@@ -19,7 +19,7 @@ package cern.c2mon.client.ext.history.common.tag;
 
 import java.sql.Timestamp;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 
 /**
@@ -54,7 +54,7 @@ public class HistoryTagRecord {
    * @param tagUpdate
    *          the client data tag value to copy
    */
-  public HistoryTagRecord(final ClientDataTagValue tagUpdate) {
+  public HistoryTagRecord(final Tag tagUpdate) {
     this.timestamp = tagUpdate.getServerTimestamp();
     this.value = tagUpdate.getValue();
     this.valid = tagUpdate.getDataTagQuality().isValid();
