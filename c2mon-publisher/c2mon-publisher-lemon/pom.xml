@@ -4,7 +4,7 @@
   <parent>
     <artifactId>c2mon-client-pom</artifactId>
     <groupId>cern.c2mon.c2mon-client</groupId>
-    <version>1.1.2</version>
+    <version>1.5.5</version>
   </parent>
   <groupId>cern.c2mon.c2mon-publisher</groupId>
   <artifactId>c2mon-publisher-lemon</artifactId>
@@ -22,12 +22,7 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-publisher</groupId>
       <artifactId>c2mon-publisher-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.5</version>
+      <version>1.5.0</version>
     </dependency>
 
     <!-- Test dependencies -->
