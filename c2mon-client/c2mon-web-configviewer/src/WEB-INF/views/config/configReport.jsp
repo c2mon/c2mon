@@ -87,7 +87,7 @@ a.btn.btn-default.status {
 
         <%--<c:forEach items="${allReports}" var="report">--%>
           <c:set var="uniqueId" value="${report.id}-${report.timestamp.time}"></c:set>
-          
+
           <%--<div role="tabpanel" class="tab-pane" id="${uniqueId}">--%>
 
             <div class="panel panel-default">
@@ -112,19 +112,17 @@ a.btn.btn-default.status {
                   <tr>
                     <th class="bold">Status</th>
                     <td class="cell-label">
-                      <span class="lead">
-                        <c:choose>
-                          <c:when test="${report.status == 'OK'}">
-                            <span class="label label-success">${report.status}</span>
-                          </c:when>
-                          <c:when test="${report.status == 'RESTART'}">
-                            <span class="label label-warning">${report.status}</span>
-                          </c:when>
-                          <c:otherwise>
-                            <span class="label label-danger">${report.status}</span>
-                          </c:otherwise>
-                        </c:choose>
-                      </span>
+                      <c:choose>
+                        <c:when test="${report.status == 'OK'}">
+                          <span class="label label-success">${report.status}</span>
+                        </c:when>
+                        <c:when test="${report.status == 'RESTART'}">
+                          <span class="label label-warning">${report.status}</span>
+                        </c:when>
+                        <c:otherwise>
+                          <span class="label label-danger">${report.status}</span>
+                        </c:otherwise>
+                      </c:choose>
                     </td>
                   </tr>
                   <tr>
@@ -153,19 +151,19 @@ a.btn.btn-default.status {
 
                 <div class="btn-group pull-right" data-toggle="buttons">
                   <label class="btn btn-default ${showSuccesses ? 'active' : ''}" data-toggle="tooltip" title="Toggle successful items" data-container="body">
-                    <input id="toggle-success-${uniqueId}" 
+                    <input id="toggle-success-${uniqueId}"
                            type="checkbox" autocomplete="off" ${showSuccesses ? 'checked' : ''}>
                     <i class="fa fa-fw fa-check-circle-o text-success"></i>
                     Successful
                   </label>
                   <label class="btn btn-default ${showWarnings ? 'active' : ''}" data-toggle="tooltip" title="Toggle warning items" data-container="body">
-                    <input id="toggle-warning-${uniqueId}" 
+                    <input id="toggle-warning-${uniqueId}"
                            type="checkbox" autocomplete="off" ${showWarnings ? 'checked' : ''}>
                     <i class="fa fa-fw fa-exclamation-circle text-warning"></i>
                     Warnings
                   </label>
                   <label class="btn btn-default ${showFailures ? 'active' : ''}" data-toggle="tooltip" title="Toggle failure items" data-container="body">
-                    <input id="toggle-failure-${uniqueId}" 
+                    <input id="toggle-failure-${uniqueId}"
                            type="checkbox" autocomplete="off" ${showFailures ? 'checked' : ''}>
                     <i class="fa fa-fw fa-times-circle-o text-danger"></i>
                     Failures
@@ -372,7 +370,7 @@ a.btn.btn-default.status {
    $(this).find('.collapse').collapse('toggle');
    return true;
    }
-  
+
    return false;
    }).show();
    }); */

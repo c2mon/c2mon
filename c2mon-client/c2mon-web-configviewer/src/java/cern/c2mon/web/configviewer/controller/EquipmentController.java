@@ -17,6 +17,7 @@
  ******************************************************************************/
 package cern.c2mon.web.configviewer.controller;
 
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,6 +28,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.web.configviewer.service.ProcessService;
+
+import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * This class acts as a controller to handle requests to view specific
@@ -47,14 +52,14 @@ public class EquipmentController {
    * View a specific equipment of a given process.
    *
    * @param processName the name of the process
-   * @param id the id of the equipment to view
-   * @param model the model to be pased to the JSP processor
+   * @param id          the id of the equipment to view
+   * @param model       the model to be passed to the JSP processor
    *
    * @return the name of the JSP page to be processed
    *
    * @throws Exception if no equipment with the specified id was found
    */
-  @RequestMapping(value = "/process/{processName}/equipment/{id}", method = { RequestMethod.GET })
+  @RequestMapping(value = "/process/{processName}/equipment/{id}", method = {RequestMethod.GET})
   public String viewEquipment(@PathVariable("processName") final String processName, @PathVariable("id") final Long id, final Model model) throws Exception {
     ProcessConfiguration process = service.getProcessConfiguration(processName);
     process.setProcessName(processName);
@@ -63,6 +68,12 @@ public class EquipmentController {
     if (equipment == null) {
       throw new Exception("No equipment with id " + id + " was found.");
     }
+
+    // Epic hack to make sure the list of tags is sorted by ID
+    Map<Long, SourceDataTag> sortedTags = new TreeMap<>(equipment.getDataTags());
+    Field field = EquipmentConfiguration.class.getDeclaredField("sourceDataTags");
+    field.setAccessible(true);
+    field.set(equipment, sortedTags);
 
     model.addAttribute("title", "Equipment Viewer");
     model.addAttribute("process", process);
