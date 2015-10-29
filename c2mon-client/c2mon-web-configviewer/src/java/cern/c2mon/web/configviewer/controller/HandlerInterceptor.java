@@ -41,7 +41,7 @@ public class HandlerInterceptor extends HandlerInterceptorAdapter {
       }
     }
 
-    if (modelAndView != null) {
+    if (modelAndView != null && !modelAndView.getViewName().startsWith("redirect")) {
       // Insert the current username
       modelAndView.getModelMap().addAttribute("username", username);
     }
