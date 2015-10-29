@@ -133,9 +133,9 @@ public class ConfigLoaderService {
   public List<ConfigurationReportHeader> getConfigurationReports(boolean refresh) {
     if (refresh || configurationReportHeaders.isEmpty()) {
       configurationReportHeaders = new ArrayList<>(gateway.getTagManager().getConfigurationReports());
+      Collections.reverse(configurationReportHeaders);
     }
 
-    Collections.reverse(configurationReportHeaders);
     return configurationReportHeaders;
   }
 
