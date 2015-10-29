@@ -141,11 +141,11 @@ th {
                   <div role="tabpanel" class="tab-pane active" id="datatags">
                     <c2mon:datatags equipment="${equipment}"></c2mon:datatags>
                   </div>
-                 
+
                   <div role="tabpanel" class="tab-pane" id="commands">
                     <c2mon:commands equipment="${equipment}"></c2mon:commands>
                   </div>
-                  
+
                   <div role="tabpanel" class="tab-pane" id="subequipment">
                     <c2mon:subequipment equipment="${equipment}"></c2mon:subequipment>
                   </div>
@@ -180,6 +180,15 @@ th {
     $('.datatag-accordion').collapse('hide');
   });
 
+  $('#expand-all-commands').click(function(e) {
+    e.preventDefault();
+    $('.command-accordion').collapse('show');
+  });
+  $('#collapse-all-commands').click(function(e) {
+    e.preventDefault();
+    $('.command-accordion').collapse('hide');
+  });
+
   // Tab click handler
   $('#tabs a').click(function(e) {
     e.preventDefault();
@@ -196,11 +205,11 @@ th {
   $('.view-tag').click(function(e) {
     e.stopPropagation();
   });
-  
+
   $('.view-command').click(function(e) {
     e.stopPropagation();
   });
-  
+
   // on load of the page: switch to the currently selected tab
   var hash = window.location.hash;
   $('#tabs a[href="' + hash + '"]').tab('show');

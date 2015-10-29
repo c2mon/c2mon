@@ -14,7 +14,19 @@
   <c:otherwise>
     <div class="panel-body">
       <h3>Commands</h3>
-      <span>Click on a Command to view its configuration.</span>
+      <p>Click on a Command to view its configuration.</p>
+
+      <div class="btn-group" role="group">
+        <button id="expand-all-commands" class="btn btn-default">
+          <i class="fa fa-expand"></i>
+          Expand All
+        </button>
+        <button id="collapse-all-commands" class="btn btn-default">
+          <i class="fa fa-compress"></i>
+          Collapse All
+        </button>
+      </div>
+
     </div>
 
     <table class="table table-bordered table-hover" style="border-collapse: collapse;">
@@ -41,7 +53,7 @@
 
           <tr>
             <td colspan="5" class="hiddenRow">
-              <div class="accordion-body collapse" id="collapseme-${command.id}">
+              <div class="accordion-body collapse command-accordion" id="collapseme-${command.id}">
 
                 <table class="table table-striped table-bordered" style="margin-bottom: 0px;">
                   <thead>
