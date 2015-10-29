@@ -77,7 +77,7 @@
           <c:forEach items="${equipment.sourceDataTags}" var="entry">
             <c:set var="tag" value="${entry.value}"></c:set>
 
-            <tr data-toggle="collapse" data-target="#collapseme-${tag.id}" class="accordion-toggle clickable">
+            <tr data-toggle="collapse" data-target="#collapse-tag-${tag.id}" class="accordion-toggle clickable">
               <td>${tag.id}</td>
               <td>${tag.name}</td>
               <td>${equipment.name}</td>
@@ -100,7 +100,7 @@
 
             <tr>
               <td colspan="7" class="hiddenRow">
-                <div class="accordion-body collapse datatag-accordion" id="collapseme-${tag.id}">
+                <div class="accordion-body collapse datatag-accordion" id="collapse-tag-${tag.id}">
 
                   <table class="table table-striped table-bordered" style="margin-bottom: 0px;">
                     <thead>

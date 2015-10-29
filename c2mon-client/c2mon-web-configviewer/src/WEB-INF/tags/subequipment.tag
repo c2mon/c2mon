@@ -8,7 +8,7 @@
       <p>This Equipment has no SubEquipment configured.</p>
     </div>
   </c:when>
-  
+
   <c:otherwise>
     <div class="panel-body">
       <h3>SubEquipments</h3>
@@ -28,14 +28,14 @@
         <c:forEach items="${equipment.subEquipmentConfigurations}" var="entry">
           <c:set var="subEquipment" value="${entry.value}"></c:set>
 
-          <tr data-toggle="collapse" data-target="#collapseme-${subEquipment.id}" class="accordion-toggle clickable">
+          <tr data-toggle="collapse" data-target="#collapse-subeq-${subEquipment.id}" class="accordion-toggle clickable">
             <td>${subEquipment.id}</td>
             <td>${subEquipment.name}</td>
           </tr>
 
           <tr>
             <td colspan="5" class="hiddenRow">
-              <div class="accordion-body collapse" id="collapseme-${subEquipment.id}">
+              <div class="accordion-body collapse" id="collapse-subeq-${subEquipment.id}">
 
                 <table class="table table-striped table-bordered">
                   <thead>

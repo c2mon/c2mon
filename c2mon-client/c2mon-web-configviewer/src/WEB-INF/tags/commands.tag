@@ -43,7 +43,7 @@
         <c:forEach items="${equipment.sourceCommandTags}" var="entry">
           <c:set var="command" value="${entry.value}"></c:set>
 
-          <tr data-toggle="collapse" data-target="#collapseme-${command.id}" class="accordion-toggle clickable">
+          <tr data-toggle="collapse" data-target="#collapse-command-${command.id}" class="accordion-toggle clickable">
             <td>${command.id}</td>
             <td>${command.name}</td>
             <td>${equipment.name}</td>
@@ -53,7 +53,7 @@
 
           <tr>
             <td colspan="5" class="hiddenRow">
-              <div class="accordion-body collapse command-accordion" id="collapseme-${command.id}">
+              <div class="accordion-body collapse command-accordion" id="collapse-command-${command.id}">
 
                 <table class="table table-striped table-bordered" style="margin-bottom: 0px;">
                   <thead>
