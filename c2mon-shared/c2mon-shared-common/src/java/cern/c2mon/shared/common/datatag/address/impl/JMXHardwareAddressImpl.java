@@ -1,18 +1,19 @@
 /*
  * $Id $
- * 
+ *
  * $Date$ $Revision$ $Author$
- * 
+ *
  * Copyright CERN ${year}, All Rights Reserved.
  */
 package cern.c2mon.shared.common.datatag.address.impl;
 
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.address.JMXHardwareAddress;
+import org.simpleframework.xml.Element;
 
 /**
  * Implementation of the <code>JMXHardwareAddress</code> interface
- * 
+ *
  * @see cern.c2mon.shared.common.datatag.address.JMXHardwareAddress
  * @author Wojtek Buczak
  */
@@ -20,10 +21,12 @@ public class JMXHardwareAddressImpl extends HardwareAddressImpl implements JMXHa
 
     private static final long serialVersionUID = 3154428431583350667L;
 
+    @Element(name = "object-name")
     protected String objectName;
 
     protected String attribute;
 
+    @Element(name = "call-method")
     protected String callMethod;
 
     /**
@@ -32,14 +35,17 @@ public class JMXHardwareAddressImpl extends HardwareAddressImpl implements JMXHa
      */
     protected Integer index;
 
+    @Element(name = "composite-field")
     protected String compositeField;
 
     /**
      * for JMX attributes which are maps, this attribute holds a name of the field in the map to look for This parameter
      * is not mandatory.
      */
+    @Element(name = "map-field")
     protected String mapField;
 
+    @Element(name = "receive-method")
     protected String receiveMethod;
 
     /**
@@ -61,10 +67,10 @@ public class JMXHardwareAddressImpl extends HardwareAddressImpl implements JMXHa
         setCompositeField(compositeField);
         setMapField(mapField);
         setReceiveMethod(receiveMethod);
-        
+
         if (this.attribute == null && this.callMethod == null)
             throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-                    "ether parameter \"attribute\" or \"callMethod\" must not be null.");        
+                    "ether parameter \"attribute\" or \"callMethod\" must not be null.");
     }
 
     public JMXHardwareAddressImpl(final String objectName, final String attribute, final String callMethod,
