@@ -34,6 +34,11 @@ import org.simpleframework.xml.core.Commit;
  * It accesses the server to retrieve the DAQ XML configuration file (using the
  * ProcessRequestHandler) and loads the associated configuration details. This
  * is done in the configure() method.
+ *
+ * TODO: the XML naming strategy of this hierarchy does not follow conventions.. Some elements use "TitleCase" and the rest use "dashed-case".
+ * This should be refactored to use "camelCase" exclusively. Doing so would remove the need for all the SimpleXML annotations (Jackson's XmlMapper can handle
+ * it with no annotations whatsoever). In fact, even 3rd-party {@link cern.c2mon.shared.common.datatag.address.HardwareAddress} implementations are forced to
+ * add SimpleXML annotations if they want to view their configs on the web interface, which is ridiculous.
  */
 @Root
 public class ProcessConfiguration {
@@ -288,6 +293,7 @@ public class ProcessConfiguration {
    * Returns the equipment configuration with the provided id.
    *
    * @param equipmentId The id of the desired equipment.
+   *
    * @return The equipment configuration with the provided id.
    */
   public EquipmentConfiguration getEquipmentConfiguration(final long equipmentId) {
