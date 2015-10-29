@@ -41,8 +41,8 @@ tr {
       <div class="panel panel-default">
         <div class="panel-heading clearfix">
           <h3 class="panel-title pull-left" style="padding-top: 7.5px;">All previously applied configurations</h3>
-          <span class="pull-right"> 
-            
+          <span class="pull-right">
+
             <a href=".?refresh=true" class="btn btn-default btn-sm"><i class="fa fa-fw fa-refresh"></i>Refresh</a>
           </span>
         </div>
@@ -60,30 +60,26 @@ tr {
           </thead>
 
           <tbody>
-            <c:forEach items="${cache}" var="entry">
-              <c:set var="id" value="${entry.key}" />
-              <c:set var="report" value="${entry.value[fn:length(entry.value) -1]}" />
-
-                  <tr>
-                    <td class="id">${id}</td>
-                    <td>${report.name}</td>
-                    <td>${report.timestamp}</td>
-                    <td>${report.user}</td>
-                    <td class="cell-label">
-                      <c:choose>
-                        <c:when test="${report.status == 'FAILURE'}">
-                          <span class="label label-danger">FAILURE</span>
-                        </c:when>
-                        <c:when test="${report.status == 'RESTART'}">
-                          <span class="label label-warning">RESTART</span>
-                        </c:when>
-                        <c:otherwise>
-                          <span class="label label-success">OK</span>
-                        </c:otherwise>
-                      </c:choose>
-                    </td>
-                  </tr>
-                  
+            <c:forEach items="${cache}" var="report">
+              <tr>
+                <td class="id">${report.id}</td>
+                <td>${report.name}</td>
+                <td>${report.timestamp}</td>
+                <td>${report.user}</td>
+                <td class="cell-label">
+                  <c:choose>
+                    <c:when test="${report.status == 'FAILURE'}">
+                      <span class="label label-danger">FAILURE</span>
+                    </c:when>
+                    <c:when test="${report.status == 'RESTART'}">
+                      <span class="label label-warning">RESTART</span>
+                    </c:when>
+                    <c:otherwise>
+                      <span class="label label-success">OK</span>
+                    </c:otherwise>
+                  </c:choose>
+                </td>
+              </tr>
             </c:forEach>
           </tbody>
         </table>

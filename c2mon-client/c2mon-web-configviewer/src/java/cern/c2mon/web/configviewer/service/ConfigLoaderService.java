@@ -49,7 +49,7 @@ public class ConfigLoaderService {
    * configuration id may have multiple reports (as it may be run multiple
    * times).
    */
-  private Map<String, List<ConfigurationReportHeader>> configurationReportHeaders = new TreeMap<>();
+  private  List<ConfigurationReportHeader> configurationReportHeaders = new ArrayList<>();
 
   /**
    * Stores the full {@link ConfigurationReport} objects. Each configuration id
@@ -95,14 +95,7 @@ public class ConfigLoaderService {
     // store the report for viewing later
     ConfigurationReportHeader header = new ConfigurationReportHeader(report.getId(), report.getName(), report.getUser(), report.getStatus(),
         report.getStatusDescription(), report.getTimestamp());
-
-    Map<String, List<ConfigurationReportHeader>> headers = getConfigurationReports(false);
-    if (headers.containsKey(String.valueOf(configurationId))) {
-      headers.get(String.valueOf(configurationId)).add(header);
-    } else {
-
-      headers.put(String.valueOf(configurationId), new ArrayList<>(Arrays.asList(header)));
-    }
+    configurationReportHeaders.add(header);
   }
 
   /**
@@ -137,21 +130,12 @@ public class ConfigLoaderService {
    *
    * @return all the previously applied configuration reports
    */
-  public Map<String, List<ConfigurationReportHeader>> getConfigurationReports(boolean refresh) {
-
+  public List<ConfigurationReportHeader> getConfigurationReports(boolean refresh) {
     if (refresh || configurationReportHeaders.isEmpty()) {
-      List<ConfigurationReportHeader> reports = new ArrayList<>(gateway.getTagManager().getConfigurationReports());
-      Collections.sort(reports);
-
-      for (ConfigurationReportHeader report : reports) {
-        if (configurationReportHeaders.containsKey(String.valueOf(report.getId()))) {
-          configurationReportHeaders.get(String.valueOf(report.getId())).add(report);
-        } else {
-          configurationReportHeaders.put(String.valueOf(report.getId()), new ArrayList<>(Arrays.asList(report)));
-        }
-      }
+      configurationReportHeaders = new ArrayList<>(gateway.getTagManager().getConfigurationReports());
     }
 
+    Collections.reverse(configurationReportHeaders);
     return configurationReportHeaders;
   }
 
