@@ -147,7 +147,7 @@ public class ConfigLoaderController {
     ConfigurationReport report = null;
 
     if (timestamp == null) {
-      report = reports.get(0);
+      report = reports.get(reports.size() - 1);
     }
 
     for (ConfigurationReport r : reports) {
