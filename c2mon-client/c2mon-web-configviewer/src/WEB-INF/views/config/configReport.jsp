@@ -256,14 +256,14 @@ a.btn.btn-default.status {
                                 <c:if test="${!pagedListHolder.firstPage}">
                                     <li>
                                         <!-- link to previous page (pagedListHolder.getPage() - 1) -->
-                                        <a href="?page=${pagedListHolder.getPage() - 1}&ts=${report.timestamp}">
+                                        <a href="?page=${pagedListHolder.getPage() - 1}&ts=${report.timestamp}&s=${showSuccesses}&w=${showWarnings}&f=${showFailures}">
                                             <span>&laquo;</span>
                                         </a>
                                     </li>
                                 </c:if>
                                 <c:if test="${pagedListHolder.firstLinkedPage > 0}">
                                     <!-- link to first page -->
-                                    <li><a href="?page=0&ts=${report.timestamp}">1</a></li>
+                                    <li><a href="?page=0&ts=${report.timestamp}&s=${showSuccesses}&w=${showWarnings}&f=${showFailures}">1</a></li>
                                 </c:if>
                                 <c:if test="${pagedListHolder.firstLinkedPage > 1}">
                                     <li class="disabled"><span>...</span></li>
@@ -275,7 +275,7 @@ a.btn.btn-default.status {
                                         </c:when>
                                         <c:otherwise>
                                             <!-- link to specific page (page i + 1) -->
-                                            <li><a href="?page=${i}&ts=${report.timestamp}">${i+1}</a></li>
+                                            <li><a href="?page=${i}&ts=${report.timestamp}&s=${showSuccesses}&w=${showWarnings}&f=${showFailures}">${i+1}</a></li>
                                         </c:otherwise>
                                     </c:choose>
                                 </c:forEach>
@@ -284,11 +284,14 @@ a.btn.btn-default.status {
                                 </c:if>
                                 <c:if test="${pagedListHolder.lastLinkedPage < pagedListHolder.pageCount - 1}">
                                     <!-- link to last page (pagedListHolder.getPageCount() - 1) -->
-                                    <li><a href="?page=${pagedListHolder.getPageCount() - 1}&ts=${report.timestamp}">${pagedListHolder.pageCount}</a></li>
+                                    <li>
+                                      <a href="?page=${pagedListHolder.getPageCount() - 1}&ts=${report.timestamp}&s=${showSuccesses}&w=${showWarnings}&f=${showFailures}">
+                                      ${pagedListHolder.pageCount}</a>
+                                    </li>
                                 </c:if>
                                 <c:if test="${!pagedListHolder.lastPage}">
                                     <!-- link to next page (pagedListHolder.getPage() + 1) -->
-                                    <li><a href="?page=${pagedListHolder.getPage() + 1}&ts=${report.timestamp}">&raquo;</a></li>
+                                    <li><a href="?page=${pagedListHolder.getPage() + 1}&ts=${report.timestamp}&s=${showSuccesses}&w=${showWarnings}&f=${showFailures}">&raquo;</a></li>
                                 </c:if>
                             </c:if>
 
