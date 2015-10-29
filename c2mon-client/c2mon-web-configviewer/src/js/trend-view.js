@@ -74,10 +74,12 @@ TrendView.prototype.init = function() {
     $('#chart-toolbar').hide();
   }
   if (this.shouldHideTitle()) {
+    $('.navbar').hide();
+    $('#page-wrapper').css('margin', '0');
     $('#page-title').hide();
     $('#page-body').css('margin-top', '20px');
-    $('.container-fluid').css('padding-left', '35px');
-    $('.container-fluid').css('padding-right', '35px');
+    $('.breadcrumb').hide();
+    $('footer').hide();
   }
 
   // Resize the chart to fit the viewport
