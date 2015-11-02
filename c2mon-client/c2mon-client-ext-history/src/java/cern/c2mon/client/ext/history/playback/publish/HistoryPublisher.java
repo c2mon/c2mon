@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.listener.TagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.ext.history.common.HistoryUpdate;
 import cern.c2mon.client.ext.history.common.id.SupervisionEventId;
 import cern.c2mon.client.ext.history.common.id.TagValueUpdateId;
@@ -146,7 +146,7 @@ public class HistoryPublisher {
    *          The new value which is given. Is sent to the tags which subscribes
    *          to the listeners of this value
    * @param doClean
-   *          <code>true</code> if the the {@link ClientDataTag#clean()} should
+   *          <code>true</code> if the the {@link ClientDataTagImpl#clean()} should
    *          be called first. Is of course only called if the newValue is a
    *          {@link TagValueUpdate}
    */
@@ -165,7 +165,7 @@ public class HistoryPublisher {
   }
   
   /**
-   * Calls {@link ClientDataTag#clean()} before sending the update. Notifies the
+   * Calls {@link ClientDataTagImpl#clean()} before sending the update. Notifies the
    * listeners about a new update.
    * 
    * @param initialValue
@@ -189,21 +189,21 @@ public class HistoryPublisher {
   
   /**
    * Notifies the listeners about a new update. Does only call the
-   * {@link ClientDataTag#clean()} if <code>doClean</code> is <code>true</code>
+   * {@link ClientDataTagImpl#clean()} if <code>doClean</code> is <code>true</code>
    * 
    * @param newValue
    *          The new value which is given. Is sent to the tags which subscribes
    *          to the tag id in the value
    * @param doClean
-   *          <code>true</code> if the the {@link ClientDataTag#clean()} should
+   *          <code>true</code> if the the {@link ClientDataTagImpl#clean()} should
    *          be called first
    */
   private void publish(final TagValueUpdate newValue, final boolean doClean) {
     for (final TagUpdateListener listener : this.tagListenersManager.getValues(newValue.getId())) {
       try {
         if (doClean
-            && listener instanceof ClientDataTag) {
-          ((ClientDataTag) listener).clean();
+            && listener instanceof ClientDataTagImpl) {
+          ((ClientDataTagImpl) listener).clean();
         }
         listener.onUpdate(newValue);
       }
