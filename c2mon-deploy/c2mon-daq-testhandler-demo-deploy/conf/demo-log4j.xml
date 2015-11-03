@@ -12,16 +12,6 @@
                      threshold="info"
                      xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
-  <renderer renderedClass="cern.c2mon.shared.common.filter.FilteredDataTagValue"
-            renderingClass="cern.c2mon.shared.daq.filter.FilteredDataTagValueRenderer" />
-
-  <renderer renderedClass="cern.c2mon.shared.daq.command.SourceCommandTagValue"
-            renderingClass="cern.c2mon.shared.daq.command.SourceCommandTagValueRenderer" />
-
-  <renderer renderedClass="cern.c2mon.shared.daq.command.SourceCommandTagReport"
-            renderingClass="cern.c2mon.shared.daq.command.SourceCommandReportRenderer" />
-
-
   <!--
     Create a RollingFileAppender.
   -->
@@ -149,11 +139,11 @@
     <level value="debug"/>
     <appender-ref ref="FileAppender" />
   </logger>
-  
+
   <logger name="cern.c2mon.daq.common.messaging.impl.ProxyJmsSender" additivity="false">
     <level value="fatal"/>
     <appender-ref ref="FileAppender" />
-  </logger>  
+  </logger>
 
   <root>
     <level value="debug"/>
