@@ -15,9 +15,6 @@
   <renderer renderedClass="cern.c2mon.shared.common.filter.FilteredDataTagValue"
             renderingClass="cern.c2mon.shared.daq.filter.FilteredDataTagValueRenderer" />
 
-  <renderer renderedClass="cern.c2mon.shared.common.datatag.SourceDataTagValue"
-            renderingClass="cern.c2mon.shared.daq.datatag.SourceDataTagValueRenderer" />
-
   <renderer renderedClass="cern.c2mon.shared.daq.command.SourceCommandTagValue"
             renderingClass="cern.c2mon.shared.daq.command.SourceCommandTagValueRenderer" />
 
