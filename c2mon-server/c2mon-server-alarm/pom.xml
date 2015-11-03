@@ -10,7 +10,7 @@
 
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-alarm</artifactId>
-  <version>1.6.0</version>
+  <version>1.6.1-SNAPSHOT</version>
   <name>c2mon-server-alarm</name>
   <packaging>jar</packaging>
   <description>The C2MON server Alarm module coordinates the Alarm evaluation on incoming Tag updates.</description>
