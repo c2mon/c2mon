@@ -273,4 +273,9 @@ public class SourceCommandTagValue implements Serializable, Cloneable {
   public void log() {
     cmdlog.info(this.toString());
   }
+
+  @Override
+  public String toString() {
+    return "COMMAND" + '\t' + this.getId() + '\t' + this.getName() + '\t' + this.getDataType() + '\t' + this.getValue();
+  }
 }

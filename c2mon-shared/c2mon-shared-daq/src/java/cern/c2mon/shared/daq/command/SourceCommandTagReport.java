@@ -322,6 +322,12 @@ public final class SourceCommandTagReport {
         cmdlog.info(this.toString());
     }
 
+    @Override
+    public String toString() {
+        return "REPORT" + '\t' + this.getId() + '\t' + this.getName() + '\t' + this.getStatus() + '\t' + this.getFullDescription() + '\t' + this
+            .getReturnValue() + '\t';
+    }
+
     /**
      * Set the optional return value from the equipment after successful command execution
      *
