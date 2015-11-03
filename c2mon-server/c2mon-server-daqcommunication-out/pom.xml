@@ -10,7 +10,7 @@
 
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-daqcommunication-out</artifactId>
-  <version>1.5.4-SNAPSHOT</version>
+  <version>1.6.0</version>
   <name>c2mon-server-daqcommunication-out</name>
   <packaging>jar</packaging>
   <description>C2MON module managing outgoing communication to the DAQ layer</description>
