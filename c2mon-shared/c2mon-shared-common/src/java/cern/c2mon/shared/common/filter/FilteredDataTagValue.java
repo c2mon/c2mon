@@ -218,6 +218,42 @@ public class FilteredDataTagValue {
         TAGLOGGER.info(this.toString());
     }
 
+    @Override
+    public String toString() {
+        StringBuffer str = new StringBuffer();
+
+        str.append(this.getId());
+        str.append('\t');
+        str.append(this.getName());
+        str.append('\t');
+        str.append(this.getTimestamp());
+        str.append('\t');
+        str.append(this.getDataType());
+        str.append('\t');
+        str.append(this.getValue());
+        str.append('\t');
+
+        str.append(this.isDynamicFiltered());
+        str.append('\t');
+        str.append(this.getFilterApplied());
+        if (this.getQualityCode() != null || this.getQualityCode() != 0) {
+            str.append('\t');
+            str.append(this.getQualityCode());
+
+        } else {
+            str.append("\tOK");
+        }
+        if (this.getQualityDescription() != null) {
+            str.append('\t');
+            str.append(this.getQualityDescription());
+        }
+        if (this.getValueDescription() != null) {
+            str.append('\t');
+            str.append(this.getValueDescription());
+        }
+        return str.toString();
+    }
+
     // METHODS FOR TRANSFORMATION TO AND FROM XML
 
     /**
