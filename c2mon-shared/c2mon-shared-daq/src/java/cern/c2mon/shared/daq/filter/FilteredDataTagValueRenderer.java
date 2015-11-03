@@ -27,7 +27,7 @@ import cern.c2mon.shared.common.filter.FilteredDataTagValue;
  * log4j.
  *
  * @author mbrightw
- *
+ * @deprecated since we switched to slf4j, implementation-specific features like this are not a good idea
  */
 public class FilteredDataTagValueRenderer implements ObjectRenderer {
 
