@@ -9,16 +9,6 @@
 <log4j:configuration debug="false" 
                      threshold="debug"
                      xmlns:log4j='http://jakarta.apache.org/log4j/'>
-
-  <renderer  renderedClass="cern.c2mon.shared.common.datatag.SourceDataTagValue"
-             renderingClass="cern.c2mon.shared.daq.datatag.SourceDataTagValueRenderer" />
-             
-  <renderer  renderedClass="cern.c2mon.server.common.rule.RuleTag"
-             renderingClass="cern.c2mon.server.common.rule.RuleTagRenderer" />
-             
-  <renderer  renderedClass="cern.c2mon.server.common.alarm.Alarm"
-             renderingClass="cern.c2mon.server.common.alarm.renderer.AlarmRenderer" />
-                                          
              
   <appender name="FileAppender" class="org.apache.log4j.RollingFileAppender">
     <errorHandler class="org.apache.log4j.varia.FallbackErrorHandler">
