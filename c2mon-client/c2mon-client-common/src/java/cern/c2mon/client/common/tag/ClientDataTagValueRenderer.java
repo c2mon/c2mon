@@ -12,7 +12,7 @@ import org.apache.log4j.or.ObjectRenderer;
  *
  * <PRE>
  * Logger log = Logger.getLogger( ... );
- * ClientDataTagValue tag =  ... ;
+ * Tag tag =  ... ;
  * log.info(tag);
  * </PRE>
  *
@@ -33,14 +33,14 @@ public class ClientDataTagValueRenderer implements ObjectRenderer {
 
   /**
    * Implementation of the ObjectRenderer interface
-   * @param o   the <code>ClientDataTagValue</code> to be rendered
-   * @return    a string representation of the <code>ClientDataTagValue</code>, null if the
+   * @param o   the <code>Tag</code> to be rendered
+   * @return    a string representation of the <code>Tag</code>, null if the
    * object passed as a parameter is null.
    */
   public String doRender(Object o) {
     if (o != null) {
-      if (o instanceof ClientDataTagValue) {
-        ClientDataTagValue tag = (ClientDataTagValue) o;
+      if (o instanceof Tag) {
+        Tag tag = (Tag) o;
         StringBuffer str = new StringBuffer();
 
         str.append(tag.getId());
