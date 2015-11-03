@@ -8,10 +8,6 @@
 
 	<!-- Create a ConsoleAppender. Log messages are written to the console -->
 
-	<renderer renderedClass="cern.c2mon.shared.common.datatag.SourceDataTagValue"
-		renderingClass="cern.c2mon.shared.daq.datatag.SourceDataTagValueRenderer" />
-
-
 	<appender name="ConsoleAppender" class="org.apache.log4j.ConsoleAppender">
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n" />
