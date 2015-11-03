@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.log4j.or.ObjectRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
+import cern.c2mon.client.common.tag.TagRenderer;
 import cern.c2mon.publisher.Publisher;
 import cern.c2mon.shared.client.tag.TagConfig;
 
@@ -48,6 +51,9 @@ public class LemonPublisher implements Publisher
 	private static final Logger log = LoggerFactory.getLogger(LemonPublisher.class);
 
 	private static final Logger taglogger = LoggerFactory.getLogger("ClientDataTagLogger");
+	
+	/** used to render the {@link Tag} objects for log4j */
+  private final ObjectRenderer log4jObjectRenderer = new TagRenderer();
 
 	// Set this to something else to block real udp communication
 	static int LEMON_SERVER_NONET = Integer.getInteger("cern.c2mon.publisher.lemon.noNet", 0);
@@ -541,10 +547,7 @@ public class LemonPublisher implements Publisher
 	{
 
 		// Saves the received value into a separate file
-		if (taglogger != null)
-		{
-			taglogger.info("{}", cdt);
-		}
+		taglogger.info(log4jObjectRenderer.doRender(cdt));
 
 		// Just taking into account valid updates
 		if (cdt.getDataTagQuality().isValid())
