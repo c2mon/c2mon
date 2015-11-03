@@ -42,8 +42,10 @@ import cern.c2mon.shared.common.datatag.SourceDataTagValue;
  * <PRE>
  * 651	nzmey.test33.xs11	2004-02-23 13:14:19.505	2004-02-23 13:13:01.505 null	false	Aliv of Process Driver.TDSexpired
  * </PRE>
+ * 
+ * @deprecated Since the migration to SLF4J this class became obsolete
  */
-
+ @Deprecated
 public class SourceDataTagValueRenderer implements ObjectRenderer {
 
   /**
