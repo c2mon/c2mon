@@ -29,7 +29,7 @@ import org.w3c.dom.NodeList;
  * that need not be transmitted to the application server. The fields guaranteedDelivery,
  * priority and timeToLive are only needed as message parameters and are therefore not
  * included in the XML. Therefore, a SourceDataTagValue object created via the fromXML
- * method mayno be equal to the original object (equals() may return false).
+ * method may not be equal to the original object (equals() may return false).
  *
  * @author Jan Stowisek
  * @version $Revision: 1.14 $ ($Date: 2008/11/27 10:22:36 $ - $State: Exp $)
@@ -692,6 +692,39 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
 
 	}
 	return result;
+  }
+  
+  
+  
+  @Override
+  public String toString() {
+    StringBuffer str = new StringBuffer();
+
+    str.append(getId());
+    str.append('\t');
+    str.append(getName());
+    str.append('\t');
+    str.append(getTimestamp());
+    str.append('\t');
+    str.append(getValue());
+    str.append('\t');
+    str.append(getDataType());
+    if (getQuality() != null && ! getQuality().isValid()) {
+      str.append('\t');
+      str.append(getQuality().getQualityCode());
+      str.append('\t');
+      str.append(getQuality().getDescription());
+    }
+    else {
+      str.append("\t0\tOK");
+    }
+    if (getValueDescription() != null) {
+      str.append('\t');
+      // remove all \n and replace all \t characters of the value description string
+      str.append(getValueDescription().replace("\n", "").replace("\t", "  ") );
+    }
+    
+    return str.toString(); 
   }
 
 }
