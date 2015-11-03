@@ -7,8 +7,9 @@ import org.apache.log4j.or.ObjectRenderer;
  * files.
  *
  * @author Mark Brightwell
- *
+ * @deprecated Since the migration to SLF4J this class is obsolete 
  */
+@Deprecated
 public class RuleTagRenderer implements ObjectRenderer {
 
   @Override
