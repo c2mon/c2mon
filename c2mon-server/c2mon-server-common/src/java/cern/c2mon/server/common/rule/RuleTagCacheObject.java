@@ -228,4 +228,35 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
     public Set<Long> getSubEquipmentIds() {
       return parentSubEquipments;
     }
+    
+    @Override
+    public String toString() {
+      StringBuffer str = new StringBuffer();
+
+      str.append(getId());
+      str.append('\t');
+      str.append(getName());
+      str.append('\t');
+      str.append(getTimestamp());
+      str.append('\t');
+      str.append(getValue());
+      str.append('\t');
+      str.append(getDataType());
+      
+      if (!isValid()) {
+        str.append('\t');
+        str.append(getDataTagQuality().getInvalidQualityStates());
+      }
+      else {
+        str.append("\t0\tOK");
+      }
+      
+      if (getValueDescription() != null) {
+        str.append('\t');
+        // remove all \n and replace all \t characters of the value description string
+        str.append(getValueDescription().replace("\n", "").replace("\t", "  ") );
+      }
+      
+      return str.toString();
+    }
 }
