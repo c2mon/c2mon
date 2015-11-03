@@ -22,6 +22,7 @@ import java.nio.charset.CharsetEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.or.ObjectRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
+import cern.c2mon.client.common.tag.TagRenderer;
 import cern.c2mon.publisher.Publisher;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
@@ -58,6 +61,9 @@ public class DipPublisher implements Publisher {
 
   /** Log4j logger instance */
   private static final Logger LOG = LoggerFactory.getLogger(DipPublisher.class);
+  
+  /** used to render the {@link Tag} objects for log4j */
+  private final ObjectRenderer log4jObjectRenderer;
 
   /** The DIP Wiki URL */
   private static final String DIP_WIKI_URL = "http://cern.ch/c2monwiki/DIP+Publisher";
@@ -89,6 +95,7 @@ public class DipPublisher implements Publisher {
 
   @Autowired
   public DipPublisher(@Value("${c2mon.publisher.dip.server.name}") final String serverName) {
+    log4jObjectRenderer = new TagRenderer();
     dipFactory = Dip.create(serverName);
     LOG.info("Created new DIP publisher: " + serverName);
   }
@@ -97,7 +104,7 @@ public class DipPublisher implements Publisher {
   public void onUpdate(final ClientDataTagValue cdt, final TagConfig cdtConfig) {
     // Saves the received value into a separate file
     Logger logger = LoggerFactory.getLogger("ClientDataTagLogger");
-    logger.debug("{}", cdt);
+    logger.debug(log4jObjectRenderer.doRender(cdt));
 
     if (LOG.isDebugEnabled()) {
       StringBuffer str = new StringBuffer("received tag update [\n");
