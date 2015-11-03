@@ -1,66 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>cern.c2mon.c2mon-server</groupId>
-		<artifactId>c2mon-server-pom</artifactId>
-		<version>RELEASE</version>
-	</parent>
+  <parent>
+    <groupId>cern.c2mon.c2mon-server</groupId>
+    <artifactId>c2mon-server-pom</artifactId>
+    <version>RELEASE</version>
+  </parent>
 
-	<artifactId>c2mon-server-daqcommunication-out</artifactId>
-	<version>1.5.4-SNAPSHOT</version>
-	<name>c2mon-server-daqcommunication-out</name>
-	<packaging>jar</packaging>
-	<description>
-    	C2MON module managing outgoing communication to the DAQ layer
-    </description>
-	<url>http://timweb.cern.ch</url>
+  <groupId>cern.c2mon.c2mon-server</groupId>
+  <artifactId>c2mon-server-daqcommunication-out</artifactId>
+  <version>1.5.4-SNAPSHOT</version>
+  <name>c2mon-server-daqcommunication-out</name>
+  <packaging>jar</packaging>
+  <description>C2MON module managing outgoing communication to the DAQ layer</description>
+  <url>http://timweb.cern.ch</url>
 
-	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-daqcommunication-out</developerConnection>
-	</scm>
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-daqcommunication-out</developerConnection>
+  </scm>
 
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymock</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymockclassextension</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-		</dependency>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymockclassextension</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-jms</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-all</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-cache</artifactId>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jms</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-all</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-cache</artifactId>
       <version>[1.5.5, 2.0.0)</version>
-		</dependency>
+    </dependency>
 
     <!-- C2MON test dependencies -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.7.5</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>net.sf.ehcache</groupId>
       <artifactId>ehcache-core</artifactId>
@@ -70,7 +62,7 @@
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-test</artifactId>
     </dependency>
-	</dependencies>
+  </dependencies>
 
   <build>
     <plugins>
@@ -87,5 +79,5 @@
     </plugins>
   </build>
 
-	<developers />
+  <developers />
 </project>
