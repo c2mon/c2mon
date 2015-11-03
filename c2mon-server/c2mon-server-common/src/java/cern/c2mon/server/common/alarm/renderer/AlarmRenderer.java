@@ -7,7 +7,10 @@ import cern.c2mon.server.common.alarm.Alarm;
 /**
  * Log4j ObjectRenderer for the Alarm class. The purpose of an object render is to log objects of a certain class in a
  * uniform way.
+ * 
+ * @deprecated Since the migration to SLF4J this class is obsolete
  */
+@Deprecated
 public class AlarmRenderer implements ObjectRenderer {
 
     /**
