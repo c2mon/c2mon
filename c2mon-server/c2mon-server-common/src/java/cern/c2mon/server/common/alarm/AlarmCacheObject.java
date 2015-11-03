@@ -399,5 +399,30 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
   public boolean isPublishedToLaser() {
     return isPublished();
   }
+  
+  @Override
+  public String toString() {
+    StringBuffer str = new StringBuffer();
+
+    str.append(getId());
+    str.append('\t');
+    str.append(getTagId());
+    str.append('\t');
+    str.append(getTimestamp());
+    str.append('\t');
+    str.append(getFaultFamily());
+    str.append('\t');
+    str.append(getFaultMember());
+    str.append('\t');
+    str.append(getFaultCode());
+    str.append('\t');
+    str.append(getState());
+    if (getInfo() != null) {
+      str.append('\t');
+      str.append(getInfo());
+    }
+
+    return str.toString();
+  }
 
 }
