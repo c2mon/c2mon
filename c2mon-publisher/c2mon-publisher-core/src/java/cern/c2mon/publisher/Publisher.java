@@ -17,7 +17,7 @@
  ******************************************************************************/
 package cern.c2mon.publisher;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.shared.client.tag.TagConfig;
 
 /**
@@ -40,10 +40,10 @@ public interface Publisher {
    * Please notice, that the {@link TagConfig} object is only refresh from the server
    * once the TID configuration file has changed or has been touched.
    * 
-   * @param cdt An new tag update received by the {@link Gateway}
+   * @param tag An new tag update received by the {@link Gateway}
    * @param cdtConfig A reference of the tag configuration which is belonging to this tag update
    */
-  void onUpdate(final ClientDataTagValue cdt, final TagConfig cdtConfig);
+  void onUpdate(final Tag tag, final TagConfig cdtConfig);
   
   /**
    * This method is called at shutdown of the publisher. There is no need to

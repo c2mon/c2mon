@@ -90,7 +90,7 @@ class TidWatchdog extends FileWatchdog {
   protected void doOnChange() {
     logger.info("TID file has changed!");
 
-    if (gateway != null && !this.gateway.subscribeDataTags(new File(PUBLISHER_TID_FILE))) {
+    if (gateway != null && !this.gateway.subscribe(new File(PUBLISHER_TID_FILE))) {
       logger.error("Unable to successfully parse data tag file " + PUBLISHER_TID_FILE);
     }
   }

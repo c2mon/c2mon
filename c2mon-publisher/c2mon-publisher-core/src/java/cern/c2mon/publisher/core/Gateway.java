@@ -35,27 +35,31 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.listener.BaseTagListener;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.C2monServiceGateway;
-import cern.c2mon.client.core.C2monTagManager;
+import cern.c2mon.client.core.ConfigurationService;
+import cern.c2mon.client.core.TagService;
 import cern.c2mon.publisher.Publisher;
 import cern.c2mon.shared.client.tag.TagConfig;
 
 
 /**
- * This class subscribes to the {@link C2monTagManager} and publishes the incoming
+ * This class subscribes to the {@link TagService} and publishes the incoming
  * data tags via RdaPublisher.
  * 
  * @author Matthias Braeger 
  */
 @Service
-public class Gateway implements DataTagUpdateListener {
+public class Gateway implements BaseTagListener {
   /**  The Log4j's logger  */
   private static final Logger LOG = LoggerFactory.getLogger(Gateway.class);
   
-  /** The C2MON tag manager */
-  private final C2monTagManager tagManager;
+  /** C2MON tag service */
+  private final TagService tagService;
+  
+  /** C2MON tag configuration service */
+  private final ConfigurationService configService;
   
   /** The list of subscribed tags */
   private final Set<Long> tagIds = new HashSet<Long>();
@@ -78,7 +82,8 @@ public class Gateway implements DataTagUpdateListener {
     publisher = publisherService;
     
     // Initialize global Tag Manager variable
-    tagManager = C2monServiceGateway.getTagManager();
+    tagService = C2monServiceGateway.getTagService();
+    configService = C2monServiceGateway.getConfigurationService();
   }
   
   /**
@@ -88,7 +93,7 @@ public class Gateway implements DataTagUpdateListener {
    * @param dataTagList a file that contains a list of data tag IDs
    * @return true, if subscription was successful
    */
-  protected final synchronized boolean subscribeDataTags(final File dataTagList) {
+  protected final synchronized boolean subscribe(final File dataTagList) {
     boolean tagSubscriptionSuccessful = false;
     
     Set<Long> newTagIds = parseDataTags(dataTagList);
@@ -98,12 +103,12 @@ public class Gateway implements DataTagUpdateListener {
       while (!tagSubscriptionSuccessful) {
         try {
           // Get first the static tag configurations for the new tags 
-          Collection<TagConfig> newTagConfigs = tagManager.getTagConfigurations(newTagIds);
+          Collection<TagConfig> newTagConfigs = configService.getTagConfigurations(newTagIds);
           for (TagConfig tagConfig : newTagConfigs) {
             tagConfigs.put(tagConfig.getId(), tagConfig);
           }
           // Subscribe to the tags
-          tagManager.subscribeDataTags(newTagIds, this);
+          tagService.subscribe(newTagIds, this);
           tagSubscriptionSuccessful = true;
         }
         catch (Exception ex) {
@@ -134,7 +139,7 @@ public class Gateway implements DataTagUpdateListener {
    */
   public synchronized void updateAllTagConfigurations() {
     LOG.info("Updating configuration information from all subscribed tags.");
-    Collection<TagConfig> newTagConfigs = tagManager.getTagConfigurations(tagIds);
+    Collection<TagConfig> newTagConfigs = configService.getTagConfigurations(tagIds);
     for (TagConfig tagConfig : newTagConfigs) {
       tagConfigs.put(tagConfig.getId(), tagConfig);
     }
@@ -152,7 +157,7 @@ public class Gateway implements DataTagUpdateListener {
     LOG.debug("entering parseDataTags()...");
     final Set<Long> dataTags = new HashSet<Long>();
     BufferedReader in = null;
-    int counter = 0;
+
     
     try {
       in = new BufferedReader(new FileReader(dataTagList));
@@ -175,7 +180,6 @@ public class Gateway implements DataTagUpdateListener {
               try {
                 dataTags.add(Long.valueOf(lineBuffer[i].trim()));
                 LOG.debug("parseDataTags() - Added data tag ID " + lineBuffer[i] + " to list.");
-                counter++;
               } catch (NumberFormatException nfe) {
                 // Do nothing
               }
@@ -188,12 +192,13 @@ public class Gateway implements DataTagUpdateListener {
         LOG.error("parseDataTags() - An error occured while parsing the file.", e);
         return null;
       }
-      
-      try {
-        in.close();
-      } catch (IOException e) {
-        LOG.error("parseDataTags() - Error while closing file " + dataTagList.getAbsolutePath(), e);
-        return null;
+      finally {
+        try {
+          in.close();
+        } catch (IOException e) {
+          LOG.error("parseDataTags() - Error while closing file " + dataTagList.getAbsolutePath(), e);
+          return null;
+        }
       }
     }
     
@@ -214,7 +219,7 @@ public class Gateway implements DataTagUpdateListener {
    * @param tagUpdate A ClientDataTag object with updated properties
    */
   @Override
-  public synchronized void onUpdate(final ClientDataTagValue tagUpdate) {
+  public synchronized void onUpdate(final Tag tagUpdate) {
     if (tagUpdate.getDataTagQuality().isExistingTag()) {
       publisher.onUpdate(tagUpdate, tagConfigs.get(tagUpdate.getId()));
     }
@@ -248,7 +253,7 @@ public class Gateway implements DataTagUpdateListener {
   @PreDestroy
   private void shutdown() {
     LOG.info("Shutdown of JAPC publisher was triggered...");
-    tagManager.unsubscribeAllDataTags(this);
+    tagService.unsubscribe(this);
     publisher.shutdown();
   }
 }

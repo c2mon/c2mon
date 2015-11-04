@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.publisher.Publisher;
 import cern.c2mon.shared.client.tag.TagConfig;
 
@@ -18,7 +18,7 @@ public class TestPublisher implements Publisher {
   private static int counter = 0;
   
   @Override
-  public void onUpdate(final ClientDataTagValue cdt, final TagConfig cdtConfig) {
+  public void onUpdate(final Tag cdt, final TagConfig cdtConfig) {
     LOG.debug("Got update for tag " + cdt.getId());
     counter++;
   }
