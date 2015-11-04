@@ -139,58 +139,77 @@ public class LemonPublisherTest
 
 			// Update 1
 			ts = new Timestamp(System.currentTimeMillis());
+			expect(cdt.getId()).andReturn(1L).anyTimes();
 			expect(cdt.getName()).andReturn("CLIC:CS-CCR-TEST:SYS.KERN.UPTIME").anyTimes();
 			expect(cdt.getValue()).andReturn(111).anyTimes();
 			expect(cdt.getTimestamp()).andReturn(ts);
 			ts = new Timestamp(System.currentTimeMillis() + 15000);
 			expect(cdt.getTimestamp()).andReturn(ts).anyTimes();
-
+			expect(cdt.isValid()).andReturn(Boolean.TRUE);
 			expect(cdt.getDataTagQuality()).andReturn(qualityValid).anyTimes();
 
 			// Update 2
 			ts1 = new Timestamp(System.currentTimeMillis());
+			expect(cdt1.getId()).andReturn(2L).anyTimes();
 			expect(cdt1.getName()).andReturn("CLIC:CS-CCR-PROB:SYS.KERN.UPTIME").anyTimes();
 			expect(cdt1.getValue()).andReturn(222).anyTimes();
 			expect(cdt1.getTimestamp()).andReturn(ts1).anyTimes();
+			expect(cdt1.isValid()).andReturn(Boolean.TRUE).anyTimes();
 			expect(cdt1.getDataTagQuality()).andReturn(qualityValid).anyTimes();
 
 			// Update 3
 			ts2 = new Timestamp(System.currentTimeMillis());
+			expect(cdt2.getId()).andReturn(3L).anyTimes();
 			expect(cdt2.getName()).andReturn("CLIC:CS-CCR-PROB:SYS.NET.OUT").anyTimes();
 			expect(cdt2.getValue()).andReturn(333.0).anyTimes();
 			expect(cdt2.getTimestamp()).andReturn(ts2).anyTimes();
+			expect(cdt2.isValid()).andReturn(Boolean.TRUE).anyTimes();
 			expect(cdt2.getDataTagQuality()).andReturn(qualityValid).anyTimes();
 
 			// Update 4
 			ts3 = new Timestamp(System.currentTimeMillis());
+			expect(cdt3.getId()).andReturn(4L).anyTimes();
 			expect(cdt3.getName()).andReturn("CLIC:CS-CCR-PROB:SYS.NET.IN").anyTimes();
 			expect(cdt3.getValue()).andReturn(444).anyTimes();
 			expect(cdt3.getTimestamp()).andReturn(ts3).anyTimes();
+			expect(cdt3.isValid()).andReturn(Boolean.TRUE).anyTimes();
 			expect(cdt3.getDataTagQuality()).andReturn(qualityValid).anyTimes();
 
 			// Update 4
 
+			expect(cdt4.getId()).andReturn(5L).anyTimes();
+			expect(cdt4.getName()).andReturn("CLIC:CS-CCR-PROB:SYS.NET.OUT").anyTimes();
+      expect(cdt4.getValue()).andReturn(445).anyTimes();
+      expect(cdt4.getTimestamp()).andReturn(ts4).anyTimes();
+      expect(cdt4.isValid()).andReturn(Boolean.FALSE).anyTimes();
 			expect(cdt4.getDataTagQuality()).andReturn(qualityInvalid).anyTimes();
+			expect(qualityInvalid.getDescription()).andReturn("description").anyTimes();
 
 			// Update 5
 			ts5 = new Timestamp(System.currentTimeMillis());
+			expect(cdt5.getId()).andReturn(6L).anyTimes();
 			expect(cdt5.getName()).andReturn("CLIC:CS-CCR-TEST:SYS.KERN.ACTIVEPROC").anyTimes();
 			expect(cdt5.getValue()).andReturn(555).anyTimes();
 			expect(cdt5.getTimestamp()).andReturn(ts5).anyTimes();
+			expect(cdt5.isValid()).andReturn(Boolean.TRUE).anyTimes();
 			expect(cdt5.getDataTagQuality()).andReturn(qualityValid).anyTimes();
 
 			// Update 6
 			ts6 = new Timestamp(System.currentTimeMillis());
+			expect(cdt6.getId()).andReturn(7L).anyTimes();
 			expect(cdt6.getName()).andReturn("CLIC:CS-CCR-DEMO:SYS.KERN.DOWNTIME").anyTimes();
 			expect(cdt6.getValue()).andReturn(999).anyTimes();
 			expect(cdt6.getTimestamp()).andReturn(ts6).anyTimes();
+			expect(cdt6.isValid()).andReturn(Boolean.TRUE).anyTimes();
 			expect(cdt6.getDataTagQuality()).andReturn(qualityValid).anyTimes();
 
 			// Update 7
 			ts7 = new Timestamp(System.currentTimeMillis() + 5000);
+			expect(cdt7.getId()).andReturn(8L).anyTimes();
 			expect(cdt7.getName()).andReturn("CLIC:CS-CCR-TEST:SYS.KERN.DOWNTIME").anyTimes();
 			expect(cdt7.getValue()).andReturn(90909).anyTimes();
 			expect(cdt7.getTimestamp()).andReturn(ts7).anyTimes();
+			expect(cdt7.isValid()).andReturn(Boolean.TRUE).anyTimes();
 			expect(cdt7.getDataTagQuality()).andReturn(qualityValid).anyTimes();
 
 			replay(cdt, cdt1, cdt2, cdt3, cdt4, cdt5, cdt6, cdt7, qualityValid, qualityInvalid);
