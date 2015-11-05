@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TagRenderer;
 import cern.c2mon.publisher.Publisher;
@@ -101,7 +101,7 @@ public class DipPublisher implements Publisher {
   }
 
   @Override
-  public void onUpdate(final ClientDataTagValue cdt, final TagConfig cdtConfig) {
+  public void onUpdate(final Tag cdt, final TagConfig cdtConfig) {
     // Saves the received value into a separate file
     Logger logger = LoggerFactory.getLogger("ClientDataTagLogger");
     logger.debug(log4jObjectRenderer.doRender(cdt));
@@ -185,7 +185,7 @@ public class DipPublisher implements Publisher {
    * @param cdt The tag update value
    * @param pub DIP publication address
    */
-  private void publishTag(final ClientDataTagValue cdt, final DipPublication pub) {
+  private void publishTag(final Tag cdt, final DipPublication pub) {
     DipTimestamp ts = new DipTimestamp();
     ts.setMillis(System.currentTimeMillis());
     DipData data = dipFactory.createDipData();

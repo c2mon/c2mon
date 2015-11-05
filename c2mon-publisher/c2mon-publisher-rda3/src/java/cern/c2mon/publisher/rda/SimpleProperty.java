@@ -6,8 +6,8 @@ package cern.c2mon.publisher.rda;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.listener.BaseTagListener;
+import cern.c2mon.client.common.tag.Tag;
 import cern.cmw.data.Data;
 import cern.cmw.data.DataFactory;
 import cern.cmw.rda3.common.data.AcquiredData;
@@ -21,7 +21,7 @@ import cern.cmw.rda3.server.subscription.SubscriptionSource;
  *
  * @author Matthias Braeger, Wojtek Buczak (refactoring for RDA3)
  */
-final class SimpleProperty implements DataTagUpdateListener {
+final class SimpleProperty implements BaseTagListener {
 
     /** Log4j logger instance */
     private static final Logger LOG = LoggerFactory.getLogger(SimpleProperty.class);
@@ -55,12 +55,12 @@ final class SimpleProperty implements DataTagUpdateListener {
     }
 
     /**
-     * Creates a CMW Data object of the {@link ClientDataTagValue} object
+     * Creates a CMW Data object of the {@link Tag} object
      * 
-     * @param cdt The {@link ClientDataTagValue} object that shall be packed as CMW Data
-     * @return The representation of the {@link ClientDataTagValue} object
+     * @param cdt The {@link Tag} object that shall be packed as CMW Data
+     * @return The representation of the {@link Tag} object
      */
-    private static Data pack(final ClientDataTagValue cdt) {
+    private static Data pack(final Tag cdt) {
         Data data = DataFactory.createData();
 
         switch (cdt.getTypeNumeric()) {
@@ -112,7 +112,7 @@ final class SimpleProperty implements DataTagUpdateListener {
      * Generates a new {@link Data} object from the received tag update and propagates it to all the listeners.
      */
     @Override
-    public synchronized void onUpdate(final ClientDataTagValue cdt) {
+    public synchronized void onUpdate(final Tag cdt) {
         Data newValue = pack(cdt);
         LOG.debug("Value update received for RDA property {} : {}", rdaPropertyName, newValue);
 

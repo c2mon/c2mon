@@ -25,10 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TagRenderer;
 import cern.c2mon.publisher.Publisher;
@@ -543,7 +541,7 @@ public class LemonPublisher implements Publisher
 	} // isScheduled
 
 	@Override
-	public void onUpdate(ClientDataTagValue cdt, TagConfig cdtConfig)
+	public void onUpdate(Tag cdt, TagConfig cdtConfig)
 	{
 
 		// Saves the received value into a separate file

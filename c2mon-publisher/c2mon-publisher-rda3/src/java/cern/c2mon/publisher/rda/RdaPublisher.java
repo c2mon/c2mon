@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TagRenderer;
 import cern.c2mon.publisher.Publisher;
 import cern.c2mon.publisher.core.Gateway;
@@ -192,7 +192,7 @@ public final class RdaPublisher implements Publisher {
      * @param cdtConfig The tag configuration which is belonging to this tag update
      */
     @Override
-    public void onUpdate(final ClientDataTagValue cdt, final TagConfig cdtConfig) {
+    public void onUpdate(final Tag cdt, final TagConfig cdtConfig) {
         // Saves the received value into a separate file
         Logger logger = LoggerFactory.getLogger("ClientDataTagLogger");
         logger.debug(log4jObjectRenderer.doRender(cdt));
