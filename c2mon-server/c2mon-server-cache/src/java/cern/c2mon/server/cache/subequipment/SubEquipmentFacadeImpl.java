@@ -75,7 +75,6 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
   @Override
   public SubEquipment createCacheObject(Long id, Properties properties){
     SubEquipmentCacheObject subEquipment = new SubEquipmentCacheObject(id);
-    setCommonProperties(subEquipment, properties);
     configureCacheObject(subEquipment, properties);
     validateConfig(subEquipment);
     return subEquipment;
@@ -89,6 +88,7 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
   @Override
   protected Change configureCacheObject(SubEquipment subEquipment, Properties properties) {
     SubEquipmentCacheObject subEquipmentCacheObject = (SubEquipmentCacheObject) subEquipment;
+    EquipmentConfigurationUpdate update = setCommonProperties(subEquipment, properties);
     String tmpStr = properties.getProperty("equipmentId");
 
     // TODO: Remove obsolete parent_equip_id property
@@ -104,7 +104,7 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
       }
     }
 
-    return null;
+    return update;
   }
 
   @Override
@@ -146,7 +146,7 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
   /**
    * Throws an exception if the validation fails.
    *
-   * @param subEquipmentCacheObject the SubEquipment to validate
+   * @param subEquipment the SubEquipment to validate
    * @throws ConfigurationException if the validation fails
    */
   @Override
