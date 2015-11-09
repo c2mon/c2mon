@@ -58,6 +58,12 @@ public class WieJapcMessageHandler extends GenericJapcMessageHandler {
 
         try {
 
+            
+            if (getEquipmentLogger().isDebugEnabled()) {
+                getEquipmentLogger().debug(
+                        String.format("handleJAPCValue(): DataFieldName is %s", 
+                                addr.getDataFieldName().toString()));
+            }
             SimpleParameterValue svalue = mapValue.get(addr.getDataFieldName());
             
             if (getEquipmentLogger().isDebugEnabled()) {
