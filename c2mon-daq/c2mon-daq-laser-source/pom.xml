@@ -32,11 +32,6 @@
 			<artifactId>c2mon-shared-daq</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>cern.diamon</groupId>
-			<artifactId>diamon-alarms-commons-spring</artifactId>
-			<version>0.0.8</version>
-		</dependency>
 		
 		
 
@@ -57,6 +52,11 @@
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymockclassextension</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.diamon</groupId>
+			<artifactId>diamon-alarms-commons</artifactId>
+			<version>0.0.26</version>
 		</dependency>
 	</dependencies>
 

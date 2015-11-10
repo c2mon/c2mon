@@ -53,11 +53,9 @@ public class AlarmListener implements AlarmConsumerInterface {
     }
 
     public synchronized void connectToLaser() throws JMSException {
-        System.setProperty("diamon.alarms.jmsdriver", "cern.diamon.alarms.sonic.SonicConnection");
-
-        connector = AlarmConnectorFactory.getConnector("tcp://sljas2:2506,tcp://sljas3:2506");
+        connector = AlarmConnectorFactory.getConnector("failover:(tcp://jms-laser-pro1:61670,tcp://jms-laser-pro2:61670)");
         connector.addListener(this);
-        connector.setTopicRoot("CMW.ALARM_SYSTEM.ALARMS.SOURCES.");
+        connector.setTopicRoot("CERN.DIAMON.ALARM.INCOMING.OLD.");
         connector.connect();
         isStarted = true;
     }
