@@ -63,9 +63,12 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment>implements
   private final ControlTagCache controlCache;
 
   @Autowired
-  public EquipmentCacheImpl(final ClusterCache clusterCache, @Qualifier("equipmentEhcache") final Ehcache ehcache,
-      @Qualifier("equipmentEhcacheLoader") final CacheLoader cacheLoader, @Qualifier("equipmentCacheLoader") final C2monCacheLoader c2monCacheLoader,
-      @Qualifier("equipmentDAO") final SimpleCacheLoaderDAO<Equipment> cacheLoaderDAO, final ControlTagCache controlCache) {
+  public EquipmentCacheImpl(final ClusterCache clusterCache, 
+                            @Qualifier("equipmentEhcache") final Ehcache ehcache,
+                            @Qualifier("equipmentEhcacheLoader") final CacheLoader cacheLoader, 
+                            @Qualifier("equipmentCacheLoader") final C2monCacheLoader c2monCacheLoader,
+                            @Qualifier("equipmentDAO") final SimpleCacheLoaderDAO<Equipment> cacheLoaderDAO, 
+                            final ControlTagCache controlCache) {
 
     super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
     this.controlCache = controlCache;
@@ -77,28 +80,9 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment>implements
   @PostConstruct
   public void init() {
     LOGGER.info("Initializing Equipment cache...");
-
-    try {
-      getCache().setNodeBulkLoadEnabled(true);
-    }
-    catch (UnsupportedOperationException ex) {
-      LOGGER.warn("setNodeBulkLoadEnabled() method threw an exception when " + "loading the cache (UnsupportedOperationException) - this is "
-          + "normal behaviour in a single-server mode and can be ignored");
-    }
-
     // common initialization (other than preload, which needs synch below)
     commonInit();
-
-    try {
-      getCache().setNodeBulkLoadEnabled(false);
-    }
-    catch (UnsupportedOperationException ex) {
-      LOGGER.warn("setNodeBulkLoadEnabled() method threw an exception when " + "loading the cache (UnsupportedOperationException) - this is "
-          + "normal behaviour in a single-server mode and can be ignored");
-    }
-
     doPostConfigurationOfEquipmentControlTags();
-
     LOGGER.info("Equipment cache initialization complete.");
   }
 
