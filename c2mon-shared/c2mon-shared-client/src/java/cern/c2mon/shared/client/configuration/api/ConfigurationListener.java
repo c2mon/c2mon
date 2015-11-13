@@ -1,4 +1,4 @@
-package cern.c2mon.shared.client.configuration.configuration;
+package cern.c2mon.shared.client.configuration.api;
 
 /**
  * TODO

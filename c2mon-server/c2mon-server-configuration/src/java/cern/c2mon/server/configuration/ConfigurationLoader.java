@@ -23,7 +23,7 @@ import java.util.List;
 import cern.c2mon.shared.client.configuration.ConfigurationException;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
-import cern.c2mon.shared.client.configuration.configuration.Configuration;
+import cern.c2mon.shared.client.configuration.api.Configuration;
 
 /**
  * Public bean that can be accessed to load configurations into

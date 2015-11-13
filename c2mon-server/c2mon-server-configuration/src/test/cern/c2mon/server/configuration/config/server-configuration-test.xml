@@ -48,14 +48,12 @@
   
   <bean id="tagConfigGateway" class="cern.c2mon.server.configuration.handler.impl.TagConfigGateway" autowire="constructor"/> 
   
-  <bean class="cern.c2mon.server.configuration.handler.transacted.DataTagConfigTransactedImpl" autowire="constructor"/>
-  <bean class="cern.c2mon.server.configuration.handler.transacted.ControlTagConfigTransactedImpl" autowire="constructor"/>
-  <bean class="cern.c2mon.server.configuration.handler.transacted.RuleTagConfigTransactedImpl" autowire="constructor"/>
-  <bean class="cern.c2mon.server.configuration.handler.transacted.AlarmConfigTransactedImpl" autowire="constructor"/>
-  <bean class="cern.c2mon.server.configuration.handler.transacted.EquipmentConfigTransactedImpl" autowire="constructor"/>
-  <bean class="cern.c2mon.server.configuration.handler.transacted.SubEquipmentConfigTransactedImpl" autowire="constructor"/>
-  <bean class="cern.c2mon.server.configuration.handler.transacted.ProcessConfigTransactedImpl" autowire="constructor"/>
-  <bean class="cern.c2mon.server.configuration.handler.transacted.DeviceClassConfigTransactedImpl" autowire="constructor"/>
-  <bean class="cern.c2mon.server.configuration.handler.transacted.DeviceConfigTransactedImpl" autowire="constructor"/>
+  <context:annotation-config/>
+  <context:component-scan base-package="cern.c2mon.server.configuration.handler.transacted"/>
 
+  <bean class="cern.c2mon.server.configuration.parser.impl.ConfigurationParserImpl">
+    <constructor-arg name="sequenceTaskFactory" ref="sequenceTaskFactory"/>
+  </bean>
+
+  <bean id="sequenceTaskFactory" class="cern.c2mon.server.configuration.parser.tasks.SequenceTaskFactory"/>
 </beans>

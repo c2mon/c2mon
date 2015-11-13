@@ -3,7 +3,9 @@ package cern.c2mon.server.configuraton.helper;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.common.alive.AliveTimerCacheObject;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
+import cern.c2mon.server.common.commfault.CommFaultTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.DeviceCacheObject;
@@ -27,6 +29,24 @@ import cern.c2mon.shared.client.device.DeviceProperty;
  *
  */
 public class ObjectEqualityComparison {
+
+
+  public static void assertAliveTimerValuesEquals(AliveTimerCacheObject expectedObject, AliveTimerCacheObject object) {
+    assertEquals(expectedObject.getAliveTagId(), object.getAliveTagId());
+    assertEquals(expectedObject.getRelatedId(), object.getRelatedId());
+    assertEquals(expectedObject.getRelatedName(), object.getRelatedName());
+    assertEquals(expectedObject.getRelatedStateTagId(), object.getRelatedStateTagId());
+    assertEquals(expectedObject.getAliveType(), object.getAliveType());
+    assertEquals(expectedObject.getAliveInterval(), object.getAliveInterval());
+  }
+
+  public static void assertCommFaultTagValuesEquals(CommFaultTagCacheObject expectedObject, CommFaultTagCacheObject object) {
+    assertEquals(expectedObject.getAliveTagId(), object.getAliveTagId());
+    assertEquals(expectedObject.getEquipmentId(), object.getEquipmentId());
+    assertEquals(expectedObject.getEquipmentName(), object.getEquipmentName());
+    assertEquals(expectedObject.getAliveTagId(), object.getAliveTagId());
+    assertEquals(expectedObject.getStateTagId(), object.getStateTagId());
+  }
 
   public static void assertDataTagValueEquals(DataTagCacheObject expectedObject, DataTagCacheObject object) {
     assertDataTagConfigEquals(expectedObject, object);

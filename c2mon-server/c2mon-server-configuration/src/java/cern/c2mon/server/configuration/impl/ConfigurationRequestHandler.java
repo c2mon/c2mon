@@ -37,10 +37,9 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.shared.client.configuration.ConfigurationException;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
-import cern.c2mon.shared.client.configuration.configuration.Configuration;
+import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

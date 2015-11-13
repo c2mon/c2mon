@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
@@ -57,10 +56,9 @@ import cern.c2mon.server.configuration.handler.ProcessConfigHandler;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.handler.SubEquipmentConfigHandler;
 import cern.c2mon.server.configuration.handler.impl.CommandTagConfigHandler;
+import cern.c2mon.server.configuration.parser.ConfigurationParser;
 import cern.c2mon.server.daqcommunication.in.JmsContainerManager;
 import cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager;
-import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
-import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
@@ -68,9 +66,7 @@ import cern.c2mon.shared.client.configuration.ConfigurationException;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReportFileFilter;
 import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
-import cern.c2mon.shared.client.configuration.configuration.Configuration;
-import cern.c2mon.shared.client.configuration.configuration.process.Process;
-import cern.c2mon.shared.client.configuration.configuration.tag.DataTag;
+import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.converter.DateFormatConverter;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
@@ -155,6 +151,11 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   private volatile boolean cancelRequested = false;
 
   private ClusterCache clusterCache;
+  
+  /**
+   * singelton helper-object for parsing POJO Configuration objects into ConfigurationElements
+   */
+  private ConfigurationParser configParser;
 
   @Autowired
   public ConfigurationLoaderImpl(ProcessCommunicationManager processCommunicationManager,
@@ -164,7 +165,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       EquipmentConfigHandler equipmentConfigHandler, SubEquipmentConfigHandler subEquipmentConfigHandler,
       ProcessConfigHandler processConfigHandler, ProcessFacade processFacade, ClusterCache clusterCache,
       ProcessCache processCache, DeviceClassConfigHandler deviceClassConfigHandler,
-      DeviceConfigHandler deviceConfigHandler) {
+      DeviceConfigHandler deviceConfigHandler, ConfigurationParser configParser) {
     super();
     this.processCommunicationManager = processCommunicationManager;
     this.configurationDAO = configurationDAO;
@@ -181,6 +182,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     this.clusterCache = clusterCache;
     this.deviceClassConfigHandler = deviceClassConfigHandler;
     this.deviceConfigHandler = deviceConfigHandler;
+    this.configParser = configParser;
   }
 
   @Override
@@ -191,7 +193,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     // Try to acquire the configuration lock.
     if (clusterCache.tryWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY, 1L)) {
       try {
-        List<ConfigurationElement> configurationElements = parseConfigurationElements(configuration);
+        List<ConfigurationElement> configurationElements = configParser.parse(configuration);
 
         report = applyConfiguration(-1, configuration.getName(), configurationElements, null);
 
@@ -217,44 +219,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     }
 
     return report;
-  }
-
-  /**
-   * Takes a {@link Configuration} object and converts it to a list of {@link ConfigurationElement} objects.
-   *
-   * @param configuration
-   * @return
-   */
-  private List<ConfigurationElement> parseConfigurationElements(Configuration configuration) {
-    List<ConfigurationElement> elements = new ArrayList<>();
-
-    for (Process process : configuration.getProcesses()) {
-      for (cern.c2mon.shared.client.configuration.configuration.equipment.Equipment equipment : process.getEquipments()) {
-        for (DataTag tag : equipment.getDataTags()) {
-          ConfigurationElement element = new ConfigurationElement();
-          if (tag.getDelete()) {
-            element.setAction(Action.REMOVE);
-          } else {
-            element.setAction(Action.CREATE);
-          }
-          element.setEntity(Entity.DATATAG);
-          element.setEntityId(tag.getId());
-          element.setSequenceId(-1L);
-
-          Properties properties = new Properties();
-          properties.put("name", tag.getName());
-          properties.put("description", tag.getDescription());
-          properties.put("dataType", tag.getType());
-          properties.put("equipmentId", String.valueOf(tag.getEquipmentId()));
-          properties.put("address", tag.getAddress().toConfigXML());
-
-          element.setElementProperties(properties);
-          elements.add(element);
-        }
-      }
-    }
-
-    return elements;
   }
 
   @Override
@@ -353,7 +317,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
           if (processChanges == null) {
             continue;
           }
-          
+
           for (ProcessChange processChange : processChanges) {
 
             Long processId = processChange.getProcessId();
