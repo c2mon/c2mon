@@ -58,24 +58,4 @@ public class ClientRequestReportTest {
     assertTrue(!report.executedSuccessfully());
     assertTrue(report.getErrorMessage() == null);      
   }
-  
-  @Test(expected=UnsupportedOperationException.class)
-  public void testExceptionOnMethodCallForResult() {
-    DummyClientRequestReport report = new DummyClientRequestReport();
-    report.getCurrentOperation();
-  }
-  
-  @Test(expected=UnsupportedOperationException.class)
-  public void testExceptionOnMethodCallForProgress() {
-    DummyClientRequestReport report = new DummyClientRequestReport(1, 2, 3, 4, "desc");
-    report.executedSuccessfully();
-  }
-  
-  @Test(expected=UnsupportedOperationException.class)
-  public void testExceptionOnMethodCallForError() {
-    DummyClientRequestReport report = new DummyClientRequestReport(true, "with description");
-    report.getProgressDescription();
-  }
-  
-  
 }
