@@ -1153,19 +1153,19 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     checker.notifyElementUpdated(EasyMock.isA(Alarm.class));
     EasyMock.expectLastCall().once();
     EasyMock.replay(checker);
-    
+
     alarmCache.registerSynchronousListener(checker);
-    
+
     DataTagCacheObject toInit = (DataTagCacheObject)dataTagCache.getCopy(200003L);
     toInit.setValue(Boolean.TRUE);
     toInit.getDataTagQuality().validate();
     dataTagCache.putQuiet(toInit);
-    
+
     ConfigurationReport report = configurationLoader.applyConfiguration(22);
     verify(checker);
   }
-  
-  
+
+
   /**
    * Test the creation, update and removal of alarm.
    */
@@ -1174,13 +1174,13 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   public void testCreateUpdateAlarm() {
     replay(mockManager);
 
-    
+
     // we do not expect to send the alarm as the datatag is unitialized.
     C2monCacheListener<Alarm> checker = EasyMock.createMock(C2monCacheListener.class);
     EasyMock.replay(checker);
-    
+
     alarmCache.registerSynchronousListener(checker);
-    
+
     ConfigurationReport report = configurationLoader.applyConfiguration(22);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -1229,7 +1229,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     EasyMock.expectLastCall().once();
     EasyMock.replay(checker);
     alarmCache.registerSynchronousListener(checker);
-    
+
     ConfigurationReport report = configurationLoader.applyConfiguration(24);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -1481,45 +1481,5 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     list = "[]";
     processList = converter.convert(list);
     assertTrue(processList.size() == 0);
-  }
-
-  @Test
-  public void testNewConfiguration() throws Exception {
-//    Configuration configuration = new Configuration("test create tag", "test", "test");
-//
-//    cern.c2mon.shared.client.configuration.configuration.process.Process process = new cern.c2mon.shared.client.configuration.configuration.process.Process(50L);
-//    configuration.addProcess(process);
-//    cern.c2mon.shared.client.configuration.configuration.equipment.Equipment equipment = new cern.c2mon.shared.client.configuration.configuration.equipment.Equipment(150L, process.getId());
-//    configuration.addEquipment(process.getId(), equipment);
-//    HardwareAddress hardwareAddress = new PLCHardwareAddressImpl(1, 0, 0, 0, 0f, 0f, "");
-//    DataTagAddress address = new DataTagAddress(hardwareAddress, 99999);
-//    DataTag tag = new DataTag(1L, "test_tag", "tag for testing", equipment.getId(), "Boolean", false, address);
-//    configuration.addDataTag(tag);
-//
-//    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport()).times(2);
-//    replay(mockManager);
-//
-//    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
-//    assertNotNull(report.getName());
-//    assertNotNull(report.getId());
-//    assertNotNull(report.getStatus());
-//    assertNotNull(report.getStatusDescription());
-//    assertTrue(report.getStatus() == Status.OK);
-//
-//    configuration = new Configuration("test remove tag", "test", "test");
-//    configuration.addProcess(process);
-//    configuration.addEquipment(process.getId(), equipment);
-//    tag.setDelete(true);
-//    configuration.addDataTag(tag);
-//
-//    //expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport()).times(2);
-//    //replay(mockManager);
-//
-//    report = configurationLoader.applyConfiguration(configuration);
-//    assertNotNull(report.getName());
-//    assertNotNull(report.getId());
-//    assertNotNull(report.getStatus());
-//    assertNotNull(report.getStatusDescription());
-//    assertTrue(report.getStatus() == Status.OK);
   }
 }
