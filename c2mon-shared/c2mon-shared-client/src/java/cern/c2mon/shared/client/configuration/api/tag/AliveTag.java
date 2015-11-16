@@ -31,11 +31,11 @@ public class AliveTag extends ControlTag {
 
 
   // TODO CHECK if a AliveTag DataType is always a LONG
-  @DefaultValue("Long")
-  private final DataType dataType = null;
-
-  @DefaultValue("false")
-  private Boolean isLogged = null;
+//  @DefaultValue("Long")
+//  private final DataType dataType = null;
+//
+//  @DefaultValue("false")
+//  private Boolean isLogged = null;
 
   @Override
   public boolean requiredFieldsGiven() {
@@ -44,11 +44,7 @@ public class AliveTag extends ControlTag {
 
   @Builder
   public AliveTag( Long id, String name, String description, TagMode mode, @Singular List<Alarm> alarms,  DataTagAddress address) {
-    super(id, name, description, null, mode, null, alarms);
+    super(id, name, description, DataType.LONG, mode, false, alarms);
     this.address = address != null ? address.toConfigXML() : null;
-
   }
-
-
-
 }
