@@ -19,9 +19,9 @@
  */
 package cern.c2mon.client.core.configuration;
 
+import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
-import cern.c2mon.shared.client.configuration.api.ConfigurationListener;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.util.jms.JmsSender;
 import com.google.gson.*;
@@ -47,7 +47,7 @@ public class ConfigurationRequestSender {
    *
    * @return
    */
-  public ConfigurationReport applyConfiguration(Configuration configuration, ConfigurationListener listener) {
+  public ConfigurationReport applyConfiguration(Configuration configuration, ClientRequestReportListener listener) {
     Gson gson = new GsonBuilder().registerTypeAdapter(HardwareAddress.class, new InterfaceAdapter<HardwareAddress>()).create();
     String message = gson.toJson(configuration);
     String reply = jmsSender.sendRequestToQueue(message, "c2mon.config", 3600000);

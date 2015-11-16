@@ -1,16 +1,15 @@
 package cern.c2mon.client.core;
 
-import java.util.Collection;
-
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
 import cern.c2mon.shared.client.configuration.api.Configuration;
-import cern.c2mon.shared.client.configuration.api.ConfigurationListener;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.request.ClientRequestErrorReport;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
 import cern.c2mon.shared.client.tag.TagConfig;
+
+import java.util.Collection;
 
 /**
  * The Configuration Service allows applying new configurations to the server and to
@@ -71,7 +70,7 @@ public interface ConfigurationService {
    *
    * @return
    */
-  ConfigurationReport applyConfiguration(Configuration configuration, ConfigurationListener listener);
+  ConfigurationReport applyConfiguration(final Configuration configuration, final ClientRequestReportListener listener);
 
   /**
    * Retrieve a list of all previously applied configuration reports from the

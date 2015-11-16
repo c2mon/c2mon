@@ -1,24 +1,21 @@
 package cern.c2mon.client.core.service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import javax.jms.JMSException;
-
-import cern.c2mon.client.core.configuration.ConfigurationRequestSender;
-import cern.c2mon.shared.client.configuration.api.Configuration;
-import cern.c2mon.shared.client.configuration.api.ConfigurationListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.core.ConfigurationService;
+import cern.c2mon.client.core.configuration.ConfigurationRequestSender;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
+import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.tag.TagConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.jms.JMSException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 @Service
 @Slf4j
@@ -53,7 +50,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
   }
 
   @Override
-  public ConfigurationReport applyConfiguration(Configuration configuration, ConfigurationListener listener) {
+  public ConfigurationReport applyConfiguration(Configuration configuration, ClientRequestReportListener listener) {
     return configurationRequestSender.applyConfiguration(configuration, listener);
   }
 
