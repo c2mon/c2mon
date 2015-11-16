@@ -36,6 +36,8 @@
         <!-- max number of threads used to request tags from server -->
         <prop key="c2mon.client.request.threads.max">5</prop>
         <prop key="c2mon.client.rbac.admin">c2mon.rbac.admin</prop>
+        <!-- configuration request queue. TODO rename to c2mon.client.config.queue -->
+        <prop key="jms.config.destination">c2mon.config</prop>
       </props>
     </property>
   </bean>
