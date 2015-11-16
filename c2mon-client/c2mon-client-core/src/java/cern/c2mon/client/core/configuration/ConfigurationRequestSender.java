@@ -26,6 +26,7 @@ import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.util.jms.JmsSender;
 import com.google.gson.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Type;
@@ -41,6 +42,9 @@ public class ConfigurationRequestSender {
   @Autowired
   private JmsSender jmsSender;
 
+  @Value("${jms.config.destination}")
+  private String jmsConfigDestination;
+
   /**
    * @param configuration
    * @param listener
@@ -50,7 +54,7 @@ public class ConfigurationRequestSender {
   public ConfigurationReport applyConfiguration(Configuration configuration, ClientRequestReportListener listener) {
     Gson gson = new GsonBuilder().registerTypeAdapter(HardwareAddress.class, new InterfaceAdapter<HardwareAddress>()).create();
     String message = gson.toJson(configuration);
-    String reply = jmsSender.sendRequestToQueue(message, "c2mon.config", 3600000);
+    String reply = jmsSender.sendRequestToQueue(message, jmsConfigDestination, 3600000);
     return gson.fromJson(reply, ConfigurationReport.class);
   }
 
