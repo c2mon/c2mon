@@ -5,6 +5,8 @@ import java.util.Collection;
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
+import cern.c2mon.shared.client.configuration.api.Configuration;
+import cern.c2mon.shared.client.configuration.api.ConfigurationListener;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.request.ClientRequestErrorReport;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
@@ -13,7 +15,7 @@ import cern.c2mon.shared.client.tag.TagConfig;
 /**
  * The Configuration Service allows applying new configurations to the server and to
  * fetch the configuration for the configured DAQ Processes.
- * 
+ *
  * @author Matthias Braeger
  */
 public interface ConfigurationService {
@@ -28,7 +30,7 @@ public interface ConfigurationService {
    * @return A collection of all <code>TagConfiguration</code> objects
    */
   Collection<TagConfig> getTagConfigurations(final Collection<Long> tagIds);
-  
+
   /**
    * Applies the configuration and returns a Configuration Report.
    * The values are fetched from the server.
@@ -60,6 +62,16 @@ public interface ConfigurationService {
    * @return A Configuration Report object
    */
   ConfigurationReport applyConfiguration(final Long configurationId, final ClientRequestReportListener reportListener);
+
+  /**
+   *
+   *
+   * @param configuration
+   * @param listener
+   *
+   * @return
+   */
+  ConfigurationReport applyConfiguration(Configuration configuration, ConfigurationListener listener);
 
   /**
    * Retrieve a list of all previously applied configuration reports from the

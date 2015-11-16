@@ -5,6 +5,9 @@ import java.util.Collection;
 
 import javax.jms.JMSException;
 
+import cern.c2mon.client.core.configuration.ConfigurationRequestSender;
+import cern.c2mon.shared.client.configuration.api.Configuration;
+import cern.c2mon.shared.client.configuration.api.ConfigurationListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,33 +20,41 @@ import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.tag.TagConfig;
 import lombok.extern.slf4j.Slf4j;
 
-@Service @Slf4j
+@Service
+@Slf4j
 public class ConfigurationServiceImpl implements ConfigurationService {
 
-  /** Provides methods for requesting tag information from the C2MON server */
+  /**
+   * Provides methods for requesting tag information from the C2MON server
+   */
   private final RequestHandler clientRequestHandler;
-  
-  
+
+  private ConfigurationRequestSender configurationRequestSender;
+
   /**
    * Default Constructor, used by Spring to instantiate the Singleton service
    *
    * @param requestHandler Provides methods for requesting tag information from the C2MON server
    */
   @Autowired
-  protected ConfigurationServiceImpl(final RequestHandler requestHandler) {
+  protected ConfigurationServiceImpl(final RequestHandler requestHandler, final ConfigurationRequestSender configurationRequestSender) {
     this.clientRequestHandler = requestHandler;
+    this.configurationRequestSender = configurationRequestSender;
   }
-  
+
   @Override
   public ConfigurationReport applyConfiguration(final Long configurationId) {
-
     return clientRequestHandler.applyConfiguration(configurationId);
   }
 
   @Override
   public ConfigurationReport applyConfiguration(Long configurationId, ClientRequestReportListener reportListener) {
-
     return clientRequestHandler.applyConfiguration(configurationId, reportListener);
+  }
+
+  @Override
+  public ConfigurationReport applyConfiguration(Configuration configuration, ConfigurationListener listener) {
+    return configurationRequestSender.applyConfiguration(configuration, listener);
   }
 
   @Override
@@ -74,9 +85,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     } catch (JMSException e) {
       log.error("getProcessNames() - JMS connection lost -> Could not retrieve process names from the C2MON server.", e);
     }
-    return  new ArrayList<ProcessNameResponse>();
+    return new ArrayList<>();
   }
-  
+
   @Override
   public Collection<TagConfig> getTagConfigurations(final Collection<Long> tagIds) {
 
@@ -86,7 +97,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     } catch (JMSException e) {
       log.error("getTagConfigurations() - JMS connection lost -> Could not retrieve missing tags from the C2MON server.", e);
     }
-    return new ArrayList<TagConfig>();
+    return new ArrayList<>();
   }
 
   @Override
