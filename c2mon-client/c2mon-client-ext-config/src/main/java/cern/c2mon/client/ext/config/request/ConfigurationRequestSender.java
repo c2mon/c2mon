@@ -20,13 +20,12 @@
 package cern.c2mon.client.ext.config.request;
 
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
-import cern.c2mon.shared.client.configuration.configuration.Configuration;
-import cern.c2mon.shared.client.configuration.configuration.ConfigurationListener;
+import cern.c2mon.shared.client.configuration.api.Configuration;
+import cern.c2mon.shared.client.configuration.api.ConfigurationListener;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.util.jms.JmsSender;
 import com.google.gson.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Type;
@@ -55,6 +54,11 @@ public class ConfigurationRequestSender {
     return gson.fromJson(reply, ConfigurationReport.class);
   }
 
+  /**
+   * Wraps the JSON serialisation/deserialisation of an interface type, adding concrete class information
+   *
+   * @param <T>
+   */
   final class InterfaceAdapter<T> implements JsonSerializer<T>, JsonDeserializer<T> {
     @Override
     public JsonElement serialize(T object, Type interfaceType, JsonSerializationContext context) {
