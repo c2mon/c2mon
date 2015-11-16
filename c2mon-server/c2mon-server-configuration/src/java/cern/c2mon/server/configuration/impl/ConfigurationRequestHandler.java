@@ -27,6 +27,7 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,15 +40,6 @@ import cern.c2mon.shared.client.configuration.ConfigurationException;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 
 /**
  * Handles configuration requests received on JMS from clients.
@@ -76,8 +68,8 @@ public class ConfigurationRequestHandler implements SessionAwareMessageListener<
 
   @Override
   public void onMessage(Message message, Session session) throws JMSException {
-    Configuration configuration = new GsonBuilder().registerTypeAdapter(HardwareAddress.class, new InterfaceAdapter<HardwareAddress>()).create()
-        .fromJson(TextMessage.class.cast(message).getText(), Configuration.class);
+    Gson gson = new GsonBuilder().registerTypeAdapter(HardwareAddress.class, new InterfaceAdapter<HardwareAddress>()).create();
+    Configuration configuration = gson.fromJson(TextMessage.class.cast(message).getText(), Configuration.class);
     log.info(String.format("Configuration request received"));
 
     ConfigurationReport configurationReport;
@@ -101,7 +93,7 @@ public class ConfigurationRequestHandler implements SessionAwareMessageListener<
       try {
         messageProducer = session.createProducer(replyDestination);
         TextMessage replyMessage = session.createTextMessage();
-        replyMessage.setText(configurationReport.toXML());
+        replyMessage.setText(gson.toJson(configurationReport));
         if (log.isDebugEnabled()) {
           log.debug("Sending reconfiguration report to client.");
         }
@@ -117,6 +109,11 @@ public class ConfigurationRequestHandler implements SessionAwareMessageListener<
     }
   }
 
+  /**
+   * TODO: move this to shared library
+   *
+   * @param <T>
+   */
   final class InterfaceAdapter<T> implements JsonSerializer<T>, JsonDeserializer<T> {
     @Override
     public JsonElement serialize(T object, Type interfaceType, JsonSerializationContext context) {
