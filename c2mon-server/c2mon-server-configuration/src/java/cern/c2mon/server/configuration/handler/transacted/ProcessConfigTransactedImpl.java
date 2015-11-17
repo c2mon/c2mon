@@ -26,6 +26,7 @@ import cern.c2mon.server.daqcommunication.in.JmsContainerManager;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.daq.config.Change;
 
 /**
  * See interface docs.
@@ -120,47 +121,19 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
   @Override
   @Transactional(value = "cacheTransactionManager")
   public ProcessChange doUpdateProcess(final Long id, final Properties properties) throws IllegalAccessException {
-    if (properties.containsKey("id")) {
-      LOGGER.warn("Attempting to change the process id - this is not currently supported!");
-      properties.remove("id");
-    }
-    if (properties.containsKey("name")) {
-      LOGGER.warn("Attempting to change the process name - this is not currently supported!");
-      properties.remove("name");
-    }
-    boolean aliveConfigure = false;
-    if (properties.containsKey("aliveInterval") || properties.containsKey("aliveTagId")) {
-      aliveConfigure = true;
-    }
-    
+
     processCache.acquireWriteLockOnKey(id);
     try {
-      Process process = processCache.get(id);
-      try {
-        if (aliveConfigure) {
-          processFacade.removeAliveTimer(process.getId());
-        }
-        
-        // always empty return
-        processFacade.updateConfig(process, properties);
-        processDAO.updateConfig(process);
-        processCache.releaseWriteLockOnKey(id);
-        if (aliveConfigure) {
-          processFacade.loadAndStartAliveTag(process.getId());
-        }
-      } catch (RuntimeException e) {
-        LOGGER.error("Exception caught while updating a new Process - rolling back DB changes and removing from cache.");
-        processCache.remove(id);
-        if (aliveConfigure) {
-          processFacade.removeAliveTimer(process.getId());
-        }
-        throw new UnexpectedRollbackException("Unexpected exception caught while updating a Process configuration.", e);
-      }
-    } finally {
-      if (processCache.isWriteLockedByCurrentThread(id)) {
-        processCache.releaseWriteLockOnKey(id);
-      }
+      Process processCopy = processCache.getCopy(id);
+  
+      processFacade.updateConfig(processCopy, properties);
+      processDAO.updateConfig(processCopy);
+      processCache.put(id, processCopy);
     }
+    finally {
+      processCache.releaseWriteLockOnKey(id);
+    }
+
     return new ProcessChange(id);
   }
 

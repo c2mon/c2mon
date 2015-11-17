@@ -42,7 +42,6 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.common.ConfigurationException;
-import cern.c2mon.shared.daq.config.Change;
 
 /**
  * See interface documentation.
@@ -191,54 +190,44 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
   @Override
   public ProcessChange updateProcess(final Long processId,
                                     final Properties elementProperties) throws IllegalAccessException {
+    
     if (elementProperties.containsKey("id")) {
       LOGGER.warn("Attempting to change the process id - this is not currently supported!");
       elementProperties.remove("id");
     }
+    
     if (elementProperties.containsKey("name")) {
       LOGGER.warn("Attempting to change the process name - this is not currently supported!");
       elementProperties.remove("name");
     }
+    
     boolean aliveConfigure = false;
     if (elementProperties.containsKey("aliveInterval") || elementProperties.containsKey("aliveTagId")) {
       aliveConfigure = true;
     }
-    Change processUpdate; //not used so far, as no change sent to DAQ
-    processCache.acquireWriteLockOnKey(processId);
-    Process process;
+    
+    ProcessChange processChange = new ProcessChange(processId);
     try {
-      process = processCache.get(processId);
-      try {
-        Long oldAliveId = process.getAliveTagId();
-        processUpdate = processFacade.updateConfig(process, elementProperties);
-        processConfigTransacted.doUpdateProcess(processId, elementProperties);
-        //stop old, start new - transaction is committed here
-        if (aliveConfigure) {
-          processFacade.removeAliveDirectly(oldAliveId);
-          processFacade.loadAndStartAliveTag(process.getId());
-        }
-      } catch (RuntimeException e) {
-        LOGGER.error("Exception caught while updating a new Process - rolling back DB and cache changes for this Process.");
-        //remove newly configured alive directly (process in cache may have been reloaded from DB)
-        if (aliveConfigure) {
-          processFacade.removeAliveDirectly(process.getAliveTagId());
-        }
-        //reload old cache object
-        processCache.remove(processId);
-        processCache.loadFromDb(processId);
-        //reload old alive
-        if (aliveConfigure) {
-          processFacade.loadAndStartAliveTag(processId);
-        }
-        throw new UnexpectedRollbackException("Unexpected exception caught while updating a Process configuration.", e);
+      Long oldAliveId = processCache.getCopy(processId).getAliveTagId();
+
+      processConfigTransacted.doUpdateProcess(processId, elementProperties);
+
+      //stop old, start new - transaction is committed here
+      if (aliveConfigure) {
+        processFacade.removeAliveDirectly(oldAliveId);
+        processFacade.loadAndStartAliveTag(processId);
+        processChange.requiresReboot();
       }
+      
     } catch (CacheElementNotFoundException cacheEx) {
       LOGGER.warn("Unable to locate Process " + processId + " in cache so unable to update it.");
       throw cacheEx;
-    } finally {
-      processCache.releaseWriteLockOnKey(processId);
+    } catch (RuntimeException e) {
+      LOGGER.error("Exception caught while updating Process " + processId + " - rolling back DB and cache changes for this Process.");
+      throw new UnexpectedRollbackException("Unexpected exception caught while updating Process " + processId, e);
     }
-    return new ProcessChange(processId);
+    
+    return processChange;
   }
 
   /**

@@ -843,11 +843,12 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     report = configurationLoader.applyConfiguration(17);
     System.out.println(report.toXML());
 
-    cacheObject = (ProcessCacheObject) processCache.get(2L);
+    cacheObject = (ProcessCacheObject) processCache.getCopy(2L);
     expectedObject.setDescription("updated description");
     expectedObject.setMaxMessageDelay(4000);
 
     ObjectEqualityComparison.assertProcessEquals(expectedObject, cacheObject);
+    assertFalse(report.getProcessesToReboot().isEmpty());
 
     verify(mockManager);
   }
