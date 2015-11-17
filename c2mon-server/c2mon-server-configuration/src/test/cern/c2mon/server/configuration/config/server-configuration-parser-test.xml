@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<bean id="processCache" class="org.easymock.EasyMock"
+		factory-method="createStrictMock">
+		<constructor-arg value="cern.c2mon.server.cache.ProcessCache" />
+	</bean>
+
+	<bean id="equipmentCache" class="org.easymock.EasyMock"
+		factory-method="createStrictMock">
+		<constructor-arg value="cern.c2mon.server.cache.EquipmentCache" />
+	</bean>
+
+	<bean id="subEquipmentCache" class="org.easymock.EasyMock"
+		factory-method="createStrictMock">
+		<constructor-arg value="cern.c2mon.server.cache.SubEquipmentCache" />
+	</bean>
+
+	<bean id="commFaultTagCache" class="org.easymock.EasyMock"
+		factory-method="createStrictMock">
+		<constructor-arg value="cern.c2mon.server.cache.CommFaultTagCache" />
+	</bean>
+
+	<bean id="aliveTagCache" class="org.easymock.EasyMock"
+		factory-method="createStrictMock">
+		<constructor-arg value="cern.c2mon.server.cache.AliveTimerCache" />
+	</bean>
+
+	<bean id="controlTagCache" class="org.easymock.EasyMock"
+		factory-method="createStrictMock">
+		<constructor-arg value="cern.c2mon.server.cache.ControlTagCache" />
+	</bean>
+
+	<bean id="dataTagCache" class="org.easymock.EasyMock"
+		factory-method="createStrictMock">
+		<constructor-arg value="cern.c2mon.server.cache.DataTagCache" />
+	</bean>
+
+	<bean id="ruleTagCache" class="org.easymock.EasyMock"
+		factory-method="createStrictMock">
+		<constructor-arg value="cern.c2mon.server.cache.RuleTagCache" />
+	</bean>
+
+	<bean id="alarmCache" class="org.easymock.EasyMock"
+		factory-method="createStrictMock">
+		<constructor-arg value="cern.c2mon.server.cache.AlarmCache" />
+	</bean>
+
+	<bean id="commandCache" class="org.easymock.EasyMock"
+		  factory-method="createStrictMock">
+		<constructor-arg value="cern.c2mon.server.cache.CommandTagCache" />
+	</bean>
+	
+	<context:annotation-config />
+	<context:component-scan base-package="cern.c2mon.server.configuration.parser" />
+	
+</beans>
