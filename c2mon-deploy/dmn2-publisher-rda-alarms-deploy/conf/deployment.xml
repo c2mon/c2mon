@@ -8,7 +8,7 @@
 				<main-class name="cern.c2mon.publisher.rdaAlarms.RdaAlarmsMain">
 					<arg></arg>
 				</main-class>
-				<property name="log4j.configuration" value="file:conf/log4j.propertues" />
+				<property name="log4j.configuration" value="file:conf/log4j.properties" />
 				<property name="c2mon.client.conf.url" value="file:conf/client.properties" />
 				<property name="provider.properties" value="file:conf/provider.properties" />
 				<property name="mgt.jmx.port" value="17017" />
