@@ -8,7 +8,13 @@
 				<main-class name="cern.c2mon.publisher.rdaAlarms.RdaAlarmsMain">
 					<arg></arg>
 				</main-class>
-				<property name="log4j.configuration" value="file:log4j.propertues" />
+				<property name="log4j.configuration" value="file:conf/log4j.propertues" />
+				<property name="c2mon.client.conf.url" value="file:conf/client.properties" />
+				<property name="provider.properties" value="file:conf/provider.properties" />
+				<property name="mgt.jmx.port" value="17017" />
+				<property name="spring.profiles.active" value="PROD-DB" />
+				<property name="cmw.rda3.transport.server.multiThreadedPublisher" value="true" />
+				<property name="oracle.net.tns_admin" value="/etc" />				
 				<java-vm-args>-Xms384m -Xmx384m -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
 			</startscript>
 		</application>
@@ -16,6 +22,9 @@
 		<application name="dmn2-publisher-rda-alarms-pro">
 			<deployment installLocation="/opt/dmn2/dmn2-publisher-rda-alarms">
 				<directory name="conf">
+					<file name="provider.properties" sourceDir="~dmndev/repo/c2mon/provider" mask="400" />
+					<file name="client.properties" sourceDir="~dmndev/repo/c2mon/client" mask="400" />
+					<file name="log4j.properties" sourceDir="~dmndev/repo/c2mon/provider" mask="644" />
 				</directory>
 				<notification>
 					<mail address="diamon-developers@cern.ch" />
@@ -27,7 +36,11 @@
 
 		<application name="dmn2-publisher-rda-alarms-dev">
 			<deployment installLocation="/opt/dmn2/dmn2-publisher-rda-alarms-dev">
-				<file name="provider.properties" sourceDir="~dmndev/repo/c2mon/provider" mask="400" />
+				<directory name="conf">
+					<file name="provider.properties" sourceDir="~dmndev/repo/c2mon/provider" mask="400" />
+					<file name="client.properties" sourceDir="~dmndev/repo/c2mon/client" mask="400" />
+					<file name="log4j.properties" sourceDir="~dmndev/repo/c2mon/provider" mask="644" />
+				</directory>
 			</deployment>
 			<startscript name="DMN2-PUBLISHER-RDA-ALARMS-DEV">
 			</startscript>

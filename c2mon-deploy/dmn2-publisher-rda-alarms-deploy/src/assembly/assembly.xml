@@ -51,7 +51,7 @@
 		</file>
 		<file>
 			<source>log4j.properties</source>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory>/conf</outputDirectory>
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
