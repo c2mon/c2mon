@@ -13,23 +13,23 @@
 			</startscript>
 		</application>
 
-		<application name="dmn2-pub-alarms-pro">
-			<deployment installLocation="/opt/dmn2/dmn2-alarms/dmn2-pub-alarms">
+		<application name="dmn2-publisher-rda-alarms-pro">
+			<deployment installLocation="/opt/dmn2/dmn2-publiser-rda-alarms">
 				<directory name="conf">
 				</directory>
 				<notification>
 					<mail address="diamon-developers@cern.ch" />
 				</notification>
 			</deployment>
-			<startscript name="DMN2-PUB-ALARMS">
+			<startscript name="DMN2-PUBLISHER-RDA-ALARMS">
 			</startscript>
 		</application>
 
-		<application name="dmn2-pub-alarms-dev">
-			<deployment installLocation="/opt/dmn2/dmn2-alarms/dmn2-pub-alarms-dev">
+		<application name="dmn2-publisher-rda-alarms-dev">
+			<deployment installLocation="/opt/dmn2/dmn2-publisher-rda-alarms-dev">
 				<file name="provider.properties" sourceDir="~dmndev/repo/c2mon/provider" mask="400" />
 			</deployment>
-			<startscript name="DMN2-PUB-ALARMS-DEV">
+			<startscript name="DMN2-PUBLISHER-RDA-ALARMS-DEV">
 			</startscript>
 		</application>
 
