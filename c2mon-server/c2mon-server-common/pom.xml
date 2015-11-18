@@ -3,13 +3,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-  <parent>
+	<parent>
 		<groupId>cern.c2mon.c2mon-server</groupId>
 		<artifactId>c2mon-server-pom</artifactId>
 		<version>RELEASE</version>
 	</parent>
 
-  <groupId>cern.c2mon.c2mon-server</groupId>
+	<groupId>cern.c2mon.c2mon-server</groupId>
 	<artifactId>c2mon-server-common</artifactId>
 	<version>1.6.4-SNAPSHOT</version>
 	<name>c2mon-server-common</name>
@@ -26,15 +26,26 @@
 
 	<dependencies>
 
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+
 		<!-- test deps -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-    </dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.5</version>
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -53,22 +64,22 @@
 		<dependency>
 			<groupId>cern.c2mon.c2mon-shared</groupId>
 			<artifactId>c2mon-shared-common</artifactId>
-      <version>[1.5.7, 2.0.0)</version>
+			<version>[1.5.7, 2.0.0)</version>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-shared</groupId>
 			<artifactId>c2mon-shared-daq</artifactId>
-      <version>[1.5.3, 2.0.0)</version>
+			<version>[1.5.3, 2.0.0)</version>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-shared</groupId>
 			<artifactId>c2mon-shared-client</artifactId>
-      <version>[1.6.0, 2.0.0)</version>
+			<version>[1.6.0, 2.0.0)</version>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-shared</groupId>
 			<artifactId>c2mon-shared-rule</artifactId>
-      <version>[1.2.10, 2.0.0)</version>
+			<version>[1.2.10, 2.0.0)</version>
 		</dependency>
 	</dependencies>
 	<developers />
