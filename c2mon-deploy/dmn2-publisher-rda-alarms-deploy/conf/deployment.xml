@@ -14,7 +14,7 @@
 		</application>
 
 		<application name="dmn2-publisher-rda-alarms-pro">
-			<deployment installLocation="/opt/dmn2/dmn2-publiser-rda-alarms">
+			<deployment installLocation="/opt/dmn2/dmn2-publisher-rda-alarms">
 				<directory name="conf">
 				</directory>
 				<notification>
