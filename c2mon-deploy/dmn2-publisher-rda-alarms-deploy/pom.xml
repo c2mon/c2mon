@@ -14,14 +14,19 @@
 	<name>c2mon-publisher-rda-alarms-deploy</name>
 	<artifactId>c2mon-publisher-rda-alarms-deploy</artifactId>
 
-	<description>DMN2 RDA alarms publishers 
-(the japc-ext-laser replacement)</description>
+	<description>DMN2 RDA alarms publishers (the japc-ext-laser replacement)</description>
 
 	<scm>
 		<developerConnection>https://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/dmn2-publisher-rda-alarms-deploy</developerConnection>
 	</scm>
 
   <dependencies>
+    <dependency>
+	  	<groupId>cern.c2mon.c2mon-publisher</groupId>
+  		<artifactId>c2mon-publisher-rda-alarms</artifactId>
+	  	<version>RELEASE</version>
+    </dependency>
+
 
     <!-- C2MON Client API dependencies -->
     <dependency>
