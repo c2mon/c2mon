@@ -21,6 +21,9 @@ import java.sql.Timestamp;
 public class Alarm {
 
   @Id
+  @Column(name = "servertime")
+  private Timestamp timestamp;
+
   @Column(name = "alarmid")
   private Long id;
 
@@ -35,9 +38,6 @@ public class Alarm {
 
   @Column(name = "faultmember")
   private String faultMember;
-
-  @Column(name = "servertime")
-  private Timestamp timestamp;
 
   @Type(type="yes_no")
   private boolean active;
