@@ -72,10 +72,49 @@ public class AlarmFacadeImplTest {
     EasyMock.verify(alarmCache, tagLocationService);
 
     assertEquals(AlarmCondition.TERMINATE, newAlarm.getState());
-    assertTrue(newAlarm.getTimestamp().after(origTime));
+    assertTrue(newAlarm.getTimestamp().equals(tag.getCacheTimestamp()));
     assertEquals(AlarmCondition.TERMINATE, currentAlarmState.getState()); //also update alarm parameter object (usually in cache)
-    assertTrue(currentAlarmState.getTimestamp().after(origTime));   
+    assertTrue(currentAlarmState.getTimestamp().equals(tag.getCacheTimestamp()));   
     assertTrue(currentAlarmState.isPublishedToLaser());
+  }
+  
+  /**
+   * Testing the change of an Alarm from ACTIVE to TERMINATE. Important is also that
+   * the new alarm timestamp is set to the tag cache timestamp. This is currently the only
+   * way to determine which tag event triggered which alarm evaluation.
+   */
+  @Test
+  public void testUpdateTimestampIsSetToTagCacheTimestamp() {
+    Timestamp tagTime = new Timestamp(System.currentTimeMillis() - 1000);
+
+    DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
+    AlarmCacheObject currentAlarmState = CacheObjectCreation.createTestAlarm2();
+    Timestamp origTime = new Timestamp(System.currentTimeMillis() - 50000);
+    currentAlarmState.setTimestamp(origTime);
+    tag.setSourceTimestamp(tagTime);
+    //check set as expected
+    assertEquals(AlarmCondition.ACTIVE, currentAlarmState.getState());
+    assertEquals(AlarmCondition.TERMINATE, currentAlarmState.getCondition().evaluateState(tag.getValue()));
+    assertTrue(tag.isValid());
+    assertFalse(currentAlarmState.isPublishedToLaser());
+    currentAlarmState.hasBeenPublished(origTime);
+    
+    // Recording Mock calls
+    alarmCache.acquireWriteLockOnKey(currentAlarmState.getId());
+    EasyMock.expect(alarmCache.get(currentAlarmState.getId())).andReturn(currentAlarmState);
+    alarmCache.put(currentAlarmState.getId(), currentAlarmState);
+    alarmCache.releaseWriteLockOnKey(currentAlarmState.getId());
+    EasyMock.replay(alarmCache, tagLocationService);
+    
+    //(1) test update works    
+    AlarmCacheObject newAlarm = (AlarmCacheObject) alarmFacadeImpl.update(currentAlarmState.getId(), tag);
+    EasyMock.verify(alarmCache, tagLocationService);
+
+    assertEquals(AlarmCondition.TERMINATE, newAlarm.getState());
+    assertTrue(newAlarm.getTimestamp().equals(tag.getCacheTimestamp()));
+    assertEquals(AlarmCondition.TERMINATE, currentAlarmState.getState()); //also update alarm parameter object (usually in cache)
+    assertTrue(currentAlarmState.getTimestamp().equals(tag.getCacheTimestamp()));   
+    assertFalse(currentAlarmState.isPublishedToLaser());
   }
   
   /**

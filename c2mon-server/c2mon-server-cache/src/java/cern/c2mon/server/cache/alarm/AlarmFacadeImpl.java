@@ -268,7 +268,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     // Reset previous change state
     alarmCacheObject.setAlarmChangeState(AlarmChangeState.CHANGE_NONE);
     // this time is then used in LASER publication as user timestamp
-    Timestamp alarmTime = new Timestamp(System.currentTimeMillis());
+    Timestamp alarmTime = tag.getCacheTimestamp();
     // not possible to evaluate alarms with associated null tag; occurs during normal operation
     // (may change in future is alarm state depends on quality f.eg.)
     if (tag.getValue() == null) {
