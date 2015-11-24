@@ -30,7 +30,7 @@ public class SonicConnectorTest extends GenericMessageHandlerTst {
      * the case when the connection does not succed. Any other exception during the test is 
      * considered to be an error.
      */
-    @Test
+//    @Test
     public void testSonicConnector()
     {
         try
