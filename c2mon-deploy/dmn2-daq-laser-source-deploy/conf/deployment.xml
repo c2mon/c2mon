@@ -6,7 +6,7 @@
 		<application>
 			<startscript>
 				<main-class name="cern.c2mon.daq.common.startup.DaqStartup">
-					<arg>-processName ${PROCESS_NAME} -noDeadband</arg>
+					<arg>-processName ${PROCESS_NAME}</arg>
 					<output>
 						<file name="${DAQ_LOG_HOME}/${PROCESS_NAME}.out.log" />
 					</output>
