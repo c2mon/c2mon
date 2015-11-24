@@ -154,4 +154,5 @@
       </plugins>
     </pluginManagement>
   </build>
+  <groupId>cern.c2mon.c2mon-daq</groupId>
 </project>
