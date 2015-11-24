@@ -15,7 +15,7 @@
 			</startscript>
 		</application>
 
-		<application name="dmn2-daq-laser-source">
+		<application name="dmn2-daq-laser-source-pro">
 
 			<deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-laser-source-pro">
 				<directory name="conf">
