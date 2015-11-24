@@ -17,7 +17,7 @@
 
 		<application name="dmn2-daq-laser-source">
 
-			<deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-laser-source">
+			<deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-laser-source-pro">
 				<directory name="conf">
 					<file name="c2mon.properties" source="~diamonop/c2mon/daq/daq.properties" mask="400" />					
 					<file name="log4j.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
@@ -28,9 +28,22 @@
 				</notification>
 			</deployment>
 			
-			<startscript name="DMN2-DAQ-LASER-SOURCE">
-				<env name="PROCESS_NAME" value="P_ALARM" />
-				<java-vm-args>-Xms1G -Xmx1G -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
+			<startscript name="DMN2-DAQ-LASER-ELEC">
+				<env name="PROCESS_NAME" value="P_ALARM_ELEC" />
+				<java-vm-args>-Xms2G -Xmx2G -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
+			</startscript>
+			<startscript name="DMN2-DAQ-LASER-MISC">
+				<env name="PROCESS_NAME" value="P_ALARM_MISC" />
+			</startscript>
+			<startscript name="DMN2-DAQ-LASER-POFGC">
+				<env name="PROCESS_NAME" value="P_ALARM_POFGC" />
+				<java-vm-args>-Xms2G -Xmx2G -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
+			</startscript>
+			<startscript name="DMN2-DAQ-LASER-TIMOP">
+				<env name="PROCESS_NAME" value="P_ALARM_TIMOP" />
+			</startscript>
+			<startscript name="DMN2-DAQ-LASER-VACUUM">
+				<env name="PROCESS_NAME" value="P_ALARM_VACUUM" />
 			</startscript>
 		</application>
 
