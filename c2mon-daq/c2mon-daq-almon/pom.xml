@@ -80,14 +80,14 @@
       <groupId>cern.japc</groupId>
       <artifactId>japc</artifactId>
       <!-- <version>[2.23.16,3.0.0)</version> -->
-      <version>2.23.16</version>
+      <version>3.2.9</version>
     </dependency>
 
     <dependency>
       <groupId>cern.japc</groupId>
       <artifactId>japc-ext-cmwrda</artifactId>
       <!-- <version>[2.16.1,3.0.0)</version> -->
-      <version>2.16.1</version>
+      <version>3.2.1</version>
     </dependency>
 
     <dependency>
@@ -103,14 +103,14 @@
       <groupId>cern.japc</groupId>
       <artifactId>japc-ext-cmwrda3</artifactId>
       <!-- <version>[1.0.2,2.0.0)</version> -->
-      <version>1.0.2</version>
+      <version>2.1.1</version>
     </dependency>
 
     <dependency>
       <groupId>cern.japc</groupId>
       <artifactId>japc-ext-tgm</artifactId>
       <!-- <version>[2.5.10,3.0.0)</version> -->
-      <version>2.5.10</version>
+      <version>3.0.5</version>
     </dependency>
 
     <dependency>
