@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.spectrum.SpectrumEvent.SpectrumEventType;
+import cern.c2mon.daq.spectrum.listener.SpectrumListenerJunit;
 import cern.c2mon.daq.spectrum.util.DiskBufferTest;
 import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.UseConf;
@@ -135,6 +136,9 @@ public class SpectrumEventProcessorTest extends GenericMessageHandlerTst {
         theHandler.connectToDataSource();                        
         SpectrumTestUtil.trySleepSec(3);
         LOG.info("Init done.");
+        
+        SpectrumListenerJunit spectrumListenerJunit = new SpectrumListenerJunit();
+        spectrumListenerJunit.setProcessor(theHandler.getProcessor());
         SpectrumTestUtil.sendMessage(primaryServer, SpectrumEventType.RST, "-", 1);
         SpectrumTestUtil.sendMessage(secondaryServer, SpectrumEventType.RST, "-", 1);
         SpectrumTestUtil.trySleepSec(3);

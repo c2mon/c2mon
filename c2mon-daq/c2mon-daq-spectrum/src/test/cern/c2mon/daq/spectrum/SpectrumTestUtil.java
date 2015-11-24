@@ -69,7 +69,8 @@ public class SpectrumTestUtil {
             address = InetAddress.getByName(hostname);
             buffer.append(address.getHostAddress() + " ");
         } catch (UnknownHostException e) {
-            LOG.error("Unknown host {}", hostname, e);
+            LOG.warn("Unknown host {}", hostname);
+            LOG.trace("Tacktrace as follows", e);
             buffer.append(hostname + " ");
         }
         
