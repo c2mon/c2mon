@@ -183,19 +183,21 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
       properties.remove("subEquipmentId");
     }
     Change dataTagUpdate = null;
-    tagCache.acquireWriteLockOnKey(id);
+    tagCache.acquireWriteLockOnKey(id); // needed to avoid overwrite of incoming value updates
     try {
-      DataTag dataTag = tagCache.get(id);
-      dataTagUpdate = commonTagFacade.updateConfig(dataTag, properties);
-      configurableDAO.updateConfig(dataTag);
+      DataTag dataTagCopy = tagCache.getCopy(id);
+      dataTagUpdate = commonTagFacade.updateConfig(dataTagCopy, properties);
+
+      configurableDAO.updateConfig(dataTagCopy);
+      tagCache.putQuiet(dataTagCopy);
       if (((DataTagUpdate) dataTagUpdate).isEmpty()) {
         return new ProcessChange();
       } else {
-        if (dataTag.getEquipmentId() != null) {
-          return new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(dataTag.getEquipmentId()), dataTagUpdate);
+        if (dataTagCopy.getEquipmentId() != null) {
+          return new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(dataTagCopy.getEquipmentId()), dataTagUpdate);
         }
         else {
-          return new ProcessChange(subEquipmentFacade.getProcessIdForAbstractEquipment(dataTag.getSubEquipmentId()), dataTagUpdate);
+          return new ProcessChange(subEquipmentFacade.getProcessIdForAbstractEquipment(dataTagCopy.getSubEquipmentId()), dataTagUpdate);
         }
       }
     } catch (CacheElementNotFoundException ex) { //tag not found

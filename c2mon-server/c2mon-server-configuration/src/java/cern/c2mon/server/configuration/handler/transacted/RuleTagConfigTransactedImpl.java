@@ -129,30 +129,35 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
   public void doUpdateRuleTag(Long id, Properties properties) throws IllegalAccessException {
     LOGGER.trace("Updating RuleTag " + id);   
+
     tagCache.acquireWriteLockOnKey(id);
     try {
-      RuleTag ruleTag = tagCache.get(id);
+      RuleTag ruleTagCopy = tagCache.getCopy(id);
       Collection<Long> oldTagIds = null;
+
       //first record the old tag Ids before reconfiguring
       if (properties.containsKey("ruleText")) {
-         oldTagIds = ruleTag.getRuleInputTagIds();
+         oldTagIds = ruleTagCopy.getRuleInputTagIds();
       }    
-      try {            
-        commonTagFacade.updateConfig(ruleTag, properties);      
-        configurableDAO.updateConfig(ruleTag);      
+
+      try {
+        commonTagFacade.updateConfig(ruleTagCopy, properties);
+        configurableDAO.updateConfig(ruleTagCopy);
+        tagCache.putQuiet(ruleTagCopy);
       } catch (RuntimeException e) {
         String msg = "Exception caught while updating Rule";
         LOGGER.error(msg, e);
         throw new UnexpectedRollbackException(msg, e);      
       }
+
       try {
         //if successful so far, adjust associated Tags (remove all old, add all new)
         if (oldTagIds != null) {
           for (Long oldTagId : oldTagIds) {
-            tagConfigGateway.removeRuleFromTag(oldTagId, ruleTag.getId());
+            tagConfigGateway.removeRuleFromTag(oldTagId, ruleTagCopy.getId());
           }
-          for (Long newTagId : ruleTag.getRuleInputTagIds()) {
-            tagConfigGateway.addRuleToTag(newTagId, ruleTag.getId());    
+          for (Long newTagId : ruleTagCopy.getRuleInputTagIds()) {
+            tagConfigGateway.addRuleToTag(newTagId, ruleTagCopy.getId());
           }
         }
       } catch (RuntimeException e) {
@@ -162,14 +167,14 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
         if (oldTagIds != null) {
           for (Long oldTagId : oldTagIds) {
             try {
-              tagConfigGateway.addRuleToTag(oldTagId, ruleTag.getId());           
+              tagConfigGateway.addRuleToTag(oldTagId, ruleTagCopy.getId());
             } catch (Exception ex) {
               LOGGER.warn("Exception caught while rolling back rule update", ex);
             }            
           }
-          for (Long newTagId : ruleTag.getRuleInputTagIds()) {
+          for (Long newTagId : ruleTagCopy.getRuleInputTagIds()) {
             try {
-              tagConfigGateway.removeRuleFromTag(newTagId, ruleTag.getId());              
+              tagConfigGateway.removeRuleFromTag(newTagId, ruleTagCopy.getId());
             } catch (Exception ex) {
               LOGGER.warn("Exception caught while rolling back rule update", ex);
             }
@@ -181,7 +186,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
       //reset all parent DAQ/Equipment ids of rules higher up the pile - if fails, no rolling back possible, so rule cache may be left inconsistent
       try {
         LOGGER.trace("Resetting all relevant Rule parent Process/Equipment ids");
-        for (Long parentRuleId : ruleTag.getRuleIds()) {
+        for (Long parentRuleId : ruleTagCopy.getRuleIds()) {
           ruleTagFacade.setParentSupervisionIds(parentRuleId);
         }
       } catch (Exception e) {
