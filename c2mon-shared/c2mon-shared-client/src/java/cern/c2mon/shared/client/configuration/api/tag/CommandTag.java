@@ -60,6 +60,11 @@ public class CommandTag extends Tag {
   private String rbacProperty;
 
   /**
+   * Expected data type for the tag's value
+   */
+  private DataType dataType;
+
+  /**
    * Hardware address of the CommandTag. The Hardware address is required by the data source to actually execute the
    * command.
    * Saved as String to make the property simpler
@@ -73,7 +78,7 @@ public class CommandTag extends Tag {
 
   @Override
   public boolean requiredFieldsGiven() {
-    return (getId() != null) && (getName() != null) && (getDescription() != null) && (getDataType() != null)
+    return (getId() != null) && (getName() != null) && (getDescription() != null)
         && (getClientTimeout() != null) && (getExecTimeout() != null) && (getSourceTimeout() != null)
         && (getSourceRetries() != null) && (getRbacClass() != null) && (getRbacDevice() != null) && (getRbacProperty() != null) ;
   }
@@ -81,7 +86,8 @@ public class CommandTag extends Tag {
   @Builder
   public CommandTag(boolean deleted, Long id, String name, String description, DataType dataType, TagMode mode, @Singular List<Alarm> alarms
       , Integer clientTimeout, Integer execTimeout, Integer sourceTimeout, Integer sourceRetries, String rbacClass, String rbacDevice, String rbacProperty, HardwareAddress hardwareAddress) {
-    super(deleted, id, name, description, dataType, mode, alarms);
+    super(deleted, id, name, description, mode, alarms);
+    this.dataType = dataType;
     this.clientTimeout = clientTimeout;
     this.execTimeout = execTimeout;
     this.sourceTimeout = sourceTimeout;

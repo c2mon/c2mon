@@ -1,10 +1,19 @@
 package cern.c2mon.server.configuration.handler.transacted;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Properties;
-
+import cern.c2mon.server.cache.*;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.cache.loading.ControlTagLoaderDAO;
+import cern.c2mon.server.common.control.ControlTag;
+import cern.c2mon.server.common.control.ControlTagCacheObject;
+import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
+import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
+import cern.c2mon.server.configuration.impl.ProcessChange;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.daq.config.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,28 +22,10 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
-import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
-import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.c2mon.server.cache.ControlTagCache;
-import cern.c2mon.server.cache.ControlTagFacade;
-import cern.c2mon.server.cache.DataTagFacade;
-import cern.c2mon.server.cache.EquipmentFacade;
-import cern.c2mon.server.cache.ProcessFacade;
-import cern.c2mon.server.cache.SubEquipmentFacade;
-import cern.c2mon.server.cache.TagLocationService;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.cache.loading.ControlTagLoaderDAO;
-import cern.c2mon.server.common.control.ControlTag;
-import cern.c2mon.shared.client.configuration.ConfigurationElement;
-import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
-import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
-import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
-import cern.c2mon.shared.daq.config.Change;
-import cern.c2mon.shared.daq.config.DataTagAdd;
-import cern.c2mon.shared.daq.config.DataTagRemove;
-import cern.c2mon.shared.daq.config.DataTagUpdate;
-import cern.c2mon.shared.daq.config.ITagChange;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * See interface for doc.
@@ -102,6 +93,11 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
     try {
       LOGGER.trace("Creating ControlTag " + element.getEntityId());
       ControlTag controlTag = commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+
+      if (controlTag.getEquipmentId() != null) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Equipment id cannot be set at creation time for ControlTags - unable to configure.");
+      }
+
       try {
         configurableDAO.insert(controlTag);
       } catch (Exception e) {
@@ -138,10 +134,24 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
     Change controlTagUpdate;       
     tagCache.acquireWriteLockOnKey(id);
     try {      
-      ControlTag controlTag = tagCache.get(id);
-      controlTagUpdate = commonTagFacade.updateConfig(controlTag, elementProperties); //sets id of controlTagUpdate also     
-      configurableDAO.updateConfig(controlTag);
-      if (((ControlTagFacade) commonTagFacade).isInProcessList(controlTag)) {
+      ControlTag controlTagCopy = tagCache.getCopy(id);
+
+      // Removing temporally the equipment and process id to not store it into the database (chicken-egg problem)
+      Long eqId = controlTagCopy.getEquipmentId();
+      Long processId = controlTagCopy.getProcessId();
+
+      ((ControlTagCacheObject) controlTagCopy).setEquipmentId(null);
+
+      controlTagUpdate = commonTagFacade.updateConfig(controlTagCopy, elementProperties); //sets id of controlTagUpdate also
+      configurableDAO.updateConfig(controlTagCopy);
+
+      // Setting back equipment and process ID for cache object
+      ((ControlTagCacheObject) controlTagCopy).setEquipmentId(eqId);
+      ((ControlTagCacheObject) controlTagCopy).setProcessId(processId);
+
+      tagCache.putQuiet(controlTagCopy);
+
+      if (((ControlTagFacade) commonTagFacade).isInProcessList(controlTagCopy)) {
         tagCache.releaseWriteLockOnKey(id);
         return getProcessChanges((DataTagUpdate) controlTagUpdate, id);  
       } else {        

@@ -19,14 +19,13 @@ public class ConfigurationStatusTagUtil {
         .id(id)
         .name("StatusTag")
         .description("foo")
-        .dataType(DataType.INTEGER)
         .build();
 
     Properties props = new Properties();
     props.setProperty("name", "StatusTag");
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", DataType.INTEGER.toString());
+    props.setProperty("dataType", DataType.STRING.toString());
     props.setProperty("isLogged", String.valueOf(true));
     props.setProperty("processId", String.valueOf(1l));
 
@@ -39,7 +38,6 @@ public class ConfigurationStatusTagUtil {
         .name("StatusTag")
         .description("foo")
         .mode(TagMode.TEST)
-        .dataType(DataType.INTEGER)
         .isLogged(false)
         .build();
 
@@ -47,7 +45,7 @@ public class ConfigurationStatusTagUtil {
     props.setProperty("name", "StatusTag");
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", DataType.INTEGER.toString());
+    props.setProperty("dataType", DataType.STRING.toString());
     props.setProperty("isLogged", String.valueOf(false));
     props.setProperty("processId", String.valueOf(1l));
 
@@ -59,14 +57,13 @@ public class ConfigurationStatusTagUtil {
         .id(id)
         .name("StatusTag")
         .description("foo")
-        .dataType(DataType.INTEGER)
         .build();
 
     Properties props = new Properties();
     props.setProperty("name", "StatusTag");
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", DataType.INTEGER.toString());
+    props.setProperty("dataType", DataType.STRING.toString());
     props.setProperty("isLogged", String.valueOf(true));
     props.setProperty("processId", String.valueOf(1l));
 
@@ -79,7 +76,6 @@ public class ConfigurationStatusTagUtil {
         .name("StatusTag_Update")
         .description("foo_Update")
         .mode(TagMode.OPERATIONAL)
-        .dataType(DataType.DOUBLE)
         .isLogged(true)
         .build();
 
@@ -87,7 +83,6 @@ public class ConfigurationStatusTagUtil {
     props.setProperty("name", "StatusTag_Update");
     props.setProperty("description", "foo_Update");
     props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("dataType", DataType.DOUBLE.toString());
     props.setProperty("isLogged", String.valueOf(true));
 
     return new Pair<>(pro, props);
@@ -96,12 +91,10 @@ public class ConfigurationStatusTagUtil {
   public static Pair<StatusTag, Properties> buildUpdateStatusTagWithSomeFields(Long id) {
     StatusTag pro = StatusTag.builder()
         .id(id)
-        .name("StatusTag_Update")
         .description("foo_Update")
         .build();
 
     Properties props = new Properties();
-    props.setProperty("name", "StatusTag_Update");
     props.setProperty("description", "foo_Update");
 
     return new Pair<>(pro, props);
@@ -113,14 +106,13 @@ public class ConfigurationStatusTagUtil {
     StatusTag.StatusTagBuilder pro = StatusTag.builder()
         .id(id)
         .name("StatusTag"+parent)
-        .description("foo")
-        .dataType(DataType.INTEGER);
+        .description("foo");
 
     Properties props = new Properties();
     props.setProperty("name", "StatusTag"+parent);
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", DataType.INTEGER.toString());
+    props.setProperty("dataType", DataType.STRING.toString());
     props.setProperty("isLogged", String.valueOf(true));
     switch(parent){
       case "process" : props.setProperty("processId", String.valueOf(parentId)); break;
@@ -137,14 +129,13 @@ public class ConfigurationStatusTagUtil {
         .name("StatusTag"+parent)
         .description("foo")
         .mode(TagMode.TEST)
-        .dataType(DataType.INTEGER)
         .isLogged(false);
 
     Properties props = new Properties();
     props.setProperty("name", "StatusTag"+parent);
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", DataType.INTEGER.toString());
+    props.setProperty("dataType", DataType.STRING.toString());
     props.setProperty("isLogged", String.valueOf(false));
     switch(parent){
       case "process" : props.setProperty("processId", String.valueOf(parentId)); break;

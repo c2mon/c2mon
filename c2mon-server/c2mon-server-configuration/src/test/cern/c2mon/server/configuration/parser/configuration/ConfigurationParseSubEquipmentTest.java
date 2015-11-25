@@ -519,7 +519,7 @@ public class ConfigurationParseSubEquipmentTest {
   @Test
   public void subEquipmentCreate_withNewControlTag() {
     subEquipmentCreate.expect(ConfigurationParseException.class);
-    subEquipmentCreate.expectMessage("Not possible to create a ControlTag for Process or Equipment.");
+    subEquipmentCreate.expectMessage("Not possible to create a ControlTag for Process or Equipment when the parent already exists.");
 
     // Setup Configuration Instance
     SubEquipment subEquipment = buildUpdateSubEquipmentNewControlTag(1l);

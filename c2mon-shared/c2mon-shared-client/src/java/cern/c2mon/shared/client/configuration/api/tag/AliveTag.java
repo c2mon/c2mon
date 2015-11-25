@@ -29,22 +29,23 @@ public class AliveTag extends ControlTag {
     address = privateAlarmCondition.toConfigXML();
   }
 
+  @DefaultValue("Long")
+  private DataType dataType = null;
 
-  // TODO CHECK if a AliveTag DataType is always a LONG
-//  @DefaultValue("Long")
-//  private final DataType dataType = null;
-//
-//  @DefaultValue("false")
-//  private Boolean isLogged = null;
+  @DefaultValue("false")
+  private Boolean isLogged = null;
 
   @Override
   public boolean requiredFieldsGiven() {
-    return (getId() != null) && (getName() != null) && (getDescription() != null);
+    return super.requiredFieldsGiven();
   }
 
   @Builder
   public AliveTag( Long id, String name, String description, TagMode mode, @Singular List<Alarm> alarms,  DataTagAddress address) {
-    super(id, name, description, DataType.LONG, mode, false, alarms);
+    super(id, name, description, mode, alarms);
     this.address = address != null ? address.toConfigXML() : null;
   }
+
+
+
 }

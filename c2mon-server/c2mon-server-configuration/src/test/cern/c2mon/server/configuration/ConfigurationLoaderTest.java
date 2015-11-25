@@ -304,6 +304,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedObject.setMinValue(null); // check can reset min & max to null using
                                       // update
     expectedObject.setMaxValue(null);
+    cacheObject = (ControlTagCacheObject) controlTagCache.get(500L);
     ObjectEqualityComparison.assertDataTagConfigEquals(expectedObject, cacheObject);
 
   }

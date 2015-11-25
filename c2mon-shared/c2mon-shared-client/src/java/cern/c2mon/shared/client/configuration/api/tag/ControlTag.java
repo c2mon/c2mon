@@ -26,13 +26,10 @@ public abstract class ControlTag extends Tag {
    * Indicates whether this tag's value changes shall be logged to the
    * short-term log.
    */
-  @DefaultValue("true")
-  private Boolean isLogged = true;
 
-  public ControlTag(Long id, String name, String description, DataType dataType, TagMode mode,
-                    Boolean isLogged, @Singular List<Alarm> alarms) {
-    super(false, id, name, description, dataType, mode, alarms);
-    this.isLogged = isLogged;
+  public ControlTag(Long id, String name, String description, TagMode mode,
+                    @Singular List<Alarm> alarms) {
+    super(false, id, name, description, mode, alarms);
   }
 
 }

@@ -48,6 +48,7 @@ public class DataTag<T extends Number> extends Tag {
   /**
    * Address configuration of the datatag (if any)
    */
+  // TODO: check if update is possible
   @Setter(AccessLevel.NONE)
   private String address;
 
@@ -63,16 +64,27 @@ public class DataTag<T extends Number> extends Tag {
   private String unit;
 
   /**
+   * Expected data type for the tag's value
+   */
+  private DataType dataType;
+
+  /**
    * Indicates whether this tag's value changes shall be logged to the
    * short-term log.
    */
   @DefaultValue("true")
   private Boolean isLogged = true;
 
+  @Override
+  public boolean requiredFieldsGiven() {
+    return super.requiredFieldsGiven()  && (getDataType() != null);
+  }
+
   @Builder
   public DataTag(boolean deleted, Long id, String name, String description, DataType dataType, TagMode mode, @Singular List<Alarm> alarms,
       Boolean isLogged, String unit, T minValue, T maxValue, DataTagAddress address, String dipAddress, String japcAddress ) {
-    super(deleted, id, name, description, dataType, mode, alarms);
+    super(deleted, id, name, description, mode, alarms);
+    this.dataType = dataType;
     this.minValue = minValue;
     this.maxValue = maxValue;
     this.address = address != null ? address.toConfigXML() : null;

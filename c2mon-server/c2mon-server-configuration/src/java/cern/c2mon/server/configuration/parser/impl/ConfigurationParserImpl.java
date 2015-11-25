@@ -323,7 +323,7 @@ public class ConfigurationParserImpl implements ConfigurationParser {
     if (parentTask == null) {
       for (SequenceTask task : tasks) {
         if (task.getConfigurationElement().getAction().equals(Action.CREATE)) {
-          throw new ConfigurationParseException("Not possible to create a ControlTag for Process or Equipment.");
+          throw new ConfigurationParseException("Not possible to create a ControlTag for Process or Equipment when the parent already exists.");
         }
       }
     } else if (parentTask.getConfigurationElement().getAction().equals(Action.UPDATE)) {

@@ -56,11 +56,13 @@ public class Equipment implements ConfigurationObject {
   /**
    * Fully qualified name of the EquipmentMessageHandler subclass to be used by the DAQ to connect to the equipment.
    */
+  // update not allowed
   private String handlerClass;
 
   /**
    * Address parameters used by the handler class to connect to the equipment.
    */
+  // TODO: check if update is possible
   private String address;
 
   @IgnoreProperty

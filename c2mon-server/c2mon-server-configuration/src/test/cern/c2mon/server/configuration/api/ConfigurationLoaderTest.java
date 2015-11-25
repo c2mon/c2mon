@@ -37,6 +37,7 @@ import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
+import com.google.gson.Gson;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.After;
@@ -66,6 +67,7 @@ import static cern.c2mon.server.configuration.parser.util.ConfigurationAliveTagU
 import static cern.c2mon.server.configuration.parser.util.ConfigurationAliveTagUtil.builderAliveTagWithPrimFields;
 import static cern.c2mon.server.configuration.parser.util.ConfigurationAllTogetherUtil.buildAllMandatory;
 import static cern.c2mon.server.configuration.parser.util.ConfigurationCommFaultTagUtil.builderCommFaultTagUpdate;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationCommFaultTagUtil.builderCommFaultTagWithAllFields;
 import static cern.c2mon.server.configuration.parser.util.ConfigurationCommFaultTagUtil.builderCommFaultTagWithPrimFields;
 import static cern.c2mon.server.configuration.parser.util.ConfigurationCommandTagUtil.buildDeleteCommandTag;
 import static cern.c2mon.server.configuration.parser.util.ConfigurationCommandTagUtil.builderCommandTagUpdate;
@@ -94,7 +96,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:cern/c2mon/server/configuration/config/server-configuration-loader-api-test.xml"})
-@Ignore
+@DirtiesContext
 public class ConfigurationLoaderTest {
 
   @Autowired
@@ -175,9 +177,6 @@ public class ConfigurationLoaderTest {
   @Before
   public void beforeTest() throws IOException {
 
-    // make sure Process is "running" (o.w. nothing is sent to DAQ)
-
-
     // reset mock
     reset(mockManager);
   }
@@ -185,6 +184,13 @@ public class ConfigurationLoaderTest {
   @After
   public void afterTest() throws IOException {
     testDataInserter.removeTestData();
+  }
+
+  @Test
+  public void serialiseToJson() {
+    Configuration insert =  buildAllMandatory()._1;
+
+    new Gson().toJson(insert);
   }
 
   @Test
@@ -251,28 +257,12 @@ public class ConfigurationLoaderTest {
     assertFalse(aliveTimerCache.hasKey(12L));
 
     verify(mockManager);
-
   }
 
   @Test
   public void testUpdateProcess() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
     // called once when updating the equipment;
     // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(mockManager.sendConfiguration(eq(1L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
-
-      @Override
-      public ConfigurationChangeEventReport answer() throws Throwable {
-        List<Change> changeList = (List<Change>) EasyMock.getCurrentArguments()[1];
-        ConfigurationChangeEventReport report = new ConfigurationChangeEventReport();
-        for (Change change : changeList) {
-          ChangeReport changeReport = new ChangeReport(change);
-          changeReport.setState(ChangeReport.CHANGE_STATE.SUCCESS);
-          report.appendChangeReport(changeReport);
-        }
-        return report;
-      }
-    });
-
     replay(mockManager);
 
     // SETUP:
@@ -304,6 +294,7 @@ public class ConfigurationLoaderTest {
     ProcessCacheObject expectedCacheObjectProcess = cacheObjectFactory.buildProcessCacheObject(1L, process._2);
     expectedCacheObjectProcess.setDescription(processUpdate._2.getProperty("description"));
     expectedCacheObjectProcess.setMaxMessageSize(Integer.parseInt(processUpdate._2.getProperty("maxMessageSize")));
+    expectedCacheObjectProcess.setJmsDaqCommandQueue(cacheObjectProcess.getJmsDaqCommandQueue());
 
     ObjectEqualityComparison.assertProcessEquals(expectedCacheObjectProcess, cacheObjectProcess);
 
@@ -962,7 +953,7 @@ public class ConfigurationLoaderTest {
     Pair<Process.ProcessBuilder, Properties> process = builderProcessWithAllFields(1L, 11L, 12L);
 
     Pair<StatusTag.StatusTagBuilder, Properties> statusTagE = builderStatusTagWithPrimFields(21L, "equipment", 2L);
-    Pair<CommFaultTag.CommFaultTagBuilder, Properties> commFaultTagE = builderCommFaultTagWithPrimFields(22L, "equipment", 2L);
+    Pair<CommFaultTag.CommFaultTagBuilder, Properties> commFaultTagE = builderCommFaultTagWithAllFields(22L, "equipment", 2L);
     Pair<AliveTag.AliveTagBuilder, Properties> aliveTagE = builderAliveTagWithAllFields(23l, "equipment", 2L);
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L, 21L, 22L, 23L);
     Pair<DataTag.DataTagBuilder, Properties> dataTag = builderDataTagWithAllFields(100L, "equipment", 2L);
@@ -1032,21 +1023,6 @@ public class ConfigurationLoaderTest {
   public void testUpdateStatusTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
     // called once when updating the equipment;
     // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(mockManager.sendConfiguration(eq(1L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
-
-      @Override
-      public ConfigurationChangeEventReport answer() throws Throwable {
-        List<Change> changeList = (List<Change>) EasyMock.getCurrentArguments()[1];
-        ConfigurationChangeEventReport report = new ConfigurationChangeEventReport();
-        for (Change change : changeList) {
-          ChangeReport changeReport = new ChangeReport(change);
-          changeReport.setState(ChangeReport.CHANGE_STATE.SUCCESS);
-          report.appendChangeReport(changeReport);
-        }
-        return report;
-      }
-    });
-
     replay(mockManager);
 
     // SETUP:
@@ -1146,7 +1122,7 @@ public class ConfigurationLoaderTest {
     Pair<Process.ProcessBuilder, Properties> process = builderProcessWithAllFields(1L, 11L, 12L);
 
     Pair<StatusTag.StatusTagBuilder, Properties> statusTagE = builderStatusTagWithPrimFields(21L, "equipment", 2L);
-    Pair<CommFaultTag.CommFaultTagBuilder, Properties> commFaultTagE = builderCommFaultTagWithPrimFields(22L, "equipment", 2L);
+    Pair<CommFaultTag.CommFaultTagBuilder, Properties> commFaultTagE = builderCommFaultTagWithAllFields(22L, "equipment", 2L);
     Pair<AliveTag.AliveTagBuilder, Properties> aliveTagE = builderAliveTagWithAllFields(23l, "equipment", 2L);
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L, 21L, 22L, 23L);
     Pair<DataTag.DataTagBuilder, Properties> dataTag = builderDataTagWithAllFields(100L, "equipment", 2L);

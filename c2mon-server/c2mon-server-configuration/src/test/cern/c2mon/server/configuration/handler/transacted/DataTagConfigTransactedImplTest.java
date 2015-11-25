@@ -73,7 +73,9 @@ public class DataTagConfigTransactedImplTest {
     update.setDataTagId(dataTag.getId());
     update.setEquipmentId(dataTag.getEquipmentId());
     dataTagCache.acquireWriteLockOnKey(dataTag.getId());
-    EasyMock.expect(dataTagCache.get(dataTag.getId())).andReturn(dataTag);
+    EasyMock.expect(dataTagCache.getCopy(dataTag.getId())).andReturn(dataTag);
+    dataTagCache.putQuiet(dataTag);
+    EasyMock.expectLastCall();
     EasyMock.expect(dataTagFacade.updateConfig(dataTag, new Properties())).andReturn(update);
     dataTagLoaderDAO.updateConfig(dataTag);
     dataTagCache.releaseWriteLockOnKey(dataTag.getId());
@@ -102,7 +104,9 @@ public class DataTagConfigTransactedImplTest {
     update.setEquipmentId(dataTag.getEquipmentId());
     update.setName("new name");
     dataTagCache.acquireWriteLockOnKey(dataTag.getId());
-    EasyMock.expect(dataTagCache.get(dataTag.getId())).andReturn(dataTag);
+    EasyMock.expect(dataTagCache.getCopy(dataTag.getId())).andReturn(dataTag);
+    dataTagCache.putQuiet(dataTag);
+    EasyMock.expectLastCall();
     EasyMock.expect(dataTagFacade.updateConfig(dataTag, new Properties())).andReturn(update);
     dataTagLoaderDAO.updateConfig(dataTag);
     dataTagCache.releaseWriteLockOnKey(dataTag.getId());
@@ -135,7 +139,9 @@ public class DataTagConfigTransactedImplTest {
 
     dataTagCache.acquireWriteLockOnKey(dataTag.getId());
 
-    EasyMock.expect(dataTagCache.get(dataTag.getId())).andReturn(dataTag);
+    EasyMock.expect(dataTagCache.getCopy(dataTag.getId())).andReturn(dataTag);
+    dataTagCache.putQuiet(dataTag);
+    EasyMock.expectLastCall();
     EasyMock.expect(dataTagFacade.updateConfig(dataTag, properties)).andReturn(update);
     EasyMock.expect(equipmentFacade.getProcessIdForAbstractEquipment(dataTag.getEquipmentId())).andReturn(50L);
 
@@ -176,7 +182,9 @@ public class DataTagConfigTransactedImplTest {
 
     dataTagCache.acquireWriteLockOnKey(dataTag.getId());
 
-    EasyMock.expect(dataTagCache.get(dataTag.getId())).andReturn(dataTag);
+    EasyMock.expect(dataTagCache.getCopy(dataTag.getId())).andReturn(dataTag);
+    dataTagCache.putQuiet(dataTag);
+    EasyMock.expectLastCall();
     EasyMock.expect(dataTagFacade.updateConfig(dataTag, properties)).andReturn(update);
 
     dataTagLoaderDAO.updateConfig(dataTag);

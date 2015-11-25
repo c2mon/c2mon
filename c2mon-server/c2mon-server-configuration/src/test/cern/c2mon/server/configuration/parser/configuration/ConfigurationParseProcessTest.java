@@ -404,7 +404,7 @@ public class ConfigurationParseProcessTest {
   @Test
   public void processCreate_withNewControlTag() {
     processCreate.expect(ConfigurationParseException.class);
-    processCreate.expectMessage("Not possible to create a ControlTag for Process or Equipment.");
+    processCreate.expectMessage("Not possible to create a ControlTag for Process or Equipment when the parent already exists.");
 
     // Setup Configuration Instance
     Process process = buildUpdateProcessNewControlTag(1l);

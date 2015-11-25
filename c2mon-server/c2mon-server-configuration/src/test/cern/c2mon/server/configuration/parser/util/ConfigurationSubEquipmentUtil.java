@@ -22,8 +22,8 @@ public class ConfigurationSubEquipmentUtil {
         .id(id)
         .name("SubEquipment")
         .description("foo")
-        .stateTag(StatusTag.builder().id(0l).name("").description("").dataType(DataType.INTEGER).build())
-        .commFaultTag(CommFaultTag.builder().id(2l).name("").description("").dataType(DataType.INTEGER).build())
+        .stateTag(StatusTag.builder().id(0l).name("").description("").build())
+        .commFaultTag(CommFaultTag.builder().id(2l).name("").description("").build())
         .build();
 
     Properties props = new Properties();
@@ -42,11 +42,11 @@ public class ConfigurationSubEquipmentUtil {
         .id(id)
         .name("SubEquipment")
         .description("foo")
-        .stateTag(StatusTag.builder().id(0l).name("").description("").dataType(DataType.INTEGER).build())
+        .stateTag(StatusTag.builder().id(0l).name("").description("").build())
         .aliveInterval(60000)
         .aliveTag(AliveTag.builder().id(1l).name("").description("").build())
         .handlerClass("testHandler")
-        .commFaultTag(CommFaultTag.builder().id(2l).name("").description("").dataType(DataType.INTEGER).build())
+        .commFaultTag(CommFaultTag.builder().id(2l).name("").description("").build())
         .build();
 
     Properties props = new Properties();
@@ -67,8 +67,8 @@ public class ConfigurationSubEquipmentUtil {
         .id(id)
         .name("SubEquipment")
         .description("foo")
-        .stateTag(StatusTag.builder().id(0l).name("").description("").dataType(DataType.INTEGER).build())
-        .commFaultTag(CommFaultTag.builder().id(2l).name("").description("").dataType(DataType.INTEGER).build())
+        .stateTag(StatusTag.builder().id(0l).name("").description("").build())
+        .commFaultTag(CommFaultTag.builder().id(2l).name("").description("").build())
         .build();
 
     Properties props = new Properties();
@@ -136,7 +136,7 @@ public class ConfigurationSubEquipmentUtil {
         .id(id)
         .name("SubEquipment")
         .description("foo")
-        .stateTag(StatusTag.builder().id(0l).name("").description("").dataType(DataType.INTEGER).build())
+        .stateTag(StatusTag.builder().id(0l).name("").description("").build())
         .commFaultTag(CommFaultTag.builder().id(1l).name("").description("").build());
 
     Properties props = new Properties();

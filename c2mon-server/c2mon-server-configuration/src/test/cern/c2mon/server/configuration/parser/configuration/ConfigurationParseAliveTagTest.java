@@ -33,7 +33,6 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({ "classpath:cern/c2mon/server/configuration/config/server-configuration-parser-test.xml" })
-@Ignore
 public class ConfigurationParseAliveTagTest {
 
   @Autowired

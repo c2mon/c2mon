@@ -39,6 +39,8 @@ public class Process implements ConfigurationObject {
 
   /**
    * Unique name of the equipment.
+   *
+   * Note: Consider that an update of the name is not provided on the server side.
    */
   private String name;
 

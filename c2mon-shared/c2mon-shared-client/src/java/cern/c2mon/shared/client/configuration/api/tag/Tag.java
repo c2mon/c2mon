@@ -47,11 +47,6 @@ public abstract class Tag implements ConfigurationObject {
   private String description;
 
   /**
-   * Expected data type for the tag's value
-   */
-  private DataType dataType;
-
-  /**
    * Indicates whether a tag is "in operation", "in maintenance" or "in test".
    */
   @DefaultValue("TEST")
@@ -71,16 +66,15 @@ public abstract class Tag implements ConfigurationObject {
    */
   @Override
   public boolean requiredFieldsGiven() {
-    return (getId() != null) && (getName() != null) && (description != null) && (dataType != null);
+    return (getId() != null) && (getName() != null) && (description != null) ;
   }
 
-  public Tag(boolean deleted, Long id, String name, String description, DataType dataType, TagMode mode, @Singular List<Alarm> alarms) {
+  public Tag(boolean deleted, Long id, String name, String description, TagMode mode, @Singular List<Alarm> alarms) {
     super();
     this.deleted = deleted;
     this.id = id;
     this.name = name;
     this.description = description;
-    this.dataType = dataType;
     this.mode = mode;
     this.alarms = alarms == null ?  new ArrayList<Alarm>() : alarms;
 

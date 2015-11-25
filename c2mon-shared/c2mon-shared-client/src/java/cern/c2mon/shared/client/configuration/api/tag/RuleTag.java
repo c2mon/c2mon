@@ -36,15 +36,26 @@ public class RuleTag extends Tag {
   private String japcAddress;
 
   /**
+   * Expected data type for the tag's value
+   */
+  private DataType dataType;
+
+  /**
    * Indicates whether this tag's value changes shall be logged to the
    * short-term log.
    */
   @DefaultValue("true")
   private Boolean isLogged = true;
 
+  @Override
+  public boolean requiredFieldsGiven() {
+    return super.requiredFieldsGiven()  && (getDataType() != null);
+  }
+
   @Builder
   public RuleTag(boolean deleted, Long id, String name, String description, DataType dataType, TagMode mode, @Singular List<Alarm> alarms, Boolean isLogged, String ruleText, String dipAddress, String japcAddress) {
-    super(deleted, id, name, description, dataType, mode, alarms);
+    super(deleted, id, name, description, mode, alarms);
+    this.dataType = dataType;
     this.ruleText = ruleText;
     this.dipAddress = dipAddress;
     this.japcAddress = japcAddress;
