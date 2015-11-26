@@ -81,30 +81,34 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
   @Override
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRED)
   public void doCreateAlarm(final ConfigurationElement element) throws IllegalAccessException {
+    
+    Alarm alarm = null;
+    
     alarmCache.acquireWriteLockOnKey(element.getEntityId());
     try {
       LOGGER.trace("Creating alarm " + element.getEntityId());
-      Alarm alarm = alarmFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+      alarm = alarmFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+      
       try {
         alarmDAO.insert(alarm);
-      } catch (Exception e) {
-        LOGGER.error("Exception caught while inserting a new Alarm into the DB - rolling back changes", e);
-        throw new UnexpectedRollbackException("Unexpected exception while creating an Alarm: rolling back the change", e);
-      }
-      try {
         alarmCache.putQuiet(alarm);
-        //add alarm to tag in cache (no DB persistence here)
-        tagConfigGateway.addAlarmToTag(alarm.getTagId(), alarm.getId());
       } catch (Exception e) {
-        LOGGER.error("Exception caught while loading a new Alarm", e);
-        alarmCache.remove(alarm.getId());
-        tagConfigGateway.removeAlarmFromTag(alarm.getTagId(), alarm.getId());
-        throw new UnexpectedRollbackException("Unexpected exception while creating an Alarm: rolling back the creation", e);
+        LOGGER.error("Exception caught while loading creating alarm with id " + element.getEntityId(), e);
+        throw new UnexpectedRollbackException("Unexpected exception while creating an Alarm " + element.getEntityId() + ": rolling back the creation", e);
       }
     } finally {
       alarmCache.releaseWriteLockOnKey(element.getEntityId());
     }
-
+    
+    // add alarm to tag in cache (no DB persistence here)
+    try {
+      tagConfigGateway.addAlarmToTag(alarm.getTagId(), alarm.getId());
+    } catch (Exception e) {
+      LOGGER.error("Exception caught while adding new Alarm " + alarm.getId() + " to Tag " + alarm.getId(), e);
+      alarmCache.remove(alarm.getId());
+      tagConfigGateway.removeAlarmFromTag(alarm.getTagId(), alarm.getId());
+      throw new UnexpectedRollbackException("Unexpected exception while creating a Alarm " + alarm.getId() + ": rolling back the creation", e);
+    }
   }
 
   /**
@@ -124,11 +128,13 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
       LOGGER.warn("Attempting to change the tag to which an alarm is attached - this is not currently supported!");
       properties.remove("dataTagId");
     }
+    
     alarmCache.acquireWriteLockOnKey(alarmId);
     try {
-      Alarm alarm = alarmCache.get(alarmId);
+      Alarm alarm = alarmCache.getCopy(alarmId);
       alarmFacade.updateConfig(alarm, properties);
       alarmDAO.updateConfig(alarm);
+      alarmCache.put(alarmId, alarm);
     } catch (CacheElementNotFoundException ex) {
       throw ex;
     } catch (Exception ex) {
