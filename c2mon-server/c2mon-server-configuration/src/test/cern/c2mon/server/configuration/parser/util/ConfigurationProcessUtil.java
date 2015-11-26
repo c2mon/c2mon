@@ -20,7 +20,7 @@ public class ConfigurationProcessUtil {
         .id(id)
         .name("Prozess")
         .description("foo")
-        .stateTag(StatusTag.builder().id(0l).name("").description("").build())
+        .statusTag(StatusTag.builder().id(0l).name("").description("").build())
         .aliveTag(AliveTag.builder().id(1l).name("").description("").build())
         .build();
 
@@ -41,7 +41,7 @@ public class ConfigurationProcessUtil {
         .id(id)
         .name("P_TEST")
         .description("foo")
-        .stateTag(StatusTag.builder().id(0l).name("").description("").build())
+        .statusTag(StatusTag.builder().id(0l).name("").description("").build())
         .aliveInterval(66000)
         .aliveTag(AliveTag.builder().id(1l).name("").description("").build())
         .maxMessageDelay(6000)
@@ -65,7 +65,7 @@ public class ConfigurationProcessUtil {
         .id(id)
         .name("Prozess")
         .description("foo")
-        .stateTag(StatusTag.builder().id(0l).name("").description("").build())
+        .statusTag(StatusTag.builder().id(0l).name("").description("").build())
         .aliveTag(AliveTag.builder().id(1l).name("").description("").build())
         .build();
 

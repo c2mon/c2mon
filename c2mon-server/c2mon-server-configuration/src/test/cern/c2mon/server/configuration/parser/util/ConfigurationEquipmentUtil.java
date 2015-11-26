@@ -23,7 +23,7 @@ public class ConfigurationEquipmentUtil {
         .id(id)
         .name("Equipment")
         .description("foo")
-        .stateTag(StatusTag.builder().id(0l).name("").description("").build())
+        .statusTag(StatusTag.builder().id(0l).name("").description("").build())
         .commFaultTag(CommFaultTag.builder().id(2l).name("").description("").build())
         .build();
 
@@ -43,7 +43,7 @@ public class ConfigurationEquipmentUtil {
         .id(id)
         .name("Equipment")
         .description("foo")
-        .stateTag(StatusTag.builder().id(0l).name("").description("").build())
+        .statusTag(StatusTag.builder().id(0l).name("").description("").build())
         .aliveInterval(60000)
         .aliveTag(AliveTag.builder().id(1l).name("").description("").build())
         .handlerClass("testHandler")
@@ -69,7 +69,7 @@ public class ConfigurationEquipmentUtil {
         .id(id)
         .name("Equipment")
         .description("foo")
-        .stateTag(StatusTag.builder().id(0l).name("").description("").build())
+        .statusTag(StatusTag.builder().id(0l).name("").description("").build())
         .commFaultTag(CommFaultTag.builder().id(2l).name("").description("").build())
         .build();
 

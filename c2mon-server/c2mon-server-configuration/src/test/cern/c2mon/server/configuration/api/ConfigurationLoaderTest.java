@@ -202,7 +202,7 @@ public class ConfigurationLoaderTest {
     Pair<AliveTag.AliveTagBuilder, Properties> aliveTag = builderAliveTagWithPrimFields(12l, "process", 1L); // 6
     Pair<Process.ProcessBuilder, Properties> process = builderProcessWithAllFields(1L, 11L, 12L);
 
-    Process build = process._1.aliveTag(aliveTag._1.build()).stateTag(statusTag._1.build()).build();
+1    Process build = process._1.aliveTag(aliveTag._1.build()).statusTag(statusTag._1.build()).build();
     Configuration configuration = ConfigurationUtil.getConfBuilderProcess(build);
 
 
@@ -271,7 +271,7 @@ public class ConfigurationLoaderTest {
     Pair<AliveTag.AliveTagBuilder, Properties> aliveTagP = builderAliveTagWithPrimFields(12l, "process", 1L); // 6
     Pair<Process.ProcessBuilder, Properties> process = builderProcessWithAllFields(1L, 11L, 12L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -342,7 +342,7 @@ public class ConfigurationLoaderTest {
     Pair<AliveTag.AliveTagBuilder, Properties> aliveTagP = builderAliveTagWithPrimFields(12l, "process", 1L); // 6
     Pair<Process.ProcessBuilder, Properties> process = builderProcessWithAllFields(1L, 11L, 12L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build()).build();
     Configuration instert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(instert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -353,7 +353,7 @@ public class ConfigurationLoaderTest {
     Pair<AliveTag.AliveTagBuilder, Properties> aliveTagE = builderAliveTagWithAllFields(23l, "equipment", 2L); // 6
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L , 21L, 22L, 23L);
 
-    Equipment buildE = equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).build();
+    Equipment buildE = equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).build();
     Configuration configuration = ConfigurationUtil.getConfBuilderEquipment(buildE);
 
     //apply the configuration to the server
@@ -463,8 +463,8 @@ public class ConfigurationLoaderTest {
     Pair<AliveTag.AliveTagBuilder, Properties> aliveTagE = builderAliveTagWithAllFields(23l, "equipment", 2L);
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L , 21L, 22L, 23L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -551,8 +551,8 @@ public class ConfigurationLoaderTest {
     Pair<AliveTag.AliveTagBuilder, Properties> aliveTagE = builderAliveTagWithAllFields(23l, "equipment", 2L);
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L , 21L, 22L, 23L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -633,8 +633,8 @@ public class ConfigurationLoaderTest {
     Pair<AliveTag.AliveTagBuilder, Properties> aliveTagE = builderAliveTagWithAllFields(23l, "equipment", 2L);
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L , 21L, 22L, 23L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -645,7 +645,7 @@ public class ConfigurationLoaderTest {
     Pair<AliveTag.AliveTagBuilder, Properties> aliveTagS = builderAliveTagWithAllFields(33l, "subEquipment", 3L); // 6
     Pair<SubEquipment.SubEquipmentBuilder, Properties> subEquipment = builderSubEquipmentWithAllFields(3L, 2L, 31L, 32L, 33L);
 
-    SubEquipment buildS = subEquipment._1.aliveTag(aliveTagS._1.build()).stateTag(statusTagS._1.build()).commFaultTag(commFaultTagS._1.build()).build();
+    SubEquipment buildS = subEquipment._1.aliveTag(aliveTagS._1.build()).statusTag(statusTagS._1.build()).commFaultTag(commFaultTagS._1.build()).build();
     Configuration configuration = ConfigurationUtil.getConfBuilderSubEquipment(2L, 1L, buildS);
 
     //apply the configuration to the server
@@ -763,10 +763,10 @@ public class ConfigurationLoaderTest {
     Pair<CommFaultTag.CommFaultTagBuilder, Properties> commFaultTagS = builderCommFaultTagWithPrimFields(32L, "subEquipment", 3L); // 24
     Pair<AliveTag.AliveTagBuilder, Properties> aliveTagS = builderAliveTagWithAllFields(33l, "subEquipment", 3L); // 6
     Pair<SubEquipment.SubEquipmentBuilder, Properties> subEquipment = builderSubEquipmentWithAllFields(3L, 2L, 31L, 32L, 33L);
-    SubEquipment buildS = subEquipment._1.aliveTag(aliveTagS._1.build()).stateTag(statusTagS._1.build()).commFaultTag(commFaultTagS._1.build()).build();
+    SubEquipment buildS = subEquipment._1.aliveTag(aliveTagS._1.build()).statusTag(statusTagS._1.build()).commFaultTag(commFaultTagS._1.build()).build();
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).subEquipment(buildS).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).subEquipment(buildS).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -860,10 +860,10 @@ public class ConfigurationLoaderTest {
     Pair<CommFaultTag.CommFaultTagBuilder, Properties> commFaultTagS = builderCommFaultTagWithPrimFields(32L, "subEquipment", 3L); // 24
     Pair<AliveTag.AliveTagBuilder, Properties> aliveTagS = builderAliveTagWithAllFields(33l, "subEquipment", 3L); // 6
     Pair<SubEquipment.SubEquipmentBuilder, Properties> subEquipment = builderSubEquipmentWithAllFields(3L, 2L, 31L, 32L, 33L);
-    SubEquipment buildS = subEquipment._1.aliveTag(aliveTagS._1.build()).stateTag(statusTagS._1.build()).commFaultTag(commFaultTagS._1.build()).build();
+    SubEquipment buildS = subEquipment._1.aliveTag(aliveTagS._1.build()).statusTag(statusTagS._1.build()).commFaultTag(commFaultTagS._1.build()).build();
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).subEquipment(buildS).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).subEquipment(buildS).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -958,8 +958,8 @@ public class ConfigurationLoaderTest {
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L, 21L, 22L, 23L);
     Pair<DataTag.DataTagBuilder, Properties> dataTag = builderDataTagWithAllFields(100L, "equipment", 2L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
 
     Configuration instert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(instert);
@@ -1037,8 +1037,8 @@ public class ConfigurationLoaderTest {
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L, 21L, 22L, 23L);
     Pair<DataTag.DataTagBuilder, Properties> dataTag = builderDataTagWithAllFields(100L, "equipment", 2L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
 
     Configuration instert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(instert);
@@ -1127,8 +1127,8 @@ public class ConfigurationLoaderTest {
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L, 21L, 22L, 23L);
     Pair<DataTag.DataTagBuilder, Properties> dataTag = builderDataTagWithAllFields(100L, "equipment", 2L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
 
     Configuration instert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(instert);
@@ -1204,8 +1204,8 @@ public class ConfigurationLoaderTest {
     Pair<AliveTag.AliveTagBuilder, Properties> aliveTagE = builderAliveTagWithAllFields(23l, "equipment", 2L);
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L , 21L, 22L, 23L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -1290,8 +1290,8 @@ public class ConfigurationLoaderTest {
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L , 21L, 22L, 23L);
     Pair<DataTag.DataTagBuilder, Properties> dataTag = builderDataTagWithAllFields(100L, "equipment", 2L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -1373,8 +1373,8 @@ public class ConfigurationLoaderTest {
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L , 21L, 22L, 23L);
     Pair<DataTag.DataTagBuilder, Properties> dataTag = builderDataTagWithAllFields(100L, "equipment", 2L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -1452,10 +1452,10 @@ public class ConfigurationLoaderTest {
     Pair<CommFaultTag.CommFaultTagBuilder, Properties> commFaultTagS = builderCommFaultTagWithPrimFields(32L, "subEquipment", 3L); // 24
     Pair<AliveTag.AliveTagBuilder, Properties> aliveTagS = builderAliveTagWithAllFields(33l, "subEquipment", 3L); // 6
     Pair<SubEquipment.SubEquipmentBuilder, Properties> subEquipment = builderSubEquipmentWithAllFields(3L, 2L, 31L, 32L, 33L);
-    SubEquipment buildS = subEquipment._1.aliveTag(aliveTagS._1.build()).stateTag(statusTagS._1.build()).commFaultTag(commFaultTagS._1.build()).build();
+    SubEquipment buildS = subEquipment._1.aliveTag(aliveTagS._1.build()).statusTag(statusTagS._1.build()).commFaultTag(commFaultTagS._1.build()).build();
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).subEquipment(buildS).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).subEquipment(buildS).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -1543,10 +1543,10 @@ public class ConfigurationLoaderTest {
     Pair<AliveTag.AliveTagBuilder, Properties> aliveTagS = builderAliveTagWithAllFields(33l, "subEquipment", 3L); // 6
     Pair<SubEquipment.SubEquipmentBuilder, Properties> subEquipment = builderSubEquipmentWithAllFields(3L, 2L, 31L, 32L, 33L);
     Pair<DataTag.DataTagBuilder, Properties> dataTag = builderDataTagWithAllFields(100L, "subEquipment", 3L);
-    SubEquipment buildS = subEquipment._1.aliveTag(aliveTagS._1.build()).stateTag(statusTagS._1.build()).commFaultTag(commFaultTagS._1.build()).dataTag(dataTag._1.build()).build();
+    SubEquipment buildS = subEquipment._1.aliveTag(aliveTagS._1.build()).statusTag(statusTagS._1.build()).commFaultTag(commFaultTagS._1.build()).dataTag(dataTag._1.build()).build();
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).subEquipment(buildS).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).subEquipment(buildS).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -1633,10 +1633,10 @@ public class ConfigurationLoaderTest {
     Pair<AliveTag.AliveTagBuilder, Properties> aliveTagS = builderAliveTagWithAllFields(33l, "subEquipment", 3L); // 6
     Pair<SubEquipment.SubEquipmentBuilder, Properties> subEquipment = builderSubEquipmentWithAllFields(3L, 2L, 31L, 32L, 33L);
     Pair<DataTag.DataTagBuilder, Properties> dataTag = builderDataTagWithAllFields(100L, "subEquipment", 3L);
-    SubEquipment buildS = subEquipment._1.aliveTag(aliveTagS._1.build()).stateTag(statusTagS._1.build()).commFaultTag(commFaultTagS._1.build()).dataTag(dataTag._1.build()).build();
+    SubEquipment buildS = subEquipment._1.aliveTag(aliveTagS._1.build()).statusTag(statusTagS._1.build()).commFaultTag(commFaultTagS._1.build()).dataTag(dataTag._1.build()).build();
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).subEquipment(buildS).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).subEquipment(buildS).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -1712,8 +1712,8 @@ public class ConfigurationLoaderTest {
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L , 21L, 22L, 23L);
     Pair<DataTag.DataTagBuilder, Properties> dataTag = builderDataTagWithAllFields(100L, "equipment", 2L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -1784,8 +1784,8 @@ public class ConfigurationLoaderTest {
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L , 21L, 22L, 23L);
     Pair<DataTag.DataTagBuilder, Properties> dataTag = builderDataTagWithAllFields(100L, "equipment", 2L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -1864,8 +1864,8 @@ public class ConfigurationLoaderTest {
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L , 21L, 22L, 23L);
     Pair<DataTag.DataTagBuilder, Properties> dataTag = builderDataTagWithAllFields(100L, "equipment", 2L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -1933,8 +1933,8 @@ public class ConfigurationLoaderTest {
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L , 21L, 22L, 23L);
     Pair<DataTag.DataTagBuilder, Properties> dataTag = builderDataTagWithAllFields(100L, "equipment", 2L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -2020,8 +2020,8 @@ public class ConfigurationLoaderTest {
     Pair<Alarm.AlarmBuilder, Properties> alarm1 = builderAlarmWithAllFields(666L,100L);
     Pair<Alarm.AlarmBuilder, Properties> alarm2 = builderAlarmWithAllFields(667L,100L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag((DataTag<Number>) dataTag._1.alarm(alarm1._1.build()).alarm(alarm2._1.build()).build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag((DataTag<Number>) dataTag._1.alarm(alarm1._1.build()).alarm(alarm2._1.build()).build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -2095,8 +2095,8 @@ public class ConfigurationLoaderTest {
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L , 21L, 22L, 23L);
     Pair<DataTag.DataTagBuilder, Properties> dataTag = builderDataTagWithAllFields(100L, "equipment", 2L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -2167,8 +2167,8 @@ public class ConfigurationLoaderTest {
     Pair<DataTag.DataTagBuilder, Properties> dataTag = builderDataTagWithAllFields(100L, "equipment", 2L);
     Pair<Alarm.AlarmBuilder, Properties> alarm = builderAlarmWithAllFields(666L,100L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag((DataTag<Number>) dataTag._1.alarm(alarm._1.build()).build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag((DataTag<Number>) dataTag._1.alarm(alarm._1.build()).build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -2241,8 +2241,8 @@ public class ConfigurationLoaderTest {
     Pair<DataTag.DataTagBuilder, Properties> dataTag = builderDataTagWithAllFields(100L, "equipment", 2L);
     Pair<Alarm.AlarmBuilder, Properties> alarm = builderAlarmWithAllFields(666L,100L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag((DataTag<Number>) dataTag._1.alarm(alarm._1.build()).build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag((DataTag<Number>) dataTag._1.alarm(alarm._1.build()).build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -2309,8 +2309,8 @@ public class ConfigurationLoaderTest {
     Pair<AliveTag.AliveTagBuilder, Properties> aliveTagE = builderAliveTagWithAllFields(23l, "equipment", 2L);
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L , 21L, 22L, 23L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -2383,8 +2383,8 @@ public class ConfigurationLoaderTest {
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L , 21L, 22L, 23L);
     Pair<CommandTag.CommandTagBuilder, Properties> commandTag = builderCommandTagWithAllFields(100_000L, 2L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).commandTag(commandTag._1.build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).commandTag(commandTag._1.build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -2465,8 +2465,8 @@ public class ConfigurationLoaderTest {
     Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L , 21L, 22L, 23L);
     Pair<CommandTag.CommandTagBuilder, Properties> commandTag = builderCommandTagWithAllFields(100_000L, 2L);
 
-    Process buildP = process._1.aliveTag(aliveTagP._1.build()).stateTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).stateTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).commandTag(commandTag._1.build()).build()).build();
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).commandTag(commandTag._1.build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));

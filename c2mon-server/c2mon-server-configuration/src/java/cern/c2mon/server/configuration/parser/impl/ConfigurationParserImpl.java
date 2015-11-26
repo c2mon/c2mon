@@ -85,7 +85,7 @@ public class ConfigurationParserImpl implements ConfigurationParser {
       tempSeq = sequenceTaskFactory.createSequenceTask(process);
       tempSeq = setControlTags(tempSeq, process);
       tasks.add(tempSeq);
-      List<SequenceTask> tempList = parseControlTags(tasks, process, process.getStateTag(), process.getAliveTag());
+      List<SequenceTask> tempList = parseControlTags(tasks, process, process.getStatusTag(), process.getAliveTag());
       validateControlTags(tempSeq, tempList);
       parseEquipments(tasks, process.getEquipments(), process);
     }
@@ -108,7 +108,7 @@ public class ConfigurationParserImpl implements ConfigurationParser {
       tasks.add(setParentId(tempSeq, parent));
 
       // parse the attached objects of the equipment:
-      List<SequenceTask> tempList = parseControlTags(tasks, equipment, equipment.getStateTag(), equipment.getCommFaultTag(), equipment.getAliveTag());
+      List<SequenceTask> tempList = parseControlTags(tasks, equipment, equipment.getStatusTag(), equipment.getCommFaultTag(), equipment.getAliveTag());
       validateControlTags(tempSeq, tempList);
       parseDataTags(tasks, equipment, equipment.getDataTags());
       parseCommandTags(tasks, equipment, equipment.getCommandTags());
@@ -131,7 +131,7 @@ public class ConfigurationParserImpl implements ConfigurationParser {
       tempSeq = sequenceTaskFactory.createSequenceTask(subEquipment);
       tempSeq = setControlTags(tempSeq, subEquipment);
       tasks.add(setParentId(tempSeq, parent));
-      List<SequenceTask> tempList = parseControlTags(tasks, subEquipment, subEquipment.getStateTag(), subEquipment.getCommFaultTag(), subEquipment.getAliveTag());
+      List<SequenceTask> tempList = parseControlTags(tasks, subEquipment, subEquipment.getStatusTag(), subEquipment.getCommFaultTag(), subEquipment.getAliveTag());
       validateControlTags(tempSeq, tempList);
       parseDataTags(tasks, subEquipment, subEquipment.getDataTags());
     }
@@ -299,14 +299,14 @@ public class ConfigurationParserImpl implements ConfigurationParser {
 
       // Set all controlTagIds for processes
       if (object instanceof Process) {
-        task.getConfigurationElement().getElementProperties().setProperty("stateTagId", String.valueOf(((Process) object).getStateTag().getId()));
+        task.getConfigurationElement().getElementProperties().setProperty("stateTagId", String.valueOf(((Process) object).getStatusTag().getId()));
         if (((Process) object).getAliveTag() != null) {
           task.getConfigurationElement().getElementProperties().setProperty("aliveTagId", String.valueOf(((Process) object).getAliveTag().getId()));
         }
 
         // Set all controlTagIds for equipments
       } else if (object instanceof Equipment) {
-        task.getConfigurationElement().getElementProperties().setProperty("stateTagId", String.valueOf(((Equipment) object).getStateTag().getId()));
+        task.getConfigurationElement().getElementProperties().setProperty("stateTagId", String.valueOf(((Equipment) object).getStatusTag().getId()));
         if (((Equipment) object).getAliveTag() != null) {
           task.getConfigurationElement().getElementProperties().setProperty("aliveTagId", String.valueOf(((Equipment) object).getAliveTag().getId()));
         }

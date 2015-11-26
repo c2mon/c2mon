@@ -71,7 +71,7 @@ public class ConfigurationUtil {
     AliveTag.AliveTagBuilder alive = builderAliveTagWithPrimFields(1L, "equipment", 1L)._1;
     StatusTag.StatusTagBuilder status = builderStatusTagWithPrimFields(1L, "equipment", 1L)._1;
     Equipment.EquipmentBuilder equipment = builderEquipmentWithPrimFields(1L, 1L, 1L, 1L, 1L)._1;
-    equipment.aliveTag(alive.build()).stateTag(status.build());
+    equipment.aliveTag(alive.build()).statusTag(status.build());
     for (CommFaultTag element : elements) {
       equipment.commFaultTag(element);
     }
@@ -102,7 +102,7 @@ public class ConfigurationUtil {
 //    Process.ProcessBuilder tempBuild = Process.builder().id(1L);
     StatusTag.StatusTagBuilder status = builderStatusTagWithPrimFields(1L, "process", 1L)._1;
     Process.ProcessBuilder process = builderProcessWithPrimFields(1L, 1L, 1L)._1;
-    process.stateTag(status.build());
+    process.statusTag(status.build());
     for (AliveTag element : elements) {
       process.aliveTag(element);
     }
@@ -131,7 +131,7 @@ public class ConfigurationUtil {
    */
   public static Configuration getConfBuilderStatusTagEUpdate(Long equipmentId, Long processId, StatusTag element) {
     Equipment.EquipmentBuilder tempBuild = Equipment.builder().id(equipmentId);
-    tempBuild.stateTag(element);
+    tempBuild.statusTag(element);
     return getConfBuilder().process(Process.builder().id(processId).equipment(tempBuild.build()).build()).build();
   }
 
@@ -167,7 +167,7 @@ public class ConfigurationUtil {
     Process.ProcessBuilder process = builderProcessWithPrimFields(1L, 1L, 1L)._1;
     process.aliveTag(alive.build());
     for (StatusTag element : elements) {
-      process.stateTag(element);
+      process.statusTag(element);
     }
     return getConfBuilder().process(process.build()).build();
   }
@@ -175,7 +175,7 @@ public class ConfigurationUtil {
   public static Configuration getConfBuilderStatusTagUpdate(StatusTag... elements) {
     Process.ProcessBuilder tempBuild = Process.builder().id(1L);
     for (StatusTag element : elements) {
-      tempBuild.stateTag(element);
+      tempBuild.statusTag(element);
     }
     return getConfBuilder().process(tempBuild.build()).build();
   }

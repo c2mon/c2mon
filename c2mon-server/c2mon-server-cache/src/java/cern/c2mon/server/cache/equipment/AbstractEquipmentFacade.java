@@ -122,7 +122,7 @@ public abstract class AbstractEquipmentFacade<T extends AbstractEquipment> exten
       }
     }
 
-    if ((tmpStr = properties.getProperty("stateTagId")) != null) {
+    if ((tmpStr = properties.getProperty("stateTagId")) != null || (tmpStr = properties.getProperty("statusTagId")) != null) {
       try {
         abstractEquipmentCacheObject.setStateTagId(Long.valueOf(tmpStr));
       } catch (NumberFormatException e) {

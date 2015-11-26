@@ -66,7 +66,7 @@ public class Equipment implements ConfigurationObject {
   private String address;
 
   @IgnoreProperty
-  private StatusTag stateTag;
+  private StatusTag statusTag;
 
   @IgnoreProperty
   private AliveTag aliveTag;
@@ -88,12 +88,12 @@ public class Equipment implements ConfigurationObject {
 
   @Override
   public boolean requiredFieldsGiven() {
-    return (id != null) && (name != null) && (description != null) && (stateTag != null) && (commFaultTag != null);
+    return (id != null) && (name != null) && (description != null) && (statusTag != null) && (commFaultTag != null);
   }
 
   @Builder
   public Equipment(boolean deleted, Long id, String name, Integer aliveInterval, String description,
-                   String handlerClass, String address, @Singular List<SubEquipment> subEquipments, StatusTag stateTag, CommFaultTag commFaultTag, AliveTag aliveTag, @Singular List<DataTag<Number>> dataTags,  @Singular List<CommandTag> commandTags) {
+                   String handlerClass, String address, @Singular List<SubEquipment> subEquipments, StatusTag statusTag, CommFaultTag commFaultTag, AliveTag aliveTag, @Singular List<DataTag<Number>> dataTags,  @Singular List<CommandTag> commandTags) {
     this.deleted = deleted;
     this.id = id;
     this.name = name;
@@ -103,7 +103,7 @@ public class Equipment implements ConfigurationObject {
     this.address = address;
 
     // metadata of the equipment:
-    this.stateTag = stateTag;
+    this.statusTag = statusTag;
     this.commFaultTag = commFaultTag;
     this.aliveTag = aliveTag;
 

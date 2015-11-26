@@ -123,7 +123,7 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"aliveTagId\" to Long: " + tmpStr);
       }
     }  
-    if ((tmpStr = properties.getProperty("stateTagId")) != null) {
+    if ((tmpStr = properties.getProperty("stateTagId")) != null || (tmpStr = properties.getProperty("statusTagId")) != null ) {
       try {
         processCacheObject.setStateTagId(Long.valueOf(tmpStr));
       }
@@ -230,8 +230,8 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
    * to take care of committing the changes made to the process object back to the cache. 
    * 
    * @param process the Process that is starting
-   * @param hostName the hostname of the Process
-   * @param startupTime the start up time
+   * @param pHostName the hostname of the Process
+   * @param pStartupTime the start up time
    */
   private void start(final Process process, final String pHostName, final Timestamp pStartupTime) {
     ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
@@ -263,8 +263,8 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
    * since it will force the DAQ to start
    * 
    * @param process the Process that is starting
-   * @param hostName the hostname of the Process
-   * @param startupTime the start up time
+   * @param pHostName the hostname of the Process
+   * @param pStartupTime the start up time
    */
   private void startLocal(final Process process, final String pHostName, final Timestamp pStartupTime) {
     ProcessCacheObject processCacheObject = (ProcessCacheObject) process;

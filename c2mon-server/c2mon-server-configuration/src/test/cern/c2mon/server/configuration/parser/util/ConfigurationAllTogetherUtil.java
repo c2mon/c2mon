@@ -84,9 +84,9 @@ public class ConfigurationAllTogetherUtil {
     Pair<CommandTag.CommandTagBuilder, Properties> commandTag = builderCommandTagWithPrimFields(id++, 1L); //27
 
     Configuration conf = getConfBuilder()
-        .process(process._1.aliveTag(aliveTagP._1.alarm(alarmAP._1.build()).build()).stateTag(statusTagP._1.alarm(alarmSP._1.build()).build())
-            .equipment(equipment._1.commFaultTag(commFaultTagE._1.alarm(alarmCE._1.build()).build()).aliveTag(aliveTagE._1.alarm(alarmAE._1.build()).build()).stateTag(statusTagE._1.alarm(alarmSE._1.build()).build()).dataTag((DataTag<Number>) dataTagE._1.alarm(alarmDE._1.build()).build()).commandTag(commandTag._1.build())
-                .subEquipment(subEquipment._1.commFaultTag(commFaultTagS._1.alarm(alarmCS._1.build()).build()).aliveTag(aliveTagS._1.alarm(alarmAS._1.build()).build()).stateTag(statusTagS._1.alarm(alarmSS._1.build()).build()).dataTag((DataTag<Number>) dataTagS._1.alarm(alarmDS._1.build()).build())
+        .process(process._1.aliveTag(aliveTagP._1.alarm(alarmAP._1.build()).build()).statusTag(statusTagP._1.alarm(alarmSP._1.build()).build())
+            .equipment(equipment._1.commFaultTag(commFaultTagE._1.alarm(alarmCE._1.build()).build()).aliveTag(aliveTagE._1.alarm(alarmAE._1.build()).build()).statusTag(statusTagE._1.alarm(alarmSE._1.build()).build()).dataTag((DataTag<Number>) dataTagE._1.alarm(alarmDE._1.build()).build()).commandTag(commandTag._1.build())
+                .subEquipment(subEquipment._1.commFaultTag(commFaultTagS._1.alarm(alarmCS._1.build()).build()).aliveTag(aliveTagS._1.alarm(alarmAS._1.build()).build()).statusTag(statusTagS._1.alarm(alarmSS._1.build()).build()).dataTag((DataTag<Number>) dataTagS._1.alarm(alarmDS._1.build()).build())
                     .build()).build()).build())
         .rule(ruleTag._1.alarm(alarmR._1.build()).build()).build();
 
@@ -164,9 +164,9 @@ public class ConfigurationAllTogetherUtil {
     Pair<CommandTag.CommandTagBuilder, Properties> commandTag = builderCommandTagWithAllFields(id++, 1L); //27
 
     Configuration conf = getConfBuilder()
-        .process(process._1.aliveTag(aliveTagP._1.alarm(alarmAP._1.build()).build()).stateTag(statusTagP._1.alarm(alarmSP._1.build()).build())
-            .equipment(equipment._1.commFaultTag(commFaultTagE._1.alarm(alarmCE._1.build()).build()).aliveTag(aliveTagE._1.alarm(alarmAE._1.build()).build()).stateTag(statusTagE._1.alarm(alarmSE._1.build()).build()).dataTag((DataTag<Number>) dataTagE._1.alarm(alarmDE._1.build()).build()).commandTag(commandTag._1.build())
-                .subEquipment(subEquipment._1.commFaultTag(commFaultTagS._1.alarm(alarmCS._1.build()).build()).aliveTag(aliveTagS._1.alarm(alarmAS._1.build()).build()).stateTag(statusTagS._1.alarm(alarmSS._1.build()).build()).dataTag((DataTag<Number>) dataTagS._1.alarm(alarmDS._1.build()).build())
+        .process(process._1.aliveTag(aliveTagP._1.alarm(alarmAP._1.build()).build()).statusTag(statusTagP._1.alarm(alarmSP._1.build()).build())
+            .equipment(equipment._1.commFaultTag(commFaultTagE._1.alarm(alarmCE._1.build()).build()).aliveTag(aliveTagE._1.alarm(alarmAE._1.build()).build()).statusTag(statusTagE._1.alarm(alarmSE._1.build()).build()).dataTag((DataTag<Number>) dataTagE._1.alarm(alarmDE._1.build()).build()).commandTag(commandTag._1.build())
+                .subEquipment(subEquipment._1.commFaultTag(commFaultTagS._1.alarm(alarmCS._1.build()).build()).aliveTag(aliveTagS._1.alarm(alarmAS._1.build()).build()).statusTag(statusTagS._1.alarm(alarmSS._1.build()).build()).dataTag((DataTag<Number>) dataTagS._1.alarm(alarmDS._1.build()).build())
                     .build()).build()).build())
         .rule(ruleTag._1.alarm(alarmR._1.build()).build()).build();
 

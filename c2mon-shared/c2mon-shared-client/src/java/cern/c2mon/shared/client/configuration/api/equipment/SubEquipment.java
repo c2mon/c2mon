@@ -29,7 +29,7 @@ public class SubEquipment extends Equipment {
 
   @Builder(builderMethodName = "builderSubEquipment")
   public SubEquipment(boolean deleted, Long id, String name, Integer aliveInterval, String description,
-                      String handlerClass, StatusTag stateTag, AliveTag aliveTag, CommFaultTag commFaultTag, @Singular List<DataTag<Number>> dataTags) {
-    super(deleted, id, name, aliveInterval, description, handlerClass, null, new ArrayList<SubEquipment>(), stateTag, commFaultTag, aliveTag, dataTags, null);
+                      String handlerClass, StatusTag statusTag, AliveTag aliveTag, CommFaultTag commFaultTag, @Singular List<DataTag<Number>> dataTags) {
+    super(deleted, id, name, aliveInterval, description, handlerClass, null, new ArrayList<SubEquipment>(), statusTag, commFaultTag, aliveTag, dataTags, null);
   }
 }

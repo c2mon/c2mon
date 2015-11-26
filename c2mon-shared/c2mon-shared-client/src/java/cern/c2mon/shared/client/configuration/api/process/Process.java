@@ -5,7 +5,6 @@ import java.util.List;
 
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.tag.AliveTag;
-import cern.c2mon.shared.client.configuration.api.tag.ControlTag;
 import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
 import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationObject;
@@ -72,7 +71,7 @@ public class Process implements ConfigurationObject {
   private AliveTag aliveTag;
 
   @IgnoreProperty
-  private StatusTag stateTag;
+  private StatusTag statusTag;
 
   @IgnoreProperty
   @Singular
@@ -84,7 +83,7 @@ public class Process implements ConfigurationObject {
 
   @Override
   public boolean requiredFieldsGiven() {
-    return (id != null) && (name != null) && (description != null) && (stateTag != null) && (aliveTag != null);
+    return (id != null) && (name != null) && (description != null) && (statusTag != null) && (aliveTag != null);
   }
 
   /**
@@ -100,8 +99,8 @@ public class Process implements ConfigurationObject {
    * @param equipments
    */
   @Builder
-  public Process(boolean deleted, Long id, String name,  Integer aliveInterval, String description, Integer maxMessageSize,
-                 Integer maxMessageDelay, @Singular List<Equipment> equipments, StatusTag stateTag, AliveTag aliveTag) {
+  public Process(boolean deleted, Long id, String name, Integer aliveInterval, String description, Integer maxMessageSize,
+                 Integer maxMessageDelay, @Singular List<Equipment> equipments, StatusTag statusTag, AliveTag aliveTag) {
     super();
     this.deleted = deleted;
     this.id = id;
@@ -110,7 +109,7 @@ public class Process implements ConfigurationObject {
     this.description = description;
     this.maxMessageSize = maxMessageSize;
     this.maxMessageDelay = maxMessageDelay;
-    this.stateTag = stateTag;
+    this.statusTag = statusTag;
     this.aliveTag = aliveTag;
     this.equipments = equipments == null ? new ArrayList<Equipment>() : equipments;
   }
