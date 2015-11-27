@@ -202,7 +202,7 @@ public class ConfigurationLoaderTest {
     Pair<AliveTag.AliveTagBuilder, Properties> aliveTag = builderAliveTagWithPrimFields(12l, "process", 1L); // 6
     Pair<Process.ProcessBuilder, Properties> process = builderProcessWithAllFields(1L, 11L, 12L);
 
-1    Process build = process._1.aliveTag(aliveTag._1.build()).statusTag(statusTag._1.build()).build();
+    Process build = process._1.aliveTag(aliveTag._1.build()).statusTag(statusTag._1.build()).build();
     Configuration configuration = ConfigurationUtil.getConfBuilderProcess(build);
 
 
