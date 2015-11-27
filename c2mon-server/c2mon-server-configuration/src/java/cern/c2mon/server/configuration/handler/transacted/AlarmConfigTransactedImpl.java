@@ -134,7 +134,7 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
       Alarm alarm = alarmCache.getCopy(alarmId);
       alarmFacade.updateConfig(alarm, properties);
       alarmDAO.updateConfig(alarm);
-      alarmCache.put(alarmId, alarm);
+      alarmCache.putQuiet(alarm);
     } catch (CacheElementNotFoundException ex) {
       throw ex;
     } catch (Exception ex) {
