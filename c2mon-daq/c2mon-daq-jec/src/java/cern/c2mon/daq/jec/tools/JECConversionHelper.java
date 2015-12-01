@@ -103,7 +103,7 @@ public final class JECConversionHelper {
      */
     public static float convertPLCValueToFloat(final int value, 
             final PLCHardwareAddress hardwareAddress) {
-        return convertPLCValueToFloat(value, hardwareAddress.getResolutionFactor(), hardwareAddress.getPhysicalMinVal(), hardwareAddress.getPhysicMaxVal());
+        return convertPLCValueToFloat(value, hardwareAddress.getResolutionFactor(), hardwareAddress.getPhysicalMinVal(), hardwareAddress.getPhysicalMaxVal());
     }
     
     /**
@@ -135,7 +135,7 @@ public final class JECConversionHelper {
      */
     public static int convertJavaToPLCValue(final float javaValue, 
             final PLCHardwareAddress hardwareAddress) {
-        return convertJavaToPLCValue(javaValue, hardwareAddress.getResolutionFactor(), hardwareAddress.getPhysicalMinVal(), hardwareAddress.getPhysicMaxVal());
+        return convertJavaToPLCValue(javaValue, hardwareAddress.getResolutionFactor(), hardwareAddress.getPhysicalMinVal(), hardwareAddress.getPhysicalMaxVal());
     }
     
     /**

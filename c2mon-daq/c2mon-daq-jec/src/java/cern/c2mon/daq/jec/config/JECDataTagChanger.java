@@ -183,7 +183,7 @@ public class JECDataTagChanger implements IDataTagChanger {
         PLCHardwareAddress hardwareAddress = (PLCHardwareAddress) sourceDataTag.getHardwareAddress();
         PLCHardwareAddress oldHardwareAddress = (PLCHardwareAddress) oldSourceDataTag.getHardwareAddress();
         if (DataTagChangerHelper.hasHardwareAddressChanged(hardwareAddress, oldHardwareAddress)) {
-            if (hardwareAddress.getPhysicalMinVal() != oldHardwareAddress.getPhysicalMinVal() || hardwareAddress.getPhysicMaxVal() != oldHardwareAddress.getPhysicMaxVal()
+            if (hardwareAddress.getPhysicalMinVal() != oldHardwareAddress.getPhysicalMinVal() || hardwareAddress.getPhysicalMaxVal() != oldHardwareAddress.getPhysicalMaxVal()
                     || hardwareAddress.getResolutionFactor() != oldHardwareAddress.getResolutionFactor()) {
                 jecRestarter.triggerRestart();
             } else if (JECTagChangerHelper.mightAffectPLCAddressSpace(hardwareAddress, oldHardwareAddress)) {

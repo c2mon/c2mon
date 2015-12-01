@@ -53,7 +53,7 @@ public class TestPLCHardwareAddress implements PLCHardwareAddress {
     }
 
     @Override
-    public float getPhysicMaxVal() {
+    public float getPhysicalMaxVal() {
         // TODO Auto-generated method stub
         return 0;
     }

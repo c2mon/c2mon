@@ -113,7 +113,7 @@ public class ProcessConfigurationLoaderTest {
         assertEquals(0, hardwareAddress.getWordId());
         assertEquals(1, hardwareAddress.getBitId());
         assertTrue(0.0 - hardwareAddress.getPhysicalMinVal() < 0.0000000001);
-        assertTrue(0.0 - hardwareAddress.getPhysicMaxVal() < 0.0000000001);
+        assertTrue(0.0 - hardwareAddress.getPhysicalMaxVal() < 0.0000000001);
         assertEquals(1, hardwareAddress.getResolutionFactor());
         assertEquals(0, hardwareAddress.getCommandPulseLength());
         assertEquals("INT999", hardwareAddress.getNativeAddress());

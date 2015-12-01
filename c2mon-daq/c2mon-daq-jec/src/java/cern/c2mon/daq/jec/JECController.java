@@ -689,7 +689,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
     private void configureDeadband(final ISourceDataTag analogDataTag) {
         PLCHardwareAddress anaTagAddress = (PLCHardwareAddress) analogDataTag.getHardwareAddress();
         int wordID = anaTagAddress.getWordId();
-        float physicalMaxValue = anaTagAddress.getPhysicMaxVal();
+        float physicalMaxValue = anaTagAddress.getPhysicalMaxVal();
         float physicalMinValue = anaTagAddress.getPhysicalMinVal();
         int resolutionFactor = anaTagAddress.getResolutionFactor();
         float deadbandValue = analogDataTag.getValueDeadband();
