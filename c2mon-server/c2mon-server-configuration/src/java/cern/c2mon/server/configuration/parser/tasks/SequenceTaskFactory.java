@@ -156,7 +156,7 @@ public class SequenceTaskFactory {
 
       // find all annotated fields, which don't belong to the Property
       for (Field field : getSuperFields(klass).values()) {
-        if (field.getDeclaredAnnotation(IgnoreProperty.class) != null)
+        if (field.getAnnotation(IgnoreProperty.class) != null)
           ignoreFields.add(field.getName());
       }
       BeanInfo info = Introspector.getBeanInfo(klass);
@@ -208,7 +208,7 @@ public class SequenceTaskFactory {
   private Properties setDefaultValues(Properties properties, ConfigurationObject object) {
     try {
       for (Field field : getSuperFields(object.getClass()).values()) {
-        if (field.getDeclaredAnnotation(DefaultValue.class) != null && !properties.containsKey(field.getName())) {
+        if (field.getAnnotation(DefaultValue.class) != null && !properties.containsKey(field.getName())) {
 
           // extract all default values from fields which Type is no enum
           if (field.getType().getEnumConstants() == null) {
