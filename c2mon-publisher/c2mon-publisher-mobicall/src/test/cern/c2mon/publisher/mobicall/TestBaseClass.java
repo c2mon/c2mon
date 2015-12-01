@@ -4,6 +4,8 @@
 
 package cern.c2mon.publisher.mobicall;
 
+import java.io.IOException;
+
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
@@ -56,7 +58,7 @@ public class TestBaseClass {
         return log;
     }
 
-    protected void startTestPublisher() {
+    protected void startTestPublisher() throws IOException {
         if (!running) {
             publisher = new MobicallAlarmsPublisher(new C2monConnection());
             publisher.start();
