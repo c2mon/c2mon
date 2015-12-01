@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:c="http://www.springframework.org/schema/c" default-autowire="byName"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+<!-- enable spring annotations scanning ===================================================== -->
+	<context:component-scan base-package="cern.c2mon.publisher.rdaAlarms" />
+	<context:mbean-export registration="ignoreExisting" />
+	<context:property-placeholder ignore-resource-not-found="true" ignore-unresolvable="true" />
+
+<!--  PROPERTY SETUP ======================================================================== -->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="properties">
+			<props>
+				<prop key="alarm.jdbc.user"></prop>
+				<prop key="alarm.jdbc.password"></prop>
+				<prop key="alarm.jdbc.url"></prop>
+				<prop key="alarm.jdbc.driverClass"></prop>
+			</props>
+		</property>
+		<property name="locations">
+			<value>${provider.properties}</value>
+		</property>
+
+		<property name="ignoreResourceNotFound">
+			<!-- we require the properties file -->
+			<value>false</value>
+		</property>
+	</bean>
+
+
+<!--   BEAN DECLARATION ====================================================================== -->
+	<bean id="publisher" class="cern.c2mon.publisher.rdaAlarms.RdaAlarmsPublisher" factory-method = "getPublisher" >
+		<property name="serverName" value="DMN-RDA-ALARMS" />
+ 		<property name="sourceMgr" ref="sourceMgr" />
+ 		<property name="c2mon" ref="c2mon" />
+		<property name="received" ref="VCMreceived" /> 
+		<property name="processed" ref="VCMprocessed" /> 
+	</bean>
+
+	<bean id="VCMreceived" class="cern.c2mon.publisher.rdaAlarms.VCM">
+		<property name="vcmSeconds" value="60" /> 
+	</bean>
+	<bean id="VCMprocessed" class="cern.c2mon.publisher.rdaAlarms.VCM">
+		<property name="vcmSeconds" value="60" /> 
+	</bean>
+
+	<bean id="sourceMgr" class="cern.c2mon.publisher.rdaAlarms.SourceManager" >
+ 		<property name="dataProvider" ref="dataProvider" />
+	</bean>
+	
+	
+	<beans profile="PROD">
+		<bean id="c2mon" class="cern.c2mon.publisher.rdaAlarms.C2monConnection"></bean> 
+		<bean id="dataProvider" class="cern.c2mon.publisher.rdaAlarms.DataProviderJms"></bean>
+	</beans>
+	
+	<beans profile="PROD-DB">
+		<bean id="c2mon" class="cern.c2mon.publisher.rdaAlarms.C2monConnection"></bean> 
+		<bean id="dataProvider" class="cern.c2mon.publisher.rdaAlarms.DataProviderDB">
+ 			<constructor-arg ref="dataSource" />
+		</bean>
+	
+		<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+			<property name="driverClassName" value="${alarm.jdbc.driverClass}" />
+			<property name="url" value="${alarm.jdbc.url}" />
+			<property name="username" value="${alarm.jdbc.user}" />
+			<property name="password" value="${alarm.jdbc.password}" />
+			<property name="maxActive" value="2" />
+			<property name="validationQuery" value="SELECT 0 FROM DUAL" />
+			<property name="testWhileIdle" value="true" />
+			<property name="timeBetweenEvictionRunsMillis" value="3600000" />
+			<property name="initialSize" value="3" />
+		</bean>
+	</beans>
+	<beans profile="TEST">
+		<bean id="c2mon" class="cern.c2mon.publisher.rdaAlarms.C2monConnectionMock"></bean> 
+		<bean id="dataProvider" class="cern.c2mon.publisher.rdaAlarms.DataProviderMock"></bean>
+	</beans>
+
+ </beans>
