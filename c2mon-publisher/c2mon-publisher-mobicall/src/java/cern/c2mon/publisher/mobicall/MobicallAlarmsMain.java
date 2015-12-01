@@ -7,15 +7,11 @@ package cern.c2mon.publisher.mobicall;
 import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 /**
- * The RDA alarms publisher acts as a C2MON client working with all alarm tags in the server.
- * Based on configuration data, a property is created for each of the alarm sources, an alarm
- * becomes an entry in the internal storage of the property (a String/String map).
+ * The Mobicall alarms publisher acts as a C2MON client working with all alarm tags in the server.
+ * Based on configuration data, alarms are forwarded to the Mobicall system through a SNMP trap.
  *
- * See demo code in this project for more information about how to subscribe and use the data
- * provided by the publisher
  *
  * @author mbuttner
  */
@@ -26,21 +22,15 @@ public class MobicallAlarmsMain extends Thread {
 
     public static void main(String[] args)
     {
-        System.setProperty("spring.profiles.default", "PROD");
-
         String log4jConfigFile = System.getProperty("log4j.configuration", "log4j-diamon.properties");
         PropertyConfigurator.configureAndWatch(log4jConfigFile, 60 * 1000);
         log = LoggerFactory.getLogger(MobicallAlarmsMain.class);
         log.info("Logging system ready ({})...", log4jConfigFile);
 
         Runtime.getRuntime().addShutdownHook(new MobicallAlarmsMain());
-        FileSystemXmlApplicationContext context = null;
-        try
-        {
-             context = new FileSystemXmlApplicationContext(System.getProperty("context",
-                        "classpath:cern/c2mon/publisher/rdaAlarms/alarms_publisher.xml"));
-
-             client = context.getBean("publisher", MobicallAlarmsPublisher.class);
+        
+        try {
+             client = new MobicallAlarmsPublisher(new C2monConnection());
              client.start();
              client.join();
         }
@@ -48,12 +38,6 @@ public class MobicallAlarmsMain extends Thread {
         {
             e.printStackTrace();
             System.exit(1);
-        }
-        finally
-        {
-            if (context != null) {
-                context.close();
-            }
         }
         log.info("Halt.");
         System.exit(0);

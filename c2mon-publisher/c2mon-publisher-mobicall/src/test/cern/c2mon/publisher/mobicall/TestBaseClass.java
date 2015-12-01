@@ -34,18 +34,16 @@ public class TestBaseClass {
 
     private Logger log;
     private static MobicallAlarmsPublisher publisher;
-
+    private boolean running;
+    
     @Autowired
     ApplicationContext applicationContext;
 
     @BeforeClass
     public static void init() {
         System.setProperty("c2mon.client.conf.url", "file:client.properties");
-        System.setProperty("provider.properties", "file:provider.properties");
         System.setProperty("app.version", "0.1");
         System.setProperty("app.name", "test");
-        System.setProperty("cmw.rda3.transport.server.multiThreadedPublisher","true");
-//        System.setProperty("cmw.directory.client.serverList", "cmw-dir-test:5021");
 
         String log4jConfigFile = System.getProperty("log4j.configuration", "log4j.properties");
         PropertyConfigurator.configure(log4jConfigFile);
@@ -59,8 +57,8 @@ public class TestBaseClass {
     }
 
     protected void startTestPublisher() {
-        publisher = MobicallAlarmsPublisher.getPublisher();
-        if (!publisher.isRunning()) {
+        if (!running) {
+            publisher = new MobicallAlarmsPublisher(new C2monConnection());
             publisher.start();
         }
     }

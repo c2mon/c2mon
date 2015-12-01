@@ -35,9 +35,9 @@ class C2monConnectionMonitor implements ClientHealthListener, ConnectionListener
     }
     
     private C2monConnectionMonitor() {
-        C2monServiceGateway.getSupervisionManager().addClientHealthListener(this);
-        C2monServiceGateway.getSupervisionManager().addConnectionListener(this);
-        C2monServiceGateway.getSupervisionManager().addHeartbeatListener(this);
+        C2monServiceGateway.getSupervisionService().addClientHealthListener(this);
+        C2monServiceGateway.getSupervisionService().addConnectionListener(this);
+        C2monServiceGateway.getSupervisionService().addHeartbeatListener(this);
     }
     
     //

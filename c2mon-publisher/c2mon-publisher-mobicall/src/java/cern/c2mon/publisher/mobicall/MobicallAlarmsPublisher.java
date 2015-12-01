@@ -15,7 +15,6 @@ import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
 import cern.c2mon.client.jms.AlarmListener;
@@ -30,68 +29,25 @@ public final class MobicallAlarmsPublisher implements Runnable, AlarmListener {
     @SuppressWarnings("unused")
     private static final SimpleDateFormat df = new SimpleDateFormat("dd.MM.YYYY HH:MM:SS");
 
-    private static MobicallAlarmsPublisher publisher;
-    
-    private VCM received;
-    private VCM processed;
-    private long rejected;
-
     private Thread daemonThread;
     private C2monConnectionIntf c2mon;
-    private volatile boolean running = false;
     
     //
     // --- CONSTRUCTION ----------------------------------------------------------------
     //
-    private MobicallAlarmsPublisher() {
+    public MobicallAlarmsPublisher(C2monConnectionIntf c2mon) {
         LOG.warn("Publisher instance created ...");
+        this.c2mon= c2mon;
     }
 
-    public static MobicallAlarmsPublisher getPublisher() {
-        if (publisher == null) {
-            publisher = new MobicallAlarmsPublisher();
-        }
-        return publisher;
-    }
 
     //
     // --- PUBLIC GETTERS / SETTERS ----------------------------------------------------
-    // ... some of them are used by Spring at bean construction time ...
-    public void setC2mon(C2monConnectionIntf c2mon) {
-        this.c2mon = c2mon;
-        this.c2mon.setListener(this);
-    }
-    
-    public C2monConnectionIntf getC2mon() {
-        return this.c2mon;
-    }
-        
-    public void setReceived(VCM received) {
-        this.received = received;
-    }
-    
-    public void setProcessed(VCM processed) {
-        this.processed = processed;
-    }
-    
+            
     static String getAlarmId(AlarmValue av) {
         return av.getFaultFamily() + ":" + av.getFaultMember() + ":" + av.getFaultCode();
     }
     
-    //
-    // --- JMX -------------------------------------------------------------------------
-    //
-
-    @ManagedAttribute
-    public long getRejected() {
-        return this.rejected;
-    }
-
-    @ManagedAttribute
-    public boolean isRunning()
-    {
-        return this.running;
-    }
 
 
     //
@@ -120,7 +76,6 @@ public final class MobicallAlarmsPublisher implements Runnable, AlarmListener {
             }
             LOG.info("Started with initial selection of " + activeAlarms.size() + " alarms.");
             // everything ready, start the RDA server for publishung
-            running = true;
         } catch (Exception e) {
             LOG.error("A major problem occured while running the RDA server. Stopping publisher!", e);
         }
@@ -135,7 +90,6 @@ public final class MobicallAlarmsPublisher implements Runnable, AlarmListener {
         c2mon.stop();
         try {
             daemonThread.join();
-            running = false;
         } catch (InterruptedException e) {
             LOG.warn("InterruptedException caught", e);
         }
@@ -150,9 +104,7 @@ public final class MobicallAlarmsPublisher implements Runnable, AlarmListener {
 
         String alarmId = getAlarmId(av);
         LOG.debug(" RECEIVED    > " + alarmId + " is active:" + av.isActive());
-        received.increment();
         // TODO
-        processed.increment();
         LOG.debug(" PROCESSED    > " + alarmId);
 
     }
