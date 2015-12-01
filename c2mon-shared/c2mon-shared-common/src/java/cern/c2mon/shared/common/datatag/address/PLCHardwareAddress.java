@@ -82,7 +82,7 @@ public interface PLCHardwareAddress  extends HardwareAddress {
    * convert hardware values sent by the PLC to engineering values.
    * @see #getPhysicalMinVal()
    */
-  float getPhysicMaxVal();
+  float getPhysicalMaxVal();
 
   /**
    * Get the physical address of the tag, depending on PLC model used.

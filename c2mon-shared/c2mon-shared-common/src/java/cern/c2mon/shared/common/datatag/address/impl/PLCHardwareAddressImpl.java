@@ -201,7 +201,7 @@ public class PLCHardwareAddressImpl extends HardwareAddressImpl implements PLCHa
    * @see #getPhysicalMinVal()
    */
   @Override
-  public final float getPhysicMaxVal() {
+  public final float getPhysicalMaxVal() {
     return this.physicalMaxVal;
   }
 
