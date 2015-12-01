@@ -34,31 +34,31 @@ import com.google.gson.Gson;
  * DataTagShortTermLog class It is aware of the DataShortTermLog java bean
  * structure and knows how its information has to be transfered into/from other
  * objects
- * 
+ *
  * @author mruizgar
- * 
+ *
  */
 public final class DataTagShortTermLogConverter implements LoggerConverter<Tag> {
 
     /** The maximum length for the reportText */
     private static final int MAX_LENGTH = 1000;
-    
+
     /** The index to which the text will be significative */
     private static final int SPLIT_INDEX = 99;
-    
+
     /**
      * Gson object used for converting DataTagQuality to String.
      */
     private Gson gson = GsonFactory.createGson();
-         
+
     /**
      * Creates a DataTagValue object from the info stored in the
      * DataTagCacheObject
-     * 
+     *
      * @param pTag
      *            DataTagCacheObject containing some useful metadata for the
      *            DataTagValue object
-     * @param dtShortTerm 
+     * @param dtShortTerm
      *            DataTagShortTermLog object containing some useful metadata for the
      *            DataTagValue object
      * @return An object containing the dataTags values previously stored in the
@@ -89,7 +89,7 @@ public final class DataTagShortTermLogConverter implements LoggerConverter<Tag> 
     /**
      * Creates a new DataTagQuality object depending on the values passed as
      * parameters
-     * 
+     *
      * @param code
      *            Number that indicates the quality of the datatag
      * @param desc
@@ -108,11 +108,11 @@ public final class DataTagShortTermLogConverter implements LoggerConverter<Tag> 
 
     /**
      * Creates a new object whose type is set up based in the parameters
-     * 
-     * @param dtShortTerm 
-     *            DataTagShortTermLog object containing the value and type 
+     *
+     * @param dtShortTerm
+     *            DataTagShortTermLog object containing the value and type
      *            to which a new object has to be created
-     *            
+     *
      * @return An object of the same type and value as indicated per the
      *         parameters
      */
@@ -128,11 +128,11 @@ public final class DataTagShortTermLogConverter implements LoggerConverter<Tag> 
     /**
      * Assigns a description to the DataTag depending on the values of its other
      * attributes
-     * 
+     *
      * @param dtDictionary
      *            Object containing several descriptions that are used for the
      *            datatags
-     * @param dtShortTerm 
+     * @param dtShortTerm
      *            Object containing useful information for the dataTag
      * @param dtValue
      *            The dataTag value object
@@ -143,7 +143,7 @@ public final class DataTagShortTermLogConverter implements LoggerConverter<Tag> 
 //        String valueDescription = "";
 //        if (dtShortTerm.getTagQualityCode() == DataTagQuality.OK) {
 //            if (dtShortTerm.getTagName() != null) {
-//                valueDescription = dtShortTerm.getTagQualityDesc(); 
+//                valueDescription = dtShortTerm.getTagQualityDesc();
 //            } else {
 //                valueDescription = "";
 //            }
@@ -168,7 +168,7 @@ public final class DataTagShortTermLogConverter implements LoggerConverter<Tag> 
           dtSTLog.setTagValue(tag.getValue().toString());
       } else {
           dtSTLog.setTagValue(null);
-      } 
+      }
       dtSTLog.setTagValueDesc(tag.getValueDescription());
       dtSTLog.setTagDataType(tag.getDataType());
       if (tag instanceof DataTag || tag instanceof ControlTag) {
@@ -179,15 +179,16 @@ public final class DataTagShortTermLogConverter implements LoggerConverter<Tag> 
       int code = 0;
       if (tag.getDataTagQuality() != null) {
         for (TagQualityStatus status : tag.getDataTagQuality().getInvalidQualityStates().keySet()) {
-          code = (int) (code + Math.pow(2, status.getCode())); 
+          code = (int) (code + Math.pow(2, status.getCode()));
         }
-      }      
+      }
       dtSTLog.setTagQualityCode(code); //for longterm log and statistics purpose
-      dtSTLog.setTagQualityDesc(gson.toJson(tag.getDataTagQuality().getInvalidQualityStates()));      
+      dtSTLog.setTagQualityDesc(gson.toJson(tag.getDataTagQuality().getInvalidQualityStates()));
       if (dtSTLog.getTagQualityDesc() != null && dtSTLog.getTagQualityDesc().length() > MAX_LENGTH) {
           dtSTLog.setTagQualityDesc("{\"UNKNOWN_REASON\":\"Invalid quality String was too long: unable to store in ShortTermLog table.\"}");
       }
       dtSTLog.setTagDir("I");
+      dtSTLog.setTagMode(tag.getMode());
       return dtSTLog;
     }
 
