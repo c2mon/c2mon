@@ -178,7 +178,7 @@
     </update>
     
     <!-- must specify jdbcType for parameters that can be null in DB  -->
-    <insert id="testInsertDataTag" parameterType="cern.c2mon.server.common.datatag.DataTagCacheObject">
+    <insert id="insertDataTag" parameterType="cern.c2mon.server.common.datatag.DataTagCacheObject">
       INSERT INTO DATATAG (TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE,
                             TAGVALUE, TAGVALUEDESC,
                             TAGTIMESTAMP, TAGDAQTIMESTAMP, TAGSRVTIMESTAMP, 

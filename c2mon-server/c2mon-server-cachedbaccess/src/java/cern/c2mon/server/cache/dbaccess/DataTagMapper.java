@@ -31,7 +31,7 @@ import cern.c2mon.server.common.datatag.DataTagCacheObject;
 public interface DataTagMapper extends PersistenceMapper<DataTag>, LoaderMapper<DataTag>, 
                                             BatchLoaderMapper<DataTag>, ConfigurableMapper<DataTag> {
   
-  void testInsertDataTag(DataTag dataTag);
+  void insertDataTag(DataTag dataTag);
   
   void deleteDataTag(Long id);
   

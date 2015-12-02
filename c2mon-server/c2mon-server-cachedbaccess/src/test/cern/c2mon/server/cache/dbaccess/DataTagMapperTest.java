@@ -130,7 +130,7 @@ public class DataTagMapperTest {
 
 
     //put in database
-    dataTagMapper.testInsertDataTag(cacheObject);
+    dataTagMapper.insertDataTag(cacheObject);
     assertTrue(dataTagMapper.isInDb(cacheObject.getId()));
 
     //retrieve from database
@@ -169,7 +169,7 @@ public class DataTagMapperTest {
 //    cacheObject.setSubEquipmentId(250L);
 //
 //    //put in database
-//    dataTagMapper.testInsertDataTag(cacheObject);
+//    dataTagMapper.insertDataTag(cacheObject);
 //    assertTrue(dataTagMapper.isInDb(cacheObject.getId()));
 //
 //    //retrieve from database
@@ -208,7 +208,7 @@ public class DataTagMapperTest {
 //    cacheObject.setProcessId(50L); //need test process also (P_JAPC01)
 
     //put in database
-    dataTagMapper.testInsertDataTag(cacheObject);
+    dataTagMapper.insertDataTag(cacheObject);
     assertTrue(dataTagMapper.isInDb(cacheObject.getId()));
 
     //retrieve from database
@@ -250,7 +250,7 @@ public class DataTagMapperTest {
     cacheObject.setDataType("Boolean"); // non null
     cacheObject.setEquipmentId(new Long(150)); //need test equipment inserted
 
-    dataTagMapper.testInsertDataTag(cacheObject);
+    dataTagMapper.insertDataTag(cacheObject);
 
     cacheObject.setValue(Boolean.TRUE);
     cacheObject.setValueDescription("test value description");

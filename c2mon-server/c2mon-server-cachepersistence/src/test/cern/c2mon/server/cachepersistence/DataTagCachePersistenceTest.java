@@ -106,7 +106,7 @@ public class DataTagCachePersistenceTest implements ApplicationContextAware {
     
     //create a test cache object, put in DB and cache
 //    DataTagCacheObject originalObject = (DataTagCacheObject) DataTagMapperTest.createTestDataTag();
-//    dataTagMapper.testInsertDataTag((DataTagCacheObject) originalObject);
+//    dataTagMapper.insertDataTag((DataTagCacheObject) originalObject);
     dataTagCache.put(originalObject.getId(), originalObject);
     
     //check it is in cache (only values so far...)
@@ -164,7 +164,7 @@ public class DataTagCachePersistenceTest implements ApplicationContextAware {
     floatTag.setValue(new Float(10));
     floatTag.setCacheTimestamp(new Timestamp(System.currentTimeMillis() - 10)); //before both updates
     
-    dataTagMapper.testInsertDataTag(floatTag);
+    dataTagMapper.insertDataTag(floatTag);
     assertNotNull(dataTagMapper.getItem(floatTag.getId()));
     dataTagCache.put(floatTag.getId(), floatTag);
     

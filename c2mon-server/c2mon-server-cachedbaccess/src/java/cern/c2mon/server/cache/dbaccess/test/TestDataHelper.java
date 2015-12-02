@@ -118,9 +118,9 @@ public class TestDataHelper {
     equipmentMapper.insertEquipment(equipment);
     subEquipmentMapper.insertSubEquipment(subEquipment);
     subEquipmentMapper.insertSubEquipment(subEquipment2);
-    dataTagMapper.testInsertDataTag(dataTag);
-    dataTagMapper.testInsertDataTag(dataTag2);
-    dataTagMapper.testInsertDataTag(dataTag3);
+    dataTagMapper.insertDataTag(dataTag);
+    dataTagMapper.insertDataTag(dataTag2);
+    dataTagMapper.insertDataTag(dataTag3);
     commandTagMapper.insertCommandTag(commandTag);
     alarmMapper.insertAlarm(alarm1);
     alarmMapper.insertAlarm(alarm2);

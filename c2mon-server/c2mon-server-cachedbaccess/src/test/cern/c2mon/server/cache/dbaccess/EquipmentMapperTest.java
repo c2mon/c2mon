@@ -136,7 +136,7 @@ public class EquipmentMapperTest {
 //      SubEquipmentCacheObject subEquipmentCacheObject = createTestSubEquipment();
 //      subEquipmentMapper.insertSubEquipment(subEquipmentCacheObject);      
 //      DataTagCacheObject dataTagCacheObject = DataTagMapperTest.createTestDataTag();
-//      dataTagMapper.testInsertDataTag(dataTagCacheObject);
+//      dataTagMapper.insertDataTag(dataTagCacheObject);
       EquipmentCacheObject retrievedObject = (EquipmentCacheObject) equipmentMapper.getItem(equipmentCacheObject.getId());
       assertEquals(equipmentCacheObject.getId(), retrievedObject.getId());
       assertEquals(equipmentCacheObject.getName(), retrievedObject.getName());
