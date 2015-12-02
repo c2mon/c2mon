@@ -72,17 +72,9 @@ public class C2monConnection implements C2monConnectionIntf {
     }
 
     @Override
-    public int getQuality(long alarmTagId) {
-        int qual = 0;
-        Tag tag = C2monServiceGateway.getTagService().get(alarmTagId);
-        if (tag != null) {
-            if (tag.getDataTagQuality().isValid()) {
-                qual = qual | Quality.VALID;
-            }
-            if (tag.getDataTagQuality().isExistingTag()) {
-                qual = qual | Quality.EXISTING;
-            }
-        }
-        return qual;
+    public boolean isTagValid(Long tagId) {
+        Tag tag = C2monServiceGateway.getTagService().get(tagId);
+        return (tag.getDataTagQuality().isValid() && tag.getDataTagQuality().isExistingTag());
     }
+
 }

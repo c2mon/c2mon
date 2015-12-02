@@ -25,18 +25,6 @@ public interface C2monConnectionIntf {
     void stop();                                    // stop the C2MON connection
     
     Collection<AlarmValue> getActiveAlarms();       // retrieve the initial list of active alarms
-    public int getQuality(long alarmTagId);         // check underlying datatag for an alarm (see below)
-
-    /**
-     * Use this to check the return value of getQuality(). An alarm is valid if the underlying datatag
-     * exists and is valid. Otherwise, the alarm should be removed from the publisher, or have a special
-     * status.
-     * Ex.: if (qual &amp; Quality.EXISTING == Quality.EXISTING) is true if the data tag is existing
-     */
-    public static class Quality {
-        public static final int EXISTING =1;
-        public static final int VALID =2;        
-    }
-
+    boolean isTagValid(Long tagId);
 
 }

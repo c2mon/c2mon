@@ -12,6 +12,10 @@ import org.slf4j.LoggerFactory;
  * The Mobicall alarms publisher acts as a C2MON client working with all alarm tags in the server.
  * Based on configuration data, alarms are forwarded to the Mobicall system through a SNMP trap.
  *
+ * TODO send mobicall notifications on startup only if alarm was activated in between stop and start!
+ * TODO test and write tests 
+ * TODO comment and document
+ * 
  *
  * @author mbuttner
  */
@@ -30,7 +34,9 @@ public class MobicallAlarmsMain extends Thread {
         Runtime.getRuntime().addShutdownHook(new MobicallAlarmsMain());
         
         try {
-             client = new MobicallAlarmsPublisher(new C2monConnection());
+             client = new MobicallAlarmsPublisher(new C2monConnection(), 
+                     MobicallConfigLoaderDB.getLoader(), new SenderSnmpImpl());
+             
              client.connect();
              synchronized (client) {
                  client.wait();
