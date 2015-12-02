@@ -4,8 +4,6 @@
 
 package cern.c2mon.publisher.mobicall;
 
-import java.io.IOException;
-
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
@@ -14,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-
-import cern.c2mon.publisher.mobicall.MobicallAlarmsPublisher;
 
 @ContextConfiguration("classpath:cern/c2mon/publisher/rdaAlarms/alarms_publisher.xml")
 @ActiveProfiles(profiles = "TEST")
@@ -35,8 +31,12 @@ public class TestBaseClass {
     public static final String  SAMPLE_ALARM_ID = SAMPLE_FF + ":" + SAMPLE_FM + ":" + SAMPLE_FC;
 
     private Logger log;
-    private static MobicallAlarmsPublisher publisher;
-    private boolean running;
+    protected static MobicallAlarmsPublisher publisher;
+    protected static MobicallConfigLoaderMock loader;
+    protected static C2monConnectionMock c2mon;
+    protected static SenderMockImpl sender;
+    
+    private static boolean running;
     
     @Autowired
     ApplicationContext applicationContext;
@@ -48,7 +48,6 @@ public class TestBaseClass {
         System.setProperty("app.name", "test");
 
         String log4jConfigFile = System.getProperty("log4j.configuration", "log4j.properties");
-        System.out.println(log4jConfigFile);
         PropertyConfigurator.configure(log4jConfigFile);
     }
 
@@ -59,9 +58,12 @@ public class TestBaseClass {
         return log;
     }
 
-    protected void startTestPublisher() throws Exception {
+    protected static void startTestPublisher() throws Exception {
         if (!running) {
-            publisher = new MobicallAlarmsPublisher(new C2monConnection());
+            loader = new MobicallConfigLoaderMock();
+            c2mon = new C2monConnectionMock();
+            sender = new SenderMockImpl();
+            publisher = new MobicallAlarmsPublisher(c2mon, loader, sender);
             publisher.connect();
         }
     }

@@ -11,11 +11,10 @@ import java.util.Collection;
 import javax.jms.JMSException;
 
 import cern.c2mon.client.jms.AlarmListener;
-import cern.c2mon.publisher.mobicall.C2monConnectionIntf;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 
-public class C2monConnectionMock implements C2monConnectionIntf{
+public class C2monConnectionMock implements C2monConnectionIntf {
 
     AlarmListener listener;
     
@@ -33,13 +32,21 @@ public class C2monConnectionMock implements C2monConnectionIntf{
         return activeAlarms;
     }
 
-    public void activateAlarm(String ff, String fm, int fc) {
-        AlarmValue av = new AlarmValueImpl(1L, fc, fm, ff, "Activation", 1L, getSystemTs(), true);
+    public void activateAlarm(String ff, String fm, int fc, boolean valid) {
+        long tagId = 2;
+        if (valid) {
+            tagId = 1;
+        }
+        AlarmValue av = new AlarmValueImpl(1L, fc, fm, ff, "Activation", tagId, getSystemTs(), true);
         listener.onAlarmUpdate(av);
     }
 
-    public void terminateAlarm(String ff, String fm, int fc) {
-        AlarmValue av = new AlarmValueImpl(1L, fc, fm, ff, "Activation", 1L, getSystemTs(), false);
+    public void terminateAlarm(String ff, String fm, int fc, boolean valid) {
+        long tagId = 2;
+        if (valid) {
+            tagId = 1;
+        }
+        AlarmValue av = new AlarmValueImpl(1L, fc, fm, ff, "Activation", tagId, getSystemTs(), false);
         listener.onAlarmUpdate(av);
     }
 
@@ -47,12 +54,6 @@ public class C2monConnectionMock implements C2monConnectionIntf{
         return new Timestamp(System.currentTimeMillis());
     }
     
-    @Override
-    public int getQuality(long alarmTagId) {
-        int qual = Quality.EXISTING | Quality.VALID;
-        return qual;
-    }
-
     @Override
     public void connectListener() throws JMSException {
         // not needed for mock
@@ -68,4 +69,10 @@ public class C2monConnectionMock implements C2monConnectionIntf{
         // not needed for mock
     }
     
+
+    @Override
+    public boolean isTagValid(Long tagId) {
+        return true;
+    }
+        
 }
