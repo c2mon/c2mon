@@ -62,6 +62,18 @@
       <artifactId>spring-jms</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+      <version>1.9.13</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <version>1.9.3</version>
+    </dependency>
+
     <!-- C2MON server dependencies -->
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>

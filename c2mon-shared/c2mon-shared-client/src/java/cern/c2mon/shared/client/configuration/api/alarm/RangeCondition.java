@@ -13,7 +13,6 @@ import lombok.ToString;
  * The related class path in the xml String is witten in the code itself
  */
 @Data
-@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class RangeCondition extends AlarmCondition {
 
@@ -44,6 +43,9 @@ public class RangeCondition extends AlarmCondition {
     result += minValue != null ? "<max-value type=\""+getDataType()+"\">"+maxValue.toString()+"</max-value>\n" : "";
     result += "</AlarmCondition>";
     return result;
+  }
+
+  public RangeCondition(){
   }
 
 }

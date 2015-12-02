@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.simpleframework.xml.Element;
@@ -234,6 +235,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
     /**
      * Returns true if value-based deadband filtering is enabled for this DataTagAddress object.
      */
+    @JsonIgnore
     public boolean isValueDeadbandEnabled() {
         return this.valueDeadbandType != DataTagDeadband.DEADBAND_NONE;
     }
@@ -241,6 +243,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
     /**
      * Returns true if value-based deadband filtering is enabled for the process
      */
+    @JsonIgnore
     public boolean isProcessValueDeadbandEnabled() {
         if (valueDeadbandType == DataTagDeadband.DEADBAND_PROCESS_ABSOLUTE
                 || valueDeadbandType == DataTagDeadband.DEADBAND_PROCESS_RELATIVE
@@ -255,6 +258,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
     /**
      * Returns true if time-based deadband filtering is enabled for this DataTagAddress object.
      */
+    @JsonIgnore
     public boolean isTimeDeadbandEnabled() {
         return this.timeDeadband > 0;
     }
@@ -548,6 +552,10 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
      */
     public boolean isStaticTimedeadband() {
         return staticTimedeadband;
+    }
+
+    public void setValueCheckMonitor(ValueChangeMonitor monitor) {
+        this.valueChangeMonitor = monitor;
     }
 
     public ValueChangeMonitor getValueCheckMonitor() {

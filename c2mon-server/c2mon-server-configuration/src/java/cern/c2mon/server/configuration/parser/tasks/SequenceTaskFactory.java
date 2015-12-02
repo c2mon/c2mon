@@ -7,6 +7,7 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
+import cern.c2mon.shared.client.configuration.api.alarm.AlarmCondition;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.process.Process;
@@ -15,6 +16,8 @@ import cern.c2mon.shared.client.configuration.api.util.ConfigurationObject;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import cern.c2mon.shared.client.tag.TagMode;
+import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -166,7 +169,28 @@ public class SequenceTaskFactory {
       for (PropertyDescriptor pd : props) {
         if (!ignoreFields.contains(pd.getName())) {
           if (pd.getReadMethod().invoke(obj) != null) {
-            String tempProp = pd.getPropertyType().equals(TagMode.class) ? String.valueOf(((TagMode)pd.getReadMethod().invoke(obj)).ordinal()) : pd.getReadMethod().invoke(obj).toString();
+            String tempProp;
+
+            // check if the property is a TagMode. If so we have to call the ordinal() method manual because the enum toString method don't return the needed number.
+            if(pd.getPropertyType().equals(TagMode.class)){
+              tempProp = String.valueOf(((TagMode) pd.getReadMethod().invoke(obj)).ordinal());
+
+              // check if the property is a DataTagAddress. If so we have to call the toConfigXML() method because the server expect the xml string of a DataTagAddress.
+            } else if(pd.getPropertyType().equals(DataTagAddress.class)){
+              tempProp =  String.valueOf(((DataTagAddress) pd.getReadMethod().invoke(obj)).toConfigXML());
+
+              //check if the property is a HardWareAddress. If so we have to call the toConfigXML() method because the server expect the xml string of a DataTagAddress.
+            }else if(pd.getPropertyType().equals(HardwareAddress.class)){
+              tempProp =  String.valueOf(((HardwareAddress) pd.getReadMethod().invoke(obj)).toConfigXML());
+
+              // check if the property is a AlarmCondition. If so we have to call the getXMLCondition() method because the server expect the xml string of an AlarmCondition.
+            }else if(pd.getPropertyType().equals(AlarmCondition.class)){
+              tempProp =  String.valueOf(((AlarmCondition) pd.getReadMethod().invoke(obj)).getXMLCondition());
+
+              // default call of all properties. Returns the standard toStringValue of the given Type
+            }else {
+              tempProp = pd.getReadMethod().invoke(obj).toString();
+            }
             properties.setProperty(pd.getName(), tempProp);
           }
         }

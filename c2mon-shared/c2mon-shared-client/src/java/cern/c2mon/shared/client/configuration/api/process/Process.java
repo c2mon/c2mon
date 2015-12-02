@@ -34,7 +34,7 @@ public class Process implements ConfigurationObject {
    * Unique identifier of the equipment.
    */
   @IgnoreProperty
-  private final Long id;
+  private Long id;
 
   /**
    * Unique name of the equipment.
@@ -112,5 +112,9 @@ public class Process implements ConfigurationObject {
     this.statusTag = statusTag;
     this.aliveTag = aliveTag;
     this.equipments = equipments == null ? new ArrayList<Equipment>() : equipments;
+  }
+
+  public Process(){
+
   }
 }

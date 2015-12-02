@@ -1,6 +1,8 @@
 package cern.c2mon.shared.client.configuration.api.tag;
 
+import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
+import cern.c2mon.shared.client.configuration.api.metaData.MetaData;
 import cern.c2mon.shared.client.configuration.api.util.DataType;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.tag.TagMode;
@@ -26,10 +28,13 @@ public class StatusTag extends ControlTag {
 
   @Builder
   public StatusTag(Long id, String name, String description, TagMode mode, @Singular List<Alarm> alarms,
-                   Boolean isLogged) {
-    super(id, name, description, mode, alarms);
+                   Boolean isLogged, MetaData metaData) {
+    super(id, name, description, mode, alarms, metaData);
 
     this.isLogged = isLogged;
+  }
+
+  public StatusTag(){
 
   }
 }

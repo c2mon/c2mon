@@ -1,6 +1,8 @@
 package cern.c2mon.shared.client.configuration.api.util;
 
 
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+
 /**
  * Interface which defines objects which are used to create a {@link cern.c2mon.shared.client.configuration.ConfigurationElement}.
  * Although the structure of the ConfigurationObjects are well defined each object needs to provide the
@@ -8,10 +10,11 @@ package cern.c2mon.shared.client.configuration.api.util;
  *
  * A ConfigurationObjects is a POJO which holds information for creating the {@link cern.c2mon.shared.client.configuration.ConfigurationElement}.
  *
- * If the id of the object is known by the Server the {@link SequenceTaskFactory} tries to create a UPDATE {@link cern.c2mon.shared.client.configuration.ConfigurationElement}.
+ * If the id of the object is known by the Server the {@link cern.c2mon.server.configuration.parser.tasks.SequenceTaskFactory} tries to create a UPDATE {@link cern.c2mon.shared.client.configuration.ConfigurationElement}.
  * If the id of the object is not known by the Server the {@link SequenceTaskFactory} tries to create a CREATE {@link cern.c2mon.shared.client.configuration.ConfigurationElement}.
  * If field deleted is set to true the  {@link SequenceTaskFactory} tries to create a DELETE {@link cern.c2mon.shared.client.configuration.ConfigurationElement}.
  */
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
 public interface ConfigurationObject {
 
   /**

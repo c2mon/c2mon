@@ -8,7 +8,7 @@ import lombok.ToString;
 
 /**
  * Value condition to a {@link Alarm}.
- *
+ * <p/>
  * Attention the getXMLCondition Method returns a hard coded xmml string.
  * The related class path in the xml String is witten in the code itself
  */
@@ -18,9 +18,9 @@ import lombok.ToString;
 public class ValueCondition extends AlarmCondition {
 
   private Object value;
-  
+
   @Builder
-  public ValueCondition(DataType dataType, Object value){
+  public ValueCondition(DataType dataType, Object value) {
     super(dataType);
     this.value = value;
   }
@@ -29,9 +29,12 @@ public class ValueCondition extends AlarmCondition {
   public String getXMLCondition() {
     String result = "";
     result += "<AlarmCondition class=\"cern.c2mon.server.common.alarm.ValueAlarmCondition\">\n";
-    result += "<alarm-value type=\""+getDataType()+"\">"+value.toString()+"</alarm-value>\n";
+    result += "<alarm-value type=\"" + getDataType() + "\">" + value.toString() + "</alarm-value>\n";
     result += "</AlarmCondition>";
     return result;
+  }
+
+  public ValueCondition() {
   }
 
 }

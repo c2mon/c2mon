@@ -32,4 +32,8 @@ public class SubEquipment extends Equipment {
                       String handlerClass, StatusTag statusTag, AliveTag aliveTag, CommFaultTag commFaultTag, @Singular List<DataTag<Number>> dataTags) {
     super(deleted, id, name, aliveInterval, description, handlerClass, null, new ArrayList<SubEquipment>(), statusTag, commFaultTag, aliveTag, dataTags, null);
   }
+
+  public SubEquipment(){
+
+  }
 }

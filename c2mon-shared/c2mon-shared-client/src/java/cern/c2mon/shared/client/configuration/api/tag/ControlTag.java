@@ -3,6 +3,7 @@ package cern.c2mon.shared.client.configuration.api.tag;
 import java.util.List;
 
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
+import cern.c2mon.shared.client.configuration.api.metaData.MetaData;
 import cern.c2mon.shared.client.configuration.api.util.DataType;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.tag.TagMode;
@@ -28,8 +29,15 @@ public abstract class ControlTag extends Tag {
    */
 
   public ControlTag(Long id, String name, String description, TagMode mode,
-                    @Singular List<Alarm> alarms) {
-    super(false, id, name, description, mode, alarms);
+                    @Singular List<Alarm> alarms, MetaData metaData) {
+    super(false, id, name, description, mode, alarms, metaData);
+  }
+
+  /**
+   * empty default constructor
+   */
+  public ControlTag(){
+
   }
 
 }

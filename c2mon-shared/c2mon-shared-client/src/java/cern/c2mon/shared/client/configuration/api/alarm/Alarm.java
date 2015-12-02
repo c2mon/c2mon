@@ -1,5 +1,6 @@
 package cern.c2mon.shared.client.configuration.api.alarm;
 
+import cern.c2mon.shared.client.configuration.api.metaData.MetaData;
 import cern.c2mon.shared.client.configuration.api.util.DataType;
 import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationObject;
@@ -11,7 +12,7 @@ import lombok.Setter;
 /**
  * Alarm which holds the information to create a {@link cern.c2mon.shared.client.configuration.ConfigurationElement}
  * related to Alarms.
- *
+ * <p/>
  * The class is a lombok class which uses the Builder annotation.
  *
  * @author Franz Ritter
@@ -53,14 +54,13 @@ public class Alarm implements ConfigurationObject {
    **/
   private Integer faultCode;
 
+  /**
+   * Meta data of the alarm object. Holds arbitrary data which are related to the given Alarm.
+   */
+  private MetaData metaData;
 
   // TODO check if alarm condition is mandatory
-  @Setter(AccessLevel.NONE)
-  private String alarmCondition;
-
-  public void setAlarmCondition(AlarmCondition privateAlarmCondition) {
-    alarmCondition = privateAlarmCondition.getXMLCondition();
-  }
+  private AlarmCondition alarmCondition;
 
   @Override
   public boolean requiredFieldsGiven() {
@@ -72,7 +72,7 @@ public class Alarm implements ConfigurationObject {
 
   @Builder
   public Alarm(boolean deleted, Long id, DataType valueType, Long dataTagId, String faultFamily, String faultMember, Integer faultCode,
-               AlarmCondition alarmCondition) {
+               AlarmCondition alarmCondition, MetaData metaData) {
     super();
     this.deleted = deleted;
     this.id = id;
@@ -81,7 +81,10 @@ public class Alarm implements ConfigurationObject {
     this.faultFamily = faultFamily;
     this.faultMember = faultMember;
     this.faultCode = faultCode;
-    this.alarmCondition = alarmCondition != null ? alarmCondition.getXMLCondition() : null;
+    this.alarmCondition = alarmCondition;
+    this.metaData = metaData;
   }
 
+  public Alarm() {
+  }
 }

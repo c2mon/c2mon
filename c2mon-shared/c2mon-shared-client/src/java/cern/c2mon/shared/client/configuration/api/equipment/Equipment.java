@@ -16,7 +16,7 @@ import lombok.Singular;
  * POJO class for the ConfigurationObject.
  * Holds the information to create a {@link cern.c2mon.shared.client.configuration.ConfigurationElement}
  * related to Equipment.
- * <p>
+ * <p/>
  * The class is a lombok class which uses the Builder annotation.
  *
  * @author Justin Lewis Salmon
@@ -93,7 +93,7 @@ public class Equipment implements ConfigurationObject {
 
   @Builder
   public Equipment(boolean deleted, Long id, String name, Integer aliveInterval, String description,
-                   String handlerClass, String address, @Singular List<SubEquipment> subEquipments, StatusTag statusTag, CommFaultTag commFaultTag, AliveTag aliveTag, @Singular List<DataTag<Number>> dataTags,  @Singular List<CommandTag> commandTags) {
+                   String handlerClass, String address, @Singular List<SubEquipment> subEquipments, StatusTag statusTag, CommFaultTag commFaultTag, AliveTag aliveTag, @Singular List<DataTag<Number>> dataTags, @Singular List<CommandTag> commandTags) {
     this.deleted = deleted;
     this.id = id;
     this.name = name;
@@ -111,6 +111,10 @@ public class Equipment implements ConfigurationObject {
     this.subEquipments = subEquipments == null ? new ArrayList<SubEquipment>() : subEquipments;
     this.commandTags = commandTags == null ? new ArrayList<CommandTag>() : commandTags;
     this.dataTags = dataTags;
+  }
+
+  public Equipment() {
+
   }
 
 

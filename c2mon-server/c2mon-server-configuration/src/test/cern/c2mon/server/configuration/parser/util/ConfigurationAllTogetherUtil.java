@@ -4,6 +4,7 @@ import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
+import cern.c2mon.shared.client.configuration.api.metaData.MetaData;
 import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.*;
 
@@ -34,6 +35,84 @@ import static cern.c2mon.server.configuration.parser.util.ConfigurationSubEquipm
 import static cern.c2mon.server.configuration.parser.util.ConfigurationUtil.getConfBuilder;
 
 public class ConfigurationAllTogetherUtil {
+
+  public static Configuration buildAllMandatoryWithMetaData() {
+
+    //Build the basic configurationElements
+    Long id = 0l;
+
+    Process.ProcessBuilder process = builderProcessWithPrimFields(id++, 24l, 6l)._1; // 0
+    Equipment.EquipmentBuilder equipment = builderEquipmentWithPrimFields(id++, 0l, 25l ,7l, 4l )._1; // 1
+    SubEquipment.SubEquipmentBuilder subEquipment = builderSubEquipmentWithPrimFields(id++, 1l, 26l ,8l, 5l )._1; // 2
+
+    id++;
+    CommFaultTag.CommFaultTagBuilder commFaultTagE = builderCommFaultTagWithPrimFields(id++, "equipment", 1l)._1; // 4
+    CommFaultTag.CommFaultTagBuilder commFaultTagS = builderCommFaultTagWithPrimFields(id++, "subEquipment", 2l)._1; // 5
+
+    AliveTag.AliveTagBuilder aliveTagP = builderAliveTagWithPrimFields(id++, "process", 0l)._1; // 6
+    AliveTag.AliveTagBuilder aliveTagE = builderAliveTagWithPrimFields(id++, "equipment", 1l)._1; // 7
+    AliveTag.AliveTagBuilder aliveTagS = builderAliveTagWithPrimFields(id++, "subEquipment", 2l)._1; // 8
+
+    DataTag.DataTagBuilder dataTagE = builderDataTagWithPrimFields(id++, "equipment", 1l)._1; // 9
+    DataTag.DataTagBuilder dataTagS = builderDataTagWithPrimFields(id++, "subEquipment", 2l)._1; // 10
+
+    RuleTag.RuleTagBuilder ruleTag = builderRuleTagWithPrimFields(id++)._1; // 11
+
+    id++;
+    Alarm.AlarmBuilder alarmAP = builderAlarmWithPrimFields(id++, "aliveTag", 6l)._1; // 13
+    Alarm.AlarmBuilder alarmCE = builderAlarmWithPrimFields(id++, "commFaultTag", 4l)._1; // 14
+    Alarm.AlarmBuilder alarmAE = builderAlarmWithPrimFields(id++, "aliveTag", 7l)._1; // 15
+    Alarm.AlarmBuilder alarmDE = builderAlarmWithPrimFields(id++, "dataTag", 9l)._1; // 16
+    Alarm.AlarmBuilder alarmCS = builderAlarmWithPrimFields(id++, "commFaultTag", 5l)._1; // 17
+    Alarm.AlarmBuilder alarmAS = builderAlarmWithPrimFields(id++, "aliveTag", 8l)._1; // 18
+    Alarm.AlarmBuilder alarmDS = builderAlarmWithPrimFields(id++, "dataTag", 10l)._1; // 19
+    Alarm.AlarmBuilder alarmR = builderAlarmWithPrimFields(id++, "ruleTag", 11l)._1; // 20
+    Alarm.AlarmBuilder alarmSP = builderAlarmWithPrimFields(id++, "statusTag", 24l)._1; // 21
+    Alarm.AlarmBuilder alarmSE = builderAlarmWithPrimFields(id++, "statusTag", 25l)._1; // 22
+    Alarm.AlarmBuilder alarmSS = builderAlarmWithPrimFields(id++, "statusTag", 26l)._1; // 23
+
+    StatusTag.StatusTagBuilder statusTagP = builderStatusTagWithPrimFields(id++, "process", 0l)._1; // 24
+    StatusTag.StatusTagBuilder statusTagE = builderStatusTagWithPrimFields(id++, "equipment", 1l)._1; // 25
+    StatusTag.StatusTagBuilder statusTagS = builderStatusTagWithPrimFields(id++, "subEquipment", 2l)._1; // 26
+
+    CommandTag.CommandTagBuilder commandTag = builderCommandTagWithPrimFields(id++, 1L)._1; //27
+
+    // Build metaData of each kind and add them to the tags and alarms.
+    MetaData metaData = MetaData.builder().addMetaData("Building", 513).addMetaData("Responsible","Max Mustermann").addMetaData("maintained",true).build();
+
+    commFaultTagE.metaData(metaData);
+    commFaultTagS.metaData(metaData);
+    aliveTagP.metaData(metaData);
+    aliveTagE.metaData(metaData);
+    aliveTagS.metaData(metaData);
+    dataTagE.metaData(metaData);
+    dataTagS.metaData(metaData);
+    ruleTag.metaData(metaData);
+
+    alarmAP.metaData(metaData);
+    alarmCE.metaData(metaData);
+    alarmAE.metaData(metaData);
+    alarmDE.metaData(metaData);
+    alarmCS.metaData(metaData);
+    alarmAS.metaData(metaData);
+    alarmDS.metaData(metaData);
+    alarmR.metaData(metaData);
+    alarmSP.metaData(metaData);
+    alarmSE.metaData(metaData);
+    alarmSS.metaData(metaData);
+
+    Configuration conf = getConfBuilder()
+        .process(process.aliveTag(aliveTagP.alarm(alarmAP.build()).build()).statusTag(statusTagP.alarm(alarmSP.build()).build())
+            .equipment(equipment.commFaultTag(commFaultTagE.alarm(alarmCE.build()).build()).aliveTag(aliveTagE.alarm(alarmAE.build()).build()).statusTag(statusTagE.alarm(alarmSE.build()).build()).dataTag((DataTag<Number>) dataTagE.alarm(alarmDE.build()).build()).commandTag(commandTag.build())
+                .subEquipment(subEquipment.commFaultTag(commFaultTagS.alarm(alarmCS.build()).build()).aliveTag(aliveTagS.alarm(alarmAS.build()).build()).statusTag(statusTagS.alarm(alarmSS.build()).build()).dataTag((DataTag<Number>) dataTagS.alarm(alarmDS.build()).build())
+                    .build()).build()).build())
+        .rule(ruleTag.alarm(alarmR.build()).build()).build();
+
+
+
+    return conf;
+  }
+
 
   /**
    * returns a Configuration which build ALL possible configurations ones

@@ -4,6 +4,7 @@ import java.util.List;
 
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.alarm.AlarmCondition;
+import cern.c2mon.shared.client.configuration.api.metaData.MetaData;
 import cern.c2mon.shared.client.configuration.api.util.DataType;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.tag.TagMode;
@@ -48,13 +49,17 @@ public class DataTag<T extends Number> extends Tag {
   /**
    * Address configuration of the datatag (if any)
    */
-  // TODO: check if update is possible
-  @Setter(AccessLevel.NONE)
-  private String address;
+  private DataTagAddress address;
 
-  public void setAddress(DataTagAddress privateAlarmCondition) {
-    address = privateAlarmCondition.toConfigXML();
-  }
+  /**
+   * Address configuration of the datatag (if any)
+   */
+//  @Setter(AccessLevel.NONE)
+//  private String address;
+
+//  public void setAddress(DataTagAddress privateAlarmCondition) {
+//    address = privateAlarmCondition == null ? null : privateAlarmCondition.toConfigXML();
+//  }
 
   /**
    * Unit of the tag's value. This parameter is defined at configuration time
@@ -77,21 +82,25 @@ public class DataTag<T extends Number> extends Tag {
 
   @Override
   public boolean requiredFieldsGiven() {
-    return super.requiredFieldsGiven()  && (getDataType() != null);
+    return super.requiredFieldsGiven() && (getDataType() != null);
   }
 
   @Builder
   public DataTag(boolean deleted, Long id, String name, String description, DataType dataType, TagMode mode, @Singular List<Alarm> alarms,
-      Boolean isLogged, String unit, T minValue, T maxValue, DataTagAddress address, String dipAddress, String japcAddress ) {
-    super(deleted, id, name, description, mode, alarms);
+                 Boolean isLogged, String unit, T minValue, T maxValue, DataTagAddress address, String dipAddress, String japcAddress, MetaData metaData) {
+    super(deleted, id, name, description, mode, alarms, metaData);
     this.dataType = dataType;
     this.minValue = minValue;
     this.maxValue = maxValue;
-    this.address = address != null ? address.toConfigXML() : null;
+    this.address = address ;
     this.unit = unit;
     this.dipAddress = dipAddress;
     this.japcAddress = japcAddress;
     this.isLogged = isLogged;
+  }
+
+  public DataTag() {
+
   }
 
 }

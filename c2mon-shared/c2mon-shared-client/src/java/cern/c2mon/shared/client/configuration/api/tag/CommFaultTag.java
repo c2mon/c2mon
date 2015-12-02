@@ -3,6 +3,7 @@ package cern.c2mon.shared.client.configuration.api.tag;
 import java.util.List;
 
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
+import cern.c2mon.shared.client.configuration.api.metaData.MetaData;
 import cern.c2mon.shared.client.configuration.api.util.DataType;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.tag.TagMode;
@@ -11,22 +12,18 @@ import lombok.*;
 
 /**
  * @author Franz Ritter
- *
  */
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class CommFaultTag extends ControlTag {
 
+
   /**
    * Address configuration of the datatag (if any)
    */
-  @Setter(AccessLevel.NONE)
-  private String address;
 
-  public void setAddress(DataTagAddress privateAlarmCondition) {
-    address = privateAlarmCondition.toConfigXML();
-  }
+  private DataTagAddress address;
 
   @DefaultValue("Boolean")
   private DataType dataType = null;
@@ -41,10 +38,16 @@ public class CommFaultTag extends ControlTag {
 
   @Builder
   public CommFaultTag(Long id, String name, String description, TagMode mode, @Singular List<Alarm> alarms,
-      Boolean isLogged,  DataTagAddress address) {
-    super( id, name, description, mode, alarms);
-    this.address = address != null ? address.toConfigXML() : null;
+                      Boolean isLogged, DataTagAddress address, MetaData metaData) {
+    super(id, name, description, mode, alarms, metaData);
+    this.address = address;
     this.isLogged = isLogged;
+  }
+
+  /**
+   * empty default constructor
+   */
+  public CommFaultTag(){
 
   }
 }

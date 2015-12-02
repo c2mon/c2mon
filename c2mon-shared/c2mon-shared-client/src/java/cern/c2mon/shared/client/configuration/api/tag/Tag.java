@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
+import cern.c2mon.shared.client.configuration.api.metaData.MetaData;
 import cern.c2mon.shared.client.configuration.api.util.DataType;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationObject;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
@@ -52,8 +53,13 @@ public abstract class Tag implements ConfigurationObject {
   @DefaultValue("TEST")
   private TagMode mode = TagMode.TEST;
 
+  /**
+   * Meta data of the tag object. Holds arbitrary data which are related to the given Tag.
+   */
+  private MetaData metaData;
+
   @IgnoreProperty
-  private List<Alarm> alarms;
+  private List<Alarm> alarms = new ArrayList<>();
 
   public void addAlarm(Alarm alarm) {
     this.alarms.add(alarm);
@@ -69,7 +75,7 @@ public abstract class Tag implements ConfigurationObject {
     return (getId() != null) && (getName() != null) && (description != null) ;
   }
 
-  public Tag(boolean deleted, Long id, String name, String description, TagMode mode, @Singular List<Alarm> alarms) {
+  public Tag(boolean deleted, Long id, String name, String description, TagMode mode, @Singular List<Alarm> alarms, MetaData metaData) {
     super();
     this.deleted = deleted;
     this.id = id;
@@ -77,6 +83,10 @@ public abstract class Tag implements ConfigurationObject {
     this.description = description;
     this.mode = mode;
     this.alarms = alarms == null ?  new ArrayList<Alarm>() : alarms;
+    this.metaData = metaData;
+  }
+
+  public Tag(){
 
   }
 

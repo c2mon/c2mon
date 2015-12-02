@@ -1,6 +1,7 @@
 package cern.c2mon.shared.client.configuration.api.tag;
 
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
+import cern.c2mon.shared.client.configuration.api.metaData.MetaData;
 import cern.c2mon.shared.client.configuration.api.util.DataType;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
@@ -38,12 +39,6 @@ public class CommandTag extends Tag {
    */
   private Integer sourceRetries;
 
-//  will be set due the parsing:
-//  /**
-//   * Unique identifier of the equipment unit the CommandTag is attached to.
-//   */
-//  private Long equipmentId;
-
   /**
    * RBAC class.
    */
@@ -69,24 +64,19 @@ public class CommandTag extends Tag {
    * command.
    * Saved as String to make the property simpler
    */
-  @Setter(AccessLevel.NONE)
-  private String hardwareAddress;
-
-  public void setHardwareAddress(HardwareAddress hwAddress) {
-    this.hardwareAddress = hwAddress.toConfigXML();
-  }
+  private HardwareAddress hardwareAddress;
 
   @Override
   public boolean requiredFieldsGiven() {
     return (getId() != null) && (getName() != null) && (getDescription() != null)
         && (getClientTimeout() != null) && (getExecTimeout() != null) && (getSourceTimeout() != null)
-        && (getSourceRetries() != null) && (getRbacClass() != null) && (getRbacDevice() != null) && (getRbacProperty() != null) ;
+        && (getSourceRetries() != null) && (getRbacClass() != null) && (getRbacDevice() != null) && (getRbacProperty() != null);
   }
 
   @Builder
   public CommandTag(boolean deleted, Long id, String name, String description, DataType dataType, TagMode mode, @Singular List<Alarm> alarms
-      , Integer clientTimeout, Integer execTimeout, Integer sourceTimeout, Integer sourceRetries, String rbacClass, String rbacDevice, String rbacProperty, HardwareAddress hardwareAddress) {
-    super(deleted, id, name, description, mode, alarms);
+      , Integer clientTimeout, Integer execTimeout, Integer sourceTimeout, Integer sourceRetries, String rbacClass, String rbacDevice, String rbacProperty, HardwareAddress hardwareAddress, MetaData metaData) {
+    super(deleted, id, name, description, mode, alarms, metaData);
     this.dataType = dataType;
     this.clientTimeout = clientTimeout;
     this.execTimeout = execTimeout;
@@ -95,7 +85,13 @@ public class CommandTag extends Tag {
     this.rbacClass = rbacClass;
     this.rbacDevice = rbacDevice;
     this.rbacProperty = rbacProperty;
-    this.hardwareAddress = hardwareAddress != null ? hardwareAddress.toConfigXML() : null;
+    this.hardwareAddress = hardwareAddress;
+  }
+
+  /**
+   * empty default constructor
+   */
+  public CommandTag(){
 
   }
 }
