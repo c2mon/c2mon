@@ -22,7 +22,7 @@ public class MobicallAlarmsMain extends Thread {
 
     public static void main(String[] args)
     {
-        String log4jConfigFile = System.getProperty("log4j.configuration", "log4j-diamon.properties");
+        String log4jConfigFile = System.getProperty("log4j.configuration", "log4j.properties");
         PropertyConfigurator.configureAndWatch(log4jConfigFile, 60 * 1000);
         log = LoggerFactory.getLogger(MobicallAlarmsMain.class);
         log.info("Logging system ready ({})...", log4jConfigFile);
@@ -31,8 +31,10 @@ public class MobicallAlarmsMain extends Thread {
         
         try {
              client = new MobicallAlarmsPublisher(new C2monConnection());
-             client.start();
-             client.join();
+             client.connect();
+             synchronized (client) {
+                 client.wait();
+             }
         }
         catch (Exception e)
         {
@@ -56,7 +58,7 @@ public class MobicallAlarmsMain extends Thread {
     {
         log.info("Going down ...");
         if (client != null) {
-            client.shutdown();
+            client.close();
         }
     }
 

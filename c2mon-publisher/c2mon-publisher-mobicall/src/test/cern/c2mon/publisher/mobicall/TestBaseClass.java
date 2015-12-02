@@ -48,6 +48,7 @@ public class TestBaseClass {
         System.setProperty("app.name", "test");
 
         String log4jConfigFile = System.getProperty("log4j.configuration", "log4j.properties");
+        System.out.println(log4jConfigFile);
         PropertyConfigurator.configure(log4jConfigFile);
     }
 
@@ -58,14 +59,14 @@ public class TestBaseClass {
         return log;
     }
 
-    protected void startTestPublisher() throws IOException {
+    protected void startTestPublisher() throws Exception {
         if (!running) {
             publisher = new MobicallAlarmsPublisher(new C2monConnection());
-            publisher.start();
+            publisher.connect();
         }
     }
 
     protected static void stopTestPublisher() {
-        publisher.shutdown();
+        publisher.close();
     }
 }

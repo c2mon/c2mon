@@ -31,18 +31,19 @@ import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultTcpTransportMapping;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 
+import cern.c2mon.client.common.tag.Tag;
+import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 
 /**
  */
-public final class MobicallAlarmsPublisher implements Runnable, AlarmListener {
+public final class MobicallAlarmsPublisher implements AlarmListener {
 
     static final Logger LOG = LoggerFactory.getLogger(MobicallAlarmsPublisher.class);
     @SuppressWarnings("unused")
     private static final SimpleDateFormat df = new SimpleDateFormat("dd.MM.YYYY HH:MM:SS");
 
-    private Thread daemonThread;
     private C2monConnectionIntf c2mon;
 
     private Vector<String> MobicallServers;
@@ -56,18 +57,20 @@ public final class MobicallAlarmsPublisher implements Runnable, AlarmListener {
     private int delay;
     private String protocol;
     private boolean sendTraps;
-    
+ 
+    private int eventCounter = 0;
     
     //
     // --- CONSTRUCTION ----------------------------------------------------------------
     //
-    public MobicallAlarmsPublisher(C2monConnectionIntf c2mon) throws IOException {
-        LOG.warn("Publisher instance created ...");
+    public MobicallAlarmsPublisher(C2monConnectionIntf c2mon) throws Exception {
+        LOG.info("Building publisher instance ...");
+        LOG.info("... loading Mobicall settings ...");
         MobicallServers = new Vector<String>();
     
         snmpTargets = new Vector<CommunityTarget>();
         snmpConfig = new Properties();
-        snmpConfig.load(this.getClass().getResourceAsStream("mobicall.properties"));
+        snmpConfig.load(this.getClass().getResourceAsStream("/mobicall.properties"));
         this.delay = Integer.parseInt(snmpConfig.getProperty("mobicall.delay"));
         this.protocol = snmpConfig.getProperty("mobicall.protocol");
         MobicallServers.add(snmpConfig.getProperty("mobicall.server.main"));
@@ -77,66 +80,52 @@ public final class MobicallAlarmsPublisher implements Runnable, AlarmListener {
             MobicallServers.add(snmpConfig.getProperty("mobicall.server.debug"));
         }
         sendTraps = Boolean.parseBoolean(snmpConfig.getProperty("mobicall.active"));
+        LOG.info("-> " + snmpConfig.toString());
+        
+        LOG.info("... setting up SNMP communication ...");
         setupSNMP();
         this.c2mon = c2mon;
         
+        LOG.info("... loading Mobicall alarms ...");
         MobicallAlarm.init();
+        LOG.info("Publisher ready.");
     }
 
 
     //
     // --- PUBLIC METHODS ---------------------------------------------------------------
             
-    static String getAlarmId(AlarmValue av) {
+    private static String getAlarmId(AlarmValue av) {
         return av.getFaultFamily() + ":" + av.getFaultMember() + ":" + av.getFaultCode();
     }
     
-
-
-    //
-    // --- DAEMON -----------------------------------------------------------------------
-    //
-    /**
-     * This method has to be called in order to start the RDA publisher
-     */
-    public void start() {
-        daemonThread = new Thread(this);
-        daemonThread.start();
-    }
-
-    @Override
-    public void run() {
+    public void connect() {
         try {
-            LOG.info("Starting RDA device server");
+            LOG.info("Starting Mobicall publisher");
 
             c2mon.start();
             Collection<AlarmValue> activeAlarms = c2mon.getActiveAlarms();
             LOG.info("... now listening to incoming alarms.");
-            
+
+            c2mon.setListener(this);
             c2mon.connectListener();
             for (AlarmValue av : activeAlarms) {
                 this.onAlarmUpdate(av);
             }
             LOG.info("Started with initial selection of " + activeAlarms.size() + " alarms.");
-            // everything ready, start the RDA server for publishung
         } catch (Exception e) {
-            LOG.error("A major problem occured while running the RDA server. Stopping publisher!", e);
+            LOG.error("A major problem occured while running the Publisher. Stopping now!", e);
+            throw new RuntimeException(e);
         }
     }
 
-    public void join() throws InterruptedException {
-        this.daemonThread.join();
-    }
-
-    public void shutdown() {        
+    public void close() {        
         LOG.info("Stopping C2MON ...");
         c2mon.stop();
-        try {
-            daemonThread.join();
-        } catch (InterruptedException e) {
-            LOG.warn("InterruptedException caught", e);
+        synchronized (this) {
+            this.notifyAll();
         }
-        LOG.info("RDA publisher stopped.");
+        LOG.info("Publisher stopped.");
     }
 
     //
@@ -146,15 +135,21 @@ public final class MobicallAlarmsPublisher implements Runnable, AlarmListener {
     public void onAlarmUpdate(AlarmValue av) {
         String alarmId = getAlarmId(av);
         LOG.debug(" RECEIVED    > " + alarmId + " is active:" + av.isActive());        
-        MobicallAlarm ma = MobicallAlarm.find(av);
+        MobicallAlarm ma = MobicallAlarm.find(alarmId);
         if (ma != null) {
             if (sendTraps) {
-                sendTrap(ma.getMobicallId(), composeTrapMessage(ma, av));            
+//                sendTrap(ma.getMobicallId(), composeTrapMessage(ma, av));            
+                LOG.warn("DO NOT USE FOR FIRST TESTS");
             } else {
                 LOG.info(composeTrapMessage(ma, av));
             }
         }
         LOG.debug(" PROCESSED    > " + alarmId);
+        eventCounter++;
+        if (eventCounter >= 1000) {
+            LOG.info("Processed 1000 alarm events since last message.");
+            eventCounter = 0;
+        }
     }
 
     
@@ -172,7 +167,7 @@ public final class MobicallAlarmsPublisher implements Runnable, AlarmListener {
       //
       // SNMP global handle setup
       //
-      LOG.warn("Mobicall setup (" + MobicallAlarmsPublisher.class.getName() + ") ...");
+      LOG.info("Mobicall setup (" + MobicallAlarmsPublisher.class.getName() + ") ...");
       TransportMapping transport;
       try {
           if (protocol.equals("UDP")) {
@@ -200,7 +195,7 @@ public final class MobicallAlarmsPublisher implements Runnable, AlarmListener {
           ct.setVersion(SnmpConstants.version1);
           snmpTargets.add(ct);
       }
-      LOG.warn("Mobicall setup completed with " + counter + " servers");
+      LOG.info("Mobicall setup completed with " + counter + " servers");
   }
 
   /**
@@ -217,10 +212,8 @@ public final class MobicallAlarmsPublisher implements Runnable, AlarmListener {
       pdu.add(new VariableBinding(new OID(MOBICALL_ALARM_NR_OID), new OctetString(alarmNumber)));
       pdu.add(new VariableBinding(new OID(MOBICALL_ADDITIONAL_INFO_OID), new OctetString(message)));
     
-      if (LOG.isDebugEnabled()) {
-          LOG.debug("Sending Mobicall message for alarmNumber '" + alarmNumber + "' with text '" + message + "'");
-          LOG.debug("Message: " + pdu.toString());
-      }
+      LOG.debug("Sending Mobicall message for alarmNumber '" + alarmNumber + "' with text '" + message + "'");
+      LOG.debug("Message: " + pdu.toString());
 
       int success = 0;
       for (CommunityTarget ct : snmpTargets) {
@@ -254,17 +247,17 @@ public final class MobicallAlarmsPublisher implements Runnable, AlarmListener {
    * @return <code>String</code> the value to be assigned to the "message" OID in the SNMP trap
    */
   private String composeTrapMessage(MobicallAlarm alarm, AlarmValue av) {
-    StringBuffer message = new StringBuffer();
-    message.append(alarm.getSystemName());
-    message.append(" ");
-    message.append(alarm.getIdentifier());
-    message.append(" ");
-    message.append(alarm.getFaultCode() + " [" + alarm.getMobicallId() + "] ");
-    message.append(" ");
-    message.append(alarm.getProblemDescription());
-    message.append(" ");
-    message.append(av.isActive() ? "ACTIVE" : "TERMINATE");
-    return message.toString();
+      StringBuffer message = new StringBuffer();
+      message.append(alarm.getSystemName());
+      message.append(" ");
+      message.append(alarm.getIdentifier());
+      message.append(" ");
+      message.append(alarm.getFaultCode() + " [" + alarm.getMobicallId() + "] ");
+      message.append(" ");
+      message.append(alarm.getProblemDescription());
+      message.append(" ");
+      message.append(av.isActive() ? "ACTIVE" : "TERMINATE");
+      return message.toString();
   }
 
 }
