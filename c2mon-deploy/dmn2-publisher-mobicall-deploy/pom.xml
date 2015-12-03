@@ -10,20 +10,20 @@
 	</parent>
 
 	<groupId>cern.c2mon</groupId>
-	<version>0.0.8-SNAPSHOT</version>
-	<name>c2mon-publisher-rda-alarms-deploy</name>
-	<artifactId>c2mon-publisher-rda-alarms-deploy</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>c2mon-publisher-mobicall-deploy</name>
+	<artifactId>c2mon-publisher-mobicall-deploy</artifactId>
 
-	<description>DMN2 RDA alarms publishers (the japc-ext-laser replacement)</description>
+	<description>DMN2 Mobicall alarms publishers</description>
 
 	<scm>
-		<developerConnection>https://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/dmn2-publisher-rda-alarms-deploy</developerConnection>
+		<developerConnection>https://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/dmn2-publisher-mobicall-deploy</developerConnection>
 	</scm>
 
   <dependencies>
     <dependency>
 	  	<groupId>cern.c2mon.c2mon-publisher</groupId>
-  		<artifactId>c2mon-publisher-rda-alarms</artifactId>
+  		<artifactId>c2mon-publisher-mobicall</artifactId>
 	  	<version>RELEASE</version>
     </dependency>
 
@@ -35,75 +35,12 @@
       <version>1.6.1</version><!--$NO-MVN-MAN-VER$-->
     </dependency>
 
-    <!-- CERN 3rd party dependencies -->
-	<dependency>
-		<groupId>cern.cmw</groupId>
-		<artifactId>cmw-rda3</artifactId>
-		<version>[1.2.1, 2.0.0)</version>
-	</dependency>
-	<dependency>
-		<groupId>cern.cmw</groupId>
-		<artifactId>cmw-rda3-cern</artifactId>
-		<version>[1.2.1, 2.0.0)</version>
-	</dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-    </dependency>
 	<dependency>
   		<groupId>cern.accsoft.commons</groupId>
   		<artifactId>accsoft-commons-jmxdirectory-registration-client</artifactId>
   		<version>1.1.8</version>
   	</dependency>
-	<dependency>
-		<groupId>cern.diamon</groupId>
-		<artifactId>alarm-dataprovider-client-jms</artifactId>
-		<version>[1.0.0,2.0.0]</version>
-	</dependency>
 
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-			<version>1.4</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.oracle</groupId>
-			<artifactId>ojdbc14</artifactId>
-			<version>10.2.0.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>cern.japc</groupId>
-			<artifactId>japc</artifactId>
-			<version>[2.23.16,3.0.0)</version>
-		</dependency>
-
-		<dependency>
-			<groupId>cern.japc</groupId>
-			<artifactId>japc-ext-cmwrda</artifactId>
-			<version>[2.16.1,3.0.0)</version>
-		</dependency>
-
-		<dependency>
-			<groupId>cern.japc</groupId>
-			<artifactId>japc-ext-cmwrda3</artifactId>
-			<version>[1.0.2,2.0.0)</version>
-		</dependency>
-
-<!-- 
-    <dependency>
-		<groupId>org.slf4j</groupId>
-		<artifactId>slf4j-log4j12</artifactId>
-		<version>1.7.5</version>
-	</dependency>
- -->
-    <!-- Test dependencies -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-	 		<scope>test</scope>
-    </dependency>
 
 	</dependencies>
 
