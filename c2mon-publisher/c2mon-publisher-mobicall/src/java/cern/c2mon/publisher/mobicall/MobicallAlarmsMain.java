@@ -12,6 +12,9 @@ import org.slf4j.LoggerFactory;
  * The Mobicall alarms publisher acts as a C2MON client working with all alarm tags in the server.
  * Based on configuration data, alarms are forwarded to the Mobicall system through a SNMP trap.
  *
+ * Notification of technical problems: Remember to set diamon.support property to the mail address
+ * of the team. By default, mails go to the author!
+ * 
  * Notes:
  * - alarms are notified to mobicall if they have a "notification id" in the alarm definition. This id
  *   comes from Mobicall and should first be declared there.
@@ -33,7 +36,7 @@ import org.slf4j.LoggerFactory;
  *   restarting in order to adjust it to the duration of the outage
  * 
  * - start/stop: the main method uses a shutdown hook to ask all threads (alarm listener and configuration
- *   loader) to go down in a clean way. The configuraton defines a latency time (default 5s). When
+ *   loader) to go down in a clean way. The configuration defines a latency time (default 5s). When
  *   threads sleep, they do it for this time. When stopping, the caller should wait for exactly this 
  *   delay to make sure the threads have the required time to stop.  
  *   
@@ -58,7 +61,7 @@ public class MobicallAlarmsMain extends Thread {
         PropertyConfigurator.configureAndWatch(log4jConfigFile, 60 * 1000);
         log = LoggerFactory.getLogger(MobicallAlarmsMain.class);
         log.info("Logging system ready ({})...", log4jConfigFile);
-
+        
         // add the shutdown hook. When called, this initiates the clean stop of the app 
         // (usually done from ctrl-c in interactive mode, or wreboot on deployed version)
         Runtime.getRuntime().addShutdownHook(new MobicallAlarmsMain());

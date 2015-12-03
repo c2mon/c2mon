@@ -69,6 +69,9 @@ public class MobicallConfigurator implements Runnable {
                 // the 10th failure = stop it, could harm the system
                 if (failures > 10) {
                     LOG.warn("Too many failures, stopping the reconfiguration thread!");
+                    DiamonSupport.getSupport().notifyTeam("Mobicall config thread died",
+                            "You should keep an eye on the Mobicall publisher. If failure persists, " +
+                            "try to find the reason for the problem and restart the process.");
                     cont = false;
                 }
                 
