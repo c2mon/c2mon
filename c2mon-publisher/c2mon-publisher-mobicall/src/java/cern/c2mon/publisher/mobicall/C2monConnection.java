@@ -17,8 +17,14 @@ import cern.c2mon.client.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 
 /**
- * Implementation of C2monConnectionIntf for the real C2MON connection. This is the class
- * to be used in the Spring configuration for production purpose.
+ * Implementation of C2monConnectionIntf with the subset of really used C2MON functions. 
+ * This reduction to the minimum needed stuff simplifies the mock of the C2MON connection
+ * for testing purposes.
+ * 
+ * Actions here are:
+ * - register our app as alarm listener on start, and unregister on stop
+ * - reduce the data tag quality to a simple boolean (false if the underlying data tag is
+ *   not valid or not existing)
  * 
  * @author mbuttner
  */

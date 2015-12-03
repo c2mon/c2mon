@@ -7,7 +7,11 @@ package cern.c2mon.publisher.mobicall;
 
 /**
  * Mobicall alarm POJO. Class has only getters and setters for the alarm attributes used by the alarm 
- * notification through Mobicall system
+ * notification through Mobicall system.
+ * 
+ * A Mobicall-alarm is an alarm defined in our reference database WITH a non-null/non-0 value in the
+ * notification id field. This indicates that events should be forwarded to Mobicall with some
+ * alarm information and the notification id known by the Mobicall system.
  *  
  * @author mbuttner
  */

@@ -10,8 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * For test purpose. Creates a fake alarm for Mobicall notification with alarm id FF:FM:1. All other
- * "find" requests should fail.
+ * For test purpose. Creates some alarm data and serves it to the test classes through the same
+ * interface than the database-based production alarm provider.
+ * 
+ * Initially alarms FF:FM:1 and FF:FM:2 are present. On the second call (or first "reload"), the
+ * alarm FF:FM:1 is replaced by FF:FM:3
  * 
  * @author mbuttner
  */
@@ -22,6 +25,9 @@ public class MobicallConfigLoaderMock implements MobicallConfigLoaderIntf {
     private ConcurrentHashMap<String, MobicallAlarm> alarms;
     private long count = 0;
     
+    //
+    // --- CONSTRUCTION ------------------------------------------------------------------------------
+    //
     public MobicallConfigLoaderMock() {
         alarms = new ConcurrentHashMap<String, MobicallAlarm>();
         
@@ -32,6 +38,9 @@ public class MobicallConfigLoaderMock implements MobicallConfigLoaderIntf {
         alarms.put("FF:FM:2", ma2);
     }
     
+    //
+    // --- Implements MobicallConfigLoaderIntf -------------------------------------------------------
+    // 
     @Override
     public void loadConfig() {
         LOG.info("Request for config load received");
@@ -54,11 +63,20 @@ public class MobicallConfigLoaderMock implements MobicallConfigLoaderIntf {
     public void close() {
         // No need for this in the mock
     }
-
+    
+    //
+    // --- PUBLIC METHODS --------------------------------------------------------------------------
+    //
+    /**
+     * @return <code>long</code> the number of times the configuration reload was triggered
+     */
     public long getCount() {
         return this.count;
     }
 
+    //
+    // --- PRIVATE METHODS -------------------------------------------------------------------------
+    //
     private static MobicallAlarm createAlarm(String sys, String id, int fc, String mobi, String pb) {
         MobicallAlarm ma = new MobicallAlarm(sys + ":" + id + ":" + fc);
         ma.setSystemName(sys);

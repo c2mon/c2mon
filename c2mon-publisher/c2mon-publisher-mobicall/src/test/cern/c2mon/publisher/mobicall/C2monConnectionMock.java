@@ -14,30 +14,25 @@ import cern.c2mon.client.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 
+/**
+ * Emulates the C2monConnection behavior. The class provides methods to simulate alarm events 
+ * coming from C2MON and obtain possible situations on the C2MON (like invalid datatags)
+ * 
+ * @author mbuttner
+ */
 public class C2monConnectionMock implements C2monConnectionIntf {
 
     AlarmListener listener;
-    
-    @Override
-    public void setListener(AlarmListener listener) {
-        this.listener = listener;
-    }
 
-
-    @Override
-    public Collection<AlarmValue> getActiveAlarms() {
-        ArrayList<AlarmValue> activeAlarms = new ArrayList<AlarmValue>();
-
-        AlarmValue av = new AlarmValueImpl(1L, 1, "FM", "FF", "Info", 1L, new Timestamp(System.currentTimeMillis()), true);
-        activeAlarms.add(av);
-        
-        AlarmValue av2 = 
-                new AlarmValueImpl(2L, 2, "FM", "FF", "Info", 2L, new Timestamp(System.currentTimeMillis() - (120 * 1000)), true);
-        activeAlarms.add(av2);
-        
-        return activeAlarms;
-    }
-
+    /**
+     * Inject an alarm activation into the system. The "valid"-boolean is translated into a fake
+     * tag id for the underlying datatag. If valid is false the tag id is set to a value which will
+     * be interpreted by the getQuality call as invalid.
+     * @param ff <code>String</code> the fault family or system name
+     * @param fm <code>String</code> the fault member or device name
+     * @param fc <code>int</code> the fault code
+     * @param valid <code>boolean</code> validity of the underlying datatag (to simulate invalid in tests)
+     */
     public void activateAlarm(String ff, String fm, int fc, boolean valid) {
         long tagId = 3;
         if (valid) {
@@ -47,6 +42,10 @@ public class C2monConnectionMock implements C2monConnectionIntf {
         listener.onAlarmUpdate(av);
     }
 
+    /**
+     * Inject an alarm termination into the system. Same behavior as activation, see activateAlarm()
+     */
+    @SuppressWarnings("javadoc")
     public void terminateAlarm(String ff, String fm, int fc, boolean valid) {
         long tagId = 2;
         if (valid) {
@@ -56,15 +55,40 @@ public class C2monConnectionMock implements C2monConnectionIntf {
         listener.onAlarmUpdate(av);
     }
 
-    private Timestamp getSystemTs() {
-        return new Timestamp(System.currentTimeMillis());
+    //
+    // --- Implements C2monConnectionIntf ------------------------------------------------------------
+    //
+
+    @Override
+    public void setListener(AlarmListener listener) {
+        this.listener = listener;
     }
-    
+
+    /**
+     * Return initial active list. To check the behavior of the startup procedure, one alarm is considered 
+     * to become active "now", and another one two minutes ago: the second one is too old to be notified,
+     * the tests validate that no notification is sent for this one. 
+     */
+    @Override
+    public Collection<AlarmValue> getActiveAlarms() {
+        ArrayList<AlarmValue> activeAlarms = new ArrayList<AlarmValue>();
+
+        AlarmValue av = new AlarmValueImpl(1L, 1, "FM", "FF", "Info", 1L, new Timestamp(System.currentTimeMillis()),
+                true);
+        activeAlarms.add(av);
+
+        AlarmValue av2 = new AlarmValueImpl(2L, 2, "FM", "FF", "Info", 2L, new Timestamp(System.currentTimeMillis()
+                - (120 * 1000)), true);
+        activeAlarms.add(av2);
+
+        return activeAlarms;
+    }
+
     @Override
     public void connectListener() throws JMSException {
         // not needed for mock
     }
-    
+
     @Override
     public void start() throws Exception {
         // not needed for mock
@@ -74,8 +98,12 @@ public class C2monConnectionMock implements C2monConnectionIntf {
     public void stop() {
         // not needed for mock
     }
-    
 
+    /**
+     * Simulate valid and invalid datatags: if the tag id is greater than 2, the method will reply that the tag is not
+     * valid (allows to check the behavior if the datatag for a given alarm is not valid (see activate and terminate
+     * above).
+     */
     @Override
     public boolean isTagValid(Long tagId) {
         if (tagId > 2) {
@@ -83,5 +111,12 @@ public class C2monConnectionMock implements C2monConnectionIntf {
         }
         return true;
     }
-        
+
+    //
+    // --- PRIVATE METHODS -------------------------------------------------------------------------
+    //
+    private Timestamp getSystemTs() {
+        return new Timestamp(System.currentTimeMillis());
+    }
+
 }

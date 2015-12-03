@@ -10,6 +10,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+/**
+ * Check that notifications are sent only for valid and configured alarms, i.e. that nothing is
+ * sent if we do not have a notification id, or the underlying datatag is not vali. 
+ * 
+ * @author mbuttner
+ */
 public class TestSender {
 
     //

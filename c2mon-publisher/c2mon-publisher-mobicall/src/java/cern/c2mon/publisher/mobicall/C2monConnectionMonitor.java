@@ -25,6 +25,8 @@ class C2monConnectionMonitor implements ClientHealthListener, ConnectionListener
 
     private static C2monConnectionMonitor instance;
     private static final Logger LOG = LoggerFactory.getLogger(C2monConnectionMonitor.class);
+    
+    
     //
     // --- CONSTRUCTION -----------------------------------------------------------------------------
     //

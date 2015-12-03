@@ -25,6 +25,6 @@ public interface C2monConnectionIntf {
     void stop();                                    // stop the C2MON connection
     
     Collection<AlarmValue> getActiveAlarms();       // retrieve the initial list of active alarms
-    boolean isTagValid(Long tagId);
+    boolean isTagValid(Long tagId);                 // false if not existing or not valid
 
 }

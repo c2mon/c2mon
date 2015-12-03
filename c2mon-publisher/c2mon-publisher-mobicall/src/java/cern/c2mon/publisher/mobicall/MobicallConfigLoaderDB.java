@@ -95,7 +95,10 @@ public class MobicallConfigLoaderDB implements MobicallConfigLoaderIntf {
     }
     
     /**
-     * Try to connect to database and retrieve the latest set of Mobicall alarm definitions.
+     * Read Mobicall alarm definitions from the database. The result is loaded into a temporary
+     * Map. The result is moved (in sync'd way) to the persistent map only if at least an alarm 
+     * was found and no exception happened during the whole DB access. Otherwise, the result is
+     * ignored and we go on with the old config. 
      */
     @Override
     public void loadConfig() {
@@ -119,6 +122,7 @@ public class MobicallConfigLoaderDB implements MobicallConfigLoaderIntf {
                 ) {
             
             ConcurrentHashMap<String, MobicallAlarm> tmpAlarms = new ConcurrentHashMap<String, MobicallAlarm>();
+            int count = 0;
             while (rs.next()) {
                 MobicallAlarm ma = new MobicallAlarm(rs.getString("alarm_id"));
                 ma.setSystemName(rs.getString("system_name"));
@@ -128,10 +132,15 @@ public class MobicallConfigLoaderDB implements MobicallConfigLoaderIntf {
                 ma.setProblemDescription(rs.getString("problem_description"));
                 tmpAlarms.put(ma.getAlarmId(), ma);
                 LOG.debug("Added {} to configuration", ma.getAlarmId());
+                count++;
             }            
-            synchronized(alarms) {
-                alarms = tmpAlarms;
-                LOG.info("Size of Mobicall alarm map: " + alarms.size());
+            if (count > 0) {
+                synchronized(alarms) {
+                    alarms = tmpAlarms;
+                    LOG.info("Size of Mobicall alarm map: " + alarms.size());
+                }
+            } else {
+                LOG.warn("No alarm definitions found, keep previous configuration.");                
             }
         } catch (Exception e) {
             LOG.warn("Failed to reload the mobicall alarm definitions", e);

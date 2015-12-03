@@ -23,6 +23,13 @@ import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultTcpTransportMapping;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 
+/**
+ * The implementation to send alarm messages to Mobicall over SNMP. The behavior of this
+ * class is widely dependant on the configuration parameters in mobicall.properties (prototocol,
+ * min time between two messages, target servers, ...)
+ * 
+ * @author mbuttner
+ */
 public class SenderSnmpImpl implements SenderIntf {
 
     private static final Logger LOG = LoggerFactory.getLogger(SenderSnmpImpl.class);
@@ -39,7 +46,9 @@ public class SenderSnmpImpl implements SenderIntf {
     private String protocol;
     private boolean sendTraps;
 
-    
+    //
+    // --- Implements SenderIntf ----------------------------------------------------------------
+    //
     @Override
     public void setup() throws IOException {
         LOG.info("... loading Mobicall settings ...");
@@ -67,12 +76,11 @@ public class SenderSnmpImpl implements SenderIntf {
     @Override
     public void send(String mobicallId, String message) {
         if (sendTraps) {
+            LOG.warn("SENDING message to PRODUCTION Mobicall!");
           sendTrap(mobicallId, message);            
-          LOG.warn("DO NOT USE FOR FIRST TESTS");
       } else {
           LOG.info(message);
-      }
-        
+      }        
     }
     
     //
@@ -125,7 +133,6 @@ public class SenderSnmpImpl implements SenderIntf {
      * @param alarmNumber <code>String</code> is the Mobicall id which defines the notifications to trigger
      * @param message <code>String</code> for additional info in Mobicall
      */
-    // TODO enable this method for real production mode
     private void sendTrap(String alarmNumber, String message) {
         // creating PDU
         PDUv1 pdu = new PDUv1();

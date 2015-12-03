@@ -105,11 +105,22 @@ public final class MobicallAlarmsPublisher implements AlarmListener {
     //
     // --- Implements AlarmListener -----------------------------------------------------------
     //
+    /**
+     * The alarm event callback as defined by the C2MON interface. Here the data is only 
+     * forwarded to the version of the method able to process both startup and runtime events.
+     */
     @Override
     public void onAlarmUpdate(AlarmValue av) {
         onAlarmUpdate(av, 0);
     }
     
+    /**
+     * If the second parameter is non-0, it is used as timestamp to discard alarms older than
+     * this value. This mechanism is used to prevent redundant notification at startup.
+     * 
+     * @param av <code>AlarmValue</code> describing the alarm event sent by C2MON
+     * @param resendFromTs <code>long</code> 0 at runtime, otherwise timestamp for inclusion of events
+     */
     public void onAlarmUpdate(AlarmValue av, long resendFromTs) {
         String alarmId = getAlarmId(av);
         LOG.debug(" RECEIVED    > " + alarmId + " is active:" + av.isActive());        
