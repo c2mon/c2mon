@@ -33,6 +33,7 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
 public class SenderSnmpImpl implements SenderIntf {
 
     private static final Logger LOG = LoggerFactory.getLogger(SenderSnmpImpl.class);
+    private static final Logger JRN = LoggerFactory.getLogger("MOBICALL_JOURNAL");
 
     private Vector<String> MobicallServers;
     private final String MOBICALL_ALARM_NR_OID = "0.0.0.0";
@@ -77,10 +78,12 @@ public class SenderSnmpImpl implements SenderIntf {
     public void send(String mobicallId, String message) {
         if (sendTraps) {
             LOG.warn("SENDING message to PRODUCTION Mobicall!");
-          sendTrap(mobicallId, message);            
-      } else {
-          LOG.info(message);
-      }        
+            sendTrap(mobicallId, message);            
+            JRN.info("SENT>   {}", message);
+        } else {
+            LOG.info(message);
+            JRN.info("logged> {}", message);
+        }        
     }
     
     //
