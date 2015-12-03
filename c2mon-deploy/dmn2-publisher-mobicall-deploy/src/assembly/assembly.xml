@@ -55,12 +55,6 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-		<file>
-			<source>/user/diamonop/repo/c2mon/client/client.properties</source>
-			<outputDirectory>/conf</outputDirectory>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>
 	</files>
 
 </assembly>
