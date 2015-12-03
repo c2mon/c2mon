@@ -44,9 +44,6 @@ import org.slf4j.LoggerFactory;
  *   sending of SNMP traps. For unit tests, these 3 external elements are mock'd (to allow testing
  *   of only the internal logic). 
  *
- * TODO safety mechanism if configuration mechanism dies (notification !?)
- * TODO deployment project
- *
  * @author mbuttner
  */
 public class MobicallAlarmsMain extends Thread {
