@@ -9,7 +9,7 @@
   <groupId>cern.c2mon.c2mon-publisher</groupId>
   <artifactId>c2mon-publisher-mobicall</artifactId>
   <name>The C2MON Publisher for alarms to Mobicall</name>
-  <version>1.0.0</version>
+  <version>1.0.1-SNAPSHOT</version>
   <description>This project is used to publish alarms to Mobicall</description>
   <scm>
     <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-publisher/c2mon-publisher-mobicall</developerConnection>
