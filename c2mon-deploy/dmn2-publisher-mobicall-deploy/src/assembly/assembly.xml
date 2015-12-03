@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+
+	<id>assembly</id>
+
+	<formats>
+		<format>tar.gz</format>
+	</formats>
+
+	<!--  do not include base directory -->
+	<includeBaseDirectory>false</includeBaseDirectory>
+
+	<dependencySets>
+
+		<dependencySet>
+			<outputDirectory>/lib</outputDirectory>
+			<fileMode>0644</fileMode>
+		</dependencySet>
+
+	</dependencySets>
+
+	<fileSets>
+		<fileSet>
+			<includes>
+				<include>log/</include>
+			</includes>
+			<fileMode>0755</fileMode>
+			<directoryMode>0755</directoryMode>
+		</fileSet>
+	</fileSets>
+
+	<files>
+
+		<!--  deployment descriptor -->
+		<file>
+			<source>conf/deployment.xml</source>
+			<outputDirectory>/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+
+		<!--  copy the version file -->
+		<file>
+			<source>version.txt</source>
+			<outputDirectory>/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+		<file>
+			<source>log4j.properties</source>
+			<outputDirectory>/conf</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+		<file>
+			<source>/user/diamonop/repo/c2mon/client/client.properties</source>
+			<outputDirectory>/conf</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+	</files>
+
+</assembly>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+	<product name="c2mon-publisher-mobicall">
+
+		<!-- this application section is a parent configuration for both PROD and TEST -->
+		<application>
+			<startscript>
+				<main-class name="cern.c2mon.publisher.mobicall.MobicallAlarmsMain">
+					<arg></arg>
+				</main-class>
+				<property name="log4j.configuration" value="file:conf/log4j.properties" />
+				<property name="c2mon.client.conf.url" value="file:conf/client.properties" />
+				<property name="oracle.net.tns_admin" value="/etc" />				
+			</startscript>
+		</application>
+
+		<application name="dmn2-publisher-mobicall-pro">
+			<deployment installLocation="/opt/dmn2/dmn2-publisher-mobicall">
+				<directory name="conf">
+					<file name="client.properties" sourceDir="~diamonop/repo/c2mon/client" mask="400" />
+				</directory>
+				<notification>
+					<mail address="diamon-developers@cern.ch" />
+				</notification>
+			</deployment>
+			<startscript name="DMN2-PUBLISHER-MOBICALL">
+			</startscript>
+		</application>
+
+		<application name="dmn2-publisher-mobicall-dev">
+			<deployment installLocation="/opt/dmn2/dmn2-publisher-mobicall-dev">
+				<directory name="conf">
+					<file name="client.properties" sourceDir="~dmndev/repo/c2mon/client" mask="400" />
+				</directory>
+			</deployment>
+			<startscript name="DMN2-PUBLISHER-MOBICALL-DEV">
+			</startscript>
+		</application>
+
+	</product>
+</products>
