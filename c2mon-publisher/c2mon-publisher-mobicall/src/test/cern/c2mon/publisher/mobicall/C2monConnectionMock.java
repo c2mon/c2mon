@@ -26,14 +26,20 @@ public class C2monConnectionMock implements C2monConnectionIntf {
 
     @Override
     public Collection<AlarmValue> getActiveAlarms() {
-        AlarmValue av = new AlarmValueImpl(1L, 1, "FM", "FF", "Info", 1L, new Timestamp(System.currentTimeMillis()), true);
         ArrayList<AlarmValue> activeAlarms = new ArrayList<AlarmValue>();
+
+        AlarmValue av = new AlarmValueImpl(1L, 1, "FM", "FF", "Info", 1L, new Timestamp(System.currentTimeMillis()), true);
         activeAlarms.add(av);
+        
+        AlarmValue av2 = 
+                new AlarmValueImpl(2L, 2, "FM", "FF", "Info", 2L, new Timestamp(System.currentTimeMillis() - (120 * 1000)), true);
+        activeAlarms.add(av2);
+        
         return activeAlarms;
     }
 
     public void activateAlarm(String ff, String fm, int fc, boolean valid) {
-        long tagId = 2;
+        long tagId = 3;
         if (valid) {
             tagId = 1;
         }
@@ -72,6 +78,9 @@ public class C2monConnectionMock implements C2monConnectionIntf {
 
     @Override
     public boolean isTagValid(Long tagId) {
+        if (tagId > 2) {
+            return false;
+        }
         return true;
     }
         

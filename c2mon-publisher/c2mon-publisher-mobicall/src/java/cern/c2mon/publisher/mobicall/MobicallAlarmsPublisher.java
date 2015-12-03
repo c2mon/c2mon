@@ -10,7 +10,6 @@
  ******************************************************************************/
 package cern.c2mon.publisher.mobicall;
 
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 
 import org.slf4j.Logger;
@@ -23,9 +22,9 @@ import cern.c2mon.shared.client.alarm.AlarmValue;
  */
 public final class MobicallAlarmsPublisher implements AlarmListener {
 
+    public static final int DEFAULT_RESEND_ON_START = 60;
+    
     static final Logger LOG = LoggerFactory.getLogger(MobicallAlarmsPublisher.class);
-    @SuppressWarnings("unused")
-    private static final SimpleDateFormat df = new SimpleDateFormat("dd.MM.YYYY HH:MM:SS");
 
     private C2monConnectionIntf c2mon;
     private MobicallConfigLoaderIntf loader;
@@ -37,6 +36,7 @@ public final class MobicallAlarmsPublisher implements AlarmListener {
     private static Thread configuratorThread;
     private static MobicallConfigurator configurator;
 
+    private int resendDelayOnStart = DEFAULT_RESEND_ON_START; // in seconds
     
     //
     // --- CONSTRUCTION ----------------------------------------------------------------
@@ -46,6 +46,10 @@ public final class MobicallAlarmsPublisher implements AlarmListener {
         this.loader = loader;
         this.c2mon = c2mon;
         this.sender = sender;
+        
+        if (System.getProperty("mobicall.resend.delay") != null) {
+            this.resendDelayOnStart = Integer.parseInt(System.getProperty("mobicall.resend.delay"));            
+        }
         LOG.info("Publisher ready.");
     }
     
@@ -71,8 +75,9 @@ public final class MobicallAlarmsPublisher implements AlarmListener {
 
             c2mon.setListener(this);
             c2mon.connectListener();
+            long resendFromTs = System.currentTimeMillis() - (resendDelayOnStart * 1000);
             for (AlarmValue av : activeAlarms) {
-                this.onAlarmUpdate(av);
+                this.onAlarmUpdate(av, resendFromTs);
             }
             LOG.info("Started with initial selection of " + activeAlarms.size() + " alarms.");
         } catch (Exception e) {
@@ -102,12 +107,20 @@ public final class MobicallAlarmsPublisher implements AlarmListener {
     //
     @Override
     public void onAlarmUpdate(AlarmValue av) {
+        onAlarmUpdate(av, 0);
+    }
+    
+    public void onAlarmUpdate(AlarmValue av, long resendFromTs) {
         String alarmId = getAlarmId(av);
         LOG.debug(" RECEIVED    > " + alarmId + " is active:" + av.isActive());        
         MobicallAlarm ma = loader.find(alarmId);
         if (ma != null) {
             if (c2mon.isTagValid(av.getTagId())) {
-                sender.send(ma.getMobicallId(), composeTrapMessage(ma, av));
+                if (resendFromTs == 0 || av.getTimestamp().getTime() > resendFromTs) {
+                    sender.send(ma.getMobicallId(), composeTrapMessage(ma, av));
+                } else {
+                    LOG.info("Do not re-notify " + getAlarmId(av) + " (too old)");                    
+                }
             } else {
                 LOG.warn("Quality of alarm " + alarmId + " is not valid & existing, no notification sent");                
             }
@@ -119,7 +132,6 @@ public final class MobicallAlarmsPublisher implements AlarmListener {
             eventCounter = 0;
         }
     }
-
     
     //
     // --- PRIVATE -------------------------------------------------------------------------------

@@ -36,6 +36,7 @@ public class MobicallConfigurator implements Runnable {
                 failures++;
                 if (failures > 10) {
                     LOG.warn("Too many failures, stopping the reconfiguration thread!");                    
+                    cont = false;
                 }
             } else {
                 LOG.warn("Time to reload config ...");
