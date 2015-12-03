@@ -35,7 +35,8 @@ public class MobicallConfigLoaderDB implements MobicallConfigLoaderIntf {
     
     private ConcurrentHashMap<String, MobicallAlarm> alarms;
     private Connection conn;
-
+    private boolean pbNotified;
+    
     //
     // --- CONSTRUCTION ------------------------------------------------------------------------
     //
@@ -141,9 +142,23 @@ public class MobicallConfigLoaderDB implements MobicallConfigLoaderIntf {
                 }
             } else {
                 LOG.warn("No alarm definitions found, keep previous configuration.");                
+                if (!pbNotified) {
+                    pbNotified = true;
+                    DiamonSupport.getSupport().notifyTeam("Mobicall: Empty DB configuration", 
+                            "The database returned an empty set of Mobicall alarms, config ignored. \n" + 
+                            "You will not receive any further mail about such a problem until you \n" +
+                            " restart the process.");
+                }
             }
         } catch (Exception e) {
             LOG.warn("Failed to reload the mobicall alarm definitions", e);
+            if (!pbNotified) {
+                pbNotified = true;
+                DiamonSupport.getSupport().notifyTeam("Mobicall: DB access exception", 
+                    "The database access completed with exception [" + e.getMessage() + "]. \n" + 
+                    "You will not receive any further mail about such a problem until you \n" +
+                    " restart the process.");
+            }
         }                    
     }
 
