@@ -47,13 +47,13 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
     private AlarmListener listener;
 
     private Map<String, ISourceDataTag> alarmToTag = new HashMap<>();
-    
+
     private DataTagValueDictionary valueDictionary = new DataTagValueDictionary();
 
     private static final String backupIndicator = "isBackup";
-    
+
     private HashMap<String, Calendar> outdatedSources = new HashMap<String, Calendar>();
-    
+
     /**
      */
     public LaserNativeMessageHandler() {
@@ -85,12 +85,12 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                 throw new EqIOException(e);
             }
         }
-            
+
         // set data tag configuration changer
         super.getEquipmentConfigurationHandler().setDataTagChanger(this);
         // set equipment configuration changer
         getEquipmentConfigurationHandler().setEquipmentConfigurationChanger(this);
-        
+
         initializeMBean();
         registerTags();
 
@@ -131,13 +131,14 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                 getEquipmentConfiguration().getName());
 
         getEquipmentMessageSender().confirmEquipmentStateOK();
-        
+
         for (final ISourceDataTag dataTag : getEquipmentConfiguration().getSourceDataTags().values()) {
 
             if (dataTag.getHardwareAddress() instanceof LASERHardwareAddress) {
                 addDataTagAndSendUpdate(dataTag, false);
             } else {
-                log.warn("Cannot process datatag {}: the hardware address is not of type {}", dataTag.getId(), LASERHardwareAddress.class.getName());
+                log.warn("Cannot process datatag {}: the hardware address is not of type {}", dataTag.getId(),
+                        LASERHardwareAddress.class.getName());
             }
 
         }
@@ -172,10 +173,10 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
             alarmToTag.put(alarmId, dataTag);
         }
 
-        if(sendUpdate) {
+        if (sendUpdate) {
             getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.FALSE, System.currentTimeMillis());
         }
-        
+
     }
 
     //
@@ -286,9 +287,9 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
     @Override
     public void onMessage(AlarmMessageData alarmMessage) {
-    
-        boolean isBackup = alarmMessage.getMt().equals(MessageType.BACKUP); 
-        
+
+        boolean isBackup = alarmMessage.getMt().equals(MessageType.BACKUP);
+
         // Check if the source uses an outdated source API
         try {
             ClientAlarmEvent alarm = alarmMessage.getFaults().iterator().next();
@@ -304,8 +305,8 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
             log.debug("Unable to check if the source uses an outdated source API, no alarms in the message. source :  "
                     + alarmMessage.getSourceId());
         }
-        
-        if (isBackup){
+
+        if (isBackup) {
             // a backup alarm
             try {
                 getEquipmentMessageSender().sendSupervisionAlive();
@@ -319,25 +320,25 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
         Visitor kv = new Visitor(isBackup);
         alarmMessage.visit(kv);
     }
-    
+
     private void outdatedSource(String sourceName) {
-        
-        if(!outdatedSources.containsKey(sourceName)) {
+
+        if (!outdatedSources.containsKey(sourceName)) {
             logOutDatedSources.info("The following source uses an outdated source API ---- " + sourceName);
             outdatedSources.put(sourceName, Calendar.getInstance());
         }
-        
-        if ((Calendar.getInstance().get(Calendar.DAY_OF_YEAR) > outdatedSources.get(sourceName).get(Calendar.DAY_OF_YEAR)
-                && Calendar.getInstance().get(Calendar.HOUR_OF_DAY) > outdatedSources.get(sourceName).get(Calendar.HOUR_OF_DAY))
+
+        if ((Calendar.getInstance().get(Calendar.DAY_OF_YEAR) > outdatedSources.get(sourceName).get(
+                Calendar.DAY_OF_YEAR) && Calendar.getInstance().get(Calendar.HOUR_OF_DAY) > outdatedSources.get(
+                sourceName).get(Calendar.HOUR_OF_DAY))
                 || Calendar.getInstance().get(Calendar.YEAR) > outdatedSources.get(sourceName).get(Calendar.YEAR)) {
-            
+
             logOutDatedSources.info("The following source uses an outdated source API ---- " + sourceName);
             outdatedSources.get(sourceName).setTime(Calendar.getInstance().getTime());
-            
-        }
-        
-    }
 
+        }
+
+    }
 
     /**
      * Synchronize all dataTags values with the alarms values present in the backup
@@ -370,8 +371,9 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                 if (!found) {
                     // Terminate alarm
                     mbean.setDataTag(dataTag.getId());
-                    
-                    getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.FALSE, messageData.getSourceTs(), backupIndicator + "=true\n");
+
+                    getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.FALSE, messageData.getSourceTs(),
+                            backupIndicator + "=true\n");
                     mbean.setValue(Boolean.FALSE);
 
                     String alarmID = dataTag.getName();
@@ -399,92 +401,71 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
     }
 
-    private class Visitor implements AlarmMessageVisitor  {
+    private class Visitor implements AlarmMessageVisitor {
 
         boolean isBackup;
-        
+
         Visitor(boolean isBackup) {
             this.isBackup = isBackup;
         }
 
-        
         @Override
         public void onAlarm(ClientAlarmEvent alarm) {
             ISourceDataTag dataTag = findDataTag(alarm.getAlarmId());
-            
-            String suffix = isBackup? " by backup" : "";
-            
-            if (dataTag != null) {
-                if (alarm.getDescriptor().equals(Descriptor.ACTIVE)) {
 
-                    if (dataTag.getCurrentValue() != null && dataTag.getCurrentValue().getValue().equals(Boolean.TRUE)) {
-                        // NOTHING
+            String suffix = isBackup ? " by backup" : "";
 
-                        log.debug(dataTag.getId() + " - " + alarm.getAlarmId()
-                                + " - ACTIVE -> ACTIVE {}. alarm change ignored", suffix);
+            if (alarm.getDescriptor() == Descriptor.UNKNOWN_STATE) {
+                log.warn(getEquipmentConfiguration().getName() + " sent alarm " + alarm.getAlarmId()
+                        + " with unknown state");
+                return;
+            }
 
-                    } else {
+            if (dataTag == null) {
+                log.warn(getEquipmentConfiguration().getName() + " sent unknown alarm " + alarm.getAlarmId());
+            } else {
 
-                        // udpate mbeans in another service asynchronous
-                        mbean.setDataTag(dataTag.getId());
-                        
-                        // extract the user properties as value description
-                        String valDescr = "";
-                        for (String key : alarm.getUserPropNames()) {
-                            valDescr += key + "=" + alarm.getProperty(key) + "\n";
-                        }
-                        
-                        if (isBackup) {
-                            valDescr += backupIndicator + "=true\n";
-                        }
-                        
-
-                        valueDictionary.addDescription(dataTag, valDescr);
-                        
-                        getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.TRUE, alarm.getUserTs(),
-                                valDescr);
-                        mbean.setValue(Boolean.TRUE);
-
-                        log.debug(dataTag.getId() + " - " + alarm.getAlarmId() + " - TERM -> ACTIVE {}.", suffix);
-
+                if (dataTag.getCurrentValue() != null) {
+                    Boolean curval = (Boolean) dataTag.getCurrentValue().getValue();
+                    if (alarm.getDescriptor() == Descriptor.ACTIVE && curval.equals(Boolean.TRUE)
+                            || alarm.getDescriptor() == Descriptor.TERMINATE && curval.equals(Boolean.FALSE)) {
+                        log.warn(dataTag.getId() + " - " + alarm.getAlarmId() + " : alarm change ignored", suffix);
+                        return;
                     }
-                } else if (alarm.getDescriptor().equals(Descriptor.TERMINATE)) {
+                }
 
-                    if (dataTag.getCurrentValue() != null && dataTag.getCurrentValue().getValue().equals(Boolean.FALSE)) {
-                        // NOTHING
-                        log.debug(dataTag.getId() + " - " + alarm.getAlarmId() + " - TERM -> TERM {}. alarm change ignored", suffix);
+                Boolean newState = Boolean.FALSE;
+                String valDescr = "";
 
-                    } else {
-                        mbean.setDataTag(dataTag.getId());
-                        getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.FALSE, alarm.getUserTs());
-                        mbean.setValue(Boolean.FALSE);
+                // udpate mbeans in another service asynchronous
+                mbean.setDataTag(dataTag.getId());
 
-                        log.debug(dataTag.getId() + " - " + alarm.getAlarmId() + " - ACTIVE -> TERM {}.", suffix);
-                    }
+                if (alarm.getDescriptor() == Descriptor.ACTIVE || alarm.getDescriptor() == Descriptor.CHANGE) {
 
-                } else if (alarm.getDescriptor().equals(Descriptor.CHANGE)) {
-
-                    // update mbeans in another service asynchronous
-                    mbean.setDataTag(dataTag.getId());
-                    
-                    String valDescr = "";
+                    // extract the user properties as value description
                     for (String key : alarm.getUserPropNames()) {
                         valDescr += key + "=" + alarm.getProperty(key) + "\n";
                     }
-                    
+
                     if (isBackup) {
                         valDescr += backupIndicator + "=true\n";
                     }
-                    
-                    valueDictionary.addDescription(dataTag, valDescr);
 
-                    getEquipmentMessageSender()
-                            .sendTagFiltered(dataTag, Boolean.TRUE, alarm.getUserTs(), valDescr);
-                    mbean.setValue(Boolean.TRUE);
+                    valueDictionary.addDescription(dataTag, valDescr);
+                    newState = Boolean.TRUE;
+                    log.debug(dataTag.getId() + " - " + alarm.getAlarmId() + " - TERM -> ACTIVE {}.", suffix);
                 }
+
+                if (alarm.getDescriptor().equals(Descriptor.TERMINATE)) {
+                    log.debug(dataTag.getId() + " - " + alarm.getAlarmId() + " - ACTIVE -> TERM {}.", suffix);
+                }
+
+                getEquipmentMessageSender().sendTagFiltered(dataTag, newState, alarm.getUserTs(), valDescr);
+                mbean.setValue(newState);
+
             }
         }
-        
+
     }
-    
+
 }
