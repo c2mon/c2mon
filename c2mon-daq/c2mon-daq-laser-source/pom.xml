@@ -14,8 +14,8 @@
 	<name>c2mon-daq-laser-source</name>
 	<packaging>jar</packaging>
 	<description>
-  This is a C2MON native LASER DAQ. This DAQ allows to acquire data from LASER source brokers.
-  </description>
+	  This is a C2MON native LASER DAQ. This DAQ allows to acquire data from LASER source brokers.
+  	</description>
 	<url />
 
 	<dependencies>
@@ -76,5 +76,4 @@
 
 	<developers />
 	
-	<groupId>cern.c2mon.c2mon-daq</groupId>
 </project>
