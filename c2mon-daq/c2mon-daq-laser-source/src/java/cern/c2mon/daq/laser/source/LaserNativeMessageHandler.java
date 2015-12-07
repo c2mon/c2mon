@@ -349,7 +349,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
      * 2. call onAlarm for each ClientAlarmEvent in backup<br>
      * </p>
      * 
-     * @param messageData
+     * @param messageData <code>AlarmMessageData</code>
      */
     public void checkTerminatedAlarmsByBackup(AlarmMessageData messageData) {
 
@@ -463,7 +463,6 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                     }
 
                 } else if (alarm.getDescriptor().equals(Descriptor.CHANGE)) {
-                    // TODO
 
                     // update mbeans in another service asynchronous
                     mbean.setDataTag(dataTag.getId());

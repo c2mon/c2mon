@@ -18,8 +18,6 @@ import cern.c2mon.daq.test.SourceDataTagValueCapture;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
-import cern.diamon.alarms.client.AlarmMessageData;
-import cern.diamon.alarms.client.ClientAlarmEvent;
 import cern.diamon.alarms.source.AlarmMessageBuilder.MessageType;
 
 @UseHandler(LaserNativeMessageHandler.class)
@@ -57,7 +55,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
         replay(messageSender);
 
         laserMessage.connectToDataSource();
-        laserMessage.onMessage(MyAlarmMessageData.createUpdateMessage(true, MessageType.UPDATE, "LHC"));
+        laserMessage.onMessage(AlarmMessageTestData.createUpdateMessage(true, MessageType.UPDATE, "LHC"));
 
         Thread.sleep(1000);
 
@@ -84,7 +82,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
         ISourceDataTag dataTag = laserMessage.getEquipmentConfiguration().getSourceDataTag((long) 124149);
         laserMessage.getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis());
 
-        laserMessage.onMessage(MyAlarmMessageData.createUpdateMessage(false, MessageType.UPDATE, "LHC"));
+        laserMessage.onMessage(AlarmMessageTestData.createUpdateMessage(false, MessageType.UPDATE, "LHC"));
 
         Thread.sleep(1000);
 
@@ -106,7 +104,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
         ISourceDataTag dataTag1 = laserMessage.getEquipmentConfiguration().getSourceDataTag((long) 124150);
         
         laserMessage.connectToDataSource();
-        laserMessage.onMessage(MyAlarmMessageData.createUnknownAlarm(true, MessageType.UPDATE, "LHC"));
+        laserMessage.onMessage(AlarmMessageTestData.createUnknownAlarm(true, MessageType.UPDATE, "LHC"));
 
         Thread.sleep(1000);
         
@@ -134,7 +132,7 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
         ISourceDataTag dataTag = laserMessage.getEquipmentConfiguration().getSourceDataTag((long) 124150);
         laserMessage.getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis());
 
-        laserMessage.onMessage(MyAlarmMessageData.createBackupMessage(MessageType.BACKUP, "LHC"));
+        laserMessage.onMessage(AlarmMessageTestData.createBackupMessage(MessageType.BACKUP, "LHC", false));
 
         Thread.sleep(3000);
 
@@ -150,84 +148,5 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
 
     }
 
-    private static class MyAlarmMessageData extends AlarmMessageData {
-
-        public MyAlarmMessageData() {
-
-        }
-
-        static AlarmMessageData createUpdateMessage(boolean active, MessageType messageType, String sourceId) throws InterruptedException {
-            MyAlarmMessageData result = new MyAlarmMessageData();
-            result.setSourceHost(sourceId);
-            result.setSourceTs(System.currentTimeMillis());
-            result.setMessageType(messageType);
-            result.setSourceId(sourceId);
-
-            ClientAlarmEvent alarm = MyClientAlarmEvent.createAlarm(active, "LHCCOLLIMATOR", "TCSG.B5R7.B2", 22000);
-            Thread.sleep(1000);
-            ClientAlarmEvent alarm1 = MyClientAlarmEvent.createAlarm(active, "DMNALMON", "MKBV.UA63.SCSS.AB2", 2);
-
-            result.addFault(alarm);
-            result.addFault(alarm1);
-
-            return result;
-        }
-
-        static AlarmMessageData createUnknownAlarm(boolean active, MessageType messageType, String sourceId) {
-            MyAlarmMessageData result = new MyAlarmMessageData();
-            result.setSourceHost(sourceId);
-            result.setSourceTs(System.currentTimeMillis());
-            result.setMessageType(messageType);
-            result.setSourceId(sourceId);
-
-            ClientAlarmEvent alarm = MyClientAlarmEvent.createAlarm(active, "Unknown", "ABCD.EFGH.IJKL", 21000);
-
-            result.addFault(alarm);
-
-            return result;
-        }
-
-        static AlarmMessageData createBackupMessage(MessageType messageType, String sourceId) {
-            MyAlarmMessageData result = new MyAlarmMessageData();
-            result.setSourceHost(sourceId);
-            result.setSourceTs(System.currentTimeMillis());
-            result.setMessageType(messageType);
-            result.setSourceId(sourceId);
-
-            try {
-                ClientAlarmEvent alarm = MyClientAlarmEvent.createAlarm(true, "LHCCOLLIMATOR", "TCSG.B5R7.B2", 22000);
-                Thread.sleep(1000);
-                ClientAlarmEvent alarm2 = MyClientAlarmEvent.createAlarm(true, "LHC", "test", 1);
-                Thread.sleep(1000);
-                ClientAlarmEvent alarm3 = MyClientAlarmEvent.createAlarm(true, "LHCCOLL", "TCSG", 2);
-
-                result.addFault(alarm);
-                result.addFault(alarm2);
-                result.addFault(alarm3);
-            } catch (InterruptedException ie) {
-                ie.printStackTrace();
-            }
-
-            return result;
-        }
-
-    }
-
-    private static class MyClientAlarmEvent extends ClientAlarmEvent {
-
-        public MyClientAlarmEvent(String deviceClass, String deviceName, int faultCode) {
-            super(deviceClass, deviceName, faultCode);
-        }
-
-        static ClientAlarmEvent createAlarm(boolean active, String deviceClass, String deviceName, int faultCode) {
-            MyClientAlarmEvent alarm = new MyClientAlarmEvent(deviceClass, deviceName, faultCode);
-            alarm.setActive(active);
-            alarm.setUserTs(System.currentTimeMillis());
-            alarm.setProperty("ASI_PREFIX", "");
-
-            return alarm;
-
-        }
-    }
 
 }
