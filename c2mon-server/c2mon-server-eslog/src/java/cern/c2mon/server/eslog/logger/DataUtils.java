@@ -1,7 +1,7 @@
 package cern.c2mon.server.eslog.logger;
 
-import cern.c2mon.server.eslog.indexer.BulkSettings;
 import cern.c2mon.server.eslog.structure.types.TagES;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
@@ -9,13 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Provides the knowledge about the ElasticSearch cluster: index, types...
  * @author Alban Marguet.
  */
 @Slf4j
+@Data
 @Service
 public class DataUtils {
     private final String INDEX_PREFIX = "c2mon_";
@@ -33,32 +37,44 @@ public class DataUtils {
     private Set<String> aliases;
     private Set<String> types;
     private HashMap<String, Integer> bulkSettings;
-    private Connector connector;
 
-    @Autowired
-    public DataUtils(Client client, Connector connector, String clusterName, String host, int port, String nodeName) {
-        this.host = host;
-        this.port = port;
-        this.client = client;
-        this.nodeName = nodeName;
-        this.clusterName = clusterName;
-        setTransportSettings(clusterName, nodeName);
-
-        this.indices = initializeIndexes();
-        this.aliases = initializeAliases();
-        this.types = initializeTypes();
+    public DataUtils() {
+        this.indices = new HashSet<>();
+        this.aliases = new HashSet<>();
+        this.types = new HashSet<>();
         this.lastIndex = FIRST_INDEX;
         this.bulkSettings = new HashMap<>();
+    }
+
+    public void setBulkSettings() {
         bulkSettings.put("bulkActions", BulkSettings.BULK_ACTIONS.getSetting());
         bulkSettings.put("bulkSize", BulkSettings.BULK_SIZE.getSetting());
         bulkSettings.put("flushInterval", BulkSettings.FLUSH_INTERVAL.getSetting());
         bulkSettings.put("concurrent", BulkSettings.CONCURRENT.getSetting());
-
-        this.connector = connector;
     }
 
-    public Connector getConnector() {
-        return connector;
+    public void addIndex(String indexName) {
+        if (indexName.matches("^" + INDEX_PREFIX + "\\d\\d\\d\\d-\\d\\d$")) {
+            indices.add(indexName);
+        } else {
+            throw new IllegalArgumentException("Indices must follow the format \"c2mon_YYYY_MM\".");
+        }
+    }
+
+    public void addAlias(String aliasName) {
+        if (aliasName.matches("^" + TAG_PREFIX + "\\d+$")) {
+            aliases.add(aliasName);
+        } else {
+            throw new IllegalArgumentException("Aliases must follow the format \"tag_tagId\".");
+        }
+    }
+
+    public void addType(String typeName) {
+        if (typeName.matches("^" + TAG_PREFIX + "\\d+$")) {
+            types.add(typeName);
+        } else {
+            throw new IllegalArgumentException("Types must follow the format \"tag_dataType\".");
+        }
     }
 
     public void setTransportSettings(String clusterName, String nodeName) {
@@ -67,45 +83,6 @@ public class DataUtils {
 
     public Settings getTransportSettings() {
         return transportSettings;
-    }
-    /**
-     * Query the ElasticSearch cluster to know the most recent index in the cluster.
-     * @return name of the index.
-     */
-    public String updateLastIndex() {
-        String lastIndex = FIRST_INDEX;
-
-        for (String index: indices) {
-            if (index.matches("^" + INDEX_PREFIX + "(.*)") && index.substring(INDEX_PREFIX.length(), index.length())
-                    .compareTo(lastIndex.substring(INDEX_PREFIX.length(), lastIndex.length())) > 0) {
-                lastIndex = index;
-            }
-        }
-        log.info("Updated last index: " + lastIndex);
-        return lastIndex;
-    }
-
-    /**
-     * Get the last inserted index in the ElasticSearch cluster. (the most recent)
-     * @return name of the index.
-     */
-    public String getLastIndex() {
-        this.lastIndex = updateLastIndex();
-        return lastIndex;
-    }
-
-    /**
-     * @return set of names of the aliases present in the cluster.
-     */
-    public Set<String> getAliases() {
-        return aliases;
-    }
-
-    /**
-     * @return set of names of the indexes present in the cluster.
-     */
-    public Set<String> getIndices() {
-        return indices;
     }
 
     /**
@@ -116,90 +93,6 @@ public class DataUtils {
      */
     public String generateAliasName(long tagId) {
         return TAG_PREFIX + tagId;
-    }
-
-    /**
-     * Retrieve the indexes present in the ElasticSearch cluster.
-     * @return Set of String containing the names of the indexes.
-     */
-    public Set<String> initializeIndexes() {
-        Set<String> set = new HashSet<>();
-
-        String[] indices = client.admin().indices().prepareGetIndex().get().indices();
-        Collections.addAll(set, indices);
-
-        return set;
-    }
-
-    /**
-     * Retrieve the aliases present in the ElasticSearch cluster.
-     * @return Set of String containing the names of the aliases.
-     */
-    public Set<String> initializeAliases() {
-        Set<String> set = new HashSet<>();
-
-        Set<String> elements = client.admin().cluster().prepareState().execute().actionGet().
-                getState().getMetaData().getAliasAndIndexLookup().keySet();
-        set.addAll(elements);
-
-        return set;
-    }
-
-    /**
-     * Retrieve the types present in the ElasticSearch cluster.
-     * @return Set of String containing the names of the types.
-     */
-    public Set<String> initializeTypes() {
-        Set<String> set = new HashSet<>();
-
-        String[] elements = (String[]) client.admin().cluster().prepareState().execute().actionGet().
-                getState().getMetaData().index(getLastIndex()).getMappings().values().toArray();
-        Collections.addAll(set, elements);
-
-        return set;
-    }
-
-    /**
-     * Settings for the index/Month: 10 shards and 0 replica.
-     * @return Settings.Builder to attach to an IndexRequest.
-     */
-    public Settings.Builder getMonthIndexSettings() {
-        return Settings.settingsBuilder().put("number_of_shards", IndexMonthSettings.SHARDS.getSetting())
-                .put("number_of_replicas", IndexMonthSettings.REPLICA.getSetting());
-    }
-
-    /**
-     * Type in ElasticSearch.
-     * @param tag TagES
-     * @return String of the form "tag_type"
-     */
-    public String getType(TagES tag) {
-        return TAG_PREFIX + tag.getDataType();
-    }
-
-    /**
-     *
-     * @return Types present in the ElasticSearch cluster.
-     */
-    public Set<String> getTypes() {
-        return types;
-    }
-
-    /**
-     * Index where a TagES is stored in the ElasticSearch cluster.
-     * @param tag TagES
-     * @return name of the index of tag.
-     */
-    public String getIndex(TagES tag) {
-        return millisecondsToYearMonth(tag.getTagServerTime());
-    }
-
-    /**
-     * BulkSettings to send data in batches.
-     * @return
-     */
-    public HashMap<String, Integer> getBulkSettings() {
-        return bulkSettings;
     }
 
     /**
@@ -215,27 +108,47 @@ public class DataUtils {
         return timestamp.substring(0,7);
     }
 
-    public String getClusterName() {
-        return clusterName;
+    /**
+     * Settings for the index/Month: 10 shards and 0 replica.
+     * @return Settings.Builder to attach to an IndexRequest.
+     */
+    public Settings.Builder getMonthIndexSettings() {
+        return Settings.settingsBuilder().put("number_of_shards", IndexMonthSettings.SHARDS.getSetting())
+                .put("number_of_replicas", IndexMonthSettings.REPLICA.getSetting());
     }
 
-    public void setClusterName(String clusterName) {
-        this.clusterName = clusterName;
+    /**
+     * Get the last inserted index in the ElasticSearch cluster. (the most recent)
+     * @return name of the index.
+     */
+    public String getLastIndex() {
+        String lastIndex = FIRST_INDEX;
+
+        for (String index: indices) {
+            if (index.matches("^" + INDEX_PREFIX + "(.*)") && index.substring(INDEX_PREFIX.length(), index.length())
+                    .compareTo(lastIndex.substring(INDEX_PREFIX.length(), lastIndex.length())) > 0) {
+                lastIndex = index;
+            }
+        }
+        log.info("Updated last index: " + lastIndex);
+        return lastIndex;
     }
 
-    public String getHost() {
-        return host;
+    /**
+     * Index where a TagES is stored in the ElasticSearch cluster.
+     * @param tag TagES
+     * @return name of the index of tag.
+     */
+    public String getIndex(TagES tag) {
+        return millisecondsToYearMonth(tag.getTagServerTime());
     }
 
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
+    /**
+     * Type in ElasticSearch.
+     * @param tag TagES
+     * @return String of the form "tag_type"
+     */
+    public String getType(TagES tag) {
+        return TAG_PREFIX + tag.getDataType();
     }
 }

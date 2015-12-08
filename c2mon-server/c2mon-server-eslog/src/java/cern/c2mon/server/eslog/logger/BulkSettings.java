@@ -1,4 +1,4 @@
-package cern.c2mon.server.eslog.indexer;
+package cern.c2mon.server.eslog.logger;
 
 /**
  * Handles the bulk indexing settings.

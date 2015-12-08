@@ -19,8 +19,10 @@ public abstract class Query {
     protected final String MIN = "min";
     protected final String MAX = "max";
 
-    public void setParameters(Client client, String[] indices, boolean isTypeDefined, String[] types, long[] tagIds, int from, int size, int min, int max) {
+
+    public Query(Client client, String[] indices, boolean isTypeDefined, String[] types, long[] tagIds, int from, int size, int min, int max) {
         setClient(client);
+        parameters = new HashMap<>();
         parameters.put(INDICES, indices);
         parameters.put(IS_TYPE_DEFINED, isTypeDefined);
         parameters.put(TYPES, types);

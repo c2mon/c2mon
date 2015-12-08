@@ -41,7 +41,7 @@ import java.util.Collection;
  * @author Alban Marguet
  *
  */
-@Service
+//@Service
 @Slf4j
 public class TagLogCacheListener implements BufferedTimCacheListener<Tag>, SmartLifecycle {
   
@@ -69,7 +69,7 @@ public class TagLogCacheListener implements BufferedTimCacheListener<Tag>, Smart
    * 
    * @param cacheRegistrationService for registering cache listeners
    */
-  @Autowired
+  //@Autowired
   public TagLogCacheListener(final CacheRegistrationService cacheRegistrationService, final DataTagESLogConverter dataTagESLogConverter) {
     super();
     this.cacheRegistrationService = cacheRegistrationService;

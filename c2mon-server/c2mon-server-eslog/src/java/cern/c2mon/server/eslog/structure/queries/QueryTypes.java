@@ -9,14 +9,9 @@ import java.util.Set;
 /**
  * @author Alban Marguet.
  */
-public class QueryAliases extends Query {
-    public QueryAliases(Client client, String[] indices, boolean isTypeDefined, String[] types, long[] tagIds, int from, int size, int min, int max) {
+public class QueryTypes extends Query {
+    public QueryTypes(Client client, String[] indices, boolean isTypeDefined, String[] types, long[] tagIds, int from, int size, int min, int max) {
         super(client, indices, isTypeDefined, types, tagIds, from, size, min, max);
-    }
-
-    public void addAlias(String indexMonth, String aliasName) {
-        client.admin().indices().prepareAliases().addAlias(indexMonth, aliasName)
-                .execute().actionGet();
     }
 
     public List<String> getListOfAnswer() {

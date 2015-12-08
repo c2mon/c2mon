@@ -3,6 +3,7 @@ package cern.c2mon.server.eslog.structure.queries;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.sort.SortOrder;
@@ -15,6 +16,10 @@ import java.util.List;
  * @author Alban Marguet.
  */
 public class QueryLastXValuesRange extends Query {
+    public QueryLastXValuesRange(Client client, String[] indices, boolean isTypeDefined, String[] types, long[] tagIds, int from, int size, int min, int max) {
+        super(client, indices, isTypeDefined, types, tagIds, from, size, min, max);
+    }
+
     protected SearchResponse getResponse() {
         SearchRequestBuilder requestBuilder = client.prepareSearch(indices());
 

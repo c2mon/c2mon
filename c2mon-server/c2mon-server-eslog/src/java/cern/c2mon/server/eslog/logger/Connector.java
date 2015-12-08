@@ -6,18 +6,26 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Requirements to connect/query the ElasticSearch cluster.
  * @author Alban Marguet.
  */
 public interface Connector {
+    Client createClient();
     void close(Client client);
     void indexTags(List<TagES> tags);
+
     List<String> getIndices();
-    List<String> handleQuery(Query query, String[] indexes, boolean isTypeDefined, String[] types, long[] tagIds, int from, int size, int min, int max);
+    List<String> getAliases();
+    List<String> getTypes();
+
+    Set<String> initializeIndexes();
+    Set<String> initializeTypes();
+    Set<String> initializeAliases();
+
+    List<String> handleQuery(Query query);
     boolean handleIndexQuery(Query query, String indexName, Settings.Builder settings, String type, String mapping);
     void handleAliasQuery(Query query, String indexMonth, String aliasName);
-    DataUtils getUtils();
-    Client getClient();
 }
