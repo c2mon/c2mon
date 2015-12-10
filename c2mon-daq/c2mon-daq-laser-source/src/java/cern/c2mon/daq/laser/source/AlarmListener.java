@@ -30,7 +30,7 @@ public class AlarmListener implements AlarmConsumerInterface {
 
     private AlarmConnector connector;
     boolean isStarted = false;
-    private final ConcurrentHashMap<String, LaserMessageHandler> handlers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, LaserNativeMessageHandler> handlers = new ConcurrentHashMap<>();
 
     private String jmsUrl = "failover:(tcp://jms-laser-pro1:61670,tcp://jms-laser-pro2:61670)";
     private String jmsRootTopic = "CERN.DIAMON.ALARM.INCOMING.OLD.";
@@ -61,11 +61,11 @@ public class AlarmListener implements AlarmConsumerInterface {
     // --- PUBLIC METHODS ----------------------------------------------------------------------------------
     //
     
-    public synchronized void addHandler(LaserMessageHandler messageHandler) {
+    public synchronized void addHandler(LaserNativeMessageHandler messageHandler) {
         handlers.put(messageHandler.getEquipmentConfiguration().getName(), messageHandler);
     }
 
-    public synchronized void removeHandler(LaserMessageHandler messageHandler) {
+    public synchronized void removeHandler(LaserNativeMessageHandler messageHandler) {
         handlers.remove(messageHandler.getEquipmentConfiguration().getName());
 
         if (handlers.isEmpty()) {
@@ -113,7 +113,7 @@ public class AlarmListener implements AlarmConsumerInterface {
      */
     @Override
     public void onMessage(AlarmMessageData alarmMessage) {
-        LaserMessageHandler result = handlers.get(alarmMessage.getSourceId());
+        LaserNativeMessageHandler result = handlers.get(alarmMessage.getSourceId());
         if (result != null) {
             result.onMessage(alarmMessage);
         }               

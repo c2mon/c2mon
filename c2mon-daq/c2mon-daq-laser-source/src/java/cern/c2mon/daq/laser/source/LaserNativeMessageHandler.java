@@ -36,10 +36,10 @@ import cern.diamon.alarms.shared.data.AlarmHandle.Descriptor;
 import cern.diamon.alarms.shared.data.AlarmHandle.SystemProperty;
 import cern.diamon.alarms.source.AlarmMessageBuilder.MessageType;
 
-public class LaserMessageHandler extends EquipmentMessageHandler implements IDataTagChanger,
+public class LaserNativeMessageHandler extends EquipmentMessageHandler implements IDataTagChanger,
         IEquipmentConfigurationChanger, AlarmConsumerInterface {
 
-    private static final Logger log = LoggerFactory.getLogger(LaserMessageHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(LaserNativeMessageHandler.class);
     private static final Logger logOutDatedSources = LoggerFactory.getLogger("OutdatedSources");
     private static final String backupIndicator = "isBackup=true\n";
 

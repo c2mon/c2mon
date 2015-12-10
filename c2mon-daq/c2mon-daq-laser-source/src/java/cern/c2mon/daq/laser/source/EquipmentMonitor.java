@@ -24,12 +24,12 @@ public class EquipmentMonitor implements EquipmentMonitorMBean {
     
     private IEquipmentConfiguration equipment;
     private ISourceDataTag dataTag;
-    private LaserMessageHandler handler;
+    private LaserNativeMessageHandler handler;
     
     //
     // --- CONSTRUCTION ---------------------------------------------------------------------------
     //
-    public EquipmentMonitor(IEquipmentConfiguration equipment, LaserMessageHandler handler) {
+    public EquipmentMonitor(IEquipmentConfiguration equipment, LaserNativeMessageHandler handler) {
         this.equipment = equipment;
         this.handler = handler;
     }

@@ -24,10 +24,10 @@ import cern.diamon.alarms.source.AlarmMessageBuilder.MessageType;
  * 
  * @author mbuttner
  */
-@UseHandler(LaserMessageHandler.class)
+@UseHandler(LaserNativeMessageHandler.class)
 public class LaserMessageHandlerTestBis extends GenericMessageHandlerTst {
     
-    LaserMessageHandler laserMessage;
+    LaserNativeMessageHandler laserMessage;
     AlarmListener listener = AlarmListener.getAlarmListener();
     EquipmentSenderMock sender;
     
@@ -36,7 +36,7 @@ public class LaserMessageHandlerTestBis extends GenericMessageHandlerTst {
     //
     @Override
     protected void beforeTest() throws Exception {
-        laserMessage = (LaserMessageHandler) msgHandler;
+        laserMessage = (LaserNativeMessageHandler) msgHandler;
         laserMessage.setAlarmListener(listener);
         sender = new EquipmentSenderMock(laserMessage.getName());
         laserMessage.connectToDataSource(sender);
