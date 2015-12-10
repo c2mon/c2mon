@@ -463,7 +463,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                 // DMN-2488 using the userTs in TAG will trigger a discard of the update on the
                 // server side. Result: we must pack the user timestamp into the description!
                 long now = System.currentTimeMillis();
-                valDescr.append("ASI_USER_TS=" + alarm.getUserTs());
+                valDescr.append("ASI_USER_TS=" + alarm.getUserTs() + "\n");
                 if (!getEquipmentMessageSender().sendTagFiltered(dataTag, newState, now, valDescr.toString())) {
                     log.warn("sendTagFiltered for {} returned false !?", alarm.getAlarmId());                                        
                 }
