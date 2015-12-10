@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>c2mon-daq-laser-source</artifactId>
-	<version>1.0.4-SNAPSHOT</version>
+	<version>1.0.4</version>
 	<name>c2mon-daq-laser-source</name>
 	<packaging>jar</packaging>
 	<description>
