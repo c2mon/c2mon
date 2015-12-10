@@ -118,7 +118,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
     @Override
     public void refreshDataTag(long arg0) {
-        // Nothing
+        log.info("Refresh datatag {}", arg0);
     }
 
     //
@@ -175,7 +175,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
         if (sendUpdate) {
             getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.FALSE, System.currentTimeMillis());
-        }
+        } 
 
     }
 
@@ -435,7 +435,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                 }
 
                 Boolean newState = Boolean.FALSE;
-                String valDescr = "";
+                StringBuffer valDescr = new StringBuffer();
 
                 // udpate mbeans in another service asynchronous
                 mbean.setDataTag(dataTag.getId());
@@ -444,14 +444,14 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
                     // extract the user properties as value description
                     for (String key : alarm.getUserPropNames()) {
-                        valDescr += key + "=" + alarm.getProperty(key) + "\n";
+                        valDescr.append(key + "=" + alarm.getProperty(key) + "\n");
                     }
 
                     if (isBackup) {
-                        valDescr += backupIndicator + "=true\n";
+                        valDescr.append(backupIndicator + "=true\n");
                     }
 
-                    valueDictionary.addDescription(dataTag, valDescr);
+                    valueDictionary.addDescription(dataTag, valDescr.toString());
                     newState = Boolean.TRUE;
                     log.debug(dataTag.getId() + " - " + alarm.getAlarmId() + " - TERM -> ACTIVE {}.", suffix);
                 }
@@ -460,8 +460,13 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                     log.debug(dataTag.getId() + " - " + alarm.getAlarmId() + " - ACTIVE -> TERM {}.", suffix);
                 }
 
-                getEquipmentMessageSender().sendTagFiltered(dataTag, newState, alarm.getUserTs(), valDescr);
-                mbean.setValue(newState);
+                // DMN-2488 using the userTs in TAG will trigger a discard of the update on the
+                // server side. Result: we must pack the user timestamp into the description!
+                long now = System.currentTimeMillis();
+                valDescr.append("ASI_USER_TS=" + alarm.getUserTs());
+                if (!getEquipmentMessageSender().sendTagFiltered(dataTag, newState, now, valDescr.toString())) {
+                    log.warn("sendTagFiltered for {} returned false !?", alarm.getAlarmId());                                        
+                }
 
             }
         }
