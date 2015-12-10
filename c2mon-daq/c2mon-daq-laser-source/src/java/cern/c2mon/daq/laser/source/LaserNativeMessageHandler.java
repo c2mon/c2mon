@@ -39,9 +39,9 @@ import cern.diamon.alarms.source.AlarmMessageBuilder.MessageType;
 public class LaserNativeMessageHandler extends EquipmentMessageHandler implements IDataTagChanger,
         IEquipmentConfigurationChanger, AlarmConsumerInterface {
 
-    private static final Logger log = LoggerFactory.getLogger(LaserNativeMessageHandler.class);
-    private static final Logger logOutDatedSources = LoggerFactory.getLogger("OutdatedSources");
-    private static final String backupIndicator = "isBackup=true\n";
+    private static final Logger LOG = LoggerFactory.getLogger(LaserNativeMessageHandler.class);
+    private static final Logger LOG_OUTDATED = LoggerFactory.getLogger("OutdatedSources");
+    private static final String BACKUP_PROP = "isBackup=true\n";
 
     protected EquipmentMonitor mbean;
 
@@ -65,7 +65,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
     @SuppressWarnings("hiding")
     public synchronized void connectToDataSource(IEquipmentMessageSender sender) throws EqIOException {
         this.sender = sender;
-        log.debug("connectToDataSource - entering...");
+        LOG.debug("connectToDataSource - entering...");
 
         if (listener == null) {
             listener = AlarmListener.getAlarmListener();
@@ -84,21 +84,21 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
         initializeMBean();
         registerTags();
 
-        log.trace("connectToDataSource - leaving connectToDataSource()");
+        LOG.trace("connectToDataSource - leaving connectToDataSource()");
 
     }
 
     @Override
     public synchronized void disconnectFromDataSource() throws EqIOException {
-        log.debug("disconnectFromDataSource - entering ..");
+        LOG.debug("disconnectFromDataSource - entering ..");
 
         if (listener != null) {
-            log.trace("disconnectFromDataSource Removing Handler from LASER listener..");
+            LOG.trace("disconnectFromDataSource Removing Handler from LASER listener..");
             listener.removeHandler(this);
-            log.info("disconnectFromDataSource Handler from LASER listener removed.");
+            LOG.info("disconnectFromDataSource Handler from LASER listener removed.");
         }
 
-        log.trace("disconnectFromDataSource - leaving ..");
+        LOG.trace("disconnectFromDataSource - leaving ..");
     }
 
     @Override
@@ -124,62 +124,62 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
     synchronized public void registerTags() {
 
         IEquipmentConfiguration econfig = getEquipmentConfiguration();
-        log.info("registering {} tags for equipment {} ...", econfig.getSourceDataTags().size(), getName());
+        LOG.info("registering {} tags for equipment {} ...", econfig.getSourceDataTags().size(), getName());
 
         sender.confirmEquipmentStateOK();
 
         for (final ISourceDataTag dataTag : econfig.getSourceDataTags().values()) {
             if (dataTag.getHardwareAddress() instanceof LASERHardwareAddress) {
-                log.info(format("mapping DataTag (%d) -> %s", dataTag.getId(), dataTag.getName()));
+                LOG.info(format("mapping DataTag (%d) -> %s", dataTag.getId(), dataTag.getName()));
                 alarmToTag.put(dataTag.getName(), dataTag);
             } else {
-                log.warn("Cannot process datatag {}/{} with address type {}", 
+                LOG.warn("Cannot process datatag {}/{} with address type {}", 
                         dataTag.getId(), dataTag.getName(), dataTag.getHardwareAddress().getClass().toString());
             }
         }
 
         listener.addHandler(this);
-        log.info("Tags registered");
+        LOG.info("Tags registered");
     }
 
 
     @Override
     public synchronized void onAddDataTag(ISourceDataTag dataTag, ChangeReport changeReport) {
-        log.debug(format("entering onAddDataTag(%d)..", dataTag.getId()));
+        LOG.debug(format("entering onAddDataTag(%d)..", dataTag.getId()));
         changeReport.setState(CHANGE_STATE.SUCCESS);
 
         try {
-            log.info(format("mapping DataTag (%d) -> %s", dataTag.getId(), dataTag.getName()));
+            LOG.info(format("mapping DataTag (%d) -> %s", dataTag.getId(), dataTag.getName()));
             alarmToTag.put(dataTag.getName(), dataTag);
         } catch (Exception ex) {
             changeReport.setState(CHANGE_STATE.FAIL);
             changeReport.appendError(ex.getMessage());
         }
 
-        log.trace(format("leaving onAddDataTag(%d)", dataTag.getId()));
+        LOG.trace(format("leaving onAddDataTag(%d)", dataTag.getId()));
     }
 
     @Override
     public synchronized void onRemoveDataTag(ISourceDataTag sourceDataTag, ChangeReport changeReport) {
-        log.debug(format("entering onRemoveDataTag(%d)..", sourceDataTag.getId()));
+        LOG.debug(format("entering onRemoveDataTag(%d)..", sourceDataTag.getId()));
         changeReport.setState(CHANGE_STATE.SUCCESS);
         alarmToTag.remove(sourceDataTag.getName());
-        log.trace(format("leaving onRemoveDataTag(%d)", sourceDataTag.getId()));
+        LOG.trace(format("leaving onRemoveDataTag(%d)", sourceDataTag.getId()));
     }
 
     @Override
     public synchronized void onUpdateDataTag(ISourceDataTag tag, ISourceDataTag oldTag, ChangeReport report) {        
-        log.debug(format("entering onUpdateDataTag(%d,%d)..", tag.getId(), oldTag.getId()));
+        LOG.debug(format("entering onUpdateDataTag(%d,%d)..", tag.getId(), oldTag.getId()));
         report.setState(CHANGE_STATE.SUCCESS);
         alarmToTag.put(tag.getName(), tag);
-        log.trace(format("leaving onUpdateDataTag(%d,%d)", tag.getId(), oldTag.getId()));
+        LOG.trace(format("leaving onUpdateDataTag(%d,%d)", tag.getId(), oldTag.getId()));
     }
 
     @Override
     public synchronized void onUpdateEquipmentConfiguration(IEquipmentConfiguration config,
             IEquipmentConfiguration oldConfig, ChangeReport report) {
 
-        log.debug("entering onUpdateEquipmentConfiguration()..");
+        LOG.debug("entering onUpdateEquipmentConfiguration()..");
         try {
             this.disconnectFromDataSource();
             this.connectToDataSource();
@@ -188,7 +188,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
             report.setState(CHANGE_STATE.REBOOT);
             report.appendWarn(ex.getMessage());
         } finally {
-            log.trace("leaving onUpdateEquipmentConfiguration()");
+            LOG.trace("leaving onUpdateEquipmentConfiguration()");
         }
 
     }
@@ -204,20 +204,20 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
             if (mbs.isRegistered(objName)) {
                 mbs.unregisterMBean(objName);
-                log.info("JMX monitoring for source already registered, removed it ...");
+                LOG.info("JMX monitoring for source already registered, removed it ...");
             }
 
             mbs.registerMBean(mbean, objName);
-            log.info("MBean registered");
+            LOG.info("MBean registered");
         } catch (Exception e) {
-            log.warn("Cannot register mbean due to " + e.getMessage(), e);
+            LOG.warn("Cannot register mbean due to " + e.getMessage(), e);
         }
 
     }
 
     @Override
     public void onException(JMSException ex) {
-        log.error("Got Exception from LASER library : " + ex.getMessage(), ex);
+        LOG.error("Got Exception from LASER library : " + ex.getMessage(), ex);
         sender.confirmEquipmentStateIncorrect(ex.getMessage());
 
     }
@@ -242,13 +242,13 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
             if (asiEventIdStr == null || asiEventIdStr.isEmpty()) {
                 String sourceName = alarmMessage.getSourceId();
                 if (!outdatedSources.containsKey(sourceName)) {
-                    logOutDatedSources.info("The following source uses an outdated source API ---- " + sourceName);
+                    LOG_OUTDATED.info("The following source uses an outdated source API ---- " + sourceName);
                 }
                 outdatedSources.put(sourceName, System.currentTimeMillis());
             }
         }
         catch (Exception e) {
-            log.debug("Unable to check source API level (empty message from {})", alarmMessage.getSourceId());
+            LOG.debug("Unable to check source API level (empty message from {})", alarmMessage.getSourceId());
         }
         
         //
@@ -258,7 +258,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                 sender.sendSupervisionAlive();
                 checkTerminatedAlarmsByBackup(alarmMessage);
             } catch (Exception e) {
-                log.error("Error occured while reading the backup message: " + e.getMessage(), e);
+                LOG.error("Error occured while reading the backup message: " + e.getMessage(), e);
             }
 
         }
@@ -281,7 +281,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
             if (dataTag.getHardwareAddress() instanceof LASERHardwareAddress) {
 
                 String alarmId = dataTag.getName();
-                log.debug("Backup init check for " + alarmId + " ... ");
+                LOG.debug("Backup init check for " + alarmId + " ... ");
                 
                 ClientAlarmEvent event = messageData.getFault(alarmId);
                 Boolean isActive = null;
@@ -289,13 +289,13 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                     isActive = (Boolean) dataTag.getCurrentValue().getValue();
                 }
                 if (event == null && (isActive == null || isActive == Boolean.TRUE)) {                
-                    log.debug(dataTag.getId() + " - " + alarmId + " - ACTIVE -> TERM by backup.");
+                    LOG.debug(dataTag.getId() + " - " + alarmId + " - ACTIVE -> TERM by backup.");
                     long ts = messageData.getSourceTs();
-                    sender.sendTagFiltered(dataTag, Boolean.FALSE, ts, backupIndicator);
+                    sender.sendTagFiltered(dataTag, Boolean.FALSE, ts, BACKUP_PROP);
                     
                     mbean.setDataTag(dataTag.getId());
                     mbean.setValue(Boolean.FALSE);                
-                    log.trace(dataTag.getName() + " updated.");
+                    LOG.trace(dataTag.getName() + " updated.");
                 } 
             }
         }
@@ -317,20 +317,20 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
             String suffix = isBackup ? " by backup" : "";
 
             if (alarm.getDescriptor() == Descriptor.UNKNOWN_STATE) {
-                log.warn(getEquipmentConfiguration().getName() + " sent alarm " + alarm.getAlarmId()
+                LOG.warn(getEquipmentConfiguration().getName() + " sent alarm " + alarm.getAlarmId()
                         + " with unknown state");
                 return;
             }
 
             if (dataTag == null) {
-                log.warn(getEquipmentConfiguration().getName() + " sent unknown alarm " + alarm.getAlarmId());
+                LOG.warn(getEquipmentConfiguration().getName() + " sent unknown alarm " + alarm.getAlarmId());
             } else {
 
                 if (dataTag.getCurrentValue() != null) {
                     Boolean curval = (Boolean) dataTag.getCurrentValue().getValue();
                     if ((alarm.getDescriptor() == Descriptor.ACTIVE && curval.equals(Boolean.TRUE))
                             || (alarm.getDescriptor() == Descriptor.TERMINATE && curval.equals(Boolean.FALSE))) {
-                        log.warn(dataTag.getId() + " - " + alarm.getAlarmId() + " : alarm change ignored", suffix);
+                        LOG.debug(dataTag.getId() + " - " + alarm.getAlarmId() + " : alarm change ignored", suffix);
                         return;
                     }
                 }
@@ -349,19 +349,19 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                     }
 
                     if (isBackup) {
-                        valDescr.append(backupIndicator);
+                        valDescr.append(BACKUP_PROP);
                     }
 
                     newState = Boolean.TRUE;
-                    log.debug(dataTag.getId() + " - " + alarm.getAlarmId() + " - TERM -> ACTIVE {}.", suffix);
+                    LOG.debug(dataTag.getId() + " - " + alarm.getAlarmId() + " - TERM -> ACTIVE {}.", suffix);
                 }
 
                 if (alarm.getDescriptor().equals(Descriptor.TERMINATE)) {
-                    log.debug(dataTag.getId() + " - " + alarm.getAlarmId() + " - ACTIVE -> TERM {}.", suffix);
+                    LOG.debug(dataTag.getId() + " - " + alarm.getAlarmId() + " - ACTIVE -> TERM {}.", suffix);
                 }
 
                 if (!sender.sendTagFiltered(dataTag, newState, alarm.getUserTs(), valDescr.toString())) {
-                    log.warn("sendTagFiltered for {} returned false !?", alarm.getAlarmId());                                        
+                    LOG.warn("sendTagFiltered for {} returned false !?", alarm.getAlarmId());                                        
                 }
 
             }
