@@ -16,7 +16,7 @@ public interface EquipmentMonitorMBean {
     
     public boolean getValue();
     
-    public void setValue(boolean value);
+    public boolean setValue(boolean value);
     
     public int getAlarmsOn();
     

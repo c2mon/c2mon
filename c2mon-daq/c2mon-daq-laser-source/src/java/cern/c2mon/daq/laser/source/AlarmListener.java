@@ -1,5 +1,7 @@
 package cern.c2mon.daq.laser.source;
 
+import java.io.IOException;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.jms.JMSException;
@@ -12,64 +14,85 @@ import cern.diamon.alarms.client.AlarmConnectorFactory;
 import cern.diamon.alarms.client.AlarmConsumerInterface;
 import cern.diamon.alarms.client.AlarmMessageData;
 
+/**
+ * The listener connects to the JMS brokers (and topics) specified in AlarmsJms.properties
+ * in the root of the classpath. I fthe file can not be found, default values are used.
+ * 
+ * For all alarm messages received, a forward to the C2MON-DAQ equipment message handler 
+ * corresponding to the alarms source id done.
+ * 
+ * @author mbuttner
+ */
 public class AlarmListener implements AlarmConsumerInterface {
 
-    private static final Logger log = LoggerFactory.getLogger(AlarmListener.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AlarmListener.class);
+    private static AlarmListener listener;
 
     private AlarmConnector connector;
-
     boolean isStarted = false;
+    private final ConcurrentHashMap<String, LaserMessageHandler> handlers = new ConcurrentHashMap<>();
 
-    private final ConcurrentHashMap<String, LaserNativeMessageHandler> listHandler = new ConcurrentHashMap<>();
+    private String jmsUrl = "failover:(tcp://jms-laser-pro1:61670,tcp://jms-laser-pro2:61670)";
+    private String jmsRootTopic = "CERN.DIAMON.ALARM.INCOMING.OLD.";
 
-    public static AlarmListener INSTANCE;
-
+    
+    //
+    // --- CONSTRUCTION -----------------------------------------------------------------------------------
+    //
     private AlarmListener() {
-
+        Properties config = new Properties();
+        try {
+            config.load(this.getClass().getResourceAsStream("/AlarmsJms.properties"));
+            jmsUrl = config.getProperty("diamon.alarms.jms.brokers");
+            jmsRootTopic = config.getProperty("diamon.alarms.jms.root_topic");
+        } catch (IOException e) {
+            LOG.warn("Failed to load JMS configuration parameters, using defaults");
+        }
     }
 
     public synchronized static AlarmListener getAlarmListener() {
-        if (INSTANCE == null) {
-            INSTANCE = new AlarmListener();
+        if (listener == null) {
+            listener = new AlarmListener();
         }
-        return INSTANCE;
+        return listener;
     }
 
-    private synchronized LaserNativeMessageHandler getHandler(String sourceName) {
-        return listHandler.get(sourceName);
+    //
+    // --- PUBLIC METHODS ----------------------------------------------------------------------------------
+    //
+    
+    public synchronized void addHandler(LaserMessageHandler messageHandler) {
+        handlers.put(messageHandler.getEquipmentConfiguration().getName(), messageHandler);
     }
 
-    public synchronized void addHandler(LaserNativeMessageHandler messageHandler) {
-        listHandler.put(messageHandler.getEquipmentConfiguration().getName(), messageHandler);
-    }
+    public synchronized void removeHandler(LaserMessageHandler messageHandler) {
+        handlers.remove(messageHandler.getEquipmentConfiguration().getName());
 
-    public synchronized void removeHandler(LaserNativeMessageHandler messageHandler) {
-        listHandler.remove(messageHandler.getEquipmentConfiguration().getName());
-
-        if (listHandler.isEmpty()) {
+        if (handlers.isEmpty()) {
             disconnectFromLaser();
         }
         
     }
 
     public synchronized void connectToLaser() throws JMSException {
-        connector = AlarmConnectorFactory.getConnector("failover:(tcp://jms-laser-pro1:61670,tcp://jms-laser-pro2:61670)");
+        connector = AlarmConnectorFactory.getConnector(jmsUrl);
         connector.addListener(this);
-        connector.setTopicRoot("CERN.DIAMON.ALARM.INCOMING.OLD.");
+        connector.setTopicRoot(jmsRootTopic);
         connector.connect();
         isStarted = true;
     }
 
-    public void startListingToSource(String sourceName) throws JMSException {
+    
+    public void startListeningToSource(String sourceName) throws JMSException {
         if (!isStarted) {
             connectToLaser();
         }
-        log.info("Start listening to source {}", sourceName);
+        LOG.info("Start listening to source {}", sourceName);
         connector.addSource(sourceName);
     }
 
-    public void removeListingToSource(String sourceName) throws JMSException {
-        log.info("Remove listing from source {}", sourceName);
+    public void removeListeningToSource(String sourceName) throws JMSException {
+        LOG.info("Remove listing from source {}", sourceName);
         if (connector != null) {
             connector.removeSource(sourceName);
         }
@@ -82,33 +105,33 @@ public class AlarmListener implements AlarmConsumerInterface {
         isStarted = false;
     }
 
+    //
+    // --- Implements AlarmListener ----------------------------------------------------------------------
+    //
+    /*
+     * Forward the alarm message to the equipment handler corresponding to the alarm source.
+     */
     @Override
     public void onMessage(AlarmMessageData alarmMessage) {
-
-        LaserNativeMessageHandler result = getHandler(alarmMessage.getSourceId());
-        
+        LaserMessageHandler result = handlers.get(alarmMessage.getSourceId());
         if (result != null) {
             result.onMessage(alarmMessage);
-        }
-        
-
-        
+        }               
     }
 
-    
     @Override
     public void onException(JMSException e) {
-        log.warn("JMS exception due to communication problem: " + e.getMessage());
+        LOG.warn("JMS exception due to communication problem: " + e.getMessage());
     }
 
     @Override
     public void reset() {
-        log.info("The connection was reset: you should adapt your internal data accordingly");
+        LOG.info("The connection was reset: you should adapt your internal data accordingly");
     }
 
     @Override
     public String getName() {
-        return "MyTestConsumer";
+        return "LASER_DAQ";
     }
 
 

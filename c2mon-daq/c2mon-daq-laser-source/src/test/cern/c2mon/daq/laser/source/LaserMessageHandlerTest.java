@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNull;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
+import cern.c2mon.daq.laser.source.testutil.AlarmMessageTestData;
 import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.SourceDataTagValueCapture;
 import cern.c2mon.daq.test.UseConf;
@@ -20,19 +21,23 @@ import cern.c2mon.daq.test.UseHandler;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.diamon.alarms.source.AlarmMessageBuilder.MessageType;
 
-@UseHandler(LaserNativeMessageHandler.class)
-public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
+/**
+ * This serie of unit tests is based on the C2MON DAQ framework mock.
+ * 
+ * @author mbuttner
+ */
+@UseHandler(LaserMessageHandler.class)
+public class LaserMessageHandlerTest extends GenericMessageHandlerTst {
 
-    LaserNativeMessageHandler laserMessage;
+    LaserMessageHandler laserMessage;
     AlarmListener listener = AlarmListener.getAlarmListener();
 
-    public LaserNativeMessageHandlerTest() {
-        
-    }
-
+    //
+    // --- SETUP --------------------------------------------------------------------------
+    // 
     @Override
     protected void beforeTest() throws Exception {
-        laserMessage = (LaserNativeMessageHandler) msgHandler;
+        laserMessage = (LaserMessageHandler) msgHandler;
         laserMessage.setAlarmListener(listener);
     }
 
@@ -41,6 +46,9 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
         // NOTHING
     }
 
+    //
+    // --- TESTS ---------------------------------------------------------------------------
+    //
     @Test
     @UseConf("f_laser_test1.xml")
     public void testAlarmTurnsTrue() throws Exception {
@@ -148,5 +156,54 @@ public class LaserNativeMessageHandlerTest extends GenericMessageHandlerTst {
 
     }
 
+    @Test
+    @UseConf("f_laser_test1.xml")
+    public void testActivateByBackup() throws Exception {
+        messageSender.sendCommfaultTag(107211, true);
+
+        expectLastCall().once();      
+        SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
+
+        messageSender.addValue(EasyMock.capture(sdtv));
+        expectLastCall().times(3);
+
+        replay(messageSender);
+
+        laserMessage.connectToDataSource();
+        laserMessage.onMessage(AlarmMessageTestData.createBackupMessage(MessageType.BACKUP, "LHC", false));
+
+        Thread.sleep(3000);
+
+        verify(messageSender);
+        assertEquals(1, sdtv.getNumberOfCapturedValues(124149));
+        assertEquals(true, sdtv.getValueAt(0, 124149).getValue());
+    }
+
+    @Test
+    @UseConf("f_laser_test1.xml")
+    public void testTerminateByBackup() throws Exception {
+        messageSender.sendCommfaultTag(107211, true);
+        expectLastCall().once();
+        
+        SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
+
+        messageSender.addValue(EasyMock.capture(sdtv));
+        expectLastCall().times(4);
+
+        replay(messageSender);
+
+        laserMessage.connectToDataSource();
+        
+        ISourceDataTag dataTag = laserMessage.getEquipmentConfiguration().getSourceDataTag((long) 124149);
+        laserMessage.getEquipmentMessageSender().sendTagFiltered(dataTag, Boolean.TRUE, System.currentTimeMillis());
+
+        laserMessage.onMessage(AlarmMessageTestData.createBackupMessage(MessageType.BACKUP, "LHC", true));
+
+        Thread.sleep(3000);
+
+        verify(messageSender);
+        assertEquals(2, sdtv.getNumberOfCapturedValues(124149));
+        assertEquals(false, sdtv.getValueAt(1, 124149).getValue());
+    }
 
 }
