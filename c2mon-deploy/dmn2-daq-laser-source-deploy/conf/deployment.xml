@@ -20,7 +20,7 @@
 			<deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-laser-source-pro">
 				<directory name="conf">
 					<file name="c2mon.properties" source="~diamonop/c2mon/daq/daq.properties" mask="400" />					
-					<file name="log4j.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
+					<file name="log4j.xml" source="~diamonop/c2mon/daq/daq-laser-log4j.xml" mask="444" />
 					
 				</directory>
 				<notification>
