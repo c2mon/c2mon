@@ -25,7 +25,7 @@ import cern.diamon.alarms.source.AlarmMessageBuilder.MessageType;
  * @author mbuttner
  */
 @UseHandler(LaserNativeMessageHandler.class)
-public class LaserMessageHandlerTestBis extends GenericMessageHandlerTst {
+public class LaserHandlerTestBis extends GenericMessageHandlerTst {
     
     LaserNativeMessageHandler laserMessage;
     AlarmListener listener = AlarmListener.getAlarmListener();
