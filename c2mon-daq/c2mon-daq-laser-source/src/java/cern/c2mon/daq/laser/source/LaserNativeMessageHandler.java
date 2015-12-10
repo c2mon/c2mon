@@ -361,7 +361,7 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
                 }
 
                 if (!sender.sendTagFiltered(dataTag, newState, alarm.getUserTs(), valDescr.toString())) {
-                    LOG.warn("sendTagFiltered for {} returned false !?", alarm.getAlarmId());                                        
+                    LOG.debug("Update for {} was filtered !?", alarm.getAlarmId());                                        
                 }
 
             }
