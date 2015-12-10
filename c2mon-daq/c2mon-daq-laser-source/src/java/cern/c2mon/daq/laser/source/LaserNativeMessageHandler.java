@@ -328,8 +328,8 @@ public class LaserNativeMessageHandler extends EquipmentMessageHandler implement
 
                 if (dataTag.getCurrentValue() != null) {
                     Boolean curval = (Boolean) dataTag.getCurrentValue().getValue();
-                    if (alarm.getDescriptor() == Descriptor.ACTIVE && curval.equals(Boolean.TRUE)
-                            || alarm.getDescriptor() == Descriptor.TERMINATE && curval.equals(Boolean.FALSE)) {
+                    if ((alarm.getDescriptor() == Descriptor.ACTIVE && curval.equals(Boolean.TRUE))
+                            || (alarm.getDescriptor() == Descriptor.TERMINATE && curval.equals(Boolean.FALSE))) {
                         log.warn(dataTag.getId() + " - " + alarm.getAlarmId() + " : alarm change ignored", suffix);
                         return;
                     }
