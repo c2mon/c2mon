@@ -1,6 +1,5 @@
 package cern.c2mon.server.eslog.structure.types;
 
-import cern.c2mon.server.eslog.structure.mappings.TagBooleanMapping;
 import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -38,7 +37,7 @@ public class TagStringTest {
     public void testMapping() throws IOException {
         TagStringMapping mapping = new TagStringMapping("string");
         String expected = mapping.getMapping();
-        tagString.setMapping("boolean", mapping);
+        tagString.setMapping("string");
         assertEquals(expected, tagString.getMapping());
     }
 
@@ -46,7 +45,7 @@ public class TagStringTest {
     public void testBuild() throws IOException {
         tagString.setQuality("ok");
         String line = "\n  \"quality\": \"ok\"";
-        String text = "{\n  \"tagId\": 0,\n  \"tagTime\": 0,\n  \"tagServerTime\": 0,\n  \"tagDaqTime\": 0,\n  \"tagStatus\": 0," + line + "\n}";
+        String text = "{\n  \"metadataProcess\": {},\n  \"tagId\": 0,\n  \"tagTime\": 0,\n  \"tagServerTime\": 0,\n  \"tagDaqTime\": 0,\n  \"tagStatus\": 0," + line + "\n}";
         assertEquals(text, tagString.build());
     }
 }

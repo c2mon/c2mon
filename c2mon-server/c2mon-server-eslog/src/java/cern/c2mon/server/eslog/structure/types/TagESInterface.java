@@ -16,5 +16,5 @@ public interface TagESInterface {
     String toString();
     Object getTagValue();
     void setTagValue(Object tagValue);
-    void setMapping(String tagValueType, TagESMapping mapping);
+    void setMapping(String tagValueType);
 }

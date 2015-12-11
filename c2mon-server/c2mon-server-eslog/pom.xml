@@ -15,7 +15,6 @@
     <version>1.0.1-SNAPSHOT</version>
 
     <dependencies>
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -26,6 +25,21 @@
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
             <version>2.1.0</version>
+        </dependency>
+
+        <!-- ElasticSearch test dependencies -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-test-framework</artifactId>
+            <version>5.3.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>2.1.0</version>
+            <scope>test</scope>
+            <type>test-jar</type>
         </dependency>
 
         <!-- Spring deps -->
@@ -46,18 +60,6 @@
         <dependency>
             <groupId>cern.c2mon.c2mon-server</groupId>
             <artifactId>c2mon-server-all</artifactId>
-            <!--
-            <exclusions>
-                <exclusion>
-                    <artifactId>xml-apis</artifactId>
-                    <groupId>xml-apis</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jms</artifactId>
-                    <groupId>javax.jms</groupId>
-                </exclusion>
-            </exclusions>
-            -->
         </dependency>
 
         <!-- Test dependency -->
@@ -80,8 +82,5 @@
             <version>1.7.5</version>
             <scope>test</scope>
         </dependency>
-
-
     </dependencies>
-
 </project>

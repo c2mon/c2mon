@@ -1,10 +1,5 @@
 package cern.c2mon.server.eslog.structure.types;
 
-import cern.c2mon.server.eslog.structure.mappings.TagESMapping;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-
-import java.io.IOException;
-
 /**
  * Represents a Tag in ElasticSearch.
  * This type of TagES contains a numeric tagValue.
@@ -23,10 +18,5 @@ public class TagNumeric extends TagES implements TagESInterface {
         } else {
             throw new IllegalArgumentException("Must pass a numeric tagValue to TagNumeric in ElasticSearch");
         }
-    }
-
-    @Override
-    public void setMapping(String tagValueType, TagESMapping mapping) {
-        this.mapping = mapping;
     }
 }

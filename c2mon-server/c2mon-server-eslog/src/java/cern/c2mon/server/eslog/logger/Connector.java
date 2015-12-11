@@ -17,15 +17,9 @@ public interface Connector {
     void close(Client client);
     void indexTags(List<TagES> tags);
 
-    List<String> getIndices();
-    List<String> getAliases();
-    List<String> getTypes();
+    void updateLists();
 
-    Set<String> initializeIndexes();
-    Set<String> initializeTypes();
-    Set<String> initializeAliases();
-
-    List<String> handleQuery(Query query);
-    boolean handleIndexQuery(Query query, String indexName, Settings.Builder settings, String type, String mapping);
-    void handleAliasQuery(Query query, String indexMonth, String aliasName);
+    List<String> handleListingQuery(Query query);
+    boolean handleIndexQuery(Query query, String indexName, Settings settings, String type, String mapping);
+    boolean handleAliasQuery(Query query, String indexMonth, String aliasName);
 }

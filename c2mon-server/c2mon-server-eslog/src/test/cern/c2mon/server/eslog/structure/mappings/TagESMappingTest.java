@@ -16,6 +16,6 @@ public class TagESMappingTest {
     @Test
     public void testGetESMapping() {
         TagESMapping mapping = new TagESMapping();
-        assertNull(mapping.getMapping());
+        assertNotNull(mapping.getMapping());
     }
 }

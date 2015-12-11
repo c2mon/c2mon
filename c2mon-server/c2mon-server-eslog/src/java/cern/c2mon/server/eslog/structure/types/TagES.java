@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
@@ -29,7 +31,13 @@ public class TagES implements TagESInterface {
     private String quality; //tagstatusdesc
     protected Object tagValue;
     private String tagValueDesc;
-    protected TagESMapping mapping;
+    protected transient TagESMapping mapping;
+
+
+    public TagES() {
+        this.metadataProcess = new HashMap<>();
+        this.mapping = new TagESMapping();
+    }
 
     /**
      * Return a JSON representing the Tag for indexing in ElasticSearch.
@@ -42,8 +50,8 @@ public class TagES implements TagESInterface {
         return json;
     }
 
-    public void setMapping(String tagValueType, TagESMapping mapping) {
-        this.mapping = mapping;
+    public void setMapping(String tagValueType) {
+        //TODO: check type
         mapping.setProperties(tagValueType);
     }
 

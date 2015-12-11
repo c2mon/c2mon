@@ -42,7 +42,7 @@ public class TagNumericTest {
     public void testMapping() throws IOException {
         TagNumericMapping mapping = new TagNumericMapping("double");
         String expected = mapping.getMapping();
-        tagNumeric.setMapping("double", mapping);
+        tagNumeric.setMapping("double");
         assertEquals(expected, tagNumeric.getMapping());
     }
 
@@ -50,7 +50,7 @@ public class TagNumericTest {
     public void testBuild() throws IOException {
         tagNumeric.setDataType("numeric");
         String line = "\n  \"dataType\": \"numeric\",";
-        String text = "{\n  \"tagId\": 0," + line + "\n  \"tagTime\": 0,\n  \"tagServerTime\": 0,\n  \"tagDaqTime\": 0,\n  \"tagStatus\": 0\n}";
+        String text = "{\n  \"metadataProcess\": {},\n  \"tagId\": 0," + line + "\n  \"tagTime\": 0,\n  \"tagServerTime\": 0,\n  \"tagDaqTime\": 0,\n  \"tagStatus\": 0\n}";
         assertEquals(text, tagNumeric.build());
     }
 }

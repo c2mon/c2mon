@@ -5,19 +5,31 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 
+import java.util.List;
+
 /**
  * @author Alban Marguet.
  */
 public class QueryIndexBuilder extends Query {
+    public QueryIndexBuilder(Client client) {
+        super(client);
+    }
 
-    public QueryIndexBuilder(Client client, String[] indices, boolean isTypeDefined, String[] types, long[] tagIds, int from, int size, int min, int max) {
+    public QueryIndexBuilder(Client client, List<String> indices, boolean isTypeDefined, List<String> types, List<Long> tagIds, int from, int size, int min, int max) {
         super(client, indices, isTypeDefined, types, tagIds, from, size, min, max);
     }
 
-    public boolean indexNew(String indexName, Settings.Builder settings, String type, String mapping) {
-        CreateIndexRequestBuilder createIndexRequestBuilder = client.admin().indices().prepareCreate(indexName);
-        createIndexRequestBuilder.setSettings(settings);
-        createIndexRequestBuilder.addMapping(type, mapping);
+    public boolean indexNew(String index, Settings settings, String type, String mapping) {
+        CreateIndexRequestBuilder createIndexRequestBuilder = client.admin().indices().prepareCreate(index);
+
+        if (settings != null) {
+            createIndexRequestBuilder.setSettings(settings);
+        }
+
+        if (type != null && mapping != null && mapping.compareTo("") != 0) {
+            createIndexRequestBuilder.addMapping(type, mapping);
+        }
+
         CreateIndexResponse response = createIndexRequestBuilder.execute().actionGet();
         return response.isAcknowledged();
     }

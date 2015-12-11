@@ -26,12 +26,6 @@ public class DataUtils {
     private final String TAG_PREFIX = "tag_";
     private final String FIRST_INDEX = INDEX_PREFIX + "1970-01";
 
-    private String clusterName;
-    private String host;
-    private int port;
-    private String nodeName;
-    private Settings transportSettings;
-    private Client client;
     private String lastIndex;
     private Set<String> indices;
     private Set<String> aliases;
@@ -54,7 +48,7 @@ public class DataUtils {
     }
 
     public void addIndex(String indexName) {
-        if (indexName.matches("^" + INDEX_PREFIX + "\\d\\d\\d\\d-\\d\\d$")) {
+        if (checkIndex(indexName)) {
             indices.add(indexName);
         } else {
             throw new IllegalArgumentException("Indices must follow the format \"c2mon_YYYY_MM\".");
@@ -62,7 +56,7 @@ public class DataUtils {
     }
 
     public void addAlias(String aliasName) {
-        if (aliasName.matches("^" + TAG_PREFIX + "\\d+$")) {
+        if (checkAlias(aliasName)) {
             aliases.add(aliasName);
         } else {
             throw new IllegalArgumentException("Aliases must follow the format \"tag_tagId\".");
@@ -70,20 +64,24 @@ public class DataUtils {
     }
 
     public void addType(String typeName) {
-        if (typeName.matches("^" + TAG_PREFIX + "\\d+$")) {
+        if (checkType(typeName)) {
             types.add(typeName);
         } else {
             throw new IllegalArgumentException("Types must follow the format \"tag_dataType\".");
         }
     }
-
-    public void setTransportSettings(String clusterName, String nodeName) {
-        this.transportSettings = Settings.settingsBuilder().put("cluster.name", clusterName).put("node.name", nodeName).build();
+    public boolean checkIndex(String index) {
+        return index.matches("^" + INDEX_PREFIX + "\\d\\d\\d\\d-\\d\\d$");
     }
 
-    public Settings getTransportSettings() {
-        return transportSettings;
+    public boolean checkAlias(String alias) {
+        return alias.matches("^" + TAG_PREFIX + "\\d+$");
     }
+
+    public boolean checkType(String type) {
+        return type.matches("^" + TAG_PREFIX + ".+$");
+    }
+
 
     /**
      * Utility method.
@@ -112,9 +110,9 @@ public class DataUtils {
      * Settings for the index/Month: 10 shards and 0 replica.
      * @return Settings.Builder to attach to an IndexRequest.
      */
-    public Settings.Builder getMonthIndexSettings() {
+    public Settings getMonthIndexSettings() {
         return Settings.settingsBuilder().put("number_of_shards", IndexMonthSettings.SHARDS.getSetting())
-                .put("number_of_replicas", IndexMonthSettings.REPLICA.getSetting());
+                .put("number_of_replicas", IndexMonthSettings.REPLICA.getSetting()).build();
     }
 
     /**

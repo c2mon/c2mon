@@ -26,10 +26,6 @@ public class DataUtilsTest {
     String INDEX_PREFIX = "c2mon_";
     String TAG_PREFIX = "tag_";
     String FIRST_INDEX = INDEX_PREFIX + "1970-01";
-    String clusterName = "elasticsearch";
-    String host = "127.0.0.1";
-    int port = 9200;
-    String nodeName = "node-java";
     Set<String> types = new HashSet<>();
     Set<String> aliases = new HashSet<>();
     Set<String> indices = new HashSet<>();
@@ -65,16 +61,9 @@ public class DataUtilsTest {
         bulkSettings.put("flushInterval", BulkSettings.FLUSH_INTERVAL.getSetting());
         bulkSettings.put("concurrent", BulkSettings.CONCURRENT.getSetting());
 
-        when(connector.getIndices()).thenReturn(listIndices);
-        when(connector.getAliases()).thenReturn(listAliases);
-        when(connector.getTypes()).thenReturn(listTypes);
-    }
-
-    @Test
-    public void testSetTransportSettings() {
-        Settings expected = Settings.settingsBuilder().put("cluster.name", clusterName).put("node.name", nodeName).build();
-        dataUtils.setTransportSettings(clusterName, nodeName);
-        assertEquals(expected, dataUtils.getTransportSettings());
+//        when(connector.getIndices()).thenReturn(listIndices);
+//        when(connector.getAliases()).thenReturn(listAliases);
+//        when(connector.).thenReturn(listTypes);
     }
 
     @Test

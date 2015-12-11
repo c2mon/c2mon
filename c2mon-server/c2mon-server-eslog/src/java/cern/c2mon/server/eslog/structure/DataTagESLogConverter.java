@@ -26,7 +26,7 @@ import java.util.Map;
  * @author Alban Marguet.
  */
 @Slf4j
-//@Component
+@Component
 public class DataTagESLogConverter {
     private final ProcessCache processCache;
     private final EquipmentCache equipmentCache;
@@ -34,7 +34,7 @@ public class DataTagESLogConverter {
     private TagES tagES;
     private Gson gson;
 
-    //@Autowired
+    @Autowired
     public DataTagESLogConverter(final ProcessCache processCache, final EquipmentCache equipmentCache, final SubEquipmentCache subEquipmentCache, TagES tagES) {
         this.processCache = processCache;
         this.equipmentCache = equipmentCache;

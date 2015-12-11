@@ -9,6 +9,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.index.query.QueryBuilders;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,24 +20,28 @@ import java.util.List;
 @Slf4j
 public class QueryIndices extends Query {
 
-    public QueryIndices(Client client, String[] indices, boolean isTypeDefined, String[] types, long[] tagIds, int from, int size, int min, int max) {
+    public QueryIndices(Client client) {
+        super(client);
+    }
+
+    public QueryIndices(Client client, List<String> indices, boolean isTypeDefined, List<String> types, List<Long> tagIds, int from, int size, int min, int max) {
         super(client, indices, isTypeDefined, types, tagIds, from, size, min, max);
     }
     /**
      * Query to get all the entries where the tagId is present.
      * @return SearchResponse
      */
-    protected SearchResponse getResponse() {
-        SearchRequestBuilder requestBuilder = client.prepareSearch(indices());
-
-        return requestBuilder
-                .setSearchType(SearchType.DEFAULT)
-                .setFrom(0)
-                .setSize(1)
-                .setQuery(QueryBuilders.boolQuery()
-                        .filter(QueryBuilders.termsQuery("tagId", tagIds())))
-                .setRouting(getRouting(tagIds()))
-                .execute().actionGet();
+    public SearchResponse getResponse() {
+        SearchRequestBuilder requestBuilder = client.prepareSearch();
+                requestBuilder.setSearchType(SearchType.DEFAULT)
+                .setIndices(indices())
+                .setFrom(from())
+                .setSize(size());
+                if (tagIds() != null) {
+                    requestBuilder.setQuery(QueryBuilders.boolQuery()
+                            .filter(QueryBuilders.termsQuery("tagId", tagIds())));
+                }
+                return requestBuilder.execute().actionGet();
     }
 
     /**
@@ -44,19 +49,26 @@ public class QueryIndices extends Query {
      * @return List<String>: names of the indices.
      */
     public List<String> getListOfAnswer() {
-        String[] indices = client.admin().indices().prepareGetIndex().get().indices();
-        return Arrays.asList(indices);
+        if (client != null) {
+            String[] indices = client.admin().indices().prepareGetIndex().get().indices();
+            return Arrays.asList(indices);
+        } else {
+            log.warn("getListOFAnswer() - Warning: client has value " + client + ".");
+        }
+        return new ArrayList<>();
     }
 
-    public void initTest() {
+    public boolean initTest() {
         try {
             List<String> indices = getListOfAnswer();
             log.info("indices present in the cluster:");
             for (String s : indices) {
                 log.info(s);
             }
+            return true;
         } catch(NoNodeAvailableException e) {
             log.error("initTest() - Error while creating client, could not find a connection to the ElasticSearch cluster, is it running?");
+            return false;
         }
     }
 }

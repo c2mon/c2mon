@@ -8,19 +8,30 @@ package cern.c2mon.server.eslog.structure.mappings;
 public interface Mapping {
     String stringType = "string";
     String longType = "long";
-    String intType = "int";
+    String intType = "integer";
     String doubleType = "double";
     String boolType = "boolean";
     String dateType = "date";
     String indexNotAnalyzed = "not_analyzed";
-
-    String routing = "required";
+    String routing = "true";
 
     /**
      * Lowercase everything in the output.
      */
     String getMapping();
     void setProperties(String tagValueType);
+
+    class Routing {
+        String required;
+
+        Routing() {
+            this.required = routing;
+        }
+
+        public String getRequired() {
+            return required;
+        }
+    }
 
     class Properties {
         TagId tagId;

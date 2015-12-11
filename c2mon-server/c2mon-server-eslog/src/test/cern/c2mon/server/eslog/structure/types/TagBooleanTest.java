@@ -41,7 +41,7 @@ public class TagBooleanTest {
     public void testMapping() throws IOException {
         TagBooleanMapping mapping = new TagBooleanMapping("boolean");
         String expected = mapping.getMapping();
-        tagBoolean.setMapping("boolean", mapping);
+        tagBoolean.setMapping("boolean");
         assertEquals(expected, tagBoolean.getMapping());
     }
 
@@ -49,7 +49,7 @@ public class TagBooleanTest {
     public void testBuild() throws IOException {
         tagBoolean.setDataType("boolean");
         String line = "\n  \"dataType\": \"boolean\",";
-        String text = "{\n  \"tagId\": 0," + line + "\n  \"tagTime\": 0,\n  \"tagServerTime\": 0,\n  \"tagDaqTime\": 0,\n  \"tagStatus\": 0\n}";
+        String text = "{\n  \"metadataProcess\": {},\n  \"tagId\": 0," + line + "\n  \"tagTime\": 0,\n  \"tagServerTime\": 0,\n  \"tagDaqTime\": 0,\n  \"tagStatus\": 0\n}";
         assertEquals(text, tagBoolean.build());
     }
 }
