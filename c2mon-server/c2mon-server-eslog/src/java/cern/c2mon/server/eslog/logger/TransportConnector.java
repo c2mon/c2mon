@@ -158,6 +158,7 @@ public class TransportConnector implements Connector {
         if (isLocal) {
             this.settings = Settings.settingsBuilder().put("node.local", true).put("node.name", node).put("cluster.name", cluster).build();
             setPort(LOCAL_PORT);
+            log.info("port: " + port);
             Client builder = TransportClient.builder().settings(settings).build()
                     .addTransportAddress(new LocalTransportAddress(String.valueOf(port)));
             log.info("Created local client on host " + host + " and port " + port + " with name " + node + ", in cluster " + cluster + ".");

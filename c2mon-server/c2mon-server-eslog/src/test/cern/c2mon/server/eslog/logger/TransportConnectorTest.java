@@ -79,7 +79,7 @@ public class TransportConnectorTest {
         connector.setNode(nodeName);
 
         connector.init();
-        //clean(connector.getClient(), connector.getIndices());
+        clean(connector.getClient(), connector.getIndices());
     }
 
     @After
@@ -92,6 +92,7 @@ public class TransportConnectorTest {
         connector.close(connector.getClient());
         clusterClient.close();
         clusterNode.close();
+        sleep();
     }
 
     @Test
@@ -489,6 +490,14 @@ public class TransportConnectorTest {
                 client.admin().indices().delete(new DeleteIndexRequest(index)).actionGet();
             }
             client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
+        }
+    }
+
+    private void sleep() {
+        try {
+            Thread.sleep(1000L);
+        } catch(InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
