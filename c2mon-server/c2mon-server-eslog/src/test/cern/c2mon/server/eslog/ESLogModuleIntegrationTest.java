@@ -1,13 +1,13 @@
 package cern.c2mon.server.eslog;
 
+import cern.c2mon.server.eslog.logger.TransportConnector;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -27,6 +27,8 @@ public class ESLogModuleIntegrationTest {
 	private static String nodeName;
 	private static Node clusterNode;
 	private static Client clusterClient;
+	@Autowired
+	private TransportConnector connector;
 
 	@BeforeClass
 	public static void initCluster() {
@@ -40,7 +42,7 @@ public class ESLogModuleIntegrationTest {
 				.settings(Settings.settingsBuilder()
 						.put("path.home", home)
 						.put("cluster.name", clusterName)
-						.put("node.local", false)
+						.put("node.local", true)
 						.put("node.name", "ClusterNode")
 						.put("node.data", true)
 						.put("node.master", true)
@@ -57,9 +59,20 @@ public class ESLogModuleIntegrationTest {
 	}
 
 	@AfterClass
-	public static void tidyUp() {
+	public static void tidyUpCluster() {
 		clusterClient.close();
 		clusterNode.close();
+	}
+
+	@Before
+	public void initClient() {
+		connector.setLocal(true);
+		connector.init();
+	}
+
+	@After
+	public void tidyUpClient() {
+		connector.close(connector.getClient());
 	}
 
 	@Test

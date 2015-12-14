@@ -69,6 +69,7 @@ public class TransportConnector implements Connector {
 	private String node;
 
 	private boolean isLocal;
+
 	private Settings settings;
 
 	private BulkProcessor bulkProcessor;
@@ -77,10 +78,10 @@ public class TransportConnector implements Connector {
 	public TransportConnector() {
 		this.bulkProcessorName = DEFAULT_BULK_PROCESSOR_NAME;
 		this.bulkSettings = new HashMap<>();
-		this.isLocal = false;
 		this.indices = new HashSet<>();
 		this.types = new HashSet<>();
 		this.aliases = new HashSet<>();
+		this.isLocal = true;
 	}
 
 
@@ -158,7 +159,7 @@ public class TransportConnector implements Connector {
 	public Client createClient() {
 		if (isLocal) {
 			this.settings = Settings.settingsBuilder()
-					.put("node.local", true)
+					.put("node.local", isLocal)
 					.put("node.name", node)
 					.put("cluster.name", cluster).build();
 
