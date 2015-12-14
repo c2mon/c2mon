@@ -12,7 +12,7 @@
 	<groupId>cern.dmn2.dmn2-daq</groupId>
 	<artifactId>dmn2-daq-spectrum-deploy</artifactId>
 	<name>DMN2 SPECTRUM DAQ deployment module</name>
-	<version>1.1.10-SNAPSHOT</version>
+	<version>1.1.10</version>
 
 	<description>DMN2 SPECTRUM DAQ assembling required modules and configuration files</description>
 
