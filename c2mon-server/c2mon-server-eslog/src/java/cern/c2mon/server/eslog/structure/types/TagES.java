@@ -1,17 +1,14 @@
 package cern.c2mon.server.eslog.structure.types;
 
-import cern.c2mon.server.eslog.structure.mappings.TagESMapping;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import cern.c2mon.server.eslog.structure.mappings.TagESMapping;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Class that represents a Tag for ElasticSearch.
@@ -19,6 +16,7 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
  * @author Alban Marguet.
  */
 @Slf4j
+@Data
 public class TagES implements TagESInterface {
     private Map<String, String> metadataProcess;
     private long tagId;
@@ -96,93 +94,5 @@ public class TagES implements TagESInterface {
             str.append('\t');
         }
         return str.toString();
-    }
-
-    public Map<String, String> getMetadataProcess() {
-        return metadataProcess;
-    }
-
-    public long getTagId() {
-        return tagId;
-    }
-
-    public String getTagName() {
-        return tagName;
-    }
-
-    public String getDataType() {
-        return dataType;
-    }
-
-    public long getTagTime() {
-        return tagTime;
-    }
-
-    public long getTagServerTime() {
-        return tagServerTime;
-    }
-
-    public long getTagDaqTime() {
-        return tagDaqTime;
-    }
-
-    public int getTagStatus() {
-        return tagStatus;
-    }
-
-    public String getTagValueDesc() {
-        return tagValueDesc;
-    }
-
-    public void setMetadataProcess(Map<String, String> metadataProcess) {
-        this.metadataProcess = metadataProcess;
-    }
-
-    public void setTagId(long tagId) {
-        this.tagId = tagId;
-    }
-
-    public void setTagName(String tagName) {
-        this.tagName = tagName;
-    }
-
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
-    }
-
-    public void setTagTime(long tagTime) {
-        this.tagTime = tagTime;
-    }
-
-    public void setTagServerTime(long tagServerTime) {
-        this.tagServerTime = tagServerTime;
-    }
-
-    public void setTagDaqTime(long tagDaqTime) {
-        this.tagDaqTime = tagDaqTime;
-    }
-
-    public void setTagStatus(int tagStatus) {
-        this.tagStatus = tagStatus;
-    }
-
-    public void setQuality(String quality) {
-        this.quality = quality;
-    }
-
-    public void setTagValue(Object tagValue) {
-        this.tagValue = tagValue;
-    }
-
-    public void setTagValueDesc(String tagValueDesc) {
-        this.tagValueDesc = tagValueDesc;
-    }
-
-    public String getQuality() {
-        return quality;
-    }
-
-    public Object getTagValue() {
-        return tagValue;
     }
 }

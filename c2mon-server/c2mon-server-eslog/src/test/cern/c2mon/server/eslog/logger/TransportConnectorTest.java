@@ -1,26 +1,41 @@
 package cern.c2mon.server.eslog.logger;
 
-import cern.c2mon.server.eslog.structure.mappings.Mapping;
-import cern.c2mon.server.eslog.structure.queries.*;
-import cern.c2mon.server.eslog.structure.types.TagES;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.tools.ant.util.FileUtils;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertNull;
+import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.io.FileUtils;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
-import org.junit.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
-import static junit.framework.TestCase.*;
-import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import cern.c2mon.server.eslog.structure.mappings.Mapping;
+import cern.c2mon.server.eslog.structure.queries.Query;
+import cern.c2mon.server.eslog.structure.queries.QueryAliases;
+import cern.c2mon.server.eslog.structure.queries.QueryIndexBuilder;
+import cern.c2mon.server.eslog.structure.queries.QueryIndices;
+import cern.c2mon.server.eslog.structure.queries.QueryTypes;
+import cern.c2mon.server.eslog.structure.types.TagES;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Test the entire functionality of the node.
@@ -68,8 +83,8 @@ public class TransportConnectorTest {
     public void clientSetup() throws IOException {
         log.info("@Before");
         log.info("begin delete directory");
-        FileUtils.delete(new File(home + "/data"));
-        log.info("end delete directory");
+        FileUtils.cleanDirectory(new File(home + "/data"));
+        log.info("end. Cleaned ./data directory");
 
         connector = new TransportConnector();
         connector.setLocal(true);
