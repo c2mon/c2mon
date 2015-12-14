@@ -53,6 +53,12 @@
       <artifactId>c2mon-server-shorttermlog</artifactId>
       <version>[1.5.0, 2.0.0)</version>
     </dependency>
+    
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-eslog</artifactId>
+      <version>[1.0.1-SNAPSHOT, 2.0.0)</version>
+    </dependency>
 
     <!-- for distributed cache only -->
     <dependency>

@@ -17,6 +17,10 @@
   <import resource="classpath:cern/c2mon/server/client/config/server-client.xml"/>
   <import resource="classpath:cern/c2mon/server/laser/config/server-laser.xml"/>
   <import resource="classpath:cern/c2mon/server/video/config/server-video.xml"/>
+  
+  <!-- Elastic Search  persistence module
+   <import resource="classpath:cern/c2mon/server/eslog/config/server-eslog.xml"/>
+   -->
 
   <!--
     Triggers JMX export through RMI on a random port with default access
