@@ -2,192 +2,187 @@ package cern.c2mon.server.eslog.structure.mappings;
 
 /**
  * Defines the ElasticSearch arguments for the types and the indices.
- * Permits to have dynamic mappings according to what we want to insert.
+ * Permits to have dynamic mappings according to what we want to insert. (dataType)
  * @author Alban Marguet.
  */
 public interface Mapping {
-    String stringType = "string";
-    String longType = "long";
-    String intType = "integer";
-    String doubleType = "double";
-    String boolType = "boolean";
-    String dateType = "date";
-    String indexNotAnalyzed = "not_analyzed";
-    String routing = "true";
+	String stringType = "string";
+	String longType = "long";
+	String intType = "integer";
+	String doubleType = "double";
+	String boolType = "boolean";
+	String dateType = "date";
+	String indexNotAnalyzed = "not_analyzed";
+	String routing = "true";
 
-    /**
-     * Lowercase everything in the output.
-     */
-    String getMapping();
-    void setProperties(String tagValueType);
+	String getMapping();
+	void setProperties(String tagValueType);
 
-    class Routing {
-        String required;
+	class Routing {
+		String required;
+		Routing() {
+			this.required = routing;
+		}
+		public String getRequired() {
+			return required;
+		}
+	}
 
-        Routing() {
-            this.required = routing;
-        }
+	class Properties {
+		TagId tagId;
+		TagName tagName;
+		DataType dataType;
+		TagTime tagTime;
+		TagServerTime tagServerTime;
+		TagDaqTime tagDaqTime;
+		TagStatus tagStatus;
+		Quality quality;
+		TagValueDesc tagValueDesc;
+		TagValue tagValue;
+		ProcessName processName;
+		EquipmentName equipmentName;
+		SubEquipmentName subEquipmentName;
 
-        public String getRequired() {
-            return required;
-        }
-    }
+		Properties(String tagValueType) {
+			this.tagId = new TagId(longType);
+			this.tagName = new TagName(stringType, indexNotAnalyzed);
+			this.dataType = new DataType(stringType, indexNotAnalyzed);
+			this.tagTime = new TagTime(dateType);
+			this.tagServerTime = new TagServerTime(dateType);
+			this.tagDaqTime = new TagDaqTime(dateType);
+			this.tagStatus = new TagStatus(intType);
+			this.quality = new Quality(stringType, indexNotAnalyzed);
+			this.tagValueDesc = new TagValueDesc(stringType, indexNotAnalyzed);
+			this.tagValue = new TagValue(tagValueType);
+			this.processName = new ProcessName(stringType, indexNotAnalyzed);
+			this.equipmentName = new EquipmentName(stringType, indexNotAnalyzed);
+			this.subEquipmentName = new SubEquipmentName(stringType, indexNotAnalyzed);
+		}
 
-    class Properties {
-        TagId tagId;
-        TagName tagName;
-        DataType dataType;
-        TagTime tagTime;
-        TagServerTime tagServerTime;
-        TagDaqTime tagDaqTime;
-        TagStatus tagStatus;
-        Quality quality;
-        TagValueDesc tagValueDesc;
-        TagValue tagValue;
-        ProcessName processName;
-        EquipmentName equipmentName;
-        SubEquipmentName subEquipmentName;
+		public String getValueType() {
+			return tagValue.getType();
+		}
+	}
 
-        Properties(String tagValueType) {
-            this.tagId = new TagId(longType);
-            this.tagName = new TagName(stringType, indexNotAnalyzed);
-            this.dataType = new DataType(stringType, indexNotAnalyzed);
-            this.tagTime = new TagTime(dateType);
-            this.tagServerTime = new TagServerTime(dateType);
-            this.tagDaqTime = new TagDaqTime(dateType);
-            this.tagStatus = new TagStatus(intType);
-            this.quality = new Quality(stringType, indexNotAnalyzed);
-            this.tagValueDesc = new TagValueDesc(stringType, indexNotAnalyzed);
-            this.tagValue = new TagValue(tagValueType);
-            this.processName = new ProcessName(stringType, indexNotAnalyzed);
-            this.equipmentName = new EquipmentName(stringType, indexNotAnalyzed);
-            this.subEquipmentName = new SubEquipmentName(stringType, indexNotAnalyzed);
-        }
+	class TagId {
+		String type;
 
-        public String getValueType() {
-            return tagValue.getType();
-        }
-    }
+		public TagId(String type) {
+			this.type = type;
+		}
+	}
 
-    class TagId {
-        String type;
+	class TagName {
+		String type;
+		String index;
 
-        public TagId(String type) {
-            this.type = type;
-        }
-    }
+		public TagName(String type, String indexing) {
+			this.type = type;
+			this.index = indexing;
+		}
+	}
 
-    class TagName {
-        String type;
-        String index;
+	class DataType {
+		private String type;
+		private String index;
 
-        public TagName(String type, String indexing) {
-            this.type = type;
-            this.index = indexing;
-        }
-    }
+		public DataType(String type, String indexing) {
+			this.type = type;
+			this.index = indexing;
+		}
+	}
 
-    class DataType {
-        private String type;
-        private String index;
+	class TagTime {
+		private String type;
 
-        public DataType(String type, String indexing) {
-            this.type = type;
-            this.index = indexing;
-        }
-    }
+		public TagTime(String type) {
+			this.type = type;
+		}
+	}
 
-    class TagTime {
-        private String type;
+	class TagServerTime {
+		private String type;
 
-        public TagTime(String type) {
-            this.type = type;
-        }
-    }
+		public TagServerTime(String type) {
+			this.type = type;
+		}
+	}
 
-    class TagServerTime {
-        private String type;
+	class TagDaqTime {
+		private String type;
 
-        public TagServerTime(String type) {
-            this.type = type;
-        }
-    }
+		public TagDaqTime(String type) {
+			this.type = type;
+		}
+	}
 
-    class TagDaqTime {
-        private String type;
+	class TagStatus {
+		private String type;
 
-        public TagDaqTime(String type) {
-            this.type = type;
-        }
-    }
+		public TagStatus(String type) {
+			this.type = type;
+		}
+	}
 
-    class TagStatus {
-        private String type;
+	class Quality {
+		private String type;
+		private String index;
 
-        public TagStatus(String type) {
-            this.type = type;
-        }
-    }
+		public Quality(String type, String indexing) {
+			this.type = type;
+			this.index = indexing;
+		}
+	}
 
-    class Quality {
-        private String type;
-        private String index;
+	class TagValueDesc {
+		private String type;
+		private String index;
 
-        public Quality(String type, String indexing) {
-            this.type = type;
-            this.index = indexing;
-        }
-    }
+		public TagValueDesc(String type, String indexing) {
+			this.type = type;
+			this.index = indexing;
+		}
+	}
 
-    class TagValueDesc {
-        private String type;
-        private String index;
+	class TagValue {
+		private String type;
 
-        public TagValueDesc(String type, String indexing) {
-            this.type = type;
-            this.index = indexing;
-        }
-    }
+		public TagValue(String type) {
+			this.type = type;
+		}
 
-    class TagValue {
-        private String type;
+		public String getType() {
+			return type;
+		}
+	}
 
-        public TagValue(String type) {
-            this.type = type;
-        }
+	class ProcessName {
+		private String type;
+		private String index;
 
-        public String getType() {
-            return type;
-        }
-    }
+		public ProcessName(String type, String indexing) {
+			this.type = type;
+			this.index = indexing;
+		}
+	}
 
-    class ProcessName {
-        private String type;
-        private String index;
+	class EquipmentName {
+		private String type;
+		private String index;
 
-        public ProcessName(String type, String indexing) {
-            this.type = type;
-            this.index = indexing;
-        }
-    }
+		public EquipmentName(String type, String indexing) {
+			this.type = type;
+			this.index = indexing;
+		}
+	}
 
-    class EquipmentName {
-        private String type;
-        private String index;
+	class SubEquipmentName {
+		private String type;
+		private String index;
 
-        public EquipmentName(String type, String indexing) {
-            this.type = type;
-            this.index = indexing;
-        }
-    }
-
-    class SubEquipmentName {
-        private String type;
-        private String index;
-
-        public SubEquipmentName(String type, String indexing) {
-            this.type = type;
-            this.index = indexing;
-        }
-    }
+		public SubEquipmentName(String type, String indexing) {
+			this.type = type;
+			this.index = indexing;
+		}
+	}
 }

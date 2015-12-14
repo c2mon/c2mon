@@ -6,16 +6,16 @@ package cern.c2mon.server.eslog.structure.types;
  * @author Alban Marguet.
  */
 public class TagString extends TagES implements TagESInterface {
-    public String getMapping() {
-        return mapping.getMapping();
+  /**
+   * Set the tagValue as a String for this TagES.
+   * @param tagValue Object supposed to be a String.
+   */
+  @Override
+  public void setTagValue(Object tagValue) {
+    if (tagValue instanceof String) {
+      this.tagValue = tagValue;
+    } else {
+      throw new IllegalArgumentException("Must give a String object to TagString in ElasticSearch");
     }
-
-    @Override
-    public void setTagValue(Object tagValue) {
-        if (tagValue instanceof String) {
-            this.tagValue = tagValue;
-        } else {
-            throw new IllegalArgumentException("Must give a String object to TagString in ElasticSearch");
-        }
-    }
+  }
 }
