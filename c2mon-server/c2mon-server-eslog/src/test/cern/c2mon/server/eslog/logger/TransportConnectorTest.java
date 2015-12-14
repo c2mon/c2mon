@@ -10,9 +10,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,27 +28,22 @@ import static org.junit.Assert.assertTrue;
  */
 @Slf4j
 public class TransportConnectorTest {
-    String clusterName;
-    String nodeName;
-    String host;
-    String home;
-
-    Node clusterNode;
-    Client clusterClient;
+    static String clusterName;
+    static String nodeName;
+    static String host;
+    static String home;
+    static Node clusterNode;
+    static Client clusterClient;
 
     TransportConnector connector;
 
-    @Before
-    public void setup() throws IOException {
-        // CLUSTER SETUP
-        log.info("@Before");
+    @BeforeClass
+    public static void initCluster() {
+        log.info("@BeforeClass");
         clusterName = "elasticsearch";
         home = "../config/elasticsearch";
         host = "localhost";
         nodeName = "transportNode";
-        log.info("begin delete directory");
-        FileUtils.delete(new File(home + "/data"));
-        log.info("end delete directory");
 
         clusterNode = nodeBuilder()
                 .settings(Settings.settingsBuilder()
@@ -63,14 +56,21 @@ public class TransportConnectorTest {
                         .put("http.enabled", false)
                         .put("transport.host", "localhost")
                         .put("transport.tcp.port", 9300)
-                .build())
+                        .build())
                 .node();
         clusterNode.start();
         clusterClient = clusterNode.client();
         log.info("Node created with home " + home + " in cluster " + clusterName + ".");
         clusterClient.admin().cluster().prepareHealth().setWaitForGreenStatus().execute().actionGet();
+    }
 
-        // CLIENT SETUP
+    @Before
+    public void clientSetup() throws IOException {
+        log.info("@Before");
+        log.info("begin delete directory");
+        FileUtils.delete(new File(home + "/data"));
+        log.info("end delete directory");
+
         connector = new TransportConnector();
         connector.setLocal(true);
         connector.setCluster(clusterName);
@@ -79,7 +79,7 @@ public class TransportConnectorTest {
         connector.setNode(nodeName);
 
         connector.init();
-        clean(connector.getClient(), connector.getIndices());
+        //clean(connector.getClient(), connector.getIndices());
     }
 
     @After
@@ -90,9 +90,14 @@ public class TransportConnectorTest {
         connector.setIndices(new HashSet<String>());
         connector.setTypes(new HashSet<String>());
         connector.close(connector.getClient());
+        sleep();
+    }
+
+    @AfterClass
+    public static void cleanCluster() {
+        log.info("@AfterClass");
         clusterClient.close();
         clusterNode.close();
-        sleep();
     }
 
     @Test
@@ -122,16 +127,18 @@ public class TransportConnectorTest {
 
     @Test
     public void testCreateClient() {
-        connector.createClient();
+        Client client = connector.createClient();
         assertNotNull(connector.getClient());
         assertEquals(1, connector.getPort());
         assertEquals("true", connector.getSettings().get("node.local"));
+        client.close();
 
         connector.setLocal(false);
-        connector.createClient();
+        client = connector.createClient();
         assertNotNull(connector.getClient());
         assertEquals(9300, connector.getPort());
         assertEquals("localhost", connector.getHost());
+        client.close();
     }
 
     @Test

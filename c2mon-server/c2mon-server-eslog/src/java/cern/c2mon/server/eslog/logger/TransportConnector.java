@@ -165,7 +165,7 @@ public class TransportConnector implements Connector {
             return builder;
         } else {
             this.settings = Settings.settingsBuilder().put("cluster.name", cluster).put("node.name", node).build();
-            setPort(9300);
+            setPort(9300); // TODO: use port
             try {
                 Client builder = TransportClient.builder().settings(settings).build()
                         .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), port));
@@ -483,6 +483,7 @@ public class TransportConnector implements Connector {
     public void close(Client client) {
         if (client != null) {
             client.close();
+            log.info("Closed client: " + client.settings().get("node.name"));
         }
     }
 
