@@ -17,5 +17,5 @@ CMDLINE="\
 "
 
 pwd
-java ${PARAMS} -cp "../../c2mon-daq-spectrum/build/classes:lib/*:." cern.c2mon.daq.common.startup.DaqStartup ${CMDLINE}
+java ${PARAMS} -cp ".:lib/*:." cern.c2mon.daq.common.startup.DaqStartup ${CMDLINE}
 
