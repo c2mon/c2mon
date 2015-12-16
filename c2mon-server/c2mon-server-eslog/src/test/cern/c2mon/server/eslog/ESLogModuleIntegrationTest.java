@@ -15,28 +15,30 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 /**
  * Integration test with the core modules.
+ * 
  * @author Alban Marguet.
  */
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/eslog/config/server-eslog-integration.xml"})
+@ContextConfiguration({ "classpath:cern/c2mon/server/eslog/config/server-eslog-integration.xml" })
+@Ignore
 public class ESLogModuleIntegrationTest {
-	private static String clusterName;
-	private static String home;
-	private static String host;
-	private static String nodeName;
-	private static Node clusterNode;
-	private static Client clusterClient;
-	@Autowired
-	private TransportConnector connector;
+  private static String clusterName;
+  private static String home;
+  private static String host;
+  private static String nodeName;
+  private static Node clusterNode;
+  private static Client clusterClient;
+  @Autowired
+  private TransportConnector connector;
 
-	@BeforeClass
-	public static void initCluster() {
-		log.info("@BeforeClass");
-		clusterName = "elasticsearch";
-		home = "../../resources/elasticsearch";
-		host = "localhost";
-		nodeName = "transportNode";
+  @BeforeClass
+  public static void initCluster() {
+    log.info("@BeforeClass");
+    clusterName = "elasticsearch";
+    home = "../../resources/elasticsearch";
+    host = "localhost";
+    nodeName = "transportNode";
 
 		clusterNode = nodeBuilder()
 				.settings(Settings.settingsBuilder()
@@ -52,35 +54,35 @@ public class ESLogModuleIntegrationTest {
 						.build())
 				.node();
 
-		clusterNode.start();
-		clusterClient = clusterNode.client();
-		log.info("Node created with home " + home + " in cluster " + clusterName + ".");
-		clusterClient.admin().cluster().prepareHealth().setWaitForGreenStatus().execute().actionGet();
-	}
+    clusterNode.start();
+    clusterClient = clusterNode.client();
+    log.info("Node created with home " + home + " in cluster " + clusterName + ".");
+    clusterClient.admin().cluster().prepareHealth().setWaitForGreenStatus().execute().actionGet();
+  }
 
-	@AfterClass
-	public static void tidyUpCluster() {
-		clusterClient.close();
-		clusterNode.close();
-	}
+  @AfterClass
+  public static void tidyUpCluster() {
+    clusterClient.close();
+    clusterNode.close();
+  }
 
-	@Before
-	public void initClient() {
-		connector.setLocal(true);
-		connector.init();
-	}
+  @Before
+  public void initClient() {
+    connector.setLocal(true);
+    connector.init();
+  }
 
-	@After
-	public void tidyUpClient() {
-		connector.close(connector.getClient());
-	}
+  @After
+  public void tidyUpClient() {
+    connector.close(connector.getClient());
+  }
 
-	@Test
-	public void testModuleStartup() {
-		String[] indices = clusterClient.admin().indices().prepareGetIndex().get().indices();
-		log.info("indices in the cluster:");
-		for (String index : indices) {
-			log.info(index);
-		}
-	}
+  @Test
+  public void testModuleStartup() {
+    String[] indices = clusterClient.admin().indices().prepareGetIndex().get().indices();
+    log.info("indices in the cluster:");
+    for (String index : indices) {
+      log.info(index);
+    }
+  }
 }
