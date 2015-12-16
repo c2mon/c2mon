@@ -10,15 +10,15 @@
   <context:component-scan base-package="cern.c2mon.daq.common,cern.c2mon.daq.filter" />
 
   <!-- load daqProperties so that they can be used in the XML -->
-  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+  <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
     <property name="ignoreUnresolvablePlaceholders" value="true" />
   </bean>
-  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+  <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
     <property name="ignoreResourceNotFound" value="true" />
     <property name="ignoreUnresolvablePlaceholders" value="true" />
     <property name="properties" ref="daqProperties" />
   </bean>
-  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+  <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
     <property name="properties">
       <props>
         <prop key="jms.daq.user.2">user-default</prop>
