@@ -47,114 +47,114 @@ import java.util.Collection;
 @Slf4j
 public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, SmartLifecycle {
 
-	/**
-	 * Reference to registration service.
-	 */
-	private final CacheRegistrationService cacheRegistrationService;
+  /**
+   * Reference to registration service.
+   */
+  private final CacheRegistrationService cacheRegistrationService;
 
-	private final DataTagESLogConverter dataTagESLogConverter;
+  private final DataTagESLogConverter dataTagESLogConverter;
 
-	private ArrayList<TagES> tagESCollection;
+  private ArrayList<TagES> tagESCollection;
 
-	private Connector connector;
+  private Connector connector;
 
-	/**
-	 * Listener container lifecycle hook.
-	 */
-	private Lifecycle listenerContainer;
+  /**
+   * Listener container lifecycle hook.
+   */
+  private Lifecycle listenerContainer;
 
-	/**
-	 * Lifecycle flag.
-	 */
-	private volatile boolean running = false;
+  /**
+   * Lifecycle flag.
+   */
+  private volatile boolean running = false;
 
-	/**
-	 * Autowired constructor.
-	 *
-	 * @param cacheRegistrationService for registering cache listeners
-	 */
-	@Autowired
-	public TagESLogCacheListener(final CacheRegistrationService cacheRegistrationService, final DataTagESLogConverter dataTagESLogConverter, final TransportConnector connector) {
-		super();
-		this.cacheRegistrationService = cacheRegistrationService;
-		this.dataTagESLogConverter = dataTagESLogConverter;
-		this.tagESCollection = new ArrayList<>();
-		this.connector = connector;
-	}
+  /**
+   * Autowired constructor.
+   *
+   * @param cacheRegistrationService for registering cache listeners
+   */
+  @Autowired
+  public TagESLogCacheListener(final CacheRegistrationService cacheRegistrationService, final DataTagESLogConverter dataTagESLogConverter, final TransportConnector connector) {
+    super();
+    this.cacheRegistrationService = cacheRegistrationService;
+    this.dataTagESLogConverter = dataTagESLogConverter;
+    this.tagESCollection = new ArrayList<>();
+    this.connector = connector;
+  }
 
-	/**
-	 * Registers to be notified of all Tag updates (data, rule and control tags).
-	 */
-	@PostConstruct
-	public void init() {
-		listenerContainer = cacheRegistrationService.registerBufferedListenerToTags(this);
-	}
+  /**
+   * Registers to be notified of all Tag updates (data, rule and control tags).
+   */
+  @PostConstruct
+  public void init() {
+    listenerContainer = cacheRegistrationService.registerBufferedListenerToTags(this);
+  }
 
-	@Override
-	public void confirmStatus(Collection<Tag> tagCollection) {
-		//do not log confirm callbacks (STL data not essential)
-	}
+  @Override
+  public void confirmStatus(Collection<Tag> tagCollection) {
+    //do not log confirm callbacks (STL data not essential)
+  }
 
-	/**
-	 * When receiving a cache update, get the metadata for tags and send them to the ElasticSearch node.
-	 * @param tagCollection batch of tags to be logged to ElasticSearch
-	 */
-	@Override
-	public void notifyElementUpdated(Collection<Tag> tagCollection) {
-		log.debug("Received a tagCollection of " + tagCollection.size() + " elements.");
+  /**
+   * When receiving a cache update, get the metadata for tags and send them to the ElasticSearch node.
+   * @param tagCollection batch of tags to be logged to ElasticSearch
+   */
+  @Override
+  public void notifyElementUpdated(Collection<Tag> tagCollection) {
+    log.debug("Received a tagCollection of " + tagCollection.size() + " elements.");
 
-		ArrayList<Tag> tagsToLog = new ArrayList<>(tagCollection.size());
-		for (Tag tag : tagCollection) {
-			if (tag.isLogged()) {
-				tagsToLog.add(tag);
-			}
-		}
+    ArrayList<Tag> tagsToLog = new ArrayList<>(tagCollection.size());
+    for (Tag tag : tagCollection) {
+      if (tag.isLogged()) {
+        tagsToLog.add(tag);
+      }
+    }
 
-		for (Tag tag: tagsToLog) {
-			TagES tagES = dataTagESLogConverter.convertToTagES(tag);
-			tagESCollection.add(tagES);
-		}
-		log.debug("Created a TagESCollection of " + tagESCollection.size() + " elements.");
+    for (Tag tag: tagsToLog) {
+      TagES tagES = dataTagESLogConverter.convertToTagES(tag);
+      tagESCollection.add(tagES);
+    }
+    log.debug("Created a TagESCollection of " + tagESCollection.size() + " elements.");
 
-		connector.indexTags(tagESCollection);
-	}
+    connector.indexTags(tagESCollection);
+  }
 
-	public ArrayList<TagES> getTagESCollection() {
-		return tagESCollection;
-	}
+  public ArrayList<TagES> getTagESCollection() {
+    return tagESCollection;
+  }
 
-	@Override
-	public boolean isAutoStartup() {
-		return false;
-	}
+  @Override
+  public boolean isAutoStartup() {
+    return false;
+  }
 
-	@Override
-	public void stop(Runnable runnable) {
-		stop();
-		runnable.run();
-	}
+  @Override
+  public void stop(Runnable runnable) {
+    stop();
+    runnable.run();
+  }
 
-	@Override
-	public boolean isRunning() {
-		return running;
-	}
+  @Override
+  public boolean isRunning() {
+    return running;
+  }
 
-	@Override
-	public void start() {
-		log.debug("Starting Tag logger (elastic-search-log)");
-		running = true;
-		listenerContainer.start();
-	}
+  @Override
+  public void start() {
+    log.debug("Starting Tag logger (elastic-search-log)");
+    running = true;
+    listenerContainer.start();
+  }
 
-	@Override
-	public void stop() {
-		log.debug("Stopping Tag logger (elastic-search-log)");
-		listenerContainer.stop();
-		running = false;
-	}
+  @Override
+  public void stop() {
+    log.debug("Stopping Tag logger (elastic-search-log)");
+    listenerContainer.stop();
+    running = false;
+  }
 
-	@Override
-	public int getPhase() {
-		return ServerConstants.PHASE_STOP_LAST - 1;
-	}
+  @Override
+  public int getPhase() {
+    return ServerConstants.PHASE_STOP_LAST - 1;
+  }
 }

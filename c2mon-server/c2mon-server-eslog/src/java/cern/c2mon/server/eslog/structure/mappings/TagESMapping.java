@@ -10,23 +10,23 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class TagESMapping implements Mapping {
-	Routing _routing;
-	Properties properties;
+  Routing _routing;
+  Properties properties;
 
-	public TagESMapping() {
-		_routing = new Routing();
-	}
+  public TagESMapping() {
+    _routing = new Routing();
+  }
 
-	@Override
-	public String getMapping() {
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		String json = gson.toJson(this);
-		log.info(json);
-		return json;
-	}
+  @Override
+  public String getMapping() {
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    String json = gson.toJson(this);
+    log.info(json);
+    return json;
+  }
 
-	@Override
-	public void setProperties(String tagValueType) {
-		properties = new Properties(tagValueType);
-	}
+  @Override
+  public void setProperties(String tagValueType) {
+    properties = new Properties(tagValueType);
+  }
 }

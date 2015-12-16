@@ -6,16 +6,16 @@ package cern.c2mon.server.eslog.logger;
  * @author Alban Marguet.
  */
 public enum IndexMonthSettings {
-	SHARDS (10),
-	REPLICA (0);
+  SHARDS (10),
+  REPLICA (0);
 
-	private final int setting;
+  private final int setting;
 
-	IndexMonthSettings(int setting) {
-		this.setting = setting;
-	}
+  IndexMonthSettings(int setting) {
+    this.setting = setting;
+  }
 
-	public int getSetting() {
-		return setting;
-	}
+  public int getSetting() {
+    return setting;
+  }
 }

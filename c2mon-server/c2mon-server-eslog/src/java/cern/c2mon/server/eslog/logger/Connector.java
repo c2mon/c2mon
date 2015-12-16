@@ -13,15 +13,15 @@ import java.util.Set;
  * @author Alban Marguet.
  */
 public interface Connector {
-	Client createClient();
-	void close(Client client);
-	void indexTags(List<TagES> tags);
+  Client createClient();
+  void close(Client client);
+  void indexTags(List<TagES> tags);
 
-	void updateLists();
+  void updateLists();
 
-	List<String> handleListingQuery(Query query);
-	boolean handleIndexQuery(Query query, String indexName, Settings settings, String type, String mapping);
-	boolean handleAliasQuery(Query query, String indexMonth, String aliasName);
-	boolean bulkAdd(String index, String type, String json, TagES tag);
-	boolean bulkAddAlias(String indexMonth, TagES tag);
+  List<String> handleListingQuery(Query query);
+  boolean handleIndexQuery(Query query, String indexName, Settings settings, String type, String mapping);
+  boolean handleAliasQuery(Query query, String indexMonth, String aliasName);
+  boolean bulkAdd(String index, String type, String json, TagES tag);
+  boolean bulkAddAlias(String indexMonth, TagES tag);
 }

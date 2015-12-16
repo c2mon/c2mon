@@ -47,19 +47,19 @@ public class TransportConnectorTest {
     host = "localhost";
     nodeName = "transportNode";
 
-		clusterNode = nodeBuilder()
-				.settings(Settings.settingsBuilder()
-						.put("path.home", home)
-						.put("cluster.name", clusterName)
-						.put("node.local", true)
-						.put("node.name", "ClusterNode")
-						.put("node.data", true)
-						.put("node.master", true)
-						.put("http.enabled", false)
-						.put("transport.host", "localhost")
-						.put("transport.tcp.port", 9300)
-						.build())
-				.node();
+    clusterNode = nodeBuilder()
+        .settings(Settings.settingsBuilder()
+            .put("path.home", home)
+            .put("cluster.name", clusterName)
+            .put("node.local", true)
+            .put("node.name", "ClusterNode")
+            .put("node.data", true)
+            .put("node.master", true)
+            .put("http.enabled", false)
+            .put("transport.host", "localhost")
+            .put("transport.tcp.port", 9300)
+            .build())
+        .node();
 
     clusterNode.start();
     clusterClient = clusterNode.client();
@@ -89,7 +89,7 @@ public class TransportConnectorTest {
     connector.setHost(host);
     connector.setNode(nodeName);
     connector.init();
-		connector.setPort(9300); //Because of the setLocal(true); to be in default mode.
+    connector.setPort(9300); //Because of the setLocal(true); to be in default mode.
     // clean(connector.getClient(), connector.getIndices());
   }
 
@@ -138,7 +138,6 @@ public class TransportConnectorTest {
   @Test
   public void testCreateClient() {
     Client client = connector.createClient();
-    // setLocal(true) in @Before
     assertNotNull(connector.getClient());
     assertEquals(1, connector.getPort());
     assertEquals("true", connector.getSettings().get("node.local"));

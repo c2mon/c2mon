@@ -15,26 +15,26 @@ import java.util.List;
  */
 @Slf4j
 public class QueryTypes extends Query {
-	public QueryTypes(Client client) {
-		super(client);
-	}
+  public QueryTypes(Client client) {
+    super(client);
+  }
 
-	public QueryTypes(Client client, List<String> indices, boolean isTypeDefined, List<String> types, List<Long> tagIds, int from, int size, int min, int max) {
-		super(client, indices, isTypeDefined, types, tagIds, from, size, min, max);
-	}
+  public QueryTypes(Client client, List<String> indices, boolean isTypeDefined, List<String> types, List<Long> tagIds, int from, int size, int min, int max) {
+    super(client, indices, isTypeDefined, types, tagIds, from, size, min, max);
+  }
 
-	public List<String> getListOfAnswer() {
-		List<String> result = new ArrayList<>();
-		Iterator<ObjectCursor<IndexMetaData>> indicesIt = client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().indices().values().iterator();
+  public List<String> getListOfAnswer() {
+    List<String> result = new ArrayList<>();
+    Iterator<ObjectCursor<IndexMetaData>> indicesIt = client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().indices().values().iterator();
 
-		while(indicesIt.hasNext()) {
-			Iterator<ObjectCursor<MappingMetaData>> mappings = indicesIt.next().value.getMappings().values().iterator();
+    while(indicesIt.hasNext()) {
+      Iterator<ObjectCursor<MappingMetaData>> mappings = indicesIt.next().value.getMappings().values().iterator();
 
-			while(mappings.hasNext()) {
-				result.add(mappings.next().value.type());
-			}
-		}
+      while(mappings.hasNext()) {
+        result.add(mappings.next().value.type());
+      }
+    }
 
-		return result;
-	}
+    return result;
+  }
 }

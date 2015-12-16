@@ -20,61 +20,61 @@ import java.util.List;
 @Slf4j
 public class QueryIndices extends Query {
 
-	public QueryIndices(Client client) {
-		super(client);
-	}
+  public QueryIndices(Client client) {
+    super(client);
+  }
 
-	public QueryIndices(Client client, List<String> indices, boolean isTypeDefined, List<String> types, List<Long> tagIds, int from, int size, int min, int max) {
-		super(client, indices, isTypeDefined, types, tagIds, from, size, min, max);
-	}
-	/**
-	 * Query to get all the entries where the tagId is present.
-	 * @return SearchResponse
-	 */
-	public SearchResponse getResponse() {
-		SearchRequestBuilder requestBuilder = client.prepareSearch();
-		requestBuilder.setSearchType(SearchType.DEFAULT)
-				.setIndices(indices())
-				.setFrom(from())
-				.setSize(size());
+  public QueryIndices(Client client, List<String> indices, boolean isTypeDefined, List<String> types, List<Long> tagIds, int from, int size, int min, int max) {
+    super(client, indices, isTypeDefined, types, tagIds, from, size, min, max);
+  }
+  /**
+   * Query to get all the entries where the tagId is present.
+   * @return SearchResponse
+   */
+  public SearchResponse getResponse() {
+    SearchRequestBuilder requestBuilder = client.prepareSearch();
+    requestBuilder.setSearchType(SearchType.DEFAULT)
+        .setIndices(indices())
+        .setFrom(from())
+        .setSize(size());
 
-		if (tagIds() != null) {
-			requestBuilder.setQuery(QueryBuilders.boolQuery()
-					.filter(QueryBuilders.termsQuery("tagId", tagIds())));
-		}
+    if (tagIds() != null) {
+      requestBuilder.setQuery(QueryBuilders.boolQuery()
+          .filter(QueryBuilders.termsQuery("tagId", tagIds())));
+    }
 
-		return requestBuilder.execute().actionGet();
-	}
+    return requestBuilder.execute().actionGet();
+  }
 
-	/**
-	 * Simple query to get all the indices in the cluster.
-	 * @return List<String>: names of the indices.
-	 */
-	public List<String> getListOfAnswer() {
-		if (client != null) {
-			String[] indices = client.admin().indices().prepareGetIndex().get().indices();
-			return Arrays.asList(indices);
+  /**
+   * Simple query to get all the indices in the cluster.
+   * @return List<String>: names of the indices.
+   */
+  public List<String> getListOfAnswer() {
+    if (client != null) {
+      String[] indices = client.admin().indices().prepareGetIndex().get().indices();
+      return Arrays.asList(indices);
 
-		} else {
-			log.warn("getListOFAnswer() - Warning: client has value " + client + ".");
-		}
+    } else {
+      log.warn("getListOFAnswer() - Warning: client has value " + client + ".");
+    }
 
-		return new ArrayList<>();
-	}
+    return new ArrayList<>();
+  }
 
-	public boolean initTest() {
-		try {
-			List<String> indices = getListOfAnswer();
-			log.info("Indices present in the cluster:");
-			for (String s : indices) {
-				log.info(s);
-			}
+  public boolean initTest() {
+    try {
+      List<String> indices = getListOfAnswer();
+      log.info("Indices present in the cluster:");
+      for (String s : indices) {
+        log.info(s);
+      }
 
-			return true;
+      return true;
 
-		} catch(NoNodeAvailableException e) {
-			log.error("initTest() - Error while creating client, could not find a connection to the ElasticSearch cluster, is it running?");
-			return false;
-		}
-	}
+    } catch(NoNodeAvailableException e) {
+      log.error("initTest() - Error while creating client, could not find a connection to the ElasticSearch cluster, is it running?");
+      return false;
+    }
+  }
 }

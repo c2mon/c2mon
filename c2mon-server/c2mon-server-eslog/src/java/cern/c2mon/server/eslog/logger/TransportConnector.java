@@ -159,13 +159,13 @@ public class TransportConnector implements Connector {
       public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
         log.warn("Error executing bulk", failure);
       }
-				})
-				.setName(bulkProcessorName)
-				.setBulkActions(bulkSettings.get("bulkActions"))
-				.setBulkSize(new ByteSizeValue(bulkSettings.get("bulkSize"), ByteSizeUnit.GB))
-				.setFlushInterval(TimeValue.timeValueSeconds(bulkSettings.get("flushInterval")))
-				.setConcurrentRequests(bulkSettings.get("concurrent"))
-				.build();
+        })
+        .setName(bulkProcessorName)
+        .setBulkActions(bulkSettings.get("bulkActions"))
+        .setBulkSize(new ByteSizeValue(bulkSettings.get("bulkSize"), ByteSizeUnit.GB))
+        .setFlushInterval(TimeValue.timeValueSeconds(bulkSettings.get("flushInterval")))
+        .setConcurrentRequests(bulkSettings.get("concurrent"))
+        .build();
 
     log.debug("BulkProcessor created.");
   }

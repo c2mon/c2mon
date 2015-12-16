@@ -12,9 +12,9 @@ import static org.junit.Assert.assertThat;
  */
 @Slf4j
 public class IndexMonthSettingsTest {
-	@Test
-	public void should() {
-		assertThat(IndexMonthSettings.REPLICA.getSetting(), is(0));
-		assertThat(IndexMonthSettings.SHARDS.getSetting(), is(10));
-	}
+  @Test
+  public void should() {
+    assertThat(IndexMonthSettings.REPLICA.getSetting(), is(0));
+    assertThat(IndexMonthSettings.SHARDS.getSetting(), is(10));
+  }
 }
