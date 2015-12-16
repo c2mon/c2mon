@@ -88,8 +88,9 @@ public class TransportConnectorTest {
     connector.setCluster(clusterName);
     connector.setHost(host);
     connector.setNode(nodeName);
+    connector.setPort(9350);
     connector.init();
-    connector.setPort(9300); //Because of the setLocal(true); to be in default mode.
+     //Because of the setLocal(true); to be in default mode.
     // clean(connector.getClient(), connector.getIndices());
   }
 
