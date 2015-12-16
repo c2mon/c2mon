@@ -73,10 +73,10 @@ public class TransportConnector implements Connector {
   @Value("${es.host:localhost}")
   private String host;
 
-  @Value("${es.cluster:elasticsearch}")
+  @Value("${es.cluster:c2mon}")
   private String cluster;
 
-  @Value("${es.node:TransportNode-javaClient}")
+  @Value("${es.node:c2mon-transport-node}")
   private String node;
 
   @Value("${es.local:true}")
@@ -102,8 +102,11 @@ public class TransportConnector implements Connector {
   @PostConstruct
   public void init() {
     
+    log.info("init() - Connecting to elasticsearch cluster " + cluster + " on host=" + host + ", port=" + port);
+    
     if (!host.equalsIgnoreCase("localhost")) {
       this.isLocal = false;
+      log.debug("init() - Connecting to local elasticsearch instance (inside same JVM) is disabled");
     }
     
     this.client = createClient();
