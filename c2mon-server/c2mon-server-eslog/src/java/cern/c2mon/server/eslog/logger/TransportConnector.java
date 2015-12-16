@@ -92,8 +92,13 @@ public class TransportConnector implements Connector {
 	 ****************************************************************************/
 
 
+	/**
+	 * Instantiate the Client to communicate with the ElasticSearch cluster.
+	 * If it is well instantiated, retrieve the indices and and create a bulkProcessor for batch writes.
+	 */
 	@PostConstruct
 	public void init() {
+
 		this.client = createClient();
 
 		if (initTestPass()) {
@@ -121,6 +126,9 @@ public class TransportConnector implements Connector {
 		}
 	}
 
+	/**
+	 * Instantiate a BulkProcessor for batch writes. Settings are in the Enum BulkSettings.
+	 */
 	public void initBulkSettings() {
 		bulkSettings.put("bulkActions", BulkSettings.BULK_ACTIONS.getSetting());
 		bulkSettings.put("bulkSize", BulkSettings.BULK_SIZE.getSetting());
@@ -164,6 +172,7 @@ public class TransportConnector implements Connector {
 					.put("cluster.name", cluster).build();
 
 			setPort(LOCAL_PORT);
+
 			log.debug("port: " + port);
 
 			Client builder = TransportClient.builder().settings(settings).build()
@@ -454,6 +463,10 @@ public class TransportConnector implements Connector {
 		return handleIndexQuery(new QueryIndexBuilder(client, Arrays.asList(index), true, Arrays.asList(type), null, -1, -1, -1, -1), index, getMonthIndexSettings(), type, mapping);
 	}
 
+	/**
+	 * Query the ElasticSearch cluster to retrieve all the indices, types and aliases present already at startup.
+	 * Store them in memory in the Sets: indices, types and aliases.
+	 */
 	public void updateLists() {
 		indices.addAll(handleListingQuery(new QueryIndices(client)));
 		types.addAll(handleListingQuery(new QueryTypes(client)));
@@ -526,6 +539,10 @@ public class TransportConnector implements Connector {
 		}
 	}
 
+	/**
+	 * Add an index to the Set indices. Called by the writing of a new Index if it was successful.
+	 * @param indexName name of the index created in ElasticSearch.
+	 */
 	public void addIndex(String indexName) {
 		if (checkIndex(indexName)) {
 			indices.add(indexName);
@@ -534,6 +551,10 @@ public class TransportConnector implements Connector {
 		}
 	}
 
+	/**
+	 * Add an index to the Set indices. Called by the writing of a new Index if it was successful.
+	 * @param aliasName
+	 */
 	public void addAlias(String aliasName) {
 		if (checkAlias(aliasName)) {
 			aliases.add(aliasName);
