@@ -7,10 +7,10 @@
 
   <!-- keep this file synchronized with the test properties file in the server test module (all properties should appear in both) -->
 
-  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+  <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
     <property name="ignoreUnresolvablePlaceholders" value="true" />
   </bean>
-  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+  <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
     <property name="ignoreResourceNotFound" value="true" />
     <property name="locations">
       <list>
