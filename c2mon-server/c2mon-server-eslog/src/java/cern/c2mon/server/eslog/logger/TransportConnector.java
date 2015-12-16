@@ -52,9 +52,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Data
 public class TransportConnector implements Connector {
-
+  /** Prefix used for every index in the ElasticSearch cluster, e.g., c2mon_2015-11 is a valid index. */
   private final String INDEX_PREFIX = "c2mon_";
+  /** Every tag or alias must begin with the same prefix, e.g., tag_string is a good type and tag_207807 is a good alias. */
   private final String TAG_PREFIX = "tag_";
+  /** The first index in the cluster is c2mon_1970-01 which corresponds to the Epoch time (ES stocks timestamps in milliseconds since Epoch). */
   private final String FIRST_INDEX = INDEX_PREFIX + "1970-01";
 
   /** Only used, if elasticsearch is started inside this JVM */
@@ -64,35 +66,46 @@ public class TransportConnector implements Connector {
   private final Set<String> indices = new HashSet<>();
   private final Set<String> types = new HashSet<>();
   private final Set<String> aliases = new HashSet<>();
-  
+
+  /** The Client communicates with the Node inside the ElasticSearch cluster.*/
   private Client client;
 
-  @Value("${es.port:9300}")
+  /** Port to which to connect when using a client that is not local. By default 9350 which should be free. */
+  @Value("${es.port:9350}")
   private int port;
 
+  /** Name of the host holding the ElasticSearch cluster. */
   @Value("${es.host:localhost}")
   private String host;
 
+  /** Name of the cluster. Must be set in order to connect to the right one in case there are several clusters running at the host. */
   @Value("${es.cluster:c2mon}")
   private String cluster;
 
-  @Value("${es.node:c2mon-transport-node}")
+  /** Name of the node in the cluster (more useful for debugging and to know which one is connected to the cluster). */
+  @Value("${es.node:c2mon-indexing-transport-node}")
   private String node;
 
+  /** Setting this to true will make the connector connect to a cluster inside the JVM. To false to a real cluster. */
   @Value("${es.local:true}")
   private boolean isLocal;
 
+  /** Connection settings for the node according to the host, port, cluster, node and isLocal. */
   private Settings settings;
 
+  /** Allows to send the data by batch. */
   private BulkProcessor bulkProcessor;
 
+  /** Name of the BulkProcessor (more for debugging). */
   private final String bulkProcessorName = "ES-BulkProcessor";
-  
+
+
   /*****************************************************************************
    * 
    * INITIALIZATION
    * 
    ****************************************************************************/
+
 
   /**
    * Instantiate the Client to communicate with the ElasticSearch cluster. If it
@@ -102,17 +115,21 @@ public class TransportConnector implements Connector {
   @PostConstruct
   public void init() {
     
-    log.info("init() - Connecting to elasticsearch cluster " + cluster + " on host=" + host + ", port=" + port);
+    log.info("init() - Connecting to ElasticSearch cluster " + cluster + " on host=" + host + ", port=" + port + ".");
     
-    if (!host.equalsIgnoreCase("localhost")) {
-      this.isLocal = false;
-      log.debug("init() - Connecting to local elasticsearch instance (inside same JVM) is disabled");
+    if (!(port == 9350)) {
+      setLocal(false);
+      log.debug("init() - Connecting to local ElasticSearch instance (inside same JVM) is disabled.");
+    }
+    else if (host.equalsIgnoreCase("localhost")) {
+      //TODO: launch a local cluster.
+      log.debug("init() - Connecting to local ElasticSearch instance (inside same JVM) is enabled.");
     }
     
     this.client = createClient();
 
     if (initTestPass()) {
-      log.debug("init() - initial test passed: Transport client is connected to the cluster.");
+      log.debug("init() - initial test passed: Transport client is connected to the cluster " + cluster + ".");
       updateLists();
       initBulkSettings();
 
@@ -123,17 +140,20 @@ public class TransportConnector implements Connector {
       for (String index : indices) {
         log.debug(index);
       }
+
       log.info("Types in the cluster:");
       for (String type : types) {
         log.debug(type);
       }
+
       log.info("Aliases in the cluster:");
       for (String alias : aliases) {
         log.debug(alias);
       }
+
     }
     else {
-      log.error("Cluster is not initialized.");
+      log.error("init() - Cluster is not initialized: cluster:" + cluster + ", host: " + host + ", port: " + port + ".");
     }
   }
 
@@ -159,7 +179,7 @@ public class TransportConnector implements Connector {
       public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
         log.warn("Error executing bulk", failure);
       }
-        })
+    })
         .setName(bulkProcessorName)
         .setBulkActions(bulkSettings.get("bulkActions"))
         .setBulkSize(new ByteSizeValue(bulkSettings.get("bulkSize"), ByteSizeUnit.GB))
@@ -172,7 +192,6 @@ public class TransportConnector implements Connector {
 
   /**
    * Need a transportClient to communicate with the ElasticSearch cluster.
-   * 
    * @return Client to communicate with the ElasticSearch cluster.
    */
   public Client createClient() {
@@ -181,9 +200,8 @@ public class TransportConnector implements Connector {
 
       setPort(LOCAL_PORT);
 
-      log.debug("port: " + port);
-
-      Client builder = TransportClient.builder().settings(settings).build().addTransportAddress(new LocalTransportAddress(String.valueOf(port)));
+      Client builder = TransportClient.builder().settings(settings).build()
+          .addTransportAddress(new LocalTransportAddress(String.valueOf(port)));
 
       log.info("Created local client on host " + host + " and port " + port + " with name " + node + ", in cluster " + cluster + ".");
       return builder;
@@ -269,8 +287,8 @@ public class TransportConnector implements Connector {
 
       for (TagES tag : tags) {
         indexTag(tag);
-        aliases.put(generateAliasName(tag.getTagId()), tag); // 1 by 1 so to be
-                                                             // launched after.
+        // 1 by 1 = long running
+        aliases.put(generateAliasName(tag.getTagId()), tag);
       }
 
       // FLUSH
@@ -281,20 +299,19 @@ public class TransportConnector implements Connector {
         bulkAddAlias(generateIndex(aliases.get(alias).getTagServerTime()), aliases.get(alias));
       }
 
-      client.admin().indices().prepareRefresh().execute().actionGet(); // for
-                                                                       // quasi
-                                                                       // real
-                                                                       // time
-                                                                       // retrieval.
+      /** For quasi real time retrieval. */
+      client.admin().indices().prepareRefresh().execute().actionGet();
       client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
     }
   }
+
 
   /*****************************************************************************
    * 
    * UTILITY FOR INDEXING
    * 
    ****************************************************************************/
+
 
   /**
    * Handles a query for the ElasticSearch cluster. This method only handles the
@@ -579,9 +596,7 @@ public class TransportConnector implements Connector {
   }
 
   /**
-   * Add an index to the Set indices. Called by the writing of a new Index if it
-   * was successful.
-   * 
+   * Add an index to the Set indices. Called by the writing of a new Index if it was successful.
    * @param indexName name of the index created in ElasticSearch.
    */
   public void addIndex(String indexName) {
@@ -594,9 +609,7 @@ public class TransportConnector implements Connector {
   }
 
   /**
-   * Add an index to the Set indices. Called by the writing of a new Index if it
-   * was successful.
-   * 
+   * Add an alias to the Set aliases. Called by the writing of a new alias if it was successful.
    * @param aliasName
    */
   public void addAlias(String aliasName) {
@@ -608,6 +621,10 @@ public class TransportConnector implements Connector {
     }
   }
 
+  /**
+   * Add a type to the Set types. Called by the writing of a new Index if it was successful.
+   * @param typeName type defined for the new document.
+   */
   public void addType(String typeName) {
     if (checkType(typeName)) {
       types.add(typeName);
@@ -617,14 +634,29 @@ public class TransportConnector implements Connector {
     }
   }
 
+  /**
+   * Check if the index has the right format: c2mon_YYYY-MM.
+   * @param index the actual index name.
+   * @return true if it has the right format, false otherwise.
+   */
   public boolean checkIndex(String index) {
     return index.matches("^" + INDEX_PREFIX + "\\d\\d\\d\\d-\\d\\d$");
   }
 
+  /**
+   * Check if an alias has the right format: tag_tagId.
+   * @param alias the acutal alias name.
+   * @return true if it has the right format, false otherwise.
+   */
   public boolean checkAlias(String alias) {
     return alias.matches("^" + TAG_PREFIX + "\\d+$");
   }
 
+  /**
+   * Check if a type has the right format: tag_(string||long||int||double||boolean)
+   * @param type the type name.
+   * @return true if it has the right format, false otherwise.
+   */
   public boolean checkType(String type) {
     String dataType = type.substring(TAG_PREFIX.length());
     return type.matches("^" + TAG_PREFIX + ".+$") && (dataType.matches(Mapping.boolType) || dataType.matches(Mapping.doubleType)
