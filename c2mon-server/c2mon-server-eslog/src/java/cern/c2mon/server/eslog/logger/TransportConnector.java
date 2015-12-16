@@ -61,6 +61,8 @@ public class TransportConnector implements Connector {
 
   /** Only used, if elasticsearch is started inside this JVM */
   private final int LOCAL_PORT = 1;
+  /** Default port for elastic search transport node */
+  public final static int DEFAULT_ES_PORT = 9300;
 
   private final HashMap<String, Integer> bulkSettings = new HashMap<>();
   private final Set<String> indices = new HashSet<>();
@@ -70,8 +72,8 @@ public class TransportConnector implements Connector {
   /** The Client communicates with the Node inside the ElasticSearch cluster.*/
   private Client client;
 
-  /** Port to which to connect when using a client that is not local. By default 9350 which should be free. */
-  @Value("${es.port:9350}")
+  /** Port to which to connect when using a client that is not local. By default 9300 should be used. */
+  @Value("${es.port:9300}")
   private int port;
 
   /** Name of the host holding the ElasticSearch cluster. */
@@ -117,13 +119,14 @@ public class TransportConnector implements Connector {
     
     log.info("init() - Connecting to ElasticSearch cluster " + cluster + " on host=" + host + ", port=" + port + ".");
     
-    if (!(port == 9350)) {
-      setLocal(false);
-      log.debug("init() - Connecting to local ElasticSearch instance (inside same JVM) is disabled.");
-    }
-    else if (host.equalsIgnoreCase("localhost")) {
+    
+    if (System.getProperty("es.host") == null && host.equalsIgnoreCase("localhost") && port == DEFAULT_ES_PORT) {
       //TODO: launch a local cluster.
       log.debug("init() - Connecting to local ElasticSearch instance (inside same JVM) is enabled.");
+    }
+    else if (System.getProperty("es.host") != null || !(port == DEFAULT_ES_PORT)) {
+      setLocal(false);
+      log.debug("init() - Connecting to local ElasticSearch instance (inside same JVM) is disabled.");
     }
     
     this.client = createClient();

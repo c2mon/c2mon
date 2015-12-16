@@ -35,7 +35,7 @@ public class ESLogModuleIntegrationTest {
   @BeforeClass
   public static void initCluster() {
     log.info("@BeforeClass");
-    clusterName = "elasticsearch";
+    clusterName = "testCluster";
     home = "../../resources/elasticsearch";
     host = "localhost";
     nodeName = "transportNode";
@@ -50,7 +50,7 @@ public class ESLogModuleIntegrationTest {
             .put("node.master", true)
             .put("http.enabled", false)
             .put("transport.host", "localhost")
-            .put("transport.tcp.port", 9300)
+            .put("transport.tcp.port", 8300)
             .build())
         .node();
 
@@ -64,12 +64,6 @@ public class ESLogModuleIntegrationTest {
   public static void tidyUpCluster() {
     clusterClient.close();
     clusterNode.close();
-  }
-
-  @Before
-  public void initClient() {
-    connector.setLocal(true);
-    connector.init();
   }
 
   @After
