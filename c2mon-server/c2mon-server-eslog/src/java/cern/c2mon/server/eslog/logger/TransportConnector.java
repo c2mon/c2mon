@@ -291,7 +291,7 @@ public class TransportConnector implements Connector {
    * @param tag to index.
    * @return true, if tag indexing was successful
    */
-  private boolean indexTag(TagES tag) {
+  protected boolean indexTag(TagES tag) {
     String tagJson = tag.build();
     String indexMonth = generateIndex(tag.getTagServerTime());
     String type = generateType(tag.getDataType());
