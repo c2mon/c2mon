@@ -291,7 +291,7 @@ public class TransportConnector implements Connector {
    * @param tag to index.
    * @return true, if tag indexing was successful
    */
-  public boolean indexTag(TagES tag) {
+  private boolean indexTag(TagES tag) {
     String tagJson = tag.build();
     String indexMonth = generateIndex(tag.getTagServerTime());
     String type = generateType(tag.getDataType());
@@ -465,6 +465,7 @@ public class TransportConnector implements Connector {
    * @param json request for indexing.
    * @param tag TagES to be indexed.
    */
+  @Override
   public boolean bulkAdd(String index, String type, String json, TagES tag) {
 
     if (tag == null || index == null || type == null || !checkIndex(index) || !checkType(type)) {
@@ -488,8 +489,11 @@ public class TransportConnector implements Connector {
 
       if (bulkProcessor != null) {
         bulkProcessor.add(indexNewTag);
-        log.debug("bulkAdd() - BulkProcessor will handle indexing of new index: " + index + ".");
+        log.trace("bulkAdd() - BulkProcessor will handle indexing of new index: " + index + ".");
         return true;
+      }
+      else {
+        log.error("bulkProcessor is null. This should never happen!");
       }
 
       return false;
@@ -563,7 +567,7 @@ public class TransportConnector implements Connector {
       indices.addAll(handleListingQuery(new QueryIndices(client)));
       types.addAll(handleListingQuery(new QueryTypes(client)));
       aliases.addAll(handleListingQuery(new QueryAliases(client)));
-      log.debug("updateLists() - Updating list of indices, types and aliases.");
+      log.trace("updateLists() - Updating list of indices, types and aliases.");
     } else {
       log.warn("updateLists() - Warning: Client seems to be null.");
     }
@@ -752,21 +756,23 @@ public class TransportConnector implements Connector {
         .node();
   }
 
-  public void displayLists() {
-    log.debug("displayLists():");
-    log.debug("Indices in the cluster:");
-    for (String index : indices) {
-      log.debug(index);
-    }
-
-    log.debug("Types in the cluster:");
-    for (String type : types) {
-      log.debug(type);
-    }
-
-    log.debug("Aliases in the cluster:");
-    for (String alias : aliases) {
-      log.debug(alias);
+  private void displayLists() {
+    if (log.isTraceEnabled()) {
+      log.trace("displayLists():");
+      log.trace("Indices in the cluster:");
+      for (String index : indices) {
+        log.trace(index);
+      }
+  
+      log.trace("Types in the cluster:");
+      for (String type : types) {
+        log.trace(type);
+      }
+  
+      log.trace("Aliases in the cluster:");
+      for (String alias : aliases) {
+        log.trace(alias);
+      }
     }
   }
 
