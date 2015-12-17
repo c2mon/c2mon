@@ -119,13 +119,16 @@ public class TransportConnector implements Connector {
     
     log.info("init() - Connecting to ElasticSearch cluster " + cluster + " on host=" + host + ", port=" + port + ".");
     
-    
-    if (System.getProperty("es.host") == null && host.equalsIgnoreCase("localhost") && port == DEFAULT_ES_PORT) {
-      //TODO: launch a local cluster.
-      log.debug("init() - Connecting to local ElasticSearch instance (inside same JVM) is enabled.");
-    }
-    else if (System.getProperty("es.host") != null || !(port == DEFAULT_ES_PORT)) {
+    if (!host.equalsIgnoreCase("localhost")) {
       setLocal(false);
+    }
+    
+    if (isLocal) {
+      log.debug("init() - Connecting to local ElasticSearch instance (inside same JVM) is enabled.");
+      
+      //TODO: launch a local cluster.
+    }
+    else {
       log.debug("init() - Connecting to local ElasticSearch instance (inside same JVM) is disabled.");
     }
     
