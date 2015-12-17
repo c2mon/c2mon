@@ -18,6 +18,15 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.listener;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.SmartLifecycle;
+import org.springframework.stereotype.Service;
+
 import cern.c2mon.server.cache.BufferedTimCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.component.Lifecycle;
@@ -28,13 +37,6 @@ import cern.c2mon.server.eslog.logger.TransportConnector;
 import cern.c2mon.server.eslog.structure.DataTagESLogConverter;
 import cern.c2mon.server.eslog.structure.types.TagES;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.SmartLifecycle;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Listens to updates in the Rule and DataTag caches and calls the DAO
@@ -54,9 +56,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
 
   private final DataTagESLogConverter dataTagESLogConverter;
 
-  private ArrayList<TagES> tagESCollection;
-
-  private Connector connector;
+  private final Connector connector;
 
   /**
    * Listener container lifecycle hook.
@@ -78,7 +78,6 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
     super();
     this.cacheRegistrationService = cacheRegistrationService;
     this.dataTagESLogConverter = dataTagESLogConverter;
-    this.tagESCollection = new ArrayList<>();
     this.connector = connector;
   }
 
@@ -101,9 +100,10 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
    */
   @Override
   public void notifyElementUpdated(Collection<Tag> tagCollection) {
-    log.debug("Received a tagCollection of " + tagCollection.size() + " elements.");
+    log.trace("notifyElementUpdated() - Received a tagCollection of " + tagCollection.size() + " elements.");
 
-    ArrayList<Tag> tagsToLog = new ArrayList<>(tagCollection.size());
+    Collection<TagES> tagESCollection = new ArrayList<>();
+    Collection<Tag> tagsToLog = new ArrayList<>(tagCollection.size());
     for (Tag tag : tagCollection) {
       if (tag.isLogged()) {
         tagsToLog.add(tag);
@@ -113,18 +113,23 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
     try {
       for (Tag tag: tagsToLog) {
         TagES tagES = dataTagESLogConverter.convertToTagES(tag);
-        tagESCollection.add(tagES);
+        
+        if (tagES != null) {
+          tagESCollection.add(tagES);
+        }
+        else {
+          log.warn("notifyElementUpdated() - Unsupported data type " + tag.getDataType() + " for tag #" + tag.getId() + " (" + tag.getName() + ") ==> Not sent to elasticsearch");
+        }
       }
-      log.debug("Created a TagESCollection of " + tagESCollection.size() + " elements.");
-
+      
+      log.trace("notifyElementUpdated() - Created a TagESCollection of " + tagESCollection.size() + " elements.");
+      
+      // Sending to elasticsearch
       connector.indexTags(tagESCollection);
+      
     } catch (Exception e) {
       log.error("notifyElementUpdated() - Catch unexpected exception while trying to instantiate data and send it to the ElasticSearch cluster.", e);
     }
-  }
-
-  public ArrayList<TagES> getTagESCollection() {
-    return tagESCollection;
   }
 
   @Override

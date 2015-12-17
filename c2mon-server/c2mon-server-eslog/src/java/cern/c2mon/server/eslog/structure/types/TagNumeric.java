@@ -12,7 +12,7 @@ public class TagNumeric extends TagES implements TagESInterface {
    */
   @Override
   public void setTagValue(Object tagValue) {
-    if (tagValue instanceof Integer || tagValue instanceof Double || tagValue instanceof Float || tagValue instanceof Long) {
+    if (tagValue instanceof Number) {
       this.tagValue = tagValue;
     } else {
       throw new IllegalArgumentException("Must pass a numeric tagValue to TagNumeric in ElasticSearch");

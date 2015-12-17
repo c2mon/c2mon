@@ -1,11 +1,13 @@
 package cern.c2mon.server.eslog.logger;
 
-import java.io.IOException;
+import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,7 +32,6 @@ import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.node.Node;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -43,8 +44,6 @@ import cern.c2mon.server.eslog.structure.queries.QueryTypes;
 import cern.c2mon.server.eslog.structure.types.TagES;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-
-import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 /**
  * Allows to connect to the cluster via a transport client. Handles all the
@@ -295,9 +294,12 @@ public class TransportConnector implements Connector {
     String tagJson = tag.build();
     String indexMonth = generateIndex(tag.getTagServerTime());
     String type = generateType(tag.getDataType());
-    log.debug("Index a new tag.");
-    log.debug("Index = " + indexMonth);
-    log.debug("Type = " + type);
+    
+    if (log.isTraceEnabled()) {
+      log.trace("indexTag() - Index a new tag.");
+      log.trace("indexTag() - Index = " + indexMonth);
+      log.trace("indexTag() - Type = " + type);
+    }
 
     bulkAdd(indexMonth, type, tagJson, tag);
   }
@@ -309,11 +311,11 @@ public class TransportConnector implements Connector {
    * @param tags to index.
    */
   @Override
-  public void indexTags(List<TagES> tags) {
+  public void indexTags(Collection<TagES> tags) {
     Map<String, TagES> aliases = new HashMap<>();
+    
     if (tags == null) {
-      log.debug("indexTags() - received a null List of tags to log to ElasticSearch.");
-
+      log.trace("indexTags() - received a null List of tags to log to ElasticSearch.");
     }
     else {
 
@@ -324,7 +326,7 @@ public class TransportConnector implements Connector {
       }
 
       // FLUSH
-      log.debug("Close bulk.");
+      log.trace("indexTags() - closing bulk.");
       closeBulk();
       refreshClusterStats();
 

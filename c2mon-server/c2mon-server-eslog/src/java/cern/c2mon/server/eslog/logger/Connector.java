@@ -1,12 +1,13 @@
 package cern.c2mon.server.eslog.logger;
 
-import cern.c2mon.server.eslog.structure.queries.Query;
-import cern.c2mon.server.eslog.structure.types.TagES;
+import java.util.Collection;
+import java.util.List;
+
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 
-import java.util.List;
-import java.util.Set;
+import cern.c2mon.server.eslog.structure.queries.Query;
+import cern.c2mon.server.eslog.structure.types.TagES;
 
 /**
  * Requirements to connect/query and index data to the ElasticSearch cluster.
@@ -15,7 +16,7 @@ import java.util.Set;
 public interface Connector {
   Client createClient();
   void close(Client client);
-  void indexTags(List<TagES> tags);
+  void indexTags(Collection<TagES> tags);
 
   void updateLists();
 

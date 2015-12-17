@@ -9,6 +9,8 @@ public interface Mapping {
   String stringType = "string";
   String longType = "long";
   String intType = "integer";
+  String floatType = "float";
+  String shortType = "short";
   String doubleType = "double";
   String boolType = "boolean";
   String dateType = "date";

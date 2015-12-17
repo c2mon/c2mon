@@ -123,11 +123,12 @@ public class DataTagESLogConverter {
       return new TagString();
 
     }
-    else if (dataType.compareTo(Mapping.intType) == 0
-        || dataType.compareTo(Mapping.doubleType) == 0
-        || dataType.compareTo(Mapping.longType) == 0) {
+    else if (dataType.equalsIgnoreCase(Mapping.intType)
+        || dataType.equalsIgnoreCase(Mapping.doubleType)
+        || dataType.equalsIgnoreCase(Mapping.longType)
+        || dataType.equalsIgnoreCase(Mapping.floatType)
+        || dataType.equalsIgnoreCase(Mapping.shortType)) {
       return new TagNumeric();
-
     }
     else {
       log.warn("instantiateTagES() - Tag did not correspond to any existing type. (dataType = " + dataType + ").");
