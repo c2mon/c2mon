@@ -3,12 +3,14 @@ package cern.c2mon.server.eslog.structure;
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
+import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.eslog.structure.mappings.Mapping;
+import cern.c2mon.server.eslog.structure.types.TagBoolean;
 import cern.c2mon.server.eslog.structure.types.TagES;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
@@ -245,5 +247,16 @@ public class DataTagESLogConverterTest {
 		when(tagC2MON.getValue()).thenReturn(timeStamp);
 		tagES = esLogConverter.convertToTagES(tagC2MON);
 		assertEquals(timeStamp, tagES.getTagValue());
+	}
+
+	@Test
+	public void testBadValues() {
+    DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
+    tag.setDaqTimestamp(null);
+    tag.setSourceTimestamp(null);
+    TagES tagES = esLogConverter.convertToTagES(tag);
+    assertTrue(tagES instanceof TagBoolean);
+    assertEquals(0, tagES.getTagDaqTime());
+    assertEquals(0, tagES.getTagTime());
 	}
 }

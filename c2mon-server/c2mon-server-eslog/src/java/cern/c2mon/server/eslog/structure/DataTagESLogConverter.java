@@ -62,9 +62,10 @@ public class DataTagESLogConverter {
     }
 
     tagES.setMetadataProcess(getTagMetadataProcess(tag));
+
     tagES.setTagId(tag.getId());
     tagES.setTagName(tag.getName());
-    tagES.setDataType(tag.getDataType());
+    tagES.setDataType(tag.getDataType().toLowerCase());
 
     if (tag instanceof DataTag || tag instanceof ControlTag) {
       Timestamp sourceTimeStamp = ((DataTag) tag).getSourceTimestamp();
@@ -76,7 +77,11 @@ public class DataTagESLogConverter {
       }
     }
 
-    tagES.setTagServerTime(tag.getCacheTimestamp().getTime());
+    Timestamp serverTimeStamp = tag.getCacheTimestamp();
+    if (serverTimeStamp != null) {
+      tagES.setTagServerTime(serverTimeStamp.getTime());
+    }
+
     int code = 0;
 
     if (tag.getDataTagQuality() != null) {
@@ -86,10 +91,12 @@ public class DataTagESLogConverter {
     }
 
     tagES.setTagStatus(code);
+
     DataTagQuality quality = tag.getDataTagQuality();
 
     if (quality != null && quality.isInitialised()) {
       tagES.setQuality(gson.toJson(quality.getInvalidQualityStates()));
+
       if (tagES.getQuality() != null) {
         tagES.setQuality("{\"UNKNOWN_REASON\":\"Invalid quality String was too long: unable to store in ShortTermLog table.\"}");
       }
@@ -108,18 +115,21 @@ public class DataTagESLogConverter {
    */
   public TagES instantiateTagES(String dataType) {
     dataType = dataType.toLowerCase();
+
     if (dataType.compareTo(Mapping.boolType) == 0) {
       return new TagBoolean();
-
-    } else if (dataType.compareTo(Mapping.stringType) == 0) {
+    }
+    else if (dataType.compareTo(Mapping.stringType) == 0) {
       return new TagString();
 
-    } else if (dataType.compareTo(Mapping.intType) == 0
+    }
+    else if (dataType.compareTo(Mapping.intType) == 0
         || dataType.compareTo(Mapping.doubleType) == 0
         || dataType.compareTo(Mapping.longType) == 0) {
       return new TagNumeric();
 
-    } else {
+    }
+    else {
       log.warn("instantiateTagES() - Tag did not correspond to any existing type. (dataType = " + dataType + ").");
       return null;
     }
@@ -138,25 +148,37 @@ public class DataTagESLogConverter {
     long processId = -1;
     long equipmentId = -1;
     long subEquipmentId = -1;
+
     String processName;
     String equipmentName;
     String subEquipmentName;
 
-    if (!tag.getSubEquipmentIds().isEmpty() && tag.getSubEquipmentIds().size() >= 1) {
+    if (tag.getSubEquipmentIds() != null && !tag.getSubEquipmentIds().isEmpty() && tag.getSubEquipmentIds().size() >= 1) {
       subEquipmentId = tag.getSubEquipmentIds().iterator().next();
 
-      equipmentId = subEquipmentCache.get(subEquipmentId).getParentId();
+      SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);
+      if (subEquipment != null) {
+        equipmentId = subEquipment.getParentId();
+      }
 
-      processId = equipmentCache.get(equipmentId).getProcessId();
+      Equipment equipment = equipmentCache.get(equipmentId);
+
+      if (equipment != null) {
+        processId = equipment.getProcessId();
+      }
 
     }
-    else if (!tag.getEquipmentIds().isEmpty() && tag.getEquipmentIds().size() >= 1) {
+    else if (tag.getEquipmentIds() != null && !tag.getEquipmentIds().isEmpty() && tag.getEquipmentIds().size() >= 1) {
       equipmentId = tag.getEquipmentIds().iterator().next();
 
-      processId = equipmentCache.get(equipmentId).getProcessId();
+      Equipment equipment = equipmentCache.get(equipmentId);
+
+      if (equipment != null) {
+        processId = equipment.getProcessId();
+      }
 
     }
-    else if (!tag.getProcessIds().isEmpty() && tag.getProcessIds().size() >= 1) {
+    else if (tag.getProcessIds() != null && !tag.getProcessIds().isEmpty() && tag.getProcessIds().size() >= 1) {
       processId = tag.getProcessIds().iterator().next();
     }
     else {

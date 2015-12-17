@@ -30,6 +30,7 @@ public class ESLogModuleIntegrationTest {
   private static String nodeName;
   private static Node clusterNode;
   private static Client clusterClient;
+
   @Autowired
   private TransportConnector connector;
 
@@ -67,14 +68,8 @@ public class ESLogModuleIntegrationTest {
     clusterNode.close();
   }
 
-  @After
-  public void tidyUpClient() {
-    connector.close(connector.getClient());
-  }
-
   @Test
   public void testModuleStartup() {
-    assertNotNull(connector);
     String[] indices = clusterClient.admin().indices().prepareGetIndex().get().indices();
     log.info("indices in the cluster:");
     for (String index : indices) {
