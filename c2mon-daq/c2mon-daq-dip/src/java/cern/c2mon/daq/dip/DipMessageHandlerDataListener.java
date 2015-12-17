@@ -1102,7 +1102,8 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
   /**
    * This method is called-back when some problems with particular
-   * subscription appears.
+   * subscription appears. To recover from the error the method will try 
+   * a re-subscription.
    *
    * @param ds
    *            - dip subscription
@@ -1115,12 +1116,13 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
         + ds.getTopicName() + ", error msg.: " + de.getMessage() + ", error trace: ", de);
     Collection<ISourceDataTag> collection = dipController.getSubscribedDataTags().get(ds.getTopicName());
     if (collection != null) {
-      Iterator<ISourceDataTag> iter = collection.iterator();
-      while (iter.hasNext()) {
-        this.dipController.getEquipmentMessageSender().sendInvalidTag(iter.next(), SourceDataQuality.DATA_UNAVAILABLE,
+      for (ISourceDataTag sdt : collection) {
+        this.dipController.getEquipmentMessageSender().sendInvalidTag(sdt, SourceDataQuality.DATA_UNAVAILABLE,
             "handleException() received from DIP: " + de.getMessage());
       }
     }
+    
+    dipController.renewSubscription(ds.getTopicName());
   }
 
   /**

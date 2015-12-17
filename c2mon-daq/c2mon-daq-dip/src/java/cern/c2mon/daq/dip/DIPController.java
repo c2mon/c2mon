@@ -150,10 +150,21 @@ public class DIPController {
       }
     }
 
+    return createDipSubscription(sdtAddress.getItemName(), changeReport);
+  }
+  
+  /**
+   * Creates the and stores the DIP subscription. In case of an address problem all related tags are 
+   * marked as invalid.
+   * @param topicName The DIP address
+   * @param changeReport The change report
+   * @return {@link CHANGE_STATE#SUCCESS} in case all went fine, otherwise {@link CHANGE_STATE#FAIL}
+   */
+  private CHANGE_STATE createDipSubscription(final String topicName, final ChangeReport changeReport) {
     DipSubscription dipSubscr = null;
     try {
-      dipSubscr = this.dipFactory.createDipSubscription(sdtAddress.getItemName(), this.handler);
-      this.dipSubscriptions.put(sdtAddress.getItemName(), dipSubscr);
+      dipSubscr = this.dipFactory.createDipSubscription(topicName, this.handler);
+      this.dipSubscriptions.put(topicName, dipSubscr);
 
       getEquipmentLogger().debug("connection - Creating subscription for " + dipSubscr.getTopicName());
     } catch (DipException ex) {
@@ -162,11 +173,10 @@ public class DIPController {
         changeReport.appendError("connection - A problem with creating subscription occured");
       }
 
-      Collection<ISourceDataTag> collection = subscribedDataTags.get(sdtAddress.getItemName());
+      Collection<ISourceDataTag> collection = subscribedDataTags.get(topicName);
       if (collection != null) {
-        Iterator<ISourceDataTag> iter = collection.iterator();
-        while (iter.hasNext()) {
-          this.equipmentMessageSender.sendInvalidTag(iter.next(), SourceDataQuality.INCORRECT_NATIVE_ADDRESS,
+        for (ISourceDataTag sdt : collection) {
+          this.equipmentMessageSender.sendInvalidTag(sdt, SourceDataQuality.INCORRECT_NATIVE_ADDRESS,
               "DIP subscription error! Reason: " + ex.getMessage());
         }
       }
@@ -194,13 +204,15 @@ public class DIPController {
     try {
       getEquipmentLogger().debug(new StringBuffer("disconnection - destroying subscription ").append(dipSubscription.getTopicName()));
       this.dipFactory.destroyDipSubscription(dipSubscription);
-    } catch (DipException de) {
+    } 
+    catch (DipException de) {
       getEquipmentLogger().error("disconnection - A problem occured while trying to destroy dip subscription : " + de.getMessage());
       if (changeReport != null) {
         changeReport.appendError("disconnection - DipException - A problem occured while trying to destroy dip subscription");
       }
       return CHANGE_STATE.FAIL;
-    } catch (Exception ex) {
+    } 
+    catch (Exception ex) {
       getEquipmentLogger().error("disconnection - A problem occured while trying to destroy dip subscription : ", ex);
       if (changeReport != null) {
         changeReport.appendError("disconnection - A problem occured while trying to destroy dip subscription");
@@ -297,6 +309,16 @@ public class DIPController {
    */
   public ConcurrentHashMap<String, DipSubscription> getDipSubscriptions() {
       return this.dipSubscriptions;
+  }
+  
+  /**
+   * Renews the subscription to a DIP client by disconnecting and
+   * then reconnecting.
+   * @param topicName The DIP topic name.
+   */
+  public void renewSubscription(final String topicName) {
+    disconnection(this.dipSubscriptions.get(topicName), null);
+    createDipSubscription(topicName, null);
   }
 
   /**
