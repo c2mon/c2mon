@@ -35,7 +35,7 @@ import org.elasticsearch.node.Node;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.eslog.structure.mappings.Mapping;
+import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
 import cern.c2mon.server.eslog.structure.queries.Query;
 import cern.c2mon.server.eslog.structure.queries.QueryAliases;
 import cern.c2mon.server.eslog.structure.queries.QueryIndexBuilder;
@@ -715,14 +715,7 @@ public class TransportConnector implements Connector {
   public boolean checkType(String type) {
     String dataType = type.substring(TAG_PREFIX.length());
     
-    return type.matches("^" + TAG_PREFIX + ".+$") 
-        && (dataType.matches(Mapping.boolType) 
-            || dataType.matches(Mapping.doubleType)
-            || dataType.matches(Mapping.intType) 
-            || dataType.matches(Mapping.longType) 
-            || dataType.matches(Mapping.stringType) 
-            || dataType.matches(Mapping.floatType) 
-            || dataType.matches(Mapping.shortType));
+    return type.matches("^" + TAG_PREFIX + ".+$") && (ValueType.matches(dataType));
   }
 
   /**

@@ -6,17 +6,17 @@ package cern.c2mon.server.eslog.structure.mappings;
  */
 public class TagNumericMapping extends TagESMapping implements Mapping {
 
-  public TagNumericMapping(String type) {
+  public TagNumericMapping(ValueType type) {
     super();
     setProperties(type);
   }
 
   @Override
-  public void setProperties(String tagValueType) {
-    if (!(tagValueType.compareTo(intType) == 0) && !(tagValueType.compareTo(doubleType) == 0)) {
-      throw new IllegalArgumentException("Type for TagNumeric must be integer or double.");
-    } else {
+  public void setProperties(ValueType tagValueType) {
+    if (ValueType.isNumeric(tagValueType)) {
       this.properties = new Properties(tagValueType);
+    } else {
+      throw new IllegalArgumentException("Type for TagNumeric must be integer or double.");
     }
   }
 }

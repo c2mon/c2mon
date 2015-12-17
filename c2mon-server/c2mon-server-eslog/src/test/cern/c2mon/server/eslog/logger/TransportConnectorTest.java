@@ -1,11 +1,19 @@
 package cern.c2mon.server.eslog.logger;
 
-import cern.c2mon.server.eslog.structure.mappings.Mapping;
-import cern.c2mon.server.eslog.structure.queries.*;
-import cern.c2mon.server.eslog.structure.types.TagBoolean;
-import cern.c2mon.server.eslog.structure.types.TagES;
-import cern.c2mon.server.eslog.structure.types.TagString;
-import lombok.extern.slf4j.Slf4j;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -19,14 +27,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
-import static junit.framework.TestCase.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
+import cern.c2mon.server.eslog.structure.queries.Query;
+import cern.c2mon.server.eslog.structure.queries.QueryAliases;
+import cern.c2mon.server.eslog.structure.queries.QueryIndexBuilder;
+import cern.c2mon.server.eslog.structure.queries.QueryIndices;
+import cern.c2mon.server.eslog.structure.queries.QueryTypes;
+import cern.c2mon.server.eslog.structure.types.TagBoolean;
+import cern.c2mon.server.eslog.structure.types.TagES;
+import cern.c2mon.server.eslog.structure.types.TagString;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Test the entire functionality of the node.
@@ -209,7 +219,7 @@ public class TransportConnectorTest {
     String index = "c2mon_2015-02";
     String type = "tag_string";
     TagES tag = new TagString();
-    tag.setMapping("string");
+    tag.setMapping(ValueType.stringType);
 
     boolean isAcked = connector.instantiateIndex(tag, index, type);
     assertTrue(isAcked);
@@ -369,8 +379,8 @@ public class TransportConnectorTest {
   public void testBulkAddAlias() {
     TagES tag = new TagString();
     tag.setTagId(1L);
-    tag.setDataType(Mapping.stringType);
-    tag.setMapping(Mapping.stringType);
+    tag.setDataType(ValueType.stringType.toString());
+    tag.setMapping(ValueType.stringType);
     connector.getAliases().add("tag_1");
     connector.handleIndexQuery(createIndexQuery(connector.getClient()), "c2mon_2015-12", connector.getMonthIndexSettings(),
         connector.generateType(tag.getDataType()), tag.getMapping());
@@ -385,9 +395,9 @@ public class TransportConnectorTest {
   @Ignore
   public void testBadBulkAdd() throws IOException {
     TagES tag = new TagString();
-    tag.setDataType(Mapping.stringType);
+    tag.setDataType(ValueType.stringType.toString());
     tag.setTagId(1L);
-    tag.setMapping(Mapping.stringType);
+    tag.setMapping(ValueType.stringType);
 
     assertFalse(connector.bulkAdd(null, tag.getDataType(), tag.build(), tag));
     assertFalse(connector.bulkAdd("c2mon_2015-12", "badType", tag.build(), tag));
@@ -403,8 +413,8 @@ public class TransportConnectorTest {
   @Ignore
   public void testIndexTag() {
     TagES tag = new TagString();
-    tag.setDataType(Mapping.stringType);
-    tag.setMapping(Mapping.stringType);
+    tag.setDataType(ValueType.stringType.toString());
+    tag.setMapping(ValueType.stringType);
     tag.setTagId(1L);
     tag.setTagServerTime(123456789000L);
 
@@ -432,8 +442,8 @@ public class TransportConnectorTest {
 
     for (; id <= size; id++, tagServerTime += 1000) {
       TagES tag = new TagString();
-      tag.setDataType(Mapping.stringType);
-      tag.setMapping(Mapping.stringType);
+      tag.setDataType(ValueType.stringType.toString());
+      tag.setMapping(ValueType.stringType);
       tag.setTagId(id);
       tag.setTagServerTime(tagServerTime);
       list.add(tag);

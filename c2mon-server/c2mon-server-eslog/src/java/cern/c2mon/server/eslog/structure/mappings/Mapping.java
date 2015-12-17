@@ -6,19 +6,69 @@ package cern.c2mon.server.eslog.structure.mappings;
  * @author Alban Marguet.
  */
 public interface Mapping {
-  String stringType = "string";
-  String longType = "long";
-  String intType = "integer";
-  String floatType = "float";
-  String shortType = "short";
-  String doubleType = "double";
-  String boolType = "boolean";
-  String dateType = "date";
+  public enum ValueType {
+    stringType("string"),
+    longType("long"),
+    intType("integer"),
+    floatType("float"),
+    shortType("short"),
+    doubleType("double"),
+    boolType("boolean"),
+    dateType("date");
+    
+    ValueType(final String type) {
+      this.type = type;
+    }
+    
+    private final String type;
+    
+    @Override
+    public String toString() {
+      return this.type;
+    }
+    
+    public static boolean isNumeric(ValueType type) {
+      switch (type) {
+      case floatType:
+      case longType:
+      case shortType:
+      case doubleType:
+      case intType:
+        return true;
+      default:
+        return false;
+      }
+    }
+    
+    public static boolean isNumeric(final String typeAsString) {
+      if (floatType.toString().equalsIgnoreCase(typeAsString)
+          || longType.toString().equalsIgnoreCase(typeAsString)
+          || shortType.toString().equalsIgnoreCase(typeAsString)
+          || doubleType.toString().equalsIgnoreCase(typeAsString)
+          || intType.toString().equalsIgnoreCase(typeAsString)) {
+        return true;
+      }
+      
+      return false;
+    }
+    
+    public static boolean matches(final String typeAsString) {
+      if (isNumeric(typeAsString)
+          || boolType.toString().equalsIgnoreCase(typeAsString)
+          || dateType.toString().equalsIgnoreCase(typeAsString)
+          || stringType.toString().equalsIgnoreCase(typeAsString)) {
+        return true;
+      }
+      
+      return false;
+    }
+  }
+
   String indexNotAnalyzed = "not_analyzed";
   String routing = "true";
 
   String getMapping();
-  void setProperties(String tagValueType);
+  void setProperties(ValueType tagValueType);
 
   class Routing {
     String required;
@@ -45,20 +95,20 @@ public interface Mapping {
     EquipmentName equipmentName;
     SubEquipmentName subEquipmentName;
 
-    Properties(String tagValueType) {
-      this.tagId = new TagId(longType);
-      this.tagName = new TagName(stringType, indexNotAnalyzed);
-      this.dataType = new DataType(stringType, indexNotAnalyzed);
-      this.tagTime = new TagTime(dateType);
-      this.tagServerTime = new TagServerTime(dateType);
-      this.tagDaqTime = new TagDaqTime(dateType);
-      this.tagStatus = new TagStatus(intType);
-      this.quality = new Quality(stringType, indexNotAnalyzed);
-      this.tagValueDesc = new TagValueDesc(stringType, indexNotAnalyzed);
+    Properties(ValueType tagValueType) {
+      this.tagId = new TagId();
+      this.tagName = new TagName();
+      this.dataType = new DataType();
+      this.tagTime = new TagTime();
+      this.tagServerTime = new TagServerTime();
+      this.tagDaqTime = new TagDaqTime();
+      this.tagStatus = new TagStatus();
+      this.quality = new Quality();
+      this.tagValueDesc = new TagValueDesc();
       this.tagValue = new TagValue(tagValueType);
-      this.processName = new ProcessName(stringType, indexNotAnalyzed);
-      this.equipmentName = new EquipmentName(stringType, indexNotAnalyzed);
-      this.subEquipmentName = new SubEquipmentName(stringType, indexNotAnalyzed);
+      this.processName = new ProcessName();
+      this.equipmentName = new EquipmentName();
+      this.subEquipmentName = new SubEquipmentName();
     }
 
     public String getValueType() {
@@ -67,90 +117,50 @@ public interface Mapping {
   }
 
   class TagId {
-    String type;
-
-    public TagId(String type) {
-      this.type = type;
-    }
+    private final String type = ValueType.longType.toString();
   }
 
   class TagName {
-    String type;
-    String index;
-
-    public TagName(String type, String indexing) {
-      this.type = type;
-      this.index = indexing;
-    }
+    private final String type = ValueType.stringType.toString();
+    private final String index = indexNotAnalyzed;
   }
 
   class DataType {
-    private String type;
-    private String index;
-
-    public DataType(String type, String indexing) {
-      this.type = type;
-      this.index = indexing;
-    }
+    private String type = ValueType.stringType.toString();
+    private final String index = indexNotAnalyzed;
   }
 
   class TagTime {
-    private String type;
-
-    public TagTime(String type) {
-      this.type = type;
-    }
+    private final String type = ValueType.dateType.toString();
   }
 
   class TagServerTime {
-    private String type;
-
-    public TagServerTime(String type) {
-      this.type = type;
-    }
+    private final String type = ValueType.dateType.toString();
   }
 
   class TagDaqTime {
-    private String type;
-
-    public TagDaqTime(String type) {
-      this.type = type;
-    }
+    private final String type = ValueType.dateType.toString();;
   }
 
   class TagStatus {
-    private String type;
-
-    public TagStatus(String type) {
-      this.type = type;
-    }
+    private final String type = ValueType.intType.toString();
   }
 
   class Quality {
-    private String type;
-    private String index;
-
-    public Quality(String type, String indexing) {
-      this.type = type;
-      this.index = indexing;
-    }
+    private final String type = ValueType.stringType.toString();
+    private final String index = indexNotAnalyzed;
   }
 
   class TagValueDesc {
-    private String type;
-    private String index;
-
-    public TagValueDesc(String type, String indexing) {
-      this.type = type;
-      this.index = indexing;
-    }
+    private final String type = ValueType.stringType.toString();
+    private final String index = indexNotAnalyzed;
   }
 
   class TagValue {
-    private String type;
+    private final String type;
 
-    public TagValue(String type) {
-      this.type = type;
+    public TagValue(ValueType type) {
+      this.type = type.toString();
     }
 
     public String getType() {
@@ -159,32 +169,17 @@ public interface Mapping {
   }
 
   class ProcessName {
-    private String type;
-    private String index;
-
-    public ProcessName(String type, String indexing) {
-      this.type = type;
-      this.index = indexing;
-    }
+    private final String type = ValueType.stringType.toString();
+    private final String index = indexNotAnalyzed;
   }
 
   class EquipmentName {
-    private String type;
-    private String index;
-
-    public EquipmentName(String type, String indexing) {
-      this.type = type;
-      this.index = indexing;
-    }
+    private final String type = ValueType.stringType.toString();
+    private final String index = indexNotAnalyzed;
   }
 
   class SubEquipmentName {
-    private String type;
-    private String index;
-
-    public SubEquipmentName(String type, String indexing) {
-      this.type = type;
-      this.index = indexing;
-    }
+    private final String type = ValueType.stringType.toString();
+    private final String index = indexNotAnalyzed;
   }
 }

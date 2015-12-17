@@ -5,17 +5,17 @@ package cern.c2mon.server.eslog.structure.mappings;
  * @author Alban Marguet.
  */
 public class TagBooleanMapping extends TagESMapping implements Mapping {
-  public TagBooleanMapping(String type) {
+  public TagBooleanMapping(ValueType type) {
     super();
     setProperties(type);
   }
 
   @Override
-  public void setProperties(String tagValueType) {
-    if (tagValueType.compareTo(boolType) != 0) {
-      throw new IllegalArgumentException("Type for TagBoolean must be boolean.");
-    } else {
+  public void setProperties(ValueType tagValueType) {
+    if (tagValueType.equals(ValueType.boolType)) {
       properties = new Properties(tagValueType);
+    } else {
+      throw new IllegalArgumentException("Type for TagBoolean must be boolean.");
     }
   }
 }

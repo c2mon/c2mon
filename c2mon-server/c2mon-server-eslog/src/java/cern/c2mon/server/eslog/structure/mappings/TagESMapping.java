@@ -26,7 +26,7 @@ public class TagESMapping implements Mapping {
   }
 
   @Override
-  public void setProperties(String tagValueType) {
+  public void setProperties(ValueType tagValueType) {
     properties = new Properties(tagValueType);
   }
 }

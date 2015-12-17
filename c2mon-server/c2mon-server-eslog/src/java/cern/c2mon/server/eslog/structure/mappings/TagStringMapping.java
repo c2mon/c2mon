@@ -5,17 +5,17 @@ package cern.c2mon.server.eslog.structure.mappings;
  * @author Alban Marguet.
  */
 public class TagStringMapping extends TagESMapping implements Mapping {
-  public TagStringMapping(String type) {
+  public TagStringMapping(ValueType type) {
     super();
     setProperties(type);
   }
 
   @Override
-  public void setProperties(String tagValueType) {
-    if (tagValueType.compareTo(stringType) != 0) {
-      throw new IllegalArgumentException("Type for TagString must be string.");
-    } else {
+  public void setProperties(ValueType tagValueType) {
+    if (tagValueType.equals(ValueType.stringType)) {
       this.properties = new Properties(tagValueType);
+    } else {
+      throw new IllegalArgumentException("Type for TagString must be string.");
     }
   }
 }

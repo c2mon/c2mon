@@ -1,44 +1,40 @@
 package cern.c2mon.server.eslog.structure;
 
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.SubEquipmentCache;
-import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.common.equipment.EquipmentCacheObject;
-import cern.c2mon.server.common.process.ProcessCacheObject;
-import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
-import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.eslog.structure.mappings.Mapping;
-import cern.c2mon.server.eslog.structure.types.TagBoolean;
-import cern.c2mon.server.eslog.structure.types.TagES;
-import cern.c2mon.server.test.CacheObjectCreation;
-import cern.c2mon.shared.common.datatag.DataTagQuality;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import cern.c2mon.server.cache.EquipmentCache;
+import cern.c2mon.server.cache.ProcessCache;
+import cern.c2mon.server.cache.SubEquipmentCache;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.common.equipment.EquipmentCacheObject;
+import cern.c2mon.server.common.process.ProcessCacheObject;
+import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
+import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
+import cern.c2mon.server.eslog.structure.types.TagBoolean;
+import cern.c2mon.server.eslog.structure.types.TagES;
+import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
 
 /**
  * Checks on the fields of data appened/set to TagES.
  * @author Alban Marguet.
  */
-@Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public class DataTagESLogConverterTest {
 
@@ -216,13 +212,13 @@ public class DataTagESLogConverterTest {
 	public void testConvertToTagES() throws IOException {
 		long id = 1L;
 		String name = "tag";
-		String type = Mapping.boolType;
+		ValueType type = ValueType.boolType;
 		long timeStamp = 123456L;
 		boolean value = true;
 		String valueDesc = "ok";
 		when(tagC2MON.getId()).thenReturn(id);
 		when(tagC2MON.getName()).thenReturn(name);
-		when(tagC2MON.getDataType()).thenReturn(type);
+		when(tagC2MON.getDataType()).thenReturn(type.toString());
 		when(tagC2MON.getCacheTimestamp()).thenReturn(new Timestamp(timeStamp));
 		when(tagC2MON.getDataTagQuality()).thenReturn(null);
 		when(tagC2MON.getValue()).thenReturn(value);
@@ -232,18 +228,18 @@ public class DataTagESLogConverterTest {
 		assertNotNull(tagES.getMetadataProcess());
 		assertEquals(id, tagES.getTagId());
 		assertEquals(name, tagES.getTagName());
-		assertEquals(type, tagES.getDataType());
+		assertEquals(type.toString(), tagES.getDataType());
 		assertEquals(timeStamp, tagES.getTagServerTime());
 		assertEquals(0, tagES.getTagStatus());
 		assertEquals(value, tagES.getTagValue());
 		assertEquals(valueDesc, tagES.getTagValueDesc());
 
-		when(tagC2MON.getDataType()).thenReturn(Mapping.stringType);
+		when(tagC2MON.getDataType()).thenReturn(ValueType.stringType.toString());
 		when(tagC2MON.getValue()).thenReturn(name);
 		tagES = esLogConverter.convertToTagES(tagC2MON);
 		assertEquals(name, tagES.getTagValue());
 
-		when(tagC2MON.getDataType()).thenReturn(Mapping.longType);
+		when(tagC2MON.getDataType()).thenReturn(ValueType.longType.toString());
 		when(tagC2MON.getValue()).thenReturn(timeStamp);
 		tagES = esLogConverter.convertToTagES(tagC2MON);
 		assertEquals(timeStamp, tagES.getTagValue());

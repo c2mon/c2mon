@@ -1,5 +1,14 @@
 package cern.c2mon.server.eslog.structure;
 
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.google.gson.Gson;
+
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
@@ -9,7 +18,7 @@ import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.eslog.structure.mappings.Mapping;
+import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
 import cern.c2mon.server.eslog.structure.types.TagBoolean;
 import cern.c2mon.server.eslog.structure.types.TagES;
 import cern.c2mon.server.eslog.structure.types.TagNumeric;
@@ -17,15 +26,7 @@ import cern.c2mon.server.eslog.structure.types.TagString;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.util.json.GsonFactory;
-import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
-import oracle.sql.TIMESTAMPLTZ;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Converts the dataTags from the server to the ElasticSearch format.
@@ -116,18 +117,14 @@ public class DataTagESLogConverter {
   public TagES instantiateTagES(String dataType) {
     dataType = dataType.toLowerCase();
 
-    if (dataType.compareTo(Mapping.boolType) == 0) {
+    if (dataType.equalsIgnoreCase(ValueType.boolType.toString())) {
       return new TagBoolean();
     }
-    else if (dataType.compareTo(Mapping.stringType) == 0) {
+    else if (dataType.equalsIgnoreCase(ValueType.stringType.toString())) {
       return new TagString();
 
     }
-    else if (dataType.equalsIgnoreCase(Mapping.intType)
-        || dataType.equalsIgnoreCase(Mapping.doubleType)
-        || dataType.equalsIgnoreCase(Mapping.longType)
-        || dataType.equalsIgnoreCase(Mapping.floatType)
-        || dataType.equalsIgnoreCase(Mapping.shortType)) {
+    else if (ValueType.isNumeric(dataType)) {
       return new TagNumeric();
     }
     else {

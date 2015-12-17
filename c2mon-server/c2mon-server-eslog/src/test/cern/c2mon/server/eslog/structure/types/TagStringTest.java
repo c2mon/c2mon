@@ -1,23 +1,23 @@
 package cern.c2mon.server.eslog.structure.types;
 
-import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
-import lombok.extern.slf4j.Slf4j;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.io.IOException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
+import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
 
 /**
  * Tests the good behaviour of the TagString class.
  * verify that it builds correctly in JSON and accept/reject good/bad types of value.
  * @author Alban Marguet.
  */
-@Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public class TagStringTest {
 	@InjectMocks
@@ -38,9 +38,9 @@ public class TagStringTest {
 
 	@Test
 	public void testMapping() throws IOException {
-		TagStringMapping mapping = new TagStringMapping("string");
+		TagStringMapping mapping = new TagStringMapping(ValueType.stringType);
 		String expected = mapping.getMapping();
-		tagString.setMapping("string");
+		tagString.setMapping(ValueType.stringType);
 
 		assertEquals(expected, tagString.getMapping());
 	}

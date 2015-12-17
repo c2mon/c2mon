@@ -6,6 +6,7 @@ import java.util.Map;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
 import cern.c2mon.server.eslog.structure.mappings.TagESMapping;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +44,7 @@ public abstract class TagES implements TagESInterface {
     return mapping.getMapping();
   }
 
-  public void setMapping(String tagValueType) {
+  public void setMapping(ValueType tagValueType) {
     //TODO: check type
     mapping.setProperties(tagValueType);
   }

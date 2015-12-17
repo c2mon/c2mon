@@ -1,30 +1,30 @@
 package cern.c2mon.server.eslog.structure.mappings;
 
-import lombok.extern.slf4j.Slf4j;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.junit.Assert.*;
+import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
 
 /**
  * Tests the good bahaviour of the class TagStringMapping. Needed to do a good indexing in ElasticSearch.
  * @author Alban Marguet.
  */
-@Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public class TagStringMappingTest {
 
 	@Test
 	public void testGetStringMapping() {
-		TagStringMapping mapping = new TagStringMapping(Mapping.stringType);
+		TagStringMapping mapping = new TagStringMapping(ValueType.stringType);
 		String valueType = mapping.properties.getValueType();
-		assertEquals(Mapping.stringType, valueType);
+		assertEquals(ValueType.stringType.toString(), valueType);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void wrongGetStringMapping() {
-		TagStringMapping mapping = new TagStringMapping(Mapping.dateType);
+		TagStringMapping mapping = new TagStringMapping(ValueType.dateType);
 		mapping.properties.getValueType();
 	}
 }
