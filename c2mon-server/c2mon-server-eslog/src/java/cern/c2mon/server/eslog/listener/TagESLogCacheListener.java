@@ -110,13 +110,17 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
       }
     }
 
-    for (Tag tag: tagsToLog) {
-      TagES tagES = dataTagESLogConverter.convertToTagES(tag);
-      tagESCollection.add(tagES);
-    }
-    log.debug("Created a TagESCollection of " + tagESCollection.size() + " elements.");
+    try {
+      for (Tag tag: tagsToLog) {
+        TagES tagES = dataTagESLogConverter.convertToTagES(tag);
+        tagESCollection.add(tagES);
+      }
+      log.debug("Created a TagESCollection of " + tagESCollection.size() + " elements.");
 
-    connector.indexTags(tagESCollection);
+      connector.indexTags(tagESCollection);
+    } catch (Exception e) {
+      log.error("notifyElementUpdated() - Catch unexpected exception while trying to instantiate data and send it to the ElasticSearch cluster.", e);
+    }
   }
 
   public ArrayList<TagES> getTagESCollection() {

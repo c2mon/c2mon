@@ -19,9 +19,11 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.util.json.GsonFactory;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import oracle.sql.TIMESTAMPLTZ;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,8 +67,13 @@ public class DataTagESLogConverter {
     tagES.setDataType(tag.getDataType());
 
     if (tag instanceof DataTag || tag instanceof ControlTag) {
-      tagES.setTagTime(((DataTag) tag).getSourceTimestamp().getTime());
-      tagES.setTagDaqTime(((DataTag) tag).getDaqTimestamp().getTime());
+      Timestamp sourceTimeStamp = ((DataTag) tag).getSourceTimestamp();
+      Timestamp daqTimeStamp = ((DataTag) tag).getDaqTimestamp();
+
+      if (sourceTimeStamp != null && daqTimeStamp != null) {
+        tagES.setTagTime(sourceTimeStamp.getTime());
+        tagES.setTagDaqTime(daqTimeStamp.getTime());
+      }
     }
 
     tagES.setTagServerTime(tag.getCacheTimestamp().getTime());
