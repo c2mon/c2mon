@@ -289,8 +289,9 @@ public class TransportConnector implements Connector {
    * BulkProcessor.
    * 
    * @param tag to index.
+   * @return true, if tag indexing was successful
    */
-  public void indexTag(TagES tag) {
+  public boolean indexTag(TagES tag) {
     String tagJson = tag.build();
     String indexMonth = generateIndex(tag.getTagServerTime());
     String type = generateType(tag.getDataType());
@@ -301,7 +302,7 @@ public class TransportConnector implements Connector {
       log.trace("indexTag() - Type = " + type);
     }
 
-    bulkAdd(indexMonth, type, tagJson, tag);
+    return bulkAdd(indexMonth, type, tagJson, tag);
   }
 
   /**
@@ -320,9 +321,11 @@ public class TransportConnector implements Connector {
     else {
 
       for (TagES tag : tags) {
-        indexTag(tag);
-        // 1 by 1 = long running
-        aliases.put(generateAliasName(tag.getTagId()), tag);
+        if (indexTag(tag)) {
+          // 1 by 1 = long running
+          aliases.put(generateAliasName(tag.getTagId()), tag);
+          // TODO: Better make one Map with indexes and types
+        }
       }
 
       // FLUSH
@@ -465,7 +468,7 @@ public class TransportConnector implements Connector {
   public boolean bulkAdd(String index, String type, String json, TagES tag) {
 
     if (tag == null || index == null || type == null || !checkIndex(index) || !checkType(type)) {
-      log.warn("bulkAdd() - Error while indexing data. Bad index or type values: " + index + ", " + type + ".");
+      log.warn("bulkAdd() - Error while indexing data. Bad index or type values: " + index + ", " + type + ". Tag #" + tag.getTagId() + " will not be sent to elasticsearch!");
       return false;
 
     }
@@ -707,8 +710,15 @@ public class TransportConnector implements Connector {
    */
   public boolean checkType(String type) {
     String dataType = type.substring(TAG_PREFIX.length());
-    return type.matches("^" + TAG_PREFIX + ".+$") && (dataType.matches(Mapping.boolType) || dataType.matches(Mapping.doubleType)
-        || dataType.matches(Mapping.intType) || dataType.matches(Mapping.longType) || dataType.matches(Mapping.stringType));
+    
+    return type.matches("^" + TAG_PREFIX + ".+$") 
+        && (dataType.matches(Mapping.boolType) 
+            || dataType.matches(Mapping.doubleType)
+            || dataType.matches(Mapping.intType) 
+            || dataType.matches(Mapping.longType) 
+            || dataType.matches(Mapping.stringType) 
+            || dataType.matches(Mapping.floatType) 
+            || dataType.matches(Mapping.shortType));
   }
 
   /**
