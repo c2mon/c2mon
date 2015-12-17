@@ -12,6 +12,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Integration test with the core modules.
@@ -73,6 +74,7 @@ public class ESLogModuleIntegrationTest {
 
   @Test
   public void testModuleStartup() {
+    assertNotNull(connector);
     String[] indices = clusterClient.admin().indices().prepareGetIndex().get().indices();
     log.info("indices in the cluster:");
     for (String index : indices) {

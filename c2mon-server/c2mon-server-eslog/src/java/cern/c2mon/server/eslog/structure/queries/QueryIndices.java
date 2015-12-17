@@ -53,19 +53,24 @@ public class QueryIndices extends Query {
   public List<String> getListOfAnswer() {
     if (client != null) {
       String[] indices = client.admin().indices().prepareGetIndex().get().indices();
+      log.info("QueryIndices - got a list of indices, size=" + indices.length);
+
+      if (indices.length > 0) {
+        log.info("index  " + indices[0]);
+      }
       return Arrays.asList(indices);
 
     } else {
-      log.warn("getListOFAnswer() - Warning: client has value " + client + ".");
-    }
 
-    return new ArrayList<>();
+      log.warn("getListOFAnswer() - Warning: client has value " + client + ".");
+      return new ArrayList<>();
+    }
   }
 
   public boolean initTest() {
     try {
       List<String> indices = getListOfAnswer();
-      log.info("Indices present in the cluster:");
+      log.info("initTest() - Indices present in the cluster:");
       for (String s : indices) {
         log.info(s);
       }

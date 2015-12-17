@@ -48,6 +48,8 @@ public class QueryAliases extends Query {
       }
     }
 
+    log.info("QueryAliases - got a list of aliases, size=" + result.size());
+
     return result;
   }
 }

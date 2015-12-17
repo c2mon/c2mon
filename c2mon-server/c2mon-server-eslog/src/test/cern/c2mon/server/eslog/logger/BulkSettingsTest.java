@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 @Slf4j
 public class BulkSettingsTest {
   @Test
-  public void should() {
+  public void shouldHaveTheRightValues() {
     assertThat(BulkSettings.BULK_ACTIONS.getSetting(), is(5600));
     assertThat(BulkSettings.CONCURRENT.getSetting(), is(1));
     assertThat(BulkSettings.BULK_SIZE.getSetting(), is(5));

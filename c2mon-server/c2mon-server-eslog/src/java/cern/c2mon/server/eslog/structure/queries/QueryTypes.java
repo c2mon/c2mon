@@ -35,6 +35,8 @@ public class QueryTypes extends Query {
       }
     }
 
+    log.info("QueryTypes - got a list of types, size=" + result.size());
+
     return result;
   }
 }

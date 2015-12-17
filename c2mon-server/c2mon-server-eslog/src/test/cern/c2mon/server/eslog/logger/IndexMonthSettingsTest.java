@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 @Slf4j
 public class IndexMonthSettingsTest {
   @Test
-  public void should() {
+  public void shouldHaveTheRightValues() {
     assertThat(IndexMonthSettings.REPLICA.getSetting(), is(0));
     assertThat(IndexMonthSettings.SHARDS.getSetting(), is(10));
   }

@@ -10,8 +10,14 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.node.Node;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,53 +25,26 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static junit.framework.TestCase.*;
-import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
  * Test the entire functionality of the node.
- * 
+ * Need to disable c2mon.properties.
  * @author Alban Marguet.
  */
 @Slf4j
+@ContextConfiguration({"classpath:cern/c2mon/server/eslog/config/server-eslog-integration.xml" })
+@RunWith(SpringJUnit4ClassRunner.class)
 public class TransportConnectorTest {
   static String clusterName;
   static String nodeName;
   static String host;
   static String home;
-  static Node clusterNode;
   static Client clusterClient;
-
+  static Client initClient;
+  @Autowired
   TransportConnector connector;
-
-  @BeforeClass
-  public static void initCluster() {
-    log.info("@BeforeClass");
-    clusterName = "elasticsearch";
-    home = "../config/elasticsearch";
-    host = "localhost";
-    nodeName = "transportNode";
-
-    clusterNode = nodeBuilder()
-        .settings(Settings.settingsBuilder()
-            .put("path.home", home)
-            .put("cluster.name", clusterName)
-            .put("node.local", true)
-            .put("node.name", "ClusterNode")
-            .put("node.data", true)
-            .put("node.master", true)
-            .put("http.enabled", false)
-            .put("transport.host", "localhost")
-            .put("transport.tcp.port", 9300)
-            .build())
-        .node();
-
-    clusterNode.start();
-    clusterClient = clusterNode.client();
-    log.info("Node created with home " + home + " in cluster " + clusterName + ".");
-    clusterClient.admin().cluster().prepareHealth().setWaitForGreenStatus().execute().actionGet();
-  }
 
   @Before
   public void clientSetup() throws IOException {
@@ -83,39 +62,35 @@ public class TransportConnectorTest {
 
     log.info("end. Cleaned ./data directory");
 
-    connector = new TransportConnector();
-    connector.setLocal(true);
-    connector.setCluster(clusterName);
-    connector.setHost(host);
-    connector.setNode(nodeName);
-    connector.setPort(TransportConnector.DEFAULT_ES_PORT);
-    connector.init();
-     //Because of the setLocal(true); to be in default mode.
-    // clean(connector.getClient(), connector.getIndices());
+    if (connector.getClient() != null) {
+      initClient = connector.getClient();
+    }
+
+    nodeName = connector.getNode();
+    clusterName = connector.getCluster();
+    host = connector.getHost();
+
+    connector.setClient(initClient);
+    clusterClient = connector.getClient();
   }
 
   @After
   public void tidyUp() {
+    sleep();
+
     log.info("@After");
-    clean(connector.getClient(), connector.getIndices());
+
+    clean(clusterClient, connector.getIndices());
     connector.getAliases().clear();
     connector.getIndices().clear();
     connector.getTypes().clear();
-    connector.close(connector.getClient());
-  }
-
-  @AfterClass
-  public static void cleanCluster() {
-    log.info("@AfterClass");
-    clusterClient.close();
-    clusterNode.close();
   }
 
   @Test
   public void testInit() {
     Settings expectedSettings = Settings.settingsBuilder().put("node.local", true).put("node.name", nodeName).put("cluster.name", clusterName).build();
 
-    assertNotNull(connector.getClient());
+    assertNotNull(clusterClient);
     assertTrue(connector.isLocal());
     assertEquals(expectedSettings, connector.getSettings());
     assertEquals("true", connector.getSettings().get("node.local"));
@@ -124,6 +99,7 @@ public class TransportConnectorTest {
     assertNotNull(connector.getTypes());
     assertNotNull(connector.getAliases());
     assertNotNull(connector.getBulkProcessor());
+    assertNotNull(connector.getClusterFinder());
   }
 
   @Test
@@ -137,43 +113,29 @@ public class TransportConnectorTest {
   }
 
   @Test
-  public void testCreateClient() {
-    Client client = connector.createClient();
-    assertNotNull(connector.getClient());
+  public void testCreateLocalClient() {
+    assertNotNull(clusterClient);
     assertEquals(1, connector.getPort());
     assertEquals("true", connector.getSettings().get("node.local"));
-    client.close();
-
-    connector.setLocal(false);
-    connector.setPort(9300);
-    client = connector.createClient();
-    assertNotNull(connector.getClient());
-    assertEquals(9300, connector.getPort());
-    assertEquals("localhost", connector.getHost());
-    client.close();
   }
 
   @Test
   public void testHandleListingQuery() {
-    Client client = connector.getClient();
     Query query = null;
     Set<String> result = new HashSet<>();
 
-    assertNull(connector.handleListingQuery(query));
+    assertTrue(connector.handleListingQuery(query).size() == 0);
 
-    query = new QueryIndexBuilder(client);
-    assertNull(connector.handleListingQuery(query));
-
-    query = new QueryIndices(client);
+    query = new QueryIndices(clusterClient);
     result.addAll(connector.handleListingQuery(query));
     assertEquals(connector.getIndices(), result);
 
-    query = new QueryAliases(client);
+    query = new QueryAliases(clusterClient);
     result = new HashSet<>();
     result.addAll(connector.handleListingQuery(query));
     assertEquals(connector.getAliases(), result);
 
-    query = new QueryTypes(client);
+    query = new QueryTypes(clusterClient);
     result = new HashSet<>();
     result.addAll(connector.handleListingQuery(query));
     assertEquals(connector.getTypes(), result);
@@ -181,29 +143,32 @@ public class TransportConnectorTest {
 
   @Test
   public void testHandleIndexQuery() {
+    Client initClient = clusterClient;
+
     Set<String> init = new HashSet<>();
     init.addAll(connector.getIndices());
     Settings settings = connector.getMonthIndexSettings();
     String type = "tag_string";
     String mapping = "";
 
-    Client client = null;
-    Query query = new QueryIndices(client); // Bad Query type
+    clusterClient = null;
+    Query query = new QueryIndices(clusterClient); // Bad Query type
     boolean result = connector.handleIndexQuery(query, "nullIndex", settings, type, mapping);
     assertEquals(init, connector.getIndices());
     assertFalse(result);
 
     // due to bad Query type
-    client = connector.getClient();
+    connector.setClient(initClient);
+    clusterClient = connector.getClient();
     result = connector.handleIndexQuery(query, "nullIndex", settings, type, mapping);
     assertFalse(result);
 
     // Parameters not set
-    query = new QueryIndexBuilder(client);
+    query = new QueryIndexBuilder(clusterClient);
     result = connector.handleIndexQuery(query, "nullIndex", settings, type, mapping);
     assertFalse(result);
 
-    query = createIndexQuery(client);
+    query = createIndexQuery(clusterClient);
     result = connector.handleIndexQuery(query, "c2mon_2015-01", settings, type, mapping);
     assertTrue(result);
     assertFalse(init.containsAll(connector.getIndices()));
@@ -217,8 +182,8 @@ public class TransportConnectorTest {
     String type = "tag_string";
     String mapping = "";
 
-    Client client = null;
-    Query query = new QueryAliases(client);
+    clusterClient = null;
+    Query query = new QueryAliases(clusterClient);
     boolean result = connector.handleAliasQuery(query, "nullIndex", "tag_1");
     assertEquals(init, connector.getAliases());
     assertFalse(result);
@@ -228,12 +193,12 @@ public class TransportConnectorTest {
     assertEquals(init, connector.getAliases());
     assertFalse(result);
 
-    client = connector.getClient();
-    query.setClient(client);
+    clusterClient = initClient;
+    query.setClient(clusterClient);
     result = connector.handleAliasQuery(query, "badFormat", "badFormat");
     assertFalse(result);
 
-    connector.handleIndexQuery(createIndexQuery(client), "c2mon_2015-01", settings, type, mapping);
+    connector.handleIndexQuery(createIndexQuery(clusterClient), "c2mon_2015-01", settings, type, mapping);
     result = connector.handleAliasQuery(query, "c2mon_2015-01", "tag_1");
     assertTrue(result);
     assertFalse(init.containsAll(connector.getAliases()));
@@ -256,10 +221,8 @@ public class TransportConnectorTest {
   public void testUpdateLists() {
     Set<String> expectedIndex = new HashSet<>();
     Set<String> expectedType = new HashSet<>();
-    Set<String> expectedAlias = new HashSet<>();
     assertEquals(expectedIndex, connector.getIndices());
     assertEquals(expectedType, connector.getTypes());
-    assertEquals(expectedAlias, connector.getAliases());
 
     connector.handleIndexQuery(createIndexQuery(connector.getClient()), "c2mon_2015-01", Settings.EMPTY, "tag_string", "");
     connector.updateLists();
@@ -267,7 +230,6 @@ public class TransportConnectorTest {
     expectedType.add("tag_string");
     assertEquals(expectedIndex, connector.getIndices());
     assertEquals(expectedType, connector.getTypes());
-    assertEquals(expectedAlias, connector.getAliases());
   }
 
   @Test
@@ -307,6 +269,7 @@ public class TransportConnectorTest {
     connector.closeBulk();
     try {
       assertTrue(connector.getBulkProcessor().awaitClose(10, TimeUnit.SECONDS));
+      assertNotNull(connector.getBulkProcessor());
     }
     catch (InterruptedException e) {
       log.info("how come?");
@@ -419,45 +382,54 @@ public class TransportConnectorTest {
   }
 
   @Test
+  @Ignore
   public void testBadBulkAdd() throws IOException {
     TagES tag = new TagString();
     tag.setDataType(Mapping.stringType);
     tag.setTagId(1L);
     tag.setMapping(Mapping.stringType);
+
     assertFalse(connector.bulkAdd(null, tag.getDataType(), tag.build(), tag));
     assertFalse(connector.bulkAdd("c2mon_2015-12", "badType", tag.build(), tag));
     assertFalse(connector.getIndices().contains("c2mon_2015-12"));
+
     assertTrue(connector.bulkAdd("c2mon_2015-12", connector.generateType(tag.getDataType()), tag.build(), tag));
+    connector.closeBulk();
+    assertTrue(connector.getIndices().size() == 1);
     assertTrue(connector.getIndices().contains("c2mon_2015-12"));
   }
 
   @Test
+  @Ignore
   public void testIndexTag() {
     TagES tag = new TagString();
     tag.setDataType(Mapping.stringType);
     tag.setMapping(Mapping.stringType);
     tag.setTagId(1L);
     tag.setTagServerTime(123456789000L);
+
     connector.indexTag(tag);
+    connector.closeBulk();
+
     assertTrue(connector.getIndices().contains(connector.generateIndex(123456789000L)));
     assertTrue(connector.getTypes().contains(connector.generateType(tag.getDataType())));
-    // assertTrue(connector.getAliases().contains(connector.generateAliasName(tag.getTagId())));
+
     QueryIndices query = new QueryIndices(connector.getClient());
     QueryTypes queryTypes = new QueryTypes(connector.getClient());
-    // QueryAliases queryAliases = new QueryAliases(connector.getClient());
+
     assertTrue(connector.handleListingQuery(query).contains(connector.generateIndex(123456789000L)));
     assertTrue(connector.handleListingQuery(queryTypes).contains(connector.generateType(tag.getDataType())));
-    // assertTrue(connector.handleListingQuery(queryAliases).contains(connector.generateAliasName(tag.getTagId())));
   }
 
   @Test
   public void testIndexTags() {
-    long size = 1000L;
+    long size = 10;
     List<TagES> list = new ArrayList<>();
     Set<String> listIndices = new HashSet<>();
     Set<String> listAliases = new HashSet<>();
     long id = 1L;
     long tagServerTime = 123456789000L;
+
     for (; id <= size; id++, tagServerTime += 1000) {
       TagES tag = new TagString();
       tag.setDataType(Mapping.stringType);
@@ -468,7 +440,9 @@ public class TransportConnectorTest {
       listIndices.add(connector.generateIndex(tag.getTagServerTime()));
       listAliases.add(connector.generateAliasName(tag.getTagId()));
     }
+
     connector.indexTags(list);
+
     Set<String> resultIndices = connector.getIndices();
     Set<String> resultAliases = connector.getAliases();
     Set<String> resultTypes = connector.getTypes();
@@ -481,6 +455,7 @@ public class TransportConnectorTest {
     List<String> liveTypes = connector.handleListingQuery(queryTypes);
     List<String> liveAliases = connector.handleListingQuery(queryAliases);
     List<Long> queryIds = new ArrayList<>();
+
     for (long i = 1; i <= size; i++) {
       queryIds.add(i);
     }
@@ -488,22 +463,22 @@ public class TransportConnectorTest {
     QueryIndices query = new QueryIndices(connector.getClient(), Arrays.asList("c2mon_1973-11"), true, Arrays.asList("tag_string"), queryIds, 0, 10, -1, -1);
     SearchResponse response = query.getResponse();
     log.info(response.toString());
+
     assertEquals(size, response.getHits().getTotalHits());
     assertTrue(resultIndices.size() == liveIndices.size());
-    // assertTrue(resultAliases.size() == size && liveAliases.size() == size);
+    assertTrue(resultAliases.size() == size && liveAliases.size() == size);
 
     assertTrue(resultTypes.contains("tag_string") && resultTypes.size() == 1);
     assertTrue(resultIndices.containsAll(listIndices) && resultIndices.size() == listIndices.size());
-    // assertTrue(resultAliases.containsAll(listAliases) && resultAliases.size()
-    // == listAliases.size());
+    assertTrue(resultAliases.containsAll(listAliases) && resultAliases.size() == listAliases.size());
 
     assertTrue(liveIndices.containsAll(resultIndices));
     assertTrue(liveTypes.containsAll(resultTypes));
-    // assertTrue(liveAliases.containsAll(resultAliases));
+    assertTrue(liveAliases.containsAll(resultAliases));
   }
 
   private void clean(Client client, Set<String> indices) {
-    log.info("Delete the mess.");
+    log.info("Delete the indices present in the ElasticSearch cluster.");
     if (client != null) {
       for (String index : indices) {
         log.info("delete " + index);
@@ -511,12 +486,13 @@ public class TransportConnectorTest {
       }
 
       client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
+      client.admin().indices().prepareRefresh().execute().actionGet();
     }
   }
 
   private void sleep() {
     try {
-      Thread.sleep(1000L);
+      Thread.sleep(2000L);
     }
     catch (InterruptedException e) {
       e.printStackTrace();

@@ -21,6 +21,7 @@ import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
@@ -28,6 +29,8 @@ import org.elasticsearch.common.transport.LocalTransportAddress;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.node.Node;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +43,8 @@ import cern.c2mon.server.eslog.structure.queries.QueryTypes;
 import cern.c2mon.server.eslog.structure.types.TagES;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+
+import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 /**
  * Allows to connect to the cluster via a transport client. Handles all the
@@ -61,9 +66,11 @@ public class TransportConnector implements Connector {
 
   /** Only used, if elasticsearch is started inside this JVM */
   private final int LOCAL_PORT = 1;
+
   /** Default port for elastic search transport node */
   public final static int DEFAULT_ES_PORT = 9300;
 
+  /** Contains in-memory the content of the Indices, types and aliases present in the cluster. */
   private final HashMap<String, Integer> bulkSettings = new HashMap<>();
   private final Set<String> indices = new HashSet<>();
   private final Set<String> types = new HashSet<>();
@@ -101,6 +108,34 @@ public class TransportConnector implements Connector {
   /** Name of the BulkProcessor (more for debugging). */
   private final String bulkProcessorName = "ES-BulkProcessor";
 
+  /** Used only if no setting is defined to connect to the cluster. */
+  private Node localNode;
+
+  /** Used to look for an ElasticSearch cluster when not connected to any. */
+  Thread clusterFinder;
+
+  public TransportConnector() {
+    declareClusterResearch();
+  }
+
+  /**
+   * Declares a new Thread that is used to look for an ElasticSearch cluster.
+   */
+  public void declareClusterResearch() {
+    clusterFinder = new Thread() {
+      public void run() {
+        try {
+          do {
+            initializationSteps();
+            Thread.sleep(1000);
+          } while (!initTestPass());
+        } catch (InterruptedException e) {
+          log.debug("clusterFinder - Interrupted.");
+        }
+      }
+    };
+  }
+
 
   /*****************************************************************************
    * 
@@ -116,51 +151,44 @@ public class TransportConnector implements Connector {
    */
   @PostConstruct
   public void init() {
-    
-    log.info("init() - Connecting to ElasticSearch cluster " + cluster + " on host=" + host + ", port=" + port + ".");
-    
-    if (!host.equalsIgnoreCase("localhost")) {
-      setLocal(false);
+    clusterFinder.start();
+    log.debug("init() - Connecting to ElasticSearch cluster " + cluster + " on host=" + host + ", port=" + port + ".");
+
+    try {
+      clusterFinder.join();
+    } catch (InterruptedException e) {
+      log.warn("init() - Interruption of the Thread when trying to wait for clusterFinder.");
     }
-    
+
+    /** The Connector found a connection to a cluster. */
+
+    log.debug("init() - initial test passed: Transport client is connected to the cluster " + cluster + ".");
+    updateLists();
+    initBulkSettings();
+
+    log.debug("init() - Everything is initialized.");
+    log.info("init() - Connected to cluster " + cluster + " with node " + node + ".");
+
+    displayLists();
+  }
+
+  /**
+   * Called by an independent thread in order to look for an ElasticSearch cluster and connect to it.
+   * This creates a Transport client that is able to communicate with the nodes.
+   */
+  public void initializationSteps() {
     if (isLocal) {
-      log.debug("init() - Connecting to local ElasticSearch instance (inside same JVM) is enabled.");
-      
-      //TODO: launch a local cluster.
+      setHost("local");
+      setPort(LOCAL_PORT);
+
+      localNode = launchLocalCluster();
+      log.info("init() - Connecting to local ElasticSearch instance (inside same JVM) is enabled.");
     }
     else {
-      log.debug("init() - Connecting to local ElasticSearch instance (inside same JVM) is disabled.");
+      log.info("init() - Connecting to local ElasticSearch instance (inside same JVM) is disabled.");
     }
-    
+
     this.client = createClient();
-
-    if (initTestPass()) {
-      log.debug("init() - initial test passed: Transport client is connected to the cluster " + cluster + ".");
-      updateLists();
-      initBulkSettings();
-
-      log.info("init() - Everything is initialized.");
-      log.info("init() - Connected to cluster " + cluster + " with node " + node + ".");
-
-      log.info("Indices in the cluster:");
-      for (String index : indices) {
-        log.debug(index);
-      }
-
-      log.info("Types in the cluster:");
-      for (String type : types) {
-        log.debug(type);
-      }
-
-      log.info("Aliases in the cluster:");
-      for (String alias : aliases) {
-        log.debug(alias);
-      }
-
-    }
-    else {
-      log.error("init() - Cluster is not initialized: cluster:" + cluster + ", host: " + host + ", port: " + port + ".");
-    }
   }
 
   /**
@@ -175,11 +203,13 @@ public class TransportConnector implements Connector {
 
     this.bulkProcessor = BulkProcessor.builder(client, new BulkProcessor.Listener() {
       public void beforeBulk(long executionId, BulkRequest request) {
-        log.info("Going to execute new bulk composed of {} actions", request.numberOfActions());
+        log.debug("Going to execute new bulk composed of {} actions", request.numberOfActions());
       }
 
       public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
-        log.info("Executed bulk composed of {} actions", request.numberOfActions());
+        log.debug("afterBulk() - Executed bulk composed of {} actions", request.numberOfActions());
+        log.debug("afterBulk() - Now updating lists in memory...");
+        refreshClusterStats();
       }
 
       public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
@@ -204,35 +234,25 @@ public class TransportConnector implements Connector {
     if (isLocal) {
       this.settings = Settings.settingsBuilder().put("node.local", isLocal).put("node.name", node).put("cluster.name", cluster).build();
 
-      setPort(LOCAL_PORT);
-
-      Client builder = TransportClient.builder().settings(settings).build()
+      log.debug("Creating local client on host " + host + " and port " + port + " with name " + node + ", in cluster " + cluster + ".");
+      return TransportClient.builder().settings(settings).build()
           .addTransportAddress(new LocalTransportAddress(String.valueOf(port)));
-
-      log.info("Created local client on host " + host + " and port " + port + " with name " + node + ", in cluster " + cluster + ".");
-      return builder;
 
     }
     else {
-
       this.settings = Settings.settingsBuilder().put("cluster.name", cluster).put("node.name", node).build();
 
-      setPort(port);
+      log.debug("Creating  client on host " + host + " and port " + port + " with name " + node + ", in cluster " + cluster + ".");
 
       try {
-        Client builder = TransportClient.builder().settings(settings).build()
+        return TransportClient.builder().settings(settings).build()
             .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), port));
-
-        log.debug("Created client on host " + host + " and port " + port + " with name " + node + ", in cluster " + cluster + ".");
-        return builder;
-
       }
       catch (UnknownHostException e) {
         log.error("createTransportClient() - Error whilst connecting to the ElasticSearch cluster (host=" + host + ", port=" + port + ").", e);
+        return null;
       }
     }
-
-    return null;
   }
 
   /**
@@ -243,9 +263,15 @@ public class TransportConnector implements Connector {
    */
   public boolean initTestPass() {
     if (client != null) {
-      client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
-      return new QueryIndices(client).initTest();
+      try {
+        client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
+        log.debug("initTestPass() - Everything is allright.");
+        return true;
 
+      } catch (NoNodeAvailableException e) {
+        log.debug("initTestPass() - NoNodeAvailableException: cluster not reachable.");
+        return false;
+      }
     }
     else {
       log.warn("initTestPass() - client for the ElasticSearch cluster seems to have null value.");
@@ -300,14 +326,14 @@ public class TransportConnector implements Connector {
       // FLUSH
       log.debug("Close bulk.");
       closeBulk();
+      refreshClusterStats();
 
       for (String alias : aliases.keySet()) {
         bulkAddAlias(generateIndex(aliases.get(alias).getTagServerTime()), aliases.get(alias));
       }
 
       /** For quasi real time retrieval. */
-      client.admin().indices().prepareRefresh().execute().actionGet();
-      client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
+      refreshClusterStats();
     }
   }
 
@@ -332,24 +358,23 @@ public class TransportConnector implements Connector {
 
     if (client == null) {
       log.error("handleQuery() - Error: the client value is " + client + ".");
-      return null;
     }
 
     if (query instanceof QueryIndices) {
-      log.info("Handling queryIndices.");
+      log.debug("handleListingQuery() - Handling queryIndices.");
       queryResponse.addAll(((QueryIndices) query).getListOfAnswer());
+
     }
     else if (query instanceof QueryAliases) {
-      log.info("Handling queryAliases.");
+      log.debug("handleListingQuery() - Handling queryAliases.");
       queryResponse.addAll(((QueryAliases) query).getListOfAnswer());
     }
     else if (query instanceof QueryTypes) {
-      log.info("Handling queryTypes.");
+      log.debug("handleListingQuery() - Handling queryTypes.");
       queryResponse.addAll(((QueryTypes) query).getListOfAnswer());
     }
     else {
-      log.error("handleQuery() - Unhandled query type.");
-      return null;
+      log.error("handleListingQuery() - Unhandled query type.");
     }
 
     return queryResponse;
@@ -381,6 +406,7 @@ public class TransportConnector implements Connector {
       isAcked = ((QueryIndexBuilder) query).indexNew(indexName, settings, type, mapping);
 
       if (isAcked) {
+        log.debug("handleIndexQuery() - success in indexing " + indexName + ".");
         addType(type);
         addIndex(indexName);
       }
@@ -433,13 +459,8 @@ public class TransportConnector implements Connector {
    * @param type of the document.
    * @param json request for indexing.
    * @param tag TagES to be indexed.
-   * @throws IOException
    */
   public boolean bulkAdd(String index, String type, String json, TagES tag) {
-    log.debug("indices:");
-    for (String i : indices) {
-      log.debug(i);
-    }
 
     if (tag == null || index == null || type == null || !checkIndex(index) || !checkType(type)) {
       log.warn("bulkAdd() - Error while indexing data. Bad index or type values: " + index + ", " + type + ".");
@@ -447,20 +468,26 @@ public class TransportConnector implements Connector {
 
     }
     else {
-
-      if (!indices.contains(index)) {
-        boolean isIndexed = instantiateIndex(tag, index, type);
-
-        if (isIndexed) {
-          addType(type);
-          addIndex(index);
-          log.debug("Indexed a new tag of type " + type + ".");
-        }
-      }
+//      if (!indices.contains(index)) {
+//        log.info("bulkAdd() - Trying to instantiate new index " + index + ".");
+//        boolean isIndexed = instantiateIndex(tag, index, type);
+//
+//        if (isIndexed) {
+//          addType(type);
+//          addIndex(index);
+//          log.debug("bulkAdd() - Indexed a new tag of type " + type + " to index " + index + ".");
+//        }
+//      }
 
       IndexRequest indexNewTag = new IndexRequest(index, type).source(json).routing(String.valueOf(tag.getTagId()));
-      bulkProcessor.add(indexNewTag);
-      return true;
+
+      if (bulkProcessor != null) {
+        bulkProcessor.add(indexNewTag);
+        log.debug("bulkAdd() - BulkProcessor will handle indexing of new index: " + index + ".");
+        return true;
+      }
+
+      return false;
     }
   }
 
@@ -484,7 +511,7 @@ public class TransportConnector implements Connector {
 
       if (isAcked) {
         addAlias(aliasName);
-        log.debug("Add alias: " + aliasName + " for index " + indexMonth);
+        log.debug("bulKAddAlias() - Add alias: " + aliasName + " for index " + indexMonth + ".");
       }
       return true;
     }
@@ -504,6 +531,7 @@ public class TransportConnector implements Connector {
    */
   public boolean instantiateIndex(TagES tag, String index, String type) {
     if (indices.contains(index)) {
+      log.debug("instantiateIndex() - cluster already contains " + index + ".");
       return false;
     }
 
@@ -514,6 +542,7 @@ public class TransportConnector implements Connector {
     }
 
     updateLists();
+    log.debug("instantiateIndex() - updating lists in memory.");
 
     return handleIndexQuery(new QueryIndexBuilder(client, Arrays.asList(index), true, Arrays.asList(type), null, -1, -1, -1, -1), index,
         getMonthIndexSettings(), type, mapping);
@@ -525,15 +554,22 @@ public class TransportConnector implements Connector {
    * indices, types and aliases.
    */
   public void updateLists() {
-    indices.addAll(handleListingQuery(new QueryIndices(client)));
-    types.addAll(handleListingQuery(new QueryTypes(client)));
-    aliases.addAll(handleListingQuery(new QueryAliases(client)));
+    if (client != null) {
+      indices.addAll(handleListingQuery(new QueryIndices(client)));
+      types.addAll(handleListingQuery(new QueryTypes(client)));
+      aliases.addAll(handleListingQuery(new QueryAliases(client)));
+      log.debug("updateLists() - Updating list of indices, types and aliases.");
+    } else {
+      log.warn("updateLists() - Warning: Client seems to be null.");
+    }
+
+    displayLists();
   }
 
   /**
    * Utility method. Aliases have the following format: "tag_tagId".
    * 
-   * @param tagId
+   * @param tagId tag of the TagES for which to create Alias.
    * @return name of the alias for a given tagId.
    */
   public String generateAliasName(long tagId) {
@@ -580,7 +616,8 @@ public class TransportConnector implements Connector {
    */
   public void closeBulk() {
     try {
-      bulkProcessor.awaitClose(1, TimeUnit.SECONDS);
+      bulkProcessor.awaitClose(100, TimeUnit.MILLISECONDS);
+      log.debug("closeBulk() - closing bulkProcessor");
     }
     catch (InterruptedException e) {
       log.warn("closeBulk() - Error whilst awaitClose() the bulkProcessor.", e);
@@ -608,6 +645,7 @@ public class TransportConnector implements Connector {
   public void addIndex(String indexName) {
     if (checkIndex(indexName)) {
       indices.add(indexName);
+      log.debug("addIndex() - Added index " + indexName + " in memory list.");
     }
     else {
       throw new IllegalArgumentException("Indices must follow the format \"c2mon_YYYY_MM\".");
@@ -616,11 +654,12 @@ public class TransportConnector implements Connector {
 
   /**
    * Add an alias to the Set aliases. Called by the writing of a new alias if it was successful.
-   * @param aliasName
+   * @param aliasName name of the alias to give.
    */
   public void addAlias(String aliasName) {
     if (checkAlias(aliasName)) {
       aliases.add(aliasName);
+      log.debug("addAlias() - Added alias " + aliasName + " in memory list.");
     }
     else {
       throw new IllegalArgumentException("Aliases must follow the format \"tag_tagId\".");
@@ -634,6 +673,7 @@ public class TransportConnector implements Connector {
   public void addType(String typeName) {
     if (checkType(typeName)) {
       types.add(typeName);
+      log.debug("addType() - Added type " + typeName + " in memory list.");
     }
     else {
       throw new IllegalArgumentException("Types must follow the format \"tag_dataType\".");
@@ -677,5 +717,51 @@ public class TransportConnector implements Connector {
   public Settings getMonthIndexSettings() {
     return Settings.settingsBuilder().put("number_of_shards", IndexMonthSettings.SHARDS.getSetting())
         .put("number_of_replicas", IndexMonthSettings.REPLICA.getSetting()).build();
+  }
+
+  /**
+   * Launch a local (to the JVM) ElasticSearch cluster that will answer to the Queries.
+   * @return Node with which we can communicate.
+   */
+  private Node launchLocalCluster() {
+    String home = ".";
+    setLocal(true);
+    log.info("launchLocalCLuster() - Launch a new local cluster: home=" + home + ", clusterName=" + cluster + ".");
+
+    return nodeBuilder().settings(Settings.settingsBuilder()
+            .put("path.home", home)
+            .put("cluster.name", cluster)
+            .put("node.local", isLocal)
+            .put("node.name", "ClusterNode")
+            .put("node.data", true)
+            .put("node.master", true)
+            .put("http.enabled", false)
+            .build())
+        .node();
+  }
+
+  public void displayLists() {
+    log.debug("displayLists():");
+    log.debug("Indices in the cluster:");
+    for (String index : indices) {
+      log.debug(index);
+    }
+
+    log.debug("Types in the cluster:");
+    for (String type : types) {
+      log.debug(type);
+    }
+
+    log.debug("Aliases in the cluster:");
+    for (String alias : aliases) {
+      log.debug(alias);
+    }
+  }
+
+  public void refreshClusterStats() {
+    log.debug("refreshClusterStats()");
+    client.admin().indices().prepareRefresh().execute().actionGet();
+    client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
+    updateLists();
   }
 }
