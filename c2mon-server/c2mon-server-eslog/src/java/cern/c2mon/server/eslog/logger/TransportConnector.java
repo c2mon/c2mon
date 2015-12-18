@@ -298,7 +298,7 @@ public class TransportConnector implements Connector {
    */
   protected boolean indexTag(TagES tag) {
     String tagJson = tag.build();
-    String indexMonth = generateIndex(tag.getTagServerTime());
+    String indexMonth = generateIndex(tag.getServerTime());
     String type = generateType(tag.getDataType());
     
     if (log.isTraceEnabled()) {
@@ -328,7 +328,7 @@ public class TransportConnector implements Connector {
       for (TagES tag : tags) {
         if (indexTag(tag)) {
           // 1 by 1 = long running
-          aliases.put(generateAliasName(tag.getTagId()), tag);
+          aliases.put(generateAliasName(tag.getId()), tag);
           // TODO: Better make one Map with indexes and types
         }
       }
@@ -339,7 +339,7 @@ public class TransportConnector implements Connector {
       refreshClusterStats();
 
       for (String alias : aliases.keySet()) {
-        bulkAddAlias(generateIndex(aliases.get(alias).getTagServerTime()), aliases.get(alias));
+        bulkAddAlias(generateIndex(aliases.get(alias).getServerTime()), aliases.get(alias));
       }
 
       /** For quasi real time retrieval. */
@@ -474,7 +474,7 @@ public class TransportConnector implements Connector {
   public boolean bulkAdd(String index, String type, String json, TagES tag) {
 
     if (tag == null || index == null || type == null || !checkIndex(index) || !checkType(type)) {
-      log.warn("bulkAdd() - Error while indexing data. Bad index or type values: " + index + ", " + type + ". Tag #" + tag.getTagId() + " will not be sent to elasticsearch!");
+      log.warn("bulkAdd() - Error while indexing data. Bad index or type values: " + index + ", " + type + ". Tag #" + tag.getId() + " will not be sent to elasticsearch!");
       return false;
 
     }
@@ -490,7 +490,7 @@ public class TransportConnector implements Connector {
 //        }
 //      }
 
-      IndexRequest indexNewTag = new IndexRequest(index, type).source(json).routing(String.valueOf(tag.getTagId()));
+      IndexRequest indexNewTag = new IndexRequest(index, type).source(json).routing(String.valueOf(tag.getId()));
 
       if (bulkProcessor != null) {
         bulkProcessor.add(indexNewTag);
@@ -517,7 +517,7 @@ public class TransportConnector implements Connector {
       throw new IllegalArgumentException("bulkAddAlias() - IllegalArgument (tag = " + tag + ", index = " + indexMonth + ").");
     }
 
-    long id = tag.getTagId();
+    long id = tag.getId();
     String aliasName = generateAliasName(id);
 
     if (!aliases.contains(aliasName)) {

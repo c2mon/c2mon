@@ -262,8 +262,8 @@ public class TransportConnectorTest {
   public void testGenerateIndex() {
     String expected = connector.getINDEX_PREFIX() + connector.millisecondsToYearMonth(123456L);
     TagES tag = new TagBoolean();
-    tag.setTagServerTime(123456L);
-    String value = connector.generateIndex(tag.getTagServerTime());
+    tag.setServerTime(123456L);
+    String value = connector.generateIndex(tag.getServerTime());
     assertEquals(expected, value);
   }
 
@@ -378,7 +378,7 @@ public class TransportConnectorTest {
   @Test
   public void testBulkAddAlias() {
     TagES tag = new TagString();
-    tag.setTagId(1L);
+    tag.setId(1L);
     tag.setDataType(ValueType.stringType.toString());
     tag.setMapping(ValueType.stringType);
     connector.getAliases().add("tag_1");
@@ -396,7 +396,7 @@ public class TransportConnectorTest {
   public void testBadBulkAdd() throws IOException {
     TagES tag = new TagString();
     tag.setDataType(ValueType.stringType.toString());
-    tag.setTagId(1L);
+    tag.setId(1L);
     tag.setMapping(ValueType.stringType);
 
     assertFalse(connector.bulkAdd(null, tag.getDataType(), tag.build(), tag));
@@ -415,8 +415,8 @@ public class TransportConnectorTest {
     TagES tag = new TagString();
     tag.setDataType(ValueType.stringType.toString());
     tag.setMapping(ValueType.stringType);
-    tag.setTagId(1L);
-    tag.setTagServerTime(123456789000L);
+    tag.setId(1L);
+    tag.setServerTime(123456789000L);
 
     connector.indexTag(tag);
     connector.closeBulk();
@@ -444,11 +444,11 @@ public class TransportConnectorTest {
       TagES tag = new TagString();
       tag.setDataType(ValueType.stringType.toString());
       tag.setMapping(ValueType.stringType);
-      tag.setTagId(id);
-      tag.setTagServerTime(tagServerTime);
+      tag.setId(id);
+      tag.setServerTime(tagServerTime);
       list.add(tag);
-      listIndices.add(connector.generateIndex(tag.getTagServerTime()));
-      listAliases.add(connector.generateAliasName(tag.getTagId()));
+      listIndices.add(connector.generateIndex(tag.getServerTime()));
+      listAliases.add(connector.generateAliasName(tag.getId()));
     }
 
     connector.indexTags(list);

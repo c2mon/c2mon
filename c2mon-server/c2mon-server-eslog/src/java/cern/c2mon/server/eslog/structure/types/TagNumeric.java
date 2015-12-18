@@ -11,9 +11,9 @@ public class TagNumeric extends TagES implements TagESInterface {
    * @param tagValue Object supposed to be numeric.
    */
   @Override
-  public void setTagValue(Object tagValue) {
+  public void setValue(Object tagValue) {
     if (tagValue instanceof Number) {
-      this.tagValue = tagValue;
+      this.value = tagValue;
     } else {
       throw new IllegalArgumentException("Must pass a numeric tagValue to TagNumeric in ElasticSearch");
     }

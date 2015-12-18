@@ -1,8 +1,5 @@
 package cern.c2mon.server.eslog.structure.types;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -19,26 +16,28 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Data
 public abstract class TagES implements TagESInterface {
-  private Map<String, String> metadataProcess;
-  private long tagId;
-  private String tagName;
+  private long id;
+  private String name;
   private String dataType;
-  private long tagTime;
-  private long tagServerTime;
-  private long tagDaqTime;
-  private int tagStatus;
+  private long sourceTime;
+  private long serverTime;
+  private long daqTime;
+  private int status;
   private String quality; //tagstatusdesc
-  protected Object tagValue;
-  private String tagValueDesc;
+  protected Object value;
+  private String valueDescription;
+  
+  private String process;
+  private String equipment;
+  private String subEquipment;
   protected transient TagESMapping mapping;
 
 
   public TagES() {
-    this.metadataProcess = new HashMap<>();
     this.mapping = new TagESMapping();
   }
 
-  abstract public void setTagValue(Object tagValue);
+  abstract public void setValue(Object tagValue);
 
   public String getMapping() {
     return mapping.getMapping();
@@ -65,23 +64,23 @@ public abstract class TagES implements TagESInterface {
   @Override
   public String toString() {
     StringBuilder str = new StringBuilder();
-    str.append(getTagId());
+    str.append(getId());
     str.append('\t');
-    str.append(getTagName());
+    str.append(getName());
     str.append('\t');
     str.append("tagValue");
     str.append('\t');
-    str.append(getTagValueDesc());
+    str.append(getValueDescription());
     str.append('\t');
     str.append(getDataType());
     str.append('\t');
-    str.append(getTagTime());
+    str.append(getSourceTime());
     str.append('\t');
-    str.append(getTagDaqTime());
+    str.append(getDaqTime());
     str.append('\t');
-    str.append(getTagServerTime());
+    str.append(getServerTime());
     str.append('\t');
-    str.append(getTagStatus());
+    str.append(getStatus());
     str.append('\t');
     if ((getQuality() != null) && (getQuality().equals(""))) {
       str.append("null");
@@ -89,10 +88,11 @@ public abstract class TagES implements TagESInterface {
       str.append(getQuality());
     }
     str.append('\t');
-    for (String metadata : getMetadataProcess().values()) {
-      str.append(metadata);
-      str.append('\t');
-    }
+    str.append(getProcess());
+    str.append('\t');
+    str.append(getEquipment());
+    str.append('\t');
+    str.append(getSubEquipment());
     return str.toString();
   }
 }

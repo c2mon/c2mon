@@ -26,20 +26,20 @@ public class TagBooleanTest {
 
   @Test
   public void testValue() {
-    tagBoolean.setTagValue(true);
+    tagBoolean.setValue(true);
 
-    assertEquals(true, tagBoolean.getTagValue());
-    assertTrue(tagBoolean.getTagValue() instanceof Boolean);
+    assertEquals(true, tagBoolean.getValue());
+    assertTrue(tagBoolean.getValue() instanceof Boolean);
 
-    tagBoolean.setTagValue(false);
+    tagBoolean.setValue(false);
 
-    assertEquals(false, tagBoolean.getTagValue());
-    assertTrue(tagBoolean.getTagValue() instanceof Boolean);
+    assertEquals(false, tagBoolean.getValue());
+    assertTrue(tagBoolean.getValue() instanceof Boolean);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testBadValue() {
-    tagBoolean.setTagValue("NotBoolean");
+    tagBoolean.setValue("NotBoolean");
   }
 
   @Test

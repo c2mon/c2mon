@@ -62,10 +62,19 @@ public class DataTagESLogConverter {
       return null;
     }
 
-    tagES.setMetadataProcess(getTagMetadataProcess(tag));
+    Map<String, String> parentNames = getTagMetadataProcess(tag);
+    if (parentNames.containsKey("process")) {
+      tagES.setProcess(parentNames.get("process"));
+    }
+    if (parentNames.containsKey("equipment")) {
+      tagES.setEquipment(parentNames.get("equipment"));
+    }
+    if (parentNames.containsKey("subEquipment")) {
+      tagES.setSubEquipment(parentNames.get("subEquipment"));
+    }
 
-    tagES.setTagId(tag.getId());
-    tagES.setTagName(tag.getName());
+    tagES.setId(tag.getId());
+    tagES.setName(tag.getName());
     tagES.setDataType(tag.getDataType().toLowerCase());
 
     if (tag instanceof DataTag || tag instanceof ControlTag) {
@@ -73,14 +82,14 @@ public class DataTagESLogConverter {
       Timestamp daqTimeStamp = ((DataTag) tag).getDaqTimestamp();
 
       if (sourceTimeStamp != null && daqTimeStamp != null) {
-        tagES.setTagTime(sourceTimeStamp.getTime());
-        tagES.setTagDaqTime(daqTimeStamp.getTime());
+        tagES.setSourceTime(sourceTimeStamp.getTime());
+        tagES.setDaqTime(daqTimeStamp.getTime());
       }
     }
 
     Timestamp serverTimeStamp = tag.getCacheTimestamp();
     if (serverTimeStamp != null) {
-      tagES.setTagServerTime(serverTimeStamp.getTime());
+      tagES.setServerTime(serverTimeStamp.getTime());
     }
 
     int code = 0;
@@ -91,7 +100,7 @@ public class DataTagESLogConverter {
       }
     }
 
-    tagES.setTagStatus(code);
+    tagES.setStatus(code);
 
     DataTagQuality quality = tag.getDataTagQuality();
 
@@ -103,8 +112,8 @@ public class DataTagESLogConverter {
       }
     }
 
-    tagES.setTagValue(tag.getValue());
-    tagES.setTagValueDesc(tag.getValueDescription());
+    tagES.setValue(tag.getValue());
+    tagES.setValueDescription(tag.getValueDescription());
 
     return tagES;
   }
@@ -186,19 +195,19 @@ public class DataTagESLogConverter {
 
     processName = getProcessName(processId);
     log.info("add process");
-    result.put("Process", processName);
+    result.put("process", processName);
 
     if (equipmentId != -1) {
       equipmentName = getEquipmentName(equipmentId);
       if (equipmentName != null) {
-        result.put("Equipment", equipmentName);
+        result.put("equipment", equipmentName);
         log.info("add equipment");
       }
     }
     if (subEquipmentId != -1) {
       subEquipmentName = getSubEquipmentName(subEquipmentId);
       if (subEquipmentName != null) {
-        result.put("SubEquipment", subEquipmentName);
+        result.put("subEquipment", subEquipmentName);
         log.info("add subEquipment");
       }
     }

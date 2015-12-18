@@ -25,15 +25,15 @@ public class TagStringTest {
 
 	@Test
 	public void testValue() {
-		tagString.setTagValue("test");
+		tagString.setValue("test");
 
-		assertEquals("test", tagString.getTagValue());
-		assertTrue(tagString.getTagValue() instanceof String);
+		assertEquals("test", tagString.getValue());
+		assertTrue(tagString.getValue() instanceof String);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testBadValue() {
-		tagString.setTagValue(123456789);
+		tagString.setValue(123456789);
 	}
 
 	@Test
@@ -49,7 +49,7 @@ public class TagStringTest {
 	public void testBuild() throws IOException {
 		tagString.setQuality("ok");
 		String line = "\n  \"quality\": \"ok\"";
-		String text = "{\n  \"metadataProcess\": {},\n  \"tagId\": 0,\n  \"tagTime\": 0,\n  \"tagServerTime\": 0,\n  \"tagDaqTime\": 0,\n  \"tagStatus\": 0," + line + "\n}";
+		String text = "{\n  \"metadataProcess\": {},\n  \"Id\": 0,\n  \"sourceTime\": 0,\n  \"serverTime\": 0,\n  \"daqTime\": 0,\n  \"status\": 0," + line + "\n}";
 
 		assertEquals(text, tagString.build());
 	}

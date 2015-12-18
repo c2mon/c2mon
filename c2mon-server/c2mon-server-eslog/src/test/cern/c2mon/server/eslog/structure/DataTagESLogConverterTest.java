@@ -1,7 +1,6 @@
 package cern.c2mon.server.eslog.structure;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -33,226 +32,226 @@ import cern.c2mon.shared.common.datatag.DataTagQuality;
 
 /**
  * Checks on the fields of data appened/set to TagES.
+ * 
  * @author Alban Marguet.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class DataTagESLogConverterTest {
 
-	/**
-	 * The class under test.
-	 */
-	@InjectMocks
-	DataTagESLogConverter esLogConverter;
+  /**
+   * The class under test.
+   */
+  @InjectMocks
+  DataTagESLogConverter esLogConverter;
 
-	@Mock
-	ProcessCache processCache;
+  @Mock
+  ProcessCache processCache;
 
-	@Mock
-	EquipmentCache equipmentCache;
+  @Mock
+  EquipmentCache equipmentCache;
 
-	@Mock
-	SubEquipmentCache subEquipmentCache;
+  @Mock
+  SubEquipmentCache subEquipmentCache;
 
-	@Mock
-	DataTagQuality dataTagQuality;
+  @Mock
+  DataTagQuality dataTagQuality;
 
-	@Mock
-	DataTagCacheObject tag;
+  @Mock
+  DataTagCacheObject tag;
 
-	@Mock
-	Tag tagC2MON;
+  @Mock
+  Tag tagC2MON;
 
-	@Mock
-	TagES tagES;
+  @Mock
+  TagES tagES;
 
-	@Test
-	public void testGetProcessName() {
-		ProcessCacheObject process = CacheObjectCreation.createTestProcess1();
-		String expected = "process1";
-		process.setName(expected);
+  @Test
+  public void testGetProcessName() {
+    ProcessCacheObject process = CacheObjectCreation.createTestProcess1();
+    String expected = "process1";
+    process.setName(expected);
 
-		when(processCache.get(1L)).thenReturn(process);
-		assertEquals(expected, processCache.get(1L).getName());
-	}
+    when(processCache.get(1L)).thenReturn(process);
+    assertEquals(expected, processCache.get(1L).getName());
+  }
 
-	@Test
-	public void testGetEquipmentName() {
-		EquipmentCacheObject equipment = CacheObjectCreation.createTestEquipment();
-		String expected = "equipment1";
-		equipment.setName(expected);
+  @Test
+  public void testGetEquipmentName() {
+    EquipmentCacheObject equipment = CacheObjectCreation.createTestEquipment();
+    String expected = "equipment1";
+    equipment.setName(expected);
 
-		when(equipmentCache.get(1L)).thenReturn(equipment);
-		assertEquals(expected, equipmentCache.get(1L).getName());
-	}
+    when(equipmentCache.get(1L)).thenReturn(equipment);
+    assertEquals(expected, equipmentCache.get(1L).getName());
+  }
 
-	@Test
-	public void testGetSubEquipmentName() {
-		SubEquipmentCacheObject subEquipment = CacheObjectCreation.createTestSubEquipment();
-		String expected = "subEquipment1";
-		subEquipment.setName(expected);
+  @Test
+  public void testGetSubEquipmentName() {
+    SubEquipmentCacheObject subEquipment = CacheObjectCreation.createTestSubEquipment();
+    String expected = "subEquipment1";
+    subEquipment.setName(expected);
 
-		when(subEquipmentCache.get(1L)).thenReturn(subEquipment);
-		assertEquals(expected, subEquipmentCache.get(1L).getName());
-	}
+    when(subEquipmentCache.get(1L)).thenReturn(subEquipment);
+    assertEquals(expected, subEquipmentCache.get(1L).getName());
+  }
 
-	@Test
-	public void generalTestGetTagMetadataProcess() {
-		ProcessCacheObject process = CacheObjectCreation.createTestProcess1();
-		process.setName("process");
-		EquipmentCacheObject equipment = CacheObjectCreation.createTestEquipment();
-		equipment.setName("equipment");
-		equipment.setProcessId(process.getId());
-		SubEquipmentCacheObject subEquipment = CacheObjectCreation.createTestSubEquipment();
-		subEquipment.setName("subEquipment");
-		subEquipment.setParentId(equipment.getId());
-		HashMap<String, String> expected = new HashMap<>();
-		expected.put("Process", "process");
-		expected.put("Equipment", "equipment");
-		expected.put("SubEquipment", "subEquipment");
+  @Test
+  public void generalTestGetTagMetadataProcess() {
+    ProcessCacheObject process = CacheObjectCreation.createTestProcess1();
+    process.setName("process");
+    EquipmentCacheObject equipment = CacheObjectCreation.createTestEquipment();
+    equipment.setName("equipment");
+    equipment.setProcessId(process.getId());
+    SubEquipmentCacheObject subEquipment = CacheObjectCreation.createTestSubEquipment();
+    subEquipment.setName("subEquipment");
+    subEquipment.setParentId(equipment.getId());
+    HashMap<String, String> expected = new HashMap<>();
+    expected.put("Process", "process");
+    expected.put("Equipment", "equipment");
+    expected.put("SubEquipment", "subEquipment");
 
-		when(processCache.get(1L)).thenReturn(process);
-		when(equipmentCache.get(1L)).thenReturn(equipment);
-		when(subEquipmentCache.get(1L)).thenReturn(subEquipment);
+    when(processCache.get(1L)).thenReturn(process);
+    when(equipmentCache.get(1L)).thenReturn(equipment);
+    when(subEquipmentCache.get(1L)).thenReturn(subEquipment);
 
-		assertEquals(processCache.get(1L), process);
-		assertEquals(equipmentCache.get(1L), equipment);
-		assertEquals(subEquipmentCache.get(1L), subEquipment);
+    assertEquals(processCache.get(1L), process);
+    assertEquals(equipmentCache.get(1L), equipment);
+    assertEquals(subEquipmentCache.get(1L), subEquipment);
 
-		when(tag.getSubEquipmentIds()).thenReturn(Collections.singleton(subEquipment.getId()));
-		assertEquals(subEquipmentCache.get(1L).getParentId(), equipment.getId());
-		assertEquals(equipmentCache.get(1L).getProcessId(), process.getId());
-	}
+    when(tag.getSubEquipmentIds()).thenReturn(Collections.singleton(subEquipment.getId()));
+    assertEquals(subEquipmentCache.get(1L).getParentId(), equipment.getId());
+    assertEquals(equipmentCache.get(1L).getProcessId(), process.getId());
+  }
 
-	@Test
-	public void testGetTagMetadataProcessWithSubEquipment() {
-		ProcessCacheObject process = CacheObjectCreation.createTestProcess1();
-		process.setName("process");
-		EquipmentCacheObject equipment = CacheObjectCreation.createTestEquipment();
-		equipment.setName("equipment");
-		equipment.setProcessId(process.getId());
-		SubEquipmentCacheObject subEquipment = CacheObjectCreation.createTestSubEquipment();
-		subEquipment.setName("subEquipment");
-		subEquipment.setParentId(equipment.getId());
-		HashMap<String, String> expected = new HashMap<>();
-		expected.put("Process", "process");
-		expected.put("Equipment", "equipment");
-		expected.put("SubEquipment", "subEquipment");
+  @Test
+  public void testGetTagMetadataProcessWithSubEquipment() {
+    ProcessCacheObject process = CacheObjectCreation.createTestProcess1();
+    process.setName("process");
+    EquipmentCacheObject equipment = CacheObjectCreation.createTestEquipment();
+    equipment.setName("equipment");
+    equipment.setProcessId(process.getId());
+    SubEquipmentCacheObject subEquipment = CacheObjectCreation.createTestSubEquipment();
+    subEquipment.setName("subEquipment");
+    subEquipment.setParentId(equipment.getId());
+    HashMap<String, String> expected = new HashMap<>();
+    expected.put("Process", "process");
+    expected.put("Equipment", "equipment");
+    expected.put("SubEquipment", "subEquipment");
 
-		tag.setProcessId(process.getId());
-		when(processCache.get(process.getId())).thenReturn(process);
-		tag.setEquipmentId(equipment.getId());
-		when(equipmentCache.get(equipment.getId())).thenReturn(equipment);
-		tag.setSubEquipmentId(subEquipment.getId());
-		when(subEquipmentCache.get(subEquipment.getId())).thenReturn(subEquipment);
-		when(tag.getSubEquipmentIds()).thenReturn(Collections.singleton(subEquipment.getId()));
+    tag.setProcessId(process.getId());
+    when(processCache.get(process.getId())).thenReturn(process);
+    tag.setEquipmentId(equipment.getId());
+    when(equipmentCache.get(equipment.getId())).thenReturn(equipment);
+    tag.setSubEquipmentId(subEquipment.getId());
+    when(subEquipmentCache.get(subEquipment.getId())).thenReturn(subEquipment);
+    when(tag.getSubEquipmentIds()).thenReturn(Collections.singleton(subEquipment.getId()));
 
-		Map <String, String> result = esLogConverter.getTagMetadataProcess(tag);
+    Map<String, String> result = esLogConverter.getTagMetadataProcess(tag);
 
-		assertEquals(expected, result);
-	}
+    assertEquals(expected, result);
+  }
 
-	@Test
-	public void testGetTagMetadataProcessWithEquipment() {
-		ProcessCacheObject process = CacheObjectCreation.createTestProcess1();
-		process.setName("process");
-		EquipmentCacheObject equipment = CacheObjectCreation.createTestEquipment();
-		equipment.setName("equipment");
-		equipment.setProcessId(process.getId());
+  @Test
+  public void testGetTagMetadataProcessWithEquipment() {
+    ProcessCacheObject process = CacheObjectCreation.createTestProcess1();
+    process.setName("process");
+    EquipmentCacheObject equipment = CacheObjectCreation.createTestEquipment();
+    equipment.setName("equipment");
+    equipment.setProcessId(process.getId());
 
-		HashMap<String, String> expected = new HashMap<>();
-		expected.put("Process", "process");
-		expected.put("Equipment", "equipment");
+    HashMap<String, String> expected = new HashMap<>();
+    expected.put("Process", "process");
+    expected.put("Equipment", "equipment");
 
-		tag.setProcessId(process.getId());
-		when(processCache.get(process.getId())).thenReturn(process);
-		tag.setEquipmentId(equipment.getId());
-		when(equipmentCache.get(equipment.getId())).thenReturn(equipment);
-		when(tag.getEquipmentIds()).thenReturn(Collections.singleton(equipment.getId()));
+    tag.setProcessId(process.getId());
+    when(processCache.get(process.getId())).thenReturn(process);
+    tag.setEquipmentId(equipment.getId());
+    when(equipmentCache.get(equipment.getId())).thenReturn(equipment);
+    when(tag.getEquipmentIds()).thenReturn(Collections.singleton(equipment.getId()));
 
-		Map <String, String> result = esLogConverter.getTagMetadataProcess(tag);
+    Map<String, String> result = esLogConverter.getTagMetadataProcess(tag);
 
-		assertEquals(expected, result);
-	}
+    assertEquals(expected, result);
+  }
 
-	@Test
-	public void testGetMetadataProcessWithProcess() {
-		ProcessCacheObject process = CacheObjectCreation.createTestProcess1();
-		process.setName("process");
+  @Test
+  public void testGetMetadataProcessWithProcess() {
+    ProcessCacheObject process = CacheObjectCreation.createTestProcess1();
+    process.setName("process");
 
-		HashMap<String, String> expected = new HashMap<>();
-		expected.put("Process", "process");
+    HashMap<String, String> expected = new HashMap<>();
+    expected.put("Process", "process");
 
-		tag.setProcessId(process.getId());
-		when(processCache.get(process.getId())).thenReturn(process);
-		when(tag.getProcessIds()).thenReturn(Collections.singleton(process.getId()));
+    tag.setProcessId(process.getId());
+    when(processCache.get(process.getId())).thenReturn(process);
+    when(tag.getProcessIds()).thenReturn(Collections.singleton(process.getId()));
 
-		Map <String, String> result = esLogConverter.getTagMetadataProcess(tag);
-		assertEquals(expected, result);
-	}
+    Map<String, String> result = esLogConverter.getTagMetadataProcess(tag);
+    assertEquals(expected, result);
+  }
 
-	@Test
-	public void testGetMetadataProcessWithNull() {
-		HashMap<String, String> expected = new HashMap<>();
+  @Test
+  public void testGetMetadataProcessWithNull() {
+    HashMap<String, String> expected = new HashMap<>();
 
-		Map <String, String> result = esLogConverter.getTagMetadataProcess(tag);
-		assertEquals(expected, result);
-	}
+    Map<String, String> result = esLogConverter.getTagMetadataProcess(tag);
+    assertEquals(expected, result);
+  }
 
-	@Test
-	public void testGetTagMetadataWithNothing() {
-		HashMap<String, String> expected = new HashMap<>();
-		DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
-		tag.setEquipmentId(null);
-		tag.setSubEquipmentId(null);
-		tag.setProcessId(null);
-		assertEquals(expected, esLogConverter.getTagMetadataProcess(tag));
-	}
+  @Test
+  public void testGetTagMetadataWithNothing() {
+    HashMap<String, String> expected = new HashMap<>();
+    DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
+    tag.setEquipmentId(null);
+    tag.setSubEquipmentId(null);
+    tag.setProcessId(null);
+    assertEquals(expected, esLogConverter.getTagMetadataProcess(tag));
+  }
 
-	@Test
-	public void testConvertToTagES() throws IOException {
-		long id = 1L;
-		String name = "tag";
-		ValueType type = ValueType.boolType;
-		long timeStamp = 123456L;
-		boolean value = true;
-		String valueDesc = "ok";
-		when(tagC2MON.getId()).thenReturn(id);
-		when(tagC2MON.getName()).thenReturn(name);
-		when(tagC2MON.getDataType()).thenReturn(type.toString());
-		when(tagC2MON.getCacheTimestamp()).thenReturn(new Timestamp(timeStamp));
-		when(tagC2MON.getDataTagQuality()).thenReturn(null);
-		when(tagC2MON.getValue()).thenReturn(value);
-		when(tagC2MON.getValueDescription()).thenReturn(valueDesc);
+  @Test
+  public void testConvertToTagES() throws IOException {
+    long id = 1L;
+    String name = "tag";
+    ValueType type = ValueType.boolType;
+    long timeStamp = 123456L;
+    boolean value = true;
+    String valueDesc = "ok";
+    when(tagC2MON.getId()).thenReturn(id);
+    when(tagC2MON.getName()).thenReturn(name);
+    when(tagC2MON.getDataType()).thenReturn(type.toString());
+    when(tagC2MON.getCacheTimestamp()).thenReturn(new Timestamp(timeStamp));
+    when(tagC2MON.getDataTagQuality()).thenReturn(null);
+    when(tagC2MON.getValue()).thenReturn(value);
+    when(tagC2MON.getValueDescription()).thenReturn(valueDesc);
 
-		TagES tagES = esLogConverter.convertToTagES(tagC2MON);
-		assertNotNull(tagES.getMetadataProcess());
-		assertEquals(id, tagES.getTagId());
-		assertEquals(name, tagES.getTagName());
-		assertEquals(type.toString(), tagES.getDataType());
-		assertEquals(timeStamp, tagES.getTagServerTime());
-		assertEquals(0, tagES.getTagStatus());
-		assertEquals(value, tagES.getTagValue());
-		assertEquals(valueDesc, tagES.getTagValueDesc());
+    TagES tagES = esLogConverter.convertToTagES(tagC2MON);
+    assertEquals(id, tagES.getId());
+    assertEquals(name, tagES.getName());
+    assertEquals(type.toString(), tagES.getDataType());
+    assertEquals(timeStamp, tagES.getServerTime());
+    assertEquals(0, tagES.getStatus());
+    assertEquals(value, tagES.getValue());
+    assertEquals(valueDesc, tagES.getValueDescription());
 
-		when(tagC2MON.getDataType()).thenReturn(ValueType.stringType.toString());
-		when(tagC2MON.getValue()).thenReturn(name);
-		tagES = esLogConverter.convertToTagES(tagC2MON);
-		assertEquals(name, tagES.getTagValue());
+    when(tagC2MON.getDataType()).thenReturn(ValueType.stringType.toString());
+    when(tagC2MON.getValue()).thenReturn(name);
+    tagES = esLogConverter.convertToTagES(tagC2MON);
+    assertEquals(name, tagES.getValue());
 
-		when(tagC2MON.getDataType()).thenReturn(ValueType.longType.toString());
-		when(tagC2MON.getValue()).thenReturn(timeStamp);
-		tagES = esLogConverter.convertToTagES(tagC2MON);
-		assertEquals(timeStamp, tagES.getTagValue());
-	}
+    when(tagC2MON.getDataType()).thenReturn(ValueType.longType.toString());
+    when(tagC2MON.getValue()).thenReturn(timeStamp);
+    tagES = esLogConverter.convertToTagES(tagC2MON);
+    assertEquals(timeStamp, tagES.getValue());
+  }
 
-	@Test
-	public void testBadValues() {
+  @Test
+  public void testBadValues() {
     DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
     tag.setDaqTimestamp(null);
     tag.setSourceTimestamp(null);
     TagES tagES = esLogConverter.convertToTagES(tag);
     assertTrue(tagES instanceof TagBoolean);
-    assertEquals(0, tagES.getTagDaqTime());
-    assertEquals(0, tagES.getTagTime());
-	}
+    assertEquals(0, tagES.getDaqTime());
+    assertEquals(0, tagES.getSourceTime());
+  }
 }

@@ -11,9 +11,9 @@ public class TagString extends TagES implements TagESInterface {
    * @param tagValue Object supposed to be a String.
    */
   @Override
-  public void setTagValue(Object tagValue) {
+  public void setValue(Object tagValue) {
     if (tagValue instanceof String) {
-      this.tagValue = tagValue;
+      this.value = tagValue;
     } else {
       throw new IllegalArgumentException("Must give a String object to TagString in ElasticSearch");
     }

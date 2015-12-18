@@ -27,20 +27,20 @@ public class TagNumericTest {
 
   @Test
   public void testValue() {
-    tagNumeric.setTagValue(123);
+    tagNumeric.setValue(123);
 
-    assertEquals(123, tagNumeric.getTagValue());
-    assertTrue(tagNumeric.getTagValue() instanceof Integer);
+    assertEquals(123, tagNumeric.getValue());
+    assertTrue(tagNumeric.getValue() instanceof Integer);
 
-    tagNumeric.setTagValue(1.23);
+    tagNumeric.setValue(1.23);
 
-    assertEquals(1.23, tagNumeric.getTagValue());
-    assertTrue(tagNumeric.getTagValue() instanceof Double);
+    assertEquals(1.23, tagNumeric.getValue());
+    assertTrue(tagNumeric.getValue() instanceof Double);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testBadValue() {
-    tagNumeric.setTagValue("notNumeric");
+    tagNumeric.setValue("notNumeric");
   }
 
   @Test
