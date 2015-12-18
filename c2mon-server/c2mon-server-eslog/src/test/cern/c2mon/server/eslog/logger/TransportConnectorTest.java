@@ -502,7 +502,7 @@ public class TransportConnectorTest {
 
   private void sleep() {
     try {
-      Thread.sleep(1000L);
+      Thread.sleep(2000L);
     }
     catch (InterruptedException e) {
       e.printStackTrace();
