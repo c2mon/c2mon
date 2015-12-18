@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
 @Slf4j
 @ContextConfiguration({"classpath:cern/c2mon/server/eslog/config/server-eslog-integration.xml" })
 @RunWith(SpringJUnit4ClassRunner.class)
-
+@Ignore
 public class ESLogModuleIntegrationTest {
   private static String clusterName;
   private static String home;
