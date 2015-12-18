@@ -122,8 +122,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
         }
 
       } catch (Exception e) {
-        log.error("notifyElementUpdated() - Catch unexpected exception while trying to instantiate data and send it to the ElasticSearch cluster.", e);
-        log.error("notifyElementUpdate() - tag was not added to the ElasticSearch cluster (type " + tag.getDataType() + ", tag #" + tag.getId() + " (" + tag.getName() + ", tagValue=" + tag.getValue() + ")");
+        log.error("notifyElementUpdated() - Error occurred during tag parsing for ElasticSearch. Tag is not added to bulk sending (tag #" + tag.getId() + ", name=" + tag.getName() + ", tagValue=" + tag.getValue() + ", type=" + tag.getDataType() + ")", e);
       }
     }
 
@@ -135,7 +134,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
       connector.indexTags(tagESCollection);
     }
     catch(Exception e) {
-      log.error("notifyElementUpdate() - Exception occurred while trying to index data to the ElasticSearch cluster.");
+      log.error("notifyElementUpdated() - Exception occurred while trying to index data to the ElasticSearch cluster.");
     }
   }
 
