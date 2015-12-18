@@ -65,6 +65,7 @@ public class TransportConnector implements Connector {
 
   /** Only used, if elasticsearch is started inside this JVM */
   private final int LOCAL_PORT = 1;
+  private final String LOCAL_HOST = "local";
 
   /** Default port for elastic search transport node */
   public final static int DEFAULT_ES_PORT = 9300;
@@ -150,12 +151,13 @@ public class TransportConnector implements Connector {
    */
   @PostConstruct
   public void init() {
-    clusterFinder.start();
-    log.debug("init() - Connecting to ElasticSearch cluster " + cluster + " on host=" + host + ", port=" + port + ".");
 
-    if (!host.equalsIgnoreCase("localhost")) {
+    if (!host.equalsIgnoreCase("localhost") && !host.equalsIgnoreCase("local")) {
       setLocal(false);
     }
+
+    clusterFinder.start();
+    log.debug("init() - Connecting to ElasticSearch cluster " + cluster + " on host=" + host + ", port=" + port + ".");
 
     try {
       clusterFinder.join();
@@ -181,7 +183,7 @@ public class TransportConnector implements Connector {
    */
   public void initializationSteps() {
     if (isLocal) {
-      setHost("local");
+      setHost(LOCAL_HOST);
       setPort(LOCAL_PORT);
 
       localNode = launchLocalCluster();
@@ -190,7 +192,6 @@ public class TransportConnector implements Connector {
     else {
       log.info("init() - Connecting to local ElasticSearch instance (inside same JVM) is disabled.");
     }
-
     this.client = createClient();
   }
 
