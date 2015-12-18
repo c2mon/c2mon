@@ -134,9 +134,9 @@ public class DataTagESLogConverterTest {
     subEquipment.setName("subEquipment");
     subEquipment.setParentId(equipment.getId());
     HashMap<String, String> expected = new HashMap<>();
-    expected.put("Process", "process");
-    expected.put("Equipment", "equipment");
-    expected.put("SubEquipment", "subEquipment");
+    expected.put("process", "process");
+    expected.put("equipment", "equipment");
+    expected.put("subEquipment", "subEquipment");
 
     tag.setProcessId(process.getId());
     when(processCache.get(process.getId())).thenReturn(process);
@@ -160,8 +160,8 @@ public class DataTagESLogConverterTest {
     equipment.setProcessId(process.getId());
 
     HashMap<String, String> expected = new HashMap<>();
-    expected.put("Process", "process");
-    expected.put("Equipment", "equipment");
+    expected.put("process", "process");
+    expected.put("equipment", "equipment");
 
     tag.setProcessId(process.getId());
     when(processCache.get(process.getId())).thenReturn(process);
@@ -180,7 +180,7 @@ public class DataTagESLogConverterTest {
     process.setName("process");
 
     HashMap<String, String> expected = new HashMap<>();
-    expected.put("Process", "process");
+    expected.put("process", "process");
 
     tag.setProcessId(process.getId());
     when(processCache.get(process.getId())).thenReturn(process);

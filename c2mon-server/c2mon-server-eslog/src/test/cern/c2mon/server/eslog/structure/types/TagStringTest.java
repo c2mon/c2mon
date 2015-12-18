@@ -1,5 +1,6 @@
 package cern.c2mon.server.eslog.structure.types;
 
+import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -49,8 +50,14 @@ public class TagStringTest {
 	public void testBuild() throws IOException {
 		tagString.setQuality("ok");
 		String line = "\n  \"quality\": \"ok\"";
-		String text = "{\n  \"metadataProcess\": {},\n  \"Id\": 0,\n  \"sourceTime\": 0,\n  \"serverTime\": 0,\n  \"daqTime\": 0,\n  \"status\": 0," + line + "\n}";
+		String text = "{\n  \"id\": 0,\n  \"sourceTime\": 0,\n  \"serverTime\": 0,\n  \"daqTime\": 0,\n  \"status\": 0," + line + "\n}";
 
 		assertEquals(text, tagString.build());
+	}
+
+	@Test
+	public void testNullValue() {
+		tagString.setValue(null);
+		assertNull(tagString.getValue());
 	}
 }

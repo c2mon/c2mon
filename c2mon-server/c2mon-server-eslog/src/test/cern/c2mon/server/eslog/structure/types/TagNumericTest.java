@@ -1,10 +1,18 @@
 package cern.c2mon.server.eslog.structure.types;
 
+import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.DataTagConstants;
+import cern.c2mon.shared.common.datatag.DataTagValueDictionary;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -56,9 +64,15 @@ public class TagNumericTest {
   public void testBuild() throws IOException {
     tagNumeric.setDataType("numeric");
     String line = "\n  \"dataType\": \"numeric\",";
-    String text = "{\n  \"metadataProcess\": {},\n  \"tagId\": 0," + line
-        + "\n  \"tagTime\": 0,\n  \"tagServerTime\": 0,\n  \"tagDaqTime\": 0,\n  \"tagStatus\": 0\n}";
+    String text = "{\n  \"id\": 0," + line
+        + "\n  \"sourceTime\": 0,\n  \"serverTime\": 0,\n  \"daqTime\": 0,\n  \"status\": 0\n}";
 
     assertEquals(text, tagNumeric.build());
+  }
+
+  @Test
+  public void testNullValue() {
+    tagNumeric.setValue(null);
+    assertNull(tagNumeric.getValue());
   }
 }

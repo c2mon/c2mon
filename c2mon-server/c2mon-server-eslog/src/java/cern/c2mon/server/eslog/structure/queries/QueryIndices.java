@@ -40,7 +40,7 @@ public class QueryIndices extends Query {
 
     if (tagIds() != null) {
       requestBuilder.setQuery(QueryBuilders.boolQuery()
-          .filter(QueryBuilders.termsQuery("tagId", tagIds())));
+          .filter(QueryBuilders.termsQuery("id", tagIds())));
     }
 
     return requestBuilder.execute().actionGet();

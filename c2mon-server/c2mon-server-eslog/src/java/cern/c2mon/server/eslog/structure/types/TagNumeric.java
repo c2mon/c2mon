@@ -1,10 +1,13 @@
 package cern.c2mon.server.eslog.structure.types;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Represents a Tag in ElasticSearch.
  * This type of TagES contains a numeric tagValue.
  * @author Alban Marguet.
  */
+@Slf4j
 public class TagNumeric extends TagES implements TagESInterface {
   /**
    * Set tagValue of TagNumeric to the value of Tag in C2MON if it was numeric.
@@ -12,10 +15,15 @@ public class TagNumeric extends TagES implements TagESInterface {
    */
   @Override
   public void setValue(Object tagValue) {
-    if (tagValue instanceof Number) {
+    if (tagValue == null) {
+      log.trace("setValue() TagNumeric - Value is not set (tagValue= " + tagValue + ").");
+    }
+    else if (tagValue instanceof Number) {
       this.value = tagValue;
-    } else {
-      throw new IllegalArgumentException("Must pass a numeric tagValue to TagNumeric in ElasticSearch");
+    }
+    else {
+      log.trace("setValue() - tagValue has value " + tagValue + ".");
+      throw new IllegalArgumentException("setValue() - Cannot instantiate new TagNumeric in ElasticSearch because the tagValue has class=" + tagValue.getClass() + ")");
     }
   }
 }

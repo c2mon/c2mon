@@ -1,5 +1,6 @@
 package cern.c2mon.server.eslog.structure.types;
 
+import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -55,9 +56,15 @@ public class TagBooleanTest {
   public void testBuild() throws IOException {
     tagBoolean.setDataType("boolean");
     String line = "\n  \"dataType\": \"boolean\",";
-    String text = "{\n  \"metadataProcess\": {},\n  \"tagId\": 0," + line
-        + "\n  \"tagTime\": 0,\n  \"tagServerTime\": 0,\n  \"tagDaqTime\": 0,\n  \"tagStatus\": 0\n}";
+    String text = "{\n  \"id\": 0," + line
+        + "\n  \"sourceTime\": 0,\n  \"serverTime\": 0,\n  \"daqTime\": 0,\n  \"status\": 0\n}";
 
     assertEquals(text, tagBoolean.build());
+  }
+
+  @Test
+  public void testNullValue() {
+    tagBoolean.setValue(null);
+    assertNull(tagBoolean.getValue());
   }
 }

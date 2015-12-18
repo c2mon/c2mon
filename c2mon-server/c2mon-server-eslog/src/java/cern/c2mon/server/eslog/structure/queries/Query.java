@@ -26,7 +26,6 @@ public abstract class Query {
   @Getter
   protected boolean parametersSet = false;
 
-
   public Query(Client client, List<String> indices, boolean isTypeDefined, List<String> types, List<Long> tagIds, int from, int size, int min, int max) {
     setClient(client);
     parameters = new HashMap<>();

@@ -6,7 +6,7 @@ package cern.c2mon.server.eslog.structure.mappings;
  * @author Alban Marguet.
  */
 public interface Mapping {
-  public enum ValueType {
+  enum ValueType {
     stringType("string"),
     longType("long"),
     intType("integer"),

@@ -63,12 +63,15 @@ public class DataTagESLogConverter {
     }
 
     Map<String, String> parentNames = getTagMetadataProcess(tag);
+
     if (parentNames.containsKey("process")) {
       tagES.setProcess(parentNames.get("process"));
     }
+
     if (parentNames.containsKey("equipment")) {
       tagES.setEquipment(parentNames.get("equipment"));
     }
+
     if (parentNames.containsKey("subEquipment")) {
       tagES.setSubEquipment(parentNames.get("subEquipment"));
     }

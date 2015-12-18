@@ -129,6 +129,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
       
     } catch (Exception e) {
       log.error("notifyElementUpdated() - Catch unexpected exception while trying to instantiate data and send it to the ElasticSearch cluster.", e);
+      e.printStackTrace();
     }
   }
 
