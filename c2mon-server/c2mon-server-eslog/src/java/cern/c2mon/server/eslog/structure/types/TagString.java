@@ -20,8 +20,9 @@ public class TagString extends TagES implements TagESInterface {
     }
     else if (tagValue instanceof String) {
       this.value = tagValue;
-    } else {
-      throw new IllegalArgumentException("setValue() - Cannot instantiate new TagString in ElasticSearch because the tagValue has class=" + tagValue.getClass() + ")");
+    }
+    else {
+      throw new IllegalArgumentException("setValue() - Cannot instantiate new TagString in ElasticSearch because the tagValue has class=" + tagValue.getClass().getName() + ")");
     }
   }
 }

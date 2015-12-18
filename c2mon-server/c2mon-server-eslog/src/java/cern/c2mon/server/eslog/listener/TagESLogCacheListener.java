@@ -110,26 +110,32 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
       }
     }
 
-    try {
-      for (Tag tag: tagsToLog) {
+    for (Tag tag: tagsToLog) {
+      try {
         TagES tagES = dataTagESLogConverter.convertToTagES(tag);
-        
+
         if (tagES != null) {
           tagESCollection.add(tagES);
         }
         else {
           log.warn("notifyElementUpdated() - Unsupported data type " + tag.getDataType() + " for tag #" + tag.getId() + " (" + tag.getName() + ") ==> Not sent to elasticsearch");
         }
+
+      } catch (Exception e) {
+        log.error("notifyElementUpdated() - Catch unexpected exception while trying to instantiate data and send it to the ElasticSearch cluster.", e);
+        log.error("notifyElementUpdate() - tag was not added to the ElasticSearch cluster (type " + tag.getDataType() + ", tag #" + tag.getId() + " (" + tag.getName() + ", tagValue=" + tag.getValue() + ")");
       }
-      
-      log.trace("notifyElementUpdated() - Created a TagESCollection of " + tagESCollection.size() + " elements.");
-      
+    }
+
+    log.trace("notifyElementUpdated() - Created a TagESCollection of " + tagESCollection.size() + " elements.");
+
+
+    try {
       // Sending to elasticsearch
       connector.indexTags(tagESCollection);
-      
-    } catch (Exception e) {
-      log.error("notifyElementUpdated() - Catch unexpected exception while trying to instantiate data and send it to the ElasticSearch cluster.", e);
-      e.printStackTrace();
+    }
+    catch(Exception e) {
+      log.error("notifyElementUpdate() - Exception occurred while trying to index data to the ElasticSearch cluster.");
     }
   }
 

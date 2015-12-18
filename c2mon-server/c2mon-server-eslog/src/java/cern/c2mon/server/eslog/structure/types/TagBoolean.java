@@ -20,8 +20,9 @@ public class TagBoolean extends TagES implements TagESInterface {
     }
     else if (tagValue instanceof Boolean) {
       this.value = tagValue;
-    } else {
-      throw new IllegalArgumentException("setValue() - Cannot instantiate new TagBoolean in ElasticSearch because the tagValue has class=" + tagValue.getClass() + ")");
+    }
+    else {
+      throw new IllegalArgumentException("setValue() - Cannot instantiate new TagBoolean in ElasticSearch because the tagValue has class=" + tagValue.getClass().getName() + ")");
     }
   }
 }

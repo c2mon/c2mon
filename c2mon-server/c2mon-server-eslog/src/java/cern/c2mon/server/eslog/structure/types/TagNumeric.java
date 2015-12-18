@@ -23,7 +23,7 @@ public class TagNumeric extends TagES implements TagESInterface {
     }
     else {
       log.trace("setValue() - tagValue has value " + tagValue + ".");
-      throw new IllegalArgumentException("setValue() - Cannot instantiate new TagNumeric in ElasticSearch because the tagValue has class=" + tagValue.getClass() + ")");
+      throw new IllegalArgumentException("setValue() - Cannot instantiate new TagNumeric in ElasticSearch because the tagValue has class=" + tagValue.getClass().getName() + ")");
     }
   }
 }
