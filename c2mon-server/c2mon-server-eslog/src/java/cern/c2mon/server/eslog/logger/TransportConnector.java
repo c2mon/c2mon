@@ -153,6 +153,10 @@ public class TransportConnector implements Connector {
     clusterFinder.start();
     log.debug("init() - Connecting to ElasticSearch cluster " + cluster + " on host=" + host + ", port=" + port + ".");
 
+    if (!host.equalsIgnoreCase("localhost")) {
+      setLocal(false);
+    }
+
     try {
       clusterFinder.join();
     } catch (InterruptedException e) {
