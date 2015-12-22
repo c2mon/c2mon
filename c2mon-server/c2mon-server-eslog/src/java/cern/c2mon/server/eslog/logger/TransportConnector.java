@@ -767,10 +767,10 @@ public class TransportConnector implements Connector {
         log.trace(type);
       }
   
-      log.trace("Aliases in the cluster:");
-      for (String alias : aliases) {
-        log.trace(alias);
-      }
+//      log.trace("Aliases in the cluster:");
+//      for (String alias : aliases) {
+//        log.trace(alias);
+//      }
     }
   }
 
