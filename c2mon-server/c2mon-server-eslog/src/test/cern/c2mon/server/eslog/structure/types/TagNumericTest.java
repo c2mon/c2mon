@@ -5,14 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.test.CacheObjectCreation;
-import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
-import cern.c2mon.shared.common.datatag.DataTagValueDictionary;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

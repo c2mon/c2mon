@@ -583,8 +583,8 @@ public class TransportConnector implements Connector {
   /**
    * Utility method. Aliases have the following format: "tag_tagId".
    * 
-   * @param tagId tag of the TagES for which to create Alias.
-   * @return name of the alias for a given tagId.
+   * @param id tag of the TagES for which to create Alias.
+   * @return name of the alias for a given id.
    */
   public String generateAliasName(long tagId) {
     return TAG_PREFIX + tagId;
@@ -603,7 +603,7 @@ public class TransportConnector implements Connector {
   /**
    * Index where a TagES is stored in the ElasticSearch cluster.
    * 
-   * @param tagServerTime TagES's tagServerTime (milliseconds since Epoch).
+   * @param serverTime TagES's serverTime (milliseconds since Epoch).
    * @return name of the index of tag.
    */
   public String generateIndex(long tagServerTime) {

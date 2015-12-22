@@ -13,7 +13,7 @@
 //
 ///**
 // * Class used to query the last X values to the ElasticSearch cluster with at least a given index.
-// * Can alos specify the type, the TagId to fine tune the query.
+// * Can alos specify the type, the Id to fine tune the query.
 // * @author Alban Marguet.
 // */
 //public class QueryLastXValues extends Query {
@@ -38,8 +38,8 @@
 //        return requestBuilder.setSearchType(SearchType.DEFAULT)
 //                .setFrom(from())
 //                .setSize(size())
-//                .setQuery(QueryBuilders.boolQuery().must(QueryBuilders.termsQuery("tagId", tagIds())))
-//                .addSort("tagServerTime", SortOrder.DESC)
+//                .setQuery(QueryBuilders.boolQuery().must(QueryBuilders.termsQuery("id", tagIds())))
+//                .addSort("serverTime", SortOrder.DESC)
 //                .setRouting(getRouting(tagIds()))
 //                .execute().actionGet();
 //    }

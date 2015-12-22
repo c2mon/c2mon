@@ -68,7 +68,7 @@ public abstract class TagES implements TagESInterface {
     str.append('\t');
     str.append(getName());
     str.append('\t');
-    str.append("tagValue");
+    str.append("value");
     str.append('\t');
     str.append(getValueDescription());
     str.append('\t');

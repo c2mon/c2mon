@@ -36,9 +36,9 @@
 //                .setFrom(from())
 //                .setSize(size())
 //                .setQuery(QueryBuilders.boolQuery()
-//                        .must(QueryBuilders.rangeQuery("tagServerTime").gte(min()).lte(max()))
-//                        .filter(QueryBuilders.termsQuery("tagId", tagIds())))
-//                .addSort("tagServerTime", SortOrder.DESC)
+//                        .must(QueryBuilders.rangeQuery("serverTime").gte(min()).lte(max()))
+//                        .filter(QueryBuilders.termsQuery("id", tagIds())))
+//                .addSort("serverTime", SortOrder.DESC)
 //                .setRouting(getRouting(tagIds()))
 //                .execute().actionGet();
 //    }

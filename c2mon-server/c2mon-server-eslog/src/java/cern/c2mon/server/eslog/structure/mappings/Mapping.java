@@ -1,5 +1,7 @@
 package cern.c2mon.server.eslog.structure.mappings;
 
+import lombok.Getter;
+
 /**
  * Defines the ElasticSearch arguments for the types and the indices.
  * Permits to have dynamic mappings according to what we want to insert. (dataType)
@@ -81,46 +83,46 @@ public interface Mapping {
   }
 
   class Properties {
-    TagId tagId;
-    TagName tagName;
+    Id id;
+    Name name;
     DataType dataType;
-    TagTime tagTime;
-    TagServerTime tagServerTime;
-    TagDaqTime tagDaqTime;
-    TagStatus tagStatus;
+    SourceTime sourceTime;
+    ServerTime serverTime;
+    DaqTime daqTime;
+    Status status;
     Quality quality;
-    TagValueDesc tagValueDesc;
-    TagValue tagValue;
+    ValueDescription valueDescription;
+    Value value;
     ProcessName processName;
     EquipmentName equipmentName;
     SubEquipmentName subEquipmentName;
 
-    Properties(ValueType tagValueType) {
-      this.tagId = new TagId();
-      this.tagName = new TagName();
+    Properties(ValueType valueType) {
+      this.id = new Id();
+      this.name = new Name();
       this.dataType = new DataType();
-      this.tagTime = new TagTime();
-      this.tagServerTime = new TagServerTime();
-      this.tagDaqTime = new TagDaqTime();
-      this.tagStatus = new TagStatus();
+      this.sourceTime = new SourceTime();
+      this.serverTime = new ServerTime();
+      this.daqTime = new DaqTime();
+      this.status = new Status();
       this.quality = new Quality();
-      this.tagValueDesc = new TagValueDesc();
-      this.tagValue = new TagValue(tagValueType);
+      this.valueDescription = new ValueDescription();
+      this.value = new Value(valueType);
       this.processName = new ProcessName();
       this.equipmentName = new EquipmentName();
       this.subEquipmentName = new SubEquipmentName();
     }
 
     public String getValueType() {
-      return tagValue.getType();
+      return value.getType();
     }
   }
 
-  class TagId {
+  class Id {
     private final String type = ValueType.longType.toString();
   }
 
-  class TagName {
+  class Name {
     private final String type = ValueType.stringType.toString();
     private final String index = indexNotAnalyzed;
   }
@@ -130,19 +132,18 @@ public interface Mapping {
     private final String index = indexNotAnalyzed;
   }
 
-  class TagTime {
+  class SourceTime {
     private final String type = ValueType.dateType.toString();
+    private final String format = "epoch_millis";
   }
 
-  class TagServerTime {
-    private final String type = ValueType.dateType.toString();
+  class ServerTime extends SourceTime {
   }
 
-  class TagDaqTime {
-    private final String type = ValueType.dateType.toString();;
+  class DaqTime extends SourceTime{
   }
 
-  class TagStatus {
+  class Status {
     private final String type = ValueType.intType.toString();
   }
 
@@ -151,20 +152,17 @@ public interface Mapping {
     private final String index = indexNotAnalyzed;
   }
 
-  class TagValueDesc {
+  class ValueDescription {
     private final String type = ValueType.stringType.toString();
     private final String index = indexNotAnalyzed;
   }
 
-  class TagValue {
+  @Getter
+  class Value {
     private final String type;
 
-    public TagValue(ValueType type) {
+    public Value(ValueType type) {
       this.type = type.toString();
-    }
-
-    public String getType() {
-      return type;
     }
   }
 

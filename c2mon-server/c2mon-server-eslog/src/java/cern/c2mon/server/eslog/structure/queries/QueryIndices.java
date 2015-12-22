@@ -28,7 +28,7 @@ public class QueryIndices extends Query {
     super(client, indices, isTypeDefined, types, tagIds, from, size, min, max);
   }
   /**
-   * Query to get all the entries where the tagId is present.
+   * Query to get all the entries where the id is present.
    * @return SearchResponse
    */
   public SearchResponse getResponse() {

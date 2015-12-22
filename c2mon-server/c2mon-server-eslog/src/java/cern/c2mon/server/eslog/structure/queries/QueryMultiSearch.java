@@ -13,7 +13,7 @@
 ///**
 // * Query a multiSearch request against the ElasticSearch cluster.
 // * Basically represents one QueryLastXValuesRange for every required index in indices().
-// * We are then getting the last X values in the given range for each different provided tagId.
+// * We are then getting the last X values in the given range for each different provided id.
 // * @author Alban Marguet.
 // */
 //@Slf4j
@@ -69,9 +69,9 @@
 //                .setFrom(from())
 //                .setSize(size())
 //                .setQuery(QueryBuilders.boolQuery()
-//                        .must(QueryBuilders.rangeQuery("tagServerTime").gte(min()).lte(max()))
-//                        .filter(QueryBuilders.termsQuery("tagId", tagIds())))
-//                .addSort("tagServerTime", SortOrder.DESC)
+//                        .must(QueryBuilders.rangeQuery("serverTime").gte(min()).lte(max()))
+//                        .filter(QueryBuilders.termsQuery("id", tagIds())))
+//                .addSort("serverTime", SortOrder.DESC)
 //                .setRouting(getRouting(tagIds()));
 //        return srb;
 //    }

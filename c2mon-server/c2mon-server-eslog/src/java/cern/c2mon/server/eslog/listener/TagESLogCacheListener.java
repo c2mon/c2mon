@@ -122,7 +122,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
         }
 
       } catch (Exception e) {
-        log.error("notifyElementUpdated() - Error occurred during tag parsing for ElasticSearch. Tag #" + tag.getId() + " is not added to bulk sending (name=" + tag.getName() + ", tagValue=" + tag.getValue() + ", type=" + tag.getDataType() + ")", e);
+        log.error("notifyElementUpdated() - Error occurred during tag parsing for ElasticSearch. Tag #" + tag.getId() + " is not added to bulk sending (name=" + tag.getName() + ", value=" + tag.getValue() + ", type=" + tag.getDataType() + ")", e);
       }
     }
 

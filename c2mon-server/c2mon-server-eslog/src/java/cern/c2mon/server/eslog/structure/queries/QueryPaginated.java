@@ -66,15 +66,15 @@
 //        if (!toCount) {
 //            from = begin;
 //            size = PAGE_SIZE;
-//            countBuilder.addSort("tagServerTime", SortOrder.DESC);
+//            countBuilder.addSort("serverTime", SortOrder.DESC);
 //        }
 //
 //        return countBuilder.setSearchType(SearchType.DEFAULT)
 //                .setSize(size)
 //                .setFrom(from)
 //                .setQuery(QueryBuilders.boolQuery()
-//                        .must(QueryBuilders.rangeQuery("tagServerTime").gte(min()).lte(max()))
-//                        .filter(QueryBuilders.termsQuery("tagId", tagIds())))
+//                        .must(QueryBuilders.rangeQuery("serverTime").gte(min()).lte(max()))
+//                        .filter(QueryBuilders.termsQuery("id", tagIds())))
 //                .setRouting(getRouting(tagIds()))
 //                .execute().actionGet();
 //        }

@@ -58,16 +58,16 @@
 //		expectedSettings.put("concurrent", 1);
 //
 //		builder = jsonBuilder().startObject()
-//				.field("tagId", 1)
-//				.field("tagName", "name")
-//				.field("tagTime", 123456L)
+//				.field("id", 1)
+//				.field("name", "name")
+//				.field("sourceTime", 123456L)
 //				.field("dataType", "boolean")
-//				.field("tagServerTime", 123456L)
-//				.field("tagDaqTime", 123456L)
-//				.field("tagStatus", 0)
+//				.field("serverTime", 123456L)
+//				.field("daqTime", 123456L)
+//				.field("status", 0)
 //				.field("quality", "quality ok")
-//				.field("tagValueDesc", "value desc")
-//				.field("tagValue", true)
+//				.field("valueDescription", "value desc")
+//				.field("value", true)
 //				.endObject().string();
 //
 //		collectionSize = 5;
