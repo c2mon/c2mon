@@ -1,0 +1,3 @@
+<config>
+  <property name="views-navigation-tree-root-path" type="java.lang.String" value="Production" />
+</config>
