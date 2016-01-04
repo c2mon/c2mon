@@ -180,13 +180,16 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
 
                     } else {
 
-                        if (service == null) {
-                            service = new RbaLoginService();
-                            service.setLoginPolicy(LoginPolicy.LOCATION);
-                            service.setAutoRefresh(true);
-                            service.setApplicationName(ProcUtils.getApplicationName());
-                            service.startAndLogin();
+                        synchronized (service) {
+                            if (service == null) {
+                                service = new RbaLoginService();
+                                service.setLoginPolicy(LoginPolicy.LOCATION);
+                                service.setAutoRefresh(true);
+                                service.setApplicationName(ProcUtils.getApplicationName());
+                                service.startAndLogin();
+                            }
                         }
+                        
 
                         // try rbac credentials
                         try {
@@ -213,12 +216,14 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
 
                     // report the equipment is correctly connected
                     getEquipmentMessageSender().confirmEquipmentStateOK();
-
+                    
+                    logger.info(format("successfully connected to JMX service: %s", jmxServiceUrl));
+                    
                     // schedule connection testing task
                     connectionTestFuture = executor.scheduleAtFixedRate(new ConnectionTestingTask(handler), 0,
                             CONNECTION_TEST_INTERVAL, TimeUnit.MILLISECONDS);
 
-                    logger.info(format("successfully connected to JMX service: %s", jmxServiceUrl));
+                    
                 } catch (Exception ex) {
                     StringBuilder bld = new StringBuilder("failed to connect to JMX service: ").append(jmxServiceUrl)
                             .append(" ").append(ex.getMessage());
@@ -252,6 +257,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
                 for (ISourceDataTag tag : getEquipmentConfiguration().getSourceDataTags().values()) {
                     registerTag(tag);
                 }
+                refreshAllDataTags();
             }
 
         }// run
@@ -295,6 +301,9 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
         public void run() {
             try {
                 handler.getJVMUptime();
+            } catch (SecurityException secEx) {
+                handler.getEquipmentMessageSender().confirmEquipmentStateIncorrect(secEx.getMessage());
+                logger.info("Cannot access JMX data : " + secEx.getMessage());
             } catch (Exception ex) {
                 logger.error("Exception caught while trying to get JVM uptime", ex);
 
@@ -310,6 +319,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
                         // reconnect
                         handler.disconnectFromDataSource();
                         handler.connectToDataSource();
+                        
                     } catch (Exception e) {
                         logger.error("Exception caught:", e);
                     }
@@ -395,7 +405,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
         if (logger.isTraceEnabled())
             logger.trace(format("entering startPoller(%d,%d)..", tag.getId(), Integer.valueOf(pollingTime)));
 
-        scheduledFutures.put(tag.getId(), executor.scheduleAtFixedRate(new PollerTask(this, tag), pollingTime,
+        scheduledFutures.put(tag.getId(), executor.scheduleAtFixedRate(new PollerTask(this, tag), 0,
                 pollingTime, TimeUnit.MILLISECONDS));
 
         logger.trace("leaving startPoller()");
