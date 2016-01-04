@@ -39,7 +39,7 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
       <artifactId>c2mon-client-all</artifactId>
-      <version>1.6.0</version>
+      <version>1.6.2</version>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
