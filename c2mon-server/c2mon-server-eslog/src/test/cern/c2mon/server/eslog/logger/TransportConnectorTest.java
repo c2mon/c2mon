@@ -392,7 +392,6 @@ public class TransportConnectorTest {
   }
 
   @Test
-  @Ignore
   public void testBadBulkAdd() throws IOException {
     TagES tag = new TagString();
     tag.setDataType(ValueType.stringType.toString());
@@ -410,7 +409,7 @@ public class TransportConnectorTest {
   }
 
   @Test
-  @Ignore
+  @Ignore("Works alone but not along the other tests (bulk processing synchronization)")
   public void testIndexTag() {
     TagES tag = new TagString();
     tag.setDataType(ValueType.stringType.toString());

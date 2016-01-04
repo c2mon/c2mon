@@ -28,7 +28,7 @@ public class QueryIndexBuilder extends Query {
       createIndexRequestBuilder.setSettings(settings);
     }
 
-    if (type != null && mapping != null && mapping.compareTo("") != 0) {
+    if (type != null && mapping != null && !mapping.equals("")) {
       createIndexRequestBuilder.addMapping(type, mapping);
     }
 

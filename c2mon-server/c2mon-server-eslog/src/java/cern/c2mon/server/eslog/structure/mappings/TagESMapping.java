@@ -21,7 +21,7 @@ public class TagESMapping implements Mapping {
   public String getMapping() {
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
     String json = gson.toJson(this);
-    log.info(json);
+    log.trace(json);
     return json;
   }
 

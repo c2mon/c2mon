@@ -14,15 +14,15 @@ public class TagBoolean extends TagES implements TagESInterface {
    * @param value Object supposed to be a boolean.
    */
   @Override
-  public void setValue(Object tagValue) {
-    if (tagValue == null) {
-      log.trace("setValue() TagBoolean - Value is not set (value= " + tagValue + ").");
+  public void setValue(Object value) {
+    if (value == null) {
+      log.trace("setValue() TagBoolean - Value is not set (value= " + value + ").");
     }
-    else if (tagValue instanceof Boolean) {
-      this.value = tagValue;
+    else if (value instanceof Boolean) {
+      this.value = value;
     }
     else {
-      throw new IllegalArgumentException("setValue() - Cannot instantiate new TagBoolean in ElasticSearch because the value has class=" + tagValue.getClass().getName() + ")");
+      throw new IllegalArgumentException("setValue() - Cannot instantiate new TagBoolean in ElasticSearch because the value has class=" + value.getClass().getName() + ")");
     }
   }
 }

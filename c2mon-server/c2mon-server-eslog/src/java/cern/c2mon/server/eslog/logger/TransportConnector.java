@@ -342,7 +342,7 @@ public class TransportConnector implements Connector {
         bulkAddAlias(generateIndex(aliases.get(alias).getServerTime()), aliases.get(alias));
       }
 
-      /** For quasi real time retrieval. */
+      /** For almost real time retrieval. */
       refreshClusterStats();
     }
   }
@@ -407,16 +407,16 @@ public class TransportConnector implements Connector {
   public boolean handleIndexQuery(Query query, String indexName, Settings settings, String type, String mapping) {
     boolean isAcked = false;
 
-    if (client == null) {
+    if (client == null || query == null || query.getClient() == null) {
       log.error("handleIndexQuery() - Error: the client value is " + client + ".");
       return isAcked;
     }
 
-    if (query instanceof QueryIndexBuilder && query.isParametersSet()) {
+    if (query instanceof QueryIndexBuilder && checkIndex(indexName)) {
       isAcked = ((QueryIndexBuilder) query).indexNew(indexName, settings, type, mapping);
 
       if (isAcked) {
-        log.debug("handleIndexQuery() - success in indexing " + indexName + ".");
+        log.debug("handleIndexQuery() - Success in indexing " + indexName + " with mapping " + mapping + ".");
         addType(type);
         addIndex(indexName);
       }
@@ -479,16 +479,15 @@ public class TransportConnector implements Connector {
 
     }
     else {
-//      if (!indices.contains(index)) {
-//        log.info("bulkAdd() - Trying to instantiate new index " + index + ".");
-//        boolean isIndexed = instantiateIndex(tag, index, type);
-//
-//        if (isIndexed) {
-//          addType(type);
-//          addIndex(index);
-//          log.debug("bulkAdd() - Indexed a new tag of type " + type + " to index " + index + ".");
-//        }
-//      }
+      if (!indices.contains(index)) {
+        boolean isIndexed = instantiateIndex(tag, index, type);
+
+        if (isIndexed) {
+          //A set will not add twice the same value
+          addType(type);
+          addIndex(index);
+        }
+      }
 
       IndexRequest indexNewTag = new IndexRequest(index, type).source(json).routing(String.valueOf(tag.getId()));
 
@@ -558,7 +557,7 @@ public class TransportConnector implements Connector {
     updateLists();
     log.debug("instantiateIndex() - updating lists in memory.");
 
-    return handleIndexQuery(new QueryIndexBuilder(client, Arrays.asList(index), true, Arrays.asList(type), null, -1, -1, -1, -1), index,
+    return handleIndexQuery(new QueryIndexBuilder(client), index,
         getMonthIndexSettings(), type, mapping);
   }
 
@@ -573,7 +572,8 @@ public class TransportConnector implements Connector {
       types.addAll(handleListingQuery(new QueryTypes(client)));
       aliases.addAll(handleListingQuery(new QueryAliases(client)));
       log.trace("updateLists() - Updating list of indices, types and aliases.");
-    } else {
+    }
+    else {
       log.warn("updateLists() - Warning: Client seems to be null.");
     }
 
@@ -586,8 +586,8 @@ public class TransportConnector implements Connector {
    * @param id tag of the TagES for which to create Alias.
    * @return name of the alias for a given id.
    */
-  public String generateAliasName(long tagId) {
-    return TAG_PREFIX + tagId;
+  public String generateAliasName(long id) {
+    return TAG_PREFIX + id;
   }
 
   /**
@@ -606,8 +606,8 @@ public class TransportConnector implements Connector {
    * @param serverTime TagES's serverTime (milliseconds since Epoch).
    * @return name of the index of tag.
    */
-  public String generateIndex(long tagServerTime) {
-    return INDEX_PREFIX + millisecondsToYearMonth(tagServerTime);
+  public String generateIndex(long serverTime) {
+    return INDEX_PREFIX + millisecondsToYearMonth(serverTime);
   }
 
   /**

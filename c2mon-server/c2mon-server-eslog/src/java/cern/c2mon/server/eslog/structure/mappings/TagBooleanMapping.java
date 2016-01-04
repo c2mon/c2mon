@@ -11,9 +11,9 @@ public class TagBooleanMapping extends TagESMapping implements Mapping {
   }
 
   @Override
-  public void setProperties(ValueType tagValueType) {
-    if (tagValueType.equals(ValueType.boolType)) {
-      properties = new Properties(tagValueType);
+  public void setProperties(ValueType valueType) {
+    if (valueType.equals(ValueType.boolType)) {
+      properties = new Properties(valueType);
     } else {
       throw new IllegalArgumentException("Type for TagBoolean must be boolean.");
     }
