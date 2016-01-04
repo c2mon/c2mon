@@ -8,7 +8,7 @@
   </parent>
 
   <groupId>cern.c2mon.c2mon-daq</groupId>
-  <version>1.2.2</version>
+  <version>1.2.3-SNAPSHOT</version>
   <name>c2mon-daq-test</name>
   <artifactId>c2mon-daq-test</artifactId>
   <packaging>jar</packaging>
