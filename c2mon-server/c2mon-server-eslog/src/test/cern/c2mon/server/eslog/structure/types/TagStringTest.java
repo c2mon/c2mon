@@ -50,7 +50,7 @@ public class TagStringTest {
 	public void testBuild() throws IOException {
 		tagString.setQuality("ok");
 		String line = "\n  \"quality\": \"ok\"";
-		String text = "{\n  \"id\": 0,\n  \"sourceTime\": 0,\n  \"serverTime\": 0,\n  \"daqTime\": 0,\n  \"status\": 0," + line + "\n}";
+		String text = "{\n  \"id\": 0,\n  \"sourceTimestamp\": 0,\n  \"serverTimestamp\": 0,\n  \"daqTimestamp\": 0,\n  \"status\": 0," + line + "\n}";
 
 		assertEquals(text, tagString.build());
 	}

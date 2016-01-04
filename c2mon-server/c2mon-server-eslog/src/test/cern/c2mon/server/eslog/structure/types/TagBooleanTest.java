@@ -57,7 +57,8 @@ public class TagBooleanTest {
     tagBoolean.setDataType("boolean");
     String line = "\n  \"dataType\": \"boolean\",";
     String text = "{\n  \"id\": 0," + line
-        + "\n  \"sourceTime\": 0,\n  \"serverTime\": 0,\n  \"daqTime\": 0,\n  \"status\": 0\n}";
+        + "\n  \"sourceTimestamp\": 0,\n  \"serverTimestamp\": 0,\n  \"daqTimestamp\": 0,\n  \"status\": 0\n" +
+        "}";
 
     assertEquals(text, tagBoolean.build());
   }

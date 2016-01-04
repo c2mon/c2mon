@@ -1,7 +1,6 @@
 package cern.c2mon.server.eslog.structure;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -10,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import cern.c2mon.server.eslog.structure.types.TagNumeric;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -228,7 +228,7 @@ public class DataTagESLogConverterTest {
     assertEquals(id, tagES.getId());
     assertEquals(name, tagES.getName());
     assertEquals(type.toString(), tagES.getDataType());
-    assertEquals(timeStamp, tagES.getServerTime());
+    assertEquals(timeStamp, tagES.getServerTimestamp());
     assertEquals(0, tagES.getStatus());
     assertEquals(value, tagES.getValue());
     assertEquals(valueDesc, tagES.getValueDescription());
@@ -251,7 +251,106 @@ public class DataTagESLogConverterTest {
     tag.setSourceTimestamp(null);
     TagES tagES = esLogConverter.convertToTagES(tag);
     assertTrue(tagES instanceof TagBoolean);
-    assertEquals(0, tagES.getDaqTime());
-    assertEquals(0, tagES.getSourceTime());
+    assertEquals(0, tagES.getDaqTimestamp());
+    assertEquals(0, tagES.getSourceTimestamp());
+  }
+
+  @Test
+  public void ModuleConvertsTagsAsExpected() {
+    Tag tag = createTagExample();
+    TagES tagES = esLogConverter.convertToTagES(tag);
+    String expectedMapping = createMapping(tagES.getDataType());
+
+    assertTrue(tagES instanceof TagBoolean);
+    assertTrue(tagES.getValueBoolean());
+    assertNull(tagES.getValueNumeric());
+    assertNull(tagES.getValueString());
+    assertTrue((Boolean) tagES.getValue());
+    assertEquals("boolean", tagES.getDataType());
+    assertEquals(expectedMapping, tagES.getMapping());
+
+    DataTagCacheObject tagNumeric = new DataTagCacheObject();
+    tagNumeric.setId(1L);
+    tagNumeric.setDataType("Integer");
+    tagNumeric.setValue(126387213);
+    tagES = esLogConverter.convertToTagES(tagNumeric);
+    expectedMapping = createMapping(tagES.getDataType());
+
+    assertTrue(tagES instanceof TagNumeric);
+    assertNull(tagES.getValueBoolean());
+    assertEquals(126387213, tagES.getValueNumeric());
+    assertEquals(126387213, tagES.getValue());
+    assertNull(tagES.getValueString());
+    assertEquals("integer", tagES.getDataType());
+    assertNotEquals(expectedMapping, tagES.getMapping());
+  }
+
+  /**
+   * @return Tag of type boolean with value true.
+   */
+  private DataTagCacheObject createTagExample() {
+    DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
+    tag.setDataType("boolean");
+    tag.setLogged(true);
+
+    return tag;
+  }
+
+  private String createMapping(String dataType) {
+    return "{\n" +
+        "  \"_routing\": {\n" +
+        "    \"required\": \"true\"\n" +
+        "  },\n" +
+        "  \"properties\": {\n" +
+        "    \"id\": {\n" +
+        "      \"type\": \"long\"\n" +
+        "    },\n" +
+        "    \"name\": {\n" +
+        "      \"type\": \"string\",\n" +
+        "      \"index\": \"not_analyzed\"\n" +
+        "    },\n" +
+        "    \"dataType\": {\n" +
+        "      \"type\": \"string\",\n" +
+        "      \"index\": \"not_analyzed\"\n" +
+        "    },\n" +
+        "    \"sourceTimestamp\": {\n" +
+        "      \"type\": \"date\",\n" +
+        "      \"format\": \"epoch_millis\"\n" +
+        "    },\n" +
+        "    \"serverTimestamp\": {\n" +
+        "      \"type\": \"date\",\n" +
+        "      \"format\": \"epoch_millis\"\n" +
+        "    },\n" +
+        "    \"daqTimestamp\": {\n" +
+        "      \"type\": \"date\",\n" +
+        "      \"format\": \"epoch_millis\"\n" +
+        "    },\n" +
+        "    \"status\": {\n" +
+        "      \"type\": \"integer\"\n" +
+        "    },\n" +
+        "    \"quality\": {\n" +
+        "      \"type\": \"string\",\n" +
+        "      \"index\": \"not_analyzed\"\n" +
+        "    },\n" +
+        "    \"valueDescription\": {\n" +
+        "      \"type\": \"string\",\n" +
+        "      \"index\": \"not_analyzed\"\n" +
+        "    },\n" +
+        "    \"valueBoolean\": {\n" +
+        "      \"type\": \"" + dataType + "\"\n" +
+        "    },\n" +
+        "    \"processName\": {\n" +
+        "      \"type\": \"string\",\n" +
+        "      \"index\": \"not_analyzed\"\n" +
+        "    },\n" +
+        "    \"equipmentName\": {\n" +
+        "      \"type\": \"string\",\n" +
+        "      \"index\": \"not_analyzed\"\n" +
+        "    },\n" +
+        "    \"subEquipmentName\": {\n" +
+        "      \"type\": \"string\",\n" +
+        "      \"index\": \"not_analyzed\"\n" +
+        "    }\n" +
+        "  }\n" + "}";
   }
 }

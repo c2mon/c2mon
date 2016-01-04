@@ -19,17 +19,21 @@ public abstract class TagES implements TagESInterface {
   private long id;
   private String name;
   private String dataType;
-  private long sourceTime;
-  private long serverTime;
-  private long daqTime;
+  private long sourceTimestamp;
+  private long serverTimestamp;
+  private long daqTimestamp;
   private int status;
   private String quality; //tagstatusdesc
-  protected Object value;
+  protected transient Object value;
+  protected Boolean valueBoolean;
+  protected String valueString;
+  protected Number valueNumeric;
   private String valueDescription;
   
   private String process;
   private String equipment;
   private String subEquipment;
+
   protected transient TagESMapping mapping;
 
 
@@ -43,9 +47,8 @@ public abstract class TagES implements TagESInterface {
     return mapping.getMapping();
   }
 
-  public void setMapping(ValueType tagValueType) {
-    //TODO: check type
-    mapping.setProperties(tagValueType);
+  public void setMapping(ValueType valueType) {
+    mapping.setProperties(valueType);
   }
 
   /**
@@ -74,11 +77,11 @@ public abstract class TagES implements TagESInterface {
     str.append('\t');
     str.append(getDataType());
     str.append('\t');
-    str.append(getSourceTime());
+    str.append(getSourceTimestamp());
     str.append('\t');
-    str.append(getDaqTime());
+    str.append(getDaqTimestamp());
     str.append('\t');
-    str.append(getServerTime());
+    str.append(getServerTimestamp());
     str.append('\t');
     str.append(getStatus());
     str.append('\t');

@@ -15,7 +15,8 @@ public class TagNumericMapping extends TagESMapping implements Mapping {
   public void setProperties(ValueType tagValueType) {
     if (ValueType.isNumeric(tagValueType)) {
       this.properties = new Properties(tagValueType);
-    } else {
+    }
+    else {
       throw new IllegalArgumentException("Type for TagNumeric must be integer or double.");
     }
   }

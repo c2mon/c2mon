@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -85,14 +86,14 @@ public class DataTagESLogConverter {
       Timestamp daqTimeStamp = ((DataTag) tag).getDaqTimestamp();
 
       if (sourceTimeStamp != null && daqTimeStamp != null) {
-        tagES.setSourceTime(sourceTimeStamp.getTime());
-        tagES.setDaqTime(daqTimeStamp.getTime());
+        tagES.setSourceTimestamp(sourceTimeStamp.getTime());
+        tagES.setDaqTimestamp(daqTimeStamp.getTime());
       }
     }
 
     Timestamp serverTimeStamp = tag.getCacheTimestamp();
     if (serverTimeStamp != null) {
-      tagES.setServerTime(serverTimeStamp.getTime());
+      tagES.setServerTimestamp(serverTimeStamp.getTime());
     }
 
     int code = 0;
@@ -118,6 +119,8 @@ public class DataTagESLogConverter {
     tagES.setValue(tag.getValue());
     tagES.setValueDescription(tag.getValueDescription());
 
+    setMapping(tagES, tagES.getDataType());
+
     return tagES;
   }
 
@@ -134,7 +137,6 @@ public class DataTagESLogConverter {
     }
     else if (dataType.equalsIgnoreCase(ValueType.stringType.toString())) {
       return new TagString();
-
     }
     else if (ValueType.isNumeric(dataType)) {
       return new TagNumeric();
@@ -267,5 +269,23 @@ public class DataTagESLogConverter {
     }
 
     return subEquipmentName;
+  }
+
+  /**
+   * Set mapping according to the dataType of the TagES.
+   * We put every numeric value as a Double in ElasticSearch for Mapping compatibility.
+   */
+  private void setMapping(TagES tagES, String dataType) {
+    if (ValueType.isNumeric(dataType)) {
+      tagES.setMapping(ValueType.doubleType);
+    }
+    else if (ValueType.isBoolean(dataType)) {
+      tagES.setMapping(ValueType.boolType);
+    }
+    else if (ValueType.isString(dataType)) {
+      tagES.setMapping(ValueType.stringType);
+    }
+
+    log.info("setMapping() - set mapping to " + tagES.getMapping() + " with dataType " + dataType + ".");
   }
 }

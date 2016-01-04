@@ -14,7 +14,8 @@ public class TagStringMapping extends TagESMapping implements Mapping {
   public void setProperties(ValueType tagValueType) {
     if (tagValueType.equals(ValueType.stringType)) {
       this.properties = new Properties(tagValueType);
-    } else {
+    }
+    else {
       throw new IllegalArgumentException("Type for TagString must be string.");
     }
   }

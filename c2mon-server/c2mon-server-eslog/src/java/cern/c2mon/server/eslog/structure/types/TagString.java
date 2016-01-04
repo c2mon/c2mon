@@ -14,15 +14,16 @@ public class TagString extends TagES implements TagESInterface {
    * @param value Object supposed to be a String.
    */
   @Override
-  public void setValue(Object tagValue) {
-    if (tagValue == null) {
-      log.trace("setValue() TagString - Value is not set (value= " + tagValue + ").");
+  public void setValue(Object value) {
+    if (value == null) {
+      log.trace("setValue() TagString - Value is not set (value= " + value + ").");
     }
-    else if (tagValue instanceof String) {
-      this.value = tagValue;
+    else if (value instanceof String) {
+      this.value = value;
+      this.valueString = (String) value;
     }
     else {
-      throw new IllegalArgumentException("setValue() - Cannot instantiate new TagString in ElasticSearch because the value has class=" + tagValue.getClass().getName() + ")");
+      throw new IllegalArgumentException("setValue() - Cannot instantiate new TagString in ElasticSearch because the value has class=" + value.getClass().getName() + ")");
     }
   }
 }

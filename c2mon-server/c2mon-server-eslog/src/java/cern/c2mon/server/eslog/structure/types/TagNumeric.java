@@ -20,6 +20,7 @@ public class TagNumeric extends TagES implements TagESInterface {
     }
     else if (value instanceof Number) {
       this.value = value;
+      this.valueNumeric = (Number) value;
     }
     else {
       log.trace("setValue() - value has value " + value + ".");

@@ -28,8 +28,8 @@ public class QueryAliases extends Query {
     if (client != null) {
       IndicesAliasesResponse response = client.admin().indices().prepareAliases().addAlias(indexMonth, aliasName).execute().actionGet();
       return response.isAcknowledged();
-
-    } else {
+    }
+    else {
       log.info("addAlias() - client has null value.");
     }
 

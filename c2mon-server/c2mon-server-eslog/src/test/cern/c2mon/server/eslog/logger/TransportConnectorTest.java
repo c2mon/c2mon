@@ -2,6 +2,7 @@ package cern.c2mon.server.eslog.logger;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -262,8 +263,8 @@ public class TransportConnectorTest {
   public void testGenerateIndex() {
     String expected = connector.getINDEX_PREFIX() + connector.millisecondsToYearMonth(123456L);
     TagES tag = new TagBoolean();
-    tag.setServerTime(123456L);
-    String value = connector.generateIndex(tag.getServerTime());
+    tag.setServerTimestamp(123456L);
+    String value = connector.generateIndex(tag.getServerTimestamp());
     assertEquals(expected, value);
   }
 
@@ -415,7 +416,13 @@ public class TransportConnectorTest {
     tag.setDataType(ValueType.stringType.toString());
     tag.setMapping(ValueType.stringType);
     tag.setId(1L);
-    tag.setServerTime(123456789000L);
+    tag.setServerTimestamp(123456789000L);
+    tag.setValue("test");
+
+    assertNull(tag.getValueNumeric());
+    assertNull(tag.getValueBoolean());
+    assertEquals("test", tag.getValue());
+    assertEquals("test", tag.getValueString());
 
     connector.indexTag(tag);
     connector.closeBulk();
@@ -444,9 +451,9 @@ public class TransportConnectorTest {
       tag.setDataType(ValueType.stringType.toString());
       tag.setMapping(ValueType.stringType);
       tag.setId(id);
-      tag.setServerTime(tagServerTime);
+      tag.setServerTimestamp(tagServerTime);
       list.add(tag);
-      listIndices.add(connector.generateIndex(tag.getServerTime()));
+      listIndices.add(connector.generateIndex(tag.getServerTimestamp()));
       listAliases.add(connector.generateAliasName(tag.getId()));
     }
 

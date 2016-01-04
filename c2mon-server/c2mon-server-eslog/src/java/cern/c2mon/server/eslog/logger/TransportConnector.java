@@ -298,7 +298,7 @@ public class TransportConnector implements Connector {
    */
   protected boolean indexTag(TagES tag) {
     String tagJson = tag.build();
-    String indexMonth = generateIndex(tag.getServerTime());
+    String indexMonth = generateIndex(tag.getServerTimestamp());
     String type = generateType(tag.getDataType());
     
     if (log.isTraceEnabled()) {
@@ -339,7 +339,7 @@ public class TransportConnector implements Connector {
       refreshClusterStats();
 
       for (String alias : aliases.keySet()) {
-        bulkAddAlias(generateIndex(aliases.get(alias).getServerTime()), aliases.get(alias));
+        bulkAddAlias(generateIndex(aliases.get(alias).getServerTimestamp()), aliases.get(alias));
       }
 
       /** For almost real time retrieval. */
@@ -450,6 +450,7 @@ public class TransportConnector implements Connector {
     if (query instanceof QueryAliases) {
 
       isAcked = ((QueryAliases) query).addAlias(indexMonth, aliasName);
+
       if (isAcked) {
         addAlias(aliasName);
       }
@@ -520,7 +521,7 @@ public class TransportConnector implements Connector {
     String aliasName = generateAliasName(id);
 
     if (!aliases.contains(aliasName)) {
-      boolean isAcked = handleAliasQuery(new QueryAliases(client, Arrays.asList(indexMonth), false, null, null, -1, -1, -1, -1), indexMonth, aliasName);
+      boolean isAcked = handleAliasQuery(new QueryAliases(client), indexMonth, aliasName);
 
       if (isAcked) {
         addAlias(aliasName);

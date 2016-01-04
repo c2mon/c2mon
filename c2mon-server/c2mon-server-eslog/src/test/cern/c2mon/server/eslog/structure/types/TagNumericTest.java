@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -58,7 +59,7 @@ public class TagNumericTest {
     tagNumeric.setDataType("numeric");
     String line = "\n  \"dataType\": \"numeric\",";
     String text = "{\n  \"id\": 0," + line
-        + "\n  \"sourceTime\": 0,\n  \"serverTime\": 0,\n  \"daqTime\": 0,\n  \"status\": 0\n}";
+        + "\n  \"sourceTimestamp\": 0,\n  \"serverTimestamp\": 0,\n  \"daqTimestamp\": 0,\n  \"status\": 0\n}";
 
     assertEquals(text, tagNumeric.build());
   }
