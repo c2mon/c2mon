@@ -339,15 +339,15 @@ public class DataTagESLogConverterTest {
         "    \"valueBoolean\": {\n" +
         "      \"type\": \"" + dataType + "\"\n" +
         "    },\n" +
-        "    \"processName\": {\n" +
+        "    \"process\": {\n" +
         "      \"type\": \"string\",\n" +
         "      \"index\": \"not_analyzed\"\n" +
         "    },\n" +
-        "    \"equipmentName\": {\n" +
+        "    \"equipment\": {\n" +
         "      \"type\": \"string\",\n" +
         "      \"index\": \"not_analyzed\"\n" +
         "    },\n" +
-        "    \"subEquipmentName\": {\n" +
+        "    \"subEquipment\": {\n" +
         "      \"type\": \"string\",\n" +
         "      \"index\": \"not_analyzed\"\n" +
         "    }\n" +

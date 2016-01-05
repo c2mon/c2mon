@@ -130,9 +130,9 @@ public interface Mapping {
     ValueBoolean valueBoolean;
     ValueString valueString;
     ValueNumeric valueNumeric;
-    ProcessName processName;
-    EquipmentName equipmentName;
-    SubEquipmentName subEquipmentName;
+    Process process;
+    Equipment equipment;
+    SubEquipment subEquipment;
 
     Properties(ValueType valueType) {
       this.id = new Id();
@@ -155,9 +155,9 @@ public interface Mapping {
         this.valueBoolean = new ValueBoolean(valueType);
       }
 
-      this.processName = new ProcessName();
-      this.equipmentName = new EquipmentName();
-      this.subEquipmentName = new SubEquipmentName();
+      this.process = new Process();
+      this.equipment = new Equipment();
+      this.subEquipment = new SubEquipment();
     }
 
     public String getValueType() {
@@ -238,17 +238,17 @@ public interface Mapping {
       }
     }
 
-    class ProcessName {
+    class Process {
       private final String type = ValueType.stringType.toString();
       private final String index = indexNotAnalyzed;
     }
 
-    class EquipmentName {
+    class Equipment {
       private final String type = ValueType.stringType.toString();
       private final String index = indexNotAnalyzed;
     }
 
-    class SubEquipmentName {
+    class SubEquipment {
       private final String type = ValueType.stringType.toString();
       private final String index = indexNotAnalyzed;
     }
