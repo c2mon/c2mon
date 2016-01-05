@@ -43,6 +43,11 @@ public class DataTagESLogConverter {
   private final SubEquipmentCache subEquipmentCache;
   private final Gson gson;
 
+  /**
+   * default ID to return if nothing is found in cache.
+   */
+  private final long DEFAULT_ID = -1;
+
   @Autowired
   public DataTagESLogConverter(final ProcessCache processCache, final EquipmentCache equipmentCache, final SubEquipmentCache subEquipmentCache) {
     this.processCache = processCache;
@@ -63,24 +68,60 @@ public class DataTagESLogConverter {
       return null;
     }
 
-    Map<String, String> parentNames = getTagMetadataProcess(tag);
-
-    if (parentNames.containsKey("process")) {
-      tagES.setProcess(parentNames.get("process"));
-    }
-
-    if (parentNames.containsKey("equipment")) {
-      tagES.setEquipment(parentNames.get("equipment"));
-    }
-
-    if (parentNames.containsKey("subEquipment")) {
-      tagES.setSubEquipment(parentNames.get("subEquipment"));
-    }
-
+    setMetadata(tag, tagES);
     tagES.setId(tag.getId());
     tagES.setName(tag.getName());
     tagES.setDataType(tag.getDataType().toLowerCase());
+    setSourceAndDaqTimestamp(tag, tagES);
+    setServerTimestamp(tag, tagES);
+    setStatus(tag, tagES);
+    setQuality(tag, tagES);
+    tagES.setValue(tag.getValue());
+    tagES.setValueDescription(tag.getValueDescription());
+    setMapping(tagES, tagES.getDataType());
 
+    return tagES;
+  }
+
+  private void setMetadata(Tag tag, TagES tagES) {
+    Map<String, String> parentNames = getTagMetadataProcess(tag);
+    String process = retrieveProcessIfExists(parentNames);
+    String equipment = retrieveEquipmentIfExists(parentNames);
+    String subEquipment = retrieveSubEquipmentIfExists(parentNames);
+
+    tagES.setProcess(process);
+    tagES.setEquipment(equipment);
+    tagES.setSubEquipment(subEquipment);
+  }
+
+  private String retrieveProcessIfExists(Map<String, String> parentNames) {
+    if (parentNames.containsKey("process")) {
+      return parentNames.get("process");
+    }
+    else {
+      return null;
+    }
+  }
+
+  private String retrieveEquipmentIfExists(Map<String, String> parentNames) {
+    if (parentNames.containsKey("equipment")) {
+      return parentNames.get("equipment");
+    }
+    else {
+      return null;
+    }
+  }
+
+  private String retrieveSubEquipmentIfExists(Map<String, String> parentNames) {
+    if (parentNames.containsKey("subEquipment")) {
+      return parentNames.get("subEquipment");
+    }
+    else {
+      return null;
+    }
+  }
+
+  private void setSourceAndDaqTimestamp(Tag tag, TagES tagES) {
     if (tag instanceof DataTag || tag instanceof ControlTag) {
       Timestamp sourceTimeStamp = ((DataTag) tag).getSourceTimestamp();
       Timestamp daqTimeStamp = ((DataTag) tag).getDaqTimestamp();
@@ -90,12 +131,16 @@ public class DataTagESLogConverter {
         tagES.setDaqTimestamp(daqTimeStamp.getTime());
       }
     }
+  }
 
+  private void setServerTimestamp(Tag tag, TagES tagES) {
     Timestamp serverTimeStamp = tag.getCacheTimestamp();
     if (serverTimeStamp != null) {
       tagES.setServerTimestamp(serverTimeStamp.getTime());
     }
+  }
 
+  private void setStatus(Tag tag, TagES tagES) {
     int code = 0;
 
     if (tag.getDataTagQuality() != null) {
@@ -105,7 +150,9 @@ public class DataTagESLogConverter {
     }
 
     tagES.setStatus(code);
+  }
 
+  private void setQuality(Tag tag, TagES tagES) {
     DataTagQuality quality = tag.getDataTagQuality();
 
     if (quality != null && quality.isInitialised()) {
@@ -115,13 +162,6 @@ public class DataTagESLogConverter {
         tagES.setQuality("{\"UNKNOWN_REASON\":\"Invalid quality String was too long: unable to store in ShortTermLog table.\"}");
       }
     }
-
-    tagES.setValue(tag.getValue());
-    tagES.setValueDescription(tag.getValueDescription());
-
-    setMapping(tagES, tagES.getDataType());
-
-    return tagES;
   }
 
   /**
@@ -157,40 +197,25 @@ public class DataTagESLogConverter {
    */
   public Map<String, String> getTagMetadataProcess(Tag tag) {
     Map<String, String> result = new HashMap<>();
-    long processId = -1;
-    long equipmentId = -1;
-    long subEquipmentId = -1;
 
-    String processName;
-    String equipmentName;
-    String subEquipmentName;
+    long processId = DEFAULT_ID;
+    long equipmentId = DEFAULT_ID;
+    long subEquipmentId = DEFAULT_ID;
 
-    if (tag.getSubEquipmentIds() != null && !tag.getSubEquipmentIds().isEmpty() && tag.getSubEquipmentIds().size() >= 1) {
+    boolean subEquipmentIsPresent = tag.getSubEquipmentIds() != null && !tag.getSubEquipmentIds().isEmpty() && tag.getSubEquipmentIds().size() >= 1;
+    boolean EquipmentIsPresent = tag.getEquipmentIds() != null && !tag.getEquipmentIds().isEmpty() && tag.getEquipmentIds().size() >= 1;
+    boolean processIsPresent = tag.getProcessIds() != null && !tag.getProcessIds().isEmpty() && tag.getProcessIds().size() >= 1;
+
+    if (subEquipmentIsPresent) {
       subEquipmentId = tag.getSubEquipmentIds().iterator().next();
-
-      SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);
-      if (subEquipment != null) {
-        equipmentId = subEquipment.getParentId();
-      }
-
-      Equipment equipment = equipmentCache.get(equipmentId);
-
-      if (equipment != null) {
-        processId = equipment.getProcessId();
-      }
-
+      equipmentId = searchEquipmentInSubEquipmentCache(subEquipmentId);
+      processId = searchProcessIdInEquipmentCache(equipmentId);
     }
-    else if (tag.getEquipmentIds() != null && !tag.getEquipmentIds().isEmpty() && tag.getEquipmentIds().size() >= 1) {
+    else if (EquipmentIsPresent) {
       equipmentId = tag.getEquipmentIds().iterator().next();
-
-      Equipment equipment = equipmentCache.get(equipmentId);
-
-      if (equipment != null) {
-        processId = equipment.getProcessId();
-      }
-
+      processId = searchProcessIdInEquipmentCache(equipmentId);
     }
-    else if (tag.getProcessIds() != null && !tag.getProcessIds().isEmpty() && tag.getProcessIds().size() >= 1) {
+    else if (processIsPresent) {
       processId = tag.getProcessIds().iterator().next();
     }
     else {
@@ -198,26 +223,59 @@ public class DataTagESLogConverter {
       return result;
     }
 
-    processName = getProcessName(processId);
+    addMetadataToResult(processId, equipmentId, subEquipmentId, result);
+
+    return result;
+  }
+
+  private long searchEquipmentInSubEquipmentCache(long subEquipmentId) {
+    SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);
+
+    if (subEquipment != null) {
+      return subEquipment.getParentId();
+    }
+    return DEFAULT_ID;
+  }
+
+  private long searchProcessIdInEquipmentCache(long equipmentId) {
+    Equipment equipment = equipmentCache.get(equipmentId);
+
+    if (equipment != null) {
+      return equipment.getProcessId();
+    }
+    return DEFAULT_ID;
+  }
+
+  private void addMetadataToResult(long processId, long equipmentId, long subEquipmentId, Map<String, String> result) {
+    addProcessNameToResult(processId, result);
+    addEquipmentNameToResult(equipmentId, result);
+    addSubEquipmentNameToResult(subEquipmentId, result);
+  }
+
+  private void addProcessNameToResult(long processId, Map<String, String> result) {
+    String processName = getProcessName(processId);
     log.info("add process");
     result.put("process", processName);
+  }
 
+  private void addEquipmentNameToResult(long equipmentId, Map<String, String> result) {
     if (equipmentId != -1) {
-      equipmentName = getEquipmentName(equipmentId);
+      String equipmentName = getEquipmentName(equipmentId);
       if (equipmentName != null) {
         result.put("equipment", equipmentName);
         log.info("add equipment");
       }
     }
+  }
+
+  private void addSubEquipmentNameToResult(long subEquipmentId, Map<String, String> result) {
     if (subEquipmentId != -1) {
-      subEquipmentName = getSubEquipmentName(subEquipmentId);
+      String subEquipmentName = getSubEquipmentName(subEquipmentId);
       if (subEquipmentName != null) {
         result.put("subEquipment", subEquipmentName);
         log.info("add subEquipment");
       }
     }
-
-    return result;
   }
 
   /**
@@ -273,7 +331,6 @@ public class DataTagESLogConverter {
 
   /**
    * Set mapping according to the dataType of the TagES.
-   * We put every numeric value as a Double in ElasticSearch for Mapping compatibility.
    */
   private void setMapping(TagES tagES, String dataType) {
     if (ValueType.isNumeric(dataType)) {

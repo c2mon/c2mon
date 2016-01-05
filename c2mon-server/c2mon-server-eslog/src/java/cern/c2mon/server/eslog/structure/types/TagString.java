@@ -19,8 +19,8 @@ public class TagString extends TagES implements TagESInterface {
       log.trace("setValue() TagString - Value is not set (value= " + value + ").");
     }
     else if (value instanceof String) {
-      setValue(value);
-      setValueString((String) value);
+      this.value = value;
+      this.valueString = (String) value;
     }
     else {
       throw new IllegalArgumentException("setValue() - Cannot instantiate new TagString in ElasticSearch because the value has class=" + value.getClass().getName() + ")");

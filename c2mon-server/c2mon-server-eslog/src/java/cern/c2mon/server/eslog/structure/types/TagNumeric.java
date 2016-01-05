@@ -16,8 +16,8 @@ public class TagNumeric extends TagES implements TagESInterface {
       log.trace("setValue() TagNumeric - Value is not set (value= " + value + ").");
     }
     else if (value instanceof Number) {
-      setValue(value);
-      setValueNumeric((Number) value);
+      this.value = value;
+      this.valueNumeric = (Number) value;
     }
     else {
       log.trace("setValue() - value has value " + value + ".");
