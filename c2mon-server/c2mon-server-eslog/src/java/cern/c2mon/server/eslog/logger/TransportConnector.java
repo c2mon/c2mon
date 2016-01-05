@@ -429,15 +429,6 @@ public class TransportConnector implements Connector {
     return isAcked;
   }
 
-  /**
-   * Handles an alias addition query for the ElasticSearch cluster.
-   * 
-   * @param query query type.
-   * @param indexMonth name of the index to which to add the alias.
-   * @param aliasName alias to give to the name; must follow the format
-   *          "tag_tagId".
-   * @return if the query has been acked.
-   */
   @Override
   public boolean handleAliasQuery(Query query, String indexMonth, String aliasName) {
     boolean isAcked = false;
@@ -463,14 +454,6 @@ public class TransportConnector implements Connector {
     return isAcked;
   }
 
-  /**
-   * Add an indexing request to the bulkProcessor to be added by batches.
-   * 
-   * @param index for the data.
-   * @param type of the document.
-   * @param json request for indexing.
-   * @param tag TagES to be indexed.
-   */
   @Override
   public boolean bulkAdd(String index, String type, String json, TagES tag) {
 
@@ -505,13 +488,7 @@ public class TransportConnector implements Connector {
     }
   }
 
-  /**
-   * Add an alias query when the data is written by batches.
-   * 
-   * @param indexMonth to add the data into.
-   * @param tag to be added to the cluster.
-   * @return if the alias is in the aliases list.
-   */
+  @Override
   public boolean bulkAddAlias(String indexMonth, TagES tag) {
     if (tag == null || !indices.contains(indexMonth) || !checkIndex(indexMonth)) {
       throw new IllegalArgumentException("bulkAddAlias() - IllegalArgument (tag = " + tag + ", index = " + indexMonth + ").");
@@ -730,8 +707,8 @@ public class TransportConnector implements Connector {
    * @return Settings.Builder to attach to an IndexRequest.
    */
   public Settings getMonthIndexSettings() {
-    return Settings.settingsBuilder().put("number_of_shards", IndexMonthSettings.SHARDS.getSetting())
-        .put("number_of_replicas", IndexMonthSettings.REPLICA.getSetting()).build();
+    return Settings.settingsBuilder().put("number_of_shards", IndexSettings.INDEX_MONTH_SETTINGS.getShards())
+        .put("number_of_replicas", IndexSettings.INDEX_MONTH_SETTINGS.getReplica()).build();
   }
 
   /**
