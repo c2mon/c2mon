@@ -178,7 +178,7 @@ public interface Mapping {
 
     class Name {
       private final String type = ValueType.stringType.toString();
-      private final String index = indexNotAnalyzed;
+      //private final String index = indexNotAnalyzed;
     }
 
     class DataType {
@@ -203,7 +203,7 @@ public interface Mapping {
 
     class Quality {
       private final String type = ValueType.stringType.toString();
-      private final String index = indexNotAnalyzed;
+      //private final String index = indexNotAnalyzed;
     }
 
     class ValueDescription {
@@ -240,17 +240,17 @@ public interface Mapping {
 
     class Process {
       private final String type = ValueType.stringType.toString();
-      private final String index = indexNotAnalyzed;
+      //private final String index = indexNotAnalyzed;
     }
 
     class Equipment {
       private final String type = ValueType.stringType.toString();
-      private final String index = indexNotAnalyzed;
+      //private final String index = indexNotAnalyzed;
     }
 
     class SubEquipment {
       private final String type = ValueType.stringType.toString();
-      private final String index = indexNotAnalyzed;
+      //private final String index = indexNotAnalyzed;
     }
   }
 }

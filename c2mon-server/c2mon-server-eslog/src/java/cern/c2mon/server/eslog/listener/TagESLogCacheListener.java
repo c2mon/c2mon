@@ -37,6 +37,7 @@ import cern.c2mon.server.eslog.logger.TransportConnector;
 import cern.c2mon.server.eslog.structure.DataTagESLogConverter;
 import cern.c2mon.server.eslog.structure.types.TagES;
 import lombok.extern.slf4j.Slf4j;
+import org.yaml.snakeyaml.nodes.CollectionNode;
 
 /**
  * Listens to updates in the Rule and DataTag caches and calls the DAO
@@ -54,8 +55,14 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
    */
   private final CacheRegistrationService cacheRegistrationService;
 
+  /**
+   * Allows t oconvert from Tag to TagES.
+   */
   private final DataTagESLogConverter dataTagESLogConverter;
 
+  /**
+   * The Connector allows to connect to an ElasticSearch cluster and to communicate in order to write data.
+   */
   private final Connector connector;
 
   /**
@@ -101,36 +108,43 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
   @Override
   public void notifyElementUpdated(Collection<Tag> tagCollection) {
     log.trace("notifyElementUpdated() - Received a tagCollection of " + tagCollection.size() + " elements.");
-
     Collection<TagES> tagESCollection = new ArrayList<>();
     Collection<Tag> tagsToLog = new ArrayList<>(tagCollection.size());
+
+    retrieveTagsToLog(tagCollection, tagsToLog);
+    convertTagsToLogToTagES(tagsToLog, tagESCollection);
+    sendCollectionTagESToElasticSearch(tagESCollection);
+  }
+
+  private void retrieveTagsToLog(Collection<Tag> tagCollection, Collection<Tag> tagsToLog) {
     for (Tag tag : tagCollection) {
       if (tag.isLogged()) {
         tagsToLog.add(tag);
       }
     }
+  }
 
+  private void convertTagsToLogToTagES(Collection<Tag> tagsToLog, Collection<TagES> tagESCollection) {
     for (Tag tag: tagsToLog) {
       try {
         TagES tagES = dataTagESLogConverter.convertToTagES(tag);
-
-        if (tagES != null) {
-          tagESCollection.add(tagES);
-        }
-        else {
-          log.warn("notifyElementUpdated() - Unsupported data type " + tag.getDataType() + " for tag #" + tag.getId() + " (" + tag.getName() + ") ==> Not sent to elasticsearch");
-        }
-
+        addTagToCollectionIfNotNull(tagES, tagESCollection);
       } catch (Exception e) {
         log.error("notifyElementUpdated() - Error occurred during tag parsing for ElasticSearch. Tag #" + tag.getId() + " is not added to bulk sending (name=" + tag.getName() + ", value=" + tag.getValue() + ", type=" + tag.getDataType() + ")", e);
       }
     }
 
     log.trace("notifyElementUpdated() - Created a TagESCollection of " + tagESCollection.size() + " elements.");
+  }
 
+  private void addTagToCollectionIfNotNull(TagES tagES, Collection<TagES> tagESCollection) {
+    if (tagES != null) {
+      tagESCollection.add(tagES);
+    }
+  }
 
+  private void sendCollectionTagESToElasticSearch(Collection<TagES> tagESCollection) {
     try {
-      // Sending to elasticsearch
       connector.indexTags(tagESCollection);
     }
     catch(Exception e) {

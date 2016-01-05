@@ -306,8 +306,7 @@ public class DataTagESLogConverterTest {
         "      \"type\": \"long\"\n" +
         "    },\n" +
         "    \"name\": {\n" +
-        "      \"type\": \"string\",\n" +
-        "      \"index\": \"not_analyzed\"\n" +
+        "      \"type\": \"string\"\n" +
         "    },\n" +
         "    \"dataType\": {\n" +
         "      \"type\": \"string\",\n" +
@@ -329,8 +328,7 @@ public class DataTagESLogConverterTest {
         "      \"type\": \"integer\"\n" +
         "    },\n" +
         "    \"quality\": {\n" +
-        "      \"type\": \"string\",\n" +
-        "      \"index\": \"not_analyzed\"\n" +
+        "      \"type\": \"string\"\n" +
         "    },\n" +
         "    \"valueDescription\": {\n" +
         "      \"type\": \"string\",\n" +
@@ -340,16 +338,13 @@ public class DataTagESLogConverterTest {
         "      \"type\": \"" + dataType + "\"\n" +
         "    },\n" +
         "    \"process\": {\n" +
-        "      \"type\": \"string\",\n" +
-        "      \"index\": \"not_analyzed\"\n" +
+        "      \"type\": \"string\"\n" +
         "    },\n" +
         "    \"equipment\": {\n" +
-        "      \"type\": \"string\",\n" +
-        "      \"index\": \"not_analyzed\"\n" +
+        "      \"type\": \"string\"\n" +
         "    },\n" +
         "    \"subEquipment\": {\n" +
-        "      \"type\": \"string\",\n" +
-        "      \"index\": \"not_analyzed\"\n" +
+        "      \"type\": \"string\"\n" +
         "    }\n" +
         "  }\n" + "}";
   }

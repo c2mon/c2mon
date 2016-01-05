@@ -88,24 +88,4 @@ public class TagESLogCacheListenerTest {
     verify(esLogConverter, atMost(2)).convertToTagES(eq(tag3));
     verify(connector).indexTags(anyList());
   }
-
-  @Test
-  public void testSizeTagESCollection() {
-    Collection<Tag> tags = new ArrayList<>();
-    int logged = 0;
-
-    for (int i = 0; i < 100; i++) {
-      DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
-
-      if (i % 3 == 0) {
-        tag.setLogged(true);
-        logged++;
-      }
-
-      tags.add(tag);
-    }
-
-    cacheListener.notifyElementUpdated(tags);
-    // TODO: assertEquals(logged, cacheListener.getTagESCollection().size());
-  }
 }
