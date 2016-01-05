@@ -51,18 +51,12 @@ public abstract class TagES implements TagESInterface {
     mapping.setProperties(valueType);
   }
 
-  /**
-   * Return a JSON representing the TagES for indexing in ElasticSearch.
-   * @return String representing the TagES in JSON.
-   */
   public String build() {
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
     String json = gson.toJson(this);
-
     log.debug(json);
     return json;
   }
-
 
   @Override
   public String toString() {
@@ -85,11 +79,7 @@ public abstract class TagES implements TagESInterface {
     str.append('\t');
     str.append(getStatus());
     str.append('\t');
-    if ((getQuality() != null) && (getQuality().equals(""))) {
-      str.append("null");
-    } else {
-      str.append(getQuality());
-    }
+    str.append(getQualityAppend(str));
     str.append('\t');
     str.append(getProcess());
     str.append('\t');
@@ -97,5 +87,14 @@ public abstract class TagES implements TagESInterface {
     str.append('\t');
     str.append(getSubEquipment());
     return str.toString();
+  }
+
+  private String getQualityAppend(StringBuilder str) {
+    boolean qualityIsEmpty = (getQuality() != null) && (getQuality().equals(""));
+    if (qualityIsEmpty) {
+      return "nullQuality";
+    } else {
+      return getQuality();
+    }
   }
 }

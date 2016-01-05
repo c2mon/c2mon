@@ -19,8 +19,8 @@ public class TagBoolean extends TagES implements TagESInterface {
       log.trace("setValue() TagBoolean - Value is not set (value= " + value + ").");
     }
     else if (value instanceof Boolean) {
-      this.value = value;
-      this.valueBoolean = (Boolean) value;
+      setValue(value);
+      setValueBoolean((Boolean) value);
     }
     else {
       throw new IllegalArgumentException("setValue() - Cannot instantiate new TagBoolean in ElasticSearch because the value has class=" + value.getClass().getName() + ")");

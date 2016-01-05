@@ -15,18 +15,20 @@ import java.util.List;
  */
 @Slf4j
 public class QueryTypes extends Query {
+
   public QueryTypes(Client client) {
     super(client);
   }
 
-  public QueryTypes(Client client, List<String> indices, boolean isTypeDefined, List<String> types, List<Long> tagIds, int from, int size, int min, int max) {
-    super(client, indices, isTypeDefined, types, tagIds, from, size, min, max);
-  }
-
   public List<String> getListOfAnswer() {
     List<String> result = new ArrayList<>();
-    Iterator<ObjectCursor<IndexMetaData>> indicesIt = client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().indices().values().iterator();
+    Iterator<ObjectCursor<IndexMetaData>> indicesIt = getIndicesWithMetadata();
+    addtypesToResult(indicesIt, result);
+    log.info("QueryTypes - got a list of types, size=" + result.size());
+    return result;
+  }
 
+  private void addtypesToResult(Iterator<ObjectCursor<IndexMetaData>> indicesIt, List<String> result) {
     while(indicesIt.hasNext()) {
       Iterator<ObjectCursor<MappingMetaData>> mappings = indicesIt.next().value.getMappings().values().iterator();
 
@@ -34,9 +36,5 @@ public class QueryTypes extends Query {
         result.add(mappings.next().value.type());
       }
     }
-
-    log.info("QueryTypes - got a list of types, size=" + result.size());
-
-    return result;
   }
 }

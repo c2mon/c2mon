@@ -1,12 +1,5 @@
 package cern.c2mon.server.eslog;
 
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.eslog.logger.TransportConnector;
-import cern.c2mon.server.eslog.structure.DataTagESLogConverter;
-import cern.c2mon.server.eslog.structure.types.TagBoolean;
-import cern.c2mon.server.eslog.structure.types.TagES;
-import cern.c2mon.server.test.CacheObjectCreation;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
@@ -16,13 +9,9 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNull;
-import static junit.framework.TestCase.assertTrue;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 /**

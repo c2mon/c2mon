@@ -16,9 +16,12 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -476,8 +479,7 @@ public class TransportConnectorTest {
       queryIds.add(i);
     }
 
-    QueryIndices query = new QueryIndices(connector.getClient(), Arrays.asList("c2mon_1973-11"), true, Arrays.asList("tag_string"), queryIds, 0, 10, -1, -1);
-    SearchResponse response = query.getResponse();
+    SearchResponse response = getResponse(connector.getClient(), new String[]{"c2mon_1973-11"}, 0, 10, null);
     log.info(response.toString());
 
     assertEquals(size, response.getHits().getTotalHits());
@@ -516,6 +518,21 @@ public class TransportConnectorTest {
   }
 
   private QueryIndexBuilder createIndexQuery(Client client) {
-    return new QueryIndexBuilder(client, Arrays.asList("c2mon_2015-01"), true, Arrays.asList("tag_String"), Arrays.asList(1L), 0, 1, -1, -1);
+    return new QueryIndexBuilder(client);
+  }
+
+  private SearchResponse getResponse(Client client, String[] indices, int from, int size, List<Long> tagIds) {
+    SearchRequestBuilder requestBuilder = client.prepareSearch();
+    requestBuilder.setSearchType(SearchType.DEFAULT)
+        .setIndices(indices)
+        .setFrom(from)
+        .setSize(size);
+
+    if (tagIds != null) {
+      requestBuilder.setQuery(QueryBuilders.boolQuery()
+          .filter(QueryBuilders.termsQuery("id", tagIds)));
+    }
+
+    return requestBuilder.execute().actionGet();
   }
 }
