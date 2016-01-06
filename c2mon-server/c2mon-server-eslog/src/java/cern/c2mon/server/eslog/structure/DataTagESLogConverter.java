@@ -168,10 +168,10 @@ public class DataTagESLogConverter {
   public TagES instantiateTagES(String dataType) {
     dataType = dataType.toLowerCase();
 
-    if (dataType.equalsIgnoreCase(ValueType.boolType.toString())) {
+    if (ValueType.isBoolean(dataType)) {
       return new TagBoolean();
     }
-    else if (dataType.equalsIgnoreCase(ValueType.stringType.toString())) {
+    else if (ValueType.isString(dataType)) {
       return new TagString();
     }
     else if (ValueType.isNumeric(dataType)) {

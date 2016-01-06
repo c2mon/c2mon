@@ -1,5 +1,6 @@
 package cern.c2mon.server.eslog.structure.queries;
 
+import com.carrotsearch.hppc.ObjectContainer;
 import com.carrotsearch.hppc.cursors.ObjectCursor;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,7 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.cluster.metadata.AliasMetaData;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
+import org.elasticsearch.cluster.metadata.MappingMetaData;
+import org.elasticsearch.common.collect.ImmutableOpenMap;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -45,5 +49,13 @@ public abstract class Query {
 
   protected Iterator<ObjectCursor<IndexMetaData>> getIndicesWithMetadata() {
     return client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().indices().values().iterator();
+  }
+
+  protected ImmutableOpenMap<String, MappingMetaData> getIndexWithMetadata(String index) {
+    return client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().index(index).getMappings();
+  }
+
+  protected ObjectContainer<AliasMetaData> getAliases(String index) {
+    return client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().index(index).getAliases().values();
   }
 }

@@ -6,8 +6,6 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 
-import java.util.List;
-
 /**
  * @author Alban Marguet.
  */
@@ -28,10 +26,10 @@ public class QueryIndexBuilder extends Query {
     boolean parametersAreInitialized = type != null && mapping != null && !mapping.equals("");
     if (parametersAreInitialized) {
       createIndexRequestBuilder.addMapping(type, mapping);
+      log.debug("indexNew() - Adds new Mapping in the handling of the query.");
     }
 
     CreateIndexResponse response = createIndexRequestBuilder.execute().actionGet();
-    log.debug("indexNew() - Response: " + response.toString());
     return response.isAcknowledged();
   }
 }

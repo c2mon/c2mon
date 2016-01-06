@@ -1,13 +1,8 @@
 package cern.c2mon.server.eslog.structure.queries;
 
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequestBuilder;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
-import org.elasticsearch.index.query.QueryBuilders;
 
 import java.util.ArrayList;
 import java.util.Arrays;

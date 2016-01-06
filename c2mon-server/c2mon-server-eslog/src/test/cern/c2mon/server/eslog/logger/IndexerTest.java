@@ -90,17 +90,15 @@ public class IndexerTest {
     connector.getClient().admin().indices().delete(new DeleteIndexRequest("*")).actionGet();
     connector.getClient().admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
     connector.getClient().admin().indices().prepareRefresh().execute().actionGet();
-    indexer.getAliases().clear();
-    indexer.getIndices().clear();
-    indexer.getTypes().clear();
+    indexer.getIndicesTypes().clear();
+    indexer.getIndicesAliases().clear();
   }
 
   @Test
   public void testInit() {
     assertTrue(indexer.isAvailable());
-    assertNotNull(indexer.getAliases());
-    assertNotNull(indexer.getIndices());
-    assertNotNull(indexer.getTypes());
+    assertNotNull(indexer.getIndicesTypes());
+    assertNotNull(indexer.getIndicesAliases());
   }
 
   @Test
@@ -112,23 +110,23 @@ public class IndexerTest {
 
     boolean isAcked = indexer.instantiateIndex(tag, index, type);
     assertTrue(isAcked);
-    assertTrue(indexer.getIndices().contains(index));
-    assertTrue(indexer.getTypes().contains(type));
+    assertTrue(indexer.getIndicesTypes().keySet().contains(index));
+    assertTrue(indexer.getIndicesTypes().get(index).contains(type));
   }
 
   @Test
   public void testUpdateLists() {
     Set<String> expectedIndex = new HashSet<>();
     Set<String> expectedType = new HashSet<>();
-    assertEquals(expectedIndex, indexer.getIndices());
-    assertEquals(expectedType, indexer.getTypes());
+    assertEquals(expectedIndex, indexer.getIndicesTypes().keySet());
+    assertNull(indexer.getIndicesTypes().get(0));
     expectedIndex.add("c2mon_2015-01");
 
     connector.handleIndexQuery("c2mon_2015-01", Settings.EMPTY, "", "");
     indexer.updateLists();
 
-    assertEquals(expectedIndex, indexer.getIndices());
-    assertEquals(expectedType, indexer.getTypes());
+    assertEquals(expectedIndex, indexer.getIndicesTypes().keySet());
+    assertEquals(expectedType, indexer.getIndicesTypes().get("c2mon_2015-01"));
   }
 
   @Test
@@ -175,24 +173,27 @@ public class IndexerTest {
     Set<String> expected = new HashSet<>();
     expected.add(index);
     indexer.addIndex(index);
-    assertEquals(expected, indexer.getIndices());
-    indexer.getIndices().clear();
+    assertEquals(expected, indexer.getIndicesTypes().keySet());
+    indexer.getIndicesTypes().clear();
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testAddBadType() {
     String index = "c2mon_bad";
-    indexer.addType(index);
+    String badType = "tagff_test";
+    indexer.addType(index, badType);
   }
 
   @Test
   public void testAddGoodType() {
-    String index = "tag_string";
+    String index = "c2mon_1970-01";
+    String type = "tag_string";
     Set<String> expected = new HashSet<>();
-    expected.add(index);
-    indexer.addType(index);
-    assertEquals(expected, indexer.getTypes());
-    indexer.getTypes().clear();
+    expected.add(type);
+    indexer.addIndex(index);
+    indexer.addType(index, type);
+    assertEquals(expected, indexer.getIndicesTypes().get(index));
+    indexer.getIndicesTypes().clear();
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -203,12 +204,14 @@ public class IndexerTest {
 
   @Test
   public void testAddGoodAlias() {
-    String index = "tag_12658";
+    String index = "c2mon_1970-01";
+    String alias = "tag_12658";
     Set<String> expected = new HashSet<>();
-    expected.add(index);
-    indexer.addAlias(index);
-    assertEquals(expected, indexer.getAliases());
-    indexer.getAliases().clear();
+    expected.add(alias);
+    indexer.addIndex(index);
+    indexer.addAlias(index, alias);
+    assertEquals(expected, indexer.getIndicesAliases().get(index));
+    indexer.getIndicesAliases().clear();
   }
 
   @Test
@@ -232,7 +235,7 @@ public class IndexerTest {
 
   @Test
   @Ignore("Works alone but not along the other tests (bulk processing synchronization)")
-  public void testWriteTag() {
+  public void testSendTagToBatch() {
     TagES tag = new TagString();
     tag.setDataType(Mapping.ValueType.stringType.toString());
     tag.setMapping(Mapping.ValueType.stringType);
@@ -240,22 +243,24 @@ public class IndexerTest {
     tag.setServerTimestamp(123456789000L);
     tag.setValue("test");
 
+    String indexName = indexer.generateIndex(tag.getServerTimestamp());
+
     assertNull(tag.getValueNumeric());
     assertNull(tag.getValueBoolean());
     assertEquals("test", tag.getValue());
     assertEquals("test", tag.getValueString());
 
-    indexer.writeTag(tag);
+    indexer.sendTagToBatch(tag);
     connector.closeBulk();
 
-    assertTrue(indexer.getIndices().contains(indexer.generateIndex(123456789000L)));
-    assertTrue(indexer.getTypes().contains(indexer.generateType(tag.getDataType())));
+    assertTrue(indexer.getIndicesTypes().keySet().contains(indexer.generateIndex(123456789000L)));
+    assertTrue(indexer.getIndicesTypes().get(indexName).contains(indexer.generateType(tag.getDataType())));
 
     QueryIndices query = new QueryIndices(connector.getClient());
     QueryTypes queryTypes = new QueryTypes(connector.getClient());
 
-    assertTrue(connector.handleListingQuery(query).contains(indexer.generateIndex(123456789000L)));
-    assertTrue(connector.handleListingQuery(queryTypes).contains(indexer.generateType(tag.getDataType())));
+    assertTrue(connector.handleListingQuery(query, indexName).contains(indexer.generateIndex(123456789000L)));
+    assertTrue(connector.handleListingQuery(queryTypes, indexName).contains(indexer.generateType(tag.getDataType())));
   }
 
   @Test
@@ -278,19 +283,21 @@ public class IndexerTest {
       listAliases.add(indexer.generateAliasName(tag.getId()));
     }
 
+
+    String indexName = indexer.generateIndex(tagServerTime);
     indexer.indexTags(list);
 
-    Set<String> resultIndices = indexer.getIndices();
-    Set<String> resultAliases = indexer.getAliases();
-    Set<String> resultTypes = indexer.getTypes();
+    Set<String> resultIndices = indexer.getIndicesTypes().keySet();
+    Set<String> resultAliases = indexer.getIndicesAliases().get(indexName);
+    Set<String> resultTypes = indexer.getIndicesTypes().get(indexName);
 
     QueryIndices queryIndices = new QueryIndices(connector.getClient());
     QueryTypes queryTypes = new QueryTypes(connector.getClient());
     QueryAliases queryAliases = new QueryAliases(connector.getClient());
 
-    List<String> liveIndices = connector.handleListingQuery(queryIndices);
-    List<String> liveTypes = connector.handleListingQuery(queryTypes);
-    List<String> liveAliases = connector.handleListingQuery(queryAliases);
+    List<String> liveIndices = connector.handleListingQuery(queryIndices, indexName);
+    List<String> liveTypes = connector.handleListingQuery(queryTypes, indexName);
+    List<String> liveAliases = connector.handleListingQuery(queryAliases, indexName);
 
 
     SearchResponse response = getResponse(connector.getClient(), new String[]{"c2mon_1973-11"}, 0, 10, null);
@@ -330,20 +337,23 @@ public class IndexerTest {
     tag.setId(1L);
     tag.setDataType(Mapping.ValueType.stringType.toString());
     tag.setMapping(Mapping.ValueType.stringType);
-    indexer.getAliases().add("tag_1");
-    connector.handleIndexQuery("c2mon_2015-12", connector.getIndexSettings("INDEX_MONTH_SETTINGS"),
+    String index = "c2mon_2015-12";
+
+    indexer.getIndicesAliases().put(index, new HashSet<String>());
+    indexer.getIndicesAliases().get(index).add("tag_1");
+    connector.handleIndexQuery(index, connector.getIndexSettings("INDEX_MONTH_SETTINGS"),
         indexer.generateType(tag.getDataType()), tag.getMapping());
 
     // already contains the alias
-    assertFalse(indexer.addAliasFromBatch("c2mon_2015-12", tag));
+    assertFalse(indexer.addAliasFromBatch(index, tag));
 
-    indexer.getAliases().clear();
+    indexer.getIndicesAliases().clear();
     // indices do not contain "c2mon_2015-12"
-    assertFalse(indexer.addAliasFromBatch("c2mon_2015-12", tag));
+    assertFalse(indexer.addAliasFromBatch(index, tag));
 
-    indexer.getIndices().add("c2mon_2015-12");
-    assertTrue(indexer.addAliasFromBatch("c2mon_2015-12", tag));
-    assertTrue(indexer.getAliases().contains("tag_1"));
+    indexer.getIndicesAliases().put(index, new HashSet<String>());
+    assertTrue(indexer.addAliasFromBatch(index, tag));
+    assertTrue(indexer.getIndicesAliases().get(index).contains("tag_1"));
   }
 
   @Test
@@ -352,15 +362,16 @@ public class IndexerTest {
     tag.setDataType(Mapping.ValueType.stringType.toString());
     tag.setId(1L);
     tag.setMapping(Mapping.ValueType.stringType);
+    String type = indexer.generateType(tag.getDataType());
 
     assertFalse(indexer.indexByBatch(null, tag.getDataType(), tag.build(), tag));
     assertFalse(indexer.indexByBatch("c2mon_2015-12", "badType", tag.build(), tag));
-    assertFalse(indexer.getIndices().contains("c2mon_2015-12"));
+    assertNull(indexer.getIndicesTypes().get("c2mon_2015-12"));
 
-    assertTrue(indexer.indexByBatch("c2mon_2015-12", indexer.generateType(tag.getDataType()), tag.build(), tag));
+    assertTrue(indexer.indexByBatch("c2mon_2015-12", type, tag.build(), tag));
     connector.closeBulk();
-    assertTrue(indexer.getIndices().size() == 1);
-    assertTrue(indexer.getIndices().contains("c2mon_2015-12"));
+    assertTrue(indexer.getIndicesTypes().size() == 1);
+    assertTrue(indexer.getIndicesTypes().get("c2mon_2015-12").contains(type));
   }
 
   private SearchResponse getResponse(Client client, String[] indices, int from, int size, List<Long> tagIds) {

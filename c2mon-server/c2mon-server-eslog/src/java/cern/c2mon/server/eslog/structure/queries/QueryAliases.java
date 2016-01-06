@@ -2,15 +2,14 @@ package cern.c2mon.server.eslog.structure.queries;
 
 import com.carrotsearch.hppc.cursors.ObjectCursor;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.AliasesRequest;
-import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequestBuilder;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.cluster.metadata.AliasOrIndex;
-import org.elasticsearch.cluster.metadata.IndexMetaData;
+import org.elasticsearch.cluster.metadata.AliasMetaData;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Alban Marguet.
@@ -35,21 +34,20 @@ public class QueryAliases extends Query {
     return false;
   }
 
-  public List<String> getListOfAnswer() {
+  public List<String> getListOfAnswer(String index) {
     List<String> result = new ArrayList<>();
-    Iterator<ObjectCursor<IndexMetaData>> indicesIt = getIndicesWithMetadata();
-    addAliasesToResult(indicesIt, result);
-    log.info("QueryAliases - got a list of aliases, size=" + result.size());
+
+    if (index != null) {
+      Iterator<ObjectCursor<AliasMetaData>> aliasesIt = getAliases(index).iterator();
+      addAliasesToResult(aliasesIt, result);
+      log.info("QueryAliases - got a list of aliases, size=" + result.size());
+    }
     return result;
   }
 
-  private void addAliasesToResult(Iterator<ObjectCursor<IndexMetaData>> indicesIt, List<String> result) {
-    while(indicesIt.hasNext()) {
-      Iterator<ObjectCursor<String>> aliases = indicesIt.next().value.getAliases().keys().iterator();
-
-      while(aliases.hasNext()) {
-        result.add(aliases.next().value);
-      }
+  private void addAliasesToResult(Iterator<ObjectCursor<AliasMetaData>> aliases, List<String> result) {
+    while(aliases.hasNext()) {
+      result.add(aliases.next().value.getAlias());
     }
   }
 }

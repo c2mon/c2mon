@@ -28,9 +28,8 @@ public class Indexer {
   private final String FIRST_INDEX = INDEX_PREFIX + "1970-01";
 
   /** Contains in-memory the content of the Indices, types and aliases present in the cluster. */
-  private final Set<String> indices = new HashSet<>();
-  private final Set<String> types = new HashSet<>();
-  private final Set<String> aliases = new HashSet<>();
+  private final Map<String, Set<String>> indicesTypes = new HashMap<>();
+  private final Map<String, Set<String>> indicesAliases = new HashMap<>();
 
   private Connector connector;
   private boolean isAvailable;
@@ -64,7 +63,7 @@ public class Indexer {
     else {
 
       for (TagES tag : tags) {
-        if (writeTag(tag)) {
+        if (sendTagToBatch(tag)) {
           // 1 by 1 = long running
           aliases.put(generateAliasName(tag.getId()), tag);
           // TODO: Better make one Map with indexes and types
@@ -93,7 +92,7 @@ public class Indexer {
    * @param tag to index.
    * @return true, if tag indexing was successful
    */
-  protected boolean writeTag(TagES tag) {
+  protected boolean sendTagToBatch(TagES tag) {
     String tagJson = tag.build();
     String indexMonth = generateIndex(tag.getServerTimestamp());
     String type = generateType(tag.getDataType());
@@ -117,12 +116,12 @@ public class Indexer {
       return false;
     }
     else {
-      if (!indices.contains(index)) {
+      if (!mappingExists(index, type)) {
         boolean isIndexed = instantiateIndex(tag, index, type);
 
         if (isIndexed) {
           //A set will not add twice the same value
-          addType(type);
+          addType(index, type);
           addIndex(index);
         }
       }
@@ -134,8 +133,17 @@ public class Indexer {
         connector.launchFallBackMechanism(indexNewTag);
       }
 
+      updateLists();
+
       return isSent;
     }
+  }
+
+  private boolean mappingExists(String index, String type) {
+    Set<String> typesForIndex  = indicesTypes.get(index);
+    boolean indexPresent = indicesTypes.containsKey(type);
+    boolean typePresent = typesForIndex != null && typesForIndex.contains(type);
+    return (indexPresent || typePresent);
   }
 
   /**
@@ -149,14 +157,17 @@ public class Indexer {
     long id = tag.getId();
     String aliasName = generateAliasName(id);
 
-    boolean canBeAdded = !aliases.contains(aliasName) && indices.contains(indexMonth) && checkIndex(indexMonth) && checkAlias(aliasName);
+    boolean canBeAdded = indicesAliases.keySet().contains(indexMonth) && !indicesAliases.get(indexMonth).contains(aliasName) && checkIndex(indexMonth) && checkAlias(aliasName);
     if (canBeAdded) {
       boolean isAcked = connector.handleAliasQuery(indexMonth, aliasName);
 
       if (isAcked) {
-        addAlias(aliasName);
+        addAlias(indexMonth, aliasName);
         log.debug("addAliasFromBatch() - Add alias: " + aliasName + " for index " + indexMonth + ".");
       }
+
+      updateLists();
+
       return true;
     }
     else {
@@ -170,7 +181,8 @@ public class Indexer {
    */
   public void addIndex(String indexName) {
     if (checkIndex(indexName)) {
-      indices.add(indexName);
+      indicesTypes.put(indexName, new HashSet<String>());
+      indicesAliases.put(indexName, new HashSet<String>());
       log.debug("addIndex() - Added index " + indexName + " in memory list.");
     }
     else {
@@ -182,9 +194,9 @@ public class Indexer {
    * Add an alias to the Set aliases. Called by the writing of a new alias if it was successful.
    * @param aliasName name of the alias to give.
    */
-  public void addAlias(String aliasName) {
-    if (checkAlias(aliasName)) {
-      aliases.add(aliasName);
+  public void addAlias(String index, String aliasName) {
+    if (checkAlias(aliasName) && indicesAliases.containsKey(index)) {
+      indicesAliases.get(index).add(aliasName);
       log.debug("addAlias() - Added alias " + aliasName + " in memory list.");
     }
     else {
@@ -196,9 +208,9 @@ public class Indexer {
    * Add a type to the Set types. Called by the writing of a new Index if it was successful.
    * @param typeName type defined for the new document.
    */
-  public void addType(String typeName) {
-    if (checkType(typeName)) {
-      types.add(typeName);
+  public void addType(String index, String typeName) {
+    if (checkType(typeName) && indicesTypes.containsKey(index)) {
+      indicesTypes.get(index).add(typeName);
       log.debug("addType() - Added type " + typeName + " in memory list.");
     }
     else {
@@ -283,23 +295,32 @@ public class Indexer {
    * @return the boolean status of the Query.
    */
   public boolean instantiateIndex(TagES tag, String index, String type) {
-    if (indices.contains(index) || !checkIndex(index) || !checkType(type)) {
+    if (indicesTypes.containsKey(index) || !checkIndex(index) || !checkType(type)) {
       log.debug("instantiateIndex() - Bad index: " + index + " or type: " + type + ".");
       return false;
     }
 
     String mapping = null;
 
-    if (!types.contains(type)) {
+    if (!typeIsPresent(index, type)) {
       mapping = tag.getMapping();
+      log.debug("instantiateIndex() - Adding a new mapping to index " + index + " for type " + type + ".");
     }
 
     Settings indexSettings = connector.getIndexSettings("INDEX_MONTH_SETTINGS");
 
     boolean isAcked = connector.handleIndexQuery(index, indexSettings, type, mapping);
-    updateLists();
+
+    if (isAcked) {
+      updateLists();
+    }
 
     return isAcked;
+  }
+
+  private boolean typeIsPresent(String index, String type) {
+    Set<String> types = indicesTypes.get(index);
+    return types!= null && types.contains(type);
   }
 
   /**
@@ -308,24 +329,49 @@ public class Indexer {
    * indices, types and aliases.
    */
   public void updateLists() {
-    indices.addAll(connector.updateIndices());
-    types.addAll(connector.updateTypes());
-    aliases.addAll(connector.updateAliases());
+    updateIndices();
+    updateTypes();
+    updateAliases();
 
     displayLists();
+  }
+
+  private void updateIndices() {
+    for (String index : connector.updateIndices()) {
+      indicesTypes.put(index, new HashSet<String>());
+    }
+  }
+
+  private void updateTypes() {
+    for (String index : indicesTypes.keySet()) {
+      indicesTypes.get(index).addAll(connector.updateTypes(index));
+    }
+  }
+
+  private void updateAliases() {
+    for (String index : indicesAliases.keySet()) {
+      indicesAliases.get(index).addAll(connector.updateAliases(index));
+    }
+  }
+
+  private void clearLists() {
+    indicesTypes.clear();
+    indicesAliases.clear();
   }
 
   private void displayLists() {
     if (log.isTraceEnabled()) {
       log.trace("displayLists():");
       log.trace("Indices in the cluster:");
-      for (String index : indices) {
-        log.trace(index);
-      }
 
-      log.trace("Types in the cluster:");
-      for (String type : types) {
-        log.trace(type);
+      for (String index : indicesTypes.keySet()) {
+        log.trace(index);
+
+        log.trace("Has types:");
+        Set<String> types = indicesTypes.get(index);
+        for (String type : types) {
+          log.trace(type);
+        }
       }
 
 //      log.trace("Aliases in the cluster:");

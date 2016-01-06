@@ -299,7 +299,7 @@ public class TransportConnector implements Connector {
    * @return List of retrieved responses according to the query.
    */
   @Override
-  public List<String> handleListingQuery(Query query) {
+  public List<String> handleListingQuery(Query query, String index) {
     List<String> queryResponse = new ArrayList<>();
 
     if (client == null) {
@@ -313,11 +313,11 @@ public class TransportConnector implements Connector {
     }
     else if (query instanceof QueryAliases) {
       log.debug("handleListingQuery() - Handling queryAliases.");
-      queryResponse.addAll(((QueryAliases) query).getListOfAnswer());
+      queryResponse.addAll(((QueryAliases) query).getListOfAnswer(index));
     }
     else if (query instanceof QueryTypes) {
       log.debug("handleListingQuery() - Handling queryTypes.");
-      queryResponse.addAll(((QueryTypes) query).getListOfAnswer());
+      queryResponse.addAll(((QueryTypes) query).getListOfAnswer(index));
     }
     else {
       log.error("handleListingQuery() - Unhandled query type.");
@@ -369,25 +369,25 @@ public class TransportConnector implements Connector {
   public Set<String> updateIndices() {
     Set<String> indices = new HashSet<>();
     if (client != null) {
-      indices.addAll(handleListingQuery(new QueryIndices(client)));
+      indices.addAll(handleListingQuery(new QueryIndices(client), null));
       log.trace("updateIndices() - Updating list of indices.");
     }
     return indices;
   }
 
-  public Set<String> updateTypes() {
+  public Set<String> updateTypes(String index) {
     Set<String> types = new HashSet<>();
     if (client != null) {
-      types.addAll(handleListingQuery(new QueryTypes(client)));
+      types.addAll(handleListingQuery(new QueryTypes(client), index));
       log.trace("updateTypes() - Updating list of types.");
     }
     return types;
   }
 
-  public Set<String> updateAliases() {
+  public Set<String> updateAliases(String index) {
     Set<String> aliases = new HashSet<>();
     if (client != null) {
-      aliases.addAll(handleListingQuery(new QueryAliases(client)));
+      aliases.addAll(handleListingQuery(new QueryAliases(client), index));
       log.trace("updateAliases() - Updating list of aliases.");
     }
     return aliases;

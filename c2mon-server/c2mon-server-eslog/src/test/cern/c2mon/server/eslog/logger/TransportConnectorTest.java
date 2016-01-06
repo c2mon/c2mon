@@ -106,24 +106,23 @@ public class TransportConnectorTest {
 
   @Test
   public void testHandleListingQuery() {
-
     Query query = null;
     Set<String> result = new HashSet<>();
 
-    assertEquals(0, connector.handleListingQuery(query).size());
+    assertEquals(0, connector.handleListingQuery(query, null).size());
 
     query = new QueryIndices(connector.getClient());
-    result.addAll(connector.handleListingQuery(query));
+    result.addAll(connector.handleListingQuery(query, null));
     assertEquals(0, result.size());
 
     query = new QueryAliases(connector.getClient());
     result = new HashSet<>();
-    result.addAll(connector.handleListingQuery(query));
+    result.addAll(connector.handleListingQuery(query, null));
     assertEquals(0, result.size());
 
     query = new QueryTypes(connector.getClient());
     result = new HashSet<>();
-    result.addAll(connector.handleListingQuery(query));
+    result.addAll(connector.handleListingQuery(query, null));
     assertEquals(0, result.size());
   }
 
