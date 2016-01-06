@@ -180,14 +180,12 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
 
                     } else {
 
-                        synchronized (service) {
-                            if (service == null) {
-                                service = new RbaLoginService();
-                                service.setLoginPolicy(LoginPolicy.LOCATION);
-                                service.setAutoRefresh(true);
-                                service.setApplicationName(ProcUtils.getApplicationName());
-                                service.startAndLogin();
-                            }
+                        if (service == null) {
+                            service = new RbaLoginService();
+                            service.setLoginPolicy(LoginPolicy.LOCATION);
+                            service.setAutoRefresh(true);
+                            service.setApplicationName(ProcUtils.getApplicationName());
+                            service.startAndLogin();
                         }
                         
 
