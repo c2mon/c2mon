@@ -121,8 +121,8 @@ public class Indexer {
 
         if (isIndexed) {
           //A set will not add twice the same value
-          addType(index, type);
           addIndex(index);
+          addType(index, type);
         }
       }
 
@@ -141,9 +141,9 @@ public class Indexer {
 
   private boolean mappingExists(String index, String type) {
     Set<String> typesForIndex  = indicesTypes.get(index);
-    boolean indexPresent = indicesTypes.containsKey(type);
+    boolean indexPresent = indicesTypes.containsKey(index);
     boolean typePresent = typesForIndex != null && typesForIndex.contains(type);
-    return (indexPresent || typePresent);
+    return (indexPresent && typePresent);
   }
 
   /**
@@ -295,7 +295,7 @@ public class Indexer {
    * @return the boolean status of the Query.
    */
   public boolean instantiateIndex(TagES tag, String index, String type) {
-    if (indicesTypes.containsKey(index) || !checkIndex(index) || !checkType(type)) {
+    if ((indicesTypes.containsKey(index) && indicesTypes.get(index).contains(type)) || !checkIndex(index) || !checkType(type)) {
       log.debug("instantiateIndex() - Bad index: " + index + " or type: " + type + ".");
       return false;
     }
@@ -339,6 +339,7 @@ public class Indexer {
   private void updateIndices() {
     for (String index : connector.updateIndices()) {
       indicesTypes.put(index, new HashSet<String>());
+      indicesAliases.put(index, new HashSet<String>());
     }
   }
 
