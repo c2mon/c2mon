@@ -155,12 +155,8 @@ public class DataTagESLogConverter {
   private void setQuality(Tag tag, TagES tagES) {
     DataTagQuality quality = tag.getDataTagQuality();
 
-    if (quality != null && quality.isInitialised()) {
+    if (quality != null) {
       tagES.setQuality(gson.toJson(quality.getInvalidQualityStates()));
-
-      if (tagES.getQuality() != null) {
-        tagES.setQuality("{\"UNKNOWN_REASON\":\"Invalid quality String was too long: unable to store in ShortTermLog table.\"}");
-      }
     }
   }
 
@@ -343,6 +339,6 @@ public class DataTagESLogConverter {
       tagES.setMapping(ValueType.stringType);
     }
 
-    log.info("setMapping() - set mapping to " + tagES.getMapping() + " with dataType " + dataType + ".");
+    log.debug("setMapping() - Set mapping to " + tagES.getMapping() + " with dataType " + dataType + ".");
   }
 }
