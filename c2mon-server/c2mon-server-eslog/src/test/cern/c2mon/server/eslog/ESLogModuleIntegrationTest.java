@@ -24,20 +24,15 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 @RunWith(SpringJUnit4ClassRunner.class)
 @Ignore("Works alone but not in the continuity of all the tests (issue with the used ports for the cluster setup in memory)")
 public class ESLogModuleIntegrationTest {
-  private static String clusterName;
-  private static String home;
-  private static String host;
-  private static String nodeName;
   private static Node clusterNode;
   private static Client clusterClient;
 
   @BeforeClass
   public static void initCluster() {
     log.info("@BeforeClass");
-    clusterName = "testCluster";
-    home = "../../resources/elasticsearch";
-    host = "localhost";
-    nodeName = "transportNode";
+    String clusterName = "testCluster";
+    String home = "../../resources/elasticsearch";
+    String host = "localhost";
 
     clusterNode = nodeBuilder()
         .settings(Settings.settingsBuilder()
@@ -48,7 +43,7 @@ public class ESLogModuleIntegrationTest {
             .put("node.data", true)
             .put("node.master", true)
             .put("http.enabled", false)
-            .put("transport.host", "localhost")
+            .put("transport.host", host)
             .put("transport.tcp.port", 8300)
             .build())
         .node();

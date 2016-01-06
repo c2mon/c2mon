@@ -3,6 +3,7 @@ package cern.c2mon.server.eslog.listener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.eslog.logger.Indexer;
 import cern.c2mon.server.eslog.logger.TransportConnector;
 import cern.c2mon.server.eslog.structure.DataTagESLogConverter;
 import cern.c2mon.server.test.CacheObjectCreation;
@@ -42,7 +43,7 @@ public class TagESLogCacheListenerTest {
   CacheRegistrationService cacheRegistrationService;
 
   @Mock
-  TransportConnector connector;
+  Indexer indexer;
 
 
   @Test
@@ -52,7 +53,7 @@ public class TagESLogCacheListenerTest {
     cacheListener.notifyElementUpdated(Collections.<Tag>singletonList(tag));
 
     verify(esLogConverter).convertToTagES(eq(tag));
-    verify(connector).indexTags(anyList());
+    verify(indexer).indexTags(anyList());
   }
 
   @Test
@@ -62,7 +63,7 @@ public class TagESLogCacheListenerTest {
     cacheListener.notifyElementUpdated(Collections.<Tag>singletonList(tag));
 
     verify(esLogConverter, never()).convertToTagES(tag);
-    verify(connector).indexTags(anyList());
+    verify(indexer).indexTags(anyList());
   }
 
   @Test
@@ -86,6 +87,6 @@ public class TagESLogCacheListenerTest {
     verify(esLogConverter).convertToTagES(eq(tag1));
     verify(esLogConverter).convertToTagES(eq(tag2));
     verify(esLogConverter, atMost(2)).convertToTagES(eq(tag3));
-    verify(connector).indexTags(anyList());
+    verify(indexer).indexTags(anyList());
   }
 }

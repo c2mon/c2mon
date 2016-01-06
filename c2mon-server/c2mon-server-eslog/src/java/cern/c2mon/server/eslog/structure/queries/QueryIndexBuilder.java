@@ -31,7 +31,7 @@ public class QueryIndexBuilder extends Query {
     }
 
     CreateIndexResponse response = createIndexRequestBuilder.execute().actionGet();
-    log.debug(response.toString());
+    log.debug("indexNew() - Response: " + response.toString());
     return response.isAcknowledged();
   }
 }

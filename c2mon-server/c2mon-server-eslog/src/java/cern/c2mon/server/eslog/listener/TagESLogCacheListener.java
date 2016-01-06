@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.eslog.logger.Indexer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
@@ -66,6 +67,11 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
   private final Connector connector;
 
   /**
+   * the Indexer allows to use the connection to the ElasticSearch cluster and to write data.
+   */
+  private final Indexer indexer;
+
+  /**
    * Listener container lifecycle hook.
    */
   private Lifecycle listenerContainer;
@@ -81,11 +87,12 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
    * @param cacheRegistrationService for registering cache listeners
    */
   @Autowired
-  public TagESLogCacheListener(final CacheRegistrationService cacheRegistrationService, final DataTagESLogConverter dataTagESLogConverter, final TransportConnector connector) {
+  public TagESLogCacheListener(final CacheRegistrationService cacheRegistrationService, final DataTagESLogConverter dataTagESLogConverter, final TransportConnector connector, final Indexer indexer) {
     super();
     this.cacheRegistrationService = cacheRegistrationService;
     this.dataTagESLogConverter = dataTagESLogConverter;
     this.connector = connector;
+    this.indexer = indexer;
   }
 
   /**
@@ -145,7 +152,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
 
   private void sendCollectionTagESToElasticSearch(Collection<TagES> tagESCollection) {
     try {
-      connector.indexTags(tagESCollection);
+      indexer.indexTags(tagESCollection);
     }
     catch(Exception e) {
       log.error("notifyElementUpdated() - Exception occurred while trying to index data to the ElasticSearch cluster.");
