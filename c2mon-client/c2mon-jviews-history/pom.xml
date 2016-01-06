@@ -30,6 +30,7 @@
     <dependency>
     	<groupId>cern.c2mon.c2mon-client</groupId>
     	<artifactId>c2mon-client-ext-history</artifactId>
+        <version>[1.5.2, 2.0.0)</version>
     </dependency>
 
     <!-- 3rd party dependencies -->
