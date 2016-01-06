@@ -231,13 +231,6 @@ public class IndexerTest {
   }
 
   @Test
-  public void testGetMonthIndexSettings() {
-    Settings expected = Settings.settingsBuilder().put("number_of_shards", 10).put("number_of_replicas", 0).build();
-    assertEquals(expected.get("number_of_shards"), indexer.getMonthIndexSettings().get("number_of_shards"));
-    assertEquals(expected.get("number_of_replicas"), indexer.getMonthIndexSettings().get("number_of_replicas"));
-  }
-
-  @Test
   @Ignore("Works alone but not along the other tests (bulk processing synchronization)")
   public void testWriteTag() {
     TagES tag = new TagString();
@@ -338,7 +331,7 @@ public class IndexerTest {
     tag.setDataType(Mapping.ValueType.stringType.toString());
     tag.setMapping(Mapping.ValueType.stringType);
     indexer.getAliases().add("tag_1");
-    connector.handleIndexQuery("c2mon_2015-12", indexer.getMonthIndexSettings(),
+    connector.handleIndexQuery("c2mon_2015-12", connector.getIndexSettings("INDEX_MONTH_SETTINGS"),
         indexer.generateType(tag.getDataType()), tag.getMapping());
 
     // already contains the alias

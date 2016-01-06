@@ -82,4 +82,15 @@ public interface Connector {
    * @return response of the BulkProcessor.
    */
   boolean bulkAdd(IndexRequest indexNewTag);
+
+  /**
+   * Save data if cluster not available.
+   * @param indexNewTag indexRequest awaiting
+   */
+  void launchFallBackMechanism(IndexRequest indexNewTag);
+
+  /**
+   * @return the Index settings: number of shards and number of replica. (lucene settings)
+   */
+  Settings getIndexSettings(String name);
 }

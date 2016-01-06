@@ -69,6 +69,9 @@ public class TransportConnector implements Connector {
   @Value("${es.local:true}")
   private boolean isLocal;
 
+  @Value("${es.index.settings:INDEX_MONTH_SETTINGS}}")
+  private String indexSettings;
+
   /** Connection settings for the node according to the host, port, cluster, node and isLocal. */
   private Settings settings;
 
@@ -130,6 +133,17 @@ public class TransportConnector implements Connector {
       setLocal(false);
     }
 
+    findClusterAndLaunchBulk();
+
+    log.debug("init() - initial test passed: Transport client is connected to the cluster " + cluster + ".");
+    log.info("init() - Connected to cluster " + cluster + " with node " + node + ".");
+    isConnected = true;
+  }
+
+  /**
+   * Launch the Thread that is looking for an ElasticSearch cluster according to the parameters set.
+   */
+  private void findClusterAndLaunchBulk() {
     clusterFinder.start();
     log.debug("init() - Connecting to ElasticSearch cluster " + cluster + " on host=" + host + ", port=" + port + ".");
 
@@ -141,10 +155,6 @@ public class TransportConnector implements Connector {
 
     /** The Connector found a connection to a cluster. */
     initBulkSettings();
-
-    log.debug("init() - initial test passed: Transport client is connected to the cluster " + cluster + ".");
-    log.info("init() - Connected to cluster " + cluster + " with node " + node + ".");
-    isConnected = true;
   }
 
   /**
@@ -259,9 +269,18 @@ public class TransportConnector implements Connector {
       return true;
     }
     else {
-      log.error("bulkProcessor is null. This should never happen!");
+      log.error("bulkProcessor is null. This should not happen!");
       return false;
     }
+  }
+
+  public void launchFallBackMechanism(IndexRequest indexNewTag) {
+    findClusterAndLaunchBulk();
+    saveDataToFile(indexNewTag);
+  }
+
+  private void saveDataToFile(IndexRequest indexNewTag) {
+    //TODO
   }
 
 
@@ -378,6 +397,12 @@ public class TransportConnector implements Connector {
     log.debug("refreshClusterStats()");
     client.admin().indices().prepareRefresh().execute().actionGet();
     client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
+  }
+
+  public Settings getIndexSettings(String name) {
+    IndexSettings settings = IndexSettings.valueOf(name);
+    return Settings.settingsBuilder().put("number_of_shards", settings.getShards())
+        .put("number_of_replicas", settings.getReplica()).build();
   }
 
   /**

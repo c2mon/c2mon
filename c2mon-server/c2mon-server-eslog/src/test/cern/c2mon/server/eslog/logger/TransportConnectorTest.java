@@ -193,6 +193,13 @@ public class TransportConnectorTest {
     }
   }
 
+  @Test
+  public void testGetIndexSettings() {
+    Settings expected = Settings.settingsBuilder().put("number_of_shards", 10).put("number_of_replicas", 0).build();
+    assertEquals(expected.get("number_of_shards"), connector.getIndexSettings("INDEX_MONTH_SETTINGS").get("number_of_shards"));
+    assertEquals(expected.get("number_of_replicas"), connector.getIndexSettings("INDEX_MONTH_SETTINGS").get("number_of_replicas"));
+  }
+
   private void clean(Client client) {
     if (client != null) {
       client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();

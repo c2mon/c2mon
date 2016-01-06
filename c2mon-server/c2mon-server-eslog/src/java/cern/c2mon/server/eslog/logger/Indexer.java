@@ -128,9 +128,13 @@ public class Indexer {
       }
 
       IndexRequest indexNewTag = new IndexRequest(index, type).source(json).routing(String.valueOf(tag.getId()));
-      connector.bulkAdd(indexNewTag);
+      boolean isSent = connector.bulkAdd(indexNewTag);
 
-      return true;
+      if (!isSent) {
+        connector.launchFallBackMechanism(indexNewTag);
+      }
+
+      return isSent;
     }
   }
 
@@ -290,7 +294,9 @@ public class Indexer {
       mapping = tag.getMapping();
     }
 
-    boolean isAcked = connector.handleIndexQuery(index, getMonthIndexSettings(), type, mapping);
+    Settings indexSettings = connector.getIndexSettings("INDEX_MONTH_SETTINGS");
+
+    boolean isAcked = connector.handleIndexQuery(index, indexSettings, type, mapping);
     updateLists();
 
     return isAcked;
@@ -327,15 +333,5 @@ public class Indexer {
 //        log.trace(alias);
 //      }
     }
-  }
-
-  /**
-   * Settings for the index/Month: 10 shards and 0 replica.
-   *
-   * @return Settings.Builder to attach to an IndexRequest.
-   */
-  public Settings getMonthIndexSettings() {
-    return Settings.settingsBuilder().put("number_of_shards", IndexSettings.INDEX_MONTH_SETTINGS.getShards())
-        .put("number_of_replicas", IndexSettings.INDEX_MONTH_SETTINGS.getReplica()).build();
   }
 }
