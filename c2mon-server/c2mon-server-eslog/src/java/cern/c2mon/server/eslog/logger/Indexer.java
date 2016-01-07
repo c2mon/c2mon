@@ -1,8 +1,11 @@
 package cern.c2mon.server.eslog.logger;
 
 import cern.c2mon.server.eslog.structure.mappings.Mapping;
+import cern.c2mon.server.eslog.structure.mappings.TagBooleanMapping;
+import cern.c2mon.server.eslog.structure.mappings.TagNumericMapping;
 import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
 import cern.c2mon.server.eslog.structure.types.TagES;
+import cern.c2mon.server.eslog.structure.types.TagNumeric;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.index.IndexRequest;
@@ -320,13 +323,13 @@ public class Indexer {
   private String chooseMapping(String dataType) {
     log.trace("chooseMapping() - Choose mapping for type " + dataType);
     if (Mapping.ValueType.isBoolean(dataType)) {
-      return new TagStringMapping(Mapping.ValueType.boolType).getMapping();
+      return new TagBooleanMapping(Mapping.ValueType.boolType).getMapping();
     }
     else if (Mapping.ValueType.isString(dataType)) {
       return new TagStringMapping(Mapping.ValueType.stringType).getMapping();
     }
     else if (Mapping.ValueType.isNumeric(dataType)) {
-      return new TagStringMapping(Mapping.ValueType.doubleType).getMapping();
+      return new TagNumericMapping(Mapping.ValueType.doubleType).getMapping();
     }
     else {
       return null;
