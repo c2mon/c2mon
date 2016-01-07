@@ -301,9 +301,8 @@ public class Indexer {
     }
 
     String mapping = null;
-
     if (!typeIsPresent(index, type)) {
-      mapping = chooseMapping(type);
+      mapping = chooseMapping(type.substring(TAG_PREFIX.length()));
       log.debug("instantiateIndex() - Adding a new mapping to index " + index + " for type " + type + ": " + mapping);
     }
 

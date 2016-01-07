@@ -259,7 +259,6 @@ public class DataTagESLogConverterTest {
   public void ModuleConvertsTagsAsExpected() {
     Tag tag = createTagExample();
     TagES tagES = esLogConverter.convertToTagES(tag);
-    String expectedMapping = createMapping(tagES.getDataType());
 
     assertTrue(tagES instanceof TagBoolean);
     assertTrue(tagES.getValueBoolean());
@@ -267,14 +266,13 @@ public class DataTagESLogConverterTest {
     assertNull(tagES.getValueString());
     assertTrue((Boolean) tagES.getValue());
     assertEquals("boolean", tagES.getDataType());
-    assertEquals(expectedMapping, tagES.getMapping());
 
     DataTagCacheObject tagNumeric = new DataTagCacheObject();
     tagNumeric.setId(1L);
     tagNumeric.setDataType("Integer");
     tagNumeric.setValue(126387213);
+
     tagES = esLogConverter.convertToTagES(tagNumeric);
-    expectedMapping = createMapping(tagES.getDataType());
 
     assertTrue(tagES instanceof TagNumeric);
     assertNull(tagES.getValueBoolean());
@@ -282,7 +280,6 @@ public class DataTagESLogConverterTest {
     assertEquals(126387213, tagES.getValue());
     assertNull(tagES.getValueString());
     assertEquals("integer", tagES.getDataType());
-    assertNotEquals(expectedMapping, tagES.getMapping());
   }
 
   /**
@@ -294,58 +291,5 @@ public class DataTagESLogConverterTest {
     tag.setLogged(true);
 
     return tag;
-  }
-
-  private String createMapping(String dataType) {
-    return "{\n" +
-        "  \"_routing\": {\n" +
-        "    \"required\": \"true\"\n" +
-        "  },\n" +
-        "  \"properties\": {\n" +
-        "    \"id\": {\n" +
-        "      \"type\": \"long\"\n" +
-        "    },\n" +
-        "    \"name\": {\n" +
-        "      \"type\": \"string\"\n" +
-        "    },\n" +
-        "    \"dataType\": {\n" +
-        "      \"type\": \"string\",\n" +
-        "      \"index\": \"not_analyzed\"\n" +
-        "    },\n" +
-        "    \"sourceTimestamp\": {\n" +
-        "      \"type\": \"date\",\n" +
-        "      \"format\": \"epoch_millis\"\n" +
-        "    },\n" +
-        "    \"serverTimestamp\": {\n" +
-        "      \"type\": \"date\",\n" +
-        "      \"format\": \"epoch_millis\"\n" +
-        "    },\n" +
-        "    \"daqTimestamp\": {\n" +
-        "      \"type\": \"date\",\n" +
-        "      \"format\": \"epoch_millis\"\n" +
-        "    },\n" +
-        "    \"status\": {\n" +
-        "      \"type\": \"integer\"\n" +
-        "    },\n" +
-        "    \"quality\": {\n" +
-        "      \"type\": \"string\"\n" +
-        "    },\n" +
-        "    \"valueDescription\": {\n" +
-        "      \"type\": \"string\",\n" +
-        "      \"index\": \"not_analyzed\"\n" +
-        "    },\n" +
-        "    \"valueBoolean\": {\n" +
-        "      \"type\": \"" + dataType + "\"\n" +
-        "    },\n" +
-        "    \"process\": {\n" +
-        "      \"type\": \"string\"\n" +
-        "    },\n" +
-        "    \"equipment\": {\n" +
-        "      \"type\": \"string\"\n" +
-        "    },\n" +
-        "    \"subEquipment\": {\n" +
-        "      \"type\": \"string\"\n" +
-        "    }\n" +
-        "  }\n" + "}";
   }
 }

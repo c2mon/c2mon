@@ -1,6 +1,7 @@
 package cern.c2mon.server.eslog.logger;
 
 import cern.c2mon.server.eslog.structure.mappings.Mapping;
+import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
 import cern.c2mon.server.eslog.structure.queries.QueryAliases;
 import cern.c2mon.server.eslog.structure.queries.QueryIndices;
 import cern.c2mon.server.eslog.structure.queries.QueryTypes;
@@ -105,10 +106,8 @@ public class IndexerTest {
   public void testInstantiateIndex() {
     String index = "c2mon_2015-02";
     String type = "tag_string";
-    TagES tag = new TagString();
-    tag.setMapping(Mapping.ValueType.stringType);
 
-    boolean isAcked = indexer.instantiateIndex(tag, index, type);
+    boolean isAcked = indexer.instantiateIndex(index, type);
     assertTrue(isAcked);
     assertTrue(indexer.getIndicesTypes().keySet().contains(index));
     assertTrue(indexer.getIndicesTypes().get(index).contains(type));
@@ -238,7 +237,6 @@ public class IndexerTest {
   public void testSendTagToBatch() {
     TagES tag = new TagString();
     tag.setDataType(Mapping.ValueType.stringType.toString());
-    tag.setMapping(Mapping.ValueType.stringType);
     tag.setId(1L);
     tag.setServerTimestamp(123456789000L);
     tag.setValue("test");
@@ -275,7 +273,6 @@ public class IndexerTest {
     for (; id <= size; id++, tagServerTime += 1000) {
       TagES tag = new TagString();
       tag.setDataType(Mapping.ValueType.stringType.toString());
-      tag.setMapping(Mapping.ValueType.stringType);
       tag.setId(id);
       tag.setServerTimestamp(tagServerTime);
       list.add(tag);
@@ -336,13 +333,12 @@ public class IndexerTest {
     TagES tag = new TagString();
     tag.setId(1L);
     tag.setDataType(Mapping.ValueType.stringType.toString());
-    tag.setMapping(Mapping.ValueType.stringType);
     String index = "c2mon_2015-12";
 
     indexer.getIndicesAliases().put(index, new HashSet<String>());
     indexer.getIndicesAliases().get(index).add("tag_1");
     connector.handleIndexQuery(index, connector.getIndexSettings("INDEX_MONTH_SETTINGS"),
-        indexer.generateType(tag.getDataType()), tag.getMapping());
+        indexer.generateType(tag.getDataType()), new TagStringMapping(Mapping.ValueType.stringType).getMapping());
 
     // already contains the alias
     assertFalse(indexer.addAliasFromBatch(index, tag));
@@ -361,7 +357,6 @@ public class IndexerTest {
     TagES tag = new TagString();
     tag.setDataType(Mapping.ValueType.stringType.toString());
     tag.setId(1L);
-    tag.setMapping(Mapping.ValueType.stringType);
     String type = indexer.generateType(tag.getDataType());
 
     assertFalse(indexer.indexByBatch(null, tag.getDataType(), tag.build(), tag));
