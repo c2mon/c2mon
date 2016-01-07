@@ -70,8 +70,6 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
     private long interval = DEFAULT_CHECK_INTERVAL;
 
 
-
-
     String [] parseEquipmentAdress(String equipAdresse) throws IllegalArgumentException {
         String [] result = null;
 
@@ -139,12 +137,6 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
             }
         }
 
-        if (bc.getDataTagIds().getQueueDataTag() == null) {
-            throw new EqIOException("Configuration Problem: No TagID found for queue perf test.");
-        }
-        if (bc.getDataTagIds().getTopicDataTag() == null) {
-            throw new EqIOException("Configuration Problem: No TagID found for topic perf test.");
-        }
         if (bc.getBrokerUrl() == null) {
             throw new EqIOException("Configuration Problem: No connection URL found.");
         }
@@ -262,6 +254,8 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
             report.setState(CHANGE_STATE.FAIL);
             report.appendError(e.getMessage());
         }
+        
+        
         
         report.setState(CHANGE_STATE.SUCCESS);
         getEquipmentLogger().trace("Leaving onAddDataTag()");
