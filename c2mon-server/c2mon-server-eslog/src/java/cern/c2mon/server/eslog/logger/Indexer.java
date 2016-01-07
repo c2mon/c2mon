@@ -1,6 +1,7 @@
 package cern.c2mon.server.eslog.logger;
 
 import cern.c2mon.server.eslog.structure.mappings.Mapping;
+import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
 import cern.c2mon.server.eslog.structure.types.TagES;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -117,7 +118,7 @@ public class Indexer {
     }
     else {
       if (!mappingExists(index, type)) {
-        boolean isIndexed = instantiateIndex(tag, index, type);
+        boolean isIndexed = instantiateIndex(index, type);
 
         if (isIndexed) {
           //A set will not add twice the same value
@@ -289,12 +290,11 @@ public class Indexer {
    * If index does not exist already when adding data as bulk, we address a new
    * indexQuery to the ElasticSearch cluster.
    *
-   * @param tag TagES to add to the cluster.
    * @param index index to which add the TagES tag.
    * @param type the type of the TagES tag according to its dataType.
    * @return the boolean status of the Query.
    */
-  public boolean instantiateIndex(TagES tag, String index, String type) {
+  public boolean instantiateIndex(String index, String type) {
     if ((indicesTypes.containsKey(index) && indicesTypes.get(index).contains(type)) || !checkIndex(index) || !checkType(type)) {
       log.debug("instantiateIndex() - Bad index: " + index + " or type: " + type + ".");
       return false;
@@ -303,8 +303,8 @@ public class Indexer {
     String mapping = null;
 
     if (!typeIsPresent(index, type)) {
-      mapping = tag.getMapping();
-      log.debug("instantiateIndex() - Adding a new mapping to index " + index + " for type " + type + ".");
+      mapping = chooseMapping(type);
+      log.debug("instantiateIndex() - Adding a new mapping to index " + index + " for type " + type + ": " + mapping);
     }
 
     Settings indexSettings = connector.getIndexSettings("INDEX_MONTH_SETTINGS");
@@ -316,6 +316,22 @@ public class Indexer {
     }
 
     return isAcked;
+  }
+
+  private String chooseMapping(String dataType) {
+    log.trace("chooseMapping() - Choose mapping for type " + dataType);
+    if (Mapping.ValueType.isBoolean(dataType)) {
+      return new TagStringMapping(Mapping.ValueType.boolType).getMapping();
+    }
+    else if (Mapping.ValueType.isString(dataType)) {
+      return new TagStringMapping(Mapping.ValueType.stringType).getMapping();
+    }
+    else if (Mapping.ValueType.isNumeric(dataType)) {
+      return new TagStringMapping(Mapping.ValueType.doubleType).getMapping();
+    }
+    else {
+      return null;
+    }
   }
 
   private boolean typeIsPresent(String index, String type) {

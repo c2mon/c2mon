@@ -34,22 +34,7 @@ public abstract class TagES implements TagESInterface {
   private String equipment;
   private String subEquipment;
 
-  protected transient TagESMapping mapping;
-
-
-  public TagES() {
-    this.mapping = new TagESMapping();
-  }
-
   abstract public void setValue(Object tagValue);
-
-  public String getMapping() {
-    return mapping.getMapping();
-  }
-
-  public void setMapping(ValueType valueType) {
-    mapping.setProperties(valueType);
-  }
 
   public String build() {
     Gson gson = new GsonBuilder().setPrettyPrinting().create();

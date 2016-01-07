@@ -9,10 +9,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class TagString extends TagES implements TagESInterface {
-
-  public TagString() {
-    super();
-  }
   /**
    * Set the value as a String for this TagES.
    * @param value Object supposed to be a String.

@@ -43,14 +43,6 @@ public class TagBooleanTest {
     tagBoolean.setValue("NotBoolean");
   }
 
-  @Test
-  public void testMapping() throws IOException {
-    TagBooleanMapping mapping = new TagBooleanMapping(ValueType.boolType);
-    String expected = mapping.getMapping();
-    tagBoolean.setMapping(ValueType.boolType);
-
-    assertEquals(expected, tagBoolean.getMapping());
-  }
 
   @Test
   public void testBuild() throws IOException {

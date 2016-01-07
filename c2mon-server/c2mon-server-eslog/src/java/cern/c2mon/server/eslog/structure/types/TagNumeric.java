@@ -1,5 +1,6 @@
 package cern.c2mon.server.eslog.structure.types;
 
+import cern.c2mon.server.eslog.structure.mappings.TagNumericMapping;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -9,11 +10,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class TagNumeric extends TagES implements TagESInterface {
-
-  public TagNumeric() {
-    super();
-  }
-
   @Override
   public void setValue(Object value) {
     if (value == null) {

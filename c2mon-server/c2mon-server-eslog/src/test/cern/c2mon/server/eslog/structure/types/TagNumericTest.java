@@ -21,6 +21,7 @@ import cern.c2mon.server.eslog.structure.mappings.TagNumericMapping;
  * 
  * @author Alban Marguet.
  */
+@Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public class TagNumericTest {
 
@@ -45,14 +46,6 @@ public class TagNumericTest {
     tagNumeric.setValue("notNumeric");
   }
 
-  @Test
-  public void testMapping() throws IOException {
-    TagNumericMapping mapping = new TagNumericMapping(ValueType.doubleType);
-    String expected = mapping.getMapping();
-    tagNumeric.setMapping(ValueType.doubleType);
-
-    assertEquals(expected, tagNumeric.getMapping());
-  }
 
   @Test
   public void testBuild() throws IOException {

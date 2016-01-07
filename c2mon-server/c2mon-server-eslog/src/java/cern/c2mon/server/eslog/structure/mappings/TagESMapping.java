@@ -22,7 +22,7 @@ public class TagESMapping implements Mapping {
   public String getMapping() {
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
     String json = gson.toJson(this);
-    log.trace("getMapping() - Created the mapping :" + json);
+    log.trace("getMapping() - Created the mapping : " + json);
     return json;
   }
 

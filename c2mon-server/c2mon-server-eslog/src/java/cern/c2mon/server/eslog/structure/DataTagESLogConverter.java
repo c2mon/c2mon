@@ -78,7 +78,6 @@ public class DataTagESLogConverter {
     setQuality(tag, tagES);
     tagES.setValue(tag.getValue());
     tagES.setValueDescription(tag.getValueDescription());
-    setMapping(tagES, tagES.getDataType());
 
     return tagES;
   }
@@ -320,22 +319,5 @@ public class DataTagESLogConverter {
     }
 
     return subEquipmentName;
-  }
-
-  /**
-   * Set mapping according to the dataType of the TagES.
-   */
-  private void setMapping(TagES tagES, String dataType) {
-    if (ValueType.isNumeric(dataType)) {
-      tagES.setMapping(ValueType.doubleType);
-    }
-    else if (ValueType.isBoolean(dataType)) {
-      tagES.setMapping(ValueType.boolType);
-    }
-    else if (ValueType.isString(dataType)) {
-      tagES.setMapping(ValueType.stringType);
-    }
-
-    log.debug("setMapping() - Set mapping of type " + dataType + ".");
   }
 }

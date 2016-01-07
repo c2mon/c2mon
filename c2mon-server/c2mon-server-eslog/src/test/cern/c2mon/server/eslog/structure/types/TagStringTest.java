@@ -38,15 +38,6 @@ public class TagStringTest {
 	}
 
 	@Test
-	public void testMapping() throws IOException {
-		TagStringMapping mapping = new TagStringMapping(ValueType.stringType);
-		String expected = mapping.getMapping();
-		tagString.setMapping(ValueType.stringType);
-
-		assertEquals(expected, tagString.getMapping());
-	}
-
-	@Test
 	public void testBuild() throws IOException {
 		tagString.setQuality("ok");
 		String line = "\n  \"quality\": \"ok\"";
