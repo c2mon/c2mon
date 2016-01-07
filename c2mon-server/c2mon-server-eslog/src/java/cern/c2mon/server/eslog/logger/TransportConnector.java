@@ -30,8 +30,8 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 /**
  * Allows to connect to the cluster via a transport client. Handles all the
- * queries with a bulkProcessor to the ElasticSearch cluster. This is very light
- * for the cluster to be connected this way.
+ * queries and writes data thanks to a bulkProcessor to the ElasticSearch cluster.
+ * This is very light for the cluster to be connected this way.
  * 
  * @author Alban Marguet.
  */
@@ -96,6 +96,25 @@ public class TransportConnector implements Connector {
   }
 
   /**
+   * Instantiate the Client to communicate with the ElasticSearch cluster. If it
+   * is well instantiated, retrieve the indices and and create a bulkProcessor
+   * for batch writes.
+   */
+  @PostConstruct
+  public void init() {
+
+    if (!host.equalsIgnoreCase("localhost") && !host.equalsIgnoreCase("local")) {
+      setLocal(false);
+    }
+
+    findClusterAndLaunchBulk();
+
+    log.debug("init() - initial test passed: Transport client is connected to the cluster " + cluster + ".");
+    log.info("init() - Connected to cluster " + cluster + " with node " + node + ".");
+    isConnected = true;
+  }
+
+  /**
    * Declares a new Thread that is used to look for an ElasticSearch cluster.
    */
   public void declareClusterResearch() {
@@ -122,22 +141,50 @@ public class TransportConnector implements Connector {
 
 
   /**
-   * Instantiate the Client to communicate with the ElasticSearch cluster. If it
-   * is well instantiated, retrieve the indices and and create a bulkProcessor
-   * for batch writes.
+   * Called by an independent thread in order to look for an ElasticSearch cluster and connect to it.
+   * This creates a Transport client that is able to communicate with the nodes.
    */
-  @PostConstruct
-  public void init() {
+  public void initializationSteps() {
+    if (isLocal) {
+      setHost(LOCAL_HOST);
+      setPort(LOCAL_PORT);
 
-    if (!host.equalsIgnoreCase("localhost") && !host.equalsIgnoreCase("local")) {
-      setLocal(false);
+      localNode = launchLocalCluster();
+      log.info("init() - Connecting to local ElasticSearch instance (inside same JVM) is enabled.");
     }
+    else {
+      log.info("init() - Connecting to local ElasticSearch instance (inside same JVM) is disabled.");
+    }
+    this.client = createClient();
+  }
 
-    findClusterAndLaunchBulk();
+  /**
+   * Need a transportClient to communicate with the ElasticSearch cluster.
+   * @return Client to communicate with the ElasticSearch cluster.
+   */
+  public Client createClient() {
+    if (isLocal) {
+      this.settings = Settings.settingsBuilder().put("node.local", isLocal).put("node.name", node).put("cluster.name", cluster).build();
 
-    log.debug("init() - initial test passed: Transport client is connected to the cluster " + cluster + ".");
-    log.info("init() - Connected to cluster " + cluster + " with node " + node + ".");
-    isConnected = true;
+      log.debug("Creating local client on host " + host + " and port " + port + " with name " + node + ", in cluster " + cluster + ".");
+      return TransportClient.builder().settings(settings).build()
+          .addTransportAddress(new LocalTransportAddress(String.valueOf(port)));
+
+    }
+    else {
+      this.settings = Settings.settingsBuilder().put("cluster.name", cluster).put("node.name", node).build();
+
+      log.debug("Creating  client on host " + host + " and port " + port + " with name " + node + ", in cluster " + cluster + ".");
+
+      try {
+        return TransportClient.builder().settings(settings).build()
+            .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), port));
+      }
+      catch (UnknownHostException e) {
+        log.error("createTransportClient() - Error whilst connecting to the ElasticSearch cluster (host=" + host + ", port=" + port + ").", e);
+        return null;
+      }
+    }
   }
 
   /**
@@ -155,24 +202,6 @@ public class TransportConnector implements Connector {
 
     /** The Connector found a connection to a cluster. */
     initBulkSettings();
-  }
-
-  /**
-   * Called by an independent thread in order to look for an ElasticSearch cluster and connect to it.
-   * This creates a Transport client that is able to communicate with the nodes.
-   */
-  public void initializationSteps() {
-    if (isLocal) {
-      setHost(LOCAL_HOST);
-      setPort(LOCAL_PORT);
-
-      localNode = launchLocalCluster();
-      log.info("init() - Connecting to local ElasticSearch instance (inside same JVM) is enabled.");
-    }
-    else {
-      log.info("init() - Connecting to local ElasticSearch instance (inside same JVM) is disabled.");
-    }
-    this.client = createClient();
   }
 
   /**
@@ -207,35 +236,6 @@ public class TransportConnector implements Connector {
         .build();
 
     log.debug("BulkProcessor created.");
-  }
-
-  /**
-   * Need a transportClient to communicate with the ElasticSearch cluster.
-   * @return Client to communicate with the ElasticSearch cluster.
-   */
-  public Client createClient() {
-    if (isLocal) {
-      this.settings = Settings.settingsBuilder().put("node.local", isLocal).put("node.name", node).put("cluster.name", cluster).build();
-
-      log.debug("Creating local client on host " + host + " and port " + port + " with name " + node + ", in cluster " + cluster + ".");
-      return TransportClient.builder().settings(settings).build()
-          .addTransportAddress(new LocalTransportAddress(String.valueOf(port)));
-
-    }
-    else {
-      this.settings = Settings.settingsBuilder().put("cluster.name", cluster).put("node.name", node).build();
-
-      log.debug("Creating  client on host " + host + " and port " + port + " with name " + node + ", in cluster " + cluster + ".");
-
-      try {
-        return TransportClient.builder().settings(settings).build()
-            .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), port));
-      }
-      catch (UnknownHostException e) {
-        log.error("createTransportClient() - Error whilst connecting to the ElasticSearch cluster (host=" + host + ", port=" + port + ").", e);
-        return null;
-      }
-    }
   }
 
   /**

@@ -62,7 +62,8 @@ public interface Connector {
   List<String> handleListingQuery(Query query, String index);
 
   /**
-   * Launch an indexing query against the ElasticSearch cluster: to write data.
+   * Launch an indexing query against the ElasticSearch cluster.
+   * Used to insert a new index or to add a new mapping(type, mapping) to an existing index.
    */
   boolean handleIndexQuery(String indexName, Settings settings, String type, String mapping);
 

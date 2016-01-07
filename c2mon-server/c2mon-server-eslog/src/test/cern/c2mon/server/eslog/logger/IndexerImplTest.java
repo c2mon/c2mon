@@ -44,7 +44,7 @@ import static org.junit.Assert.assertTrue;
 @Slf4j
 @ContextConfiguration({"classpath:cern/c2mon/server/eslog/config/server-eslog-integration.xml" })
 @RunWith(SpringJUnit4ClassRunner.class)
-public class IndexerTest {
+public class IndexerImplTest {
   static String clusterName;
   static String nodeName;
   static String host;
@@ -105,7 +105,6 @@ public class IndexerTest {
   @Test
   public void testInstantiateIndex() {
     String index = "c2mon_2015-02";
-    String type = "tag_string";
 
     boolean isAcked = indexer.instantiateIndex(index);
     assertTrue(isAcked);
@@ -129,7 +128,7 @@ public class IndexerTest {
     Set<String> expectedIndex = new HashSet<>();
     Set<String> expectedType = new HashSet<>();
     assertEquals(expectedIndex, indexer.getIndicesTypes().keySet());
-    assertNull(indexer.getIndicesTypes().get(0));
+    assertNull(indexer.getIndicesTypes().get("c2mon_2015-01"));
     expectedIndex.add("c2mon_2015-01");
 
     connector.handleIndexQuery("c2mon_2015-01", Settings.EMPTY, null, null);

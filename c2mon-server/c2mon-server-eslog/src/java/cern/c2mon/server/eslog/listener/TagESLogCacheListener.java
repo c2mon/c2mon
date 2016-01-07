@@ -62,11 +62,6 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
   private final DataTagESLogConverter dataTagESLogConverter;
 
   /**
-   * The Connector allows to connect to an ElasticSearch cluster and to communicate in order to write data.
-   */
-  private final Connector connector;
-
-  /**
    * the Indexer allows to use the connection to the ElasticSearch cluster and to write data.
    */
   private final Indexer indexer;
@@ -87,11 +82,10 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
    * @param cacheRegistrationService for registering cache listeners
    */
   @Autowired
-  public TagESLogCacheListener(final CacheRegistrationService cacheRegistrationService, final DataTagESLogConverter dataTagESLogConverter, final TransportConnector connector, final Indexer indexer) {
+  public TagESLogCacheListener(final CacheRegistrationService cacheRegistrationService, final DataTagESLogConverter dataTagESLogConverter, final Indexer indexer) {
     super();
     this.cacheRegistrationService = cacheRegistrationService;
     this.dataTagESLogConverter = dataTagESLogConverter;
-    this.connector = connector;
     this.indexer = indexer;
   }
 
@@ -138,11 +132,11 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
         TagES tagES = dataTagESLogConverter.convertToTagES(tag);
         addTagToCollectionIfNotNull(tagES, tagESCollection);
       } catch (Exception e) {
-        log.error("notifyElementUpdated() - Error occurred during tag parsing for ElasticSearch. Tag #" + tag.getId() + " is not added to bulk sending (name=" + tag.getName() + ", value=" + tag.getValue() + ", type=" + tag.getDataType() + ")", e);
+        log.error("convertTagsToLogToTagES() - Error occurred during tag parsing for ElasticSearch. Tag #" + tag.getId() + " is not added to bulk sending (name=" + tag.getName() + ", value=" + tag.getValue() + ", type=" + tag.getDataType() + ")", e);
       }
     }
 
-    log.trace("notifyElementUpdated() - Created a TagESCollection of " + tagESCollection.size() + " elements.");
+    log.trace("convertTagsToLogToTagES() - Created a TagESCollection of " + tagESCollection.size() + " elements.");
   }
 
   private void addTagToCollectionIfNotNull(TagES tagES, Collection<TagES> tagESCollection) {
@@ -156,7 +150,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
       indexer.indexTags(tagESCollection);
     }
     catch(Exception e) {
-      log.error("notifyElementUpdated() - Exception occurred while trying to index data to the ElasticSearch cluster.", e);
+      log.error("sendCollectionTagESToElasticSearch() - Exception occurred while trying to index data to the ElasticSearch cluster.", e);
     }
   }
 

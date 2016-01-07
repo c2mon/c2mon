@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * Allows to query the ElasticSearch cluster. Especially to create an index and adding a mapping to it or to add aliases.
  * @author Alban Marguet.
  */
 @Slf4j
