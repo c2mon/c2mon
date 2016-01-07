@@ -339,6 +339,6 @@ public class DataTagESLogConverter {
       tagES.setMapping(ValueType.stringType);
     }
 
-    log.debug("setMapping() - Set mapping to " + tagES.getMapping() + " with dataType " + dataType + ".");
+    log.debug("setMapping() - Set mapping of type " + dataType + ".");
   }
 }

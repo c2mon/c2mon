@@ -98,9 +98,9 @@ public class Indexer {
     String type = generateType(tag.getDataType());
 
     if (log.isTraceEnabled()) {
-      log.trace("indexTag() - Index a new tag.");
-      log.trace("indexTag() - Index = " + indexMonth);
-      log.trace("indexTag() - Type = " + type);
+      log.trace("sendTagToBatch() - Index a new tag.");
+      log.trace("sendTagToBatch() - Index = " + indexMonth);
+      log.trace("sendTagToBatch() - Type = " + type);
     }
 
     return indexByBatch(indexMonth, type, tagJson, tag);

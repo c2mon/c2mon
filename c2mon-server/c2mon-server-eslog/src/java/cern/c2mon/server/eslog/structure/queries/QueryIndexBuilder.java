@@ -26,7 +26,7 @@ public class QueryIndexBuilder extends Query {
     boolean parametersAreInitialized = type != null && mapping != null && !mapping.equals("");
     if (parametersAreInitialized) {
       createIndexRequestBuilder.addMapping(type, mapping).setUpdateAllTypes(true);
-      log.debug("indexNew() - Adds new Mapping in the handling of the query.");
+      log.debug("indexNew() - Adds new Mapping for " + type + " in index " + index + ": " + mapping);
     }
 
     CreateIndexResponse response = createIndexRequestBuilder.execute().actionGet();
