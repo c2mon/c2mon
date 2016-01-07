@@ -52,6 +52,7 @@ public class ClientDataTagSerializer extends SerializerBase<ClientDataTagImpl> {
   public void serialize(ClientDataTagImpl value, JsonGenerator generator, SerializerProvider provider) throws IOException, JsonGenerationException {
     generator.writeStartObject();
     generator.writeNumberField("id", value.getId());
+    generator.writeStringField("name", value.getName());
     generator.writeStringField("description", value.getDescription());
     generator.writeObjectField("value", value.getValue());
     generator.writeStringField("valueDescription", value.getValueDescription());

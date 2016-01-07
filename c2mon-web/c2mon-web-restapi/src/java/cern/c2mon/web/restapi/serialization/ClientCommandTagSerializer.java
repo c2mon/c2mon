@@ -52,6 +52,7 @@ public class ClientCommandTagSerializer extends SerializerBase<ClientCommandTagI
   public void serialize(ClientCommandTagImpl value, JsonGenerator generator, SerializerProvider provider) throws IOException, JsonGenerationException {
     generator.writeStartObject();
     generator.writeNumberField("id", value.getId());
+    generator.writeStringField("name", value.getName());
     generator.writeStringField("description", value.getDescription());
     generator.writeObjectField("value", value.getValue());
     generator.writeStringField("valueType", value.getValueType().getSimpleName());
