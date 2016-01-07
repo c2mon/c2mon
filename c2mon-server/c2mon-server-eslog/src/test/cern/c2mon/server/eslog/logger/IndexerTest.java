@@ -44,7 +44,7 @@ import static org.junit.Assert.assertTrue;
 @Slf4j
 @ContextConfiguration({"classpath:cern/c2mon/server/eslog/config/server-eslog-integration.xml" })
 @RunWith(SpringJUnit4ClassRunner.class)
-public class IndexerImplTest {
+public class IndexerTest {
   static String clusterName;
   static String nodeName;
   static String host;
