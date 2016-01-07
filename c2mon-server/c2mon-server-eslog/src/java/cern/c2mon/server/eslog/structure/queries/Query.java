@@ -33,7 +33,7 @@ public abstract class Query {
     this.client = client;
     indices = new ArrayList<>();
     types = new ArrayList<>();
-    tagIds = new ArrayList<Long>();
+    tagIds = new ArrayList<>();
   }
 
   protected String[] getIndicesFromCluster() {

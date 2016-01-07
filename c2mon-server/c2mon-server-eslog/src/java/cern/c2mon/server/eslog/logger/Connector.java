@@ -84,12 +84,9 @@ public interface Connector {
    */
   boolean bulkAdd(IndexRequest indexNewTag);
 
-  /**
-   * Save data if cluster not available.
-   * @param indexNewTag indexRequest awaiting
-   */
-  void launchFallBackMechanism(IndexRequest indexNewTag);
+  void findClusterAndLaunchBulk();
 
+  boolean waitForYellowStatus();
   /**
    * @return the Index settings: number of shards and number of replica. (lucene settings)
    */

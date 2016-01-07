@@ -24,7 +24,7 @@ public class QueryTypes extends Query {
     if (index != null) {
       Iterator<ObjectCursor<String>> typesIt = getIndexWithMetadata(index).keys().iterator();
       addTypesToResult(typesIt, result);
-      log.info("QueryTypes - got a list of types, size=" + result.size());
+      log.info("QueryTypes - Got a list of types, size= " + result.size());
     }
     return result;
   }

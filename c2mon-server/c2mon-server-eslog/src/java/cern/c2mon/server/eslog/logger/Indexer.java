@@ -52,11 +52,15 @@ public class Indexer {
 
   @PostConstruct
   public void init() {
+    waitForConnection();
+    log.info("init() - Indexer is ready to write data to ElasticSearch.");
+  }
+
+  public void waitForConnection() {
     while(!connector.isConnected()) {
       isAvailable = false;
     }
     isAvailable = true;
-    log.info("init() - Indexer is ready to write data to ElasticSearch.");
   }
 
   /**
@@ -66,6 +70,21 @@ public class Indexer {
    * @param tags to index.
    */
   public void indexTags(Collection<TagES> tags) {
+    isAvailable = checkConnection();
+    if (isAvailable) {
+      processData(tags);
+    }
+    else {
+      log.warn("indexTags() - Launching fallBackMechanism because the connection has been interrupted.");
+      launchFallBackMechanism(tags);
+    }
+  }
+
+  public boolean checkConnection() {
+    return connector.waitForYellowStatus();
+  }
+
+  public void processData(Collection<TagES> tags) {
     Map<String, TagES> aliases = new HashMap<>();
 
     if (tags == null) {
@@ -94,6 +113,20 @@ public class Indexer {
       updateLists();
     }
   }
+
+  /**
+   * Save data if cluster not available.
+   * @param tags to be indexed.
+   */
+  public void launchFallBackMechanism(Collection<TagES> tags) {
+    connector.findClusterAndLaunchBulk();
+    saveDataToFile(tags);
+  }
+
+  private void saveDataToFile(Collection<TagES> tags) {
+    //TODO
+  }
+
 
   /**
    * Add 1 TagES to index to the ElasticSearch cluster thanks to the
@@ -140,10 +173,6 @@ public class Indexer {
 
       IndexRequest indexNewTag = new IndexRequest(index, type).source(json).routing(String.valueOf(tag.getId()));
       boolean isSent = connector.bulkAdd(indexNewTag);
-
-      if (!isSent) {
-        connector.launchFallBackMechanism(indexNewTag);
-      }
 
       updateLists();
 

@@ -90,11 +90,11 @@ public class TransportConnectorTest {
     Client initClient = connector.getClient();
 
     connector.setClient(null);
-    boolean isPassed = connector.initTestPass();
+    boolean isPassed = connector.waitForYellowStatus();
     assertFalse(isPassed);
 
     connector.setClient(initClient);
-    isPassed = connector.initTestPass();
+    isPassed = connector.waitForYellowStatus();
     assertTrue(isPassed);
   }
 

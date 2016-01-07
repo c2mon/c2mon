@@ -111,7 +111,6 @@ public class TransportConnector implements Connector {
 
     log.debug("init() - initial test passed: Transport client is connected to the cluster " + cluster + ".");
     log.info("init() - Connected to cluster " + cluster + " with node " + node + ".");
-    isConnected = true;
   }
 
   /**
@@ -124,7 +123,8 @@ public class TransportConnector implements Connector {
           do {
             initializationSteps();
             Thread.sleep(1000);
-          } while (!initTestPass());
+            isConnected = waitForYellowStatus();
+          } while (!isConnected);
         } catch (InterruptedException e) {
           log.debug("clusterFinder - Interrupted.");
         }
@@ -190,7 +190,7 @@ public class TransportConnector implements Connector {
   /**
    * Launch the Thread that is looking for an ElasticSearch cluster according to the parameters set.
    */
-  private void findClusterAndLaunchBulk() {
+  public void findClusterAndLaunchBulk() {
     clusterFinder.start();
     log.debug("init() - Connecting to ElasticSearch cluster " + cluster + " on host=" + host + ", port=" + port + ".");
 
@@ -239,25 +239,24 @@ public class TransportConnector implements Connector {
   }
 
   /**
-   * Method that query the cluster to list all the present indices. Allows to
-   * check if the cluster is well initialized.
+   * Allows to check if the cluster is well initialized.
    * 
    * @return if the query has been acked or not.
    */
-  public boolean initTestPass() {
+  public boolean waitForYellowStatus() {
     if (client != null) {
       try {
         client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
-        log.debug("initTestPass() - Everything is allright.");
+        log.debug("waitForYellowStatus() - Everything is allright.");
         return true;
 
       } catch (NoNodeAvailableException e) {
-        log.debug("initTestPass() - NoNodeAvailableException: cluster not reachable.");
+        log.debug("waitForYellowStatus() - NoNodeAvailableException: cluster not reachable.");
         return false;
       }
     }
     else {
-      log.warn("initTestPass() - client for the ElasticSearch cluster seems to have null value.");
+      log.warn("waitForYellowStatus() - client for the ElasticSearch cluster seems to have null value.");
       return false;
     }
   }
@@ -272,15 +271,6 @@ public class TransportConnector implements Connector {
       log.error("bulkProcessor is null. This should not happen!");
       return false;
     }
-  }
-
-  public void launchFallBackMechanism(IndexRequest indexNewTag) {
-    findClusterAndLaunchBulk();
-    saveDataToFile(indexNewTag);
-  }
-
-  private void saveDataToFile(IndexRequest indexNewTag) {
-    //TODO
   }
 
 
@@ -311,13 +301,13 @@ public class TransportConnector implements Connector {
       queryResponse.addAll(((QueryIndices) query).getListOfAnswer());
 
     }
-    else if (query instanceof QueryAliases) {
-      log.debug("handleListingQuery() - Handling queryAliases.");
-      queryResponse.addAll(((QueryAliases) query).getListOfAnswer(index));
-    }
     else if (query instanceof QueryTypes) {
       log.debug("handleListingQuery() - Handling queryTypes.");
       queryResponse.addAll(((QueryTypes) query).getListOfAnswer(index));
+    }
+    else if (query instanceof QueryAliases) {
+      log.debug("handleListingQuery() - Handling queryAliases.");
+      queryResponse.addAll(((QueryAliases) query).getListOfAnswer(index));
     }
     else {
       log.error("handleListingQuery() - Unhandled query type.");
