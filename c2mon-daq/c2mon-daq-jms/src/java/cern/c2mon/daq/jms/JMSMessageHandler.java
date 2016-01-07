@@ -255,8 +255,6 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
             report.appendError(e.getMessage());
         }
         
-        
-        
         report.setState(CHANGE_STATE.SUCCESS);
         getEquipmentLogger().trace("Leaving onAddDataTag()");
     }
@@ -274,6 +272,17 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
         } else if (service.getConnTestDataTag() == arg0.getId()) {
             service.setConnTestDataTag(null);
         } 
+        
+        if (service.getQueueDataTag() == null && service.getTopicDataTag() == null && service.getConnTestDataTag() == null) {
+            // no datatag to test. Why do we exist ?
+            // maybe disconnect ?
+            getEquipmentMessageSender().confirmEquipmentStateIncorrect("No tests configured. Maybe you forgot to remove this equipment completely?");
+            try {
+                disconnectFromDataSource();
+            } catch (EqIOException e) {
+                // IGNORE
+            }
+        }
         
         if (myConfig.hasBridgeConfigured()) {
             List<BridgeConfig> list = new ArrayList<>(myConfig.getBridges());
@@ -363,8 +372,12 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
                     /*
                      Cannot find the configured remote endpoint in the global config - : invalidate the tags.
                      */
-                    getEquipmentMessageSender().sendInvalidTag(getEquipmentConfiguration().getSourceDataTag(bridge.getDataTagIds().getQueueDataTag()), SourceDataQuality.INCORRECT_NATIVE_ADDRESS , msg);
-                    getEquipmentMessageSender().sendInvalidTag(getEquipmentConfiguration().getSourceDataTag(bridge.getDataTagIds().getTopicDataTag()), SourceDataQuality.INCORRECT_NATIVE_ADDRESS , msg);
+                    if (bridge.getDataTagIds().getQueueDataTag()!= null) {
+                        getEquipmentMessageSender().sendInvalidTag(getEquipmentConfiguration().getSourceDataTag(bridge.getDataTagIds().getQueueDataTag()), SourceDataQuality.INCORRECT_NATIVE_ADDRESS , msg);
+                    }
+                    if (bridge.getDataTagIds().getTopicDataTag() != null) {
+                        getEquipmentMessageSender().sendInvalidTag(getEquipmentConfiguration().getSourceDataTag(bridge.getDataTagIds().getTopicDataTag()), SourceDataQuality.INCORRECT_NATIVE_ADDRESS , msg);
+                    }
                 }
             }
         }
