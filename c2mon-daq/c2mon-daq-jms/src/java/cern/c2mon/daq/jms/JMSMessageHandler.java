@@ -9,9 +9,11 @@ package cern.c2mon.daq.jms;
 
 import static java.lang.String.format;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import javax.jms.JMSException;
@@ -23,6 +25,7 @@ import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
 import cern.c2mon.daq.jms.BrokerConfig.BridgeConfig;
 import cern.c2mon.daq.jms.BrokerConfig.ServiceTest;
+import cern.c2mon.daq.tools.equipmentexceptions.EqDataTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataQuality;
@@ -41,9 +44,8 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
 
     private BrokerConfig myConfig = null;
 
-
     private ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-    Future worker = null;
+    ScheduledFuture<?> worker = null;
 
     /**
      * indicates if {@link #runCheck()} is currently executed.
@@ -130,23 +132,10 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
         bc.setBrokerUrl(config.getAddress());
 
         for (ISourceDataTag tag : config.getSourceDataTags().values()) {
-            SimpleHardwareAddress add = (SimpleHardwareAddress) tag.getHardwareAddress();
-            String descr = add.getAddress();
-
-            String [] tmp = descr.split(";");
-            BrokerTest type = BrokerTest.valueOf(tmp[0]);
-            if (tmp.length > 1 && bc.getBridgeConfigForBroker(tmp[1]) == null) {
-                if (!tmp[1].startsWith("tcp://")) {
-                    throw new EqIOException("Invalid format for a bridge connection address:" + tmp[1]);
-                }
-                bc.putBrokerConfig(tmp[1], new BridgeConfig(tmp[1]));
-            }
-            switch(type) {
-            case TOPIC_PERF_TEST: bc.getDataTagIds().setTopicDataTag(tag.getId()); break;
-            case QUEUE_PERF_TEST: bc.getDataTagIds().setQueueDataTag(tag.getId()); break;
-            case CONNECTION_TEST: bc.getDataTagIds().setConnTestDataTag(tag.getId()); break;
-            case BRIDGE_TOPIC_PERF_TEST: bc.getBridgeConfigForBroker(tmp[1]).getDataTagIds().setTopicDataTag(tag.getId());break;
-            case BRIDGE_QUEUE_PERF_TEST: bc.getBridgeConfigForBroker(tmp[1]).getDataTagIds().setQueueDataTag(tag.getId());break;
+            try {
+                configureTag(tag, bc);
+            } catch (EqDataTagException e) {
+                throw new EqIOException("Cannot configure tag " + tag.getId() + ": " + e.getMessage());
             }
         }
 
@@ -171,6 +160,27 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
         return bc;
     }
 
+    private static void configureTag(ISourceDataTag tag, BrokerConfig bc) throws EqDataTagException {
+        SimpleHardwareAddress add = (SimpleHardwareAddress) tag.getHardwareAddress();
+        String descr = add.getAddress();
+
+        String [] tmp = descr.split(";");
+        BrokerTest type = BrokerTest.valueOf(tmp[0]);
+        if (tmp.length > 1 && bc.getBridgeConfigForBroker(tmp[1]) == null) {
+            if (!tmp[1].startsWith("tcp://")) {
+                throw new EqDataTagException("Invalid format for a bridge connection address:" + tmp[1]);
+            }
+            bc.putBrokerConfig(tmp[1], new BridgeConfig(tmp[1]));
+        }
+        switch(type) {
+        case TOPIC_PERF_TEST: bc.getDataTagIds().setTopicDataTag(tag.getId()); break;
+        case QUEUE_PERF_TEST: bc.getDataTagIds().setQueueDataTag(tag.getId()); break;
+        case CONNECTION_TEST: bc.getDataTagIds().setConnTestDataTag(tag.getId()); break;
+        case BRIDGE_TOPIC_PERF_TEST: bc.getBridgeConfigForBroker(tmp[1]).getDataTagIds().setTopicDataTag(tag.getId());break;
+        case BRIDGE_QUEUE_PERF_TEST: bc.getBridgeConfigForBroker(tmp[1]).getDataTagIds().setQueueDataTag(tag.getId());break;
+        }
+    }
+    
     /**
      * Stops the worker.
      */
@@ -229,16 +239,7 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
     @Override
     public void refreshAllDataTags() {
         getEquipmentLogger().trace("Entering refreshAllDataTags()");
-
-        //TODO : only when initialized.
-
-//        synchronized (this) {
-//            if (!runningCheck) {
-//                runCheck();
-//            } else {
-//                getEquipmentLogger().warn("Another check is already running. Refusing triggered refreshAllDataTags()");
-//            }
-//        }
+        runCheck();
         getEquipmentLogger().trace("Leaving refreshAllDataTags()");
     }
 
@@ -246,34 +247,60 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
     public void refreshDataTag(long arg0) {
         getEquipmentLogger().trace("Entering refreshDataTag()");
 
-        // NOT IMPLEMENTED
+        refreshAllDataTags();
 
         getEquipmentLogger().trace("Leaving refreshDataTag()");
     }
 
     @Override
-    public void onAddDataTag(ISourceDataTag arg0, ChangeReport arg1) {
+    public void onAddDataTag(ISourceDataTag arg0, ChangeReport report) {
         getEquipmentLogger().trace("Entering onAddDataTag()");
-//        try {
-//
-//            // TODO
-//            throw new EqIOException("Not implemented.");
-//
-//        } catch (EqIOException e) {
-//            getEquipmentLogger().warn(e.getMessage(),e);
-//            arg1.setState(CHANGE_STATE.FAIL);
-//            arg1.appendError(e.getMessage());
-//        }
-        arg1.setState(CHANGE_STATE.REBOOT);
+        
+        try {
+            configureTag(arg0, myConfig);
+        } catch (EqDataTagException e) {
+            report.setState(CHANGE_STATE.FAIL);
+            report.appendError(e.getMessage());
+        }
+        
+        report.setState(CHANGE_STATE.SUCCESS);
         getEquipmentLogger().trace("Leaving onAddDataTag()");
     }
 
     @Override
-    public void onRemoveDataTag(ISourceDataTag arg0, ChangeReport arg1) {
+    public void onRemoveDataTag(ISourceDataTag arg0, ChangeReport report) {
         getEquipmentLogger().trace("Entering onRemoveDataTag()");
 
-        arg1.setState(CHANGE_STATE.REBOOT);
+        ServiceTest service = myConfig.getDataTagIds();
+        
+        if (service.getQueueDataTag() == arg0.getId()) {
+            service.setQueueDataTag(null);
+        } else if (service.getTopicDataTag() == arg0.getId()) {
+            service.setTopicDataTag(null);
+        } else if (service.getConnTestDataTag() == arg0.getId()) {
+            service.setConnTestDataTag(null);
+        } 
+        
+        if (myConfig.hasBridgeConfigured()) {
+            List<BridgeConfig> list = new ArrayList<>(myConfig.getBridges());
+            for (BridgeConfig bc : list) {
+                ServiceTest bridge = bc.getDataTagIds(); 
+                if (bridge.getQueueDataTag() == arg0.getId()) {
+                    bridge.setQueueDataTag(null);
+                } else if (bridge.getTopicDataTag() == arg0.getId()) {
+                    bridge.setTopicDataTag(null);
+                } else if (bridge.getConnTestDataTag() == arg0.getId()) {
+                    bridge.setConnTestDataTag(null);
+                }
+                // remove if no tag is there anymore
+                if (bridge.topicDataTag == null && bridge.queueDataTag == null && bridge.connectionTestDataTag == null) {
+                    myConfig.getBridges().remove(bridge);
+                }
+            }
+            
+        }
 
+        report.setState(CHANGE_STATE.SUCCESS);
         getEquipmentLogger().trace("Leaving onRemoveDataTag()");
     }
 
@@ -371,16 +398,13 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
 
         PerfTester p = new PerfTester(config.getBrokerUrl());
 
-        ISourceDataTag queuePerfTest = getEquipmentConfiguration().getSourceDataTag(serviceTest.getQueueDataTag());
-        ISourceDataTag topicPerfTest = getEquipmentConfiguration().getSourceDataTag(serviceTest.getTopicDataTag());
-        ISourceDataTag connTest      = getEquipmentConfiguration().getSourceDataTag(serviceTest.getConnTestDataTag());
-
         getEquipmentLogger().info("Running Broker test on URL='" + config.getBrokerUrl() + "'");
 
         /*
          * connection test
          */
-        if (connTest != null) {
+        if (serviceTest.getConnTestDataTag() != null) {
+            ISourceDataTag connTest = getEquipmentConfiguration().getSourceDataTag(serviceTest.getConnTestDataTag());
             try {
                 if (!p.canConnect()) {
                     throw new JMSException("Cannot connect to Broker '" + config.getBrokerUrl() + "'");
@@ -389,8 +413,6 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
                 }
             } catch (JMSException e1) {
                 getEquipmentMessageSender().sendTagFiltered(connTest, new Boolean(false), System.currentTimeMillis(), e1.getMessage());
-                getEquipmentMessageSender().sendTagFiltered(topicPerfTest, new Float(0.0),System.currentTimeMillis());
-                getEquipmentMessageSender().sendTagFiltered(queuePerfTest, new Float(0.0),System.currentTimeMillis());
                 return;
             }
         }
@@ -398,7 +420,8 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
         /*
          * Topic
          */
-        if (topicPerfTest != null) {
+        if (serviceTest.getTopicDataTag() != null) {
+            ISourceDataTag topicPerfTest = getEquipmentConfiguration().getSourceDataTag(serviceTest.getTopicDataTag());
             try {
                 float speedTopic = p.measureTopicMessagePerf("MON2");
                 //getEquipmentMessageSender().sendTagFiltered(topicPerfTest, new Float(speedTopic), System.currentTimeMillis());
@@ -418,7 +441,8 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
         /*
          * Queue
          */
-        if (queuePerfTest != null) {
+        if (serviceTest.getQueueDataTag() != null) {
+            ISourceDataTag queuePerfTest = getEquipmentConfiguration().getSourceDataTag(serviceTest.getQueueDataTag());
             try {
                 float speedQueue = p.measureQueueMessagePerf("MON2");
                 //getEquipmentMessageSender().sendTagFiltered(queuePerfTest, new Float(speedQueue), System.currentTimeMillis());
@@ -450,38 +474,44 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
 
         ServiceTest serviceTest = config.getDataTagIds();
 
-        ISourceDataTag queuePerfTest = getEquipmentConfiguration().getSourceDataTag(serviceTest.getQueueDataTag());
-        ISourceDataTag topicPerfTest = getEquipmentConfiguration().getSourceDataTag(serviceTest.getTopicDataTag());
+        
+        
 
         PerfTester p = new PerfTester(config.getRemoteUrl(), myConfig.getBrokerUrl());
 
-        /* Bridge Queue Perf */
-        try {
-            float speedQueue = p.measureQueueMessagePerf("MON2-BRIDGE");
-            //getEquipmentMessageSender().sendTagFiltered(queuePerfTest, new Float(speedQueue), System.currentTimeMillis());
-            if (speedQueue == 0.0f) {
-                throw new Exception("Timeout!");
+        if (serviceTest.getQueueDataTag() != null) {
+            ISourceDataTag queuePerfTest = getEquipmentConfiguration().getSourceDataTag(serviceTest.getQueueDataTag());
+            /* Bridge Queue Perf */
+            try {
+                float speedQueue = p.measureQueueMessagePerf("MON2-BRIDGE");
+                //getEquipmentMessageSender().sendTagFiltered(queuePerfTest, new Float(speedQueue), System.currentTimeMillis());
+                if (speedQueue == 0.0f) {
+                    throw new Exception("Timeout!");
+                }
+                getEquipmentMessageSender().sendTagFiltered(queuePerfTest, new Float(speedQueue), System.currentTimeMillis());
+            } catch (Exception e) {
+                String msg = "Cannot aquire queue message perf for bridge: " + e.getMessage();
+                getEquipmentMessageSender().sendInvalidTag(queuePerfTest, SourceDataQuality.DATA_UNAVAILABLE, msg);
+                getEquipmentLogger().info(msg, e);
             }
-            getEquipmentMessageSender().sendTagFiltered(queuePerfTest, new Float(speedQueue), System.currentTimeMillis());
-        } catch (Exception e) {
-            String msg = "Cannot aquire queue message perf for bridge: " + e.getMessage();
-            getEquipmentMessageSender().sendInvalidTag(queuePerfTest, SourceDataQuality.DATA_UNAVAILABLE, msg);
-            getEquipmentLogger().info(msg, e);
         }
 
-        /* Bridge Topic Perf */
-        try {
-            float speedTopic = p.measureTopicMessagePerf("MON2-BRIDGE");
-            // getEquipmentMessageSender().sendTagFiltered(topicPerfTest, new Float(speedTopic), System.currentTimeMillis());
-            if (speedTopic == 0.0f) {
-                throw new Exception("Timeout!");
+        if (serviceTest.getTopicDataTag() != null) {
+            ISourceDataTag topicPerfTest = getEquipmentConfiguration().getSourceDataTag(serviceTest.getTopicDataTag());
+            /* Bridge Topic Perf */
+            try {
+                float speedTopic = p.measureTopicMessagePerf("MON2-BRIDGE");
+                // getEquipmentMessageSender().sendTagFiltered(topicPerfTest, new Float(speedTopic), System.currentTimeMillis());
+                if (speedTopic == 0.0f) {
+                    throw new Exception("Timeout!");
+                }
+                getEquipmentMessageSender().sendTagFiltered(topicPerfTest, new Float(speedTopic), System.currentTimeMillis());
+    
+            } catch (Exception e) {
+                String msg = "Cannot aquire topic message perf for bridge: " + e.getMessage();
+                getEquipmentMessageSender().sendInvalidTag(topicPerfTest, SourceDataQuality.DATA_UNAVAILABLE, msg);
+                getEquipmentLogger().info(msg, e);
             }
-            getEquipmentMessageSender().sendTagFiltered(topicPerfTest, new Float(speedTopic), System.currentTimeMillis());
-
-        } catch (Exception e) {
-            String msg = "Cannot aquire topic message perf for bridge: " + e.getMessage();
-            getEquipmentMessageSender().sendInvalidTag(queuePerfTest, SourceDataQuality.DATA_UNAVAILABLE, msg);
-            getEquipmentLogger().info(msg, e);
         }
     }
 
