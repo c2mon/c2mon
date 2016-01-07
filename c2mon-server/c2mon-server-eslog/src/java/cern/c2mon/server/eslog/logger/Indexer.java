@@ -337,6 +337,7 @@ public class Indexer {
   }
 
   private boolean typeIsPresent(String index, String type) {
+    updateLists();
     Set<String> types = indicesTypes.get(index);
     return types!= null && types.contains(type);
   }
