@@ -120,12 +120,20 @@ public class Indexer {
       return false;
     }
     else {
-      if (!mappingExists(index, type)) {
-        boolean isIndexed = instantiateIndex(index, type);
+      updateLists();
+
+      if (!indexExists(index)) {
+        boolean isIndexed = instantiateIndex(index);
 
         if (isIndexed) {
           //A set will not add twice the same value
           addIndex(index);
+        }
+      }
+
+      if (!mappingExists(index, type)) {
+        boolean isInstantiated = instantiateType(index, type);
+        if (isInstantiated) {
           addType(index, type);
         }
       }
@@ -141,6 +149,30 @@ public class Indexer {
 
       return isSent;
     }
+  }
+
+  public boolean instantiateType(String index, String type) {
+    if ((indicesTypes.containsKey(index) && indicesTypes.get(index).contains(type)) || !checkIndex(index) || !checkType(type)) {
+      log.warn("instantiateType() - Bad type adding to index " + index + ", type: " + type);
+    }
+
+    String mapping = null;
+    if (!typeIsPresent(index, type)) {
+      mapping = chooseMapping(type.substring(TAG_PREFIX.length()));
+      log.debug("instantiateIndex() - Adding a new mapping to index " + index + " for type " + type + ": " + mapping);
+    }
+
+    boolean mappingAdded = connector.handleIndexQuery(index, null, type, mapping);
+
+    if (mappingAdded) {
+      updateLists();
+    }
+
+    return mappingAdded;
+  }
+
+  private boolean indexExists(String index) {
+    return indicesTypes.containsKey(index);
   }
 
   private boolean mappingExists(String index, String type) {
@@ -294,24 +326,17 @@ public class Indexer {
    * indexQuery to the ElasticSearch cluster.
    *
    * @param index index to which add the TagES tag.
-   * @param type the type of the TagES tag according to its dataType.
    * @return the boolean status of the Query.
    */
-  public boolean instantiateIndex(String index, String type) {
-    if ((indicesTypes.containsKey(index) && indicesTypes.get(index).contains(type)) || !checkIndex(index) || !checkType(type)) {
-      log.debug("instantiateIndex() - Bad index: " + index + " or type: " + type + ".");
+  public boolean instantiateIndex(String index) {
+    if (indicesTypes.containsKey(index) || !checkIndex(index)) {
+      log.debug("instantiateIndex() - Bad index: " + index + ".");
       return false;
-    }
-
-    String mapping = null;
-    if (!typeIsPresent(index, type)) {
-      mapping = chooseMapping(type.substring(TAG_PREFIX.length()));
-      log.debug("instantiateIndex() - Adding a new mapping to index " + index + " for type " + type + ": " + mapping);
     }
 
     Settings indexSettings = connector.getIndexSettings("INDEX_MONTH_SETTINGS");
 
-    boolean isAcked = connector.handleIndexQuery(index, indexSettings, type, mapping);
+    boolean isAcked = connector.handleIndexQuery(index, indexSettings, null, null);
 
     if (isAcked) {
       updateLists();
@@ -337,7 +362,6 @@ public class Indexer {
   }
 
   private boolean typeIsPresent(String index, String type) {
-    updateLists();
     Set<String> types = indicesTypes.get(index);
     return types!= null && types.contains(type);
   }

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.index.IndexRequest;
@@ -133,14 +134,14 @@ public class TransportConnectorTest {
     Set<String> init = new HashSet<>();
     Settings settings = createMonthSettings();
     String type = "tag_string";
-    String mapping = "";
+    String mapping = new TagStringMapping(ValueType.stringType).getMapping();
 
     connector.setClient(null); // should be caught
     boolean result = connector.handleIndexQuery("c2mon_2015-01", settings, type, mapping);
     assertFalse(result);
 
     connector.setClient(initClient);
-    result = connector.handleIndexQuery("c2mon_2015-01", settings, type, mapping);
+    result = connector.handleIndexQuery("c2mon_2015-01", settings, null, null);
     assertTrue(result);
   }
 
@@ -150,7 +151,7 @@ public class TransportConnectorTest {
     Set<String> init = new HashSet<>();
     Settings settings = Settings.settingsBuilder().build();
     String type = "tag_string";
-    String mapping = "";
+    String mapping = new TagStringMapping(ValueType.stringType).getMapping();
 
     connector.setClient(null);
     // Client is null
@@ -158,6 +159,7 @@ public class TransportConnectorTest {
     assertFalse(result);
 
     connector.setClient(initClient);
+    connector.getClient().admin().indices().prepareCreate("c2mon_2015-01").execute().actionGet();
     connector.handleIndexQuery("c2mon_2015-01", settings, type, mapping);
     result = connector.handleAliasQuery("c2mon_2015-01", "tag_1");
     assertTrue(result);

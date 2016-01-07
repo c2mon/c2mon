@@ -107,7 +107,18 @@ public class IndexerTest {
     String index = "c2mon_2015-02";
     String type = "tag_string";
 
-    boolean isAcked = indexer.instantiateIndex(index, type);
+    boolean isAcked = indexer.instantiateIndex(index);
+    assertTrue(isAcked);
+    assertTrue(indexer.getIndicesTypes().keySet().contains(index));
+  }
+
+  @Test
+  public void testInstantiateType() {
+    String index = "c2mon_2015-02";
+    String type = "tag_string";
+
+    testInstantiateIndex();
+    boolean isAcked = indexer.instantiateType(index, type);
     assertTrue(isAcked);
     assertTrue(indexer.getIndicesTypes().keySet().contains(index));
     assertTrue(indexer.getIndicesTypes().get(index).contains(type));
@@ -121,10 +132,12 @@ public class IndexerTest {
     assertNull(indexer.getIndicesTypes().get(0));
     expectedIndex.add("c2mon_2015-01");
 
-    connector.handleIndexQuery("c2mon_2015-01", Settings.EMPTY, "", "");
+    connector.handleIndexQuery("c2mon_2015-01", Settings.EMPTY, null, null);
     indexer.updateLists();
 
     assertEquals(expectedIndex, indexer.getIndicesTypes().keySet());
+
+    connector.handleIndexQuery("c2mon_2015-01", null, "tag_string", new TagStringMapping(Mapping.ValueType.stringType).getMapping());
     assertEquals(expectedType, indexer.getIndicesTypes().get("c2mon_2015-01"));
   }
 
@@ -337,6 +350,7 @@ public class IndexerTest {
 
     indexer.getIndicesAliases().put(index, new HashSet<String>());
     indexer.getIndicesAliases().get(index).add("tag_1");
+    connector.getClient().admin().indices().prepareCreate(index).execute().actionGet();
     connector.handleIndexQuery(index, connector.getIndexSettings("INDEX_MONTH_SETTINGS"),
         indexer.generateType(tag.getDataType()), new TagStringMapping(Mapping.ValueType.stringType).getMapping());
 
@@ -353,7 +367,7 @@ public class IndexerTest {
   }
 
   @Test
-  public void testBadIndexByBatch() throws IOException {
+  public void testIndexByBatch() throws IOException {
     TagES tag = new TagString();
     tag.setDataType(Mapping.ValueType.stringType.toString());
     tag.setId(1L);

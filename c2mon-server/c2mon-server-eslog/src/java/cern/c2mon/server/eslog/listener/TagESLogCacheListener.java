@@ -129,6 +129,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
         tagsToLog.add(tag);
       }
     }
+    log.trace("retrieveTagsToLog() - With " + tagsToLog.size() + " tags to be logged.");
   }
 
   private void convertTagsToLogToTagES(Collection<Tag> tagsToLog, Collection<TagES> tagESCollection) {
@@ -155,8 +156,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
       indexer.indexTags(tagESCollection);
     }
     catch(Exception e) {
-      log.error("notifyElementUpdated() - Exception occurred while trying to index data to the ElasticSearch cluster.");
-      log.error(e.getMessage());
+      log.error("notifyElementUpdated() - Exception occurred while trying to index data to the ElasticSearch cluster.", e);
     }
   }
 
