@@ -9,6 +9,10 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class TagBoolean extends TagES implements TagESInterface {
+
+  public TagBoolean() {
+    super();
+  }
   /**
    * Set the value of this TagBoolean to the value of the Tag in C2MON.
    * @param value Object supposed to be a boolean.

@@ -10,6 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TagNumeric extends TagES implements TagESInterface {
 
+  public TagNumeric() {
+    super();
+  }
+
   @Override
   public void setValue(Object value) {
     if (value == null) {

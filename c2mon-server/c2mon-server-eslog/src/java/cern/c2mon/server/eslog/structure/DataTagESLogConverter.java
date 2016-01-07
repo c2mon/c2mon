@@ -250,7 +250,6 @@ public class DataTagESLogConverter {
 
   private void addProcessNameToResult(long processId, Map<String, String> result) {
     String processName = getProcessName(processId);
-    log.info("add process");
     result.put("process", processName);
   }
 
@@ -259,7 +258,6 @@ public class DataTagESLogConverter {
       String equipmentName = getEquipmentName(equipmentId);
       if (equipmentName != null) {
         result.put("equipment", equipmentName);
-        log.info("add equipment");
       }
     }
   }
@@ -269,7 +267,6 @@ public class DataTagESLogConverter {
       String subEquipmentName = getSubEquipmentName(subEquipmentId);
       if (subEquipmentName != null) {
         result.put("subEquipment", subEquipmentName);
-        log.info("add subEquipment");
       }
     }
   }

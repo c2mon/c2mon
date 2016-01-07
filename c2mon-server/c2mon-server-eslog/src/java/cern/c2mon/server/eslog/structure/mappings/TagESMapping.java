@@ -15,13 +15,14 @@ public class TagESMapping implements Mapping {
 
   public TagESMapping() {
     _routing = new Routing();
+    log.trace("TagESMapping() - Initialized a mapping with routing.");
   }
 
   @Override
   public String getMapping() {
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
     String json = gson.toJson(this);
-    log.trace(json);
+    log.trace("getMapping() - Created the mapping :" + json);
     return json;
   }
 
