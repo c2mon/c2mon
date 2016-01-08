@@ -37,14 +37,14 @@ import cern.c2mon.client.jms.BroadcastMessageListener;
  * @author vdeila
  * 
  */
-class AdminMessageListenerWrapper extends AbstractListenerWrapper<BroadcastMessageListener, BroadcastMessage> {
+class BroadcastMessageListenerWrapper extends AbstractListenerWrapper<BroadcastMessageListener, BroadcastMessage> {
 
   /**
    * Constructor.
    * @param queueCapacity size of event queue
    * @param slowConsumerListener listener registered for JMS problem callbacks
    */
-  public AdminMessageListenerWrapper(int queueCapacity, SlowConsumerListener slowConsumerListener, final ExecutorService executorService) {
+  public BroadcastMessageListenerWrapper(int queueCapacity, SlowConsumerListener slowConsumerListener, final ExecutorService executorService) {
     super(queueCapacity, slowConsumerListener, executorService);    
   }
 

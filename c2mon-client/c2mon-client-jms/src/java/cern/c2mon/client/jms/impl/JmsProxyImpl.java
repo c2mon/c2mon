@@ -176,7 +176,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    * Subscribes to the admin messages topic and notifies any registered
    * listeners. Thread start once and lives until final stop.
    */
-  private AdminMessageListenerWrapper adminMessageListenerWrapper;
+  private BroadcastMessageListenerWrapper broadcastMessageListenerWrapper;
 
   /**
    * Subscribes to the Supervision topic and notifies any registered listeners.
@@ -307,8 +307,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     connectionListenersLock = new ReentrantReadWriteLock();
     supervisionListenerWrapper = new SupervisionListenerWrapper(HIGH_LISTENER_QUEUE_SIZE, slowConsumerListener, topicPollingExecutor);
     supervisionListenerWrapper.start();
-    adminMessageListenerWrapper = new AdminMessageListenerWrapper(DEFAULT_LISTENER_QUEUE_SIZE, slowConsumerListener, topicPollingExecutor);
-    adminMessageListenerWrapper.start();
+    broadcastMessageListenerWrapper = new BroadcastMessageListenerWrapper(DEFAULT_LISTENER_QUEUE_SIZE, slowConsumerListener, topicPollingExecutor);
+    broadcastMessageListenerWrapper.start();
     heartbeatListenerWrapper = new HeartbeatListenerWrapper(DEFAULT_LISTENER_QUEUE_SIZE, slowConsumerListener, topicPollingExecutor);
     heartbeatListenerWrapper.start();
     alarmListenerWrapper = new AlarmListenerWrapper(HIGH_LISTENER_QUEUE_SIZE, slowConsumerListener, topicPollingExecutor);
@@ -513,7 +513,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     if (adminMessageTopic != null) {
       Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
       final MessageConsumer consumer = session.createConsumer(adminMessageTopic);
-      consumer.setMessageListener(adminMessageListenerWrapper);
+      consumer.setMessageListener(broadcastMessageListenerWrapper);
     }
   }
 
@@ -872,7 +872,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     if (adminMessageTopic == null) {
       throw new IllegalStateException(String.format("Cannot register '%s' without having the admin message topic", BroadcastMessageListener.class.getSimpleName()));
     }
-    adminMessageListenerWrapper.addListener(broadcastMessageListener);
+    broadcastMessageListenerWrapper.addListener(broadcastMessageListener);
   }
 
   @Override
@@ -880,7 +880,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     if (broadcastMessageListener == null) {
       throw new NullPointerException("Trying to unregister null BroadcastMessage listener from JmsProxy.");
     }
-    adminMessageListenerWrapper.removeListener(broadcastMessageListener);
+    broadcastMessageListenerWrapper.removeListener(broadcastMessageListener);
   }
 
   @Override
@@ -974,7 +974,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     shutdownRequested = true;
     supervisionListenerWrapper.stop();
     alarmListenerWrapper.stop();
-    adminMessageListenerWrapper.stop();
+    broadcastMessageListenerWrapper.stop();
     heartbeatListenerWrapper.stop();
     topicPollingExecutor.shutdown();
     disconnectQuietly();
@@ -997,7 +997,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     returnMap.put(supervisionTopic.toString(), supervisionListenerWrapper.getQueueSize());
     returnMap.put(alarmTopic.toString(), alarmListenerWrapper.getQueueSize());
     if (adminMessageTopic != null) {
-      returnMap.put(adminMessageTopic.toString(), adminMessageListenerWrapper.getQueueSize());
+      returnMap.put(adminMessageTopic.toString(), broadcastMessageListenerWrapper.getQueueSize());
     }
     returnMap.put(heartbeatTopic.toString(), heartbeatListenerWrapper.getQueueSize());
     return returnMap;
