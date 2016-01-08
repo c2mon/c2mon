@@ -21,11 +21,11 @@ public class Metadata implements Serializable, Cloneable {
 
   private Map<String, Object> metadata = new HashMap<>();
 
-  public static String toJSON(Metadata metadata){
+  public static String toJSON(Metadata metadata) {
     return toJSON(metadata.getMetadata());
   }
 
-  public static String toJSON(Map<String, Object> metadata){
+  public static String toJSON(Map<String, Object> metadata) {
     ObjectMapper mapper = new ObjectMapper();
     try {
       return mapper.writeValueAsString(metadata);
@@ -36,7 +36,7 @@ public class Metadata implements Serializable, Cloneable {
     return null;
   }
 
-  public static Map<String, Object> fromJSON(String jsonString){
+  public static Map<String, Object> fromJSON(String jsonString) {
     ObjectMapper mapper = new ObjectMapper();
     try {
       return mapper.readValue(jsonString, Map.class);
