@@ -1,4 +1,4 @@
-package cern.c2mon.client.auth.impl;
+package cern.c2mon.client.ext.rbac.impl;
 
 import cern.accsoft.security.rba.RBAToken;
 

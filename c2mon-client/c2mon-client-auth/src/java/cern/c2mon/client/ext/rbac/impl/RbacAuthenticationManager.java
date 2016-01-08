@@ -15,7 +15,7 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
-package cern.c2mon.client.auth.impl;
+package cern.c2mon.client.ext.rbac.impl;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -37,8 +37,8 @@ import cern.accsoft.security.rba.TokenFormatException;
 import cern.accsoft.security.rba.login.DefaultCallbackHandler;
 import cern.accsoft.security.rba.login.LoginPolicy;
 import cern.accsoft.security.rba.login.RBALoginContext;
-import cern.c2mon.client.auth.AuthenticationListener;
-import cern.c2mon.client.auth.AuthenticationManager;
+import cern.c2mon.client.ext.rbac.AuthenticationListener;
+import cern.c2mon.client.ext.rbac.AuthenticationManager;
 import cern.rba.util.holder.ClientTierRbaTokenChangeListener;
 import cern.rba.util.holder.ClientTierSubjectHolder;
 

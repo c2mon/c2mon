@@ -1,7 +1,7 @@
 /*******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ * <p/>
  * Copyright (C) 2004 - 2011 CERN. This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
@@ -12,31 +12,33 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- * 
+ * <p/>
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
-package cern.c2mon.client.auth;
+package cern.c2mon.client.ext.rbac;
+
+import cern.c2mon.shared.common.command.AuthorizationDetails;
 
 /**
- * This listener interface is used by the C2MON SessionManager
- * to get informed about a user login or logout. 
+ * The Authorization Manager allows you to check whether the an
+ * authenticated user is authorized for a given task.
  *
  * @author Matthias Braeger
  */
-public interface AuthenticationListener {
-  
+public interface AuthorizationManager {
+
   /**
-   * This method is called whenever a user successfully 
-   * managed to login.
-   * @param userName The name of the user that logged in.
+   * Checks whether the logged in user is authorized against the given
+   * authorization details.
+   *
+   * @param userName The name of the user for which we have to check privileges
+   * @param authorizationDetails The authorization details that shall be checked
+   * @return <code>true</code>, if the logged in user is authorized for the
+   *         given authorization details.
+   * @throws RuntimeException If <code>authorizationDetails</code> cannot
+   *         be cast into the supported authentication class, e.g.
+   *         <code>RbacAuthorizationDetails</code>
+   * @throws NullPointerException In case of a <code>null</code> parameter 
    */
-  void onLogin(String userName);
-  
-  /**
-   * This method is called when a previously logged user
-   * successfully logged out.
-   * 
-   * @param userName The name of the user that has been logged out.
-   */
-  void onLogout(String userName);
+  boolean isAuthorized(String userName, AuthorizationDetails authorizationDetails);
 }

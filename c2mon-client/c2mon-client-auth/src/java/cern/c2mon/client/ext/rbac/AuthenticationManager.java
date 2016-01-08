@@ -15,7 +15,7 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
-package cern.c2mon.client.auth;
+package cern.c2mon.client.ext.rbac;
 
 import java.util.Set;
 

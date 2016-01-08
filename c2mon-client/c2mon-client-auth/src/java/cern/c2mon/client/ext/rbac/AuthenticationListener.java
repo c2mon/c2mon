@@ -15,30 +15,28 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
-package cern.c2mon.client.auth;
-
-import cern.c2mon.shared.common.command.AuthorizationDetails;
+package cern.c2mon.client.ext.rbac;
 
 /**
- * The Authorization Manager allows you to check whether the an
- * authenticated user is authorized for a given task.
+ * This listener interface is used by the C2MON SessionManager
+ * to get informed about a user login or logout. 
  *
  * @author Matthias Braeger
  */
-public interface AuthorizationManager {
-
+public interface AuthenticationListener {
+  
   /**
-   * Checks whether the logged in user is authorized against the given
-   * authorization details.
-   * 
-   * @param userName The name of the user for which we have to check privileges
-   * @param authorizationDetails The authorization details that shall be checked
-   * @return <code>true</code>, if the logged in user is authorized for the
-   *         given authorization details.
-   * @throws RuntimeException If <code>authorizationDetails</code> cannot
-   *         be cast into the supported authentication class, e.g.
-   *         <code>RbacAuthorizationDetails</code>
-   * @throws NullPointerException In case of a <code>null</code> parameter 
+   * This method is called whenever a user successfully 
+   * managed to login.
+   * @param userName The name of the user that logged in.
    */
-  boolean isAuthorized(String userName, AuthorizationDetails authorizationDetails);
+  void onLogin(String userName);
+  
+  /**
+   * This method is called when a previously logged user
+   * successfully logged out.
+   * 
+   * @param userName The name of the user that has been logged out.
+   */
+  void onLogout(String userName);
 }

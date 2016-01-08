@@ -15,7 +15,7 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
-package cern.c2mon.client.auth.impl;
+package cern.c2mon.client.ext.rbac.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,8 +23,7 @@ import org.springframework.stereotype.Service;
 import cern.accsoft.security.rba.RBAToken;
 import cern.accsoft.security.rba.authorization.AccessChecker;
 import cern.accsoft.security.rba.authorization.AccessException;
-import cern.c2mon.client.auth.AuthorizationManager;
-import cern.rba.util.lookup.RbaTokenLookup;
+import cern.c2mon.client.ext.rbac.AuthorizationManager;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.common.command.AuthorizationDetails;
 
