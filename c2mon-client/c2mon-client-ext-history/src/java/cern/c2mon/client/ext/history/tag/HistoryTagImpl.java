@@ -18,11 +18,7 @@
 package cern.c2mon.client.ext.history.tag;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.slf4j.Logger;
@@ -468,6 +464,11 @@ public class HistoryTagImpl implements HistoryTag {
       }
     }
     return TypeNumeric.TYPE_UNKNOWN;
+  }
+
+  @Override
+  public Map<String, Object> getMetadata() {
+    return null;
   }
 
   @Override
