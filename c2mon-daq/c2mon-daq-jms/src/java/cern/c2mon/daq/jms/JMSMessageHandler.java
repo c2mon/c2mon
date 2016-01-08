@@ -262,6 +262,7 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
         
         report.setState(CHANGE_STATE.SUCCESS);
         getEquipmentLogger().trace("Leaving onAddDataTag()");
+        service.submit(getWorker());
     }
 
     @Override
