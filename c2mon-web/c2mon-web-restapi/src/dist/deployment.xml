@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+  <product name="c2mon-web-restapi">
+
+    <application name="default">
+      <startscript>
+        <main-class name="org.springframework.boot.loader.JarLauncher" />
+        <property name="logging.file" value="log/c2mon-web-restapi.log" />
+      </startscript>
+      <deployment installLocation="/opt/c2mon-web-restapi/">
+        <backupPolicy keepBackups="2">
+          <preserve type="dir" name="log"/>
+        </backupPolicy>
+      </deployment>
+    </application>
+
+
+    <application name="c2mon-web-restapi-pro" extends="default">
+      <startscript name="C2MON-WEB-RESTAPI-PRO">
+        <property name="c2mon.client.conf.url" value="http://timweb/conf/c2mon-client.properties" />
+      </startscript>
+      <deployment installLocation="/opt/c2mon-web-restapi">
+        <notification>
+          <mail address="c2mon-admin@cern.ch"/>
+        </notification>
+      </deployment>
+    </application>
+
+    <application name="c2mon-web-restapi-test" extends="default">
+      <startscript name="C2MON-WEB-RESTAPI-TEST">
+        <property name="c2mon.client.conf.url" value="http://timweb/test/conf/c2mon-client.properties" />
+        <property name="server.port" value="8081" />
+      </startscript>
+      <deployment installLocation="/opt/c2mon-web-restapi-test">
+        <notification>
+          <mail address="c2mon-admin@cern.ch"/>
+        </notification>
+      </deployment>
+    </application>
+
+  </product>
+</products>

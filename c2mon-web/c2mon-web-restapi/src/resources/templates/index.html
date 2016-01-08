@@ -1,0 +1,347 @@
+<!--
+  This page is served when a request to the API root is made.
+  It shows a little basic documentation about the API.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>C2MON REST API</title>
+
+  <link rel="stylesheet" th:href="@{/css/bootstrap/bootstrap.css}"  href="../../css/bootstrap/bootstrap.css" />
+
+  <style type="text/css">
+    body {
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+
+    .navbar {
+      margin-bottom: 20px;
+    }
+
+    /* Alter the colour of bootstrap's navbar */
+    .navbar-default {
+      background-color: rgb(247, 247, 247);
+    }
+
+  </style>
+</head>
+
+<body>
+<div class="container">
+
+  <!-- Static navbar -->
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">
+          C<sup>2</sup>MON REST API
+        </a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <!--           <ul class="nav navbar-nav">
+          <li class="active">
+            <a href="#">Home</a>
+          </li>
+        </ul> -->
+      </div>
+      <!--/.nav-collapse -->
+    </div>
+    <!--/.container-fluid -->
+  </nav>
+
+  <!-- Main component for a primary marketing message or call to action -->
+  <div class="page-header">
+    <h1>
+      C<sup>2</sup>MON REST API Documentation
+    </h1>
+  </div>
+
+  <div>
+    <p>This page documents the C2MON REST API, what it is capable of, and how to use it to integrate C2MON data into web applications.</p>
+
+    <table class="table table-bordered table-condensed">
+      <tbody>
+      <tr>
+        <th>
+          <p>Developed by</p>
+        </th>
+        <td>
+          <p>
+            <a href="mailto:justin.lewis.salmon@cern.ch" class="external-link" rel="nofollow">Justin Lewis Salmon</a>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <th>
+          <p>Status</p>
+        </th>
+        <td>
+          <p>Operational</p>
+        </td>
+      </tr>
+      <tr>
+        <th>
+          <p>Source code</p>
+        </th>
+        <td>
+          <p>
+            <a href="http://sources/browse/tim2-svn/trunk/c2mon/c2mon-web/c2mon-web-restapi" class="external-link" rel="nofollow">SVN Link</a>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <th>Design documentation</th>
+        <td>
+          <p>
+            Initial study document:
+            <a href="https://edms.cern.ch/document/1462727/1" class="external-link" rel="nofollow">https://edms.cern.ch/document/1462727/1</a>
+          </p>
+          <p>
+            Presentation:
+            <a href="https://edms.cern.ch/document/1465057/1" class="external-link" rel="nofollow">https://edms.cern.ch/document/1465057/1</a>
+          </p>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <h1>REST</h1>
+    <p>Representational State Transfer (REST) is a set of guidelines for creating web services which allow networked devices to communicate with each
+      other via HTTP. REST is oriented around clients making requests for data to a stateless server. Thus, the REST paradigm is a pull model, as opposed to
+      the push model employed by clients of the core C2MON API.</p>
+    <h1>Exposed Resources</h1>
+    <p>
+      Currently, the API exposes the following data (or <em>resources</em>) to the client:
+    </p>
+    <ul style="list-style-type: square;">
+      <li>
+        <strong>Data tag values</strong> (including control tags)
+      </li>
+      <li>
+        <strong>Alarms</strong>
+      </li>
+      <li>
+        <strong>Commands</strong>
+      </li>
+      <li>
+        <strong>Device classes</strong>
+      </li>
+      <li>
+        <strong>Devices</strong> (and their properties/fields)
+      </li>
+    </ul>
+
+    <h1>Data Format</h1>
+    <p>Currently, the API responds in JSON format only. It is lightweight, easy to parse, easy to read and has great support on the web. Support for XML
+      responses could be added in the future if the need arises.</p>
+    <p>The following is an example of the data format of a data tag:</p>
+      <pre>
+{
+  &quot;id&quot; : 160867,
+  &quot;description&quot; : &quot;PUISSANCE TOTAL 400KV ACTUEL&quot;,
+  &quot;value&quot; : 86.3,
+  &quot;valueDescription&quot; : &quot;&quot;,
+  &quot;serverTimestamp&quot; : &quot;2015-01-20 13:13:18.784&quot;,
+  &quot;sourceTimestamp&quot; : &quot;2015-01-20 13:13:16.674&quot;,
+  &quot;mode&quot; : &quot;OPERATIONAL&quot;,
+  &quot;simulated&quot; : false,
+  &quot;dataType&quot; : &quot;Float&quot;,
+  &quot;quality&quot; : {
+    &quot;invalidQualityStates&quot; : {
+    },
+    &quot;existingTag&quot; : true,
+    &quot;initialised&quot; : true,
+    &quot;description&quot; : &quot;OK&quot;,
+    &quot;valid&quot; : true,
+    &quot;accessible&quot; : true
+  },
+  &quot;alarms&quot; : [ ]
+}
+      </pre>
+
+    <h1>URL Structure</h1>
+    <p>
+      It is possible to retrieve both the<strong> current live value</strong> and <strong>historical values</strong> of data tags.
+    </p>
+    <h2>Accessing Live Values</h2>
+    <p>To retrieve live cache values from the server, the URL structure is as described in the following table:</p>
+    <table class="table table-bordered">
+      <tbody>
+      <tr>
+        <th style="width: 40%;">Request</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>
+              <span>
+                <code>GET /datatags/{id}</code>
+              </span>
+        </td>
+        <td>
+          <span>Retrieves a specific data tag.</span>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <code>GET /alarms/{id}</code>
+        </td>
+        <td>
+          <span>Retrieves a specific alarm.</span>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <code>GET /commands/{id}</code>
+        </td>
+        <td>Retrieves a specific command.</td>
+      </tr>
+      <tr>
+        <td>
+          <code>GET /classes/{id}</code>
+        </td>
+        <td>Retrieves a specific device class.</td>
+      </tr>
+      <tr>
+        <td>
+          <code>GET /devices/{id}</code>
+        </td>
+        <td>Retrieves a specific device.</td>
+      </tr>
+      <tr>
+        <td>
+          <code>GET /devices/{id}/properties</code>
+        </td>
+        <td>Retrieves all properties of a device.</td>
+      </tr>
+      <tr>
+        <td>
+          <code>GET /devices/{id}/properties/{id}</code>
+        </td>
+        <td>Retrieves a specific property of a device.</td>
+      </tr>
+      <tr>
+        <td>
+          <code>GET /devices/{id}/properties/{id}/fields</code>
+        </td>
+        <td>Retrieves all fields of a property.</td>
+      </tr>
+      <tr>
+        <td>
+          <code>GET /devices/{id}/properties/{id}/fields/{id}</code>
+        </td>
+        <td>Retrieves a specific field of a property.</td>
+      </tr>
+      </tbody>
+    </table>
+    <p>Note: the API currently only supports GET requests (not POST).</p>
+
+    <h2>Accessing Historical Values</h2>
+    <p>To retrieve historical values from the server, the client need only append the string “/history” to the request URL and specify additional
+      parameters defining the number and/or date range of records desired, as described in the following table:</p>
+    <table class="table table-bordered">
+      <tbody>
+      <tr>
+        <th>Parameter</th>
+        <th>Description</th>
+        <th>Example</th>
+      </tr>
+      <tr>
+        <td>
+          <code>records</code>
+        </td>
+        <td>Retrieves a specific number of records.</td>
+        <td>
+          <code>GET /datatags/1234/history?records=1000</code>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <code>days</code>
+        </td>
+        <td>Retrieves all records for a number of days.</td>
+        <td>
+          <code>GET /datatags/1234/history?days=5</code>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <code>to</code>
+          /
+          <code>from</code>
+        </td>
+        <td>
+          <p>Retrieves all records between the specified dates.</p>
+        </td>
+        <td>
+          <p>
+            <code>
+              GET /datatags/1234/history?from=18-11-2014 15:00:945&amp;
+              <span>to=17-11-2014 09:30:134</span>
+            </code>
+          </p>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <p>
+      <span>Note: The date format for the </span>
+      <code>to/from</code>
+      <span> parameters is &quot;</span>
+      <code>yyyy-MM-dd HH:mm:ss</code>
+      <span>&quot;.</span>
+    </p>
+
+    <h1>
+      <span>API Versioning</span>
+    </h1>
+    <p>Inevitably, APIs change over time. It is important to ensure that changes to the API will not cause existing client applications to break.
+      Therefore, the API is versioned in order to provide backwards compatibility in the future. To specify a particular API version, the client must send an
+      "Accept" header of the following format:</p>
+    <pre>application/json; version=c2mon.web.rest.api.v1</pre>
+    <p>The server will then send a response that matches the request version. If no header is supplied, the latest version of the API will be assumed. The
+      server will always indicate the API version in the "Content-Type" response header.</p>
+
+    <h1>Error Handling</h1>
+    <p>Should an error occur while processing the client request, the API will return a useful, meaningful and consumable error message to the client. The
+      error message will be in JSON format, just like the format of all other resources. The API will return sensible HTTP status error codes (4xx series for
+      client errors, 5xx series for server errors).</p>
+    <p>The JSON error body will look, for example, like the following (for a request for a non-existent data tag):</p>
+      <pre>
+{
+  &quot;status&quot; : 404,
+  &quot;message&quot; : &quot;No datatag with id 1223173 was found.&quot;
+}
+</pre>
+    <p>Error descriptions are generally descriptive enough to allow the client to understand the reason for the failure.</p>
+
+    <h1>Security</h1>
+    <p>Currently, the API does not require authentication, as it is not possible to execute commands and also because it is restricted to the TN. However,
+      in the future, RBAC authentication may be implemented.</p>
+    <p>
+        <span>
+          <br />
+        </span>
+    </p>
+    <p></p>
+  </div>
+</div>
+<!-- /container -->
+
+<!-- jQuery -->
+<script th:src="@{/js/jquery/jquery.js}" ></script>
+<!-- Bootstrap Core JavaScript -->
+<script th:src="@{/js/bootstrap/bootstrap.js}"></script>
+
+</body>
+</html>
