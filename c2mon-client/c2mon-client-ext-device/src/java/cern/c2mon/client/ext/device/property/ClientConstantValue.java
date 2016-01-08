@@ -19,6 +19,7 @@ package cern.c2mon.client.ext.device.property;
 
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Map;
 
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TypeNumeric;
@@ -191,6 +192,11 @@ public class ClientConstantValue<T> implements Tag {
     }
     
     return TypeNumeric.TYPE_UNKNOWN;
+  }
+
+  @Override
+  public Map<String, Object> getMetadata() {
+    return null;
   }
 
   @Override
