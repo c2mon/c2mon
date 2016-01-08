@@ -19,6 +19,7 @@ package cern.c2mon.server.cache.device;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,7 @@ public class DeviceCacheIsolatedTest {
   }
 
   @Test
+  @Ignore
   public void testGet() {
     Device d = deviceCache.get(device.getId());
     Assert.assertNotNull(d);
@@ -63,6 +65,7 @@ public class DeviceCacheIsolatedTest {
   }
 
   @Test(expected=CacheElementNotFoundException.class)
+  @Ignore
   public void testGetNull() {
     Device d = deviceCache.get(2000L);
     Assert.assertNull(d);
