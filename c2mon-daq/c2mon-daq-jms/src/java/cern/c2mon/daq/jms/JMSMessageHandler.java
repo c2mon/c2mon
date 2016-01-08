@@ -38,6 +38,17 @@ import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 public class JMSMessageHandler extends EquipmentMessageHandler implements IDataTagChanger,
         IEquipmentConfigurationChanger {
 
+    /**
+     * the destination name used for the topic and queue performance test.
+     */
+    public static final String DEST_NAME = "MON";
+
+    /**
+     * the destination name used for the topic and queue performance test via the bridge. 
+     */
+    public static final String BRIDGE_DEST_NAME = "MON-BRIDGE";
+
+
     private enum BrokerTest {
         CONNECTION_TEST, TOPIC_PERF_TEST, QUEUE_PERF_TEST, BRIDGE_TOPIC_PERF_TEST, BRIDGE_QUEUE_PERF_TEST;
     }
@@ -436,7 +447,7 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
         if (serviceTest.getTopicDataTag() != null) {
             ISourceDataTag topicPerfTest = getEquipmentConfiguration().getSourceDataTag(serviceTest.getTopicDataTag());
             try {
-                float speedTopic = p.measureTopicMessagePerf("MON2");
+                float speedTopic = p.measureTopicMessagePerf(DEST_NAME);
                 //getEquipmentMessageSender().sendTagFiltered(topicPerfTest, new Float(speedTopic), System.currentTimeMillis());
 
                 if (speedTopic == 0.0f) {
@@ -457,7 +468,7 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
         if (serviceTest.getQueueDataTag() != null) {
             ISourceDataTag queuePerfTest = getEquipmentConfiguration().getSourceDataTag(serviceTest.getQueueDataTag());
             try {
-                float speedQueue = p.measureQueueMessagePerf("MON2");
+                float speedQueue = p.measureQueueMessagePerf(DEST_NAME);
                 //getEquipmentMessageSender().sendTagFiltered(queuePerfTest, new Float(speedQueue), System.currentTimeMillis());
 
                 if (speedQueue == 0.0f) {
@@ -496,14 +507,14 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
             ISourceDataTag queuePerfTest = getEquipmentConfiguration().getSourceDataTag(serviceTest.getQueueDataTag());
             /* Bridge Queue Perf */
             try {
-                float speedQueue = p.measureQueueMessagePerf("MON2-BRIDGE");
+                float speedQueue = p.measureQueueMessagePerf(BRIDGE_DEST_NAME);
                 //getEquipmentMessageSender().sendTagFiltered(queuePerfTest, new Float(speedQueue), System.currentTimeMillis());
                 if (speedQueue == 0.0f) {
                     throw new Exception("Timeout!");
                 }
                 getEquipmentMessageSender().sendTagFiltered(queuePerfTest, new Float(speedQueue), System.currentTimeMillis());
             } catch (Exception e) {
-                String msg = "Cannot aquire queue message perf for bridge: " + e.getMessage();
+                String msg = "Cannot aquire bridge queue message perf on " + BRIDGE_DEST_NAME + ": " + e.getMessage();
                 getEquipmentMessageSender().sendInvalidTag(queuePerfTest, SourceDataQuality.DATA_UNAVAILABLE, msg);
                 getEquipmentLogger().info(msg, e);
             }
@@ -513,7 +524,7 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
             ISourceDataTag topicPerfTest = getEquipmentConfiguration().getSourceDataTag(serviceTest.getTopicDataTag());
             /* Bridge Topic Perf */
             try {
-                float speedTopic = p.measureTopicMessagePerf("MON2-BRIDGE");
+                float speedTopic = p.measureTopicMessagePerf(BRIDGE_DEST_NAME);
                 // getEquipmentMessageSender().sendTagFiltered(topicPerfTest, new Float(speedTopic), System.currentTimeMillis());
                 if (speedTopic == 0.0f) {
                     throw new Exception("Timeout!");
@@ -521,7 +532,7 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
                 getEquipmentMessageSender().sendTagFiltered(topicPerfTest, new Float(speedTopic), System.currentTimeMillis());
     
             } catch (Exception e) {
-                String msg = "Cannot aquire topic message perf for bridge: " + e.getMessage();
+                String msg = "Cannot aquire bridge topic message perf on " + BRIDGE_DEST_NAME + ": " + e.getMessage();
                 getEquipmentMessageSender().sendInvalidTag(topicPerfTest, SourceDataQuality.DATA_UNAVAILABLE, msg);
                 getEquipmentLogger().info(msg, e);
             }
