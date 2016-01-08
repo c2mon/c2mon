@@ -102,7 +102,7 @@ public class ClientRequestDelegatorTest {
 
   @Before
   public void resetMocks() {
-    EasyMock.reset(ruleTagCache, controlTagCache, dataTagCache);
+    EasyMock.reset(ruleTagCache, controlTagCache, dataTagCache, tagLocationService, tagFacadeGateway, aliveTimerFacade);
   }
 
 
