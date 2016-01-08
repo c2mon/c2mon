@@ -17,9 +17,7 @@
  ******************************************************************************/
 package cern.c2mon.client.core.tag;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,6 +27,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.simpleframework.xml.Attribute;
@@ -192,6 +191,11 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
   private String ruleExpressionString;
 
   /**
+   * Metadata of an Tag object.
+   */
+  private Map<String, Object> metadata = new HashMap<>();
+
+  /**
    * Concurrent modifiable collection of DataTagUpdateListeners registered for
    * updates on this DataTag
    */
@@ -233,6 +237,22 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
     if (unknown) {
       setUnknown();
     }
+  }
+
+  /**
+   * Set the field metadata.
+   * @param metadata the data to set.
+   */
+  public void setMetadata(Map<String, Object> metadata){
+    this.metadata = metadata;
+  }
+
+  /**
+   * Returns the metadata to the corresponding tag.
+   * @return the metadata of the object.
+   */
+  public Map<String, Object> getMetadata(){
+    return this.metadata;
   }
 
   private void setUnknown() {
@@ -805,6 +825,7 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
 
         aliveTagFlag = tagUpdate.isAliveTag();
         controlTagFlag = tagUpdate.isControlTag();
+        this.metadata = tagUpdate.getMetadata();
 
         // Notify all listeners of the update
         clone = this.clone();
@@ -1057,6 +1078,23 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
     finally { updateTagLock.readLock().unlock(); }
   }
 
+  private <T> T deepClone(T o) {
+    try {
+      ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+      ObjectOutputStream out = null;
+      out = new ObjectOutputStream(byteOut);
+      out.writeObject(o);
+      out.flush();
+      ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(byteOut.toByteArray()));
+      return (T) o.getClass().cast(in.readObject());
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+    LOG.error("Cloning of in metadata failed. the Object ist not serializable");
+    throw  new RuntimeException("Cloning of in metadata failed. the Object ist not serializable");
+  }
 
   /**
    * Creates a clone of the this object. The only difference is that
@@ -1109,8 +1147,19 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
         }
       }
 
-      // AlarmsValue objects are immutable
-      clone.alarms = (ArrayList<AlarmValue>) alarms.clone();
+      // clone the metadata map - alternative:
+      //clone.metadata = (Map<String, Object>) ((HashMap)this.metadata).clone();
+      //clone.metadata.putAll(metadata);
+      clone.metadata = new HashMap<>();
+      for(Entry<String, Object> entry : metadata.entrySet()) {
+        clone.metadata.put(deepClone(entry.getKey()), deepClone(entry.getValue()));
+      }
+
+          // AlarmsValue objects are immutable
+      clone.alarms = new ArrayList<>();
+      for(AlarmValue alarm : alarms){
+        clone.alarms.add(alarm.clone());
+      }
 
       if (tagQuality != null) {
         clone.tagQuality = tagQuality.clone();

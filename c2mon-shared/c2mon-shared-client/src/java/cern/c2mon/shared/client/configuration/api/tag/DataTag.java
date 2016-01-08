@@ -3,8 +3,7 @@ package cern.c2mon.shared.client.configuration.api.tag;
 import java.util.List;
 
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
-import cern.c2mon.shared.client.configuration.api.alarm.AlarmCondition;
-import cern.c2mon.shared.client.configuration.api.metaData.MetaData;
+import cern.c2mon.shared.common.metadata.Metadata;
 import cern.c2mon.shared.client.configuration.api.util.DataType;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.tag.TagMode;
@@ -12,9 +11,14 @@ import cern.c2mon.shared.common.datatag.DataTagAddress;
 import lombok.*;
 
 /**
- * TODO
+ * Configuration object for a DataTag.
+ * Holds the information to create a {@link cern.c2mon.shared.client.configuration.ConfigurationElement}
+ * related to a DataTag.
+ * <p/>
+ * For further information how to use instances of this for server configurations read <a
+ * href="http://c2mon.web.cern.ch/c2mon/docs/#_offline_configuration_via_c2mon_database_test_purpose_only">this</a> documentation.
+ * <p/>
  *
- * @author Justin Lewis Salmon
  * @author Franz Ritter
  */
 @Data
@@ -52,16 +56,6 @@ public class DataTag<T extends Number> extends Tag {
   private DataTagAddress address;
 
   /**
-   * Address configuration of the datatag (if any)
-   */
-//  @Setter(AccessLevel.NONE)
-//  private String address;
-
-//  public void setAddress(DataTagAddress privateAlarmCondition) {
-//    address = privateAlarmCondition == null ? null : privateAlarmCondition.toConfigXML();
-//  }
-
-  /**
    * Unit of the tag's value. This parameter is defined at configuration time
    * and doesn't change during run-time. It is mainly used for analogue values
    * that may represent e.g. a flow in "m3", a voltage in "kV" etc.
@@ -80,19 +74,34 @@ public class DataTag<T extends Number> extends Tag {
   @DefaultValue("true")
   private Boolean isLogged = true;
 
-  @Override
-  public boolean requiredFieldsGiven() {
-    return super.requiredFieldsGiven() && (getDataType() != null);
-  }
-
+  /**
+   * Constructor for building a DataTag with all fields.
+   * To build a DataTag with arbitrary fields use the builder pattern.
+   *
+   * @param id          Unique id of the tag.
+   * @param name        Unique name the tag.
+   * @param description Describes the propose of the tag.
+   * @param mode        define the mode in which the tag is running.
+   * @param alarms      List of configuration PObjects for this tag. If the argument is null the field will be an empty List as default.
+   * @param metadata    Arbitrary metadata attached to this tag configuration.
+   * @param isLogged    Defines if the tag which belongs to this configuration should be logged.
+   * @param deleted     Determine if this object apply as deletion.
+   * @param dataType    Determine the data type of the DataTag which belongs to this configuration.
+   * @param unit        Unit of the tag's value.
+   * @param minValue    Minimum value of the DataTag which belongs to this configuration.
+   * @param maxValue    Maximum value of the DataTag which belongs to this configuration.
+   * @param address     DataTagAddress which belongs to this tag configuration.
+   * @param dipAddress  Defines the dipAddress of the DataTag which belongs to this configuration.
+   * @param japcAddress Defines the japcAddress of the DataTag which belongs to this configuration.
+   */
   @Builder
   public DataTag(boolean deleted, Long id, String name, String description, DataType dataType, TagMode mode, @Singular List<Alarm> alarms,
-                 Boolean isLogged, String unit, T minValue, T maxValue, DataTagAddress address, String dipAddress, String japcAddress, MetaData metaData) {
-    super(deleted, id, name, description, mode, alarms, metaData);
+                 Boolean isLogged, String unit, T minValue, T maxValue, DataTagAddress address, String dipAddress, String japcAddress, Metadata metadata) {
+    super(deleted, id, name, description, mode, alarms, metadata);
     this.dataType = dataType;
     this.minValue = minValue;
     this.maxValue = maxValue;
-    this.address = address ;
+    this.address = address;
     this.unit = unit;
     this.dipAddress = dipAddress;
     this.japcAddress = japcAddress;
@@ -100,7 +109,11 @@ public class DataTag<T extends Number> extends Tag {
   }
 
   public DataTag() {
+  }
 
+  @Override
+  public boolean requiredFieldsGiven() {
+    return super.requiredFieldsGiven() && (getDataType() != null);
   }
 
 }

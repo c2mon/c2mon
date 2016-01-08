@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -726,6 +727,11 @@ public class ClientDataTagImplIsValidUpdateTest {
     public boolean isAliveTag() {
       // TODO Auto-generated method stub
       return false;
+    }
+
+    @Override
+    public Map<String, Object> getMetadata(){
+      return null;
     }
   }
 }

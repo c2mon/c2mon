@@ -26,7 +26,5 @@ public abstract class AlarmCondition {
   abstract public String getXMLCondition();
 
   public AlarmCondition() {
-//    Configuration insert =  buildAllMandatory()._1;
   }
-
 }

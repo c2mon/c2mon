@@ -19,6 +19,7 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
 import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
+import cern.c2mon.shared.common.metadata.Metadata;
 import cern.c2mon.shared.common.type.TypeConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +34,6 @@ import java.util.Set;
  */
 @Service
 public class CacheObjectFactoryWithProperties {
-
 
   @Autowired
   private DataTagCache dataTagCache;
@@ -192,6 +192,9 @@ public class CacheObjectFactoryWithProperties {
     if(props.getProperty("isLogged") != null){
       expectedObject.setLogged(Boolean.parseBoolean(props.getProperty("isLogged")));
     }
+    if(props.getProperty("metadata") != null){
+      expectedObject.setMetadata(Metadata.builder().metadata(Metadata.fromJSON(props.getProperty("metadata"))).build());
+    }
     expectedObject.setTopic(controlTagPublicationTopic);
     expectedObject.setDataTagQuality(new DataTagQualityImpl());
 
@@ -243,6 +246,9 @@ public class CacheObjectFactoryWithProperties {
     }
     if (props.getProperty("isLogged") != null) {
       expectedObject.setLogged(Boolean.parseBoolean(props.getProperty("isLogged")));
+    }
+    if(props.getProperty("metadata") != null){
+      expectedObject.setMetadata(Metadata.builder().metadata(Metadata.fromJSON(props.getProperty("metadata"))).build());
     }
     if (props.getProperty("equipmentId") != null) {
       expectedObject.setEquipmentId(Long.valueOf(props.getProperty("equipmentId")));
@@ -327,6 +333,9 @@ public class CacheObjectFactoryWithProperties {
     if (props.getProperty("isLogged") != null) {
       expectedObject.setLogged(Boolean.parseBoolean(props.getProperty("isLogged")));
     }
+    if(props.getProperty("metadata") != null){
+      expectedObject.setMetadata(Metadata.builder().metadata(Metadata.fromJSON(props.getProperty("metadata"))).build());
+    }
     if (props.getProperty("ruleText") != null) {
       expectedObject.setRuleText(props.getProperty("ruleText"));
     }
@@ -341,7 +350,7 @@ public class CacheObjectFactoryWithProperties {
     return expectedObject;
   }
 
-  public AlarmCacheObject buildRuleTagCacheObject(Long id, Properties props) {
+  public AlarmCacheObject buildAlarmCacheObject(Long id, Properties props) {
 
     AlarmCacheObject expectedObject = new AlarmCacheObject(id);
 
@@ -359,6 +368,9 @@ public class CacheObjectFactoryWithProperties {
     }
     if (props.getProperty("alarmCondition") != null) {
       expectedObject.setCondition(AlarmCondition.fromConfigXML(props.getProperty("alarmCondition")));
+    }
+    if(props.getProperty("metadata") != null){
+      expectedObject.setMetadata(Metadata.builder().metadata(Metadata.fromJSON(props.getProperty("metadata"))).build());
     }
     return expectedObject;
   }

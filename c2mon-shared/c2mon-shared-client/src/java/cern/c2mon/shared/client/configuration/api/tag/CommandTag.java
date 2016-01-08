@@ -1,7 +1,7 @@
 package cern.c2mon.shared.client.configuration.api.tag;
 
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
-import cern.c2mon.shared.client.configuration.api.metaData.MetaData;
+import cern.c2mon.shared.common.metadata.Metadata;
 import cern.c2mon.shared.client.configuration.api.util.DataType;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
@@ -10,15 +10,23 @@ import lombok.*;
 import java.util.List;
 
 /**
- * TODO
+ * Configuration object for a CommandTag.
+ * Holds the information to create a {@link cern.c2mon.shared.client.configuration.ConfigurationElement}
+ * related to a CommandTag.
+ * <p/>
+ * For further information how to use instances of this for server configurations read <a
+ * href="http://c2mon.web.cern.ch/c2mon/docs/#_offline_configuration_via_c2mon_database_test_purpose_only">this</a> documentation.
+ * <p/>
+ * The class uses the lombok builder annotation.
+ * Therefore to create instances of this class you need to use the builder pattern which is provided by lombok.
  *
- * @author Justin Lewis Salmon
  * @author Franz Ritter
  */
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class CommandTag extends Tag {
+
   /**
    * Client timeout of the CommandTag
    */
@@ -39,6 +47,7 @@ public class CommandTag extends Tag {
    */
   private Integer sourceRetries;
 
+  // TODO remove CERN specific rbac fields;
   /**
    * RBAC class.
    */
@@ -66,17 +75,11 @@ public class CommandTag extends Tag {
    */
   private HardwareAddress hardwareAddress;
 
-  @Override
-  public boolean requiredFieldsGiven() {
-    return (getId() != null) && (getName() != null) && (getDescription() != null)
-        && (getClientTimeout() != null) && (getExecTimeout() != null) && (getSourceTimeout() != null)
-        && (getSourceRetries() != null) && (getRbacClass() != null) && (getRbacDevice() != null) && (getRbacProperty() != null);
-  }
-
   @Builder
-  public CommandTag(boolean deleted, Long id, String name, String description, DataType dataType, TagMode mode, @Singular List<Alarm> alarms
-      , Integer clientTimeout, Integer execTimeout, Integer sourceTimeout, Integer sourceRetries, String rbacClass, String rbacDevice, String rbacProperty, HardwareAddress hardwareAddress, MetaData metaData) {
-    super(deleted, id, name, description, mode, alarms, metaData);
+  protected CommandTag(boolean deleted, Long id, String name, String description, DataType dataType, TagMode mode, @Singular List<Alarm> alarms
+      , Integer clientTimeout, Integer execTimeout, Integer sourceTimeout, Integer sourceRetries, String rbacClass, String rbacDevice, String rbacProperty,
+                    HardwareAddress hardwareAddress, Metadata metadata) {
+    super(deleted, id, name, description, mode, alarms, metadata);
     this.dataType = dataType;
     this.clientTimeout = clientTimeout;
     this.execTimeout = execTimeout;
@@ -89,9 +92,15 @@ public class CommandTag extends Tag {
   }
 
   /**
-   * empty default constructor
+   * Empty default constructor
    */
-  public CommandTag(){
+  public CommandTag() {
+  }
 
+  @Override
+  public boolean requiredFieldsGiven() {
+    return (getId() != null) && (getName() != null) && (getDescription() != null)
+        && (getClientTimeout() != null) && (getExecTimeout() != null) && (getSourceTimeout() != null)
+        && (getSourceRetries() != null) && (getRbacClass() != null) && (getRbacDevice() != null) && (getRbacProperty() != null);
   }
 }

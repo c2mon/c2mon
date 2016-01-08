@@ -22,6 +22,7 @@ public class ConfigurationSubEquipmentUtil {
         .id(id)
         .name("SubEquipment")
         .description("foo")
+        .handlerClass("cern.c2mon.driver.")
         .statusTag(StatusTag.builder().id(0l).name("").description("").build())
         .commFaultTag(CommFaultTag.builder().id(2l).name("").description("").build())
         .build();
@@ -33,6 +34,7 @@ public class ConfigurationSubEquipmentUtil {
     props.setProperty("commFaultTagId", String.valueOf(2l));
     props.setProperty("aliveInterval", String.valueOf(60000));
     props.setProperty("equipmentId", String.valueOf(1l));
+    props.setProperty("handlerClass", "cern.c2mon.driver.");
 
     return new Pair<>(pro, props);
   }
@@ -67,6 +69,7 @@ public class ConfigurationSubEquipmentUtil {
         .id(id)
         .name("SubEquipment")
         .description("foo")
+        .handlerClass("cern.c2mon.driver.")
         .statusTag(StatusTag.builder().id(0l).name("").description("").build())
         .commFaultTag(CommFaultTag.builder().id(2l).name("").description("").build())
         .build();
@@ -78,6 +81,7 @@ public class ConfigurationSubEquipmentUtil {
     props.setProperty("commFaultTagId", String.valueOf(2l));
     props.setProperty("aliveInterval", String.valueOf(60000));
     props.setProperty("equipmentId", String.valueOf(1l));
+    props.setProperty("handlerClass", "cern.c2mon.driver.");
 
     return new Pair<>(pro, props);
   }
@@ -95,14 +99,14 @@ public class ConfigurationSubEquipmentUtil {
         .name("SubEquipment_Update")
         .description("foo_Update")
         .aliveInterval(100000)
-        .handlerClass("testHandler_Update")
+        .handlerClass("cern.c2mon.driver.")
         .build();
 
     Properties props = new Properties();
     props.setProperty("name", "SubEquipment_Update");
     props.setProperty("description", "foo_Update");
     props.setProperty("aliveInterval", String.valueOf(100000));
-    props.setProperty("handlerClass", "testHandler_Update");
+    props.setProperty("handlerClass", "cern.c2mon.driver.");
 
     return new Pair<>(pro, props);
   }
@@ -112,11 +116,13 @@ public class ConfigurationSubEquipmentUtil {
         .id(id)
         .name("SubEquipment_Update")
         .description("foo_Update")
+        .handlerClass("cern.c2mon.driver.")
         .build();
 
     Properties props = new Properties();
     props.setProperty("name", "SubEquipment_Update");
     props.setProperty("description", "foo_Update");
+    props.setProperty("handlerClass", "cern.c2mon.driver.");
 
     return new Pair<>(pro, props);
   }
@@ -136,6 +142,7 @@ public class ConfigurationSubEquipmentUtil {
         .id(id)
         .name("SubEquipment")
         .description("foo")
+        .handlerClass("cern.c2mon.driver.")
         .statusTag(StatusTag.builder().id(0l).name("").description("").build())
         .commFaultTag(CommFaultTag.builder().id(1l).name("").description("").build());
 
@@ -146,6 +153,7 @@ public class ConfigurationSubEquipmentUtil {
     props.setProperty("equipmentId", String.valueOf(parentId));
     props.setProperty("stateTagId", String.valueOf(statusTagId));
     props.setProperty("commFaultTagId", String.valueOf(commFaultId));
+    props.setProperty("handlerClass", "cern.c2mon.driver.");
     if (aliveTagId != null) {
       props.setProperty("aliveTagId", String.valueOf(aliveTagId));
     }

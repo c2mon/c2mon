@@ -37,6 +37,7 @@ import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.DataTagValueDictionary;
+import cern.c2mon.shared.common.metadata.Metadata;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
@@ -90,11 +91,12 @@ public final class CacheObjectCreation {
     alarm3.setInfo("alarm info");
     alarm3.setState(AlarmCondition.TERMINATE);
     alarm3.setTimestamp(new Timestamp(System.currentTimeMillis() - 2000));
-    alarm3.setDataTagId(100003L);  
+    alarm3.setDataTagId(100003L);
+    alarm3.setMetadata(Metadata.builder().addMetadata("testMetadata",11).build());
     alarm3.hasBeenPublished(new Timestamp(System.currentTimeMillis()));
     return alarm3;
   }
-  
+
   /**
    * Does not set reference to tag id.
    * Created alarm has not been published to external alarm system (i.e. publication field is null)

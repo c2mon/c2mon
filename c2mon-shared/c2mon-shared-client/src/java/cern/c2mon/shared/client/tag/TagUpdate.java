@@ -1,7 +1,7 @@
 /*******************************************************************************
  * This file is part of the CERN Control and Monitoring Platform (C2MON)
  * project. See http://ts-project-tim.web.cern.ch
- *
+ * <p/>
  * Copyright (C) 2004 - 2011 CERN. This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
@@ -12,12 +12,13 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- *
+ * <p/>
  * Author: C2MON team, tim.support@cern.ch
  ******************************************************************************/
 package cern.c2mon.shared.client.tag;
 
 import java.util.Collection;
+import java.util.Map;
 
 
 /**
@@ -88,16 +89,18 @@ public interface TagUpdate extends TagValueUpdate {
    *         is published on change.
    */
   String getTopicName();
-  
+
   /**
    * Will return <code>true</code>, if the tag update is for a 
    * Control (Alive-, Status- or CommFault) tag 
    * @return <code>true</code>, if the given tag update belongs to a Control tag
    */
   boolean isControlTag();
-  
+
   /**
    * @return <code>true</code>, if the given tag update belongs to an Alive Control tag
    */
   boolean isAliveTag();
+
+  Map<String, Object> getMetadata();
 }

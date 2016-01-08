@@ -7,6 +7,7 @@ import cern.c2mon.shared.client.configuration.api.util.DataType;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
+import cern.c2mon.shared.common.metadata.Metadata;
 
 //@Service
 public class ConfigurationDataTagUtil {
@@ -48,6 +49,7 @@ public class ConfigurationDataTagUtil {
         .maxValue(10)
         .address(new DataTagAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress")))
         .unit("testUnit")
+        .metadata(Metadata.builder().addMetadata("testMetadata",11).build())
         .build();
 
     Properties props = new Properties();
@@ -60,6 +62,7 @@ public class ConfigurationDataTagUtil {
     props.setProperty("maxValue", String.valueOf(10));
     props.setProperty("address", new DataTagAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress")).toConfigXML());
     props.setProperty("equipmentId", String.valueOf(1l));
+    props.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata",11).build()));
     props.setProperty("unit", "testUnit");
 
     return new Pair<DataTag<Number>, Properties>(pro, props);
@@ -96,6 +99,7 @@ public class ConfigurationDataTagUtil {
         .maxValue(11)
         .address(new DataTagAddress(new PLCHardwareAddressImpl(2, 2, 2, 2, 2, 2.0f, "testAddress_Update")))
         .unit("testUnit_Update")
+        .metadata(Metadata.builder().addMetadata("testMetadata_Update",true).build())
         .build();
 
     Properties props = new Properties();
@@ -108,6 +112,7 @@ public class ConfigurationDataTagUtil {
     props.setProperty("maxValue", String.valueOf(11));
     props.setProperty("address", new DataTagAddress(new PLCHardwareAddressImpl(2, 2, 2, 2, 2, 2.0f, "testAddress_Update")).toConfigXML());
     props.setProperty("unit", "testUnit_Update");
+    props.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata_Update",true).build()));
 
     return new Pair<>(pro, props);
   }
@@ -178,7 +183,8 @@ public class ConfigurationDataTagUtil {
         .address(new DataTagAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress")))
         .unit("testUnit")
         .dipAddress("testConfigDIPaddress")
-        .japcAddress("testConfigJAPCaddress");
+        .japcAddress("testConfigJAPCaddress")
+        .metadata(Metadata.builder().addMetadata("testMetadata",11).build());
 
 
     Properties props = new Properties();
@@ -193,6 +199,7 @@ public class ConfigurationDataTagUtil {
     props.setProperty("unit", "testUnit");
     props.setProperty("dipAddress", "testConfigDIPaddress");
     props.setProperty("japcAddress", "testConfigJAPCaddress");
+    props.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata",11).build()));
     switch(parent){
       case "equipment" : props.setProperty("equipmentId", String.valueOf(parentId)); break;
       case "subEquipment" : props.setProperty("subEquipmentId", String.valueOf(parentId)); break;
@@ -208,7 +215,8 @@ public class ConfigurationDataTagUtil {
         .description("foo_update")
         .maxValue(20)
         .address(new DataTagAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress_update")))
-        .japcAddress("testConfigJAPCaddress_update");
+        .japcAddress("testConfigJAPCaddress_update")
+        .metadata(Metadata.builder().addMetadata("testMetadata_update",true).build());;
 
 
     Properties props = new Properties();
@@ -216,6 +224,7 @@ public class ConfigurationDataTagUtil {
     props.setProperty("maxValue", String.valueOf(20));
     props.setProperty("address", new DataTagAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress_update")).toConfigXML());
     props.setProperty("japcAddress", "testConfigJAPCaddress_update");
+    props.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata_update",true).build()));
 
     return new Pair<>(pro, props);
   }

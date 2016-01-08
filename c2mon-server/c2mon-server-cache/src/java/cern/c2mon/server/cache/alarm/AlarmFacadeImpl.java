@@ -19,8 +19,10 @@
 package cern.c2mon.server.cache.alarm;
 
 import java.sql.Timestamp;
+import java.util.Map;
 import java.util.Properties;
 
+import cern.c2mon.shared.common.metadata.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -227,6 +229,13 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
       catch (Exception e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Exception: Unable to create AlarmCondition object from parameter \"alarmCondition\": \n" + tmpStr);
       }
+    }
+
+    // ALARM metadata
+    tmpStr = alarmProperties.getProperty("metadata");
+    if (tmpStr != null) {
+      Metadata metadata = new Metadata().builder().metadata(Metadata.fromJSON(tmpStr)).build();
+      alarmCacheObject.setMetadata(metadata);
     }
 
     // set the JMS topic

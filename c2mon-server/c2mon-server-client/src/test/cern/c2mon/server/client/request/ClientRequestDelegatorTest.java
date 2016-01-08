@@ -1,16 +1,29 @@
 package cern.c2mon.server.client.request;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import cern.c2mon.server.cache.*;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.common.alarm.TagWithAlarms;
+import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.request.ClientRequestResult;
+import cern.c2mon.shared.client.tag.TagUpdate;
+import cern.c2mon.shared.common.metadata.Metadata;
+import cern.c2mon.shared.util.json.GsonFactory;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.easymock.EasyMock;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,8 +32,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.cache.DeviceClassFacade;
-import cern.c2mon.server.cache.DeviceFacade;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.server.test.broker.TestBrokerService;
@@ -28,8 +39,15 @@ import cern.c2mon.shared.client.device.DeviceClassNameResponse;
 import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
 
+import static cern.c2mon.server.client.request.util.CompareClientRequestResult.compareAlarmValuesWithAlarCacheObject;
+import static cern.c2mon.server.client.request.util.CompareClientRequestResult.compareTagUpdateWithDataTagCacheObject;
+import static cern.c2mon.server.client.request.util.CompareClientRequestResult.compareTagUpdates;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Justin Lewis Salmon
+ * @author Franz Ritter
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({ "classpath:cern/c2mon/server/client/config/server-client-requestdelegator-test.xml" })
@@ -46,6 +64,27 @@ public class ClientRequestDelegatorTest {
   @Autowired
   DeviceClassFacade deviceClassFacadeMock;
 
+  @Autowired
+  ClientTagRequestHelper tagRequestHelper;
+
+  @Autowired
+  RuleTagCache ruleTagCache;
+
+  @Autowired
+  ControlTagCache controlTagCache;
+
+  @Autowired
+  DataTagCache dataTagCache;
+
+  @Autowired
+  TagLocationService tagLocationService;
+
+  @Autowired
+  AliveTimerFacade aliveTimerFacade;
+
+  @Autowired
+  TagFacadeGateway tagFacadeGateway;
+
   @Value("${jms.client.request.queue}")
   private String requestQueue;
 
@@ -60,6 +99,12 @@ public class ClientRequestDelegatorTest {
   public static void stopBroker() throws Exception {
     testBrokerService.stopBroker();
   }
+
+  @Before
+  public void resetMocks() {
+    EasyMock.reset(ruleTagCache, controlTagCache, dataTagCache);
+  }
+
 
   @Test
   public void testHandleDeviceClassNamesRequest() throws JMSException {
@@ -133,6 +178,104 @@ public class ClientRequestDelegatorTest {
 
     // Verify that everything happened as expected
     EasyMock.verify(deviceFacadeMock);
+  }
+
+  @Test
+  public void handleClientRequestTagValue(){
+
+    // calling of the isInTagCache() Method in getTagsById() [ClientTagRequestHelper]
+    EasyMock.expect(tagLocationService.isInTagCache(1L)).andReturn(true);
+
+    DataTagCacheObject dataTagObject = CacheObjectCreation.createTestDataTag();
+    dataTagObject.setMetadata(Metadata.builder().addMetadata("testString","hello").addMetadata("tesInt",1).addMetadata("booleanFoo",true).addMetadata("tesLong",1L).addMetadata("tesFloat",1.0f).addMetadata("tesDouble",1.0).build());
+    dataTagObject.setProcessId(10L);
+    dataTagObject.setProcessId(10L);
+
+    // build Tag
+    TagWithAlarms tagWithAlarm = new TagWithAlarmsImpl(dataTagObject, Collections.EMPTY_LIST);
+
+    EasyMock.expect(tagFacadeGateway.getTagWithAlarms(1L)).andReturn(tagWithAlarm);
+    EasyMock.expect(aliveTimerFacade.isRegisteredAliveTimer(1L)).andReturn(false);
+    EasyMock.replay(tagLocationService, tagFacadeGateway, aliveTimerFacade);
+
+    ClientRequestImpl<TagUpdate> request = new ClientRequestImpl<>(TagUpdate.class);
+    request.addTagId(1L);
+
+    // build the TagUpdate through handleTagRequest() call
+    Collection<? extends ClientRequestResult> tagUpdates = tagRequestHelper.handleTagRequest(request);
+    assertTrue(tagUpdates.size() == 1);
+    assertTrue(((List)tagUpdates).get(0) instanceof TagUpdate);
+
+    // compare tag data of the Tag
+    TagUpdate tagUpdate = (TagUpdate) ((List)tagUpdates).get(0);
+    compareTagUpdateWithDataTagCacheObject(tagUpdate ,dataTagObject);
+
+    // verify mocks
+    EasyMock.verify(tagLocationService, tagFacadeGateway, aliveTimerFacade);
+
+    // test the parsing to Json and from json:
+    String jsonMessage = GsonFactory.createGson().toJson(tagUpdates);
+
+    ClientRequestImpl<TagUpdate> clientRequest = new ClientRequestImpl<>(TagUpdate.class);
+    Collection<TagUpdate> tagUpdateFromJson = clientRequest.fromJsonResponse(jsonMessage);
+
+    // compare tag on the sever side with the on on the client side:
+    TagUpdate tagUpdateClient =(TagUpdate) ((List)tagUpdateFromJson).get(0);
+    compareTagUpdates(tagUpdateClient, tagUpdate);
+  }
+
+  @Test
+  public void handleClientRequestTagValueWithAlarm(){
+
+    // calling of the isInTagCache() Method in getTagsById() [ClientTagRequestHelper]
+    EasyMock.expect(tagLocationService.isInTagCache(1L)).andReturn(true);
+
+    DataTagCacheObject dataTagObject = CacheObjectCreation.createTestDataTag();
+    dataTagObject.setMetadata(Metadata.builder().addMetadata("testString","hello").addMetadata("tesInt",1).addMetadata("booleanFoo",true).addMetadata("tesLong",1L).addMetadata("tesFloat",1.0f).addMetadata("tesDouble",1.0).build());
+    dataTagObject.setProcessId(10L);
+    dataTagObject.setProcessId(10L);
+
+    // build Alarms
+    AlarmCacheObject alarmServer1 = CacheObjectCreation.createTestAlarm1();
+    AlarmCacheObject alarmServer2 = CacheObjectCreation.createTestAlarm2();
+
+    alarmServer1.setDataTagId(dataTagObject.getId());
+    alarmServer2.setDataTagId(dataTagObject.getId());
+    alarmServer1.setMetadata(Metadata.builder().addMetadata("testString","hello").addMetadata("tesInt",1).addMetadata("booleanFoo",true).build());
+    alarmServer2.setMetadata(Metadata.builder().addMetadata("testString","hello").addMetadata("tesInt",1).addMetadata("booleanFoo",true).build());
+
+    TagWithAlarms tagWithAlarm = new TagWithAlarmsImpl(dataTagObject, new ArrayList<Alarm>(Arrays.asList(alarmServer1,alarmServer2)));
+
+    EasyMock.expect(tagFacadeGateway.getTagWithAlarms(1L)).andReturn(tagWithAlarm);
+    EasyMock.expect(aliveTimerFacade.isRegisteredAliveTimer(1L)).andReturn(false);
+    EasyMock.replay(tagLocationService, tagFacadeGateway, aliveTimerFacade);
+
+    ClientRequestImpl<TagUpdate> request = new ClientRequestImpl<>(TagUpdate.class);
+    request.addTagId(1L);
+
+    // build the TagUpdate through handleTagRequest() call
+    Collection<? extends ClientRequestResult> tagUpdates = tagRequestHelper.handleTagRequest(request);
+    assertTrue(tagUpdates.size() == 1);
+    assertTrue(((List)tagUpdates).get(0) instanceof TagUpdate);
+
+    // compare tag data of the Tag
+    TagUpdate tagUpdate = (TagUpdate) ((List)tagUpdates).get(0);
+    compareTagUpdateWithDataTagCacheObject(tagUpdate ,dataTagObject);
+    compareAlarmValuesWithAlarCacheObject((AlarmValue) ((List)tagUpdate.getAlarms()).get(0), alarmServer1);
+    compareAlarmValuesWithAlarCacheObject((AlarmValue) ((List)tagUpdate.getAlarms()).get(1), alarmServer2);
+
+    // verify mocks
+    EasyMock.verify(tagLocationService, tagFacadeGateway, aliveTimerFacade);
+
+    // test the parsing to Json and from json:
+    String jsonMessage = GsonFactory.createGson().toJson(tagUpdates);
+
+    ClientRequestImpl<TagUpdate> clientRequest = new ClientRequestImpl<>(TagUpdate.class);
+    Collection<TagUpdate> tagUpdateFromJson = clientRequest.fromJsonResponse(jsonMessage);
+
+    // compare tag on the sever side with the on on the client side:
+    TagUpdate tagUpdateClient =(TagUpdate) ((List)tagUpdateFromJson).get(0);
+    compareTagUpdates(tagUpdateClient, tagUpdate);
   }
 
 }

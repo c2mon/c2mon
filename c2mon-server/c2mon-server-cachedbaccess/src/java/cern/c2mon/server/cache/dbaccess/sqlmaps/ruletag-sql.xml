@@ -18,7 +18,7 @@
             TAGUNIT, TAGSIMULATED, TAGLOGGED, 
             TAGVALUEDICTIONARY, TAGDIPADDRESS,
             TAGJAPCADDRESS, TAGRULE, 
-            TAGRULEIDS, ALARMID
+            TAGRULEIDS, ALARMID, TAGMETADATA
        FROM DATATAG LEFT OUTER JOIN ALARM 
          ON ALARM_TAGID = TAGID     
       WHERE TAGCONTROLTAG=0 
@@ -32,7 +32,7 @@
             TAGUNIT, TAGSIMULATED, TAGLOGGED, 
             TAGVALUEDICTIONARY, TAGDIPADDRESS,
             TAGJAPCADDRESS, TAGRULE, 
-            TAGRULEIDS, ALARMID
+            TAGRULEIDS, ALARMID, TAGMETADATA
        FROM DATATAG LEFT OUTER JOIN ALARM 
          ON ALARM_TAGID = TAGID     
       WHERE TAGCONTROLTAG=0 
@@ -49,7 +49,7 @@
             TAGUNIT, TAGSIMULATED, TAGLOGGED, 
             TAGVALUEDICTIONARY, TAGDIPADDRESS,
             TAGJAPCADDRESS, TAGRULE,
-            TAGRULEIDS, ALARMID
+            TAGRULEIDS, ALARMID, TAGMETADATA
        FROM DATATAG LEFT OUTER JOIN ALARM 
          ON ALARM_TAGID = TAGID     
       WHERE TAGCONTROLTAG=0 
@@ -79,7 +79,8 @@
              TAGDIPADDRESS = #{dipAddress,jdbcType=VARCHAR},
              TAGJAPCADDRESS = #{japcAddress,jdbcType=VARCHAR},
              TAGRULEIDS = #{ruleIdsString, jdbcType=VARCHAR},
-             TAGRULE = #{ruleText,jdbcType=VARCHAR}
+             TAGRULE = #{ruleText,jdbcType=VARCHAR},
+             TAGMETADATA = #{metadata,jdbcType=VARCHAR}
        WHERE TAGID=#{id}     
     </update>
     
@@ -91,7 +92,7 @@
                            TAGUNIT, TAGSIMULATED, TAGLOGGED, 
                            TAGVALUEDICTIONARY, TAGDIPADDRESS,
                            TAGJAPCADDRESS, TAGRULE,
-                           TAGRULEIDS, TAGCONTROLTAG                                 
+                           TAGRULEIDS, TAGCONTROLTAG, TAGMETADATA
                 )
       VALUES (#{id},#{name},SUBSTR(#{description, jdbcType=VARCHAR}, 1, 100),#{mode},#{dataType},
               #{value,javaType=java.lang.Object,jdbcType=BLOB},SUBSTR(#{valueDescription,jdbcType=VARCHAR}, 1, 2000),
@@ -101,7 +102,7 @@
               #{valueDictionary,jdbcType=VARCHAR},
               #{dipAddress,jdbcType=VARCHAR},#{japcAddress,jdbcType=VARCHAR}, #{ruleText,jdbcType=VARCHAR},
               #{ruleIdsString, jdbcType=VARCHAR},
-              0
+              0, #{metadata, jdbcType=VARCHAR}
                 )
     </insert>        
     

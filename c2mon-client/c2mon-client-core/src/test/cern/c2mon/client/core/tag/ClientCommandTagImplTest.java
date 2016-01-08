@@ -30,8 +30,8 @@ public class ClientCommandTagImplTest {
     assertTrue(commandTag.getId().equals(newCommandTag.getId()));
     assertTrue(commandTag.getMaxValue().equals(newCommandTag.getMaxValue()));
     assertTrue(commandTag.getHardwareAddress().equals(newCommandTag.getHardwareAddress()));
-  } 
-  
+  }
+
   /**
    * This test is useful when checking that changes made on the server are supported by the client. However
    * it is not a good idea to run this in a continuous deployment environment since the test is

@@ -1,9 +1,7 @@
 package cern.c2mon.shared.client.tag;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.*;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -69,6 +67,12 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
   
   /** In case of an Alive Control tag update, this field is set to <code>true</code> */
   private boolean aliveTag = false;
+
+  /**
+   * Metadata according to the tag in this class.
+   */
+  @NotNull
+  private Map<String, Object> metadata = new HashMap<>();
 
   /**
    * Private default constructor needed for JSON
@@ -287,5 +291,21 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
     if (aliveTag) {
       this.controlTag = true;
     }
+  }
+
+  /**
+   * Set the field metadata.
+   * @param metadata the data to set.
+   */
+  public void setMetadata(Map<String, Object> metadata){
+    this.metadata = metadata;
+  }
+
+  /**
+   * Returns the metadata to the corresponding tag.
+   * @return the metadata of the object.
+   */
+  public Map<String, Object> getMetadata(){
+    return this.metadata;
   }
 }

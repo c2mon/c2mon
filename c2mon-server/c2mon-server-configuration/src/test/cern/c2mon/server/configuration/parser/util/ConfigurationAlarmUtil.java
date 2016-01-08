@@ -4,6 +4,7 @@ import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.alarm.RangeCondition;
 import cern.c2mon.shared.client.configuration.api.alarm.ValueCondition;
 import cern.c2mon.shared.client.configuration.api.util.DataType;
+import cern.c2mon.shared.common.metadata.Metadata;
 
 import java.util.Properties;
 
@@ -46,6 +47,7 @@ public class ConfigurationAlarmUtil {
         .faultCode(10)
         .valueType(DataType.INTEGER)
         .alarmCondition(RangeCondition.builder().dataType(DataType.INTEGER).minValue(0).maxValue(10).build())
+        .metadata(Metadata.builder().addMetadata("testMetadata",11).build())
         .build();
 
     Properties props = new Properties();
@@ -59,6 +61,7 @@ public class ConfigurationAlarmUtil {
         "<max-value type=\"" + DataType.INTEGER + "\">10</max-value>\n" +
         "</AlarmCondition>";
     props.setProperty("alarmCondition", condition.toString());
+    props.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata",11).build()));
 
     return new Pair<>(pro, props);
   }
@@ -78,6 +81,7 @@ public class ConfigurationAlarmUtil {
         .faultCode(11)
         .valueType(DataType.DOUBLE)
         .alarmCondition(ValueCondition.builder().dataType(DataType.DOUBLE).value(10).build())
+        .metadata(Metadata.builder().addMetadata("testMetadata_update",true).build())
         .build();
 
     Properties props = new Properties();
@@ -89,6 +93,7 @@ public class ConfigurationAlarmUtil {
         "<alarm-value type=\"" + DataType.DOUBLE + "\">10</alarm-value>\n" +
         "</AlarmCondition>";
     props.setProperty("alarmCondition", condition.toString());
+    props.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata_update",true).build()));
 
     return new Pair<>(pro, props);
   }
@@ -99,6 +104,7 @@ public class ConfigurationAlarmUtil {
         .faultFamily("faultFam_Test_Update")
         .faultCode(11)
         .alarmCondition(ValueCondition.builder().dataType(DataType.DOUBLE).value(10).build())
+        .metadata(Metadata.builder().addMetadata("testMetadata_update",true).build())
         .build();
 
     Properties props = new Properties();
@@ -108,6 +114,7 @@ public class ConfigurationAlarmUtil {
         "<alarm-value type=\"" + DataType.DOUBLE + "\">10</alarm-value>\n" +
         "</AlarmCondition>";
     props.setProperty("alarmCondition", condition.toString());
+    props.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata_update",true).build()));
 
     return new Pair<>(pro, props);
   }
@@ -154,7 +161,8 @@ public class ConfigurationAlarmUtil {
         .faultMember("faultMember_Test")
         .faultCode(10)
         .valueType(DataType.INTEGER)
-        .alarmCondition(RangeCondition.builder().dataType(DataType.INTEGER).minValue(0).maxValue(10).build());
+        .alarmCondition(RangeCondition.builder().dataType(DataType.INTEGER).minValue(0).maxValue(10).build())
+        .metadata(Metadata.builder().addMetadata("testMetadata",11).build());
 
     Properties props = new Properties();
     props.setProperty("faultFamily", "faultFam_Test");
@@ -167,6 +175,7 @@ public class ConfigurationAlarmUtil {
         "</AlarmCondition>";
     props.setProperty("alarmCondition", condition);
     props.setProperty("dataTagId", Long.toString(parentId));
+    props.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata",11).build()));
 
     return new Pair<>(pro, props);
   }
@@ -174,10 +183,12 @@ public class ConfigurationAlarmUtil {
   public static Pair<Alarm.AlarmBuilder, Properties> builderAlarmUpdate(Long id, Long parentId) {
     Alarm.AlarmBuilder pro = Alarm.builder()
         .id(id)
-        .faultFamily("faultFam_Test_Update");
+        .faultFamily("faultFam_Test_Update")
+        .metadata(Metadata.builder().addMetadata("testMetadata_update",true).build());
 
     Properties props = new Properties();
     props.setProperty("faultFamily", "faultFam_Test_Update");
+    props.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata_update",true).build()));
 
     return new Pair<>(pro, props);
   }

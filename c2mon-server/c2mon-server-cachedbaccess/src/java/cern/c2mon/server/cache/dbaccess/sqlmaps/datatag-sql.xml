@@ -39,6 +39,8 @@
       <result property="address" column="TAGADDRESS" javaType="cern.c2mon.shared.common.datatag.DataTagAddress" jdbcType="VARCHAR"/>
       
       <result property="ruleIdsString" column="TAGRULEIDS" jdbcType="VARCHAR"/>
+
+      <result property="metadata" column="TAGMETADATA" javaType="Metadata" jdbcType="VARCHAR"/>
       
       <collection property="alarmIds" ofType="Long" javaType="java.util.ArrayList" resultMap="tagAlarmIdsResultMap"/>
          
@@ -80,7 +82,7 @@
             E2.EQID as SUBEQUIPMENT_ID,
             TAGMINVAL, TAGMAXVAL, TAGUNIT, TAGSIMULATED, TAGLOGGED, 
             TAGVALUEDICTIONARY, TAGADDRESS, TAGDIPADDRESS,
-            TAGJAPCADDRESS, TAGRULEIDS, ALARMID, PROCID
+            TAGJAPCADDRESS, TAGRULEIDS, ALARMID, PROCID, TAGMETADATA
      FROM DATATAG LEFT OUTER JOIN ALARM 
             ON ALARM_TAGID = TAGID
           LEFT OUTER JOIN EQUIPMENT E1
@@ -103,7 +105,7 @@
             E2.EQID as SUBEQUIPMENT_ID,
             TAGMINVAL, TAGMAXVAL, TAGUNIT, TAGSIMULATED, TAGLOGGED, 
             TAGVALUEDICTIONARY, TAGADDRESS, TAGDIPADDRESS,
-            TAGJAPCADDRESS, TAGRULEIDS, ALARMID, PROCID
+            TAGJAPCADDRESS, TAGRULEIDS, ALARMID, PROCID, TAGMETADATA
      FROM DATATAG LEFT OUTER JOIN ALARM 
             ON ALARM_TAGID = TAGID
           LEFT OUTER JOIN EQUIPMENT E1
@@ -127,7 +129,7 @@
             E2.EQID as SUBEQUIPMENT_ID,
             TAGMINVAL, TAGMAXVAL, TAGUNIT, TAGSIMULATED, TAGLOGGED, 
             TAGVALUEDICTIONARY, TAGADDRESS, TAGDIPADDRESS,
-            TAGJAPCADDRESS, TAGRULEIDS, ALARMID, PROCID
+            TAGJAPCADDRESS, TAGRULEIDS, ALARMID, PROCID, TAGMETADATA
      FROM DATATAG LEFT OUTER JOIN ALARM 
             ON ALARM_TAGID = TAGID
           LEFT OUTER JOIN EQUIPMENT E1
@@ -173,7 +175,8 @@
              TAGADDRESS = #{address,jdbcType=VARCHAR},
              TAGDIPADDRESS = #{dipAddress,jdbcType=VARCHAR},
              TAGJAPCADDRESS = #{japcAddress,jdbcType=VARCHAR},
-             TAGRULEIDS = #{ruleIdsString, jdbcType=VARCHAR}
+             TAGRULEIDS = #{ruleIdsString, jdbcType=VARCHAR},
+             TAGMETADATA = #{metadata,jdbcType=VARCHAR}
        WHERE TAGID=#{id} 
     </update>
     
@@ -187,7 +190,7 @@
                             TAGUNIT, TAGSIMULATED, TAGLOGGED,
                             TAGVALUEDICTIONARY, TAGADDRESS,
                             TAGDIPADDRESS, TAGJAPCADDRESS,
-                            TAGRULEIDS, TAGCONTROLTAG
+                            TAGRULEIDS, TAGCONTROLTAG, TAGMETADATA
                 )
       VALUES (#{id},#{name},SUBSTR(#{description, jdbcType=VARCHAR}, 1, 100),#{mode},#{dataType},
               #{value,javaType=java.lang.Object,jdbcType=BLOB},SUBSTR(#{valueDescription,jdbcType=VARCHAR}, 1, 2000),
@@ -206,7 +209,7 @@
               #{valueDictionary,jdbcType=VARCHAR},#{address,jdbcType=VARCHAR},
               #{dipAddress,jdbcType=VARCHAR},#{japcAddress,jdbcType=VARCHAR},
               #{ruleIdsString, jdbcType=VARCHAR},
-              0
+              0, #{metadata, jdbcType=VARCHAR}
                 )
     </insert>        
     

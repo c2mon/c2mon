@@ -25,6 +25,7 @@ public class ConfigurationEquipmentUtil {
         .description("foo")
         .statusTag(StatusTag.builder().id(0l).name("").description("").build())
         .commFaultTag(CommFaultTag.builder().id(2l).name("").description("").build())
+        .handlerClass("cern.c2mon.driver.")
         .build();
 
     Properties props = new Properties();
@@ -34,6 +35,7 @@ public class ConfigurationEquipmentUtil {
     props.setProperty("commFaultTagId", String.valueOf(2l));
     props.setProperty("aliveInterval", String.valueOf(60000));
     props.setProperty("processId", String.valueOf(1l));
+    props.setProperty("handlerClass", "cern.c2mon.driver.");
 
     return new Pair<>(pro, props);
   }
@@ -71,6 +73,7 @@ public class ConfigurationEquipmentUtil {
         .description("foo")
         .statusTag(StatusTag.builder().id(0l).name("").description("").build())
         .commFaultTag(CommFaultTag.builder().id(2l).name("").description("").build())
+        .handlerClass("cern.c2mon.driver.")
         .build();
 
     Properties props = new Properties();
@@ -80,6 +83,7 @@ public class ConfigurationEquipmentUtil {
     props.setProperty("commFaultTagId", String.valueOf(2l));
     props.setProperty("aliveInterval", String.valueOf(60000));
     props.setProperty("processId", String.valueOf(1l));
+    props.setProperty("handlerClass", "cern.c2mon.driver.");
 
     return new Pair<>(pro, props);
   }
@@ -117,12 +121,14 @@ public class ConfigurationEquipmentUtil {
         .name("Equipment_Update")
         .description("foo_Update")
         .address("testAddress_Update")
+        .handlerClass("handlerClassName")
         .build();
 
     Properties props = new Properties();
     props.setProperty("name", "Equipment_Update");
     props.setProperty("description", "foo_Update");
     props.setProperty("address", "testAddress_Update");
+    props.setProperty("handlerClass", "handlerClassName");
 
     return new Pair<>(pro, props);
   }
@@ -142,6 +148,7 @@ public class ConfigurationEquipmentUtil {
     Equipment.EquipmentBuilder pro = Equipment.builder()
         .id(id)
         .name("Equipment")
+        .handlerClass("cern.c2mon.driver.")
         .description("foo");
 
     Properties props = new Properties();
@@ -151,6 +158,7 @@ public class ConfigurationEquipmentUtil {
     props.setProperty("processId", String.valueOf(parentId));
     props.setProperty("stateTagId", String.valueOf(statusTagId));
     props.setProperty("commFaultTagId", String.valueOf(commFaultId));
+    props.setProperty("handlerClass", "cern.c2mon.driver.");
     if (aliveTagId != null) {
       props.setProperty("aliveTagId", String.valueOf(aliveTagId));
     }

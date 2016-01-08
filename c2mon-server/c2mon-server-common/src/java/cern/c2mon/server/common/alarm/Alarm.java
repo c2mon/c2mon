@@ -19,10 +19,12 @@
 package cern.c2mon.server.common.alarm;
 
 import java.sql.Timestamp;
+import java.util.Map;
 
 import cern.c2mon.server.common.alarm.AlarmCacheObject.AlarmChangeState;
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.server.common.alarm.AlarmCondition;
+import cern.c2mon.shared.common.metadata.Metadata;
 
 /**
  * Interface giving access to the most important attributes of an Alarm
@@ -103,6 +105,8 @@ public interface Alarm extends Cacheable {
    * @return the JMS topic on which the alarm is to be distributed
    */
   String getTopic();
+
+  Metadata getMetadata();
 
   /**
    * Has the current value of the Alarm been published to LASER?

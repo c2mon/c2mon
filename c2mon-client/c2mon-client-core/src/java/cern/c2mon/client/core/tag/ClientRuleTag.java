@@ -18,11 +18,7 @@
 package cern.c2mon.client.core.tag;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -412,6 +408,11 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
       return "Client rule tag result";
     }
     return this.valueDescription;
+  }
+
+  @Override
+  public Map<String, Object> getMetadata(){
+    return Collections.emptyMap();
   }
 
   @Override

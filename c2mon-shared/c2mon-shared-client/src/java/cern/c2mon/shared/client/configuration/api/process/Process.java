@@ -14,18 +14,21 @@ import lombok.Data;
 import lombok.Singular;
 
 /**
- * POJO class of a Process.
- * <p>
- * The class is a lombok class which uses the Builder annotation.
+ * Configuration object for a Process.
+ * Holds the information to create a {@link cern.c2mon.shared.client.configuration.ConfigurationElement}
+ * related to a Process.
+ * <p/>
+ * For further information how to use instances of this for server configurations read <a
+ * href="http://c2mon.web.cern.ch/c2mon/docs/#_offline_configuration_via_c2mon_database_test_purpose_only">this</a> documentation.
+ * <p/>
  *
- * @author Justin Lewis Salmon
  * @author Franz Ritter
  */
 @Data
 public class Process implements ConfigurationObject {
 
   /**
-   * determine if the instance of this class defines a DELETE command
+   * Determine if the instance of this class defines a DELETE command
    */
   @IgnoreProperty
   private boolean deleted;
@@ -38,7 +41,7 @@ public class Process implements ConfigurationObject {
 
   /**
    * Unique name of the equipment.
-   *
+   * <p/>
    * Note: Consider that an update of the name is not provided on the server side.
    */
   private String name;
@@ -77,30 +80,26 @@ public class Process implements ConfigurationObject {
   @Singular
   private List<Equipment> equipments = new ArrayList<>();
 
-  public void addEquipment(Equipment equipment) {
-    this.equipments.add(equipment);
-  }
-
-  @Override
-  public boolean requiredFieldsGiven() {
-    return (id != null) && (name != null) && (description != null) && (statusTag != null) && (aliveTag != null);
-  }
-
   /**
-   * For adding ControlTags use the addControlTag Method
+   * Constructor for building a Process with all fields.
+   * To build a Process with arbitrary fields use the builder pattern.
    *
-   * @param deleted
-   * @param id
-   * @param name
-   * @param aliveInterval
-   * @param description
-   * @param maxMessageSize
-   * @param maxMessageDelay
-   * @param equipments
+   * @param id              Unique id of the Process.
+   * @param name            Unique name the Process.
+   * @param description     Describes the propose of the Process.
+   * @param deleted         Determine if this object apply as deletion.
+   * @param aliveInterval   Defines the configuration of the alive interval of the AliveTag which is attached to this Process.
+   * @param maxMessageSize  Defines the configuration of the maximum message size of this process.
+   * @param maxMessageDelay Defines the configuration of the maximum message delay of this process.
+   * @param equipments      List of Equipment configuration objects for this tag. If the argument is null the field will be an empty List as default.
+   * @param statusTag       Mandatory configuration object for an StatusTag which is attached to this process. If the configuration is not a delete this
+   *                        field have to be null.
+   * @param aliveTag        Mandatory configuration object for an AliveTag which is attached to this process. If the configuration is not a delete this field
+   *                        have to be null.
    */
   @Builder
   public Process(boolean deleted, Long id, String name, Integer aliveInterval, String description, Integer maxMessageSize,
-                 Integer maxMessageDelay, @Singular List<Equipment> equipments, StatusTag statusTag, AliveTag aliveTag) {
+                    Integer maxMessageDelay, @Singular List<Equipment> equipments, StatusTag statusTag, AliveTag aliveTag) {
     super();
     this.deleted = deleted;
     this.id = id;
@@ -114,7 +113,20 @@ public class Process implements ConfigurationObject {
     this.equipments = equipments == null ? new ArrayList<Equipment>() : equipments;
   }
 
-  public Process(){
+  public Process() {
+  }
 
+  /**
+   * Adds an Equipment to the Process if the Process is already created.
+   *
+   * @param equipment The configuration object for an Equipment.
+   */
+  public void addEquipment(Equipment equipment) {
+    this.equipments.add(equipment);
+  }
+
+  @Override
+  public boolean requiredFieldsGiven() {
+    return (id != null) && (name != null) && (description != null) && (statusTag != null) && (aliveTag != null);
   }
 }

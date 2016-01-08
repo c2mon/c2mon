@@ -18,9 +18,11 @@
 package cern.c2mon.server.common.alarm;
 
 import java.sql.Timestamp;
+import java.util.Map;
 
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.server.common.alarm.AlarmCondition;
+import cern.c2mon.shared.common.metadata.Metadata;
 
 /**
  * Alarm object held in the cache.
@@ -82,6 +84,12 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
    * AlarmCondition used to determine the alarm's current state
    **/
   private AlarmCondition condition;
+
+  /**
+   * The meta data of the Alatm. The meta data can be arbitrary and of of the type String, Numeric and Boolean.
+   * Not every Alarm needs to have a meta data. Also the meta data don't have to be every time the same.
+   */
+  private Metadata metadata;
 
   /** 
    * The alarm's current state 
@@ -245,6 +253,13 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
     return this.condition;
   }
 
+  public final Metadata getMetadata(){
+    return this.metadata;
+  }
+
+  public void setMetadata(Metadata data){
+    this.metadata = data;
+  }
   /**
    * Getter method.
    * @return the TIM topic to publish to to clients on

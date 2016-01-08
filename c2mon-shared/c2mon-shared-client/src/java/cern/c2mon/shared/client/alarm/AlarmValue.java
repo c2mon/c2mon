@@ -1,6 +1,7 @@
 package cern.c2mon.shared.client.alarm;
 
 import java.sql.Timestamp;
+import java.util.Map;
 
 import cern.c2mon.shared.client.request.ClientRequestResult;
 
@@ -53,6 +54,9 @@ public interface AlarmValue extends ClientRequestResult {
    * @return the unique identifier of the Tag
    */
   Long getTagId();
+
+  /
+  Map<String, Object> getMetadata();
   
   /** 
    * @return The description of the Tag 

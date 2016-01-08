@@ -1,14 +1,15 @@
 package cern.c2mon.shared.client.alarm;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 
+import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
@@ -17,7 +18,6 @@ import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
 
 import cern.c2mon.shared.client.request.ClientRequestReport;
-
 
 /**
  * This bean class implements the <code>AlarmValue</code> interface
@@ -31,6 +31,7 @@ import cern.c2mon.shared.client.request.ClientRequestReport;
  * @see cern.c2mon.shared.client.tag.TagValueUpdate
  */
 @Root(name = "AlarmValue")
+@Slf4j
 public final class AlarmValueImpl extends ClientRequestReport implements AlarmValue, Cloneable {
 
   /** Alarm id */
@@ -74,7 +75,13 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   /** <code>true</code>, if the alarm is active */
   @Element
   private boolean active;
-  
+
+  /**
+   * Metadata according to the tag in this class.
+   */
+  @NotNull
+  private Map<String, Object> metadata = new HashMap<>();
+
   /**
    * Hidden Constructor needed for JSON
    */
@@ -219,10 +226,31 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   public AlarmValue clone() throws CloneNotSupportedException {
     AlarmValueImpl clone = (AlarmValueImpl) super.clone();
     clone.timestamp = (Timestamp) timestamp.clone();
-    
+    clone.metadata = new HashMap<>();
+    for(Map.Entry<String, Object> entry : metadata.entrySet()) {
+      clone.metadata.put(deepClone(entry.getKey()), deepClone(entry.getValue()));
+    }
+
     return clone;
   }
-  
+
+  private <T> T deepClone(T o) {
+    try {
+      ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+      ObjectOutputStream out = null;
+      out = new ObjectOutputStream(byteOut);
+      out.writeObject(o);
+      out.flush();
+      ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(byteOut.toByteArray()));
+      return (T) o.getClass().cast(in.readObject());
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+    log.error("Cloning of in metadata failed. the Object ist not serializable");
+    throw  new RuntimeException("Cloning of in metadata failed. the Object ist not serializable");
+  }
   
   public String getXml() {
       Serializer serializer = new Persister(new AnnotationStrategy());
@@ -288,5 +316,21 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   @Override
   public String getTagDescription() {
     return tagDescription;
+  }
+
+  /**
+   * Set the field metadata.
+   * @param metadata the data to set.
+   */
+  public void setMetadata(Map<String, Object> metadata){
+    this.metadata = metadata;
+  }
+
+  /**
+   * Returns the metadata to the corresponding tag.
+   * @return the metadata of the object.
+   */
+  public Map<String, Object> getMetadata(){
+    return this.metadata;
   }
 }

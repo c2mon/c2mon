@@ -1,19 +1,20 @@
 package cern.c2mon.shared.client.configuration.api.alarm;
 
-import cern.c2mon.shared.client.configuration.api.metaData.MetaData;
+import cern.c2mon.shared.common.metadata.Metadata;
 import cern.c2mon.shared.client.configuration.api.util.DataType;
 import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationObject;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Setter;
 
 /**
- * Alarm which holds the information to create a {@link cern.c2mon.shared.client.configuration.ConfigurationElement}
- * related to Alarms.
+ * Configuration object for a Alarm.
+ * Holds the information to create a {@link cern.c2mon.shared.client.configuration.ConfigurationElement}
+ * related to an Alarm.
  * <p/>
- * The class is a lombok class which uses the Builder annotation.
+ * For further information how to use instances of this for server configurations read <a
+ * href="http://c2mon.web.cern.ch/c2mon/docs/#_offline_configuration_via_c2mon_database_test_purpose_only">this</a> documentation.
+ * <p/>
  *
  * @author Franz Ritter
  */
@@ -57,22 +58,28 @@ public class Alarm implements ConfigurationObject {
   /**
    * Meta data of the alarm object. Holds arbitrary data which are related to the given Alarm.
    */
-  private MetaData metaData;
+  private Metadata metadata;
 
   // TODO check if alarm condition is mandatory
   private AlarmCondition alarmCondition;
 
-  @Override
-  public boolean requiredFieldsGiven() {
-    boolean result = (getId() != null) && (getFaultMember() != null)
-        && (getFaultFamily() != null) && (getFaultCode() != null) && (getValueType() != null);
-
-    return result;
-  }
-
+  /**
+   * Constructor for building a Alarm with all fields.
+   * To build a Alarm with arbitrary fields use the builder pattern.
+   *
+   * @param deleted        Determine if this object apply as deletion.
+   * @param id             Unique id of the alarm.
+   * @param valueType      Determine the data type of the alarm which belongs to this configuration.
+   * @param dataTagId      Determine the id of the tag which this alarm is attached to.
+   * @param faultFamily    LASER fault family of the alarm.
+   * @param faultMember    LASER fault member of the alarm.
+   * @param faultCode      LASER fault code of the alarm.
+   * @param alarmCondition Determine the alarm condition of this alarm.
+   * @param metadata       Arbitrary metadata attached to this alarm configuration.
+   */
   @Builder
   public Alarm(boolean deleted, Long id, DataType valueType, Long dataTagId, String faultFamily, String faultMember, Integer faultCode,
-               AlarmCondition alarmCondition, MetaData metaData) {
+               AlarmCondition alarmCondition, Metadata metadata) {
     super();
     this.deleted = deleted;
     this.id = id;
@@ -82,9 +89,17 @@ public class Alarm implements ConfigurationObject {
     this.faultMember = faultMember;
     this.faultCode = faultCode;
     this.alarmCondition = alarmCondition;
-    this.metaData = metaData;
+    this.metadata = metadata;
   }
 
   public Alarm() {
+  }
+
+  @Override
+  public boolean requiredFieldsGiven() {
+    boolean result = (getId() != null) && (getFaultMember() != null)
+        && (getFaultFamily() != null) && (getFaultCode() != null) && (getValueType() != null);
+
+    return result;
   }
 }

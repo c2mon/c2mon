@@ -11,11 +11,13 @@ import lombok.Singular;
 import lombok.ToString;
 
 /**
- * POJO class for the ConfigurationObject.
+ * Configuration object for a SubEquipment.
  * Holds the information to create a {@link cern.c2mon.shared.client.configuration.ConfigurationElement}
- * related to SubEquipment.
- * <p>
- * The class is a lombok class which uses the Builder annotation.
+ * related to a SubEquipment.
+ * <p/>
+ * For further information how to use instances of this for server configurations read <a
+ * href="http://c2mon.web.cern.ch/c2mon/docs/#_offline_configuration_via_c2mon_database_test_purpose_only">this</a> documentation.
+ * <p/>
  *
  * @author Franz Ritter
  */
@@ -24,16 +26,36 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public class SubEquipment extends Equipment {
 
-  //Set automatic by the superclass
-//  private Long equipmentId;
 
+  /**
+   * Constructor for building a SubEquipment with all fields.
+   * To build a SubEquipment with arbitrary fields use the builder pattern.
+   *
+   * @param id            Unique id of the SubEquipment.
+   * @param name          Unique name the SubEquipment.
+   * @param description   Describes the propose of the SubEquipment.
+   * @param deleted       Determine if this object apply as deletion.
+   * @param aliveInterval Defines the configuration of the alive interval of the AliveTag which is attached to this Process.
+   * @param equipments    List of SubEquipment configuration objects for this tag. If the argument is null the field will be an empty List as default.
+   * @param statusTag     Mandatory configuration object for an StatusTag which is attached to this process. If the configuration is not a delete this
+   *                      field have to be null.
+   * @param aliveTag      Mandatory configuration object for an AliveTag which is attached to this process. If the configuration is not a delete this field
+   *                      have to be null.
+   * @param handlerClass  Full path-class name of the handler class of the this SubEquipment.
+   * @param address       Address parameter used by the handler class to connect to the SubEquipment.
+   * @param commFaultTag  Mandatory configuration object for an CommFaultTag which is attached to this process. If the configuration is not a delete this
+   *                      field have to be null.
+   * @param dataTags      Optional list of DataTag configurations which are attached to this SubEquipment. If the argument is null the field will be an empty
+   *                      List as default.
+   * @param commandTags   Optional list of CommandTag configurations which are attached to this SubEquipment. If the argument is null the field will be an empty
+   *                      List as default.
+   */
   @Builder(builderMethodName = "builderSubEquipment")
   public SubEquipment(boolean deleted, Long id, String name, Integer aliveInterval, String description,
                       String handlerClass, StatusTag statusTag, AliveTag aliveTag, CommFaultTag commFaultTag, @Singular List<DataTag<Number>> dataTags) {
     super(deleted, id, name, aliveInterval, description, handlerClass, null, new ArrayList<SubEquipment>(), statusTag, commFaultTag, aliveTag, dataTags, null);
   }
 
-  public SubEquipment(){
-
+  public SubEquipment() {
   }
 }

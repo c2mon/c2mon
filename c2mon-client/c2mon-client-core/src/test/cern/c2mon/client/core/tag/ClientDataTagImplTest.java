@@ -8,7 +8,15 @@ import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
+import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.alarm.AlarmValueImpl;
+import cern.c2mon.shared.client.tag.TransferTagValueImpl;
+import cern.c2mon.shared.common.metadata.Metadata;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
@@ -33,25 +41,48 @@ public class ClientDataTagImplTest {
   private TagUpdate createValidTransferTag(final Long tagId, Object value) {
     DataTagQuality tagQuality = new DataTagQualityImpl(
         TagQualityStatus.EQUIPMENT_DOWN, "its down!");
+    Metadata metadata = Metadata.builder().addMetadata("testString", "hello").addMetadata("tesInt", 1).addMetadata("booleanFoo", true).addMetadata("tesLong", 1L).addMetadata("tesFloat", 1.0f).addMetadata("tesDouble", 1.0).build();
 
     tagQuality.addInvalidStatus(TagQualityStatus.EQUIPMENT_DOWN, "its down!");
     tagQuality.validate();
 
-    TagUpdate tagUpdate =
-      new TransferTagImpl(
-          tagId,
-          value,
-          "test value desc",
-          (DataTagQualityImpl) tagQuality,
-          TagMode.TEST,
-          new Timestamp(System.currentTimeMillis() - 10000L),
-          new Timestamp(System.currentTimeMillis() - 5000L),
-          new Timestamp(System.currentTimeMillis()),
-          "Test description",
-          "My.data.tag.name",
-          "My.jms.topic");
-
+    TransferTagImpl tagUpdate =
+        new TransferTagImpl(
+            tagId,
+            value,
+            "test value desc",
+            (DataTagQualityImpl) tagQuality,
+            TagMode.TEST,
+            new Timestamp(System.currentTimeMillis() - 10000L),
+            new Timestamp(System.currentTimeMillis() - 5000L),
+            new Timestamp(System.currentTimeMillis()),
+            "Test description",
+            "My.data.tag.name",
+            "My.jms.topic");
+    tagUpdate.setMetadata(metadata.getMetadata());
+    tagUpdate.addAlarmValue(createAlarmValue(tagId));
     return tagUpdate;
+  }
+
+  /**
+   * Private helper method for creating an <code>AlarmValueImpl</code>.
+   *
+   */
+  private static AlarmValueImpl createAlarmValue(Long tagId) {
+    Metadata metadata = Metadata.builder().addMetadata("testString", "hello").addMetadata("tesInt", 1).addMetadata("booleanFoo", true).addMetadata("tesLong", 1L).addMetadata("tesFloat", 1.0f).addMetadata("tesDouble", 1.0).build();
+
+    AlarmValueImpl alarmValue =
+        new AlarmValueImpl(
+            4321L,
+            1007,
+            "getFaultMember",
+            "getFaultFamily",
+            "getInfo",
+            tagId,
+            new Timestamp(System.currentTimeMillis()),
+            true);
+      alarmValue.setMetadata(metadata.getMetadata());
+    return alarmValue;
   }
 
 
@@ -70,14 +101,39 @@ public class ClientDataTagImplTest {
     assertEquals(original.getUnit(), copy.getUnit());
     assertEquals(original.getValue(), copy.getValue());
     assertEquals(original.getValueDescription(), copy.getValueDescription());
+    checkMetadataCopy(original.getMetadata(), copy.getMetadata());
+    checkAlarmValueCopy(new ArrayList<>(original.getAlarms()),new ArrayList<>(copy.getAlarms()));
+  }
+
+  private void checkAlarmValueCopy(final List<AlarmValue> original, final List<AlarmValue> copy) {
+    assertEquals(original.size(),copy.size());
+    for(int i =0; i <copy.size(); i++){
+      assertNotSame("The two objects should not point to the same reference in memory!", original.get(i), copy.get(i));
+      assertTrue(original.get(i).equals(copy.get(i)));
+      assertEquals(original.get(i).getFaultMember(), copy.get(i).getFaultMember());
+      assertEquals(original.get(i).getFaultFamily(), copy.get(i).getFaultFamily());
+      assertEquals(original.get(i).getFaultCode(), copy.get(i).getFaultCode());
+      assertEquals(original.get(i).getInfo(), copy.get(i).getInfo());
+      assertEquals(original.get(i).getTagId(), copy.get(i).getTagId());
+      assertEquals(original.get(i).getTimestamp(), copy.get(i).getTimestamp());
+      checkMetadataCopy(original.get(i).getMetadata(), copy.get(i).getMetadata());
+    }
+  }
+
+  private void checkMetadataCopy(Map<String,Object> original, Map<String,Object> copy) {
+    assertEquals(original.size(),copy.size());
+    for(String key : original.keySet()){
+      assertTrue(copy.containsKey(key));
+      assertNotSame("The two objects should not point to the same reference in memory!", original.get(key), copy.get(key));
+      assertEquals(original.get(key), copy.get(key));
+    }
   }
 
   private void checkTagCopy(final ClientDataTagImpl original, final ClientDataTagImpl copy) {
     checkTagValueCopy(original, copy);
     if (original.getUpdateListeners().isEmpty()) {
       assertEquals(original.getUpdateListeners().size(), copy.getUpdateListeners().size());
-    }
-    else {
+    } else {
       assertNotSame(original.getUpdateListeners().size(), copy.getUpdateListeners().size());
     }
     assertEquals(0, copy.getUpdateListeners().size());
@@ -86,7 +142,7 @@ public class ClientDataTagImplTest {
   @Test
   public void testClean() throws CloneNotSupportedException {
     final ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
-    ((ClientDataTagImpl) cdt).onUpdate(createValidTransferTag(1234L));
+    cdt.onUpdate(createValidTransferTag(1234L));
 
     Tag copy = cdt.clone();
     ((ClientDataTagImpl) copy).clean();
@@ -182,6 +238,7 @@ public class ClientDataTagImplTest {
         assertNotNull(tagUpdate);
         assertEquals(cdt, tagUpdate);
         checkTagValueCopy(cdt, tagUpdate);
+        assertFalse(cdt == tagUpdate);
       }
     });
 
@@ -233,24 +290,24 @@ public class ClientDataTagImplTest {
   @Test
   public void testXMLSerialization() throws Exception {
 
-      ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
-      ((ClientDataTagImpl) cdt).onUpdate(createValidTransferTag(1234L));
+    ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
+    ((ClientDataTagImpl) cdt).onUpdate(createValidTransferTag(1234L));
 
-      assertTrue(cdt.getXml().contains("<isValid>true</isValid>"));
-      TagQualityStatus statusToAdd1 = TagQualityStatus.VALUE_OUT_OF_BOUNDS;
-      TagQualityStatus statusToAdd2 = TagQualityStatus.INACCESSIBLE;
-      cdt.getDataTagQuality().addInvalidStatus(statusToAdd1, "Value is over 9000!");
-      cdt.getDataTagQuality().addInvalidStatus(statusToAdd2, "It's down!");
-      assertTrue(cdt.getXml().contains("<isValid>false</isValid>"));
-      cdt.getDataTagQuality().removeInvalidStatus(statusToAdd1);
-      cdt.getDataTagQuality().removeInvalidStatus(statusToAdd2);
-      assertTrue(cdt.getXml().contains("<isValid>true</isValid>"));
-      cdt.getDataTagQuality().addInvalidStatus(statusToAdd1, "Value is over 9000!");
-      cdt.getDataTagQuality().addInvalidStatus(statusToAdd2, "It's down!");
-      assertTrue(cdt.getXml().contains("<isValid>false</isValid>"));
+    assertTrue(cdt.getXml().contains("<isValid>true</isValid>"));
+    TagQualityStatus statusToAdd1 = TagQualityStatus.VALUE_OUT_OF_BOUNDS;
+    TagQualityStatus statusToAdd2 = TagQualityStatus.INACCESSIBLE;
+    cdt.getDataTagQuality().addInvalidStatus(statusToAdd1, "Value is over 9000!");
+    cdt.getDataTagQuality().addInvalidStatus(statusToAdd2, "It's down!");
+    assertTrue(cdt.getXml().contains("<isValid>false</isValid>"));
+    cdt.getDataTagQuality().removeInvalidStatus(statusToAdd1);
+    cdt.getDataTagQuality().removeInvalidStatus(statusToAdd2);
+    assertTrue(cdt.getXml().contains("<isValid>true</isValid>"));
+    cdt.getDataTagQuality().addInvalidStatus(statusToAdd1, "Value is over 9000!");
+    cdt.getDataTagQuality().addInvalidStatus(statusToAdd2, "It's down!");
+    assertTrue(cdt.getXml().contains("<isValid>false</isValid>"));
 
-      ClientDataTagImpl cdt2 = ClientDataTagImpl.fromXml(cdt.toString());
-      assertEquals(cdt.getId(), cdt2.getId());
+    ClientDataTagImpl cdt2 = ClientDataTagImpl.fromXml(cdt.toString());
+    assertEquals(cdt.getId(), cdt2.getId());
   }
 
 }

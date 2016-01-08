@@ -20,14 +20,9 @@ package cern.c2mon.server.cache.common;
 
 import java.lang.reflect.Field;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.StringTokenizer;
+import java.util.*;
 
+import cern.c2mon.shared.common.metadata.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -228,6 +223,14 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
       // JAPC address
       if (properties.getProperty("japcAddress") != null) {
         tag.setJapcAddress(checkAndSetNull(properties.getProperty("japcAddress")));
+      }
+
+      // TAG metadata
+      tmpStr = properties.getProperty("metadata");
+      if (tmpStr != null) {
+        Metadata metadata = new Metadata().builder().metadata(Metadata.fromJSON(tmpStr)).build();
+
+        tag.setMetadata(metadata);
       }
     } finally {
       tagCache.releaseWriteLockOnKey(tag.getId());

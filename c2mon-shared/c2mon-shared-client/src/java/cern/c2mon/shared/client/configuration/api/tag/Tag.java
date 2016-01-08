@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
-import cern.c2mon.shared.client.configuration.api.metaData.MetaData;
-import cern.c2mon.shared.client.configuration.api.util.DataType;
+import cern.c2mon.shared.common.metadata.Metadata;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationObject;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
@@ -16,8 +15,6 @@ import lombok.Singular;
 /**
  * Tag class which holds the information to create a {@link cern.c2mon.shared.client.configuration.ConfigurationElement}
  * related to all Tags.
- * <p>
- * The class is a lombok class which uses the Builder annotation.
  *
  * @author Franz Ritter
  */
@@ -56,7 +53,7 @@ public abstract class Tag implements ConfigurationObject {
   /**
    * Meta data of the tag object. Holds arbitrary data which are related to the given Tag.
    */
-  private MetaData metaData;
+  private Metadata metadata;
 
   @IgnoreProperty
   private List<Alarm> alarms = new ArrayList<>();
@@ -65,29 +62,28 @@ public abstract class Tag implements ConfigurationObject {
     this.alarms.add(alarm);
   }
 
-  /**
-   * Checks if all mandatory fields are set.
-   * <p>
-   * mode is also a Primary filed. But Because that mode is also a default Value it is not necessary to set it in the POJO
-   */
-  @Override
-  public boolean requiredFieldsGiven() {
-    return (getId() != null) && (getName() != null) && (description != null) ;
-  }
-
-  public Tag(boolean deleted, Long id, String name, String description, TagMode mode, @Singular List<Alarm> alarms, MetaData metaData) {
+  public Tag(boolean deleted, Long id, String name, String description, TagMode mode, @Singular List<Alarm> alarms, Metadata metadata) {
     super();
     this.deleted = deleted;
     this.id = id;
     this.name = name;
     this.description = description;
     this.mode = mode;
-    this.alarms = alarms == null ?  new ArrayList<Alarm>() : alarms;
-    this.metaData = metaData;
+    this.alarms = alarms == null ? new ArrayList<Alarm>() : alarms;
+    this.metadata = metadata;
   }
 
-  public Tag(){
+  public Tag() {
+  }
 
+  /**
+   * Checks if all mandatory fields are set.
+   * <p/>
+   * mode is also a Primary filed. But Because that mode is also a default Value it is not necessary to set it in the POJO
+   */
+  @Override
+  public boolean requiredFieldsGiven() {
+    return (getId() != null) && (getName() != null) && (description != null);
   }
 
 }

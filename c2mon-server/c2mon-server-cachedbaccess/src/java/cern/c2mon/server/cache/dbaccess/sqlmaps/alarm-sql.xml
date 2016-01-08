@@ -16,11 +16,12 @@
       <result property="info" column="ALARMINFO" jdbcType="VARCHAR"/>      
       <result property="condition" column="ALARMCONDITION" javaType="AlarmCondition" jdbcType="VARCHAR"/>
       <result property="dataTagId" column="ALARM_TAGID" jdbcType="NUMERIC"/>
-      <association property="lastPublication" javaType="LaserPublication">        
+      <result property="metadata" column="ALARMMETADATA" javaType="Metadata" jdbcType="VARCHAR"/>
+      <association property="lastPublication" javaType="LaserPublication">
         <result property="state" column="ALA_PUB_STATE" jdbcType="VARCHAR"/>
         <result property="publicationTime" column="ALA_PUB_TIME" jdbcType="TIMESTAMP"/>
         <result property="info" column="ALA_PUB_INFO" jdbcType="VARCHAR"/>              
-      </association>      
+      </association>
     </resultMap>
   
     <!-- getAll needed for persistent caches -->
@@ -28,7 +29,7 @@
      SELECT alarmid, alarm_tagid, alarmffamily, 
             alarmfmember, alarmfcode, alarmcondition, 
             alarmstate, alarmtime, ala_published, alarminfo,
-            ala_pub_state, ala_pub_time, ala_pub_info
+            ala_pub_state, ala_pub_time, ala_pub_info, alarmmetadata
        FROM alarm
     </select>
     
@@ -36,7 +37,7 @@
      SELECT alarmid, alarm_tagid, alarmffamily, 
             alarmfmember, alarmfcode, alarmcondition, 
             alarmstate, alarmtime, ala_published, alarminfo,
-            ala_pub_state, ala_pub_time, ala_pub_info
+            ala_pub_state, ala_pub_time, ala_pub_info, alarmmetadata
        FROM alarm
     WHERE alarmid <![CDATA[ >= ]]> #{firstId}
       AND alarmid <![CDATA[ <= ]]> #{lastId}
@@ -47,7 +48,7 @@
        SELECT alarmid, alarm_tagid, alarmffamily,
               alarmfmember, alarmfcode, alarmcondition, 
               alarmstate, alarmtime, ala_published, alarminfo,
-              ala_pub_state, ala_pub_time, ala_pub_info
+              ala_pub_state, ala_pub_time, ala_pub_info, alarmmetadata
          FROM alarm 
         WHERE alarmid = #{id}                
     </select>
@@ -75,7 +76,8 @@
          SET ALARMFFAMILY = #{faultFamily},
              ALARMFMEMBER = #{faultMember},
              ALARMFCODE = #{faultCode},
-             ALARMCONDITION = #{condition,javaType=AlarmCondition,jdbcType=VARCHAR}                           
+             ALARMCONDITION = #{condition,javaType=AlarmCondition,jdbcType=VARCHAR},
+             ALARMMETADATA = #{metadata,jdbcType=VARCHAR}
        WHERE ALARMID = #{id}
     </update>
     
@@ -84,13 +86,14 @@
       INSERT INTO ALARM (ALARMID, ALARMFFAMILY, ALARMFMEMBER, ALARMFCODE,
                          ALARMSTATE, ALARMTIME, ALA_PUBLISHED, ALARMINFO,
                          ALARMCONDITION, ALARM_TAGID, 
-                         ALA_PUB_STATE, ALA_PUB_TIME, ALA_PUB_INFO                         
+                         ALA_PUB_STATE, ALA_PUB_TIME, ALA_PUB_INFO, ALARMMETADATA
                 )
       VALUES (#{id},#{faultFamily},#{faultMember},#{faultCode},
               #{state,jdbcType=VARCHAR}, #{timestamp,jdbcType=TIMESTAMP}, #{published,jdbcType=NUMERIC}, #{info,jdbcType=VARCHAR},
               #{condition,javaType=AlarmCondition,jdbcType=VARCHAR},              
               #{dataTagId,jdbcType=NUMERIC},
-              #{lastPublication.state,jdbcType=VARCHAR}, #{lastPublication.publicationTime,jdbcType=TIMESTAMP}, #{lastPublication.info,jdbcType=VARCHAR}
+              #{lastPublication.state,jdbcType=VARCHAR}, #{lastPublication.publicationTime,jdbcType=TIMESTAMP}, #{lastPublication.info,jdbcType=VARCHAR},
+              #{metadata, jdbcType=VARCHAR}
              )
     </insert>        
     

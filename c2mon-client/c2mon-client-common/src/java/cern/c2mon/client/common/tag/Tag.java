@@ -1,7 +1,7 @@
 /*******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- *
+ * <p/>
  * Copyright (C) 2004 - 2011 CERN. This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
@@ -12,17 +12,20 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- *
+ * <p/>
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
 package cern.c2mon.client.common.tag;
+
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Map;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.metadata.Metadata;
 import cern.c2mon.shared.common.rule.RuleInputValue;
 import cern.c2mon.shared.rule.RuleExpression;
 
@@ -34,7 +37,7 @@ import cern.c2mon.shared.rule.RuleExpression;
  * @see Tag
  * @see DataTagUpdateListener
  * @author Matthias Braeger
- * 
+ *
  * @TODO: Remove ClientDataTagValue inheritence
  */
 public interface Tag extends RuleInputValue {
@@ -181,7 +184,7 @@ public interface Tag extends RuleInputValue {
    * @return the tag type in the form of a java Class, or <code>null</code>
    *         if no initial value has yet been received from the server
    */
-  Class< ? > getType();
+  Class<?> getType();
 
   /**
    * Returns the hash code of the class type that is used by this
@@ -193,6 +196,12 @@ public interface Tag extends RuleInputValue {
    * @see TypeNumeric
    */
   TypeNumeric getTypeNumeric();
+
+  /**
+   * Returns the Meta Data from the Tag
+   * @return all meta data as a Map
+   */
+  Map<String, Object> getMetadata();
 
   /**
    * @return  <code>true</code>, if tag represents an Alive Control tag

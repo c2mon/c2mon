@@ -13,20 +13,21 @@ import lombok.Singular;
 
 
 /**
- * POJO class for the ConfigurationObject.
+ * Configuration object for a Equipment.
  * Holds the information to create a {@link cern.c2mon.shared.client.configuration.ConfigurationElement}
- * related to Equipment.
+ * related to an Equipment.
  * <p/>
- * The class is a lombok class which uses the Builder annotation.
+ * For further information how to use instances of this for server configurations read <a
+ * href="http://c2mon.web.cern.ch/c2mon/docs/#_offline_configuration_via_c2mon_database_test_purpose_only">this</a> documentation.
+ * <p/>
  *
- * @author Justin Lewis Salmon
  * @author Franz Ritter
  */
 @Data
 public class Equipment implements ConfigurationObject {
 
   /**
-   * determine if the instance of this class defines a DELETE command
+   * Determine if the instance of this class defines a DELETE command
    */
   @IgnoreProperty
   private boolean deleted;
@@ -55,45 +56,87 @@ public class Equipment implements ConfigurationObject {
 
   /**
    * Fully qualified name of the EquipmentMessageHandler subclass to be used by the DAQ to connect to the equipment.
+   * Make Sure that the name of the class matches with the full EquipmentMessageHandler class name.
    */
-  // update not allowed
   private String handlerClass;
 
   /**
    * Address parameters used by the handler class to connect to the equipment.
    */
-  // TODO: check if update is possible
   private String address;
 
+  /**
+   * The StatusTag is one of three mandatory control tags which are needed to create an Equipment.
+   * For further information of the tag read the documentation of {@link StatusTag}.
+   */
   @IgnoreProperty
   private StatusTag statusTag;
 
+  /**
+   * The AliveTag is one of three mandatory control tags which are needed to create an Equipment.
+   * For further information of the tag read the documentation of {@link AliveTag}.
+   */
   @IgnoreProperty
   private AliveTag aliveTag;
 
+  /**
+   * The CommFaultTag is one of three mandatory control tags which are needed to create an Equipment.
+   * For further information of the tag read the documentation of {@link CommFaultTag}.
+   */
   @IgnoreProperty
   private CommFaultTag commFaultTag;
 
+  /**
+   * The list of DataTags which are attached to the Equipment.
+   * Each DataTag holds a unique configuration information.
+   */
   @IgnoreProperty
   @Singular
   private List<DataTag<Number>> dataTags = new ArrayList<>();
 
+  /**
+   * The list of SubEquipments which are attached to the Equipment.
+   * Each SubEquipment holds a unique configuration information.
+   */
   @IgnoreProperty
   @Singular
   private List<SubEquipment> subEquipments = new ArrayList<>();
 
+  /**
+   * The list of CommandTags which are attached to the Equipment.
+   * Each CommandTag holds a unique configuration information.
+   */
   @IgnoreProperty
   @Singular
   private List<CommandTag> commandTags = new ArrayList<>();
 
-  @Override
-  public boolean requiredFieldsGiven() {
-    return (id != null) && (name != null) && (description != null) && (statusTag != null) && (commFaultTag != null);
-  }
-
+  /**
+   * Constructor for building a Equipment with all fields.
+   * To build a Equipment with arbitrary fields use the builder pattern.
+   *
+   * @param id            Unique id of the Equipment.
+   * @param name          Unique name the Equipment.
+   * @param description   Describes the propose of the Equipment.
+   * @param deleted       Determine if this object apply as deletion.
+   * @param aliveInterval Defines the configuration of the alive interval of the AliveTag which is attached to this Process.
+   * @param equipments    List of SubEquipment configuration objects for this tag. If the argument is null the field will be an empty List as default.
+   * @param statusTag     Mandatory configuration object for an StatusTag which is attached to this process. If the configuration is not a delete this
+   *                      field have to be null.
+   * @param aliveTag      Mandatory configuration object for an AliveTag which is attached to this process. If the configuration is not a delete this field
+   *                      have to be null.
+   * @param handlerClass  Full path-class name of the handler class of the this equipemnt.
+   * @param address       Address parameter used by the handler class to connect to the equipment.
+   * @param commFaultTag  Mandatory configuration object for an CommFaultTag which is attached to this process. If the configuration is not a delete this
+   *                      field have to be null.
+   * @param dataTags      Optional list of DataTag configurations which are attached to this Equipment. If the argument is null the field will be an empty
+   *                      List as default.
+   * @param commandTags   Optional list of CommandTag configurations which are attached to this Equipment. If the argument is null the field will be an empty
+   *                      List as default.
+   */
   @Builder
   public Equipment(boolean deleted, Long id, String name, Integer aliveInterval, String description,
-                   String handlerClass, String address, @Singular List<SubEquipment> subEquipments, StatusTag statusTag, CommFaultTag commFaultTag, AliveTag aliveTag, @Singular List<DataTag<Number>> dataTags, @Singular List<CommandTag> commandTags) {
+                   String handlerClass, String address, @Singular List<SubEquipment> subEquipments, StatusTag statusTag, CommFaultTag commFaultTag,
+                   AliveTag aliveTag, @Singular List<DataTag<Number>> dataTags, @Singular List<CommandTag> commandTags) {
     this.deleted = deleted;
     this.id = id;
     this.name = name;
@@ -114,8 +157,10 @@ public class Equipment implements ConfigurationObject {
   }
 
   public Equipment() {
-
   }
 
-
+  @Override
+  public boolean requiredFieldsGiven() {
+    return (id != null) && (name != null) && (description != null) && (statusTag != null) && (commFaultTag != null) && (handlerClass != null);
+  }
 }

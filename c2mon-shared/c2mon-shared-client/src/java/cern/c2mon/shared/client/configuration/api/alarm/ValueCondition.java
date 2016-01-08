@@ -25,6 +25,9 @@ public class ValueCondition extends AlarmCondition {
     this.value = value;
   }
 
+  public ValueCondition() {
+  }
+
   @Override
   public String getXMLCondition() {
     String result = "";
@@ -32,9 +35,6 @@ public class ValueCondition extends AlarmCondition {
     result += "<alarm-value type=\"" + getDataType() + "\">" + value.toString() + "</alarm-value>\n";
     result += "</AlarmCondition>";
     return result;
-  }
-
-  public ValueCondition() {
   }
 
 }

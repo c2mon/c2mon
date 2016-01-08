@@ -1,0 +1,74 @@
+package cern.c2mon.server.client.request.util;
+
+import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.tag.TagUpdate;
+
+import java.math.BigDecimal;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Created by fritter on 09/12/15.
+ */
+public abstract class CompareClientRequestResult {
+
+  public static void compareTagUpdateWithDataTagCacheObject(TagUpdate valueClient, DataTagCacheObject valueServer) {
+    assertEquals(valueClient.getId(), valueServer.getId());
+    assertEquals(valueClient.getValue(), valueServer.getValue());
+    assertEquals(valueClient.getValueDescription(), valueServer.getValueDescription());
+    assertEquals(valueClient.getDataTagQuality(), valueServer.getDataTagQuality());
+    assertEquals(valueClient.getSourceTimestamp(), valueServer.getTimestamp());
+    assertEquals(valueClient.getDaqTimestamp(), valueServer.getDaqTimestamp());
+    assertEquals(valueClient.getServerTimestamp(), valueServer.getCacheTimestamp());
+    assertEquals(valueClient.getDescription(), valueServer.getDescription());
+    assertEquals(valueClient.getName(), valueServer.getName());
+    assertEquals(valueClient.getTopicName(), valueServer.getTopic());
+    assertEquals(valueClient.getMetadata(), valueServer.getMetadata().getMetadata());
+  }
+
+  public static void compareAlarmValuesWithAlarCacheObject(AlarmValue valueClient, AlarmCacheObject valueServer) {
+    assertEquals(valueClient.getId(), valueServer.getId());
+    assertEquals(valueClient.getFaultCode(), valueServer.getFaultCode());
+    assertEquals(valueClient.getFaultMember(), valueServer.getFaultMember());
+    assertEquals(valueClient.getFaultFamily(), valueServer.getFaultFamily());
+    assertEquals(valueClient.getInfo(), valueServer.getInfo());
+    assertEquals(valueClient.getTagId(), valueServer.getTagId());
+    assertEquals(valueClient.getTimestamp(), valueServer.getTimestamp());
+    assertEquals(valueClient.isActive(), valueServer.isActive());
+    if (valueServer.getMetadata() != null && valueClient.getMetadata().isEmpty()) {
+      compareMetadata(valueClient.getMetadata(), valueServer.getMetadata().getMetadata());
+    }
+  }
+
+  public static void compareTagUpdates(TagUpdate client, TagUpdate server) {
+    assertEquals(client.getId(), server.getId());
+    assertEquals(client.getValue(), server.getValue());
+    assertEquals(client.getValueDescription(), server.getValueDescription());
+    assertEquals(client.getDataTagQuality(), server.getDataTagQuality());
+    assertEquals(client.getSourceTimestamp(), server.getSourceTimestamp());
+    assertEquals(client.getDaqTimestamp(), server.getDaqTimestamp());
+    assertEquals(client.getServerTimestamp(), server.getServerTimestamp());
+    assertEquals(client.getDescription(), server.getDescription());
+    assertEquals(client.getName(), server.getName());
+    assertEquals(client.getTopicName(), server.getTopicName());
+    assertEquals(client.getMetadata().size(), server.getMetadata().size());
+
+    compareMetadata(client.getMetadata(), server.getMetadata());
+  }
+
+  public static void compareMetadata(Map<String, Object> metadataClient, Map<String, Object> metadataServer) {
+    for (String key : metadataClient.keySet()) {
+      Object valueSever = metadataServer.get(key);
+      Object valueClient = metadataClient.get(key);
+      if (valueSever instanceof Number && valueClient instanceof Number) {
+        assertTrue(new BigDecimal(valueSever.toString()).compareTo(new BigDecimal(valueClient.toString())) == 0);
+      } else {
+        assertEquals(valueClient, valueSever);
+      }
+    }
+  }
+}

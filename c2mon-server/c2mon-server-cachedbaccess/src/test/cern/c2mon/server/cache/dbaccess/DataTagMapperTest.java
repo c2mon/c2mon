@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import java.sql.Timestamp;
 import java.util.List;
 
+import cern.c2mon.shared.common.metadata.Metadata;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -126,8 +127,8 @@ public class DataTagMapperTest {
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setRuleIdsString("1234");
+    cacheObject.setMetadata(Metadata.builder().addMetadata("String",11).build());
     cacheObject.setProcessId(50L); //need test process also (P_JAPC01)
-
 
     //put in database
     dataTagMapper.insertDataTag(cacheObject);
@@ -159,6 +160,7 @@ public class DataTagMapperTest {
     assertEquals(cacheObject.getTimestamp(), retrievedObject.getTimestamp());
     assertEquals(cacheObject.getSourceTimestamp(), retrievedObject.getSourceTimestamp());
     assertEquals(cacheObject.getRuleIdsString(), retrievedObject.getRuleIdsString());
+    assertEquals(cacheObject.getMetadata(), retrievedObject.getMetadata());
 
 //    dataTagMapper.deleteDataTag(cacheObject.getId());
 //    assertFalse(dataTagMapper.isInDb(cacheObject.getId()));
@@ -249,6 +251,7 @@ public class DataTagMapperTest {
     cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
     cacheObject.setDataType("Boolean"); // non null
     cacheObject.setEquipmentId(new Long(150)); //need test equipment inserted
+    cacheObject.setMetadata(Metadata.builder().addMetadata("metadata",11).build());
 
     dataTagMapper.insertDataTag(cacheObject);
 
@@ -258,6 +261,7 @@ public class DataTagMapperTest {
     cacheObject.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.UNDEFINED_VALUE,"undefined value"));
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
+    cacheObject.setMetadata(Metadata.builder().addMetadata("metadata_boolean",true).build());
 
     dataTagMapper.updateCacheable(cacheObject);
 
@@ -270,6 +274,7 @@ public class DataTagMapperTest {
     assertEquals(cacheObject.getDataTagQuality(), retrievedObject.getDataTagQuality());
     assertEquals(cacheObject.getTimestamp(), retrievedObject.getTimestamp());
     assertEquals(cacheObject.getSourceTimestamp(), retrievedObject.getSourceTimestamp());
+    assertEquals(Metadata.builder().addMetadata("metadata",11).build(), retrievedObject.getMetadata());
 
     //other values should be the same or ...
     assertEquals(cacheObject.getId(), retrievedObject.getId());

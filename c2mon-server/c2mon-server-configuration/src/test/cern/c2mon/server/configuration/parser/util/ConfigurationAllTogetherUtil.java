@@ -4,9 +4,9 @@ import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
-import cern.c2mon.shared.client.configuration.api.metaData.MetaData;
 import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.*;
+import cern.c2mon.shared.common.metadata.Metadata;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ import static cern.c2mon.server.configuration.parser.util.ConfigurationUtil.getC
 
 public class ConfigurationAllTogetherUtil {
 
-  public static Configuration buildAllMandatoryWithMetaData() {
+  public static Configuration buildAllMandatoryWithMetadata() {
 
     //Build the basic configurationElements
     Long id = 0l;
@@ -77,29 +77,29 @@ public class ConfigurationAllTogetherUtil {
 
     CommandTag.CommandTagBuilder commandTag = builderCommandTagWithPrimFields(id++, 1L)._1; //27
 
-    // Build metaData of each kind and add them to the tags and alarms.
-    MetaData metaData = MetaData.builder().addMetaData("Building", 513).addMetaData("Responsible","Max Mustermann").addMetaData("maintained",true).build();
+    // Build metadata of each kind and add them to the tags and alarms.
+    Metadata metadata = Metadata.builder().addMetadata("Building", 513).addMetadata("Responsible","Max Mustermann").addMetadata("maintained",true).build();
 
-    commFaultTagE.metaData(metaData);
-    commFaultTagS.metaData(metaData);
-    aliveTagP.metaData(metaData);
-    aliveTagE.metaData(metaData);
-    aliveTagS.metaData(metaData);
-    dataTagE.metaData(metaData);
-    dataTagS.metaData(metaData);
-    ruleTag.metaData(metaData);
+    commFaultTagE.metadata(metadata);
+    commFaultTagS.metadata(metadata);
+    aliveTagP.metadata(metadata);
+    aliveTagE.metadata(metadata);
+    aliveTagS.metadata(metadata);
+    dataTagE.metadata(metadata);
+    dataTagS.metadata(metadata);
+    ruleTag.metadata(metadata);
 
-    alarmAP.metaData(metaData);
-    alarmCE.metaData(metaData);
-    alarmAE.metaData(metaData);
-    alarmDE.metaData(metaData);
-    alarmCS.metaData(metaData);
-    alarmAS.metaData(metaData);
-    alarmDS.metaData(metaData);
-    alarmR.metaData(metaData);
-    alarmSP.metaData(metaData);
-    alarmSE.metaData(metaData);
-    alarmSS.metaData(metaData);
+    alarmAP.metadata(metadata);
+    alarmCE.metadata(metadata);
+    alarmAE.metadata(metadata);
+    alarmDE.metadata(metadata);
+    alarmCS.metadata(metadata);
+    alarmAS.metadata(metadata);
+    alarmDS.metadata(metadata);
+    alarmR.metadata(metadata);
+    alarmSP.metadata(metadata);
+    alarmSE.metadata(metadata);
+    alarmSS.metadata(metadata);
 
     Configuration conf = getConfBuilder()
         .process(process.aliveTag(aliveTagP.alarm(alarmAP.build()).build()).statusTag(statusTagP.alarm(alarmSP.build()).build())

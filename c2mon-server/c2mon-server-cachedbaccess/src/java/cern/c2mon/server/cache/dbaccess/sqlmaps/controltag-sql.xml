@@ -16,7 +16,7 @@
             TAGQUALITYDESC, TAG_EQID AS EQUIPMENT_ID,
             TAGMINVAL, TAGMAXVAL, TAGUNIT, TAGSIMULATED, TAGLOGGED, 
             TAGVALUEDICTIONARY, TAGADDRESS, TAGDIPADDRESS,
-            TAGJAPCADDRESS, TAGRULEIDS, ALARMID     
+            TAGJAPCADDRESS, TAGRULEIDS, ALARMID, TAGMETADATA
        FROM DATATAG LEFT OUTER JOIN ALARM 
          ON ALARM_TAGID = TAGID
       WHERE TAGCONTROLTAG=1 
@@ -30,7 +30,7 @@
             TAGQUALITYDESC, TAG_EQID AS EQUIPMENT_ID,
             TAGMINVAL, TAGMAXVAL, TAGUNIT, TAGSIMULATED, TAGLOGGED, 
             TAGVALUEDICTIONARY, TAGADDRESS, TAGDIPADDRESS,
-            TAGJAPCADDRESS, TAGRULEIDS, ALARMID
+            TAGJAPCADDRESS, TAGRULEIDS, ALARMID, TAGMETADATA
             FROM DATATAG LEFT OUTER JOIN ALARM 
         ON ALARM_TAGID = TAGID
      WHERE TAGCONTROLTAG=1 
@@ -60,7 +60,7 @@
                             TAGUNIT, TAGSIMULATED, TAGLOGGED,
                             TAGVALUEDICTIONARY, TAGADDRESS,
                             TAGDIPADDRESS, TAGJAPCADDRESS,
-                            TAGRULEIDS, TAGCONTROLTAG
+                            TAGRULEIDS, TAGCONTROLTAG, TAGMETADATA
                 )
       VALUES (#{id},#{name},SUBSTR(#{description, jdbcType=VARCHAR}, 1, 100),#{mode},#{dataType},
               #{value,javaType=java.lang.Object,jdbcType=BLOB},SUBSTR(#{valueDescription,jdbcType=VARCHAR}, 1, 2000),
@@ -71,7 +71,7 @@
               #{valueDictionary,jdbcType=VARCHAR},#{address,jdbcType=VARCHAR},
               #{dipAddress,jdbcType=VARCHAR},#{japcAddress,jdbcType=VARCHAR},
               #{ruleIdsString, jdbcType=VARCHAR},
-              1
+              1, #{metadata, jdbcType=VARCHAR}
                 )
     </insert>        
     

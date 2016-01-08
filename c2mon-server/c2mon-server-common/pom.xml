@@ -81,6 +81,11 @@
 			<artifactId>c2mon-shared-rule</artifactId>
 			<version>[1.2.10, 2.0.0)</version>
 		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.9.3</version>
+		</dependency>
 	</dependencies>
 	<developers />
 </project>
