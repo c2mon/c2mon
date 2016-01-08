@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import cern.c2mon.client.common.service.SessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.core.C2monCommandManager;
-import cern.c2mon.client.core.C2monSessionManager;
 import cern.c2mon.client.core.CommandService;
 import cern.c2mon.client.core.tag.ClientCommandTagImpl;
 import cern.c2mon.client.jms.RequestHandler;
@@ -46,7 +46,7 @@ public class CommandManager implements C2monCommandManager, CommandService {
   /**
    * The C2MON session manager
    */
-  private final C2monSessionManager sessionManager;
+  private SessionService sessionService;
 
   /**
    * Provides methods for requesting commands information and sending
@@ -65,16 +65,21 @@ public class CommandManager implements C2monCommandManager, CommandService {
    *          server
    */
   @Autowired
-  protected CommandManager(final C2monSessionManager pSessionManager, final RequestHandler pRequestHandler) {
-    this.sessionManager = pSessionManager;
+  protected CommandManager(final RequestHandler pRequestHandler) {
     this.clientRequestHandler = pRequestHandler;
   }
 
   @Override
   public CommandReport executeCommand(final String userName, final Long commandId, final Object value) throws CommandTagValueException {
-    if (!sessionManager.isUserLogged(userName)) {
-      return new CommandReportImpl(commandId,
-          CommandExecutionStatus.STATUS_AUTHORISATION_FAILED, "No user is logged-in.");
+    if(sessionService != null){
+      LOG.info("Executing command with SessionService authentication");
+
+      if (!sessionService.isUserLogged(userName)) {
+        return new CommandReportImpl(commandId,
+            CommandExecutionStatus.STATUS_AUTHORISATION_FAILED, "No user is logged-in.");
+      }
+    } else {
+      LOG.info("Executing command without SessionService authentication");
     }
 
     if (!commandCache.containsKey(commandId)) {
@@ -89,7 +94,7 @@ public class CommandManager implements C2monCommandManager, CommandService {
 
     CommandExecuteRequest<Object> executeRequest = createCommandExecuteRequest(cct, value);
 
-    if (!isAuthorized(userName, commandId)) {
+    if (sessionService != null && !isAuthorized(userName, commandId)) {
         return new CommandReportImpl(commandId,
             CommandExecutionStatus.STATUS_AUTHORISATION_FAILED,
             "The logged user has not the priviledges to execute command " + commandId + ".");
@@ -250,17 +255,19 @@ public class CommandManager implements C2monCommandManager, CommandService {
     return commandTags.iterator().next();
   }
 
+
+
   @Override
   public boolean isAuthorized(final String userName, final Long commandId) {
     if (!commandCache.containsKey(commandId)) {
       getCommandTag(commandId);
     }
 
-    if (sessionManager.isUserLogged(userName)) {
+    if (sessionService.isUserLogged(userName)) {
       ClientCommandTagImpl<Object> cct = commandCache.get(commandId);
       if (cct.isExistingCommand()) {
         if (cct.getAuthorizationDetails() != null) {
-          return sessionManager.isAuthorized(userName, cct.getAuthorizationDetails());
+          return sessionService.isAuthorized(userName, cct.getAuthorizationDetails());
         }
         else {
           LOG.warn("isAuthorized() - No authorization details received for command "
@@ -270,6 +277,19 @@ public class CommandManager implements C2monCommandManager, CommandService {
     }
 
     return false;
+  }
+
+  @Override
+  public void registerSessionService(SessionService sessionService) {
+    if(sessionService == null){
+      LOG.warn("No SessionService to to the CommandManager set. Service is null.");
+    }
+
+    if(this.sessionService != null){
+      LOG.warn("SessionService were already set. Overriding of the service!");
+    }
+
+    this.sessionService = sessionService;
   }
 
   @Override

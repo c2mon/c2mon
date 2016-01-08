@@ -2,6 +2,7 @@ package cern.c2mon.client.core;
 
 import java.util.Set;
 
+import cern.c2mon.client.common.service.SessionService;
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.shared.client.command.CommandReport;
 import cern.c2mon.shared.client.command.CommandTagValueException;
@@ -60,6 +61,13 @@ public interface CommandService {
    * @see C2monSessionManager#getLoggedUserNames()
    */
   boolean isAuthorized(String userName, Long commandId);
+
+  /**
+   * Register a SessionService to apply a authentication module to this service.
+   *
+   * @param sessionService the {@link SesssionService} to use
+   */
+  void registerSessionService(SessionService sessionService);
 
   /**
    * Refreshes the entire local command tag cache with the latest

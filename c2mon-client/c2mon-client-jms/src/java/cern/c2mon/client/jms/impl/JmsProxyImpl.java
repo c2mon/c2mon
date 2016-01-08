@@ -53,7 +53,7 @@ import cern.accsoft.commons.util.proc.ProcUtils;
 import cern.accsoft.commons.util.proc.ProcessInfo;
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.common.listener.TagUpdateListener;
-import cern.c2mon.client.jms.AdminMessageListener;
+import cern.c2mon.client.jms.BroadcastMessageListener;
 import cern.c2mon.client.jms.AlarmListener;
 import cern.c2mon.client.jms.ConnectionListener;
 import cern.c2mon.client.jms.HeartbeatListener;
@@ -865,22 +865,22 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   }
 
   @Override
-  public void registerAdminMessageListener(final AdminMessageListener adminMessageListener) {
-    if (adminMessageListener == null) {
-      throw new NullPointerException("Trying to register null AdminMessage listener with JmsProxy.");
+  public void registerBroadcastMessageListener(final BroadcastMessageListener broadcastMessageListener) {
+    if (broadcastMessageListener == null) {
+      throw new NullPointerException("Trying to register null BroadcastMessage listener with JmsProxy.");
     }
     if (adminMessageTopic == null) {
-      throw new IllegalStateException(String.format("Cannot register '%s' without having the admin message topic", AdminMessageListener.class.getSimpleName()));
+      throw new IllegalStateException(String.format("Cannot register '%s' without having the admin message topic", BroadcastMessageListener.class.getSimpleName()));
     }
-    adminMessageListenerWrapper.addListener(adminMessageListener);
+    adminMessageListenerWrapper.addListener(broadcastMessageListener);
   }
 
   @Override
-  public void unregisterAdminMessageListener(final AdminMessageListener adminMessageListener) {
-    if (adminMessageListener == null) {
-      throw new NullPointerException("Trying to unregister null AdminMessage listener from JmsProxy.");
+  public void unregisterBroadcastMessageListener(final BroadcastMessageListener broadcastMessageListener) {
+    if (broadcastMessageListener == null) {
+      throw new NullPointerException("Trying to unregister null BroadcastMessage listener from JmsProxy.");
     }
-    adminMessageListenerWrapper.removeListener(adminMessageListener);
+    adminMessageListenerWrapper.removeListener(broadcastMessageListener);
   }
 
   @Override
@@ -938,7 +938,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   }
 
   @Override
-  public void setAdminMessageTopic(final Destination adminMessageTopic) {
+  public void setBroadcastMessageTopic(final Destination adminMessageTopic) {
     if (this.adminMessageTopic != null) {
       throw new IllegalStateException("Cannot set the admin message topic more than one time");
     }

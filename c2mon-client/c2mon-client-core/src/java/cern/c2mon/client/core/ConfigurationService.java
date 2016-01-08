@@ -58,12 +58,17 @@ public interface ConfigurationService {
    * @param reportListener Is informed about the progress of the operation on the server side.
    * @see ClientRequestProgressReport
    * @see ClientRequestErrorReport
-   * @return A Configuration Report object
+   * @return A {@link ConfigurationReport} object
    */
   ConfigurationReport applyConfiguration(final Long configurationId, final ClientRequestReportListener reportListener);
 
   /**
-   *
+   * Applies a configuration based on a {@link Configuration} object.
+   * The object holds all information what should be configured and how it should be configured.
+   * This includes the common operations CREATE, DELETE  and UPDATE.
+   * <p/>
+   * For more information of the configuration object read the documentation of {@link Configuration}
+   * or folloe the instruction in the @see <a href="http://c2mon.web.cern.ch/c2mon/docs/#_offline_configuration_via_c2mon_database_test_purpose_only">c2mon documentation</a>.
    *
    * @param configuration
    * @param listener

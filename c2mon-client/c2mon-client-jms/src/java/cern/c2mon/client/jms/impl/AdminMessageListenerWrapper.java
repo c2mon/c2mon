@@ -23,9 +23,9 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
-import cern.c2mon.client.common.admin.AdminMessage;
-import cern.c2mon.client.common.admin.AdminMessageImpl;
-import cern.c2mon.client.jms.AdminMessageListener;
+import cern.c2mon.client.common.admin.BroadcastMessage;
+import cern.c2mon.client.common.admin.BroadcastMessageImpl;
+import cern.c2mon.client.jms.BroadcastMessageListener;
 
 /**
  * Wrapper JMS listener to register to the administrator messages topic. This
@@ -37,7 +37,7 @@ import cern.c2mon.client.jms.AdminMessageListener;
  * @author vdeila
  * 
  */
-class AdminMessageListenerWrapper extends AbstractListenerWrapper<AdminMessageListener, AdminMessage> {
+class AdminMessageListenerWrapper extends AbstractListenerWrapper<BroadcastMessageListener, BroadcastMessage> {
 
   /**
    * Constructor.
@@ -49,22 +49,22 @@ class AdminMessageListenerWrapper extends AbstractListenerWrapper<AdminMessageLi
   }
 
   @Override
-  protected AdminMessage convertMessage(Message message) throws JMSException {
-    return AdminMessageImpl.fromJson(((TextMessage) message).getText());
+  protected BroadcastMessage convertMessage(Message message) throws JMSException {
+    return BroadcastMessageImpl.fromJson(((TextMessage) message).getText());
   }
 
   @Override
-  protected void invokeListener(final AdminMessageListener listener, final AdminMessage event) {
-    listener.onAdminMessageUpdate(event);
+  protected void invokeListener(final BroadcastMessageListener listener, final BroadcastMessage event) {
+    listener.onBroadcastMessageReceived(event);
   }
 
   @Override
-  protected String getDescription(AdminMessage event) {
+  protected String getDescription(BroadcastMessage event) {
     return "Admin message: " + event.getMessage();
   }
 
   @Override
-  protected boolean filterout(AdminMessage event) {    
+  protected boolean filterout(BroadcastMessage event) {
     return false;
   }
 

@@ -17,38 +17,53 @@
  *****************************************************************************/
 package cern.c2mon.client.common.admin;
 
+import java.sql.Timestamp;
+
+import cern.c2mon.shared.client.request.ClientRequestResult;
+
 /**
- * Exception thrown when a admin message fails to being delivered
+ * An BroadcastMessage is used to send messages to the user, from an administrator.
  * 
  * @author vdeila
  */
-public class AdminMessageDeliveryException extends Exception {
-
-  /** serialVersionUID */
-  private static final long serialVersionUID = -4288662906928869600L;
+public interface BroadcastMessage extends ClientRequestResult, Cloneable {
 
   /**
-   * Constructor
+   * @return the type of message
    */
-  public AdminMessageDeliveryException() { }
+  BroadcastMessageType getType();
 
   /**
-   * @param message the error message
+   * @return the sender of the message
    */
-  public AdminMessageDeliveryException(final String message) {
-    super(message); }
+  String getSender();
 
   /**
-   * @param cause the cause
+   * @return the message
    */
-  public AdminMessageDeliveryException(final Throwable cause) {
-    super(cause); }
+  String getMessage();
 
   /**
-   * @param message the error message
-   * @param cause the cause
+   * @return the time of when the message was created
    */
-  public AdminMessageDeliveryException(final String message, final Throwable cause) {
-    super(message, cause); }
+  Timestamp getTimestamp();
+
+  /**
+   * Clones the instance of that interface
+   * 
+   * @return A clone of the object
+   * @throws CloneNotSupportedException
+   *           Thrown in case that one of the fields of the interface
+   *           implementation is not cloneable.
+   */
+  BroadcastMessage clone() throws CloneNotSupportedException;
+
+  /** The types of messages */
+  enum BroadcastMessageType {
+    /** Only information */
+    INFO,
+    /** A warning message */
+    WARN
+  }
 
 }

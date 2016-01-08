@@ -27,20 +27,20 @@ import cern.c2mon.shared.util.json.GsonFactory;
 import com.google.gson.Gson;
 
 /**
- * Implementation of the AdminMessage which is used to send messages to the
+ * Implementation of the BroadcastMessage which is used to send messages to the
  * user, from the administrator
  * 
  * @author vdeila
  * 
  */
-public class AdminMessageImpl implements AdminMessage {
+public class BroadcastMessageImpl implements BroadcastMessage {
 
   /** Gson parser singleton for that class */
   private static transient Gson gson = null;
 
   /** the type of message */
   @NotNull
-  private AdminMessageType type;
+  private BroadcastMessageType type;
 
   /** the sender of the message */
   @NotNull
@@ -59,7 +59,7 @@ public class AdminMessageImpl implements AdminMessage {
    * Constructor used by Gson
    */
   @SuppressWarnings("unused")
-  private AdminMessageImpl() {
+  private BroadcastMessageImpl() {
     // Do nothing
   };
 
@@ -75,7 +75,7 @@ public class AdminMessageImpl implements AdminMessage {
    * @param timestamp
    *          the time of when the message was created
    */
-  public AdminMessageImpl(final AdminMessageType type, final String sender, final String message, final Timestamp timestamp) {
+  public BroadcastMessageImpl(final BroadcastMessageType type, final String sender, final String message, final Timestamp timestamp) {
     this.type = type;
     this.sender = sender;
     this.message = message;
@@ -85,14 +85,14 @@ public class AdminMessageImpl implements AdminMessage {
   /**
    * Copy constructor
    * 
-   * @param adminMessage the admin message to copy
+   * @param broadcastMessage the admin message to copy
    */
-  public AdminMessageImpl(final AdminMessage adminMessage) {
-    this.type = adminMessage.getType();
-    this.sender = adminMessage.getSender();
-    this.message = adminMessage.getMessage();
-    if (adminMessage.getTimestamp() != null) {
-      this.timestamp = (Timestamp) adminMessage.getTimestamp().clone();
+  public BroadcastMessageImpl(final BroadcastMessage broadcastMessage) {
+    this.type = broadcastMessage.getType();
+    this.sender = broadcastMessage.getSender();
+    this.message = broadcastMessage.getMessage();
+    if (broadcastMessage.getTimestamp() != null) {
+      this.timestamp = (Timestamp) broadcastMessage.getTimestamp().clone();
     }
     else {
       this.timestamp = null;
@@ -100,8 +100,8 @@ public class AdminMessageImpl implements AdminMessage {
   }
   
   @Override
-  public AdminMessage clone() throws CloneNotSupportedException {
-    AdminMessageImpl clone = (AdminMessageImpl) super.clone();
+  public BroadcastMessage clone() throws CloneNotSupportedException {
+    BroadcastMessageImpl clone = (BroadcastMessageImpl) super.clone();
     if (timestamp != null) {
       clone.timestamp = (Timestamp) timestamp.clone();
     }
@@ -109,7 +109,7 @@ public class AdminMessageImpl implements AdminMessage {
   }
 
   @Override
-  public AdminMessageType getType() {
+  public BroadcastMessageType getType() {
     return this.type;
   }
 
@@ -131,7 +131,7 @@ public class AdminMessageImpl implements AdminMessage {
   @Override
   public String toString() {
     return String.format("%s [message=%s, sender=%s, timestamp=%s, type=%s]", 
-        AdminMessageImpl.class.getSimpleName(),
+        BroadcastMessageImpl.class.getSimpleName(),
         message, 
         sender, 
         timestamp, 
@@ -155,9 +155,9 @@ public class AdminMessageImpl implements AdminMessage {
       return true;
     if (obj == null)
       return false;
-    if (!(obj instanceof AdminMessageImpl))
+    if (!(obj instanceof BroadcastMessageImpl))
       return false;
-    AdminMessageImpl other = (AdminMessageImpl) obj;
+    BroadcastMessageImpl other = (BroadcastMessageImpl) obj;
     if (message == null) {
       if (other.message != null)
         return false;
@@ -210,14 +210,14 @@ public class AdminMessageImpl implements AdminMessage {
   }
 
   /**
-   * Deserialized the JSON string into a {@link AdminMessage} object instance
+   * Deserialized the JSON string into a {@link BroadcastMessage} object instance
    * 
    * @param json
-   *          A JSON string representation of a {@link AdminMessageImpl} class
-   * @return The deserialized <code>AdminMessage</code> instance of the JSON
+   *          A JSON string representation of a {@link BroadcastMessageImpl} class
+   * @return The deserialized <code>BroadcastMessage</code> instance of the JSON
    *         message
    */
-  public static final AdminMessage fromJson(final String json) {
-    return getGson().fromJson(json, AdminMessageImpl.class);
+  public static final BroadcastMessage fromJson(final String json) {
+    return getGson().fromJson(json, BroadcastMessageImpl.class);
   }
 }

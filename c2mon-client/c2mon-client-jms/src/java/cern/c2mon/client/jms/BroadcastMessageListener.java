@@ -18,23 +18,22 @@
  *****************************************************************************/
 package cern.c2mon.client.jms;
 
-import cern.c2mon.client.common.admin.AdminMessage;
+import cern.c2mon.client.common.admin.BroadcastMessage;
 
 /**
- * Interface that needs implementing by classes wishing to register for admin
+ * Interface that needs implementing by classes wishing to register for broadcast
  * messages.
  * 
  * @author vdeila
  * 
  */
-public interface AdminMessageListener {
+public interface BroadcastMessageListener {
 
   /**
-   * Called when a administrator message is recieved from the topic
+   * Called when a broadcast message is received from the topic
    * 
-   * @param adminMessage
-   *          the admin message
+   * @param broadcastMessage the message
    */
-  void onAdminMessageUpdate(AdminMessage adminMessage);
+  void onBroadcastMessageReceived(BroadcastMessage broadcastMessage);
 
 }

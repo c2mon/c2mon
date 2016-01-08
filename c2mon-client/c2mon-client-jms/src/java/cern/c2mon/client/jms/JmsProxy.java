@@ -24,7 +24,6 @@ import javax.jms.JMSException;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.common.listener.TagUpdateListener;
-import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
 
@@ -207,7 +206,7 @@ public interface JmsProxy {
    * @param adminMessageTopic the adminMessageTopic to set
    * @throws IllegalStateException if trying to set the admin message topic a second time
    */
-  void setAdminMessageTopic(final Destination adminMessageTopic);
+  void setBroadcastMessageTopic(final Destination adminMessageTopic);
   
   /**
    * Register a listener to be notified of alarm messages received
@@ -227,22 +226,22 @@ public interface JmsProxy {
   void unregisterAlarmListener(final AlarmListener alarmListener) throws JMSException;
   
   /**
-   * Register a listener to be notified of AdminMessage events received
+   * Register a listener to be notified of BroadcastMessage events received
    * from the server.
    * 
-   * @param adminMessageListener the listener to register
+   * @param broadcastMessageListener the listener to register
    * @throws NullPointerException if argument is null
    * @throws IllegalStateException if 
    */
-  void registerAdminMessageListener(AdminMessageListener adminMessageListener);
+  void registerBroadcastMessageListener(BroadcastMessageListener broadcastMessageListener);
   
   /**
-   * Unregister the listener from receiving AdminMessage updates.
+   * Unregister the listener from receiving BroadcastMessage updates.
    * 
-   * @param adminMessageListener the listener to remove
+   * @param broadcastMessageListener the listener to remove
    * @throws NullPointerException if argument is null
    */
-  void unregisterAdminMessageListener(AdminMessageListener adminMessageListener);
+  void unregisterBroadcastMessageListener(BroadcastMessageListener broadcastMessageListener);
 
   
   /**

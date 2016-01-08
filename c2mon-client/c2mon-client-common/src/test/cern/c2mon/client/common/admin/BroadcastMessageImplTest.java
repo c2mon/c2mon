@@ -24,29 +24,29 @@ import java.sql.Timestamp;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.client.common.admin.AdminMessage.AdminMessageType;
+import cern.c2mon.client.common.admin.BroadcastMessage.BroadcastMessageType;
 
 /**
- * Test for the {@link AdminMessageImpl} class
+ * Test for the {@link BroadcastMessageImpl} class
  * 
  * @author vdeila
  *
  */
-public class AdminMessageImplTest {
+public class BroadcastMessageImplTest {
 
   /** The object that the test will be executed on */
-  private AdminMessageImpl adminMessage;
+  private BroadcastMessageImpl adminMessage;
   
   @Before
   public void setUp() throws Exception {
-    adminMessage = new AdminMessageImpl(AdminMessageType.INFO, "Test Sender", "The message", new Timestamp(System.currentTimeMillis()));
+    adminMessage = new BroadcastMessageImpl(BroadcastMessageType.INFO, "Test Sender", "The message", new Timestamp(System.currentTimeMillis()));
   }
 
   @Test
   public void testToJson() {
     final String json = adminMessage.toJson();
     assertNotNull(adminMessage);
-    assertEquals(adminMessage, AdminMessageImpl.fromJson(json));
+    assertEquals(adminMessage, BroadcastMessageImpl.fromJson(json));
   }
   
   @Test
@@ -56,7 +56,7 @@ public class AdminMessageImplTest {
   
   @Test
   public void testCopyConstructor() {
-    assertEquals(adminMessage, new AdminMessageImpl(adminMessage));
+    assertEquals(adminMessage, new BroadcastMessageImpl(adminMessage));
   }
   
 }
