@@ -108,6 +108,11 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
         if (autoStart) {
             start();
         }
+        // register handler as data-tag changer
+        getEquipmentConfigurationHandler().setEquipmentConfigurationChanger(this);
+        
+        // set equipment configuration changer
+        getEquipmentConfigurationHandler().setDataTagChanger(this);
 
         getEquipmentLogger().info("Starting with Interval = " + getInterval()+ "msec and configuration " + myConfig);
 
