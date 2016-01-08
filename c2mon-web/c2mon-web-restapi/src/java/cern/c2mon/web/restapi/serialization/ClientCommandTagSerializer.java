@@ -19,26 +19,18 @@ package cern.c2mon.web.restapi.serialization;
 
 import java.io.IOException;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.map.SerializerProvider;
-import org.codehaus.jackson.map.ser.std.SerializerBase;
-
 import cern.c2mon.client.core.tag.ClientCommandTagImpl;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
 /**
  * Custom serialisation class for {@link ClientCommandTagImpl} objects.
  *
  * @author Justin Lewis Salmon
  */
-public class ClientCommandTagSerializer extends SerializerBase<ClientCommandTagImpl> {
-
-  /**
-   * Constructor.
-   */
-  public ClientCommandTagSerializer() {
-    super(ClientCommandTagImpl.class);
-  }
+public class ClientCommandTagSerializer extends JsonSerializer<ClientCommandTagImpl> {
 
   /*
    * (non-Javadoc)

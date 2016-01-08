@@ -19,37 +19,30 @@ package cern.c2mon.web.restapi.serialization;
 
 import java.io.IOException;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.map.SerializerProvider;
-import org.codehaus.jackson.map.ser.std.SerializerBase;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
 /**
  * Custom serialisation class for {@link AlarmValueImpl} objects.
  *
  * @author Justin Lewis Salmon
  */
-class AlarmValueSerializer extends SerializerBase<AlarmValueImpl> {
-
-  /**
-   * Constructor.
-   */
-  public AlarmValueSerializer() {
-    super(AlarmValueImpl.class);
-  }
+public class AlarmValueSerializer extends JsonSerializer<AlarmValueImpl> {
 
   /*
    * (non-Javadoc)
    *
    * @see
-   * org.codehaus.jackson.map.ser.std.SerializerBase#serialize(java.lang.Object
-   * , org.codehaus.jackson.JsonGenerator,
+   * org.codehaus.jackson.map.ser.std.SerializerBase#serialize(java.lang.Object, org.codehaus.jackson.JsonGenerator,
    * org.codehaus.jackson.map.SerializerProvider)
    */
   @Override
-  public void serialize(AlarmValueImpl value, JsonGenerator generator, SerializerProvider provider) throws IOException, JsonGenerationException {
+  public void serialize(AlarmValueImpl value, JsonGenerator generator, SerializerProvider provider) throws IOException, JsonProcessingException {
     generator.writeStartObject();
     generator.writeNumberField("id", value.getId());
     generator.writeNumberField("tagId", value.getTagId());

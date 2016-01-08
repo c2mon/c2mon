@@ -1,7 +1,7 @@
 /*******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- *
+ * <p>
  * Copyright (C) 2004 - 2014 CERN. This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
@@ -12,41 +12,31 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- *
+ * <p>
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
 package cern.c2mon.web.restapi.serialization;
 
 import java.io.IOException;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.map.SerializerProvider;
-import org.codehaus.jackson.map.ser.std.SerializerBase;
-
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
 /**
  * Custom serialisation class for {@link ClientDataTagImpl} objects.
  *
  * @author Justin Lewis Salmon
  */
-public class ClientDataTagSerializer extends SerializerBase<ClientDataTagImpl> {
-
-  /**
-   * Constructor.
-   */
-  public ClientDataTagSerializer() {
-    super(ClientDataTagImpl.class);
-  }
+public class ClientDataTagSerializer extends JsonSerializer<ClientDataTagImpl> {
 
   /*
    * (non-Javadoc)
    *
    * @see
-   * org.codehaus.jackson.map.ser.std.SerializerBase#serialize(java.lang.Object
-   * , org.codehaus.jackson.JsonGenerator,
-   * org.codehaus.jackson.map.SerializerProvider)
+   * org.codehaus.jackson.map.ser.std.SerializerBase#serialize(java.lang.Object, org.codehaus.jackson.JsonGenerator, org.codehaus.jackson.map.SerializerProvider)
    */
   @Override
   public void serialize(ClientDataTagImpl value, JsonGenerator generator, SerializerProvider provider) throws IOException, JsonGenerationException {
@@ -57,10 +47,20 @@ public class ClientDataTagSerializer extends SerializerBase<ClientDataTagImpl> {
     generator.writeObjectField("value", value.getValue());
     generator.writeStringField("valueDescription", value.getValueDescription());
     generator.writeStringField("serverTimestamp", value.getServerTimestamp().toString());
-    generator.writeStringField("sourceTimestamp", value.getDaqTimestamp().toString());
+
+    // Sometimes the DAQ timestamp is null
+    if (value.getDaqTimestamp() != null) {
+      generator.writeStringField("sourceTimestamp", value.getDaqTimestamp().toString());
+    }
+
     generator.writeStringField("mode", value.getMode().toString());
     generator.writeBooleanField("simulated", value.isSimulated());
-    generator.writeStringField("dataType", value.getType().getSimpleName());
+
+    // If the value is null, the type will also be null
+    if (value.getType() != null) {
+      generator.writeStringField("dataType", value.getType().getSimpleName());
+    }
+
     generator.writeObjectField("quality", value.getDataTagQuality());
     generator.writeObjectField("alarms", value.getAlarms());
     generator.writeEndObject();

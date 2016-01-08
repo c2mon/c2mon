@@ -19,26 +19,18 @@ package cern.c2mon.web.restapi.serialization;
 
 import java.io.IOException;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.map.SerializerProvider;
-import org.codehaus.jackson.map.ser.std.SerializerBase;
-
 import cern.c2mon.client.ext.history.updates.HistoryTagValueUpdateImpl;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
 /**
  * Custom serialisation class for {@link HistoryTagValueUpdateImpl} objects.
  *
  * @author Justin Lewis Salmon
  */
-public class HistoryTagValueUpdateSerializer extends SerializerBase<HistoryTagValueUpdateImpl> {
-
-  /**
-   * Constructor.
-   */
-  public HistoryTagValueUpdateSerializer() {
-    super(HistoryTagValueUpdateImpl.class);
-  }
+public class HistoryTagValueUpdateSerializer extends JsonSerializer<HistoryTagValueUpdateImpl> {
 
   /*
    * (non-Javadoc)
