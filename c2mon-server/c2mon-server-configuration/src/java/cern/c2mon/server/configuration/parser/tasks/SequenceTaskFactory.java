@@ -56,7 +56,8 @@ public class SequenceTaskFactory {
 
   @Autowired
   public SequenceTaskFactory(ProcessCache processCache, EquipmentCache equipmentCache, SubEquipmentCache subEquipmentCache, ControlTagCache controlTagCache,
-                             AliveTimerCache aliveTagCache, CommFaultTagCache commFaultTagCache, DataTagCache dataTagCache, RuleTagCache ruleTagCache, AlarmCache alarmCache, CommandTagCache commandTagCache) {
+                             AliveTimerCache aliveTagCache, CommFaultTagCache commFaultTagCache, DataTagCache dataTagCache, RuleTagCache ruleTagCache,
+                             AlarmCache alarmCache, CommandTagCache commandTagCache) {
     this.processCache = processCache;
     this.equipmentCache = equipmentCache;
     this.subEquipmentCache = subEquipmentCache;
@@ -88,7 +89,7 @@ public class SequenceTaskFactory {
    * @param clazz   class type of the object
    * @param <T>     generic type of the object
    * @return SequenceTask based on the {@link ConfigurationObject}, or null in case that the configuration object
-   *         only serves as empty container.
+   * only serves as empty container.
    */
   private <T extends ConfigurationObject> SequenceTask buildSequenceTask(ConfigurationObject confObj, Class<T> clazz) {
     ConfigurationElement element = new ConfigurationElement();
@@ -173,26 +174,34 @@ public class SequenceTaskFactory {
           if (pd.getReadMethod().invoke(obj) != null) {
             String tempProp;
 
-            // check if the property is a TagMode. If so we have to call the ordinal() method manual because the enum toString method don't return the needed number.
-            if(pd.getPropertyType().equals(TagMode.class)){
+            // check if the property is a TagMode. If so we have to call the ordinal() method manual because the enum toString method don't return the needed
+            // number.
+            if (pd.getPropertyType().equals(TagMode.class)) {
               tempProp = String.valueOf(((TagMode) pd.getReadMethod().invoke(obj)).ordinal());
 
-              // check if the property is a DataTagAddress. If so we have to call the toConfigXML() method because the server expect the xml string of a DataTagAddress.
-            } else if(pd.getPropertyType().equals(DataTagAddress.class)){
-              tempProp =  String.valueOf(((DataTagAddress) pd.getReadMethod().invoke(obj)).toConfigXML());
+            } else if (pd.getPropertyType().equals(DataTagAddress.class)) {
+              // check if the property is a DataTagAddress. If so we have to call the toConfigXML() method because the server expect the xml string of a
+              // DataTagAddress.
+              tempProp = String.valueOf(((DataTagAddress) pd.getReadMethod().invoke(obj)).toConfigXML());
 
-              //check if the property is a HardWareAddress. If so we have to call the toConfigXML() method because the server expect the xml string of a DataTagAddress.
-            }else if(pd.getPropertyType().equals(HardwareAddress.class)){
-              tempProp =  String.valueOf(((HardwareAddress) pd.getReadMethod().invoke(obj)).toConfigXML());
+            } else if (pd.getPropertyType().equals(HardwareAddress.class)) {
+              // check if the property is a HardWareAddress. If so we have to call the toConfigXML() method because the server expect the xml string of a
+              // DataTagAddress.
+              tempProp = String.valueOf(((HardwareAddress) pd.getReadMethod().invoke(obj)).toConfigXML());
 
-              // check if the property is a AlarmCondition. If so we have to call the getXMLCondition() method because the server expect the xml string of an AlarmCondition.
-            }else if(pd.getPropertyType().equals(AlarmCondition.class)){
-              tempProp =  String.valueOf(((AlarmCondition) pd.getReadMethod().invoke(obj)).getXMLCondition());
+            } else if (pd.getPropertyType().equals(AlarmCondition.class)) {
+              // check if the property is a AlarmCondition. If so we have to call the getXMLCondition() method because the server expect the xml string of an
+              // AlarmCondition.
+              tempProp = String.valueOf(((AlarmCondition) pd.getReadMethod().invoke(obj)).getXMLCondition());
 
+            } else if (pd.getPropertyType().equals(Metadata.class)) {
+              tempProp = String.valueOf(Metadata.toJSON((Metadata) pd.getReadMethod().invoke(obj)));
+
+            } else {
               // default call of all properties. Returns the standard toStringValue of the given Type
-            }else {
               tempProp = pd.getReadMethod().invoke(obj).toString();
             }
+
             properties.setProperty(pd.getName(), tempProp);
           }
         }
@@ -222,7 +231,7 @@ public class SequenceTaskFactory {
    * To provide default values to the fields of the ConfigurationObject a annotation is used.
    * This method extract the default values of all Fields in a ConfigurationObject and
    * put them into the properties.
-   * <p>
+   * <p/>
    * Because {@link Properties} is a collection additional infromation based on the default value
    * are added to the properties from the argument.
    * The return value is the same object than the method  properties argument.
@@ -238,13 +247,14 @@ public class SequenceTaskFactory {
 
           // extract all default values from fields which Type is no enum
           if (field.getType().getEnumConstants() == null) {
-            properties.setProperty(field.getName(), field.getType().getDeclaredConstructor(String.class).newInstance(field.getAnnotation(DefaultValue.class).value()).toString());
+            properties.setProperty(field.getName(), field.getType().getDeclaredConstructor(String.class).newInstance(field.getAnnotation(DefaultValue.class)
+                .value()).toString());
 
             // receive all default values from fields which type is an enum
           } else {
             for (Object x : field.getType().getEnumConstants()) {
               if (x.toString().equals(field.getAnnotation(DefaultValue.class).value())) {
-                if(field.getType().equals(TagMode.class)) {
+                if (field.getType().equals(TagMode.class)) {
                   properties.setProperty(field.getName(), String.valueOf(((TagMode) x).ordinal()));
                 } else {
                   properties.setProperty(field.getName(), field.getType().cast(x).toString());
