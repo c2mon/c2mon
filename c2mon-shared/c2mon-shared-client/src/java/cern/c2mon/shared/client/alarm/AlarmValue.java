@@ -55,7 +55,6 @@ public interface AlarmValue extends ClientRequestResult {
    */
   Long getTagId();
 
-  /
   Map<String, Object> getMetadata();
   
   /** 
