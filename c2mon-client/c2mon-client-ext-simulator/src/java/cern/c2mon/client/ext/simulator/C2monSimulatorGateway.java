@@ -23,7 +23,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import cern.c2mon.client.core.C2monServiceGateway;
-import cern.c2mon.client.core.C2monServiceGateway.Module;
 
 public class C2monSimulatorGateway {
   /** Class logger */
