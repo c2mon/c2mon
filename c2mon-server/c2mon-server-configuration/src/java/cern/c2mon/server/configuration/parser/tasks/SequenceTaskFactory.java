@@ -18,6 +18,7 @@ import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.metadata.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,19 +85,20 @@ public class SequenceTaskFactory {
    * Because of that it is not important which instance of  {@link ConfigurationObject} is given.
    *
    * @param confObj Object which holds the Information to create a {@link SequenceTask}
-   * @param klass   class type of the object
+   * @param clazz   class type of the object
    * @param <T>     generic type of the object
-   * @return SequenceTask based on the {@link ConfigurationObject}
+   * @return SequenceTask based on the {@link ConfigurationObject}, or null in case that the configuration object
+   *         only serves as empty container.
    */
-  private <T extends ConfigurationObject> SequenceTask buildSequenceTask(ConfigurationObject confObj, Class<T> klass) {
+  private <T extends ConfigurationObject> SequenceTask buildSequenceTask(ConfigurationObject confObj, Class<T> clazz) {
     ConfigurationElement element = new ConfigurationElement();
     TaskOrder order;
     Properties properties = new Properties();
     //downcast the confObj to the actual type
-    T obj = klass.cast(confObj);
+    T obj = clazz.cast(confObj);
 
     // set basic information of the ConfigurationElement, based on the type of the confObj
-    element.setEntity(getEntity(klass));
+    element.setEntity(getEntity(clazz));
     element.setEntityId(confObj.getId());
     element.setSequenceId(-1l);
 
@@ -108,10 +110,10 @@ public class SequenceTaskFactory {
     } else {
 
       // if the tag already exists try to create a update
-      if (cacheHasId(obj.getId(), klass)) {
+      if (cacheHasId(obj.getId(), clazz)) {
         element.setAction(Action.UPDATE);
         order = getUpdateTaskOrder(obj);
-        properties = extractPropertiesFromField(obj, klass);
+        properties = extractPropertiesFromField(obj, clazz);
       } else {
 
         // look if all fields are given to crate a new instance
@@ -121,7 +123,7 @@ public class SequenceTaskFactory {
           properties = extractPropertiesFromField(obj, obj.getClass());
           setDefaultValues(properties, obj);
         } else {
-          throw new ConfigurationParseException("Creating " + klass.getSimpleName() + " " + obj.getId() + " failed. Not enough arguments.");
+          throw new ConfigurationParseException("Creating " + clazz.getSimpleName() + " (id = " + obj.getId() + ") failed. Not enough arguments.");
         }
       }
     }
@@ -134,7 +136,7 @@ public class SequenceTaskFactory {
     if (properties.isEmpty() && !element.getAction().equals(Action.REMOVE)) {
       return null;
     } else {
-      return buildTaskInstance(element, order, klass);
+      return buildTaskInstance(element, order, clazz);
     }
   }
 

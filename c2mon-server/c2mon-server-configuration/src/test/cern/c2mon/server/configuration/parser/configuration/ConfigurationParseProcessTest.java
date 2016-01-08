@@ -96,7 +96,7 @@ public class ConfigurationParseProcessTest {
   public void processUpdate_notExistingInstance() {
     // Setup Exception
     processUpdate.expect(ConfigurationParseException.class);
-    processUpdate.expectMessage("Creating Process 1 failed. Not enough arguments.");
+    processUpdate.expectMessage("Creating Process (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<Process,Properties> pair = buildUpdateProcessWtihSomeFields(1l);
@@ -224,7 +224,7 @@ public class ConfigurationParseProcessTest {
   public void processCreate_withNoFields() {
     // Setup Exception
     processCreate.expect(ConfigurationParseException.class);
-    processCreate.expectMessage("Creating Process 1 failed. Not enough arguments.");
+    processCreate.expectMessage("Creating Process (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Configuration configuration = getConfBuilderProcess(buildProcessWtihId(1L)._1);

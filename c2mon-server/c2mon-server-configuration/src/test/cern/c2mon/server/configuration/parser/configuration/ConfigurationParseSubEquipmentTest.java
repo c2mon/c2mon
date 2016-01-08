@@ -105,7 +105,7 @@ public class ConfigurationParseSubEquipmentTest {
   public void subEquipmentUpdate_notExistingInstance() {
     // Setup Exception
     subEquipmentUpdate.expect(ConfigurationParseException.class);
-    subEquipmentUpdate.expectMessage("Creating SubEquipment 1 failed. Not enough arguments.");
+    subEquipmentUpdate.expectMessage("Creating SubEquipment (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<SubEquipment,Properties> pair = buildUpdateSubEquipmentWithSomeFields(1l);
@@ -258,7 +258,7 @@ public class ConfigurationParseSubEquipmentTest {
   public void subEquipmentCreate_withNoFields() {
     // Setup Exception
     subEquipmentCreate.expect(ConfigurationParseException.class);
-    subEquipmentCreate.expectMessage("Creating SubEquipment 1 failed. Not enough arguments.");
+    subEquipmentCreate.expectMessage("Creating SubEquipment (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Configuration configuration = getConfBuilderSubEquipment(buildSubEquipmentWithId(1L)._1);
@@ -317,7 +317,7 @@ public class ConfigurationParseSubEquipmentTest {
   @Test
   public void subEquipmentCreate_withNotExistingSupClass() {
     subEquipmentCreate.expect(ConfigurationParseException.class);
-    subEquipmentCreate.expectMessage("Creating Process 1 failed. Not enough arguments.");
+    subEquipmentCreate.expectMessage("Creating Process (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<SubEquipment,Properties> pair = buildSubEquipmentWtihPrimFields(1l);

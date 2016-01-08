@@ -93,7 +93,7 @@ public class ConfigurationParseAliveTagTest {
   public void aliveTagUpdate_notExistingInstance() {
     // Setup Exception
     aliveTagUpdate.expect(ConfigurationParseException.class);
-    aliveTagUpdate.expectMessage("Creating AliveTag 1 failed. Not enough arguments.");
+    aliveTagUpdate.expectMessage("Creating AliveTag (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<AliveTag,Properties> pair = buildUpdateAliveTagWithSomeFields(1l);
@@ -179,7 +179,7 @@ public class ConfigurationParseAliveTagTest {
   public void aliveTagCreate_withNoFields() {
     // Setup Exception
     aliveTagCreate.expect(ConfigurationParseException.class);
-    aliveTagCreate.expectMessage("Creating AliveTag 1 failed. Not enough arguments.");
+    aliveTagCreate.expectMessage("Creating AliveTag (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Configuration configuration = getConfBuilderAliveTagP(buildAliveTagWtihId(1L)._1);
@@ -232,7 +232,7 @@ public class ConfigurationParseAliveTagTest {
   @Test
   public void aliveTagCreate_withNotExistingSupClass() {
     aliveTagCreate.expect(ConfigurationParseException.class);
-    aliveTagCreate.expectMessage("Creating Process 1 failed. Not enough arguments.");
+    aliveTagCreate.expectMessage("Creating Process (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<AliveTag,Properties> pair = buildAliveTagWithPrimFields(1l);

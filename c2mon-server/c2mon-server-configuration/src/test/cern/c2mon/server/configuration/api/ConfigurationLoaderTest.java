@@ -32,7 +32,7 @@ import cern.c2mon.shared.common.NoSimpleValueParseException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
-import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
+import cern.c2mon.shared.common.metadata.Metadata;
 import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
@@ -42,7 +42,6 @@ import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1315,6 +1314,7 @@ public class ConfigurationLoaderTest {
     DataTagCacheObject expectedCacheObjectData = cacheObjectFactory.buildDataTagCacheObject(100L, dataTag._2, 1L);
     expectedCacheObjectData.setDescription(dataTagUpdate._2.getProperty("description"));
     expectedCacheObjectData.setJapcAddress(dataTagUpdate._2.getProperty("japcAddress"));
+    expectedCacheObjectData.setMetadata(Metadata.builder().addMetadata("testMetadata_update",true).build());
     expectedCacheObjectData.setMaxValue((Comparable) TypeConverter.cast(dataTagUpdate._2.getProperty("maxValue"), dataTag._2.getProperty("dataType")));
     expectedCacheObjectData.setAddress(DataTagAddress.fromConfigXML(dataTagUpdate._2.getProperty("address")));
 
@@ -1570,6 +1570,7 @@ public class ConfigurationLoaderTest {
     DataTagCacheObject expectedCacheObjectData = cacheObjectFactory.buildDataTagCacheObject(100L, dataTag._2, 1L);
     expectedCacheObjectData.setDescription(dataTagUpdate._2.getProperty("description"));
     expectedCacheObjectData.setJapcAddress(dataTagUpdate._2.getProperty("japcAddress"));
+    expectedCacheObjectData.setMetadata(Metadata.builder().addMetadata("testMetadata_update",true).build());
     expectedCacheObjectData.setMaxValue((Comparable) TypeConverter.cast(dataTagUpdate._2.getProperty("maxValue"), dataTag._2.getProperty("dataType")));
     expectedCacheObjectData.setAddress(DataTagAddress.fromConfigXML(dataTagUpdate._2.getProperty("address")));
 
@@ -2115,7 +2116,7 @@ public class ConfigurationLoaderTest {
 
     // get cacheObject from the cache and compare to the an expected cacheObject
     AlarmCacheObject cacheObjectAlarm = (AlarmCacheObject) alarmCache.get(666L);
-    AlarmCacheObject expectedCacheObjectAlarm = cacheObjectFactory.buildRuleTagCacheObject(666L, alarm._2);
+    AlarmCacheObject expectedCacheObjectAlarm = cacheObjectFactory.buildAlarmCacheObject(666L, alarm._2);
 
     ObjectEqualityComparison.assertAlarmEquals(expectedCacheObjectAlarm, cacheObjectAlarm);
     // Check if all caches are updated
@@ -2187,7 +2188,7 @@ public class ConfigurationLoaderTest {
 
     // get cacheObject from the cache and compare to the an expected cacheObject
     AlarmCacheObject cacheObjectAlarm = (AlarmCacheObject) alarmCache.get(666L);
-    AlarmCacheObject expectedCacheObjectAlarm = cacheObjectFactory.buildRuleTagCacheObject(666L, alarm._2);
+    AlarmCacheObject expectedCacheObjectAlarm = cacheObjectFactory.buildAlarmCacheObject(666L, alarm._2);
     expectedCacheObjectAlarm.setFaultFamily(alarmUpdate._2.getProperty("faultFamily"));
 
     ObjectEqualityComparison.assertAlarmEquals(expectedCacheObjectAlarm, cacheObjectAlarm);

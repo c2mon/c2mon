@@ -47,23 +47,25 @@ public class ConfigurationParserImpl implements ConfigurationParser {
    */
   @Override
   public List<ConfigurationElement> parse(Configuration configuration) {
+    //
+    List<SequenceTask> taskResultList = new ArrayList<>();
     List<ConfigurationElement> elements = new ArrayList<>();
-    List<SequenceTask> tasks = new ArrayList<>();
+
 
     // need to check if there are any processes or Rules are given
     if (configuration.getProcesses() != null) {
-      parseProcesses(tasks, configuration.getProcesses());
+      addProcesses(taskResultList, configuration.getProcesses());
     }
     if (configuration.getRules() != null) {
-      parseRules(tasks, configuration.getRules());
+      addRules(taskResultList, configuration.getRules());
     }
 
     // After parsing configure given list and put it in the right order
-    // remove all null tasks which are are created from shell-objects
-    tasks.removeAll(Collections.singleton(null));
-    Collections.sort(tasks);
+    // remove all null taskResultList which are are created from shell-objects
+    taskResultList.removeAll(Collections.singleton(null));
+    Collections.sort(taskResultList);
     long seqId = 0l;
-    for (SequenceTask task : tasks) {
+    for (SequenceTask task : taskResultList) {
       ConfigurationElement element = task.getConfigurationElement();
       element.setSequenceId(seqId++);
       element.setConfigId(-1l);
@@ -73,21 +75,23 @@ public class ConfigurationParserImpl implements ConfigurationParser {
   }
 
   /**
-   * Parses all {@link Process} and underlying {@link ConfigurationObject}s.
+   * Parses all {@link Process} and underlying {@link ConfigurationsequenceTaskFactoryObject}s.
    * All retrieved {@link SequenceTask}s will be added to the task-list as side effect!
    *
-   * @param tasks     List which gets filled due the side effect of this method
+   * @param tasks     List which gets filled due to the side effect of this method.
    * @param processes list of all processes from the ConfigurationObject
    */
-  private void parseProcesses(List<SequenceTask> tasks, List<Process> processes) {
-    SequenceTask tempSeq;
+  private void addProcesses(List<SequenceTask> tasks, List<Process> processes) {
+    SequenceTask tempTask;
     for (Process process : processes) {
-      tempSeq = sequenceTaskFactory.createSequenceTask(process);
-      tempSeq = setControlTags(tempSeq, process);
-      tasks.add(tempSeq);
-      List<SequenceTask> tempList = parseControlTags(tasks, process, process.getStatusTag(), process.getAliveTag());
-      validateControlTags(tempSeq, tempList);
-      parseEquipments(tasks, process.getEquipments(), process);
+      tempTask = sequenceTaskFactory.createSequenceTask(process);
+      tempTask = setControlTagIds(tempTask, process);
+      tasks.add(tempTask);
+
+      // parse the attached objects of the process:
+      List<SequenceTask> tempList = addControlTags(tasks, process, process.getStatusTag(), process.getAliveTag());
+      validateControlTags(tempTask, tempList);
+      addEquipments(tasks, process.getEquipments(), process);
     }
   }
 
@@ -96,23 +100,23 @@ public class ConfigurationParserImpl implements ConfigurationParser {
    * Parses all {@link Equipment} and underlying ConfigurationObjects.
    * All retrieved {@link SequenceTask}s will be added to the task-list as side effect!
    *
-   * @param tasks      List which gets filled due the side effect of this method
+   * @param tasks      List which gets filled due to the side effect of this method.
    * @param equipments list of all equipments of the overlying object
    * @param parent     Overlying Process which holds this Equipment
    */
-  private void parseEquipments(List<SequenceTask> tasks, List<Equipment> equipments, Process parent) {
-    SequenceTask tempSeq;
+  private void addEquipments(List<SequenceTask> tasks, List<Equipment> equipments, Process parent) {
+    SequenceTask tempTask;
     for (Equipment equipment : equipments) {
-      tempSeq = sequenceTaskFactory.createSequenceTask(equipment);
-      tempSeq = setControlTags(tempSeq, equipment);
-      tasks.add(setParentId(tempSeq, parent));
+      tempTask = sequenceTaskFactory.createSequenceTask(equipment);
+      tempTask = setControlTagIds(tempTask, equipment);
+      tasks.add(setParentId(tempTask, parent));
 
       // parse the attached objects of the equipment:
-      List<SequenceTask> tempList = parseControlTags(tasks, equipment, equipment.getStatusTag(), equipment.getCommFaultTag(), equipment.getAliveTag());
-      validateControlTags(tempSeq, tempList);
-      parseDataTags(tasks, equipment, equipment.getDataTags());
-      parseCommandTags(tasks, equipment, equipment.getCommandTags());
-      parseSubEquipments(tasks, equipment.getSubEquipments(), equipment);
+      List<SequenceTask> taskList = addControlTags(tasks, equipment, equipment.getStatusTag(), equipment.getCommFaultTag(), equipment.getAliveTag());
+      validateControlTags(tempTask, taskList);
+      addDataTags(tasks, equipment, equipment.getDataTags());
+      addCommandTags(tasks, equipment, equipment.getCommandTags());
+      addSubEquipments(tasks, equipment.getSubEquipments(), equipment);
     }
   }
 
@@ -121,19 +125,22 @@ public class ConfigurationParserImpl implements ConfigurationParser {
    * Parses all {@link SubEquipment} and underlying ConfigurationObjects.
    * All retrieved {@link SequenceTask}s will be added to the task-list as side effect!
    *
-   * @param tasks         List which gets filled due the side effect of this method
+   * @param tasks         List which gets filled due to the side effect of this method.
    * @param subEquipments list of all subEquipments of the overlying object
    * @param parent        Overlying Equipment which holds this Equipment
    */
-  private void parseSubEquipments(List<SequenceTask> tasks, List<SubEquipment> subEquipments, Equipment parent) {
-    SequenceTask tempSeq;
+  private void addSubEquipments(List<SequenceTask> tasks, List<SubEquipment> subEquipments, Equipment parent) {
+    SequenceTask tempTask;
     for (SubEquipment subEquipment : subEquipments) {
-      tempSeq = sequenceTaskFactory.createSequenceTask(subEquipment);
-      tempSeq = setControlTags(tempSeq, subEquipment);
-      tasks.add(setParentId(tempSeq, parent));
-      List<SequenceTask> tempList = parseControlTags(tasks, subEquipment, subEquipment.getStatusTag(), subEquipment.getCommFaultTag(), subEquipment.getAliveTag());
-      validateControlTags(tempSeq, tempList);
-      parseDataTags(tasks, subEquipment, subEquipment.getDataTags());
+      tempTask = sequenceTaskFactory.createSequenceTask(subEquipment);
+      tempTask = setControlTagIds(tempTask, subEquipment);
+      tasks.add(setParentId(tempTask, parent));
+
+      // parse the attached objects of the subEquipment:
+      List<SequenceTask> tempList = addControlTags(tasks, subEquipment, subEquipment.getStatusTag(), subEquipment.getCommFaultTag(), subEquipment
+          .getAliveTag());
+      validateControlTags(tempTask, tempList);
+      addDataTags(tasks, subEquipment, subEquipment.getDataTags());
     }
   }
 
@@ -141,21 +148,21 @@ public class ConfigurationParserImpl implements ConfigurationParser {
    * Parses all {@link DataTag}s and underlying {@link Alarm}s.
    * All retrieved {@link SequenceTask}s will be added to the task-list as side effect!
    *
-   * @param tasks  List which gets filled due the side effect of this method.
+   * @param tasks  List which gets filled due to the side effect of this method.
    * @param parent Overlying Object which holds this Tag.
    * @param tags   list of all DataTags of the overlying object
    */
-  private void parseDataTags(List<SequenceTask> tasks, ConfigurationObject parent, List<DataTag<Number>> tags) {
-    SequenceTask tempSeq;
+  private void addDataTags(List<SequenceTask> tasks, ConfigurationObject parent, List<DataTag<Number>> tags) {
+    SequenceTask tempTask;
 
     for (DataTag tag : tags) {
       if (parent instanceof Equipment) {
-        tempSeq = sequenceTaskFactory.createSequenceTask(tag);
-        tasks.add(setParentId(tempSeq, parent));
+        tempTask = sequenceTaskFactory.createSequenceTask(tag);
+        tasks.add(setParentId(tempTask, parent));
       } else {
         throw new ConfigurationParseException("Parsing DataTag " + tag.getId() + " failed. Containing ClassType dosent exist.");
       }
-      parseAlarms(tasks, tag.getAlarms(), tag);
+      addAlarms(tasks, tag.getAlarms(), tag);
     }
   }
 
@@ -165,41 +172,56 @@ public class ConfigurationParserImpl implements ConfigurationParser {
    * for setting the equipmentId after calling the createSequenceTask() method.
    * All retrieved {@link SequenceTask}s will be added to the task-list as side effect!
    *
-   * @param tasks  List which gets filled due the side effect of this method.
+   * @param tasks  List which gets filled due to the side effect of this method.
    * @param parent Overlying equipment which holds this Tags.
    * @param tags   list of all CommandTags of the overlying equipment
    */
-  private void parseCommandTags(List<SequenceTask> tasks, Equipment parent, List<CommandTag> tags) {
+  private void addCommandTags(List<SequenceTask> tasks, Equipment parent, List<CommandTag> tags) {
     SequenceTask tempSeq;
 
     for (CommandTag tag : tags) {
       tempSeq = sequenceTaskFactory.createSequenceTask(tag);
 
       //set the parentId (equipmentId)
-      if (tempSeq != null) {
-        if (!tempSeq.getConfigurationElement().getElementProperties().isEmpty() && tempSeq.getConfigurationElement().getAction().equals(Action.CREATE))
-          tempSeq.getConfigurationElement().getElementProperties().setProperty("equipmentId", String.valueOf(parent.getId()));
+      if (tempSeq != null
+          && !tempSeq.getConfigurationElement().getElementProperties().isEmpty()
+          && tempSeq.getConfigurationElement().getAction().equals(Action.CREATE)) {
+        tempSeq.getConfigurationElement().getElementProperties().setProperty("equipmentId", String.valueOf(parent.getId()));
       }
       tasks.add(tempSeq);
     }
   }
 
-  private List<SequenceTask> parseControlTags(List<SequenceTask> tasks, ConfigurationObject parent, ControlTag... tags) {
+  /**
+   * Parses a control tag and at it to the SequenceTask list.
+   * A Command tag can only be parsed when then the parent of the tag is a Process or a Equipment.
+   * All retrieved {@link SequenceTask}s will be added to the task-list as side effect!
+   *
+   * @param tasks The List of taks
+   * @param parent
+   * @param tags
+   * @return
+   */
+  private List<SequenceTask> addControlTags(List<SequenceTask> tasks, ConfigurationObject parent, ControlTag... tags) {
     SequenceTask tempSeq;
     List<SequenceTask> result = new ArrayList<>();
 
     for (Tag tag : tags) {
       if (tag != null) {
+
         if (parent instanceof Process || parent instanceof Equipment) {
           tempSeq = sequenceTaskFactory.createSequenceTask(tag);
+
           if (tempSeq != null) {
             tasks.add(setParentId(tempSeq, parent));
             result.add(tempSeq);
           }
+
         } else {
-          throw new ConfigurationParseException("Parsing ControlTag " + tag.getId() + " failed. Containing ClassType dosent exist.");
+          throw new ConfigurationParseException("Parsing ControlTag " + tag.getId() + " failed. Containing ClassType does not exist.");
         }
-        parseAlarms(tasks, tag.getAlarms(), tag);
+
+        addAlarms(tasks, tag.getAlarms(), tag);
       }
     }
     return result;
@@ -209,23 +231,26 @@ public class ConfigurationParserImpl implements ConfigurationParser {
    * Parses all {@link Alarm}s.
    * All retrieved {@link SequenceTask}s will be added to the task-list as side effect!
    *
-   * @param tasks  List which gets filled due the side effect of this method.
+   * @param tasks  List which gets filled due to the side effect of this method.
    * @param alarms list of all Alarms of the overlying object
    * @param parent Overlying Object which holds this Tag.
    */
-  private void parseAlarms(List<SequenceTask> tasks, List<Alarm> alarms, ConfigurationObject parent) {
+  private void addAlarms(List<SequenceTask> tasks, List<Alarm> alarms, ConfigurationObject parent) {
     SequenceTask tempSeq;
     for (Alarm alarm : alarms) {
       if (parent instanceof Tag) {
+
         tempSeq = sequenceTaskFactory.createSequenceTask(alarm);
         if (tempSeq != null) {
+
           if (!tempSeq.getConfigurationElement().getElementProperties().isEmpty() && tempSeq.getConfigurationElement().getAction().equals(Action.CREATE)) {
             tempSeq.getConfigurationElement().getElementProperties().setProperty("dataTagId", String.valueOf(parent.getId()));
           }
+
         }
         tasks.add(tempSeq);
       } else {
-        throw new ConfigurationParseException("Parsing Alarm " + alarm.getId() + " failed. Containing ClassType dosent exist.");
+        throw new ConfigurationParseException("Parsing Alarm " + alarm.getId() + " failed. Containing ClassType does not exist.");
       }
     }
   }
@@ -234,15 +259,15 @@ public class ConfigurationParserImpl implements ConfigurationParser {
    * Parses all {@link RuleTag}s and underlying {@link Alarm}s.
    * All retrieved {@link SequenceTask}s will be added to the task-list as side effect!
    *
-   * @param tasks List which gets filled due the side effect of this method.
+   * @param tasks List which gets filled due to the side effect of this method.
    * @param rules list of all Rules of the overlying {@link Tag}
    */
-  private void parseRules(List<SequenceTask> tasks, List<RuleTag> rules) {
+  private void addRules(List<SequenceTask> tasks, List<RuleTag> rules) {
     SequenceTask tempSeq;
     for (RuleTag rule : rules) {
       tempSeq = sequenceTaskFactory.createSequenceTask(rule);
       tasks.add(tempSeq);
-      parseAlarms(tasks, rule.getAlarms(), rule);
+      addAlarms(tasks, rule.getAlarms(), rule);
     }
   }
 
@@ -294,7 +319,7 @@ public class ConfigurationParserImpl implements ConfigurationParser {
    * @param object object which holds the tag with die id information
    * @return extended task. If not a CREATE task nothing happens
    */
-  private SequenceTask setControlTags(SequenceTask task, ConfigurationObject object) {
+  private SequenceTask setControlTagIds(SequenceTask task, ConfigurationObject object) {
     if (task != null && task.getConfigurationElement().getAction().equals(Action.CREATE)) {
 
       // Set all controlTagIds for processes

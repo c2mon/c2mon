@@ -96,7 +96,7 @@ public class ConfigurationParseCommFaultTagTest {
   public void commFaultTagUpdate_notExistingInstance() {
     // Setup Exception
     commFaultTagUpdate.expect(ConfigurationParseException.class);
-    commFaultTagUpdate.expectMessage("Creating CommFaultTag 1 failed. Not enough arguments.");
+    commFaultTagUpdate.expectMessage("Creating CommFaultTag (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<CommFaultTag,Properties> pair = buildUpdateCommFaultTagWithSomeFields(1l);
@@ -179,7 +179,7 @@ public class ConfigurationParseCommFaultTagTest {
   public void commFaultTagCreate_withNoFields() {
     // Setup Exception
     commFaultTagCreate.expect(ConfigurationParseException.class);
-    commFaultTagCreate.expectMessage("Creating CommFaultTag 1 failed. Not enough arguments.");
+    commFaultTagCreate.expectMessage("Creating CommFaultTag (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Configuration configuration = getConfBuilderCommFaultTagE(buildCommFaultTagWithId(1L)._1);
@@ -236,7 +236,7 @@ public class ConfigurationParseCommFaultTagTest {
   @Test
   public void commFaultTagCreate_withNotExistingSupClass() {
     commFaultTagCreate.expect(ConfigurationParseException.class);
-    commFaultTagCreate.expectMessage("Creating Process 1 failed. Not enough arguments.");
+    commFaultTagCreate.expectMessage("Creating Process (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<CommFaultTag,Properties> pair = buildCommFaultTagWithPrimFields(1l);

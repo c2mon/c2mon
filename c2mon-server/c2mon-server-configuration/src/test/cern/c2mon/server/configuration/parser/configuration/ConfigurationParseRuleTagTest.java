@@ -80,7 +80,7 @@ public class ConfigurationParseRuleTagTest {
   public void processUpdate_notExistingInstance() {
     // Setup Exception
     processUpdate.expect(ConfigurationParseException.class);
-    processUpdate.expectMessage("Creating RuleTag 1 failed. Not enough arguments.");
+    processUpdate.expectMessage("Creating RuleTag (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<RuleTag,Properties> pair = buildUpdateRuleTagWtihSomeFields(1l);
@@ -208,7 +208,7 @@ public class ConfigurationParseRuleTagTest {
   public void processCreate_withNoFields() {
     // Setup Exception
     processCreate.expect(ConfigurationParseException.class);
-    processCreate.expectMessage("Creating RuleTag 1 failed. Not enough arguments.");
+    processCreate.expectMessage("Creating RuleTag (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Configuration configuration = getConfBuilderRuleTag(buildRuleTagWtihId(1L)._1);

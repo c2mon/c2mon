@@ -97,7 +97,7 @@ public class ConfigurationParseAlarmTest {
   public void alarmUpdate_notExistingInstance() {
     // Setup Exception
     alarmUpdate.expect(ConfigurationParseException.class);
-    alarmUpdate.expectMessage("Creating Alarm 1 failed. Not enough arguments.");
+    alarmUpdate.expectMessage("Creating Alarm (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<Alarm, Properties> pair = buildUpdateAlarmWithSomeFields(1l);
@@ -240,7 +240,7 @@ public class ConfigurationParseAlarmTest {
   public void alarmCreate_withNoFields() {
     // Setup Exception
     alarmCreate.expect(ConfigurationParseException.class);
-    alarmCreate.expectMessage("Creating Alarm 1 failed. Not enough arguments.");
+    alarmCreate.expectMessage("Creating Alarm (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Configuration configuration = getConfBuilderAlarm(buildAlarmWithId(1L)._1);
@@ -295,7 +295,7 @@ public class ConfigurationParseAlarmTest {
   @Test
   public void alarmCreate_withNotExistingSupClass() {
     alarmCreate.expect(ConfigurationParseException.class);
-    alarmCreate.expectMessage("Creating Process 1 failed. Not enough arguments.");
+    alarmCreate.expectMessage("Creating Process (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<Alarm, Properties> pair = buildAlarmWithPrimFields(1l);

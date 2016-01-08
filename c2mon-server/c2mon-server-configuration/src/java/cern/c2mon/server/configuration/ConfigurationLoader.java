@@ -75,7 +75,19 @@ public interface ConfigurationLoader {
   ConfigurationReport applyConfiguration(int configId);
 
   /**
-   * Super awesome new configuration method!
+   * Applies a configuration based on a configuration object to the server.
+   * The object itself holds all information for the configuration and don't depend on the Config database.
+   * The object is used to create a list configuration elements which are used fot
+   * the configuration by the server itself.
+   *
+   * <p>The returned report is made up of reports for each individual configuration
+   * element.
+   *
+   * <p>Configuration are made up of a number of configuration elements. Configuration
+   * elements are either applied successfully on the server or not at all. However,
+   * if a configuration element fails on the DAQ layer for some reason, but applied
+   * successfully on the server, the change will be committed on the server (DAQ
+   * may need a restart).
    *
    * @param configuration
    * @return

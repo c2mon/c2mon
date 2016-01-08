@@ -152,7 +152,7 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
       subEquipmentCache.acquireWriteLockOnKey(equipmentId);
     }
   }
-  
+
   private void acquireEquipmentWriteLockForElement(final Long id, Properties elementProperties) {
     String equipmentIdValue = elementProperties.getProperty(EQUIPMENT_ID);
     if (equipmentIdValue == null || equipmentIdValue.equalsIgnoreCase("")) {

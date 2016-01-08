@@ -8,7 +8,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
-import static cern.c2mon.server.configuration.parser.util.ConfigurationAllTogetherUtil.buildAllMandatoryWithMetaData;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationAllTogetherUtil.buildAllMandatoryWithMetadata;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -18,7 +18,7 @@ public class ParseToJSON {
 
   @Test
   public void parseComplexConfiguration() {
-    Configuration insert = buildAllMandatoryWithMetaData();
+    Configuration insert = buildAllMandatoryWithMetadata();
 
     ObjectMapper mapper = new ObjectMapper();
     try {

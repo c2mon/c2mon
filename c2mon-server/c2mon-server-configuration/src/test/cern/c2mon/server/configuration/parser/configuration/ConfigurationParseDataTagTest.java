@@ -99,7 +99,7 @@ public class ConfigurationParseDataTagTest {
   public void dataTagUpdate_notExistingInstance() {
     // Setup Exception
     dataTagUpdate.expect(ConfigurationParseException.class);
-    dataTagUpdate.expectMessage("Creating DataTag 1 failed. Not enough arguments.");
+    dataTagUpdate.expectMessage("Creating DataTag (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<DataTag<Number>, Properties> pair = buildUpdateDataTagWithSomeFields(1l);
@@ -248,7 +248,7 @@ public class ConfigurationParseDataTagTest {
   public void dataTagCreate_withNoFields() {
     // Setup Exception
     dataTagCreate.expect(ConfigurationParseException.class);
-    dataTagCreate.expectMessage("Creating DataTag 1 failed. Not enough arguments.");
+    dataTagCreate.expectMessage("Creating DataTag (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Configuration configuration = getConfBuilderDataTagE(buildDataTagWithId(1L)._1);
@@ -305,7 +305,7 @@ public class ConfigurationParseDataTagTest {
   @Test
   public void dataTagCreate_withNotExistingSupClass() {
     dataTagCreate.expect(ConfigurationParseException.class);
-    dataTagCreate.expectMessage("Creating Process 1 failed. Not enough arguments.");
+    dataTagCreate.expectMessage("Creating Process (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<DataTag<Number>, Properties> pair = buildDataTagWithPrimFields(1l);

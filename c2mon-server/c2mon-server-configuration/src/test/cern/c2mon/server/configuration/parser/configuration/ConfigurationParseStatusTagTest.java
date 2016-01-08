@@ -90,7 +90,7 @@ public class ConfigurationParseStatusTagTest {
   public void statusTagUpdate_notExistingInstance() {
     // Setup Exception
     statusTagUpdate.expect(ConfigurationParseException.class);
-    statusTagUpdate.expectMessage("Creating StatusTag 1 failed. Not enough arguments.");
+    statusTagUpdate.expectMessage("Creating StatusTag (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<StatusTag,Properties> pair = buildUpdateStatusTagWithSomeFields(1l);
@@ -176,7 +176,7 @@ public class ConfigurationParseStatusTagTest {
   public void statusTagCreate_withNoFields() {
     // Setup Exception
     statusTagCreate.expect(ConfigurationParseException.class);
-    statusTagCreate.expectMessage("Creating StatusTag 1 failed. Not enough arguments.");
+    statusTagCreate.expectMessage("Creating StatusTag (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Configuration configuration = getConfBuilderStatusTagP(buildStatusTagWithId(1L)._1);
@@ -229,7 +229,7 @@ public class ConfigurationParseStatusTagTest {
   @Test
   public void statusTagCreate_withNotExistingSupClass() {
     statusTagCreate.expect(ConfigurationParseException.class);
-    statusTagCreate.expectMessage("Creating Process 1 failed. Not enough arguments.");
+    statusTagCreate.expectMessage("Creating Process (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<StatusTag,Properties> pair = buildStatusTagWithPrimFields(1l);

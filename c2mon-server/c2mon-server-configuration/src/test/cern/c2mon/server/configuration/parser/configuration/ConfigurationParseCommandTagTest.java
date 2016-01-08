@@ -92,7 +92,7 @@ public class ConfigurationParseCommandTagTest {
   public void commandTagUpdate_notExistingInstance() {
     // Setup Exception
     commandTagUpdate.expect(ConfigurationParseException.class);
-    commandTagUpdate.expectMessage("Creating CommandTag 1 failed. Not enough arguments.");
+    commandTagUpdate.expectMessage("Creating CommandTag (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<CommandTag, Properties> pair = buildUpdateCommandTagWithSomeFields(1l);
@@ -241,7 +241,7 @@ public class ConfigurationParseCommandTagTest {
   public void commandTagCreate_withNoFields() {
     // Setup Exception
     commandTagCreate.expect(ConfigurationParseException.class);
-    commandTagCreate.expectMessage("Creating CommandTag 1 failed. Not enough arguments.");
+    commandTagCreate.expectMessage("Creating CommandTag (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Configuration configuration = getConfBuilderCommandTag(1L, 1L, buildCommandTagWithId(1L)._1);
@@ -298,7 +298,7 @@ public class ConfigurationParseCommandTagTest {
   @Test
   public void commandTagCreate_withNotExistingSupClass() {
     commandTagCreate.expect(ConfigurationParseException.class);
-    commandTagCreate.expectMessage("Creating Process 1 failed. Not enough arguments.");
+    commandTagCreate.expectMessage("Creating Process (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<CommandTag, Properties> pair = buildCommandTagWithPrimFields(1l);

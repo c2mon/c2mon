@@ -97,6 +97,7 @@ public class ConfigurationRequestHandler implements SessionAwareMessageListener<
         if (log.isDebugEnabled()) {
           log.debug("Sending reconfiguration report to client.");
         }
+        log.info("Sending reconfiguration report to client.");
         messageProducer.send(replyMessage);
       } finally {
         if (messageProducer != null) {
