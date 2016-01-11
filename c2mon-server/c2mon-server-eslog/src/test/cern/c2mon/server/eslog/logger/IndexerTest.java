@@ -298,11 +298,6 @@ public class IndexerTest {
     String indexName = indexer.generateIndex(tagServerTime);
     indexer.indexTags(list);
 
-    try {
-      indexer.getPoolManager().join(5000);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
 
 
     Set<String> resultIndices = indexer.getIndicesTypes().keySet();
