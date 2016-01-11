@@ -94,6 +94,7 @@ public class Indexer {
     }
     else {
       int counter = 0;
+      updateLists();
       for (TagES tag : tags) {
         if (sendTagToBatch(tag)) {
           counter++;
@@ -172,7 +173,6 @@ public class Indexer {
       return false;
     }
     else {
-      //updateLists();
       createNotExistingIndex(index);
       createNotExistingMapping(index, type);
 
