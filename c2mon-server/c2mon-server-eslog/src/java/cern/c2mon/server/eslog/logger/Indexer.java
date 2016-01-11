@@ -85,22 +85,26 @@ public class Indexer {
   }
 
   public void processData(Collection<TagES> tags) {
+    log.trace("processData() - Received a collection of " + tags.size() +  " tags to send by batch.");
     Map<String, TagES> aliases = new HashMap<>();
 
     if (tags == null) {
-      log.trace("indexTags() - received a null List of tags to log to ElasticSearch.");
+      log.trace("processData() - Received a null List of tags to log to ElasticSearch.");
     }
     else {
-
+      int counter = 0;
       for (TagES tag : tags) {
         if (sendTagToBatch(tag)) {
+          counter++;
           // 1 by 1 = long running
           aliases.put(generateAliasName(tag.getId()), tag);
         }
       }
 
+      log.trace("processData() - Created a batch composed of " + counter + " tags.");
+
       // FLUSH
-      log.trace("indexTags() - closing bulk.");
+      log.trace("processData() - closing bulk.");
       connector.closeBulk();
       connector.refreshClusterStats();
 
@@ -173,8 +177,6 @@ public class Indexer {
 
       IndexRequest indexNewTag = new IndexRequest(index, type).source(json).routing(String.valueOf(tag.getId()));
       boolean isSent = connector.bulkAdd(indexNewTag);
-
-      updateLists();
 
       return isSent;
     }
