@@ -5,6 +5,7 @@ import cern.c2mon.server.eslog.structure.mappings.TagBooleanMapping;
 import cern.c2mon.server.eslog.structure.mappings.TagNumericMapping;
 import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
 import cern.c2mon.server.eslog.structure.types.TagES;
+import cern.c2mon.shared.util.threadhandler.ThreadHandler;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.index.IndexRequest;
@@ -40,6 +41,22 @@ public class Indexer {
    */
   private Connector connector;
 
+  private List<IndexWorker> pool;
+
+  private Thread poolManager;
+
+  private class IndexWorker extends Thread {
+    Collection<TagES> tags;
+
+    public IndexWorker(Collection<TagES> tags) {
+      this.tags = tags;
+    }
+
+    public void run() {
+      processData(tags);
+    }
+  }
+
   /**
    * Is available if the Connector has found a connection.
    */
@@ -48,6 +65,21 @@ public class Indexer {
   @Autowired
   public Indexer(final Connector connector) {
     this.connector = connector;
+    this.pool = new ArrayList<>();
+    this.poolManager = new Thread() {
+      public void run() {
+        log.info("init() - PoolManager started.");
+        while(isAvailable) {
+          for (IndexWorker worker : pool) {
+            try {
+              worker.join();
+            } catch (InterruptedException e) {
+              log.info("poolManager - Interrupted while trying to join the thread " + worker.getId());
+            }
+          }
+        }
+      }
+    };
   }
 
   @PostConstruct
@@ -61,6 +93,7 @@ public class Indexer {
       isAvailable = false;
     }
     isAvailable = true;
+    poolManager.start();
   }
 
   /**
@@ -72,7 +105,9 @@ public class Indexer {
   public void indexTags(Collection<TagES> tags) {
     isAvailable = checkConnection();
     if (isAvailable) {
-      processData(tags);
+      IndexWorker worker = new IndexWorker(tags);
+      pool.add(worker);
+      worker.start();
     }
     else {
       log.warn("indexTags() - Launching fallBackMechanism because the connection has been interrupted.");
