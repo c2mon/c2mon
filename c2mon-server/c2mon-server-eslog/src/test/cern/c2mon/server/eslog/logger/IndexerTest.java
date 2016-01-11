@@ -313,8 +313,11 @@ public class IndexerTest {
     List<String> liveAliases = connector.handleListingQuery(queryAliases, indexName);
 
 
-    SearchResponse response = getResponse(connector.getClient(), new String[]{"c2mon_1973-11"}, 0, 10, null);
-    log.info(response.toString());
+    SearchResponse response = getResponse(connector.getClient(), new String[]{indexName}, 0, 10, null);
+
+    log.debug(response.toString());
+    log.debug("size: " + size);
+    log.debug("response: " + response.getHits().getTotalHits());
 
     assertEquals(size, response.getHits().getTotalHits());
     assertTrue(resultIndices.size() == liveIndices.size());

@@ -140,16 +140,16 @@ public class Indexer {
    */
   protected boolean sendTagToBatch(TagES tag) {
     String tagJson = tag.build();
-    String indexMonth = generateIndex(tag.getServerTimestamp());
+    String indexName = generateIndex(tag.getServerTimestamp());
     String type = generateType(tag.getDataType());
 
     if (log.isTraceEnabled()) {
       log.trace("sendTagToBatch() - Index a new tag.");
-      log.trace("sendTagToBatch() - Index = " + indexMonth);
+      log.trace("sendTagToBatch() - Index = " + indexName);
       log.trace("sendTagToBatch() - Type = " + type);
     }
 
-    return indexByBatch(indexMonth, type, tagJson, tag);
+    return indexByBatch(indexName, type, tagJson, tag);
   }
 
   public String generateIndex(long serverTime) {
