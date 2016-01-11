@@ -108,14 +108,11 @@ public class Indexer {
       // FLUSH
       log.trace("processData() - closing bulk.");
       connector.closeBulk();
-      connector.refreshClusterStats();
 
       for (String alias : aliases.keySet()) {
         addAliasFromBatch(generateIndex(aliases.get(alias).getServerTimestamp()), aliases.get(alias));
       }
 
-      /** For almost real time retrieval. */
-      connector.refreshClusterStats();
       updateLists();
     }
   }
@@ -216,13 +213,7 @@ public class Indexer {
     }
 
     Settings indexSettings = connector.getIndexSettings("INDEX_MONTH_SETTINGS");
-
     boolean isAcked = connector.handleIndexQuery(index, indexSettings, null, null);
-
-//    if (isAcked) {
-//      updateLists();
-//    }
-
     return isAcked;
   }
 
@@ -265,10 +256,6 @@ public class Indexer {
 
     boolean mappingAdded = connector.handleIndexQuery(index, null, type, mapping);
 
-//    if (mappingAdded) {
-//      updateLists();
-//    }
-
     return mappingAdded;
   }
 
@@ -305,14 +292,6 @@ public class Indexer {
     boolean canBeAdded = indicesAliases.keySet().contains(indexMonth) && !indicesAliases.get(indexMonth).contains(aliasName) && checkIndex(indexMonth) && checkAlias(aliasName);
     if (canBeAdded) {
       boolean isAcked = connector.handleAliasQuery(indexMonth, aliasName);
-
-//      if (isAcked) {
-//        addAlias(indexMonth, aliasName);
-//        log.debug("addAliasFromBatch() - Add alias: " + aliasName + " for index " + indexMonth + ".");
-//      }
-//
-//      updateLists();
-
       return true;
     }
     else {
@@ -397,11 +376,10 @@ public class Indexer {
    * indices, types and aliases.
    */
   public void updateLists() {
+    clearLists();
     updateIndices();
     updateTypes();
     updateAliases();
-
-    displayLists();
   }
 
   private void updateIndices() {
