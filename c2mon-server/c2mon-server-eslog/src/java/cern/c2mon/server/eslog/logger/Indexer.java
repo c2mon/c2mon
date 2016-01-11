@@ -89,7 +89,7 @@ public class Indexer {
     log.trace("processData() - Received a collection of " + tags.size() +  " tags to send by batch.");
     Map<String, TagES> aliases = new HashMap<>();
 
-    if (tags == null || tags.size() == 0) {
+    if (tags.size() == 0) {
       log.trace("processData() - Received a null List of tags to log to ElasticSearch.");
     }
     else {
@@ -174,9 +174,7 @@ public class Indexer {
       createNotExistingMapping(index, type);
 
       IndexRequest indexNewTag = new IndexRequest(index, type).source(json).routing(String.valueOf(tag.getId()));
-      boolean isSent = connector.bulkAdd(indexNewTag);
-
-      return isSent;
+      return connector.bulkAdd(indexNewTag);
     }
   }
 
@@ -213,8 +211,7 @@ public class Indexer {
     }
 
     Settings indexSettings = connector.getIndexSettings("INDEX_MONTH_SETTINGS");
-    boolean isAcked = connector.handleIndexQuery(index, indexSettings, null, null);
-    return isAcked;
+    return connector.handleIndexQuery(index, indexSettings, null, null);
   }
 
   private void createNotExistingMapping(String index, String type) {
@@ -254,9 +251,7 @@ public class Indexer {
       log.debug("instantiateIndex() - Adding a new mapping to index " + index + " for type " + type + ": " + mapping);
     }
 
-    boolean mappingAdded = connector.handleIndexQuery(index, null, type, mapping);
-
-    return mappingAdded;
+    return connector.handleIndexQuery(index, null, type, mapping);
   }
 
   /**
@@ -290,13 +285,7 @@ public class Indexer {
     String aliasName = generateAliasName(id);
 
     boolean canBeAdded = indicesAliases.keySet().contains(indexMonth) && !indicesAliases.get(indexMonth).contains(aliasName) && checkIndex(indexMonth) && checkAlias(aliasName);
-    if (canBeAdded) {
-      boolean isAcked = connector.handleAliasQuery(indexMonth, aliasName);
-      return true;
-    }
-    else {
-      return false;
-    }
+    return canBeAdded && connector.handleAliasQuery(indexMonth, aliasName);
   }
 
   /**
