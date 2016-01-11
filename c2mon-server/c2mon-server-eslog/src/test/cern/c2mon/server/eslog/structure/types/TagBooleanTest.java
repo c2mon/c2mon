@@ -1,5 +1,6 @@
 package cern.c2mon.server.eslog.structure.types;
 
+import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -30,12 +31,16 @@ public class TagBooleanTest {
     tagBoolean.setValue(true);
 
     assertEquals(true, tagBoolean.getValue());
+    assertEquals(1, tagBoolean.getValueNumeric());
+    assertTrue(tagBoolean.getValueBoolean());
     assertTrue(tagBoolean.getValue() instanceof Boolean);
 
     tagBoolean.setValue(false);
 
     assertEquals(false, tagBoolean.getValue());
     assertTrue(tagBoolean.getValue() instanceof Boolean);
+    assertFalse(tagBoolean.getValueBoolean());
+    assertEquals(0, tagBoolean.getValueNumeric());
   }
 
   @Test(expected = IllegalArgumentException.class)

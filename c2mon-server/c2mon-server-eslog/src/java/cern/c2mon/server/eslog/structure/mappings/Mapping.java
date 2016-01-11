@@ -153,6 +153,7 @@ public interface Mapping {
       }
       else if (ValueType.isBoolean(valueType)){
         this.valueBoolean = new ValueBoolean(valueType);
+        this.valueNumeric = new ValueNumeric(ValueType.intType);
       }
 
       this.process = new Process();
@@ -161,11 +162,11 @@ public interface Mapping {
     }
 
     public String getValueType() {
-      if (valueNumeric != null) {
-        return valueNumeric.getType();
-      }
-      else if (valueBoolean != null) {
+      if (valueBoolean != null) {
         return valueBoolean.getType();
+      }
+      else if (valueNumeric != null) {
+        return valueNumeric.getType();
       }
       else {
         return valueString.getType();

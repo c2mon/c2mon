@@ -262,7 +262,7 @@ public class DataTagESLogConverterTest {
 
     assertTrue(tagES instanceof TagBoolean);
     assertTrue(tagES.getValueBoolean());
-    assertNull(tagES.getValueNumeric());
+    assertEquals(1, tagES.getValueNumeric());
     assertNull(tagES.getValueString());
     assertTrue((Boolean) tagES.getValue());
     assertEquals("boolean", tagES.getDataType());
