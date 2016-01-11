@@ -9,7 +9,7 @@ package cern.c2mon.server.eslog.logger;
 public enum BulkSettings {
   BULK_ACTIONS (5600),
   BULK_SIZE (5),
-  FLUSH_INTERVAL (1),
+  FLUSH_INTERVAL (10),
   CONCURRENT (1);
 
   private final int setting;

@@ -16,6 +16,6 @@ public class BulkSettingsTest {
     assertThat(BulkSettings.BULK_ACTIONS.getSetting(), is(5600));
     assertThat(BulkSettings.CONCURRENT.getSetting(), is(1));
     assertThat(BulkSettings.BULK_SIZE.getSetting(), is(5));
-    assertThat(BulkSettings.FLUSH_INTERVAL.getSetting(), is(1));
+    assertThat(BulkSettings.FLUSH_INTERVAL.getSetting(), is(10));
   }
 }

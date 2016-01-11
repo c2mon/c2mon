@@ -88,7 +88,7 @@ public class Indexer {
     log.trace("processData() - Received a collection of " + tags.size() +  " tags to send by batch.");
     Map<String, TagES> aliases = new HashMap<>();
 
-    if (tags == null) {
+    if (tags == null || tags.size() == 0) {
       log.trace("processData() - Received a null List of tags to log to ElasticSearch.");
     }
     else {
@@ -171,7 +171,7 @@ public class Indexer {
       return false;
     }
     else {
-      updateLists();
+      //updateLists();
       createNotExistingIndex(index);
       createNotExistingMapping(index, type);
 
@@ -218,9 +218,9 @@ public class Indexer {
 
     boolean isAcked = connector.handleIndexQuery(index, indexSettings, null, null);
 
-    if (isAcked) {
-      updateLists();
-    }
+//    if (isAcked) {
+//      updateLists();
+//    }
 
     return isAcked;
   }
@@ -264,9 +264,9 @@ public class Indexer {
 
     boolean mappingAdded = connector.handleIndexQuery(index, null, type, mapping);
 
-    if (mappingAdded) {
-      updateLists();
-    }
+//    if (mappingAdded) {
+//      updateLists();
+//    }
 
     return mappingAdded;
   }
@@ -305,12 +305,12 @@ public class Indexer {
     if (canBeAdded) {
       boolean isAcked = connector.handleAliasQuery(indexMonth, aliasName);
 
-      if (isAcked) {
-        addAlias(indexMonth, aliasName);
-        log.debug("addAliasFromBatch() - Add alias: " + aliasName + " for index " + indexMonth + ".");
-      }
-
-      updateLists();
+//      if (isAcked) {
+//        addAlias(indexMonth, aliasName);
+//        log.debug("addAliasFromBatch() - Add alias: " + aliasName + " for index " + indexMonth + ".");
+//      }
+//
+//      updateLists();
 
       return true;
     }

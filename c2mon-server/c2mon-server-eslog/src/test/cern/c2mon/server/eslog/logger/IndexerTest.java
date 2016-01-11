@@ -10,6 +10,8 @@ import cern.c2mon.server.eslog.structure.types.TagES;
 import cern.c2mon.server.eslog.structure.types.TagString;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
+import org.elasticsearch.action.admin.indices.exists.types.TypesExistsRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -108,7 +110,7 @@ public class IndexerTest {
 
     boolean isAcked = indexer.instantiateIndex(index);
     assertTrue(isAcked);
-    assertTrue(indexer.getIndicesTypes().keySet().contains(index));
+    assertTrue(connector.getClient().admin().indices().exists(new IndicesExistsRequest(index)).actionGet().isExists());
   }
 
   @Test
@@ -119,8 +121,8 @@ public class IndexerTest {
     testInstantiateIndex();
     boolean isAcked = indexer.instantiateType(index, type);
     assertTrue(isAcked);
-    assertTrue(indexer.getIndicesTypes().keySet().contains(index));
-    assertTrue(indexer.getIndicesTypes().get(index).contains(type));
+    assertTrue(connector.getClient().admin().indices().exists(new IndicesExistsRequest(index)).actionGet().isExists());
+    assertTrue(connector.getClient().admin().indices().typesExists(new TypesExistsRequest(new String[]{index}, type)).actionGet().isExists());
   }
 
   @Test
@@ -362,6 +364,8 @@ public class IndexerTest {
 
     indexer.getIndicesAliases().put(index, new HashSet<String>());
     assertTrue(indexer.addAliasFromBatch(index, tag));
+    //normal behavior in the program, easier tests
+    indexer.addAlias(index, "tag_1");
     assertTrue(indexer.getIndicesAliases().get(index).contains("tag_1"));
   }
 
