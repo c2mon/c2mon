@@ -9,7 +9,7 @@
 
   <groupId>cern.c2mon.c2mon-client</groupId>
   <artifactId>c2mon-client-ext-simulator</artifactId>
-  <version>1.6.3</version>
+  <version>1.6.4-SNAPSHOT</version>
   <name>c2mon-client-ext-simulator</name>
   <packaging>jar</packaging>
 	<url>http://timweb.cern.ch</url>
