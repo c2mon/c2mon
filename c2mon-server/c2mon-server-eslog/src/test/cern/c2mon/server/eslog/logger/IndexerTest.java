@@ -369,7 +369,7 @@ public class IndexerTest {
     indexer.getIndicesAliases().put(index, new HashSet<String>());
     indexer.getIndicesAliases().get(index).add("tag_1");
     connector.getClient().admin().indices().prepareCreate(index).execute().actionGet();
-    connector.handleIndexQuery(index, connector.getIndexSettings("INDEX_MONTH_SETTINGS"),
+    connector.handleIndexQuery(index, connector.getIndexSettings("INDEX_MONTH"),
         indexer.generateType(tag.getDataType()), new TagStringMapping(Mapping.ValueType.stringType).getMapping());
 
     // already contains the alias
