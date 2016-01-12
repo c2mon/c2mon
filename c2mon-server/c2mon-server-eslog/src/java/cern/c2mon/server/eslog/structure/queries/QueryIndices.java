@@ -28,7 +28,7 @@ public class QueryIndices extends Query {
   public List<String> getListOfAnswer() {
     if (client != null) {
       String[] indicesFromCluster = getIndicesFromCluster();
-      log.info("QueryIndices - got a list of indices, size=" + indicesFromCluster.length);
+      log.debug("getListOfAnswer() - got a list of indices, size=" + indicesFromCluster.length);
       return Arrays.asList(indicesFromCluster);
     }
     else {
@@ -50,7 +50,7 @@ public class QueryIndices extends Query {
   }
 
   private void displayIndices(List<String> indices) {
-    log.info("initTest() - Indices present in the cluster:");
+    log.debug("displayIndices() - Indices present in the cluster:");
     for (String s : indices) {
       log.info(s);
     }

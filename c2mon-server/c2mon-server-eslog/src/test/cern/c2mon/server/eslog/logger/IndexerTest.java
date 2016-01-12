@@ -313,7 +313,7 @@ public class IndexerTest {
     List<String> liveAliases = connector.handleListingQuery(queryAliases, indexName);
 
 
-    SearchResponse response = getResponse(connector.getClient(), new String[]{indexName}, 0, 10, null);
+    SearchResponse response = getResponse(connector.getClient(), new String[]{indexName});
     sleep();
     log.debug(response.toString());
     log.debug("size: " + size);
@@ -391,19 +391,8 @@ public class IndexerTest {
     assertTrue(indexer.getIndicesTypes().get("c2mon_2015-12").contains(type));
   }
 
-  private SearchResponse getResponse(Client client, String[] indices, int from, int size, List<Long> tagIds) {
-    SearchRequestBuilder requestBuilder = client.prepareSearch();
-    requestBuilder.setSearchType(SearchType.DEFAULT)
-        .setIndices(indices)
-        .setFrom(from)
-        .setSize(size);
-
-    if (tagIds != null) {
-      requestBuilder.setQuery(QueryBuilders.boolQuery()
-          .filter(QueryBuilders.termsQuery("id", tagIds)));
-    }
-
-    return requestBuilder.execute().actionGet();
+  private SearchResponse getResponse(Client client, String[] indices) {
+    return client.prepareSearch(indices).setSearchType(SearchType.DEFAULT).execute().actionGet();
   }
 
   private void sleep() {

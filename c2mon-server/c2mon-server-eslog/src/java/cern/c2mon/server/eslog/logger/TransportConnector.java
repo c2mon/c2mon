@@ -216,7 +216,7 @@ public class TransportConnector implements Connector {
 
     this.bulkProcessor = BulkProcessor.builder(client, new BulkProcessor.Listener() {
       public void beforeBulk(long executionId, BulkRequest request) {
-        log.debug("Going to execute new bulk composed of {} actions", request.numberOfActions());
+        log.debug("beforeBulk() - Going to execute new bulk composed of {} actions", request.numberOfActions());
       }
 
       public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
@@ -225,7 +225,7 @@ public class TransportConnector implements Connector {
       }
 
       public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
-        log.warn("Error executing bulk", failure);
+        log.warn("afterBulk() - Error executing bulk", failure);
       }
     })
         .setName(bulkProcessorName)
@@ -235,7 +235,7 @@ public class TransportConnector implements Connector {
         .setConcurrentRequests(bulkSettings.get("concurrent"))
         .build();
 
-    log.debug("BulkProcessor created.");
+    log.debug("initBulkSettings() - BulkProcessor created.");
   }
 
   /**
@@ -247,7 +247,7 @@ public class TransportConnector implements Connector {
     if (client != null) {
       try {
         client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
-        log.debug("waitForYellowStatus() - Everything is allright.");
+        log.debug("waitForYellowStatus() - Everything is alright.");
         return true;
 
       } catch (NoNodeAvailableException e) {
