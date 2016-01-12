@@ -27,6 +27,17 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
+    <!--external c2mon dependencies-->
+    <dependency>
+      <groupId>cern.c2mon.c2mon-client</groupId>
+      <artifactId>c2mon-client-ext-messenger</artifactId>
+      <version>1.6.3</version>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-client</groupId>
+      <artifactId>c2mon-client-ext-rbac</artifactId>
+      <version>1.6.3</version>
+    </dependency>
   </dependencies>
 
   <developers />
