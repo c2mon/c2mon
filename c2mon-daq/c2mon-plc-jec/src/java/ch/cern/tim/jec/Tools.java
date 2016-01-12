@@ -1,17 +1,19 @@
-/*//////////////////////////////////////////////////////////////////////////////
-//                         TIM PLC INTERFACING SYSTEM                         //
-//                                                                            //
-//  Class to convert byte arrays into Strings and vice-versa.                 //
-//  Here, the data to send is converted from String to Byte Array and the     //
-//  data to receive is converted from Byte Array to String.                   //
-//                                                                            //
-// -------------------------------------------------------------------------- //
-// Changes made by            Date                Changes Made                //
-// -------------------------------------------------------------------------- //
-//  Joao Simoes           01/07/2004          First Implementation            //
-//  Joao Simoes           25/07/2004          Comment ameiloration            //
-//  Joao Simoes           25/07/2004          StringToPackedBCD - result var  //
-//////////////////////////////////////////////////////////////////////////////*/
+/******************************************************************************
+ * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * 
+ * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
+ * C2MON is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation, either version 3 of the license.
+ * 
+ * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+ * more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
+ *****************************************************************************/
 
 package ch.cern.tim.jec;
 

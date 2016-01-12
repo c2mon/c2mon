@@ -1,29 +1,19 @@
 /******************************************************************************
- * This file is part of the Technical Infrastructure Monitoring (TIM) project.
- * See http://ts-project-tim.web.cern.ch
- *
- * Copyright (C) 2005 - 2011 CERN This program is free software; you can
- * redistribute it and/or modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version. This program is distributed
- * in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details. You should have received
- * a copy of the GNU General Public License along with this program; if not,
- * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
- *
- * Author: TIM team, tim.support@cern.ch
+ * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * 
+ * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
+ * C2MON is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation, either version 3 of the license.
+ * 
+ * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+ * more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-// TIM Data Aquisition System. CERN. All rights reserved.
-//
-// T Nick:           Date:       Info:
-// -------------------------------------------------------------------------
-// D wbuczak      12/July/2004    Class generation from the model
-// P jletrasi     21/July/2004    JEC Protocol Implementation
-// P jletrasi     25/July/2004    Comment ameiloration
-// P jletrasi     08/Sept/2004    Set Time message added
-// -------------------------------------------------------------------------
 
 // PLC connection library
 package cern.c2mon.daq.jec;
