@@ -1,18 +1,17 @@
-/**
- * This package contains the interfaces used by the ConfigurationLoader
- * bean for applying individual configuration elements. The impementations
- * can be found in the .impl subpackage.
+/******************************************************************************
+ * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
  * 
- * <p>All "create", "update" and "remove" methods will run within a DB
- * transaction (propagation REQUIRED). Runtime exceptions will cause a 
- * transaction rollback and all concerned cache elements will be removed
- * from the cache and reloaded from the DB at the next access.
+ * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
+ * C2MON is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation, either version 3 of the license.
  * 
- * <p>In general, a configuration is split into configuration elements. In
- * terms of transactions, each element runs in it's own transaction and
- * is either entirely or not at all applied.
+ * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+ * more details.
  * 
- * <p>Notice the interfaces are required for the Spring AOP transactional
- * proxy to work (see Spring docs).
- */
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
+ *****************************************************************************/
 package cern.c2mon.server.configuration.handler;

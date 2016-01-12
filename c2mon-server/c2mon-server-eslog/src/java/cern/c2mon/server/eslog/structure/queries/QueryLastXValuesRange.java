@@ -1,55 +1,16 @@
-//package cern.c2mon.server.eslog.structure.queries;
-//
-//import org.elasticsearch.action.search.SearchRequestBuilder;
-//import org.elasticsearch.action.search.SearchResponse;
-//import org.elasticsearch.action.search.SearchType;
-//import org.elasticsearch.client.Client;
-//import org.elasticsearch.index.query.QueryBuilders;
-//import org.elasticsearch.search.SearchHit;
-//import org.elasticsearch.search.sort.SortOrder;
-//
-//import java.util.ArrayList;
-//import java.util.List;
-//
-///**
-// * Query the last X values and have a range on the time between min and max values (dates/milliseconds since Epoch).
-// * @author Alban Marguet.
-// */
-//public class QueryLastXValuesRange extends Query {
-//    public QueryLastXValuesRange(Client client) {
-//        super(client);
-//    }
-//
-//    public QueryLastXValuesRange(Client client, List<String> indices, boolean isTypeDefined, List<String> types, List<Long> tagIds, int from, int size, int min, int max) {
-//        super(client, indices, isTypeDefined, types, tagIds, from, size, min, max);
-//    }
-//
-//    protected SearchResponse getResponse() {
-//        SearchRequestBuilder requestBuilder = client.prepareSearch(indices());
-//
-//        if (isTypeDefined()) {
-//            requestBuilder.setTypes(types());
-//        }
-//
-//        return requestBuilder
-//                .setSearchType(SearchType.DEFAULT)
-//                .setFrom(from())
-//                .setSize(size())
-//                .setQuery(QueryBuilders.boolQuery()
-//                        .must(QueryBuilders.rangeQuery("serverTime").gte(min()).lte(max()))
-//                        .filter(QueryBuilders.termsQuery("id", tagIds())))
-//                .addSort("serverTime", SortOrder.DESC)
-//                .setRouting(getRouting(tagIds()))
-//                .execute().actionGet();
-//    }
-//
-//    public List<String> getListOfAnswer() {
-//        List<String> list = new ArrayList<>();
-//        SearchResponse response = getResponse();
-//        SearchHit[] hits = response.getHits().getHits();
-//        for (SearchHit hit : hits) {
-//            list.add(hit.getSourceAsString());
-//        }
-//        return list;
-//    }
-//}
+/******************************************************************************
+ * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * 
+ * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
+ * C2MON is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation, either version 3 of the license.
+ * 
+ * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+ * more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
+ *****************************************************************************/

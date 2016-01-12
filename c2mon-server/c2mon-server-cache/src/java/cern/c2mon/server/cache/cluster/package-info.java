@@ -1,16 +1,17 @@
-/**
- * The cluster cache contains parameters that need sharing across a server cluster.
- * The keys can be used to synchronize cluster actions. Timestamps or other shared
- * values can also be stored.
+/******************************************************************************
+ * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
  * 
- * <p>Make sure to follow the key naming convention, to allow re-use of this cache
- * by all modules (including optional ones). Keys should follow the pattern
+ * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
+ * C2MON is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation, either version 3 of the license.
  * 
- * <code> module-top-level-package-name.property-name </code>
+ * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+ * more details.
  * 
- * This package contains the implementation of this cache.
- * 
- * @author Mark Brightwell
- *
- */
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
+ *****************************************************************************/
 package cern.c2mon.server.cache.cluster;

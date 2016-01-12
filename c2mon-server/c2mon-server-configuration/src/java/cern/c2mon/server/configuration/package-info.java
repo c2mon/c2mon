@@ -1,10 +1,17 @@
-/**
- * Contains all the public interfaces of the C2MON configuration module.
- *
- * <p>The ConfigurationLoader bean is available for loading configurations into
- * the server cache (and DB). Configuration requests can also be sent to JMS
- * on the ${jms.config.destination} queue.
- *
- * <p>IMPORTANT: no other interface or class should be used externally
- */
+/******************************************************************************
+ * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * 
+ * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
+ * C2MON is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation, either version 3 of the license.
+ * 
+ * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+ * more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
+ *****************************************************************************/
 package cern.c2mon.server.configuration;
