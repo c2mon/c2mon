@@ -234,7 +234,7 @@ public class TransportConnectorTest {
   }
 
   private Settings createMonthSettings() {
-    return Settings.settingsBuilder().put("number_of_shards", IndexSettings.INDEX_MONTH_SETTINGS.getShards())
-        .put("number_of_replicas", IndexSettings.INDEX_MONTH_SETTINGS.getReplica()).build();
+    return Settings.settingsBuilder().put("number_of_shards", IndexSettings.INDEX_MONTH.getShards())
+        .put("number_of_replicas", IndexSettings.INDEX_MONTH.getReplica()).build();
   }
 }

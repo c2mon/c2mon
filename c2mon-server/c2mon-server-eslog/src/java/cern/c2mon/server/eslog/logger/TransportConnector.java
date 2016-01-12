@@ -85,7 +85,7 @@ public class TransportConnector implements Connector {
   @Value("${es.local:true}")
   private boolean isLocal;
 
-  @Value("${es.index.settings:INDEX_MONTH_SETTINGS}}")
+  @Value("${es.index.settings:INDEX_MONTH}}")
   private String indexSettings;
 
   /** Connection settings for the node according to the host, port, cluster, node and isLocal. */
@@ -125,7 +125,7 @@ public class TransportConnector implements Connector {
 
     findClusterAndLaunchBulk();
 
-    log.debug("init() - initial test passed: Transport client is connected to the cluster " + cluster + ".");
+    log.debug("init() - Initial test passed: Transport client is connected to the cluster " + cluster + ".");
     log.info("init() - Connected to cluster " + cluster + " with node " + node + ".");
   }
 

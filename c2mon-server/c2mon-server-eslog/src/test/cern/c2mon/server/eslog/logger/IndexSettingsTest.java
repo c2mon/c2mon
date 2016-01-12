@@ -30,13 +30,19 @@ import static org.junit.Assert.assertThat;
 public class IndexSettingsTest {
   @Test
   public void shouldHaveTheRightMonthlyValues() {
-    assertThat(IndexSettings.INDEX_MONTH_SETTINGS.getReplica(), is(0));
-    assertThat(IndexSettings.INDEX_MONTH_SETTINGS.getShards(), is(10));
+    assertThat(IndexSettings.INDEX_MONTH.getReplica(), is(0));
+    assertThat(IndexSettings.INDEX_MONTH.getShards(), is(10));
+
+    assertThat(IndexSettings.INDEX_MONTH_REPLICATED.getReplica(), is(2));
+    assertThat(IndexSettings.INDEX_MONTH_REPLICATED.getShards(), is(10));
   }
 
   @Test
   public void shouldHaveTheRightDailyValues() {
-    assertThat(IndexSettings.INDEX_DAILY_SETTINGS.getReplica(), is(0));
-    assertThat(IndexSettings.INDEX_DAILY_SETTINGS.getShards(), is(1));
+    assertThat(IndexSettings.INDEX_DAILY.getReplica(), is(0));
+    assertThat(IndexSettings.INDEX_DAILY.getShards(), is(1));
+
+    assertThat(IndexSettings.INDEX_DAILY_REPLICATED.getReplica(), is(2));
+    assertThat(IndexSettings.INDEX_DAILY_REPLICATED.getShards(), is(1));
   }
 }

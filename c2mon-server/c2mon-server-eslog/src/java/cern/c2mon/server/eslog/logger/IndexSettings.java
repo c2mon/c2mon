@@ -25,8 +25,10 @@ package cern.c2mon.server.eslog.logger;
  */
 public enum IndexSettings {
 
-  INDEX_MONTH_SETTINGS(10, 0),
-  INDEX_DAILY_SETTINGS(1, 0);
+  INDEX_MONTH(10, 0),
+  INDEX_MONTH_REPLICATED(10, 2),
+  INDEX_DAILY(1, 0),
+  INDEX_DAILY_REPLICATED(1, 2);
 
   private final int shards;
   private final int replica;

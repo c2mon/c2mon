@@ -34,7 +34,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * Implementation of the Indexer Interface.
+ * Used to write (a.k.a. index) the data to elasticSearch.
+ * Makes use of the Connector connection to an ElasticSearch cluster.
  * @author Alban Marguet.
  */
 @Service
