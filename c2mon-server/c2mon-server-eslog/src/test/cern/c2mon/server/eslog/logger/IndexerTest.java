@@ -314,7 +314,7 @@ public class IndexerTest {
 
 
     SearchResponse response = getResponse(connector.getClient(), new String[]{indexName}, 0, 10, null);
-
+    sleep();
     log.debug(response.toString());
     log.debug("size: " + size);
     log.debug("response: " + response.getHits().getTotalHits());
