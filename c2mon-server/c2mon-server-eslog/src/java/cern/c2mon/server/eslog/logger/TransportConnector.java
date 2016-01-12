@@ -423,6 +423,7 @@ public class TransportConnector implements Connector {
   public void closeBulk() {
     try {
       bulkProcessor.awaitClose(100, TimeUnit.MILLISECONDS);
+      refreshClusterStats();
       log.debug("closeBulk() - closing bulkProcessor");
     }
     catch (InterruptedException e) {
