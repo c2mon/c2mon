@@ -21,7 +21,6 @@ import cern.c2mon.server.eslog.structure.mappings.TagBooleanMapping;
 import cern.c2mon.server.eslog.structure.mappings.TagNumericMapping;
 import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
 import cern.c2mon.server.eslog.structure.types.TagES;
-import cern.c2mon.shared.util.threadhandler.ThreadHandler;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.index.IndexRequest;
@@ -227,7 +226,7 @@ public class Indexer {
       return false;
     }
 
-    Settings indexSettings = connector.getIndexSettings("INDEX_MONTH_SETTINGS");
+    Settings indexSettings = connector.getIndexSettings("INDEX_MONTH");
     return connector.handleIndexQuery(index, indexSettings, null, null);
   }
 
