@@ -16,7 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.types;
 
-import cern.c2mon.server.eslog.structure.mappings.TagNumericMapping;
 import lombok.extern.slf4j.Slf4j;
 
 /**

@@ -156,14 +156,14 @@ public class IndexerTest {
 
   @Test
   public void testGenerateAliasName() {
-    String expected = indexer.getTAG_PREFIX() + "1";
+    String expected = Indexer.TAG_PREFIX + "1";
     String value = indexer.generateAliasName(1L);
     assertEquals(expected, value);
   }
 
   @Test
   public void testGenerateType() {
-    String expected = indexer.getTAG_PREFIX() + "string";
+    String expected = Indexer.TAG_PREFIX + "string";
     TagES tag = new TagString();
     tag.setDataType("String");
     String value = indexer.generateType(tag.getDataType());
@@ -172,7 +172,7 @@ public class IndexerTest {
 
   @Test
   public void testGenerateIndex() {
-    String expected = indexer.getINDEX_PREFIX() + indexer.millisecondsToYearMonth(123456L);
+    String expected = Indexer.INDEX_PREFIX + indexer.millisecondsToYearMonth(123456L);
     TagES tag = new TagBoolean();
     tag.setServerTimestamp(123456L);
     String value = indexer.generateIndex(tag.getServerTimestamp());

@@ -16,50 +16,34 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.logger;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
+import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
 import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
+import cern.c2mon.server.eslog.structure.queries.Query;
+import cern.c2mon.server.eslog.structure.queries.QueryAliases;
+import cern.c2mon.server.eslog.structure.queries.QueryIndices;
+import cern.c2mon.server.eslog.structure.queries.QueryTypes;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
-import cern.c2mon.server.eslog.structure.queries.Query;
-import cern.c2mon.server.eslog.structure.queries.QueryAliases;
-import cern.c2mon.server.eslog.structure.queries.QueryIndexBuilder;
-import cern.c2mon.server.eslog.structure.queries.QueryIndices;
-import cern.c2mon.server.eslog.structure.queries.QueryTypes;
-import cern.c2mon.server.eslog.structure.types.TagBoolean;
-import cern.c2mon.server.eslog.structure.types.TagES;
-import cern.c2mon.server.eslog.structure.types.TagString;
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test the entire functionality of the node.
@@ -147,7 +131,6 @@ public class TransportConnectorTest {
   public void testHandleIndexQuery() {
     Client initClient = connector.getClient();
 
-    Set<String> init = new HashSet<>();
     Settings settings = createMonthSettings();
     String type = "tag_string";
     String mapping = new TagStringMapping(ValueType.stringType).getMapping();
@@ -164,7 +147,6 @@ public class TransportConnectorTest {
   @Test
   public void testHandleAliasQuery() {
     Client initClient = connector.getClient();
-    Set<String> init = new HashSet<>();
     Settings settings = Settings.settingsBuilder().build();
     String type = "tag_string";
     String mapping = new TagStringMapping(ValueType.stringType).getMapping();
@@ -206,7 +188,7 @@ public class TransportConnectorTest {
       assertNotNull(connector.getBulkProcessor());
     }
     catch (InterruptedException e) {
-      log.info("how come?");
+      log.debug("how come?");
     }
   }
 
@@ -215,13 +197,6 @@ public class TransportConnectorTest {
     Settings expected = Settings.settingsBuilder().put("number_of_shards", 10).put("number_of_replicas", 0).build();
     assertEquals(expected.get("number_of_shards"), connector.getIndexSettings("INDEX_MONTH").get("number_of_shards"));
     assertEquals(expected.get("number_of_replicas"), connector.getIndexSettings("INDEX_MONTH").get("number_of_replicas"));
-  }
-
-  private void clean(Client client) {
-    if (client != null) {
-      client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
-      client.admin().indices().prepareRefresh().execute().actionGet();
-    }
   }
 
   private void sleep() {

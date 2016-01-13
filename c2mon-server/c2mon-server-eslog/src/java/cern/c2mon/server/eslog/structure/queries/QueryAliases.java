@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.queries;
 
+import cern.c2mon.server.eslog.logger.Indexer;
 import com.carrotsearch.hppc.cursors.ObjectCursor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequestBuilder;
@@ -23,9 +24,7 @@ import org.elasticsearch.action.admin.indices.alias.IndicesAliasesResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.cluster.metadata.AliasMetaData;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Alban Marguet.
@@ -39,8 +38,10 @@ public class QueryAliases extends Query {
 
   public boolean addAlias(String indexMonth, String aliasName) {
     if (client != null) {
+      String tagId = aliasName.substring(Indexer.TAG_PREFIX.length());
+      String json = "{\"term\" : { \"id\" : " + tagId + " } }";
       IndicesAliasesRequestBuilder preparedAliases = prepareAliases();
-      IndicesAliasesResponse response = preparedAliases.addAlias(indexMonth, aliasName).execute().actionGet();
+      IndicesAliasesResponse response = preparedAliases.addAlias(indexMonth, aliasName, json).execute().actionGet();
       return response.isAcknowledged();
     }
     else {

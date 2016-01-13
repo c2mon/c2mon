@@ -16,20 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.types;
 
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
-import cern.c2mon.server.eslog.structure.mappings.TagBooleanMapping;
+import java.io.IOException;
+
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the good behaviour of the TagBoolean class. verify that it builds

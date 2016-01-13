@@ -52,23 +52,4 @@ public class QueryIndices extends Query {
       return new ArrayList<>();
     }
   }
-
-  public boolean initTest() {
-    try {
-      indices = getListOfAnswer();
-      displayIndices(indices);
-      return true;
-    }
-    catch(NoNodeAvailableException e) {
-      log.error("initTest() - Error while creating client, could not find a connection to the ElasticSearch cluster, is it running?");
-      return false;
-    }
-  }
-
-  private void displayIndices(List<String> indices) {
-    log.debug("displayIndices() - Indices present in the cluster:");
-    for (String s : indices) {
-      log.info(s);
-    }
-  }
 }

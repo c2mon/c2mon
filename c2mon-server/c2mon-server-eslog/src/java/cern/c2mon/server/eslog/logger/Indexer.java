@@ -42,11 +42,11 @@ import java.util.*;
 @Data
 public class Indexer {
   /** Prefix used for every index in the ElasticSearch cluster, e.g., c2mon_2015-11 is a valid index. */
-  private final String INDEX_PREFIX = "c2mon_";
+  public static final String INDEX_PREFIX = "c2mon_";
   /** Every tag or alias must begin with the same prefix, e.g., tag_string is a good type and tag_207807 is a good alias. */
-  private final String TAG_PREFIX = "tag_";
+  public static final String TAG_PREFIX = "tag_";
   /** The first index in the cluster is c2mon_1970-01 which corresponds to the Epoch time (ES stocks timestamps in milliseconds since Epoch). */
-  private final String FIRST_INDEX = INDEX_PREFIX + "1970-01";
+  public static final String FIRST_INDEX = INDEX_PREFIX + "1970-01";
 
   /** Contains in-memory the content of the Indices, types and aliases present in the cluster. */
   private final Map<String, Set<String>> indicesTypes = new HashMap<>();
@@ -87,21 +87,6 @@ public class Indexer {
    * @param tags to index.
    */
   public void indexTags(Collection<TagES> tags) {
-    isAvailable = checkConnection();
-    if (isAvailable) {
-      processData(tags);
-    }
-    else {
-      log.warn("indexTags() - Launching fallBackMechanism because the connection has been interrupted.");
-      launchFallBackMechanism(tags);
-    }
-  }
-
-  public boolean checkConnection() {
-    return connector.waitForYellowStatus();
-  }
-
-  public void processData(Collection<TagES> tags) {
     log.trace("processData() - Received a collection of " + tags.size() +  " tags to send by batch.");
     Map<String, TagES> aliases = new HashMap<>();
 
@@ -132,20 +117,6 @@ public class Indexer {
       updateLists();
     }
   }
-
-  /**
-   * Save data if cluster not available.
-   * @param tags to be indexed.
-   */
-  public void launchFallBackMechanism(Collection<TagES> tags) {
-    connector.findClusterAndLaunchBulk();
-    saveDataToFile(tags);
-  }
-
-  private void saveDataToFile(Collection<TagES> tags) {
-    //TODO
-  }
-
 
   /**
    * Add 1 TagES to index to the ElasticSearch cluster thanks to the

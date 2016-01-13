@@ -16,6 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.queries;
 
+import cern.c2mon.server.eslog.logger.Indexer;
+import cern.c2mon.server.eslog.logger.TransportConnector;
 import com.carrotsearch.hppc.ObjectContainer;
 import com.carrotsearch.hppc.cursors.ObjectCursor;
 import lombok.Getter;

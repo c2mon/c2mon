@@ -18,7 +18,7 @@ package cern.c2mon.server.eslog.logger;
 
 /**
  * Handles the bulk indexing settings.
- * Default is %600 actions before flush OR 5 seconds. We have an interval of 1 second between the flushes and have at
+ * Default is 5600 actions before flush OR 5 mb. We have an interval of 10 second between the flushes and have at
  * most 1 concurrent bulkProcessors.
  * @author Alban Marguet.
  */

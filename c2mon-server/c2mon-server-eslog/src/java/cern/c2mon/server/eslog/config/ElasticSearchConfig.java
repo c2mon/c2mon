@@ -22,9 +22,13 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 /**
- * Holds the configuration for the ElasticSearch cluster. es.port es.host
- * es.cluster es.node.name
- * 
+ * Holds the configuration for the ElasticSearch cluster. Used in TransportConnector class for:
+ * es.port
+ * es.host
+ * es.cluster
+ * es.node.name
+ * es.index.settings
+ *
  * @author Alban Marguet.
  */
 @Configuration

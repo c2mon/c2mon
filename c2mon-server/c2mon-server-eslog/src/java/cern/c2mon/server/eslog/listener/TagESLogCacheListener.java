@@ -55,12 +55,12 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
   private final CacheRegistrationService cacheRegistrationService;
 
   /**
-   * Allows t oconvert from Tag to TagES.
+   * Allows to convert from Tag to TagES.
    */
   private final DataTagESLogConverter dataTagESLogConverter;
 
   /**
-   * the Indexer allows to use the connection to the ElasticSearch cluster and to write data.
+   * The Indexer allows to use the connection to the ElasticSearch cluster and to write data.
    */
   private final Indexer indexer;
 

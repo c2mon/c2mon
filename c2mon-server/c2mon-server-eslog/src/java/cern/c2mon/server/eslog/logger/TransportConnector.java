@@ -17,8 +17,11 @@
 package cern.c2mon.server.eslog.logger;
 
 import cern.c2mon.server.eslog.structure.queries.*;
+import cern.c2mon.server.eslog.structure.types.TagES;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -26,6 +29,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.cluster.metadata.AliasOrIndex;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.transport.LocalTransportAddress;
@@ -33,6 +37,7 @@ import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.node.Node;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -107,7 +112,11 @@ public class TransportConnector implements Connector {
 
   private final HashMap<String, Integer> bulkSettings = new HashMap<>();
 
-  public TransportConnector() {
+  private final ESPersistenceManager esPersistenceManager;
+
+  @Autowired
+  public TransportConnector(final ESPersistenceManager esPersistenceManager) {
+    this.esPersistenceManager = esPersistenceManager;
     declareClusterResearch();
   }
 
@@ -218,6 +227,10 @@ public class TransportConnector implements Connector {
 
     /** The Connector found a connection to a cluster. */
     initBulkSettings();
+    List<IndexRequest> backup = esPersistenceManager.retrieveBackupData();
+    for (IndexRequest request : backup) {
+      bulkAdd(request);
+    }
   }
 
   /**
@@ -237,11 +250,21 @@ public class TransportConnector implements Connector {
 
       public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
         log.debug("afterBulk() - Executed bulk composed of {} actions", request.numberOfActions());
+        handleFailedActions(request, response);
+        if (!waitForYellowStatus()) {
+          esPersistenceManager.launchFallBackMechanism(request);
+          findClusterAndLaunchBulk();
+        }
         refreshClusterStats();
       }
 
       public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
         log.warn("afterBulk() - Error executing bulk", failure);
+        handleFailedActions(request, null);
+        if (!waitForYellowStatus()) {
+          esPersistenceManager.launchFallBackMechanism(request);
+          findClusterAndLaunchBulk();
+        }
       }
     })
         .setName(bulkProcessorName)
@@ -277,9 +300,9 @@ public class TransportConnector implements Connector {
     }
   }
 
-  public boolean bulkAdd(IndexRequest indexNewTag) {
-    if (bulkProcessor != null && indexNewTag != null) {
-      bulkProcessor.add(indexNewTag);
+  public boolean bulkAdd(IndexRequest request) {
+    if (bulkProcessor != null && request != null) {
+      bulkProcessor.add(request);
       log.trace("bulkAdd() - BulkProcessor will handle indexing of new index.");
       return true;
     }
@@ -459,5 +482,36 @@ public class TransportConnector implements Connector {
       client.close();
       log.info("close() - Closed client: " + client.settings().get("node.name"));
     }
+  }
+
+  public void handleFailedActions(BulkRequest request, BulkResponse response) {
+    if (response == null) {
+      for (ActionRequest action : request.requests()) {
+        if (action instanceof IndexRequest) {
+          bulkAdd((IndexRequest) action);
+        }
+      }
+    }
+    else {
+      List<Integer> failedActions = getFailedActions(response);
+      for (int failedAction : failedActions) {
+        ActionRequest current = request.requests().get(failedAction);
+        if (current instanceof IndexRequest) {
+          bulkAdd((IndexRequest) current);
+        }
+      }
+    }
+  }
+
+  private List<Integer> getFailedActions(BulkResponse bulkResponse) {
+    List<Integer> failedActions = new ArrayList<>();
+    if (bulkResponse.hasFailures()) {
+      for (BulkItemResponse item : bulkResponse.getItems()) {
+        if (item.isFailed()) {
+          failedActions.add(item.getItemId());
+        }
+      }
+    }
+    return failedActions;
   }
 }
