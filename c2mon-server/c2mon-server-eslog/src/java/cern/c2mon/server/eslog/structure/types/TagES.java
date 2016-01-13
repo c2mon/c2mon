@@ -18,11 +18,13 @@ package cern.c2mon.server.eslog.structure.types;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
-import cern.c2mon.server.eslog.structure.mappings.TagESMapping;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.Map;
 
 /**
  * Class that represents a Tag for ElasticSearch.
@@ -45,6 +47,9 @@ public abstract class TagES implements TagESInterface {
   protected String valueString;
   protected Number valueNumeric;
   private String valueDescription;
+
+  //TODO: be able to discover what is inside and create a static structure for it.
+  private transient Map<String, Object> metadata;
   
   private String process;
   private String equipment;
@@ -66,7 +71,7 @@ public abstract class TagES implements TagESInterface {
     str.append('\t');
     str.append(getName());
     str.append('\t');
-    str.append("value");
+    str.append(getValue());
     str.append('\t');
     str.append(getValueDescription());
     str.append('\t');
@@ -96,6 +101,20 @@ public abstract class TagES implements TagESInterface {
       return "nullQuality";
     } else {
       return getQuality();
+    }
+  }
+
+  private String serializeToString(Object object) {
+    try {
+      ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+      ObjectOutputStream objectOutputStream = new ObjectOutputStream(arrayOutputStream);
+      objectOutputStream.writeObject(object);
+      objectOutputStream.flush();
+      return new String(arrayOutputStream.toByteArray());
+    }
+    catch (IOException e) {
+      log.warn("serializeToString() - Could not get String output for TagES id " + id);
+      return null;
     }
   }
 }

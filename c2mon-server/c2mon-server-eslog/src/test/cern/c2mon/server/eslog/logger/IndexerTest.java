@@ -156,14 +156,14 @@ public class IndexerTest {
 
   @Test
   public void testGenerateAliasName() {
-    String expected = Indexer.TAG_PREFIX + "1";
-    String value = indexer.generateAliasName(1L);
+    String expected = indexer.getTagPrefix() + "1";
+    String value = indexer.generateAliasName(1);
     assertEquals(expected, value);
   }
 
   @Test
   public void testGenerateType() {
-    String expected = Indexer.TAG_PREFIX + "string";
+    String expected = indexer.getTagPrefix() + "string";
     TagES tag = new TagString();
     tag.setDataType("String");
     String value = indexer.generateType(tag.getDataType());
@@ -172,7 +172,7 @@ public class IndexerTest {
 
   @Test
   public void testGenerateIndex() {
-    String expected = Indexer.INDEX_PREFIX + indexer.millisecondsToYearMonth(123456L);
+    String expected = indexer.getIndexPrefix() + indexer.millisecondsToYearMonth(123456L);
     TagES tag = new TagBoolean();
     tag.setServerTimestamp(123456L);
     String value = indexer.generateIndex(tag.getServerTimestamp());
@@ -241,6 +241,7 @@ public class IndexerTest {
 
   @Test
   public void testCheckIndex() {
+    log.debug(indexer.getIndexPrefix());
     assertTrue(indexer.checkIndex("c2mon_1234-69"));
     assertFalse(indexer.checkIndex("c2mon-1234-69"));
     assertFalse(indexer.checkIndex("c2mon_1234.69"));
@@ -369,7 +370,7 @@ public class IndexerTest {
     indexer.getIndicesAliases().put(index, new HashSet<String>());
     indexer.getIndicesAliases().get(index).add("tag_1");
     connector.getClient().admin().indices().prepareCreate(index).execute().actionGet();
-    connector.handleIndexQuery(index, connector.getIndexSettings("INDEX_MONTH"),
+    connector.handleIndexQuery(index, connector.getIndexSettings(10, 0),
         indexer.generateType(tag.getDataType()), new TagStringMapping(Mapping.ValueType.stringType).getMapping());
 
     // already contains the alias

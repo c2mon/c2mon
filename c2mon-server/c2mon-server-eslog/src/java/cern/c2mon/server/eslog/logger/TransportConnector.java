@@ -60,7 +60,7 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 @Slf4j
 @Data
 public class TransportConnector implements Connector {
-  /** Only used, if elasticsearch is started inside this JVM */
+  /** Only used, if elasticSearch is started inside this JVM */
   private final int LOCAL_PORT = 1;
   private final String LOCAL_HOST = "local";
 
@@ -90,8 +90,13 @@ public class TransportConnector implements Connector {
   @Value("${es.local:true}")
   private boolean isLocal;
 
-  @Value("${es.index.settings:INDEX_MONTH}")
-  private String indexSettings;
+  /** Number of shards attributed to an index. */
+  @Value("${es.config.index.shards:10}")
+  private int shards;
+
+  /** Number of replica for each of the indices in ElasticSearch. */
+  @Value("${es.config.index.replica:0}")
+  private int replica;
 
   @Value("${es.backup}")
   private String backupFilePath;
@@ -113,7 +118,15 @@ public class TransportConnector implements Connector {
 
   private boolean isConnected;
 
-  private final HashMap<String, Integer> bulkSettings = new HashMap<>();
+  /** BulkSettings */
+  @Value("${es.config.bulk.actions:5600}")
+  private int bulkActions;
+  @Value("${es.config.bulk.size:5}")
+  private int bulkSize;
+  @Value("${es.config.bulk.flush:10}")
+  private int flushInterval;
+  @Value("${es.config.bulk.concurrent:1}")
+  private int concurrent;
 
   private final ESPersistenceManager esPersistenceManager;
 
@@ -242,11 +255,6 @@ public class TransportConnector implements Connector {
    * BulkSettings.
    */
   public void initBulkSettings() {
-    bulkSettings.put("bulkActions", BulkSettings.BULK_ACTIONS.getSetting());
-    bulkSettings.put("bulkSize", BulkSettings.BULK_SIZE.getSetting());
-    bulkSettings.put("flushInterval", BulkSettings.FLUSH_INTERVAL.getSetting());
-    bulkSettings.put("concurrent", BulkSettings.CONCURRENT.getSetting());
-
     this.bulkProcessor = BulkProcessor.builder(client, new BulkProcessor.Listener() {
       public void beforeBulk(long executionId, BulkRequest request) {
         log.debug("beforeBulk() - Going to execute new bulk composed of {} actions", request.numberOfActions());
@@ -272,10 +280,10 @@ public class TransportConnector implements Connector {
       }
     })
         .setName(bulkProcessorName)
-        .setBulkActions(bulkSettings.get("bulkActions"))
-        .setBulkSize(new ByteSizeValue(bulkSettings.get("bulkSize"), ByteSizeUnit.GB))
-        .setFlushInterval(TimeValue.timeValueSeconds(bulkSettings.get("flushInterval")))
-        .setConcurrentRequests(bulkSettings.get("concurrent"))
+        .setBulkActions(bulkActions)
+        .setBulkSize(new ByteSizeValue(bulkSize, ByteSizeUnit.GB))
+        .setFlushInterval(TimeValue.timeValueSeconds(flushInterval))
+        .setConcurrentRequests(concurrent)
         .build();
 
     log.debug("initBulkSettings() - BulkProcessor created.");
@@ -432,10 +440,9 @@ public class TransportConnector implements Connector {
     client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
   }
 
-  public Settings getIndexSettings(String name) {
-    IndexSettings settings = IndexSettings.valueOf(name);
-    return Settings.settingsBuilder().put("number_of_shards", settings.getShards())
-        .put("number_of_replicas", settings.getReplica()).build();
+  public Settings getIndexSettings(int shards, int replica) {
+    return Settings.settingsBuilder().put("number_of_shards", shards)
+        .put("number_of_replicas", replica).build();
   }
 
   /**
@@ -465,7 +472,7 @@ public class TransportConnector implements Connector {
    */
   public void closeBulk() {
     try {
-      bulkProcessor.awaitClose(100, TimeUnit.MILLISECONDS);
+      bulkProcessor.awaitClose(10, TimeUnit.MILLISECONDS);
       refreshClusterStats();
       log.debug("closeBulk() - closing bulkProcessor");
     }

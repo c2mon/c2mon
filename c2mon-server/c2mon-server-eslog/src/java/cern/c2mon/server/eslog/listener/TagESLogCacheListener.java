@@ -22,6 +22,7 @@ import java.util.Collection;
 import javax.annotation.PostConstruct;
 
 import cern.c2mon.server.eslog.logger.Indexer;
+import cern.c2mon.server.eslog.structure.converter.DataTagESLogConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
@@ -31,12 +32,8 @@ import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.eslog.logger.Connector;
-import cern.c2mon.server.eslog.logger.TransportConnector;
-import cern.c2mon.server.eslog.structure.DataTagESLogConverter;
 import cern.c2mon.server.eslog.structure.types.TagES;
 import lombok.extern.slf4j.Slf4j;
-import org.yaml.snakeyaml.nodes.CollectionNode;
 
 /**
  * Listens to updates in the Rule and DataTag caches and calls the DAO

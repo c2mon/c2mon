@@ -50,9 +50,8 @@ public interface Connector {
    */
   void refreshClusterStats();
 
-  /**
-   * @return the Client connected to the ElasticSearch cluster.
-   */
+  int getShards();
+  int getReplica();
   Client getClient();
 
   /**
@@ -106,5 +105,5 @@ public interface Connector {
   /**
    * @return the Index settings: number of shards and number of replica. (lucene settings)
    */
-  Settings getIndexSettings(String name);
+  Settings getIndexSettings(int shards, int replica);
 }

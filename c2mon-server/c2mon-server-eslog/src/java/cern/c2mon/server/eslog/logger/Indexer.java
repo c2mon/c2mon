@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.settings.Settings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -42,11 +43,15 @@ import java.util.*;
 @Data
 public class Indexer {
   /** Prefix used for every index in the ElasticSearch cluster, e.g., c2mon_2015-11 is a valid index. */
-  public static final String INDEX_PREFIX = "c2mon_";
+  @Value("${es.prefix.index:c2mon_}")
+  private String indexPrefix;
+
   /** Every tag or alias must begin with the same prefix, e.g., tag_string is a good type and tag_207807 is a good alias. */
-  public static final String TAG_PREFIX = "tag_";
+  @Value("${es.prefix.tag:tag_}")
+  private String tagPrefix;
+
   /** The first index in the cluster is c2mon_1970-01 which corresponds to the Epoch time (ES stocks timestamps in milliseconds since Epoch). */
-  public static final String FIRST_INDEX = INDEX_PREFIX + "1970-01";
+  private final String FIRST_INDEX = indexPrefix + "1970-01";
 
   /** Contains in-memory the content of the Indices, types and aliases present in the cluster. */
   private final Map<String, Set<String>> indicesTypes = new HashMap<>();
@@ -140,11 +145,11 @@ public class Indexer {
   }
 
   public String generateIndex(long serverTime) {
-    return INDEX_PREFIX + millisecondsToYearMonth(serverTime);
+    return indexPrefix + millisecondsToYearMonth(serverTime);
   }
 
   public String generateType(String dataType) {
-    return TAG_PREFIX + dataType.toLowerCase();
+    return tagPrefix + dataType.toLowerCase();
   }
 
   protected boolean indexByBatch(String index, String type, String json, TagES tag) {
@@ -166,13 +171,13 @@ public class Indexer {
   }
 
   public boolean checkIndex(String index) {
-    return index.matches("^" + INDEX_PREFIX + "\\d\\d\\d\\d-\\d\\d$");
+    return index.matches("^" + indexPrefix + "\\d\\d\\d\\d-\\d\\d$");
   }
 
   public boolean checkType(String type) {
-    String dataType = type.substring(TAG_PREFIX.length());
+    String dataType = type.substring(tagPrefix.length());
 
-    return type.matches("^" + TAG_PREFIX + ".+$") && (Mapping.ValueType.matches(dataType));
+    return type.matches("^" + tagPrefix + ".+$") && (Mapping.ValueType.matches(dataType));
   }
 
   private void createNotExistingIndex(String index) {
@@ -197,7 +202,7 @@ public class Indexer {
       return false;
     }
 
-    Settings indexSettings = connector.getIndexSettings("INDEX_MONTH");
+    Settings indexSettings = connector.getIndexSettings(connector.getShards(), connector.getReplica());
     return connector.handleIndexQuery(index, indexSettings, null, null);
   }
 
@@ -234,7 +239,7 @@ public class Indexer {
 
     String mapping = null;
     if (!typeIsPresent(index, type)) {
-      mapping = chooseMapping(type.substring(TAG_PREFIX.length()));
+      mapping = chooseMapping(type.substring(tagPrefix.length()));
       log.debug("instantiateIndex() - Adding a new mapping to index " + index + " for type " + type + ": " + mapping);
     }
 
@@ -282,14 +287,14 @@ public class Indexer {
    * @return name of the alias for a given id.
    */
   public String generateAliasName(long id) {
-    return TAG_PREFIX + id;
+    return tagPrefix + id;
   }
 
   /**
    * Check if an alias has the right format: tag_tagId.
    */
   public boolean checkAlias(String alias) {
-    return alias.matches("^" + TAG_PREFIX + "\\d+$");
+    return alias.matches("^" + tagPrefix + "\\d+$");
   }
 
   /**

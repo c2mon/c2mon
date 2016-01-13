@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import cern.c2mon.server.eslog.structure.converter.DataTagESLogConverter;
 import cern.c2mon.server.eslog.structure.types.TagNumeric;
 import org.junit.Test;
 import org.junit.runner.RunWith;

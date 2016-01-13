@@ -1,4 +1,3 @@
-package cern.c2mon.server.eslog.logger;
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
  * <p/>
@@ -15,6 +14,7 @@ package cern.c2mon.server.eslog.logger;
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
+package cern.c2mon.server.eslog.logger;
 
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.bulk.BulkRequest;

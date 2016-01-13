@@ -195,8 +195,8 @@ public class TransportConnectorTest {
   @Test
   public void testGetIndexSettings() {
     Settings expected = Settings.settingsBuilder().put("number_of_shards", 10).put("number_of_replicas", 0).build();
-    assertEquals(expected.get("number_of_shards"), connector.getIndexSettings("INDEX_MONTH").get("number_of_shards"));
-    assertEquals(expected.get("number_of_replicas"), connector.getIndexSettings("INDEX_MONTH").get("number_of_replicas"));
+    assertEquals(expected.get("number_of_shards"), connector.getIndexSettings(10, 0).get("number_of_shards"));
+    assertEquals(expected.get("number_of_replicas"), connector.getIndexSettings(10, 0).get("number_of_replicas"));
   }
 
   private void sleep() {
@@ -209,7 +209,7 @@ public class TransportConnectorTest {
   }
 
   private Settings createMonthSettings() {
-    return Settings.settingsBuilder().put("number_of_shards", IndexSettings.INDEX_MONTH.getShards())
-        .put("number_of_replicas", IndexSettings.INDEX_MONTH.getReplica()).build();
+    return Settings.settingsBuilder().put("number_of_shards", 10)
+        .put("number_of_replicas", 0).build();
   }
 }

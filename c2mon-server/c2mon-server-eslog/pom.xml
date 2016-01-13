@@ -76,6 +76,11 @@
       <version>2.4</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-shorttermlog</artifactId>
+      <version>1.6.4-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
   <build>
