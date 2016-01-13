@@ -98,7 +98,7 @@ public class TransportConnector implements Connector {
   @Value("${es.config.index.replica:0}")
   private int replica;
 
-  @Value("${es.backup}")
+  @Value("${es.backup:null}")
   private String backupFilePath;
 
   /** Connection settings for the node according to the host, port, cluster, node and isLocal. */
