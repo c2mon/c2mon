@@ -21,9 +21,6 @@ import com.google.gson.GsonBuilder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.Map;
 
 /**
@@ -101,20 +98,6 @@ public abstract class TagES implements TagESInterface {
       return "nullQuality";
     } else {
       return getQuality();
-    }
-  }
-
-  private String serializeToString(Object object) {
-    try {
-      ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
-      ObjectOutputStream objectOutputStream = new ObjectOutputStream(arrayOutputStream);
-      objectOutputStream.writeObject(object);
-      objectOutputStream.flush();
-      return new String(arrayOutputStream.toByteArray());
-    }
-    catch (IOException e) {
-      log.warn("serializeToString() - Could not get String output for TagES id " + id);
-      return null;
     }
   }
 }
