@@ -90,8 +90,11 @@ public class TransportConnector implements Connector {
   @Value("${es.local:true}")
   private boolean isLocal;
 
-  @Value("${es.index.settings:INDEX_MONTH}}")
+  @Value("${es.index.settings:INDEX_MONTH}")
   private String indexSettings;
+
+  @Value("${es.backup}")
+  private String backupFilePath;
 
   /** Connection settings for the node according to the host, port, cluster, node and isLocal. */
   private Settings settings;
@@ -117,6 +120,7 @@ public class TransportConnector implements Connector {
   @Autowired
   public TransportConnector(final ESPersistenceManager esPersistenceManager) {
     this.esPersistenceManager = esPersistenceManager;
+    esPersistenceManager.setupBackup(backupFilePath);
     declareClusterResearch();
   }
 
