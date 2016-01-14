@@ -16,24 +16,23 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.listener;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import javax.annotation.PostConstruct;
-
-import cern.c2mon.server.eslog.logger.Indexer;
-import cern.c2mon.server.eslog.structure.converter.DataTagESLogConverter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.SmartLifecycle;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.BufferedTimCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.eslog.logger.Indexer;
+import cern.c2mon.server.eslog.logger.TagIndexer;
+import cern.c2mon.server.eslog.structure.converter.DataTagESLogConverter;
 import cern.c2mon.server.eslog.structure.types.TagES;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.SmartLifecycle;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Listens to updates in the Rule and DataTag caches and calls the DAO
@@ -59,7 +58,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
   /**
    * The Indexer allows to use the connection to the ElasticSearch cluster and to write data.
    */
-  private final Indexer indexer;
+  private final TagIndexer indexer;
 
   /**
    * Listener container lifecycle hook.
@@ -77,7 +76,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
    * @param cacheRegistrationService for registering cache listeners
    */
   @Autowired
-  public TagESLogCacheListener(final CacheRegistrationService cacheRegistrationService, final DataTagESLogConverter dataTagESLogConverter, final Indexer indexer) {
+  public TagESLogCacheListener(final CacheRegistrationService cacheRegistrationService, final DataTagESLogConverter dataTagESLogConverter, final TagIndexer indexer) {
     super();
     this.cacheRegistrationService = cacheRegistrationService;
     this.dataTagESLogConverter = dataTagESLogConverter;

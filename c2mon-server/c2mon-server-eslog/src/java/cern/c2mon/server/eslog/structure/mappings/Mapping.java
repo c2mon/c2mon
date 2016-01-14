@@ -25,6 +25,7 @@ import lombok.Getter;
  */
 public interface Mapping {
   enum ValueType {
+    supervisionType("supervision"),
     stringType("string"),
     longType("long"),
     intType("integer"),
@@ -43,6 +44,14 @@ public interface Mapping {
     @Override
     public String toString() {
       return this.type;
+    }
+
+    public static boolean isSupervision(ValueType type) {
+      return supervisionType.equals(type);
+    }
+
+    public static boolean isSupervision(String typeAsString) {
+      return supervisionType.toString().equalsIgnoreCase(typeAsString);
     }
     
     public static boolean isNumeric(ValueType type) {
@@ -268,6 +277,54 @@ public interface Mapping {
     class SubEquipment {
       private final String type = ValueType.stringType.toString();
       //private final String index = indexNotAnalyzed;
+    }
+  }
+
+  class SupervisionSettings {
+    private final int number_of_shards;
+    private final int number_of_replicas;
+
+    SupervisionSettings(int shards, int replica) {
+      this.number_of_shards = shards;
+      this.number_of_replicas = replica;
+    }
+  }
+
+  class SupervisionProperties {
+    private Supervision supervision;
+
+    SupervisionProperties() {
+      this.supervision = new Supervision();
+    }
+
+    class Supervision {
+      private Id id;
+      private Timestamp timestamp;
+      private Message message;
+      private Status status;
+
+      Supervision() {
+        this.id = new Id();
+        this.timestamp = new Timestamp();
+        this.message = new Message();
+        this.status = new Status();
+      }
+
+      class Id {
+        private final String type = ValueType.longType.toString();
+      }
+
+      class Timestamp {
+        private final String type = ValueType.dateType.toString();
+      }
+
+      class Message {
+        private final String type = ValueType.stringType.toString();
+      }
+
+      class Status {
+        private final String type = ValueType.stringType.toString();
+      }
     }
   }
 }

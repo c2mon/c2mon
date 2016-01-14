@@ -18,6 +18,7 @@ package cern.c2mon.server.eslog.logger;
 
 import cern.c2mon.server.eslog.structure.queries.*;
 import cern.c2mon.server.eslog.structure.types.TagES;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.ActionRequest;
@@ -26,6 +27,7 @@ import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.client.transport.TransportClient;
@@ -367,18 +369,6 @@ public class TransportConnector implements Connector {
     return queryResponse;
   }
 
-  /**
-   * Handles an indexing query for the ElasticSearch cluster. This method allows
-   * to add a new index/type if needed directly to the cluster in addition to
-   * adding the data itself.
-   *
-   * @param indexName of the index to add the data to.
-   * @param settings of the index in the cluster.
-   * @param type of the document to add to the cluster.
-   * @param mapping contains the information for the indexing: routing, fields,
-   *          fields types...
-   * @return true if the client has been acked.
-   */
   @Override
   public boolean handleIndexQuery(String indexName, Settings settings, String type, String mapping) {
     QueryIndexBuilder query = new QueryIndexBuilder(client);
@@ -404,6 +394,20 @@ public class TransportConnector implements Connector {
     }
 
     isAcked = ((QueryAliases) query).addAlias(indexMonth, aliasName);
+    return isAcked;
+  }
+
+  @Override
+  public boolean handleSupervisionQuery(String indexName, String mapping, SupervisionEvent supervisionEvent) {
+    SupervisionQuery supervisionQuery = new SupervisionQuery(client, supervisionEvent);
+    boolean isAcked = false;
+
+    if (client == null) {
+      log.error("handleSupervisionQuery() - Error: Client is null.");
+      return isAcked;
+    }
+
+    isAcked = supervisionQuery.logSupervisionEvent(indexName, mapping);
     return isAcked;
   }
 

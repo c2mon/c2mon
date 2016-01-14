@@ -66,7 +66,7 @@ public class IndexerTest {
   static Client clusterClient;
   static Client initClient;
   @Autowired
-  Indexer indexer;
+  TagIndexer indexer;
   @Autowired
   TransportConnector connector;
 
@@ -165,7 +165,7 @@ public class IndexerTest {
     String expected = indexer.getTagPrefix() + "string";
     TagES tag = new TagString();
     tag.setDataType("String");
-    String value = indexer.generateType(tag.getDataType());
+    String value = indexer.generateTagType(tag.getDataType());
     assertEquals(expected, value);
   }
 
@@ -174,7 +174,7 @@ public class IndexerTest {
     String expected = indexer.getIndexPrefix() + indexer.millisecondsToYearMonth(123456L);
     TagES tag = new TagBoolean();
     tag.setServerTimestamp(123456L);
-    String value = indexer.generateIndex(tag.getServerTimestamp());
+    String value = indexer.generateTagIndex(tag.getServerTimestamp());
     assertEquals(expected, value);
   }
 
@@ -266,7 +266,7 @@ public class IndexerTest {
     tag.setServerTimestamp(123456789000L);
     tag.setValue(true);
 
-    String indexName = indexer.generateIndex(tag.getServerTimestamp());
+    String indexName = indexer.generateTagIndex(tag.getServerTimestamp());
 
     assertEquals(1, tag.getValueNumeric());
     assertTrue(tag.getValueBoolean());
@@ -275,14 +275,14 @@ public class IndexerTest {
     indexer.sendTagToBatch(tag);
     connector.closeBulk();
 
-    assertTrue(indexer.getIndicesTypes().keySet().contains(indexer.generateIndex(123456789000L)));
-    assertTrue(indexer.getIndicesTypes().get(indexName).contains(indexer.generateType(tag.getDataType())));
+    assertTrue(indexer.getIndicesTypes().keySet().contains(indexer.generateTagIndex(123456789000L)));
+    assertTrue(indexer.getIndicesTypes().get(indexName).contains(indexer.generateTagType(tag.getDataType())));
 
     QueryIndices query = new QueryIndices(connector.getClient());
     QueryTypes queryTypes = new QueryTypes(connector.getClient());
 
-    assertTrue(connector.handleListingQuery(query, indexName).contains(indexer.generateIndex(123456789000L)));
-    assertTrue(connector.handleListingQuery(queryTypes, indexName).contains(indexer.generateType(tag.getDataType())));
+    assertTrue(connector.handleListingQuery(query, indexName).contains(indexer.generateTagIndex(123456789000L)));
+    assertTrue(connector.handleListingQuery(queryTypes, indexName).contains(indexer.generateTagType(tag.getDataType())));
   }
 
   @Test
@@ -300,12 +300,12 @@ public class IndexerTest {
       tag.setId(id);
       tag.setServerTimestamp(tagServerTime);
       list.add(tag);
-      listIndices.add(indexer.generateIndex(tag.getServerTimestamp()));
+      listIndices.add(indexer.generateTagIndex(tag.getServerTimestamp()));
       listAliases.add(indexer.generateAliasName(tag.getId()));
     }
 
 
-    String indexName = indexer.generateIndex(tagServerTime);
+    String indexName = indexer.generateTagIndex(tagServerTime);
     indexer.indexTags(list);
     sleep();
     assertTrue(connector.waitForYellowStatus());
@@ -368,7 +368,7 @@ public class IndexerTest {
     indexer.getIndicesAliases().get(index).add("tag_1");
     connector.getClient().admin().indices().prepareCreate(index).execute().actionGet();
     connector.handleIndexQuery(index, connector.getIndexSettings(10, 0),
-        indexer.generateType(tag.getDataType()), new TagStringMapping(Mapping.ValueType.stringType).getMapping());
+        indexer.generateTagType(tag.getDataType()), new TagStringMapping(Mapping.ValueType.stringType).getMapping());
 
     // already contains the alias
     assertFalse(indexer.addAliasFromBatch(index, tag));
@@ -389,7 +389,7 @@ public class IndexerTest {
     TagES tag = new TagString();
     tag.setDataType(Mapping.ValueType.stringType.toString());
     tag.setId(1L);
-    String type = indexer.generateType(tag.getDataType());
+    String type = indexer.generateTagType(tag.getDataType());
 
     assertFalse(indexer.indexByBatch(null, tag.getDataType(), tag.build(), tag));
     assertFalse(indexer.indexByBatch("c2mon_2015-12", "badType", tag.build(), tag));

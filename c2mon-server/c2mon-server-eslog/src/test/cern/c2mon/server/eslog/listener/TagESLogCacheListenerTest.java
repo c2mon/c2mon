@@ -19,7 +19,7 @@ package cern.c2mon.server.eslog.listener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.eslog.logger.Indexer;
+import cern.c2mon.server.eslog.logger.TagIndexer;
 import cern.c2mon.server.eslog.structure.converter.DataTagESLogConverter;
 import cern.c2mon.server.test.CacheObjectCreation;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -57,7 +56,7 @@ public class TagESLogCacheListenerTest {
   CacheRegistrationService cacheRegistrationService;
 
   @Mock
-  Indexer indexer;
+  TagIndexer indexer;
 
 
   @Test
