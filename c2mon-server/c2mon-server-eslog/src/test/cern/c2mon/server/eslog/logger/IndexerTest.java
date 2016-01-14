@@ -307,8 +307,8 @@ public class IndexerTest {
 
     String indexName = indexer.generateIndex(tagServerTime);
     indexer.indexTags(list);
+    sleep();
     assertTrue(connector.waitForYellowStatus());
-
 
     Set<String> resultIndices = indexer.getIndicesTypes().keySet();
     Set<String> resultAliases = indexer.getIndicesAliases().get(indexName);
@@ -407,7 +407,7 @@ public class IndexerTest {
 
   private void sleep() {
     try {
-      Thread.sleep(2000L);
+      Thread.sleep(3000L);
     }
     catch (InterruptedException e) {
       e.printStackTrace();
