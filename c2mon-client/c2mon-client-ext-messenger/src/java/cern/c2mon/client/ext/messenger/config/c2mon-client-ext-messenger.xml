@@ -21,5 +21,11 @@
   <bean id="broadcastMessageTimeout" class="java.lang.Long">
     <constructor-arg value="60000"/>
   </bean>
-  
+
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="location">
+      <value>${c2mon.client.conf.url}</value>
+    </property>
+  </bean>
+
 </beans>
