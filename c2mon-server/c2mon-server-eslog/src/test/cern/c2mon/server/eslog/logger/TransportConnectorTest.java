@@ -67,7 +67,6 @@ public class TransportConnectorTest {
 
   @After
   public void tidyUp() {
-    sleep();
     log.info("@After");
     connector.getClient().admin().indices().delete(new DeleteIndexRequest("*")).actionGet();
   }

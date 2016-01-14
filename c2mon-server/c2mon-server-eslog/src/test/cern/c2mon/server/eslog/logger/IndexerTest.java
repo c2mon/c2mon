@@ -100,7 +100,6 @@ public class IndexerTest {
 
   @After
   public void tidyUp() {
-    sleep();
     log.info("@After");
     connector.getClient().admin().indices().delete(new DeleteIndexRequest("*")).actionGet();
     connector.getClient().admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
@@ -260,20 +259,18 @@ public class IndexerTest {
   }
 
   @Test
-  @Ignore("Works alone but not along the other tests (bulk processing synchronization)")
   public void testSendTagToBatch() {
-    TagES tag = new TagString();
-    tag.setDataType(Mapping.ValueType.stringType.toString());
+    TagES tag = new TagBoolean();
+    tag.setDataType(Mapping.ValueType.boolType.toString());
     tag.setId(1L);
     tag.setServerTimestamp(123456789000L);
-    tag.setValue("test");
+    tag.setValue(true);
 
     String indexName = indexer.generateIndex(tag.getServerTimestamp());
 
-    assertNull(tag.getValueNumeric());
-    assertNull(tag.getValueBoolean());
-    assertEquals("test", tag.getValue());
-    assertEquals("test", tag.getValueString());
+    assertEquals(1, tag.getValueNumeric());
+    assertTrue(tag.getValueBoolean());
+    assertNull(tag.getValueString());
 
     indexer.sendTagToBatch(tag);
     connector.closeBulk();
@@ -327,7 +324,7 @@ public class IndexerTest {
 
 
     SearchResponse response = getResponse(connector.getClient(), new String[]{indexName});
-    sleep();
+
     log.debug(response.toString());
     log.debug("size: " + size);
     log.debug("response: " + response.getHits().getTotalHits());
