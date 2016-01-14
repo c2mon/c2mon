@@ -307,7 +307,7 @@ public class IndexerTest {
 
     String indexName = indexer.generateIndex(tagServerTime);
     indexer.indexTags(list);
-
+    assertTrue(connector.waitForYellowStatus());
 
 
     Set<String> resultIndices = indexer.getIndicesTypes().keySet();
