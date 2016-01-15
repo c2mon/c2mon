@@ -16,45 +16,48 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.listener;
 
-import cern.c2mon.server.eslog.logger.SupervisionIndexer;
-import cern.c2mon.server.supervision.SupervisionNotifier;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
-import cern.c2mon.shared.common.supervision.SupervisionConstants;
-import lombok.extern.slf4j.Slf4j;
+import cern.c2mon.server.cache.CacheRegistrationService;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.eslog.logger.AlarmIndexer;
+import cern.c2mon.server.eslog.structure.converter.AlarmESLogConverter;
+import cern.c2mon.server.eslog.structure.types.AlarmES;
+import cern.c2mon.server.test.CacheObjectCreation;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.sql.Timestamp;
-
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Alban Marguet
  */
-@Slf4j
 @RunWith(MockitoJUnitRunner.class)
-public class ESLogSupervisionListenerTest {
-  private SupervisionConstants.SupervisionEntity entity = SupervisionConstants.SupervisionEntity.PROCESS;
-  private SupervisionConstants.SupervisionStatus status = SupervisionConstants.SupervisionStatus.RUNNING;
-  private Timestamp timestamp = new Timestamp(123456789);
-  private long id = 1L;
-  private String message = "message";
-  private SupervisionEvent event = new SupervisionEventImpl(entity, id, status, timestamp, message);
-  @Mock
-  private SupervisionNotifier  supervisionNotifier;
+public class AlarmESLogListenerTest {
   @InjectMocks
-  private ESLogSupervisionListener listener;
+  private AlarmESLogListener listener;
   @Mock
-  private SupervisionIndexer indexer;
+  private AlarmIndexer alarmIndexer;
+  @Mock
+  private CacheRegistrationService cacheRegistrationService;
+  @Mock
+  private AlarmESLogConverter alarmESLogConverter;
+  private Alarm alarm = CacheObjectCreation.createTestAlarm1();
+  private AlarmES alarmES = new AlarmES();
+
+  @Before
+  public void setup() {
+    when(alarmESLogConverter.convertAlarmToAlarmES(eq(alarm))).thenReturn(alarmES);
+  }
 
   @Test
-  public void testNotifySupervisionEvent() {
-    listener.notifySupervisionEvent(event);
-    verify(indexer).logSupervisionEvent(eq(event));
+  public void testAlarmIsSentToIndexer() {
+    listener.notifyElementUpdated(alarm);
+    verify(alarmESLogConverter).convertAlarmToAlarmES(eq(alarm));
+    verify(alarmIndexer).logAlarm(eq(alarmES));
   }
 }

@@ -18,10 +18,12 @@ package cern.c2mon.server.eslog.structure.converter;
 
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.eslog.structure.types.AlarmES;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Alban Marguet
  */
+@Component
 public class AlarmESLogConverter {
   public AlarmES convertAlarmToAlarmES(Alarm alarm) {
     AlarmES alarmES = new AlarmES();

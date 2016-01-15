@@ -26,24 +26,42 @@ import static org.junit.Assert.assertNull;
 /**
  * @author Alban Marguet
  */
-public class SupervisionMappingTest {
-  private SupervisionMapping mapping;
+public class AlarmMappingTest {
+  private AlarmMapping mapping;
   private int shards = 10;
   private int replica = 0;
   private String expectedMappings = "{\n" +
       "  \"mappings\": {\n" +
-      "    \"supervision\": {\n" +
-      "      \"id\": {\n" +
+      "    \"alarm\": {\n" +
+      "      \"tagId\": {\n" +
       "        \"type\": \"long\"\n" +
       "      },\n" +
-      "      \"timestamp\": {\n" +
-      "        \"type\": \"date\",\n" +
-      "        \"format\": \"epoch_millis\"\n" +
+      "      \"alarmId\": {\n" +
+      "        \"type\": \"long\"\n" +
       "      },\n" +
-      "      \"message\": {\n" +
+      "      \"faultFamily\": {\n" +
       "        \"type\": \"string\"\n" +
       "      },\n" +
-      "      \"status\": {\n" +
+      "      \"faultMember\": {\n" +
+      "        \"type\": \"string\"\n" +
+      "      },\n" +
+      "      \"faultCode\": {\n" +
+      "        \"type\": \"integer\"\n" +
+      "      },\n" +
+      "      \"active\": {\n" +
+      "        \"type\": \"boolean\"\n" +
+      "      },\n" +
+      "      \"priority\": {\n" +
+      "        \"type\": \"integer\"\n" +
+      "      },\n" +
+      "      \"info\": {\n" +
+      "        \"type\": \"string\"\n" +
+      "      },\n" +
+      "      \"serverTimestamp\": {\n" +
+      "        \"type\": \"long\",\n" +
+      "        \"format\": \"epoch_millis\"\n" +
+      "      },\n" +
+      "      \"timeZone\": {\n" +
       "        \"type\": \"string\"\n" +
       "      }\n" +
       "    }\n" +
@@ -58,7 +76,7 @@ public class SupervisionMappingTest {
 
   @Before
   public void setup() {
-    mapping = new SupervisionMapping();
+    mapping = new AlarmMapping();
   }
 
   @Test
@@ -74,7 +92,7 @@ public class SupervisionMappingTest {
     mapping.setProperties(Mapping.ValueType.boolType);
     assertNull(mapping.getMappings());
 
-    mapping.setProperties(Mapping.ValueType.supervisionType);
+    mapping.setProperties(Mapping.ValueType.alarmType);
     assertNotNull(mapping.getMappings());
     assertNull(mapping.getSettings());
     assertEquals(expectedMappings, mapping.getMapping());

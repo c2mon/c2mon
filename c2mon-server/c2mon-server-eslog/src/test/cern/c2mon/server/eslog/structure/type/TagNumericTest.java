@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.eslog.structure.types;
+package cern.c2mon.server.eslog.structure.type;
 
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
@@ -22,49 +22,61 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
+import cern.c2mon.server.eslog.structure.types.TagNumeric;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
-import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
+import cern.c2mon.server.eslog.structure.mappings.TagNumericMapping;
 
 /**
- * Tests the good behaviour of the TagString class.
- * verify that it builds correctly in JSON and accept/reject good/bad types of value.
+ * Tests the good behaviour of the TagNumeric class. verify that it builds
+ * correctly in JSON and accept/reject good/bad types of value.
+ * 
  * @author Alban Marguet.
  */
+@Slf4j
 @RunWith(MockitoJUnitRunner.class)
-public class TagStringTest {
-	@InjectMocks
-	TagString tagString;
+public class TagNumericTest {
 
-	@Test
-	public void testValue() {
-		tagString.setValue("test");
+  @InjectMocks
+  TagNumeric tagNumeric;
 
-		assertEquals("test", tagString.getValue());
-		assertTrue(tagString.getValue() instanceof String);
-	}
+  @Test
+  public void testValue() {
+    tagNumeric.setValue(123);
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testBadValue() {
-		tagString.setValue(123456789);
-	}
+    assertEquals(123, tagNumeric.getValue());
+    assertTrue(tagNumeric.getValue() instanceof Integer);
 
-	@Test
-	public void testBuild() throws IOException {
-		tagString.setQuality("ok");
-		String line = "\n  \"quality\": \"ok\"";
-		String text = "{\n  \"id\": 0,\n  \"sourceTimestamp\": 0,\n  \"serverTimestamp\": 0,\n  \"daqTimestamp\": 0,\n  \"status\": 0," + line + "\n}";
+    tagNumeric.setValue(1.23);
 
-		assertEquals(text, tagString.build());
-	}
+    assertEquals(1.23, tagNumeric.getValue());
+    assertTrue(tagNumeric.getValue() instanceof Double);
+  }
 
-	@Test
-	public void testNullValue() {
-		tagString.setValue(null);
-		assertNull(tagString.getValue());
-	}
+  @Test(expected = IllegalArgumentException.class)
+  public void testBadValue() {
+    tagNumeric.setValue("notNumeric");
+  }
+
+
+  @Test
+  public void testBuild() throws IOException {
+    tagNumeric.setDataType("numeric");
+    String line = "\n  \"dataType\": \"numeric\",";
+    String text = "{\n  \"id\": 0," + line
+        + "\n  \"sourceTimestamp\": 0,\n  \"serverTimestamp\": 0,\n  \"daqTimestamp\": 0,\n  \"status\": 0\n}";
+
+    assertEquals(text, tagNumeric.build());
+  }
+
+  @Test
+  public void testNullValue() {
+    tagNumeric.setValue(null);
+    assertNull(tagNumeric.getValue());
+  }
 }

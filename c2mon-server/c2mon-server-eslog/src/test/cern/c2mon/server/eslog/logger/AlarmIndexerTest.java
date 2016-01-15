@@ -16,11 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.logger;
 
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.eslog.structure.converter.AlarmESLogConverter;
+import cern.c2mon.server.eslog.structure.mappings.AlarmMapping;
 import cern.c2mon.server.eslog.structure.mappings.Mapping;
-import cern.c2mon.server.eslog.structure.mappings.SupervisionMapping;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
-import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import cern.c2mon.server.eslog.structure.types.AlarmES;
+import cern.c2mon.server.test.CacheObjectCreation;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,31 +42,29 @@ import static org.mockito.Mockito.when;
  * @author Alban Marguet
  */
 @RunWith(MockitoJUnitRunner.class)
-public class SupervisionIndexerTest {
-  private SupervisionConstants.SupervisionEntity entity = SupervisionConstants.SupervisionEntity.PROCESS;
-  private SupervisionConstants.SupervisionStatus status = SupervisionConstants.SupervisionStatus.RUNNING;
-  private Timestamp timestamp = new Timestamp(123456789);
-  private long id = 1L;
-  private String message = "message";
-  private SupervisionMapping mapping;
-  private SupervisionEvent event;
-
+public class AlarmIndexerTest {
+  private Alarm alarm;
+  private AlarmES alarmES;
+  private AlarmMapping mapping;
+  private Timestamp timestamp;
   @InjectMocks
-  SupervisionIndexer indexer;
-
+  private AlarmIndexer indexer;
   @Mock
-  TransportConnector connector;
+  private TransportConnector connector;
+  private AlarmESLogConverter alarmESLogConverter = new AlarmESLogConverter();
 
   @Before
   public void setup() {
-    event = new SupervisionEventImpl(entity, id, status, timestamp, message);
-    when(connector.handleSupervisionQuery(anyString(), anyString(), eq(event))).thenReturn(true);
+    alarm = CacheObjectCreation.createTestAlarm1();
+    alarmES = alarmESLogConverter.convertAlarmToAlarmES(alarm);
+    timestamp = alarm.getTimestamp();
+    when(connector.handleAlarmQuery(anyString(), anyString(), eq(alarmES))).thenReturn(true);
     when(connector.getReplica()).thenReturn(0);
     when(connector.getShards()).thenReturn(10);
-    indexer.setSupervisionPrefix("prevision_");
-    mapping = new SupervisionMapping();
+    indexer.setAlarmPrefix("alarm_");
+    mapping = new AlarmMapping();
     mapping.configure(connector.getShards(), connector.getReplica());
-    mapping.setProperties(Mapping.ValueType.supervisionType);
+    mapping.setProperties(Mapping.ValueType.alarmType);
   }
 
   @Test
@@ -77,15 +76,15 @@ public class SupervisionIndexerTest {
 
   @Test
   public void testGenerateSupervisionIndex() {
-    String expected = indexer.supervisionPrefix + indexer.millisecondsToYearMonth(timestamp.getTime());
-    assertEquals(expected, indexer.generateSupervisionIndex(timestamp.getTime()));
+    String expected = indexer.alarmPrefix + indexer.millisecondsToYearMonth(timestamp.getTime());
+    assertEquals(expected, indexer.generateAlarmIndex(timestamp.getTime()));
   }
 
   @Test
   public void testLogSupervisionEvent() {
     String expectedMapping = mapping.getMapping();
 
-    indexer.logSupervisionEvent(event);
-    verify(connector).handleSupervisionQuery(eq(indexer.getSupervisionPrefix() + indexer.millisecondsToYearMonth(timestamp.getTime())), eq(expectedMapping), eq(event));
+    indexer.logAlarm(alarmES);
+    verify(connector).handleAlarmQuery(eq(indexer.generateAlarmIndex(timestamp.getTime())), eq(expectedMapping), eq(alarmES));
   }
 }
