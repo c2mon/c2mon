@@ -26,9 +26,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Data
-public class SupervisionMapping implements Mapping {
+public class AlarmMapping implements Mapping {
   private Settings settings;
-  private SupervisionProperties mappings;
+  private AlarmProperties mappings;
 
   public String getMapping() {
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -39,8 +39,8 @@ public class SupervisionMapping implements Mapping {
 
   @Override
   public void setProperties(ValueType valueType) {
-    if (ValueType.isSupervision(valueType)) {
-      mappings = new SupervisionProperties();
+    if (ValueType.isAlarm(valueType)) {
+      mappings = new AlarmProperties();
     }
     else {
       log.debug("setProperties() - Could not instantiate properties, type is null");

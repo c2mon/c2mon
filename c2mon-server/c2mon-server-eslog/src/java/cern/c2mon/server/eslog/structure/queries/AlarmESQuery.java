@@ -1,3 +1,4 @@
+package cern.c2mon.server.eslog.structure.queries;
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
  * <p/>
@@ -14,8 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.eslog.structure.queries;
 
+import cern.c2mon.server.eslog.structure.types.AlarmES;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,22 +32,27 @@ import java.util.Map;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class SupervisionQuery extends Query {
-  private long id;
-  private String entity;
-  private long timestamp;
-  private String message;
-  private String status;
+public class AlarmESQuery extends Query {
+  private long tagId;
+  private long alarmId;
+  private String faultFamily;
+  private String faultMember;
+  private int faultCode;
+  private boolean active;
+  private int priority;
+  private String info;
+  private long serverTimestamp;
+  private String timeZone;
   private Map<String, Object> json;
 
-  public SupervisionQuery(Client client, SupervisionEvent supervisionEvent) {
+  public AlarmESQuery(Client client, AlarmES alarmES) {
     super(client);
     json = new HashMap<>();
-    getElements(supervisionEvent);
+    getElements(alarmES);
     toJson();
   }
 
-  public boolean logSupervisionEvent(String indexName, String mapping) {
+  public boolean logAlarmES(String indexName, String mapping) {
     boolean indexExists = client.admin().indices().prepareExists(indexName).execute().actionGet().isExists();
     if (!indexExists) {
       client.admin().indices().prepareCreate(indexName).setSource(mapping).execute().actionGet();
@@ -56,19 +62,29 @@ public class SupervisionQuery extends Query {
     return response.isCreated();
   }
 
-  public void getElements(SupervisionEvent supervisionEvent) {
-    id = supervisionEvent.getEntityId();
-    entity = supervisionEvent.getEntity().name();
-    timestamp = supervisionEvent.getEventTime().getTime();
-    message = supervisionEvent.getMessage();
-    status = supervisionEvent.getStatus().name();
+  public void getElements(AlarmES alarmES) {
+    tagId = alarmES.getTagId();
+    alarmId = alarmES.getAlarmId();
+    faultFamily = alarmES.getFaultFamily();
+    faultMember = alarmES.getFaultMember();
+    faultCode = alarmES.getFaultCode();
+    active = alarmES.isActive();
+    priority = alarmES.getPriority();
+    info = alarmES.getInfo();
+    serverTimestamp = alarmES.getServerTimestamp().getTime();
+    timeZone = alarmES.getTimezone();
   }
 
   private void toJson() {
-    json.put("id", id);
-    json.put("entity", entity);
-    json.put("timestamp", timestamp);
-    json.put("message", message);
-    json.put("status", status);
+    json.put("tagId", tagId);
+    json.put("alarmId", alarmId);
+    json.put("faultFamily", faultFamily);
+    json.put("faultMember", faultMember);
+    json.put("faultCode", faultCode);
+    json.put("active", active);
+    json.put("priority", priority);
+    json.put("info", info);
+    json.put("serverTimeStamp", serverTimestamp);
+    json.put("timeZone", timeZone);
   }
 }

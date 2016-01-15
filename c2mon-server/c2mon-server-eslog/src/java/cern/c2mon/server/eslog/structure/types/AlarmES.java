@@ -14,40 +14,39 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.eslog.structure.mappings;
+package cern.c2mon.server.eslog.structure.types;
 
+import cern.c2mon.shared.util.json.GsonFactory;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+
+import java.sql.Timestamp;
 
 /**
  * @author Alban Marguet
  */
 @Slf4j
 @Data
-public class SupervisionMapping implements Mapping {
-  private Settings settings;
-  private SupervisionProperties mappings;
+public class AlarmES {
+  private static final Gson GSON = GsonFactory.createGson();
 
-  public String getMapping() {
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    String json = gson.toJson(this);
-    log.trace("getMapping() - Created the supervision mapping: " + json);
-    return json;
-  }
+  private long tagId;
+  private long alarmId;
+
+  private String faultFamily;
+  private String faultMember;
+  private int faultCode;
+
+  private boolean active;
+  private int priority;
+  private String info;
+
+  private Timestamp serverTimestamp;
+  private String timezone;
 
   @Override
-  public void setProperties(ValueType valueType) {
-    if (ValueType.isSupervision(valueType)) {
-      mappings = new SupervisionProperties();
-    }
-    else {
-      log.debug("setProperties() - Could not instantiate properties, type is null");
-    }
-  }
-
-  public void configure(int shards, int replica) {
-    settings = new Settings(shards, replica);
+  public String toString() {
+    return GSON.toJson(this);
   }
 }

@@ -16,9 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.logger;
 
+import cern.c2mon.server.eslog.structure.mappings.AlarmMapping;
 import cern.c2mon.server.eslog.structure.mappings.Mapping;
-import cern.c2mon.server.eslog.structure.mappings.SupervisionMapping;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.server.eslog.structure.types.AlarmES;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
@@ -30,15 +30,13 @@ import javax.annotation.PostConstruct;
 /**
  * @author Alban Marguet
  */
-@Service
 @Slf4j
+@Service
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class SupervisionIndexer extends Indexer {
-  private final String supervisionType = "supervision";
-
+public class AlarmIndexer extends Indexer {
   @Autowired
-  public SupervisionIndexer(final Connector connector) {
+  public AlarmIndexer(final Connector connector) {
     super(connector);
   }
 
@@ -47,23 +45,18 @@ public class SupervisionIndexer extends Indexer {
     super.init();
   }
 
-  public void logSupervisionEvent(SupervisionEvent supervisionEvent) {
-    if (supervisionEvent != null && supervisionEvent.getEventTime() != null ) {
-      String indexName = generateSupervisionIndex(supervisionEvent.getEventTime().getTime());
+  public void logAlarm(AlarmES alarmES) {
+    String indexName = generateAlarmIndex(alarmES.getServerTimestamp().getTime());
 
-      SupervisionMapping supervisionMapping = new SupervisionMapping();
-      supervisionMapping.configure(connector.getShards(), connector.getReplica());
-      supervisionMapping.setProperties(Mapping.ValueType.supervisionType);
-      String mapping = supervisionMapping.getMapping();
+    AlarmMapping alarmMapping = new AlarmMapping();
+    alarmMapping.configure(connector.getShards(), connector.getReplica());
+    alarmMapping.setProperties(Mapping.ValueType.alarmType);
+    String mapping = alarmMapping.getMapping();
 
-      connector.handleSupervisionQuery(indexName, mapping, supervisionEvent);
-    }
-    else {
-      log.debug("logSupervisionEvent() - Could not instantiate SupervisionEventImpl, null value.");
-    }
+    connector.handleAlarmQuery(indexName, mapping, alarmES);
   }
 
-  public String generateSupervisionIndex(long time) {
-    return supervisionPrefix + millisecondsToYearMonth(time);
+  public String generateAlarmIndex(long time) {
+    return alarmPrefix + millisecondsToYearMonth(time);
   }
 }

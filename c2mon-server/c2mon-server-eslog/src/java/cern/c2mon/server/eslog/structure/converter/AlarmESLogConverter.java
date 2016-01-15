@@ -14,40 +14,35 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.eslog.structure.mappings;
+package cern.c2mon.server.eslog.structure.converter;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.eslog.structure.types.AlarmES;
 
 /**
  * @author Alban Marguet
  */
-@Slf4j
-@Data
-public class SupervisionMapping implements Mapping {
-  private Settings settings;
-  private SupervisionProperties mappings;
+public class AlarmESLogConverter {
+  public AlarmES convertAlarmToAlarmES(Alarm alarm) {
+    AlarmES alarmES = new AlarmES();
 
-  public String getMapping() {
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    String json = gson.toJson(this);
-    log.trace("getMapping() - Created the supervision mapping: " + json);
-    return json;
-  }
-
-  @Override
-  public void setProperties(ValueType valueType) {
-    if (ValueType.isSupervision(valueType)) {
-      mappings = new SupervisionProperties();
+    if (alarm == null) {
+      return null;
     }
-    else {
-      log.debug("setProperties() - Could not instantiate properties, type is null");
-    }
-  }
 
-  public void configure(int shards, int replica) {
-    settings = new Settings(shards, replica);
+    alarmES.setTagId(alarm.getTagId());
+    alarmES.setAlarmId(alarm.getId());
+
+    alarmES.setActive(alarm.isActive());
+
+    alarmES.setFaultFamily(alarm.getFaultFamily());
+    alarmES.setFaultMember(alarm.getFaultMember());
+    alarmES.setFaultCode(alarm.getFaultCode());
+
+    alarmES.setServerTimestamp(alarm.getTimestamp());
+
+    alarmES.setInfo(alarm.getInfo());
+
+    return alarmES;
   }
 }

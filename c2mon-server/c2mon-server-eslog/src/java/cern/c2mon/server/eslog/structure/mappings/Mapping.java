@@ -25,6 +25,7 @@ import lombok.Getter;
  */
 public interface Mapping {
   enum ValueType {
+    alarmType("alarm"),
     supervisionType("supervision"),
     stringType("string"),
     longType("long"),
@@ -44,6 +45,14 @@ public interface Mapping {
     @Override
     public String toString() {
       return this.type;
+    }
+
+    public static boolean isAlarm(ValueType type) {
+      return alarmType.equals(type);
+    }
+
+    public static boolean isAlarm(String typeAsString) {
+      return alarmType.toString().equalsIgnoreCase(typeAsString);
     }
 
     public static boolean isSupervision(ValueType type) {
@@ -125,6 +134,7 @@ public interface Mapping {
 
   String indexNotAnalyzed = "not_analyzed";
   String routing = "true";
+  String epochMillisFormat = "epoch_millis";
 
   String getMapping();
 
@@ -214,7 +224,7 @@ public interface Mapping {
 
     class SourceTimestamp {
       private final String type = ValueType.dateType.toString();
-      private final String format = "epoch_millis";
+      private final String format = epochMillisFormat;
     }
 
     class ServerTimestamp extends SourceTimestamp {
@@ -280,11 +290,11 @@ public interface Mapping {
     }
   }
 
-  class SupervisionSettings {
+  class Settings {
     private final int number_of_shards;
     private final int number_of_replicas;
 
-    SupervisionSettings(int shards, int replica) {
+    Settings(int shards, int replica) {
       this.number_of_shards = shards;
       this.number_of_replicas = replica;
     }
@@ -316,6 +326,7 @@ public interface Mapping {
 
       class Timestamp {
         private final String type = ValueType.dateType.toString();
+        private final String format = epochMillisFormat;
       }
 
       class Message {
@@ -323,6 +334,82 @@ public interface Mapping {
       }
 
       class Status {
+        private final String type = ValueType.stringType.toString();
+      }
+    }
+  }
+
+  class AlarmProperties {
+    private Alarm alarm;
+
+    AlarmProperties() {
+      this.alarm = new Alarm();
+    }
+
+    class Alarm {
+      private TagId tagId;
+      private AlarmId alarmId;
+      private FaultFamily faultFamily;
+      private FaultMember faultMember;
+      private FaultCode faultCode;
+      private Active active;
+      private Priority priority;
+      private Info info;
+      private ServerTimestamp serverTimestamp;
+      private TimeZone timeZone;
+
+
+      Alarm() {
+        this.tagId = new TagId();
+        this.alarmId = new AlarmId();
+        this.faultFamily = new FaultFamily();
+        this.faultMember = new FaultMember();
+        this.faultCode = new FaultCode();
+        this.active = new Active();
+        this.priority = new Priority();
+        this.info = new Info();
+        this.serverTimestamp = new ServerTimestamp();
+        this.timeZone = new TimeZone();
+      }
+
+      class TagId {
+        private final String type = ValueType.longType.toString();
+      }
+
+      class AlarmId {
+        private final String type = ValueType.longType.toString();
+      }
+
+      class FaultFamily {
+        private final String type = ValueType.stringType.toString();
+      }
+
+      class FaultMember {
+        private final String type = ValueType.stringType.toString();
+      }
+
+      class FaultCode {
+        private final String type = ValueType.intType.toString();
+      }
+
+      class Active {
+        private final String type = ValueType.boolType.toString();
+      }
+
+      class Priority {
+        private final String type = ValueType.intType.toString();
+      }
+
+      class Info {
+        private final String type = ValueType.stringType.toString();
+      }
+
+      class ServerTimestamp {
+        private final String type = ValueType.longType.toString();
+        private final String format = epochMillisFormat;
+      }
+
+      class TimeZone {
         private final String type = ValueType.stringType.toString();
       }
     }

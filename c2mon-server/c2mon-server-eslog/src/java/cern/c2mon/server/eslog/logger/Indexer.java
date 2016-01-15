@@ -49,6 +49,9 @@ public abstract class Indexer {
   @Value("${es.prefix.supervision:supervision_}")
   protected String supervisionPrefix;
 
+  @Value("${es.prefix.alarm:alarm_}")
+  protected String alarmPrefix;
+
   /**
    * Handles the connection with the ElasticSearch cluster.
    */

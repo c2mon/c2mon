@@ -17,6 +17,7 @@
 package cern.c2mon.server.eslog.logger;
 
 import cern.c2mon.server.eslog.structure.queries.Query;
+import cern.c2mon.server.eslog.structure.types.AlarmES;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
@@ -87,6 +88,12 @@ public interface Connector {
    * Allows to add a new SupervisionEvent to ElasticSearch.
    */
   boolean handleSupervisionQuery(String indexName, String mapping, SupervisionEvent supervisionEvent);
+
+  /**
+   * Allows to add a new AlarmES to ElasticSearch.
+   */
+  boolean handleAlarmQuery(String indexName, String mapping, AlarmES alarmES);
+
   /**
    * Launch an alias query against the ElasticSearch cluster: to fake an index/Tag.
    * It attaches an alias referencing one Tag from an index.

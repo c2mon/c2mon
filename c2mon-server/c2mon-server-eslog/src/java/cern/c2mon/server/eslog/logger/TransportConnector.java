@@ -17,7 +17,9 @@
 package cern.c2mon.server.eslog.logger;
 
 import cern.c2mon.server.eslog.structure.queries.*;
+import cern.c2mon.server.eslog.structure.types.AlarmES;
 import cern.c2mon.server.eslog.structure.types.TagES;
+import cern.c2mon.shared.client.alarm.AlarmQuery;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -408,6 +410,20 @@ public class TransportConnector implements Connector {
     }
 
     isAcked = supervisionQuery.logSupervisionEvent(indexName, mapping);
+    return isAcked;
+  }
+
+  @Override
+  public boolean handleAlarmQuery(String indexName, String mapping, AlarmES alarmES) {
+    AlarmESQuery alarmESQuery = new AlarmESQuery(client, alarmES);
+    boolean isAcked = false;
+
+    if (client == null) {
+      log.error("handleAlarmQuery() - Error: Client is null.");
+      return isAcked;
+    }
+
+    isAcked = alarmESQuery.logAlarmES(indexName, mapping);
     return isAcked;
   }
 
