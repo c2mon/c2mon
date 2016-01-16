@@ -14,6 +14,7 @@
   <packaging>jar</packaging>
   <description>Extension providing history data and playback for the C2MON client.</description>
   <url>http://timweb.cern.ch</url>
+  
   <dependencies>
 
     <!-- C2MON dependencies -->
