@@ -41,7 +41,6 @@ import cern.c2mon.daq.common.conf.equipment.ICoreEquipmentConfigurationChanger;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
-import cern.c2mon.daq.common.vcm.ValueChangeMonitorEngine;
 import cern.c2mon.daq.tools.CommandParamsHandler;
 import cern.c2mon.daq.tools.StackTraceHelper;
 import cern.c2mon.daq.tools.processexceptions.ConfUnknownTypeException;
@@ -50,7 +49,6 @@ import cern.c2mon.shared.common.command.ISourceCommandTag;
 import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
-import cern.c2mon.shared.common.datatag.ValueChangeMonitor;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.common.process.SubEquipmentConfiguration;
@@ -390,13 +388,6 @@ public class ConfigurationController {
         for (ICoreDataTagChanger dataTagChanger : coreChangers) {
           dataTagChanger.onAddDataTag(sourceDataTag, changeReport);
         }
-
-        // register tag in the ValueChangeMonitorEngine if needed
-        if (sourceDataTag.hasValueCheckMonitor()) {
-          ValueChangeMonitor vcm = sourceDataTag.getValueCheckMonitor();
-          ValueChangeMonitorEngine.getInstance().register(dataTagAddChange.getEquipmentId(), sourceDataTag, vcm);
-        }
-
       }
       IDataTagChanger dataTagChanger = dataTagChangers.get(equipmentId);
       if (dataTagChanger != null) {
@@ -509,9 +500,6 @@ public class ConfigurationController {
           dataTagChanger.onRemoveDataTag(sourceDataTag, changeReport);
         }
 
-        // unregister tag from ValueChangeMonitorEngine (if it was previously
-        // registered)
-        ValueChangeMonitorEngine.getInstance().unregister(sourceDataTag);
       }
       IDataTagChanger dataTagChanger = dataTagChangers.get(equipmentId);
       if (dataTagChanger != null) {

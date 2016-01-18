@@ -137,9 +137,6 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
     @Element(name = "guaranteed-delivery")
     private boolean guaranteedDelivery;
 
-    @Element(name = "value-change-monitor", required = false)
-    private volatile ValueChangeMonitor valueChangeMonitor;
-
     // ----------------------------------------------------------------------------
     // CONSTRUCTORS
     // ----------------------------------------------------------------------------
@@ -221,9 +218,6 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
             clonedAddress = (DataTagAddress) super.clone();
             if (this.hardwareAddress != null) {
                 clonedAddress.hardwareAddress = this.hardwareAddress.clone();
-            }
-            if (this.valueChangeMonitor != null) {
-              clonedAddress.valueChangeMonitor = this.valueChangeMonitor.clone();
             }
         } catch (CloneNotSupportedException e) {
             // Should not happen if the hardware addresses remain as they are.
@@ -393,10 +387,6 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
             str.append(hardwareAddress.toConfigXML());
         }
 
-        if (valueChangeMonitor != null) {
-            str.append(valueChangeMonitor.toString());
-        }
-
         if (timeToLive != TTL_FOREVER) {
             str.append("        <time-to-live>");
             str.append(timeToLive);
@@ -480,8 +470,6 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
                 fieldName = fieldNode.getNodeName();
                 if (fieldName.equals("HardwareAddress")) {
                     result.setHardwareAddress(HardwareAddressFactory.getInstance().fromConfigXML((org.w3c.dom.Element) fieldNode));
-                } else if (fieldName.equals("value-change-monitor")) {
-                    result.valueChangeMonitor = ValueChangeMonitor.fromConfigXML((org.w3c.dom.Element) fieldNode);
                 } else {
                     fieldValueString = fieldNode.getFirstChild().getNodeValue();
                     if (fieldName.equals("time-to-live")) {
@@ -570,16 +558,5 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
         return staticTimedeadband;
     }
 
-    public void setValueCheckMonitor(ValueChangeMonitor monitor) {
-        this.valueChangeMonitor = monitor;
-    }
-
-    public ValueChangeMonitor getValueCheckMonitor() {
-        return this.valueChangeMonitor;
-    }
-
-    public boolean hasValueCheckMonitor() {
-        return this.valueChangeMonitor == null ? false : true;
-    }
 
 }

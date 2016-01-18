@@ -24,8 +24,6 @@ import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
-import cern.c2mon.daq.common.vcm.ValueChangeMonitorEngine;
-import cern.c2mon.daq.common.vcm.ValueChangeMonitorEvent;
 import cern.c2mon.daq.tools.DataTagValueFilter;
 import cern.c2mon.daq.tools.DataTagValueValidator;
 import cern.c2mon.daq.tools.EquipmentSenderHelper;
@@ -175,29 +173,6 @@ class EquipmentSenderValid {
 
           // Send Invalid Tag
           this.equipmentSenderInvalid.sendInvalidTag(currentSourceDataTag, newTagValue, pValueDescr, newSDQuality, new Timestamp(sourceTimestamp));
-
-          // if tag has value checker monitor registered
-        } else if (currentSourceDataTag.hasValueCheckMonitor() && !sentByValueCheckMonitor) {
-
-          if (newTagValue instanceof Number) {
-            ValueChangeMonitorEngine.getInstance().sendEvent(
-                new ValueChangeMonitorEvent(currentSourceDataTag.getId(), ((Number) newTagValue).doubleValue(), pValueDescr,
-                    sourceTimestamp));
-          } else if (newTagValue instanceof Boolean) {
-            Boolean v = (Boolean) newTagValue;
-            ValueChangeMonitorEngine.getInstance().sendEvent(
-                new ValueChangeMonitorEvent(currentSourceDataTag.getId(), v.booleanValue() == true ? 1 : 0, pValueDescr,
-                    sourceTimestamp));
-          } else {
-            // for strings the value is not important - we can anyway just monitor if the events arrive in regular
-            // time-windows
-            ValueChangeMonitorEngine.getInstance()
-            .sendEvent(
-                new ValueChangeMonitorEvent(currentSourceDataTag.getId(), 0, pValueDescr,
-                    sourceTimestamp));
-          }
-
-          successfulSent = true;
 
           // Remove tags which have not convertible values
         } else if (!this.dataTagValueValidator.isConvertible(currentSourceDataTag, newTagValue)) {

@@ -22,11 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import cern.c2mon.daq.common.vcm.ValueChangeMonitorEngine;
 import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
-import cern.c2mon.shared.common.datatag.ValueChangeMonitor;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.common.process.SubEquipmentConfiguration;
@@ -200,12 +198,6 @@ public class EquipmentConfigurationFactory extends XMLTagValueExtractor implemen
         }
       }
       equipmentConfiguration.getDataTags().put(sourceDataTag.getId(), sourceDataTag);
-
-      // register tag in the ValueChangeMonitorEngine if needed
-      if (sourceDataTag.hasValueCheckMonitor()) {
-        ValueChangeMonitor vcm = sourceDataTag.getValueCheckMonitor();
-        ValueChangeMonitorEngine.getInstance().register(equipmentConfiguration.getId(), sourceDataTag, vcm);
-      }
 
     } // for
   }

@@ -177,12 +177,6 @@
         <scope>test</scope>
       </dependency>
 
-      <!-- esper is used by the DAQ core for value change monitoring -->
-      <dependency>
-        <groupId>com.espertech</groupId>
-        <artifactId>esper</artifactId>
-        <version>4.6.0</version>
-      </dependency>
     </dependencies>
 
 

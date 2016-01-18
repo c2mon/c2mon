@@ -82,18 +82,6 @@ public interface ISourceDataTag {
     SourceDataTagValue getCurrentValue();
 
     /**
-     * Checks if tag has VCM registered
-     * @return true if value check monitor is defined, false otherwise
-     */
-    boolean hasValueCheckMonitor();
-
-    /**
-     * Gets the value check monitor object, if defined
-     * @return value check monitor object's reference
-     */
-    ValueChangeMonitor getValueCheckMonitor();
-
-    /**
      * Invalidate the current value of a SourceDataTag The invalidate method
      * will always return a SourceDataTagValue object, unless
      * <UL>

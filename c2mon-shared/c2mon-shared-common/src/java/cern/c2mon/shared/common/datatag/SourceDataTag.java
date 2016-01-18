@@ -825,14 +825,4 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
         this.dataType = TagDataType.getDataTypeString(dataType);
     }
 
-    @Override
-    public ValueChangeMonitor getValueCheckMonitor() {
-        return address.getValueCheckMonitor();
-    }
-
-    @Override
-    public boolean hasValueCheckMonitor() {
-        return address.hasValueCheckMonitor();
-    }
-
 }
