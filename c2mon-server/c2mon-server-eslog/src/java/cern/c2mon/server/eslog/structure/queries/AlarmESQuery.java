@@ -54,8 +54,7 @@ public class AlarmESQuery extends Query {
   }
 
   public boolean logAlarmES(String indexName, String mapping) {
-    boolean indexExists = client.admin().indices().prepareExists(indexName).execute().actionGet().isExists();
-    if (!indexExists && mapping != null) {
+    if (!indexExists(indexName) && mapping != null) {
       client.admin().indices().prepareCreate(indexName).setSource(mapping).execute().actionGet();
     }
 

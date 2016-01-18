@@ -64,11 +64,11 @@ public class TagIndexer extends Indexer {
    * @param tags to index.
    */
   public void indexTags(Collection<TagES> tags) {
-    log.trace("processData() - Received a collection of " + tags.size() +  " tags to send by batch.");
+    log.trace("indexTags() - Received a collection of " + tags.size() +  " tags to send by batch.");
     Map<String, TagES> aliases = new HashMap<>();
 
     if (tags.size() == 0) {
-      log.trace("processData() - Received a null List of tags to log to ElasticSearch.");
+      log.trace("indexTags() - Received a null List of tags to log to ElasticSearch.");
     }
     else {
       int counter = 0;
@@ -81,10 +81,10 @@ public class TagIndexer extends Indexer {
         }
       }
 
-      log.trace("processData() - Created a batch composed of " + counter + " tags.");
+      log.trace("indexTags() - Created a batch composed of " + counter + " tags.");
 
       // FLUSH
-      log.trace("processData() - closing bulk.");
+      log.trace("indexTags() - closing bulk.");
       connector.closeBulk();
 
       for (String alias : aliases.keySet()) {

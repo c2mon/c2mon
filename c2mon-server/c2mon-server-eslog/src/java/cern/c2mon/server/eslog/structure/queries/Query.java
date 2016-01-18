@@ -75,4 +75,8 @@ public abstract class Query {
   protected ObjectContainer<AliasMetaData> getAliases(String index) {
     return client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().index(index).getAliases().values();
   }
+
+  protected boolean indexExists(String indexName) {
+    return client.admin().indices().prepareExists(indexName).execute().actionGet().isExists();
+  }
 }

@@ -148,13 +148,10 @@ public class TransportConnector implements Connector {
    */
   @PostConstruct
   public void init() {
-
     if (!host.equalsIgnoreCase("localhost") && !host.equalsIgnoreCase("local")) {
       setLocal(false);
     }
-
     findClusterAndLaunchBulk();
-
     log.debug("init() - Initial test passed: Transport client is connected to the cluster " + cluster + ".");
     log.info("init() - Connected to cluster " + cluster + " with node " + node + ".");
   }
@@ -283,6 +280,7 @@ public class TransportConnector implements Connector {
        */
       public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
         log.warn("afterBulk() - Error executing bulk", failure);
+        closeBulk();
         handleFailedActions(request, null);
         if (!waitForYellowStatus()) {
           esPersistenceManager.launchFallBackMechanism(request);

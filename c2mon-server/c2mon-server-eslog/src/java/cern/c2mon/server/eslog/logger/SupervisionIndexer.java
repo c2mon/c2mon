@@ -59,7 +59,10 @@ public class SupervisionIndexer extends Indexer {
     if (supervisionEvent != null && supervisionEvent.getEventTime() != null ) {
       String indexName = generateSupervisionIndex(supervisionEvent.getEventTime().getTime());
       String mapping = createMappingIfNewIndex(indexName);
-      connector.handleSupervisionQuery(indexName, mapping, supervisionEvent);
+      boolean isAcked = connector.handleSupervisionQuery(indexName, mapping, supervisionEvent);
+      if (isAcked) {
+        indices.add(indexName);
+      }
     }
     else {
       log.debug("logSupervisionEvent() - Could not instantiate SupervisionEventImpl, null value.");
@@ -78,7 +81,6 @@ public class SupervisionIndexer extends Indexer {
       SupervisionMapping supervisionMapping = new SupervisionMapping();
       supervisionMapping.configure(connector.getShards(), connector.getReplica());
       supervisionMapping.setProperties(Mapping.ValueType.supervisionType);
-      indices.add(indexName);
       return supervisionMapping.getMapping();
     }
     return null;
