@@ -26,6 +26,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Allows to send the data to ElasticSearch through the Connector interface.
@@ -36,6 +40,7 @@ import javax.annotation.PostConstruct;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class AlarmIndexer extends Indexer {
+  Set<String> indices = new HashSet<>();
   /** Autowired constructor */
   @Autowired
   public AlarmIndexer(final Connector connector) {
@@ -56,12 +61,8 @@ public class AlarmIndexer extends Indexer {
    */
   public void logAlarm(AlarmES alarmES) {
     String indexName = generateAlarmIndex(alarmES.getServerTimestamp().getTime());
-
-    AlarmMapping alarmMapping = new AlarmMapping();
-    alarmMapping.configure(connector.getShards(), connector.getReplica());
-    alarmMapping.setProperties(Mapping.ValueType.alarmType);
-    String mapping = alarmMapping.getMapping();
-
+    indices.add(indexName);
+    String mapping = createMappingIfNewIndex(indexName);
     connector.handleAlarmQuery(indexName, mapping, alarmES);
   }
 
@@ -70,5 +71,15 @@ public class AlarmIndexer extends Indexer {
    */
   public String generateAlarmIndex(long time) {
     return alarmPrefix + millisecondsToYearMonth(time);
+  }
+
+  public String createMappingIfNewIndex(String indexName) {
+    if (!indices.contains(indexName)) {
+      AlarmMapping alarmMapping = new AlarmMapping();
+      alarmMapping.configure(connector.getShards(), connector.getReplica());
+      alarmMapping.setProperties(Mapping.ValueType.alarmType);
+      return alarmMapping.getMapping();
+    }
+    return null;
   }
 }

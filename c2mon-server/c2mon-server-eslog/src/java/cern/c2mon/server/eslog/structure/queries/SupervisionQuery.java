@@ -48,7 +48,7 @@ public class SupervisionQuery extends Query {
 
   public boolean logSupervisionEvent(String indexName, String mapping) {
     boolean indexExists = client.admin().indices().prepareExists(indexName).execute().actionGet().isExists();
-    if (!indexExists) {
+    if (!indexExists && mapping != null) {
       client.admin().indices().prepareCreate(indexName).setSource(mapping).execute().actionGet();
     }
 
