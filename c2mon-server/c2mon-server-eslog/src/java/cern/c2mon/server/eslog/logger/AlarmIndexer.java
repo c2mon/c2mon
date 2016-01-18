@@ -61,7 +61,6 @@ public class AlarmIndexer extends Indexer {
    */
   public void logAlarm(AlarmES alarmES) {
     String indexName = generateAlarmIndex(alarmES.getServerTimestamp().getTime());
-    indices.add(indexName);
     String mapping = createMappingIfNewIndex(indexName);
     connector.handleAlarmQuery(indexName, mapping, alarmES);
   }
@@ -78,6 +77,7 @@ public class AlarmIndexer extends Indexer {
       AlarmMapping alarmMapping = new AlarmMapping();
       alarmMapping.configure(connector.getShards(), connector.getReplica());
       alarmMapping.setProperties(Mapping.ValueType.alarmType);
+      indices.add(indexName);
       return alarmMapping.getMapping();
     }
     return null;

@@ -21,6 +21,7 @@ import cern.c2mon.server.eslog.structure.mappings.SupervisionMapping;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,6 +67,11 @@ public class SupervisionIndexerTest {
     mapping = new SupervisionMapping();
     mapping.configure(connector.getShards(), connector.getReplica());
     mapping.setProperties(Mapping.ValueType.supervisionType);
+  }
+
+  @After
+  public void cleanUp() {
+    indexer.getIndices().clear();
   }
 
   @Test

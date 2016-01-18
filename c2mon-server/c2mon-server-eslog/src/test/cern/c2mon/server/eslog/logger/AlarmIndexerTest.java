@@ -22,6 +22,7 @@ import cern.c2mon.server.eslog.structure.mappings.AlarmMapping;
 import cern.c2mon.server.eslog.structure.mappings.Mapping;
 import cern.c2mon.server.eslog.structure.types.AlarmES;
 import cern.c2mon.server.test.CacheObjectCreation;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -65,6 +66,11 @@ public class AlarmIndexerTest {
     mapping = new AlarmMapping();
     mapping.configure(connector.getShards(), connector.getReplica());
     mapping.setProperties(Mapping.ValueType.alarmType);
+  }
+
+  @After
+  public void cleanUp() {
+    indexer.getIndices().clear();
   }
 
   @Test
