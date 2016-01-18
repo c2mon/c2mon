@@ -24,6 +24,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 
 /**
+ * Allows to create a new Index inside the ElasticSearch cluster.
  * @author Alban Marguet.
  */
 @Slf4j

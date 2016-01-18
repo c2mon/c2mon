@@ -43,7 +43,7 @@ public class AlarmESQueryTest {
   private String info;
   private long serverTimestamp;
   private String timeZone;
-  private Map<String, Object> json;
+  private Map<String, Object> jsonSource;
   AlarmESQuery query;
   Client client;
   AlarmESLogConverter alarmESLogConverter;
@@ -64,17 +64,17 @@ public class AlarmESQueryTest {
     info = alarm.getInfo();
     serverTimestamp = alarm.getTimestamp().getTime();
 
-    json = new HashMap<>();
-    json.put("tagId", tagId);
-    json.put("alarmId", alarmId);
-    json.put("faultFamily", faultFamily);
-    json.put("faultMember", faultMember);
-    json.put("faultCode", faultCode);
-    json.put("active", active);
-    json.put("priority", priority);
-    json.put("info", info);
-    json.put("serverTimeStamp", serverTimestamp);
-    json.put("timeZone", timeZone);
+    jsonSource = new HashMap<>();
+    jsonSource.put("tagId", tagId);
+    jsonSource.put("alarmId", alarmId);
+    jsonSource.put("faultFamily", faultFamily);
+    jsonSource.put("faultMember", faultMember);
+    jsonSource.put("faultCode", faultCode);
+    jsonSource.put("active", active);
+    jsonSource.put("priority", priority);
+    jsonSource.put("info", info);
+    jsonSource.put("serverTimeStamp", serverTimestamp);
+    jsonSource.put("timeZone", timeZone);
 
     query = new AlarmESQuery(client, alarmES);
   }
@@ -92,6 +92,6 @@ public class AlarmESQueryTest {
     assertEquals(serverTimestamp, query.getServerTimestamp());
     assertEquals(timeZone, query.getTimeZone());
 
-    assertEquals(json, query.getJson());
+    assertEquals(jsonSource, query.getJsonSource());
   }
 }

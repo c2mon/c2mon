@@ -21,6 +21,7 @@ import cern.c2mon.server.eslog.structure.types.AlarmES;
 import org.springframework.stereotype.Component;
 
 /**
+ * Convert an Alarm to an AlarmES for ElasticSearch writing.
  * @author Alban Marguet
  */
 @Component

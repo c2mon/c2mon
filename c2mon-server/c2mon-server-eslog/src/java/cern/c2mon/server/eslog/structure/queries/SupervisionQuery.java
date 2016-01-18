@@ -19,7 +19,6 @@ package cern.c2mon.server.eslog.structure.queries;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 
@@ -27,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ *
  * @author Alban Marguet
  */
 @Data
@@ -37,11 +37,11 @@ public class SupervisionQuery extends Query {
   private long timestamp;
   private String message;
   private String status;
-  private Map<String, Object> json;
+  private Map<String, Object> jsonSource;
 
   public SupervisionQuery(Client client, SupervisionEvent supervisionEvent) {
     super(client);
-    json = new HashMap<>();
+    jsonSource = new HashMap<>();
     getElements(supervisionEvent);
     toJson();
   }
@@ -52,7 +52,7 @@ public class SupervisionQuery extends Query {
       client.admin().indices().prepareCreate(indexName).setSource(mapping).execute().actionGet();
     }
 
-    IndexResponse response = client.prepareIndex().setIndex(indexName).setSource(json).execute().actionGet();
+    IndexResponse response = client.prepareIndex().setIndex(indexName).setSource(jsonSource).execute().actionGet();
     return response.isCreated();
   }
 
@@ -65,10 +65,10 @@ public class SupervisionQuery extends Query {
   }
 
   private void toJson() {
-    json.put("id", id);
-    json.put("entity", entity);
-    json.put("timestamp", timestamp);
-    json.put("message", message);
-    json.put("status", status);
+    jsonSource.put("id", id);
+    jsonSource.put("entity", entity);
+    jsonSource.put("timestamp", timestamp);
+    jsonSource.put("message", message);
+    jsonSource.put("status", status);
   }
 }

@@ -22,6 +22,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * Mapping used for AlarmES in ElasticSearch.
  * @author Alban Marguet
  */
 @Slf4j
@@ -30,6 +31,9 @@ public class AlarmMapping implements Mapping {
   private Settings settings;
   private AlarmProperties mappings;
 
+  /**
+   * @return the mapping as JSON String for ElasticSearch.
+   */
   public String getMapping() {
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
     String json = gson.toJson(this);
@@ -37,6 +41,9 @@ public class AlarmMapping implements Mapping {
     return json;
   }
 
+  /**
+   * Initialize the mapping according that the valueType is alarm type.
+   */
   @Override
   public void setProperties(ValueType valueType) {
     if (ValueType.isAlarm(valueType)) {
@@ -47,6 +54,9 @@ public class AlarmMapping implements Mapping {
     }
   }
 
+  /**
+   * Set shards and replica number for the index in ElasticSearch.
+   */
   public void configure(int shards, int replica) {
     settings = new Settings(shards, replica);
   }

@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 
 /**
+ * Allows to write a SupervisionEvent to ElasticSearch through the Connector.
  * @author Alban Marguet
  */
 @Service
@@ -42,11 +43,18 @@ public class SupervisionIndexer extends Indexer {
     super(connector);
   }
 
+  /**
+   * Wait for the connection with ElasticSearch to be alive.
+   */
   @PostConstruct
   public void init() {
     super.init();
   }
 
+  /**
+   * Write the SupervisionEvent to ElasticSearch in the Supervision index.
+   * @param supervisionEvent to be written to ElasticSearch.
+   */
   public void logSupervisionEvent(SupervisionEvent supervisionEvent) {
     if (supervisionEvent != null && supervisionEvent.getEventTime() != null ) {
       String indexName = generateSupervisionIndex(supervisionEvent.getEventTime().getTime());
@@ -63,6 +71,9 @@ public class SupervisionIndexer extends Indexer {
     }
   }
 
+  /**
+   * Format: "supervisionPrefix_YYYY-MM".
+   */
   public String generateSupervisionIndex(long time) {
     return supervisionPrefix + millisecondsToYearMonth(time);
   }

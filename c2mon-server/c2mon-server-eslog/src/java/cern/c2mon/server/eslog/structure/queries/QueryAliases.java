@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * Create a query to write Alias for ElasticSearch.
  * @author Alban Marguet.
  */
 @Slf4j

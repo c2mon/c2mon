@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 
 /**
+ * Allows to send the data to ElasticSearch through the Connector interface.
  * @author Alban Marguet
  */
 @Slf4j
@@ -35,16 +36,24 @@ import javax.annotation.PostConstruct;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class AlarmIndexer extends Indexer {
+  /** Autowired constructor */
   @Autowired
   public AlarmIndexer(final Connector connector) {
     super(connector);
   }
 
+  /**
+   * Make sure the connection is alive.
+   */
   @PostConstruct
   public void init() {
     super.init();
   }
 
+  /**
+   * Creates a new AlarmQuery to write the data to ElasticSearch inside the alarm index.
+   * @param alarmES to write to the cluster.
+   */
   public void logAlarm(AlarmES alarmES) {
     String indexName = generateAlarmIndex(alarmES.getServerTimestamp().getTime());
 
@@ -56,6 +65,9 @@ public class AlarmIndexer extends Indexer {
     connector.handleAlarmQuery(indexName, mapping, alarmES);
   }
 
+  /**
+   * Format: "alarmPrefix_YYYY-MM".
+   */
   public String generateAlarmIndex(long time) {
     return alarmPrefix + millisecondsToYearMonth(time);
   }

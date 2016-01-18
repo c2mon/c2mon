@@ -38,18 +38,18 @@ public class SupervisionQueryTest {
   private long timestamp = 123456L;
   private String message = "message";
   private String status = "RUNNING";
-  private Map<String, Object> json = new HashMap<>();
+  private Map<String, Object> jsonSource = new HashMap<>();
   private SupervisionEvent event;
   SupervisionQuery query;
   Client client;
 
   @Before
   public void setup() {
-    json.put("id", id);
-    json.put("entity", entity);
-    json.put("timestamp", timestamp);
-    json.put("message", message);
-    json.put("status", status);
+    jsonSource.put("id", id);
+    jsonSource.put("entity", entity);
+    jsonSource.put("timestamp", timestamp);
+    jsonSource.put("message", message);
+    jsonSource.put("status", status);
     event = new SupervisionEventImpl(SupervisionConstants.SupervisionEntity.PROCESS, id, SupervisionConstants.SupervisionStatus.RUNNING, new Timestamp(timestamp), message);
     query = new SupervisionQuery(client, event);
   }
@@ -61,6 +61,6 @@ public class SupervisionQueryTest {
     assertEquals(timestamp, query.getTimestamp());
     assertEquals(message, query.getMessage());
     assertEquals(status, query.getStatus());
-    assertEquals(json, query.getJson());
+    assertEquals(jsonSource, query.getJsonSource());
   }
 }

@@ -22,6 +22,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * Mapping for SupervisionEvent in ElasticSearch.
  * @author Alban Marguet
  */
 @Slf4j
@@ -30,6 +31,9 @@ public class SupervisionMapping implements Mapping {
   private Settings settings;
   private SupervisionProperties mappings;
 
+  /**
+   * @return the mapping as JSON String for ElasticSearch.
+   */
   public String getMapping() {
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
     String json = gson.toJson(this);
@@ -37,6 +41,9 @@ public class SupervisionMapping implements Mapping {
     return json;
   }
 
+  /**
+   * Initialize the mapping according that the dataType is supervision type.
+   */
   @Override
   public void setProperties(ValueType valueType) {
     if (ValueType.isSupervision(valueType)) {
@@ -47,6 +54,9 @@ public class SupervisionMapping implements Mapping {
     }
   }
 
+  /**
+   * Configure the index number of shards and replica for supervision events.
+   */
   public void configure(int shards, int replica) {
     settings = new Settings(shards, replica);
   }

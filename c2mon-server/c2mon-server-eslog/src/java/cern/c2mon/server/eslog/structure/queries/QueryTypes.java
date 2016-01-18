@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * Retrieve the types present in ElasticSearch for a specific index.
  * @author Alban Marguet.
  */
 @Slf4j

@@ -264,6 +264,10 @@ public class TransportConnector implements Connector {
         log.debug("beforeBulk() - Going to execute new bulk composed of {} actions", request.numberOfActions());
       }
 
+      /**
+       * Some failure exist in the BulkProcessor, will try to redo them
+       * and launch the fallback mechanism if connection is lost.
+       */
       public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
         log.debug("afterBulk() - Executed bulk composed of {} actions", request.numberOfActions());
         handleFailedActions(request, response);
@@ -274,6 +278,9 @@ public class TransportConnector implements Connector {
         refreshClusterStats();
       }
 
+      /**
+       * Will try to send the data again and launch the Fallback mechanism if we lost connection to the cluster.
+       */
       public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
         log.warn("afterBulk() - Error executing bulk", failure);
         handleFailedActions(request, null);
@@ -316,6 +323,9 @@ public class TransportConnector implements Connector {
     }
   }
 
+  /**
+   * Add an indexRequest to the BulkProcessor in order to write data to ElasticSearch.
+   */
   public boolean bulkAdd(IndexRequest request) {
     if (bulkProcessor != null && request != null) {
       bulkProcessor.add(request);
@@ -515,6 +525,9 @@ public class TransportConnector implements Connector {
     }
   }
 
+  /**
+   * If Batch actions have been failed, they will be added to the BulkProcessor again.
+   */
   public void handleFailedActions(BulkRequest request, BulkResponse response) {
     if (response == null) {
       for (ActionRequest action : request.requests()) {
@@ -534,6 +547,9 @@ public class TransportConnector implements Connector {
     }
   }
 
+  /**
+   * Retrieve the failed actions of the BulkProcessor.
+   */
   private List<Integer> getFailedActions(BulkResponse bulkResponse) {
     List<Integer> failedActions = new ArrayList<>();
     if (bulkResponse.hasFailures()) {

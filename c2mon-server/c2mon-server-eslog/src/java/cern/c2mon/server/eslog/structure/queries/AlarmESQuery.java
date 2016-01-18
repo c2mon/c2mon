@@ -1,4 +1,3 @@
-package cern.c2mon.server.eslog.structure.queries;
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
  * <p/>
@@ -15,12 +14,11 @@ package cern.c2mon.server.eslog.structure.queries;
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
+package cern.c2mon.server.eslog.structure.queries;
 
 import cern.c2mon.server.eslog.structure.types.AlarmES;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 
@@ -43,11 +41,14 @@ public class AlarmESQuery extends Query {
   private String info;
   private long serverTimestamp;
   private String timeZone;
-  private Map<String, Object> json;
+  private Map<String, Object> jsonSource;
 
+  /**
+   * Creates an ElasticSearch query for an Alarm event, create the needed JSON and create the appropriate query.
+   */
   public AlarmESQuery(Client client, AlarmES alarmES) {
     super(client);
-    json = new HashMap<>();
+    jsonSource = new HashMap<>();
     getElements(alarmES);
     toJson();
   }
@@ -58,7 +59,7 @@ public class AlarmESQuery extends Query {
       client.admin().indices().prepareCreate(indexName).setSource(mapping).execute().actionGet();
     }
 
-    IndexResponse response = client.prepareIndex().setIndex(indexName).setSource(json).execute().actionGet();
+    IndexResponse response = client.prepareIndex().setIndex(indexName).setSource(jsonSource).execute().actionGet();
     return response.isCreated();
   }
 
@@ -76,15 +77,15 @@ public class AlarmESQuery extends Query {
   }
 
   private void toJson() {
-    json.put("tagId", tagId);
-    json.put("alarmId", alarmId);
-    json.put("faultFamily", faultFamily);
-    json.put("faultMember", faultMember);
-    json.put("faultCode", faultCode);
-    json.put("active", active);
-    json.put("priority", priority);
-    json.put("info", info);
-    json.put("serverTimeStamp", serverTimestamp);
-    json.put("timeZone", timeZone);
+    jsonSource.put("tagId", tagId);
+    jsonSource.put("alarmId", alarmId);
+    jsonSource.put("faultFamily", faultFamily);
+    jsonSource.put("faultMember", faultMember);
+    jsonSource.put("faultCode", faultCode);
+    jsonSource.put("active", active);
+    jsonSource.put("priority", priority);
+    jsonSource.put("info", info);
+    jsonSource.put("serverTimeStamp", serverTimestamp);
+    jsonSource.put("timeZone", timeZone);
   }
 }

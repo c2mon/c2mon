@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.sql.Timestamp;
 
 /**
+ * Represents an Alarm Event for ElasticSearch.
  * @author Alban Marguet
  */
 @Slf4j

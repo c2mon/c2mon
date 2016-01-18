@@ -32,7 +32,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 
 /**
- * Listens to updates in the Alarm cache and send them to ElasticSearch with the Indexer class.
+ * Listens to updates in the Alarm cache and send them to ElasticSearch with the AlarmIndexer class.
  *
  * @author Alban Marguet
  */

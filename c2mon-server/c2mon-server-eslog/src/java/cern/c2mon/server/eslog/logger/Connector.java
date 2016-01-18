@@ -111,9 +111,16 @@ public interface Connector {
    */
   boolean bulkAdd(IndexRequest indexNewTag);
 
+  /**
+   * If cluster is found, initialize the BulkProcessor to send by batch.
+   */
   void findClusterAndLaunchBulk();
 
+  /**
+   * Wait for all operations to be taken into account.
+   */
   boolean waitForYellowStatus();
+
   /**
    * @return the Index settings: number of shards and number of replica. (lucene settings)
    */
