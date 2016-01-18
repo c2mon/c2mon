@@ -84,10 +84,29 @@ public abstract class Indexer {
    * Milliseconds since Epoch time to YYYY-MM.
    */
   public String millisecondsToYearMonth(long millis) {
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
-
-    Date date = new Date(millis);
-    String timestamp = sdf.format(date);
+    String timestamp = getSimpleDateFormatForMilliseconds("yyyy-MM-dd HH:mm:ss.SSSSSS", millis);
     return timestamp.substring(0, 7);
+  }
+
+  /**
+   * Milliseconds since Epoch time to YYYY-ww.
+   */
+  public String millisecondsToYearWeek(long millis) {
+    String timeStamp = getSimpleDateFormatForMilliseconds("yyyy-ww", millis);
+    return timeStamp;
+  }
+
+  /**
+   * Milliseconds since Epoch time to YYYY-MM-DD.
+   */
+  public String millisecondsToYearMonthDay(long millis) {
+    String timestamp = getSimpleDateFormatForMilliseconds("yyyy-MM-dd HH:mm:ss.SSSSSS", millis);
+    return timestamp.substring(0, 10);
+  }
+
+  private String getSimpleDateFormatForMilliseconds(String wantedPattern, long millis) {
+    SimpleDateFormat sdf = new SimpleDateFormat(wantedPattern);
+    Date date = new Date(millis);
+    return sdf.format(date);
   }
 }

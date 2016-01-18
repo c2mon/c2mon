@@ -185,6 +185,20 @@ public class IndexerTest {
     assertEquals(expected, value);
   }
 
+  @Test
+  public void testMillisecondsToYearWeek() {
+    String expected = "2015-49";
+    String value = indexer.millisecondsToYearWeek(1448928000000L);
+    assertEquals(expected, value);
+  }
+
+  @Test
+  public void testMillisecondsToYearMonthDay() {
+    String expected = "2015-12-01";
+    String value = indexer.millisecondsToYearMonthDay(1448928000000L);
+    assertEquals(expected, value);
+  }
+
   @Test(expected = IllegalArgumentException.class)
   public void testAddBadIndex() {
     String index = "c2mon_bad";
