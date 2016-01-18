@@ -61,6 +61,8 @@ public class AlarmESQuery extends Query {
       client.admin().indices().prepareCreate(indexName).setSource(mapping).execute().actionGet();
     }
 
+    log.debug("logAlarmES() - Source query is: " + jsonSource + ".");
+
     IndexResponse response = client.prepareIndex().setIndex(indexName).setSource(jsonSource).execute().actionGet();
     return response.isCreated();
   }

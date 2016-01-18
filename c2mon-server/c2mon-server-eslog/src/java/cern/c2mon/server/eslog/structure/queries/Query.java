@@ -77,6 +77,7 @@ public abstract class Query {
   }
 
   protected boolean indexExists(String indexName) {
+    log.debug("indexExists() - Look for the existence of the index " + indexName + ".");
     return client.admin().indices().prepareExists(indexName).execute().actionGet().isExists();
   }
 }
