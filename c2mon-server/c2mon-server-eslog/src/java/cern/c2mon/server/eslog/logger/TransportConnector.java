@@ -423,6 +423,7 @@ public class TransportConnector implements Connector {
 
   @Override
   public boolean handleAlarmQuery(String indexName, String mapping, AlarmES alarmES) {
+    log.debug("handleAlarmQuery() - Handling AlarmESQuery with mapping:" + mapping + " for index: " + indexName + ".");
     AlarmESQuery alarmESQuery = new AlarmESQuery(client, alarmES);
     boolean isAcked = false;
 

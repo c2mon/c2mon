@@ -19,6 +19,7 @@ package cern.c2mon.server.eslog.structure.queries;
 import cern.c2mon.server.eslog.structure.types.AlarmES;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 
@@ -28,6 +29,7 @@ import java.util.Map;
 /**
  * @author Alban Marguet
  */
+@Slf4j
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class AlarmESQuery extends Query {
@@ -54,6 +56,7 @@ public class AlarmESQuery extends Query {
   }
 
   public boolean logAlarmES(String indexName, String mapping) {
+    log.debug("logAlarmES() - Try to create a writing query for Alarm.");
     if (!indexExists(indexName) && mapping != null) {
       client.admin().indices().prepareCreate(indexName).setSource(mapping).execute().actionGet();
     }

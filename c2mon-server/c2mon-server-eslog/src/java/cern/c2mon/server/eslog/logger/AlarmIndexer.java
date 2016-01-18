@@ -60,11 +60,17 @@ public class AlarmIndexer extends Indexer {
    * @param alarmES to write to the cluster.
    */
   public void logAlarm(AlarmES alarmES) {
-    String indexName = generateAlarmIndex(alarmES.getServerTimestamp().getTime());
-    String mapping = createMappingIfNewIndex(indexName);
-    boolean isAcked = connector.handleAlarmQuery(indexName, mapping, alarmES);
-    if (isAcked) {
-      indices.add(indexName);
+    if (alarmES != null && alarmES.getServerTimestamp() != null ) {
+      String indexName = generateAlarmIndex(alarmES.getServerTimestamp().getTime());
+      String mapping = createMappingIfNewIndex(indexName);
+      boolean isAcked = connector.handleAlarmQuery(indexName, mapping, alarmES);
+      if (isAcked) {
+        log.debug("logAlarm() - isAcked: " + isAcked);
+        indices.add(indexName);
+      }
+    }
+    else {
+      log.debug("logAlarm() - Could not instantiate AlarmES, null value.");
     }
   }
 
