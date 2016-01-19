@@ -374,6 +374,8 @@ public interface Mapping {
         private FaultMember faultMember;
         private FaultCode faultCode;
         private Active active;
+        private Activity activity;
+        private ActiveNumeric activeNumeric;
         private Priority priority;
         private Info info;
         private ServerTimestamp serverTimestamp;
@@ -387,6 +389,8 @@ public interface Mapping {
           this.faultMember = new FaultMember();
           this.faultCode = new FaultCode();
           this.active = new Active();
+          this.activity = new Activity();
+          this.activeNumeric = new ActiveNumeric();
           this.priority = new Priority();
           this.info = new Info();
           this.serverTimestamp = new ServerTimestamp();
@@ -415,6 +419,14 @@ public interface Mapping {
 
         class Active {
           private final String type = ValueType.boolType.toString();
+        }
+
+        class Activity {
+          private final String type = ValueType.stringType.toString();
+        }
+
+        class ActiveNumeric {
+          private final String type = ValueType.doubleType.toString();
         }
 
         class Priority {

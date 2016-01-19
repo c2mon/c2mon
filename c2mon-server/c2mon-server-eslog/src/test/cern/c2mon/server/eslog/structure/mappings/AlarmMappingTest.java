@@ -52,6 +52,12 @@ public class AlarmMappingTest {
       "        \"active\": {\n" +
       "          \"type\": \"boolean\"\n" +
       "        },\n" +
+      "        \"activity\": {\n" +
+      "          \"type\": \"string\"\n" +
+      "        },\n" +
+      "        \"activeNumeric\": {\n" +
+      "          \"type\": \"double\"\n" +
+      "        },\n" +
       "        \"priority\": {\n" +
       "          \"type\": \"integer\"\n" +
       "        },\n" +

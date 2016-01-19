@@ -39,6 +39,14 @@ public class AlarmESLogConverter {
     alarmES.setAlarmId(alarm.getId());
 
     alarmES.setActive(alarm.isActive());
+    alarmES.setActivity(String.valueOf(alarm.isActive()));
+
+    if (alarmES.isActive()) {
+      alarmES.setActiveNumeric(1);
+    }
+    else {
+      alarmES.setActiveNumeric(0);
+    }
 
     alarmES.setFaultFamily(alarm.getFaultFamily());
     alarmES.setFaultMember(alarm.getFaultMember());

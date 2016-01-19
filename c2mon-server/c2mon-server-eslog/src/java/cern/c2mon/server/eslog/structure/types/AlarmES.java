@@ -38,6 +38,8 @@ public class AlarmES {
   private int faultCode;
 
   private boolean active;
+  private String activity;
+  private double activeNumeric;
   private int priority;
   private String info;
 
