@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.queries;
 
+import cern.c2mon.server.eslog.structure.mappings.Mapping;
 import cern.c2mon.server.eslog.structure.types.AlarmES;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -64,7 +65,7 @@ public class AlarmESQuery extends Query {
 
     if (indexExists(indexName)) {
       log.debug("logAlarmES() - Add new Alarm event to index " + indexName + ".");
-      IndexResponse response = client.prepareIndex().setIndex(indexName).setSource(jsonSource).execute().actionGet();
+      IndexResponse response = client.prepareIndex().setIndex(indexName).setType(Mapping.ValueType.alarmType.toString()).setSource(jsonSource).execute().actionGet();
       return response.isCreated();
     }
     return false;

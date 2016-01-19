@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.queries;
 
+import cern.c2mon.server.eslog.structure.mappings.Mapping;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -56,7 +57,7 @@ public class SupervisionQuery extends Query {
 
     if (indexExists(indexName)) {
       log.debug("logSupervisionEvent() - Add new Supervision event to index " + indexName + ".");
-      IndexResponse response = client.prepareIndex().setIndex(indexName).setSource(jsonSource).execute().actionGet();
+      IndexResponse response = client.prepareIndex().setIndex(indexName).setType(Mapping.ValueType.supervisionType.toString()).setSource(jsonSource).execute().actionGet();
       return response.isCreated();
     }
     return false;
