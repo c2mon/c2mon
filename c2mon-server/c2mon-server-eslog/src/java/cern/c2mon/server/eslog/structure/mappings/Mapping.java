@@ -161,6 +161,7 @@ public interface Mapping {
     DaqTimestamp daqTimestamp;
     Status status;
     Quality quality;
+    Valid valid;
     ValueDescription valueDescription;
     ValueBoolean valueBoolean;
     ValueString valueString;
@@ -178,6 +179,7 @@ public interface Mapping {
       this.daqTimestamp = new DaqTimestamp();
       this.status = new Status();
       this.quality = new Quality();
+      this.valid = new Valid();
       this.valueDescription = new ValueDescription();
 
       if (ValueType.isNumeric(valueType)) {
@@ -240,6 +242,10 @@ public interface Mapping {
     class Quality {
       private final String type = ValueType.stringType.toString();
       //private final String index = indexNotAnalyzed;
+    }
+
+    class Valid {
+      private final String type = ValueType.boolType.toString();
     }
 
     class ValueDescription {

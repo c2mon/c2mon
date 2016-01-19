@@ -93,6 +93,7 @@ public class DataTagESLogConverter {
     setServerTimestamp(tag, tagES);
     setStatus(tag, tagES);
     setQuality(tag, tagES);
+    setValid(tag, tagES);
     tagES.setValue(tag.getValue());
     tagES.setValueDescription(tag.getValueDescription());
 
@@ -189,6 +190,12 @@ public class DataTagESLogConverter {
     if (quality != null) {
       tagES.setQuality(gson.toJson(quality.getInvalidQualityStates()));
     }
+  }
+
+  private void setValid(Tag tag, TagES tagES) {
+    DataTagQuality quality = tag.getDataTagQuality();
+
+    tagES.setValid(quality == null || quality.getInvalidQualityStates().isEmpty());
   }
 
   /**

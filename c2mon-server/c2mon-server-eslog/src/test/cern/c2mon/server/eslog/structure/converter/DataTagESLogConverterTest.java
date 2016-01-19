@@ -27,6 +27,8 @@ import java.util.Map;
 
 import cern.c2mon.server.eslog.structure.converter.DataTagESLogConverter;
 import cern.c2mon.server.eslog.structure.types.TagNumeric;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -249,6 +251,8 @@ public class DataTagESLogConverterTest {
     assertEquals(0, tagES.getStatus());
     assertEquals(value, tagES.getValue());
     assertEquals(valueDesc, tagES.getValueDescription());
+    assertNull(tagES.getQuality());
+    assertTrue(tagES.getValid());
 
     when(tagC2MON.getDataType()).thenReturn(ValueType.stringType.toString());
     when(tagC2MON.getValue()).thenReturn(name);
@@ -259,6 +263,11 @@ public class DataTagESLogConverterTest {
     when(tagC2MON.getValue()).thenReturn(timeStamp);
     tagES = esLogConverter.convertToTagES(tagC2MON);
     assertEquals(timeStamp, tagES.getValue());
+
+    when(tagC2MON.getDataTagQuality()).thenReturn(new DataTagQualityImpl(TagQualityStatus.EQUIPMENT_DOWN));
+    tagES = esLogConverter.convertToTagES(tagC2MON);
+    assertNotNull(tagES.getQuality());
+    assertFalse(tagES.getValid());
   }
 
   @Test

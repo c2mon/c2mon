@@ -39,6 +39,7 @@ public abstract class TagES implements TagESInterface {
   private long daqTimestamp;
   private int status;
   private String quality; //tagstatusdesc
+  private Boolean valid; //if quality is OK or not
   protected transient Object value;
   protected Boolean valueBoolean;
   protected String valueString;
@@ -83,6 +84,8 @@ public abstract class TagES implements TagESInterface {
     str.append(getStatus());
     str.append('\t');
     str.append(getQualityAppend(str));
+    str.append('\t');
+    str.append(getValid());
     str.append('\t');
     str.append(getProcess());
     str.append('\t');
