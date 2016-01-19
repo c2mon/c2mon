@@ -36,20 +36,20 @@ import java.util.Date;
 @Data
 public abstract class Indexer {
   /** Prefix used for every index in the ElasticSearch cluster, e.g., c2mon_2015-11 is a valid index. */
-  @Value("${es.prefix.index:c2mon_}")
+  @Value("${es.prefix.tag:c2mon-tag_}")
   protected String indexPrefix;
 
   /** Every tag or alias must begin with the same prefix, e.g., tag_string is a good type and tag_207807 is a good alias. */
-  @Value("${es.prefix.tag:tag_}")
-  protected String tagPrefix;
+  @Value("${es.prefix.type:tag_}")
+  protected String typePrefix;
 
   /** The first index in the cluster is c2mon_1970-01 which corresponds to the Epoch time (ES stocks timestamps in milliseconds since Epoch). */
   protected String FIRST_INDEX = indexPrefix + "1970-01";
 
-  @Value("${es.prefix.supervision:supervision_}")
+  @Value("${es.prefix.supervision:c2mon-supervision_}")
   protected String supervisionPrefix;
 
-  @Value("${es.prefix.alarm:alarm_}")
+  @Value("${es.prefix.alarm:c2mon-alarm_}")
   protected String alarmPrefix;
 
   /**

@@ -121,7 +121,7 @@ public class TagIndexer extends Indexer {
   }
 
   public String generateTagType(String dataType) {
-    return tagPrefix + dataType.toLowerCase();
+    return typePrefix + dataType.toLowerCase();
   }
 
   protected boolean indexByBatch(String index, String type, String json, TagES tag) {
@@ -147,9 +147,9 @@ public class TagIndexer extends Indexer {
   }
 
   public boolean checkType(String type) {
-    String dataType = type.substring(tagPrefix.length());
+    String dataType = type.substring(typePrefix.length());
 
-    return type.matches("^" + tagPrefix + ".+$") && (Mapping.ValueType.matches(dataType));
+    return type.matches("^" + typePrefix + ".+$") && (Mapping.ValueType.matches(dataType));
   }
 
   private void createNotExistingIndex(String index) {
@@ -211,7 +211,7 @@ public class TagIndexer extends Indexer {
 
     String mapping = null;
     if (!typeIsPresent(index, type)) {
-      mapping = chooseMapping(type.substring(tagPrefix.length()));
+      mapping = chooseMapping(type.substring(typePrefix.length()));
       log.debug("instantiateIndex() - Adding a new mapping to index " + index + " for type " + type + ": " + mapping);
     }
 
@@ -259,14 +259,14 @@ public class TagIndexer extends Indexer {
    * @return name of the alias for a given id.
    */
   public String generateAliasName(long id) {
-    return tagPrefix + id;
+    return typePrefix + id;
   }
 
   /**
    * Check if an alias has the right format: tag_tagId.
    */
   public boolean checkAlias(String alias) {
-    return alias.matches("^" + tagPrefix + "\\d+$");
+    return alias.matches("^" + typePrefix + "\\d+$");
   }
 
   /**

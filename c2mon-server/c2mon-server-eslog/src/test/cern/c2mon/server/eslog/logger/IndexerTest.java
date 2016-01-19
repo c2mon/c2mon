@@ -117,7 +117,7 @@ public class IndexerTest {
 
   @Test
   public void testInstantiateIndex() {
-    String index = "c2mon_2015-02";
+    String index = "c2mon-tag_2015-02";
 
     boolean isAcked = indexer.instantiateIndex(index);
     assertTrue(isAcked);
@@ -126,7 +126,7 @@ public class IndexerTest {
 
   @Test
   public void testInstantiateType() {
-    String index = "c2mon_2015-02";
+    String index = "c2mon-tag_2015-02";
     String type = "tag_string";
 
     testInstantiateIndex();
@@ -141,28 +141,28 @@ public class IndexerTest {
     Set<String> expectedIndex = new HashSet<>();
     Set<String> expectedType = new HashSet<>();
     assertEquals(expectedIndex, indexer.getIndicesTypes().keySet());
-    assertNull(indexer.getIndicesTypes().get("c2mon_2015-01"));
-    expectedIndex.add("c2mon_2015-01");
+    assertNull(indexer.getIndicesTypes().get("c2mon-tag_2015-01"));
+    expectedIndex.add("c2mon-tag_2015-01");
 
-    connector.handleIndexQuery("c2mon_2015-01", Settings.EMPTY, null, null);
+    connector.handleIndexQuery("c2mon-tag_2015-01", Settings.EMPTY, null, null);
     indexer.updateLists();
 
     assertEquals(expectedIndex, indexer.getIndicesTypes().keySet());
 
-    connector.handleIndexQuery("c2mon_2015-01", null, "tag_string", new TagStringMapping(Mapping.ValueType.stringType).getMapping());
-    assertEquals(expectedType, indexer.getIndicesTypes().get("c2mon_2015-01"));
+    connector.handleIndexQuery("c2mon-tag_2015-01", null, "tag_string", new TagStringMapping(Mapping.ValueType.stringType).getMapping());
+    assertEquals(expectedType, indexer.getIndicesTypes().get("c2mon-tag_2015-01"));
   }
 
   @Test
   public void testGenerateAliasName() {
-    String expected = indexer.getTagPrefix() + "1";
+    String expected = indexer.getTypePrefix() + "1";
     String value = indexer.generateAliasName(1);
     assertEquals(expected, value);
   }
 
   @Test
   public void testGenerateType() {
-    String expected = indexer.getTagPrefix() + "string";
+    String expected = indexer.getTypePrefix() + "string";
     TagES tag = new TagString();
     tag.setDataType("String");
     String value = indexer.generateTagType(tag.getDataType());
@@ -201,13 +201,13 @@ public class IndexerTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testAddBadIndex() {
-    String index = "c2mon_bad";
+    String index = "c2mon-tag_bad";
     indexer.addIndex(index);
   }
 
   @Test
   public void testAddGoodIndex() {
-    String index = "c2mon_2005-06";
+    String index = "c2mon-tag_2005-06";
     Set<String> expected = new HashSet<>();
     expected.add(index);
     indexer.addIndex(index);
@@ -217,14 +217,14 @@ public class IndexerTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testAddBadType() {
-    String index = "c2mon_bad";
+    String index = "c2mon-tag_bad";
     String badType = "tagff_test";
     indexer.addType(index, badType);
   }
 
   @Test
   public void testAddGoodType() {
-    String index = "c2mon_1970-01";
+    String index = "c2mon-tag_1970-01";
     String type = "tag_string";
     Set<String> expected = new HashSet<>();
     expected.add(type);
@@ -242,7 +242,7 @@ public class IndexerTest {
 
   @Test
   public void testAddGoodAlias() {
-    String index = "c2mon_1970-01";
+    String index = "c2mon-tag_1970-01";
     String alias = "tag_12658";
     Set<String> expected = new HashSet<>();
     expected.add(alias);
@@ -255,9 +255,9 @@ public class IndexerTest {
   @Test
   public void testCheckIndex() {
     log.debug(indexer.getIndexPrefix());
-    assertTrue(indexer.checkIndex("c2mon_1234-69"));
-    assertFalse(indexer.checkIndex("c2mon-1234-69"));
-    assertFalse(indexer.checkIndex("c2mon_1234.69"));
+    assertTrue(indexer.checkIndex("c2mon-tag_1234-69"));
+    assertFalse(indexer.checkIndex("c2mon-tag-1234-69"));
+    assertFalse(indexer.checkIndex("c2mon-tag_1234.69"));
     assertFalse(indexer.checkIndex("tag_1234-69"));
   }
 
@@ -269,7 +269,7 @@ public class IndexerTest {
     assertTrue(indexer.checkType("tag_double"));
     assertTrue(indexer.checkType("tag_boolean"));
     assertFalse(indexer.checkType("nope"));
-    assertFalse(indexer.checkType("c2mon_1970-1"));
+    assertFalse(indexer.checkType("c2mon-tag_1970-1"));
   }
 
   @Test
@@ -376,7 +376,7 @@ public class IndexerTest {
     TagES tag = new TagString();
     tag.setId(1L);
     tag.setDataType(Mapping.ValueType.stringType.toString());
-    String index = "c2mon_2015-12";
+    String index = "c2mon-tag_2015-12";
 
     indexer.getIndicesAliases().put(index, new HashSet<String>());
     indexer.getIndicesAliases().get(index).add("tag_1");
@@ -406,13 +406,13 @@ public class IndexerTest {
     String type = indexer.generateTagType(tag.getDataType());
 
     assertFalse(indexer.indexByBatch(null, tag.getDataType(), tag.build(), tag));
-    assertFalse(indexer.indexByBatch("c2mon_2015-12", "badType", tag.build(), tag));
-    assertNull(indexer.getIndicesTypes().get("c2mon_2015-12"));
+    assertFalse(indexer.indexByBatch("c2mon-tag_2015-12", "badType", tag.build(), tag));
+    assertNull(indexer.getIndicesTypes().get("c2mon-tag_2015-12"));
 
-    assertTrue(indexer.indexByBatch("c2mon_2015-12", type, tag.build(), tag));
+    assertTrue(indexer.indexByBatch("c2mon-tag_2015-12", type, tag.build(), tag));
     connector.closeBulk();
     assertTrue(indexer.getIndicesTypes().size() == 1);
-    assertTrue(indexer.getIndicesTypes().get("c2mon_2015-12").contains(type));
+    assertTrue(indexer.getIndicesTypes().get("c2mon-tag_2015-12").contains(type));
   }
 
   private SearchResponse getResponse(Client client, String[] indices) {
