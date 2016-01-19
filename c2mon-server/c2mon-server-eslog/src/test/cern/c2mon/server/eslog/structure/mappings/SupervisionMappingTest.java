@@ -33,18 +33,20 @@ public class SupervisionMappingTest {
   private String expectedMappings = "{\n" +
       "  \"mappings\": {\n" +
       "    \"supervision\": {\n" +
-      "      \"id\": {\n" +
-      "        \"type\": \"long\"\n" +
-      "      },\n" +
-      "      \"timestamp\": {\n" +
-      "        \"type\": \"date\",\n" +
-      "        \"format\": \"epoch_millis\"\n" +
-      "      },\n" +
-      "      \"message\": {\n" +
-      "        \"type\": \"string\"\n" +
-      "      },\n" +
-      "      \"status\": {\n" +
-      "        \"type\": \"string\"\n" +
+      "      \"properties\": {\n" +
+      "        \"id\": {\n" +
+      "          \"type\": \"long\"\n" +
+      "        },\n" +
+      "        \"timestamp\": {\n" +
+      "          \"type\": \"date\",\n" +
+      "          \"format\": \"epoch_millis\"\n" +
+      "        },\n" +
+      "        \"message\": {\n" +
+      "          \"type\": \"string\"\n" +
+      "        },\n" +
+      "        \"status\": {\n" +
+      "          \"type\": \"string\"\n" +
+      "        }\n" +
       "      }\n" +
       "    }\n" +
       "  }\n" +

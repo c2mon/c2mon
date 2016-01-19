@@ -33,36 +33,38 @@ public class AlarmMappingTest {
   private String expectedMappings = "{\n" +
       "  \"mappings\": {\n" +
       "    \"alarm\": {\n" +
-      "      \"tagId\": {\n" +
-      "        \"type\": \"long\"\n" +
-      "      },\n" +
-      "      \"alarmId\": {\n" +
-      "        \"type\": \"long\"\n" +
-      "      },\n" +
-      "      \"faultFamily\": {\n" +
-      "        \"type\": \"string\"\n" +
-      "      },\n" +
-      "      \"faultMember\": {\n" +
-      "        \"type\": \"string\"\n" +
-      "      },\n" +
-      "      \"faultCode\": {\n" +
-      "        \"type\": \"integer\"\n" +
-      "      },\n" +
-      "      \"active\": {\n" +
-      "        \"type\": \"boolean\"\n" +
-      "      },\n" +
-      "      \"priority\": {\n" +
-      "        \"type\": \"integer\"\n" +
-      "      },\n" +
-      "      \"info\": {\n" +
-      "        \"type\": \"string\"\n" +
-      "      },\n" +
-      "      \"serverTimestamp\": {\n" +
-      "        \"type\": \"date\",\n" +
-      "        \"format\": \"epoch_millis\"\n" +
-      "      },\n" +
-      "      \"timeZone\": {\n" +
-      "        \"type\": \"string\"\n" +
+      "      \"properties\": {\n" +
+      "        \"tagId\": {\n" +
+      "          \"type\": \"long\"\n" +
+      "        },\n" +
+      "        \"alarmId\": {\n" +
+      "          \"type\": \"long\"\n" +
+      "        },\n" +
+      "        \"faultFamily\": {\n" +
+      "          \"type\": \"string\"\n" +
+      "        },\n" +
+      "        \"faultMember\": {\n" +
+      "          \"type\": \"string\"\n" +
+      "        },\n" +
+      "        \"faultCode\": {\n" +
+      "          \"type\": \"integer\"\n" +
+      "        },\n" +
+      "        \"active\": {\n" +
+      "          \"type\": \"boolean\"\n" +
+      "        },\n" +
+      "        \"priority\": {\n" +
+      "          \"type\": \"integer\"\n" +
+      "        },\n" +
+      "        \"info\": {\n" +
+      "          \"type\": \"string\"\n" +
+      "        },\n" +
+      "        \"serverTimestamp\": {\n" +
+      "          \"type\": \"date\",\n" +
+      "          \"format\": \"epoch_millis\"\n" +
+      "        },\n" +
+      "        \"timeZone\": {\n" +
+      "          \"type\": \"string\"\n" +
+      "        }\n" +
       "      }\n" +
       "    }\n" +
       "  }\n" +

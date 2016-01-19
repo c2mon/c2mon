@@ -308,33 +308,41 @@ public interface Mapping {
     }
 
     class Supervision {
-      private Id id;
-      private Timestamp timestamp;
-      private Message message;
-      private Status status;
+      private Properties properties;
 
       Supervision() {
-        this.id = new Id();
-        this.timestamp = new Timestamp();
-        this.message = new Message();
-        this.status = new Status();
+        properties = new Properties();
       }
 
-      class Id {
-        private final String type = ValueType.longType.toString();
-      }
+      class Properties {
+        private Id id;
+        private Timestamp timestamp;
+        private Message message;
+        private Status status;
 
-      class Timestamp {
-        private final String type = ValueType.dateType.toString();
-        private final String format = epochMillisFormat;
-      }
+        Properties() {
+          this.id = new Id();
+          this.timestamp = new Timestamp();
+          this.message = new Message();
+          this.status = new Status();
+        }
 
-      class Message {
-        private final String type = ValueType.stringType.toString();
-      }
+        class Id {
+          private final String type = ValueType.longType.toString();
+        }
 
-      class Status {
-        private final String type = ValueType.stringType.toString();
+        class Timestamp {
+          private final String type = ValueType.dateType.toString();
+          private final String format = epochMillisFormat;
+        }
+
+        class Message {
+          private final String type = ValueType.stringType.toString();
+        }
+
+        class Status {
+          private final String type = ValueType.stringType.toString();
+        }
       }
     }
   }
@@ -347,70 +355,78 @@ public interface Mapping {
     }
 
     class Alarm {
-      private TagId tagId;
-      private AlarmId alarmId;
-      private FaultFamily faultFamily;
-      private FaultMember faultMember;
-      private FaultCode faultCode;
-      private Active active;
-      private Priority priority;
-      private Info info;
-      private ServerTimestamp serverTimestamp;
-      private TimeZone timeZone;
-
+      private Properties properties;
 
       Alarm() {
-        this.tagId = new TagId();
-        this.alarmId = new AlarmId();
-        this.faultFamily = new FaultFamily();
-        this.faultMember = new FaultMember();
-        this.faultCode = new FaultCode();
-        this.active = new Active();
-        this.priority = new Priority();
-        this.info = new Info();
-        this.serverTimestamp = new ServerTimestamp();
-        this.timeZone = new TimeZone();
+        properties = new Properties();
       }
 
-      class TagId {
-        private final String type = ValueType.longType.toString();
-      }
+      class Properties {
+        private TagId tagId;
+        private AlarmId alarmId;
+        private FaultFamily faultFamily;
+        private FaultMember faultMember;
+        private FaultCode faultCode;
+        private Active active;
+        private Priority priority;
+        private Info info;
+        private ServerTimestamp serverTimestamp;
+        private TimeZone timeZone;
 
-      class AlarmId {
-        private final String type = ValueType.longType.toString();
-      }
 
-      class FaultFamily {
-        private final String type = ValueType.stringType.toString();
-      }
+        Properties() {
+          this.tagId = new TagId();
+          this.alarmId = new AlarmId();
+          this.faultFamily = new FaultFamily();
+          this.faultMember = new FaultMember();
+          this.faultCode = new FaultCode();
+          this.active = new Active();
+          this.priority = new Priority();
+          this.info = new Info();
+          this.serverTimestamp = new ServerTimestamp();
+          this.timeZone = new TimeZone();
+        }
 
-      class FaultMember {
-        private final String type = ValueType.stringType.toString();
-      }
+        class TagId {
+          private final String type = ValueType.longType.toString();
+        }
 
-      class FaultCode {
-        private final String type = ValueType.intType.toString();
-      }
+        class AlarmId {
+          private final String type = ValueType.longType.toString();
+        }
 
-      class Active {
-        private final String type = ValueType.boolType.toString();
-      }
+        class FaultFamily {
+          private final String type = ValueType.stringType.toString();
+        }
 
-      class Priority {
-        private final String type = ValueType.intType.toString();
-      }
+        class FaultMember {
+          private final String type = ValueType.stringType.toString();
+        }
 
-      class Info {
-        private final String type = ValueType.stringType.toString();
-      }
+        class FaultCode {
+          private final String type = ValueType.intType.toString();
+        }
 
-      class ServerTimestamp {
-        private final String type = ValueType.dateType.toString();
-        private final String format = epochMillisFormat;
-      }
+        class Active {
+          private final String type = ValueType.boolType.toString();
+        }
 
-      class TimeZone {
-        private final String type = ValueType.stringType.toString();
+        class Priority {
+          private final String type = ValueType.intType.toString();
+        }
+
+        class Info {
+          private final String type = ValueType.stringType.toString();
+        }
+
+        class ServerTimestamp {
+          private final String type = ValueType.dateType.toString();
+          private final String format = epochMillisFormat;
+        }
+
+        class TimeZone {
+          private final String type = ValueType.stringType.toString();
+        }
       }
     }
   }
