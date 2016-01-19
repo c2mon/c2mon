@@ -26,10 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Allows to send the data to ElasticSearch through the Connector interface.
@@ -40,7 +38,7 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class AlarmIndexer extends Indexer {
-  Set<String> indices = new HashSet<>();
+  Map<String, String> indices = new HashMap<>();
   /** Autowired constructor */
   @Autowired
   public AlarmIndexer(final Connector connector) {
@@ -62,11 +60,11 @@ public class AlarmIndexer extends Indexer {
   public void logAlarm(AlarmES alarmES) {
     if (alarmES != null && alarmES.getServerTimestamp() != null ) {
       String indexName = generateAlarmIndex(alarmES.getServerTimestamp().getTime());
-      String mapping = createMappingIfNewIndex(indexName);
+      String mapping = createOrRetrieveMapping(indexName);
       boolean isAcked = connector.handleAlarmQuery(indexName, mapping, alarmES);
       if (isAcked) {
         log.debug("logAlarm() - isAcked: " + isAcked);
-        indices.add(indexName);
+        indices.put(indexName, mapping);
       }
     }
     else {
@@ -81,13 +79,15 @@ public class AlarmIndexer extends Indexer {
     return alarmPrefix + millisecondsToYearMonth(time);
   }
 
-  public String createMappingIfNewIndex(String indexName) {
-    if (!indices.contains(indexName)) {
+  public String createOrRetrieveMapping(String indexName) {
+    if (indices.keySet().contains(indexName)) {
+      return indices.get(indexName);
+    }
+    else {
       AlarmMapping alarmMapping = new AlarmMapping();
       alarmMapping.configure(connector.getShards(), connector.getReplica());
       alarmMapping.setProperties(Mapping.ValueType.alarmType);
       return alarmMapping.getMapping();
     }
-    return null;
   }
 }

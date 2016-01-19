@@ -26,7 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Allows to write a SupervisionEvent to ElasticSearch through the Connector.
@@ -37,7 +38,7 @@ import java.util.*;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class SupervisionIndexer extends Indexer {
-  Set<String> indices = new HashSet<>();
+  Map<String, String> indices = new HashMap<>();
   @Autowired
   public SupervisionIndexer(final Connector connector) {
     super(connector);
@@ -61,7 +62,8 @@ public class SupervisionIndexer extends Indexer {
       String mapping = createMappingIfNewIndex(indexName);
       boolean isAcked = connector.handleSupervisionQuery(indexName, mapping, supervisionEvent);
       if (isAcked) {
-        indices.add(indexName);
+        log.debug("logSupervisionEvent() - isAcked: " + isAcked);
+        indices.put(indexName, mapping);
       }
     }
     else {
@@ -77,12 +79,14 @@ public class SupervisionIndexer extends Indexer {
   }
 
   public String createMappingIfNewIndex(String indexName) {
-    if (!indices.contains(indexName)) {
+    if (indices.keySet().contains(indexName)) {
+      return indices.get(indexName);
+    }
+    else {
       SupervisionMapping supervisionMapping = new SupervisionMapping();
       supervisionMapping.configure(connector.getShards(), connector.getReplica());
       supervisionMapping.setProperties(Mapping.ValueType.supervisionType);
       return supervisionMapping.getMapping();
     }
-    return null;
   }
 }
