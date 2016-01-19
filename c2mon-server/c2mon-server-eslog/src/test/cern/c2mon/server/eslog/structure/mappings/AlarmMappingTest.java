@@ -58,7 +58,7 @@ public class AlarmMappingTest {
       "        \"type\": \"string\"\n" +
       "      },\n" +
       "      \"serverTimestamp\": {\n" +
-      "        \"type\": \"long\",\n" +
+      "        \"type\": \"date\",\n" +
       "        \"format\": \"epoch_millis\"\n" +
       "      },\n" +
       "      \"timeZone\": {\n" +
