@@ -18,6 +18,7 @@ package cern.c2mon.server.eslog.structure.types;
 
 import cern.c2mon.shared.util.json.GsonFactory;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,7 +31,7 @@ import java.sql.Timestamp;
 @Slf4j
 @Data
 public class AlarmES {
-  private static final Gson GSON = GsonFactory.createGson();
+  private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
   private long tagId;
   private long alarmId;

@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 
 import cern.c2mon.server.eslog.structure.types.TagString;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -36,6 +37,7 @@ import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
  * verify that it builds correctly in JSON and accept/reject good/bad types of value.
  * @author Alban Marguet.
  */
+@Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public class TagStringTest {
 	@InjectMocks

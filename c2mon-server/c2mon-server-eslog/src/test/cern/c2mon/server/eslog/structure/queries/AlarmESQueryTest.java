@@ -24,26 +24,13 @@ import org.elasticsearch.client.Client;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static junit.framework.TestCase.assertEquals;
 
 /**
  * @author Alban Marguet
  */
 public class AlarmESQueryTest {
-  private long tagId;
-  private long alarmId;
-  private String faultFamily;
-  private String faultMember;
-  private int faultCode;
-  private boolean active;
-  private int priority;
-  private String info;
-  private long serverTimestamp;
-  private String timeZone;
-  private Map<String, Object> jsonSource;
+  private String jsonSource;
   AlarmESQuery query;
   Client client;
   AlarmESLogConverter alarmESLogConverter;
@@ -55,43 +42,13 @@ public class AlarmESQueryTest {
     alarm = CacheObjectCreation.createTestAlarm1();
     alarmESLogConverter = new AlarmESLogConverter();
     alarmES = alarmESLogConverter.convertAlarmToAlarmES(alarm);
-    tagId = alarm.getTagId();
-    alarmId = alarm.getId();
-    faultFamily = alarm.getFaultFamily();
-    faultMember = alarm.getFaultMember();
-    faultCode = alarm.getFaultCode();
-    active = alarm.isActive();
-    info = alarm.getInfo();
-    serverTimestamp = alarm.getTimestamp().getTime();
-
-    jsonSource = new HashMap<>();
-    jsonSource.put("tagId", tagId);
-    jsonSource.put("alarmId", alarmId);
-    jsonSource.put("faultFamily", faultFamily);
-    jsonSource.put("faultMember", faultMember);
-    jsonSource.put("faultCode", faultCode);
-    jsonSource.put("active", active);
-    jsonSource.put("priority", priority);
-    jsonSource.put("info", info);
-    jsonSource.put("serverTimeStamp", serverTimestamp);
-    jsonSource.put("timeZone", timeZone);
 
     query = new AlarmESQuery(client, alarmES);
+    jsonSource = alarmES.toString();
   }
 
   @Test
   public void testCorrectOutput() {
-    assertEquals(tagId, query.getTagId());
-    assertEquals(alarmId, query.getAlarmId());
-    assertEquals(faultFamily, query.getFaultFamily());
-    assertEquals(faultMember, query.getFaultMember());
-    assertEquals(faultCode, query.getFaultCode());
-    assertEquals(active, query.isActive());
-    assertEquals(priority, query.getPriority());
-    assertEquals(info, query.getInfo());
-    assertEquals(serverTimestamp, query.getServerTimestamp());
-    assertEquals(timeZone, query.getTimeZone());
-
     assertEquals(jsonSource, query.getJsonSource());
   }
 }

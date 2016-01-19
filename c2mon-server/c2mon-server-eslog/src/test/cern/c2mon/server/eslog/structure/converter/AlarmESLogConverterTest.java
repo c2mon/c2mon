@@ -19,6 +19,7 @@ package cern.c2mon.server.eslog.structure.converter;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.eslog.structure.types.AlarmES;
 import cern.c2mon.server.test.CacheObjectCreation;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -30,6 +31,7 @@ import static junit.framework.TestCase.assertEquals;
 /**
  * @author Alban Marguet
  */
+@Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public class AlarmESLogConverterTest {
   @InjectMocks
@@ -48,6 +50,7 @@ public class AlarmESLogConverterTest {
     alarm = CacheObjectCreation.createTestAlarm1();
     alarmES = alarmESLogConverter.convertAlarmToAlarmES(alarm);
 
+    log.debug(alarmES.toString());
     assertEquals(alarm.getTagId().longValue(), alarmES.getTagId());
     assertEquals(alarm.getId().longValue(), alarmES.getAlarmId());
     assertEquals(alarm.getFaultFamily(), alarmES.getFaultFamily());

@@ -21,6 +21,7 @@ import cern.c2mon.server.eslog.structure.types.AlarmES;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 
@@ -34,26 +35,16 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class AlarmESQuery extends Query {
-  private long tagId;
-  private long alarmId;
-  private String faultFamily;
-  private String faultMember;
-  private int faultCode;
-  private boolean active;
-  private int priority;
-  private String info;
-  private long serverTimestamp;
-  private String timeZone;
-  private Map<String, Object> jsonSource;
+  private String routing;
+  private String jsonSource;
 
   /**
    * Creates an ElasticSearch query for an Alarm event, create the needed JSON and create the appropriate query.
    */
   public AlarmESQuery(Client client, AlarmES alarmES) {
     super(client);
-    jsonSource = new HashMap<>();
-    getElements(alarmES);
-    toJson();
+    jsonSource = alarmES.toString();
+    routing = String.valueOf(alarmES.getAlarmId());
   }
 
   public boolean logAlarmES(String indexName, String mapping) {
@@ -65,35 +56,9 @@ public class AlarmESQuery extends Query {
 
     if (indexExists(indexName)) {
       log.debug("logAlarmES() - Add new Alarm event to index " + indexName + ".");
-      IndexResponse response = client.prepareIndex().setIndex(indexName).setType(Mapping.ValueType.alarmType.toString()).setSource(jsonSource).execute().actionGet();
+      IndexResponse response = client.prepareIndex().setIndex(indexName).setType(Mapping.ValueType.alarmType.toString()).setSource(jsonSource).setRouting(routing).execute().actionGet();
       return response.isCreated();
     }
     return false;
-  }
-
-  public void getElements(AlarmES alarmES) {
-    tagId = alarmES.getTagId();
-    alarmId = alarmES.getAlarmId();
-    faultFamily = alarmES.getFaultFamily();
-    faultMember = alarmES.getFaultMember();
-    faultCode = alarmES.getFaultCode();
-    active = alarmES.isActive();
-    priority = alarmES.getPriority();
-    info = alarmES.getInfo();
-    serverTimestamp = alarmES.getServerTimestamp().getTime();
-    timeZone = alarmES.getTimezone();
-  }
-
-  private void toJson() {
-    jsonSource.put("tagId", tagId);
-    jsonSource.put("alarmId", alarmId);
-    jsonSource.put("faultFamily", faultFamily);
-    jsonSource.put("faultMember", faultMember);
-    jsonSource.put("faultCode", faultCode);
-    jsonSource.put("active", active);
-    jsonSource.put("priority", priority);
-    jsonSource.put("info", info);
-    jsonSource.put("serverTimeStamp", serverTimestamp);
-    jsonSource.put("timeZone", timeZone);
   }
 }
