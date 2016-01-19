@@ -1,6 +1,10 @@
 C2MON Notifier Changelog:
 ---------------------------
 
+19.01.2016 release 1.0.8
+===========================
+* DMN-2510 : Updated to spring4 and latest c2mon client 
+
 30.04.2015 release 1.0.7
 ===========================
 * DMN-2171 : Notifier sends no ERROR->WARN transition 
