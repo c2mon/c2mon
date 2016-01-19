@@ -17,6 +17,8 @@
 package cern.c2mon.server.eslog.listener;
 
 import cern.c2mon.server.eslog.logger.SupervisionIndexer;
+import cern.c2mon.server.eslog.structure.converter.SupervisionESConverter;
+import cern.c2mon.server.eslog.structure.types.SupervisionES;
 import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
@@ -32,6 +34,7 @@ import java.sql.Timestamp;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Alban Marguet
@@ -45,16 +48,20 @@ public class ESLogSupervisionListenerTest {
   private long id = 1L;
   private String message = "message";
   private SupervisionEvent event = new SupervisionEventImpl(entity, id, status, timestamp, message);
+  private SupervisionES supervisionES;
   @Mock
   private SupervisionNotifier  supervisionNotifier;
   @InjectMocks
   private ESLogSupervisionListener listener;
   @Mock
   private SupervisionIndexer indexer;
+  @Mock
+  private SupervisionESConverter supervisionESConverter;
 
   @Test
   public void testNotifySupervisionEvent() {
+    when(supervisionESConverter.convertSupervisionEventToSupervisionES(eq(event))).thenReturn(supervisionES);
     listener.notifySupervisionEvent(event);
-    verify(indexer).logSupervisionEvent(eq(event));
+    verify(indexer).logSupervisionEvent(eq(supervisionES));
   }
 }

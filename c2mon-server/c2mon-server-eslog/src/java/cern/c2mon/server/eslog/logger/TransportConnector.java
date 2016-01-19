@@ -18,9 +18,7 @@ package cern.c2mon.server.eslog.logger;
 
 import cern.c2mon.server.eslog.structure.queries.*;
 import cern.c2mon.server.eslog.structure.types.AlarmES;
-import cern.c2mon.server.eslog.structure.types.TagES;
-import cern.c2mon.shared.client.alarm.AlarmQuery;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.server.eslog.structure.types.SupervisionES;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.ActionRequest;
@@ -29,11 +27,9 @@ import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.cluster.metadata.AliasOrIndex;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.transport.LocalTransportAddress;
@@ -48,7 +44,10 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
@@ -408,8 +407,8 @@ public class TransportConnector implements Connector {
   }
 
   @Override
-  public boolean handleSupervisionQuery(String indexName, String mapping, SupervisionEvent supervisionEvent) {
-    SupervisionQuery supervisionQuery = new SupervisionQuery(client, supervisionEvent);
+  public boolean handleSupervisionQuery(String indexName, String mapping, SupervisionES supervisionES) {
+    SupervisionQuery supervisionQuery = new SupervisionQuery(client, supervisionES);
     boolean isAcked = false;
 
     if (client == null) {

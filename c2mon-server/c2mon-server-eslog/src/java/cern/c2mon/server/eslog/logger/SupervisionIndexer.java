@@ -18,6 +18,7 @@ package cern.c2mon.server.eslog.logger;
 
 import cern.c2mon.server.eslog.structure.mappings.Mapping;
 import cern.c2mon.server.eslog.structure.mappings.SupervisionMapping;
+import cern.c2mon.server.eslog.structure.types.SupervisionES;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -53,14 +54,14 @@ public class SupervisionIndexer extends Indexer {
   }
 
   /**
-   * Write the SupervisionEvent to ElasticSearch in the Supervision index.
-   * @param supervisionEvent to be written to ElasticSearch.
+   * Write the SupervisionES to ElasticSearch in the Supervision index.
+   * @param supervisionES to be written to ElasticSearch.
    */
-  public void logSupervisionEvent(SupervisionEvent supervisionEvent) {
-    if (supervisionEvent != null && supervisionEvent.getEventTime() != null ) {
-      String indexName = generateSupervisionIndex(supervisionEvent.getEventTime().getTime());
+  public void logSupervisionEvent(SupervisionES supervisionES) {
+    if (supervisionES != null) {
+      String indexName = generateSupervisionIndex(supervisionES.getEventTime());
       String mapping = createMappingIfNewIndex(indexName);
-      boolean isAcked = connector.handleSupervisionQuery(indexName, mapping, supervisionEvent);
+      boolean isAcked = connector.handleSupervisionQuery(indexName, mapping, supervisionES);
       if (isAcked) {
         log.debug("logSupervisionEvent() - isAcked: " + isAcked);
         indices.put(indexName, mapping);

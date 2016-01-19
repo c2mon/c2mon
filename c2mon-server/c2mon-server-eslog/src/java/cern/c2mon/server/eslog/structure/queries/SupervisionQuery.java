@@ -17,6 +17,7 @@
 package cern.c2mon.server.eslog.structure.queries;
 
 import cern.c2mon.server.eslog.structure.mappings.Mapping;
+import cern.c2mon.server.eslog.structure.types.SupervisionES;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,18 +36,13 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class SupervisionQuery extends Query {
-  private long id;
-  private String entity;
-  private long timestamp;
-  private String message;
-  private String status;
-  private Map<String, Object> jsonSource;
+  private String routing;
+  private String jsonSource;
 
-  public SupervisionQuery(Client client, SupervisionEvent supervisionEvent) {
+  public SupervisionQuery(Client client, SupervisionES supervisionES) {
     super(client);
-    jsonSource = new HashMap<>();
-    getElements(supervisionEvent);
-    toJson();
+    routing = String.valueOf(supervisionES.getEntityId());
+    jsonSource = supervisionES.toString();
   }
 
   public boolean logSupervisionEvent(String indexName, String mapping) {
@@ -57,25 +53,9 @@ public class SupervisionQuery extends Query {
 
     if (indexExists(indexName)) {
       log.debug("logSupervisionEvent() - Add new Supervision event to index " + indexName + ".");
-      IndexResponse response = client.prepareIndex().setIndex(indexName).setType(Mapping.ValueType.supervisionType.toString()).setSource(jsonSource).execute().actionGet();
+      IndexResponse response = client.prepareIndex().setIndex(indexName).setType(Mapping.ValueType.supervisionType.toString()).setSource(jsonSource).setRouting(routing).execute().actionGet();
       return response.isCreated();
     }
     return false;
-  }
-
-  public void getElements(SupervisionEvent supervisionEvent) {
-    id = supervisionEvent.getEntityId();
-    entity = supervisionEvent.getEntity().name();
-    timestamp = supervisionEvent.getEventTime().getTime();
-    message = supervisionEvent.getMessage();
-    status = supervisionEvent.getStatus().name();
-  }
-
-  private void toJson() {
-    jsonSource.put("id", id);
-    jsonSource.put("entity", entity);
-    jsonSource.put("timestamp", timestamp);
-    jsonSource.put("message", message);
-    jsonSource.put("status", status);
   }
 }

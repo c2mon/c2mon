@@ -18,7 +18,7 @@ package cern.c2mon.server.eslog.logger;
 
 import cern.c2mon.server.eslog.structure.queries.Query;
 import cern.c2mon.server.eslog.structure.types.AlarmES;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.server.eslog.structure.types.SupervisionES;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
@@ -87,7 +87,7 @@ public interface Connector {
   /**
    * Allows to add a new SupervisionEvent to ElasticSearch.
    */
-  boolean handleSupervisionQuery(String indexName, String mapping, SupervisionEvent supervisionEvent);
+  boolean handleSupervisionQuery(String indexName, String mapping, SupervisionES supervisionES);
 
   /**
    * Allows to add a new AlarmES to ElasticSearch.

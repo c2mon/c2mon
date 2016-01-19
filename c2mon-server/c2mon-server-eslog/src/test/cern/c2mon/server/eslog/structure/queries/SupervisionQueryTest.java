@@ -16,6 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.queries;
 
+import cern.c2mon.server.eslog.structure.converter.SupervisionESConverter;
+import cern.c2mon.server.eslog.structure.types.SupervisionES;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
@@ -38,29 +40,23 @@ public class SupervisionQueryTest {
   private long timestamp = 123456L;
   private String message = "message";
   private String status = "RUNNING";
-  private Map<String, Object> jsonSource = new HashMap<>();
+  private String jsonSource;
+  private SupervisionESConverter supervisionESConverter = new SupervisionESConverter();
   private SupervisionEvent event;
-  SupervisionQuery query;
-  Client client;
+  private SupervisionQuery query;
+  private SupervisionES supervisionES;
+  private Client client;
 
   @Before
   public void setup() {
-    jsonSource.put("id", id);
-    jsonSource.put("entity", entity);
-    jsonSource.put("timestamp", timestamp);
-    jsonSource.put("message", message);
-    jsonSource.put("status", status);
     event = new SupervisionEventImpl(SupervisionConstants.SupervisionEntity.PROCESS, id, SupervisionConstants.SupervisionStatus.RUNNING, new Timestamp(timestamp), message);
-    query = new SupervisionQuery(client, event);
+    supervisionES = supervisionESConverter.convertSupervisionEventToSupervisionES(event);
+    query = new SupervisionQuery(client, supervisionES);
+    jsonSource = supervisionES.toString();
   }
 
   @Test
   public void testCorrectOutput() {
-    assertEquals(id, query.getId());
-    assertEquals(entity, query.getEntity());
-    assertEquals(timestamp, query.getTimestamp());
-    assertEquals(message, query.getMessage());
-    assertEquals(status, query.getStatus());
     assertEquals(jsonSource, query.getJsonSource());
   }
 }

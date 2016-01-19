@@ -19,6 +19,9 @@ package cern.c2mon.server.eslog.listener;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.eslog.logger.SupervisionIndexer;
+import cern.c2mon.server.eslog.structure.converter.SupervisionESConverter;
+import cern.c2mon.server.eslog.structure.types.AlarmES;
+import cern.c2mon.server.eslog.structure.types.SupervisionES;
 import cern.c2mon.server.supervision.SupervisionListener;
 import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
@@ -44,6 +47,9 @@ public class ESLogSupervisionListener implements SupervisionListener, SmartLifec
   /** Supervision Mapper */
   private SupervisionIndexer supervisionIndexer;
 
+  /** Convert SupervisionEvent to SupervisionES for ElasticSearch.*/
+  private SupervisionESConverter supervisionESConverter;
+
   /** Listener container lifecycle hook. */
   private Lifecycle listenerContainer;
 
@@ -57,9 +63,10 @@ public class ESLogSupervisionListener implements SupervisionListener, SmartLifec
    * @param supervisionIndexer the mapper to write to the DB
    */
   @Autowired
-  public ESLogSupervisionListener(final SupervisionNotifier supervisionNotifier, final SupervisionIndexer supervisionIndexer) {
+  public ESLogSupervisionListener(final SupervisionNotifier supervisionNotifier, final SupervisionIndexer supervisionIndexer, final SupervisionESConverter supervisionESConverter) {
     this.supervisionNotifier = supervisionNotifier;
     this.supervisionIndexer = supervisionIndexer;
+    this.supervisionESConverter = supervisionESConverter;
   }
 
   /**
@@ -80,7 +87,8 @@ public class ESLogSupervisionListener implements SupervisionListener, SmartLifec
           + " for " + supervisionEvent.getEntity()
           + " " + supervisionEvent.getEntityId() + " to ElasticSearch");
     }
-    supervisionIndexer.logSupervisionEvent(supervisionEvent);
+    SupervisionES supervisionES = supervisionESConverter.convertSupervisionEventToSupervisionES(supervisionEvent);
+    supervisionIndexer.logSupervisionEvent(supervisionES);
   }
 
   @Override

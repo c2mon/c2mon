@@ -16,8 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.logger;
 
+import cern.c2mon.server.eslog.structure.converter.SupervisionESConverter;
 import cern.c2mon.server.eslog.structure.mappings.Mapping;
 import cern.c2mon.server.eslog.structure.mappings.SupervisionMapping;
+import cern.c2mon.server.eslog.structure.types.SupervisionES;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
@@ -50,6 +52,7 @@ public class SupervisionIndexerTest {
   private String message = "message";
   private SupervisionMapping mapping;
   private SupervisionEvent event;
+  private SupervisionES supervisionES;
 
   @InjectMocks
   SupervisionIndexer indexer;
@@ -57,10 +60,20 @@ public class SupervisionIndexerTest {
   @Mock
   TransportConnector connector;
 
+  @Mock
+  SupervisionESConverter supervisionESConverter;
+
   @Before
   public void setup() {
     event = new SupervisionEventImpl(entity, id, status, timestamp, message);
-    when(connector.handleSupervisionQuery(anyString(), anyString(), eq(event))).thenReturn(true);
+    supervisionES = new SupervisionES();
+    supervisionES.setEntityId(id);
+    supervisionES.setEntityName(entity.name());
+    supervisionES.setEventTime(timestamp.getTime());
+    supervisionES.setMessage(message);
+    supervisionES.setStatusName(status.name());
+        when(supervisionESConverter.convertSupervisionEventToSupervisionES(eq(event))).thenReturn(supervisionES);
+    when(connector.handleSupervisionQuery(anyString(), anyString(), eq(supervisionES))).thenReturn(true);
     when(connector.getReplica()).thenReturn(0);
     when(connector.getShards()).thenReturn(10);
     indexer.setSupervisionPrefix("prevision_");
@@ -91,7 +104,7 @@ public class SupervisionIndexerTest {
   public void testLogSupervisionEvent() {
     String expectedMapping = mapping.getMapping();
 
-    indexer.logSupervisionEvent(event);
-    verify(connector).handleSupervisionQuery(eq(indexer.getSupervisionPrefix() + indexer.millisecondsToYearMonth(timestamp.getTime())), eq(expectedMapping), eq(event));
+    indexer.logSupervisionEvent(supervisionES);
+    verify(connector).handleSupervisionQuery(eq(indexer.getSupervisionPrefix() + indexer.millisecondsToYearMonth(timestamp.getTime())), eq(expectedMapping), eq(supervisionES));
   }
 }
