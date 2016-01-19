@@ -188,7 +188,7 @@ public interface Mapping {
       }
       else if (ValueType.isBoolean(valueType)){
         this.valueBoolean = new ValueBoolean(valueType);
-        this.valueNumeric = new ValueNumeric(ValueType.intType);
+        this.valueNumeric = new ValueNumeric(ValueType.doubleType);
       }
 
       this.process = new Process();
