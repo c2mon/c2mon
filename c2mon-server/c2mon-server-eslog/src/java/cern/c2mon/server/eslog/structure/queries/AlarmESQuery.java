@@ -59,8 +59,12 @@ public class AlarmESQuery extends Query {
     log.debug("logAlarmES() - Try to create a writing query for Alarm.");
     if (!indexExists(indexName) && mapping != null) {
       client.admin().indices().prepareCreate(indexName).setSource(mapping).execute().actionGet();
-      IndexResponse response = client.prepareIndex().setIndex(indexName).setSource(jsonSource).execute().actionGet();
       log.debug("logAlarmES() - Source query is: " + jsonSource + ".");
+    }
+
+    if (indexExists(indexName)) {
+      log.debug("logAlarmES() - Add new Alarm event to index " + indexName + ".");
+      IndexResponse response = client.prepareIndex().setIndex(indexName).setSource(jsonSource).execute().actionGet();
       return response.isCreated();
     }
     return false;

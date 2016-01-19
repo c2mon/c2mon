@@ -51,8 +51,12 @@ public class SupervisionQuery extends Query {
   public boolean logSupervisionEvent(String indexName, String mapping) {
     if (!indexExists(indexName) && mapping != null) {
       client.admin().indices().prepareCreate(indexName).setSource(mapping).execute().actionGet();
-      IndexResponse response = client.prepareIndex().setIndex(indexName).setSource(jsonSource).execute().actionGet();
       log.debug("logSupervisionEvent() - Source query is: " + jsonSource + ".");
+    }
+
+    if (indexExists(indexName)) {
+      log.debug("logSupervisionEvent() - Add new Supervision event to index " + indexName + ".");
+      IndexResponse response = client.prepareIndex().setIndex(indexName).setSource(jsonSource).execute().actionGet();
       return response.isCreated();
     }
     return false;
