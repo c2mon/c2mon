@@ -20,6 +20,8 @@ import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.eslog.structure.types.AlarmES;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
+
 /**
  * Convert an Alarm to an AlarmES for ElasticSearch writing.
  * @author Alban Marguet
@@ -42,7 +44,10 @@ public class AlarmESLogConverter {
     alarmES.setFaultMember(alarm.getFaultMember());
     alarmES.setFaultCode(alarm.getFaultCode());
 
-    alarmES.setServerTimestamp(alarm.getTimestamp());
+    Timestamp alarmTimestamp = alarm.getTimestamp();
+    if (alarmTimestamp != null) {
+      alarmES.setServerTimestamp(alarm.getTimestamp().getTime());
+    }
 
     alarmES.setInfo(alarm.getInfo());
 

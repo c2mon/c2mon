@@ -58,6 +58,6 @@ public class AlarmESLogConverterTest {
     assertEquals(alarm.getFaultCode(), alarmES.getFaultCode());
     assertEquals(alarm.isActive(), alarmES.isActive());
     assertEquals(alarm.getInfo(), alarmES.getInfo());
-    assertEquals(alarm.getTimestamp(), alarmES.getServerTimestamp());
+    assertEquals(alarm.getTimestamp().getTime(), alarmES.getServerTimestamp());
   }
 }

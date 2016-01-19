@@ -16,13 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.types;
 
-import cern.c2mon.shared.util.json.GsonFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-
-import java.sql.Timestamp;
 
 /**
  * Represents an Alarm Event for ElasticSearch.
@@ -44,7 +41,7 @@ public class AlarmES {
   private int priority;
   private String info;
 
-  private Timestamp serverTimestamp;
+  private long serverTimestamp;
   private String timezone;
 
   @Override

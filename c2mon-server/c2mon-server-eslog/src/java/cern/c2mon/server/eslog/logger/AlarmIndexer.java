@@ -58,8 +58,8 @@ public class AlarmIndexer extends Indexer {
    * @param alarmES to write to the cluster.
    */
   public void logAlarm(AlarmES alarmES) {
-    if (alarmES != null && alarmES.getServerTimestamp() != null ) {
-      String indexName = generateAlarmIndex(alarmES.getServerTimestamp().getTime());
+    if (alarmES != null) {
+      String indexName = generateAlarmIndex(alarmES.getServerTimestamp());
       String mapping = createOrRetrieveMapping(indexName);
       boolean isAcked = connector.handleAlarmQuery(indexName, mapping, alarmES);
       if (isAcked) {
