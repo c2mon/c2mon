@@ -405,7 +405,7 @@ public interface Mapping {
       }
 
       class ServerTimestamp {
-        private final String type = ValueType.longType.toString();
+        private final String type = ValueType.dateType.toString();
         private final String format = epochMillisFormat;
       }
 

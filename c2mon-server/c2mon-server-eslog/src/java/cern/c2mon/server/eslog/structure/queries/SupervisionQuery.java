@@ -19,6 +19,7 @@ package cern.c2mon.server.eslog.structure.queries;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 
@@ -29,6 +30,7 @@ import java.util.Map;
  *
  * @author Alban Marguet
  */
+@Slf4j
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class SupervisionQuery extends Query {
@@ -49,10 +51,11 @@ public class SupervisionQuery extends Query {
   public boolean logSupervisionEvent(String indexName, String mapping) {
     if (!indexExists(indexName) && mapping != null) {
       client.admin().indices().prepareCreate(indexName).setSource(mapping).execute().actionGet();
+      IndexResponse response = client.prepareIndex().setIndex(indexName).setSource(jsonSource).execute().actionGet();
+      log.debug("logSupervisionEvent() - Source query is: " + jsonSource + ".");
+      return response.isCreated();
     }
-
-    IndexResponse response = client.prepareIndex().setIndex(indexName).setSource(jsonSource).execute().actionGet();
-    return response.isCreated();
+    return false;
   }
 
   public void getElements(SupervisionEvent supervisionEvent) {
