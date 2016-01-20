@@ -29,6 +29,7 @@ import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertEquals;
 
 /**
+ * Insure that AlarmESLogConverter converts well Alarm to AlarmES.
  * @author Alban Marguet
  */
 @Slf4j

@@ -27,15 +27,16 @@ import org.junit.Test;
 import static junit.framework.TestCase.assertEquals;
 
 /**
+ * Check that the AlarmQuery class will bring the data effectively to ElasticSearch.
  * @author Alban Marguet
  */
 public class AlarmESQueryTest {
   private String jsonSource;
-  AlarmESQuery query;
-  Client client;
-  AlarmESLogConverter alarmESLogConverter;
-  Alarm alarm;
-  AlarmES alarmES;
+  private AlarmESQuery query;
+  private Client client;
+  private AlarmESLogConverter alarmESLogConverter;
+  private Alarm alarm;
+  private AlarmES alarmES;
 
   @Before
   public void setup() {

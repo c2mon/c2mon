@@ -32,7 +32,6 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 /**
  * Integration test with the core modules.
- * 
  * @author Alban Marguet.
  */
 @Slf4j

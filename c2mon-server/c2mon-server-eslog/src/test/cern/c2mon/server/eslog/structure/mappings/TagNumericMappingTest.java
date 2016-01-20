@@ -16,21 +16,20 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.mappings;
 
-import static org.junit.Assert.assertTrue;
-
+import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Test the good behaviour of the TagNumericMapping class. We need a good mapping to index correctly the data in ElasticSearch.
+ * Test the good behaviour of the TagNumericMapping class.
+ * We need a good mapping to index correctly the data in ElasticSearch.
  * @author Alban Marguet.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class TagNumericMappingTest {
-
 	@Test
 	public void testGetNumericMapping() {
 		TagNumericMapping mapping = new TagNumericMapping(ValueType.intType);

@@ -34,7 +34,6 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,22 +52,23 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
+ * Test the Indexer methods for sending the right data to the Connector.
  * @author Alban Marguet.
  */
 @Slf4j
 @ContextConfiguration({"classpath:cern/c2mon/server/eslog/config/server-eslog-integration.xml" })
 @RunWith(SpringJUnit4ClassRunner.class)
 public class IndexerTest {
-  static String clusterName;
-  static String nodeName;
-  static String host;
-  static String home;
-  static Client clusterClient;
-  static Client initClient;
+  private static String clusterName;
+  private static String nodeName;
+  private static String host;
+  private static String home;
+  private static Client clusterClient;
+  private static Client initClient;
   @Autowired
-  TagIndexer indexer;
+  private TagIndexer indexer;
   @Autowired
-  TransportConnector connector;
+  private TransportConnector connector;
 
   @Before
   public void clientSetup() throws IOException {

@@ -32,6 +32,7 @@ import java.util.Map;
 import static junit.framework.TestCase.assertEquals;
 
 /**
+ * Check that the SupervisionQuery class will bring the data effectively to ElasticSearch.
  * @author Alban Marguet
  */
 public class SupervisionQueryTest {

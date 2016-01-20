@@ -47,15 +47,19 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Test the entire functionality of the node.
- * Need to disable c2mon.properties.
+ * Build the Spring environment.
  * @author Alban Marguet.
  */
 @Slf4j
 @ContextConfiguration({"classpath:cern/c2mon/server/eslog/config/server-eslog-integration.xml" })
 @RunWith(SpringJUnit4ClassRunner.class)
 public class TransportConnectorTest {
+  private int shards = 10;
+  private int replica = 0;
+  private int localPort = 1;
+  private String isLocal = "true";
   @Autowired
-  TransportConnector connector;
+  private TransportConnector connector;
 
   @Before
   public void clientSetup() {
@@ -74,11 +78,12 @@ public class TransportConnectorTest {
   @Test
   public void testInit() {
     Settings expectedSettings = Settings.settingsBuilder().put("node.local", true).put("node.name", connector.getNode()).put("cluster.name", connector.getCluster()).build();
+
     assertTrue(connector.isConnected());
     assertNotNull(connector.getClient());
     assertTrue(connector.isLocal());
     assertEquals(expectedSettings, connector.getSettings());
-    assertEquals("true", connector.getSettings().get("node.local"));
+    assertEquals(isLocal, connector.getSettings().get("node.local"));
     assertEquals(connector.getNode(), connector.getSettings().get("node.name"));
     assertNotNull(connector.getBulkProcessor());
     assertNotNull(connector.getClusterFinder());
@@ -100,8 +105,8 @@ public class TransportConnectorTest {
   @Test
   public void testCreateLocalClient() {
     assertNotNull(connector.getClient());
-    assertEquals(1, connector.getPort());
-    assertEquals("true", connector.getSettings().get("node.local"));
+    assertEquals(localPort, connector.getPort());
+    assertEquals(isLocal, connector.getSettings().get("node.local"));
   }
 
   @Test
@@ -129,7 +134,6 @@ public class TransportConnectorTest {
   @Test
   public void testHandleIndexQuery() {
     Client initClient = connector.getClient();
-
     Settings settings = createMonthSettings();
     String type = "tag_string";
     String mapping = new TagStringMapping(ValueType.stringType).getMapping();
@@ -165,7 +169,6 @@ public class TransportConnectorTest {
   @Test
   public void testBulkAdd() {
     BulkProcessor initBulkProcessor = connector.getBulkProcessor();
-
     boolean result = connector.bulkAdd(null);
     assertFalse(result);
 
@@ -193,14 +196,14 @@ public class TransportConnectorTest {
 
   @Test
   public void testGetIndexSettings() {
-    Settings expected = Settings.settingsBuilder().put("number_of_shards", 10).put("number_of_replicas", 0).build();
-    assertEquals(expected.get("number_of_shards"), connector.getIndexSettings(10, 0).get("number_of_shards"));
-    assertEquals(expected.get("number_of_replicas"), connector.getIndexSettings(10, 0).get("number_of_replicas"));
+    Settings expected = Settings.settingsBuilder().put("number_of_shards", shards).put("number_of_replicas", replica).build();
+    assertEquals(expected.get("number_of_shards"), connector.getIndexSettings(shards, replica).get("number_of_shards"));
+    assertEquals(expected.get("number_of_replicas"), connector.getIndexSettings(shards, replica).get("number_of_replicas"));
   }
 
   private void sleep() {
     try {
-      Thread.sleep(2000L);
+      Thread.sleep(2000);
     }
     catch (InterruptedException e) {
       e.printStackTrace();
@@ -208,7 +211,7 @@ public class TransportConnectorTest {
   }
 
   private Settings createMonthSettings() {
-    return Settings.settingsBuilder().put("number_of_shards", 10)
-        .put("number_of_replicas", 0).build();
+    return Settings.settingsBuilder().put("number_of_shards", shards)
+        .put("number_of_replicas", replica).build();
   }
 }

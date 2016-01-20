@@ -37,6 +37,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
+ * Test if the the SupervisionEvent are well translated into SupervisionES for ElasticSearch.
  * @author Alban Marguet
  */
 @Slf4j

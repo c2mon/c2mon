@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 /**
+ * Verify the output of the SupervisionMapping.
  * @author Alban Marguet
  */
 public class SupervisionMappingTest {

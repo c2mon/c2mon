@@ -30,7 +30,6 @@ import static org.junit.Assert.*;
 @Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public class TagESMappingTest {
-
 	@Test
 	public void testGetESMapping() {
 		TagESMapping mapping = new TagESMapping();

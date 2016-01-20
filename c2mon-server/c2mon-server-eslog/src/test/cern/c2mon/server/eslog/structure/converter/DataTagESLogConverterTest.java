@@ -56,33 +56,22 @@ import cern.c2mon.shared.common.datatag.DataTagQuality;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class DataTagESLogConverterTest {
-
-  /**
-   * The class under test.
-   */
   @InjectMocks
-  DataTagESLogConverter esLogConverter;
-
+  private DataTagESLogConverter esLogConverter;
   @Mock
-  ProcessCache processCache;
-
+  private ProcessCache processCache;
   @Mock
-  EquipmentCache equipmentCache;
-
+  private EquipmentCache equipmentCache;
   @Mock
-  SubEquipmentCache subEquipmentCache;
-
+  private SubEquipmentCache subEquipmentCache;
   @Mock
-  DataTagQuality dataTagQuality;
-
+  private DataTagQuality dataTagQuality;
   @Mock
-  DataTagCacheObject tag;
-
+  private DataTagCacheObject tag;
   @Mock
-  Tag tagC2MON;
-
+  private Tag tagC2MON;
   @Mock
-  TagES tagES;
+  private TagES tagES;
 
   @Test
   public void testGetProcessName() {

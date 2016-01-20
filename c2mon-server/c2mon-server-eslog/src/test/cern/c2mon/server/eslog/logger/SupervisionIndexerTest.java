@@ -41,6 +41,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
+ * Test the SupervisionIndexer class.
  * @author Alban Marguet
  */
 @RunWith(MockitoJUnitRunner.class)
@@ -55,13 +56,13 @@ public class SupervisionIndexerTest {
   private SupervisionES supervisionES;
 
   @InjectMocks
-  SupervisionIndexer indexer;
+  private SupervisionIndexer indexer;
 
   @Mock
-  TransportConnector connector;
+  private TransportConnector connector;
 
   @Mock
-  SupervisionESConverter supervisionESConverter;
+  private SupervisionESConverter supervisionESConverter;
 
   @Before
   public void setup() {

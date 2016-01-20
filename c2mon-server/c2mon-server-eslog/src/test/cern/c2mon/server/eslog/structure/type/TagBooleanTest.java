@@ -38,7 +38,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(MockitoJUnitRunner.class)
 public class TagBooleanTest {
   @InjectMocks
-  TagBoolean tagBoolean;
+  private TagBoolean tagBoolean;
 
   @Test
   public void testValue() {
@@ -61,7 +61,6 @@ public class TagBooleanTest {
   public void testBadValue() {
     tagBoolean.setValue("NotBoolean");
   }
-
 
   @Test
   public void testBuild() throws IOException {

@@ -38,31 +38,32 @@ import static org.mockito.Mockito.*;
 
 /**
  * Tests the TagLogCacheListener's utility methods.
- *
  * @author Alban Marguet
  */
 
 @Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public class TagESLogCacheListenerTest {
-
+  private long id = 2L;
+  private boolean logged = true;
+  private boolean notLogged = false;
   @InjectMocks
-  TagESLogCacheListener cacheListener;
+  private TagESLogCacheListener cacheListener;
 
   @Mock
-  DataTagESLogConverter esLogConverter;
+  private DataTagESLogConverter esLogConverter;
 
   @Mock
-  CacheRegistrationService cacheRegistrationService;
+  private CacheRegistrationService cacheRegistrationService;
 
   @Mock
-  TagIndexer indexer;
+  private TagIndexer indexer;
 
 
   @Test
   public void testTagIsLoggedToES() {
     DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
-    tag.setLogged(true);
+    tag.setLogged(logged);
     cacheListener.notifyElementUpdated(Collections.<Tag>singletonList(tag));
 
     verify(esLogConverter).convertToTagES(eq(tag));
@@ -72,7 +73,7 @@ public class TagESLogCacheListenerTest {
   @Test
   public void testTagIsNotLoggedToES() {
     DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
-    tag.setLogged(false);
+    tag.setLogged(notLogged);
     cacheListener.notifyElementUpdated(Collections.<Tag>singletonList(tag));
 
     verify(esLogConverter, never()).convertToTagES(tag);
@@ -84,14 +85,14 @@ public class TagESLogCacheListenerTest {
     ArrayList<Tag> list = new ArrayList<>();
 
     DataTagCacheObject tag1 = CacheObjectCreation.createTestDataTag();
-    tag1.setLogged(true);
+    tag1.setLogged(logged);
 
     DataTagCacheObject tag2 = CacheObjectCreation.createTestDataTag();
-    tag2.setLogged(true);
-    tag2.setId(2L);
+    tag2.setLogged(logged);
+    tag2.setId(id);
 
     DataTagCacheObject tag3 = CacheObjectCreation.createTestDataTag();
-    tag3.setLogged(false);
+    tag3.setLogged(notLogged);
     list.add(tag1);
     list.add(tag2);
     list.add(tag3);

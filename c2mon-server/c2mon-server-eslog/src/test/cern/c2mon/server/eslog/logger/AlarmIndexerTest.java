@@ -40,6 +40,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
+ * Test the AlarmIndexer methods.
  * @author Alban Marguet
  */
 @RunWith(MockitoJUnitRunner.class)
@@ -62,7 +63,7 @@ public class AlarmIndexerTest {
     when(connector.handleAlarmQuery(anyString(), anyString(), eq(alarmES))).thenReturn(true);
     when(connector.getReplica()).thenReturn(0);
     when(connector.getShards()).thenReturn(10);
-    indexer.setAlarmPrefix("alarm_");
+    indexer.setAlarmPrefix(indexer.alarmPrefix);
     mapping = new AlarmMapping();
     mapping.configure(connector.getShards(), connector.getReplica());
     mapping.setProperties(Mapping.ValueType.alarmType);

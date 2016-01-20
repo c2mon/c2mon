@@ -25,12 +25,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
 
 /**
- * Tests the good bahaviour of the class TagStringMapping. Needed to do a good indexing in ElasticSearch.
+ * Tests the good bahaviour of the class TagStringMapping.
+ * Needed to do a good indexing in ElasticSearch.
  * @author Alban Marguet.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class TagStringMappingTest {
-
 	@Test
 	public void testGetStringMapping() {
 		TagStringMapping mapping = new TagStringMapping(ValueType.stringType);

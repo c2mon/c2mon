@@ -35,13 +35,16 @@ import java.util.List;
 import static junit.framework.TestCase.assertEquals;
 
 /**
+ * Insure that the persistence to a fallback file is done effectively.
  * @author Alban Marguet
  */
 @Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public class ESPersistenceManagerTest {
+  private String backupName = "backup.back";
+  private String id = "123456789";
   @InjectMocks
-  ESPersistenceManager esPersistenceManager;
+  private ESPersistenceManager esPersistenceManager;
 
   @Rule
   public TemporaryFolder testFolder = new TemporaryFolder();
@@ -49,8 +52,8 @@ public class ESPersistenceManagerTest {
 
   @Before
   public void setup() throws IOException {
-    testFolder.newFile("backup.back");
-    esPersistenceManager.setupBackup(testFolder.getRoot().getPath() + "backup.back");
+    testFolder.newFile(backupName);
+    esPersistenceManager.setupBackup(testFolder.getRoot().getPath() + backupName);
   }
 
   @After
@@ -65,7 +68,7 @@ public class ESPersistenceManagerTest {
     List<IndexRequest> requestList = new ArrayList<>();
     requestList.add(new IndexRequest("c2mon_2016-01", "tag_string").source(""));
     requestList.add(new IndexRequest("c2mon_2016-02", "tag_boolean").source(""));
-    requestList.add(new IndexRequest("c2mon_1973-09", "tag_short", "123456789").source("{\"id\" : \"123456789\"}"));
+    requestList.add(new IndexRequest("c2mon_1973-09", "tag_short", id).source("{\"id\" : \"" + id + "\"}"));
     for (IndexRequest req : requestList) {
       bulk.add(req);
     }

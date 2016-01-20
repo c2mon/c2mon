@@ -30,7 +30,6 @@ import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class TagBooleanMappingTest {
-
 	@Test
 	public void testGetBooleanMapping() {
 		TagBooleanMapping mapping = new TagBooleanMapping(ValueType.boolType);

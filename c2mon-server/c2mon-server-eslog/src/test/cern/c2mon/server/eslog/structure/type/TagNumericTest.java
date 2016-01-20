@@ -16,12 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.type;
 
-import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-
 import cern.c2mon.server.eslog.structure.types.TagNumeric;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -29,8 +23,11 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
-import cern.c2mon.server.eslog.structure.mappings.TagNumericMapping;
+import java.io.IOException;
+
+import static junit.framework.TestCase.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the good behaviour of the TagNumeric class. verify that it builds
@@ -41,9 +38,8 @@ import cern.c2mon.server.eslog.structure.mappings.TagNumericMapping;
 @Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public class TagNumericTest {
-
   @InjectMocks
-  TagNumeric tagNumeric;
+  private TagNumeric tagNumeric;
 
   @Test
   public void testValue() {

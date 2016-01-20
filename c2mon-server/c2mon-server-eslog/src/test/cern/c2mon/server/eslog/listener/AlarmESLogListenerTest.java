@@ -34,6 +34,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
+ * Test if the Alarms are sent to ElasticSearch when received.
  * @author Alban Marguet
  */
 @RunWith(MockitoJUnitRunner.class)

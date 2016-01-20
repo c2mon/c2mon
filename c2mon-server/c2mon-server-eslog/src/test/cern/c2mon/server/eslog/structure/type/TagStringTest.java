@@ -41,7 +41,7 @@ import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
 @RunWith(MockitoJUnitRunner.class)
 public class TagStringTest {
 	@InjectMocks
-	TagString tagString;
+	private TagString tagString;
 
 	@Test
 	public void testValue() {

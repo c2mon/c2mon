@@ -21,6 +21,7 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import org.springframework.stereotype.Component;
 
 /**
+ * Converts a SupervisionEvent to a SupervisionES that is used for ElasticSearch.
  * @author Alban Marguet
  */
 @Component
