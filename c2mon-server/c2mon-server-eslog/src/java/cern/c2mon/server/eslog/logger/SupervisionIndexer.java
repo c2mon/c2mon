@@ -76,7 +76,7 @@ public class SupervisionIndexer extends Indexer {
    * Format: "supervisionPrefix_YYYY-MM".
    */
   public String generateSupervisionIndex(long time) {
-    return supervisionPrefix + millisecondsToYearMonth(time);
+    return retrieveIndexFormat(supervisionPrefix, time);
   }
 
   public String createMappingIfNewIndex(String indexName) {

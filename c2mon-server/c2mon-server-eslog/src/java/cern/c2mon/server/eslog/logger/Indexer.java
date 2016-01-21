@@ -39,6 +39,9 @@ public abstract class Indexer {
   @Value("${es.prefix.tag:c2mon-tag_}")
   protected String indexPrefix;
 
+  @Value("${es.config.index.format:M}")
+  protected String indexFormat;
+
   /** Every tag or alias must begin with the same prefix, e.g., tag_string is a good type and tag_207807 is a good alias. */
   @Value("${es.prefix.type:tag_}")
   protected String typePrefix;
@@ -78,6 +81,21 @@ public abstract class Indexer {
       isAvailable = false;
     }
     isAvailable = true;
+  }
+
+  public String retrieveIndexFormat(String prefix, long millis) {
+    switch (indexFormat) {
+      case "D":
+      case "d":
+        return prefix + millisecondsToYearMonthDay(millis);
+      case "W":
+      case "w":
+        return prefix + millisecondsToYearWeek(millis);
+      case "M":
+      case "m":
+      default:
+        return prefix + millisecondsToYearMonth(millis);
+    }
   }
 
   /**

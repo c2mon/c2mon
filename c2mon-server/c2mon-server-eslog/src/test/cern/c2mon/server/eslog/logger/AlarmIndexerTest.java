@@ -64,6 +64,7 @@ public class AlarmIndexerTest {
     when(connector.getReplica()).thenReturn(0);
     when(connector.getShards()).thenReturn(10);
     indexer.setAlarmPrefix(indexer.alarmPrefix);
+    indexer.setIndexFormat("M");
     mapping = new AlarmMapping();
     mapping.configure(connector.getShards(), connector.getReplica());
     mapping.setProperties(Mapping.ValueType.alarmType);

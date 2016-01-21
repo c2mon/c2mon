@@ -76,7 +76,7 @@ public class AlarmIndexer extends Indexer {
    * Format: "alarmPrefix_YYYY-MM".
    */
   public String generateAlarmIndex(long time) {
-    return alarmPrefix + millisecondsToYearMonth(time);
+    return retrieveIndexFormat(alarmPrefix, time);
   }
 
   public String createOrRetrieveMapping(String indexName) {

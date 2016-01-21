@@ -78,6 +78,7 @@ public class SupervisionIndexerTest {
     when(connector.getReplica()).thenReturn(0);
     when(connector.getShards()).thenReturn(10);
     indexer.setSupervisionPrefix("prevision_");
+    indexer.setIndexFormat("M");
     mapping = new SupervisionMapping();
     mapping.configure(connector.getShards(), connector.getReplica());
     mapping.setProperties(Mapping.ValueType.supervisionType);

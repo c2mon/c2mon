@@ -254,7 +254,8 @@ public class IndexerTest {
 
   @Test
   public void testCheckIndex() {
-    log.debug(indexer.getIndexPrefix());
+    log.debug("IndexFormat " + indexer.getIndexFormat());
+    log.debug("IndexPrefix " +indexer.getIndexPrefix());
     assertTrue(indexer.checkIndex("c2mon-tag_1234-69"));
     assertFalse(indexer.checkIndex("c2mon-tag-1234-69"));
     assertFalse(indexer.checkIndex("c2mon-tag_1234.69"));
@@ -413,6 +414,26 @@ public class IndexerTest {
     connector.closeBulk();
     assertTrue(indexer.getIndicesTypes().size() == 1);
     assertTrue(indexer.getIndicesTypes().get("c2mon-tag_2015-12").contains(type));
+  }
+
+  @Test
+  public void testRetrieveIndexFormat() {
+    long millis = 123456789;
+    String expectedMonth = indexer.millisecondsToYearMonth(millis);
+    String expectedWeek = indexer.millisecondsToYearWeek(millis);
+    String expectedDay = indexer.millisecondsToYearMonthDay(millis);
+
+    indexer.setIndexFormat("M");
+    String monthIndex = indexer.retrieveIndexFormat(indexer.indexPrefix, millis);
+    assertEquals(indexer.indexPrefix + expectedMonth, monthIndex);
+
+    indexer.setIndexFormat("W");
+    String weekIndex = indexer.retrieveIndexFormat(indexer.indexPrefix, millis);
+    assertEquals(indexer.indexPrefix + expectedWeek, weekIndex);
+
+    indexer.setIndexFormat("D");
+    String dayIndex = indexer.retrieveIndexFormat(indexer.indexPrefix, millis);
+    assertEquals(indexer.indexPrefix + expectedDay, dayIndex);
   }
 
   private SearchResponse getResponse(Client client, String[] indices) {

@@ -117,7 +117,7 @@ public class TagIndexer extends Indexer {
   }
 
   public String generateTagIndex(long serverTime) {
-    return indexPrefix + millisecondsToYearMonth(serverTime);
+    return retrieveIndexFormat(indexPrefix, serverTime);
   }
 
   public String generateTagType(String dataType) {
@@ -143,7 +143,7 @@ public class TagIndexer extends Indexer {
   }
 
   public boolean checkIndex(String index) {
-    return index.matches("^" + indexPrefix + "\\d\\d\\d\\d-\\d\\d$");
+    return index.matches("^" + indexPrefix + "\\d\\d\\d\\d-\\d\\d-?\\d?\\d?$");
   }
 
   public boolean checkType(String type) {
@@ -280,7 +280,7 @@ public class TagIndexer extends Indexer {
       log.debug("addIndex() - Added index " + indexName + " in memory list.");
     }
     else {
-      throw new IllegalArgumentException("Indices must follow the format \"c2mon_YYYY_MM\".");
+      throw new IllegalArgumentException("addIndex() - Index " + indexName + " does not follow the format \"indexPrefix_dateFormat\".");
     }
   }
 
