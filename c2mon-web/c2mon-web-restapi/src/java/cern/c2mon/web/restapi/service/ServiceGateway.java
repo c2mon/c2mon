@@ -16,17 +16,18 @@
  *****************************************************************************/
 package cern.c2mon.web.restapi.service;
 
-import javax.annotation.PostConstruct;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
-import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monServiceGateway;
-import cern.c2mon.client.core.C2monTagManager;
+import cern.c2mon.client.core.ConfigurationService;
+import cern.c2mon.client.core.TagService;
+import cern.c2mon.client.core.AlarmService;
+import cern.c2mon.client.core.CommandService;
 import cern.c2mon.client.ext.history.C2monHistoryGateway;
 import cern.c2mon.client.ext.history.C2monHistoryManager;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
 
 /**
  * Service wrapper bean around {@link C2monServiceGateway} for accessing C2MON
@@ -35,23 +36,22 @@ import cern.c2mon.client.ext.history.C2monHistoryManager;
  * @author Justin Lewis Salmon
  */
 @Service
+@Slf4j
 public class ServiceGateway {
 
-  private static Logger logger = LoggerFactory.getLogger(ServiceGateway.class);
+  @Getter
+  private TagService tagService;
 
-  /**
-   * Reference to the {@link C2monTagManager} instance.
-   */
-  private C2monTagManager tagManager;
+  @Getter
+  private AlarmService alarmService;
 
-  /**
-   * Reference to the {@link C2monCommandManager} instance.
-   */
-  private C2monCommandManager commandManager;
+  @Getter
+  private CommandService commandService;
 
-  /**
-   * Reference to the {@link C2monHistoryManager} instance.
-   */
+  @Getter
+  private ConfigurationService configurationService;
+
+  @Getter
   private C2monHistoryManager historyManager;
 
   /**
@@ -60,39 +60,13 @@ public class ServiceGateway {
    */
   @PostConstruct
   public void init() {
-    logger.info("Starting C2MON service gateway...");
+    log.info("Starting C2MON service gateway...");
     C2monServiceGateway.startC2monClientSynchronous();
 
-    tagManager = C2monServiceGateway.getTagManager();
-    commandManager = C2monServiceGateway.getCommandManager();
+    tagService = C2monServiceGateway.getTagService();
+    alarmService = C2monServiceGateway.getAlarmService();
+    configurationService = C2monServiceGateway.getConfigurationService();
+    commandService = C2monServiceGateway.getCommandService();
     historyManager = C2monHistoryGateway.getHistoryManager();
   }
-
-  /**
-   * Retrieve the {@link C2monTagManager} instance.
-   *
-   * @return the reference to the {@link C2monTagManager}
-   */
-  public C2monTagManager getTagManager() {
-    return tagManager;
-  }
-
-  /**
-   * Retrieve the {@link C2monCommandManager} instance.
-   *
-   * @return the reference to the {@link C2monCommandManager}
-   */
-  public C2monCommandManager getCommandManager() {
-    return commandManager;
-  }
-
-  /**
-   * Retrieve the {@link C2monHistoryManager} instance.
-   *
-   * @return the reference to the {@link C2monHistoryManager}
-   */
-  public C2monHistoryManager getHistoryManager() {
-    return historyManager;
-  }
-
 }

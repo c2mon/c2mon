@@ -16,40 +16,43 @@
  *****************************************************************************/
 package cern.c2mon.web.restapi.cache;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.springframework.stereotype.Service;
-
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 
 /**
- * Implementation of the {@link ClientDataTagCache} interface.
+ * The {@link TagCache} is used to store the latest values of data
+ * tags in order for them to be pulled RESTfully.
  *
  * @author Justin Lewis Salmon
  */
-@Service
-public class ClientDataTagCacheImpl implements ClientDataTagCache {
+public interface TagCache {
 
-  Map<Long, ClientDataTagValue> cache = new HashMap<>();
+  /**
+   * Add a tag to the cache.
+   *
+   * @param tag the tag to add
+   */
+  void add(Tag tag);
 
-  @Override
-  public void add(ClientDataTagValue tag) {
-    cache.put(tag.getId(), tag);
-  }
+  /**
+   * Retrieve a tag from the cache.
+   *
+   * @param id the ID of the tag to retrieve
+   * @return the requested tag, or null if it wasn't in the cache
+   */
+  Tag get(Long id);
 
-  @Override
-  public ClientDataTagValue get(Long id) {
-    return cache.get(id);
-  }
+  /**
+   * Remove a tag from the cache.
+   *
+   * @param id the ID of the tag to be removed.
+   */
+  void remove(Long id);
 
-  @Override
-  public void remove(Long id) {
-    cache.remove(id);
-  }
-
-  @Override
-  public boolean contains(Long id) {
-    return cache.containsKey(id);
-  }
+  /**
+   * Check if the cache contains a tag.
+   *
+   * @param id the ID of the tag to be checked
+   * @return true if the cache contains the tag, false otherwise
+   */
+  boolean contains(Long id);
 }

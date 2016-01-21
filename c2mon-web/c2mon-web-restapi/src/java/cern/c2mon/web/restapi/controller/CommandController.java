@@ -16,18 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.web.restapi.controller;
 
-import static cern.c2mon.web.restapi.version.ApiVersion.API_V1;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-
+import cern.c2mon.client.common.tag.CommandTag;
+import cern.c2mon.web.restapi.exception.UnknownResourceException;
+import cern.c2mon.web.restapi.service.CommandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import cern.c2mon.client.common.tag.ClientCommandTag;
-import cern.c2mon.web.restapi.exception.UnknownResourceException;
-import cern.c2mon.web.restapi.service.CommandService;
+import static cern.c2mon.web.restapi.version.ApiVersion.API_V1;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 /**
  * Controller entry point for command API requests.
@@ -58,14 +57,14 @@ public class CommandController {
    *
    * @param id the path variable representing the ID of the command to be
    *          retrieved
-   * @return the {@link ClientCommandTag} object itself, which will be
+   * @return the {@link CommandTag} object itself, which will be
    *         automatically serialised by Spring
    *
    * @throws UnknownResourceException if no command was found with the given ID
    */
   @RequestMapping(value = COMMAND_VALUE_MAPPING, method = GET, produces = { API_V1 })
   @ResponseBody
-  public ClientCommandTag<?> getCommand(@PathVariable final Long id) throws UnknownResourceException {
+  public CommandTag<?> getCommand(@PathVariable final Long id) throws UnknownResourceException {
     return service.getCommand(id);
   }
 }

@@ -16,41 +16,52 @@
  *****************************************************************************/
 package cern.c2mon.web.restapi.serialization;
 
-import java.io.IOException;
-
-import cern.c2mon.client.core.tag.ClientCommandTagImpl;
+import cern.c2mon.client.common.tag.Tag;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
+import java.io.IOException;
+
 /**
- * Custom serialisation class for {@link ClientCommandTagImpl} objects.
+ * Custom serialisation class for {@link Tag} objects.
  *
  * @author Justin Lewis Salmon
  */
-public class ClientCommandTagSerializer extends JsonSerializer<ClientCommandTagImpl> {
+public class TagSerializer extends JsonSerializer<Tag> {
 
   /*
    * (non-Javadoc)
    *
    * @see
-   * org.codehaus.jackson.map.ser.std.SerializerBase#serialize(java.lang.Object
-   * , org.codehaus.jackson.JsonGenerator,
-   * org.codehaus.jackson.map.SerializerProvider)
+   * org.codehaus.jackson.map.ser.std.SerializerBase#serialize(java.lang.Object, org.codehaus.jackson.JsonGenerator, org.codehaus.jackson.map.SerializerProvider)
    */
   @Override
-  public void serialize(ClientCommandTagImpl value, JsonGenerator generator, SerializerProvider provider) throws IOException, JsonGenerationException {
+  public void serialize(Tag value, JsonGenerator generator, SerializerProvider provider) throws IOException, JsonGenerationException {
     generator.writeStartObject();
     generator.writeNumberField("id", value.getId());
     generator.writeStringField("name", value.getName());
     generator.writeStringField("description", value.getDescription());
     generator.writeObjectField("value", value.getValue());
-    generator.writeStringField("valueType", value.getValueType().getSimpleName());
-    generator.writeNumberField("processId", value.getProcessId());
-    generator.writeNumberField("equipmentId", value.getEquipmentId());
-    generator.writeNumberField("clientTimeout", value.getClientTimeout());
-    generator.writeObjectField("hardwareAdress", value.getHardwareAddress());
+    generator.writeStringField("valueDescription", value.getValueDescription());
+    generator.writeStringField("serverTimestamp", value.getServerTimestamp().toString());
+
+    // Sometimes the DAQ timestamp is null
+    if (value.getDaqTimestamp() != null) {
+      generator.writeStringField("sourceTimestamp", value.getDaqTimestamp().toString());
+    }
+
+    generator.writeStringField("mode", value.getMode().toString());
+    generator.writeBooleanField("simulated", value.isSimulated());
+
+    // If the value is null, the type will also be null
+    if (value.getType() != null) {
+      generator.writeStringField("dataType", value.getType().getSimpleName());
+    }
+
+    generator.writeObjectField("quality", value.getDataTagQuality());
+    generator.writeObjectField("alarms", value.getAlarms());
     generator.writeEndObject();
   }
 }

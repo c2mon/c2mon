@@ -16,14 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.web.restapi.config;
 
-import cern.c2mon.client.core.tag.ClientCommandTagImpl;
-import cern.c2mon.client.core.tag.ClientDataTagImpl;
+import cern.c2mon.client.common.tag.CommandTag;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.ext.history.updates.HistoryTagValueUpdateImpl;
-import cern.c2mon.shared.client.alarm.AlarmValueImpl;
-import cern.c2mon.web.restapi.serialization.AlarmValueSerializer;
-import cern.c2mon.web.restapi.serialization.ClientCommandTagSerializer;
-import cern.c2mon.web.restapi.serialization.ClientDataTagSerializer;
-import cern.c2mon.web.restapi.serialization.HistoryTagValueUpdateSerializer;
+import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.tag.TagConfig;
+import cern.c2mon.web.restapi.serialization.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -39,9 +37,10 @@ public class JsonConfig {
     Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
 
     // Add custom serializers here
-    builder.serializerByType(AlarmValueImpl.class, new AlarmValueSerializer());
-    builder.serializerByType(ClientDataTagImpl.class, new ClientDataTagSerializer());
-    builder.serializerByType(ClientCommandTagImpl.class, new ClientCommandTagSerializer());
+    builder.serializerByType(Tag.class, new TagSerializer());
+    builder.serializerByType(TagConfig.class, new TagConfigSerializer());
+    builder.serializerByType(AlarmValue.class, new AlarmValueSerializer());
+    builder.serializerByType(CommandTag.class, new CommandTagSerializer());
     builder.serializerByType(HistoryTagValueUpdateImpl.class, new HistoryTagValueUpdateSerializer());
 
     // Enable pretty printing

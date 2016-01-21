@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.web.restapi.service;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +45,10 @@ public class AlarmService {
    * @param id the ID of the {@link AlarmValue} to retrieve
    * @return the {@link AlarmValue} object
    *
-   * @throws UnknownResourceException if no alarm could be found with the given
-   *           ID
+   * @throws UnknownResourceException if no alarm could be found with the given ID
    */
   public AlarmValue getAlarmValue(Long id) throws UnknownResourceException {
-    List<AlarmValue> list = (List<AlarmValue>) gateway.getTagManager().getAlarms(Arrays.asList(id));
+    List<AlarmValue> list = (List<AlarmValue>) gateway.getAlarmService().getAlarms(Collections.singletonList(id));
 
     if (list.isEmpty()) {
       throw new UnknownResourceException("No alarm with id " + id + " was found.");

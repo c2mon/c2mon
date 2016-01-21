@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.web.restapi.exception;
 
+import lombok.Data;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -24,6 +25,7 @@ import org.springframework.http.HttpStatus;
  *
  * @author Justin Lewis Salmon
  */
+@Data
 class ErrorResponse {
 
   /**
@@ -56,23 +58,5 @@ class ErrorResponse {
   public ErrorResponse(HttpStatus status, String message) {
     this.status = status.value();
     this.message = message;
-  }
-
-  /**
-   * Retrieve the HTTP status code.
-   *
-   * @return the status code
-   */
-  public int getStatus() {
-    return status;
-  }
-
-  /**
-   * Retrieve the error message string.
-   *
-   * @return the message
-   */
-  public String getMessage() {
-    return message;
   }
 }

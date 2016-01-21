@@ -16,14 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.web.restapi.service;
 
+import cern.c2mon.client.common.tag.CommandTag;
+import cern.c2mon.web.restapi.exception.UnknownResourceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.common.tag.ClientCommandTag;
-import cern.c2mon.web.restapi.exception.UnknownResourceException;
-
 /**
- * Service bean for accessing {@link ClientCommandTag} objects from the C2MON
+ * Service bean for accessing {@link CommandTag} objects from the C2MON
  * server.
  *
  * @author Justin Lewis Salmon
@@ -38,16 +37,16 @@ public class CommandService {
   private ServiceGateway gateway;
 
   /**
-   * Retrieve a {@link ClientCommandTag} object.
+   * Retrieve a {@link CommandTag} object.
    *
-   * @param id the ID of the {@link ClientCommandTag} to retrieve
-   * @return the {@link ClientCommandTag} object
+   * @param id the ID of the {@link CommandTag} to retrieve
+   * @return the {@link CommandTag} object
    *
    * @throws UnknownResourceException if no command could be found with the
    *           given ID
    */
-  public ClientCommandTag<?> getCommand(Long id) throws UnknownResourceException {
-    ClientCommandTag<Object> command = gateway.getCommandManager().getCommandTag(id);
+  public CommandTag<?> getCommand(Long id) throws UnknownResourceException {
+    CommandTag<Object> command = gateway.getCommandService().getCommandTag(id);
 
     if (command == null || !command.isExistingCommand()) {
       throw new UnknownResourceException("No command was found with id " + id);

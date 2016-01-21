@@ -18,6 +18,7 @@ package cern.c2mon.web.restapi.serialization;
 
 import java.io.IOException;
 
+import cern.c2mon.shared.client.alarm.AlarmValue;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -31,7 +32,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
  *
  * @author Justin Lewis Salmon
  */
-public class AlarmValueSerializer extends JsonSerializer<AlarmValueImpl> {
+public class AlarmValueSerializer extends JsonSerializer<AlarmValue> {
 
   /*
    * (non-Javadoc)
@@ -41,7 +42,7 @@ public class AlarmValueSerializer extends JsonSerializer<AlarmValueImpl> {
    * org.codehaus.jackson.map.SerializerProvider)
    */
   @Override
-  public void serialize(AlarmValueImpl value, JsonGenerator generator, SerializerProvider provider) throws IOException, JsonProcessingException {
+  public void serialize(AlarmValue value, JsonGenerator generator, SerializerProvider provider) throws IOException, JsonProcessingException {
     generator.writeStartObject();
     generator.writeNumberField("id", value.getId());
     generator.writeNumberField("tagId", value.getTagId());
