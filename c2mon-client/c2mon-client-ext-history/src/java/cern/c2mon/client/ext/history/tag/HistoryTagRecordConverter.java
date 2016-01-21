@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -26,9 +26,6 @@ import java.util.Stack;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.nfunk.jep.JEP;
-import org.nfunk.jep.ParseException;
-import org.nfunk.jep.function.PostfixMathCommand;
 
 import cern.c2mon.client.ext.history.common.tag.HistoryTag;
 import cern.c2mon.client.ext.history.common.tag.HistoryTagConfiguration;
@@ -146,130 +143,133 @@ final class HistoryTagRecordConverter {
    * @return the changed data
    */
   private Object changeResult(final Object data, final String changeExpression) {
-    if (changeExpression == null) {
-      return data;
-    }
+//    if (changeExpression == null) {
+//      return data;
+//    }
+//
+//    Object result;
+//
+//    if (data != null && data.getClass().isArray()) {
+//      final int arrayLength = Array.getLength(data);
+//      final Object[] array = new Object[arrayLength];
+//
+//      for (int i = 0; i < arrayLength; i++) {
+//        Array.set(array, i, changeResult(Array.get(data, i), changeExpression));
+//      }
+//      result = array;
+//    }
+//    else {
+//      final JEP jep = new JEP();
+//      try {
+//        if (data == null) {
+//          jep.addVariable("x", 0.0);
+//        }
+//        else {
+//          jep.addVariable("x", TypeConverter.castToType(data, double.class));
+//        }
+//        jep.addFunction("formatTime", new DateFormatFunction());
+//        jep.addFunction("concat", new ConcatFunction());
+//        for (HistoryTagResultType resultType : HistoryTagResultType.values()) {
+//          jep.addFunction(resultType.toString().toLowerCase(), new ChangeFunction(resultType));
+//        }
+//        jep.parseExpression(changeExpression);
+//        result = jep.getValueAsObject();
+//      } catch (Exception e) {
+//        final String dataStr;
+//        if (data == null) {
+//          dataStr = "null";
+//        }
+//        else {
+//          dataStr = data.toString();
+//        }
+//        final String errorMessage = String.format(
+//            "The expression '%s' could not be evaluated where x is '%s'",
+//            changeExpression, dataStr
+//            );
+//        LOG.error(errorMessage, e);
+//        throw new RuntimeException(errorMessage, e);
+//      }
+//    }
 
-    Object result;
-
-    if (data != null && data.getClass().isArray()) {
-      final int arrayLength = Array.getLength(data);
-      final Object[] array = new Object[arrayLength];
-
-      for (int i = 0; i < arrayLength; i++) {
-        Array.set(array, i, changeResult(Array.get(data, i), changeExpression));
-      }
-      result = array;
-    }
-    else {
-      final JEP jep = new JEP();
-      try {
-        if (data == null) {
-          jep.addVariable("x", 0.0);
-        }
-        else {
-          jep.addVariable("x", TypeConverter.castToType(data, double.class));
-        }
-        jep.addFunction("formatTime", new DateFormatFunction());
-        jep.addFunction("concat", new ConcatFunction());
-        for (HistoryTagResultType resultType : HistoryTagResultType.values()) {
-          jep.addFunction(resultType.toString().toLowerCase(), new ChangeFunction(resultType));
-        }
-        jep.parseExpression(changeExpression);
-        result = jep.getValueAsObject();
-      } catch (Exception e) {
-        final String dataStr;
-        if (data == null) {
-          dataStr = "null";
-        }
-        else {
-          dataStr = data.toString();
-        }
-        final String errorMessage = String.format(
-            "The expression '%s' could not be evaluated where x is '%s'",
-            changeExpression, dataStr
-            );
-        LOG.error(errorMessage, e);
-        throw new RuntimeException(errorMessage, e);
-      }
-    }
-
-    return result;
+    throw new UnsupportedOperationException(
+        "The executed functionality is not anymore supported due to an incompatible third party dependency to Jep."
+        + "In case of a need, please send a StackTrace to c2mon-support@cern.ch.");
+//    return result;
   }
 
-  /** Function available from the jep expressions */
-  private class ChangeFunction extends PostfixMathCommand {
-    /** The result type */
-    private final HistoryTagResultType resultType;
-    /** @param resultType the result type */
-    public ChangeFunction(final HistoryTagResultType resultType) {
-      super();
-      this.resultType = resultType;
-    }
-
-    @Override
-    public int getNumberOfParameters() {
-      return 0;
-    }
-
-    @Override
-    public void run(final Stack stack) throws ParseException {
-      stack.push(convertToResultType(this.resultType));
-    }
-  }
-
-  /** Function for formatting a Timestamp */
-  private static class DateFormatFunction extends PostfixMathCommand {
-    public DateFormatFunction() {
-      numberOfParameters = 2;
-    }
-
-    @Override
-    public void run(final Stack stack) throws ParseException {
-      checkStack(stack);
-      final Timestamp date;
-      final String newFormat;
-      try {
-        newFormat = TypeConverter.castToType(stack.pop(), String.class);
-      }
-      catch (Exception e) {
-        throw new ParseException("The second argument must be a String!");
-      }
-      try {
-        date =  TypeConverter.castToType(stack.pop(), Timestamp.class);
-      }
-      catch (Exception e) {
-        throw new ParseException("The first argument must be a Timestamp!");
-      }
-
-      stack.push(new SimpleDateFormat(newFormat).format(date));
-    }
-  }
-
-  /** Function for concatting two values */
-  private static class ConcatFunction extends PostfixMathCommand {
-    public ConcatFunction() {
-      numberOfParameters = 2;
-    }
-
-    @Override
-    public void run(final Stack stack) throws ParseException {
-      checkStack(stack);
-
-      Object value2 = stack.pop();
-      Object value1 = stack.pop();
-
-      if (value1 == null) {
-        value1 = "null";
-      }
-      if (value2 == null) {
-        value2 = "null";
-      }
-      final String result = value1.toString().concat(value2.toString());
-
-      stack.push(result);
-    }
-  }
+//  /** Function available from the jep expressions */
+//  private class ChangeFunction extends PostfixMathCommand {
+//    /** The result type */
+//    private final HistoryTagResultType resultType;
+//    /** @param resultType the result type */
+//    public ChangeFunction(final HistoryTagResultType resultType) {
+//      super();
+//      this.resultType = resultType;
+//    }
+//
+//    @Override
+//    public int getNumberOfParameters() {
+//      return 0;
+//    }
+//
+//    @Override
+//    public void run(final Stack stack) throws ParseException {
+//      stack.push(convertToResultType(this.resultType));
+//    }
+//  }
+//
+//  /** Function for formatting a Timestamp */
+//  private static class DateFormatFunction extends PostfixMathCommand {
+//    public DateFormatFunction() {
+//      numberOfParameters = 2;
+//    }
+//
+//    @Override
+//    public void run(final Stack stack) throws ParseException {
+//      checkStack(stack);
+//      final Timestamp date;
+//      final String newFormat;
+//      try {
+//        newFormat = TypeConverter.castToType(stack.pop(), String.class);
+//      }
+//      catch (Exception e) {
+//        throw new ParseException("The second argument must be a String!");
+//      }
+//      try {
+//        date =  TypeConverter.castToType(stack.pop(), Timestamp.class);
+//      }
+//      catch (Exception e) {
+//        throw new ParseException("The first argument must be a Timestamp!");
+//      }
+//
+//      stack.push(new SimpleDateFormat(newFormat).format(date));
+//    }
+//  }
+//
+//  /** Function for concatting two values */
+//  private static class ConcatFunction extends PostfixMathCommand {
+//    public ConcatFunction() {
+//      numberOfParameters = 2;
+//    }
+//
+//    @Override
+//    public void run(final Stack stack) throws ParseException {
+//      checkStack(stack);
+//
+//      Object value2 = stack.pop();
+//      Object value1 = stack.pop();
+//
+//      if (value1 == null) {
+//        value1 = "null";
+//      }
+//      if (value2 == null) {
+//        value2 = "null";
+//      }
+//      final String result = value1.toString().concat(value2.toString());
+//
+//      stack.push(result);
+//    }
+//  }
 
   /**
    * @param <T> the return type, must be comparable
