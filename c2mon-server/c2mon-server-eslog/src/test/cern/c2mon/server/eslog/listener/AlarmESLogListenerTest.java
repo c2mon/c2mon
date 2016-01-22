@@ -37,23 +37,23 @@ import static org.mockito.Mockito.when;
  * Test if the Alarms are sent to ElasticSearch when received.
  * @author Alban Marguet
  */
-@RunWith(MockitoJUnitRunner.class)
-public class AlarmESLogListenerTest {
-  @InjectMocks
-  private AlarmESLogListener listener;
-  @Mock
-  private AlarmIndexer alarmIndexer;
-  @Mock
-  private CacheRegistrationService cacheRegistrationService;
-  @Mock
-  private AlarmESLogConverter alarmESLogConverter;
-  private Alarm alarm = CacheObjectCreation.createTestAlarm1();
-  private AlarmES alarmES = new AlarmES();
-
-  @Before
-  public void setup() {
-    when(alarmESLogConverter.convertAlarmToAlarmES(eq(alarm))).thenReturn(alarmES);
-  }
+//@RunWith(MockitoJUnitRunner.class)
+//public class AlarmESLogListenerTest {
+//  @InjectMocks
+//  private AlarmESLogListener listener;
+//  @Mock
+//  private AlarmIndexer alarmIndexer;
+//  @Mock
+//  private CacheRegistrationService cacheRegistrationService;
+//  @Mock
+//  private AlarmESLogConverter alarmESLogConverter;
+//  private Alarm alarm = CacheObjectCreation.createTestAlarm1();
+//  private AlarmES alarmES = new AlarmES();
+//
+//  @Before
+//  public void setup() {
+//    when(alarmESLogConverter.convertAlarmToAlarmES(eq(alarm))).thenReturn(alarmES);
+//  }
 
 //  @Test
 //  public void testAlarmIsSentToIndexer() {
@@ -61,4 +61,4 @@ public class AlarmESLogListenerTest {
 //    verify(alarmESLogConverter).convertAlarmToAlarmES(eq(alarm));
 //    verify(alarmIndexer).logAlarm(eq(alarmES));
 //  }
-}
+//}
