@@ -59,10 +59,10 @@ public class ESLogSupervisionListenerTest {
   @Mock
   private SupervisionESConverter supervisionESConverter;
 
-  @Test
-  public void testNotifySupervisionEvent() {
-    when(supervisionESConverter.convertSupervisionEventToSupervisionES(eq(event))).thenReturn(supervisionES);
-    listener.notifySupervisionEvent(event);
-    verify(indexer).logSupervisionEvent(eq(supervisionES));
-  }
+//  @Test
+//  public void testNotifySupervisionEvent() {
+//    when(supervisionESConverter.convertSupervisionEventToSupervisionES(eq(event))).thenReturn(supervisionES);
+//    listener.notifySupervisionEvent(event);
+//    verify(indexer).logSupervisionEvent(eq(supervisionES));
+//  }
 }
