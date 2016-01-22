@@ -38,7 +38,7 @@ import javax.annotation.PostConstruct;
  */
 @Slf4j
 @Service
-public class AlarmESLogListener {//implements C2monCacheListener<Alarm>, SmartLifecycle {
+public class AlarmESLogListener implements C2monCacheListener<Alarm>, SmartLifecycle {
   /** Reference to registration service. */
   private CacheRegistrationService cacheRegistrationService;
 
@@ -60,33 +60,33 @@ public class AlarmESLogListener {//implements C2monCacheListener<Alarm>, SmartLi
    * @param cacheRegistrationService for registering cache listeners.
    * @param alarmIndexer for logging cache objects to ElasticSearch.
    */
-//  @Autowired
-//  public AlarmESLogListener(final CacheRegistrationService cacheRegistrationService, final AlarmIndexer alarmIndexer, final AlarmESLogConverter alarmESLogConverter) {
-//    super();
-//    this.cacheRegistrationService = cacheRegistrationService;
-//    this.alarmIndexer = alarmIndexer;
-//    this.alarmESLogConverter = alarmESLogConverter;
-//  }
+  @Autowired
+  public AlarmESLogListener(final CacheRegistrationService cacheRegistrationService, final AlarmIndexer alarmIndexer, final AlarmESLogConverter alarmESLogConverter) {
+    super();
+    this.cacheRegistrationService = cacheRegistrationService;
+    this.alarmIndexer = alarmIndexer;
+    this.alarmESLogConverter = alarmESLogConverter;
+  }
 
   /**
    * Registers to be notified of all Tag updates (data, rule and control tags).
    */
-//  @PostConstruct
-//  public void init() {
-//    listenerContainer = cacheRegistrationService.registerToAlarms(this);
-//  }
+  @PostConstruct
+  public void init() {
+    listenerContainer = cacheRegistrationService.registerToAlarms(this);
+  }
 
-//  @Override
-//  public void notifyElementUpdated(Alarm cacheable) {
-//    log.debug("notifyElementUpdated() - Received an Alarm event.");
-//    try {
-//      AlarmES alarmES = alarmESLogConverter.convertAlarmToAlarmES(cacheable);
-//      sendIfAlarmESIsNotNull(alarmES);
-//    }
-//    catch(Exception e) {
-//      log.error("notifyElementUpdated() - Could not add Alarm to ElasticSearch: Alarm # " + cacheable.getId() + ".", e);
-//    }
-//  }
+  @Override
+  public void notifyElementUpdated(Alarm cacheable) {
+    log.debug("notifyElementUpdated() - Received an Alarm event.");
+    try {
+      AlarmES alarmES = alarmESLogConverter.convertAlarmToAlarmES(cacheable);
+      sendIfAlarmESIsNotNull(alarmES);
+    }
+    catch(Exception e) {
+      log.error("notifyElementUpdated() - Could not add Alarm to ElasticSearch: Alarm # " + cacheable.getId() + ".", e);
+    }
+  }
 
   public void sendIfAlarmESIsNotNull(AlarmES alarmES) {
     if (alarmES != null) {
@@ -97,43 +97,43 @@ public class AlarmESLogListener {//implements C2monCacheListener<Alarm>, SmartLi
     }
   }
 
-//  @Override
-//  public void confirmStatus(Alarm cacheable) {
-//    // no confirmation required
-//  }
+  @Override
+  public void confirmStatus(Alarm cacheable) {
+    // no confirmation required
+  }
 
-//  @Override
-//  public boolean isAutoStartup() {
-//    return false;
-//  }
-//
-//  @Override
-//  public void stop(Runnable runnable) {
-//    stop();
-//    runnable.run();
-//  }
-//
-//  @Override
-//  public boolean isRunning() {
-//    return running;
-//  }
-//
-//  @Override
-//  public void start() {
-//    log.debug("Starting Alarm logger (eslog)");
-//    running = true;
-//    listenerContainer.start();
-//  }
-//
-//  @Override
-//  public void stop() {
-//    log.debug("Stopping Alarm logger (eslog)");
-//    listenerContainer.stop();
-//    running = false;
-//  }
-//
-//  @Override
-//  public int getPhase() {
-//    return ServerConstants.PHASE_STOP_LAST - 1;
-//  }
+  @Override
+  public boolean isAutoStartup() {
+    return false;
+  }
+
+  @Override
+  public void stop(Runnable runnable) {
+    stop();
+    runnable.run();
+  }
+
+  @Override
+  public boolean isRunning() {
+    return running;
+  }
+
+  @Override
+  public void start() {
+    log.debug("Starting Alarm logger (eslog)");
+    running = true;
+    listenerContainer.start();
+  }
+
+  @Override
+  public void stop() {
+    log.debug("Stopping Alarm logger (eslog)");
+    listenerContainer.stop();
+    running = false;
+  }
+
+  @Override
+  public int getPhase() {
+    return ServerConstants.PHASE_STOP_LAST - 1;
+  }
 }
