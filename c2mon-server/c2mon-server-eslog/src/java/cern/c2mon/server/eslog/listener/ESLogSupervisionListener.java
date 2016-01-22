@@ -40,7 +40,7 @@ import javax.annotation.PostConstruct;
  */
 @Slf4j
 @Service
-public class ESLogSupervisionListener implements SupervisionListener, SmartLifecycle {
+public class ESLogSupervisionListener {//implements SupervisionListener, SmartLifecycle {
   /** Notifier of supervision module. */
   private SupervisionNotifier supervisionNotifier;
 
@@ -79,50 +79,50 @@ public class ESLogSupervisionListener implements SupervisionListener, SmartLifec
 //    listenerContainer = supervisionNotifier.registerAsListener(this);
 //  }
 
-  @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
-  @Override
-  public void notifySupervisionEvent(final SupervisionEvent supervisionEvent) {
-    if (log.isDebugEnabled()) {
-      log.debug("notifySupervisionEvent() - Logging supervision status " + supervisionEvent.getStatus()
-          + " for " + supervisionEvent.getEntity()
-          + " " + supervisionEvent.getEntityId() + " to ElasticSearch");
-    }
-    SupervisionES supervisionES = supervisionESConverter.convertSupervisionEventToSupervisionES(supervisionEvent);
-    supervisionIndexer.logSupervisionEvent(supervisionES);
-  }
-
-  @Override
-  public boolean isAutoStartup() {
-    return false;
-  }
-
-  @Override
-  public void stop(Runnable runnable) {
-    stop();
-    runnable.run();
-  }
-
-  @Override
-  public boolean isRunning() {
-    return running;
-  }
-
-  @Override
-  public void start() {
-    log.debug("Starting ES supervision event logger.");
-    running = true;
-    listenerContainer.start();
-  }
-
-  @Override
-  public void stop() {
-    log.debug("Stopping ES supervision event logger.");
-    listenerContainer.stop();
-    running = false;
-  }
-
-  @Override
-  public int getPhase() {
-    return ServerConstants.PHASE_STOP_LAST - 1;
-  }
+//  @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
+//  @Override
+//  public void notifySupervisionEvent(final SupervisionEvent supervisionEvent) {
+//    if (log.isDebugEnabled()) {
+//      log.debug("notifySupervisionEvent() - Logging supervision status " + supervisionEvent.getStatus()
+//          + " for " + supervisionEvent.getEntity()
+//          + " " + supervisionEvent.getEntityId() + " to ElasticSearch");
+//    }
+//    SupervisionES supervisionES = supervisionESConverter.convertSupervisionEventToSupervisionES(supervisionEvent);
+//    supervisionIndexer.logSupervisionEvent(supervisionES);
+//  }
+//
+//  @Override
+//  public boolean isAutoStartup() {
+//    return false;
+//  }
+//
+//  @Override
+//  public void stop(Runnable runnable) {
+//    stop();
+//    runnable.run();
+//  }
+//
+//  @Override
+//  public boolean isRunning() {
+//    return running;
+//  }
+//
+//  @Override
+//  public void start() {
+//    log.debug("Starting ES supervision event logger.");
+//    running = true;
+//    listenerContainer.start();
+//  }
+//
+//  @Override
+//  public void stop() {
+//    log.debug("Stopping ES supervision event logger.");
+//    listenerContainer.stop();
+//    running = false;
+//  }
+//
+//  @Override
+//  public int getPhase() {
+//    return ServerConstants.PHASE_STOP_LAST - 1;
+//  }
 }

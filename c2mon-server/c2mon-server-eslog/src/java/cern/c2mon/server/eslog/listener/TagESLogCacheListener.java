@@ -167,14 +167,14 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
 
   @Override
   public void start() {
-    log.debug("Starting Tag logger (elastic-search-log)");
+    log.debug("Starting Tag logger (eslog)");
     running = true;
     listenerContainer.start();
   }
 
   @Override
   public void stop() {
-    log.debug("Stopping Tag logger (elastic-search-log)");
+    log.debug("Stopping Tag logger (eslog)");
     listenerContainer.stop();
     running = false;
   }
