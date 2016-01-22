@@ -64,7 +64,7 @@ public class TagIndexer extends Indexer {
    * @param tags to index.
    */
   public void indexTags(Collection<TagES> tags) {
-    log.trace("indexTags() - Received a collection of " + tags.size() +  " tags to send by batch.");
+    log.debug("indexTags() - Received a collection of " + tags.size() +  " tags to send by batch.");
     Map<String, TagES> aliases = new HashMap<>();
 
     if (tags.size() == 0) {
@@ -81,10 +81,10 @@ public class TagIndexer extends Indexer {
         }
       }
 
-      log.trace("indexTags() - Created a batch composed of " + counter + " tags.");
+      log.debug("indexTags() - Created a batch composed of " + counter + " tags.");
 
       // FLUSH
-      log.trace("indexTags() - closing bulk.");
+      log.debug("indexTags() - closing bulk.");
       connector.closeBulk();
 
       for (String alias : aliases.keySet()) {

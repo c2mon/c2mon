@@ -117,7 +117,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
         tagsToLog.add(tag);
       }
     }
-    log.trace("retrieveTagsToLog() - With " + tagsToLog.size() + " tags to be logged.");
+    log.debug("retrieveTagsToLog() - With " + tagsToLog.size() + " tags to be logged.");
   }
 
   private void convertTagsToLogToTagES(Collection<Tag> tagsToLog, Collection<TagES> tagESCollection) {
@@ -130,7 +130,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
       }
     }
 
-    log.trace("convertTagsToLogToTagES() - Created a TagESCollection of " + tagESCollection.size() + " elements.");
+    log.debug("convertTagsToLogToTagES() - Created a TagESCollection of " + tagESCollection.size() + " elements.");
   }
 
   private void addTagToCollectionIfNotNull(TagES tagES, Collection<TagES> tagESCollection) {
