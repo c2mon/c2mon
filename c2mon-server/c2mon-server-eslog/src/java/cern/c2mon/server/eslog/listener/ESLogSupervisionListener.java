@@ -62,22 +62,22 @@ public class ESLogSupervisionListener implements SupervisionListener, SmartLifec
    * @param supervisionNotifier the notifier to register to
    * @param supervisionIndexer the mapper to write to the DB
    */
-  @Autowired
-  public ESLogSupervisionListener(final SupervisionNotifier supervisionNotifier, final SupervisionIndexer supervisionIndexer, final SupervisionESConverter supervisionESConverter) {
-    this.supervisionNotifier = supervisionNotifier;
-    this.supervisionIndexer = supervisionIndexer;
-    this.supervisionESConverter = supervisionESConverter;
-  }
+//  @Autowired
+//  public ESLogSupervisionListener(final SupervisionNotifier supervisionNotifier, final SupervisionIndexer supervisionIndexer, final SupervisionESConverter supervisionESConverter) {
+//    this.supervisionNotifier = supervisionNotifier;
+//    this.supervisionIndexer = supervisionIndexer;
+//    this.supervisionESConverter = supervisionESConverter;
+//  }
 
   /**
    * Called at bean initialisation. Registers for
    * notifications.
    */
-  @PostConstruct
-  public void init() {
-    log.debug("Registering ElasticSearch module for supervision updates");
-    listenerContainer = supervisionNotifier.registerAsListener(this);
-  }
+//  @PostConstruct
+//  public void init() {
+//    log.debug("Registering ElasticSearch module for supervision updates");
+//    listenerContainer = supervisionNotifier.registerAsListener(this);
+//  }
 
   @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
   @Override

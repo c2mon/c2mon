@@ -60,21 +60,21 @@ public class AlarmESLogListener implements C2monCacheListener<Alarm>, SmartLifec
    * @param cacheRegistrationService for registering cache listeners.
    * @param alarmIndexer for logging cache objects to ElasticSearch.
    */
-  @Autowired
-  public AlarmESLogListener(final CacheRegistrationService cacheRegistrationService, final AlarmIndexer alarmIndexer, final AlarmESLogConverter alarmESLogConverter) {
-    super();
-    this.cacheRegistrationService = cacheRegistrationService;
-    this.alarmIndexer = alarmIndexer;
-    this.alarmESLogConverter = alarmESLogConverter;
-  }
+//  @Autowired
+//  public AlarmESLogListener(final CacheRegistrationService cacheRegistrationService, final AlarmIndexer alarmIndexer, final AlarmESLogConverter alarmESLogConverter) {
+//    super();
+//    this.cacheRegistrationService = cacheRegistrationService;
+//    this.alarmIndexer = alarmIndexer;
+//    this.alarmESLogConverter = alarmESLogConverter;
+//  }
 
   /**
    * Registers to be notified of all Tag updates (data, rule and control tags).
    */
-  @PostConstruct
-  public void init() {
-    listenerContainer = cacheRegistrationService.registerToAlarms(this);
-  }
+//  @PostConstruct
+//  public void init() {
+//    listenerContainer = cacheRegistrationService.registerToAlarms(this);
+//  }
 
   @Override
   public void notifyElementUpdated(Alarm cacheable) {
