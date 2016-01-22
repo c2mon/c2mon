@@ -68,7 +68,7 @@ public class TagIndexer extends Indexer {
     Map<String, TagES> aliases = new HashMap<>();
 
     if (tags.size() == 0) {
-      log.trace("indexTags() - Received a null List of tags to log to ElasticSearch.");
+      log.debug("indexTags() - Received a null List of tags to log to ElasticSearch.");
     }
     else {
       int counter = 0;
@@ -136,7 +136,7 @@ public class TagIndexer extends Indexer {
     else {
       createNotExistingIndex(index);
       createNotExistingMapping(index, type);
-
+      log.debug("indexByBtach() - New IndexRequest for index" + index + " and source " + json);
       IndexRequest indexNewTag = new IndexRequest(index, type).source(json).routing(String.valueOf(tag.getId()));
       return connector.bulkAdd(indexNewTag);
     }

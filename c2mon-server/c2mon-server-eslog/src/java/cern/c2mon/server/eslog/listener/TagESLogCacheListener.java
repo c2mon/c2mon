@@ -102,7 +102,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
    */
   @Override
   public void notifyElementUpdated(Collection<Tag> tagCollection) {
-    log.trace("notifyElementUpdated() - Received a tagCollection of " + tagCollection.size() + " elements.");
+    log.debug("notifyElementUpdated() - Received a tagCollection of " + tagCollection.size() + " elements.");
     Collection<TagES> tagESCollection = new ArrayList<>();
     Collection<Tag> tagsToLog = new ArrayList<>(tagCollection.size());
 
@@ -141,6 +141,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
 
   private void sendCollectionTagESToElasticSearch(Collection<TagES> tagESCollection) {
     try {
+      log.debug("sendCollectionTagESToElasticSearch() - send a collection of tagES to indexer of size: " + tagESCollection.size());
       indexer.indexTags(tagESCollection);
     }
     catch(Exception e) {
