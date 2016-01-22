@@ -34,22 +34,17 @@ public class QueryIndexBuilder extends Query {
     super(client);
   }
 
-  public boolean indexNew(String index, Settings settings, String type, String mapping) {
+  public boolean indexNew(String index, String type, String mapping) {
     if (type == null && mapping == null) {
-      return handleAddingIndex(index, settings);
+      return handleAddingIndex(index);
     }
     else {
       return handleAddingMapping(index, type, mapping);
     }
   }
 
-  private boolean handleAddingIndex(String index, Settings settings) {
+  private boolean handleAddingIndex(String index) {
     CreateIndexRequestBuilder createIndexRequestBuilder = prepareCreateIndexRequestBuilder(index);
-
-    if (settings != null && settings != Settings.EMPTY) {
-      createIndexRequestBuilder.setSettings(settings);
-    }
-
     CreateIndexResponse response = createIndexRequestBuilder.execute().actionGet();
     return response.isAcknowledged();
   }

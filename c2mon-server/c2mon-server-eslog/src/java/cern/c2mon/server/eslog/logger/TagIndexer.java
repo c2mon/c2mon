@@ -174,8 +174,7 @@ public class TagIndexer extends Indexer {
       return false;
     }
 
-    Settings indexSettings = connector.getIndexSettings(connector.getShards(), connector.getReplica());
-    return connector.handleIndexQuery(index, indexSettings, null, null);
+    return connector.handleIndexQuery(index, null, null);
   }
 
   private void createNotExistingMapping(String index, String type) {
@@ -215,7 +214,7 @@ public class TagIndexer extends Indexer {
       log.debug("instantiateIndex() - Adding a new mapping to index " + index + " for type " + type + ": " + mapping);
     }
 
-    return connector.handleIndexQuery(index, null, type, mapping);
+    return connector.handleIndexQuery(index, type, mapping);
   }
 
   /**

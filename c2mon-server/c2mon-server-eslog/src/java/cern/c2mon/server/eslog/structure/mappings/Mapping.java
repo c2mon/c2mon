@@ -296,16 +296,6 @@ public interface Mapping {
     }
   }
 
-  class Settings {
-    private final int number_of_shards;
-    private final int number_of_replicas;
-
-    Settings(int shards, int replica) {
-      this.number_of_shards = shards;
-      this.number_of_replicas = replica;
-    }
-  }
-
   class SupervisionProperties {
     private Supervision supervision;
 

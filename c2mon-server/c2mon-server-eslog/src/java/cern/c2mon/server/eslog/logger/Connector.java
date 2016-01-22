@@ -52,8 +52,8 @@ public interface Connector {
    */
   void refreshClusterStats();
 
-  int getShards();
-  int getReplica();
+//  int getShards();
+//  int getReplica();
   Client getClient();
 
   /**
@@ -82,7 +82,7 @@ public interface Connector {
    * Launch an indexing query against the ElasticSearch cluster.
    * Used to insert a new index or to add a new mapping(type, mapping) to an existing index.
    */
-  boolean handleIndexQuery(String indexName, Settings settings, String type, String mapping);
+  boolean handleIndexQuery(String indexName, String type, String mapping);
 
   /**
    * Allows to add a new SupervisionEvent to ElasticSearch.
@@ -120,9 +120,4 @@ public interface Connector {
    * Wait for all operations to be taken into account.
    */
   boolean waitForYellowStatus();
-
-  /**
-   * @return the Index settings: number of shards and number of replica. (lucene settings)
-   */
-  Settings getIndexSettings(int shards, int replica);
 }

@@ -139,11 +139,11 @@ public class TransportConnectorTest {
     String mapping = new TagStringMapping(ValueType.stringType).getMapping();
 
     connector.setClient(null); // should be caught
-    boolean result = connector.handleIndexQuery("c2mon_2015-01", settings, type, mapping);
+    boolean result = connector.handleIndexQuery("c2mon_2015-01", type, mapping);
     assertFalse(result);
 
     connector.setClient(initClient);
-    result = connector.handleIndexQuery("c2mon_2015-01", settings, null, null);
+    result = connector.handleIndexQuery("c2mon_2015-01", null, null);
     assertTrue(result);
   }
 
@@ -161,7 +161,7 @@ public class TransportConnectorTest {
 
     connector.setClient(initClient);
     connector.getClient().admin().indices().prepareCreate("c2mon_2015-01").execute().actionGet();
-    connector.handleIndexQuery("c2mon_2015-01", settings, type, mapping);
+    connector.handleIndexQuery("c2mon_2015-01", type, mapping);
     result = connector.handleAliasQuery("c2mon_2015-01", "tag_1");
     assertTrue(result);
   }

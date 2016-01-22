@@ -85,7 +85,6 @@ public class SupervisionIndexer extends Indexer {
     }
     else {
       SupervisionMapping supervisionMapping = new SupervisionMapping();
-      supervisionMapping.configure(connector.getShards(), connector.getReplica());
       supervisionMapping.setProperties(Mapping.ValueType.supervisionType);
       return supervisionMapping.getMapping();
     }

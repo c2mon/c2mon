@@ -85,7 +85,6 @@ public class AlarmIndexer extends Indexer {
     }
     else {
       AlarmMapping alarmMapping = new AlarmMapping();
-      alarmMapping.configure(connector.getShards(), connector.getReplica());
       alarmMapping.setProperties(Mapping.ValueType.alarmType);
       return alarmMapping.getMapping();
     }

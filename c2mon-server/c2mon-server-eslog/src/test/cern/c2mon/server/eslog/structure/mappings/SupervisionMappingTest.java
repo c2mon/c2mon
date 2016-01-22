@@ -29,8 +29,6 @@ import static org.junit.Assert.assertNull;
  */
 public class SupervisionMappingTest {
   private SupervisionMapping mapping;
-  private int shards = 10;
-  private int replica = 0;
   private String expectedMappings = "{\n" +
       "  \"mappings\": {\n" +
       "    \"supervision\": {\n" +
@@ -52,24 +50,10 @@ public class SupervisionMappingTest {
       "    }\n" +
       "  }\n" +
       "}";
-  private String expectedSettings = "{\n" +
-      "  \"settings\": {\n" +
-      "    \"number_of_shards\": 10,\n" +
-      "    \"number_of_replicas\": 0\n" +
-      "  }\n" +
-      "}";
 
   @Before
   public void setup() {
     mapping = new SupervisionMapping();
-  }
-
-  @Test
-  public void testConfigure() {
-    mapping.configure(shards, replica);
-    assertNotNull(mapping.getSettings());
-    assertNull(mapping.getMappings());
-    assertEquals(expectedSettings, mapping.getMapping());
   }
 
   @Test
@@ -79,7 +63,6 @@ public class SupervisionMappingTest {
 
     mapping.setProperties(Mapping.ValueType.supervisionType);
     assertNotNull(mapping.getMappings());
-    assertNull(mapping.getSettings());
     assertEquals(expectedMappings, mapping.getMapping());
   }
 }

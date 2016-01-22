@@ -144,12 +144,12 @@ public class IndexerTest {
     assertNull(indexer.getIndicesTypes().get("c2mon-tag_2015-01"));
     expectedIndex.add("c2mon-tag_2015-01");
 
-    connector.handleIndexQuery("c2mon-tag_2015-01", Settings.EMPTY, null, null);
+    connector.handleIndexQuery("c2mon-tag_2015-01", null, null);
     indexer.updateLists();
 
     assertEquals(expectedIndex, indexer.getIndicesTypes().keySet());
 
-    connector.handleIndexQuery("c2mon-tag_2015-01", null, "tag_string", new TagStringMapping(Mapping.ValueType.stringType).getMapping());
+    connector.handleIndexQuery("c2mon-tag_2015-01", "tag_string", new TagStringMapping(Mapping.ValueType.stringType).getMapping());
     assertEquals(expectedType, indexer.getIndicesTypes().get("c2mon-tag_2015-01"));
   }
 
@@ -382,8 +382,7 @@ public class IndexerTest {
     indexer.getIndicesAliases().put(index, new HashSet<String>());
     indexer.getIndicesAliases().get(index).add("tag_1");
     connector.getClient().admin().indices().prepareCreate(index).execute().actionGet();
-    connector.handleIndexQuery(index, connector.getIndexSettings(10, 0),
-        indexer.generateTagType(tag.getDataType()), new TagStringMapping(Mapping.ValueType.stringType).getMapping());
+    connector.handleIndexQuery(index, indexer.generateTagType(tag.getDataType()), new TagStringMapping(Mapping.ValueType.stringType).getMapping());
 
     // already contains the alias
     assertFalse(indexer.addAliasFromBatch(index, tag));

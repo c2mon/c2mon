@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Data
 public class AlarmMapping implements Mapping {
-  private Settings settings;
   private AlarmProperties mappings;
 
   /**
@@ -52,12 +51,5 @@ public class AlarmMapping implements Mapping {
     else {
       log.debug("setProperties() - Could not instantiate properties, type is null");
     }
-  }
-
-  /**
-   * Set shards and replica number for the index in ElasticSearch.
-   */
-  public void configure(int shards, int replica) {
-    settings = new Settings(shards, replica);
   }
 }

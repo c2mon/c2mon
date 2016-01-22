@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Data
 public class SupervisionMapping implements Mapping {
-  private Settings settings;
   private SupervisionProperties mappings;
 
   /**
@@ -52,12 +51,5 @@ public class SupervisionMapping implements Mapping {
     else {
       log.debug("setProperties() - Could not instantiate properties, type is null");
     }
-  }
-
-  /**
-   * Configure the index number of shards and replica for supervision events.
-   */
-  public void configure(int shards, int replica) {
-    settings = new Settings(shards, replica);
   }
 }

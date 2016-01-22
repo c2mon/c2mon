@@ -29,8 +29,6 @@ import static org.junit.Assert.assertNull;
  */
 public class AlarmMappingTest {
   private AlarmMapping mapping;
-  private int shards = 10;
-  private int replica = 0;
   private String expectedMappings = "{\n" +
       "  \"mappings\": {\n" +
       "    \"alarm\": {\n" +
@@ -76,24 +74,10 @@ public class AlarmMappingTest {
       "    }\n" +
       "  }\n" +
       "}";
-  private String expectedSettings = "{\n" +
-      "  \"settings\": {\n" +
-      "    \"number_of_shards\": 10,\n" +
-      "    \"number_of_replicas\": 0\n" +
-      "  }\n" +
-      "}";
 
   @Before
   public void setup() {
     mapping = new AlarmMapping();
-  }
-
-  @Test
-  public void testConfigure() {
-    mapping.configure(shards, replica);
-    assertNotNull(mapping.getSettings());
-    assertNull(mapping.getMappings());
-    assertEquals(expectedSettings, mapping.getMapping());
   }
 
   @Test
@@ -103,7 +87,6 @@ public class AlarmMappingTest {
 
     mapping.setProperties(Mapping.ValueType.alarmType);
     assertNotNull(mapping.getMappings());
-    assertNull(mapping.getSettings());
     assertEquals(expectedMappings, mapping.getMapping());
   }
 }

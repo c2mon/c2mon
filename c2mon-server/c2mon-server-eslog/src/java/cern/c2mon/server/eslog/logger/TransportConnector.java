@@ -93,13 +93,13 @@ public class TransportConnector implements Connector {
   @Value("${es.local:true}")
   private boolean isLocal;
 
-  /** Number of shards attributed to an index. */
-  @Value("${es.config.index.shards:10}")
-  private int shards;
+//  /** Number of shards attributed to an index. */
+//  @Value("${es.config.index.shards:10}")
+//  private int shards;
 
-  /** Number of replica for each of the indices in ElasticSearch. */
-  @Value("${es.config.index.replica:0}")
-  private int replica;
+//  /** Number of replica for each of the indices in ElasticSearch. */
+//  @Value("${es.config.index.replica:0}")
+//  private int replica;
 
   @Value("${es.backup:null}")
   private String backupFilePath;
@@ -379,7 +379,7 @@ public class TransportConnector implements Connector {
   }
 
   @Override
-  public boolean handleIndexQuery(String indexName, Settings settings, String type, String mapping) {
+  public boolean handleIndexQuery(String indexName, String type, String mapping) {
     QueryIndexBuilder query = new QueryIndexBuilder(client);
     boolean isAcked = false;
 
@@ -388,7 +388,7 @@ public class TransportConnector implements Connector {
       return isAcked;
     }
 
-    isAcked = query.indexNew(indexName, settings, type, mapping);
+    isAcked = query.indexNew(indexName, type, mapping);
     return isAcked;
   }
 
