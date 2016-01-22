@@ -96,7 +96,7 @@ public class DataTagESLogConverter {
     setValid(tag, tagES);
     tagES.setValue(tag.getValue());
     tagES.setValueDescription(tag.getValueDescription());
-    log.debug("convertToTagES() - new tagES: " + tagES.build());
+    log.trace("convertToTagES() - new tagES: " + tagES.build());
     return tagES;
   }
 
@@ -106,13 +106,13 @@ public class DataTagESLogConverter {
   }
 
   private void retrieveTagMetadata(Tag tag, TagES tagES) {
-//    Metadata metadata = tag.getMetadata();
-//    Map<String, Object> metadataMap = new HashMap<>();
-//    if (metadata != null) {
-//      metadataMap = metadata.getMetadata();
-//    }
-//
-//    tagES.setMetadata(metadataMap);
+    Metadata metadata = tag.getMetadata();
+    Map<String, Object> metadataMap = new HashMap<>();
+    if (metadata != null) {
+      metadataMap = metadata.getMetadata();
+    }
+
+    tagES.setMetadata(metadataMap);
   }
 
   private void retrieveParentsMetadata(Tag tag, TagES tagES) {
