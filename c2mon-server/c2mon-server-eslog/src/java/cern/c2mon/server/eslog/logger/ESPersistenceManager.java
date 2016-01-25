@@ -64,6 +64,7 @@ public class ESPersistenceManager {
       this.output =  new DataOutputStreamOutput(new DataOutputStream(new FileOutputStream(backup)));
       this.input = new InputStreamStreamInput(new DataInputStream(new FileInputStream(backup)));
       this.setup = true;
+      log.debug("ESPersistenceManager() - Backup file is " + filePath);
     }
     catch (FileNotFoundException e) {
       log.warn("ESPersistenceManager() - Backup file not found!");
