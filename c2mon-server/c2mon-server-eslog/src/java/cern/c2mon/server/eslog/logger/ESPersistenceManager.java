@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * If the cluster cannot be reached, handles the writing to a text file in order to keep the data.
+ * If the cluster cannot be reached, handles the writing to a backup file in order to keep the data.
  * @author Alban Marguet
  */
 @Service

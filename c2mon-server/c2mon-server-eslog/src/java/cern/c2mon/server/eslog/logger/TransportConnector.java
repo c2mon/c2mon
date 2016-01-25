@@ -93,15 +93,7 @@ public class TransportConnector implements Connector {
   @Value("${es.local:true}")
   private boolean isLocal;
 
-//  /** Number of shards attributed to an index. */
-//  @Value("${es.config.index.shards:10}")
-//  private int shards;
-
-//  /** Number of replica for each of the indices in ElasticSearch. */
-//  @Value("${es.config.index.replica:0}")
-//  private int replica;
-
-  @Value("${es.backup:null}")
+  @Value("${es.backup:backup.ser}")
   private String backupFilePath;
 
   /** Connection settings for the node according to the host, port, cluster, node and isLocal. */
@@ -131,6 +123,7 @@ public class TransportConnector implements Connector {
   @Value("${es.config.bulk.concurrent:1}")
   private int concurrent;
 
+  /** Used for fallBack in case the cluster is not reachable anymore. */
   private final ESPersistenceManager esPersistenceManager;
 
   @Autowired
@@ -173,14 +166,6 @@ public class TransportConnector implements Connector {
       }
     };
   }
-
-
-  /*****************************************************************************
-   * 
-   * INITIALIZATION
-   * 
-   ****************************************************************************/
-
 
   /**
    * Called by an independent thread in order to look for an ElasticSearch cluster and connect to it.
@@ -334,14 +319,6 @@ public class TransportConnector implements Connector {
       return false;
     }
   }
-
-
-  /*****************************************************************************
-   * 
-   * UTILITY FOR INDEXING
-   * 
-   ****************************************************************************/
-
 
   /**
    * Handles a query for the ElasticSearch cluster. This method only handles the
