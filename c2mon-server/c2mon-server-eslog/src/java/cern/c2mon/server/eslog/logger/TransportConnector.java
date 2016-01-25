@@ -93,7 +93,6 @@ public class TransportConnector implements Connector {
   @Value("${es.local:true}")
   private boolean isLocal;
 
-  @Value("${es.backup:backup.ser}")
   private String backupFilePath;
 
   /** Connection settings for the node according to the host, port, cluster, node and isLocal. */
@@ -129,6 +128,7 @@ public class TransportConnector implements Connector {
   @Autowired
   public TransportConnector(final ESPersistenceManager esPersistenceManager) {
     this.esPersistenceManager = esPersistenceManager;
+    this.backupFilePath = System.getProperty("c2mon.home") + "/backup.ser";
     esPersistenceManager.setupBackup(backupFilePath);
     declareClusterResearch();
   }

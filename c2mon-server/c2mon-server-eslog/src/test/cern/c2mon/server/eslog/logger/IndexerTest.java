@@ -31,7 +31,6 @@ import org.elasticsearch.action.admin.indices.exists.types.TypesExistsRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.Settings;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -115,7 +114,8 @@ public class IndexerTest {
   @Test
   public void testInstantiateIndex() {
     String index = "c2mon-tag_2015-02";
-
+    log.debug(System.getProperty("c2mon.home"));
+    log.debug("BACKUP: " + connector.getBackupFilePath());
     boolean isAcked = indexer.instantiateIndex(index);
     assertTrue(isAcked);
     assertTrue(connector.getClient().admin().indices().exists(new IndicesExistsRequest(index)).actionGet().isExists());

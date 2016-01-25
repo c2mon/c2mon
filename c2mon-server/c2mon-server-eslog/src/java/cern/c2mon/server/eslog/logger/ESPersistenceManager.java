@@ -61,16 +61,18 @@ public class ESPersistenceManager {
   public void setupBackup(String filePath) {
     try {
       this.backup = new File(filePath);
+      if (!backup.exists()) {
+        if (backup.createNewFile()) {
+          log.debug("setupBackUP() - Created backup file: " + filePath);
+        }
+      }
       this.output =  new DataOutputStreamOutput(new DataOutputStream(new FileOutputStream(backup)));
       this.input = new InputStreamStreamInput(new DataInputStream(new FileInputStream(backup)));
       this.setup = true;
       log.debug("ESPersistenceManager() - Backup file is " + filePath + ".");
     }
-    catch (FileNotFoundException e) {
-      log.warn("ESPersistenceManager() - Backup file not found!; backup = " + backup + ".");
-    }
-    catch (NullPointerException e) {
-      log.warn("ESPersistenceManager() - No backup file found -> no backup mechanism enabled!; backup = " + backup + ".");
+    catch (IOException|NullPointerException e) {
+      log.warn("ESPersistenceManager() - Backup file exception!; backup = " + backup + ".", e);
     }
   }
 
