@@ -57,6 +57,8 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
      */
     public static final String BRIDGE_DEST_NAME = "MON-BRIDGE";
 
+    public static final String SYS_PROP_INTERVAL = "daq.jms.checkInterval";
+
 
     private enum BrokerTest {
         CONNECTION_TEST, TOPIC_PERF_TEST, QUEUE_PERF_TEST, BRIDGE_TOPIC_PERF_TEST, BRIDGE_QUEUE_PERF_TEST;
@@ -82,13 +84,19 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
      * default check interval
      * @see {@link #setTestInterval(long)} {@link #getInterval()}
      */
-    private static long DEFAULT_CHECK_INTERVAL = 1000 * 60 * 5;
+    private static long DEFAULT_CHECK_INTERVAL = 1000 * 60;
 
     /**
      * the check interval
      */
     private long interval = DEFAULT_CHECK_INTERVAL;
 
+    /**
+     * 
+     */
+    public JMSMessageHandler() {
+        interval = Long.valueOf(System.getProperty(SYS_PROP_INTERVAL, ""+DEFAULT_CHECK_INTERVAL));
+    }
 
     String [] parseEquipmentAdress(String equipAdresse) throws IllegalArgumentException {
         String [] result = null;
