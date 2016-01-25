@@ -216,7 +216,7 @@ public interface Mapping {
 
     class Name {
       private final String type = ValueType.stringType.toString();
-      //private final String index = indexNotAnalyzed;
+      private final String index = indexNotAnalyzed;
     }
 
     class DataType {
@@ -241,7 +241,7 @@ public interface Mapping {
 
     class Quality {
       private final String type = ValueType.stringType.toString();
-      //private final String index = indexNotAnalyzed;
+      private final String index = indexNotAnalyzed;
     }
 
     class Valid {
@@ -282,17 +282,17 @@ public interface Mapping {
 
     class Process {
       private final String type = ValueType.stringType.toString();
-      //private final String index = indexNotAnalyzed;
+      private final String index = indexNotAnalyzed;
     }
 
     class Equipment {
       private final String type = ValueType.stringType.toString();
-      //private final String index = indexNotAnalyzed;
+      private final String index = indexNotAnalyzed;
     }
 
     class SubEquipment {
       private final String type = ValueType.stringType.toString();
-      //private final String index = indexNotAnalyzed;
+      private final String index = indexNotAnalyzed;
     }
   }
 
@@ -334,10 +334,12 @@ public interface Mapping {
 
         class Message {
           private final String type = ValueType.stringType.toString();
+          private final String index = indexNotAnalyzed;
         }
 
         class Status {
           private final String type = ValueType.stringType.toString();
+          private final String index = indexNotAnalyzed;
         }
       }
     }
@@ -397,10 +399,12 @@ public interface Mapping {
 
         class FaultFamily {
           private final String type = ValueType.stringType.toString();
+          private final String index = indexNotAnalyzed;
         }
 
         class FaultMember {
           private final String type = ValueType.stringType.toString();
+          private final String index = indexNotAnalyzed;
         }
 
         class FaultCode {
@@ -413,6 +417,7 @@ public interface Mapping {
 
         class Activity {
           private final String type = ValueType.stringType.toString();
+          private final String index = indexNotAnalyzed;
         }
 
         class ActiveNumeric {
@@ -425,6 +430,7 @@ public interface Mapping {
 
         class Info {
           private final String type = ValueType.stringType.toString();
+          private final String index = indexNotAnalyzed;
         }
 
         class ServerTimestamp {
@@ -434,6 +440,7 @@ public interface Mapping {
 
         class TimeZone {
           private final String type = ValueType.stringType.toString();
+
         }
       }
     }

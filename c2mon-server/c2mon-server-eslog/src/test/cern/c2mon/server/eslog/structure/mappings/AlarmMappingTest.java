@@ -40,10 +40,12 @@ public class AlarmMappingTest {
       "          \"type\": \"long\"\n" +
       "        },\n" +
       "        \"faultFamily\": {\n" +
-      "          \"type\": \"string\"\n" +
+      "          \"type\": \"string\",\n" +
+      "          \"index\": \"not_analyzed\"\n" +
       "        },\n" +
       "        \"faultMember\": {\n" +
-      "          \"type\": \"string\"\n" +
+      "          \"type\": \"string\",\n" +
+      "          \"index\": \"not_analyzed\"\n" +
       "        },\n" +
       "        \"faultCode\": {\n" +
       "          \"type\": \"integer\"\n" +
@@ -52,7 +54,8 @@ public class AlarmMappingTest {
       "          \"type\": \"boolean\"\n" +
       "        },\n" +
       "        \"activity\": {\n" +
-      "          \"type\": \"string\"\n" +
+      "          \"type\": \"string\",\n" +
+      "          \"index\": \"not_analyzed\"\n" +
       "        },\n" +
       "        \"activeNumeric\": {\n" +
       "          \"type\": \"double\"\n" +
@@ -61,7 +64,8 @@ public class AlarmMappingTest {
       "          \"type\": \"integer\"\n" +
       "        },\n" +
       "        \"info\": {\n" +
-      "          \"type\": \"string\"\n" +
+      "          \"type\": \"string\",\n" +
+      "          \"index\": \"not_analyzed\"\n" +
       "        },\n" +
       "        \"serverTimestamp\": {\n" +
       "          \"type\": \"date\",\n" +
@@ -82,9 +86,6 @@ public class AlarmMappingTest {
 
   @Test
   public void testSetProperties() {
-    mapping.setProperties(Mapping.ValueType.boolType);
-    assertNull(mapping.getMappings());
-
     mapping.setProperties(Mapping.ValueType.alarmType);
     assertNotNull(mapping.getMappings());
     assertEquals(expectedMappings, mapping.getMapping());

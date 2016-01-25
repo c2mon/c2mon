@@ -18,6 +18,8 @@ package cern.c2mon.server.eslog.logger;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.cluster.ClusterState;
+import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Used to write (a.k.a. index) the data to elasticSearch.
@@ -126,5 +130,10 @@ public abstract class Indexer {
     SimpleDateFormat sdf = new SimpleDateFormat(wantedPattern);
     Date date = new Date(millis);
     return sdf.format(date);
+  }
+
+  public MappingMetaData retrieveMappingES(String index, String type) {
+    ClusterState state = connector.createClient().admin().cluster().prepareState().execute().actionGet().getState();
+    return state.getMetaData().index(index).mapping(type);
   }
 }

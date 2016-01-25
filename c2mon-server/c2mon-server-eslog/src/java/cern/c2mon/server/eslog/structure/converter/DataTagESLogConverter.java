@@ -22,6 +22,7 @@ import java.util.Map;
 
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.shared.common.metadata.Metadata;
+import com.google.gson.GsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -107,11 +108,15 @@ public class DataTagESLogConverter {
 
   private void retrieveTagMetadata(Tag tag, TagES tagES) {
     Metadata metadata = tag.getMetadata();
-    Map<String, Object> metadataMap = new HashMap<>();
+    Map<String, String> metadataMap = new HashMap<>();
     if (metadata != null) {
-      metadataMap = metadata.getMetadata();
+      for (String key : metadata.getMetadata().keySet()) {
+        Object value = metadata.getMetadata().get(key);
+        if (value instanceof String) {
+          metadataMap.put(key, (String) value);
+        }
+      }
     }
-
     tagES.setMetadata(metadataMap);
   }
 

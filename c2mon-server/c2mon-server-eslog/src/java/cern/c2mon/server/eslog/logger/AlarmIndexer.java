@@ -18,16 +18,18 @@ package cern.c2mon.server.eslog.logger;
 
 import cern.c2mon.server.eslog.structure.mappings.AlarmMapping;
 import cern.c2mon.server.eslog.structure.mappings.Mapping;
+import cern.c2mon.server.eslog.structure.queries.QueryIndices;
+import cern.c2mon.server.eslog.structure.queries.QueryTypes;
 import cern.c2mon.server.eslog.structure.types.AlarmES;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Allows to send the data to ElasticSearch through the Connector interface.
@@ -51,6 +53,7 @@ public class AlarmIndexer extends Indexer {
   @PostConstruct
   public void init() {
     super.init();
+    retrieveMappingsFromES();
   }
 
   /**
@@ -85,8 +88,20 @@ public class AlarmIndexer extends Indexer {
     }
     else {
       AlarmMapping alarmMapping = new AlarmMapping();
-      alarmMapping.setProperties(Mapping.ValueType.alarmType);
       return alarmMapping.getMapping();
+    }
+  }
+
+  public void retrieveMappingsFromES() {
+    List<String> indicesES = connector.handleListingQuery(new QueryIndices(connector.getClient()), null);
+    for (String index : indicesES) {
+      List<String> types = connector.handleListingQuery(new QueryTypes(connector.getClient()), index);
+      for (String type : types) {
+        MappingMetaData mapping = retrieveMappingES(index, type);
+        String jsonMapping = mapping.source().toString();
+        log.debug("retrieveMappingsFromES() - mapping: " + jsonMapping );
+        this.indices.put(index, jsonMapping);
+      }
     }
   }
 }

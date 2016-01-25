@@ -42,10 +42,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static junit.framework.TestCase.*;
 import static org.junit.Assert.assertFalse;
@@ -308,6 +305,9 @@ public class IndexerTest {
     Set<String> listAliases = new HashSet<>();
     long id = 1L;
     long tagServerTime = 123456789000L;
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("test1", "value1");
+    metadata.put("test2", "2");
 
     for (; id <= size; id++, tagServerTime += 1000) {
       TagES tag = new TagString();
@@ -317,6 +317,7 @@ public class IndexerTest {
       list.add(tag);
       listIndices.add(indexer.generateTagIndex(tag.getServerTimestamp()));
       listAliases.add(indexer.generateAliasName(tag.getId()));
+      tag.setMetadata(metadata);
     }
 
 

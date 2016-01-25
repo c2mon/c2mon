@@ -26,8 +26,8 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class TagESMapping implements Mapping {
-  Routing _routing;
-  Properties properties;
+  protected Routing _routing;
+  protected Properties properties;
 
   public TagESMapping() {
     _routing = new Routing();

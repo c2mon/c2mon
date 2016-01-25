@@ -41,10 +41,12 @@ public class SupervisionMappingTest {
       "          \"format\": \"epoch_millis\"\n" +
       "        },\n" +
       "        \"message\": {\n" +
-      "          \"type\": \"string\"\n" +
+      "          \"type\": \"string\",\n" +
+      "          \"index\": \"not_analyzed\"\n" +
       "        },\n" +
       "        \"status\": {\n" +
-      "          \"type\": \"string\"\n" +
+      "          \"type\": \"string\",\n" +
+      "          \"index\": \"not_analyzed\"\n" +
       "        }\n" +
       "      }\n" +
       "    }\n" +
@@ -58,9 +60,6 @@ public class SupervisionMappingTest {
 
   @Test
   public void testSetProperties() {
-    mapping.setProperties(Mapping.ValueType.boolType);
-    assertNull(mapping.getMappings());
-
     mapping.setProperties(Mapping.ValueType.supervisionType);
     assertNotNull(mapping.getMappings());
     assertEquals(expectedMappings, mapping.getMapping());

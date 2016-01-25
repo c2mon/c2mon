@@ -18,6 +18,8 @@ package cern.c2mon.server.eslog.structure.types;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,9 +47,7 @@ public abstract class TagES implements TagESInterface {
   protected String valueString;
   protected Number valueNumeric;
   private String valueDescription;
-
-  //TODO: be able to discover what is inside and create a static structure for it.
-  private transient Map<String, Object> metadata;
+  private transient Map<String, String> metadata;
   
   private String process;
   private String equipment;
@@ -57,9 +57,19 @@ public abstract class TagES implements TagESInterface {
 
   public String build() {
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    String json = gson.toJson(this);
+    JsonObject tagESAsTree = gson.toJsonTree(this).getAsJsonObject();
+    addMetadata(tagESAsTree);
+    String json = gson.toJson(tagESAsTree);
     log.debug(json);
     return json;
+  }
+
+  public void addMetadata(JsonObject tagESAsTree) {
+    if (tagESAsTree != null && metadata != null) {
+      for (String key : metadata.keySet()) {
+        tagESAsTree.addProperty(key, metadata.get(key));
+      }
+    }
   }
 
   @Override

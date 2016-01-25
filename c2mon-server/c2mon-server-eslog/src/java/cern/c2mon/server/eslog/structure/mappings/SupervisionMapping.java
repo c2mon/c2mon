@@ -30,6 +30,10 @@ import lombok.extern.slf4j.Slf4j;
 public class SupervisionMapping implements Mapping {
   private SupervisionProperties mappings;
 
+  public SupervisionMapping() {
+    setProperties(ValueType.supervisionType);
+  }
+
   /**
    * @return the mapping as JSON String for ElasticSearch.
    */

@@ -29,20 +29,15 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 public class AlarmMapping implements Mapping {
   private AlarmProperties mappings;
+  private transient long tagId;
 
-  /**
-   * @return the mapping as JSON String for ElasticSearch.
-   */
-  public String getMapping() {
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    String json = gson.toJson(this);
-    log.trace("getMapping() - Created the supervision mapping: " + json);
-    return json;
+  public AlarmMapping() {
+    setProperties(ValueType.alarmType);
   }
 
   /**
-   * Initialize the mapping according that the valueType is alarm type.
-   */
+   //   * Initialize the mapping according that the valueType is alarm type.
+   //   */
   @Override
   public void setProperties(ValueType valueType) {
     if (ValueType.isAlarm(valueType)) {
@@ -51,5 +46,15 @@ public class AlarmMapping implements Mapping {
     else {
       log.debug("setProperties() - Could not instantiate properties, type is null");
     }
+  }
+
+    /**
+   * @return the mapping as JSON String for ElasticSearch.
+   */
+  public String getMapping() {
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    String json = gson.toJson(this);
+    log.trace("getMapping() - Created the alarm mapping: " + json);
+    return json;
   }
 }

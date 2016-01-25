@@ -43,4 +43,10 @@ public class TagStringMappingTest {
 		TagStringMapping mapping = new TagStringMapping(ValueType.dateType);
 		mapping.properties.getValueType();
 	}
+
+  @Test
+  public void testOutput() {
+    TagStringMapping mapping = new TagStringMapping(ValueType.stringType);
+    mapping.getMapping();
+  }
 }

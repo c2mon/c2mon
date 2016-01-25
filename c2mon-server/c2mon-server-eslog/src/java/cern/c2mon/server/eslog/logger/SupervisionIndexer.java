@@ -18,16 +18,20 @@ package cern.c2mon.server.eslog.logger;
 
 import cern.c2mon.server.eslog.structure.mappings.Mapping;
 import cern.c2mon.server.eslog.structure.mappings.SupervisionMapping;
+import cern.c2mon.server.eslog.structure.queries.QueryIndices;
+import cern.c2mon.server.eslog.structure.queries.QueryTypes;
 import cern.c2mon.server.eslog.structure.types.SupervisionES;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,6 +55,7 @@ public class SupervisionIndexer extends Indexer {
   @PostConstruct
   public void init() {
     super.init();
+    retrieveMappingsFromES();
   }
 
   /**
@@ -87,6 +92,19 @@ public class SupervisionIndexer extends Indexer {
       SupervisionMapping supervisionMapping = new SupervisionMapping();
       supervisionMapping.setProperties(Mapping.ValueType.supervisionType);
       return supervisionMapping.getMapping();
+    }
+  }
+
+  public void retrieveMappingsFromES() {
+    List<String> indicesES = connector.handleListingQuery(new QueryIndices(connector.getClient()), null);
+    for (String index : indicesES) {
+      List<String> types = connector.handleListingQuery(new QueryTypes(connector.getClient()), index);
+      for (String type : types) {
+        MappingMetaData mapping = retrieveMappingES(index, type);
+        String jsonMapping = mapping.source().toString();
+        log.debug("retrieveMappingsFromES() - mapping: " + jsonMapping );
+        this.indices.put(index, jsonMapping);
+      }
     }
   }
 }
