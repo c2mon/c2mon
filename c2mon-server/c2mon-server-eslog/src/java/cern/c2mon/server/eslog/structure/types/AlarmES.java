@@ -18,8 +18,12 @@ package cern.c2mon.server.eslog.structure.types;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Represents an Alarm Event for ElasticSearch.
@@ -28,8 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Data
 public class AlarmES {
-  private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-
   private long tagId;
   private long alarmId;
 
@@ -45,9 +47,23 @@ public class AlarmES {
 
   private long serverTimestamp;
   private String timezone;
+  private transient Map<String, String> metadata = new HashMap<>();
 
   @Override
   public String toString() {
-    return GSON.toJson(this);
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    JsonObject tagESAsTree = gson.toJsonTree(this).getAsJsonObject();
+    addMetadata(tagESAsTree);
+    String json = gson.toJson(tagESAsTree);
+    log.debug(json);
+    return json;
+  }
+
+  public void addMetadata(JsonObject tagESAsTree) {
+    if (tagESAsTree != null && metadata != null) {
+      for (String key : metadata.keySet()) {
+        tagESAsTree.addProperty(key, metadata.get(key));
+      }
+    }
   }
 }

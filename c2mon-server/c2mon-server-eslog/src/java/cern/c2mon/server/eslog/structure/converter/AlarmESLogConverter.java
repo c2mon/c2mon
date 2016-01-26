@@ -17,10 +17,15 @@
 package cern.c2mon.server.eslog.structure.converter;
 
 import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.eslog.structure.types.AlarmES;
+import cern.c2mon.server.eslog.structure.types.TagES;
+import cern.c2mon.shared.common.metadata.Metadata;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Convert an Alarm to an AlarmES for ElasticSearch writing.
@@ -31,7 +36,7 @@ public class AlarmESLogConverter {
   public AlarmES convertAlarmToAlarmES(Alarm alarm) {
     AlarmES alarmES = new AlarmES();
 
-    if (alarm == null) {
+    if (alarm == null || alarm.getTagId() == null) {
       return null;
     }
 
@@ -59,6 +64,22 @@ public class AlarmESLogConverter {
 
     alarmES.setInfo(alarm.getInfo());
 
+    retrieveMetadata(alarmES, alarm);
+
     return alarmES;
+  }
+
+  private void retrieveMetadata(AlarmES alarmES, Alarm alarm) {
+    Metadata metadata = alarm.getMetadata();
+    Map<String, String> metadataMap = new HashMap<>();
+    if (metadata != null) {
+      for (String key : metadata.getMetadata().keySet()) {
+        Object value = metadata.getMetadata().get(key);
+        if (value instanceof String) {
+          metadataMap.put(key, (String) value);
+        }
+      }
+    }
+    alarmES.setMetadata(metadataMap);
   }
 }

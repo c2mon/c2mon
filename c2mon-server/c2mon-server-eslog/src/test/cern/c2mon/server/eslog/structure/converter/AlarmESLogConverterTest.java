@@ -17,16 +17,21 @@
 package cern.c2mon.server.eslog.structure.converter;
 
 import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.eslog.structure.types.AlarmES;
 import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.shared.common.metadata.Metadata;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static junit.framework.TestCase.assertNull;
+import java.util.HashMap;
+import java.util.Map;
+
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNull;
 
 /**
  * Insure that AlarmESLogConverter converts well Alarm to AlarmES.
@@ -51,6 +56,18 @@ public class AlarmESLogConverterTest {
     alarm = CacheObjectCreation.createTestAlarm1();
     alarmES = alarmESLogConverter.convertAlarmToAlarmES(alarm);
 
+    callTests(alarmES, alarm);
+  }
+
+  @Test
+  public void testMetadata() {
+    alarm = initAlarmWithMetadata();
+
+    alarmES = alarmESLogConverter.convertAlarmToAlarmES(alarm);
+    callTests(alarmES, alarm);
+  }
+
+  private void callTests(AlarmES alarmES, Alarm  alarm) {
     log.debug(alarmES.toString());
     assertEquals(alarm.getTagId().longValue(), alarmES.getTagId());
     assertEquals(alarm.getId().longValue(), alarmES.getAlarmId());
@@ -60,5 +77,19 @@ public class AlarmESLogConverterTest {
     assertEquals(alarm.isActive(), alarmES.isActive());
     assertEquals(alarm.getInfo(), alarmES.getInfo());
     assertEquals(alarm.getTimestamp().getTime(), alarmES.getServerTimestamp());
+  }
+
+  private Alarm initAlarmWithMetadata() {
+    AlarmCacheObject alarm = new AlarmCacheObject();
+    Map<String, Object> map = new HashMap<>();
+    map.put("building", "1");
+    map.put("responsible person", "coucou");
+    Metadata metadata = new Metadata();
+    metadata.setMetadata(map);
+    alarm.setId(1L);
+    alarm.setDataTagId(2L);
+    alarm.setMetadata(metadata);
+
+    return alarm;
   }
 }

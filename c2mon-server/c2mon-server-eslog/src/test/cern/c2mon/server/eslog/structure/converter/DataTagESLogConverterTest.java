@@ -29,6 +29,8 @@ import cern.c2mon.server.eslog.structure.converter.DataTagESLogConverter;
 import cern.c2mon.server.eslog.structure.types.TagNumeric;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.metadata.Metadata;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -54,6 +56,7 @@ import cern.c2mon.shared.common.datatag.DataTagQuality;
  * 
  * @author Alban Marguet.
  */
+@Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public class DataTagESLogConverterTest {
   @InjectMocks
@@ -295,6 +298,23 @@ public class DataTagESLogConverterTest {
     assertEquals(126387213, tagES.getValue());
     assertNull(tagES.getValueString());
     assertEquals("integer", tagES.getDataType());
+  }
+
+  @Test
+  public void testMetadata() {
+    Map<String, Object> map = new HashMap<>();
+    map.put("building", "1");
+    map.put("responsible", "coucou");
+    map.put("intShouldNotGoToMetadata", 2);
+    Metadata metadata = new Metadata(map);
+    DataTagCacheObject tag = createTagExample();
+    tag.setMetadata(metadata);
+
+    tagES = esLogConverter.convertToTagES(tag);
+    assertNotNull(tagES.getMetadata());
+    assertNull(tagES.getMetadata().get("intShouldNotGoToMetadata"));
+    assertEquals("1", tagES.getMetadata().get("building"));
+    assertEquals("coucou", tagES.getMetadata().get("responsible"));
   }
 
   /**

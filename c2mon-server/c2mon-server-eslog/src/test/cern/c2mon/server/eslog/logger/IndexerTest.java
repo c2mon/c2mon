@@ -305,10 +305,12 @@ public class IndexerTest {
     Set<String> listAliases = new HashSet<>();
     long id = 1L;
     long tagServerTime = 123456789000L;
-    Map<String, String> metadata = new HashMap<>();
-    metadata.put("test1", "value1");
-    metadata.put("test2", "2");
+    Map<String, String> metadata1 = new HashMap<>();
+    Map<String, String> metadata2 = new HashMap<>();
+    metadata1.put("test1", "value1");
+    metadata2.put("test2", "2");
 
+    //not all tags have the same metadata and last tag has nothing
     for (; id <= size; id++, tagServerTime += 1000) {
       TagES tag = new TagString();
       tag.setDataType(Mapping.ValueType.stringType.toString());
@@ -317,7 +319,15 @@ public class IndexerTest {
       list.add(tag);
       listIndices.add(indexer.generateTagIndex(tag.getServerTimestamp()));
       listAliases.add(indexer.generateAliasName(tag.getId()));
-      tag.setMetadata(metadata);
+      if (id == size) {
+        log.debug("list of tags realized");
+      }
+      else if (id % 2 == 0) {
+        tag.setMetadata(metadata1);
+      }
+      else {
+        tag.setMetadata(metadata2);
+      }
     }
 
 
@@ -356,6 +366,11 @@ public class IndexerTest {
     assertTrue(liveIndices.containsAll(resultIndices));
     assertTrue(liveTypes.containsAll(resultTypes));
     assertTrue(liveAliases.containsAll(resultAliases));
+  }
+
+  @Test
+  public void testIndexingWithAndWithoutMetadata() {
+
   }
 
   @Test
