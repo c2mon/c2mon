@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -29,12 +29,12 @@ import cern.c2mon.shared.common.metadata.Metadata;
 public class ConfigurationDataTagUtil {
 
 
-  public static Pair<DataTag<Number>, Properties> buildDataTagWithId(Long id) {
-    return new Pair<DataTag<Number>, Properties>(DataTag.<Number>builder().id(id).build(), new Properties());
+  public static Pair<DataTag, Properties> buildDataTagWithId(Long id) {
+    return new Pair<DataTag, Properties>(DataTag.builder().id(id).build(), new Properties());
   }
 
-  public static Pair<DataTag<Number>, Properties> buildDataTagWithPrimFields(Long id) {
-    DataTag<Number> pro = DataTag.<Number>builder()
+  public static Pair<DataTag, Properties> buildDataTagWithPrimFields(Long id) {
+    DataTag pro = DataTag.builder()
         .id(id)
         .name("DataTag")
         .description("foo")
@@ -53,8 +53,8 @@ public class ConfigurationDataTagUtil {
     return new Pair<>(pro, props);
   }
 
-  public static Pair<DataTag<Number>, Properties> buildDataTagWithAllFields(Long id) {
-    DataTag pro = DataTag.<Number>builder()
+  public static Pair<DataTag, Properties> buildDataTagWithAllFields(Long id) {
+    DataTag pro = DataTag.builder()
         .id(id)
         .name("DataTag")
         .description("foo")
@@ -81,11 +81,11 @@ public class ConfigurationDataTagUtil {
     props.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata",11).build()));
     props.setProperty("unit", "testUnit");
 
-    return new Pair<DataTag<Number>, Properties>(pro, props);
+    return new Pair<DataTag, Properties>(pro, props);
   }
 
-  public static Pair<DataTag<Number>, Properties> buildDataTagWithoutDefaultFields(Long id) {
-    DataTag<Number> pro = DataTag.<Number>builder()
+  public static Pair<DataTag, Properties> buildDataTagWithoutDefaultFields(Long id) {
+    DataTag pro = DataTag.builder()
         .id(id)
         .name("DataTag")
         .description("foo")
@@ -103,8 +103,8 @@ public class ConfigurationDataTagUtil {
     return new Pair<>(pro, props);
   }
 
-  public static Pair<DataTag<Number>, Properties> buildUpdateDataTagWithAllFields(Long id) {
-    DataTag<Number> pro = DataTag.<Number>builder()
+  public static Pair<DataTag, Properties> buildUpdateDataTagWithAllFields(Long id) {
+    DataTag pro = DataTag.builder()
         .id(id)
         .name("DataTag_Update")
         .description("foo_Update")
@@ -133,8 +133,8 @@ public class ConfigurationDataTagUtil {
     return new Pair<>(pro, props);
   }
 
-  public static Pair<DataTag<Number>, Properties> buildUpdateDataTagWithSomeFields(Long id) {
-    DataTag<Number> pro = DataTag.<Number>builder()
+  public static Pair<DataTag, Properties> buildUpdateDataTagWithSomeFields(Long id) {
+    DataTag pro = DataTag.builder()
         .id(id)
         .name("DataTag_Update")
         .description("foo_Update")
@@ -151,8 +151,8 @@ public class ConfigurationDataTagUtil {
     return new Pair<>(pro, props);
   }
 
-  public static DataTag<Number> buildDeleteDataTag(Long id) {
-    DataTag<Number> pro = DataTag.<Number>builder()
+  public static DataTag buildDeleteDataTag(Long id) {
+    DataTag pro = DataTag.builder()
         .id(id)
         .deleted(true)
         .build();
@@ -164,7 +164,7 @@ public class ConfigurationDataTagUtil {
 
 
   public static Pair<DataTag.DataTagBuilder, Properties> builderDataTagWithPrimFields(Long id, String parent, Long parentId) {
-    DataTag.DataTagBuilder pro = DataTag.<Number>builder()
+    DataTag.DataTagBuilder pro = DataTag.builder()
         .id(id)
         .name("DataTag")
         .description("foo")

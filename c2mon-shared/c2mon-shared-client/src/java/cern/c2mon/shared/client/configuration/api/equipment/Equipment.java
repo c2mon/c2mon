@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -108,7 +108,7 @@ public class Equipment implements ConfigurationObject {
    */
   @IgnoreProperty
   @Singular
-  private List<DataTag<Number>> dataTags = new ArrayList<>();
+  private List<DataTag> dataTags = new ArrayList<>();
 
   /**
    * The list of SubEquipments which are attached to the Equipment.
@@ -152,7 +152,7 @@ public class Equipment implements ConfigurationObject {
   @Builder
   public Equipment(boolean deleted, Long id, String name, Integer aliveInterval, String description,
                    String handlerClass, String address, @Singular List<SubEquipment> subEquipments, StatusTag statusTag, CommFaultTag commFaultTag,
-                   AliveTag aliveTag, @Singular List<DataTag<Number>> dataTags, @Singular List<CommandTag> commandTags) {
+                   AliveTag aliveTag, @Singular List<DataTag> dataTags, @Singular List<CommandTag> commandTags) {
     this.deleted = deleted;
     this.id = id;
     this.name = name;

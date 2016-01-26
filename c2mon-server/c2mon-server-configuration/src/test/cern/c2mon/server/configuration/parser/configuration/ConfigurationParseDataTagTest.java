@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -118,7 +118,7 @@ public class ConfigurationParseDataTagTest {
     dataTagUpdate.expectMessage("Creating DataTag (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
-    Pair<DataTag<Number>, Properties> pair = buildUpdateDataTagWithSomeFields(1l);
+    Pair<DataTag, Properties> pair = buildUpdateDataTagWithSomeFields(1l);
     Configuration configuration = getConfBuilderDataTagE(pair._1);
 
     // Setup Mock
@@ -142,7 +142,7 @@ public class ConfigurationParseDataTagTest {
   @Test
   public void dataTagUpdate_withSomeFields() {
     // Setup Configuration Instance
-    Pair<DataTag<Number>, Properties> pair = buildUpdateDataTagWithSomeFields(1l);
+    Pair<DataTag, Properties> pair = buildUpdateDataTagWithSomeFields(1l);
     Configuration configuration = getConfBuilderDataTagE(pair._1);
 
     // Setup Mock
@@ -172,7 +172,7 @@ public class ConfigurationParseDataTagTest {
   @Test
   public void dataTagUpdate_withAllFields() {
     // Setup Configuration Instance
-    Pair<DataTag<Number>, Properties> pair = buildUpdateDataTagWithAllFields(1l);
+    Pair<DataTag, Properties> pair = buildUpdateDataTagWithAllFields(1l);
     Configuration configuration = getConfBuilderDataTagE(pair._1);
 
     // Setup Mock
@@ -202,11 +202,11 @@ public class ConfigurationParseDataTagTest {
   @Test
   public void dataTagUpdate_multipleInstances_withAllFields() {
     // Setup Configuration Instance
-    Pair<DataTag<Number>, Properties> pair1 = buildUpdateDataTagWithAllFields(1l);
-    Pair<DataTag<Number>, Properties> pair2 = buildUpdateDataTagWithAllFields(2l);
-    Pair<DataTag<Number>, Properties> pair3 = buildUpdateDataTagWithAllFields(3l);
-    Pair<DataTag<Number>, Properties> pair4 = buildUpdateDataTagWithAllFields(4l);
-    Pair<DataTag<Number>, Properties> pair5 = buildUpdateDataTagWithAllFields(5l);
+    Pair<DataTag, Properties> pair1 = buildUpdateDataTagWithAllFields(1l);
+    Pair<DataTag, Properties> pair2 = buildUpdateDataTagWithAllFields(2l);
+    Pair<DataTag, Properties> pair3 = buildUpdateDataTagWithAllFields(3l);
+    Pair<DataTag, Properties> pair4 = buildUpdateDataTagWithAllFields(4l);
+    Pair<DataTag, Properties> pair5 = buildUpdateDataTagWithAllFields(5l);
 
     Configuration configuration = getConfBuilderDataTagE(pair1._1, pair2._1, pair3._1, pair4._1, pair5._1);
 
@@ -290,7 +290,7 @@ public class ConfigurationParseDataTagTest {
   @Test
   public void dataTagCreate_withMandatoryFields() {
     // Setup Configuration Instance
-    Pair<DataTag<Number>, Properties> pair = buildDataTagWithPrimFields(1l);
+    Pair<DataTag, Properties> pair = buildDataTagWithPrimFields(1l);
     Configuration configuration = getConfBuilderDataTagE(pair._1);
 
     // Setup Mock
@@ -324,7 +324,7 @@ public class ConfigurationParseDataTagTest {
     dataTagCreate.expectMessage("Creating Process (id = 1) failed. Not enough arguments.");
 
     // Setup Configuration Instance
-    Pair<DataTag<Number>, Properties> pair = buildDataTagWithPrimFields(1l);
+    Pair<DataTag, Properties> pair = buildDataTagWithPrimFields(1l);
     Configuration configuration = getConfBuilderDataTagE(pair._1);
 
     // Setup Mock
@@ -344,7 +344,7 @@ public class ConfigurationParseDataTagTest {
   @Test
   public void dataTagCreate_withAllFields() {
     // Setup Configuration Instance
-    Pair<DataTag<Number>, Properties> pair = buildDataTagWithAllFields(1l);
+    Pair<DataTag, Properties> pair = buildDataTagWithAllFields(1l);
     Configuration configuration = getConfBuilderDataTagE(pair._1);
 
     // Setup Mock
@@ -375,7 +375,7 @@ public class ConfigurationParseDataTagTest {
   @Test
   public void dataTagCreate_withoutDefaultFields() {
     // Setup Configuration Instance
-    Pair<DataTag<Number>, Properties> pair = buildDataTagWithoutDefaultFields(1l);
+    Pair<DataTag, Properties> pair = buildDataTagWithoutDefaultFields(1l);
     Configuration configuration = getConfBuilderDataTagE(pair._1);
 
     // Setup Mock
@@ -406,11 +406,11 @@ public class ConfigurationParseDataTagTest {
   @Test
   public void dataTagCreate_multipleInstances_withAllFields() {
     // Setup Configuration Instance
-    Pair<DataTag<Number>, Properties> pair1 = buildDataTagWithAllFields(1l);
-    Pair<DataTag<Number>, Properties> pair2 = buildDataTagWithAllFields(2l);
-    Pair<DataTag<Number>, Properties> pair3 = buildDataTagWithAllFields(3l);
-    Pair<DataTag<Number>, Properties> pair4 = buildDataTagWithAllFields(4l);
-    Pair<DataTag<Number>, Properties> pair5 = buildDataTagWithAllFields(5l);
+    Pair<DataTag, Properties> pair1 = buildDataTagWithAllFields(1l);
+    Pair<DataTag, Properties> pair2 = buildDataTagWithAllFields(2l);
+    Pair<DataTag, Properties> pair3 = buildDataTagWithAllFields(3l);
+    Pair<DataTag, Properties> pair4 = buildDataTagWithAllFields(4l);
+    Pair<DataTag, Properties> pair5 = buildDataTagWithAllFields(5l);
 
     Configuration configuration = getConfBuilderDataTagE(pair1._1, pair2._1, pair3._1, pair4._1, pair5._1);
 
@@ -473,7 +473,7 @@ public class ConfigurationParseDataTagTest {
     // DataTag do not exist in the cache.");
 
     // Setup Configuration Instance
-    DataTag<Number> dataTag = buildDeleteDataTag(1l);
+    DataTag dataTag = buildDeleteDataTag(1l);
     Configuration configuration = getConfBuilderDataTagE(dataTag);
 
     // Setup Mock
@@ -507,7 +507,7 @@ public class ConfigurationParseDataTagTest {
   @Test
   public void dataTagDelete_ExistingInstance() {
     // Setup Configuration Instance
-    DataTag<Number> dataTag = buildDeleteDataTag(1l);
+    DataTag dataTag = buildDeleteDataTag(1l);
     Configuration configuration = getConfBuilderDataTagE(dataTag);
 
     // Setup Mock
@@ -536,9 +536,9 @@ public class ConfigurationParseDataTagTest {
   @Test
   public void dataTagAllOperations_checkOrder() {
     // Setup Configuration Instance
-    Pair<DataTag<Number>, Properties> pairUpdate = buildUpdateDataTagWithAllFields(2l);
-    Pair<DataTag<Number>, Properties> pairCreate = buildDataTagWithAllFields(3l);
-    DataTag<Number> dataTagDelete = buildDeleteDataTag(1l);
+    Pair<DataTag, Properties> pairUpdate = buildUpdateDataTagWithAllFields(2l);
+    Pair<DataTag, Properties> pairCreate = buildDataTagWithAllFields(3l);
+    DataTag dataTagDelete = buildDeleteDataTag(1l);
     Configuration configuration = getConfBuilderDataTagE(pairUpdate._1, pairCreate._1, dataTagDelete);
 
     // Setup Mock

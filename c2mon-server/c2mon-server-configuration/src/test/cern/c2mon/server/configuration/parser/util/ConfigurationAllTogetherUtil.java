@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -119,8 +119,8 @@ public class ConfigurationAllTogetherUtil {
 
     Configuration conf = getConfBuilder()
         .process(process.aliveTag(aliveTagP.alarm(alarmAP.build()).build()).statusTag(statusTagP.alarm(alarmSP.build()).build())
-            .equipment(equipment.commFaultTag(commFaultTagE.alarm(alarmCE.build()).build()).aliveTag(aliveTagE.alarm(alarmAE.build()).build()).statusTag(statusTagE.alarm(alarmSE.build()).build()).dataTag((DataTag<Number>) dataTagE.alarm(alarmDE.build()).build()).commandTag(commandTag.build())
-                .subEquipment(subEquipment.commFaultTag(commFaultTagS.alarm(alarmCS.build()).build()).aliveTag(aliveTagS.alarm(alarmAS.build()).build()).statusTag(statusTagS.alarm(alarmSS.build()).build()).dataTag((DataTag<Number>) dataTagS.alarm(alarmDS.build()).build())
+            .equipment(equipment.commFaultTag(commFaultTagE.alarm(alarmCE.build()).build()).aliveTag(aliveTagE.alarm(alarmAE.build()).build()).statusTag(statusTagE.alarm(alarmSE.build()).build()).dataTag((DataTag) dataTagE.alarm(alarmDE.build()).build()).commandTag(commandTag.build())
+                .subEquipment(subEquipment.commFaultTag(commFaultTagS.alarm(alarmCS.build()).build()).aliveTag(aliveTagS.alarm(alarmAS.build()).build()).statusTag(statusTagS.alarm(alarmSS.build()).build()).dataTag((DataTag) dataTagS.alarm(alarmDS.build()).build())
                     .build()).build()).build())
         .rule(ruleTag.alarm(alarmR.build()).build()).build();
 
@@ -180,8 +180,8 @@ public class ConfigurationAllTogetherUtil {
 
     Configuration conf = getConfBuilder()
         .process(process._1.aliveTag(aliveTagP._1.alarm(alarmAP._1.build()).build()).statusTag(statusTagP._1.alarm(alarmSP._1.build()).build())
-            .equipment(equipment._1.commFaultTag(commFaultTagE._1.alarm(alarmCE._1.build()).build()).aliveTag(aliveTagE._1.alarm(alarmAE._1.build()).build()).statusTag(statusTagE._1.alarm(alarmSE._1.build()).build()).dataTag((DataTag<Number>) dataTagE._1.alarm(alarmDE._1.build()).build()).commandTag(commandTag._1.build())
-                .subEquipment(subEquipment._1.commFaultTag(commFaultTagS._1.alarm(alarmCS._1.build()).build()).aliveTag(aliveTagS._1.alarm(alarmAS._1.build()).build()).statusTag(statusTagS._1.alarm(alarmSS._1.build()).build()).dataTag((DataTag<Number>) dataTagS._1.alarm(alarmDS._1.build()).build())
+            .equipment(equipment._1.commFaultTag(commFaultTagE._1.alarm(alarmCE._1.build()).build()).aliveTag(aliveTagE._1.alarm(alarmAE._1.build()).build()).statusTag(statusTagE._1.alarm(alarmSE._1.build()).build()).dataTag((DataTag) dataTagE._1.alarm(alarmDE._1.build()).build()).commandTag(commandTag._1.build())
+                .subEquipment(subEquipment._1.commFaultTag(commFaultTagS._1.alarm(alarmCS._1.build()).build()).aliveTag(aliveTagS._1.alarm(alarmAS._1.build()).build()).statusTag(statusTagS._1.alarm(alarmSS._1.build()).build()).dataTag((DataTag) dataTagS._1.alarm(alarmDS._1.build()).build())
                     .build()).build()).build())
         .rule(ruleTag._1.alarm(alarmR._1.build()).build()).build();
 
@@ -260,8 +260,8 @@ public class ConfigurationAllTogetherUtil {
 
     Configuration conf = getConfBuilder()
         .process(process._1.aliveTag(aliveTagP._1.alarm(alarmAP._1.build()).build()).statusTag(statusTagP._1.alarm(alarmSP._1.build()).build())
-            .equipment(equipment._1.commFaultTag(commFaultTagE._1.alarm(alarmCE._1.build()).build()).aliveTag(aliveTagE._1.alarm(alarmAE._1.build()).build()).statusTag(statusTagE._1.alarm(alarmSE._1.build()).build()).dataTag((DataTag<Number>) dataTagE._1.alarm(alarmDE._1.build()).build()).commandTag(commandTag._1.build())
-                .subEquipment(subEquipment._1.commFaultTag(commFaultTagS._1.alarm(alarmCS._1.build()).build()).aliveTag(aliveTagS._1.alarm(alarmAS._1.build()).build()).statusTag(statusTagS._1.alarm(alarmSS._1.build()).build()).dataTag((DataTag<Number>) dataTagS._1.alarm(alarmDS._1.build()).build())
+            .equipment(equipment._1.commFaultTag(commFaultTagE._1.alarm(alarmCE._1.build()).build()).aliveTag(aliveTagE._1.alarm(alarmAE._1.build()).build()).statusTag(statusTagE._1.alarm(alarmSE._1.build()).build()).dataTag((DataTag) dataTagE._1.alarm(alarmDE._1.build()).build()).commandTag(commandTag._1.build())
+                .subEquipment(subEquipment._1.commFaultTag(commFaultTagS._1.alarm(alarmCS._1.build()).build()).aliveTag(aliveTagS._1.alarm(alarmAS._1.build()).build()).statusTag(statusTagS._1.alarm(alarmSS._1.build()).build()).dataTag((DataTag) dataTagS._1.alarm(alarmDS._1.build()).build())
                     .build()).build()).build())
         .rule(ruleTag._1.alarm(alarmR._1.build()).build()).build();
 

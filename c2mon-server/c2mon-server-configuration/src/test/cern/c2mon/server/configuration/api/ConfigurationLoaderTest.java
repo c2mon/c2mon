@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -2038,7 +2038,7 @@ public class ConfigurationLoaderTest {
     Pair<Alarm.AlarmBuilder, Properties> alarm2 = builderAlarmWithAllFields(667L,100L);
 
     Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag((DataTag<Number>) dataTag._1.alarm(alarm1._1.build()).alarm(alarm2._1.build()).build()).build()).build();
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag((DataTag) dataTag._1.alarm(alarm1._1.build()).alarm(alarm2._1.build()).build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -2185,7 +2185,7 @@ public class ConfigurationLoaderTest {
     Pair<Alarm.AlarmBuilder, Properties> alarm = builderAlarmWithAllFields(666L,100L);
 
     Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag((DataTag<Number>) dataTag._1.alarm(alarm._1.build()).build()).build()).build();
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag((DataTag) dataTag._1.alarm(alarm._1.build()).build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
@@ -2259,7 +2259,7 @@ public class ConfigurationLoaderTest {
     Pair<Alarm.AlarmBuilder, Properties> alarm = builderAlarmWithAllFields(666L,100L);
 
     Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
-        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag((DataTag<Number>) dataTag._1.alarm(alarm._1.build()).build()).build()).build();
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag((DataTag) dataTag._1.alarm(alarm._1.build()).build()).build()).build();
     Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
     configurationLoader.applyConfiguration(insert);
     processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));

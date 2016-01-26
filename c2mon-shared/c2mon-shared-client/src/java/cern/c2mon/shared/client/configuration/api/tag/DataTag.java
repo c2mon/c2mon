@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -40,21 +40,21 @@ import lombok.*;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class DataTag<T extends Number> extends Tag {
+public class DataTag extends Tag {
 
   /**
    * Minimum value for range checks. If the system receives a tag value that is
    * less than the authorized minimum value, it will flag the new tag value as
    * invalid.
    */
-  private T minValue = null;
+  private Number minValue = null;
 
   /**
    * Maximum value for range checks. If the system receives a tag value that is
    * less than the authorized minimum value, it will flag the new tag value as
    * invalid.
    */
-  private T maxValue = null;
+  private Number maxValue = null;
 
   /**
    * DIP address for tags published on DIP
@@ -112,7 +112,7 @@ public class DataTag<T extends Number> extends Tag {
    */
   @Builder
   public DataTag(boolean deleted, Long id, String name, String description, DataType dataType, TagMode mode, @Singular List<Alarm> alarms,
-                 Boolean isLogged, String unit, T minValue, T maxValue, DataTagAddress address, String dipAddress, String japcAddress, Metadata metadata) {
+                 Boolean isLogged, String unit, Number minValue, Number maxValue, DataTagAddress address, String dipAddress, String japcAddress, Metadata metadata) {
     super(deleted, id, name, description, mode, alarms, metadata);
     this.dataType = dataType;
     this.minValue = minValue;
