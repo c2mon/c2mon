@@ -16,6 +16,7 @@
     <!-- create default bin and tmp folders in the assembly -->
     <fileSet>
       <includes>
+        <include>/log</include>
         <include>/tmp</include>
         <include>/conf/local</include>
       </includes>
