@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.logger;
 
+import cern.c2mon.server.eslog.structure.queries.ClusterNotAvailableException;
 import cern.c2mon.server.eslog.structure.queries.Query;
 import cern.c2mon.server.eslog.structure.types.AlarmES;
 import cern.c2mon.server.eslog.structure.types.SupervisionES;
@@ -52,9 +53,8 @@ public interface Connector {
    */
   void refreshClusterStats();
 
-//  int getShards();
-//  int getReplica();
   Client getClient();
+  ESPersistenceManager getEsPersistenceManager();
 
   /**
    * Retrieve the lists of indices, types and aliases from ElasticSearch and

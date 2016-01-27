@@ -18,6 +18,7 @@ package cern.c2mon.server.eslog.logger;
 
 import cern.c2mon.server.eslog.structure.mappings.Mapping;
 import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
+import cern.c2mon.server.eslog.structure.queries.ClusterNotAvailableException;
 import cern.c2mon.server.eslog.structure.queries.QueryAliases;
 import cern.c2mon.server.eslog.structure.queries.QueryIndices;
 import cern.c2mon.server.eslog.structure.queries.QueryTypes;
@@ -46,6 +47,7 @@ import java.util.*;
 import static junit.framework.TestCase.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test the Indexer methods for sending the right data to the Connector.
@@ -271,7 +273,7 @@ public class IndexerTest {
   }
 
   @Test
-  public void testSendTagToBatch() {
+  public void testSendTagToBatch() throws ClusterNotAvailableException {
     TagES tag = new TagBoolean();
     tag.setDataType(Mapping.ValueType.boolType.toString());
     tag.setId(1L);
@@ -292,13 +294,12 @@ public class IndexerTest {
 
     QueryIndices query = new QueryIndices(connector.getClient());
     QueryTypes queryTypes = new QueryTypes(connector.getClient());
-
     assertTrue(connector.handleListingQuery(query, indexName).contains(indexer.generateTagIndex(123456789000L)));
     assertTrue(connector.handleListingQuery(queryTypes, indexName).contains(indexer.generateTagType(tag.getDataType())));
   }
 
   @Test
-  public void testIndexTags() {
+  public void testIndexTags() throws ClusterNotAvailableException {
     long size = 10;
     List<TagES> list = new ArrayList<>();
     Set<String> listIndices = new HashSet<>();

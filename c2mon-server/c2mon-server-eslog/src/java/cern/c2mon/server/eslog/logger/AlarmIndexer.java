@@ -18,9 +18,11 @@ package cern.c2mon.server.eslog.logger;
 
 import cern.c2mon.server.eslog.structure.mappings.AlarmMapping;
 import cern.c2mon.server.eslog.structure.mappings.Mapping;
+import cern.c2mon.server.eslog.structure.queries.ClusterNotAvailableException;
 import cern.c2mon.server.eslog.structure.queries.QueryIndices;
 import cern.c2mon.server.eslog.structure.queries.QueryTypes;
 import cern.c2mon.server.eslog.structure.types.AlarmES;
+import cern.c2mon.server.eslog.structure.types.SupervisionES;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
@@ -64,11 +66,7 @@ public class AlarmIndexer extends Indexer {
     if (alarmES != null) {
       String indexName = generateAlarmIndex(alarmES.getServerTimestamp());
       String mapping = createOrRetrieveMapping(indexName);
-      boolean isAcked = connector.handleAlarmQuery(indexName, mapping, alarmES);
-      if (isAcked) {
-        log.debug("logAlarm() - isAcked: " + isAcked);
-        indices.put(indexName, mapping);
-      }
+      indexData(indexName, mapping, alarmES);
     }
     else {
       log.debug("logAlarm() - Could not instantiate AlarmES, null value.");
@@ -76,7 +74,7 @@ public class AlarmIndexer extends Indexer {
   }
 
   /**
-   * Format: "alarmPrefix_YYYY-MM".
+   * Format: "alarmPrefix_indexSettings".
    */
   public String generateAlarmIndex(long time) {
     return retrieveIndexFormat(alarmPrefix, time);
@@ -93,15 +91,23 @@ public class AlarmIndexer extends Indexer {
   }
 
   public void retrieveMappingsFromES() {
-    List<String> indicesES = connector.handleListingQuery(new QueryIndices(connector.getClient()), null);
+    List<String> indicesES = retrieveIndicesFromES();
     for (String index : indicesES) {
-      List<String> types = connector.handleListingQuery(new QueryTypes(connector.getClient()), index);
+      List<String> types = retrieveTypesFromES(index);
       for (String type : types) {
         MappingMetaData mapping = retrieveMappingES(index, type);
         String jsonMapping = mapping.source().toString();
-        log.debug("retrieveMappingsFromES() - mapping: " + jsonMapping );
+        log.debug("retrieveMappingsFromES() - mapping: " + jsonMapping);
         this.indices.put(index, jsonMapping);
       }
+    }
+  }
+
+  public void indexData(String indexName, String mapping, AlarmES alarmES) {
+    boolean isAcked = connector.handleAlarmQuery(indexName, mapping, alarmES);
+    if (isAcked) {
+      log.debug("logAlarm() - isAcked: " + isAcked);
+      indices.put(indexName, mapping);
     }
   }
 }

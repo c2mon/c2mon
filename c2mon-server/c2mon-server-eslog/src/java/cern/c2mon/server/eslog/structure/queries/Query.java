@@ -45,38 +45,42 @@ public abstract class Query {
   protected List<String> types;
   protected List<String> indices;
 
-  public Query(Client client) {
+  public Query(Client client) throws ClusterNotAvailableException {
     this.client = client;
     indices = new ArrayList<>();
     types = new ArrayList<>();
     tagIds = new ArrayList<>();
   }
 
-  protected String[] getIndicesFromCluster() {
+  public void checkYellowStatus() throws ClusterNotAvailableException {
+    client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
+  }
+
+  protected String[] getIndicesFromCluster() throws ClusterNotAvailableException {
     return client.admin().indices().prepareGetIndex().get().indices();
   }
 
-  protected CreateIndexRequestBuilder prepareCreateIndexRequestBuilder(String index) {
+  protected CreateIndexRequestBuilder prepareCreateIndexRequestBuilder(String index) throws ClusterNotAvailableException {
     return client.admin().indices().prepareCreate(index);
   }
 
-  protected IndicesAliasesRequestBuilder prepareAliases() {
+  protected IndicesAliasesRequestBuilder prepareAliases() throws ClusterNotAvailableException {
     return client.admin().indices().prepareAliases();
   }
 
-  protected Iterator<ObjectCursor<IndexMetaData>> getIndicesWithMetadata() {
+  protected Iterator<ObjectCursor<IndexMetaData>> getIndicesWithMetadata() throws ClusterNotAvailableException {
     return client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().indices().values().iterator();
   }
 
-  protected ImmutableOpenMap<String, MappingMetaData> getIndexWithMetadata(String index) {
+  protected ImmutableOpenMap<String, MappingMetaData> getIndexWithMetadata(String index) throws ClusterNotAvailableException {
     return client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().index(index).getMappings();
   }
 
-  protected ObjectContainer<AliasMetaData> getAliases(String index) {
+  protected ObjectContainer<AliasMetaData> getAliases(String index) throws ClusterNotAvailableException {
     return client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().index(index).getAliases().values();
   }
 
-  protected boolean indexExists(String indexName) {
+  protected boolean indexExists(String indexName) throws ClusterNotAvailableException {
     log.debug("indexExists() - Look for the existence of the index " + indexName + ".");
     return client.admin().indices().prepareExists(indexName).execute().actionGet().isExists();
   }

@@ -146,6 +146,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
     }
     catch(Exception e) {
       log.error("sendCollectionTagESToElasticSearch() - Exception occurred while trying to index data to the ElasticSearch cluster.", e);
+      //indexer.getEsPersistenceManager().launchFallBackMechanism(tagESCollection);
     }
   }
 

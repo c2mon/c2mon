@@ -61,6 +61,7 @@ public class AlarmIndexerTest {
     alarmES = alarmESLogConverter.convertAlarmToAlarmES(alarm);
     timestamp = alarm.getTimestamp();
     when(connector.handleAlarmQuery(anyString(), anyString(), eq(alarmES))).thenReturn(true);
+    when(connector.getEsPersistenceManager()).thenReturn(new ESPersistenceManager());
     indexer.setAlarmPrefix(indexer.alarmPrefix);
     indexer.setIndexFormat("M");
     mapping = new AlarmMapping();

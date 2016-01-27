@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
 
 /**
  * Check that the AlarmQuery class will bring the data effectively to ElasticSearch.
@@ -39,13 +40,13 @@ public class AlarmESQueryTest {
   private AlarmES alarmES;
 
   @Before
-  public void setup() {
+  public void setup() throws ClusterNotAvailableException {
     alarm = CacheObjectCreation.createTestAlarm1();
     alarmESLogConverter = new AlarmESLogConverter();
     alarmES = alarmESLogConverter.convertAlarmToAlarmES(alarm);
+    jsonSource = alarmES.toString();
 
     query = new AlarmESQuery(client, alarmES);
-    jsonSource = alarmES.toString();
   }
 
   @Test

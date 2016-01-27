@@ -18,6 +18,7 @@ package cern.c2mon.server.eslog.logger;
 
 import cern.c2mon.server.eslog.structure.mappings.Mapping;
 import cern.c2mon.server.eslog.structure.mappings.SupervisionMapping;
+import cern.c2mon.server.eslog.structure.queries.ClusterNotAvailableException;
 import cern.c2mon.server.eslog.structure.queries.QueryIndices;
 import cern.c2mon.server.eslog.structure.queries.QueryTypes;
 import cern.c2mon.server.eslog.structure.types.SupervisionES;
@@ -30,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,11 +68,7 @@ public class SupervisionIndexer extends Indexer {
     if (supervisionES != null) {
       String indexName = generateSupervisionIndex(supervisionES.getEventTime());
       String mapping = createMappingIfNewIndex(indexName);
-      boolean isAcked = connector.handleSupervisionQuery(indexName, mapping, supervisionES);
-      if (isAcked) {
-        log.debug("logSupervisionEvent() - isAcked: " + isAcked);
-        indices.put(indexName, mapping);
-      }
+      indexData(indexName, mapping, supervisionES);
     }
     else {
       log.debug("logSupervisionEvent() - Could not instantiate SupervisionEventImpl, null value.");
@@ -96,15 +94,23 @@ public class SupervisionIndexer extends Indexer {
   }
 
   public void retrieveMappingsFromES() {
-    List<String> indicesES = connector.handleListingQuery(new QueryIndices(connector.getClient()), null);
+    List<String> indicesES = retrieveIndicesFromES();
     for (String index : indicesES) {
-      List<String> types = connector.handleListingQuery(new QueryTypes(connector.getClient()), index);
+      List<String> types = retrieveTypesFromES(index);
       for (String type : types) {
         MappingMetaData mapping = retrieveMappingES(index, type);
         String jsonMapping = mapping.source().toString();
-        log.debug("retrieveMappingsFromES() - mapping: " + jsonMapping );
+        log.debug("retrieveMappingsFromES() - mapping: " + jsonMapping);
         this.indices.put(index, jsonMapping);
       }
+    }
+  }
+
+  public void indexData(String indexName, String mapping, SupervisionES supervisionES) {
+    boolean isAcked = connector.handleSupervisionQuery(indexName, mapping, supervisionES);
+    if (isAcked) {
+      log.debug("logSupervisionEvent() - isAcked: " + isAcked);
+      indices.put(indexName, mapping);
     }
   }
 }

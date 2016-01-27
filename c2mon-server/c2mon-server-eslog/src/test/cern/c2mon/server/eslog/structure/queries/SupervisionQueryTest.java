@@ -22,19 +22,26 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.node.NodeClient;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
+import static org.mockito.Mockito.when;
 
 /**
  * Check that the SupervisionQuery class will bring the data effectively to ElasticSearch.
  * @author Alban Marguet
  */
+@RunWith(MockitoJUnitRunner.class)
 public class SupervisionQueryTest {
   private long id = 1L;
   private String entity = "PROCESS";
@@ -46,14 +53,15 @@ public class SupervisionQueryTest {
   private SupervisionEvent event;
   private SupervisionQuery query;
   private SupervisionES supervisionES;
+  @Mock
   private Client client;
 
   @Before
-  public void setup() {
+  public void setup() throws ClusterNotAvailableException {
     event = new SupervisionEventImpl(SupervisionConstants.SupervisionEntity.PROCESS, id, SupervisionConstants.SupervisionStatus.RUNNING, new Timestamp(timestamp), message);
     supervisionES = supervisionESConverter.convertSupervisionEventToSupervisionES(event);
-    query = new SupervisionQuery(client, supervisionES);
     jsonSource = supervisionES.toString();
+    query = new SupervisionQuery(client, supervisionES);
   }
 
   @Test

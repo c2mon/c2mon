@@ -20,10 +20,12 @@ import cern.c2mon.server.eslog.structure.mappings.Mapping;
 import cern.c2mon.server.eslog.structure.mappings.TagBooleanMapping;
 import cern.c2mon.server.eslog.structure.mappings.TagNumericMapping;
 import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
+import cern.c2mon.server.eslog.structure.queries.ClusterNotAvailableException;
 import cern.c2mon.server.eslog.structure.types.TagES;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.settings.Settings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -173,7 +175,6 @@ public class TagIndexer extends Indexer {
       log.debug("instantiateIndex() - Bad index: " + index + ".");
       return false;
     }
-
     return connector.handleIndexQuery(index, null, null);
   }
 
@@ -213,7 +214,6 @@ public class TagIndexer extends Indexer {
       mapping = chooseMapping(type.substring(typePrefix.length()));
       log.debug("instantiateIndex() - Adding a new mapping to index " + index + " for type " + type + ": " + mapping);
     }
-
     return connector.handleIndexQuery(index, type, mapping);
   }
 

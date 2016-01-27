@@ -18,10 +18,7 @@ package cern.c2mon.server.eslog.logger;
 
 import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
 import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
-import cern.c2mon.server.eslog.structure.queries.Query;
-import cern.c2mon.server.eslog.structure.queries.QueryAliases;
-import cern.c2mon.server.eslog.structure.queries.QueryIndices;
-import cern.c2mon.server.eslog.structure.queries.QueryTypes;
+import cern.c2mon.server.eslog.structure.queries.*;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkProcessor;
@@ -110,7 +107,7 @@ public class TransportConnectorTest {
   }
 
   @Test
-  public void testHandleListingQuery() {
+  public void testHandleListingQuery() throws ClusterNotAvailableException {
     Query query = null;
     Set<String> result = new HashSet<>();
 

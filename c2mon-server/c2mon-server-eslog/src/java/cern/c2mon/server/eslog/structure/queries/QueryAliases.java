@@ -34,11 +34,11 @@ import java.util.List;
 @Slf4j
 public class QueryAliases extends Query {
 
-  public QueryAliases(Client client) {
+  public QueryAliases(Client client) throws ClusterNotAvailableException {
     super(client);
   }
 
-  public boolean addAlias(String indexMonth, String aliasName) {
+  public boolean addAlias(String indexMonth, String aliasName) throws ClusterNotAvailableException {
     if (client != null) {
       String tagId = aliasName.substring("tag_".length());
       String json = "{\"term\" : { \"id\" : " + tagId + " } }";
@@ -53,7 +53,7 @@ public class QueryAliases extends Query {
     return false;
   }
 
-  public List<String> getListOfAnswer(String index) {
+  public List<String> getListOfAnswer(String index) throws ClusterNotAvailableException {
     List<String> result = new ArrayList<>();
 
     if (index != null) {

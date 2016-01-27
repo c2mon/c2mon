@@ -39,13 +39,13 @@ public class SupervisionQuery extends Query {
   private String routing;
   private String jsonSource;
 
-  public SupervisionQuery(Client client, SupervisionES supervisionES) {
+  public SupervisionQuery(Client client, SupervisionES supervisionES) throws ClusterNotAvailableException {
     super(client);
     routing = String.valueOf(supervisionES.getEntityId());
     jsonSource = supervisionES.toString();
   }
 
-  public boolean logSupervisionEvent(String indexName, String mapping) {
+  public boolean logSupervisionEvent(String indexName, String mapping) throws ClusterNotAvailableException {
     if (!indexExists(indexName) && mapping != null) {
       client.admin().indices().prepareCreate(indexName).setSource(mapping).execute().actionGet();
       log.debug("logSupervisionEvent() - Source query is: " + jsonSource + ".");

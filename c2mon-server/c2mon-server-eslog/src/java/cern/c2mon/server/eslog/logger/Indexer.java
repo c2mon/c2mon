@@ -16,8 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.logger;
 
+import cern.c2mon.server.eslog.structure.queries.ClusterNotAvailableException;
+import cern.c2mon.server.eslog.structure.queries.QueryIndices;
+import cern.c2mon.server.eslog.structure.queries.QueryTypes;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +30,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Used to write (a.k.a. index) the data to elasticSearch.
@@ -85,6 +87,10 @@ public abstract class Indexer {
       isAvailable = false;
     }
     isAvailable = true;
+    List<IndexRequest> backup = connector.getEsPersistenceManager().retrieveBackupData();
+    for (IndexRequest request : backup) {
+      connector.bulkAdd(request);
+    }
   }
 
   public String retrieveIndexFormat(String prefix, long millis) {
@@ -135,5 +141,25 @@ public abstract class Indexer {
   public MappingMetaData retrieveMappingES(String index, String type) {
     ClusterState state = connector.createClient().admin().cluster().prepareState().execute().actionGet().getState();
     return state.getMetaData().index(index).mapping(type);
+  }
+
+  protected List<String> retrieveIndicesFromES() {
+    try {
+      return connector.handleListingQuery(new QueryIndices(connector.getClient()), null);
+    }
+    catch (ClusterNotAvailableException e) {
+      log.debug("retrieveMappingFromES() - Could not retrieve the indices in ElasticSearch.");
+    }
+    return new ArrayList<>();
+  }
+
+  protected List<String> retrieveTypesFromES(String index) {
+    try {
+      return connector.handleListingQuery(new QueryTypes(connector.getClient()), index);
+    }
+    catch (ClusterNotAvailableException e) {
+      log.debug("retrieveMappingFromES() - Could not retrieve the types for index " + index + ".");
+    }
+    return new ArrayList<>();
   }
 }

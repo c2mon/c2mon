@@ -73,8 +73,9 @@ public class SupervisionIndexerTest {
     supervisionES.setEventTime(timestamp.getTime());
     supervisionES.setMessage(message);
     supervisionES.setStatusName(status.name());
-        when(supervisionESConverter.convertSupervisionEventToSupervisionES(eq(event))).thenReturn(supervisionES);
+    when(supervisionESConverter.convertSupervisionEventToSupervisionES(eq(event))).thenReturn(supervisionES);
     when(connector.handleSupervisionQuery(anyString(), anyString(), eq(supervisionES))).thenReturn(true);
+    when(connector.getEsPersistenceManager()).thenReturn(new ESPersistenceManager());
     indexer.setSupervisionPrefix("prevision_");
     indexer.setIndexFormat("M");
     mapping = new SupervisionMapping();

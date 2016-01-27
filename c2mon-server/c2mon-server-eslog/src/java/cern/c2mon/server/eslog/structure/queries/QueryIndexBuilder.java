@@ -30,11 +30,11 @@ import org.elasticsearch.common.settings.Settings;
 @Slf4j
 public class QueryIndexBuilder extends Query {
 
-  public QueryIndexBuilder(Client client) {
+  public QueryIndexBuilder(Client client) throws ClusterNotAvailableException {
     super(client);
   }
 
-  public boolean indexNew(String index, String type, String mapping) {
+  public boolean indexNew(String index, String type, String mapping) throws ClusterNotAvailableException {
     if (type == null && mapping == null) {
       return handleAddingIndex(index);
     }
@@ -43,13 +43,13 @@ public class QueryIndexBuilder extends Query {
     }
   }
 
-  private boolean handleAddingIndex(String index) {
+  private boolean handleAddingIndex(String index) throws ClusterNotAvailableException {
     CreateIndexRequestBuilder createIndexRequestBuilder = prepareCreateIndexRequestBuilder(index);
     CreateIndexResponse response = createIndexRequestBuilder.execute().actionGet();
     return response.isAcknowledged();
   }
 
-  private boolean handleAddingMapping(String index, String type, String mapping) {
+  private boolean handleAddingMapping(String index, String type, String mapping) throws ClusterNotAvailableException {
     PutMappingResponse response = client.admin().indices().preparePutMapping(index).setType(type).setSource(mapping).execute().actionGet();
     return response.isAcknowledged();
   }

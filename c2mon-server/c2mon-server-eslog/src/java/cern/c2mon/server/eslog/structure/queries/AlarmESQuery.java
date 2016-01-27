@@ -41,13 +41,13 @@ public class AlarmESQuery extends Query {
   /**
    * Creates an ElasticSearch query for an Alarm event, create the needed JSON and create the appropriate query.
    */
-  public AlarmESQuery(Client client, AlarmES alarmES) {
+  public AlarmESQuery(Client client, AlarmES alarmES) throws ClusterNotAvailableException {
     super(client);
     jsonSource = alarmES.toString();
     routing = String.valueOf(alarmES.getAlarmId());
   }
 
-  public boolean logAlarmES(String indexName, String mapping) {
+  public boolean logAlarmES(String indexName, String mapping) throws ClusterNotAvailableException {
     log.debug("logAlarmES() - Try to create a writing query for Alarm.");
     if (!indexExists(indexName) && mapping != null) {
       client.admin().indices().prepareCreate(indexName).setSource(mapping).execute().actionGet();

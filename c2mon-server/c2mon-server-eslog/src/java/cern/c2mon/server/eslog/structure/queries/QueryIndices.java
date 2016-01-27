@@ -32,7 +32,7 @@ import java.util.List;
 public class QueryIndices extends Query {
   List<String> indices;
 
-  public QueryIndices(Client client) {
+  public QueryIndices(Client client) throws ClusterNotAvailableException {
     super(client);
     indices = new ArrayList<>();
   }
@@ -41,7 +41,7 @@ public class QueryIndices extends Query {
    * Simple query to get all the indices in the cluster.
    * @return List<String>: names of the indices.
    */
-  public List<String> getListOfAnswer() {
+  public List<String> getListOfAnswer() throws ClusterNotAvailableException {
     if (client != null) {
       String[] indicesFromCluster = getIndicesFromCluster();
       log.debug("getListOfAnswer() - got a list of indices, size=" + indicesFromCluster.length);

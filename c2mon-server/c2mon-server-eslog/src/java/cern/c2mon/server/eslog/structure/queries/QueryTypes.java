@@ -31,11 +31,11 @@ import java.util.List;
 @Slf4j
 public class QueryTypes extends Query {
 
-  public QueryTypes(Client client) {
+  public QueryTypes(Client client) throws ClusterNotAvailableException {
     super(client);
   }
 
-  public List<String> getListOfAnswer(String index) {
+  public List<String> getListOfAnswer(String index) throws ClusterNotAvailableException {
     List<String> result = new ArrayList<>();
 
     if (index != null) {
