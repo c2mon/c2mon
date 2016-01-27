@@ -49,7 +49,7 @@
         <include>*</include>
       </includes>
       <directory>bin/</directory>
-      <fileMode>0444</fileMode>
+      <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
     
