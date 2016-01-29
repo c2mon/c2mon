@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+  ~
+  ~ This file is part of the CERN Control and Monitoring Platform 'C2MON'.
+  ~ C2MON is free software: you can redistribute it and/or modify it under the
+  ~ terms of the GNU Lesser General Public License as published by the Free
+  ~ Software Foundation, either version 3 of the license.
+  ~
+  ~ C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
+  ~ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+  ~ more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with C2MON. If not, see <http://www.gnu.org/licenses/>.
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+<products>
+  <product name="c2mon-web-manager">
+
+    <application name="default">
+      <startscript>
+        <main-class name="org.springframework.boot.loader.JarLauncher" />
+        <property name="logging.file" value="log/c2mon-web-manager.log" />
+      </startscript>
+      <deployment installLocation="/opt/c2mon-web-manager/">
+        <backupPolicy keepBackups="2">
+          <preserve type="dir" name="log"/>
+        </backupPolicy>
+      </deployment>
+    </application>
+
+
+    <application name="c2mon-web-manager-pro" extends="default">
+      <startscript name="C2MON-WEB-MANAGER-PRO">
+        <property name="c2mon.client.conf.url" value="http://timweb/conf/c2mon-client.properties" />
+        <property name="c2mon.web.conf.url" value="file:conf/c2mon-web.properties" />
+      </startscript>
+      <deployment installLocation="/opt/c2mon-web-manager">
+        <directory name="conf">
+          <file name="c2mon-web.properties" source="/user/timoper/rep/c2mon/web/c2mon-web.properties" mask="400" />
+        </directory>
+        <notification>
+          <mail address="c2mon-admin@cern.ch"/>
+        </notification>
+      </deployment>
+    </application>
+
+    <application name="c2mon-web-manager-test" extends="default">
+      <startscript name="C2MON-WEB-MANAGER-TEST">
+        <property name="c2mon.client.conf.url" value="http://timweb/test/conf/c2mon-client.properties" />
+        <property name="server.port" value="8081" />
+      </startscript>
+      <deployment installLocation="/opt/c2mon-web-manager-test">
+        <directory name="conf">
+          <file name="c2mon-web.properties" source="/user/timtest/rep/c2mon/web/c2mon-web.properties" mask="400" />
+        </directory>
+        <notification>
+          <mail address="c2mon-admin@cern.ch"/>
+        </notification>
+      </deployment>
+    </application>
+
+  </product>
+</products>
