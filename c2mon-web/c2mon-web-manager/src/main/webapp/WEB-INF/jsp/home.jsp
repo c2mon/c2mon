@@ -163,6 +163,9 @@
               </div>
               <!-- /.col-lg-6 -->
 
+              <%--<iframe src="http://localhost:3000/dashboard-solo/db/tim-test?panelId=2&fullscreen&from=1453491314768&to=1454096114769&theme=light" width="460"--%>
+                      <%--height="220" frameborder="0"></iframe>--%>
+
               <div class="chart-container col-lg-6">
                 <div class="panel panel-default">
                   <div class="panel-heading">

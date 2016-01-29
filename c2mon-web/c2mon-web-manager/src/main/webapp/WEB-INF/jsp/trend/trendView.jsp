@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib prefix="c2mon" tagdir="/WEB-INF/tags"%>
 
-<%@page import="cern.c2mon.web.configviewer.service.HistoryService"%>
+<%@page import="cern.c2mon.web.manager.service.HistoryService"%>
 <%@page import="cern.c2mon.client.ext.history.common.HistoryTagValueUpdate"%>
 <%@page import="java.util.List"%>
 
