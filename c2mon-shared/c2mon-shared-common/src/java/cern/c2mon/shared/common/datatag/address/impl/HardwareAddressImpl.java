@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -19,6 +19,7 @@ package cern.c2mon.shared.common.datatag.address.impl;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Map;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
@@ -136,74 +137,84 @@ public class HardwareAddressImpl extends HardwareAddressFactory implements Hardw
             fieldNode = fields.item(i);
             if (fieldNode.getNodeType() == Node.ELEMENT_NODE) {
                 fieldName = fieldNode.getNodeName();
-                if (fieldNode.getFirstChild() != null)
-                    fieldValueString = fieldNode.getFirstChild().getNodeValue();
-                else
-                    fieldValueString = "";
 
-                try {
-                    Field field = hwAddressClass.getDeclaredField(decodeFieldName(fieldName));
-                    fieldTypeName = field.getType().getName();
+                    if (fieldNode.getFirstChild() != null)
+                        fieldValueString = fieldNode.getFirstChild().getNodeValue();
+                    else
+                        fieldValueString = "";
 
-                    if (fieldTypeName.equals("short")) {
-                        field.setShort(hwAddress, Short.parseShort(fieldValueString));
-                    } else if (fieldTypeName.equals("java.lang.Short")) {
-                        field.set(hwAddress, new Integer(Integer.parseInt(fieldValueString)));
-                    } else if (fieldTypeName.equals("int")) {
-                        field.setInt(hwAddress, Integer.parseInt(fieldValueString));
-                    } else if (fieldTypeName.equals("java.lang.Integer")) {
-                        field.set(hwAddress, new Integer(Integer.parseInt(fieldValueString)));
-                    } else if (fieldTypeName.equals("float")) {
-                        field.setFloat(hwAddress, Float.parseFloat(fieldValueString));
-                    } else if (fieldTypeName.equals("java.lang.Float")) {
-                        field.set(hwAddress, new Float(Float.parseFloat(fieldValueString)));
-                    } else if (fieldTypeName.equals("double")) {
-                        field.setDouble(hwAddress, Double.parseDouble(fieldValueString));
-                    } else if (fieldTypeName.equals("java.lang.Double")) {
-                        field.set(hwAddress, new Double(Double.parseDouble(fieldValueString)));
-                    } else if (fieldTypeName.equals("long")) {
-                        field.setLong(hwAddress, Long.parseLong(fieldValueString));
-                    } else if (fieldTypeName.equals("java.lang.Long")) {
-                        field.set(hwAddress, new Long(Long.parseLong(fieldValueString)));
-                    } else if (fieldTypeName.equals("byte")) {
-                        field.setByte(hwAddress, Byte.parseByte(fieldValueString));
-                    } else if (fieldTypeName.equals("java.lang.Byte")) {
-                        field.set(hwAddress, new Byte(Byte.parseByte(fieldValueString)));
-                    } else if (fieldTypeName.equals("char")) {
-                        field.setChar(hwAddress, fieldValueString.charAt(0));
-                    } else if (fieldTypeName.equals("java.lang.Character")) {
-                        field.set(hwAddress, new Character(fieldValueString.charAt(0)));
-                    } else if (fieldTypeName.equals("boolean")) {
-                        field.setBoolean(hwAddress, Boolean.getBoolean(fieldValueString));
-                    } else if (fieldTypeName.equals("java.lang.Boolean")) {
-                        field.set(hwAddress, new Boolean(Boolean.getBoolean(fieldValueString)));
-                    } else if (field.getType().isEnum()) {
-                        Object[] enumConstants = field.getType().getEnumConstants();
-                        for (Object enumConstant : enumConstants) {
+                    try {
+
+                        Field field = hwAddressClass.getDeclaredField(decodeFieldName(fieldName));
+
+                      if(fieldName == "properties"){
+                        field.set(hwAddress, SimpleXMLParser.domNodeToMap(fieldNode));
+                      } else {
+
+                        fieldTypeName = field.getType().getName();
+
+                        if (fieldTypeName.equals("short")) {
+                          field.setShort(hwAddress, Short.parseShort(fieldValueString));
+                        } else if (fieldTypeName.equals("java.lang.Short")) {
+                          field.set(hwAddress, new Integer(Integer.parseInt(fieldValueString)));
+                        } else if (fieldTypeName.equals("int")) {
+                          field.setInt(hwAddress, Integer.parseInt(fieldValueString));
+                        } else if (fieldTypeName.equals("java.lang.Integer")) {
+                          field.set(hwAddress, new Integer(Integer.parseInt(fieldValueString)));
+                        } else if (fieldTypeName.equals("float")) {
+                          field.setFloat(hwAddress, Float.parseFloat(fieldValueString));
+                        } else if (fieldTypeName.equals("java.lang.Float")) {
+                          field.set(hwAddress, new Float(Float.parseFloat(fieldValueString)));
+                        } else if (fieldTypeName.equals("double")) {
+                          field.setDouble(hwAddress, Double.parseDouble(fieldValueString));
+                        } else if (fieldTypeName.equals("java.lang.Double")) {
+                          field.set(hwAddress, new Double(Double.parseDouble(fieldValueString)));
+                        } else if (fieldTypeName.equals("long")) {
+                          field.setLong(hwAddress, Long.parseLong(fieldValueString));
+                        } else if (fieldTypeName.equals("java.lang.Long")) {
+                          field.set(hwAddress, new Long(Long.parseLong(fieldValueString)));
+                        } else if (fieldTypeName.equals("byte")) {
+                          field.setByte(hwAddress, Byte.parseByte(fieldValueString));
+                        } else if (fieldTypeName.equals("java.lang.Byte")) {
+                          field.set(hwAddress, new Byte(Byte.parseByte(fieldValueString)));
+                        } else if (fieldTypeName.equals("char")) {
+                          field.setChar(hwAddress, fieldValueString.charAt(0));
+                        } else if (fieldTypeName.equals("java.lang.Character")) {
+                          field.set(hwAddress, new Character(fieldValueString.charAt(0)));
+                        } else if (fieldTypeName.equals("boolean")) {
+                          field.setBoolean(hwAddress, Boolean.getBoolean(fieldValueString));
+                        } else if (fieldTypeName.equals("java.lang.Boolean")) {
+                          field.set(hwAddress, new Boolean(Boolean.getBoolean(fieldValueString)));
+                        } else if (fieldTypeName.equals("java.util.HashMap")) {
+                          field.set(hwAddress, SimpleXMLParser.domNodeToMap(fieldNode));
+                        } else if (field.getType().isEnum()) {
+                          Object[] enumConstants = field.getType().getEnumConstants();
+                          for (Object enumConstant : enumConstants) {
                             if (enumConstant.toString().equals(fieldValueString)) {
-                                field.set(hwAddress, enumConstant);
+                              field.set(hwAddress, enumConstant);
                             }
+                          }
+                        } else {
+                          field.set(hwAddress, fieldValueString);
                         }
-                    } else {
-                        field.set(hwAddress, fieldValueString);
-                    }
-                } catch (NoSuchFieldException nsfe) {
-                    LOG.error("fromConfigXML(...) - Error occured while parsing XML <HardwareAddress> tag. "
+                      }
+                    } catch (NoSuchFieldException nsfe) {
+                        LOG.error("fromConfigXML(...) - Error occured while parsing XML <HardwareAddress> tag. "
                             + "The following variable does not exist in " + hwAddressClass.toString() + ": \""
                             + decodeFieldName(fieldName) + "\"");
-                } catch (IllegalAccessException iae) {
-                    iae.printStackTrace();
-                } catch (NumberFormatException npe) {
-                    LOG.error("fromConfigXML(...) - Error occured while parsing XML <HardwareAddress> tag. Field \""
+                    } catch (IllegalAccessException iae) {
+                        iae.printStackTrace();
+                    } catch (NumberFormatException npe) {
+                        LOG.error("fromConfigXML(...) - Error occured while parsing XML <HardwareAddress> tag. Field \""
                             + fieldName + "\" shall not be empty since we expect a \"" + fieldTypeName
                             + "\" value. Please correct the XML configuration for " + hwAddressClass.toString());
-                } catch (Exception e) {
-                    LOG.error("fromConfigXML(...) - Error occured while parsing XML <HardwareAddress> tag. Field \""
+                    } catch (Exception e) {
+                        LOG.error("fromConfigXML(...) - Error occured while parsing XML <HardwareAddress> tag. Field \""
                             + fieldName + "\" could not be parsed, should be \"" + fieldTypeName
                             + "\" value. Please correct the XML configuration for " + hwAddressClass.toString());
+                    }
                 }
             }
-        }
         // Return the fully configured HardwareAddress object
         return hwAddress;
     }
@@ -243,19 +254,24 @@ public class HardwareAddressImpl extends HardwareAddressFactory implements Hardw
             if (Modifier.isProtected(fields[i].getModifiers()) && !Modifier.isFinal(fields[i].getModifiers())) {
                 try {
                     if (fields[i].get(this) != null) {
-                        String fieldXMLName = encodeFieldName(fields[i].getName());
+                        if(fields[i].getType().getName() == "java.util.Map" || fields[i].getType().getName() == "java.util.HashMap"){
+                            str.append(SimpleXMLParser.mapToXMLString((Map<String, Object>) fields[i].get(this)));
+                        } else {
+                            str.append("          <");
+                            String fieldXMLName = encodeFieldName(fields[i].getName());
 
-                        str.append("          <");
-                        str.append(fieldXMLName);
-                        str.append(">");
-                        try {
-                            str.append(fields[i].get(this));
-                        } catch (IllegalAccessException iae) {
-                            iae.printStackTrace();
+
+                            str.append(fieldXMLName);
+                            str.append(">");
+                            try {
+                                str.append(fields[i].get(this));
+                            } catch (IllegalAccessException iae) {
+                                iae.printStackTrace();
+                            }
+                            str.append("</");
+                            str.append(fieldXMLName);
+                            str.append(">\n");
                         }
-                        str.append("</");
-                        str.append(fieldXMLName);
-                        str.append(">\n");
                     }
                 } catch (IllegalAccessException iae) {
                     iae.printStackTrace();

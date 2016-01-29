@@ -72,6 +72,10 @@
       <artifactId>jackson-mapper-asl</artifactId>
       <version>1.9.3</version>
     </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <artifactId>c2mon-shared-util</artifactId>
+    </dependency>
   </dependencies>
   <developers />
 </project>
