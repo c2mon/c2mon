@@ -3,9 +3,13 @@ package cern.c2mon.web.manager.config;
 import cern.c2mon.web.manager.security.RbacAuthenticationProvider;
 import cern.c2mon.web.manager.security.RbacDecisionManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;
+import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
+import org.springframework.boot.context.embedded.ErrorPage;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -63,14 +67,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     return new RbacDecisionManager(authorisationDetails);
   }
-
-//  @Bean
-//  public EmbeddedServletContainerCustomizer containerCustomizer() {
-//    return new EmbeddedServletContainerCustomizer() {
-//      @Override
-//      public void customize(ConfigurableEmbeddedServletContainer container) {
-//        container.addErrorPages(new ErrorPage(HttpStatus.NOT_FOUND, "/error/404"));
-//      }
-//    };
-//  }
 }
