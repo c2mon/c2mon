@@ -96,19 +96,21 @@ public class DIPDataTagChanger implements IDataTagChanger {
       getEquipmentLogger().trace(format("onUpdateDataTag - entering onUpdateDataTag(%d)..", sourceDataTag.getId()));
     }
 
-    // Disconnect old Data Tag
-    changeReport.setState(this.dipController.disconnection(oldSourceDataTag, changeReport));
-    // Connect the new Data Tag only if the disconnection was ok
-    if (changeReport.getState() == CHANGE_STATE.SUCCESS) {
-      changeReport.setState(this.dipController.connection(sourceDataTag, changeReport));
-    } else {
-      changeReport.appendInfo("onUpdateDataTag - problems disconnecing the old source fata tag ...");
+    if (oldSourceDataTag.getHardwareAddress().equals(sourceDataTag.getHardwareAddress())) {
+      changeReport.setState(CHANGE_STATE.SUCCESS);
+      getEquipmentLogger().debug("onUpdateDataTag - DIP address has not changed.");
     }
-
-    if (changeReport.getState() == CHANGE_STATE.SUCCESS) {
-      changeReport.appendInfo("onUpdateDataTag - SourceDataTag updated ...");
-    } else {
-      changeReport.appendInfo("onUpdateDataTag - SourceDataTag not updated ...");
+    else {
+      // Disconnect old Data Tag
+      this.dipController.disconnection(oldSourceDataTag, changeReport);
+      
+      changeReport.setState(this.dipController.connection(sourceDataTag, changeReport));
+  
+      if (changeReport.getState() == CHANGE_STATE.SUCCESS) {
+        changeReport.appendInfo("onUpdateDataTag - SourceDataTag successfully updated.");
+      } else {
+        changeReport.appendInfo("onUpdateDataTag - Failed connecting to new DIP address.");
+      }
     }
 
     if (getEquipmentLogger().isTraceEnabled()) {
