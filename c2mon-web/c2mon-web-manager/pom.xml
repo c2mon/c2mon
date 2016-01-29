@@ -2,14 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>1.3.0.RELEASE</version>
+    <groupId>cern</groupId>
+    <artifactId>parent-pom</artifactId>
+    <version>1.0.5-SNAPSHOT</version>
   </parent>
 
+  <groupId>cern.c2mon.c2mon-web</groupId>
   <artifactId>c2mon-web-manager</artifactId>
-  <version>1.0.0.SNAPSHOT</version>
-  <packaging>war</packaging>
+  <version>1.0.0-SNAPSHOT</version>
+  <name>c2mon-web-manager</name>
+  <description>C2MON web manager interface</description>
 
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -32,6 +34,14 @@
           <groupId>log4j</groupId>
           <artifactId>log4j</artifactId>
         </exclusion>
+        <!--<exclusion>-->
+          <!--<groupId>org.codehaus.jackson</groupId>-->
+          <!--<artifactId>jackson-mapper-asl</artifactId>-->
+        <!--</exclusion>-->
+        <!--<exclusion>-->
+          <!--<groupId>org.codehaus.jackson</groupId>-->
+          <!--<artifactId>jackson-core-asl</artifactId>-->
+        <!--</exclusion>-->
       </exclusions>
     </dependency>
     <dependency>
@@ -49,10 +59,12 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
+      <version>1.3.0.RELEASE</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-tomcat</artifactId>
+      <version>1.3.0.RELEASE</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -73,11 +85,13 @@
     <dependency>
       <groupId>org.apache.tomcat.embed</groupId>
       <artifactId>tomcat-embed-jasper</artifactId>
+      <version>8.0.28</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>jstl</artifactId>
+      <version>1.2</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -85,19 +99,19 @@
       <version>1.16.6</version>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-mapper-asl</artifactId>
-      <version>1.9.4</version>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <version>2.6.5</version>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-core-asl</artifactId>
-      <version>1.9.4</version>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>2.6.5</version>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-jaxrs</artifactId>
-      <version>1.9.4</version>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.6.5</version>
     </dependency>
     <dependency>
       <groupId>org.hsqldb</groupId>
@@ -119,11 +133,13 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <version>4.12</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
+      <version>1.3.0.RELEASE</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -133,10 +149,19 @@
   </scm>
 
   <build>
+    <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+    <testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>1.3.0.RELEASE</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

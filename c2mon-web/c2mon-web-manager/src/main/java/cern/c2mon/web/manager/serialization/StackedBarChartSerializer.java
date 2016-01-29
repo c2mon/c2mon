@@ -1,23 +1,15 @@
 package cern.c2mon.web.manager.serialization;
 
-import java.io.IOException;
-
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.map.SerializerProvider;
-import org.codehaus.jackson.map.ser.std.SerializerBase;
+import cern.c2mon.web.manager.statistics.daqlog.charts.JFreeStackedBarChart;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import org.jfree.data.category.CategoryDataset;
 
-import cern.c2mon.web.manager.statistics.daqlog.charts.JFreeStackedBarChart;
+import java.io.IOException;
 
-public class StackedBarChartSerializer extends SerializerBase<JFreeStackedBarChart> {
-
-  /**
-   * Constructor.
-   */
-  public StackedBarChartSerializer() {
-    super(JFreeStackedBarChart.class);
-  }
+public class StackedBarChartSerializer extends JsonSerializer<JFreeStackedBarChart> {
 
   /**
    * Example JSON output:
@@ -36,10 +28,6 @@ public class StackedBarChartSerializer extends SerializerBase<JFreeStackedBarCha
    *   }
    * }
    * </p>
-   *
-   * @see org.codehaus.jackson.map.ser.std.SerializerBase#serialize(Object
-   *      , org.codehaus.jackson.JsonGenerator,
-   *      org.codehaus.jackson.map.SerializerProvider)
    */
   @Override
   public void serialize(JFreeStackedBarChart chart, JsonGenerator generator, SerializerProvider provider) throws IOException, JsonGenerationException {
