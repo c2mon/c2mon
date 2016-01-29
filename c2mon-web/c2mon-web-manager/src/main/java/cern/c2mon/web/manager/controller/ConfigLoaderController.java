@@ -275,7 +275,7 @@ public class ConfigLoaderController {
    * @return Returns the current progress of the request.
    * @throws InterruptedException in case of error
    */
-  @RequestMapping(value = CONFIG_LOADER_PROGRESS_REPORT_URL + "/getProgress", method = RequestMethod.POST)
+  @RequestMapping(value = "/configloader/getProgress", method = RequestMethod.POST)
   @ResponseBody
   public Integer getProgressReport(@RequestParam("configurationId") final String configurationId) throws InterruptedException {
     logger.debug("(AJAX) Received Progress Report Request for configurationId:" + configurationId);
@@ -302,7 +302,7 @@ public class ConfigLoaderController {
    * @return Returns a description of what is happening in the server currently
    * @throws InterruptedException in case of error
    */
-  @RequestMapping(value = CONFIG_LOADER_PROGRESS_REPORT_URL + "/getProgressDescription", method = RequestMethod.POST)
+  @RequestMapping(value =  "/configloader/getProgressDescription", method = RequestMethod.POST)
   @ResponseBody
   public String getProgressDescription(@RequestParam("configurationId") final String configurationId) throws InterruptedException {
     logger.debug("(AJAX) Received Progress Description Request for configurationId:" + configurationId);

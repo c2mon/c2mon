@@ -68,24 +68,24 @@ body {
 
 <body>
   <script>
-  if(window.location.href.indexOf('?reloaded') === -1) 
-    window.location.href = window.location.href + "?reloaded=true";
+//  if(window.location.href.indexOf('?reloaded') === -1)
+//    window.location.href = window.location.href + "?reloaded=true";
   </script>
   <div id="container">
     <div id="error"></div>
 
     <div class="container">
 
-      <form class="form-signin" role="form" action="<c:url value='j_spring_security_check' />" method="post">
+      <form class="form-signin" role="form" action="login" method="post">
         <h2 class="form-signin-heading">Please sign in</h2>
 
-        <div id="username" class="form-group has-feedback">
-          <label id="error-feedback" class="control-label" style="display: none;" for="j_username">Invalid username or password</label>
-          <input type="text" class="form-control" placeholder="Username" name="j_username" id="j_username" size="32" maxlength="128" required autofocus>
+        <div class="form-group has-feedback">
+          <label id="error-feedback" class="control-label" style="display: none;" for="username">Invalid username or password</label>
+          <input type="text" class="form-control" placeholder="Username" name="username" id="username" size="32" maxlength="128" required autofocus>
         </div>
 
-        <div id="password" class="form-group has-feedback">
-          <input type="password" class="form-control" placeholder="Password" name="j_password" id="j_password" size="32" maxlength="32" required>
+        <div class="form-group has-feedback">
+          <input type="password" class="form-control" placeholder="Password" name="password" id="password" size="32" maxlength="32" required>
         </div>
 
         <button class="btn btn-large btn-primary btn-block" type="submit" name="submit" id="submit">Sign in</button>

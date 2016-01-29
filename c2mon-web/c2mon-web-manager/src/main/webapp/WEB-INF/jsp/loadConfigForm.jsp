@@ -127,7 +127,7 @@
   function getProgress() {
     $.ajax({
       type : "POST",
-      url : "../configloader/progress/getProgress",
+      url : "../configloader/getProgress",
       data : {
         configurationId : document.configLoaderForm.id.value
       },
@@ -151,7 +151,7 @@
   function getProgressDescription() {
     $.ajax({
       type : "POST",
-      url : "../configloader/progress/getProgressDescription",
+      url : "../configloader/getProgressDescription",
       data : {
         configurationId : document.configLoaderForm.id.value
       },
