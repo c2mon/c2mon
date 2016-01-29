@@ -54,8 +54,8 @@ public class DIPDataTagChanger implements IDataTagChanger {
 
   @Override
   public void onAddDataTag(ISourceDataTag sourceDataTag, ChangeReport changeReport) {
-    if (getEquipmentLogger().isDebugEnabled()) {
-      getEquipmentLogger().debug(format("onAddDataTag - entering onAddCommandTag(%d)..", sourceDataTag.getId()));
+    if (getEquipmentLogger().isTraceEnabled()) {
+      getEquipmentLogger().trace(format("onAddDataTag - entering onAddDataTag(%d)..", sourceDataTag.getId()));
     }
 
     // Connect the Data Tag
@@ -66,15 +66,15 @@ public class DIPDataTagChanger implements IDataTagChanger {
       changeReport.appendInfo("onAddDataTag - SourceDataTag not added ...");
     }
 
-    if (getEquipmentLogger().isDebugEnabled()) {
-      getEquipmentLogger().debug(format("onAddDataTag - leaving onAddCommandTag(%d)", sourceDataTag.getId()));
+    if (getEquipmentLogger().isTraceEnabled()) {
+      getEquipmentLogger().trace(format("onAddDataTag - leaving onAddDataTag(%d)", sourceDataTag.getId()));
     }
   }
 
   @Override
   public void onRemoveDataTag(ISourceDataTag sourceDataTag, ChangeReport changeReport) {
-    if (getEquipmentLogger().isDebugEnabled()) {
-      getEquipmentLogger().debug(format("onRemoveDataTag - entering onRemoveDataTag(%d)..", sourceDataTag.getId()));
+    if (getEquipmentLogger().isTraceEnabled()) {
+      getEquipmentLogger().trace(format("onRemoveDataTag - entering onRemoveDataTag(%d)..", sourceDataTag.getId()));
     }
 
     // Connect the Data Tag
@@ -85,15 +85,15 @@ public class DIPDataTagChanger implements IDataTagChanger {
       changeReport.appendInfo("onRemoveDataTag - SourceDataTag not removed ...");
     }
 
-    if (getEquipmentLogger().isDebugEnabled()) {
-      getEquipmentLogger().debug(format("onRemoveDataTag - leaving onRemoveDataTag(%d)", sourceDataTag.getId()));
+    if (getEquipmentLogger().isTraceEnabled()) {
+      getEquipmentLogger().trace(format("onRemoveDataTag - leaving onRemoveDataTag(%d)", sourceDataTag.getId()));
     }
   }
 
   @Override
   public void onUpdateDataTag(ISourceDataTag sourceDataTag, ISourceDataTag oldSourceDataTag, ChangeReport changeReport) {
-    if (getEquipmentLogger().isDebugEnabled()) {
-      getEquipmentLogger().debug(format("onRemoveDataTag - entering onUpdateDataTag(%d)..", sourceDataTag.getId()));
+    if (getEquipmentLogger().isTraceEnabled()) {
+      getEquipmentLogger().trace(format("onUpdateDataTag - entering onUpdateDataTag(%d)..", sourceDataTag.getId()));
     }
 
     // Disconnect old Data Tag
@@ -111,8 +111,8 @@ public class DIPDataTagChanger implements IDataTagChanger {
       changeReport.appendInfo("onUpdateDataTag - SourceDataTag not updated ...");
     }
 
-    if (getEquipmentLogger().isDebugEnabled()) {
-      getEquipmentLogger().debug(format("onRemoveDataTag - leaving onUpdateDataTag(%d)", sourceDataTag.getId()));
+    if (getEquipmentLogger().isTraceEnabled()) {
+      getEquipmentLogger().trace(format("onUpdateDataTag - leaving onUpdateDataTag(%d)", sourceDataTag.getId()));
     }
   }
 
