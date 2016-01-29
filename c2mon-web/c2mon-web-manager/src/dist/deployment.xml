@@ -35,7 +35,7 @@
     <application name="c2mon-web-manager-pro" extends="default">
       <startscript name="C2MON-WEB-MANAGER-PRO">
         <property name="c2mon.client.conf.url" value="http://timweb/conf/c2mon-client.properties" />
-        <property name="c2mon.web.conf.url" value="file:conf/c2mon-web.properties" />
+        <property name="c2mon.web.conf.url" value="file://${INSTALL_DIR}/conf/c2mon-web.properties" />
       </startscript>
       <deployment installLocation="/opt/c2mon-web-manager">
         <directory name="conf">
@@ -50,6 +50,7 @@
     <application name="c2mon-web-manager-test" extends="default">
       <startscript name="C2MON-WEB-MANAGER-TEST">
         <property name="c2mon.client.conf.url" value="http://timweb/test/conf/c2mon-client.properties" />
+        <property name="c2mon.web.conf.url" value="file://${INSTALL_DIR}/conf/c2mon-web.properties" />
         <property name="server.port" value="8081" />
       </startscript>
       <deployment installLocation="/opt/c2mon-web-manager-test">
