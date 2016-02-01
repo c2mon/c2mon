@@ -32,6 +32,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.settings.Settings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -43,7 +44,7 @@ import java.util.*;
  * @author Alban Marguet.
  */
 
-@Service
+@Component
 @Qualifier("tagIndexer")
 @Slf4j
 @Data

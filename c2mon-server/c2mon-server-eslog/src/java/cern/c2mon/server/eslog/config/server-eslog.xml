@@ -24,13 +24,31 @@
     <constructor-arg><bean class="cern.c2mon.server.eslog.structure.types.SupervisionES"/></constructor-arg>
   </bean>
 
-  <bean id="tagESPersistenceManager" class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
+  <bean id="tagNumericESPersistenceManager" class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
     <constructor-arg ref="tagIndexer"/>
-    <constructor-arg value="${c2mon.home}/log/tagESfallback.txt"/>
+    <constructor-arg value="${c2mon.home}/log/tagNumericESfallback.txt"/>
+    <constructor-arg>
+      <bean class="cern.c2mon.server.shorttermlog.alarm.AlarmListener"/>
+    </constructor-arg>
+    <constructor-arg><bean class="cern.c2mon.server.eslog.structure.types.TagNumeric"/></constructor-arg>
+  </bean>
+
+  <bean id="tagStringESPersistenceManager" class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
+    <constructor-arg ref="tagIndexer"/>
+    <constructor-arg value="${c2mon.home}/log/tagStringESfallback.txt"/>
     <constructor-arg>
       <bean class="cern.c2mon.server.shorttermlog.alarm.AlarmListener"/>
     </constructor-arg>
     <constructor-arg><bean class="cern.c2mon.server.eslog.structure.types.TagString"/></constructor-arg>
+  </bean>
+
+  <bean id="tagBooleanESPersistenceManager" class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
+    <constructor-arg ref="tagIndexer"/>
+    <constructor-arg value="${c2mon.home}/log/tagBooleanESfallback.txt"/>
+    <constructor-arg>
+      <bean class="cern.c2mon.server.shorttermlog.alarm.AlarmListener"/>
+    </constructor-arg>
+    <constructor-arg><bean class="cern.c2mon.server.eslog.structure.types.TagBoolean"/></constructor-arg>
   </bean>
 
 </beans>

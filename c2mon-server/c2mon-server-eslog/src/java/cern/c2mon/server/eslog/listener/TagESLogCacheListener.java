@@ -23,7 +23,9 @@ import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.eslog.structure.converter.DataTagESLogConverter;
+import cern.c2mon.server.eslog.structure.types.TagBoolean;
 import cern.c2mon.server.eslog.structure.types.TagES;
+import cern.c2mon.server.eslog.structure.types.TagString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -59,7 +61,9 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
   /**
    * The Indexer allows to use the connection to the ElasticSearch cluster and to write data.
    */
-  private final IPersistenceManager persistenceManager;
+  private final IPersistenceManager persistenceManagerTagNumeric;
+  private final IPersistenceManager persistenceManagerTagString;
+  private final IPersistenceManager persistenceManagerTagBoolean;
 
   /**
    * Listener container lifecycle hook.
@@ -77,11 +81,17 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
    * @param cacheRegistrationService for registering cache listeners
    */
   @Autowired
-  public TagESLogCacheListener(final CacheRegistrationService cacheRegistrationService, @Qualifier("tagESPersistenceManager") final IPersistenceManager persistenceManager, final DataTagESLogConverter dataTagESLogConverter) {
+  public TagESLogCacheListener(final CacheRegistrationService cacheRegistrationService,
+                               @Qualifier("tagNumericESPersistenceManager") final IPersistenceManager persistenceManagerTagNumeric,
+                               @Qualifier("tagStringESPersistenceManager") final IPersistenceManager persistenceManagerTagString,
+                               @Qualifier("tagBooleanESPersistenceManager") final IPersistenceManager persistenceManagerTagBoolean,
+                               final DataTagESLogConverter dataTagESLogConverter) {
     super();
     this.cacheRegistrationService = cacheRegistrationService;
     this.dataTagESLogConverter = dataTagESLogConverter;
-    this.persistenceManager = persistenceManager;
+    this.persistenceManagerTagNumeric = persistenceManagerTagNumeric;
+    this.persistenceManagerTagString = persistenceManagerTagString;
+    this.persistenceManagerTagBoolean = persistenceManagerTagBoolean;
   }
 
   /**
@@ -104,12 +114,14 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
   @Override
   public void notifyElementUpdated(Collection<Tag> tagCollection) {
     log.debug("notifyElementUpdated() - Received a tagCollection of " + tagCollection.size() + " elements.");
-    List<TagES> tagESCollection = new ArrayList<>();
     List<Tag> tagsToLog = new ArrayList<>(tagCollection.size());
+    List<TagES> tagNumericCollection = new ArrayList<>();
+    List<TagES> tagStringCollection = new ArrayList<>();
+    List<TagES> tagBooleanCollection = new ArrayList<>();
 
     retrieveTagsToLog(tagCollection, tagsToLog);
-    convertTagsToLogToTagES(tagsToLog, tagESCollection);
-    sendCollectionTagESToElasticSearch(tagESCollection);
+    convertTagsToLogToTagES(tagsToLog, tagNumericCollection, tagStringCollection, tagBooleanCollection);
+    sendCollectionsTagESToElasticSearch(tagNumericCollection, tagStringCollection, tagBooleanCollection);
   }
 
   private void retrieveTagsToLog(Collection<Tag> tagCollection, Collection<Tag> tagsToLog) {
@@ -121,17 +133,23 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
     log.debug("retrieveTagsToLog() - With " + tagsToLog.size() + " tags to be logged.");
   }
 
-  private void convertTagsToLogToTagES(Collection<Tag> tagsToLog, List<TagES> tagESCollection) {
+  private void convertTagsToLogToTagES(Collection<Tag> tagsToLog, List<TagES> tagNumericCollection, List<TagES> tagStringCollection, List<TagES> tagBooleanCollection) {
     for (Tag tag: tagsToLog) {
       try {
         TagES tagES = dataTagESLogConverter.convertToTagES(tag);
-        addTagToCollectionIfNotNull(tagES, tagESCollection);
+        if (tagES instanceof TagString) {
+          addTagToCollectionIfNotNull(tagES, tagStringCollection);
+        }
+        else if (tagES instanceof TagBoolean) {
+          addTagToCollectionIfNotNull(tagES, tagBooleanCollection);
+        }
+        else {
+          addTagToCollectionIfNotNull(tagES, tagNumericCollection);
+        }
       } catch (Exception e) {
         log.error("convertTagsToLogToTagES() - Error occurred during tag parsing for ElasticSearch. Tag #" + tag.getId() + " is not added to bulk sending (name=" + tag.getName() + ", value=" + tag.getValue() + ", type=" + tag.getDataType() + ")", e);
       }
     }
-
-    log.debug("convertTagsToLogToTagES() - Created a TagESCollection of " + tagESCollection.size() + " elements.");
   }
 
   private void addTagToCollectionIfNotNull(TagES tagES, Collection<TagES> tagESCollection) {
@@ -140,10 +158,16 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
     }
   }
 
-  private void sendCollectionTagESToElasticSearch(List<TagES> tagESCollection) {
+  private void sendCollectionsTagESToElasticSearch(List<TagES> tagNumericCollection, List<TagES> tagStringCollection, List<TagES> tagBooleanCollection) {
     try {
-      log.debug("sendCollectionTagESToElasticSearch() - send a collection of tagES to indexer of size: " + tagESCollection.size());
-      persistenceManager.storeData(tagESCollection);
+      log.debug("sendCollectionTagESToElasticSearch() - send a collection of tagNumeric to indexer of size: " + tagNumericCollection.size());
+      persistenceManagerTagNumeric.storeData(tagNumericCollection);
+
+      log.debug("sendCollectionTagESToElasticSearch() - send a collection of tagString to indexer of size: " + tagStringCollection.size());
+      persistenceManagerTagString.storeData(tagStringCollection);
+
+      log.debug("sendCollectionTagESToElasticSearch() - send a collection of tagBoolean to indexer of size: " + tagBooleanCollection.size());
+      persistenceManagerTagBoolean.storeData(tagBooleanCollection);
     }
     catch(Exception e) {
       log.error("sendCollectionTagESToElasticSearch() - Exception occurred while trying to index data to the ElasticSearch cluster.", e);
