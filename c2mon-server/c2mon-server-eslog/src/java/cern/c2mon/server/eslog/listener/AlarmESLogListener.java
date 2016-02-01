@@ -17,13 +17,11 @@
 package cern.c2mon.server.eslog.listener;
 
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
-import cern.c2mon.pmanager.persistence.impl.TimPersistenceManager;
 import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.eslog.logger.AlarmIndexer;
 import cern.c2mon.server.eslog.structure.converter.AlarmESLogConverter;
 import cern.c2mon.server.eslog.structure.types.AlarmES;
 import lombok.extern.slf4j.Slf4j;

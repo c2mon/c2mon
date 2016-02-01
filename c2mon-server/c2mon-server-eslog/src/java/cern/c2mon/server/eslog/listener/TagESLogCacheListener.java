@@ -16,18 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.listener;
 
-import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
-import cern.c2mon.pmanager.persistence.impl.TimPersistenceManager;
 import cern.c2mon.server.cache.BufferedTimCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.eslog.logger.Indexer;
-import cern.c2mon.server.eslog.logger.TagIndexer;
 import cern.c2mon.server.eslog.structure.converter.DataTagESLogConverter;
-import cern.c2mon.server.eslog.structure.queries.ClusterNotAvailableException;
 import cern.c2mon.server.eslog.structure.types.TagES;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

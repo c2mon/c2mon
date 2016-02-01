@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -53,35 +53,75 @@ public abstract class Query {
   }
 
   public void checkYellowStatus() throws ClusterNotAvailableException {
-    client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
+    try {
+      client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
+    }
+    catch (Exception e) {
+      throw new ClusterNotAvailableException();
+    }
   }
 
   protected String[] getIndicesFromCluster() throws ClusterNotAvailableException {
-    return client.admin().indices().prepareGetIndex().get().indices();
+    try {
+      return client.admin().indices().prepareGetIndex().get().indices();
+    }
+    catch (Exception e) {
+      throw new ClusterNotAvailableException();
+    }
   }
 
   protected CreateIndexRequestBuilder prepareCreateIndexRequestBuilder(String index) throws ClusterNotAvailableException {
-    return client.admin().indices().prepareCreate(index);
+    try {
+      return client.admin().indices().prepareCreate(index);
+    }
+    catch (Exception e) {
+      throw new ClusterNotAvailableException();
+    }
   }
 
   protected IndicesAliasesRequestBuilder prepareAliases() throws ClusterNotAvailableException {
-    return client.admin().indices().prepareAliases();
+    try {
+      return client.admin().indices().prepareAliases();
+    }
+    catch (Exception e) {
+      throw new ClusterNotAvailableException();
+    }
   }
 
   protected Iterator<ObjectCursor<IndexMetaData>> getIndicesWithMetadata() throws ClusterNotAvailableException {
-    return client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().indices().values().iterator();
+    try {
+      return client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().indices().values().iterator();
+    }
+    catch (Exception e) {
+      throw new ClusterNotAvailableException();
+    }
   }
 
   protected ImmutableOpenMap<String, MappingMetaData> getIndexWithMetadata(String index) throws ClusterNotAvailableException {
-    return client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().index(index).getMappings();
+    try {
+      return client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().index(index).getMappings();
+    }
+    catch (Exception e) {
+      throw new ClusterNotAvailableException();
+    }
   }
 
   protected ObjectContainer<AliasMetaData> getAliases(String index) throws ClusterNotAvailableException {
-    return client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().index(index).getAliases().values();
+    try {
+      return client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().index(index).getAliases().values();
+    }
+    catch (Exception e) {
+      throw new ClusterNotAvailableException();
+    }
   }
 
   protected boolean indexExists(String indexName) throws ClusterNotAvailableException {
-    log.debug("indexExists() - Look for the existence of the index " + indexName + ".");
-    return client.admin().indices().prepareExists(indexName).execute().actionGet().isExists();
+    try {
+      log.debug("indexExists() - Look for the existence of the index " + indexName + ".");
+      return client.admin().indices().prepareExists(indexName).execute().actionGet().isExists();
+    }
+    catch (Exception e) {
+      throw new ClusterNotAvailableException();
+    }
   }
 }

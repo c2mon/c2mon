@@ -17,12 +17,9 @@
 package cern.c2mon.server.eslog.listener;
 
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
-import cern.c2mon.pmanager.persistence.impl.TimPersistenceManager;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.eslog.logger.SupervisionIndexer;
 import cern.c2mon.server.eslog.structure.converter.SupervisionESConverter;
-import cern.c2mon.server.eslog.structure.types.AlarmES;
 import cern.c2mon.server.eslog.structure.types.SupervisionES;
 import cern.c2mon.server.supervision.SupervisionListener;
 import cern.c2mon.server.supervision.SupervisionNotifier;
