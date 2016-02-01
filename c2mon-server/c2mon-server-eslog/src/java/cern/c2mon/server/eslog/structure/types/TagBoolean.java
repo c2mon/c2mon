@@ -16,6 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.types;
 
+import cern.c2mon.pmanager.IFallback;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -54,5 +56,10 @@ public class TagBoolean extends TagES implements TagESInterface {
     else {
       this.valueNumeric = 0;
     }
+  }
+
+  @Override
+  public IFallback getObject(String line) {
+    return GSON.fromJson(line, TagBoolean.class);
   }
 }

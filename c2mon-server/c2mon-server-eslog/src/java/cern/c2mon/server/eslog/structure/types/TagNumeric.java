@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.types;
 
+import cern.c2mon.pmanager.IFallback;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -38,5 +39,10 @@ public class TagNumeric extends TagES implements TagESInterface {
       log.trace("setValue() - value has value " + value + ".");
       throw new IllegalArgumentException("setValue() - Cannot instantiate new TagNumeric in ElasticSearch because the value has class=" + value.getClass().getName() + ")");
     }
+  }
+
+  @Override
+  public IFallback getObject(String line) {
+    return GSON.fromJson(line, TagNumeric.class);
   }
 }
