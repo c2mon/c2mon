@@ -65,12 +65,22 @@ public class TagIndexer extends Indexer {
 
   @Override
   public void storeData(IFallback object) throws IDBPersistenceException {
-
+    if (object != null && object instanceof TagES) {
+      sendTagToBatch((TagES) object);
+    }
   }
 
   @Override
   public void storeData(List data) throws IDBPersistenceException {
-
+    if (data != null) {
+      Collection<TagES> tags = new ArrayList<>();
+      for (Object object : data) {
+        if (object instanceof TagES) {
+          tags.add((TagES) object);
+        }
+      }
+      indexTags(tags);
+    }
   }
 
   /**
