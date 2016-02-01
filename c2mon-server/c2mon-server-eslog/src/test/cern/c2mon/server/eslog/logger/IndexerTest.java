@@ -149,7 +149,7 @@ public class IndexerTest {
   }
 
   @Test
-  public void testUpdateLists() throws ClusterNotAvailableException {
+  public void testUpdateLists() throws ClusterNotAvailableException, IDBPersistenceException {
     Set<String> expectedIndex = new HashSet<>();
     Set<String> expectedType = new HashSet<>();
     assertEquals(expectedIndex, indexer.getIndicesTypes().keySet());

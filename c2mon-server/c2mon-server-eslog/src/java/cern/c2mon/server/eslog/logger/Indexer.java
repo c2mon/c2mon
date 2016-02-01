@@ -17,6 +17,7 @@
 package cern.c2mon.server.eslog.logger;
 
 import cern.c2mon.pmanager.IDBPersistenceHandler;
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.eslog.structure.queries.ClusterNotAvailableException;
 import cern.c2mon.server.eslog.structure.queries.QueryIndices;
 import cern.c2mon.server.eslog.structure.queries.QueryTypes;
@@ -78,7 +79,7 @@ public abstract class Indexer implements IDBPersistenceHandler {
   }
 
   @PostConstruct
-  public void init() {
+  public void init() throws IDBPersistenceException {
     waitForConnection();
     log.info("init() - Indexer is ready to write data to ElasticSearch.");
   }
@@ -151,23 +152,21 @@ public abstract class Indexer implements IDBPersistenceHandler {
     }
   }
 
-  protected List<String> retrieveIndicesFromES() {
+  protected List<String> retrieveIndicesFromES() throws IDBPersistenceException {
     try {
       return connector.handleListingQuery(new QueryIndices(connector.getClient()), null);
     }
     catch (ClusterNotAvailableException e) {
-      log.debug("retrieveMappingFromES() - Could not retrieve the indices in ElasticSearch.");
+      throw new IDBPersistenceException();
     }
-    return new ArrayList<>();
   }
 
-  protected List<String> retrieveTypesFromES(String index) {
+  protected List<String> retrieveTypesFromES(String index) throws IDBPersistenceException {
     try {
       return connector.handleListingQuery(new QueryTypes(connector.getClient()), index);
     }
     catch (ClusterNotAvailableException e) {
-      log.debug("retrieveMappingFromES() - Could not retrieve the types for index " + index + ".");
+      throw new IDBPersistenceException();
     }
-    return new ArrayList<>();
   }
 }

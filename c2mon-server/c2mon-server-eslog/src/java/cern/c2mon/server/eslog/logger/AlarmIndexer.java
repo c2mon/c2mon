@@ -57,7 +57,7 @@ public class AlarmIndexer extends Indexer {
    * Make sure the connection is alive.
    */
   @PostConstruct
-  public void init() {
+  public void init() throws IDBPersistenceException {
     super.init();
     retrieveMappingsFromES();
   }
@@ -71,7 +71,11 @@ public class AlarmIndexer extends Indexer {
 
   @Override
   public void storeData(List data) throws IDBPersistenceException {
-    //never sent by batch
+    for (Object object : data) {
+      if (object instanceof IFallback) {
+        storeData((IFallback) object);
+      }
+    }
   }
 
   /**
@@ -106,7 +110,7 @@ public class AlarmIndexer extends Indexer {
     }
   }
 
-  public void retrieveMappingsFromES() {
+  public void retrieveMappingsFromES() throws IDBPersistenceException {
     List<String> indicesES = retrieveIndicesFromES();
     for (String index : indicesES) {
       List<String> types = retrieveTypesFromES(index);

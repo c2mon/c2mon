@@ -60,9 +60,9 @@ public interface Connector {
    * Retrieve the lists of indices, types and aliases from ElasticSearch and
    * update them in memory.
    */
-  Set<String> updateIndices();
-  Set<String> updateTypes(String index);
-  Set<String> updateAliases(String index);
+  Set<String> updateIndices() throws IDBPersistenceException;
+  Set<String> updateTypes(String index) throws IDBPersistenceException;
+  Set<String> updateAliases(String index) throws IDBPersistenceException;
 
   /**
    * @return true if C2MON is connected to an ElasticSearch cluster. (client can communicate with it)
@@ -76,7 +76,7 @@ public interface Connector {
    * @param query to be run.
    * @return list of indices/types/aliases.
    */
-  List<String> handleListingQuery(Query query, String index);
+  List<String> handleListingQuery(Query query, String index) throws IDBPersistenceException;
 
   /**
    * Launch an indexing query against the ElasticSearch cluster.

@@ -59,7 +59,7 @@ public class TagIndexer extends Indexer {
   }
 
   @PostConstruct
-  public void init() {
+  public void init() throws IDBPersistenceException {
     super.init();
   }
 
@@ -354,27 +354,27 @@ public class TagIndexer extends Indexer {
    * aliases present already at startup. Store them in memory in the Sets:
    * indices, types and aliases.
    */
-  public void updateLists() {
+  public void updateLists() throws IDBPersistenceException {
     clearLists();
     updateIndices();
     updateTypes();
     updateAliases();
   }
 
-  private void updateIndices() {
+  private void updateIndices() throws IDBPersistenceException {
     for (String index : connector.updateIndices()) {
       indicesTypes.put(index, new HashSet<String>());
       indicesAliases.put(index, new HashSet<String>());
     }
   }
 
-  private void updateTypes() {
+  private void updateTypes() throws IDBPersistenceException {
     for (String index : indicesTypes.keySet()) {
       indicesTypes.get(index).addAll(connector.updateTypes(index));
     }
   }
 
-  private void updateAliases() {
+  private void updateAliases() throws IDBPersistenceException {
     for (String index : indicesAliases.keySet()) {
       indicesAliases.get(index).addAll(connector.updateAliases(index));
     }

@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.logger;
 
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
 import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
 import cern.c2mon.server.eslog.structure.queries.*;
@@ -120,7 +121,7 @@ public class TransportConnectorTest {
   }
 
   @Test
-  public void testHandleListingQuery() throws ClusterNotAvailableException {
+  public void testHandleListingQuery() throws ClusterNotAvailableException, IDBPersistenceException {
     Query query = null;
     Set<String> result = new HashSet<>();
 

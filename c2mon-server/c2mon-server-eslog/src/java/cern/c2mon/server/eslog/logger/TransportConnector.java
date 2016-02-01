@@ -313,7 +313,7 @@ public class TransportConnector implements Connector {
    * @return List of retrieved responses according to the query.
    */
   @Override
-  public List<String> handleListingQuery(Query query, String index) {
+  public List<String> handleListingQuery(Query query, String index) throws IDBPersistenceException {
     List<String> queryResponse = new ArrayList<>();
 
     if (client == null) {
@@ -336,6 +336,7 @@ public class TransportConnector implements Connector {
     }
     catch (ClusterNotAvailableException e) {
       log.debug("handleListingQuery() - Cluster is not reachable, aborting listing retrieval.");
+      throw new IDBPersistenceException();
     }
 
     return queryResponse;
@@ -415,7 +416,7 @@ public class TransportConnector implements Connector {
     return isAcked;
   }
 
-  public Set<String> updateIndices() {
+  public Set<String> updateIndices() throws IDBPersistenceException {
     Set<String> indices = new HashSet<>();
     if (client != null) {
       try {
@@ -429,21 +430,21 @@ public class TransportConnector implements Connector {
     return indices;
   }
 
-  public Set<String> updateTypes(String index) {
+  public Set<String> updateTypes(String index) throws IDBPersistenceException {
     Set<String> types = new HashSet<>();
     if (client != null) {
       try {
         log.trace("updateTypes() - Updating list of types.");
         types.addAll(handleListingQuery(new QueryTypes(client), index));
       }
-      catch (ClusterNotAvailableException e) {
+      catch (Exception e) {
         log.debug("updateTypes() - Cluster cannot be reached.");
       }
     }
     return types;
   }
 
-  public Set<String> updateAliases(String index) {
+  public Set<String> updateAliases(String index) throws IDBPersistenceException {
     Set<String> aliases = new HashSet<>();
     if (client != null) {
       try {
