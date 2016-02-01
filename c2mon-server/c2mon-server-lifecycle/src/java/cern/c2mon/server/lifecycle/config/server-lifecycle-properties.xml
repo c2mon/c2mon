@@ -88,7 +88,7 @@
             <prop key="c2mon.server.config.daq.enabled">false</prop>
             <prop key="c2mon.server.config.running.process.removal">true</prop>
             
-            <!-- if set not DB preloading of the cache is done at startup -->
+            <!-- if set, no DB preloading of the cache is done at startup (only valid in combination with c2mon.cache.mode="single") -->
             <prop key="c2mon.server.cache.skippreloading">false</prop>
 
             <!-- DATASOURCE PROPERTIES -->
