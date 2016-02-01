@@ -25,11 +25,10 @@ import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -50,6 +49,7 @@ import static org.junit.Assert.assertTrue;
 @Slf4j
 @ContextConfiguration({"classpath:cern/c2mon/server/eslog/config/server-eslog-integration.xml" })
 @RunWith(SpringJUnit4ClassRunner.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class TransportConnectorTest {
   private int shards = 10;
   private int replica = 0;
@@ -57,6 +57,16 @@ public class TransportConnectorTest {
   private String isLocal = "true";
   @Autowired
   private TransportConnector connector;
+
+  @BeforeClass
+  public static void setEnv() {
+    System.setProperty("c2mon.home", ".");
+  }
+
+  @AfterClass
+  public static void cleanEnv() {
+    System.clearProperty("c2mon.home");
+  }
 
   @Before
   public void clientSetup() {

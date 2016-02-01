@@ -33,11 +33,10 @@ import org.elasticsearch.action.admin.indices.exists.types.TypesExistsRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -57,6 +56,7 @@ import static org.junit.Assert.fail;
 @Slf4j
 @ContextConfiguration({"classpath:cern/c2mon/server/eslog/config/server-eslog-integration.xml" })
 @RunWith(SpringJUnit4ClassRunner.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class IndexerTest {
   private static String clusterName;
   private static String nodeName;
@@ -68,6 +68,16 @@ public class IndexerTest {
   private TagIndexer indexer;
   @Autowired
   private TransportConnector connector;
+
+  @BeforeClass
+  public static void setEnv() {
+    System.setProperty("c2mon.home", ".");
+  }
+
+  @AfterClass
+  public static void cleanEnv() {
+    System.clearProperty("c2mon.home");
+  }
 
   @Before
   public void clientSetup() throws IOException {
