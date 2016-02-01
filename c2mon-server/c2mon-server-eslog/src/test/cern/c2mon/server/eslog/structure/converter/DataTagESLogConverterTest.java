@@ -236,7 +236,7 @@ public class DataTagESLogConverterTest {
     when(tagC2MON.getValueDescription()).thenReturn(valueDesc);
 
     TagES tagES = esLogConverter.convertToTagES(tagC2MON);
-    assertEquals(id, tagES.getId());
+    assertEquals(id, tagES.getIdAsLong());
     assertEquals(name, tagES.getName());
     assertEquals(type.toString(), tagES.getDataType());
     assertEquals(timeStamp, tagES.getServerTimestamp());

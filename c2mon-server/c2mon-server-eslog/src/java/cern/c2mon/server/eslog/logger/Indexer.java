@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.logger;
 
+import cern.c2mon.pmanager.IDBPersistenceHandler;
 import cern.c2mon.server.eslog.structure.queries.ClusterNotAvailableException;
 import cern.c2mon.server.eslog.structure.queries.QueryIndices;
 import cern.c2mon.server.eslog.structure.queries.QueryTypes;
@@ -40,7 +41,7 @@ import java.util.*;
 @Service
 @Slf4j
 @Data
-public abstract class Indexer {
+public abstract class Indexer implements IDBPersistenceHandler {
   /** Prefix used for every index in the ElasticSearch cluster, e.g., c2mon_2015-11 is a valid index. */
   @Value("${es.prefix.tag:c2mon-tag_}")
   protected String indexPrefix;
@@ -87,10 +88,11 @@ public abstract class Indexer {
       isAvailable = false;
     }
     isAvailable = true;
-    List<IndexRequest> backup = connector.getEsPersistenceManager().retrieveBackupData();
-    for (IndexRequest request : backup) {
-      connector.bulkAdd(request);
-    }
+  }
+
+  @Override
+  public String getDBInfo() {
+    return connector.getCluster();
   }
 
   public String retrieveIndexFormat(String prefix, long millis) {
@@ -139,8 +141,14 @@ public abstract class Indexer {
   }
 
   public MappingMetaData retrieveMappingES(String index, String type) {
-    ClusterState state = connector.createClient().admin().cluster().prepareState().execute().actionGet().getState();
-    return state.getMetaData().index(index).mapping(type);
+    try {
+      ClusterState state = connector.createClient().admin().cluster().prepareState().execute().actionGet().getState();
+      return state.getMetaData().index(index).mapping(type);
+    }
+    catch (Exception e) {
+      log.error("retrieveMappingES() - error connecting to the ElasticSearch cluster.", e);
+      return null;
+    }
   }
 
   protected List<String> retrieveIndicesFromES() {

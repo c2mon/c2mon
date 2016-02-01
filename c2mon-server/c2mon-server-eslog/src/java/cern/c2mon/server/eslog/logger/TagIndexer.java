@@ -16,6 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.logger;
 
+import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.eslog.structure.mappings.Mapping;
 import cern.c2mon.server.eslog.structure.mappings.TagBooleanMapping;
 import cern.c2mon.server.eslog.structure.mappings.TagNumericMapping;
@@ -29,6 +31,7 @@ import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.settings.Settings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -41,6 +44,7 @@ import java.util.*;
  */
 
 @Service
+@Qualifier("tagIndexer")
 @Slf4j
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -59,13 +63,23 @@ public class TagIndexer extends Indexer {
     super.init();
   }
 
+  @Override
+  public void storeData(IFallback object) throws IDBPersistenceException {
+
+  }
+
+  @Override
+  public void storeData(List data) throws IDBPersistenceException {
+
+  }
+
   /**
    * Index several tags in the ElasticSearch cluster according to the
    * BulkProcessor parameters.
    *
    * @param tags to index.
    */
-  public void indexTags(Collection<TagES> tags) {
+  public void indexTags(Collection<TagES> tags) throws IDBPersistenceException {
     log.debug("indexTags() - Received a collection of " + tags.size() +  " tags to send by batch.");
     Map<String, TagES> aliases = new HashMap<>();
 
@@ -79,7 +93,7 @@ public class TagIndexer extends Indexer {
         if (sendTagToBatch(tag)) {
           counter++;
           // 1 by 1 = long running
-          aliases.put(generateAliasName(tag.getId()), tag);
+          aliases.put(generateAliasName(tag.getIdAsLong()), tag);
         }
       }
 
@@ -104,8 +118,8 @@ public class TagIndexer extends Indexer {
    * @param tag to index.
    * @return true, if tag indexing was successful
    */
-  protected boolean sendTagToBatch(TagES tag) {
-    String tagJson = tag.build();
+  protected boolean sendTagToBatch(TagES tag) throws IDBPersistenceException {
+    String tagJson = tag.toString();
     String indexName = generateTagIndex(tag.getServerTimestamp());
     String type = generateTagType(tag.getDataType());
 
@@ -126,7 +140,7 @@ public class TagIndexer extends Indexer {
     return typePrefix + dataType.toLowerCase();
   }
 
-  protected boolean indexByBatch(String index, String type, String json, TagES tag) {
+  protected boolean indexByBatch(String index, String type, String json, TagES tag) throws IDBPersistenceException {
     if (tag == null) {
       log.warn("indexByBatch() - Error while indexing data. Tag has null value");
       return false;
@@ -136,11 +150,19 @@ public class TagIndexer extends Indexer {
       return false;
     }
     else {
-      createNotExistingIndex(index);
-      createNotExistingMapping(index, type);
-      log.debug("indexByBtach() - New IndexRequest for index" + index + " and source " + json);
-      IndexRequest indexNewTag = new IndexRequest(index, type).source(json).routing(String.valueOf(tag.getId()));
-      return connector.bulkAdd(indexNewTag);
+      try {
+        boolean indexIsPresent = createNotExistingIndex(index);
+        boolean typeIsPresent = createNotExistingMapping(index, type);
+        log.debug("indexByBatch() - New IndexRequest for index" + index + " and source " + json);
+        if (indexIsPresent && typeIsPresent) {
+          IndexRequest indexNewTag = new IndexRequest(index, type).source(json).routing(String.valueOf(tag.getId()));
+          return connector.bulkAdd(indexNewTag);
+        }
+      }
+      catch (ClusterNotAvailableException e) {
+        throw new IDBPersistenceException();
+      }
+      return false;
     }
   }
 
@@ -154,13 +176,16 @@ public class TagIndexer extends Indexer {
     return type.matches("^" + typePrefix + ".+$") && (Mapping.ValueType.matches(dataType));
   }
 
-  private void createNotExistingIndex(String index) {
-    if (!indexExists(index)) {
+  private boolean createNotExistingIndex(String index) throws ClusterNotAvailableException {
+    boolean indexExists = indexExists(index);
+    if (!indexExists) {
       boolean isIndexed = instantiateIndex(index);
       if (isIndexed) {
         addIndex(index);
       }
+      return isIndexed;
     }
+    return indexExists;
   }
 
   /**
@@ -170,7 +195,7 @@ public class TagIndexer extends Indexer {
     return indicesTypes.containsKey(index);
   }
 
-  public boolean instantiateIndex(String index) {
+  public boolean instantiateIndex(String index) throws ClusterNotAvailableException {
     if (indicesTypes.containsKey(index) || !checkIndex(index)) {
       log.debug("instantiateIndex() - Bad index: " + index + ".");
       return false;
@@ -178,13 +203,16 @@ public class TagIndexer extends Indexer {
     return connector.handleIndexQuery(index, null, null);
   }
 
-  private void createNotExistingMapping(String index, String type) {
-    if (!mappingExists(index, type)) {
+  private boolean createNotExistingMapping(String index, String type) throws ClusterNotAvailableException {
+    boolean mappingExists = mappingExists(index, type);
+    if (!mappingExists) {
       boolean isInstantiated = instantiateType(index, type);
       if (isInstantiated) {
         addType(index, type);
       }
+      return isInstantiated;
     }
+    return mappingExists;
   }
 
   /**
@@ -204,7 +232,7 @@ public class TagIndexer extends Indexer {
     return types!= null && types.contains(type);
   }
 
-  public boolean instantiateType(String index, String type) {
+  public boolean instantiateType(String index, String type) throws ClusterNotAvailableException {
     if ((indicesTypes.containsKey(index) && indicesTypes.get(index).contains(type)) || !checkIndex(index) || !checkType(type)) {
       log.warn("instantiateType() - Bad type adding to index " + index + ", type: " + type);
     }
@@ -244,7 +272,7 @@ public class TagIndexer extends Indexer {
       throw new IllegalArgumentException("addAliasFromBatch() - IllegalArgument (tag = " + tag + ", index = " + indexMonth + ").");
     }
 
-    long id = tag.getId();
+    long id = tag.getIdAsLong();
     String aliasName = generateAliasName(id);
 
     boolean canBeAdded = indicesAliases.keySet().contains(indexMonth) && !indicesAliases.get(indexMonth).contains(aliasName) && checkIndex(indexMonth) && checkAlias(aliasName);

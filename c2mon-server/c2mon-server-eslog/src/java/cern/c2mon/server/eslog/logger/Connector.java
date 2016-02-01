@@ -16,13 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.logger;
 
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.eslog.structure.queries.ClusterNotAvailableException;
 import cern.c2mon.server.eslog.structure.queries.Query;
 import cern.c2mon.server.eslog.structure.types.AlarmES;
 import cern.c2mon.server.eslog.structure.types.SupervisionES;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.Settings;
 
 import java.util.List;
 import java.util.Set;
@@ -54,7 +54,7 @@ public interface Connector {
   void refreshClusterStats();
 
   Client getClient();
-  ESPersistenceManager getEsPersistenceManager();
+  String getCluster();
 
   /**
    * Retrieve the lists of indices, types and aliases from ElasticSearch and
@@ -82,17 +82,17 @@ public interface Connector {
    * Launch an indexing query against the ElasticSearch cluster.
    * Used to insert a new index or to add a new mapping(type, mapping) to an existing index.
    */
-  boolean handleIndexQuery(String indexName, String type, String mapping);
+  boolean handleIndexQuery(String indexName, String type, String mapping) throws ClusterNotAvailableException;
 
   /**
    * Allows to add a new SupervisionEvent to ElasticSearch.
    */
-  boolean handleSupervisionQuery(String indexName, String mapping, SupervisionES supervisionES);
+  boolean handleSupervisionQuery(String indexName, String mapping, SupervisionES supervisionES) throws IDBPersistenceException;
 
   /**
    * Allows to add a new AlarmES to ElasticSearch.
    */
-  boolean handleAlarmQuery(String indexName, String mapping, AlarmES alarmES);
+  boolean handleAlarmQuery(String indexName, String mapping, AlarmES alarmES) throws IDBPersistenceException;
 
   /**
    * Launch an alias query against the ElasticSearch cluster: to fake an index/Tag.

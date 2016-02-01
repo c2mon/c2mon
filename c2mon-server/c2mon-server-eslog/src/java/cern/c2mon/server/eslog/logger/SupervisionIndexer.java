@@ -1,21 +1,23 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * <p/>
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * <p/>
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * <p/>
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.eslog.logger;
 
+import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.eslog.structure.mappings.Mapping;
 import cern.c2mon.server.eslog.structure.mappings.SupervisionMapping;
 import cern.c2mon.server.eslog.structure.queries.ClusterNotAvailableException;
@@ -28,6 +30,7 @@ import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -41,6 +44,7 @@ import java.util.Map;
  * @author Alban Marguet
  */
 @Service
+@Qualifier("supervisionIndexer")
 @Slf4j
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -60,11 +64,23 @@ public class SupervisionIndexer extends Indexer {
     retrieveMappingsFromES();
   }
 
+  @Override
+  public void storeData(IFallback object) throws IDBPersistenceException {
+    if (object != null && object instanceof SupervisionES) {
+      logSupervisionEvent((SupervisionES) object);
+    }
+  }
+
+  @Override
+  public void storeData(List data) throws IDBPersistenceException {
+    //never sent by batch
+  }
+
   /**
    * Write the SupervisionES to ElasticSearch in the Supervision index.
    * @param supervisionES to be written to ElasticSearch.
    */
-  public void logSupervisionEvent(SupervisionES supervisionES) {
+  public void logSupervisionEvent(SupervisionES supervisionES) throws IDBPersistenceException {
     if (supervisionES != null) {
       String indexName = generateSupervisionIndex(supervisionES.getEventTime());
       String mapping = createMappingIfNewIndex(indexName);
@@ -99,14 +115,17 @@ public class SupervisionIndexer extends Indexer {
       List<String> types = retrieveTypesFromES(index);
       for (String type : types) {
         MappingMetaData mapping = retrieveMappingES(index, type);
-        String jsonMapping = mapping.source().toString();
-        log.debug("retrieveMappingsFromES() - mapping: " + jsonMapping);
-        this.indices.put(index, jsonMapping);
+
+        if (mapping != null) {
+          String jsonMapping = mapping.source().toString();
+          log.debug("retrieveMappingsFromES() - mapping: " + jsonMapping);
+          this.indices.put(index, jsonMapping);
+        }
       }
     }
   }
 
-  public void indexData(String indexName, String mapping, SupervisionES supervisionES) {
+  public void indexData(String indexName, String mapping, SupervisionES supervisionES) throws IDBPersistenceException {
     boolean isAcked = connector.handleSupervisionQuery(indexName, mapping, supervisionES);
     if (isAcked) {
       log.debug("logSupervisionEvent() - isAcked: " + isAcked);

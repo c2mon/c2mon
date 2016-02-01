@@ -1,21 +1,23 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * <p/>
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * <p/>
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * <p/>
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.eslog.logger;
 
+import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.eslog.structure.mappings.AlarmMapping;
 import cern.c2mon.server.eslog.structure.mappings.Mapping;
 import cern.c2mon.server.eslog.structure.queries.ClusterNotAvailableException;
@@ -28,6 +30,7 @@ import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -39,6 +42,7 @@ import java.util.*;
  */
 @Slf4j
 @Service
+@Qualifier("alarmIndexer")
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class AlarmIndexer extends Indexer {
@@ -58,11 +62,23 @@ public class AlarmIndexer extends Indexer {
     retrieveMappingsFromES();
   }
 
+  @Override
+  public void storeData(IFallback object) throws IDBPersistenceException {
+    if (object != null && object instanceof AlarmES) {
+      logAlarm((AlarmES) object);
+    }
+  }
+
+  @Override
+  public void storeData(List data) throws IDBPersistenceException {
+    //never sent by batch
+  }
+
   /**
    * Creates a new AlarmQuery to write the data to ElasticSearch inside the alarm index.
    * @param alarmES to write to the cluster.
    */
-  public void logAlarm(AlarmES alarmES) {
+  public void logAlarm(AlarmES alarmES) throws IDBPersistenceException {
     if (alarmES != null) {
       String indexName = generateAlarmIndex(alarmES.getServerTimestamp());
       String mapping = createOrRetrieveMapping(indexName);
@@ -96,14 +112,17 @@ public class AlarmIndexer extends Indexer {
       List<String> types = retrieveTypesFromES(index);
       for (String type : types) {
         MappingMetaData mapping = retrieveMappingES(index, type);
-        String jsonMapping = mapping.source().toString();
-        log.debug("retrieveMappingsFromES() - mapping: " + jsonMapping);
-        this.indices.put(index, jsonMapping);
+
+        if (mapping != null) {
+          String jsonMapping = mapping.source().toString();
+          log.debug("retrieveMappingsFromES() - mapping: " + jsonMapping);
+          this.indices.put(index, jsonMapping);
+        }
       }
     }
   }
 
-  public void indexData(String indexName, String mapping, AlarmES alarmES) {
+  public void indexData(String indexName, String mapping, AlarmES alarmES) throws IDBPersistenceException {
     boolean isAcked = connector.handleAlarmQuery(indexName, mapping, alarmES);
     if (isAcked) {
       log.debug("logAlarm() - isAcked: " + isAcked);

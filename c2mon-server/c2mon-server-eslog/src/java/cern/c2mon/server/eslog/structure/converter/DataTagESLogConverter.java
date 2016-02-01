@@ -97,7 +97,7 @@ public class DataTagESLogConverter {
     setValid(tag, tagES);
     tagES.setValue(tag.getValue());
     tagES.setValueDescription(tag.getValueDescription());
-    log.trace("convertToTagES() - new tagES: " + tagES.build());
+    log.trace("convertToTagES() - new tagES: " + tagES.toString());
     return tagES;
   }
 

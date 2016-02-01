@@ -129,7 +129,7 @@ public class TransportConnectorTest {
   }
 
   @Test
-  public void testHandleIndexQuery() {
+  public void testHandleIndexQuery() throws ClusterNotAvailableException {
     Client initClient = connector.getClient();
     Settings settings = createMonthSettings();
     String type = "tag_string";
@@ -145,7 +145,7 @@ public class TransportConnectorTest {
   }
 
   @Test
-  public void testHandleAliasQuery() {
+  public void testHandleAliasQuery() throws ClusterNotAvailableException {
     Client initClient = connector.getClient();
     Settings settings = Settings.settingsBuilder().build();
     String type = "tag_string";

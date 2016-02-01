@@ -16,6 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.listener;
 
+import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.pmanager.persistence.IPersistenceManager;
+import cern.c2mon.pmanager.persistence.impl.TimPersistenceManager;
 import cern.c2mon.server.cache.BufferedTimCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.component.Lifecycle;
@@ -24,15 +27,18 @@ import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.eslog.logger.Indexer;
 import cern.c2mon.server.eslog.logger.TagIndexer;
 import cern.c2mon.server.eslog.structure.converter.DataTagESLogConverter;
+import cern.c2mon.server.eslog.structure.queries.ClusterNotAvailableException;
 import cern.c2mon.server.eslog.structure.types.TagES;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Listens to updates in the Rule and DataTag caches and calls the DAO
@@ -58,7 +64,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
   /**
    * The Indexer allows to use the connection to the ElasticSearch cluster and to write data.
    */
-  private final TagIndexer indexer;
+  private final IPersistenceManager persistenceManager;
 
   /**
    * Listener container lifecycle hook.
@@ -76,11 +82,11 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
    * @param cacheRegistrationService for registering cache listeners
    */
   @Autowired
-  public TagESLogCacheListener(final CacheRegistrationService cacheRegistrationService, final DataTagESLogConverter dataTagESLogConverter, final TagIndexer indexer) {
+  public TagESLogCacheListener(final CacheRegistrationService cacheRegistrationService, @Qualifier("tagPersistenceManager") final IPersistenceManager persistenceManager, final DataTagESLogConverter dataTagESLogConverter) {
     super();
     this.cacheRegistrationService = cacheRegistrationService;
     this.dataTagESLogConverter = dataTagESLogConverter;
-    this.indexer = indexer;
+    this.persistenceManager = persistenceManager;
   }
 
   /**
@@ -103,8 +109,8 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
   @Override
   public void notifyElementUpdated(Collection<Tag> tagCollection) {
     log.debug("notifyElementUpdated() - Received a tagCollection of " + tagCollection.size() + " elements.");
-    Collection<TagES> tagESCollection = new ArrayList<>();
-    Collection<Tag> tagsToLog = new ArrayList<>(tagCollection.size());
+    List<TagES> tagESCollection = new ArrayList<>();
+    List<Tag> tagsToLog = new ArrayList<>(tagCollection.size());
 
     retrieveTagsToLog(tagCollection, tagsToLog);
     convertTagsToLogToTagES(tagsToLog, tagESCollection);
@@ -120,7 +126,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
     log.debug("retrieveTagsToLog() - With " + tagsToLog.size() + " tags to be logged.");
   }
 
-  private void convertTagsToLogToTagES(Collection<Tag> tagsToLog, Collection<TagES> tagESCollection) {
+  private void convertTagsToLogToTagES(Collection<Tag> tagsToLog, List<TagES> tagESCollection) {
     for (Tag tag: tagsToLog) {
       try {
         TagES tagES = dataTagESLogConverter.convertToTagES(tag);
@@ -139,14 +145,13 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
     }
   }
 
-  private void sendCollectionTagESToElasticSearch(Collection<TagES> tagESCollection) {
+  private void sendCollectionTagESToElasticSearch(List<TagES> tagESCollection) {
     try {
       log.debug("sendCollectionTagESToElasticSearch() - send a collection of tagES to indexer of size: " + tagESCollection.size());
-      indexer.indexTags(tagESCollection);
+      persistenceManager.storeData(tagESCollection);
     }
     catch(Exception e) {
       log.error("sendCollectionTagESToElasticSearch() - Exception occurred while trying to index data to the ElasticSearch cluster.", e);
-      //indexer.getEsPersistenceManager().launchFallBackMechanism(tagESCollection);
     }
   }
 

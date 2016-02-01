@@ -70,7 +70,7 @@ public class TagBooleanTest {
         + "\n  \"sourceTimestamp\": 0,\n  \"serverTimestamp\": 0,\n  \"daqTimestamp\": 0,\n  \"status\": 0\n" +
         "}";
 
-    assertEquals(text, tagBoolean.build());
+    assertEquals(text, tagBoolean.toString());
   }
 
   @Test

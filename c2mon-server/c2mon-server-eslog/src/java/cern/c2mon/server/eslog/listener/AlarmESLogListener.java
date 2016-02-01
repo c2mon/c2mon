@@ -1,21 +1,23 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * <p/>
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * <p/>
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * <p/>
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.eslog.listener;
 
+import cern.c2mon.pmanager.persistence.IPersistenceManager;
+import cern.c2mon.pmanager.persistence.impl.TimPersistenceManager;
 import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.alarm.Alarm;
@@ -26,6 +28,7 @@ import cern.c2mon.server.eslog.structure.converter.AlarmESLogConverter;
 import cern.c2mon.server.eslog.structure.types.AlarmES;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +46,7 @@ public class AlarmESLogListener implements C2monCacheListener<Alarm>, SmartLifec
   private CacheRegistrationService cacheRegistrationService;
 
   /** Bean that logs Tags into ElasticSearch. */
-  private AlarmIndexer alarmIndexer;
+  private IPersistenceManager persistenceManager;
 
   /** Allows to get the right information from the Alarm to create an AlarmES instance. */
   private AlarmESLogConverter alarmESLogConverter;
@@ -58,13 +61,13 @@ public class AlarmESLogListener implements C2monCacheListener<Alarm>, SmartLifec
    * Autowired constructor.
    *
    * @param cacheRegistrationService for registering cache listeners.
-   * @param alarmIndexer for logging cache objects to ElasticSearch.
+   * @param persistenceManager for logging cache objects to ElasticSearch.
    */
   @Autowired
-  public AlarmESLogListener(final CacheRegistrationService cacheRegistrationService, final AlarmIndexer alarmIndexer, final AlarmESLogConverter alarmESLogConverter) {
+  public AlarmESLogListener(final CacheRegistrationService cacheRegistrationService, @Qualifier("alarmPersistenceManager") final IPersistenceManager persistenceManager, final AlarmESLogConverter alarmESLogConverter) {
     super();
     this.cacheRegistrationService = cacheRegistrationService;
-    this.alarmIndexer = alarmIndexer;
+    this.persistenceManager = persistenceManager;
     this.alarmESLogConverter = alarmESLogConverter;
   }
 
@@ -90,7 +93,7 @@ public class AlarmESLogListener implements C2monCacheListener<Alarm>, SmartLifec
 
   public void sendIfAlarmESIsNotNull(AlarmES alarmES) {
     if (alarmES != null) {
-      alarmIndexer.logAlarm(alarmES);
+      persistenceManager.storeData(alarmES);
     }
     else {
       log.warn("notifyElementUpdated() - Warning: The received alarm was null.");

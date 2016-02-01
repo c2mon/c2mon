@@ -62,7 +62,7 @@ public class TagStringTest {
 		String line = "\n  \"quality\": \"ok\"";
 		String text = "{\n  \"id\": 0,\n  \"sourceTimestamp\": 0,\n  \"serverTimestamp\": 0,\n  \"daqTimestamp\": 0,\n  \"status\": 0," + line + "\n}";
 
-		assertEquals(text, tagString.build());
+		assertEquals(text, tagString.toString());
 	}
 
 	@Test

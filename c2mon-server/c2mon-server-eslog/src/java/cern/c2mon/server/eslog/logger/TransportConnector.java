@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.logger;
 
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.eslog.structure.queries.*;
 import cern.c2mon.server.eslog.structure.types.AlarmES;
 import cern.c2mon.server.eslog.structure.types.SupervisionES;
@@ -112,11 +113,6 @@ public class TransportConnector implements Connector {
 
   private boolean isConnected;
 
-  /** Used for fallBack in case the cluster is not reachable anymore. */
-  private final ESPersistenceManager esPersistenceManager;
-  private String backupFilePath;
-  private final String backupFileName = "/backup.ser";
-
   /** BulkSettings */
   @Value("${es.config.bulk.actions:5600}")
   private int bulkActions;
@@ -127,11 +123,7 @@ public class TransportConnector implements Connector {
   @Value("${es.config.bulk.concurrent:1}")
   private int concurrent;
 
-  @Autowired
-  public TransportConnector(final ESPersistenceManager esPersistenceManager) {
-    this.esPersistenceManager = esPersistenceManager;
-    this.backupFilePath = System.getProperty("c2mon.home") + backupFileName;
-    esPersistenceManager.setupBackup(backupFilePath);
+  public TransportConnector() {
     declareClusterResearch();
   }
 
@@ -250,9 +242,7 @@ public class TransportConnector implements Connector {
       public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
         log.debug("afterBulk() - Executed bulk composed of {} actions", request.numberOfActions());
         handleFailedActions(request, response);
-        if (!waitForYellowStatus()) {
-          findClusterAndLaunchBulk();
-        }
+        waitForYellowStatus();
         refreshClusterStats();
       }
 
@@ -263,9 +253,7 @@ public class TransportConnector implements Connector {
         log.warn("afterBulk() - Error executing bulk", failure);
         closeBulk();
         handleFailedActions(request, null);
-        if (!waitForYellowStatus()) {
-          findClusterAndLaunchBulk();
-        }
+        waitForYellowStatus();
       }
     })
         .setName(bulkProcessorName)
@@ -292,7 +280,7 @@ public class TransportConnector implements Connector {
       }
       catch (ClusterNotAvailableException e) {
         log.debug("waitForYellowStatus() - NoNodeAvailableException: cluster not reachable.");
-        //TODO
+        findClusterAndLaunchBulk();
         return false;
       }
     }
@@ -354,21 +342,16 @@ public class TransportConnector implements Connector {
   }
 
   @Override
-  public boolean handleIndexQuery(String indexName, String type, String mapping) {
+  public boolean handleIndexQuery(String indexName, String type, String mapping) throws ClusterNotAvailableException {
     boolean isAcked = false;
 
-    try {
-      QueryIndexBuilder query = new QueryIndexBuilder(client);
-      if (client == null) {
-        log.error("handleIndexQuery() - Error: the client is " + client + " and query is " + query + ".");
-        return isAcked;
-      }
+    QueryIndexBuilder query = new QueryIndexBuilder(client);
+    if (client == null) {
+      log.error("handleIndexQuery() - Error: the client is " + client + ".");
+      return isAcked;
+    }
 
-      isAcked = query.indexNew(indexName, type, mapping);
-    }
-    catch (ClusterNotAvailableException e) {
-      log.debug("handleIndexQuery() - Cluster not available, index creation cancelled.");
-    }
+    isAcked = query.indexNew(indexName, type, mapping);
     return isAcked;
   }
 
@@ -379,7 +362,7 @@ public class TransportConnector implements Connector {
       Query query = new QueryAliases(client);
 
       if (client == null) {
-        log.error("handleAliasQuery() - Error: the client is " + client + " and query is " + query + ".");
+        log.error("handleAliasQuery() - Error: the client is " + client + ".");
         return isAcked;
       }
 
@@ -392,13 +375,13 @@ public class TransportConnector implements Connector {
   }
 
   @Override
-  public boolean handleSupervisionQuery(String indexName, String mapping, SupervisionES supervisionES) {
+  public boolean handleSupervisionQuery(String indexName, String mapping, SupervisionES supervisionES) throws IDBPersistenceException {
     boolean isAcked = false;
     try {
       SupervisionQuery supervisionQuery = new SupervisionQuery(client, supervisionES);
 
       if (client == null) {
-        log.error("handleSupervisionQuery() - Error: the client is " + client + " and query is " + supervisionQuery + ".");
+        log.error("handleSupervisionQuery() - Error: the client is " + client + ".");
         return isAcked;
       }
 
@@ -406,20 +389,20 @@ public class TransportConnector implements Connector {
     }
     catch (ClusterNotAvailableException e) {
       log.debug("handleSupervisionQuery() - Cluster not available, sending SupervisionEvent to fallback file.");
-      //TODO
+      throw new IDBPersistenceException();
     }
     return isAcked;
   }
 
   @Override
-  public boolean handleAlarmQuery(String indexName, String mapping, AlarmES alarmES) {
+  public boolean handleAlarmQuery(String indexName, String mapping, AlarmES alarmES) throws IDBPersistenceException {
     log.debug("handleAlarmQuery() - Handling AlarmESQuery with mapping:" + mapping + " for index: " + indexName + ".");
     boolean isAcked = false;
     try {
       AlarmESQuery alarmESQuery = new AlarmESQuery(client, alarmES);
 
       if (client == null) {
-        log.error("handleAlarmQuery() - Error: the client is " + client + " and query is " + alarmESQuery + ".");
+        log.error("handleAlarmQuery() - Error: the client is " + client + ".");
         return isAcked;
       }
 
@@ -427,7 +410,7 @@ public class TransportConnector implements Connector {
     }
     catch (ClusterNotAvailableException e) {
       log.debug("handleAlarmQuery() - Cluster not available, sending Alarm to fallback file.");
-      //TODO
+      throw new IDBPersistenceException();
     }
     return isAcked;
   }
@@ -436,12 +419,12 @@ public class TransportConnector implements Connector {
     Set<String> indices = new HashSet<>();
     if (client != null) {
       try {
+        log.trace("updateIndices() - Updating list of indices.");
         indices.addAll(handleListingQuery(new QueryIndices(client), null));
       }
       catch (ClusterNotAvailableException e) {
         log.debug("updateIndices() - Cluster cannot be reached.");
       }
-      log.trace("updateIndices() - Updating list of indices.");
     }
     return indices;
   }
@@ -450,12 +433,12 @@ public class TransportConnector implements Connector {
     Set<String> types = new HashSet<>();
     if (client != null) {
       try {
+        log.trace("updateTypes() - Updating list of types.");
         types.addAll(handleListingQuery(new QueryTypes(client), index));
       }
       catch (ClusterNotAvailableException e) {
         log.debug("updateTypes() - Cluster cannot be reached.");
       }
-      log.trace("updateTypes() - Updating list of types.");
     }
     return types;
   }
@@ -464,12 +447,12 @@ public class TransportConnector implements Connector {
     Set<String> aliases = new HashSet<>();
     if (client != null) {
       try {
+        log.trace("updateAliases() - Updating list of aliases.");
         aliases.addAll(handleListingQuery(new QueryAliases(client), index));
       }
       catch (ClusterNotAvailableException e) {
         log.debug("updateAliases() - Cluster cannot be reached.");
       }
-      log.trace("updateAliases() - Updating list of aliases.");
     }
     return aliases;
   }

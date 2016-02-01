@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.types;
 
+import cern.c2mon.pmanager.IFallback;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -32,7 +33,8 @@ import java.util.Map;
  */
 @Slf4j
 @Data
-public abstract class TagES implements TagESInterface {
+public abstract class TagES implements TagESInterface, IFallback {
+  private transient Gson GSON = new GsonBuilder().setPrettyPrinting().create();
   private long id;
   private String name;
   private String dataType;
@@ -55,13 +57,27 @@ public abstract class TagES implements TagESInterface {
 
   abstract public void setValue(Object tagValue);
 
-  public String build() {
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    JsonObject tagESAsTree = gson.toJsonTree(this).getAsJsonObject();
+  @Override
+  public String toString() {
+    JsonObject tagESAsTree = GSON.toJsonTree(this).getAsJsonObject();
     addMetadata(tagESAsTree);
-    String json = gson.toJson(tagESAsTree);
+    String json = GSON.toJson(tagESAsTree);
     log.debug(json);
     return json;
+  }
+
+  @Override
+  public IFallback getObject(String line) {
+    return GSON.fromJson(line, TagBoolean.class);
+  }
+
+  @Override
+  public String getId() {
+    return String.valueOf(id);
+  }
+
+  public long getIdAsLong() {
+    return id;
   }
 
   public void addMetadata(JsonObject tagESAsTree) {
@@ -69,48 +85,6 @@ public abstract class TagES implements TagESInterface {
       for (String key : metadata.keySet()) {
         tagESAsTree.addProperty(key, metadata.get(key));
       }
-    }
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder str = new StringBuilder();
-    str.append(getId());
-    str.append('\t');
-    str.append(getName());
-    str.append('\t');
-    str.append(getValue());
-    str.append('\t');
-    str.append(getValueDescription());
-    str.append('\t');
-    str.append(getDataType());
-    str.append('\t');
-    str.append(getSourceTimestamp());
-    str.append('\t');
-    str.append(getDaqTimestamp());
-    str.append('\t');
-    str.append(getServerTimestamp());
-    str.append('\t');
-    str.append(getStatus());
-    str.append('\t');
-    str.append(getQualityAppend(str));
-    str.append('\t');
-    str.append(getValid());
-    str.append('\t');
-    str.append(getProcess());
-    str.append('\t');
-    str.append(getEquipment());
-    str.append('\t');
-    str.append(getSubEquipment());
-    return str.toString();
-  }
-
-  private String getQualityAppend(StringBuilder str) {
-    boolean qualityIsEmpty = (getQuality() != null) && (getQuality().equals(""));
-    if (qualityIsEmpty) {
-      return "nullQuality";
-    } else {
-      return getQuality();
     }
   }
 }

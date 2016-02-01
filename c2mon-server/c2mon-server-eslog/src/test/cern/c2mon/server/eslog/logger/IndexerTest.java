@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.logger;
 
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.eslog.structure.mappings.Mapping;
 import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
 import cern.c2mon.server.eslog.structure.queries.ClusterNotAvailableException;
@@ -114,17 +115,16 @@ public class IndexerTest {
   }
 
   @Test
-  public void testInstantiateIndex() {
+  public void testInstantiateIndex() throws ClusterNotAvailableException {
     String index = "c2mon-tag_2015-02";
     log.debug(System.getProperty("c2mon.home"));
-    log.debug("BACKUP: " + connector.getBackupFilePath());
     boolean isAcked = indexer.instantiateIndex(index);
     assertTrue(isAcked);
     assertTrue(connector.getClient().admin().indices().exists(new IndicesExistsRequest(index)).actionGet().isExists());
   }
 
   @Test
-  public void testInstantiateType() {
+  public void testInstantiateType() throws ClusterNotAvailableException {
     String index = "c2mon-tag_2015-02";
     String type = "tag_string";
 
@@ -136,7 +136,7 @@ public class IndexerTest {
   }
 
   @Test
-  public void testUpdateLists() {
+  public void testUpdateLists() throws ClusterNotAvailableException {
     Set<String> expectedIndex = new HashSet<>();
     Set<String> expectedType = new HashSet<>();
     assertEquals(expectedIndex, indexer.getIndicesTypes().keySet());
@@ -273,7 +273,7 @@ public class IndexerTest {
   }
 
   @Test
-  public void testSendTagToBatch() throws ClusterNotAvailableException {
+  public void testSendTagToBatch() throws IDBPersistenceException, ClusterNotAvailableException {
     TagES tag = new TagBoolean();
     tag.setDataType(Mapping.ValueType.boolType.toString());
     tag.setId(1L);
@@ -299,7 +299,7 @@ public class IndexerTest {
   }
 
   @Test
-  public void testIndexTags() throws ClusterNotAvailableException {
+  public void testIndexTags() throws ClusterNotAvailableException, IDBPersistenceException {
     long size = 10;
     List<TagES> list = new ArrayList<>();
     Set<String> listIndices = new HashSet<>();
@@ -319,7 +319,7 @@ public class IndexerTest {
       tag.setServerTimestamp(tagServerTime);
       list.add(tag);
       listIndices.add(indexer.generateTagIndex(tag.getServerTimestamp()));
-      listAliases.add(indexer.generateAliasName(tag.getId()));
+      listAliases.add(indexer.generateAliasName(tag.getIdAsLong()));
       if (id == size) {
         log.debug("list of tags realized");
       }
@@ -390,7 +390,7 @@ public class IndexerTest {
   }
 
   @Test
-  public void testBulkAddAlias() {
+  public void testBulkAddAlias() throws ClusterNotAvailableException {
     TagES tag = new TagString();
     tag.setId(1L);
     tag.setDataType(Mapping.ValueType.stringType.toString());
@@ -416,17 +416,17 @@ public class IndexerTest {
   }
 
   @Test
-  public void testIndexByBatch() throws IOException {
+  public void testIndexByBatch() throws IOException, IDBPersistenceException {
     TagES tag = new TagString();
     tag.setDataType(Mapping.ValueType.stringType.toString());
     tag.setId(1L);
     String type = indexer.generateTagType(tag.getDataType());
 
-    assertFalse(indexer.indexByBatch(null, tag.getDataType(), tag.build(), tag));
-    assertFalse(indexer.indexByBatch("c2mon-tag_2015-12", "badType", tag.build(), tag));
+    assertFalse(indexer.indexByBatch(null, tag.getDataType(), tag.toString(), tag));
+    assertFalse(indexer.indexByBatch("c2mon-tag_2015-12", "badType", tag.toString(), tag));
     assertNull(indexer.getIndicesTypes().get("c2mon-tag_2015-12"));
 
-    assertTrue(indexer.indexByBatch("c2mon-tag_2015-12", type, tag.build(), tag));
+    assertTrue(indexer.indexByBatch("c2mon-tag_2015-12", type, tag.toString(), tag));
     connector.closeBulk();
     assertTrue(indexer.getIndicesTypes().size() == 1);
     assertTrue(indexer.getIndicesTypes().get("c2mon-tag_2015-12").contains(type));

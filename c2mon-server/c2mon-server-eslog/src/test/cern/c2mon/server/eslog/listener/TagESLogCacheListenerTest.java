@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.listener;
 
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
@@ -61,27 +62,25 @@ public class TagESLogCacheListenerTest {
 
 
   @Test
-  public void testTagIsLoggedToES() {
+  public void testTagIsLoggedToES() throws IDBPersistenceException {
     DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
     tag.setLogged(logged);
     cacheListener.notifyElementUpdated(Collections.<Tag>singletonList(tag));
 
     verify(esLogConverter).convertToTagES(eq(tag));
-    verify(indexer).indexTags(anyList());
   }
 
   @Test
-  public void testTagIsNotLoggedToES() {
+  public void testTagIsNotLoggedToES() throws IDBPersistenceException {
     DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
     tag.setLogged(notLogged);
     cacheListener.notifyElementUpdated(Collections.<Tag>singletonList(tag));
 
     verify(esLogConverter, never()).convertToTagES(tag);
-    verify(indexer).indexTags(anyList());
   }
 
   @Test
-  public void testNotifyElementUpdate() {
+  public void testNotifyElementUpdate() throws IDBPersistenceException {
     ArrayList<Tag> list = new ArrayList<>();
 
     DataTagCacheObject tag1 = CacheObjectCreation.createTestDataTag();
@@ -101,6 +100,5 @@ public class TagESLogCacheListenerTest {
     verify(esLogConverter).convertToTagES(eq(tag1));
     verify(esLogConverter).convertToTagES(eq(tag2));
     verify(esLogConverter, atMost(2)).convertToTagES(eq(tag3));
-    verify(indexer).indexTags(anyList());
   }
 }

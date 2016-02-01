@@ -1,21 +1,23 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * <p/>
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * <p/>
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * <p/>
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.eslog.listener;
 
+import cern.c2mon.pmanager.persistence.IPersistenceManager;
+import cern.c2mon.pmanager.persistence.impl.TimPersistenceManager;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.eslog.logger.SupervisionIndexer;
@@ -27,6 +29,7 @@ import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -45,7 +48,7 @@ public class ESLogSupervisionListener implements SupervisionListener, SmartLifec
   private SupervisionNotifier supervisionNotifier;
 
   /** Supervision Mapper */
-  private SupervisionIndexer supervisionIndexer;
+  private IPersistenceManager persistenceManager;
 
   /** Convert SupervisionEvent to SupervisionES for ElasticSearch.*/
   private SupervisionESConverter supervisionESConverter;
@@ -60,12 +63,12 @@ public class ESLogSupervisionListener implements SupervisionListener, SmartLifec
    * Autowired constructor.
    *
    * @param supervisionNotifier the notifier to register to
-   * @param supervisionIndexer the mapper to write to the DB
+   * @param persistenceManager the mapper to write to the DB
    */
   @Autowired
-  public ESLogSupervisionListener(final SupervisionNotifier supervisionNotifier, final SupervisionIndexer supervisionIndexer, final SupervisionESConverter supervisionESConverter) {
+  public ESLogSupervisionListener(final SupervisionNotifier supervisionNotifier, @Qualifier("supervisionPersistenceManager") final IPersistenceManager persistenceManager, final SupervisionESConverter supervisionESConverter) {
     this.supervisionNotifier = supervisionNotifier;
-    this.supervisionIndexer = supervisionIndexer;
+    this.persistenceManager = persistenceManager;
     this.supervisionESConverter = supervisionESConverter;
   }
 
@@ -87,8 +90,13 @@ public class ESLogSupervisionListener implements SupervisionListener, SmartLifec
           + " for " + supervisionEvent.getEntity()
           + " " + supervisionEvent.getEntityId() + " to ElasticSearch");
     }
-    SupervisionES supervisionES = supervisionESConverter.convertSupervisionEventToSupervisionES(supervisionEvent);
-    supervisionIndexer.logSupervisionEvent(supervisionES);
+    try {
+      SupervisionES supervisionES = supervisionESConverter.convertSupervisionEventToSupervisionES(supervisionEvent);
+      persistenceManager.storeData(supervisionES);
+    }
+    catch (Exception e) {
+      log.error("notifySupervisionEvent() - Could not add Supervision to ElasticSearch: Event # " + supervisionEvent.getEntityId() + ".", e);
+    }
   }
 
   @Override

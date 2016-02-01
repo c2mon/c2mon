@@ -67,7 +67,7 @@ public class TagNumericTest {
     String text = "{\n  \"id\": 0," + line
         + "\n  \"sourceTimestamp\": 0,\n  \"serverTimestamp\": 0,\n  \"daqTimestamp\": 0,\n  \"status\": 0\n}";
 
-    assertEquals(text, tagNumeric.build());
+    assertEquals(text, tagNumeric.toString());
   }
 
   @Test
