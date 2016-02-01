@@ -64,7 +64,7 @@ public class AlarmESLogListener implements C2monCacheListener<Alarm>, SmartLifec
    * @param persistenceManager for logging cache objects to ElasticSearch.
    */
   @Autowired
-  public AlarmESLogListener(final CacheRegistrationService cacheRegistrationService, @Qualifier("alarmPersistenceManager") final IPersistenceManager persistenceManager, final AlarmESLogConverter alarmESLogConverter) {
+  public AlarmESLogListener(final CacheRegistrationService cacheRegistrationService, @Qualifier("alarmESPersistenceManager") final IPersistenceManager persistenceManager, final AlarmESLogConverter alarmESLogConverter) {
     super();
     this.cacheRegistrationService = cacheRegistrationService;
     this.persistenceManager = persistenceManager;

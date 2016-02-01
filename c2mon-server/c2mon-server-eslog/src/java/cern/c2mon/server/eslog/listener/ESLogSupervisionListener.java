@@ -66,7 +66,7 @@ public class ESLogSupervisionListener implements SupervisionListener, SmartLifec
    * @param persistenceManager the mapper to write to the DB
    */
   @Autowired
-  public ESLogSupervisionListener(final SupervisionNotifier supervisionNotifier, @Qualifier("supervisionPersistenceManager") final IPersistenceManager persistenceManager, final SupervisionESConverter supervisionESConverter) {
+  public ESLogSupervisionListener(final SupervisionNotifier supervisionNotifier, @Qualifier("supervisionESPersistenceManager") final IPersistenceManager persistenceManager, final SupervisionESConverter supervisionESConverter) {
     this.supervisionNotifier = supervisionNotifier;
     this.persistenceManager = persistenceManager;
     this.supervisionESConverter = supervisionESConverter;

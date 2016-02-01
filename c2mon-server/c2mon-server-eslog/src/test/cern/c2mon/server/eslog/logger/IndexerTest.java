@@ -34,6 +34,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.junit.*;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
@@ -56,7 +57,6 @@ import static org.junit.Assert.fail;
 @Slf4j
 @ContextConfiguration({"classpath:cern/c2mon/server/eslog/config/server-eslog-integration.xml" })
 @RunWith(SpringJUnit4ClassRunner.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class IndexerTest {
   private static String clusterName;
   private static String nodeName;
@@ -69,9 +69,12 @@ public class IndexerTest {
   @Autowired
   private TransportConnector connector;
 
+  @ClassRule
+  public static TemporaryFolder c2monHome = new TemporaryFolder();
+
   @BeforeClass
   public static void setEnv() {
-    System.setProperty("c2mon.home", ".");
+    System.setProperty("c2mon.home", c2monHome.toString());
   }
 
   @AfterClass

@@ -82,7 +82,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
    * @param cacheRegistrationService for registering cache listeners
    */
   @Autowired
-  public TagESLogCacheListener(final CacheRegistrationService cacheRegistrationService, @Qualifier("tagPersistenceManager") final IPersistenceManager persistenceManager, final DataTagESLogConverter dataTagESLogConverter) {
+  public TagESLogCacheListener(final CacheRegistrationService cacheRegistrationService, @Qualifier("tagESPersistenceManager") final IPersistenceManager persistenceManager, final DataTagESLogConverter dataTagESLogConverter) {
     super();
     this.cacheRegistrationService = cacheRegistrationService;
     this.dataTagESLogConverter = dataTagESLogConverter;
