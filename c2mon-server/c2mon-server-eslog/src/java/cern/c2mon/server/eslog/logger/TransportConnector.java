@@ -425,6 +425,7 @@ public class TransportConnector implements Connector {
       }
       catch (ClusterNotAvailableException e) {
         log.debug("updateIndices() - Cluster cannot be reached.");
+        throw new IDBPersistenceException();
       }
     }
     return indices;
@@ -437,8 +438,9 @@ public class TransportConnector implements Connector {
         log.trace("updateTypes() - Updating list of types.");
         types.addAll(handleListingQuery(new QueryTypes(client), index));
       }
-      catch (Exception e) {
+      catch (ClusterNotAvailableException e) {
         log.debug("updateTypes() - Cluster cannot be reached.");
+        throw new IDBPersistenceException();
       }
     }
     return types;
@@ -453,6 +455,7 @@ public class TransportConnector implements Connector {
       }
       catch (ClusterNotAvailableException e) {
         log.debug("updateAliases() - Cluster cannot be reached.");
+        throw new IDBPersistenceException();
       }
     }
     return aliases;

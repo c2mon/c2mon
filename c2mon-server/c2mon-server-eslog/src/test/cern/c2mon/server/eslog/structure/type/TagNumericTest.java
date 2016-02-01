@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.type;
 
+import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.server.eslog.structure.types.TagNumeric;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -73,5 +74,13 @@ public class TagNumericTest {
   public void testNullValue() {
     tagNumeric.setValue(null);
     assertNull(tagNumeric.getValue());
+  }
+
+  @Test
+  public void testGetObject() {
+    String line = "{\"id\":1053976,\"name\":\"CLIC:CFC-CCR-ALLGPSPS:SYS.MEM.FREEPCT\",\"dataType\":\"float\",\"sourceTimestamp\":1454342362957,\"serverTimestamp\":1454342362981,\"daqTimestamp\":1454342362957,\"status\":0,\"quality\":\"{}\",\"valid\":true,\"valueNumeric\":73.9237,\"valueDescription\":\"\",\"process\":\"P_CLIC_SPS\",\"equipment\":\"CLIC:CFC-CCR-ALLGPSPS\"}";
+    IFallback result = tagNumeric.getObject(line);
+    assertTrue(result instanceof TagNumeric);
+    assertEquals(line, result.toString());
   }
 }
