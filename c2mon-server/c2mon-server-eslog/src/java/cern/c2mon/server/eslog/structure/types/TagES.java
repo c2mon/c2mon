@@ -34,7 +34,7 @@ import java.util.Map;
 @Slf4j
 @Data
 public abstract class TagES implements TagESInterface, IFallback {
-  private transient Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+  private transient Gson GSON = new GsonBuilder().create();
   private long id;
   private String name;
   private String dataType;

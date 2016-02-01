@@ -65,10 +65,8 @@ public class TagBooleanTest {
   @Test
   public void testBuild() throws IOException {
     tagBoolean.setDataType("boolean");
-    String line = "\n  \"dataType\": \"boolean\",";
-    String text = "{\n  \"id\": 0," + line
-        + "\n  \"sourceTimestamp\": 0,\n  \"serverTimestamp\": 0,\n  \"daqTimestamp\": 0,\n  \"status\": 0\n" +
-        "}";
+    String line = "\"dataType\":\"boolean\",";
+    String text = "{\"id\":0," + line + "\"sourceTimestamp\":0,\"serverTimestamp\":0,\"daqTimestamp\":0,\"status\":0}";
 
     assertEquals(text, tagBoolean.toString());
   }

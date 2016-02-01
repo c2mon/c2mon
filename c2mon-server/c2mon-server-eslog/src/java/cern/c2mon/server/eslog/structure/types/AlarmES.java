@@ -34,7 +34,7 @@ import java.util.Map;
 @Slf4j
 @Data
 public class AlarmES implements IFallback {
-  private transient Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+  private transient Gson GSON = new GsonBuilder().create();
   private long tagId;
   private long alarmId;
 

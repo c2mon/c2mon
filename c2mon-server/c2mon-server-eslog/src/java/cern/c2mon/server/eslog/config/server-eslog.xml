@@ -8,7 +8,7 @@
 
   <bean id="alarmESPersistenceManager" class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
     <constructor-arg ref="alarmIndexer"/>
-    <constructor-arg value="${c2mon.home}/eslog-alarm.back"/>
+    <constructor-arg value="${c2mon.home}/log/alarmESfallback.txt"/>
     <constructor-arg>
       <bean class="cern.c2mon.server.shorttermlog.alarm.AlarmListener"/>
     </constructor-arg>
@@ -17,7 +17,7 @@
 
   <bean id="supervisionESPersistenceManager" class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
     <constructor-arg ref="supervisionIndexer"/>
-    <constructor-arg value="${c2mon.home}/eslog-supervision.back"/>
+    <constructor-arg value="${c2mon.home}/log/supervisionESfallback.txt"/>
     <constructor-arg>
       <bean class="cern.c2mon.server.shorttermlog.alarm.AlarmListener"/>
     </constructor-arg>
@@ -26,7 +26,7 @@
 
   <bean id="tagESPersistenceManager" class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
     <constructor-arg ref="tagIndexer"/>
-    <constructor-arg value="${c2mon.home}/eslog-tag.back"/>
+    <constructor-arg value="${c2mon.home}/log/tagESfallback.txt"/>
     <constructor-arg>
       <bean class="cern.c2mon.server.shorttermlog.alarm.AlarmListener"/>
     </constructor-arg>
