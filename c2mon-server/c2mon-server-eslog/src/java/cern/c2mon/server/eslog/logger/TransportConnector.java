@@ -293,15 +293,9 @@ public class TransportConnector implements Connector {
    */
   public boolean bulkAdd(IndexRequest request) {
     if (bulkProcessor != null && request != null) {
-      try {
-        bulkProcessor.add(request);
-        log.trace("bulkAdd() - BulkProcessor will handle indexing of new index.");
-        return true;
-      }
-      catch (Exception e) {
-        log.debug("bulkAdd() - Problem with the bulkProcessor. Restarting it.");
-        initBulkSettings();
-      }
+      bulkProcessor.add(request);
+      log.trace("bulkAdd() - BulkProcessor will handle indexing of new index.");
+      return true;
     }
     else {
       log.error("bulkProcessor is null. This should not happen!");

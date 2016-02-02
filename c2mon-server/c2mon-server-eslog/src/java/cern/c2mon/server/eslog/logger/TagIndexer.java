@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Used to write (a.k.a. index) the data to elasticSearch.
@@ -51,8 +52,8 @@ import java.util.*;
 @EqualsAndHashCode(callSuper = false)
 public class TagIndexer extends Indexer {
   /** Contains in-memory the content of the Indices, types and aliases present in the cluster. */
-  private final Map<String, Set<String>> indicesTypes = new HashMap<>();
-  private final Map<String, Set<String>> indicesAliases = new HashMap<>();
+  private final Map<String, Set<String>> indicesTypes = new ConcurrentHashMap<>();
+  private final Map<String, Set<String>> indicesAliases = new ConcurrentHashMap<>();
 
   @Autowired
   public TagIndexer(final Connector connector) {
@@ -91,7 +92,7 @@ public class TagIndexer extends Indexer {
    *
    * @param tags to index.
    */
-  public void indexTags(Collection<TagES> tags) throws IDBPersistenceException {
+  public synchronized void indexTags(Collection<TagES> tags) throws IDBPersistenceException {
     log.debug("indexTags() - Received a collection of " + tags.size() +  " tags to send by batch.");
     Map<String, TagES> aliases = new HashMap<>();
 
@@ -313,7 +314,7 @@ public class TagIndexer extends Indexer {
    * Add an index to the Set indices. Called by the writing of a new Index if it was successful.
    * @param indexName name of the index created in ElasticSearch.
    */
-  public void addIndex(String indexName) {
+  public synchronized void addIndex(String indexName) {
     if (checkIndex(indexName)) {
       indicesTypes.put(indexName, new HashSet<String>());
       indicesAliases.put(indexName, new HashSet<String>());
@@ -328,7 +329,7 @@ public class TagIndexer extends Indexer {
    * Add a type to the Set types. Called by the writing of a new Index if it was successful.
    * @param typeName type defined for the new document.
    */
-  public void addType(String index, String typeName) {
+  public synchronized void addType(String index, String typeName) {
     if (checkType(typeName) && indicesTypes.containsKey(index)) {
       indicesTypes.get(index).add(typeName);
       log.debug("addType() - Added type " + typeName + " in memory list.");
@@ -342,7 +343,7 @@ public class TagIndexer extends Indexer {
    * Add an alias to the Set aliases. Called by the writing of a new alias if it was successful.
    * @param aliasName name of the alias to give.
    */
-  public void addAlias(String index, String aliasName) {
+  public synchronized void addAlias(String index, String aliasName) {
     if (checkAlias(aliasName) && indicesAliases.containsKey(index)) {
       indicesAliases.get(index).add(aliasName);
       log.debug("addAlias() - Added alias " + aliasName + " in memory list.");
@@ -364,26 +365,26 @@ public class TagIndexer extends Indexer {
     updateAliases();
   }
 
-  private void updateIndices() throws IDBPersistenceException {
+  private synchronized void updateIndices() throws IDBPersistenceException {
     for (String index : connector.updateIndices()) {
       indicesTypes.put(index, new HashSet<String>());
       indicesAliases.put(index, new HashSet<String>());
     }
   }
 
-  private void updateTypes() throws IDBPersistenceException {
+  private synchronized void updateTypes() throws IDBPersistenceException {
     for (String index : indicesTypes.keySet()) {
       indicesTypes.get(index).addAll(connector.updateTypes(index));
     }
   }
 
-  private void updateAliases() throws IDBPersistenceException {
+  private synchronized void updateAliases() throws IDBPersistenceException {
     for (String index : indicesAliases.keySet()) {
       indicesAliases.get(index).addAll(connector.updateAliases(index));
     }
   }
 
-  private void clearLists() {
+  private synchronized void clearLists() {
     indicesTypes.clear();
     indicesAliases.clear();
   }
