@@ -241,7 +241,6 @@ public class TransportConnector implements Connector {
        */
       public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
         log.debug("afterBulk() - Executed bulk composed of {} actions", request.numberOfActions());
-        handleFailedActions(request, response);
         waitForYellowStatus();
         refreshClusterStats();
       }
@@ -252,7 +251,6 @@ public class TransportConnector implements Connector {
       public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
         log.warn("afterBulk() - Error executing bulk", failure);
         closeBulk();
-        handleFailedActions(request, null);
         waitForYellowStatus();
       }
     })
@@ -335,7 +333,7 @@ public class TransportConnector implements Connector {
       }
     }
     catch (ClusterNotAvailableException e) {
-      log.debug("handleListingQuery() - Cluster is not reachable, aborting listing retrieval.");
+      log.debug("handleListingQuery() - Cluster is not reachable, aborting listing retrieval. Throw new IDBPersistenceException.");
       throw new IDBPersistenceException();
     }
 
@@ -477,7 +475,7 @@ public class TransportConnector implements Connector {
    * @return Node with which we can communicate.
    */
   private Node launchLocalCluster() {
-    String home = ".";
+    String home = System.getProperty("c2mon.home") + "/log/elasticsearch-node/";
     setLocal(true);
     log.info("launchLocalCLuster() - Launch a new local cluster: home=" + home + ", clusterName=" + cluster + ".");
 
@@ -488,7 +486,9 @@ public class TransportConnector implements Connector {
         .put("node.name", "ClusterNode")
         .put("node.data", true)
         .put("node.master", true)
-        .put("http.enabled", false)
+        .put("http.enabled", true)
+        .put("http.cors.enabled", true)
+        .put("http.cors.allow-origin", "/.*/")
         .build())
         .node();
   }
@@ -519,28 +519,6 @@ public class TransportConnector implements Connector {
     if (client != null) {
       client.close();
       log.info("close() - Closed client: " + client.settings().get("node.name"));
-    }
-  }
-
-  /**
-   * If Batch actions have been failed, they will be added to the BulkProcessor again.
-   */
-  public void handleFailedActions(BulkRequest request, BulkResponse response) {
-    if (response == null) {
-      for (ActionRequest action : request.requests()) {
-        if (action instanceof IndexRequest) {
-          bulkAdd((IndexRequest) action);
-        }
-      }
-    }
-    else {
-      List<Integer> failedActions = getFailedActions(response);
-      for (int failedAction : failedActions) {
-        ActionRequest current = request.requests().get(failedAction);
-        if (current instanceof IndexRequest) {
-          bulkAdd((IndexRequest) current);
-        }
-      }
     }
   }
 

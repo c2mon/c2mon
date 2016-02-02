@@ -57,6 +57,7 @@ public abstract class Query {
       client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
     }
     catch (Exception e) {
+      log.debug("Query - ClusterNotAvailableException");
       throw new ClusterNotAvailableException();
     }
   }
@@ -66,6 +67,7 @@ public abstract class Query {
       return client.admin().indices().prepareGetIndex().get().indices();
     }
     catch (Exception e) {
+      log.debug("Query - ClusterNotAvailableException");
       throw new ClusterNotAvailableException();
     }
   }
@@ -75,6 +77,7 @@ public abstract class Query {
       return client.admin().indices().prepareCreate(index);
     }
     catch (Exception e) {
+      log.debug("Query - ClusterNotAvailableException");
       throw new ClusterNotAvailableException();
     }
   }
@@ -84,6 +87,7 @@ public abstract class Query {
       return client.admin().indices().prepareAliases();
     }
     catch (Exception e) {
+      log.debug("Query - ClusterNotAvailableException");
       throw new ClusterNotAvailableException();
     }
   }
@@ -93,6 +97,7 @@ public abstract class Query {
       return client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().indices().values().iterator();
     }
     catch (Exception e) {
+      log.debug("Query - ClusterNotAvailableException");
       throw new ClusterNotAvailableException();
     }
   }
@@ -102,6 +107,7 @@ public abstract class Query {
       return client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().index(index).getMappings();
     }
     catch (Exception e) {
+      log.debug("Query - ClusterNotAvailableException");
       throw new ClusterNotAvailableException();
     }
   }
@@ -111,6 +117,7 @@ public abstract class Query {
       return client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().index(index).getAliases().values();
     }
     catch (Exception e) {
+      log.debug("Query - ClusterNotAvailableException");
       throw new ClusterNotAvailableException();
     }
   }
@@ -121,6 +128,7 @@ public abstract class Query {
       return client.admin().indices().prepareExists(indexName).execute().actionGet().isExists();
     }
     catch (Exception e) {
+      log.debug("Query - ClusterNotAvailableException");
       throw new ClusterNotAvailableException();
     }
   }

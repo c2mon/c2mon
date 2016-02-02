@@ -73,6 +73,7 @@ public class TagIndexer extends Indexer {
 
   @Override
   public void storeData(List data) throws IDBPersistenceException {
+    log.debug("storeData() - Try to send data by batch of size " + data.size());
     if (data != null) {
       Collection<TagES> tags = new ArrayList<>();
       for (Object object : data) {
@@ -171,6 +172,7 @@ public class TagIndexer extends Indexer {
         }
       }
       catch (ClusterNotAvailableException e) {
+        log.debug("indexByBatch() - New IDBPersistenceException because cluster is not available.");
         throw new IDBPersistenceException();
       }
       return false;

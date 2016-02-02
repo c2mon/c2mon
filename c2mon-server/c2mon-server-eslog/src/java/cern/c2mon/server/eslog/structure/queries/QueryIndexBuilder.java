@@ -50,7 +50,13 @@ public class QueryIndexBuilder extends Query {
   }
 
   private boolean handleAddingMapping(String index, String type, String mapping) throws ClusterNotAvailableException {
-    PutMappingResponse response = client.admin().indices().preparePutMapping(index).setType(type).setSource(mapping).execute().actionGet();
-    return response.isAcknowledged();
+    try {
+      PutMappingResponse response = client.admin().indices().preparePutMapping(index).setType(type).setSource(mapping).execute().actionGet();
+      return response.isAcknowledged();
+    }
+    catch (Exception e) {
+      log.debug("Query - ClusterNotAvailableException");
+      throw new ClusterNotAvailableException();
+    }
   }
 }
