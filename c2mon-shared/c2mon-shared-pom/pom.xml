@@ -166,6 +166,25 @@
         <version>2.6.1</version>
       </dependency>
 
+      <!--jackson dependencies-->
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>2.7.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>2.7.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>2.7.0</version>
+      </dependency>
+
       <!-- spring libraries -->
       <dependency>
         <groupId>org.springframework</groupId>

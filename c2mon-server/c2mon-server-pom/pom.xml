@@ -198,6 +198,26 @@
         <version>2.3.2</version>
       </dependency>
 
+      <!--jackson dependencies-->
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>2.7.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>2.7.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>2.7.0</version>
+      </dependency>
+
+
       <!-- The following dependencies are required for using Ehcache & BigMemory. ehcache-ee-2.7.5 is shipped together with bigmemory-4.0.5 -->
       <dependency>
         <groupId>net.sf.ehcache</groupId>
