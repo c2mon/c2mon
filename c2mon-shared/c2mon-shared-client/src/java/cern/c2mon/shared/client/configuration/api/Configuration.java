@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -24,7 +24,6 @@ import cern.c2mon.shared.client.configuration.api.tag.RuleTag;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
-import org.codehaus.jackson.annotate.JsonCreator;
 
 /**
  * Configuration instances serves as POJO object for all configurations on the serve side of C2MON.
@@ -55,6 +54,11 @@ public class Configuration {
    */
   private String user;
 
+  /**
+   * Unique Id of the configuration which appears in the RequestReport of the client.
+   */
+  private Long configurationId;
+
   @Singular
   private List<Process> processes = new ArrayList<>();
 
@@ -62,7 +66,7 @@ public class Configuration {
   private List<RuleTag> rules = new ArrayList<>();
 
   @Builder
-  public Configuration(String name, String application, String user, @Singular List<Process> processes, @Singular List<RuleTag> rules) {
+  public Configuration(String name, String application, String user, @Singular List<Process> processes, @Singular List<RuleTag> rules, Long confId) {
     super();
     // Default values are set here because of the lombok behavior to overwrite all instance values with defaults.
     this.name = name;
@@ -70,6 +74,7 @@ public class Configuration {
     this.user = user;
     this.processes = processes == null ? new ArrayList<Process>() : processes;
     this.rules = rules == null ? new ArrayList<RuleTag>() : rules;
+    this.configurationId = confId;
   }
 
   public Configuration() {
