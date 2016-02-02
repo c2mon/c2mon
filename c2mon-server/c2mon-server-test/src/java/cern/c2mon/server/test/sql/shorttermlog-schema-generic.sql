@@ -63,7 +63,7 @@ CREATE TABLE if not exists SERVER_LIFECYCLE_LOG (
 );
 
 
-CREATE TABLE alarmlog (
+CREATE TABLE if not exists alarmlog (
 logdate         DATE,
 tagid           INTEGER       NOT NULL,
 alarmid         INTEGER       NOT NULL,
