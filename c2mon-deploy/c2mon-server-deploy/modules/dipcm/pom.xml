@@ -102,7 +102,7 @@
             <configuration>
               <excludeArtifactIds>*</excludeArtifactIds>
               <includeArtifactIds>c2mon-server-test</includeArtifactIds>
-              <includes>cern/c2mon/server/test/sql/*-schema-generic.sql, cern/c2mon/server/test/sql/config-data.sql</includes>
+              <includes>cern/c2mon/server/test/sql/*-schema-generic.sql</includes>
               <outputDirectory>${project.build.directory}/conf/sql</outputDirectory>
             </configuration>
           </execution>
