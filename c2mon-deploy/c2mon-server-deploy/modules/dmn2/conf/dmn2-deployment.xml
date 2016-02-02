@@ -14,7 +14,7 @@
 				<java-vm-args>-Xms4G -Xmx4G -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
 
 				<!-- the following property defines if C2MON server caches shall be preloaded from database at start-up -->
-				<property name="c2mon.server.cache.skippreloading" value="false" />
+				<property name="c2mon.server.cache.skippreloading" value="true" />
 
 				<property name="c2mon.process.name" value="DMN2-SRV" />
 				<property name="c2mon.cache.mode" value="single"/>
