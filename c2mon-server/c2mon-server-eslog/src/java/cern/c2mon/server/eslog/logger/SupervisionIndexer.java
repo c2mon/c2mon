@@ -50,6 +50,7 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = false)
 public class SupervisionIndexer extends Indexer {
   Map<String, String> indices = new HashMap<>();
+
   @Autowired
   public SupervisionIndexer(final Connector connector) {
     super(connector);
@@ -108,7 +109,6 @@ public class SupervisionIndexer extends Indexer {
     }
     else {
       SupervisionMapping supervisionMapping = new SupervisionMapping();
-      supervisionMapping.setProperties(Mapping.ValueType.supervisionType);
       return supervisionMapping.getMapping();
     }
   }

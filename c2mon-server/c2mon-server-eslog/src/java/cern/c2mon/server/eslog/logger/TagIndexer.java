@@ -74,14 +74,16 @@ public class TagIndexer extends Indexer {
 
   @Override
   public void storeData(List data) throws IDBPersistenceException {
-    log.debug("storeData() - Try to send data by batch of size " + data.size());
     if (data != null) {
+      log.debug("storeData() - Try to send data by batch of size " + data.size());
       Collection<TagES> tags = new ArrayList<>();
       for (Object object : data) {
         if (object instanceof TagES) {
+          log.debug("storeData() - type: " + object.getClass());
           tags.add((TagES) object);
         }
       }
+      log.debug("storeData() - indexTags() a new Collection of " + tags.size() + " tags.");
       indexTags(tags);
     }
   }

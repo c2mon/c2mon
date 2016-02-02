@@ -47,6 +47,7 @@ import java.util.*;
 @EqualsAndHashCode(callSuper = false)
 public class AlarmIndexer extends Indexer {
   Map<String, String> indices = new HashMap<>();
+
   /** Autowired constructor */
   @Autowired
   public AlarmIndexer(final Connector connector) {

@@ -16,19 +16,25 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.type;
 
+import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.server.eslog.structure.types.SupervisionES;
+import cern.c2mon.server.eslog.structure.types.TagString;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Alban Marguet
  */
+@Slf4j
 public class SupervisionESTest {
   private Gson gson = new GsonBuilder().create();
   private SupervisionES supervisionES;
@@ -65,5 +71,13 @@ public class SupervisionESTest {
     catch (Exception e) {
       fail("Should be able to serialize/deserialize JSON");
     }
+  }
+
+  @Test
+  public void testGetObject() {
+    String line = "{\"entityId\":1,\"message\":\"message\",\"entityName\":\"entity\",\"statusName\":\"status\",\"eventTime\":0}";
+    IFallback result = supervisionES.getObject(line);
+    assertTrue(result instanceof SupervisionES);
+    Assert.assertEquals(line, result.toString());
   }
 }

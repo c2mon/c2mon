@@ -10,7 +10,7 @@
     <constructor-arg ref="supervisionIndexer"/>
     <constructor-arg value="${c2mon.home}/log/supervisionESfallback.txt"/>
     <constructor-arg>
-      <bean class="cern.c2mon.server.shorttermlog.alarm.AlarmListener"/>
+      <bean class="cern.c2mon.server.shorttermlog.alarm.DummyAlarmListener"/>
     </constructor-arg>
     <constructor-arg><bean class="cern.c2mon.server.eslog.structure.types.SupervisionES"/></constructor-arg>
   </bean>
@@ -19,7 +19,7 @@
     <constructor-arg ref="alarmIndexer"/>
     <constructor-arg value="${c2mon.home}/log/alarmESfallback.txt"/>
     <constructor-arg>
-      <bean class="cern.c2mon.server.shorttermlog.alarm.AlarmListener"/>
+      <bean class="cern.c2mon.server.shorttermlog.alarm.DummyAlarmListener"/>
     </constructor-arg>
     <constructor-arg><bean class="cern.c2mon.server.eslog.structure.types.AlarmES"/></constructor-arg>
   </bean>
@@ -37,7 +37,7 @@
     <constructor-arg ref="tagIndexer"/>
     <constructor-arg value="${c2mon.home}/log/tagStringESfallback.txt"/>
     <constructor-arg>
-      <bean class="cern.c2mon.server.shorttermlog.alarm.AlarmListener"/>
+      <bean class="cern.c2mon.server.shorttermlog.alarm.DummyAlarmListener"/>
     </constructor-arg>
     <constructor-arg><bean class="cern.c2mon.server.eslog.structure.types.TagString"/></constructor-arg>
   </bean>
@@ -46,7 +46,7 @@
     <constructor-arg ref="tagIndexer"/>
     <constructor-arg value="${c2mon.home}/log/tagBooleanESfallback.txt"/>
     <constructor-arg>
-      <bean class="cern.c2mon.server.shorttermlog.alarm.AlarmListener"/>
+      <bean class="cern.c2mon.server.shorttermlog.alarm.DummyAlarmListener"/>
     </constructor-arg>
     <constructor-arg><bean class="cern.c2mon.server.eslog.structure.types.TagBoolean"/></constructor-arg>
   </bean>

@@ -141,14 +141,14 @@ public abstract class Indexer implements IDBPersistenceHandler {
     return sdf.format(date);
   }
 
-  public MappingMetaData retrieveMappingES(String index, String type) {
+  public MappingMetaData retrieveMappingES(String index, String type) throws IDBPersistenceException {
     try {
       ClusterState state = connector.createClient().admin().cluster().prepareState().execute().actionGet().getState();
       return state.getMetaData().index(index).mapping(type);
     }
     catch (Exception e) {
       log.error("retrieveMappingES() - error connecting to the ElasticSearch cluster.", e);
-      return null;
+      throw new IDBPersistenceException();
     }
   }
 

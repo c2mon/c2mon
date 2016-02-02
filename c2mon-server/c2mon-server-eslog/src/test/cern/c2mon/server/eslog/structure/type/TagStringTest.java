@@ -22,6 +22,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
+import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.server.eslog.structure.types.TagNumeric;
 import cern.c2mon.server.eslog.structure.types.TagString;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -69,5 +71,15 @@ public class TagStringTest {
 	public void testNullValue() {
 		tagString.setValue(null);
 		assertNull(tagString.getValue());
+	}
+
+	@Test
+	public void testGetObject() {
+    String line = "{\"id\":192506,\"name\":\"CM.MEY.VGTCTESTCM11:STATUS\",\"dataType\":\"string\",\"sourceTimestamp\":0,\"serverTimestamp\":1451915554970,\"daqTimestamp\":0,\"status\":0," +
+        "\"quality\":\"{}\",\"valueString\":\"DOWN\",\"valueDescription\":\"Communication fault tag indicates that equipment E_OPC_GTCTESTCM11 is down. Reason: Problems connecting to VGTCTESTCM11: Problems wih the DCOM connection occured\",\"process\":\"P_GTCTESTCM11\"," +
+        "\"equipment\":\"E_OPC_GTCTESTCM11\"}";
+		IFallback result = tagString.getObject(line);
+    assertTrue(result instanceof TagString);
+    assertEquals(line, result.toString());
 	}
 }

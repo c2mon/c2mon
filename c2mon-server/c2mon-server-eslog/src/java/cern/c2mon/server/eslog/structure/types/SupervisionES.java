@@ -44,7 +44,7 @@ public class SupervisionES implements IFallback {
   }
 
   @Override
-  public IFallback getObject(String line) throws DataFallbackException {
+  public IFallback getObject(String line) {
     return GSON.fromJson(line, SupervisionES.class);
   }
 
