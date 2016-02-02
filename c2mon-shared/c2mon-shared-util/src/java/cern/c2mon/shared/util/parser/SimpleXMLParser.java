@@ -135,11 +135,11 @@ public final class SimpleXMLParser implements XmlParser {
    * @param map the java object which needs to be parsed to an xml string.
    * @return The xml string representation of the given map
    */
-  public static String mapToXMLString(Map<String, Object> map){
+  public static String mapToXMLString(Map<String, String> map){
     String spaces = "            ";
     String result = spaces + "<properties class=\""+ map.getClass() +"\">" ;
 
-    for(Map.Entry<String, Object> entry : map.entrySet()){
+    for(Map.Entry<String, String> entry : map.entrySet()){
       result += "<entry key=\"" + entry.getKey() + "\">" + entry.getValue() + "</entry>";
     }
 

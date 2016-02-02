@@ -63,10 +63,10 @@ public class SimpleXMLParserTest {
   @Test
   public void parseMapToXml(){
     // test map
-    Map<String, Object> testMap = new HashMap<>();
-    testMap.put("key1", 1);
+    Map<String, String> testMap = new HashMap<>();
+    testMap.put("key1", ""+ 1 );
     testMap.put("key2", "text");
-    testMap.put("key3", true);
+    testMap.put("key3", ""+ true);
 
     // expected reult
     String testXML = "            <properties class=\"class java.util.HashMap\"><entry key=\"key1\">1</entry><entry key=\"key2\">text</entry><entry key=\"key3\">true</entry></properties>\n";

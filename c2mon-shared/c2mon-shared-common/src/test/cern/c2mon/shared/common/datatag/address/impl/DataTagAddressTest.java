@@ -16,8 +16,7 @@ package cern.c2mon.shared.common.datatag.address.impl;
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-import cern.c2mon.shared.common.datatag.address.SimpleAddress;
-import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
+import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
 import org.junit.Test;
 import org.w3c.dom.Element;
@@ -32,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Franz Ritter
  */
-public class SimpleAddressTest {
+public class DataTagAddressTest {
 
   @Test
   public void parseBasicHardwareAddressToXml(){
@@ -42,11 +41,13 @@ public class SimpleAddressTest {
     testData.put("key2", "test");
     testData.put("key3", "true");
 
-    SimpleAddress testAddress= new SimpleAddressImpl(testData);
+    DataTagAddress testAddress= new DataTagAddress(testData);
 
-    String compareString = "        <HardwareAddress class=\"cern.c2mon.shared.common.datatag.address.impl.SimpleAddressImpl\">\n" +
+    String compareString = "      <DataTagAddress>\n" +
         "            <properties class=\"class java.util.HashMap\"><entry key=\"key1\">1</entry><entry key=\"key2\">test</entry><entry key=\"key3\">true</entry></properties>\n" +
-        "        </HardwareAddress>\n";
+        "        <priority>2</priority>\n" +
+        "        <guaranteed-delivery>false</guaranteed-delivery>\n" +
+        "      </DataTagAddress>\n";
 
     // test run:
     String resultXml = testAddress.toConfigXML();
@@ -59,22 +60,24 @@ public class SimpleAddressTest {
   @Test
   public void parseXmlToBasicHardwareAddress(){
     // initialize test data:
-    String testString = "        <HardwareAddress class=\"cern.c2mon.shared.common.datatag.address.impl.SimpleAddressImpl\">\n" +
+
+    String testString = "      <DataTagAddress>\n" +
         "            <properties class=\"class java.util.HashMap\"><entry key=\"key1\">1</entry><entry key=\"key2\">test</entry><entry key=\"key3\">true</entry></properties>\n" +
-        "        </HardwareAddress>\n";
+        "        <priority>2</priority>\n" +
+        "        <guaranteed-delivery>false</guaranteed-delivery>\n" +
+        "      </DataTagAddress>\n";
 
     try {
       Element testElement;
       testElement = (Element) new SimpleXMLParser().parse(testString).getFirstChild();
-      SimpleAddress resultAddress = (SimpleAddress) HardwareAddressFactory.getInstance().fromConfigXML(testElement);
-
+      DataTagAddress resultAddress = DataTagAddress.fromConfigXML(testElement);
 
       Map<String,String> compareData = new HashMap<>();
       compareData.put("key1", "1");
       compareData.put("key2", "test");
       compareData.put("key3", "true");
 
-      for(Map.Entry<String, String> resultEntry : resultAddress.getProperties().entrySet()){
+      for(Map.Entry<String, String> resultEntry : resultAddress.getAddressParameters().entrySet()){
 
         // check keys
         assertTrue(compareData.containsKey(resultEntry.getKey()));
@@ -86,12 +89,6 @@ public class SimpleAddressTest {
     } catch (ParserConfigurationException e) {
       e.printStackTrace();
     }
-
-
-
-
-
-
   }
 
 }

@@ -147,9 +147,6 @@ public class HardwareAddressImpl extends HardwareAddressFactory implements Hardw
 
                         Field field = hwAddressClass.getDeclaredField(decodeFieldName(fieldName));
 
-                      if(fieldName == "properties"){
-                        field.set(hwAddress, SimpleXMLParser.domNodeToMap(fieldNode));
-                      } else {
 
                         fieldTypeName = field.getType().getName();
 
@@ -197,7 +194,6 @@ public class HardwareAddressImpl extends HardwareAddressFactory implements Hardw
                         } else {
                           field.set(hwAddress, fieldValueString);
                         }
-                      }
                     } catch (NoSuchFieldException nsfe) {
                         LOG.error("fromConfigXML(...) - Error occured while parsing XML <HardwareAddress> tag. "
                             + "The following variable does not exist in " + hwAddressClass.toString() + ": \""
@@ -254,9 +250,6 @@ public class HardwareAddressImpl extends HardwareAddressFactory implements Hardw
             if (Modifier.isProtected(fields[i].getModifiers()) && !Modifier.isFinal(fields[i].getModifiers())) {
                 try {
                     if (fields[i].get(this) != null) {
-                        if(fields[i].getType().getName() == "java.util.Map" || fields[i].getType().getName() == "java.util.HashMap"){
-                            str.append(SimpleXMLParser.mapToXMLString((Map<String, Object>) fields[i].get(this)));
-                        } else {
                             str.append("          <");
                             String fieldXMLName = encodeFieldName(fields[i].getName());
 
@@ -271,7 +264,6 @@ public class HardwareAddressImpl extends HardwareAddressFactory implements Hardw
                             str.append("</");
                             str.append(fieldXMLName);
                             str.append(">\n");
-                        }
                     }
                 } catch (IllegalAccessException iae) {
                     iae.printStackTrace();

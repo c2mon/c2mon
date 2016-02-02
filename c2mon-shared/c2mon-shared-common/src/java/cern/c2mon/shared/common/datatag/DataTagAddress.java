@@ -1,22 +1,24 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.shared.common.datatag;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -76,6 +78,13 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
      */
     @Element(name = "HardwareAddress", required = false)
     private HardwareAddress hardwareAddress;
+
+  /**
+   * All address information of the given DataTag
+   * This is an central element for this class which provides the information for the daq to create an DataTag.
+   */
+  Map<String, String> addressParameters = new HashMap<>();
+
 
     /**
      * Time-to-live in milliseconds. Values that have not been received by the application server before the expiration
@@ -206,6 +215,60 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
         this.guaranteedDelivery = pGuaranteedDelivery;
     }
 
+  // ----------------------------------------------------------------------------
+  // CONSTRUCTORS for addressParameters (Map<String, String>)
+  // ----------------------------------------------------------------------------
+
+  /**
+   * Constructor Default values: The timeToLive is set to TTL_FOREVER, the deadband is set to DEADBAND_NONE, the
+   * transformation factor is set to TRANSFORMATION_NONE, the priority is PRIORITY_LOW.
+   *
+   * @param hardwareAddress the hardware address for the DataTagAddress object
+   */
+  public DataTagAddress(Map<String, String> addressParameters) {
+    this(TTL_FOREVER, // maximum time-to-live
+        DataTagDeadband.DEADBAND_NONE, // no value deadband filtering
+        0f, // no value deadband
+        0, // no time deadband filtering
+        DataTagAddress.PRIORITY_LOW, // low JMS priority on delivery
+        false // no guaranteed message delivery
+    );
+    setAddressParameters(addressParameters);
+  }
+
+  /**
+   * Constructor Default values: The deadband is set to DEADBAND_NONE, the transformation factor is set to
+   * TRANSFORMATION_NONE, the priority is PRIORITY_LOW.
+   *
+   * @param hardwareAddress the hardware address for the DataTagAddress object
+   * @param timeToLive
+   * @see #timeToLive
+   */
+  public DataTagAddress(Map<String, String> addressParameters, int timeToLive) {
+    this(timeToLive, DataTagDeadband.DEADBAND_NONE, 0f, 0, DataTagAddress.PRIORITY_LOW, false);
+    setAddressParameters(addressParameters);
+  }
+
+  /**
+   * Constructor with addressParameters as parameters. Node if the parameter is null the value is not set and the default
+   * vaule of an empty hashMap is used. Therefore cant be null.
+   * @param addressParameters the address parameters for the DataTagAddress
+   * @param timeToLive TTL in seconds
+   * @param valueDeadbandType type of value-based deadband filtering
+   * @param valueDeadband parameter for value-based deadband filtering
+   * @param timeDeadband parameter for time-based deadband filtering
+   * @param priority priority of the tag.
+   * @param pGuaranteedDelivery JMS guaranteed delivery flag The deadband is set to DEADBAND_NONE.
+   */
+  public DataTagAddress(int timeToLive, short valueDeadbandType,
+                        float valueDeadband, int timeDeadband, int priority, boolean pGuaranteedDelivery) {
+    this.timeToLive = timeToLive;
+    this.valueDeadbandType = valueDeadbandType;
+    this.valueDeadband = valueDeadband;
+    this.timeDeadband = timeDeadband;
+    this.priority = priority;
+    this.guaranteedDelivery = pGuaranteedDelivery;
+  }
     /**
      * Returns a new DataTagAddress object that is an exact copy of "this".
      *
@@ -219,6 +282,18 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
             if (this.hardwareAddress != null) {
                 clonedAddress.hardwareAddress = this.hardwareAddress.clone();
             }
+
+          // clone all map values. Use String constructor for deep cloning.
+          if(!this.addressParameters.isEmpty()){
+
+            clonedAddress = (DataTagAddress) super.clone();
+            Map<String,String> cloneParameters = new HashMap<>();
+
+            for(Map.Entry<String, String> entry : addressParameters.entrySet()){
+              cloneParameters.put(new String(entry.getKey()),entry.getValue());
+            }
+
+          }
         } catch (CloneNotSupportedException e) {
             // Should not happen if the hardware addresses remain as they are.
             e.printStackTrace();
@@ -234,12 +309,30 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
         return this.hardwareAddress;
     }
 
+
+  /**
+   * Returns the address parameters for the given DataTag.
+   * @return address parameters.
+   */
+  public Map<String, String > getAddressParameters(){
+        return this.addressParameters;
+    }
+
     /**
      * Set the hardware address for the DataTag This is the central element of the DataTagAddress class. The hardware
      * address is a free-text string that can only be interpreted by the EquipmentMessageHandler class of the driver.
      */
     public void setHardwareAddress(HardwareAddress address) {
         this.hardwareAddress = address;
+    }
+
+  /**
+   * Set the parameters for the address of the given DataTag. This is an central element for this class
+   * which provides all information for the daq to create a DataTag.
+   * @param addressParameters
+   */
+  public void setAddressParameters(Map<String, String> addressParameters){
+        this.addressParameters = addressParameters;
     }
 
     /**
@@ -387,6 +480,10 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
             str.append(hardwareAddress.toConfigXML());
         }
 
+      if(!addressParameters.isEmpty()){
+        str.append(SimpleXMLParser.mapToXMLString(addressParameters));
+      }
+
         if (timeToLive != TTL_FOREVER) {
             str.append("        <time-to-live>");
             str.append(timeToLive);
@@ -470,7 +567,9 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
                 fieldName = fieldNode.getNodeName();
                 if (fieldName.equals("HardwareAddress")) {
                     result.setHardwareAddress(HardwareAddressFactory.getInstance().fromConfigXML((org.w3c.dom.Element) fieldNode));
-                } else {
+                } else if(fieldName.equals("properties")){
+                  result.setAddressParameters(SimpleXMLParser.domNodeToMap(fieldNode));
+                }else{
                     fieldValueString = fieldNode.getFirstChild().getNodeValue();
                     if (fieldName.equals("time-to-live")) {
                         result.timeToLive = Integer.parseInt(fieldValueString);
@@ -505,6 +604,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
                     && this.valueDeadband == addr.valueDeadband && this.valueDeadbandType == addr.valueDeadbandType;
             result = result && this.hardwareAddress == null ? addr.hardwareAddress == null : this.hardwareAddress
                     .equals(addr.hardwareAddress);
+          result &= this.addressParameters.equals(((DataTagAddress) pObj).getAddressParameters());
 
         }
         return result;
