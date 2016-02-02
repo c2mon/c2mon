@@ -1,7 +1,22 @@
 #!/bin/bash
 #
+# Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+# 
+# This file is part of the CERN Control and Monitoring Platform 'C2MON'.
+# C2MON is free software: you can redistribute it and/or modify it under the
+# terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation, either version 3 of the license.
+# 
+# C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+# more details.
+# 
+# You should have received a copy of the GNU Lesser General Public License
+# along with C2MON. If not, see <http://www.gnu.org/licenses/>.
+##
+
 # Starts a single, non-clustered server without Ehcache persistence
-#
 
 # check if JAVA_HOME is set
 if [ -z $JAVA_HOME ]; then
@@ -11,11 +26,20 @@ else
    export JAVA=$JAVA_HOME/bin/java
 fi
 
-# check if C2MON_HOME is set
-[[ -z "$C2MON_HOME" ]] && printf "[ERROR] No C2MON_HOME system property set!\n" && exit 1
+if [ -z "$C2MON_HOME" ] ; then
+ # get the current location 
+ SCRIPT=`readlink -f $(which $0)`
+ SCRIPTPATH=`dirname $SCRIPT`
+ C2MON_HOME="$(dirname "$SCRIPTPATH")"
+fi
 
-# Initialise classpath
-CLASSPATH=`ls $C2MON_HOME/lib/*.jar | tr -s '\n' ':'`
+if [ -z "${C2MON_HOME}/lib" ] ; then
+  printf "[ERROR] Could not find ${C2MON_HOME}/lib \n"
+  exit 1
+else
+  # Initialise classpath
+  CLASSPATH=`ls $C2MON_HOME/lib/*.jar | tr -s '\n' ':'`
+fi
 cd $C2MON_HOME
 
 JVM_MEM="-Xms256M -Xmx256M"
