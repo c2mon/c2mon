@@ -9,7 +9,7 @@
 # get the current location 
 SCRIPT=`readlink -f $(which $0)`
 SCRIPTPATH=`dirname $SCRIPT`
-C2MON_HOME=$SCRIPTPATH/..
+export C2MON_HOME="$(dirname "$SCRIPTPATH")"
 
 #set env. variables if script is available
 if [ -f $C2MON_HOME/bin/setenv.sh ] ; then
@@ -44,7 +44,7 @@ fi
 # Checking for start script
 C2MON_START_CMD=$C2MON_HOME/bin/C2MON-SRV.jvm
 if [ ! -f $C2MON_START_CMD ] ; then
-    echo -n "[ERROR] No C2MON start script found in $C2MON_HOME/bin!"
+    printf "[ERROR] No C2MON-SRV.jvm start script found in $C2MON_HOME/bin/\n"
     exit 1
 fi
 
@@ -84,7 +84,7 @@ runs() {
 # Otherwise it exits with a warning message
 
 start() {
-	echo -n "Starting a C2MON server: "
+	printf "Starting a C2MON server: "
         # Check if the PID file exists
         # If it exists, check whether the process is really running
         # If it is already running, print an error message and exit
@@ -132,7 +132,7 @@ really_start() {
 }
 
 stop() {
-	echo -n $"Shutting down this C2MON server..."
+	printf $"Shutting down this C2MON server..."
         if [ -f $C2MON_PIDFILE ] ; then
           pid=`cat $C2MON_PIDFILE`
 
@@ -151,7 +151,7 @@ stop() {
 	    PROC_RUNS=$?
 	    PROC_WAIT=0;
 	    while [ $PROC_RUNS -eq 0 ]; do
-	      echo -n .
+	      printf .
 	      sleep 1 
 	      if [ $PROC_WAIT -lt 20 ]; then
 	        let PROC_WAIT=$PROC_WAIT+1
