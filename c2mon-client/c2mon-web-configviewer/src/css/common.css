@@ -1,0 +1,45 @@
+/* Add some outer padding to all fluid containers */
+.container-fluid {
+  padding-left: 150px;
+  padding-right: 150px;
+}
+
+/* Alter the colour of bootstrap's table stripes */
+.table-striped>tbody>tr:nth-child(2n+1) {
+  background-color: rgb(247, 247, 247);
+}
+
+/* Stop IE cutting of the tails of letters in text boxes */
+input[type="text"], input[type="email"], input[type="password"], {
+  line-height: 1; 
+}
+
+/* Add some spacing above the breadcrumb bar */
+.breadcrumb {
+  margin-top: 15px;
+}
+
+/* Remove some spacing above the page title */
+.page-title {
+  margin-top: -20px; !important;
+}
+
+/* Make sure labels in table cells are vertically centred */
+.cell-label {
+  vertical-align: middle !important;
+}
+
+/* Give labels a bit of extra padding */
+.label {
+  padding-top: 5px;
+}
+
+/* Make sure the table font size isn't too big */ 
+.table {
+  font-size: 14px;
+}
+
+/* Change the cursor for clickable elements */
+.clickable {
+  cursor: pointer;
+}

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="cern.c2mon.web.configviewer.statistics.stlog.STLogStatisticsMapper">
+
+  <resultMap id="serverLifecycleEventsResultMap" type="ServerLifecycleEvent">
+    <result property="eventType" column="SLL_EVENT_TYPE" />
+    <result property="serverName" column="SLL_SERVER_NAME" />
+    <result property="eventTime" column="SLL_TIME" />
+  </resultMap>
+
+  <resultMap id="supervisionEventsResultMap" type="SupervisionEvent">
+      <result property="entity" column="SUL_ENTITY"/>
+      <result property="entityId" column="SUL_ID"/>
+      <result property="status" column="SUL_STATUS"/>
+      <result property="eventTime" column="SUL_DATE"/>
+      <result property="message" column="SUL_MESSAGE" jdbcType="VARCHAR"/>
+  </resultMap>
+  
+  <select id="getServerNames" resultType="string">
+    SELECT DISTINCT SLL_SERVER_NAME FROM SERVER_LIFECYCLE_LOG
+  </select>
+
+  <select id="getServerLifecycleEvents" resultMap="serverLifecycleEventsResultMap" parameterType="map">
+    SELECT SLL_EVENT_TYPE, SLL_SERVER_NAME, SLL_TIME FROM SERVER_LIFECYCLE_LOG
+    WHERE SLL_TIME &gt;= to_timestamp('${from}', 'YYYY-MM-DD HH24:MI:SS.FF') <!-- e.g. 2015-01-01 00:00:00.0 -->
+    AND   SLL_TIME &lt;  to_timestamp('${to}', 'YYYY-MM-DD HH24:MI:SS.FF')
+    ORDER BY SLL_TIME
+  </select>
+
+  <select id="getSupervisionEvents" resultMap="supervisionEventsResultMap" parameterType="map">
+    SELECT SUL_ENTITY, SUL_ID, SUL_STATUS, SUL_DATE, SUL_MESSAGE FROM SUPERVISION_LOG 
+    WHERE SUL_ID=#{id} 
+    AND   SUL_DATE &gt;= to_timestamp('${from}', 'YYYY-MM-DD HH24:MI:SS.FF')
+    AND   SUL_DATE &lt;  to_timestamp('${to}', 'YYYY-MM-DD HH24:MI:SS.FF')
+    ORDER BY SUL_DATE
+  </select>
+</mapper>
