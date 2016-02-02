@@ -25,6 +25,7 @@ import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.eslog.structure.converter.DataTagESLogConverter;
 import cern.c2mon.server.eslog.structure.types.TagBoolean;
 import cern.c2mon.server.eslog.structure.types.TagES;
+import cern.c2mon.server.eslog.structure.types.TagNumeric;
 import cern.c2mon.server.eslog.structure.types.TagString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,7 +144,7 @@ public class TagESLogCacheListener implements BufferedTimCacheListener<Tag>, Sma
         else if (tagES instanceof TagBoolean) {
           addTagToCollectionIfNotNull(tagES, tagBooleanCollection);
         }
-        else {
+        else if (tagES instanceof TagNumeric) {
           addTagToCollectionIfNotNull(tagES, tagNumericCollection);
         }
       } catch (Exception e) {
