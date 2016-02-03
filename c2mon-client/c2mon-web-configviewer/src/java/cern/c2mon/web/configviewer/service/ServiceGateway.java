@@ -76,7 +76,6 @@ public class ServiceGateway {
   private void startC2monServiceGateway() {
     logger.info("Starting C2MON Service Gateway...");
     C2monServiceGateway.startC2monClientSynchronous();
-    C2monSessionGateway.initialize();
   }
 
   /**
