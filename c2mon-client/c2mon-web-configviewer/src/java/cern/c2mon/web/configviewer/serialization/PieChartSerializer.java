@@ -16,25 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.web.configviewer.serialization;
 
-import java.io.IOException;
-
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.map.SerializerProvider;
-import org.codehaus.jackson.map.ser.std.SerializerBase;
+import cern.c2mon.web.configviewer.statistics.daqlog.charts.JFreePieChart;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.data.general.PieDataset;
 
-import cern.c2mon.web.configviewer.statistics.daqlog.charts.JFreePieChart;
+import java.io.IOException;
 
-public class PieChartSerializer extends SerializerBase<JFreePieChart> {
-
-  /**
-   * Constructor.
-   */
-  public PieChartSerializer() {
-    super(JFreePieChart.class);
-  }
+public class PieChartSerializer extends JsonSerializer<JFreePieChart> {
 
   /**
    * Example JSON output:
@@ -56,10 +48,6 @@ public class PieChartSerializer extends SerializerBase<JFreePieChart> {
    *   }
    * }
    * </p>
-   *
-   * @see org.codehaus.jackson.map.ser.std.SerializerBase#serialize(java.lang.Object
-   *      , org.codehaus.jackson.JsonGenerator,
-   *      org.codehaus.jackson.map.SerializerProvider)
    */
   @Override
   public void serialize(JFreePieChart chart, JsonGenerator generator, SerializerProvider provider) throws IOException, JsonGenerationException {

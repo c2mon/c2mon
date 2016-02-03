@@ -17,7 +17,7 @@
   <!-- Enables the Spring MVC @Controller programming model -->
   <mvc:annotation-driven>
     <mvc:message-converters>
-      <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+      <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
         <!-- Override the default ObjectMapper to allow custom serialization -->
         <property name="objectMapper" ref="customObjectMapper" />
       </bean>

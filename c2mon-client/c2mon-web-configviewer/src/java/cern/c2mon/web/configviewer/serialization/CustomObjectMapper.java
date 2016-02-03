@@ -16,9 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.web.configviewer.serialization;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig.Feature;
-import org.codehaus.jackson.map.ser.CustomSerializerFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.web.configviewer.statistics.daqlog.charts.JFreeBarChart;
@@ -38,17 +39,15 @@ public class CustomObjectMapper extends ObjectMapper {
    * Constructor.
    */
   public CustomObjectMapper() {
-    super();
-    CustomSerializerFactory factory = new CustomSerializerFactory();
+    SimpleModule module = new SimpleModule();
 
-    // Add custom serializers here
-    factory.addSpecificMapping(JFreeBarChart.class, new BarChartSerializer());
-    factory.addSpecificMapping(JFreeStackedBarChart.class, new StackedBarChartSerializer());
-    factory.addSpecificMapping(JFreePieChart.class, new PieChartSerializer());
-
-    this.setSerializerFactory(factory);
+    module.addSerializer(JFreeBarChart.class, new BarChartSerializer());
+    module.addSerializer(JFreeStackedBarChart.class, new StackedBarChartSerializer());
+    module.addSerializer(JFreePieChart.class, new PieChartSerializer());
 
     // Enable pretty printing
-    enable(Feature.INDENT_OUTPUT);
+    enable(SerializationFeature.INDENT_OUTPUT);
+
+    registerModule(module);
   }
 }
