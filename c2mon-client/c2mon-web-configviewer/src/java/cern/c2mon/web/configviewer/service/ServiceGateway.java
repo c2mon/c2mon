@@ -27,6 +27,7 @@ import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.ext.history.C2monHistoryGateway;
 import cern.c2mon.client.ext.history.C2monHistoryManager;
+import cern.c2mon.client.ext.rbac.C2monSessionGateway;
 
 /**
  * Service gateway wrapper for C2monServiceGateway
@@ -75,6 +76,7 @@ public class ServiceGateway {
   private void startC2monServiceGateway() {
     logger.info("Starting C2MON Service Gateway...");
     C2monServiceGateway.startC2monClientSynchronous();
+    C2monSessionGateway.initialize();
   }
 
   /**

@@ -39,7 +39,11 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
       <artifactId>c2mon-client-all</artifactId>
-      <version>1.6.2</version>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-client</groupId>
+      <artifactId>c2mon-client-ext-rbac</artifactId>
+       <version>[1.6.0, 2.0.0)</version>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
@@ -157,25 +161,6 @@
   </scm>
   <build>
     <plugins>
-
-      <!-- Generates version file -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <version>1.8</version>
-        <executions>
-          <execution>
-            <id>add-third-party</id>
-            <goals>
-              <goal>add-third-party</goal>
-            </goals>
-            <configuration>
-             <acceptPomPackaging>true</acceptPomPackaging>
-             <excludedGroups>cern.*</excludedGroups>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

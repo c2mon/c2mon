@@ -31,9 +31,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
+import cern.c2mon.client.common.service.SessionService;
 import cern.c2mon.client.common.util.RbacAuthorizationDetailsParser;
-import cern.c2mon.client.core.C2monServiceGateway;
-import cern.c2mon.client.core.C2monSessionManager;
+import cern.c2mon.client.ext.rbac.C2monSessionGateway;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 
 /**
@@ -81,7 +81,7 @@ public class RbacDecisionManager implements AccessDecisionManager {
     String pageUrl = invocation.getRequestUrl();
     logger.info(username + " tries to access url:" + pageUrl);
 
-    C2monSessionManager sessionManager = C2monServiceGateway.getSessionManager();
+    SessionService sessionManager = C2monSessionGateway.getSessionService();
 
     RbacAuthorizationDetails details = getRequiredPermissions(pageUrl);
     if (details == null) { // no special permissions required!

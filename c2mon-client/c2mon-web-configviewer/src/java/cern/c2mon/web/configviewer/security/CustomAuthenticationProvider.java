@@ -24,8 +24,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
-import cern.c2mon.client.core.C2monServiceGateway;
-import cern.c2mon.client.core.C2monSessionManager;
+import cern.c2mon.client.common.service.SessionService;
+import cern.c2mon.client.ext.rbac.C2monSessionGateway;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 
 /** Our own custom authentication Provider. */
@@ -54,8 +54,8 @@ public class CustomAuthenticationProvider  implements AuthenticationProvider  {
     String password = (String) authentication.getCredentials();
 
     // Don't attempt to login the user if they are already logged in.
-    if (!C2monServiceGateway.getSessionManager().isUserLogged(username)) {
-      if (!C2monServiceGateway.getSessionManager().login(APP_NAME, username, password)) {
+    if (!C2monSessionGateway.getSessionService().isUserLogged(username)) {
+      if (!C2monSessionGateway.getSessionService().login(APP_NAME, username, password)) {
         throw new BadCredentialsException("Invalid username/password");
       }
     } else {
@@ -81,7 +81,7 @@ public class CustomAuthenticationProvider  implements AuthenticationProvider  {
 
     String role = "ROLE_GUEST";
 
-    C2monSessionManager sessionManager = C2monServiceGateway.getSessionManager();
+    SessionService sessionManager = C2monSessionGateway.getSessionService();
 
     if (sessionManager.isAuthorized(username, adminAuthDetails))
       role = "ROLE_ADMIN";
