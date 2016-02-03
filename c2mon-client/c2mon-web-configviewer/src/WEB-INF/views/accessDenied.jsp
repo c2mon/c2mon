@@ -18,7 +18,7 @@
   <h2 style="margin-top: 100px; text-align: center;">Access Denied!</h2>
 
   <div class="container">
-    <sec:authorize ifNotGranted="ROLE_ANONYMOUS">
+    <sec:authorize access="isAuthenticated()">
       <p style="text-align: center;">Sorry, your account is not authorised to access this page.</p>
 
       <p style="text-align: center;">

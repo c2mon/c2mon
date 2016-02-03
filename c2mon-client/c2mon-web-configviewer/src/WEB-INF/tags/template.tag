@@ -72,7 +72,7 @@
       <!-- /.navbar-header -->
 
       <ul class="nav navbar-top-links navbar-right">
-        <sec:authorize ifNotGranted="ROLE_ANONYMOUS">
+        <sec:authorize access="isAuthenticated()">
           <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
               <i class="fa fa-user fa-fw"></i>
@@ -94,7 +94,7 @@
           </li>
           <!-- /.dropdown -->
         </sec:authorize>
-        <sec:authorize ifAllGranted="ROLE_ANONYMOUS">
+        <sec:authorize access="!isAuthenticated()">
           <li>
             <a href="${login}">
               <i class="fa fa-sign-out fa-fw"></i>

@@ -68,8 +68,8 @@ body {
 
 <body>
   <script>
-  if(window.location.href.indexOf('?reloaded') === -1) 
-    window.location.href = window.location.href + "?reloaded=true";
+//  if(window.location.href.indexOf('?reloaded') === -1)
+//    window.location.href = window.location.href + "?reloaded=true";
   </script>
   <div id="container">
     <div id="error"></div>

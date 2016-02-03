@@ -38,8 +38,14 @@
     <intercept-url pattern="/configloader/progress" access="hasAnyRole('ROLE_ADMIN')" />
     <intercept-url pattern="/process/**" access="hasAnyRole('ROLE_ADMIN')" />
     <intercept-url pattern="/commandviewer/**" access="hasAnyRole('ROLE_ADMIN')" />
-    <form-login login-page="/login" authentication-failure-url="/login?error=true" />
+    <form-login
+        username-parameter="j_username"
+        password-parameter="j_password"
+        login-processing-url="/j_spring_security_check"
+        login-page="/login"
+        authentication-failure-url="/login?error=true" />
     <access-denied-handler error-page="/accessDenied" />
+    <csrf disabled="true"/>
   </http>
 
   <beans:bean id="customAuthenticationProvider" class="cern.c2mon.web.configviewer.security.CustomAuthenticationProvider">
