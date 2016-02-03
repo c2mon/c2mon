@@ -72,7 +72,10 @@ public class C2monSessionGateway {
    *
    * @return The SessionService which allows to secure access to modules based on authentication.
    */
-  public static SessionService getSessionService() {
+  public static synchronized SessionService getSessionService() {
+    if (sessionService == null) {
+      initialize();
+    }
     return sessionService;
   }
 }
