@@ -21,7 +21,7 @@ import java.util.Collection;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 public class CustomUserAuthentication implements Authentication {
     
@@ -33,7 +33,7 @@ public class CustomUserAuthentication implements Authentication {
     private Authentication authentication;
     
     public CustomUserAuthentication(String role, Authentication authentication) {
-        this.grantedAuthority = new GrantedAuthorityImpl(role);
+        this.grantedAuthority = new SimpleGrantedAuthority(role);
         this.authentication = authentication;
     }
 
