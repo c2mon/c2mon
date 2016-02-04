@@ -305,15 +305,15 @@ public class DataTagESLogConverterTest {
     Map<String, Object> map = new HashMap<>();
     map.put("building", "1");
     map.put("responsible", "coucou");
-    map.put("intShouldNotGoToMetadata", 2);
+    map.put("intShouldGoToStringMetadata", 2);
     Metadata metadata = new Metadata(map);
     DataTagCacheObject tag = createTagExample();
     tag.setMetadata(metadata);
 
     tagES = esLogConverter.convertToTagES(tag);
     assertNotNull(tagES.getMetadata());
-    assertNull(tagES.getMetadata().get("intShouldNotGoToMetadata"));
     assertEquals("1", tagES.getMetadata().get("building"));
+    assertEquals("2", tagES.getMetadata().get("intShouldGoToStringMetadata"));
     assertEquals("coucou", tagES.getMetadata().get("responsible"));
   }
 

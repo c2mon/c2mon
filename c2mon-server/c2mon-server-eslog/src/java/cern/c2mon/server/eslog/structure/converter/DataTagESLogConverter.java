@@ -112,9 +112,8 @@ public class DataTagESLogConverter {
     if (metadata != null) {
       for (String key : metadata.getMetadata().keySet()) {
         Object value = metadata.getMetadata().get(key);
-        if (value instanceof String) {
-          metadataMap.put(key, (String) value);
-        }
+        //TODO: take care of the complex objects.
+        metadataMap.put(key, value.toString());
       }
     }
     tagES.setMetadata(metadataMap);

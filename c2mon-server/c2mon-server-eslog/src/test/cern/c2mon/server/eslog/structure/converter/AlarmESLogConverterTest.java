@@ -27,7 +27,9 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
@@ -41,9 +43,10 @@ import static junit.framework.TestCase.assertNull;
 @RunWith(MockitoJUnitRunner.class)
 public class AlarmESLogConverterTest {
   @InjectMocks
-  AlarmESLogConverter alarmESLogConverter;
-  Alarm alarm;
-  AlarmES alarmES;
+  private AlarmESLogConverter alarmESLogConverter;
+  private Alarm alarm;
+  private AlarmES alarmES;
+  private String arrayString;
 
   @Test
   public void testNullConvertsToNull() {
@@ -65,6 +68,7 @@ public class AlarmESLogConverterTest {
 
     alarmES = alarmESLogConverter.convertAlarmToAlarmES(alarm);
     callTests(alarmES, alarm);
+    assertEquals(arrayString, alarmES.getMetadata().get("array"));
   }
 
   private void callTests(AlarmES alarmES, Alarm  alarm) {
@@ -82,7 +86,10 @@ public class AlarmESLogConverterTest {
   private Alarm initAlarmWithMetadata() {
     AlarmCacheObject alarm = new AlarmCacheObject();
     Map<String, Object> map = new HashMap<>();
+    List<Object> emptyList = new ArrayList<>();
+    arrayString = emptyList.toString();
     map.put("building", "1");
+    map.put("array", emptyList);
     map.put("responsible person", "coucou");
     Metadata metadata = new Metadata();
     metadata.setMetadata(map);
