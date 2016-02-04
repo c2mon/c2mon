@@ -1,6 +1,21 @@
 #!/bin/sh
+#
+# Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+# 
+# This file is part of the CERN Control and Monitoring Platform 'C2MON'.
+# C2MON is free software: you can redistribute it and/or modify it under the
+# terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation, either version 3 of the license.
+# 
+# C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+# more details.
+# 
+# You should have received a copy of the GNU Lesser General Public License
+# along with C2MON. If not, see <http://www.gnu.org/licenses/>.
+##
 
-# C2MON. CERN. All rights reserved.
 #
 # This script is used to start and stop the
 # individual DAQ message handlers locally on the specified DAQ installations.
@@ -8,6 +23,59 @@
 # installation.
 #
 # ------------------------------------------------------------------------------
+
+
+###############################
+# Initialise helper functions #
+###############################
+
+BOOTUP=color
+# column to start "[  OK  ]" label in 
+RES_COL=60
+# terminal sequence to move to that column. You could change this
+# to something like "tput hpa ${RES_COL}" if your terminal supports it
+MOVE_TO_COL="echo -en \\033[${RES_COL}G"
+# terminal sequence to set color to a 'success' color (currently: green)
+SETCOLOR_SUCCESS="echo -en \\033[0;32m"
+# terminal sequence to set color to a 'failure' color (currently: red)
+SETCOLOR_FAILURE="echo -en \\033[0;31m"
+# terminal sequence to set color to a 'warning' color (currently: yellow)
+SETCOLOR_WARNING="echo -en \\033[0;33m"
+# terminal sequence to reset to the default color.
+SETCOLOR_NORMAL="echo -en \\033[0;39m"
+
+echo_success() {
+  [ "$BOOTUP" = "color" ] && $MOVE_TO_COL
+  echo -n "["
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_SUCCESS
+  echo -n $"  OK  "
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+  echo -n "]"
+  echo -ne "\r"
+  return 0
+}
+
+echo_failure() {
+  [ "$BOOTUP" = "color" ] && $MOVE_TO_COL
+  echo -n "["
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
+  echo -n $"FAILED"
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+  echo -n "]"
+  echo -ne "\r"
+  return 1
+}
+
+echo_warning() {
+  [ "$BOOTUP" = "color" ] && $MOVE_TO_COL
+  echo -n "["
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_WARNING
+  echo -n $"WARNING"
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+  echo -n "]"
+  echo -ne "\r"
+  return 1
+}
 
 # Start/stop/restart C2MON DAQ process
 
@@ -56,18 +124,7 @@ else
   export LOG4J_CONF_FILE=${DAQ_CONF_HOME}/log4j.xml
 fi
 
-
-# Source function library.
-if [ -f /etc/init.d/functions ] ; then
-  . /etc/init.d/functions
-elif [ -f /etc/rc.d/init.d/functions ] ; then
-  . /etc/rc.d/init.d/functions
-else
-  exit 0
-fi
-
 RETVAL=0
-
 
 # runs()
 # The function will check whether a process with the
