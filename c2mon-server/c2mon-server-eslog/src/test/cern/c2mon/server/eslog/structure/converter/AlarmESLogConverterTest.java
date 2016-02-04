@@ -46,7 +46,7 @@ public class AlarmESLogConverterTest {
   private AlarmESLogConverter alarmESLogConverter;
   private Alarm alarm;
   private AlarmES alarmES;
-  private String arrayString;
+  private String[] arrayString = new String[]{};
 
   @Test
   public void testNullConvertsToNull() {
@@ -68,7 +68,8 @@ public class AlarmESLogConverterTest {
 
     alarmES = alarmESLogConverter.convertAlarmToAlarmES(alarm);
     callTests(alarmES, alarm);
-    assertEquals(arrayString, alarmES.getMetadata().get("array"));
+    log.debug(arrayString.toString());
+    assertEquals(arrayString.toString(), alarmES.getMetadata().get("array"));
   }
 
   private void callTests(AlarmES alarmES, Alarm  alarm) {
@@ -86,10 +87,8 @@ public class AlarmESLogConverterTest {
   private Alarm initAlarmWithMetadata() {
     AlarmCacheObject alarm = new AlarmCacheObject();
     Map<String, Object> map = new HashMap<>();
-    List<Object> emptyList = new ArrayList<>();
-    arrayString = emptyList.toString();
     map.put("building", "1");
-    map.put("array", emptyList);
+    map.put("array", arrayString.toString());
     map.put("responsible person", "coucou");
     Metadata metadata = new Metadata();
     metadata.setMetadata(map);
