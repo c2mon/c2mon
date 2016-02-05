@@ -11,6 +11,9 @@
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-eslog</artifactId>
   <version>1.6.0</version>
+  <name>c2mon-server-eslog</name>
+  <url>http://cern.ch/c2mon</url>
+  <description>C2MON server persistence module for ElasticSearch</description>
   
    <scm>
     <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-eslog</developerConnection>
@@ -83,7 +86,7 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-shorttermlog</artifactId>
-      <version>1.6.4-SNAPSHOT</version>
+      <version>[1.6.4, 2.0.0)</version>
     </dependency>
   </dependencies>
 
@@ -101,7 +104,4 @@
       </plugin>
     </plugins>
   </build>
-  <name>c2mon-server-eslog</name>
-  <url>http://cern.ch/c2mon</url>
-  <description>C2MON server persistence module for ElasticSearch</description>
 </project>
