@@ -22,12 +22,13 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.simpleframework.xml.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.simpleframework.xml.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
@@ -79,11 +80,12 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
     @Element(name = "HardwareAddress", required = false)
     private HardwareAddress hardwareAddress;
 
-  /**
-   * All address information of the given DataTag
-   * This is an central element for this class which provides the information for the daq to create an DataTag.
-   */
-  Map<String, String> addressParameters = new HashMap<>();
+    /**
+     * All address information of the given DataTag
+     * This is an central element for this class which provides the information for the daq to create an DataTag.
+     */
+    @Element(name = "address-parameters", required = false)
+    Map<String, String> addressParameters = new HashMap<>();
 
 
     /**
@@ -214,61 +216,63 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
         this.priority = priority;
         this.guaranteedDelivery = pGuaranteedDelivery;
     }
-
-  // ----------------------------------------------------------------------------
-  // CONSTRUCTORS for addressParameters (Map<String, String>)
-  // ----------------------------------------------------------------------------
-
-  /**
-   * Constructor Default values: The timeToLive is set to TTL_FOREVER, the deadband is set to DEADBAND_NONE, the
-   * transformation factor is set to TRANSFORMATION_NONE, the priority is PRIORITY_LOW.
-   *
-   * @param hardwareAddress the hardware address for the DataTagAddress object
-   */
-  public DataTagAddress(Map<String, String> addressParameters) {
-    this(TTL_FOREVER, // maximum time-to-live
-        DataTagDeadband.DEADBAND_NONE, // no value deadband filtering
-        0f, // no value deadband
-        0, // no time deadband filtering
-        DataTagAddress.PRIORITY_LOW, // low JMS priority on delivery
-        false // no guaranteed message delivery
-    );
-    setAddressParameters(addressParameters);
-  }
-
-  /**
-   * Constructor Default values: The deadband is set to DEADBAND_NONE, the transformation factor is set to
-   * TRANSFORMATION_NONE, the priority is PRIORITY_LOW.
-   *
-   * @param hardwareAddress the hardware address for the DataTagAddress object
-   * @param timeToLive
-   * @see #timeToLive
-   */
-  public DataTagAddress(Map<String, String> addressParameters, int timeToLive) {
-    this(timeToLive, DataTagDeadband.DEADBAND_NONE, 0f, 0, DataTagAddress.PRIORITY_LOW, false);
-    setAddressParameters(addressParameters);
-  }
-
-  /**
-   * Constructor with addressParameters as parameters. Node if the parameter is null the value is not set and the default
-   * vaule of an empty hashMap is used. Therefore cant be null.
-   * @param addressParameters the address parameters for the DataTagAddress
-   * @param timeToLive TTL in seconds
-   * @param valueDeadbandType type of value-based deadband filtering
-   * @param valueDeadband parameter for value-based deadband filtering
-   * @param timeDeadband parameter for time-based deadband filtering
-   * @param priority priority of the tag.
-   * @param pGuaranteedDelivery JMS guaranteed delivery flag The deadband is set to DEADBAND_NONE.
-   */
-  public DataTagAddress(int timeToLive, short valueDeadbandType,
-                        float valueDeadband, int timeDeadband, int priority, boolean pGuaranteedDelivery) {
-    this.timeToLive = timeToLive;
-    this.valueDeadbandType = valueDeadbandType;
-    this.valueDeadband = valueDeadband;
-    this.timeDeadband = timeDeadband;
-    this.priority = priority;
-    this.guaranteedDelivery = pGuaranteedDelivery;
-  }
+  
+    // ----------------------------------------------------------------------------
+    // CONSTRUCTORS for addressParameters (Map<String, String>)
+    // ----------------------------------------------------------------------------
+  
+    /**
+     * Constructor Default values: The timeToLive is set to TTL_FOREVER, the deadband is set to DEADBAND_NONE, the
+     * transformation factor is set to TRANSFORMATION_NONE, the priority is PRIORITY_LOW.
+     *
+     * @param hardwareAddress the hardware address for the DataTagAddress object
+     */
+    public DataTagAddress(Map<String, String> addressParameters) {
+      this(TTL_FOREVER, // maximum time-to-live
+          DataTagDeadband.DEADBAND_NONE, // no value deadband filtering
+          0f, // no value deadband
+          0, // no time deadband filtering
+          DataTagAddress.PRIORITY_LOW, // low JMS priority on delivery
+          false // no guaranteed message delivery
+      );
+      
+      setAddressParameters(addressParameters);
+    }
+  
+    /**
+     * Constructor Default values: The deadband is set to DEADBAND_NONE, the transformation factor is set to
+     * TRANSFORMATION_NONE, the priority is PRIORITY_LOW.
+     *
+     * @param hardwareAddress the hardware address for the DataTagAddress object
+     * @param timeToLive
+     * @see #timeToLive
+     */
+    public DataTagAddress(Map<String, String> addressParameters, int timeToLive) {
+      this(timeToLive, DataTagDeadband.DEADBAND_NONE, 0f, 0, DataTagAddress.PRIORITY_LOW, false);
+      setAddressParameters(addressParameters);
+    }
+  
+    /**
+     * Constructor with addressParameters as parameters. Node if the parameter is null the value is not set and the default
+     * vaule of an empty hashMap is used. Therefore cant be null.
+     * @param addressParameters the address parameters for the DataTagAddress
+     * @param timeToLive TTL in seconds
+     * @param valueDeadbandType type of value-based deadband filtering
+     * @param valueDeadband parameter for value-based deadband filtering
+     * @param timeDeadband parameter for time-based deadband filtering
+     * @param priority priority of the tag.
+     * @param pGuaranteedDelivery JMS guaranteed delivery flag The deadband is set to DEADBAND_NONE.
+     */
+    public DataTagAddress(int timeToLive, short valueDeadbandType,
+                          float valueDeadband, int timeDeadband, int priority, boolean pGuaranteedDelivery) {
+      this.timeToLive = timeToLive;
+      this.valueDeadbandType = valueDeadbandType;
+      this.valueDeadband = valueDeadband;
+      this.timeDeadband = timeDeadband;
+      this.priority = priority;
+      this.guaranteedDelivery = pGuaranteedDelivery;
+    }
+    
     /**
      * Returns a new DataTagAddress object that is an exact copy of "this".
      *
@@ -276,29 +280,32 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
      */
     @Override
     public DataTagAddress clone() {
-        DataTagAddress clonedAddress = null;
-        try {
-            clonedAddress = (DataTagAddress) super.clone();
-            if (this.hardwareAddress != null) {
-                clonedAddress.hardwareAddress = this.hardwareAddress.clone();
-            }
-
-          // clone all map values. Use String constructor for deep cloning.
-          if(!this.addressParameters.isEmpty()){
-
-            clonedAddress = (DataTagAddress) super.clone();
-            Map<String,String> cloneParameters = new HashMap<>();
-
-            for(Map.Entry<String, String> entry : addressParameters.entrySet()){
-              cloneParameters.put(new String(entry.getKey()),entry.getValue());
-            }
-
-          }
-        } catch (CloneNotSupportedException e) {
-            // Should not happen if the hardware addresses remain as they are.
-            e.printStackTrace();
+      DataTagAddress clonedAddress = null;
+      try {
+        clonedAddress = (DataTagAddress) super.clone();
+        if (this.hardwareAddress != null) {
+          clonedAddress.hardwareAddress = this.hardwareAddress.clone();
         }
-        return clonedAddress;
+  
+        // Map with only primitive types does not require deep cloning
+        clonedAddress.addressParameters = new HashMap<>(addressParameters);
+  
+        if (!this.addressParameters.isEmpty()) {
+  
+          clonedAddress = (DataTagAddress) super.clone();
+          Map<String, String> cloneParameters = new HashMap<>();
+  
+          for (Map.Entry<String, String> entry : addressParameters.entrySet()) {
+            cloneParameters.put(new String(entry.getKey()), entry.getValue());
+          }
+  
+        }
+      }
+      catch (CloneNotSupportedException e) {
+        // Should not happen if the hardware addresses remain as they are.
+        e.printStackTrace();
+      }
+      return clonedAddress;
     }
 
     /**
@@ -326,13 +333,18 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
         this.hardwareAddress = address;
     }
 
-  /**
-   * Set the parameters for the address of the given DataTag. This is an central element for this class
-   * which provides all information for the daq to create a DataTag.
-   * @param addressParameters
-   */
-  public void setAddressParameters(Map<String, String> addressParameters){
+    /**
+     * Set the parameters for the address of the given DataTag. This is an central element for this class
+     * which provides all information for the daq to create a DataTag.
+     * @param addressParameters
+     */
+    public void setAddressParameters(Map<String, String> addressParameters) {
+      if (addressParameters != null) {
         this.addressParameters = addressParameters;
+      }
+      else {
+        this.addressParameters.clear();
+      }
     }
 
     /**
@@ -657,6 +669,4 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
     public boolean isStaticTimedeadband() {
         return staticTimedeadband;
     }
-
-
 }
