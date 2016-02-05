@@ -10,7 +10,7 @@
 
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-shorttermlog</artifactId>
-  <version>1.6.4</version>
+  <version>1.6.5-SNAPSHOT</version>
   <name>c2mon-server-shorttermlog</name>
   <packaging>jar</packaging>
   <description>C2MON server module for short-term logging to the DB (of Tag updates, Commands and Supervision events)</description>
