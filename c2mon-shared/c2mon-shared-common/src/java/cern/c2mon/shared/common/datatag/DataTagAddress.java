@@ -289,17 +289,6 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
   
         // Map with only primitive types does not require deep cloning
         clonedAddress.addressParameters = new HashMap<>(addressParameters);
-  
-        if (!this.addressParameters.isEmpty()) {
-  
-          clonedAddress = (DataTagAddress) super.clone();
-          Map<String, String> cloneParameters = new HashMap<>();
-  
-          for (Map.Entry<String, String> entry : addressParameters.entrySet()) {
-            cloneParameters.put(new String(entry.getKey()), entry.getValue());
-          }
-  
-        }
       }
       catch (CloneNotSupportedException e) {
         // Should not happen if the hardware addresses remain as they are.
@@ -317,11 +306,11 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
     }
 
 
-  /**
-   * Returns the address parameters for the given DataTag.
-   * @return address parameters.
-   */
-  public Map<String, String > getAddressParameters(){
+    /**
+     * Returns the address parameters for the given DataTag.
+     * @return address parameters.
+     */
+    public Map<String, String> getAddressParameters(){
         return this.addressParameters;
     }
 
@@ -579,7 +568,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
                 fieldName = fieldNode.getNodeName();
                 if (fieldName.equals("HardwareAddress")) {
                     result.setHardwareAddress(HardwareAddressFactory.getInstance().fromConfigXML((org.w3c.dom.Element) fieldNode));
-                } else if(fieldName.equals("properties")){
+                } else if(fieldName.equals("address-parameters")){
                   result.setAddressParameters(SimpleXMLParser.domNodeToMap(fieldNode));
                 }else{
                     fieldValueString = fieldNode.getFirstChild().getNodeValue();
