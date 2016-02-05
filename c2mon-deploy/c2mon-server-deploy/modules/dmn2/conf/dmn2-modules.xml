@@ -19,8 +19,7 @@
   <!--  the module to send alarms to LASER. Activated 09/2014 -->
   <import resource="classpath:cern/c2mon/server/laser/config/server-laser.xml"/>
   
-  <!-- Elastic Search persistence module
-   <import resource="classpath:cern/c2mon/server/eslog/config/server-eslog.xml"/>
-   -->
+  <!-- Elastic Search persistence module. Activated 02/2016 -->
+  <import resource="classpath:cern/c2mon/server/eslog/config/server-eslog.xml"/>
 
 </beans>
