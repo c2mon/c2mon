@@ -19,6 +19,10 @@
   <url></url>
 
   <developers />
+  
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/dipcm-daq-dip-deploy</developerConnection>
+  </scm>
 
   <!-- This is needed to retrieve the DIP dependencies -->
   <repositories>
@@ -36,10 +40,6 @@
       <version>[1.6.0, 2.0.0)</version>
     </dependency>
   </dependencies>
-
-  <scm>
-    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/dipcm/trunk/c2mon/c2mon-deploy/dipcm-daq-dip-deploy</developerConnection>
-  </scm>
   
   <properties>
     <dip.version>5.5.2</dip.version>
