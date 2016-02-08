@@ -24,10 +24,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.apache.activemq.broker.BrokerService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.activemq.broker.jmx.ManagementContext;
 import org.easymock.EasyMock;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.SourceDataTagValueCapture;
@@ -71,6 +72,7 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
 
         broker = new BrokerService();
         broker.setUseJmx(true);
+        broker.setManagementContext(null);
         broker.setPersistent(false);
         broker.addConnector(ACTIVEMQ_URL);
         broker.start();
@@ -90,12 +92,13 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
     protected void afterTest() throws Exception {
 
         // DONT' call disconnectFromDataSource() because it is called by the superclass
+        if (clicAgent != null) {
+            clicAgent.stopHeartbeat();
+            clicAgent.stopAcquisition();
+            clicAgent.stop();
 
-        clicAgent.stopHeartbeat();
-        clicAgent.stopAcquisition();
-        clicAgent.stop();
-
-        broker.stop();
+            broker.stop();
+        }
     }
 
     @Test
