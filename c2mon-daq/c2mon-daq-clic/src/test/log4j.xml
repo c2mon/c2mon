@@ -19,7 +19,7 @@
 		<appender-ref ref="ConsoleAppender" />
 	</logger>
 
-	<logger name="com.espertech.esper" additivity="false">
+	<logger name="org.apache.activemq.broker.jmx" additivity="false">
 		<level value="info" />
 		<appender-ref ref="ConsoleAppender" />
 	</logger>
