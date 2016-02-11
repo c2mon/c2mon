@@ -161,12 +161,6 @@
                                     <td>${tag.address.timeDeadband}</td>
                                   </tr>
                                 </c:if>
-                                <c:if test="${not empty tag.address.valueCheckMonitor}">
-                                  <tr>
-                                    <th>Value Check Monitor</th>
-                                    <td>${tag.address.valueCheckMonitor}</td>
-                                  </tr>
-                                </c:if>
                                 <tr>
                                   <th>Hardware Address</th>
                                   <td>
