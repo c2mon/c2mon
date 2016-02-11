@@ -23,12 +23,8 @@ import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 /**
- * Holds the configuration for the ElasticSearch cluster. Used in TransportConnector class for:
- * es.port
- * es.host
- * es.cluster
- * es.node.name
- * es.index.settings
+ * Holds the configuration for the ElasticSearch cluster. Used in TransportConnector class for
+ * the properties inside the c2mon.properties file. Allows to work with @Values.
  *
  * @author Alban Marguet.
  */

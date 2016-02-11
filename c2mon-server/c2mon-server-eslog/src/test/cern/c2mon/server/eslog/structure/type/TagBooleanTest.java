@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.type;
 
-import cern.c2mon.server.eslog.structure.types.TagBoolean;
+import cern.c2mon.server.eslog.structure.types.EsTagBoolean;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Tests the good behaviour of the TagBoolean class. verify that it builds
+ * Tests the good behaviour of the EsTagBoolean class. verify that it builds
  * correctly in JSON and accept/reject good/bad types of value.
  * 
  * @author Alban Marguet.
@@ -38,7 +38,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(MockitoJUnitRunner.class)
 public class TagBooleanTest {
   @InjectMocks
-  private TagBoolean tagBoolean;
+  private EsTagBoolean tagBoolean;
 
   @Test
   public void testValue() {

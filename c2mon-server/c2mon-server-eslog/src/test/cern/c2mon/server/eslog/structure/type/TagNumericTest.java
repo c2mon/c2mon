@@ -17,7 +17,7 @@
 package cern.c2mon.server.eslog.structure.type;
 
 import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.server.eslog.structure.types.TagNumeric;
+import cern.c2mon.server.eslog.structure.types.EsTagNumeric;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +31,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Tests the good behaviour of the TagNumeric class. verify that it builds
+ * Tests the good behaviour of the EsTagNumeric class. verify that it builds
  * correctly in JSON and accept/reject good/bad types of value.
  * 
  * @author Alban Marguet.
@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(MockitoJUnitRunner.class)
 public class TagNumericTest {
   @InjectMocks
-  private TagNumeric tagNumeric;
+  private EsTagNumeric tagNumeric;
 
   @Test
   public void testValue() {
@@ -80,7 +80,7 @@ public class TagNumericTest {
   public void testGetObject() {
     String line = "{\"id\":1053976,\"name\":\"CLIC:CFC-CCR-ALLGPSPS:SYS.MEM.FREEPCT\",\"dataType\":\"float\",\"sourceTimestamp\":1454342362957,\"serverTimestamp\":1454342362981,\"daqTimestamp\":1454342362957,\"status\":0,\"quality\":\"{}\",\"valid\":true,\"valueNumeric\":73.9237,\"valueDescription\":\"\",\"process\":\"P_CLIC_SPS\",\"equipment\":\"CLIC:CFC-CCR-ALLGPSPS\"}";
     IFallback result = tagNumeric.getObject(line);
-    assertTrue(result instanceof TagNumeric);
+    assertTrue(result instanceof EsTagNumeric);
     assertEquals(line, result.toString());
   }
 }

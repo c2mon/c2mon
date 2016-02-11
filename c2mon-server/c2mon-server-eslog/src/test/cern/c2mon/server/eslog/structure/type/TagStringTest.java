@@ -23,19 +23,15 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 
 import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.server.eslog.structure.types.TagNumeric;
-import cern.c2mon.server.eslog.structure.types.TagString;
+import cern.c2mon.server.eslog.structure.types.EsTagString;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import cern.c2mon.server.eslog.structure.mappings.Mapping.ValueType;
-import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
-
 /**
- * Tests the good behaviour of the TagString class.
+ * Tests the good behaviour of the EsTagString class.
  * verify that it builds correctly in JSON and accept/reject good/bad types of value.
  * @author Alban Marguet.
  */
@@ -43,7 +39,7 @@ import cern.c2mon.server.eslog.structure.mappings.TagStringMapping;
 @RunWith(MockitoJUnitRunner.class)
 public class TagStringTest {
 	@InjectMocks
-	private TagString tagString;
+	private EsTagString tagString;
 
 	@Test
 	public void testValue() {
@@ -79,7 +75,7 @@ public class TagStringTest {
         "\"quality\":\"{}\",\"valueString\":\"DOWN\",\"valueDescription\":\"Communication fault tag indicates that equipment E_OPC_GTCTESTCM11 is down. Reason: Problems connecting to VGTCTESTCM11: Problems wih the DCOM connection occured\",\"process\":\"P_GTCTESTCM11\"," +
         "\"equipment\":\"E_OPC_GTCTESTCM11\"}";
 		IFallback result = tagString.getObject(line);
-    assertTrue(result instanceof TagString);
+    assertTrue(result instanceof EsTagString);
     assertEquals(line, result.toString());
 	}
 }
