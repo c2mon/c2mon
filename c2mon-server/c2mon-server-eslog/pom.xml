@@ -10,7 +10,7 @@
 
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-eslog</artifactId>
-  <version>1.6.1-SNAPSHOT</version>
+  <version>1.7.0</version>
   <name>c2mon-server-eslog</name>
   <url>http://cern.ch/c2mon</url>
   <description>C2MON server persistence module for ElasticSearch</description>
