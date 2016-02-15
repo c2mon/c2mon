@@ -119,20 +119,20 @@ public abstract class EsIndexer implements IDBPersistenceHandler {
 
   /** Milliseconds since Epoch time to YYYY-MM. */
   protected String millisecondsToYearMonth(long millis) {
-    String timestamp = getSimpleDateFormatForMilliseconds("yyyy-MM-dd HH:mm:ss.SSSSSS", millis);
-    return timestamp.substring(0, 7);
+    String timestamp = getSimpleDateFormatForMilliseconds("yyyy-MM", millis);
+    return timestamp;
   }
 
   /** Milliseconds since Epoch time to YYYY-ww. */
   protected String millisecondsToYearWeek(long millis) {
-    String timeStamp = getSimpleDateFormatForMilliseconds("yyyy-ww", millis);
+    String timeStamp = getSimpleDateFormatForMilliseconds("yyyy-'W'ww", millis);
     return timeStamp;
   }
 
   /** Milliseconds since Epoch time to YYYY-MM-DD. */
   protected String millisecondsToYearMonthDay(long millis) {
-    String timestamp = getSimpleDateFormatForMilliseconds("yyyy-MM-dd HH:mm:ss.SSSSSS", millis);
-    return timestamp.substring(0, 10);
+    String timestamp = getSimpleDateFormatForMilliseconds("yyyy-MM-dd", millis);
+    return timestamp;
   }
 
   private String getSimpleDateFormatForMilliseconds(String wantedPattern, long millis) {

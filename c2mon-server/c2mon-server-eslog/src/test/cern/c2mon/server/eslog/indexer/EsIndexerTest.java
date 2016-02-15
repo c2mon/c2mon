@@ -150,7 +150,7 @@ public class EsIndexerTest {
 
   @Test
   public void testMillisecondsToYearWeek() {
-    String expected = "2015-49";
+    String expected = "2015-W49";
     String value = indexer.millisecondsToYearWeek(1448928000000L);
     assertEquals(expected, value);
   }
