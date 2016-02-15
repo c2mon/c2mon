@@ -16,12 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.shared.common.datatag;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.parsers.ParserConfigurationException;
-
+import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
+import cern.c2mon.shared.util.parser.ParserException;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementMap;
 import org.slf4j.Logger;
@@ -29,13 +29,10 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import cern.c2mon.shared.common.ConfigurationException;
-import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
-import cern.c2mon.shared.util.parser.ParserException;
-import cern.c2mon.shared.util.parser.SimpleXMLParser;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Address associated with a DataTag DataTags are linked to data sources (e.g. PLCs, external SCADA systems etc.) via a
@@ -86,7 +83,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
      * This is an central element for this class which provides the information for the daq to create an DataTag.
      */
     @ElementMap(name = "address-parameters", key="key", attribute=true, inline=true, required = false)
-    Map<String, String> addressParameters = new HashMap<>();
+    private HashMap<String, String> addressParameters = new HashMap<>();
 
 
     /**
@@ -228,7 +225,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
      *
      * @param hardwareAddress the hardware address for the DataTagAddress object
      */
-    public DataTagAddress(Map<String, String> addressParameters) {
+    public DataTagAddress(HashMap<String, String> addressParameters) {
       this(TTL_FOREVER, // maximum time-to-live
           DataTagDeadband.DEADBAND_NONE, // no value deadband filtering
           0f, // no value deadband
@@ -248,7 +245,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
      * @param timeToLive
      * @see #timeToLive
      */
-    public DataTagAddress(Map<String, String> addressParameters, int timeToLive) {
+    public DataTagAddress(HashMap<String, String> addressParameters, int timeToLive) {
       this(timeToLive, DataTagDeadband.DEADBAND_NONE, 0f, 0, DataTagAddress.PRIORITY_LOW, false);
       setAddressParameters(addressParameters);
     }
@@ -328,7 +325,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
      * which provides all information for the daq to create a DataTag.
      * @param addressParameters
      */
-    public void setAddressParameters(Map<String, String> addressParameters) {
+    public void setAddressParameters(HashMap<String, String> addressParameters) {
       if (addressParameters != null) {
         this.addressParameters = addressParameters;
       }
@@ -570,7 +567,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
                 if (fieldName.equals("HardwareAddress")) {
                     result.setHardwareAddress(HardwareAddressFactory.getInstance().fromConfigXML((org.w3c.dom.Element) fieldNode));
                 } else if(fieldName.equals("address-parameters")){
-                  result.setAddressParameters(SimpleXMLParser.domNodeToMap(fieldNode));
+                  result.setAddressParameters((HashMap<String, String>) SimpleXMLParser.domNodeToMap(fieldNode));
                 }else{
                     fieldValueString = fieldNode.getFirstChild().getNodeValue();
                     if (fieldName.equals("time-to-live")) {
