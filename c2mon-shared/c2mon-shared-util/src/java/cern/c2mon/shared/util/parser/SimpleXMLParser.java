@@ -109,7 +109,7 @@ public final class SimpleXMLParser implements XmlParser {
 
     // check if the node is a map node.
 
-    if(!node.getNodeName().equals("properties")){
+    if(!node.getNodeName().equals("address-parameters")){
       throw new IllegalArgumentException("Node does not hold the Information for creating a map");
     }
 
@@ -118,6 +118,12 @@ public final class SimpleXMLParser implements XmlParser {
 
     for(int i = 0; i< entryNodes.getLength(); i++){
       Node entryNode = entryNodes.item(i);
+
+      // check if the node represents just whitespaces...
+      if(entryNode.getNodeValue() != null && entryNode.getNodeValue().trim().isEmpty()){
+        continue;
+      }
+
       String key = entryNode.getAttributes().item(0).getNodeValue().toString();
       String value = entryNode.getFirstChild().getNodeValue();
       result.put(key, value);
@@ -137,13 +143,13 @@ public final class SimpleXMLParser implements XmlParser {
    */
   public static String mapToXMLString(Map<String, String> map){
     String spaces = "            ";
-    String result = spaces + "<properties class=\""+ map.getClass() +"\">" ;
+    String result = spaces + "<address-parameters class=\""+ map.getClass() +"\">" ;
 
     for(Map.Entry<String, String> entry : map.entrySet()){
       result += "<entry key=\"" + entry.getKey() + "\">" + entry.getValue() + "</entry>";
     }
 
-    result += "</properties>\n";
+    result += "</address-parameters>\n";
 
     return  result;
 

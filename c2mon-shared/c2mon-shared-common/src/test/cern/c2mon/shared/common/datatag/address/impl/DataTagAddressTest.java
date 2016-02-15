@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -44,7 +45,7 @@ public class DataTagAddressTest {
     DataTagAddress testAddress= new DataTagAddress(testData);
 
     String compareString = "      <DataTagAddress>\n" +
-        "            <properties class=\"class java.util.HashMap\"><entry key=\"key1\">1</entry><entry key=\"key2\">test</entry><entry key=\"key3\">true</entry></properties>\n" +
+        "            <address-parameters class=\"class java.util.HashMap\"><entry key=\"key1\">1</entry><entry key=\"key2\">test</entry><entry key=\"key3\">true</entry></address-parameters>\n" +
         "        <priority>2</priority>\n" +
         "        <guaranteed-delivery>false</guaranteed-delivery>\n" +
         "      </DataTagAddress>\n";
@@ -62,7 +63,7 @@ public class DataTagAddressTest {
     // initialize test data:
 
     String testString = "      <DataTagAddress>\n" +
-        "            <properties class=\"class java.util.HashMap\"><entry key=\"key1\">1</entry><entry key=\"key2\">test</entry><entry key=\"key3\">true</entry></properties>\n" +
+        "            <address-parameters class=\"class java.util.HashMap\"><entry key=\"key1\">1</entry><entry key=\"key2\">test</entry><entry key=\"key3\">true</entry></address-parameters>\n" +
         "        <priority>2</priority>\n" +
         "        <guaranteed-delivery>false</guaranteed-delivery>\n" +
         "      </DataTagAddress>\n";

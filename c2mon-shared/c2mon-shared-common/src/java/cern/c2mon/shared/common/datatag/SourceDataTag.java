@@ -323,6 +323,14 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
         }
     }
 
+  /**
+   * set the HardwareAddress of the DataTagAddress of this object.
+   * @param hwa the HardwareAddress to set.
+   */
+  public void setHardwareAddress(HardwareAddress hwa) {
+        address.setHardwareAddress(hwa);
+    }
+
     @Override
     public Map<String, String> getAddressParameters() {
         if (address == null) {
