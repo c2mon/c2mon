@@ -1324,7 +1324,92 @@ public class ConfigurationLoaderTest {
     assertEquals(ConfigConstants.Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
     assertTrue(report.getElementReports().size() == 1);
-//
+
+    // get cacheObject from the cache and compare to the an expected cacheObject
+    DataTagCacheObject cacheObjectData = (DataTagCacheObject) dataTagCache.get(100L);
+    DataTagCacheObject expectedCacheObjectData = cacheObjectFactory.buildDataTagCacheObject(100L, dataTag._2, 1L);
+    expectedCacheObjectData.setDescription(dataTagUpdate._2.getProperty("description"));
+    expectedCacheObjectData.setJapcAddress(dataTagUpdate._2.getProperty("japcAddress"));
+    expectedCacheObjectData.setMetadata(Metadata.builder().addMetadata("testMetadata_update",true).build());
+    expectedCacheObjectData.setMaxValue((Comparable) TypeConverter.cast(dataTagUpdate._2.getProperty("maxValue"), dataTag._2.getProperty("dataType")));
+    expectedCacheObjectData.setAddress(DataTagAddress.fromConfigXML(dataTagUpdate._2.getProperty("address")));
+
+    ObjectEqualityComparison.assertDataTagConfigEquals(expectedCacheObjectData, cacheObjectData);
+
+    verify(mockManager);
+
+    // remove the process and equipments and dataTag from the server
+    processFacade.stop(1L, new Timestamp(System.currentTimeMillis()));
+    Configuration remove = getConfBuilderProcess(buildDeleteProcess(1L));
+    report = configurationLoader.applyConfiguration(remove);
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertTrue(report.getStatus() == ConfigConstants.Status.OK);
+
+    assertFalse(processCache.hasKey(1L));
+    assertNull(processMapper.getItem(1L));
+    assertFalse(controlTagCache.hasKey(11L));
+    assertNull(controlTagMapper.getItem(11L));
+    assertFalse(aliveTimerCache.hasKey(12L));
+
+    // equipment stuff
+    assertFalse(equipmentCache.hasKey(2L));
+    assertNull(equipmentMapper.getItem(2L));
+    assertFalse(controlTagCache.hasKey(21L));
+    assertNull(controlTagMapper.getItem(21L));
+    assertFalse(commFaultTagCache.hasKey(22L));
+    assertFalse(aliveTimerCache.hasKey(23L));
+
+    assertFalse(equipmentCache.hasKey(3L));
+    assertNull(equipmentMapper.getItem(3L));
+    assertFalse(controlTagCache.hasKey(31L));
+    assertNull(controlTagMapper.getItem(31L));
+    assertFalse(commFaultTagCache.hasKey(32L));
+    assertFalse(aliveTimerCache.hasKey(33L));
+    assertFalse(dataTagCache.hasKey(100L));
+    assertNull(dataTagMapper.getItem(100L));
+
+    verify(mockManager);
+  }
+
+  @Test
+  public void testUpdateEquipmentDataTagDirect() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
+    // called once when updating the equipment;
+    // mock returns a list with the correct number of SUCCESS ChangeReports
+    expect(mockManager.sendConfiguration(eq(1L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(mockManager);
+
+    // SETUP:
+    // First add a process and equipment to the server
+    Pair<StatusTag.StatusTagBuilder, Properties> statusTagP = builderStatusTagWithPrimFields(11L, "process", 1L);
+    Pair<AliveTag.AliveTagBuilder, Properties> aliveTagP = builderAliveTagWithPrimFields(12l, "process", 1L);
+    Pair<Process.ProcessBuilder, Properties> process = builderProcessWithAllFields(1L, 11L, 12L);
+
+    Pair<StatusTag.StatusTagBuilder, Properties> statusTagE = builderStatusTagWithPrimFields(21L, "equipment", 2L);
+    Pair<CommFaultTag.CommFaultTagBuilder, Properties> commFaultTagE = builderCommFaultTagWithPrimFields(22L, "equipment", 2L);
+    Pair<AliveTag.AliveTagBuilder, Properties> aliveTagE = builderAliveTagWithAllFields(23l, "equipment", 2L);
+    Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L , 21L, 22L, 23L);
+    Pair<DataTag.DataTagBuilder, Properties> dataTag = builderDataTagWithAllFields(100L, "equipment", 2L);
+
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag(dataTag._1.build()).build()).build();
+    Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
+    configurationLoader.applyConfiguration(insert);
+    processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
+
+    // TEST:
+    // Build configuration to update the test DataTag
+    Pair<DataTag.DataTagBuilder, Properties> dataTagUpdate = builderDataTagUpdate(100L);
+    Configuration configuration = Configuration.builder().application("configuration test - application").name("configuration test name").updateTag(dataTagUpdate._1.build()).build();
+
+    //apply the configuration to the server
+    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
+
+    // check report result
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertEquals(ConfigConstants.Status.OK, report.getStatus());
+    assertTrue(report.getProcessesToReboot().isEmpty());
+    assertTrue(report.getElementReports().size() == 1);
+
     // get cacheObject from the cache and compare to the an expected cacheObject
     DataTagCacheObject cacheObjectData = (DataTagCacheObject) dataTagCache.get(100L);
     DataTagCacheObject expectedCacheObjectData = cacheObjectFactory.buildDataTagCacheObject(100L, dataTag._2, 1L);
@@ -2194,6 +2279,78 @@ public class ConfigurationLoaderTest {
     Pair<Alarm.AlarmBuilder, Properties> alarmUpdate = builderAlarmUpdate(666L, 100L);
     Configuration configuration = ConfigurationUtil.getConfBuilderAlarm(100L, 2L, 1L, alarmUpdate._1.build());
 
+    //apply the configuration to the server
+    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
+
+    // check report result
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertEquals(ConfigConstants.Status.OK, report.getStatus());
+    assertTrue(report.getElementReports().size() == 1);
+
+    // get cacheObject from the cache and compare to the an expected cacheObject
+    AlarmCacheObject cacheObjectAlarm = (AlarmCacheObject) alarmCache.get(666L);
+    AlarmCacheObject expectedCacheObjectAlarm = cacheObjectFactory.buildAlarmCacheObject(666L, alarm._2);
+    expectedCacheObjectAlarm.setFaultFamily(alarmUpdate._2.getProperty("faultFamily"));
+
+    ObjectEqualityComparison.assertAlarmEquals(expectedCacheObjectAlarm, cacheObjectAlarm);
+    // Check if all caches are updated
+    assertNotNull(alarmMapper.getItem(666L));
+
+    verify(mockManager);
+
+    // remove the process and equipments and dataTag from the server
+    processFacade.stop(1L, new Timestamp(System.currentTimeMillis()));
+    Configuration remove = getConfBuilderProcess(buildDeleteProcess(1L));
+    report = configurationLoader.applyConfiguration(remove);
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertTrue(report.getStatus() == ConfigConstants.Status.OK);
+
+    assertFalse(processCache.hasKey(1L));
+    assertNull(processMapper.getItem(1L));
+    assertFalse(controlTagCache.hasKey(11L));
+    assertNull(controlTagMapper.getItem(11L));
+    assertFalse(aliveTimerCache.hasKey(12L));
+
+    // equipment stuff
+    assertFalse(equipmentCache.hasKey(2L));
+    assertNull(equipmentMapper.getItem(2L));
+    assertFalse(controlTagCache.hasKey(21L));
+    assertNull(controlTagMapper.getItem(21L));
+    assertFalse(commFaultTagCache.hasKey(22L));
+    assertFalse(aliveTimerCache.hasKey(23L));
+    assertFalse(alarmCache.hasKey(666L));
+    assertNull(alarmMapper.getItem(666L));
+
+    verify(mockManager);
+  }
+
+  @Test
+  public void testUpdateAlarmDirect(){
+    // called once when updating the equipment;
+    // mock returns a list with the correct number of SUCCESS ChangeReports
+    replay(mockManager);
+
+    // SETUP:First add a process and equipment to the server
+    Pair<StatusTag.StatusTagBuilder, Properties> statusTagP = builderStatusTagWithPrimFields(11L, "process", 1L);
+    Pair<AliveTag.AliveTagBuilder, Properties> aliveTagP = builderAliveTagWithPrimFields(12l, "process", 1L);
+    Pair<Process.ProcessBuilder, Properties> process = builderProcessWithAllFields(1L, 11L, 12L);
+
+    Pair<StatusTag.StatusTagBuilder, Properties> statusTagE = builderStatusTagWithPrimFields(21L, "equipment", 2L);
+    Pair<CommFaultTag.CommFaultTagBuilder, Properties> commFaultTagE = builderCommFaultTagWithPrimFields(22L, "equipment", 2L);
+    Pair<AliveTag.AliveTagBuilder, Properties> aliveTagE = builderAliveTagWithAllFields(23L, "equipment", 2L);
+    Pair<Equipment.EquipmentBuilder, Properties> equipment = builderEquipmentWithAllFields(2L, 1L , 21L, 22L, 23L);
+    Pair<DataTag.DataTagBuilder, Properties> dataTag = builderDataTagWithAllFields(100L, "equipment", 2L);
+    Pair<Alarm.AlarmBuilder, Properties> alarm = builderAlarmWithAllFields(666L,100L);
+
+    Process buildP = process._1.aliveTag(aliveTagP._1.build()).statusTag(statusTagP._1.build())
+        .equipment(equipment._1.aliveTag(aliveTagE._1.build()).statusTag(statusTagE._1.build()).commFaultTag(commFaultTagE._1.build()).dataTag((DataTag) dataTag._1.alarm(alarm._1.build()).build()).build()).build();
+    Configuration insert = ConfigurationUtil.getConfBuilderProcess(buildP);
+    configurationLoader.applyConfiguration(insert);
+    processFacade.start(1L, "hostname", new Timestamp(System.currentTimeMillis()));
+
+    // TEST:Build configuration to update the test Alarm
+    Pair<Alarm.AlarmBuilder, Properties> alarmUpdate = builderAlarmUpdate(666L, 100L);
+    Configuration configuration = Configuration.builder().application("configuration test - application").name("configuration test name").updateAlarm(alarmUpdate._1.build()).build();
     //apply the configuration to the server
     ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
 

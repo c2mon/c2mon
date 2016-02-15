@@ -19,8 +19,10 @@ package cern.c2mon.shared.client.configuration.api;
 import java.util.ArrayList;
 import java.util.List;
 
+import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.RuleTag;
+import cern.c2mon.shared.client.configuration.api.tag.Tag;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
@@ -65,8 +67,15 @@ public class Configuration {
   @Singular
   private List<RuleTag> rules = new ArrayList<>();
 
+  @Singular
+  private List<Tag> updateTags = new ArrayList<>();
+
+  @Singular
+  private List<Alarm> updateAlarms = new ArrayList<>();
+
   @Builder
-  public Configuration(String name, String application, String user, @Singular List<Process> processes, @Singular List<RuleTag> rules, Long confId) {
+  public Configuration(String name, String application, String user, @Singular List<Process> processes, @Singular List<RuleTag> rules, Long confId,
+                       @Singular List<Tag> updateTags, @Singular List<Alarm> updateAlarms) {
     super();
     // Default values are set here because of the lombok behavior to overwrite all instance values with defaults.
     this.name = name;
@@ -75,6 +84,8 @@ public class Configuration {
     this.processes = processes == null ? new ArrayList<Process>() : processes;
     this.rules = rules == null ? new ArrayList<RuleTag>() : rules;
     this.configurationId = confId;
+    this.updateTags = updateTags == null ? new ArrayList<Tag>() : updateTags;
+    this.updateAlarms = updateAlarms == null ? new ArrayList<Alarm>() : updateAlarms;
   }
 
   public Configuration() {

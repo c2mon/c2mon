@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -97,6 +97,17 @@ public class SequenceTaskFactory {
   }
 
   /**
+   * Takes a {@link ConfigurationObject} and the type of the object and creates a {@link SequenceTask}.
+   * The object must hold the information for a update. Otherwise this method throw an exception which is than reported to the client.
+   *
+   * @param confObject Object which holds the Information to create a {@link SequenceTask}
+   * @return SequenceTask based on the {@link ConfigurationObject}
+   */
+  public SequenceTask createUpdateSequenceTask(ConfigurationObject confObject) {
+    return buildUpdateSequenceTask(confObject, confObject.getClass());
+  }
+
+  /**
    * Build a {@link SequenceTask} based on the information of the {@link ConfigurationObject}.
    * The information to build the Task a provided by using reflection on the {@link ConfigurationObject}.
    * Because of that it is not important which instance of  {@link ConfigurationObject} is given.
@@ -151,6 +162,37 @@ public class SequenceTaskFactory {
     // checks if the property have some information.
     // if not the ConfigurationObject served as shell object for a underlying ConfigurationObject
     if (properties.isEmpty() && !element.getAction().equals(Action.REMOVE)) {
+      return null;
+    } else {
+      return buildTaskInstance(element, order, clazz);
+    }
+  }
+
+
+  private <T extends ConfigurationObject> SequenceTask buildUpdateSequenceTask(ConfigurationObject object, Class<T> clazz){
+    ConfigurationElement element = new ConfigurationElement();
+    TaskOrder order;
+    Properties properties = new Properties();
+    //downcast the confObj to the actual type
+    T obj = clazz.cast(object);
+
+    // set basic information of the ConfigurationElement, based on the type of the confObj
+    element.setEntity(getEntity(clazz));
+    element.setEntityId(obj.getId());
+    element.setSequenceId(-1l);
+
+    if (cacheHasId(obj.getId(), clazz)) {
+      element.setAction(Action.UPDATE);
+      order = getUpdateTaskOrder(obj);
+      properties = extractPropertiesFromField(obj, clazz);
+    } else {
+      throw new ConfigurationParseException("Updating of" + clazz.getSimpleName() + " (id = " + obj.getId() + ") failed. The object is unknown to the sever.");
+    }
+
+    // put the received properties from the confObj into the ConfigurationElement
+    element.setElementProperties(properties);
+
+    if (properties.isEmpty()) {
       return null;
     } else {
       return buildTaskInstance(element, order, clazz);

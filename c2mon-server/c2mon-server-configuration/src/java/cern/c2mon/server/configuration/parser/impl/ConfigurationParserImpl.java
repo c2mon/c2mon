@@ -66,6 +66,7 @@ public class ConfigurationParserImpl implements ConfigurationParser {
     //
     List<SequenceTask> taskResultList = new ArrayList<>();
     List<ConfigurationElement> elements = new ArrayList<>();
+    long confId = configuration.getConfigurationId() == null ? System.currentTimeMillis() : configuration.getConfigurationId();
 
 
     // need to check if there are any processes or Rules are given
@@ -75,16 +76,24 @@ public class ConfigurationParserImpl implements ConfigurationParser {
     if (configuration.getRules() != null) {
       addRules(taskResultList, configuration.getRules());
     }
+    if (configuration.getUpdateTags() != null) {
+      addTagUpdates(taskResultList, configuration.getUpdateTags());
+    }
+    if (configuration.getUpdateAlarms() != null) {
+      addAlarmUpdates(taskResultList, configuration.getUpdateAlarms());
+    }
+
 
     // After parsing configure given list and put it in the right order
     // remove all null taskResultList which are are created from shell-objects
     taskResultList.removeAll(Collections.singleton(null));
     Collections.sort(taskResultList);
     long seqId = 0l;
+
     for (SequenceTask task : taskResultList) {
       ConfigurationElement element = task.getConfigurationElement();
       element.setSequenceId(seqId++);
-      element.setConfigId(-1l);
+      element.setConfigId(confId);
       elements.add(element);
     }
     return elements;
@@ -284,6 +293,37 @@ public class ConfigurationParserImpl implements ConfigurationParser {
       tempSeq = sequenceTaskFactory.createSequenceTask(rule);
       tasks.add(tempSeq);
       addAlarms(tasks, rule.getAlarms(), rule);
+    }
+  }
+
+  /**
+   * Parses all {@link Tag}s which only hold the information for a update.
+   * All retrieved {@link SequenceTask}s will be added to the task-list as side effect!
+   *
+   * @param tasks List which gets filled due to the side effect of this method.
+   * @param rules list of all Rules of the overlying {@link Tag}
+   */
+  private void addTagUpdates(List<SequenceTask> tasks, List<Tag> updateTags) {
+    SequenceTask tempSeq;
+    for (Tag tag : updateTags) {
+      tempSeq = sequenceTaskFactory.createUpdateSequenceTask(tag);
+      tasks.add(tempSeq);
+      addAlarmUpdates(tasks, tag.getAlarms());
+    }
+  }
+
+  /**
+   * Parses all {@link Alarms}s which only hold the information for a update.
+   * All retrieved {@link SequenceTask}s will be added to the task-list as side effect!
+   *
+   * @param tasks List which gets filled due to the side effect of this method.
+   * @param rules list of all Rules of the overlying {@link Tag}
+   */
+  private void addAlarmUpdates(List<SequenceTask> tasks, List<Alarm> updateAlarms) {
+    SequenceTask tempSeq;
+    for (Alarm alarm : updateAlarms) {
+      tempSeq = sequenceTaskFactory.createUpdateSequenceTask(alarm);
+      tasks.add(tempSeq);
     }
   }
 
