@@ -23,6 +23,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -84,7 +85,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
      * All address information of the given DataTag
      * This is an central element for this class which provides the information for the daq to create an DataTag.
      */
-    @Element(name = "address-parameters", required = false)
+    @ElementMap(name = "address-parameters", key="key", attribute=true, inline=true, required = false)
     Map<String, String> addressParameters = new HashMap<>();
 
 
@@ -216,11 +217,11 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
         this.priority = priority;
         this.guaranteedDelivery = pGuaranteedDelivery;
     }
-  
+
     // ----------------------------------------------------------------------------
     // CONSTRUCTORS for addressParameters (Map<String, String>)
     // ----------------------------------------------------------------------------
-  
+
     /**
      * Constructor Default values: The timeToLive is set to TTL_FOREVER, the deadband is set to DEADBAND_NONE, the
      * transformation factor is set to TRANSFORMATION_NONE, the priority is PRIORITY_LOW.
@@ -235,10 +236,10 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
           DataTagAddress.PRIORITY_LOW, // low JMS priority on delivery
           false // no guaranteed message delivery
       );
-      
+
       setAddressParameters(addressParameters);
     }
-  
+
     /**
      * Constructor Default values: The deadband is set to DEADBAND_NONE, the transformation factor is set to
      * TRANSFORMATION_NONE, the priority is PRIORITY_LOW.
@@ -251,7 +252,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
       this(timeToLive, DataTagDeadband.DEADBAND_NONE, 0f, 0, DataTagAddress.PRIORITY_LOW, false);
       setAddressParameters(addressParameters);
     }
-  
+
     /**
      * Constructor with addressParameters as parameters. Node if the parameter is null the value is not set and the default
      * vaule of an empty hashMap is used. Therefore cant be null.
@@ -272,7 +273,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
       this.priority = priority;
       this.guaranteedDelivery = pGuaranteedDelivery;
     }
-    
+
     /**
      * Returns a new DataTagAddress object that is an exact copy of "this".
      *
@@ -286,7 +287,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
         if (this.hardwareAddress != null) {
           clonedAddress.hardwareAddress = this.hardwareAddress.clone();
         }
-  
+
         // Map with only primitive types does not require deep cloning
         clonedAddress.addressParameters = new HashMap<>(addressParameters);
       }
