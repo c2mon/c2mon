@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cern.c2mon.c2mon-daq</groupId>
+        <artifactId>c2mon-daq-pom</artifactId>
+        <version>RELEASE</version>
+    </parent>
+
+    <groupId>cern.c2mon.c2mon-daq</groupId>
+    <artifactId>c2mon-daq-rest</artifactId>
+    <version>1.6.0-SNAPSHOT</version>
+    <name>c2mon-daq-rest</name>
+
+    <description>TIM data acquisition component for RESTful requests.</description>
+    <dependencies>
+        <dependency>
+            <groupId>cern.c2mon.c2mon-daq</groupId>
+            <artifactId>c2mon-daq-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cern.c2mon.c2mon-shared</groupId>
+            <artifactId>c2mon-shared-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cern.c2mon.c2mon-daq</groupId>
+            <artifactId>c2mon-daq-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--Spring dependencies-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+            <version>1.3.0.RELEASE</version>
+        </dependency>
+
+        <!--Test dependencies-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!--Third party libraries-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+
+        <!--just for testing, need to be deleted!-->
+    </dependencies>
+
+</project>
