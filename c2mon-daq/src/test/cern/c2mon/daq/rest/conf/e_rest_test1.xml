@@ -1,0 +1,28 @@
+<EquipmentUnit id="5250" name="E_REST_REST1">
+  <handler-class-name>automatically-set-by-test</handler-class-name>
+  <commfault-tag-id>107211</commfault-tag-id>
+
+  <commfault-tag-value>false</commfault-tag-value>
+  <address></address>
+  <SubEquipmentUnits>
+  </SubEquipmentUnits>
+
+  <DataTags>
+    <DataTag id="54675" name="BE.TEST:TEST1" control="false">
+      <data-type>String</data-type>
+        <min-value data-type="String"></min-value>
+        <max-value data-type="String"></max-value>
+      <DataTagAddress>
+        <address-parameters class="class java.util.HashMap"><entry key="url">http://www.testaddress.org/</entry><entry key="getFrequency">5</entry><entry key="mode">GET</entry></address-parameters>
+        <time-to-live>3600000</time-to-live>
+        <value-deadband-type>1</value-deadband-type>
+        <value-deadband>1.0</value-deadband>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+
+  </DataTags>
+  <CommandTags>
+  </CommandTags>
+</EquipmentUnit>
