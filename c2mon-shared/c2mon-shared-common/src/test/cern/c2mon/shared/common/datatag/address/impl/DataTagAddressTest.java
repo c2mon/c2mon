@@ -37,7 +37,7 @@ public class DataTagAddressTest {
   @Test
   public void parseBasicHardwareAddressToXml(){
     // initialize test data:
-    Map<String,String> testData = new HashMap<>();
+    HashMap<String,String> testData = new HashMap<>();
     testData.put("key1", "1");
     testData.put("key2", "test");
     testData.put("key3", "true");
