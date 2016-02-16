@@ -23,6 +23,7 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.ArrayUtils;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
@@ -54,6 +55,8 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      * added/removed from the class, the version number needs to change.
      */
     private static final long serialVersionUID = -145678123L;
+
+    private static ObjectMapper objectMapper = new ObjectMapper();
 
     /** Unique numeric identifier of the DataTag */
     @Attribute
@@ -844,4 +847,29 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
         this.dataType = TagDataType.getDataTypeString(dataType);
     }
 
+
+  /**
+   * Method for extracting the data from the addressParameters of thos object.
+   *
+   * @param key The key which specify which data should be extracted
+   * @param type The type the return value should have
+   * @param <T> gerneic type definition for the method
+   * @return value with the given type.
+   */
+  public <T> T getAddressParameter(String key, Class<T> type) {
+    return getAddressParameter(this.getAddressParameters(), key, type);
+  }
+
+  /**
+   * Method for extracting the data from the map with the correct type.
+   *
+   * @param parameters map which holds the data.
+   * @param key The key which specify which data should be extracted
+   * @param type The type the return value should have
+   * @param <T> gerneic type definition for the method
+   * @return value with the given type.
+   */
+  public static <T> T getAddressParameter(Map<String,String> parameters, String key, Class<T> type) {
+    return objectMapper.convertValue(parameters.get(key), type);
+  }
 }
