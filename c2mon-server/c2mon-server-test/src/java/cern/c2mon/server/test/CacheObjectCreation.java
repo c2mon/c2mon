@@ -134,7 +134,7 @@ public final class CacheObjectCreation {
     cacheObject.setUnit("test unit m/sec");
     cacheObject.setDipAddress("testDIPaddress");
     cacheObject.setJapcAddress("testJAPCaddress");
-    cacheObject.setValue(new Long(1000));
+    cacheObject.setValue(new Float(1000));
     cacheObject.setValueDescription("test value description");
     cacheObject.setSimulated(false); //null allowed
     cacheObject.setEquipmentId(new Long(150)); //need test equipment inserted 
