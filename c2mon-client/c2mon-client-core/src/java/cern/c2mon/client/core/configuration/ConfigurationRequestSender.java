@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -19,6 +19,7 @@ package cern.c2mon.client.core.configuration;
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
+import cern.c2mon.shared.client.configuration.api.tag.Tag;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.util.jms.JmsSender;
 import com.google.gson.*;
@@ -36,6 +37,8 @@ import java.lang.reflect.Type;
 @Service
 public class ConfigurationRequestSender {
 
+  private final long DEFAULT_TIMEOUT = 60_000l; // 1 minute
+
   @Autowired
   private JmsSender jmsSender;
 
@@ -49,9 +52,12 @@ public class ConfigurationRequestSender {
    * @return
    */
   public ConfigurationReport applyConfiguration(Configuration configuration, ClientRequestReportListener listener) {
-    Gson gson = new GsonBuilder().registerTypeAdapter(HardwareAddress.class, new InterfaceAdapter<HardwareAddress>()).create();
+    Gson gson = new GsonBuilder()
+        .registerTypeAdapter(HardwareAddress.class, new InterfaceAdapter<HardwareAddress>())
+        .registerTypeAdapter(Tag.class, new InterfaceAdapter<Tag>())
+        .create();
     String message = gson.toJson(configuration);
-    String reply = jmsSender.sendRequestToQueue(message, jmsConfigDestination, 3600000);
+    String reply = jmsSender.sendRequestToQueue(message, jmsConfigDestination, DEFAULT_TIMEOUT);
     return gson.fromJson(reply, ConfigurationReport.class);
   }
 
