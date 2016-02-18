@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
@@ -51,6 +52,9 @@ public class ControlTagMapperTest {
    */
   @Autowired
   private ControlTagMapper controlTagMapper;
+  @Autowired
+  private DataTagMapper dataTagMapper;
+  
 
   @After
   public void deleteTestTag() {
@@ -71,6 +75,7 @@ public class ControlTagMapperTest {
     ControlTagCacheObject retrievedObject = (ControlTagCacheObject) controlTagMapper.getItem(cacheObject.getId()); //retrieve from DB
 
     assertNotNull(retrievedObject);
+    cacheObject.setValue(Float.valueOf(1000f));
 
     //check the persistence was correct
     assertEquals(cacheObject.getId(), retrievedObject.getId());
@@ -102,8 +107,9 @@ public class ControlTagMapperTest {
   public void testUpdateControlTag() {
     ControlTagCacheObject cacheObject = CacheObjectCreation.createTestControlTag();
     controlTagMapper.insertControlTag(cacheObject);
-
-    cacheObject.setValue(new Long(2000));
+    
+    assertTrue(cacheObject.getDataType().equals("Float"));
+    cacheObject.setValue(Float.valueOf(1999f));
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setValueDescription("new control value");
@@ -115,6 +121,7 @@ public class ControlTagMapperTest {
     ControlTagCacheObject retrievedObject = (ControlTagCacheObject) controlTagMapper.getItem(cacheObject.getId());
 
     assertEquals(cacheObject.getValue(), retrievedObject.getValue());
+    assertEquals(Float.class, retrievedObject.getValue().getClass());
     assertEquals(cacheObject.getValueDescription(), retrievedObject.getValueDescription());
     assertEquals(cacheObject.getDataTagQuality(), retrievedObject.getDataTagQuality());//quality compare code and string
     assertEquals(cacheObject.getTimestamp(), retrievedObject.getTimestamp());

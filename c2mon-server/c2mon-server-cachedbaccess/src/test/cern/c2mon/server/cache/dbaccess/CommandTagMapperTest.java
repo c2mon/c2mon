@@ -101,8 +101,8 @@ public class CommandTagMapperTest {
     modifiedCommand.setSourceRetries(2);
     modifiedCommand.setExecTimeout(10);
     modifiedCommand.setClientTimeout(3);
-    modifiedCommand.setMinimum(Float.valueOf(30));
-    modifiedCommand.setMaximum(Float.valueOf(60)); 
+    modifiedCommand.setMinimum(Integer.valueOf(30));
+    modifiedCommand.setMaximum(Integer.valueOf(60)); 
     
     //update
     commandTagMapper.updateCommandTag(modifiedCommand);

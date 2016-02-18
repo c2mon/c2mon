@@ -22,8 +22,8 @@
     <typeAlias alias="Metadata" type="cern.c2mon.shared.common.metadata.Metadata" />
   </typeAliases>
   <typeHandlers>
-    <typeHandler javaType="java.lang.Comparable" jdbcType="BLOB" handler="cern.c2mon.server.cache.dbaccess.type.ComparableTypeHandler" />
-    <typeHandler javaType="java.lang.Object" jdbcType="BLOB" handler="cern.c2mon.server.cache.dbaccess.type.ComparableTypeHandler" />
+    <typeHandler javaType="java.lang.Comparable" jdbcType="VARCHAR" handler="cern.c2mon.server.cache.dbaccess.type.ComparableTypeHandler" />
+    <typeHandler javaType="java.lang.Object" jdbcType="VARCHAR" handler="cern.c2mon.server.cache.dbaccess.type.ComparableTypeHandler" />
     <typeHandler javaType="cern.c2mon.shared.common.datatag.DataTagValueDictionary" jdbcType="VARCHAR" handler="cern.c2mon.server.cache.dbaccess.type.ValueDictionaryTypeHandler"/>    
     <typeHandler javaType="cern.c2mon.shared.common.datatag.DataTagAddress" jdbcType="VARCHAR" handler="cern.c2mon.server.cache.dbaccess.type.DataTagAddressTypeHandler"/>    
     <typeHandler javaType="cern.c2mon.shared.common.datatag.address.HardwareAddress" jdbcType="VARCHAR" handler="cern.c2mon.server.cache.dbaccess.type.HardwareAddressTypeHandler"/>    

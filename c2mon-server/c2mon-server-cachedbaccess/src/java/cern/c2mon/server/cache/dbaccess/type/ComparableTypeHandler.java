@@ -16,10 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess.type;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,6 +25,8 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import cern.c2mon.shared.common.type.TypeConverter;
 
 /**
  * iBatis TypeHandler used to convert between Comparable Java objects (used for
@@ -47,20 +45,41 @@ public class ComparableTypeHandler implements TypeHandler {
 
   @Override
   public Object getResult(ResultSet rs, String columnName) throws SQLException {
-    Object returnObject = null;
+    Object returnObject  = null;
+    String valueAsString = null;
+    String tagDataType   = null;
+    
     try {
-      if (rs.getBlob(columnName) != null) {
-        returnObject = new ObjectInputStream(rs.getBlob(columnName).getBinaryStream()).readObject();
+      if (rs.getString(columnName) != null) {
+        valueAsString = rs.getString(columnName);
+        
+        tagDataType = getDataType(rs, columnName);
+        returnObject = TypeConverter.cast(valueAsString, tagDataType);
       }
-    } catch (IOException ex) {
-      LOGGER.error("IOException caught when constructing a java.lang.Comparable from the database:", ex);
-    } catch (ClassNotFoundException ex) {
-      LOGGER.error("ClassNotFoundException caught when constructing a java.lang.Comparable from the database:", ex);
     } catch (Exception ex) {
-      LOGGER.error("Unexpected exception caught when constructing a java.lang.Comparable from the database:", ex);
-    }
+      LOGGER.error("Unexpected exception caught when constructing a java.lang.Comparable from the database (it could be just a NULL DB column value):", ex);
+    } 
     return returnObject;
+  }
 
+  private String getDataType(final ResultSet rs, final String columnName) {
+    String result = "String";
+    
+    try {
+      if (columnName.startsWith("TAG")) {
+        result = rs.getString("TAGDATATYPE");
+      }
+      else if (columnName.startsWith("CMD")) {
+        result = rs.getString("CMDDATATYPE");
+      }
+      else {
+        LOGGER.warn("getDataType() - Column " + columnName + " is not supported. Using default data type (String).");
+      }
+    } catch (Exception ex) {
+        LOGGER.error("getDataType() - Error occured whilst determine resulting Java type. Set to default (=String)", ex);
+    }
+    
+    return result;
   }
 
   @Override
@@ -78,14 +97,18 @@ public class ComparableTypeHandler implements TypeHandler {
   @Override
   public void setParameter(PreparedStatement ps, int parameterIndex, Object parameter, JdbcType arg3) throws SQLException {
     try {
-      ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-      ObjectOutputStream objectOutStream = new ObjectOutputStream(outStream);
-      objectOutStream.writeObject(parameter);
-      ps.setBytes(parameterIndex, outStream.toByteArray());
-    } catch (IOException ioEx) {
-      LOGGER.error("IOException caught when setting a prepared statement parameter from a "
-          + "java.lang.Comparable object (corresponds to Min or Max values)", ioEx);
+      if (parameter != null) {
+      	// Stored as VARCHAR, so cast to String
+      	ps.setObject(parameterIndex, parameter.toString());
+      }
+      else {
+      	ps.setString(parameterIndex, null);
+      }
+    } catch (Exception ex) {
+      LOGGER.error(
+        "Exception caught when setting a prepared statement parameter from a tag value "
+        + "Object or java.lang.Comparable (used to Min or Max values)", ex);
+       
     }
-
   }
 }

@@ -59,7 +59,7 @@
     
     <update id="updateCacheable" parameterType="cern.c2mon.server.common.rule.RuleTagCacheObject">
       UPDATE DATATAG
-         SET TAGVALUE = #{value,javaType=java.lang.Object,jdbcType=BLOB},
+         SET TAGVALUE = #{value,javaType=java.lang.Object,jdbcType=VARCHAR},
              TAGVALUEDESC = SUBSTR(#{valueDescription,jdbcType=VARCHAR}, 1, 2000),
              TAGSRVTIMESTAMP = #{cacheTimestamp, jdbcType=TIMESTAMP},                                                   
              TAGQUALITYDESC = SUBSTR(#{dataTagQuality,javaType=DataTagQuality,jdbcType=VARCHAR}, 1, 1000),
@@ -95,7 +95,7 @@
                            TAGRULEIDS, TAGCONTROLTAG, TAGMETADATA
                 )
       VALUES (#{id},#{name},SUBSTR(#{description, jdbcType=VARCHAR}, 1, 100),#{mode},#{dataType},
-              #{value,javaType=java.lang.Object,jdbcType=BLOB},SUBSTR(#{valueDescription,jdbcType=VARCHAR}, 1, 2000),
+              #{value,javaType=java.lang.Object,jdbcType=VARCHAR},SUBSTR(#{valueDescription,jdbcType=VARCHAR}, 1, 2000),
               #{cacheTimestamp, jdbcType=TIMESTAMP},
               SUBSTR(#{dataTagQuality,javaType=DataTagQuality,jdbcType=VARCHAR}, 1, 1000),              
               #{unit,jdbcType=VARCHAR},#{simulated,jdbcType=NUMERIC},#{logged,jdbcType=NUMERIC},

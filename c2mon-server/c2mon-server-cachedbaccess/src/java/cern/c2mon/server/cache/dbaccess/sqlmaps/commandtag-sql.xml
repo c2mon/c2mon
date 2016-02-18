@@ -20,8 +20,8 @@
       <result property="sourceRetries" column="CMDSOURCERETRIES" jdbcType="NUMERIC"/>
       <result property="execTimeout" column="CMDEXECTIMEOUT" jdbcType="NUMERIC"/>
       <result property="clientTimeout" column="CMDCLIENTTIMEOUT" jdbcType="NUMERIC"/>      
-      <result property="minimum" column="CMDMINVALUE" javaType="java.lang.Comparable" jdbcType="BLOB"/>
-      <result property="maximum" column="CMDMAXVALUE" javaType="java.lang.Comparable" jdbcType="BLOB"/>
+      <result property="minimum" column="CMDMINVALUE" javaType="java.lang.Comparable" jdbcType="VARCHAR"/>
+      <result property="maximum" column="CMDMAXVALUE" javaType="java.lang.Comparable" jdbcType="VARCHAR"/>
        <!-- commands belong to a single equipment (not subequipment so far! - would need to change this) -->
       <result property="processId" column="EQ_PROCID" jdbcType="NUMERIC"/>
       
@@ -66,8 +66,8 @@
              CMDSOURCERETRIES = #{sourceRetries,jdbcType=NUMERIC},
              CMDEXECTIMEOUT = #{execTimeout,jdbcType=NUMERIC},
              CMDCLIENTTIMEOUT = #{clientTimeout,jdbcType=NUMERIC},                        
-             CMDMINVALUE = #{minimum,javaType=java.lang.Comparable,jdbcType=BLOB},
-             CMDMAXVALUE = #{maximum,javaType=java.lang.Comparable,jdbcType=BLOB},
+             CMDMINVALUE = #{minimum,javaType=java.lang.Comparable,jdbcType=VARCHAR},
+             CMDMAXVALUE = #{maximum,javaType=java.lang.Comparable,jdbcType=VARCHAR},
              CMDRBACCLASS = #{authorizationDetails.rbacClass,javaType=java.lang.String,jdbcType=VARCHAR},
              CMDRBACDEVICE = #{authorizationDetails.rbacDevice,javaType=java.lang.String,jdbcType=VARCHAR},
              CMDRBACPROPERTY = #{authorizationDetails.rbacProperty,javaType=java.lang.String,jdbcType=VARCHAR}                  
@@ -89,7 +89,7 @@
               #{hwAddress,javaType=cern.c2mon.shared.common.datatag.address.HardwareAddress,jdbcType=VARCHAR},
               #{sourceTimeout,jdbcType=NUMERIC},#{sourceRetries,jdbcType=NUMERIC},
               #{execTimeout,jdbcType=NUMERIC},#{clientTimeout,jdbcType=NUMERIC},
-              #{minimum,javaType=java.lang.Comparable,jdbcType=BLOB},#{maximum,javaType=java.lang.Comparable,jdbcType=BLOB},
+              #{minimum,javaType=java.lang.Comparable,jdbcType=VARCHAR},#{maximum,javaType=java.lang.Comparable,jdbcType=VARCHAR},
               #{authorizationDetails.rbacClass,javaType=java.lang.String,jdbcType=VARCHAR},
               #{authorizationDetails.rbacDevice,javaType=java.lang.String,jdbcType=VARCHAR},
               #{authorizationDetails.rbacProperty,javaType=java.lang.String,jdbcType=VARCHAR}            

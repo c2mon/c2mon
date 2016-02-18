@@ -168,8 +168,8 @@ public class DataTagMapperTest {
     assertEquals(cacheObject.isSimulated(), retrievedObject.isSimulated());
     assertEquals(cacheObject.getEquipmentId(), retrievedObject.getEquipmentId());
     assertEquals(cacheObject.getProcessId(), retrievedObject.getProcessId());
-    assertEquals(cacheObject.getMinValue(), retrievedObject.getMinValue());
-    assertEquals(cacheObject.getMaxValue(), retrievedObject.getMaxValue());
+    assertEquals(null, retrievedObject.getMinValue()); // min value is not persisted for boolean data types
+    assertEquals(null, retrievedObject.getMaxValue()); // max value is not persisted for boolean data types
     assertEquals(cacheObject.getValueDictionary().toXML(), retrievedObject.getValueDictionary().toXML()); //compare XML of value dictionary
     assertEquals(cacheObject.getAddress(), retrievedObject.getAddress());
     assertEquals(cacheObject.getDataTagQuality(), retrievedObject.getDataTagQuality());
@@ -230,7 +230,9 @@ public class DataTagMapperTest {
     assertTrue(dataTagMapper.isInDb(cacheObject.getId()));
 
     //retrieve from database
-    DataTagCacheObject retrievedObject = (DataTagCacheObject) dataTagMapper.getItem(new Long(150001));
+    DataTagCacheObject retrievedObject = 
+        (DataTagCacheObject) dataTagMapper.getItem
+        (new Long(150001));
 
     assertEquals(cacheObject.getId(), retrievedObject.getId());
     assertEquals(cacheObject.getName(), retrievedObject.getName());
@@ -248,8 +250,8 @@ public class DataTagMapperTest {
     assertEquals(cacheObject.getEquipmentId(), retrievedObject.getEquipmentId());
     assertEquals(cacheObject.getSubEquipmentId(), retrievedObject.getSubEquipmentId());
     assertEquals(cacheObject.getProcessId(), retrievedObject.getProcessId());
-    assertEquals(cacheObject.getMinValue(), retrievedObject.getMinValue());
-    assertEquals(cacheObject.getMaxValue(), retrievedObject.getMaxValue());
+    assertEquals(null, retrievedObject.getMinValue()); // min value is not persisted for boolean data types
+    assertEquals(null, retrievedObject.getMaxValue()); // max value is not persisted for boolean data types
     assertEquals(cacheObject.getValueDictionary().toXML(), retrievedObject.getValueDictionary().toXML()); //compare XML of value dictionary
     assertEquals(cacheObject.getAddress(), retrievedObject.getAddress());
     assertEquals(cacheObject.getDataTagQuality(), retrievedObject.getDataTagQuality());
