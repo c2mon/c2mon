@@ -29,32 +29,32 @@ import org.springframework.stereotype.Service;
  * @author Mark Brightwell
  *
  */
-@Service
-@ManagedResource(objectName="cern.c2mon:type=datasource,name=shortTermLogManagement")
-public class ShortTermLogManagement {
-
-  /**
-   * The cache datasource to close down.
-   */
-  private BasicDataSource stlDataSource;
-  
-  /**
-   * Autowired constructor.
-   * @param stlDataSource the short-term-log datasource
-   */
-  @Autowired
-  public ShortTermLogManagement(@Qualifier("stlDataSource") BasicDataSource stlDataSource) {
-    super();
-    this.stlDataSource = stlDataSource;
-  }
-  
-  /**
-   * For management only.
-   * @return the number of active DB connections in the short-term-log datasource pool
-   */
-  @ManagedOperation(description="The number of active DB connections in the short-term-log datasource pool.")
-  public int getNumActiveDbConnections() {
-    return stlDataSource.getNumActive();
-  }
-  
-}
+//@Service
+//@ManagedResource(objectName="cern.c2mon:type=datasource,name=shortTermLogManagement")
+//public class ShortTermLogManagement {
+//
+//  /**
+//   * The cache datasource to close down.
+//   */
+//  private BasicDataSource stlDataSource;
+//
+//  /**
+//   * Autowired constructor.
+//   * @param stlDataSource the short-term-log datasource
+//   */
+//  @Autowired
+//  public ShortTermLogManagement(@Qualifier("stlDataSource") BasicDataSource stlDataSource) {
+//    super();
+//    this.stlDataSource = stlDataSource;
+//  }
+//
+//  /**
+//   * For management only.
+//   * @return the number of active DB connections in the short-term-log datasource pool
+//   */
+//  @ManagedOperation(description="The number of active DB connections in the short-term-log datasource pool.")
+//  public int getNumActiveDbConnections() {
+//    return stlDataSource.getNumActive();
+//  }
+//
+//}
