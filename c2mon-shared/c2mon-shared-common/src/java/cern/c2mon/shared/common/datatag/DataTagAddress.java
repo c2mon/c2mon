@@ -82,7 +82,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
      * All address information of the given DataTag
      * This is an central element for this class which provides the information for the daq to create an DataTag.
      */
-    @ElementMap(name = "address-parameters", key="key", attribute=true, inline=true, required = false)
+    @ElementMap(name = "address-parameters", key="key", attribute=true, required = false)
     private HashMap<String, String> addressParameters = new HashMap<>();
 
 

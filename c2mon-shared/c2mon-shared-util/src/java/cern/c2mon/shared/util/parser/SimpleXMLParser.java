@@ -143,7 +143,7 @@ public final class SimpleXMLParser implements XmlParser {
    */
   public static String mapToXMLString(Map<String, String> map){
     String spaces = "            ";
-    String result = spaces + "<address-parameters class=\""+ map.getClass() +"\">" ;
+    String result = spaces + "<address-parameters class=\""+ map.getClass().getCanonicalName() +"\">" ;
 
     for(Map.Entry<String, String> entry : map.entrySet()){
       result += "<entry key=\"" + entry.getKey() + "\">" + entry.getValue() + "</entry>";
