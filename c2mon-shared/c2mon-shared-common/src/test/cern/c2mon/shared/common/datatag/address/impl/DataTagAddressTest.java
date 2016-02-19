@@ -19,14 +19,16 @@ package cern.c2mon.shared.common.datatag.address.impl;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
 import org.junit.Test;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.core.Persister;
 import org.w3c.dom.Element;
 
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -35,14 +37,14 @@ import static org.junit.Assert.assertTrue;
 public class DataTagAddressTest {
 
   @Test
-  public void parseBasicHardwareAddressToXml(){
+  public void parseBasicHardwareAddressToXml() {
     // initialize test data:
-    HashMap<String,String> testData = new HashMap<>();
+    HashMap<String, String> testData = new HashMap<>();
     testData.put("key1", "1");
     testData.put("key2", "test");
     testData.put("key3", "true");
 
-    DataTagAddress testAddress= new DataTagAddress(testData);
+    DataTagAddress testAddress = new DataTagAddress(testData);
 
     String compareString = "      <DataTagAddress>\n" +
         "            <address-parameters class=\"java.util.HashMap\"><entry key=\"key1\">1</entry><entry key=\"key2\">test</entry><entry key=\"key3\">true</entry></address-parameters>\n" +
@@ -59,7 +61,7 @@ public class DataTagAddressTest {
   }
 
   @Test
-  public void parseXmlToBasicHardwareAddress(){
+  public void parseXmlToBasicHardwareAddress() {
     // initialize test data:
 
     String testString = "      <DataTagAddress>\n" +
@@ -73,12 +75,12 @@ public class DataTagAddressTest {
       testElement = (Element) new SimpleXMLParser().parse(testString).getFirstChild();
       DataTagAddress resultAddress = DataTagAddress.fromConfigXML(testElement);
 
-      Map<String,String> compareData = new HashMap<>();
+      Map<String, String> compareData = new HashMap<>();
       compareData.put("key1", "1");
       compareData.put("key2", "test");
       compareData.put("key3", "true");
 
-      for(Map.Entry<String, String> resultEntry : resultAddress.getAddressParameters().entrySet()){
+      for (Map.Entry<String, String> resultEntry : resultAddress.getAddressParameters().entrySet()) {
 
         // check keys
         assertTrue(compareData.containsKey(resultEntry.getKey()));
@@ -88,6 +90,36 @@ public class DataTagAddressTest {
       }
 
     } catch (ParserConfigurationException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+  public void deserializeAndSerializeWithSimpleXml() {
+    try {
+      //setup Data
+      HashMap<String, String> map = new HashMap<>();
+      map.put("key1", "value1");
+      map.put("key2", "value2");
+
+      DataTagAddress address = new DataTagAddress(map);
+      address.setTimeToLive(100);
+
+      Serializer serializer = new Persister();
+
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+
+      // serialization
+      serializer.write(address, baos);
+      String content = new String(baos.toByteArray(), "UTF-8");
+
+      DataTagAddress address2 = serializer.read(DataTagAddress.class, content);
+
+
+      assertEquals(address2, address);
+
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
