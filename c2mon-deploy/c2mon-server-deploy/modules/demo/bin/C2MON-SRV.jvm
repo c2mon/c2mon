@@ -43,7 +43,7 @@ fi
 cd $C2MON_HOME
 
 JVM_MEM="-Xms256M -Xmx256M"
-JVM_OTHER_OPTS=(-XX:NewRatio=3 -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100)
+JVM_OTHER_OPTS=(-XX:NewRatio=3 -XX:+UseParallelGC -XX:MaxGCPauseMillis=100)
 
 # if $REMOTE_DEBUG_ENABLED variable is set, we allow connecting to the server process with the remote debugger
 if [ -n "${REMOTE_DEBUG_ENABLED+set}" ] ; then
@@ -56,4 +56,6 @@ fi
 [[ -n "${C2MON_RECOVERY_ENABLED+set}" ]] && JVM_OTHER_OPTS+=(-Dc2mon.recovery=true)
 
 
-exec -a `basename $0` $JAVA -cp "$CLASSPATH" -Dc2mon.home="$C2MON_HOME" $JVM_MEM "${JVM_OTHER_OPTS[@]}" cern.c2mon.server.lifecycle.ServerStartup
+exec -a `basename $0` $JAVA -cp "$CLASSPATH" -Dc2mon.home="$C2MON_HOME" -Dc2mon.properties.location="file://$C2MON_HOME/conf/c2mon.properties" \
+  -Dlogging.config=$C2MON_HOME/conf/logback.xml -Dlogging.path=$C2MON_HOME/log \
+  $JVM_MEM "${JVM_OTHER_OPTS[@]}" cern.c2mon.server.lifecycle.ServerStartup

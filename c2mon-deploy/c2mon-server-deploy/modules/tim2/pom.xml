@@ -77,6 +77,11 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- use Oracle db -->
+    <dependency>
+      <groupId>oracle</groupId>
+      <artifactId>ojdbc</artifactId>
+    </dependency>
 
     <!-- for logging -->
     <dependency>

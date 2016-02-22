@@ -2,20 +2,17 @@
  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/component/1.1.2 http://maven.apache.org/xsd/component-1.1.2.xsd">
 
  <dependencySets>
-
   <dependencySet>
    <outputDirectory>/lib</outputDirectory>
    <fileMode>0644</fileMode>
    <excludes>
-    <exclude>cern.c2mon.c2mon-deploy:c2mon-srv-*</exclude>
+    <exclude>cern.c2mon.c2mon-deploy:c2mon-server-*</exclude>
    </excludes>
   </dependencySet>
-
  </dependencySets>
 
+ <!-- create default tmp, log and reports folders in the assembly -->
  <fileSets>
-
-  <!-- create default tmp, log and reports folders in the assembly -->
   <fileSet>
    <includes>
     <include>tmp/</include>
@@ -35,6 +32,6 @@
    <fileMode>0755</fileMode>
    <directoryMode>0755</directoryMode>
   </fileSet>
-
  </fileSets>
+
 </component>

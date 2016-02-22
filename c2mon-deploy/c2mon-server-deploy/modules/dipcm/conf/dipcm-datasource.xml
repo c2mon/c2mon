@@ -29,7 +29,7 @@
   <!-- data source for short-term log -->
   <bean class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" id="stlDataSource">
     <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
-    <property name="url" value="jdbc:hsqldb:hsql://localhost/stl;sql.syntax_ora=true" />
+    <property name="url" value="jdbc:hsqldb:hsql://localhost/stl;config.sql.syntax_ora=true" />
     <property name="username" value="sa" />
     <property name="password" value="" />
   </bean>

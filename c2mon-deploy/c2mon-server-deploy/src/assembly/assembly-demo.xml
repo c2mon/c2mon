@@ -12,37 +12,22 @@
   <includeBaseDirectory>false</includeBaseDirectory>
 
   <componentDescriptors>
-    <componentDescriptor>src/assembly/c2mon-srv-common-assembly.xml
+    <componentDescriptor>src/assembly/assembly-common.xml
     </componentDescriptor>
   </componentDescriptors>
 
   <files>
     <!-- Copy configuration files -->
     <file>
-      <source>${basedir}/conf/demo-log4j.xml</source>
-      <outputDirectory>conf/</outputDirectory>
-      <destName>log4j.xml</destName>
-      <lineEnding>unix</lineEnding>
-      <fileMode>0444</fileMode>
-    </file>
-    <file>
-      <source>${basedir}/conf/demo-modules.xml</source>
-      <outputDirectory>conf/</outputDirectory>
-      <destName>c2mon-modules.xml</destName>
-      <lineEnding>unix</lineEnding>
-      <fileMode>0444</fileMode>
-    </file>
-    <file>
-      <source>${basedir}/conf/demo-datasource.xml</source>
-      <outputDirectory>conf/</outputDirectory>
-      <destName>c2mon-datasource.xml</destName>
-      <lineEnding>unix</lineEnding>
-      <fileMode>0444</fileMode>
-    </file>
-    <file>
-      <source>${basedir}/conf/demo-c2mon.properties</source>
+      <source>${basedir}/conf/c2mon-demo.properties</source>
       <outputDirectory>conf/</outputDirectory>
       <destName>c2mon.properties</destName>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
+    <file>
+      <source>${basedir}/conf/logback.xml</source>
+      <outputDirectory>conf/</outputDirectory>
       <lineEnding>unix</lineEnding>
       <fileMode>0444</fileMode>
     </file>
@@ -74,26 +59,6 @@
       </includes>
       <directory>bin/</directory>
       <fileMode>0755</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-
-    <!-- Copy SQL files -->
-    <fileSet>
-      <includes>
-        <include>*</include>
-      </includes>
-      <directory>${basedir}/conf/sql/</directory>
-      <outputDirectory>conf/sql</outputDirectory>
-      <fileMode>0444</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <includes>
-        <include>*</include>
-      </includes>
-      <directory>${project.build.directory}/conf/sql/cern/c2mon/server/test/sql/</directory>
-      <outputDirectory>conf/sql</outputDirectory>
-      <fileMode>0444</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
   </fileSets>

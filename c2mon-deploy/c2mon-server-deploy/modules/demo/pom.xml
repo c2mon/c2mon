@@ -10,59 +10,18 @@
   </parent>
 
   <groupId>cern.c2mon.c2mon-deploy</groupId>
-  <artifactId>c2mon-srv-demo</artifactId>
-  <name>The C2MON demo module</name>
+  <artifactId>c2mon-server-demo</artifactId>
   <version>1.7.3-SNAPSHOT</version>
 
   <description>C2MON server assembling all required modules and configuration files for the C2MON demo version</description>
-  <url></url>
 
   <dependencies>
     <!-- C2MON modules -->
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-all</artifactId>
-      <exclusions>
-        <exclusion>
-          <artifactId>ojdbc</artifactId>
-          <groupId>com.oracle</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>orai18n</artifactId>
-          <groupId>com.oracle</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-cachepersistence</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-command</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-shorttermlog</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>ojdbc</artifactId>
-          <groupId>com.oracle</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>orai18n</artifactId>
-          <groupId>com.oracle</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-client</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
-    </dependency>
+
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-test</artifactId>
@@ -83,40 +42,18 @@
     </dependency>
   </dependencies>
 
-
   <developers />
+
   <build>
     <plugins>
-
-      <!-- Used to extract the sql schemas from c2mon-server-test -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack-dependencies</id>
-            <phase>package</phase>
-            <goals>
-              <goal>unpack-dependencies</goal>
-            </goals>
-            <configuration>
-              <excludeArtifactIds>*</excludeArtifactIds>
-              <includeArtifactIds>c2mon-server-test</includeArtifactIds>
-              <includes>cern/c2mon/server/test/sql/*-schema-generic.sql, cern/c2mon/server/test/sql/config-data.sql</includes>
-              <outputDirectory>${project.build.directory}/conf/sql</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
 
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
-
+          <finalName>c2mon-server-${project.version}</finalName>
           <descriptors>
-            <descriptor>src/assembly/demo-srv-assembly.xml</descriptor>
+            <descriptor>src/assembly/assembly-demo.xml</descriptor>
           </descriptors>
-
         </configuration>
         <executions>
           <execution>
