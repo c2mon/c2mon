@@ -10,7 +10,7 @@
 
   <groupId>cern.c2mon.c2mon-client</groupId>
   <artifactId>c2mon-client-ext-device</artifactId>
-  <version>1.6.4-SNAPSHOT</version>
+  <version>1.7.0</version>
   <name>c2mon-client-ext-device</name>
   <packaging>jar</packaging>
   <url>http://timweb.cern.ch</url>
