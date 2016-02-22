@@ -100,11 +100,6 @@
       <artifactId>c2mon-server-cachepersistence</artifactId>
       <version>[1.5.0, 2.0.0)</version>
     </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-test</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
-    </dependency>
     <!--
       TODO: the following dependencies COULD be optional. For now though, they are necessary for server startup.
      -->
@@ -168,6 +163,28 @@
       <!--<version>4.3.1</version>-->
     <!--</dependency>-->
 
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-test</artifactId>
+      <version>[1.5.0, 2.0.0)</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <developers/>
