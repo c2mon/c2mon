@@ -4,8 +4,7 @@ import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
 
@@ -31,21 +30,19 @@ public class CacheConfig {
 
     switch (cacheMode) {
       case "single-nonpersistent":
-        return getEhCacheManagerFactoryBean("classpath*:**/ehcache-notTCmode-nonpersistent.xml");
+        return getEhCacheManagerFactoryBean("resources/ehcache-notTCmode-nonpersistent.xml");
       case "single":
-        return getEhCacheManagerFactoryBean("classpath*:**/ehcache-notTCmode.xml");
+        return getEhCacheManagerFactoryBean("resources/ehcache-notTCmode.xml");
       case "multi":
-        return getEhCacheManagerFactoryBean("classpath*:**/ehcache-TCmode.xml");
+        return getEhCacheManagerFactoryBean("resources/ehcache-TCmode.xml");
     }
 
     throw new RuntimeException(format("Unsupported cache mode specified: '%s'", cacheMode));
   }
 
   private EhCacheManagerFactoryBean getEhCacheManagerFactoryBean(String configLocation) throws IOException {
-    PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-    Resource resource = resolver.getResources(configLocation)[0];
     EhCacheManagerFactoryBean bean = new EhCacheManagerFactoryBean();
-    bean.setConfigLocation(resource);
+    bean.setConfigLocation(new ClassPathResource(configLocation));
     return bean;
   }
 }
