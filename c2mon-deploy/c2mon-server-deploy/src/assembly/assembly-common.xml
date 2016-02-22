@@ -5,9 +5,7 @@
   <dependencySet>
    <outputDirectory>/lib</outputDirectory>
    <fileMode>0644</fileMode>
-   <excludes>
-    <exclude>cern.c2mon.c2mon-deploy:c2mon-server-*</exclude>
-   </excludes>
+   <useProjectArtifact>false</useProjectArtifact>
   </dependencySet>
  </dependencySets>
 

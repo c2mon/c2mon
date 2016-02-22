@@ -10,7 +10,7 @@
   </parent>
 
   <groupId>cern.c2mon.c2mon-deploy</groupId>
-  <artifactId>c2mon-server-demo</artifactId>
+  <artifactId>c2mon-server</artifactId>
   <version>1.7.3-SNAPSHOT</version>
 
   <description>C2MON server assembling all required modules and configuration files for the C2MON demo version</description>
@@ -47,10 +47,43 @@
   <build>
     <plugins>
 
+      <!-- Prevent Maven from building a jar -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-jar</id>
+            <phase/>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Prevent Maven from trying to install a jar -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-install-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-jar</id>
+            <phase/>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Prevent Maven from creating a source jar -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <configuration>
+          <skipSource>true</skipSource>
+        </configuration>
+      </plugin>
+
+      <!-- Create a tar.gz -->
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
-          <finalName>c2mon-server-${project.version}</finalName>
           <descriptors>
             <descriptor>src/assembly/assembly-demo.xml</descriptor>
           </descriptors>
