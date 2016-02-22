@@ -9,14 +9,14 @@
 <!--    <property name="defaultDomain" value="bean" />-->
 <!--  </bean>-->
 
-  <bean id="exporter" class="org.springframework.jmx.export.MBeanExporter" lazy-init="false">
-    <property name="beans">
-      <map>
-        <entry key="cern.c2mon.lifecycle:name=lifecycle" value-ref="lifeCycleController" />
-      </map>
-    </property>
-<!--    <property name="server" ref="mbeanServer" />-->
-  </bean>
+  <!--<bean id="exporter" class="org.springframework.jmx.export.MBeanExporter" lazy-init="false">-->
+    <!--<property name="beans">-->
+      <!--<map>-->
+        <!--<entry key="cern.c2mon.lifecycle:name=lifecycle" value-ref="lifecycleController" />-->
+      <!--</map>-->
+    <!--</property>-->
+<!--&lt;!&ndash;    <property name="server" ref="mbeanServer" />&ndash;&gt;-->
+  <!--</bean>-->
 
 <!--  <bean class="org.springframework.jmx.support.ConnectorServerFactoryBean">-->
 <!--    <property name="serviceUrl" value="service:jmx:rmi://localhost/jndi/rmi://localhost:9523/bean"/>-->

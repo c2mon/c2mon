@@ -1,184 +1,132 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.lifecycle;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
+import org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfiguration;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.SmartLifecycle;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static java.lang.String.format;
+import static java.lang.System.getProperty;
+import static java.lang.System.setProperty;
 
 /**
- * The class containing the main method for starting a server.
- * It loads the Spring XML files (one for each module).
+ * This class is responsible for bootstrapping the C2MON application server.
  *
- * Distributed configuration details are kept in the ClusterCache
- * Spring bean (in server-cache).
+ * The following optional system properties are available:
  *
- * The following system properties are available:
+ * c2mon.properties.location   Location of the c2mon properties file. If not specified, built-in
+ *                             properties are used (in-memory database, in-memory JMS broker, etc.).
+ * logging.config              Location of the logging configuration file. If not specified, logging
+ *                             is done directly to the console.
+ * logging.path                Location of the root logging directory.
  *
- *  -Dlog4j.configuration         - location of the log4j configuration file                                REQUIRED
- *  -Dc2mon.home                  - home directory of the server (used for conf & log location ...)         REQUIRED
- *  -Dc2mon.properties.location   - location of the c2mon.properties file                                   OPTIONAL
- *                                  (optional - default is .c2mon.properties in the user home directory)
- *  -DtestMode                    - starts the Server in test mode. Accept all incoming updates no matter   OPTIONAL
- *                                  the PIK and allows normal startup of test DAQs ignoring production
- *                                  DAQs updates (true/false)
  *
- *  The c2mon.home directory must have a "conf" subdirectory containing the following files:
- *    c2mon-modules.xml           - list of modules the server should run
- *    c2mon-datasource.xml        - a java.sql.DataSource bean used for the cache persistence
+ * Deprecated properties:
  *
- *  !You will also need to include the correct SQL driver dependency in the your final project! (server deploy module)
+ * c2mon.home                  Home directory of the server (usually the installation directory
+ *                             containing bin/, conf/, log/ etc.
+ * c2mon.modules.location      Location of the server module descriptor. This file lists the modules
+ *                             that the server should run.
+ * testMode                    Starts the server in test mode. Accepts all incoming updates no matter
+ *                             the PIK and allows normal startup of test DAQs ignoring production
+ *                             DAQs updates (true/false)
  *
- * @author Mark Brightwell, Nacho Vilches
- *
+ * @author Justin Lewis Salmon
+ * @author Mark Brightwell
+ * @author Nacho Vilches
  */
-public final class ServerStartup {
+@SpringBootApplication
+@EnableAutoConfiguration(exclude = {
+    JmsAutoConfiguration.class,
+    ActiveMQAutoConfiguration.class,
+    DataSourceAutoConfiguration.class,
+    DataSourceTransactionManagerAutoConfiguration.class
+})
+@Slf4j
+public class ServerStartup {
 
-  /**
-   * Class logger.
-   */
-  private static Logger logger = Logger.getLogger(ServerStartup.class);
+  private static final String C2MON_HOME = "c2mon.home";
+  private static final String C2MON_MODULES_LOCATION = "c2mon.modules.location";
 
-  private static final String LOG4J_CONF_PROPERTY = "log4j.configuration";
+  public static void main(final String[] args) throws IOException {
+    String home = getProperty(C2MON_HOME);
+    if (home == null) {
+      home = deduceHomeDirectory();
+      if (home == null) {
+        throw new RuntimeException(format("Please specify the C2MON home directory using '%s'.", C2MON_HOME));
+      }
+      setProperty(C2MON_HOME, home);
+      log.info(format("Using home directory: %s. To override, use '%s'", home, C2MON_HOME));
+    }
 
-  private static final String C2MON_CONF_PROPERTY = "c2mon.properties.location";
+    if (getProperty(C2MON_MODULES_LOCATION) == null) {
+      setProperty(C2MON_MODULES_LOCATION, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+    }
 
-  /**
-   * Override public constructor.
-   */
-  private ServerStartup() {
+    // TODO: rename this and put it in c2mon.properties. "test mode" is not very descriptive.
+    if ((getProperty("testMode")) != null && (getProperty("testMode").equals("true"))) {
+      log.info("C2MON server starting up in TEST mode");
+    }
+
+    // Run the application
+    ConfigurableApplicationContext context = SpringApplication.run(ServerStartup.class, args);
+
+    /**
+     * Currently the context needs to be manually started. This could maybe be removed by playing around with
+     * {@link SmartLifecycle#isAutoStartup()}.
+     */
+    context.start();
+    context.registerShutdownHook();
   }
 
   /**
-   * Checks, if the most important environment variables have been set and initializes
-   * them with default values.
-   * However, this covers only those environment variables
-   * that have to be present before the Spring context is started. The other variables
-   * are initialized by Spring. See also server-lifecycle-properties.xml
+   * Attempt to figure out a sensible location for the application home directory (i.e. the directory containing bin/ conf/ log/ etc.).
+   *
+   * @return the deduced home directory path, or null if no sensible directory was found
+   *
+   * @throws IOException
    */
-  private static void initProperties() {
-    if (System.getProperty("c2mon.home") == null) {
-      System.err.println("Please specify the C2MON home directory using Java VM argument -Dc2mon.home.");
-      System.exit(-1);
+  private static String deduceHomeDirectory() throws IOException {
+    String location = ServerStartup.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+
+    // The path can be a file if we are inside a jar
+    if (new File(location).isFile()) {
+      location = new File(location).getParent();
     }
 
-    if (System.getProperty("c2mon.log.dir") == null) {
-      final String logDir = System.getProperty("c2mon.home") + "/log";
-      System.out.println("Setting log directory to: " + logDir);
-      System.setProperty("c2mon.log.dir", logDir);
-    }
-
-    //initialize log4j
-    if (System.getProperty(LOG4J_CONF_PROPERTY) == null) {
-      final String defaultConfigurationFile = System.getProperty("c2mon.home") + "/conf/log4j.xml";
-      System.out.println("No log4j location specified with Java VM argument -Dlog4j.configuration. Trying with default location: " + defaultConfigurationFile);
-      System.setProperty(LOG4J_CONF_PROPERTY, defaultConfigurationFile);
-    }
-
-
-    // File watchdog configuration for Log4j changes
-    try {
-      DOMConfigurator.configureAndWatch(System.getProperty(LOG4J_CONF_PROPERTY));
-    }
-    catch (Exception ex) {
-      ex.printStackTrace();
-      System.exit(-1);
-    }
-
-    logger.info("C2MON server startup initiated");
-
-    //set default c2mon.properties location if not specified as Dc2mon.properties.location
-    if (System.getProperty(C2MON_CONF_PROPERTY) == null) {
-      System.setProperty(C2MON_CONF_PROPERTY, System.getProperty("c2mon.home") + "/conf/c2mon.properties");
-    }
-    logger.info("Using c2mon.properties file at: " + System.getProperty(C2MON_CONF_PROPERTY));
-
-    // Test Mode
-    if ((System.getProperty("testMode")) != null && (System.getProperty("testMode").equals("true"))) {
-      logger.info("The Server is starting in TEST mode");
-    }
-  }
-
-  /**
-   * Initialized the Spring lifecycle context that will instantiate all C2MON beans
-   */
-  private static void initSpringContext() {
-  //by default run in single-server mode
-    List<String> cacheModeModules;
-    final String cacheMode = System.getProperty("c2mon.cache.mode");
-
-    if (cacheMode != null && cacheMode.equalsIgnoreCase("multi")) {
-      logger.info("C2MON server running in distributed cache mode");
-      cacheModeModules = new ArrayList<String>(Arrays.asList("cern/c2mon/server/lifecycle/config/server-lifecycle-multi.xml",
-                                         "cern/c2mon/server/cache/config/server-cache-multi-server.xml"));
-    } else if (cacheMode != null && cacheMode.equalsIgnoreCase("single")) {
-      logger.info("C2MON server running in local cache mode (not distributed)");
-      cacheModeModules = new ArrayList<String>(Arrays.asList("cern/c2mon/server/lifecycle/config/server-lifecycle-single.xml",
-      "cern/c2mon/server/cache/config/server-cache-single-server.xml"));
+    Path homeDirectory = Paths.get(location.concat("/../"));
+    if (homeDirectory.toFile().exists()) {
+      return homeDirectory.toRealPath().toString();
     } else {
-      // "single-nonpersistent" mode
-      logger.info("C2MON server running in nonpersistent local cache mode (not distributed)");
-      cacheModeModules = new ArrayList<String>(Arrays.asList("cern/c2mon/server/lifecycle/config/server-lifecycle-single.xml",
-          "cern/c2mon/server/cache/config/server-cache-nonpersistent-server.xml"));
+      return null;
     }
-
-    //core modules (in classpath); optional modules are imported in server-startup.xml
-    List<String> coreModules = new ArrayList<String>(Arrays.asList(
-                                         "cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess.xml",
-                                         "cern/c2mon/server/cache/loading/config/server-cacheloading.xml",
-                                         "cern/c2mon/server/supervision/config/server-supervision.xml",
-                                         "cern/c2mon/server/daqcommunication/in/config/server-daqcommunication-in.xml",
-                                         "cern/c2mon/server/daqcommunication/out/config/server-daqcommunication-out.xml",
-                                         "cern/c2mon/server/rule/config/server-rule.xml",
-                                         "cern/c2mon/server/configuration/config/server-configuration.xml"
-                                         ));
-
-    coreModules.addAll(cacheModeModules);
-
-    final ClassPathXmlApplicationContext xmlContext = new ClassPathXmlApplicationContext(coreModules.toArray(new String[0])) {
-
-      @Override
-      protected DefaultListableBeanFactory createBeanFactory() {
-        final DefaultListableBeanFactory vResult = super.createBeanFactory();
-        vResult.setAllowBeanDefinitionOverriding(false);
-        return vResult;
-        };
-
-    };
-
-    logger.info("Starting the beans in application context.");
-    //start all components that need manually starting
-    xmlContext.start();
-    xmlContext.registerShutdownHook();
   }
-
-  /**
-   * Main server start-up method
-   * @param args - ignored
-   */
-  public static void main(final String[] args) {
-
-    initProperties();
-    initSpringContext();
-  }
-
 }
