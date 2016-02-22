@@ -30,6 +30,10 @@
       <artifactId>orai18n</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.mybatis</groupId>
       <artifactId>mybatis-spring</artifactId>
     </dependency>
@@ -65,23 +69,34 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+      <version>1.3.0.RELEASE</version>
+    </dependency>
 
     <!-- C2MON dependencies -->
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-all</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>cern.c2mon.c2mon-server</groupId>-->
+      <!--<artifactId>c2mon-server-all</artifactId>-->
+    <!--</dependency>-->
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-command</artifactId>
       <version>[1.5.0, 2.0.0)</version>
     </dependency>
-
-    <!-- Test dependency -->
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-supervision</artifactId>
+      <version>[1.5.0, 2.0.0)</version>
+    </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-test</artifactId>
+      <version>[1.5.0, 2.0.0)</version>
+      <scope>provided</scope>
     </dependency>
+
     <dependency>
     	<groupId>org.projectlombok</groupId>
     	<artifactId>lombok</artifactId>

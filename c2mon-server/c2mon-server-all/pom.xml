@@ -1,34 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	
-  <parent>
-		<groupId>cern.c2mon.c2mon-server</groupId>
-		<artifactId>c2mon-server-pom</artifactId>
-		<version>RELEASE</version>
-	</parent>
-  
-  <groupId>cern.c2mon.c2mon-server</groupId>
-	<artifactId>c2mon-server-all</artifactId>
-	<version>1.6.11-SNAPSHOT</version>
-	<name>c2mon-server-all</name>
-	<packaging>jar</packaging>
-	<description>The C2MON Server Core UBER jar which provides the base functionality to retrieve data from the DAQ layer.
-All server modules shall directly depend on this jar!</description>
-	<url>http://cern.ch/c2mon</url>
-	
-	<!-- This is needed to retrieve the CERN parent-pom dependency -->
-	<repositories>
-	  <repository>
-        <id>parent-poms</id>
-        <name>parent-poms-local</name>
-        <url>http://artifactory/parent-poms-local</url>
-      </repository>
-	</repositories>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<dependencies>
-		<!-- C2MON Core dependencies -->
+  <parent>
+    <groupId>cern.c2mon.c2mon-server</groupId>
+    <artifactId>c2mon-server-pom</artifactId>
+    <version>RELEASE</version>
+  </parent>
+
+  <groupId>cern.c2mon.c2mon-server</groupId>
+  <artifactId>c2mon-server-all</artifactId>
+  <version>1.6.11-SNAPSHOT</version>
+  <name>c2mon-server-all</name>
+  <packaging>jar</packaging>
+  <description>The C2MON Server Core UBER jar which provides the base functionality to retrieve data from the DAQ layer.
+    All server modules shall directly depend on this jar!
+  </description>
+  <url>http://cern.ch/c2mon</url>
+
+  <!-- This is needed to retrieve the CERN parent-pom dependency -->
+  <repositories>
+    <repository>
+      <id>parent-poms</id>
+      <name>parent-poms-local</name>
+      <url>http://artifactory/parent-poms-local</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <!-- C2MON Core dependencies -->
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-cache</artifactId>
@@ -79,48 +80,48 @@ All server modules shall directly depend on this jar!</description>
       <artifactId>c2mon-server-supervision</artifactId>
       <version>[1.5.4, 2.0.0)</version>
     </dependency>
-	</dependencies>
+  </dependencies>
 
-	<developers />
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.2</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<promoteTransitiveDependencies>true</promoteTransitiveDependencies>
-							<createSourcesJar>true</createSourcesJar>
-							<artifactSet>
-								<includes>
-									<include>cern.c2mon.c2mon-server:*</include>
-									<include>cern.c2mon.c2mon-shared:*</include>
-								</includes>
-							</artifactSet>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+  <developers/>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.2</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+              <createSourcesJar>true</createSourcesJar>
+              <artifactSet>
+                <includes>
+                  <include>cern.c2mon.c2mon-server:*</include>
+                  <include>cern.c2mon.c2mon-shared:*</include>
+                </includes>
+              </artifactSet>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-          <configuration>
-            <!-- Disable doclint (which comes with Java 8) as it is very strict with javadoc and causes build failures. -->
-            <!-- TODO: Fix all the javadoc so we can re-enable doclint. -->
+        <configuration>
+          <!-- Disable doclint (which comes with Java 8) as it is very strict with javadoc and causes build failures. -->
+          <!-- TODO: Fix all the javadoc so we can re-enable doclint. -->
           <additionalparam>-Xdoclint:none</additionalparam>
         </configuration>
       </plugin>
-		</plugins>
-	</build>
+    </plugins>
+  </build>
 
-	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-all</developerConnection>
-	</scm>
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-all</developerConnection>
+  </scm>
 
 </project>

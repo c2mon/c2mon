@@ -40,9 +40,28 @@
       <artifactId>c2mon-server-alarm</artifactId>
       <version>[1.5.0, 2.0.0)</version>
     </dependency>
+    <!--<dependency>-->
+      <!--<groupId>cern.c2mon.c2mon-server</groupId>-->
+      <!--<artifactId>c2mon-server-all</artifactId>-->
+    <!--</dependency>-->
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-all</artifactId>
+      <artifactId>c2mon-server-command</artifactId>
+      <version>[1.5.0, 2.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-supervision</artifactId>
+      <version>[1.5.0, 2.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-configuration</artifactId>
+      <version>[1.5.0, 2.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-all</artifactId>
     </dependency>
 
     <!-- test only -->
@@ -54,27 +73,22 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-test</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-command</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-all</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

@@ -50,15 +50,31 @@
     </dependency>
 
     <!-- C2MON -->
+    <!--<dependency>-->
+      <!--<groupId>cern.c2mon.c2mon-server</groupId>-->
+      <!--<artifactId>c2mon-server-all</artifactId>-->
+    <!--</dependency>-->
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-all</artifactId>
+      <artifactId>c2mon-server-common</artifactId>
+      <version>[1.5.3, 2.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-cache</artifactId>
+      <version>[1.5.3, 2.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-daqcommunication-out</artifactId>
+      <version>[1.5.3, 2.0.0)</version>
     </dependency>
 
     <!-- C2MON for testing -->
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-test</artifactId>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>
