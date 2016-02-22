@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.command;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -32,9 +33,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class CommandModuleIntegrationTest {
 
   @Test
+  @Ignore("no longer necessary, full server startup integration test was moved to the lifecycle module")
   public void testModuleStartup() {
     //do nothing
   }
-  
-  
 }
