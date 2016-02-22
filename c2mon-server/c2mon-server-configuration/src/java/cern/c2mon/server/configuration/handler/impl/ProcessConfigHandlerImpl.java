@@ -23,6 +23,7 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.UnexpectedRollbackException;
 
 import cern.c2mon.server.cache.ProcessCache;
@@ -47,6 +48,7 @@ import cern.c2mon.shared.common.ConfigurationException;
  * @author Mark Brightwell
  *
  */
+@Component
 public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProcessConfigHandlerImpl.class);
