@@ -22,7 +22,6 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
     "classpath:cern/c2mon/server/rule/config/server-rule.xml",
     "classpath:cern/c2mon/server/configuration/config/server-configuration.xml",
     "classpath:cern/c2mon/server/client/config/server-client.xml",
-    "classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog.xml",
     "classpath:cern/c2mon/server/alarm/config/server-alarm.xml",
     "classpath:cern/c2mon/server/command/config/server-command.xml",
 })
