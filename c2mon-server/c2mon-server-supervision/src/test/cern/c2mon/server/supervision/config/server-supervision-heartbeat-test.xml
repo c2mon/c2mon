@@ -18,4 +18,5 @@
   
   <!-- no external modules needed for Heartbeat -->
   <import resource="classpath:cern/c2mon/server/supervision/config/server-supervision-heartbeat.xml"/>
+  <import resource="classpath:cern/c2mon/server/test/server-test-properties.xml"/>
 </beans>
