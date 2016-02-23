@@ -56,6 +56,6 @@ fi
 [[ -n "${C2MON_RECOVERY_ENABLED+set}" ]] && JVM_OTHER_OPTS+=(-Dc2mon.recovery=true)
 
 
-exec -a `basename $0` $JAVA -cp "$CLASSPATH" -Dc2mon.home="$C2MON_HOME" -Dc2mon.properties.location="file://$C2MON_HOME/conf/c2mon.properties" \
+exec -a `basename $0` $JAVA -cp "$CLASSPATH" -Dc2mon.home="$C2MON_HOME" -Dc2mon.server.properties="file://$C2MON_HOME/conf/c2mon.properties" \
   -Dlogging.config=$C2MON_HOME/conf/logback.xml -Dlogging.path=$C2MON_HOME/log \
   $JVM_MEM "${JVM_OTHER_OPTS[@]}" cern.c2mon.server.ServerStartup

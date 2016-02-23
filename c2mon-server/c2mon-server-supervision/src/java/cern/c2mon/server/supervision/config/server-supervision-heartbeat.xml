@@ -4,9 +4,9 @@
 
 
   <bean id="heartbeatConnectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory">
-    <property name="brokerURL" value="${jms.broker.client.url}" />
-    <property name="userName" value="${jms.client.user}" />
-    <property name="password" value="${jms.client.password}" />
+    <property name="brokerURL" value="${c2mon.server.client.jms.url}" />
+    <!--<property name="userName" value="${jms.client.user}" />-->
+    <!--<property name="password" value="${jms.client.password}" />-->
     <property name="clientIDPrefix" value="C2MON-SERVER-HEARTBEAT" />
     <property name="watchTopicAdvisories" value="false" />
   </bean>
@@ -18,7 +18,7 @@
   <bean name="heartbeatJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
     <property name="defaultDestination">
       <bean class="org.apache.activemq.command.ActiveMQTopic">
-        <constructor-arg value="${c2mon.jms.heartbeat.topic}" />
+        <constructor-arg value="${c2mon.server.supervision.jms.heartbeat.topic}" />
       </bean>
     </property>
     <property name="connectionFactory" ref="heartbeatSingleConnectionFactory" />

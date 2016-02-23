@@ -29,6 +29,6 @@
   -->
   <bean id="jmxBootstrap" class="cern.accsoft.commons.jmxdirectory.client.JmxBootstrap">
       <!-- The name of the process that exposes the JMX interface -->
-      <constructor-arg value="${c2mon.process.name}" />
+      <constructor-arg value="${c2mon.server.name}" />
   </bean>
 </beans>

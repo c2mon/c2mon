@@ -18,9 +18,9 @@
    <bean id="equipmentCacheLoader" class="cern.c2mon.server.cache.common.BatchCacheLoader">
     <constructor-arg ref="equipmentEhcache"/>
     <constructor-arg ref="equipmentDAO"/>
-    <constructor-arg value="${cache.loader.equipment.batch.size}"/>
-    <constructor-arg value="${cache.loader.equipment.threads.max}"/>
-    <constructor-arg value="${cache.loader.equipment.queue.size}"/>
+    <constructor-arg value="${c2mon.server.cacheloading.equipment.batchSize}"/>
+    <constructor-arg value="${c2mon.server.cacheloading.equipment.maxThreads}"/>
+    <constructor-arg value="${c2mon.server.cacheloading.equipment.queueSize}"/>
   </bean>
 
 </beans>

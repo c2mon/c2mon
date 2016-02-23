@@ -33,9 +33,9 @@ public class StlDataSourceConfig {
   private Environment environment;
 
   @Bean
-  @ConfigurationProperties("datasource.stl")
+  @ConfigurationProperties("c2mon.server.shorttermlog.jdbc")
   public DataSource stlDataSource() {
-    String url = environment.getProperty("datasource.stl.url");
+    String url = environment.getProperty("c2mon.server.shorttermlog.jdbc.url");
     if (url == null || url.contains("hsqldb:mem")) {
       return new EmbeddedDatabaseBuilder().setType(HSQL).setName("stl").addScript("classpath:resources/sql/stl-schema-generic.sql").build();
     } else if (url.contains("hsql://")) {
@@ -43,9 +43,9 @@ public class StlDataSourceConfig {
       hsqlServer.start();
 
       DataSource dataSource = DataSourceBuilder.create()
-          .url(environment.getRequiredProperty("datasource.stl.url"))
-          .username(environment.getRequiredProperty("datasource.stl.username"))
-          .password(environment.getRequiredProperty("datasource.stl.password")).build();
+          .url(environment.getRequiredProperty("c2mon.server.shorttermlog.jdbc.url"))
+          .username(environment.getRequiredProperty("c2mon.server.shorttermlog.jdbc.username"))
+          .password(environment.getRequiredProperty("c2mon.server.shorttermlog.jdbc.password")).build();
 
       DatabasePopulatorUtils.execute(new ResourceDatabasePopulator(new ClassPathResource("resources/sql/stl-schema-generic.sql")), dataSource);
       return dataSource;

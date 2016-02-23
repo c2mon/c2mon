@@ -31,6 +31,7 @@ import org.apache.activemq.broker.TransportConnector;
  * 
  * @author Mark Brightwell
  *
+ * @deprecated
  */
 public class TestBrokerService {
 

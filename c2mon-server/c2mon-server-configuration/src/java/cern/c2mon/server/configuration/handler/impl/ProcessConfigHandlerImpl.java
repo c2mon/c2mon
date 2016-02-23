@@ -23,6 +23,7 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.UnexpectedRollbackException;
 
@@ -74,7 +75,8 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
    * Flag indicating if Process removal is allowed when the Process
    * is running.
    */
-  private boolean allowRunningProcessRemoval = false;
+  @Value("c2mon.server.configuration.allowRunningProcessRemoval")
+  private boolean allowRunningProcessRemoval;
 
   /**
    * Reference to the bean managing DAQ-in JMS connections.

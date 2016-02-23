@@ -14,7 +14,7 @@
   <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-mybatis.xml"/>
   
   <bean id="configurationLoader" class="cern.c2mon.server.configuration.impl.ConfigurationLoaderImpl" autowire="constructor">
-    <property name="daqConfigEnabled" value="${c2mon.server.config.daq.enabled}"/>
+    <property name="daqConfigEnabled" value="${c2mon.server.configuration.daqConfigEnabled}"/>
     <property name="reportDirectory" value="${c2mon.home}/reports"/>    
   </bean>
     
@@ -22,7 +22,7 @@
   
   <!-- the connection below is not currently used: configuration requests are made via the client module -->
   <bean id="configRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
-   <constructor-arg index="0" value="${jms.config.destination}"/>
+   <constructor-arg index="0" value="${c2mon.server.configuration.jms.destination}"/>
   </bean>
     
   <bean id="configRequestJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
@@ -41,7 +41,7 @@
   </bean>
   
   <!--<bean class="cern.c2mon.server.configuration.handler.impl.ProcessConfigHandlerImpl">-->
-  	<!--<property name="allowRunningProcessRemoval" value="${c2mon.server.config.running.process.removal}"/>-->
+  	<!--<property name="allowRunningProcessRemoval" value="${c2mon.server.configuration.allowRunningProcessRemoval}"/>-->
   <!--</bean>-->
 
 </beans>

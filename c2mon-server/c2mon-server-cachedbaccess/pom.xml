@@ -174,11 +174,11 @@
         <version>2.8.1</version>
         <configuration>
           <argLine>
-            -Dc2mon.properties.location=${c2mon.properties.location}
-            -Ddatasource.persistence.connections.initial=2
-            -Ddatasource.persistence.connections.max=2
-            -Dc2mon.jms.controltag.publication.topic=c2mon.controltag.publication.test
-            -Dc2mon.jms.tag.publication.topic=c2mon.tag.publication.test
+            <!-- -Dc2mon.properties.location=${c2mon.properties.location}-->
+            <!-- -Ddatasource.persistence.connections.initial=2-->
+            <!-- -Ddatasource.persistence.connections.max=2-->
+            <!-- -Dc2mon.jms.controltag.publication.topic=c2mon.controltag.publication.test-->
+            <!-- -Dc2mon.jms.tag.publication.topic=c2mon.tag.publication.test-->
           </argLine>
         </configuration>
       </plugin>

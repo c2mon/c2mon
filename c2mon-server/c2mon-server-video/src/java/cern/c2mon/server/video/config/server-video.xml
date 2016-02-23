@@ -24,9 +24,9 @@
 		Connection settings for client module
 	-->
 	<bean id="videoClientActiveMQConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-		<property name="brokerURL" value="${jms.broker.client.url}" />
-		<property name="userName" value="${jms.client.user}" />
-		<property name="password" value="${jms.client.password}" />
+		<property name="brokerURL" value="${c2mon.server.client.jms.url}" />
+		<!--<property name="userName" value="${jms.client.user}" />-->
+		<!--<property name="password" value="${jms.client.password}" />-->
 		<property name="clientIDPrefix" value="C2MON-SERVER-VIDEO" />
 		<property name="watchTopicAdvisories" value="false" />
 	</bean>
@@ -39,7 +39,7 @@
 
 
 	<bean id="videoClientRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
-		<constructor-arg index="0" value="${c2mon.client.jms.video.request.queue}" />
+		<constructor-arg index="0" value="${c2mon.server.video.jms.queue.request}" />
 	</bean>
 
 	<!-- thread pool for request containers -->

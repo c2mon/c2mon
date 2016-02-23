@@ -18,9 +18,6 @@
    <bean id="deviceCacheLoader" class="cern.c2mon.server.cache.common.SimpleC2monCacheLoader">
     <constructor-arg ref="deviceEhcache"/>
     <constructor-arg ref="deviceDAO"/>
-<!--     <constructor-arg value="${cache.loader.batch.size}"/>
-    <constructor-arg value="${cache.loader.threads.max}"/>
-    <constructor-arg value="${cache.loader.queue.size}"/> -->
   </bean>
 
 </beans>

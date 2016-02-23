@@ -18,15 +18,15 @@
 <!--   </bean> -->
   
   <bean id="jmsContainerManager" class="cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl" autowire="constructor">
-    <property name="consumersInitial" value="${jms.update.consumers.initial}"/>
-    <property name="consumersMax" value="${jms.update.consumers.max}"/>
-    <property name="jmsUpdateQueueTrunk" value="${c2mon.jms.daq.queue.trunk}.update"/>
-    <property name="sessionTransacted" value="${jms.update.transacted}"/>
-    <property name="updateWarmUpSeconds" value="${jms.update.consumers.warmuptime}"/>
-    <property name="idleTaskExecutionLimit" value="${c2mon.jms.update.task.idle.limit}"/>
-    <property name="maxMessages" value="${c2mon.jms.update.task.max.messages}"/>
-    <property name="nbExecutorThreads" value="${c2mon.jms.update.executor.threads}"/>
-    <property name="receiveTimeout" value="${c2mon.jms.update.task.timeout}"/>    
+    <property name="jmsUpdateQueueTrunk"    value="${c2mon.server.daqcommunication.jms.queue.trunk}.update"/>
+    <property name="sessionTransacted"      value="${c2mon.server.daqcommunication.jms.update.transacted}"/>
+    <property name="consumersInitial"       value="${c2mon.server.daqcommunication.jms.update.consumers.initial}"/>
+    <property name="consumersMax"           value="${c2mon.server.daqcommunication.jms.update.consumers.max}"/>
+    <property name="updateWarmUpSeconds"    value="${c2mon.server.daqcommunication.jms.update.consumers.warmuptime}"/>
+    <property name="idleTaskExecutionLimit" value="${c2mon.server.daqcommunication.jms.update.idleTaskExecutionLimit}"/>
+    <property name="maxMessages"            value="${c2mon.server.daqcommunication.jms.update.maxMessagesPerTask}"/>
+    <property name="receiveTimeout"         value="${c2mon.server.daqcommunication.jms.update.receiveTimeout}"/>
+    <property name="nbExecutorThreads"      value="${c2mon.server.daqcommunication.jms.update.numExecutorThreads}"/>
   </bean>
   
 <!---->

@@ -41,20 +41,20 @@ import static java.lang.System.setProperty;
  *
  * The following optional system properties are available:
  *
- * c2mon.properties.location   Location of the c2mon properties file. If not specified, built-in
- *                             properties are used (in-memory database, in-memory JMS broker, etc.).
- * logging.config              Location of the logging configuration file. If not specified, logging
- *                             is done directly to the console.
- * logging.path                Location of the root logging directory.
+ * c2mon.server.properties  Location of an external properties file.
+ * logging.config           Location of a custom logging configuration file.
+ * logging.path             Location of the root logging directory.
  *
  *
  * Deprecated properties:
  *
- * c2mon.home                  Home directory of the server (usually the installation directory
- *                             containing bin/, conf/, log/ etc.
- * testMode                    Starts the server in test mode. Accepts all incoming updates no matter
- *                             the PIK and allows normal startup of test DAQs ignoring production
- *                             DAQs updates (true/false)
+ * c2mon.home               Home directory of the server (usually the
+ *                          installation directory containing bin/, conf/,
+ *                          log/ etc.
+ * testMode                 Starts the server in test mode. Accepts all
+ *                          incoming updates no matter the PIK and allows
+ *                          normal startup of test DAQs ignoring production
+ *                          DAQs updates (true/false)
  *
  * @author Justin Lewis Salmon
  * @author Mark Brightwell

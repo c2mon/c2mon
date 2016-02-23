@@ -226,7 +226,7 @@
     <param name="domain" value="TIM" />
     <param name="subDomain" value="C2MON-server" />
     <param name="threshold" value="WARN" />
-    <param name="sourceName" value="${c2mon.process.name}" />
+    <param name="sourceName" value="${c2mon.server.name}" />
     <param name="serverName" value="cmw-log-pro:6200" />
   </appender>
   

@@ -22,7 +22,7 @@
         <property name="com.tc.productkey.path" value="conf/terracotta-license.key" />
 
         <!-- Cluster Java arguments -->
-        <property name="c2mon.cache.mode" value="multi" />
+        <property name="c2mon.server.cache.mode" value="multi" />
         <property name="com.tc.l1.cachemanager.percentageToEvict" value="10" />
         <property name="com.tc.l1.cachemanager.threshold" value="70" />
         <property name="com.tc.l1.cachemanager.monitorOldGenOnly" value="false" />
@@ -56,7 +56,7 @@ fi
     <application name="c2mon-tim2-pro1" extends="default">
      
       <startscript name="C2MON-TIM-PRO">
-        <property name="c2mon.process.name" value="C2MON-TIM-PRO1" />
+        <property name="c2mon.server.name" value="C2MON-TIM-PRO1" />
         <!-- Configuration for LASER module -->
         <property name="laser.hosts" value="laser-test" />
         <property name="cmw.mom.brokerlist" value="sljas2:2506,sljas3:2506" />
@@ -79,7 +79,7 @@ fi
     <application name="c2mon-tim2-pro2" extends="default">
      
       <startscript name="C2MON-TIM-PRO">
-        <property name="c2mon.process.name" value="C2MON-TIM-PRO2" />
+        <property name="c2mon.server.name" value="C2MON-TIM-PRO2" />
         <!-- Configuration for LASER module -->
         <property name="laser.hosts" value="laser-test" />
         <property name="cmw.mom.brokerlist" value="sljas2:2506,sljas3:2506" />
@@ -102,7 +102,7 @@ fi
     <application name="c2mon-tim2-test1" extends="default">
      
       <startscript name="C2MON-TIM-TEST">
-        <property name="c2mon.process.name" value="C2MON-TIM-TEST1" />
+        <property name="c2mon.server.name" value="C2MON-TIM-TEST1" />
         <property name="testMode" value="true" />
         <!-- Configuration for LASER module -->
         <property name="laser.hosts" value="laser-test" />
@@ -122,7 +122,7 @@ fi
     <application name="c2mon-tim2-test2" extends="default">
       
       <startscript name="C2MON-TIM-TEST">
-        <property name="c2mon.process.name" value="C2MON-TIM-TEST2" />
+        <property name="c2mon.server.name" value="C2MON-TIM-TEST2" />
         <property name="testMode" value="true" />
         <!-- Configuration for LASER module -->
         <property name="laser.hosts" value="laser-test" />

@@ -27,7 +27,7 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
 })
 @PropertySources({
     @PropertySource("classpath:c2mon.properties"),
-    @PropertySource(value = "${c2mon.properties.location}", ignoreResourceNotFound = true)}
+    @PropertySource(value = "${c2mon.server.properties}", ignoreResourceNotFound = true)}
 )
 public class EnvironmentConfig {
 

@@ -61,6 +61,6 @@
     <client-reconnect-window>5</client-reconnect-window>
   </servers>
   <clients>
-    <logs>%(c2mon.home)/log/TC-client-logs-%(c2mon.process.name)</logs>
+    <logs>%(c2mon.home)/log/TC-client-logs-%(c2mon.server.name)</logs>
   </clients>
 </tc:tc-config>

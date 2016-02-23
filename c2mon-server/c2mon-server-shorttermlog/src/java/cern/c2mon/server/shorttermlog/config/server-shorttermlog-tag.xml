@@ -7,7 +7,7 @@
   <bean id="tagLoggerDAO" class="cern.c2mon.server.shorttermlog.dao.LoggerDAO">
     <constructor-arg ref="stlSqlSessionFactory"/>
     <constructor-arg value="cern.c2mon.server.shorttermlog.mapper.DataTagLogMapper"/>
-    <constructor-arg value="${jdbc.stl.url}"/>
+    <constructor-arg value="${c2mon.server.shorttermlog.jdbc.url}"/>
   </bean>
   
   <bean id="tagLogger" class="cern.c2mon.server.shorttermlog.logger.DefaultLogger">
@@ -17,7 +17,7 @@
     <constructor-arg>
       <bean class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
         <constructor-arg ref="tagLoggerDAO"/>
-        <constructor-arg value="${c2mon.tag.log.fallback.file}"/>
+        <constructor-arg value="${c2mon.server.shorttermlog.fallback.tag}"/>
         <constructor-arg>
           <bean class="cern.c2mon.server.shorttermlog.alarm.AlarmListener"/>
         </constructor-arg>

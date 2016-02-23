@@ -96,7 +96,7 @@
         <version>2.8.1</version>
         <configuration>
           <argLine>
-            -Dc2mon.properties.location=${c2mon.properties.location}
+            <!-- -Dc2mon.properties.location=${c2mon.properties.location}-->
           </argLine>
         </configuration>
       </plugin>

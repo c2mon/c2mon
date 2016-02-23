@@ -29,9 +29,9 @@ public class CacheDataSourceConfig {
   private Environment environment;
 
   @Bean
-  @ConfigurationProperties(prefix = "datasource.persistence")
+  @ConfigurationProperties(prefix = "c2mon.server.cachedbaccess.jdbc")
   public DataSource cacheDataSource() {
-    String url = environment.getProperty("datasource.persistence.url");
+    String url = environment.getProperty("c2mon.server.cachedbaccess.jdbc.url");
     if (url == null || url.contains("hsql")) {
       return new EmbeddedDatabaseBuilder().setType(HSQL).setName("cache").addScripts("classpath:resources/sql/cache-schema-generic.sql",
           "classpath:resources/sql/demo/cache-data-demo.sql").build();

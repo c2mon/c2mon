@@ -37,7 +37,7 @@
   <bean name="dataTagPersistenceManager" class="cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl">
     <constructor-arg ref="dataTagPersistenceDAO"/>
     <constructor-arg ref="dataTagCache" />
-    <property name="timeoutPerBatch" value="${c2mon.persistence.timeout}"/>
+    <property name="timeoutPerBatch" value="${c2mon.server.cachepersistence.timeoutPerBatch}"/>
   </bean>
 
   <bean id="datatagPersistenceSynchroListener" class="cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener">
@@ -68,7 +68,7 @@
   <bean name="alarmPersistenceManager" class="cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl">
     <constructor-arg ref="alarmPersistenceDAO"/>
     <constructor-arg ref="alarmCache" />
-    <property name="timeoutPerBatch" value="${c2mon.persistence.timeout}"/>
+    <property name="timeoutPerBatch" value="${c2mon.server.cachepersistence.timeoutPerBatch}"/>
   </bean>
 
   <bean id="alarmPersistenceSynchroListener" class="cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener">
@@ -84,7 +84,7 @@
   <bean name="processPersistenceManager" class="cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl">
     <constructor-arg ref="processPersistenceDAO"/>
     <constructor-arg ref="processCache" />
-    <property name="timeoutPerBatch" value="${c2mon.persistence.timeout}"/>
+    <property name="timeoutPerBatch" value="${c2mon.server.cachepersistence.timeoutPerBatch}"/>
   </bean>
 
   <bean id="processPersistenceSynchroListener" class="cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener">
@@ -100,7 +100,7 @@
   <bean name="equipmentPersistenceManager" class="cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl">
     <constructor-arg ref="equipmentPersistenceDAO"/>
     <constructor-arg ref="equipmentCache" />
-    <property name="timeoutPerBatch" value="${c2mon.persistence.timeout}"/>
+    <property name="timeoutPerBatch" value="${c2mon.server.cachepersistence.timeoutPerBatch}"/>
   </bean>
 
   <bean id="equipmentPersistenceSynchroListener" class="cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener">
@@ -116,7 +116,7 @@
   <bean name="subEquipmentPersistenceManager" class="cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl">
     <constructor-arg ref="subEquipmentPersistenceDAO"/>
     <constructor-arg ref="subEquipmentCache" />
-    <property name="timeoutPerBatch" value="${c2mon.persistence.timeout}"/>
+    <property name="timeoutPerBatch" value="${c2mon.server.cachepersistence.timeoutPerBatch}"/>
   </bean>
 
   <bean id="subEquipmentPersistenceSynchroListener" class="cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener">

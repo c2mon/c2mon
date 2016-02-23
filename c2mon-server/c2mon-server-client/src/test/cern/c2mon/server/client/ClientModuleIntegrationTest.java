@@ -75,10 +75,10 @@ import cern.c2mon.shared.client.request.ClientRequestImpl;
 @ContextConfiguration({ "classpath:cern/c2mon/server/client/config/server-client-integration-test.xml" })
 public class ClientModuleIntegrationTest implements ApplicationContextAware {
 
-  @Value("${c2mon.jms.client.admin.queue}")
+  @Value("${c2mon.server.client.jms.queue.admin}")
   private String adminQueue;
 
-  @Value("${jms.client.request.queue}")
+  @Value("${c2mon.server.client.jms.queue.request}")
   private String requestQueue;
 
   @Autowired

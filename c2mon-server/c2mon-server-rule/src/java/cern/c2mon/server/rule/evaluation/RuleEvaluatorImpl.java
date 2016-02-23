@@ -68,7 +68,7 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
 
   private final CacheRegistrationService cacheRegistrationService;
 
-  @Value("${c2mon.server.rule.evaluation.threads}")
+  @Value("${c2mon.server.rule.numEvaluationThreads}")
   protected int numEvaluationThreads = 1;
 
   /**

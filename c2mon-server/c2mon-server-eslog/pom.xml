@@ -98,7 +98,7 @@
         <version>2.13</version>
         <configuration>
           <argLine>
-            -Dc2mon.properties.location=${build.testOutputDirectory}/c2mon.properties
+            <!-- -Dc2mon.properties.location=${build.testOutputDirectory}/c2mon.properties-->
           </argLine>
         </configuration>
       </plugin>

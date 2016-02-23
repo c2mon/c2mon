@@ -29,9 +29,9 @@ public class ConfigDataSourceConfig {
   private Environment environment;
 
   @Bean
-  @ConfigurationProperties(prefix = "datasource.config")
+  @ConfigurationProperties(prefix = "c2mon.server.configuration.jdbc")
   public DataSource configurationDataSource() {
-    String url = environment.getProperty("datasource.config.url");
+    String url = environment.getProperty("c2mon.server.configuration.jdbc.url");
     if (url == null || url.contains("hsql")) {
       return new EmbeddedDatabaseBuilder().setType(HSQL).setName("config").addScript("classpath:resources/sql/config-schema-generic.sql").build();
     } else {

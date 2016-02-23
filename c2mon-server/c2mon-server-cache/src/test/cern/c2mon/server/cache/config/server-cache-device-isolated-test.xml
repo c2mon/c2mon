@@ -43,8 +43,8 @@
     class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
     <property name="properties">
       <props>
-        <prop key="c2mon.server.cache.skippreloading">true</prop>
-        <prop key="c2mon.cache.mode">single-nonpersistent</prop>  
+        <prop key="c2mon.server.cache.skipPreloading">true</prop>
+        <prop key="c2mon.server.cache.mode">single-nonpersistent</prop>
       </props>
     </property>
   </bean>

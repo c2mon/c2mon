@@ -26,33 +26,33 @@
     <org.springframework.version>4.2.3.RELEASE</org.springframework.version>
   </properties>
 
-  <profiles>
-    <profile>
-      <id>win</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <os>
-          <family>Windows</family>
-        </os>
-      </activation>
-      <properties>
-        <c2mon.properties.location>T:\.c2mon.test.properties</c2mon.properties.location>
-      </properties>
-    </profile>
-    <profile>
-      <id>lin</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-        <os>
-          <family>unix</family>
-        </os>
-      </activation>
-      <properties>
-        <c2mon.properties.location>/user/timtest/.c2mon.test.properties</c2mon.properties.location>
-      </properties>
-    </profile>
+  <!--<profiles>-->
+    <!--<profile>-->
+      <!--<id>win</id>-->
+      <!--<activation>-->
+        <!--<activeByDefault>false</activeByDefault>-->
+        <!--<os>-->
+          <!--<family>Windows</family>-->
+        <!--</os>-->
+      <!--</activation>-->
+      <!--<properties>-->
+        <!--<c2mon.properties.location>T:\.c2mon.test.properties</c2mon.properties.location>-->
+      <!--</properties>-->
+    <!--</profile>-->
+    <!--<profile>-->
+      <!--<id>lin</id>-->
+      <!--<activation>-->
+        <!--<activeByDefault>true</activeByDefault>-->
+        <!--<os>-->
+          <!--<family>unix</family>-->
+        <!--</os>-->
+      <!--</activation>-->
+      <!--<properties>-->
+        <!--<c2mon.properties.location>/user/timtest/.c2mon.test.properties</c2mon.properties.location>-->
+      <!--</properties>-->
+    <!--</profile>-->
 
-  </profiles>
+  <!--</profiles>-->
 
   <dependencyManagement>
     <dependencies>
@@ -301,7 +301,7 @@
             </goals>
             <configuration>
               <target>
-                <echo message="c2mon.properties configured for tests: ${c2mon.properties.location}" />
+                <!--<echo message="c2mon.properties configured for tests: ${c2mon.properties.location}" />-->
                 <echo message="Terracotta license key file (com.tc.productkey.path) configured for tests: ${com.tc.productkey.path}" />
               </target>
             </configuration>

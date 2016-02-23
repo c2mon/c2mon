@@ -9,9 +9,9 @@
   <bean id="processCommunicationXMLParser" class="cern.c2mon.shared.util.parser.SimpleXMLParser"/>
   
   <bean id="daqOutActiveMQConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-    <property name="brokerURL" value="${jms.broker.url}"/>
-    <property name="userName" value="${jms.client.user}"/>
-    <property name="password" value="${jms.client.password}"/>
+    <property name="brokerURL" value="${c2mon.server.daqcommunication.jms.url}"/>
+    <!--<property name="userName" value="${jms.client.user}"/>-->
+    <!--<property name="password" value="${jms.client.password}"/>-->
     <property name="clientIDPrefix" value="C2MON-DAQ-OUT"/> 
     <property name="watchTopicAdvisories" value="false"/>
   </bean>

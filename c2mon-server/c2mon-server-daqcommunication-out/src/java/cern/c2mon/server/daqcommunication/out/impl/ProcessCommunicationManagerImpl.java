@@ -71,7 +71,7 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
   /**
    * Time spent waiting for a DAQ to send a response when reconfiguration.
    */  
-  @Value("${c2mon.jms.daq.configuration.timeout}")
+  @Value("${c2mon.server.daqcommunication.jms.configurationTimeout}")
   private int configurationTimeout = 180000;
   
   /**

@@ -26,7 +26,7 @@ public class CacheConfig {
 
   @Bean(name = "cacheManager")
   public EhCacheManagerFactoryBean cacheManager() throws IOException {
-    String cacheMode = environment.getRequiredProperty("c2mon.cache.mode");
+    String cacheMode = environment.getRequiredProperty("c2mon.server.cache.mode");
 
     switch (cacheMode) {
       case "single-nonpersistent":

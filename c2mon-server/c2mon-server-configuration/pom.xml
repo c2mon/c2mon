@@ -137,24 +137,24 @@
         <version>2.8.1</version>
         <configuration>
           <argLine>
-            -Dc2mon.properties.location=${c2mon.properties.location}
-            -Dc2mon.log.dir=${basedir}/build/log
-            -Ddatasource.config.connections.initial=1
-            -Ddatasource.config.connections.max=2
-            -Djms.config.destination=tim.config.test
-            -Dc2mon.server.config.daq.enabled=true
-            -Dc2mon.server.config.running.process.removal=false
-            <!-- cache module properties for integration testing -->
-            -Ddatasource.persistence.connections.initial=2
-            -Ddatasource.persistence.connections.max=10
-            -Dc2mon.jms.controltag.publication.topic=c2mon.controltag.publication.test
-            -Dc2mon.jms.tag.publication.topic=c2mon.tag.publication.test
-            -Dcache.loader.batch.size=10000
-            -Dcache.loader.threads.max=2
-            -Dcache.loader.queue.size=1000
-            -Dcache.loader.equipment.batch.size=5
-            -Dcache.loader.equipment.threads.max=2
-            -Dcache.loader.equipment.queue.size=1000
+            <!-- -Dc2mon.properties.location=${c2mon.properties.location}-->
+            <!-- -Dc2mon.log.dir=${basedir}/build/log-->
+            <!-- -Ddatasource.config.connections.initial=1-->
+            <!-- -Ddatasource.config.connections.max=2-->
+            <!-- -Djms.config.destination=tim.config.test-->
+            <!-- -Dc2mon.server.config.daq.enabled=true-->
+            <!-- -Dc2mon.server.config.running.process.removal=false-->
+            <!--&lt;!&ndash; cache module properties for integration testing &ndash;&gt;-->
+            <!-- -Ddatasource.persistence.connections.initial=2-->
+            <!-- -Ddatasource.persistence.connections.max=10-->
+            <!-- -Dc2mon.jms.controltag.publication.topic=c2mon.controltag.publication.test-->
+            <!-- -Dc2mon.jms.tag.publication.topic=c2mon.tag.publication.test-->
+            <!-- -Dcache.loader.batch.size=10000-->
+            <!-- -Dcache.loader.threads.max=2-->
+            <!-- -Dcache.loader.queue.size=1000-->
+            <!-- -Dcache.loader.equipment.batch.size=5-->
+            <!-- -Dcache.loader.equipment.threads.max=2-->
+            <!-- -Dcache.loader.equipment.queue.size=1000-->
           </argLine>
         </configuration>
       </plugin>

@@ -16,9 +16,9 @@
   <bean id="alarmCacheLoader" class="cern.c2mon.server.cache.common.BatchCacheLoader">
     <constructor-arg ref="alarmEhcache"/>
     <constructor-arg ref="alarmLoaderDAO"/>
-    <constructor-arg value="${cache.loader.batch.size}"/>
-    <constructor-arg value="${cache.loader.threads.max}"/>
-    <constructor-arg value="${cache.loader.queue.size}"/>
+    <constructor-arg value="${c2mon.server.cacheloading.batchSize}"/>
+    <constructor-arg value="${c2mon.server.cacheloading.maxThreads}"/>
+    <constructor-arg value="${c2mon.server.cacheloading.queueSize}"/>
   </bean>
 
 </beans>

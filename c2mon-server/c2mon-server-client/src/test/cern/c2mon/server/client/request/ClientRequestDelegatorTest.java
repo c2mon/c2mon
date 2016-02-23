@@ -101,7 +101,7 @@ public class ClientRequestDelegatorTest {
   @Autowired
   TagFacadeGateway tagFacadeGateway;
 
-  @Value("${jms.client.request.queue}")
+  @Value("${c2mon.server.client.jms.queue.request}")
   private String requestQueue;
 
   private static TestBrokerService testBrokerService = new TestBrokerService();

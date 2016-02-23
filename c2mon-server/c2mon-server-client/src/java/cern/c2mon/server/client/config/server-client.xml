@@ -23,7 +23,7 @@ Alarm Publications
  -->
  
 <bean id="alarmDestination" class="org.apache.activemq.command.ActiveMQTopic">
-  <constructor-arg value="${jms.client.alarm.topic}"/>
+  <constructor-arg value="${c2mon.server.client.jms.topic.alarm}"/>
 </bean>
 
 <!-- plugged into ActiveJmsSender -->
@@ -48,7 +48,7 @@ Publication of Supervision events
  -->
 
 <bean id="supervisionDestination" class="org.apache.activemq.command.ActiveMQTopic">
-  <constructor-arg value="${jms.client.supervision.topic}"/>
+  <constructor-arg value="${c2mon.server.client.jms.topic.supervision}"/>
 </bean>
 
 <!-- JmsTemplate for sending supervision events; default destination set -->
@@ -73,11 +73,11 @@ Request from clients
  -->
 
 <bean id="clientRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
-   <constructor-arg index="0" value="${jms.client.request.queue}"/>
+   <constructor-arg index="0" value="${c2mon.server.client.jms.queue.request}"/>
 </bean>
 
 <bean id="adminRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
-   <constructor-arg index="0" value="${c2mon.jms.client.admin.queue}"/>
+   <constructor-arg index="0" value="${c2mon.server.client.jms.queue.admin}"/>
 </bean>
 
 <!-- thread pool for request containers -->
@@ -101,8 +101,8 @@ Request from clients
       <property name="connectionFactory" ref="clientSingleConnectionFactory"/>
       <property name="destination" ref="clientRequestDestination"/>
       <property name="messageListener" ref="clientRequestDelegator" />
-      <property name="concurrentConsumers" value="${c2mon.jms.client.consumers.min}"/>
-      <property name="maxConcurrentConsumers" value="${c2mon.jms.client.consumers.max}"/> 
+      <property name="concurrentConsumers" value="${c2mon.server.client.jms.consumers.initial}"/>
+      <property name="maxConcurrentConsumers" value="${c2mon.server.client.jms.consumers.max}"/>
       <property name="maxMessagesPerTask" value="1"/>
       <property name="receiveTimeout" value="1000"/>
       <property name="idleTaskExecutionLimit" value="600"/>   

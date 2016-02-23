@@ -59,14 +59,14 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
    * preloaded from the database, instead ehcache will initialize it from a
    * local cache storage (if available)
    */
-  @Value("${c2mon.server.cache.skippreloading}")
+  @Value("${c2mon.server.cache.skipPreloading}")
   protected boolean skipCachePreloading = false;
 
   /**
    * The cache mode is either set to "multi", "single" or "single-nonpersistent", depending on whether
    * the server is running with a distributed or single cache.
    */
-  @Value("${c2mon.cache.mode}")
+  @Value("${c2mon.server.cache.mode}")
   protected String cacheMode;
 
   /**

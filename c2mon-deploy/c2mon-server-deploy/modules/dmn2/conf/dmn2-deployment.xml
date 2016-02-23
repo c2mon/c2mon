@@ -14,10 +14,10 @@
 				<java-vm-args>-Xms4G -Xmx4G -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
 
 				<!-- the following property defines if C2MON server caches shall be preloaded from database at start-up -->
-				<property name="c2mon.server.cache.skippreloading" value="true" />
+				<property name="c2mon.server.cache.skipPreloading" value="true" />
 
-				<property name="c2mon.process.name" value="DMN2-SRV" />
-				<property name="c2mon.cache.mode" value="single"/>
+				<property name="c2mon.server.name" value="DMN2-SRV" />
+				<property name="c2mon.server.cache.mode" value="single"/>
 				<property name="c2mon.home" value="$INSTALL_DIR" />
 				<property name="com.sun.management.jmxremote.port" value="9523" />
 				<property name="com.sun.management.jmxremote.password.file" value="conf/.jmxremote.passwd" />
@@ -30,7 +30,7 @@
 					<![CDATA[
 # ***************************************************************************
 #           NOTE:					         
-#           If the c2mon.server.cache.skippreloading flag is set to "true" the server 
+#           If the c2mon.server.cache.skipPreloading flag is set to "true" the server
 #           will not preload its caches from  the database, instead it will refer to local 
 #           cache files, stored in: log/ehcache-diskstore  
 # ***************************************************************************

@@ -99,7 +99,7 @@ public class ClusterTopologyListener implements net.sf.ehcache.cluster.ClusterTo
     }
 
     // Send an SMS warning
-    SMS_LOGGER.warn("Initiating C2MON server shutdown of " + System.getProperty("c2mon.process.name") + " on " + hostname);
+    SMS_LOGGER.warn("Initiating C2MON server shutdown of " + System.getProperty("c2mon.server.name") + " on " + hostname);
   }
 
   /**
