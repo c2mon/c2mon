@@ -12,6 +12,7 @@
   <groupId>cern.c2mon.c2mon-deploy</groupId>
   <artifactId>c2mon-server</artifactId>
   <version>1.7.3-SNAPSHOT</version>
+  <name>c2mon-server-demo</name>
 
   <description>C2MON server assembling all required modules and configuration files for the C2MON demo version</description>
 
