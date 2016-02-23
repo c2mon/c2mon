@@ -16,23 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.context.annotation.*;
 
 /**
- * Holds the configuration for the ElasticSearch cluster. Used in TransportConnector class for
- * the properties inside the c2mon.properties file. Allows to work with @Values.
+ * This class is responsible for configuring the Spring context for the eslog
+ * module. It is automatically detected.
  *
  * @author Alban Marguet.
  */
 @Configuration
-@PropertySource("file:${c2mon.properties.location}")
-public class ElasticSearchConfig {
-  @Bean
-  public static PropertySourcesPlaceholderConfigurer properties() {
-    return new PropertySourcesPlaceholderConfigurer();
-  }
-}
+@ImportResource({"classpath:cern/c2mon/server/eslog/config/server-eslog.xml"})
+public class ElasticSearchConfig {}
