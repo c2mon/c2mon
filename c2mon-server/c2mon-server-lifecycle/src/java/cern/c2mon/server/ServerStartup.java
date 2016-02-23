@@ -14,10 +14,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.lifecycle;
+package cern.c2mon.server;
 
 import lombok.extern.slf4j.Slf4j;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -53,8 +52,6 @@ import static java.lang.System.setProperty;
  *
  * c2mon.home                  Home directory of the server (usually the installation directory
  *                             containing bin/, conf/, log/ etc.
- * c2mon.modules.location      Location of the server module descriptor. This file lists the modules
- *                             that the server should run.
  * testMode                    Starts the server in test mode. Accepts all incoming updates no matter
  *                             the PIK and allows normal startup of test DAQs ignoring production
  *                             DAQs updates (true/false)
@@ -74,7 +71,6 @@ import static java.lang.System.setProperty;
 public class ServerStartup {
 
   private static final String C2MON_HOME = "c2mon.home";
-  private static final String C2MON_MODULES_LOCATION = "c2mon.modules.location";
 
   public static void main(final String[] args) throws IOException {
     String home = getProperty(C2MON_HOME);
@@ -85,10 +81,6 @@ public class ServerStartup {
       }
       setProperty(C2MON_HOME, home);
       log.info(format("Using home directory: %s. To override, use '%s'", home, C2MON_HOME));
-    }
-
-    if (getProperty(C2MON_MODULES_LOCATION) == null) {
-      setProperty(C2MON_MODULES_LOCATION, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
     }
 
     // TODO: rename this and put it in c2mon.properties. "test mode" is not very descriptive.

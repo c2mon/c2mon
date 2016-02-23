@@ -1,19 +1,17 @@
-package cern.c2mon.server.lifecycle.config;
+package cern.c2mon.server.config;
 
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.DefaultLifecycleProcessor;
 
 /**
- * This class is responsible for configuring the C2MON server environment, which
- * involves loading the core modules, loading user-defined modules and processing
- * user-defined property overrides.
+ * This class is responsible for configuring the C2MON server environment,
+ * which involves loading the core modules and processing user-defined
+ * property overrides.
  *
  * @author Justin Lewis Salmon
  */
 @Configuration
 @ImportResource({
-
-    // Core modules
     "classpath:cern/c2mon/server/cache/config/server-cache.xml",
     "classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess.xml",
     "classpath:cern/c2mon/server/cache/loading/config/server-cacheloading.xml",
@@ -27,9 +25,6 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
     "classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog.xml",
     "classpath:cern/c2mon/server/alarm/config/server-alarm.xml",
     "classpath:cern/c2mon/server/command/config/server-command.xml",
-
-    // User-defined modules (soon to be deprecated and replaced by Java module interface + classpath scan)
-    "${c2mon.modules.location}",
 })
 @PropertySources({
     @PropertySource("classpath:c2mon.properties"),

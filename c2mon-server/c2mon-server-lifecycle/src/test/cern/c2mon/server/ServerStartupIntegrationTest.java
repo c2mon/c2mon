@@ -1,4 +1,4 @@
-package cern.c2mon.server.lifecycle;
+package cern.c2mon.server;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,8 +11,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = ServerStartup.class)
-@TestPropertySource(properties = {"c2mon.home=/tmp", "c2mon.modules.location='<?xml version=\"1.0\"?>'"})
-public class LifecycleIntegrationTest {
+@TestPropertySource(properties = {"c2mon.home=/tmp"})
+public class ServerStartupIntegrationTest {
 
   @Test
   public void startup() {}
