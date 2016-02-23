@@ -114,7 +114,7 @@
         <configuration>
 
           <descriptors>
-            <descriptor>src/assembly/dipcm-srv-assembly.xml</descriptor>
+            <descriptor>src/assembly/assembly-dipcm.xml</descriptor>
           </descriptors>
 
         </configuration>

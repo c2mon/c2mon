@@ -109,7 +109,7 @@
         <configuration>
 
           <descriptors>
-            <descriptor>src/assembly/tim2-srv-assembly.xml</descriptor>
+            <descriptor>src/assembly/assembly-tim2.xml</descriptor>
           </descriptors>
 
         </configuration>

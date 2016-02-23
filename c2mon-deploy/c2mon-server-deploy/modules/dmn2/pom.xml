@@ -71,7 +71,7 @@
         <configuration>
 
           <descriptors>
-            <descriptor>src/assembly/dmn2-srv-assembly.xml</descriptor>
+            <descriptor>src/assembly/assembly-dmn2.xml</descriptor>
           </descriptors>
 
         </configuration>
