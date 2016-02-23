@@ -114,8 +114,8 @@ public class TagupdateTest implements ApplicationContextAware {
   
   @Before
   public void setUp() throws Exception {
-    testBrokerService = new TestBrokerService();
-    testBrokerService.createAndStartBroker();
+//    testBrokerService = new TestBrokerService();
+//    testBrokerService.createAndStartBroker();
     testDataHelper.removeTestData();
     testDataHelper.createTestData();
     testDataHelper.insertTestDataIntoDB();
@@ -126,7 +126,7 @@ public class TagupdateTest implements ApplicationContextAware {
   @After
   public void cleanUp() throws Exception {    
     testDataHelper.removeTestData();
-    testBrokerService.stopBroker();
+//    testBrokerService.stopBroker();
   }
   
   /**
