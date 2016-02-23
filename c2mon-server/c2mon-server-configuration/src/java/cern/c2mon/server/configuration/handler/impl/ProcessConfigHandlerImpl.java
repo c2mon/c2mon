@@ -75,7 +75,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
    * Flag indicating if Process removal is allowed when the Process
    * is running.
    */
-  @Value("c2mon.server.configuration.allowRunningProcessRemoval")
+  @Value("${c2mon.server.configuration.allowRunningProcessRemoval}")
   private boolean allowRunningProcessRemoval;
 
   /**
