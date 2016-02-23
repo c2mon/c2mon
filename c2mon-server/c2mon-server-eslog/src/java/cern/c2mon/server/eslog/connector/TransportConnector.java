@@ -81,23 +81,23 @@ public class TransportConnector implements Connector {
   private Client client;
 
   /** Port to which to connect when using a client that is not local. By default 9300 should be used. */
-  @Value("${es.port:9300}")
+  @Value("${c2mon.server.eslog.port}")
   private int port;
 
   /** Name of the host holding the ElasticSearch cluster. */
-  @Value("${es.host:localhost}")
+  @Value("${c2mon.server.eslog.host}")
   private String host;
 
   /** Name of the cluster. Must be set in order to connect to the right one in case there are several clusters running at the host. */
-  @Value("${es.cluster:c2mon}")
+  @Value("${c2mon.server.eslog.cluster}")
   private String cluster;
 
   /** Name of the node in the cluster (more useful for debugging and to know which one is connected to the cluster). */
-  @Value("${es.node:c2mon-indexing-transport-node}")
+  @Value("${c2mon.server.eslog.node}")
   private String node;
 
   /** Setting this to true will make the connector connect to a cluster inside the JVM. To false to a real cluster. */
-  @Value("${es.local:true}")
+  @Value("${c2mon.server.eslog.local}")
   private boolean isLocal;
 
   /** Connection settings for the node according to the host, port, cluster, node and isLocal. */
@@ -119,13 +119,13 @@ public class TransportConnector implements Connector {
   private boolean isConnected;
 
   /** BulkSettings */
-  @Value("${es.config.bulk.actions:5600}")
+  @Value("${c2mon.server.eslog.config.bulk.actions}")
   private int bulkActions;
-  @Value("${es.config.bulk.size:5}")
+  @Value("${c2mon.server.eslog.config.bulk.size}")
   private int bulkSize;
-  @Value("${es.config.bulk.flush:10}")
+  @Value("${c2mon.server.eslog.config.bulk.flush}")
   private int flushInterval;
-  @Value("${es.config.bulk.concurrent:1}")
+  @Value("${c2mon.server.eslog.config.bulk.concurrent}")
   private int concurrent;
 
   /** Launch a Thread to discover the ElasticSearch cluster. */

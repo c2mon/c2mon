@@ -43,23 +43,23 @@ import java.util.Set;
 @Data
 public abstract class EsIndexer implements IDBPersistenceHandler {
   /** Prefix used for every index in the ElasticSearch cluster, e.g., c2mon_2015-11 is a valid index. */
-  @Value("${es.prefix.tag:c2mon-tag_}")
+  @Value("${c2mon.server.eslog.prefix.index}")
   protected String indexPrefix;
 
-  @Value("${es.config.index.format:M}")
+  @Value("${c2mon.server.eslog.config.index.format}")
   protected String indexFormat;
 
   /** Every tag or alias must begin with the same prefix, e.g., tag_string is a good type and tag_207807 is a good alias. */
-  @Value("${es.prefix.type:tag_}")
+  @Value("${c2mon.server.eslog.prefix.type}")
   protected String typePrefix;
 
   /** The first index in the cluster is c2mon_1970-01 which corresponds to the Epoch time (ES stocks timestamps in milliseconds since Epoch). */
   protected String FIRST_INDEX = indexPrefix + "1970-01";
 
-  @Value("${es.prefix.supervision:c2mon-supervision_}")
+  @Value("${c2mon.server.eslog.prefix.supervision}")
   protected String supervisionPrefix;
 
-  @Value("${es.prefix.alarm:c2mon-alarm_}")
+  @Value("${c2mon.server.eslog.prefix.alarm}")
   protected String alarmPrefix;
 
   /** Handles the connection with the ElasticSearch cluster. */

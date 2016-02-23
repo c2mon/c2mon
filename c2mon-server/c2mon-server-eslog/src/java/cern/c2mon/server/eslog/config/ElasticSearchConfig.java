@@ -26,4 +26,5 @@ import org.springframework.context.annotation.*;
  */
 @Configuration
 @ImportResource({"classpath:cern/c2mon/server/eslog/config/server-eslog.xml"})
+@PropertySource("resources/eslog.properties")
 public class ElasticSearchConfig {}

@@ -11,8 +11,7 @@
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-eslog</artifactId>
   <version>1.7.1-SNAPSHOT</version>
-  <name>c2mon-server-eslog</name>
-  <url>http://cern.ch/c2mon</url>
+
   <description>C2MON server persistence module for ElasticSearch</description>
   
    <scm>
@@ -20,11 +19,6 @@
   </scm>
 
   <dependencies>
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-    </dependency>
-
     <!-- ElasticSearch dependency -->
     <dependency>
       <groupId>org.elasticsearch</groupId>
@@ -51,6 +45,16 @@
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-all</artifactId>
     </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-shorttermlog</artifactId>
+      <version>[1.6.4, 2.0.0)</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+    </dependency>
 
     <!-- Test dependency -->
     <dependency>
@@ -70,11 +74,6 @@
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
       <version>1.10.19</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.7.5</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -83,25 +82,5 @@
       <version>2.4</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-shorttermlog</artifactId>
-      <version>[1.6.4, 2.0.0)</version>
-    </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.13</version>
-        <configuration>
-          <argLine>
-            <!-- -Dc2mon.properties.location=${build.testOutputDirectory}/c2mon.properties-->
-          </argLine>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>
