@@ -84,7 +84,7 @@ public class CacheObjectFactoryWithProperties {
   @Autowired
   private TestDataInserter testDataInserter;
 
-  @Value("${c2mon.jms.daq.queue.trunk}")
+  @Value("${c2mon.server.daqcommunication.jms.queue.trunk}")
   private String jmsDaqQueueTrunk;
 
   @Value("${c2mon.jms.tag.publication.topic}")

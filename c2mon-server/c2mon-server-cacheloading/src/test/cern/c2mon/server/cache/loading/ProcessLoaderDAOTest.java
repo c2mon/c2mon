@@ -40,7 +40,7 @@ public class ProcessLoaderDAOTest {
   @Autowired
   private ProcessDAO processDAO;
 
-  @Value("${c2mon.jms.daq.queue.trunk}")
+  @Value("${c2mon.server.daqcommunication.jms.queue.trunk}")
   private String jmsDaqQueueTrunk;
 
   @Test

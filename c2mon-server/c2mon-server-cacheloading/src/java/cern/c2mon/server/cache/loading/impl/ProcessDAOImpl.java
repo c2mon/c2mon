@@ -42,7 +42,7 @@ public class ProcessDAOImpl extends AbstractDefaultLoaderDAO<Process> implements
 
   private ProcessMapper processMapper;
 
-  @Value("${c2mon.jms.daq.queue.trunk}")
+  @Value("${c2mon.server.daqcommunication.jms.queue.trunk}")
   private String jmsDaqQueueTrunk;
 
   @Autowired

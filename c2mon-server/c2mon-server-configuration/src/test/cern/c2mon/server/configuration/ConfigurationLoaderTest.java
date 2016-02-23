@@ -247,7 +247,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @Value("${c2mon.jms.controltag.publication.topic}")
   private String controlTagPublicationTopic;
 
-  @Value("${c2mon.jms.daq.queue.trunk}")
+  @Value("${c2mon.server.daqcommunication.jms.queue.trunk}")
   private String jmsDaqQueueTrunk;
 
   /**

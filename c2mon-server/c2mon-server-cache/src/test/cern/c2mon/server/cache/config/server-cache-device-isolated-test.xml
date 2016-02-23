@@ -39,15 +39,15 @@
       value="cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO" />
   </bean>
 
-  <bean
-    class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-    <property name="properties">
-      <props>
-        <prop key="c2mon.server.cache.skipPreloading">true</prop>
-        <prop key="c2mon.server.cache.mode">single-nonpersistent</prop>
-      </props>
-    </property>
-  </bean>
+  <!--<bean-->
+    <!--class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">-->
+    <!--<property name="properties">-->
+      <!--<props>-->
+        <!--<prop key="c2mon.server.cache.skipPreloading">true</prop>-->
+        <!--<prop key="c2mon.server.cache.mode">single-nonpersistent</prop>-->
+      <!--</props>-->
+    <!--</property>-->
+  <!--</bean>-->
 
   <bean id="deviceCache" class="cern.c2mon.server.cache.device.DeviceCacheImpl">
   </bean>

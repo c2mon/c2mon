@@ -63,7 +63,7 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
   /** PIK numbers limit (min) */
   private static final int PIK_MIN = 100000;
     
-  @Value("${c2mon.jms.daq.queue.trunk}") 
+  @Value("${c2mon.server.daqcommunication.jms.queue.trunk}")
   private String jmsDaqQueueTrunk;
   
   private EquipmentFacade equipmentFacade;
