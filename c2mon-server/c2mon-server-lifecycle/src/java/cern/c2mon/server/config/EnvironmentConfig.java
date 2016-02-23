@@ -26,7 +26,7 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
     "classpath:cern/c2mon/server/command/config/server-command.xml",
 })
 @PropertySources({
-    @PropertySource("classpath:c2mon.properties"),
+    @PropertySource("classpath:resources/c2mon.properties"),
     @PropertySource(value = "${c2mon.server.properties}", ignoreResourceNotFound = true)}
 )
 public class EnvironmentConfig {
