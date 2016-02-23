@@ -12,9 +12,10 @@
   
   <!-- test specific settings (cache not in TC mode) -->
   <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+    <property name="shared" value="true" />
     <property name="configLocation" value="classpath:resources/ehcache-notTCmode-nonpersistent.xml"/>
   </bean>
   
   <bean id="clusterCache" class="cern.c2mon.server.cache.cluster.ClusterCacheImpl" autowire="constructor"/>
-  
+
 </beans>

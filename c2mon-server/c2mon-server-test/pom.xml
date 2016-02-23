@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -15,9 +15,8 @@
   <name>c2mon-server-test</name>
   <packaging>jar</packaging>
   <description>
-    	The C2MON test module with helper classes for use across all server module tests.
-    </description>
-  <url>http://timweb.cern.ch</url>
+    The C2MON test module with helper classes for use across all server module tests.
+  </description>
 
   <scm>
     <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-test</developerConnection>
@@ -27,10 +26,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <!--
-        here junit needs to be in scope compile, since we're compiling classes that are not in the test folder but in the src
-        folder
-      -->
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -40,10 +35,10 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-        <groupId>net.sf.ehcache</groupId>
-        <artifactId>ehcache-core</artifactId>
-        <scope>test</scope>
-      </dependency>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache-core</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
@@ -87,19 +82,4 @@
       <artifactId>lombok</artifactId>
     </dependency>
   </dependencies>
-  <developers />
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.8.1</version>
-        <configuration>
-          <argLine>
-            <!-- -Dc2mon.properties.location=${c2mon.properties.location}-->
-          </argLine>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>
