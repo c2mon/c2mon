@@ -135,9 +135,7 @@
    <!--  the JmsTemplate to answer client requests -->
    <bean id="requestHandlerJmsTemplate" class="org.springframework.jms.core.JmsTemplate"
       depends-on="logConnectionFactory">
-      <property name="connectionFactory">
-         <ref local="logConnectionFactory" />
-      </property>
+      <property name="connectionFactory" ref="logConnectionFactory" />
    </bean>
 
 
