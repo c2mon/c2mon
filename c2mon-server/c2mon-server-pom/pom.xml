@@ -9,7 +9,7 @@
 
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-pom</artifactId>
-  <version>1.6.4</version>
+  <version>1.6.3-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <description>This is a common parent POM for all c2mon-server modules</description>
@@ -298,6 +298,12 @@
     </pluginManagement>
 
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.5.3</version>
+      </plugin>
+      
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
