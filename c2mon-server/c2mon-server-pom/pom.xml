@@ -12,10 +12,18 @@
   <version>1.6.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <description>
-      This is a common parent POM for all c2mon-server modules
-    </description>
-  <url>http://timweb.cern.ch</url>
+  <description>This is a common parent POM for all c2mon-server modules</description>
+
+  <distributionManagement>
+    <repository>
+      <id>c2mon-releases</id>
+      <url>https://repository.cern.ch/nexus/content/repositories/c2mon-releases</url>
+    </repository>
+    <snapshotRepository>
+      <id>c2mon-snapshots</id>
+      <url>https://repository.cern.ch/nexus/content/repositories/c2mon-snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
 
   <scm>
     <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-pom</developerConnection>
