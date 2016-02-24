@@ -17,6 +17,7 @@
   <description>
     C2MON server assembling all required modules and configuration files for TIM2 and DMN2 solutions
   </description>
+
   <url>http://cern.ch/c2mon</url>
 
   <dependencies>
@@ -24,24 +25,22 @@
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-all</artifactId>
     </dependency>
-    <dependency>
-    	<groupId>org.slf4j</groupId>
-    	<artifactId>slf4j-log4j12</artifactId>
-    	<version>1.7.5</version>
-    </dependency>
+    <!--<dependency>-->
+    	<!--<groupId>org.slf4j</groupId>-->
+    	<!--<artifactId>slf4j-log4j12</artifactId>-->
+    	<!--<version>1.7.5</version>-->
+    <!--</dependency>-->
   </dependencies>
 
   <scm>
     <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-server-deploy</developerConnection>
   </scm>
 
-  <developers />
-
   <modules>
-    <module>modules/tim2</module>
-    <module>modules/dmn2</module>
     <module>modules/demo</module>
-    <module>modules/dipcm</module>
+    <module>modules/tim2</module>
+    <!--<module>modules/dmn2</module>-->
+    <!--<module>modules/dipcm</module>-->
   </modules>
 
 </project>
