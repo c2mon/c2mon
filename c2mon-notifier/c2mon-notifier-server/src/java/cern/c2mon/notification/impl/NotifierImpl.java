@@ -181,7 +181,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
 
         C2monServiceGateway.startC2monClient();
 
-        while (!C2monServiceGateway.getSupervisionManager().isServerConnectionWorking()) {
+        while (!C2monServiceGateway.getSupervisionService().isServerConnectionWorking()) {
             logger.info("Waiting for C2Mon Service to initialize..");
             try {
                 Thread.sleep(1000);
