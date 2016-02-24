@@ -10,37 +10,20 @@
   </parent>
 
   <groupId>cern.c2mon.c2mon-deploy</groupId>
-  <artifactId>c2mon-srv-tim2</artifactId>
-  <name>The TIM2 SRV module</name>
+  <artifactId>c2mon-server</artifactId>
   <version>1.7.3-SNAPSHOT</version>
+  <name>c2mon-server-tim2</name>
 
   <description>C2MON server assembling all required modules and configuration files for TIM2</description>
-  <url></url>
 
   <dependencies>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-cachepersistence</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
+      <artifactId>c2mon-server-all</artifactId>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-benchmark</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-command</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-client</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-video</artifactId>
       <version>[1.5.0, 2.0.0)</version>
     </dependency>
     <dependency>
@@ -53,7 +36,6 @@
       <artifactId>c2mon-server-shorttermlog</artifactId>
       <version>[1.5.0, 2.0.0)</version>
     </dependency>
-    
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-eslog</artifactId>
@@ -101,9 +83,43 @@
     </dependency>
   </dependencies>
 
-  <developers />
   <build>
     <plugins>
+
+      <!-- Prevent Maven from building a jar -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-jar</id>
+            <phase/>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Prevent Maven from trying to install a jar -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-install-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-jar</id>
+            <phase/>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Prevent Maven from creating a source jar -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <configuration>
+          <skipSource>true</skipSource>
+        </configuration>
+      </plugin>
+
+      <!-- Create a tar.gz -->
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>

@@ -6,7 +6,7 @@
     <application name="default">
 
       <startscript>
-        <main-class name="cern.c2mon.server.lifecycle.ServerStartup">
+        <main-class name="cern.c2mon.server.ServerStartup">
           <output>
             <file name="log/c2mon.stdout.log" />
           </output>
@@ -100,9 +100,7 @@ fi
 
 
     <application name="c2mon-tim2-test1" extends="default">
-     
       <startscript name="C2MON-TIM-TEST">
-        <property name="c2mon.server.name" value="C2MON-TIM-TEST1" />
         <property name="testMode" value="true" />
         <!-- Configuration for LASER module -->
         <property name="laser.hosts" value="laser-test" />
@@ -114,15 +112,12 @@ fi
       <deployment installLocation="/opt/c2mon-test1">
         <directory name="conf">
           <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.test1" mask="400" />
-          <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server" mask="400" />
         </directory>
       </deployment>
     </application>
 
     <application name="c2mon-tim2-test2" extends="default">
-      
       <startscript name="C2MON-TIM-TEST">
-        <property name="c2mon.server.name" value="C2MON-TIM-TEST2" />
         <property name="testMode" value="true" />
         <!-- Configuration for LASER module -->
         <property name="laser.hosts" value="laser-test" />
@@ -134,7 +129,6 @@ fi
       <deployment installLocation="/opt/c2mon-test2">
         <directory name="conf">
           <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.test2" mask="400" />
-          <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server" mask="400" />
         </directory>
       </deployment>
     </application>
