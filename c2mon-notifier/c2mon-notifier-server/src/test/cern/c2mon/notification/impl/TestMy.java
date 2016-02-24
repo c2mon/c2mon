@@ -35,7 +35,7 @@ public class TestMy {
         
         C2monServiceGateway.startC2monClient();
         
-        while (!C2monServiceGateway.getSupervisionManager().isServerConnectionWorking()) {
+        while (!C2monServiceGateway.getSupervisionService().isServerConnectionWorking()) {
 
             try {
                 Thread.sleep(1000);
@@ -45,11 +45,8 @@ public class TestMy {
             }
         }
         
-        
-        
-        
         TagCache c = new TagCache();
-        Tag t = c.resolveSubTags(2137951L);
+        Tag t = c.resolveSubTags(1107819L);
         System.out.println(t.getAllChildRules());
     }
     
