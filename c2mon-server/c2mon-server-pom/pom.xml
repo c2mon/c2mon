@@ -9,7 +9,7 @@
 
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-pom</artifactId>
-  <version>1.6.3-SNAPSHOT</version>
+  <version>1.6.4</version>
   <packaging>pom</packaging>
 
   <description>This is a common parent POM for all c2mon-server modules</description>
@@ -26,7 +26,7 @@
   </distributionManagement>
 
   <scm>
-    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-pom</developerConnection>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/tags/c2mon-server-pom-1.6.4</developerConnection>
   </scm>
 
   <!-- Shared version number properties -->
@@ -286,7 +286,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore></ignore>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>
@@ -303,7 +303,7 @@
         <artifactId>maven-release-plugin</artifactId>
         <version>2.5.3</version>
         <configuration>
-          <scmCommentPrefix></scmCommentPrefix>
+          <scmCommentPrefix />
         </configuration>
       </plugin>
       
