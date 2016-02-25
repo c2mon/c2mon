@@ -282,9 +282,6 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
     } // while
 
-    // removed as not used
-    // connectionDropped4Subscription.put(subscription, Boolean.TRUE);
-
     if (getEquipmentLogger().isDebugEnabled()) {
       getEquipmentLogger().debug("disconnected - exiting disconnected()..");
     }

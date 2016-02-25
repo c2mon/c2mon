@@ -41,8 +41,8 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
   private DipMessageHandlerDataListener handler;
 
   /**
-   * Publishes the alive tag to DIP, which is read back and sent to server,
-   * thus monitoring that the DIP subscriptions are working correctly.
+   * Publishes the alive tag to DIP, which is read back and sent to server, thus
+   * monitoring that the DIP subscriptions are working correctly.
    */
   private DipAlivePublisher alivePublisher;
 
@@ -53,11 +53,9 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
 
   /**
    * This method is responsible for opening subscriptions for all supervised
-   * SourceDataTags (data point elements). Also initializes the alive
-   * mechanism.
+   * SourceDataTags (data point elements). Also initializes the alive mechanism.
    *
-   * @throws EqIOException
-   *             In cast of connection errors
+   * @throws EqIOException In cast of connection errors
    * @roseuid 409A0D150295
    */
   @Override
@@ -66,14 +64,17 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
 
     // initialize alive mechanism
     alivePublisher = new DipAlivePublisher(getEquipmentConfiguration().getName(),
-        getEquipmentConfiguration().getSourceDataTag(getEquipmentConfiguration().getAliveTagId()), // null if not Tag found
+        getEquipmentConfiguration().getSourceDataTag(getEquipmentConfiguration().getAliveTagId()), // null
+                                                                                                   // if
+                                                                                                   // not
+                                                                                                   // Tag
+                                                                                                   // found
         getEquipmentConfiguration().getAliveTagInterval(), getEquipmentLoggerFactory());
     alivePublisher.start();
 
     // Controller
     if (this.dipController == null) {
-        this.dipController = new DIPController(getEquipmentLoggerFactory(), getEquipmentConfiguration(),
-                getEquipmentMessageSender());
+      this.dipController = new DIPController(getEquipmentLoggerFactory(), getEquipmentConfiguration(), getEquipmentMessageSender());
     }
 
     if (this.dipController.getDipFactory() == null) {
@@ -87,7 +88,8 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
         this.handler = new DipMessageHandlerDataListener(this.dipController, getEquipmentLogger(DipMessageHandlerDataListener.class));
 
         this.dipController.setHandler(this.handler);
-      } catch (Exception ex) {
+      }
+      catch (Exception ex) {
         getEquipmentLogger().error("connectToDataSource - The handler cound not initialise properly its connection", ex);
         getEquipmentMessageSender().confirmEquipmentStateIncorrect(
             "The handler cound not initialise properly its connection. " + "Check if the DIP server is running and restart the DAQ if necessary");
@@ -103,7 +105,7 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
 
     // Connection
     for (ISourceDataTag sourceDataTag : getEquipmentConfiguration().getSourceDataTags().values()) {
-      this.dipController.connection(sourceDataTag, null);
+      this.dipController.connect(sourceDataTag, null);
     }
 
     getEquipmentLogger().info("connectToDataSource - performing publication test..");
@@ -112,16 +114,17 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
 
     if (incorrectTags.isEmpty()) {
       getEquipmentLogger().info("\ttest OK");
-    } else {
+    }
+    else {
       logWarning(incorrectTags);
     }
 
     getEquipmentLogger().trace("connectToDataSource - leaving connectToDataSource");
   }
 
-
   /**
-   * Private method to log which tags have been registered to exactly the same complex DIP field.
+   * Private method to log which tags have been registered to exactly the same
+   * complex DIP field.
    *
    * @param incorrectTags
    */
@@ -139,12 +142,11 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
   }
 
   /**
-   * This method checks if there are any errors in the subscription table, i.e
-   * : if there's more than one tag registered with the same dip item-name AND
+   * This method checks if there are any errors in the subscription table, i.e :
+   * if there's more than one tag registered with the same dip item-name AND
    * field-name. All 'problematic' tags are returned in the result array
    *
-   * @param tags4topic
-   *            - the map with all registered tags for topics
+   * @param tags4topic - the map with all registered tags for topics
    *
    * @return
    */
@@ -169,19 +171,19 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
             continue;
           }
 
-         tmpFieldName2 = ((DIPHardwareAddress) sdt2.getHardwareAddress()).getFieldName();
+          tmpFieldName2 = ((DIPHardwareAddress) sdt2.getHardwareAddress()).getFieldName();
 
-         if (tmpFieldName2.equalsIgnoreCase(tmpFieldName1)) {
+          if (tmpFieldName2.equalsIgnoreCase(tmpFieldName1)) {
             doubleEntries.add(sdt2);
           }
-        }// for
+        } // for
 
         if (!doubleEntries.isEmpty()) {
           incorrectTags.put(v_key, doubleEntries);
         }
 
-      }// for
-    }// for
+      } // for
+    } // for
 
     return incorrectTags;
   }
@@ -193,7 +195,7 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
    * @roseuid 409A0D1502EF
    */
   @Override
-  public void disconnectFromDataSource()  {
+  public void disconnectFromDataSource() {
     getEquipmentLogger().trace("disconnectFromDataSource - disconnectFromDataSource() called.");
 
     if (alivePublisher != null) {
@@ -201,13 +203,13 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
     }
 
     if (this.dipController != null) {
-    	for (String key :  this.dipController.getDipSubscriptions().keySet()) {
-    		// The Key is the TopicName and the Value the DipSubscription
-    		this.dipController.disconnection(dipController.getDipSubscriptions().get(key), null);
-    	}
+      for (String dipTopic : this.dipController.getDipSubscriptions().keySet()) {
+        // The Key is the TopicName and the Value the DipSubscription
+        this.dipController.disconnect(dipTopic, null);
+      }
     }
     else {
-    	getEquipmentLogger().trace("disconnectFromDataSource - dipController was not initialice (null)");
+      getEquipmentLogger().trace("disconnectFromDataSource - dipController was not initialice (null)");
     }
   }
 

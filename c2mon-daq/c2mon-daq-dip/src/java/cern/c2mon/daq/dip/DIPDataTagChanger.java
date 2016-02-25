@@ -59,7 +59,7 @@ public class DIPDataTagChanger implements IDataTagChanger {
     }
 
     // Connect the Data Tag
-    changeReport.setState(this.dipController.connection(sourceDataTag, changeReport));
+    changeReport.setState(this.dipController.connect(sourceDataTag, changeReport));
     if (changeReport.getState() == CHANGE_STATE.SUCCESS) {
       changeReport.appendInfo("onAddDataTag - SourceDataTag added ...");
     } else {
@@ -104,7 +104,7 @@ public class DIPDataTagChanger implements IDataTagChanger {
       // Disconnect old Data Tag
       this.dipController.disconnection(oldSourceDataTag, changeReport);
       
-      changeReport.setState(this.dipController.connection(sourceDataTag, changeReport));
+      changeReport.setState(this.dipController.connect(sourceDataTag, changeReport));
   
       if (changeReport.getState() == CHANGE_STATE.SUCCESS) {
         changeReport.appendInfo("onUpdateDataTag - SourceDataTag successfully updated.");
