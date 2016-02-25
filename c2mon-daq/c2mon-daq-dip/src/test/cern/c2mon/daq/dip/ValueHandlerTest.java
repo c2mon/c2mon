@@ -321,7 +321,7 @@ public class ValueHandlerTest {
     expect(controllerMock.getEquipmentMessageSender()).andReturn(equipmentMessageSender);
     equipmentMessageSender.sendInvalidTag(tag,
                                           SourceDataQuality.INCORRECT_NATIVE_ADDRESS,
-                                          "Unknown field specified in DIP address" + unknownFieldName);
+                                          "Unknown field \"" + unknownFieldName + "\" specified in DIP address.");
     replay(controllerMock, equipmentMessageSender);
 
     handler.parseMessageAndSendValue(createComplexDipData(), tag, getHardwareAddress(unknownFieldName));
