@@ -1,24 +1,25 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.daq.dip;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.Vector;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import cern.c2mon.daq.common.IEquipmentMessageSender;
@@ -57,24 +58,18 @@ public class DIPController {
    */
   private IEquipmentMessageSender equipmentMessageSender;
 
-//  /** A vector of handled dip subscriptions */
-//  private final List<DipSubscription> dipSubscriptions = new Vector<DipSubscription>();
-//
-//  /** A vector of for topics that the handler subscribes to */
-//  private List<String> dipSubscribedItems = new Vector<String>();
-
   /**
    * A HashMap with topics that the handler subscribes to as keys and
    * a its handled dip subscriptions as value
    */
-  private final ConcurrentHashMap<String, DipSubscription> dipSubscriptions = new ConcurrentHashMap<String, DipSubscription>();
+  private final Map<String, DipSubscription> dipSubscriptions = new ConcurrentHashMap<>();
 
 
   /**
    * A HashMap for handling quick lookups for a data tags related with
    * particular topics.
    */
-  private final ConcurrentHashMap<String, Vector<ISourceDataTag>> subscribedDataTags = new ConcurrentHashMap<String, Vector<ISourceDataTag>>();
+  private final Map<String, List<ISourceDataTag>> subscribedDataTags = new ConcurrentHashMap<>();
 
   /** The DIP object */
   private DipFactory dipFactory;
@@ -131,17 +126,17 @@ public class DIPController {
       return CHANGE_STATE.FAIL;
     }
     // Create a new subscription only if one with the same item name hasn't yet been created
-    // Pair [topicName ==> vector of related SourceDataTags]
+    // Pair [topicName ==> list of related SourceDataTags]
     else if (!subscribedDataTags.containsKey(sdtAddress.getItemName())) {
       // it that's the first tag subscribed for that topic
-      Vector<ISourceDataTag> v = new Vector<ISourceDataTag>(1);
-      v.addElement(sourceDataTag);
-      this.subscribedDataTags.put(sdtAddress.getItemName(), v);
+      List<ISourceDataTag> list = new ArrayList<>(1);
+      list.add(sourceDataTag);
+      this.subscribedDataTags.put(sdtAddress.getItemName(), list);
       // If there're already tags subscribed for that topic
     } else {
-      Vector<ISourceDataTag> v = this.subscribedDataTags.get(sdtAddress.getItemName());
-      v.addElement(sourceDataTag);
-      this.subscribedDataTags.put(sdtAddress.getItemName(), v);
+      List<ISourceDataTag> list = this.subscribedDataTags.get(sdtAddress.getItemName());
+      list.add(sourceDataTag);
+      this.subscribedDataTags.put(sdtAddress.getItemName(), list);
       getEquipmentLogger().debug("connection - adding tag for item : " + sdtAddress.getItemName() + " (" + sdtAddress.getFieldName() + ")");
       if (changeReport != null) {
         changeReport.appendInfo("connection - adding tag for item : " + sdtAddress.getItemName() + " (" + sdtAddress.getFieldName() + ")");
@@ -150,9 +145,9 @@ public class DIPController {
 
     return createDipSubscription(sdtAddress.getItemName(), changeReport);
   }
-  
+
   /**
-   * Creates the and stores the DIP subscription. In case of an address problem all related tags are 
+   * Creates the and stores the DIP subscription. In case of an address problem all related tags are
    * marked as invalid.
    * @param topicName The DIP address
    * @param changeReport The change report
@@ -202,14 +197,14 @@ public class DIPController {
     try {
       getEquipmentLogger().debug(new StringBuffer("disconnection - destroying subscription ").append(dipSubscription.getTopicName()));
       this.dipFactory.destroyDipSubscription(dipSubscription);
-    } 
+    }
     catch (DipException de) {
       getEquipmentLogger().error("disconnection - A problem occured while trying to destroy dip subscription : " + de.getMessage());
       if (changeReport != null) {
         changeReport.appendError("disconnection - DipException - A problem occured while trying to destroy dip subscription");
       }
       return CHANGE_STATE.FAIL;
-    } 
+    }
     catch (Exception ex) {
       getEquipmentLogger().error("disconnection - A problem occured while trying to destroy dip subscription : ", ex);
       if (changeReport != null) {
@@ -298,17 +293,17 @@ public class DIPController {
   /**
    * @return the subscribedDataTags
    */
-  public ConcurrentHashMap<String, Vector<ISourceDataTag>> getSubscribedDataTags() {
+  public Map<String, List<ISourceDataTag>> getSubscribedDataTags() {
       return this.subscribedDataTags;
   }
 
   /**
    * @return the dipSubscriptions
    */
-  public ConcurrentHashMap<String, DipSubscription> getDipSubscriptions() {
+  public Map<String, DipSubscription> getDipSubscriptions() {
       return this.dipSubscriptions;
   }
-  
+
   /**
    * Renews the subscription to a DIP client by disconnecting and
    * then reconnecting.

@@ -1,26 +1,27 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
 package cern.c2mon.daq.dip;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Vector;
+import java.util.Map.Entry;
 
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
@@ -61,7 +62,7 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
    */
   @Override
   public void connectToDataSource() {
-    getEquipmentLogger().info("connectToDataSource - Entering connectToDataSource..");
+    getEquipmentLogger().trace("connectToDataSource - Entering connectToDataSource..");
 
     // initialize alive mechanism
     alivePublisher = new DipAlivePublisher(getEquipmentConfiguration().getName(),
@@ -106,25 +107,35 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
     }
 
     getEquipmentLogger().info("connectToDataSource - performing publication test..");
-    Hashtable<String, Vector<ISourceDataTag>> incorrectTags = testSubscriptions(this.dipController.getSubscribedDataTags());
-    if (incorrectTags != null) {
-      getEquipmentLogger().error("\tThose tags have been registered with the same item-names and field-names : ");
-      Enumeration<String> e1 = incorrectTags.keys();
-      Enumeration<Vector<ISourceDataTag>> e2 = incorrectTags.elements();
-      while (e2.hasMoreElements()) {
-        Vector<ISourceDataTag> v = e2.nextElement();
-        String itemName = (String) e1.nextElement();
-        getEquipmentLogger().error("\titem-name : " + itemName);
-        for (int i = 0; i < v.size(); i++) {
-          ISourceDataTag sdt1 = (ISourceDataTag) v.get(i);
-          getEquipmentLogger().error("\t\t " + sdt1.getId() + ", ");
-        }
-      }
-    } else {
+
+    Map<String, List<ISourceDataTag>> incorrectTags = testSubscriptions(this.dipController.getSubscribedDataTags());
+
+    if (incorrectTags.isEmpty()) {
       getEquipmentLogger().info("\ttest OK");
+    } else {
+      logWarning(incorrectTags);
     }
 
-    getEquipmentLogger().info("connectToDataSource - leaving connectToDataSource");
+    getEquipmentLogger().trace("connectToDataSource - leaving connectToDataSource");
+  }
+
+
+  /**
+   * Private method to log which tags have been registered to exactly the same complex DIP field.
+   *
+   * @param incorrectTags
+   */
+  private void logWarning(Map<String, List<ISourceDataTag>> incorrectTags) {
+    getEquipmentLogger().warn("\tThose tags have been registered with the same item-names and field-names : ");
+
+    for (Entry<String, List<ISourceDataTag>> entry : incorrectTags.entrySet()) {
+
+      getEquipmentLogger().warn("\titem-name : " + entry.getKey());
+
+      for (ISourceDataTag sdt1 : entry.getValue()) {
+        getEquipmentLogger().warn("\t\t " + sdt1.getId() + ", ");
+      }
+    }
   }
 
   /**
@@ -133,51 +144,46 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
    * field-name. All 'problematic' tags are returned in the result array
    *
    * @param tags4topic
-   *            - the hashtable with all registered tags for topics
+   *            - the map with all registered tags for topics
    *
    * @return
    */
-  private Hashtable<String, Vector<ISourceDataTag>> testSubscriptions(final Map<String, Vector<ISourceDataTag>> tags4topic) {
-    Hashtable<String, Vector<ISourceDataTag>> tmptable = new Hashtable<String, Vector<ISourceDataTag>>();
-    Hashtable<String, Vector<ISourceDataTag>> incorrectTags = new Hashtable<String, Vector<ISourceDataTag>>();
+  private Map<String, List<ISourceDataTag>> testSubscriptions(final Map<String, List<ISourceDataTag>> tags4topic) {
 
-    for (Map.Entry<String, Vector<ISourceDataTag>> entry : tags4topic.entrySet()) {
-      Vector<ISourceDataTag> v = entry.getValue();
+    Map<String, List<ISourceDataTag>> incorrectTags = new HashMap<>();
+
+    for (Map.Entry<String, List<ISourceDataTag>> entry : tags4topic.entrySet()) {
+      List<ISourceDataTag> sdtList = entry.getValue();
       String v_key = entry.getKey();
-      Vector<ISourceDataTag> v2 = new Vector<ISourceDataTag>();
-      for (int i = 0; i < v.size(); i++) {
-        ISourceDataTag sdt_i = (ISourceDataTag) v.get(i);
-        String viFieldName = ((DIPHardwareAddress) sdt_i.getHardwareAddress()).getFieldName();
-        for (int j = 0; j < v.size(); j++) {
-          if (j == i)
+      List<ISourceDataTag> doubleEntries = new ArrayList<ISourceDataTag>();
+
+      String tmpFieldName1 = null;
+      String tmpFieldName2 = null;
+
+      for (ISourceDataTag sdt1 : sdtList) {
+        tmpFieldName1 = ((DIPHardwareAddress) sdt1.getHardwareAddress()).getFieldName();
+        tmpFieldName2 = null;
+
+        for (ISourceDataTag sdt2 : sdtList) {
+          if (sdt1 == sdt2) {
             continue;
-          ISourceDataTag sdt_j = (ISourceDataTag) v.get(j);
-          String vjFieldName = ((DIPHardwareAddress) sdt_j.getHardwareAddress()).getFieldName();
-          if (vjFieldName.equalsIgnoreCase(viFieldName)) {
-            v2.add(sdt_j);
           }
+
+         tmpFieldName2 = ((DIPHardwareAddress) sdt2.getHardwareAddress()).getFieldName();
+
+         if (tmpFieldName2.equalsIgnoreCase(tmpFieldName1)) {
+            doubleEntries.add(sdt2);
+          }
+        }// for
+
+        if (!doubleEntries.isEmpty()) {
+          incorrectTags.put(v_key, doubleEntries);
         }
 
-        tmptable.put(v_key, v2);
       }// for
-
-      Enumeration<Vector<ISourceDataTag>> e2_elems = tmptable.elements();
-          Enumeration<String> e2_keys = tmptable.keys();
-          while (e2_elems.hasMoreElements()) {
-            Vector<ISourceDataTag> v3 = e2_elems.nextElement();
-            String v3key = (String) e2_keys.nextElement();
-            if (v3.size() > 0) {
-              incorrectTags.put(v3key, v3);
-            }
-          }
     }// for
 
-    if (incorrectTags.size() > 0) {
-      return incorrectTags;
-    } else {
-      return null;
-    }
-
+    return incorrectTags;
   }
 
   /**
@@ -188,7 +194,7 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
    */
   @Override
   public void disconnectFromDataSource()  {
-    getEquipmentLogger().debug("disconnectFromDataSource - disconnectFromDataSource() called.");
+    getEquipmentLogger().trace("disconnectFromDataSource - disconnectFromDataSource() called.");
 
     if (alivePublisher != null) {
       alivePublisher.stop();
@@ -201,7 +207,7 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
     	}
     }
     else {
-    	getEquipmentLogger().debug("disconnectFromDataSource - dipController was not initialice (null)");
+    	getEquipmentLogger().trace("disconnectFromDataSource - dipController was not initialice (null)");
     }
   }
 
