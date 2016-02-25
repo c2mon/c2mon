@@ -92,7 +92,7 @@ class ValueHandler {
           log.error(String.format("\tIncorrect native address for Tag #%d. DIP field \"%s\" is unknown", sdt.getId(), fieldName));
           dipController.getEquipmentMessageSender().sendInvalidTag(sdt,
                                                                    SourceDataQuality.INCORRECT_NATIVE_ADDRESS,
-                                                                   "Unknown field specified in DIP address" + fieldName);
+                                                                   "Unknown field \"" + fieldName + "\" specified in DIP address.");
           return;
         }
 

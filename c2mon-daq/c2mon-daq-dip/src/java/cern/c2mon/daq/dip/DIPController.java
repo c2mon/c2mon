@@ -109,38 +109,38 @@ public class DIPController {
    *
    */
   public CHANGE_STATE connection(final ISourceDataTag sourceDataTag, final ChangeReport changeReport) {
-    getEquipmentLogger().debug("connection - Connecting " + sourceDataTag.getId());
+    getEquipmentLogger().trace("connection - Connecting " + sourceDataTag.getId());
 
     // Hardware Address
     DIPHardwareAddress sdtAddress = (DIPHardwareAddress) sourceDataTag.getHardwareAddress();
 
     // !!!! Put extra comments in case the item-name is empty !!!
     if (sdtAddress == null || sdtAddress.getItemName() == null) {
-      getEquipmentLogger().error("connection - corrupted configuration. SDT does not contain correct hardware address!!");
+      getEquipmentLogger().error("connection - corrupted configuration. Tag #" + sourceDataTag.getId() + " has a wrongly defined hardware address!!");
+
       this.equipmentMessageSender.sendInvalidTag(sourceDataTag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS,
           "No valid DIP address defined. Please check the configuration!");
+
       if (changeReport != null) {
-        changeReport.appendError("connection - corrupted configuration. SDT does not contain correct hardware address!!");
+        changeReport.appendError("No valid DIP address defined. Please check the configuration!");
       }
 
       return CHANGE_STATE.FAIL;
     }
+
     // Create a new subscription only if one with the same item name hasn't yet been created
     // Pair [topicName ==> list of related SourceDataTags]
-    else if (!subscribedDataTags.containsKey(sdtAddress.getItemName())) {
-      // it that's the first tag subscribed for that topic
-      List<ISourceDataTag> list = new ArrayList<>(1);
-      list.add(sourceDataTag);
-      this.subscribedDataTags.put(sdtAddress.getItemName(), list);
-      // If there're already tags subscribed for that topic
-    } else {
-      List<ISourceDataTag> list = this.subscribedDataTags.get(sdtAddress.getItemName());
-      list.add(sourceDataTag);
-      this.subscribedDataTags.put(sdtAddress.getItemName(), list);
-      getEquipmentLogger().debug("connection - adding tag for item : " + sdtAddress.getItemName() + " (" + sdtAddress.getFieldName() + ")");
-      if (changeReport != null) {
-        changeReport.appendInfo("connection - adding tag for item : " + sdtAddress.getItemName() + " (" + sdtAddress.getFieldName() + ")");
-      }
+    if (!subscribedDataTags.containsKey(sdtAddress.getItemName())) {
+      this.subscribedDataTags.put(sdtAddress.getItemName(), new ArrayList<ISourceDataTag>(1));
+    }
+
+    this.subscribedDataTags.get(sdtAddress.getItemName()).add(sourceDataTag);
+
+    String logMsg = "Registered tag #" + sourceDataTag.getId() + " for DIP item : " + sdtAddress.getItemName() + " (" + sdtAddress.getFieldName() + ")";
+    getEquipmentLogger().debug("connection - " + logMsg);
+
+    if (changeReport != null) {
+      changeReport.appendInfo(logMsg);
     }
 
     return createDipSubscription(sdtAddress.getItemName(), changeReport);
@@ -162,8 +162,9 @@ public class DIPController {
       getEquipmentLogger().debug("connection - Creating subscription for " + dipSubscr.getTopicName());
     } catch (DipException ex) {
       getEquipmentLogger().error("connection - A problem with creating subscription occured : " + ex.getMessage());
+
       if(changeReport != null) {
-        changeReport.appendError("connection - A problem with creating subscription occured");
+        changeReport.appendError("connection - A problem with creating subscription occured. Reason: " + ex.getMessage());
       }
 
       Collection<ISourceDataTag> collection = subscribedDataTags.get(topicName);
