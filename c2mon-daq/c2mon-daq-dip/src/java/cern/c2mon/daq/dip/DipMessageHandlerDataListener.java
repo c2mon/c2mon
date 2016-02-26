@@ -17,6 +17,7 @@
 package cern.c2mon.daq.dip;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -176,6 +177,9 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
           // get all SourceDataTags object related with that
           // item-name (topic)
           t4topic = dipController.getSubscribedDataTags().get(subscription.getTopicName());
+          if (t4topic == null) {
+            t4topic = new ArrayList<>();
+          }
 
 
           // if the quality wasn't good - exit

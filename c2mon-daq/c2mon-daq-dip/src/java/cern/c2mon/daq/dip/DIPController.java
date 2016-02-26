@@ -237,9 +237,19 @@ public class DIPController {
   public CHANGE_STATE disconnection(final ISourceDataTag sourceDataTag, final ChangeReport changeReport) {
     // Hardware Address
     DIPHardwareAddress sdtAddress = (DIPHardwareAddress) sourceDataTag.getHardwareAddress();
+    String dipTopic = sdtAddress.getItemName();
+    
+    if (subscribedDataTags.get(dipTopic) != null) {
+      subscribedDataTags.get(dipTopic).remove(sourceDataTag);
+    }
 
-    // Disconnect the sourcedataTag
-    return disconnect(sdtAddress.getItemName(), changeReport);
+    if (subscribedDataTags.get(dipTopic) != null && subscribedDataTags.get(dipTopic).isEmpty()) {
+      subscribedDataTags.remove(dipTopic);
+      // Disconnect from DIP topic
+      return disconnect(dipTopic, changeReport);
+    }
+    
+    return CHANGE_STATE.SUCCESS;
   }
 
   /**

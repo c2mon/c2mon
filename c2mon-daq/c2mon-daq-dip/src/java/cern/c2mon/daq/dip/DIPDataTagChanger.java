@@ -61,9 +61,9 @@ public class DIPDataTagChanger implements IDataTagChanger {
     // Connect the Data Tag
     changeReport.setState(this.dipController.connect(sourceDataTag, changeReport));
     if (changeReport.getState() == CHANGE_STATE.SUCCESS) {
-      changeReport.appendInfo("onAddDataTag - SourceDataTag added ...");
+      changeReport.appendInfo("Tag successfully registered in DIP DAQ");
     } else {
-      changeReport.appendInfo("onAddDataTag - SourceDataTag not added ...");
+      changeReport.appendError("Tag registration in DIP DAQ was NOT successful!");
     }
 
     if (getEquipmentLogger().isTraceEnabled()) {
@@ -80,9 +80,9 @@ public class DIPDataTagChanger implements IDataTagChanger {
     // Connect the Data Tag
     changeReport.setState(this.dipController.disconnection(sourceDataTag, changeReport));
     if (changeReport.getState() == CHANGE_STATE.SUCCESS) {
-      changeReport.appendInfo("onRemoveDataTag - SourceDataTag removed ...");
+      changeReport.appendInfo("Tag successfully removed from DIP DAQ");
     } else {
-      changeReport.appendInfo("onRemoveDataTag - SourceDataTag not removed ...");
+      changeReport.appendWarn("Problem occured during tag unsubscription");
     }
 
     if (getEquipmentLogger().isTraceEnabled()) {
@@ -107,9 +107,9 @@ public class DIPDataTagChanger implements IDataTagChanger {
       changeReport.setState(this.dipController.connect(sourceDataTag, changeReport));
   
       if (changeReport.getState() == CHANGE_STATE.SUCCESS) {
-        changeReport.appendInfo("onUpdateDataTag - SourceDataTag successfully updated.");
+        changeReport.appendInfo("Tag on DIP DAQ successfully updated.");
       } else {
-        changeReport.appendInfo("onUpdateDataTag - Failed connecting to new DIP address.");
+        changeReport.appendError("Tag update in DIP DAQ to new topic was NOT successful!");
       }
     }
 
