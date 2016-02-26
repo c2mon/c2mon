@@ -56,7 +56,6 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
    * SourceDataTags (data point elements). Also initializes the alive mechanism.
    *
    * @throws EqIOException In cast of connection errors
-   * @roseuid 409A0D150295
    */
   @Override
   public void connectToDataSource() {
@@ -192,7 +191,6 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
    * This method closes all previously opened subscriptions.
    *
    * @throws cern.c2mon.tools.equipmentexceptions.EqIOException
-   * @roseuid 409A0D1502EF
    */
   @Override
   public void disconnectFromDataSource() {
