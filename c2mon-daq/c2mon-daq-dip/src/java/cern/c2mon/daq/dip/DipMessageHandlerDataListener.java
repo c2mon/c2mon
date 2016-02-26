@@ -247,8 +247,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
   public void connected(DipSubscription subscription) {
     getEquipmentLogger().info("connected - Publication " + subscription.getTopicName() + " is available");
     getEquipmentLogger().debug("\t requesting update!");
-    // removed as not used
-    // connectionDropped4Subscription.put(subscription,Boolean.FALSE);
+
     subscription.requestUpdate();
   }
 

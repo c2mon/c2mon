@@ -114,7 +114,6 @@ public class DIPController {
     // Hardware Address
     DIPHardwareAddress sdtAddress = (DIPHardwareAddress) sourceDataTag.getHardwareAddress();
 
-    // !!!! Put extra comments in case the item-name is empty !!!
     if (sdtAddress == null || sdtAddress.getItemName() == null) {
       getEquipmentLogger().error("connection - corrupted configuration. Tag #" + sourceDataTag.getId() + " has a wrongly defined hardware address!!");
 
@@ -149,6 +148,7 @@ public class DIPController {
       return createDipSubscription(sdtAddress.getItemName(), changeReport);
     }
     else {
+      dipSubscriptions.get(sdtAddress.getItemName()).requestUpdate();
       return CHANGE_STATE.SUCCESS;
     }
   }
