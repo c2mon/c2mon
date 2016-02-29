@@ -9,7 +9,7 @@
 
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-pom</artifactId>
-  <version>1.6.4</version>
+  <version>1.6.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <description>This is a common parent POM for all c2mon-server modules</description>
@@ -26,7 +26,7 @@
   </distributionManagement>
 
   <scm>
-    <developerConnection>scm:svn:http://svn.cern.ch/reps/tim2/tags/c2mon/c2mon-server/c2mon-server-pom-1.6.4</developerConnection>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-pom</developerConnection>
   </scm>
 
   <!-- Shared version number properties -->
