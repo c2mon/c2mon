@@ -304,7 +304,7 @@
         <version>2.5.3</version>
         <configuration>
           <scmCommentPrefix>[release]</scmCommentPrefix>
-          <tagBase>http://svn.cern.ch/reps/tim2/tags/c2mon/c2mon-server</tagBase>
+          <tagBase>svn+ssh://svn.cern.ch/reps/tim2/tags/c2mon/c2mon-server</tagBase>
         </configuration>
       </plugin>
       
