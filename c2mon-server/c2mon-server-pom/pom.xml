@@ -304,7 +304,8 @@
         <version>2.5.3</version>
         <configuration>
           <scmCommentPrefix>[release]</scmCommentPrefix>
-          <tagNameFormat>c2mon/c2mon-server/@{project.artifactId}/@{project.version}</tagNameFormat>
+          <tagBase>http://svn.cern.ch/reps/tim2/tags/c2mon/c2mon-server/c2mon-server-pom</tagBase>
+          <tagNameFormat>@{project.version}</tagNameFormat>
         </configuration>
       </plugin>
       
