@@ -39,7 +39,7 @@
             <directory name="conf">
                <file name=".jmxremote.passwd" sourceDir="~diamonop/c2mon/daq" mask="400" />
                <file name=".jmxremote.access" sourceDir="~diamonop/c2mon/daq" mask="400" />
-               <file name="daq.properties" source="~diamonop/c2mon/daq/" mask="400" />
+               <file name="daq.properties" sourceDir="~diamonop/c2mon/daq/" mask="400" />
                <file name="jmx-daq-credentials.txt" sourceDir="~diamonop/c2mon/daq" mask="400" />
                <file name="log4j.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
             </directory>
@@ -52,8 +52,8 @@
             <directory name="conf">
                <file name=".jmxremote.passwd" sourceDir="~dmndev/c2mon/daq" mask="400" />
                <file name=".jmxremote.access" sourceDir="~dmndev/c2mon/daq" mask="400" />
-               <file name="daq.properties" source="~dmndev/c2mon/daq/" mask="400" />
                <file name="jmx-daq-credentials.txt" sourceDir="~dmndev/c2mon/daq" mask="400" />
+               <file name="daq.properties" sourceDir="~dmndev/c2mon/daq/" mask="400" />
                <file name="log4j.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
             </directory>
          </deployment>
