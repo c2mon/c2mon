@@ -8,9 +8,6 @@
       -->
       <application>
       	<deployment>
-      		<directory>
-      			<link source="conf/daq.properties" target="conf/c2mon.properties" />
-      		</directory>
       	</deployment>
       
          <startscript name="DMN2-DAQ-JMX" >
