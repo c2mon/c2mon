@@ -28,15 +28,14 @@ import java.util.Map;
 
 import javax.management.remote.JMXServiceURL;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.easymock.EasyMock;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.common.DriverKernel;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
-import cern.c2mon.daq.common.vcm.ValueChangeMonitorEngine;
 import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.SourceDataTagValueCapture;
 import cern.c2mon.daq.test.UseConf;
@@ -89,7 +88,7 @@ public class JMXVCMIntegrationTest extends GenericMessageHandlerTst {
         expect(kernel.getEquipmentMessageHandlersTable()).andReturn(handlersMap).atLeastOnce();
         replay(kernel);
         // normally kernel will be autowired by spring
-        ValueChangeMonitorEngine.getInstance().setDriverKernel(kernel);
+
     }
 
     @Test
