@@ -8,8 +8,8 @@
       -->
       <application>
       	<deployment>
-      		<directory name="conf">
-      			<link source="daq.properties" target="c2mon.properties" />
+      		<directory>
+      			<link source="conf/daq.properties" target="conf/c2mon.properties" />
       		</directory>
       	</deployment>
       
