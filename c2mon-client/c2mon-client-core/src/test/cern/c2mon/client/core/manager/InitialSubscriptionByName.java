@@ -25,21 +25,21 @@ import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.TagService;
 
-public class InitialSubscriptionTest {
+public class InitialSubscriptionByName {
   
-  public InitialSubscriptionTest() {
+  public InitialSubscriptionByName() {
     C2monServiceGateway.startC2monClientSynchronous();
-    TagService tagManager = C2monServiceGateway.getTagService();
+    TagService tagService = C2monServiceGateway.getTagService();
     
-    Set<Long> tagIds = new HashSet<Long>();
-    tagIds.add(165479L);
-    tagIds.add(187252L);
-    tagIds.add(188130L);
-    tagIds.add(165471L);
-    tagIds.add(187200L);
+    Set<String> tagIds = new HashSet<>();
+    tagIds.add("CS.L05.CMS-DSS:PRESSURE_PM54");
+    tagIds.add("YA.L05.PMIL.5411=R542:DR");
+    tagIds.add("FU.L08.P$MSW01-3876_PMWTB01:MESURE");
+    tagIds.add("FU.L06.P$MSW01-3676_PMWTB01:MESURE");
+    tagIds.add("YA.L05.PATL.5611=UJ56:DR");
     
         
-    tagManager.subscribe(tagIds, new Listener());
+    tagService.subscribeByName(tagIds, new Listener());
     try {
       Thread.sleep(10000);
     }
@@ -47,9 +47,9 @@ public class InitialSubscriptionTest {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    System.out.println("Registering second listener");
-    tagIds.add(187201L);
-    tagManager.subscribe(tagIds, new Listener());
+    System.out.println("\nRegistering second listener");
+    tagIds.add("YA.L05.PMIL.5411=R542:ALARM");
+    tagService.subscribeByName(tagIds, new Listener());
     System.out.println("Registering second listener - DONE!");
     
     try {
@@ -62,7 +62,7 @@ public class InitialSubscriptionTest {
   }
   
   public static void main(String[] args) {
-    new InitialSubscriptionTest();
+    new InitialSubscriptionByName();
   }
   
   class Listener implements TagListener {
