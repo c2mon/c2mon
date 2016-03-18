@@ -323,6 +323,6 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
   @Override
   public <T extends BaseListener> void subscribeByRegex(Set<String> regexList, T listener) throws CacheSynchronizationException {
-    tagSubscriptionHandler.subscribeByRegex(regexList, listener, (listener instanceof DataTagListener));
+    tagSubscriptionHandler.subscribeByRegex(regexList, listener, (listener instanceof TagListener));
   }
 }
