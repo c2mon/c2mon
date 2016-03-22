@@ -20,7 +20,7 @@
     TAGSTATUS, TAGSTATUSDESC, TAGMODE, TAGDIR, TAGTIME, TAGDAQTIME, TAGSERVERTIME)
     VALUES (
     <!-- The logDate is not null, because is a dataTag read from the fallback file -->
-    <if test="logDate != null">SYS_EXTRACT_UTC(from_tz(#{logDate,jdbcType=TIMESTAMP},'${timezone}'))</if>
+    <if test="logDate != null">SYS_EXTRACT_UTC(#{logDate,jdbcType=TIMESTAMP})</if>
     <!-- The logDate is null, what means that comes from a DAQ -->
     <if test="logDate == null">SYS_EXTRACT_UTC(SYSTIMESTAMP)</if>
     ,#{tagId,jdbcType=NUMERIC},#{tagName,jdbcType=VARCHAR},#{tagValue,jdbcType=VARCHAR},#{tagValueDesc,jdbcType=VARCHAR}

@@ -18,7 +18,7 @@
     INSERT INTO alarmlog (LOGDATE, TAGID, ALARMID, ACTIVE, FAULTFAMILY, FAULTMEMBER, FAULTCODE, SERVERTIME, INFO)
     VALUES (
     <!-- The logDate is not null, because is a dataTag read from the fallback file -->
-    <if test="logDate != null">SYS_EXTRACT_UTC(from_tz(#{logDate,jdbcType=TIMESTAMP},'${timezone}'))</if>
+    <if test="logDate != null">SYS_EXTRACT_UTC(#{logDate,jdbcType=TIMESTAMP})</if>
     <!-- The logDate is null, what means that comes from a DAQ -->
     <if test="logDate == null">SYS_EXTRACT_UTC(SYSTIMESTAMP)</if>
     
