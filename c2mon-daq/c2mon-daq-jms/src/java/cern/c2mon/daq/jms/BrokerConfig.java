@@ -25,11 +25,14 @@ public class BrokerConfig {
 
         public static final long defaultWarnLevel = 100;
         public static final long defaultErrorLevel = 1000;
+        public static final long defaultCheckTime = 60000;
     
         private final long equipmentId;
         private String equipmentName;
         private String brokerUrl;
         private ServiceTest dataTagIds;
+        
+        private long checkTime = defaultCheckTime;
         
         private long warnLevel = defaultWarnLevel;
         private long errorLevel = defaultErrorLevel;
@@ -124,6 +127,13 @@ public class BrokerConfig {
             return b.toString();
         }
         
+        public long getCheckTime() {
+            return this.checkTime;
+        }
+        
+        public void setCheckTime(long newCheckTime) {
+            this.checkTime = newCheckTime;
+        }
         
     static class BridgeConfig {
         private String equipmentUrl = null;
