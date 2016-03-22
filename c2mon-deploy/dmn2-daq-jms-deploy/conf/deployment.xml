@@ -10,12 +10,13 @@
 
          <startscript name="DMN2-DAQ-JMS">
             <main-class name="cern.c2mon.daq.common.startup.DaqStartup">
-               <arg>-processName ${PROCESS_NAME} -noDeadband </arg>
+               <arg>-processName ${PROCESS_NAME}</arg>
                <output>
                   <file name="${DAQ_LOG_HOME}/${PROCESS_NAME}.out.log" />
                </output>
             </main-class>
             <property name="c2mon.daq.equipment.alive.filtering" value="true" />
+            <property name="daq.jms.checkInterval" value="1000" />
             <java-vm-args>-Xms128m -Xmx128m -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
             
             <env name="PROCESS_NAME" value="P_JMS" />
