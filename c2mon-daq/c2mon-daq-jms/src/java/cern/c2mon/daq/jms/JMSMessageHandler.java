@@ -290,7 +290,8 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
         
         report.setState(CHANGE_STATE.SUCCESS);
         getEquipmentLogger().trace("Leaving onAddDataTag()");
-        service.submit(getWorker());
+        stop();
+        start();
     }
 
     @Override
@@ -372,11 +373,15 @@ public class JMSMessageHandler extends EquipmentMessageHandler implements IDataT
                     myConfig = toAssign;
                 }
                 resultReport.setState(CHANGE_STATE.SUCCESS);
-            }catch(Exception ex) {
+            } catch(Exception ex) {
                 resultReport.setState(CHANGE_STATE.FAIL);
                 resultReport.appendError(ex.getMessage());
             }
+            stop();
+            start();
+            
         }
+        
         getEquipmentLogger().trace("Leaving onUpdateEquipmentConfiguration()");
     }
 
