@@ -468,6 +468,6 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
    * @return True if the TEST mode is on and False in any other case
    */
   private boolean isTestMode() {
-    return ((System.getProperty("testMode")) != null && (System.getProperty("testMode").equals("true")));
+    return ((System.getProperty("c2mon.server.testMode")) != null && (System.getProperty("c2mon.server.testMode").equals("true")));
   }
 }

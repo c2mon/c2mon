@@ -101,7 +101,7 @@ fi
 
     <application name="c2mon-tim2-test1" extends="default">
       <startscript name="C2MON-TIM-TEST">
-        <property name="testMode" value="true" />
+        <property name="c2mon.server.testMode" value="true" />
         <!-- Configuration for LASER module -->
         <property name="laser.hosts" value="laser-test" />
         <property name="cmw.mom.brokerlist" value="jms-diamon-test:2506" />
@@ -118,7 +118,7 @@ fi
 
     <application name="c2mon-tim2-test2" extends="default">
       <startscript name="C2MON-TIM-TEST">
-        <property name="testMode" value="true" />
+        <property name="c2mon.server.testMode" value="true" />
         <!-- Configuration for LASER module -->
         <property name="laser.hosts" value="laser-test" />
         <property name="cmw.mom.brokerlist" value="jms-diamon-test:2506" />

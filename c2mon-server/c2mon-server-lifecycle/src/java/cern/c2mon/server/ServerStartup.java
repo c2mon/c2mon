@@ -27,14 +27,7 @@ import org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfigura
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.SmartLifecycle;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import static java.lang.String.format;
-import static java.lang.System.getProperty;
-import static java.lang.System.setProperty;
 
 /**
  * This class is responsible for bootstrapping the C2MON application server.
@@ -44,14 +37,6 @@ import static java.lang.System.setProperty;
  * c2mon.server.properties  Location of an external properties file.
  * logging.config           Location of a custom logging configuration file.
  * logging.path             Location of the root logging directory.
- *
- *
- * Deprecated properties:
- *
- * testMode                 Starts the server in test mode. Accepts all
- *                          incoming updates no matter the PIK and allows
- *                          normal startup of test DAQs ignoring production
- *                          DAQs updates (true/false)
  *
  * @author Justin Lewis Salmon
  * @author Mark Brightwell
@@ -68,19 +53,10 @@ import static java.lang.System.setProperty;
 public class ServerStartup {
 
   public static void main(final String[] args) throws IOException {
-
-    // TODO: rename this and put it in c2mon.properties. "test mode" is not very descriptive.
-    if ((getProperty("testMode")) != null && (getProperty("testMode").equals("true"))) {
-      log.info("C2MON server starting up in TEST mode");
-    }
-
-    // Run the application
     ConfigurableApplicationContext context = SpringApplication.run(ServerStartup.class, args);
 
-    /**
-     * Currently the context needs to be manually started. This could maybe be removed by playing around with
-     * {@link SmartLifecycle#isAutoStartup()}.
-     */
+    // Currently the context needs to be manually started. This could maybe be
+    // removed by playing around with {@link SmartLifecycle#isAutoStartup()}.
     context.start();
     context.registerShutdownHook();
   }
