@@ -193,7 +193,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       try {
         List<ConfigurationElement> configurationElements = configParser.parse(configuration);
 
-        report = applyConfiguration(-1, configuration.getName(), configurationElements, null);
+        report = applyConfiguration(configuration.getConfigurationId().intValue(), configuration.getName(), configurationElements, null);
 
       } catch (Exception ex) {
         LOGGER.error("Exception caught while applying configuration " + configuration.getName(), ex);
