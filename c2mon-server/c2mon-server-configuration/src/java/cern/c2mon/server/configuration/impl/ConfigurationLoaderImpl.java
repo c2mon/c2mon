@@ -576,6 +576,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    * @param xmlReport the XML report in String format
    */
   private void archiveReport(String configId, String xmlReport) {
+    new File(reportDirectory).mkdirs();
+
     try {
       File outFile = new File(reportDirectory, "report_" + configId + "_" + System.currentTimeMillis() + ".xml");
       FileWriter fileWriter;
