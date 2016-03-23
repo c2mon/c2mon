@@ -48,9 +48,6 @@ import static java.lang.System.setProperty;
  *
  * Deprecated properties:
  *
- * c2mon.home               Home directory of the server (usually the
- *                          installation directory containing bin/, conf/,
- *                          log/ etc.
  * testMode                 Starts the server in test mode. Accepts all
  *                          incoming updates no matter the PIK and allows
  *                          normal startup of test DAQs ignoring production
@@ -70,18 +67,7 @@ import static java.lang.System.setProperty;
 @Slf4j
 public class ServerStartup {
 
-  private static final String C2MON_HOME = "c2mon.home";
-
   public static void main(final String[] args) throws IOException {
-    String home = getProperty(C2MON_HOME);
-    if (home == null) {
-      home = deduceHomeDirectory();
-      if (home == null) {
-        throw new RuntimeException(format("Please specify the C2MON home directory using '%s'.", C2MON_HOME));
-      }
-      setProperty(C2MON_HOME, home);
-      log.info(format("Using home directory: %s. To override, use '%s'", home, C2MON_HOME));
-    }
 
     // TODO: rename this and put it in c2mon.properties. "test mode" is not very descriptive.
     if ((getProperty("testMode")) != null && (getProperty("testMode").equals("true"))) {
@@ -97,28 +83,5 @@ public class ServerStartup {
      */
     context.start();
     context.registerShutdownHook();
-  }
-
-  /**
-   * Attempt to figure out a sensible location for the application home directory (i.e. the directory containing bin/ conf/ log/ etc.).
-   *
-   * @return the deduced home directory path, or null if no sensible directory was found
-   *
-   * @throws IOException
-   */
-  private static String deduceHomeDirectory() throws IOException {
-    String location = ServerStartup.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-
-    // The path can be a file if we are inside a jar
-    if (new File(location).isFile()) {
-      location = new File(location).getParent();
-    }
-
-    Path homeDirectory = Paths.get(location.concat("/../"));
-    if (homeDirectory.toFile().exists()) {
-      return homeDirectory.toRealPath().toString();
-    } else {
-      return null;
-    }
   }
 }

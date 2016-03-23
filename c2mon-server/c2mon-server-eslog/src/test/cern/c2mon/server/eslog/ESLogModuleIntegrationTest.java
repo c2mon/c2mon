@@ -44,12 +44,12 @@ public class ESLogModuleIntegrationTest {
 
   @BeforeClass
   public static void setEnv() {
-    System.setProperty("c2mon.home", c2monHome.toString());
+    System.setProperty("c2mon.server.home", c2monHome.toString());
   }
 
   @AfterClass
   public static void cleanEnv() {
-    System.clearProperty("c2mon.home");
+    System.clearProperty("c2mon.server.home");
   }
 
   @Before

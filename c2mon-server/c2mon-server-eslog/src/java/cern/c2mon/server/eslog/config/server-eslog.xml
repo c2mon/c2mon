@@ -8,7 +8,7 @@
 
   <bean id="esSupervisionEventPersistenceManager" class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
     <constructor-arg ref="esSupervisionEventIndexer"/>
-    <constructor-arg value="${c2mon.home}/log/supervisionESfallback.txt"/>
+    <constructor-arg value="${c2mon.server.home}/log/supervisionESfallback.txt"/>
     <constructor-arg>
       <bean class="cern.c2mon.server.eslog.alarm.DummyEsAlarmListener"/>
     </constructor-arg>
@@ -17,7 +17,7 @@
 
   <bean id="esAlarmPersistenceManager" class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
     <constructor-arg ref="esAlarmIndexer"/>
-    <constructor-arg value="${c2mon.home}/log/alarmESfallback.txt"/>
+    <constructor-arg value="${c2mon.server.home}/log/alarmESfallback.txt"/>
     <constructor-arg>
       <bean class="cern.c2mon.server.eslog.alarm.DummyEsAlarmListener"/>
     </constructor-arg>
@@ -26,7 +26,7 @@
 
   <bean id="esTagNumericPersistenceManager" class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
     <constructor-arg ref="esTagIndexer"/>
-    <constructor-arg value="${c2mon.home}/log/tagNumericESfallback.txt"/>
+    <constructor-arg value="${c2mon.server.home}/log/tagNumericESfallback.txt"/>
     <constructor-arg>
       <bean class="cern.c2mon.server.eslog.alarm.EsAlarmListener"/>
     </constructor-arg>
@@ -35,7 +35,7 @@
 
   <bean id="esTagStringPersistenceManager" class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
     <constructor-arg ref="esTagIndexer"/>
-    <constructor-arg value="${c2mon.home}/log/tagStringESfallback.txt"/>
+    <constructor-arg value="${c2mon.server.home}/log/tagStringESfallback.txt"/>
     <constructor-arg>
       <bean class="cern.c2mon.server.eslog.alarm.DummyEsAlarmListener"/>
     </constructor-arg>
@@ -44,7 +44,7 @@
 
   <bean id="esTagBooleanPersistenceManager" class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
     <constructor-arg ref="esTagIndexer"/>
-    <constructor-arg value="${c2mon.home}/log/tagBooleanESfallback.txt"/>
+    <constructor-arg value="${c2mon.server.home}/log/tagBooleanESfallback.txt"/>
     <constructor-arg>
       <bean class="cern.c2mon.server.eslog.alarm.DummyEsAlarmListener"/>
     </constructor-arg>

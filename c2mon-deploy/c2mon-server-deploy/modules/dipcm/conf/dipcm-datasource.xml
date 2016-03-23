@@ -17,13 +17,13 @@
   
   <!-- datasource for the cache persistence -->
   <jdbc:embedded-database id="cacheDataSource">
-    <jdbc:script location="file:${c2mon.home}/conf/sql/cache-schema-generic.sql" />
+    <jdbc:script location="file:${c2mon.server.home}/conf/sql/cache-schema-generic.sql" />
   </jdbc:embedded-database>
  
   
   <!-- data source for loading configurations -->
   <jdbc:embedded-database id="configurationDataSource">
-    <jdbc:script location="file:${c2mon.home}/conf/sql/config-schema-generic.sql" />
+    <jdbc:script location="file:${c2mon.server.home}/conf/sql/config-schema-generic.sql" />
   </jdbc:embedded-database>
   
   <!-- data source for short-term log -->
@@ -35,7 +35,7 @@
   </bean>
 
   <jdbc:initialize-database data-source="stlDataSource">
-    <jdbc:script location="file:${c2mon.home}/conf/sql/shorttermlog-schema-generic.sql" />
+    <jdbc:script location="file:${c2mon.server.home}/conf/sql/shorttermlog-schema-generic.sql" />
   </jdbc:initialize-database>
   
 </beans>

@@ -18,7 +18,7 @@
 
 				<property name="c2mon.server.name" value="DMN2-SRV" />
 				<property name="c2mon.server.cache.mode" value="single"/>
-				<property name="c2mon.home" value="$INSTALL_DIR" />
+				<property name="c2mon.server.home" value="$INSTALL_DIR" />
 				<property name="com.sun.management.jmxremote.port" value="9523" />
 				<property name="com.sun.management.jmxremote.password.file" value="conf/.jmxremote.passwd" />
 				<property name="com.sun.management.jmxremote.access.file" value="conf/.jmxremote.access" />
