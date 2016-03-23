@@ -28,6 +28,7 @@
   
   <bean id="configurationLoader" class="cern.c2mon.server.configuration.impl.ConfigurationLoaderImpl" autowire="constructor">
     <property name="daqConfigEnabled" value="true"/>
+    <property name="reportDirectory" value="/tmp/reports"/>
   </bean>
   <bean id="configurationDAO" class="cern.c2mon.server.configuration.mybatis.ConfigurationDAOImpl"/>
   
