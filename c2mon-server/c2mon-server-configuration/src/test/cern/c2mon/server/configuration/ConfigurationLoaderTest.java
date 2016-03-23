@@ -1451,7 +1451,6 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
   @Test
   public void testGetConfigurationReportHeaders() {
-    ((ConfigurationLoaderImpl) configurationLoader).setReportDirectory(".");
     List<ConfigurationReportHeader> reports = configurationLoader.getConfigurationReports();
     assertFalse(reports.isEmpty());
 
@@ -1465,7 +1464,6 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
   @Test
   public void testGetConfigurationReports() {
-    ((ConfigurationLoaderImpl) configurationLoader).setReportDirectory(".");
     List<ConfigurationReport> reports = configurationLoader.getConfigurationReports(String.valueOf(1));
     assertFalse(reports.isEmpty());
     assertTrue(reports.size() > 1); // Config 1 gets run 3 times
