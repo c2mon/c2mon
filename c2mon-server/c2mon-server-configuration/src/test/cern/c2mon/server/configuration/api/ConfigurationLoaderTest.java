@@ -1399,7 +1399,8 @@ public class ConfigurationLoaderTest {
     // TEST:
     // Build configuration to update the test DataTag
     Pair<DataTag.DataTagBuilder, Properties> dataTagUpdate = builderDataTagUpdate(100L);
-    Configuration configuration = Configuration.builder().application("configuration test - application").name("configuration test name").updateTag(dataTagUpdate._1.build()).build();
+    Configuration configuration = Configuration.builder().confId(1L).application("configuration test - application").name("configuration test name").updateTag
+        (dataTagUpdate._1.build()).build();
 
     //apply the configuration to the server
     ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
@@ -2350,7 +2351,8 @@ public class ConfigurationLoaderTest {
 
     // TEST:Build configuration to update the test Alarm
     Pair<Alarm.AlarmBuilder, Properties> alarmUpdate = builderAlarmUpdate(666L, 100L);
-    Configuration configuration = Configuration.builder().application("configuration test - application").name("configuration test name").updateAlarm(alarmUpdate._1.build()).build();
+    Configuration configuration = Configuration.builder().confId(1L).application("configuration test - application").name("configuration test name").updateAlarm
+        (alarmUpdate._1.build()).build();
     //apply the configuration to the server
     ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
 

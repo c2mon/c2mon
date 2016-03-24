@@ -32,7 +32,7 @@ import static cern.c2mon.server.configuration.parser.util.ConfigurationStatusTag
 public class ConfigurationUtil {
 
   public static Configuration.ConfigurationBuilder getConfBuilder() {
-    return Configuration.builder().application("configuration test - application").name("configuration test name");
+    return Configuration.builder().confId(1L).application("configuration test - application").name("configuration test name");
   }
 
   public static Configuration getConfBuilderProcess(Process... elements) {
