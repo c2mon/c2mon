@@ -33,11 +33,13 @@ public interface JAPCHardwareAddress extends HardwareAddress {
     /**
      * @return Optional adress specification, default is rda
      */
+    @Deprecated
     String getProtocol();
 
     /**
-     * @return Optional adress specification, default is rda
+     * @return Optional address specification, default is rda
      */
+    @Deprecated
     String getService();
 
     /**
@@ -57,7 +59,8 @@ public interface JAPCHardwareAddress extends HardwareAddress {
     String getCycleSelector();
 
     /**
-     * @return
+     * Only used within the  WieJapcMessageHandler for retrieving the correct index position in a 2d array. Default is <code>null</code>
+     * @return the index field name
      */
     String getIndexFieldName();
 
@@ -69,13 +72,16 @@ public interface JAPCHardwareAddress extends HardwareAddress {
     /**
      * @return row index of the data point element inside the array or array2d or -1 if not used
      */
+    @Deprecated
     int getRowIndex();
 
     /**
      * Mandatory for MAP type data, not used for SIMPLE
      * 
      * @return The name that specifies the index position
+     * @deprecated Please use {@link #dataFieldName} instead
      */
+    @Deprecated
     String getIndexName();
 
     /**

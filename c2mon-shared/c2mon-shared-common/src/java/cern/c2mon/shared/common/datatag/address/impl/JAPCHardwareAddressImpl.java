@@ -20,52 +20,103 @@ import org.simpleframework.xml.Element;
 
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
+import lombok.Getter;
+import lombok.Setter;
 
+/**
+ * DataTag address for c2mon-daq-japc DAQ flavour
+ *
+ * @author Matthias Braeger
+ */
+@Getter @Setter
 public class JAPCHardwareAddressImpl extends HardwareAddressImpl implements JAPCHardwareAddress {
 
+    /** Serial version UID */
     private static final long serialVersionUID = 6770995924304633009L;
 
+    /** 
+     * Optional protocol specification, default is 'rda'
+     * @deprecated Not used by the GenericJapcMessageHandler
+     */
+    @Deprecated
     @Element(required = false)
-    protected String protocol = null;
+    protected String protocol = "rda";
 
+    /** 
+     * Optional service specification, default is 'rda'
+     * @deprecated Not used by the GenericJapcMessageHandler
+     */
+    @Deprecated
     @Element(required = false)
-    protected String service = null;
+    protected String service = "rda";
 
+    /** The name of the JAPC device (cannot be null) */
     @Element(name = "device-name")
     protected String deviceName = null;
 
+    /** The name of the property within the JAPC device (cannot be null) */
     @Element(name = "property-name")
     protected String propertyName = null;
 
+    /** 
+     * The cycle selector describes how often the value shall be acquired by JAPC. 
+     * If null, the value will be acquired on change. However, the onChange model 
+     * is not supported by all devices. Default is <code>null</code>
+     */
     @Element(name = "cycle-selector", required = false)
     protected String cycleSelector = null;
 
+    /** Only used within the  WieJapcMessageHandler for retrieving the correct index position in a 2d array. Default is <code>null</code> */ 
     @Element(name = "index-field-name", required = false)
     protected String indexFieldName = null;
 
+    /** @deprecated Please use {@link #dataFieldName} instead */
+    @Deprecated
     @Element(name = "index-name", required = false)
     protected String indexName = null;
 
+    /** The data field name within a JAPC MAP. Mandatory for JAPC MAP type data, not used for SIMPLE */
     @Element(name = "data-field-name", required = false)
     protected String dataFieldName = null;
 
+    /** 
+     * The column index of the data point element inside the array or array2d.
+     * By Default set to -1, if not used
+     */
     @Element(name = "column-index")
     protected int columnIndex = -1;
 
+    /** 
+     * The row index of the data point element inside the array or array2d. 
+     * By Default set to -1, if not used
+     * @deprecated Not used by the GenericJapcMessageHandler
+     */
+    @Deprecated
     @Element(name = "row-index")
     protected int rowIndex = -1;
 
+    /** used by JAPC commands and can be either SET or GET. Default value is UNKNOWN */
     @Element(name = "command-type", required = false)
     protected String commandType = null;
 
+    /** Only used for commands (may not be set) */
     @Element(name = "context-field", required = false)
     protected String contextField = null;
 
+    /** 
+     * Used to retrieve a certain JAPC selector. 
+     * The filter string has to be specified in the following format: 'key=value'
+     */
     @Element(required = false)
     protected String filter = null;
 
     protected JAPCHardwareAddressImpl() {
         // nothing to do
+    }
+    
+    public JAPCHardwareAddressImpl(final String pDeviceName, final String pPropertyName) throws ConfigurationException {
+      setDeviceName(pDeviceName);
+      setPropertyName(pPropertyName);
     }
 
     public JAPCHardwareAddressImpl(final String pDeviceName, final String pPropertyName, final String pCycleSelector)
@@ -112,72 +163,6 @@ public class JAPCHardwareAddressImpl extends HardwareAddressImpl implements JAPC
         setFilter(filter);
     }
 
-
-    /**
-     * @return the protocol
-     */
-    @Override
-    public final String getProtocol() {
-        return protocol;
-    }
-
-    /**
-     * @return the service
-     */
-    @Override
-    public final String getService() {
-        return service;
-    }
-
-    @Override
-    public final String getDeviceName() {
-        return this.deviceName;
-    }
-
-    @Override
-    public final String getPropertyName() {
-        return this.propertyName;
-    }
-
-    @Override
-    public final String getCycleSelector() {
-        return this.cycleSelector;
-    }
-
-    @Override
-    public final String getIndexFieldName() {
-        return this.indexFieldName;
-    }
-
-    /**
-     * @return the parameterName
-     */
-    @Override
-    public final String getIndexName() {
-        return this.indexName;
-    }
-
-    /**
-     * @return the dataField
-     */
-    @Override
-    public final String getDataFieldName() {
-        return this.dataFieldName;
-    }
-
-    /**
-     * @return column index of the data point element inside the array or array2d or -1 if not used
-     */
-    @Override
-    public int getColumnIndex() {
-        return this.columnIndex;
-    }
-
-    @Override
-    public String getContextField() {
-        return this.contextField;
-    }
-
     @Override
     public boolean hasContextField() {
         return (this.contextField == null || this.contextField.length() == 0) ? false : true;
@@ -196,50 +181,15 @@ public class JAPCHardwareAddressImpl extends HardwareAddressImpl implements JAPC
         }
 
         return result;
-
-    }
-
-
-    /**
-     * @return row index of the data point element inside the array or array2d or -1 if not used
-     */
-    @Override
-    public int getRowIndex() {
-        return this.rowIndex;
     }
 
     public final boolean isMapType() {
         return this.indexFieldName != null;
     }
 
-    public final boolean isInsideArray2d() {
-        return (rowIndex == -1 ? false : true);
-    }
-
-
-    @Override
-    public String getFilter() {
-        return filter;
-    }
-
     @Override
     public boolean hasFilter() {
         return (filter == null || filter.length() == 0) ? false : true;
-    }
-
-
-    /**
-     * @param protocol the protocol to set
-     */
-    protected final void setProtocol(String protocol) {
-        this.protocol = protocol;
-    }
-
-    /**
-     * @param service the service to set
-     */
-    protected final void setService(String service) {
-        this.service = service;
     }
 
     protected final void setDeviceName(final String pDeviceName) throws ConfigurationException {
@@ -258,49 +208,8 @@ public class JAPCHardwareAddressImpl extends HardwareAddressImpl implements JAPC
         this.propertyName = pPropertyName;
     }
 
-    protected final void setCycleSelector(final String pCycleSelector) throws ConfigurationException {
-        this.cycleSelector = pCycleSelector;
-    }
-
-    protected final void setIndexFieldName(final String indexFieldName) throws ConfigurationException {
-        this.indexFieldName = indexFieldName;
-    }
-
-    /**
-     * @param parameterName the parameterName to set
-     */
-    protected final void setIndexName(String indexName) throws ConfigurationException {
-        this.indexName = indexName;
-    }
-
-    /**
-     * @param dataField the dataField to set
-     */
-    protected final void setDataFieldName(String dataFieldName) throws ConfigurationException {
-        this.dataFieldName = dataFieldName;
-    }
-
-    protected final void setRowIndex(final int pRowIndex) throws ConfigurationException {
-        this.rowIndex = pRowIndex;
-    }
-
-    protected final void setColumnIndex(final int pColumnIndex) throws ConfigurationException {
-        this.columnIndex = pColumnIndex;
-    }
-
-    protected final void setCommandType(final String commandType) throws ConfigurationException {
-        this.commandType = commandType;
-    }
-
-    protected final void setContextField(final String contextField) throws ConfigurationException {
-        this.contextField = contextField;
-    }
-
-    protected final void setFilter(final String filter) throws ConfigurationException {
-        this.filter = filter;
-    }
-
     @Override
     public void validate() throws ConfigurationException {
+      // TODO: Write address validation
     }
 }
