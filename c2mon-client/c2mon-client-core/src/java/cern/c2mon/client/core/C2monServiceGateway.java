@@ -16,12 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.client.core;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import cern.c2mon.client.core.config.C2monAutoConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import cern.c2mon.client.core.manager.CommandManager;
 import cern.c2mon.client.core.manager.SupervisionManager;
@@ -44,12 +43,8 @@ public class C2monServiceGateway {
   /** Class logger */
   private static final Logger LOG = LoggerFactory.getLogger(C2monServiceGateway.class);
 
-  /** The path to the core Spring XML */
-  private static final String APPLICATION_SPRING_XML_PATH =
-      "cern/c2mon/client/core/config/c2mon-client.xml";
-
   /** The SPRING application context, which can be used as parent context */
-  private static ClassPathXmlApplicationContext xmlContext = null;
+  private static ApplicationContext context = null;
 
   /**
    * The maximum amount of time in milliseconds which the C2MON ServiceGateway shall
@@ -90,8 +85,8 @@ public class C2monServiceGateway {
    * @return the application context of the {@linkplain C2monServiceGateway} which can be used
    *         as parent context for an API extension.
    */
-  public static final ClassPathXmlApplicationContext getApplicationContext() {
-    return xmlContext;
+  public static final ApplicationContext getApplicationContext() {
+    return context;
   }
 
 
@@ -189,21 +184,17 @@ public class C2monServiceGateway {
    * this behavior is that you can use the time in between to initialize your
    * application. However, if you don't want to check yourself that the connection
    * to the C2MON server is established you should maybe use
-   * {@link #startC2monClientSynchronous(Module...)} instead.
+   * {@link #startC2monClientSynchronous()} instead.
    *
    */
   public static synchronized void startC2monClient() {
-    if (xmlContext == null) {
+    if (context == null) {
       LOG.info("Starting C2MON client core.");
 
-      final Set<String> springXmlFiles =  new HashSet<String>();
-      springXmlFiles.add(APPLICATION_SPRING_XML_PATH);
+      context = new AnnotationConfigApplicationContext(C2monAutoConfiguration.class);
+      initiateGatewayFields(context);
 
-      xmlContext = new ClassPathXmlApplicationContext(springXmlFiles.toArray(new String[0]));
-
-      initiateGatewayFields(xmlContext);
-
-      xmlContext.registerShutdownHook();
+      ((AnnotationConfigApplicationContext) context).registerShutdownHook();
     }
     else {
       LOG.warn("startC2monClient() - C2MON client core already started.");
@@ -222,14 +213,13 @@ public class C2monServiceGateway {
    * Client API hasn't managed to connect after 60 seconds this method will
    * return with a {@link RuntimeException}.
    *
-   * @param modules the modules that should be supported by the service gateway
    * @exception RuntimeException In case the connection to the C2MON server could not
    *            be established within 60 seconds. However, the C2MON Client API will
    *            continue trying to establish the connection, but by throwing this
    *            exception we want to avoid that the application is blocking too long
    *            on this call.
    * @see C2monSupervisionManager#isServerConnectionWorking()
-   * @see #startC2monClient(Module...)
+   * @see #startC2monClient()
    */
   public static synchronized void startC2monClientSynchronous() throws RuntimeException {
     startC2monClient();
@@ -250,11 +240,11 @@ public class C2monServiceGateway {
   }
 
   /**
-   * Initiate the static fields, retrieving it from the <code>xmlContext</code>
+   * Initiate the static fields, retrieving it from the <code>context</code>
    *
    * @param xmlContext the application context
    */
-  private static void initiateGatewayFields(final ClassPathXmlApplicationContext xmlContext) {
+  private static void initiateGatewayFields(final ApplicationContext xmlContext) {
     tagManager = xmlContext.getBean(TagManager.class);
     supervisionManager = xmlContext.getBean(SupervisionManager.class);
     commandManager = xmlContext.getBean(CommandManager.class);

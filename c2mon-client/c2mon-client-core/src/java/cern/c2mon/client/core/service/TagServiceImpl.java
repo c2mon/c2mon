@@ -54,7 +54,8 @@ import lombok.extern.slf4j.Slf4j;
  *
  * @author Matthias Braeger
  */
-@Service("tagService") @Slf4j
+@Service
+@Slf4j
 public class TagServiceImpl implements AdvancedTagService {
 
   /**
