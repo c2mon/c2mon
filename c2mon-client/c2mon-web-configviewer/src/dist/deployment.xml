@@ -17,6 +17,7 @@
 
     <application name="c2mon-web-configviewer-pro" extends="default">
       <startscript name="C2MON-WEB-CONFIGVIEWER-PRO">
+        <env name="CLASSPATH" value="$INSTALL_DIR/lib/*.war" />
         <property name="c2mon.client.conf.url" value="file:///user/timoper/rep/c2mon/web/c2mon-web.properties" />
       </startscript>
       <deployment installLocation="/opt/c2mon-web-configviewer">
@@ -28,7 +29,7 @@
 
     <application name="c2mon-web-configviewer-test" extends="default">
       <startscript name="C2MON-WEB-CONFIGVIEWER-TEST">
-        <env name="CLASSPATH" value="`ls $INSTALL_DIR/lib/*.war | tr -s '\n' ':'`" />
+        <env name="CLASSPATH" value="$INSTALL_DIR/lib/*.war" />
         <property name="c2mon.client.conf.url" value="file:///user/timtest/rep/c2mon/web/c2mon-web.properties" />
         <property name="server.port" value="8081" />
       </startscript>
