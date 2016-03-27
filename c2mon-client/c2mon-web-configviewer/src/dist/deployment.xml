@@ -17,23 +17,23 @@
 
     <application name="c2mon-web-configviewer-pro" extends="default">
       <startscript name="C2MON-WEB-CONFIGVIEWER-PRO">
-        <property name="c2mon.client.conf.url" value="http://timweb/conf/c2mon-client.properties" />
+        <property name="c2mon.client.conf.url" value="file:///user/timoper/rep/c2mon/web/c2mon-web.properties" />
       </startscript>
       <deployment installLocation="/opt/c2mon-web-configviewer">
         <notification>
-          <mail address="c2mon-admin@cern.ch"/>
+          <!--<mail address="c2mon-admin@cern.ch"/>-->
         </notification>
       </deployment>
     </application>
 
     <application name="c2mon-web-configviewer-test" extends="default">
       <startscript name="C2MON-WEB-CONFIGVIEWER-TEST">
-        <property name="c2mon.client.conf.url" value="http://timweb/test/conf/c2mon-client.properties" />
+        <property name="c2mon.client.conf.url" value="file:///user/timtest/rep/c2mon/web/c2mon-web.properties" />
         <property name="server.port" value="8081" />
       </startscript>
       <deployment installLocation="/opt/c2mon-web-configviewer-test">
         <notification>
-          <mail address="c2mon-admin@cern.ch"/>
+          <!--<mail address="c2mon-admin@cern.ch"/>-->
         </notification>
       </deployment>
     </application>

@@ -192,6 +192,8 @@
   </scm>
 
   <build>
+    <finalName>${project.name}-${project.version}</finalName>
+
     <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
     <testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
     <resources>
@@ -227,6 +229,22 @@
         <configuration>
           <source>1.7</source>
           <target>1.7</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <descriptors>
+            <descriptor>src/dist/assembly.xml</descriptor>
+          </descriptors>
         </configuration>
       </plugin>
     </plugins>

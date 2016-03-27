@@ -22,7 +22,7 @@
       <directory>${project.build.directory}</directory>
       <outputDirectory>/lib</outputDirectory>
       <includes>
-        <include>${project.name}-${version}.jar</include>
+        <include>${project.name}-${version}.war</include>
       </includes>
     </fileSet>
   </fileSets>
