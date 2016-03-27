@@ -4,7 +4,7 @@
 
     <application name="default">
       <startscript>
-        <main-class name="org.springframework.boot.loader.JarLauncher" />
+        <main-class name="org.springframework.boot.loader.WarLauncher" />
         <property name="logging.file" value="log/c2mon-web-configviewer.log" />
       </startscript>
       <deployment installLocation="/opt/c2mon-web-configviewer/">
@@ -28,6 +28,7 @@
 
     <application name="c2mon-web-configviewer-test" extends="default">
       <startscript name="C2MON-WEB-CONFIGVIEWER-TEST">
+        <env name="CLASSPATH" value="`ls $INSTALL_DIR/lib/*.war | tr -s '\n' ':'`" />
         <property name="c2mon.client.conf.url" value="file:///user/timtest/rep/c2mon/web/c2mon-web.properties" />
         <property name="server.port" value="8081" />
       </startscript>
