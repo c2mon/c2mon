@@ -12,6 +12,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @SpringApplicationConfiguration(Application.class)
 public class StartupTest {
 
-  @Test
+//  @Test
   public void startup() {}
 }
