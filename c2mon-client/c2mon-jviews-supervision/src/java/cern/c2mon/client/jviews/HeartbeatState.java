@@ -72,7 +72,7 @@ public class HeartbeatState extends JPanel implements  HeartbeatListener  {
     String description = "Waiting for first heartbeat...";
     setNewHeartbeatInfo(null, icon, description);
     
-    C2monServiceGateway.getSupervisionManager().addHeartbeatListener(this);
+    C2monServiceGateway.getSupervisionService().addHeartbeatListener(this);
   }
   
   /**

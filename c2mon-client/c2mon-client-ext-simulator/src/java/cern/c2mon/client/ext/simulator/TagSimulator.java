@@ -19,7 +19,6 @@ package cern.c2mon.client.ext.simulator;
 import java.util.Map;
 import java.util.Set;
 
-import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
 /**
@@ -31,7 +30,7 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
  *
  * @author Matthias Braeger
  */
-public interface C2monTagSimulator {
+public interface TagSimulator {
 
   /**
    * Starts the simulation mode

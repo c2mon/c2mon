@@ -30,7 +30,7 @@ import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
 /**
- * This class implements the {@link C2monTagSimulator} interface. For more
+ * This class implements the {@link TagSimulator} interface. For more
  * information please read the interface description.
  * <p>
  * Internally the functionalities are realized by making use of the history 
@@ -40,7 +40,7 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
  * @author Matthias Braeger
  */
 @Service
-class TagSimulatorImpl implements C2monTagSimulator {
+class TagSimulatorImpl implements TagSimulator {
   
   /** Log4j instance */
   private static final Logger LOG = LoggerFactory.getLogger(TagSimulatorImpl.class);

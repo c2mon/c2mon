@@ -70,7 +70,7 @@ public class ConnectionState extends JPanel implements ConnectionListener {
     labelIcon.setHorizontalAlignment(JLabel.CENTER);
     this.add(labelIcon, BorderLayout.NORTH);
     setState(pState);
-    C2monServiceGateway.getSupervisionManager().addConnectionListener(this);
+    C2monServiceGateway.getSupervisionService().addConnectionListener(this);
   }
 
   public void setState(int pState) {

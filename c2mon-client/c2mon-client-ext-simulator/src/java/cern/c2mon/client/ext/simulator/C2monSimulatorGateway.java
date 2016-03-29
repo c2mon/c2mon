@@ -34,7 +34,7 @@ public class C2monSimulatorGateway {
   private static ApplicationContext context;
   
   /** Static reference to the <code>C2monSessionManager</code> singleton instance */
-  private static C2monTagSimulator tagSimulator = null;
+  private static TagSimulator tagSimulator = null;
   
   /**
    * Hidden default constructor
@@ -63,7 +63,7 @@ public class C2monSimulatorGateway {
   private static void initiateTagSimulator() {
     if (context == null) {
       context = new ClassPathXmlApplicationContext(new String[]{APPLICATION_SPRING_XML_PATH}, C2monServiceGateway.getApplicationContext());
-      tagSimulator = context.getBean(C2monTagSimulator.class);
+      tagSimulator = context.getBean(TagSimulator.class);
     }
     else {
       LOG.warn("C2monTagSimulator is already initialized.");
@@ -77,7 +77,10 @@ public class C2monSimulatorGateway {
    * @return The C2MON Tag simulator which allows changing locally the values
    *         of the registered tags
    */
-  public static C2monTagSimulator getTagSimulator() {
+  public static TagSimulator getTagSimulator() {
+    if (context == null) {
+      initialize();
+    }
     return tagSimulator;
   }
 }
