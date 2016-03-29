@@ -26,7 +26,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.ext.history.ClientDataTagRequestCallback;
 import cern.c2mon.client.ext.history.common.HistoryProvider;
 import cern.c2mon.client.ext.history.common.HistorySupervisionEvent;
@@ -74,8 +73,8 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
   private HistoryMapper historyMapper;
 
   /**
-   * Callback to get access to attributes in the {@link ClientDataTagValue}.
-   * Like for example the {@link ClientDataTagValue#getType()}
+   * Callback to get access to attributes in the {@link Tag}.
+   * Like for example the {@link Tag#getType()}
    */
   private ClientDataTagRequestCallback clientDataTagRequestCallback;
 
@@ -84,8 +83,8 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
    * @param historyMapper iBatis mapper for history DB access
    * @param clientDataTagRequestCallback
    *          Callback to get access to attributes in the
-   *          {@link ClientDataTagValue}. Like for example the
-   *          {@link ClientDataTagValue#getType()}
+   *          {@link Tag}. Like for example the
+   *          {@link Tag#getType()}
    */
   public SqlHistoryProviderDAO(final HistoryMapper historyMapper, 
       final ClientDataTagRequestCallback clientDataTagRequestCallback) {

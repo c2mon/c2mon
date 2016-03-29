@@ -20,7 +20,6 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.ext.history.ClientDataTagRequestCallback;
 import cern.c2mon.client.ext.history.common.HistoryProvider;
 import cern.c2mon.client.ext.history.common.SavedHistoryEvent;
@@ -55,8 +54,8 @@ public final class HistorySessionFactory {
    * 
    * @param clientDataTagRequestCallback
    *          callback for the history provider to get access to attributes in
-   *          the {@link ClientDataTagValue}. Like the
-   *          {@link ClientDataTagValue#getType()}.
+   *          the {@link Tag}. Like the
+   *          {@link Tag#getType()}.
    * 
    * @return A {@link HistoryProvider} which can be used to easily get history
    *         data
@@ -75,8 +74,8 @@ public final class HistorySessionFactory {
    *          may decrease performance significantly
    * @param clientDataTagRequestCallback
    *          callback for the history provider to get access to attributes in
-   *          the {@link ClientDataTagValue}. Like the
-   *          {@link ClientDataTagValue#getType()}.
+   *          the {@link Tag}. Like the
+   *          {@link Tag#getType()}.
    * 
    * @return A {@link HistoryProvider} which can be used to easily get event
    *         history data

@@ -21,7 +21,6 @@ import java.sql.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.ext.history.ClientDataTagRequestCallback;
 import cern.c2mon.client.ext.history.common.HistorySupervisionEvent;
 import cern.c2mon.client.ext.history.common.HistoryTagValueUpdate;
@@ -58,7 +57,7 @@ public final class BeanConverterUtil {
      * Converts a {@link HistoryRecordBean} object to a {@link TagValueUpdate}
      * 
      * @param bean the bean to convert
-     * @param clientDataTagRequestCallback Callback to get access to attributes in the {@link ClientDataTagValue}.
+     * @param clientDataTagRequestCallback Callback to get access to attributes in the {@link Tag}.
      * @return the converted object
      */
     public static HistoryTagValueUpdate toTagValueUpdate(final HistoryRecordBean bean,

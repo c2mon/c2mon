@@ -16,11 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.client.ext.history;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 
 /**
  * This interface is used for the history provider to get access to
- * {@link ClientDataTagValue} attributes for any given tag id.
+ * {@link Tag} attributes for any given tag id.
  * 
  * @author vdeila
  */
@@ -32,5 +32,5 @@ public interface ClientDataTagRequestCallback {
    *          the tag id
    * @return a copy of the client data tag value requested
    */
-  ClientDataTagValue getClientDataTagValue(final long tagId);
+  Tag getClientDataTagValue(final long tagId);
 }

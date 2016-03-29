@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.TagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
@@ -350,12 +349,12 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   /** Used by the {@link HistoryProvider} to get access to ClientDataTagValues */
   class ClientDataTagRequester implements ClientDataTagRequestCallback {
     @Override
-    public ClientDataTagValue getClientDataTagValue(final long tagId) {
+    public Tag getClientDataTagValue(final long tagId) {
       final Collection<Tag> tagValues = tagService.get(Arrays.asList(tagId));
       if (tagValues == null || tagValues.size() == 0) {
         throw new RuntimeException("Cannot get the client data tag value for the tag id " + tagId);
       }
-      return (ClientDataTagValue) tagValues.iterator().next();
+      return (Tag) tagValues.iterator().next();
     }
   }
 

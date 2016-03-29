@@ -17,9 +17,8 @@
 package cern.c2mon.client.ext.history;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.ext.history.common.HistoryProvider;
 import cern.c2mon.client.ext.history.common.HistoryProviderFactory;
 import cern.c2mon.client.ext.history.common.SavedHistoryEvent;
@@ -37,8 +36,8 @@ public class HistoryProviderFactoryImpl implements HistoryProviderFactory {
 
   /**
    * callback for the history provider to get access to attributes in
-   *          the {@link ClientDataTagValue}. Like the
-   *          {@link ClientDataTagValue#getType()}.
+   *          the {@link Tag}. Like the
+   *          {@link Tag#getType()}.
    */
   private final ClientDataTagRequestCallback clientDataTagRequestCallback;
   
@@ -56,8 +55,8 @@ public class HistoryProviderFactoryImpl implements HistoryProviderFactory {
    * 
    * @param clientDataTagRequestCallback
    *          callback for the history provider to get access to attributes in
-   *          the {@link ClientDataTagValue}. Like the
-   *          {@link ClientDataTagValue#getType()}.
+   *          the {@link Tag}. Like the
+   *          {@link Tag#getType()}.
    */
   public HistoryProviderFactoryImpl(final ClientDataTagRequestCallback clientDataTagRequestCallback) {
     this.clientDataTagRequestCallback = clientDataTagRequestCallback;
