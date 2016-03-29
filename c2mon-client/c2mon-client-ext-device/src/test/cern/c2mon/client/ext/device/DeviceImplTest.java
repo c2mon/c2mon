@@ -33,7 +33,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.common.listener.BaseTagListener;
 import cern.c2mon.client.common.tag.Tag;
-import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.TagService;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.core.tag.ClientRuleTag;
@@ -57,15 +56,12 @@ public class DeviceImplTest {
 
   /** Mocked components */
   @Autowired
-  private TagService tagManagerMock;
-
-  @Autowired
-  private C2monCommandManager commandManagerMock;
+  private TagService tagServiceMock;
 
   @Test
   public void testLazyLoadDeviceProperty() throws RuleFormatException, ClassNotFoundException {
     // Reset the mock
-    EasyMock.reset(tagManagerMock);
+    EasyMock.reset(tagServiceMock);
 
     DeviceImpl device = getTestDevice();
 
@@ -76,27 +72,27 @@ public class DeviceImplTest {
 
     // Expect the device to get a single data tag
     ClientDataTagImpl cdt1 = new ClientDataTagImpl(100000L);
-    EasyMock.expect(tagManagerMock.get(EasyMock.<Long> anyObject())).andReturn(cdt1).once();
+    EasyMock.expect(tagServiceMock.get(EasyMock.<Long> anyObject())).andReturn(cdt1).once();
 
     // Setup is finished, need to activate the mock
-    EasyMock.replay(tagManagerMock);
+    EasyMock.replay(tagServiceMock);
 
     Property property = device.getProperty("test_property_1");
     // Manually set the tag manager to the mock one
-    ((PropertyImpl) property).setTagManager(tagManagerMock);
+    ((PropertyImpl) property).setTagManager(tagServiceMock);
     Assert.assertTrue(property.getTagId().equals(cdt1.getId()));
     Assert.assertTrue(property.getTag() != null);
     Assert.assertTrue(property.getFields().size() == 0);
     Assert.assertTrue(property.getCategory() == Category.DATATAG);
 
     // Verify that everything happened as expected
-    EasyMock.verify(tagManagerMock);
+    EasyMock.verify(tagServiceMock);
   }
 
   @Test
   public void testGetDeviceProperty() throws RuleFormatException {
     // Reset the mock
-    EasyMock.reset(tagManagerMock);
+    EasyMock.reset(tagServiceMock);
 
     DeviceImpl device = getTestDevice();
     ClientDataTagImpl cdt1 = new ClientDataTagImpl(100000L);
@@ -114,15 +110,15 @@ public class DeviceImplTest {
     device.setDeviceProperties(deviceProperties);
 
     for (Property property : device.getProperties()) {
-      ((PropertyImpl) property).setTagManager(tagManagerMock);
+      ((PropertyImpl) property).setTagManager(tagServiceMock);
     }
 
     // Expect the device to check if the rule tag is subscribed, but make no
     // other calls
-    EasyMock.expect(tagManagerMock.isSubscribed(EasyMock.<BaseTagListener> anyObject())).andReturn(true).times(2);
+    EasyMock.expect(tagServiceMock.isSubscribed(EasyMock.<BaseTagListener> anyObject())).andReturn(true).times(2);
 
     // Setup is finished, need to activate the mock
-    EasyMock.replay(tagManagerMock);
+    EasyMock.replay(tagServiceMock);
 
     // Attempt to retrieve field value from non-mapped property
     Property property = device.getProperty("nonexistent");
@@ -147,13 +143,13 @@ public class DeviceImplTest {
     Assert.assertTrue(property.getTag() != null && property.getTag() instanceof ClientConstantValue<?>);
 
     // Verify that everything happened as expected
-    EasyMock.verify(tagManagerMock);
+    EasyMock.verify(tagServiceMock);
   }
 
   @Test
   public void testLazyLoadDeviceProperties() throws RuleFormatException, ClassNotFoundException {
     // Reset the mock
-    EasyMock.reset(tagManagerMock);
+    EasyMock.reset(tagServiceMock);
 
     DeviceImpl device = getTestDevice();
 
@@ -187,20 +183,20 @@ public class DeviceImplTest {
     ruleResultTags.add(rrt2);
 
     // Expect the device to get two data tags (one property, one field)
-    EasyMock.expect(tagManagerMock.get(10000L)).andReturn(cdt1);
-    EasyMock.expect(tagManagerMock.get(10001L)).andReturn(cdt2);
+    EasyMock.expect(tagServiceMock.get(10000L)).andReturn(cdt1);
+    EasyMock.expect(tagServiceMock.get(10001L)).andReturn(cdt2);
     // Expect the device to check if the rule tags are subscribed
-    EasyMock.expect(tagManagerMock.isSubscribed(EasyMock.<BaseTagListener> anyObject())).andReturn(false).anyTimes();
+    EasyMock.expect(tagServiceMock.isSubscribed(EasyMock.<BaseTagListener> anyObject())).andReturn(false).anyTimes();
     // Expect the device to get the tags inside the rule tags
-    EasyMock.expect(tagManagerMock.get(EasyMock.<List<Long>> anyObject())).andReturn(ruleResultTags).anyTimes();
+    EasyMock.expect(tagServiceMock.get(EasyMock.<List<Long>> anyObject())).andReturn(ruleResultTags).anyTimes();
 
     // Setup is finished, need to activate the mock
-    EasyMock.replay(tagManagerMock);
+    EasyMock.replay(tagServiceMock);
 
     device.setDeviceProperties(deviceProperties);
 
     for (Property property : device.getProperties()) {
-      ((PropertyImpl) property).setTagManager(tagManagerMock);
+      ((PropertyImpl) property).setTagManager(tagServiceMock);
     }
 
     Assert.assertTrue(device.getProperty("cpuLoadInPercent").getTag().getId().equals(cdt1.getId()));
@@ -230,13 +226,13 @@ public class DeviceImplTest {
     Assert.assertTrue(acquisition.getField("numCores2").getTag().getValue().equals(ccv2.getValue()));
 
     // Verify that everything happened as expected
-    EasyMock.verify(tagManagerMock);
+    EasyMock.verify(tagServiceMock);
   }
 
   @Test
   public void testGetDeviceProperties() {
     // Reset the mock
-    EasyMock.reset(tagManagerMock);
+    EasyMock.reset(tagServiceMock);
 
     DeviceImpl device = getTestDevice();
     ClientDataTagImpl cdt1 = new ClientDataTagImpl(100000L);
@@ -254,20 +250,20 @@ public class DeviceImplTest {
     // Expect the device to never, ever call the server
 
     // Setup is finished, need to activate the mock
-    EasyMock.replay(tagManagerMock);
+    EasyMock.replay(tagServiceMock);
 
     Assert.assertTrue(device.getProperty("test_property_1").getTagId() == cdt1.getId());
     Assert.assertTrue(device.getProperty("test_property_2").getTagId() == cdt2.getId());
     Assert.assertTrue(device.getProperty("test_property_3").getTagId() == cdt3.getId());
 
     // Verify that everything happened as expected
-    EasyMock.verify(tagManagerMock);
+    EasyMock.verify(tagServiceMock);
   }
 
   @Test
   public void testRuleUpdate() throws RuleFormatException, ClassNotFoundException, InterruptedException {
     // Reset the mock
-    EasyMock.reset(tagManagerMock);
+    EasyMock.reset(tagServiceMock);
 
     final DeviceImpl device = getTestDevice();
 
@@ -280,19 +276,19 @@ public class DeviceImplTest {
     dataTagValues.add(cdt2);
 
     // Expect the device to check if the rule is already subscribed
-    EasyMock.expect(tagManagerMock.isSubscribed(EasyMock.<BaseTagListener> anyObject())).andReturn(false);
+    EasyMock.expect(tagServiceMock.isSubscribed(EasyMock.<BaseTagListener> anyObject())).andReturn(false);
     // Expect the device to get the tags inside the rule
-    EasyMock.expect(tagManagerMock.get(EasyMock.<Set<Long>> anyObject())).andReturn(dataTagValues);
+    EasyMock.expect(tagServiceMock.get(EasyMock.<Set<Long>> anyObject())).andReturn(dataTagValues);
 
     // Setup is finished, need to activate the mock
-    EasyMock.replay(tagManagerMock);
+    EasyMock.replay(tagServiceMock);
 
     final List<DeviceProperty> deviceProperties = new ArrayList<>();
     deviceProperties.add(new DeviceProperty(1L, "test_property_rule_name", "(#234 + #345) / 2", "clientRule", "Float"));
     device.setDeviceProperties(deviceProperties);
 
     for (Property property : device.getProperties()) {
-      ((PropertyImpl) property).setTagManager(tagManagerMock);
+      ((PropertyImpl) property).setTagManager(tagServiceMock);
     }
 
     ClientRuleTag rule = (ClientRuleTag) device.getProperty("test_property_rule_name").getTag();
@@ -301,7 +297,7 @@ public class DeviceImplTest {
     Assert.assertTrue((Float) rule.getValue() == 1F);
 
     // Verify that everything happened as expected
-    EasyMock.verify(tagManagerMock);
+    EasyMock.verify(tagServiceMock);
   }
 
   @Test
@@ -314,7 +310,7 @@ public class DeviceImplTest {
   @Test
   public void testGetDevicePropertyField() throws RuleFormatException {
     // Reset the mock
-    EasyMock.reset(tagManagerMock);
+    EasyMock.reset(tagServiceMock);
 
     DeviceImpl device = getTestDevice();
     ClientDataTagImpl cdt1 = new ClientDataTagImpl(100000L);
@@ -334,15 +330,15 @@ public class DeviceImplTest {
     device.setDeviceProperties(properties);
 
     for (Property property : device.getProperties()) {
-      ((PropertyImpl) property).setTagManager(tagManagerMock);
+      ((PropertyImpl) property).setTagManager(tagServiceMock);
     }
 
     // Expect the device to check if the rule tag is subscribed, but make no
     // other calls
-    EasyMock.expect(tagManagerMock.isSubscribed(EasyMock.<BaseTagListener> anyObject())).andReturn(true).times(1);
+    EasyMock.expect(tagServiceMock.isSubscribed(EasyMock.<BaseTagListener> anyObject())).andReturn(true).times(1);
 
     // Setup is finished, need to activate the mock
-    EasyMock.replay(tagManagerMock);
+    EasyMock.replay(tagServiceMock);
 
     Property property = device.getProperty("acquisition");
     Field field = property.getField("cpuLoadInPercent");
@@ -355,13 +351,13 @@ public class DeviceImplTest {
     Assert.assertTrue(field.getTag().getValue() == ccv2.getValue());
 
     // Verify that everything happened as expected
-    EasyMock.verify(tagManagerMock);
+    EasyMock.verify(tagServiceMock);
   }
 
   @Test
   public void testLazyLoadDevicePropertyFields() throws RuleFormatException, ClassNotFoundException {
     // Reset the mock
-    EasyMock.reset(tagManagerMock);
+    EasyMock.reset(tagServiceMock);
 
     DeviceImpl device = getTestDevice();
 
@@ -385,21 +381,21 @@ public class DeviceImplTest {
     ruleResultTags.add(cdt2);
 
     // Expect the device to get one data tag
-    EasyMock.expect(tagManagerMock.get(EasyMock.<Long> anyObject())).andReturn(cdt).once();
+    EasyMock.expect(tagServiceMock.get(EasyMock.<Long> anyObject())).andReturn(cdt).once();
     // Expect the device to check if the rule tag is subscribed
-    EasyMock.expect(tagManagerMock.isSubscribed(EasyMock.<BaseTagListener> anyObject())).andReturn(false).anyTimes();
+    EasyMock.expect(tagServiceMock.isSubscribed(EasyMock.<BaseTagListener> anyObject())).andReturn(false).anyTimes();
     // Expect the device to get the tags inside the rule tag
-    EasyMock.expect(tagManagerMock.get(EasyMock.<List<Long>> anyObject())).andReturn(ruleResultTags).anyTimes();
+    EasyMock.expect(tagServiceMock.get(EasyMock.<List<Long>> anyObject())).andReturn(ruleResultTags).anyTimes();
 
     // Setup is finished, need to activate the mock
-    EasyMock.replay(tagManagerMock);
+    EasyMock.replay(tagServiceMock);
 
     List<DeviceProperty> deviceProperties = new ArrayList<>();
     deviceProperties.add(new DeviceProperty(5L, "acquisition", "mappedProperty", deviceFields));
     device.setDeviceProperties(deviceProperties);
 
     for (Property property : device.getProperties()) {
-      ((PropertyImpl) property).setTagManager(tagManagerMock);
+      ((PropertyImpl) property).setTagManager(tagServiceMock);
     }
 
     Property fields = device.getProperty("acquisition");
@@ -418,7 +414,7 @@ public class DeviceImplTest {
     Assert.assertTrue(fields.getField("numCores").getTag().getValue().equals(ccv2.getValue()));
 
     // Verify that everything happened as expected
-    EasyMock.verify(tagManagerMock);
+    EasyMock.verify(tagServiceMock);
   }
 
   private DeviceImpl getTestDevice() {

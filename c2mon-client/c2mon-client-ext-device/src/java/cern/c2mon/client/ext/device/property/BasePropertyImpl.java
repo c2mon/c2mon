@@ -22,7 +22,6 @@ import java.util.Set;
 import cern.c2mon.client.common.listener.BaseTagListener;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.C2monServiceGateway;
-import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.TagService;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.core.tag.ClientRuleTag;

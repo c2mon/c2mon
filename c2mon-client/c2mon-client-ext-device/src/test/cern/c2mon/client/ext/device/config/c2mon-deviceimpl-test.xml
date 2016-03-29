@@ -11,7 +11,7 @@
 
   <bean id="commandManager" class="org.easymock.EasyMock"
     factory-method="createMock">
-    <constructor-arg value="cern.c2mon.client.core.C2monCommandManager" />
+    <constructor-arg value="cern.c2mon.client.core.CommandService" />
   </bean>
   
 </beans>
