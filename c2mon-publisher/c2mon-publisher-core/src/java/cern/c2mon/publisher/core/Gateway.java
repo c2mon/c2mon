@@ -80,7 +80,7 @@ public class Gateway implements BaseTagListener {
     LOG.info("Starting publisher gateway...");
     publisher = publisherService;
     
-    // Initialize global Tag Manager variable
+    // Initialize global Tag Service variable
     tagService = C2monServiceGateway.getTagService();
     configService = C2monServiceGateway.getConfigurationService();
   }
