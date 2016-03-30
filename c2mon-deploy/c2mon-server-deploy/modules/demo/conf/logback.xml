@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true">
   <include resource="org/springframework/boot/logging/logback/defaults.xml" />
-  <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
-
 
   <property name="LOG_FILE"       value="${LOG_PATH:-/tmp}/c2mon.log"/>
   <property name="TAG_LOG_FILE"   value="${LOG_PATH:-/tmp}/c2mon.tag.log"/>
@@ -80,13 +78,13 @@
   </appender>
 
 
-  <logger name="SourceDataTagLogger" level="INFO">
+  <logger name="SourceDataTagLogger" level="INFO" additivity="false">
     <appender-ref ref="TagAppender"/>
   </logger>
-  <logger name="RuleTagLogger" level="INFO">
+  <logger name="RuleTagLogger" level="INFO" additivity="false">
     <appender-ref ref="RuleTagAppender"/>
   </logger>
-  <logger name="ShortTermLogFallbackLogger" level="INFO">
+  <logger name="ShortTermLogFallbackLogger" level="INFO" additivity="false">
     <appender-ref ref="ShortTermLogAppender"/>
   </logger>
   <logger name="cern.c2mon" level="DEBUG"/>
@@ -97,7 +95,6 @@
 
 
   <root level="INFO">
-    <appender-ref ref="CONSOLE" />
     <appender-ref ref="FileAppender"/>
     <appender-ref ref="ErrorAppender"/>
   </root>
