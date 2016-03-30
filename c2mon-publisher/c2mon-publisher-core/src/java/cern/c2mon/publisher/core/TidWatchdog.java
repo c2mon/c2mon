@@ -47,7 +47,7 @@ class TidWatchdog extends FileWatchdog {
   /**
    * Default Constructor
    *
-   * Initializes the TID watchdag to scan for the default file "conf/publisher.tid".
+   * Initializes the TID watchdog to scan for the default file "conf/publisher.tid".
    * Alternatively, the default location can be overwritten with the following Java
    * environment variable:
    * <p>
