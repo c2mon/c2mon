@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.tag.Tag;
-import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TagRenderer;
 import cern.c2mon.publisher.Publisher;
 import cern.c2mon.shared.client.tag.TagConfig;
