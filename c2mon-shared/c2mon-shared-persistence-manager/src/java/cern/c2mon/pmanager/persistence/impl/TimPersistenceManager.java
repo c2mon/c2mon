@@ -234,9 +234,8 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
         }
         size = data.size();
 
-        // If the collection is empty, print a warning and return
         if (size == 0) {
-            LOG.warn("log([Collection]) : called with an empty collection.");
+            LOG.debug("log([Collection]) : called with an empty collection.");
             return connectionDown;
         }
 
