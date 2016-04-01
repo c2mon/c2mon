@@ -76,24 +76,14 @@
     </dependency>
 
     <!-- C2MON dependencies -->
-    <!--<dependency>-->
-      <!--<groupId>cern.c2mon.c2mon-server</groupId>-->
-      <!--<artifactId>c2mon-server-all</artifactId>-->
-    <!--</dependency>-->
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-command</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
+      <artifactId>c2mon-server-all</artifactId>
     </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-supervision</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
-    </dependency>
+
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-test</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
       <scope>provided</scope>
     </dependency>
 
