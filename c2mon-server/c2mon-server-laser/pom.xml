@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -25,7 +24,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -36,15 +34,10 @@
       <artifactId>c2mon-server-all</artifactId>
     </dependency>
     <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-cachepersistence</artifactId>
-      <version>LATEST</version>
-    </dependency>
-    <dependency>
-    	<groupId>cern.laser</groupId>
-    	<artifactId>laser-source-ext</artifactId>
-    	<version>LATEST</version>
-    	<exclusions>
+      <groupId>cern.laser</groupId>
+      <artifactId>laser-source-ext</artifactId>
+      <version>[1.7.1,)</version>
+      <exclusions>
         <exclusion>
           <groupId>org.springframework</groupId>
           <artifactId>spring</artifactId>
@@ -58,12 +51,12 @@
       <artifactId>c2mon-server-test</artifactId>
     </dependency>
     <dependency>
-    	<groupId>org.easymock</groupId>
-    	<artifactId>easymock</artifactId>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
     </dependency>
     <dependency>
-    	<groupId>org.easymock</groupId>
-    	<artifactId>easymockclassextension</artifactId>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymockclassextension</artifactId>
     </dependency>
   </dependencies>
 
