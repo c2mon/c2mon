@@ -481,7 +481,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
             str.append(hardwareAddress.toConfigXML());
         }
 
-      if(!addressParameters.isEmpty()){
+      if (addressParameters != null && !addressParameters.isEmpty()){
         str.append(SimpleXMLParser.mapToXMLString(addressParameters));
       }
 
