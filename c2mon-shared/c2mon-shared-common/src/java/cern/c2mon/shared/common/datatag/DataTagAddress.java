@@ -286,7 +286,9 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
         }
 
         // Map with only primitive types does not require deep cloning
-        clonedAddress.addressParameters = new HashMap<>(addressParameters);
+        if (this.addressParameters != null) {
+          clonedAddress.addressParameters = new HashMap<>(addressParameters);
+        }
       }
       catch (CloneNotSupportedException e) {
         // Should not happen if the hardware addresses remain as they are.
