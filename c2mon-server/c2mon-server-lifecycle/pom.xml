@@ -118,10 +118,23 @@
       <artifactId>c2mon-server-alarm</artifactId>
       <version>[1.5.0, 2.0.0)</version>
     </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-shorttermlog</artifactId>
+      <version>[1.5.0, 2.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-test</artifactId>
+      <version>[1.5.0, 2.0.0)</version>
+      <scope>compile</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
+      <version>2.3.3</version>
+      <classifier>jdk6debug</classifier>
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
@@ -141,17 +154,17 @@
 
 
     <!-- The following dependencies are required for using Ehcache. -->
-    <!--<dependency>-->
-    <!--<groupId>net.sf.ehcache</groupId>-->
-    <!--<artifactId>ehcache-core</artifactId>-->
-    <!--<scope>provided</scope>-->
-    <!--</dependency>-->
-
     <dependency>
       <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache</artifactId>
-      <version>2.10.1</version>
+      <artifactId>ehcache-core</artifactId>
+      <scope>provided</scope>
     </dependency>
+
+    <!--<dependency>-->
+      <!--<groupId>net.sf.ehcache</groupId>-->
+      <!--<artifactId>ehcache</artifactId>-->
+      <!--<version>2.10.1</version>-->
+    <!--</dependency>-->
     <!--<dependency>-->
       <!--<groupId>org.terracotta</groupId>-->
       <!--<artifactId>terracotta-toolkit-runtime</artifactId>-->
