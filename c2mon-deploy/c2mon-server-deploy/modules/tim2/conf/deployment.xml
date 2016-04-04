@@ -16,6 +16,7 @@
         <java-vm-args>-XX:NewRatio=3 -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
 
         <property name="c2mon.server.home" value="${INSTALL_DIR}" />
+        <property name="c2mon.server.properties" value="conf/c2mon.properties" />
         <property name="oracle.net.tns_admin" value="/etc" />
 
         <!-- Terracotta license key -->
