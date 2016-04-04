@@ -17,6 +17,10 @@
 
         <property name="c2mon.server.home" value="${INSTALL_DIR}" />
         <property name="c2mon.server.properties" value="conf/c2mon.properties" />
+
+        <property name="logging.config" value="${INSTALL_DIR}/conf/logback.xml" />
+        <property name="logging.path" value="${INSTALL_DIR}/log/" />
+
         <property name="oracle.net.tns_admin" value="/etc" />
 
         <!-- Terracotta license key -->

@@ -37,7 +37,7 @@
       <source>${basedir}/conf/logback.xml</source>
       <outputDirectory>conf/</outputDirectory>
       <lineEnding>unix</lineEnding>
-      <fileMode>0700</fileMode>
+      <fileMode>0644</fileMode>
     </file>
 
     <!-- copy the license file for Terracotta -->
