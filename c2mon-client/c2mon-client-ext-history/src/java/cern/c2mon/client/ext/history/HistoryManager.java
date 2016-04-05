@@ -24,9 +24,11 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.client.ext.history.dbaccess.HistorySessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.TagUpdateListener;
@@ -83,15 +85,19 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   
   /** A connection listener checking if the connection to the JMS is lost. */
   private ConnectionListener jmsConnectionListener = null;
+
+  private HistorySessionFactory historySessionFactory;
  
   @Autowired
   protected HistoryManager(final AdvancedTagService tagService, final BasicCacheHandler pCache,
-      final CoreSupervisionManager pSupervisionManager, final HistoryTagManager historyTagManager) {
+      final CoreSupervisionManager pSupervisionManager, final HistoryTagManager historyTagManager,
+                           @Qualifier("historyFactory") HistorySessionFactory historySessionFactory) {
     
     this.tagService = tagService;
     this.cache = pCache;
     this.supervisionManager = pSupervisionManager;
     this.historyTagManager = historyTagManager;
+    this.historySessionFactory = historySessionFactory;
   }
 
   /**
@@ -306,7 +312,7 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
 
   @Override
   public HistoryProviderFactory getHistoryProviderFactory() {
-    return new HistoryProviderFactoryImpl(new ClientDataTagRequester());
+    return new HistoryProviderFactoryImpl(new ClientDataTagRequester(), historySessionFactory);
   }
 
   @Override

@@ -50,7 +50,8 @@
   <!--
     Requests the history records of a list of tags from the short term log
   -->
-  <select   id="getRecords" 
+  <select   id="getRecords"
+            databaseId="oracle"
             parameterType="ShortTermLogHistoryRequestBean"
             resultMap="historyRecordResultMap">
             
@@ -82,12 +83,46 @@
       </if>
   </select>
 
+  <select   id="getRecords"
+            databaseId="mysql"
+            parameterType="ShortTermLogHistoryRequestBean"
+            resultMap="historyRecordResultMap">
+
+    <if test="maxRecords != null">
+      SELECT * FROM (
+    </if>
+
+    SELECT
+    LOGDATE, TAGID, TAGNAME, TAGVALUE,  TAGVALUEDESC, TAGDATATYPE,
+    TAGTIME, TAGDAQTIME, TAGSERVERTIME, TAGSTATUSDESC, TAGMODE
+    FROM SHORTTERMLOG
+    WHERE
+    (TAGID IN
+    <foreach item="tag" index="index" collection="tagIds"
+             open="(" separator="," close=")">
+      #{tag}
+    </foreach>
+    )
+    <if test="fromTime != null">
+      AND TAGSERVERTIME <![CDATA[ >= ]]> CONVERT_TZ( #{fromTime}, @@session.time_zone, '+00:00' )
+    </if>
+    <if test="toTime != null">
+      AND TAGSERVERTIME <![CDATA[ < ]]> CONVERT_TZ( #{toTime}, @@session.time_zone, '+00:00' )
+    </if>
+    <if test="maxRecords != null">
+      ORDER BY TAGSERVERTIME DESC, TAGDAQTIME DESC, TAGTIME DESC
+      ) AS SHORTTERMLOG
+      LIMIT #{maxRecords}
+    </if>
+  </select>
+
   <!--
     Requests the initial value for the given tag.
     Searches the initial log and from the 00:00 of the day where the log is requested to the start time
     of the request. Then the latest record is returned.
   -->
-  <select   id="getInitialRecord" 
+  <select   id="getInitialRecord"
+            databaseId="oracle"
             parameterType="InitialRecordHistoryRequestBean"
             resultMap="historyRecordResultMap">
     SELECT * FROM (
@@ -115,12 +150,43 @@
     )
     WHERE rownum <![CDATA[ <= 1 ]]>
   </select>
+
+  <select   id="getInitialRecord"
+            databaseId="mysql"
+            parameterType="InitialRecordHistoryRequestBean"
+            resultMap="historyRecordResultMap">
+    SELECT * FROM (
+      SELECT LOGDATE, TAGID, TAGNAME, TAGVALUE, TAGVALUEDESC, TAGDATATYPE, TAGTIME, TAGDAQTIME, TAGSERVERTIME, TAGSTATUSDESC, TAGMODE, 0 AS FROMSNAPSHOT
+      FROM SHORTTERMLOG
+      WHERE
+      tagid = #{tagId}
+      AND
+      (
+        SELECT COUNT(*)
+        FROM STL_DAY_SNAPSHOT SNAPSHOT
+        WHERE SNAPSHOT.TAGID = #{tagId}
+        AND SNAPSHOT.LOGDATE = DATE(CONVERT_TZ( #{beforeTime}, @@session.time_zone, '+00:00' ))
+        AND SNAPSHOT.TAGSERVERTIME <![CDATA[ < ]]> SNAPSHOT.LOGDATE
+      ) = 0
+      AND TAGSERVERTIME <![CDATA[ >= ]]> DATE(CONVERT_TZ( #{beforeTime}, @@session.time_zone, '+00:00' ))
+      AND TAGSERVERTIME <![CDATA[ <= ]]> CONVERT_TZ( #{beforeTime}, @@session.time_zone, '+00:00' )
+      UNION ALL
+        SELECT LOGDATE+1 as LOGDATE, TAGID, TAGNAME, TAGVALUE, TAGVALUEDESC, TAGDATATYPE, TAGTIME, TAGDAQTIME, TAGSERVERTIME, TAGSTATUSDESC, TAGMODE, 1 AS FROMSNAPSHOT
+      FROM STL_DAY_SNAPSHOT
+      WHERE
+      tagid = #{tagId}
+      AND LOGDATE = DATE(CONVERT_TZ( #{beforeTime}, @@session.time_zone, '+00:00' )) - 1
+      ORDER BY TAGSERVERTIME DESC, TAGDAQTIME DESC, TAGTIME DESC, LOGDATE DESC
+      ) AS SHORTTERMLOG
+    LIMIT <![CDATA[ 1 ]]>
+  </select>
   
   <!--
     Requests all daily snapshot data for the given set of tags, and the given time span.
     The data is requeted from the daily snapshot table.
   -->
-  <select   id="getDailySnapshotRecords" 
+  <select   id="getDailySnapshotRecords"
+            databaseId="oracle"
             parameterType="DailySnapshotRequestBean"
             resultMap="historyRecordResultMap">
     SELECT LOGDATE+1 as LOGDATE, TAGID, TAGNAME, TAGVALUE, TAGVALUEDESC, TAGDATATYPE, TAGTIME, TAGDAQTIME, TAGSERVERTIME, TAGSTATUSDESC, TAGMODE, 1 AS FROMSNAPSHOT
@@ -135,11 +201,29 @@
         AND LOGDATE <![CDATA[ >= ]]> TRUNC(#{fromTime}, 'DD')
         AND LOGDATE <![CDATA[ <= ]]> TRUNC(#{toTime}, 'DD')
   </select>
+
+  <select   id="getDailySnapshotRecords"
+            databaseId="mysql"
+            parameterType="DailySnapshotRequestBean"
+            resultMap="historyRecordResultMap">
+    SELECT LOGDATE+1 as LOGDATE, TAGID, TAGNAME, TAGVALUE, TAGVALUEDESC, TAGDATATYPE, TAGTIME, TAGDAQTIME, TAGSERVERTIME, TAGSTATUSDESC, TAGMODE, 1 AS FROMSNAPSHOT
+    FROM STL_DAY_SNAPSHOT
+    WHERE
+    (TAGID in
+    <foreach item="tag" index="index" collection="tagIds"
+             open="(" separator="," close=")">
+      #{tag}
+    </foreach>
+    )
+    AND LOGDATE <![CDATA[ >= ]]> DATE(#{fromTime})
+    AND LOGDATE <![CDATA[ <= ]]> DATE(#{toTime})
+  </select>
   
   <!--
     Requests supervision events matching the request parameter
    -->
-  <select   id="getSupervisionEvents" 
+  <select   id="getSupervisionEvents"
+            databaseId="oracle"
             parameterType="SupervisionEventRequestBean"
             resultMap="SupervisionRecordResultMap">
     SELECT SUL_ENTITY, SUL_ID, SUL_DATE, SUL_STATUS, SUL_MESSAGE
@@ -154,11 +238,29 @@
         </if>
     ORDER BY SUL_DATE ASC
   </select>
+
+  <select   id="getSupervisionEvents"
+            databaseId="mysql"
+            parameterType="SupervisionEventRequestBean"
+            resultMap="SupervisionRecordResultMap">
+    SELECT SUL_ENTITY, SUL_ID, SUL_DATE, SUL_STATUS, SUL_MESSAGE
+    FROM SUPERVISION_LOG
+    WHERE
+    (SUL_ID = #{id})
+    AND (SUL_ENTITY LIKE #{entity})
+    <if test="fromTime != null ">
+      <if test="toTime != null">
+        AND SUL_DATE BETWEEN CONVERT_TZ( #{fromTime}, @@session.time_zone, '+00:00' ) AND CONVERT_TZ( #{toTime}, @@session.time_zone, '+00:00' )
+      </if>
+    </if>
+    ORDER BY SUL_DATE ASC
+  </select>
   
   <!--
     Requests the initial supervision event matching the request parameter
    -->
-  <select   id="getInitialSupervisionEvents" 
+  <select   id="getInitialSupervisionEvents"
+            databaseId="oracle"
             parameterType="SupervisionEventRequestBean"
             resultMap="SupervisionRecordResultMap">
     SELECT * FROM (
@@ -171,6 +273,22 @@
       ORDER BY SUL_DATE DESC
     )
     WHERE rownum <![CDATA[ <= 1 ]]>
+  </select>
+
+  <select   id="getInitialSupervisionEvents"
+            databaseId="mysql"
+            parameterType="SupervisionEventRequestBean"
+            resultMap="SupervisionRecordResultMap">
+    SELECT * FROM (
+    SELECT SUL_ENTITY, SUL_ID, SUL_DATE, SUL_STATUS, SUL_MESSAGE
+    FROM SUPERVISION_LOG
+    WHERE
+    (SUL_ID = #{id})
+    AND (SUL_ENTITY LIKE #{entity})
+    AND SUL_DATE <![CDATA[ <= ]]> CONVERT_TZ( #{fromTime}, @@session.time_zone, '+00:00' )
+    ORDER BY SUL_DATE DESC
+    ) AS SHORTTERMLOG
+    LIMIT <![CDATA[ 1 ]]>
   </select>
   
 </mapper>

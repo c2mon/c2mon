@@ -17,13 +17,16 @@
 package cern.c2mon.client.ext.history;
 
 import cern.c2mon.client.ext.history.alarm.AlarmHistoryService;
+import cern.c2mon.client.ext.history.config.HistoryConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import cern.c2mon.client.core.C2monServiceGateway;
 
+@Deprecated
 public class C2monHistoryGateway {
 
   /** Class logger */
@@ -31,7 +34,7 @@ public class C2monHistoryGateway {
 
   /** The path to the core Spring XML */
   private static final String APPLICATION_SPRING_XML_PATH
-    = "classpath:cern/c2mon/client/ext/history/springConfig/spring-history.xml";
+    = "classpath:cern/c2mon/client/ext/history/config/spring-history.xml";
 
   /** The extended SPRING application context for this gateway */
   public static ApplicationContext context;
@@ -67,8 +70,9 @@ public class C2monHistoryGateway {
    */
   private static void initiateHistoryManager() {
     if (context == null) {
-      context = new ClassPathXmlApplicationContext
-          (new String[]{APPLICATION_SPRING_XML_PATH}, C2monServiceGateway.getApplicationContext());
+      context = new AnnotationConfigApplicationContext
+          (HistoryConfig.class);
+
       historyManager = context.getBean(C2monHistoryManager.class);
     }
     else {

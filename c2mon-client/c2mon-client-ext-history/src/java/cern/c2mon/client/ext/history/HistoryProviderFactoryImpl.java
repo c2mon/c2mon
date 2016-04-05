@@ -40,16 +40,8 @@ public class HistoryProviderFactoryImpl implements HistoryProviderFactory {
    *          {@link Tag#getType()}.
    */
   private final ClientDataTagRequestCallback clientDataTagRequestCallback;
-  
-  @Autowired
+
   private HistorySessionFactory historyFactory;
-  
-  /**
-   * Constructor
-   */
-  public HistoryProviderFactoryImpl() {
-    this(null);
-  }
   
   /**
    * 
@@ -58,11 +50,9 @@ public class HistoryProviderFactoryImpl implements HistoryProviderFactory {
    *          the {@link Tag}. Like the
    *          {@link Tag#getType()}.
    */
-  public HistoryProviderFactoryImpl(final ClientDataTagRequestCallback clientDataTagRequestCallback) {
+  public HistoryProviderFactoryImpl(final ClientDataTagRequestCallback clientDataTagRequestCallback, HistorySessionFactory historySessionFactory) {
     this.clientDataTagRequestCallback = clientDataTagRequestCallback;
-    
-    this.historyFactory = (HistorySessionFactory)
-        C2monHistoryGateway.context.getBean("historyFactory");
+    this.historyFactory = historySessionFactory;
   }
 
   @Override

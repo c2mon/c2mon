@@ -11,10 +11,10 @@
 	<context:annotation-config />
 	<context:component-scan base-package="cern.c2mon.client.ext.history" />
 	
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="ignoreResourceNotFound" value="true" />
-		<property name="location" value="${c2mon.client.conf.url}" />
-	</bean>
+	<!--<bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">-->
+		<!--<property name="ignoreResourceNotFound" value="true" />-->
+		<!--<property name="location" value="${c2mon.client.conf.url}" />-->
+	<!--</bean>-->
 
 	<!--
 		configure the data source connection pool (from .c2mon.properties in
@@ -45,6 +45,7 @@
 		<property name="configLocation"
 			value="classpath:cern/c2mon/client/ext/history/dbaccess/config/history-ibatis.xml" />
 		<property name="dataSource" ref="historyDataSource" />
+		<property name="databaseIdProvider" ref="databaseIdProvider"/>
 	</bean>
 
 	<bean id="historyConnectionMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
@@ -66,6 +67,21 @@
 	</bean>
 	
 	<bean id="historyFactory" class="cern.c2mon.client.ext.history.dbaccess.HistorySessionFactory">
+	</bean>
+
+	<bean id="vendorProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="properties">
+			<props>
+				<prop key="HSQLDB">oracle</prop>
+				<prop key="H2">h2</prop>
+				<prop key="Oracle">oracle</prop>
+				<prop key="MySQL">mysql</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="databaseIdProvider" class="org.apache.ibatis.mapping.VendorDatabaseIdProvider">
+		<property name="properties" ref="vendorProperties"/>
 	</bean>
 	
 </beans>
