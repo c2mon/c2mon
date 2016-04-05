@@ -65,6 +65,15 @@
                   <exclude>cern.c2mon.c2mon-client:*-ext-*</exclude>
                 </excludes>
               </artifactSet>
+              <filters>
+                <filter>
+                  <artifact>cern.c2mon.c2mon-client:c2mon-client-core</artifact>
+                  <includes>
+                    <include>**/**</include>
+                    <include>META-INF/spring.factories</include>
+                  </includes>
+                </filter>
+              </filters>
             </configuration>
           </execution>
         </executions>
