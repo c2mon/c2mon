@@ -72,7 +72,7 @@
 	<bean id="vendorProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 		<property name="properties">
 			<props>
-				<prop key="HSQLDB">oracle</prop>
+				<prop key="HSQL">oracle</prop>
 				<prop key="H2">h2</prop>
 				<prop key="Oracle">oracle</prop>
 				<prop key="MySQL">mysql</prop>
