@@ -1,6 +1,6 @@
 SET DATABASE SQL SYNTAX ORA TRUE;
 
-CREATE TABLE if not exists shorttermlog (
+CREATE TABLE IF NOT EXISTS SHORTTERMLOG (
 logdate           DATE          NOT NULL,
 tagid             INTEGER     NOT NULL,
 tagname           VARCHAR(60),
@@ -15,9 +15,9 @@ tagstatusdesc     VARCHAR(1000),
 tagmode           INTEGER,
 tagdir            VARCHAR(1));
 
---create index stl_tagid_ix on shorttermlog(tagid);
+--create index stl_tagid_ix on SHORTTERMLOG(tagid);
 
-CREATE TABLE if not exists SUPERVISION_LOG(
+CREATE TABLE IF NOT EXISTS SUPERVISION_LOG (
   SUL_ENTITY  VARCHAR(30) NOT NULL,
   SUL_ID      INTEGER NOT NULL,
   SUL_DATE    TIMESTAMP(6) NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE if not exists SUPERVISION_LOG(
   SUL_MESSAGE VARCHAR(200)
 );
 
-CREATE TABLE if not exists stl_day_snapshot (
+CREATE TABLE IF NOT EXISTS STL_DAY_SNAPSHOT (
 logdate       DATE
 ,tagid         INTEGER      NOT NULL
 ,tagname       VARCHAR(60)
@@ -40,9 +40,9 @@ logdate       DATE
 ,tagvaluedesc  VARCHAR(1000)
 );
 
---create index tdl_tagid_ix on stl_day_snapshot(tagid);
+--create index tdl_tagid_ix on STL_DAY_SNAPSHOT(tagid);
 
-CREATE TABLE if not exists commandtaglog (
+CREATE TABLE IF NOT EXISTS COMMANDTAGLOG (
 cmdid           INTEGER       NOT NULL,
 cmdname         VARCHAR(60)    NOT NULL,
 cmdmode         INTEGER       NOT NULL,
@@ -56,14 +56,14 @@ cmdreportstatus VARCHAR(50),
 cmdreportdesc   VARCHAR(100)
 );
 
-CREATE TABLE if not exists SERVER_LIFECYCLE_LOG (
+CREATE TABLE IF NOT EXISTS SERVER_LIFECYCLE_LOG (
     SLL_EVENT_TYPE      VARCHAR(10) NOT NULL,
     SLL_SERVER_NAME     VARCHAR(20) NOT NULL,
     SLL_TIME            TIMESTAMP(6) NOT NULL   
 );
 
 
-CREATE TABLE if not exists alarmlog (
+CREATE TABLE IF NOT EXISTS ALARMLOG (
 logdate         DATE,
 tagid           INTEGER       NOT NULL,
 alarmid         INTEGER       NOT NULL,

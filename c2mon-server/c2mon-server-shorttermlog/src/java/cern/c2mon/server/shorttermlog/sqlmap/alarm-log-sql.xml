@@ -14,8 +14,8 @@
     information for a given dataTag. The values for the inserted row are
     stored in the DataTagShortTermLog object
   -->
-  <insert id="insertLog" parameterType="AlarmSTLog">
-    INSERT INTO alarmlog (LOGDATE, TAGID, ALARMID, ACTIVE, FAULTFAMILY, FAULTMEMBER, FAULTCODE, SERVERTIME, INFO)
+  <insert id="insertLog" databaseId="oracle" parameterType="AlarmSTLog">
+    INSERT INTO ALARMLOG (LOGDATE, TAGID, ALARMID, ACTIVE, FAULTFAMILY, FAULTMEMBER, FAULTCODE, SERVERTIME, INFO)
     VALUES (
     <!-- The logDate is not null, because is a dataTag read from the fallback file -->
     <if test="logDate != null">SYS_EXTRACT_UTC(#{logDate,jdbcType=TIMESTAMP})</if>
@@ -32,10 +32,29 @@
     ,SYS_EXTRACT_UTC(#{serverTimestamp,jdbcType=TIMESTAMP})
     ,#{info,jdbcType=VARCHAR})
   </insert>
+
+  <insert id="insertLog" databaseId="mysql" parameterType="AlarmSTLog">
+    INSERT INTO ALARMLOG (LOGDATE, TAGID, ALARMID, ACTIVE, FAULTFAMILY, FAULTMEMBER, FAULTCODE, SERVERTIME, INFO)
+    VALUES (
+    <!-- The logDate is not null, because is a dataTag read from the fallback file -->
+    <if test="logDate != null">CONVERT_TZ( #{logDate,jdbcType=TIMESTAMP}, @@session.time_zone, '+00:00' )</if>
+    <!-- The logDate is null, what means that comes from a DAQ -->
+    <if test="logDate == null">CONVERT_TZ( CURRENT_TIMESTAMP, @@session.time_zone, '+00:00' )</if>
+
+    ,#{tagId,jdbcType=NUMERIC}
+    ,#{id,jdbcType=NUMERIC}
+    ,<if test="active == true">'Y'</if>
+    <if test="active == false">'N'</if>
+    ,#{faultFamily,jdbcType=VARCHAR}
+    ,#{faultMember,jdbcType=VARCHAR}
+    ,#{faultCode,jdbcType=NUMERIC}
+    , CONVERT_TZ( #{serverTimestamp,jdbcType=TIMESTAMP}, @@session.time_zone, '+00:00' )
+    ,#{info,jdbcType=VARCHAR})
+  </insert>
   
   <!-- only used to remove inserts done during testing -->
   <delete id="deleteAlarmLog" parameterType="Long">
-    DELETE FROM alarmlog WHERE alarmid = #{id}
+    DELETE FROM ALARMLOG WHERE alarmid = #{id}
   </delete>
   
 </mapper>

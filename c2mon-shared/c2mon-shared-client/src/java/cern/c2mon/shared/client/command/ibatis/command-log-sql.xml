@@ -20,8 +20,8 @@
       <result property="reportDescription" column="CMDREPORTDESC" jdbcType="VARCHAR"/>                          
   </resultMap>
     
-  <insert id="insertLog" parameterType="CommandTagLog">
-    INSERT INTO commandtaglog (CMDID, CMDNAME, CMDMODE, CMDTIME, CMDVALUE, CMDDATATYPE, CMDUSER, CMDHOST,
+  <insert id="insertLog" databaseId="oracle" parameterType="CommandTagLog">
+    INSERT INTO COMMANDTAGLOG (CMDID, CMDNAME, CMDMODE, CMDTIME, CMDVALUE, CMDDATATYPE, CMDUSER, CMDHOST,
                                CMDREPORTTIME, CMDREPORTSTATUS, CMDREPORTDESC)
     VALUES (
     #{tagId}, #{name, jdbcType=VARCHAR}, #{mode, jdbcType=NUMERIC}, SYS_EXTRACT_UTC(#{executionTime, jdbcType=TIMESTAMP}),
@@ -29,16 +29,26 @@
     SYS_EXTRACT_UTC(#{reportTime, jdbcType=TIMESTAMP}), #{reportStatus, jdbcType=VARCHAR}, #{reportDescription, jdbcType=VARCHAR})
     
   </insert>
+
+  <insert id="insertLog" databaseId="mysql" parameterType="CommandTagLog">
+    INSERT INTO COMMANDTAGLOG (CMDID, CMDNAME, CMDMODE, CMDTIME, CMDVALUE, CMDDATATYPE, CMDUSER, CMDHOST,
+    CMDREPORTTIME, CMDREPORTSTATUS, CMDREPORTDESC)
+    VALUES (
+    #{tagId}, #{name, jdbcType=VARCHAR}, #{mode, jdbcType=NUMERIC}, CONVERT_TZ( #{executionTime, jdbcType=TIMESTAMP}, @@session.time_zone, '+00:00' ),
+    #{value, jdbcType=VARCHAR}, #{dataType, jdbcType=VARCHAR}, #{user, jdbcType=VARCHAR}, #{host, jdbcType=VARCHAR},
+    CONVERT_TZ( #{reportTime, jdbcType=TIMESTAMP}, @@session.time_zone, '+00:00' ), #{reportStatus, jdbcType=VARCHAR}, #{reportDescription, jdbcType=VARCHAR})
+
+  </insert>
   
   <select id="getCommandTagLog" parameterType="Long" resultMap="commandResultMap" >
     SELECT CMDID, CMDNAME, CMDMODE, CMDTIME, CMDVALUE, CMDDATATYPE, 
             CMDUSER, CMDHOST, CMDREPORTTIME, CMDREPORTSTATUS, CMDREPORTDESC
-      FROM commandtaglog
+      FROM COMMANDTAGLOG
      WHERE CMDID = #{id}    
   </select>
   
   <delete id="deleteAllLogs" parameterType="Long">
-    DELETE FROM commandtaglog
+    DELETE FROM COMMANDTAGLOG
           WHERE CMDID = #{id}        
   </delete>
   

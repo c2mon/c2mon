@@ -17,21 +17,27 @@
       <result property="message" column="sul_message" jdbcType="VARCHAR"/>             
   </resultMap>
     
-  <insert id="logSupervisionEvent" parameterType="SupervisionEvent">
-    INSERT INTO supervision_log (sul_entity, sul_id, sul_status, sul_date, sul_message)
+  <insert id="logSupervisionEvent" databaseId="oracle" parameterType="SupervisionEvent">
+    INSERT INTO SUPERVISION_LOG (sul_entity, sul_id, sul_status, sul_date, sul_message)
     VALUES (
     #{entity}, #{entityId}, #{status}, SYS_EXTRACT_UTC(#{eventTime}), #{message, jdbcType=VARCHAR})
+  </insert>
+
+  <insert id="logSupervisionEvent" databaseId="mysql" parameterType="SupervisionEvent">
+    INSERT INTO SUPERVISION_LOG (sul_entity, sul_id, sul_status, sul_date, sul_message)
+    VALUES (
+    #{entity}, #{entityId}, #{status}, CONVERT_TZ( #{eventTime}, @@session.time_zone, '+00:00' ), #{message, jdbcType=VARCHAR})
   </insert>
   
   <select id="getEntitySupervision" parameterType="Long" resultMap="supervisionEntityResultMap" >
     SELECT sul_entity, sul_id, sul_date, sul_status, sul_message
-      FROM supervision_log
+      FROM SUPERVISION_LOG
      WHERE sul_id = #{id}    
   </select>
   
   <delete id="testDelete" parameterType="Long">
-    DELETE FROM supervision_log
-          WHERE sul_id = #{id}        
+    DELETE FROM SUPERVISION_LOG
+          WHERE sul_id = #{id}
   </delete>
   
 </mapper>

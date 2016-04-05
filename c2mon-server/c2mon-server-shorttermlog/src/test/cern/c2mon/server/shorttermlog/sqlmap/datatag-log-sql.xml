@@ -15,7 +15,7 @@
     stored in the DataTagShortTermLog object
   -->
   <insert id="insertLog" parameterType="DataTagSTLog">
-    INSERT INTO shorttermlog (LOGDATE, TAGID, TAGNAME, TAGVALUE, TAGVALUEDESC,
+    INSERT INTO SHORTTERMLOG (LOGDATE, TAGID, TAGNAME, TAGVALUE, TAGVALUEDESC,
     TAGDATATYPE,
     TAGSTATUS, TAGSTATUSDESC, TAGMODE, TAGDIR, TAGTIME, TAGDAQTIME, TAGSERVERTIME)
     VALUES (
@@ -33,7 +33,7 @@
   
   <!-- only used to remove inserts done during testing -->
   <delete id="deleteDataTagLog" parameterType="Long">
-    DELETE FROM shorttermlog WHERE tagid = #{id}
+    DELETE FROM SHORTTERMLOG WHERE tagid = #{id}
   </delete>
   
 </mapper>
