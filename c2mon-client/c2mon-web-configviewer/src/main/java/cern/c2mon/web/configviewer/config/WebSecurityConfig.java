@@ -38,6 +38,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     // If the RBAC triplet isn't given, disable authentication entirely.
     if (!environment.containsProperty("c2mon.web.rbac.admin")) {
+      http.authorizeRequests().anyRequest().permitAll().and().csrf().disable();
       return;
     }
 
