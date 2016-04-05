@@ -2,7 +2,6 @@ package cern.c2mon.web.configviewer.security;
 
 import cern.c2mon.client.common.service.SessionService;
 import cern.c2mon.client.common.util.RbacAuthorizationDetailsParser;
-import cern.c2mon.client.ext.rbac.C2monSessionGateway;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +33,7 @@ public class RbacDecisionManager implements AccessDecisionManager {
    */
   private Map<String, String> authorizationDetails;
 
+  @Autowired
   private SessionService sessionService;
 
   /**
@@ -48,8 +48,6 @@ public class RbacDecisionManager implements AccessDecisionManager {
   @Autowired
   public RbacDecisionManager(final Map<String, String> authorizationDetails) {
     this.authorizationDetails = authorizationDetails;
-//    C2monSessionGateway.initialize();
-    this.sessionService = C2monSessionGateway.getSessionService();
   }
 
   @Override

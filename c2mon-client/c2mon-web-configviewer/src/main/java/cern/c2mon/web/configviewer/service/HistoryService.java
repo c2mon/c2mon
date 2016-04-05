@@ -26,11 +26,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import cern.c2mon.client.ext.history.HistoryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.ext.history.C2monHistoryGateway;
 import cern.c2mon.client.ext.history.common.HistoryLoadingConfiguration;
 import cern.c2mon.client.ext.history.common.HistoryLoadingManager;
 import cern.c2mon.client.ext.history.common.HistoryProvider;
@@ -40,6 +41,7 @@ import cern.c2mon.client.ext.history.common.exception.LoadingParameterException;
 import cern.c2mon.client.ext.history.updates.HistoryTagValueUpdateImpl;
 import cern.c2mon.web.configviewer.controller.TrendViewController;
 import cern.c2mon.web.configviewer.util.InvalidPoint;
+
 
 /**
  * HistoryService providing the XML representation for the history of a given tag.
@@ -61,21 +63,8 @@ public class HistoryService {
   /** Date format used in History Queries */
   private static final String DATE_FORMAT = "dd/MM/yyyy-HH:mm";
 
-  /** Used to retrieve Historical Data */
-  private HistoryProvider historyProvider;
-
-  public HistoryService() throws HistoryProviderException {
-
-//    try {
-//     a historyProvider = C2monHistoryGateway.getHistoryManager().
-//          getHistoryProviderFactory().createHistoryProvider();
-//    }
-//    catch (HistoryProviderException e) {
-//      logger.error("Can't load any history because a HistoryProvider cannot be created.", e);
-//      throw new HistoryProviderException("Cannot retrieve the data from the Short term log " +
-//          "because no history provider is accessible.");
-//    }
-  }
+  @Autowired
+  private HistoryManager historyManager;
 
   /**
    * @return XML representation of Tag's History
@@ -232,8 +221,8 @@ public class HistoryService {
     final long id = Long.parseLong(dataTagId);
     Collection<Long> dataTagIds = new ArrayList<Long>();
     dataTagIds.add(id);
-    final HistoryLoadingManager loadingManager = C2monHistoryGateway.getHistoryManager()
-        .createHistoryLoadingManager(historyProvider, dataTagIds);
+    final HistoryLoadingManager loadingManager = historyManager
+        .createHistoryLoadingManager(getHistoryProvider(), dataTagIds);
 
     final HistoryLoadingConfiguration configuration = new HistoryLoadingConfiguration();
     configuration.setLoadInitialValues(true);
@@ -271,8 +260,8 @@ public class HistoryService {
     final long id = Long.parseLong(dataTagId);
     Collection<Long> dataTagIds = new ArrayList<Long>();
     dataTagIds.add(id);
-    final HistoryLoadingManager loadingManager = C2monHistoryGateway.getHistoryManager()
-        .createHistoryLoadingManager(historyProvider, dataTagIds);
+    final HistoryLoadingManager loadingManager = historyManager
+        .createHistoryLoadingManager(getHistoryProvider(), dataTagIds);
 
     final HistoryLoadingConfiguration configuration = new HistoryLoadingConfiguration();
     configuration.setLoadInitialValues(true);
@@ -312,8 +301,8 @@ public class HistoryService {
     final long id = Long.parseLong(dataTagId);
     Collection<Long> dataTagIds = new ArrayList<Long>();
     dataTagIds.add(id);
-    final HistoryLoadingManager loadingManager = C2monHistoryGateway.getHistoryManager()
-        .createHistoryLoadingManager(historyProvider, dataTagIds);
+    final HistoryLoadingManager loadingManager = historyManager
+        .createHistoryLoadingManager(getHistoryProvider(), dataTagIds);
 
     final HistoryLoadingConfiguration configuration = new HistoryLoadingConfiguration();
     configuration.setLoadInitialValues(true);
@@ -497,5 +486,20 @@ public class HistoryService {
     java.util.Date date = dateFormat.parse(dateString);
     final long time = date.getTime();
     return new Timestamp(time);
+  }
+
+  private HistoryProvider getHistoryProvider() throws HistoryProviderException {
+    HistoryProvider provider = null;
+
+    try {
+      provider = historyManager.getHistoryProviderFactory().createHistoryProvider();
+    }
+    catch (HistoryProviderException e) {
+      logger.error("Can't load any history because a HistoryProvider cannot be created.", e);
+      throw new HistoryProviderException("Cannot retrieve the data from the Short term log " +
+          "because no history provider is accessible.");
+    }
+
+    return provider;
   }
 }

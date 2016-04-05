@@ -19,8 +19,8 @@ package cern.c2mon.web.configviewer.statistics;
 import java.text.ParseException;
 import java.util.*;
 
+import cern.c2mon.client.ext.history.lifecycle.ServerLifecycleEvent;
 import cern.c2mon.web.configviewer.statistics.daqlog.charts.WebChart;
-import cern.c2mon.web.configviewer.statistics.stlog.ServerLifecycleEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

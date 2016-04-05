@@ -16,14 +16,13 @@
  ******************************************************************************/
 package cern.c2mon.web.configviewer.statistics;
 
-import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.manager.TagManager;
+import cern.c2mon.client.ext.history.lifecycle.ServerLifecycleEvent;
+import cern.c2mon.client.ext.history.lifecycle.ServerLifecycleEventRepository;
 import cern.c2mon.shared.client.statistics.TagStatisticsResponse;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.web.configviewer.service.ProcessService;
 import cern.c2mon.web.configviewer.statistics.daqlog.charts.WebChart;
-import cern.c2mon.web.configviewer.statistics.stlog.ServerLifecycleEvent;
-import cern.c2mon.web.configviewer.statistics.stlog.ServerLifecycleEventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

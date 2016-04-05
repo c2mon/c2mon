@@ -312,7 +312,7 @@ public class TrendViewController {
     } catch (final TagIdException e) {
       return ("redirect:" + TREND_VIEW_FORM_URL + "?error=" + id);
     } catch (Exception e) {
-      logger.error(e.getMessage());
+      logger.error("Error: ", e);
     }
     return ("redirect:" + TREND_VIEW_FORM_URL + "?error=" + id);
   }
