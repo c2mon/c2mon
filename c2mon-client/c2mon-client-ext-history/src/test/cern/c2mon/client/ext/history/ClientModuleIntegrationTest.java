@@ -33,7 +33,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
   {
         "classpath:cern/c2mon/client/ext/history/c2mon-historymanager-test.xml"
         ,
-        "classpath:cern/c2mon/client/ext/history/springConfig/spring-history.xml" 
+        "classpath:cern/c2mon/client/ext/history/config/spring-history.xml"
   })
 public class ClientModuleIntegrationTest {
 
