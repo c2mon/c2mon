@@ -10,10 +10,8 @@
   <groupId>cern.c2mon.c2mon-client</groupId>
   <artifactId>c2mon-client-ext-history</artifactId>
   <version>1.7.1-SNAPSHOT</version>
-  <name>c2mon-client-ext-history</name>
+
   <packaging>jar</packaging>
-  <description>Extension providing history data and playback for the C2MON client.</description>
-  <url>http://timweb.cern.ch</url>
 
   <dependencies>
 
@@ -24,16 +22,16 @@
     </dependency>
 
     <!-- 3rd party dependencies -->
-    <dependency>
-      <groupId>oracle</groupId>
-      <artifactId>ojdbc6</artifactId>
-      <version>11.2.0.3</version>
-    </dependency>
-    <dependency>
-      <groupId>oracle</groupId>
-      <artifactId>orai18n</artifactId>
-      <version>11.2.0.3</version>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>oracle</groupId>-->
+      <!--<artifactId>ojdbc6</artifactId>-->
+      <!--<version>11.2.0.3</version>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>oracle</groupId>-->
+      <!--<artifactId>orai18n</artifactId>-->
+      <!--<version>11.2.0.3</version>-->
+    <!--</dependency>-->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
@@ -59,13 +57,13 @@
         mybatis-spring > 1.1.0 requires: mybatis version > 3.1.0
         More info here: http://mybatis.github.io/spring/
       -->
-      <version>1.2.2</version>
+      <version>1.2.5</version>
     </dependency>
 
     <dependency>
       <groupId>org.mybatis</groupId>
       <artifactId>mybatis</artifactId>
-      <version>3.2.7</version>
+      <version>3.3.1</version>
     </dependency>
 
     <dependency>
@@ -136,11 +134,11 @@
         <configuration>
           <argLine>
             <!-- for the tests -->
-            -Dc2mon.client.conf.url=http://timweb/conf/c2mon-client.properties
+            <!-- -Dc2mon.client.conf.url=http://timweb/conf/c2mon-client.properties-->
 
-            <!-- added during the migration to Spring -->
-            -Ddatasource.persistence.connections.initial=2
-            -Ddatasource.persistence.connections.max=2
+            <!--&lt;!&ndash; added during the migration to Spring &ndash;&gt;-->
+            <!-- -Ddatasource.persistence.connections.initial=2-->
+            <!-- -Ddatasource.persistence.connections.max=2-->
             <!-- added during the migration to Spring -->
 
             <!-- for the tests -->

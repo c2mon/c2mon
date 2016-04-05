@@ -407,10 +407,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     for (Map.Entry<String, MessageListenerWrapper> entry : topicToWrapper.entrySet()) {
       entry.getValue().stop();
     }
-    try {
-      connection.close(); // closes all consumers and sessions also
-    } catch (JMSException jmsEx) {
-      LOGGER.error("disconnect() - Exception caught while attempting to disconnect from JMS - aborting this attempt.", jmsEx);
+    if (connection != null) {
+      try {
+        connection.close(); // closes all consumers and sessions also
+      } catch (JMSException jmsEx) {
+        LOGGER.error("disconnect() - Exception caught while attempting to disconnect from JMS - aborting this attempt.", jmsEx);
+      }
     }
   }
 
