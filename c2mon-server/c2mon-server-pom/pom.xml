@@ -144,8 +144,13 @@
 
       <dependency>
         <groupId>org.mybatis</groupId>
+        <artifactId>mybatis</artifactId>
+        <version>3.3.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mybatis</groupId>
         <artifactId>mybatis-spring</artifactId>
-        <version>1.2.4</version>
+        <version>1.2.5</version>
       </dependency>
       <dependency>
         <groupId>javax.jms</groupId>
