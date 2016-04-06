@@ -139,6 +139,10 @@ th {
             <th>Data Type</th>
             <td>${tag.value['class'].name}</td>
           </tr>
+          <tr>
+            <th>Metadata</th>
+            <td>${tag.metadata}</td>
+          </tr>
         </tbody>
       </table>
     </div>
