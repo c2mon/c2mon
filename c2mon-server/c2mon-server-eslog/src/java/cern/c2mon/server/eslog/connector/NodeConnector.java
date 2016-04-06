@@ -15,3 +15,4 @@
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 //TODO: Implement a node that lies inside the ElasticSearch cluster (node client).
+//      See also: https://www.elastic.co/guide/en/elasticsearch/guide/current/_transport_client_versus_node_client.html
