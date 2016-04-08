@@ -20,26 +20,26 @@
 		configure the data source connection pool (from .c2mon.properties in
 		production)
 	-->        
-	<bean id="historyDataSource" class="org.apache.commons.dbcp.BasicDataSource">
-	
-		<property name="driverClassName" value="${c2mon.jdbc.driver}" />
-        <property name="url" value="${c2mon.jdbc.ro.url}" />
-        <property name="username" value="${c2mon.jdbc.ro.user}" />
-        <property name="password" value="${c2mon.jdbc.ro.password}" />
-   	<!--
-     	<property name="driverClassName" value="oracle.jdbc.OracleDriver" />
-        <property name="url" value="jdbc:oracle:thin:@( DESCRIPTION= (ADDRESS= (PROTOCOL=TCP) (HOST=dbsrva3202.cern.ch) (PORT=1574) ) (ENABLE=BROKEN) (CONNECT_DATA= (SID=TIMTST)))" />
-        <property name="username" value="timop" />
-        <property name="password" value="optim1954" />  
-	  -->  
-		<!--    <property name="logWriter" value=""/>-->
-		<property name="defaultAutoCommit" value="false" />
-		<!--<property name="validationQuery" value="SELECT 0 FROM DUAL" />-->
-    <property name="testWhileIdle" value="true" />
-    <property name="timeBetweenEvictionRunsMillis" value="600000" />        
-		<property name="initialSize" value="1" />
-		<property name="maxActive" value="2" />
-	</bean>
+	<!--<bean id="historyDataSource" class="org.apache.commons.dbcp.BasicDataSource">-->
+	<!---->
+		<!--<property name="driverClassName" value="${c2mon.jdbc.driver}" />-->
+        <!--<property name="url" value="${c2mon.jdbc.ro.url}" />-->
+        <!--<property name="username" value="${c2mon.jdbc.ro.user}" />-->
+        <!--<property name="password" value="${c2mon.jdbc.ro.password}" />-->
+   	<!--&lt;!&ndash;-->
+     	<!--<property name="driverClassName" value="oracle.jdbc.OracleDriver" />-->
+        <!--<property name="url" value="jdbc:oracle:thin:@( DESCRIPTION= (ADDRESS= (PROTOCOL=TCP) (HOST=dbsrva3202.cern.ch) (PORT=1574) ) (ENABLE=BROKEN) (CONNECT_DATA= (SID=TIMTST)))" />-->
+        <!--<property name="username" value="timop" />-->
+        <!--<property name="password" value="optim1954" />  -->
+	  <!--&ndash;&gt;  -->
+		<!--&lt;!&ndash;    <property name="logWriter" value=""/>&ndash;&gt;-->
+		<!--<property name="defaultAutoCommit" value="false" />-->
+		<!--&lt;!&ndash;<property name="validationQuery" value="SELECT 0 FROM DUAL" />&ndash;&gt;-->
+    <!--<property name="testWhileIdle" value="true" />-->
+    <!--<property name="timeBetweenEvictionRunsMillis" value="600000" />        -->
+		<!--<property name="initialSize" value="1" />-->
+		<!--<property name="maxActive" value="2" />-->
+	<!--</bean>-->
 
 	<bean id="historySqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="configLocation"
