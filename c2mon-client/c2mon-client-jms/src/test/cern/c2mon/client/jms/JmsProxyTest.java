@@ -76,7 +76,14 @@ import cern.c2mon.shared.util.json.GsonFactory;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({ "classpath:cern/c2mon/client/jms/config/c2mon-client-jms.xml",
                          "classpath:cern/c2mon/client/jms/config/c2mon-client-jms-properties.xml" })
-@TestPropertySource("classpath:c2mon-client.properties")
+@TestPropertySource(
+    locations = "classpath:c2mon-client.properties",
+    properties = {
+        "c2mon.client.jms.url=vm://localhost",
+        "c2mon.client.jms.user=",
+        "c2mon.client.jms.password="
+    }
+)
 public class JmsProxyTest {
   
   /**
@@ -89,7 +96,7 @@ public class JmsProxyTest {
    * For sending message to the broker, to be picked up by the tested proxy.
    */
   private ActiveJmsSender jmsSender;
-  
+
   private JmsTemplate serverTemplate;
  
   private static ConnectionFactory connectionFactory;
@@ -109,7 +116,7 @@ public class JmsProxyTest {
   public void setUp() throws Exception {    
     jmsSender = new ActiveJmsSender();
     jmsSender.setJmsTemplate(new JmsTemplate(connectionFactory));
-    serverTemplate = new JmsTemplate(connectionFactory);    
+    serverTemplate = new JmsTemplate(connectionFactory);
     //JMS connection is started in separate thread, so leave time to connect
     Thread.sleep(2000);
   }
