@@ -20,6 +20,7 @@ import cern.c2mon.client.core.config.C2monAutoConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import cern.c2mon.client.core.manager.CommandManager;
@@ -255,4 +256,10 @@ public class C2monServiceGateway {
     tagService = xmlContext.getBean(TagService.class);
   }
 
+  /**
+   * Stop the C2MON client.
+   */
+  public static synchronized void stopC2monClient() {
+    ((ConfigurableApplicationContext) context).close();
+  }
 }
