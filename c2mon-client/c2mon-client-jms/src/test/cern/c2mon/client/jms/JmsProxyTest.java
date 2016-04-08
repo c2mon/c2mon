@@ -42,6 +42,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;
 import org.springframework.test.annotation.DirtiesContext;
@@ -91,6 +92,9 @@ public class JmsProxyTest {
    */
   @Autowired
   private JmsProxy jmsProxy;
+
+  @Autowired
+  private Environment environment;
   
   /**
    * For sending message to the broker, to be picked up by the tested proxy.
@@ -153,7 +157,7 @@ public class JmsProxyTest {
   @DirtiesContext
   public void testSendRequest() throws JMSException, InterruptedException {     
     JsonRequest<SupervisionEvent> jsonRequest = new ClientRequestImpl<SupervisionEvent>(SupervisionEvent.class);      
-    final String queueName = System.getProperty("c2mon.client.jms.request.queue") + "-" + System.currentTimeMillis();
+    final String queueName = environment.getRequiredProperty("c2mon.client.jms.request.queue") + "-" + System.currentTimeMillis();
     new Thread(new Runnable() {      
       @Override
       public void run() {       
@@ -342,7 +346,7 @@ public class JmsProxyTest {
     
     jmsProxy.registerSupervisionListener(supervisionListener1);
     jmsProxy.registerSupervisionListener(supervisionListener2);
-    String topicName = System.getProperty("c2mon.client.jms.supervision.topic");
+    String topicName = environment.getRequiredProperty("c2mon.client.jms.supervision.topic");
     Assert.assertNotNull(topicName);
     jmsSender.sendToTopic(((SupervisionEventImpl) event).toJson(), topicName);
     
@@ -399,7 +403,7 @@ public class JmsProxyTest {
     EasyMock.replay(reportListener);
     
     ClientRequestImpl<ConfigurationReport> jsonRequest = new ClientRequestImpl<ConfigurationReport>(ConfigurationReport.class);      
-    final String queueName = System.getProperty("c2mon.client.jms.request.queue") + "-" + System.currentTimeMillis();
+    final String queueName = environment.getRequiredProperty("c2mon.client.jms.request.queue") + "-" + System.currentTimeMillis();
     new Thread(new Runnable() {      
       @Override
       public void run() {       
@@ -464,7 +468,7 @@ public class JmsProxyTest {
     EasyMock.replay(reportListener);
     
     ClientRequestImpl<ConfigurationReport> jsonRequest = new ClientRequestImpl<ConfigurationReport>(ConfigurationReport.class);      
-    final String queueName = System.getProperty("c2mon.client.jms.request.queue") + "-" + System.currentTimeMillis();
+    final String queueName = environment.getRequiredProperty("c2mon.client.jms.request.queue") + "-" + System.currentTimeMillis();
     new Thread(new Runnable() {      
       @Override
       public void run() {       
