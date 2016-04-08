@@ -12,7 +12,17 @@
 
   <files>
     <file>
-      <source>${project.basedir}/src/dist/deployment.xml</source>
+      <source>${basedir}/src/dist/conf/c2mon-client.properties</source>
+      <outputDirectory>conf</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>${basedir}/src/dist/bin/webapp.sh</source>
+      <outputDirectory>bin</outputDirectory>
+      <fileMode>0755</fileMode>
+    </file>
+    <file>
+      <source>${basedir}/src/dist/deployment.xml</source>
       <outputDirectory>/</outputDirectory>
     </file>
   </files>
@@ -24,6 +34,13 @@
       <includes>
         <include>${project.name}-${version}.war</include>
       </includes>
+    </fileSet>
+    <fileSet>
+      <directory>./</directory>
+      <outputDirectory>/log</outputDirectory>
+      <excludes>
+        <exclude>*/**</exclude>
+      </excludes>
     </fileSet>
   </fileSets>
 </assembly>
