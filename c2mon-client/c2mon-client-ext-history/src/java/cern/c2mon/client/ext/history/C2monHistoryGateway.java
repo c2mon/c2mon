@@ -17,78 +17,40 @@
 package cern.c2mon.client.ext.history;
 
 import cern.c2mon.client.ext.history.alarm.AlarmHistoryService;
-import cern.c2mon.client.ext.history.config.HistoryConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import cern.c2mon.client.core.C2monServiceGateway;
 
-@Deprecated
 public class C2monHistoryGateway {
 
-  /** Class logger */
-  private static final Logger LOG = LoggerFactory.getLogger(C2monHistoryGateway.class);
-
-  /** The path to the core Spring XML */
-  private static final String APPLICATION_SPRING_XML_PATH
-    = "classpath:cern/c2mon/client/ext/history/config/spring-history.xml";
-
-  /** The extended SPRING application context for this gateway */
-  public static ApplicationContext context;
-
-  /** Static reference to the <code>C2monHistoryManager</code> singleton instance */
   private static C2monHistoryManager historyManager = null;
 
-  /** Static reference to the <code>AlarmHistoryService</code> singleton instance */
   private static AlarmHistoryService alarmHistoryService = null;
 
-  /**
-   * Hidden default constructor
-   */
-  private C2monHistoryGateway() {
-    // Do nothing
-  }
+  public static ApplicationContext context;
+
+  private C2monHistoryGateway() {}
 
   /**
-   * Initializes the C2monHistoryManager. Must be called before using for the
-   * first time {@link #getTagSimulator()}.
-   * @see #startC2monClientSynchronous(Module...)
+   * Initializes the C2monHistoryManager.
    */
   public static synchronized void initialize() {
     if (C2monServiceGateway.getApplicationContext() == null) {
       C2monServiceGateway.startC2monClientSynchronous();
-    }
-    initiateHistoryManager();
-  }
-
-  /**
-   * Private method which initiates the static field(s) of this gateway by retrieving
-   * it from the extended gateway {@link #context}.
-   */
-  private static void initiateHistoryManager() {
-    if (context == null) {
-      context = new AnnotationConfigApplicationContext
-          (HistoryConfig.class);
-
+      context = C2monServiceGateway.getApplicationContext();
       historyManager = context.getBean(C2monHistoryManager.class);
-    }
-    else {
-      LOG.warn("C2monHistoryManager is already initialized.");
+      alarmHistoryService = context.getBean(AlarmHistoryService.class);
     }
   }
 
  /**
-  * @return The C2MON history manager which allows
-  *         switching data into history mode.
+  * @return the {@link C2monHistoryManager} instance
   */
   public static synchronized C2monHistoryManager getHistoryManager() {
-
-    if (historyManager == null) {
+    if (context == null) {
       initialize();
     }
+
     return historyManager;
   }
 
@@ -96,10 +58,10 @@ public class C2monHistoryGateway {
    * @return the {@link AlarmHistoryService} instance
    */
   public static synchronized AlarmHistoryService getAlarmHistoryService() {
-    if (alarmHistoryService == null) {
+    if (context == null) {
       initialize();
-      alarmHistoryService = context.getBean(AlarmHistoryService.class);
     }
+
     return alarmHistoryService;
   }
 }

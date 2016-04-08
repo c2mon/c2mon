@@ -24,6 +24,7 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.client.core.TagService;
 import cern.c2mon.client.ext.history.dbaccess.HistorySessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +63,7 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   private static final Logger LOG = LoggerFactory.getLogger(HistoryManager.class);
   
   /** Reference to the <code>TagManager</code> singleton */
-  private final AdvancedTagService tagService;
+  private final TagService tagService;
 
   /** Reference to the <code>ClientDataTagCache</code> */
   private final BasicCacheHandler cache;
@@ -89,7 +90,7 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   private HistorySessionFactory historySessionFactory;
  
   @Autowired
-  protected HistoryManager(final AdvancedTagService tagService, final BasicCacheHandler pCache,
+  protected HistoryManager(final TagService tagService, final BasicCacheHandler pCache,
       final CoreSupervisionManager pSupervisionManager, final HistoryTagManager historyTagManager,
                            @Qualifier("historyFactory") HistorySessionFactory historySessionFactory) {
     
@@ -106,7 +107,7 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   @SuppressWarnings("unused")
   @PostConstruct
   private void init() {
-    tagService.addTagSubscriptionListener(this);
+    ((AdvancedTagService) tagService).addTagSubscriptionListener(this);
   }
 
   @Override
