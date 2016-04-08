@@ -6,6 +6,6 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
   <!-- imports properties for tests -->
-  <bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+  <bean id="propertyPlaceholderConfigurer" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
 
 </beans>

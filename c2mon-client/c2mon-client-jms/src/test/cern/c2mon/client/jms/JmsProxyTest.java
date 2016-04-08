@@ -46,6 +46,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
@@ -75,6 +76,7 @@ import cern.c2mon.shared.util.json.GsonFactory;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({ "classpath:cern/c2mon/client/jms/config/c2mon-client-jms.xml",
                          "classpath:cern/c2mon/client/jms/config/c2mon-client-jms-properties.xml" })
+@TestPropertySource("classpath:c2mon-client.properties")
 public class JmsProxyTest {
   
   /**

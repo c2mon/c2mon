@@ -47,4 +47,12 @@
   <scm>
     <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-common</developerConnection>
   </scm>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/resources</directory>
+      </resource>
+    </resources>
+  </build>
 </project>
