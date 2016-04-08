@@ -107,6 +107,11 @@
       <artifactId>querydsl-jpa</artifactId>
       <version>3.6.8</version>
     </dependency>
+    <dependency>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis</artifactId>
+      <version>1.4.01</version>
+    </dependency>
 
     <!-- test dependencies -->
     <dependency>
