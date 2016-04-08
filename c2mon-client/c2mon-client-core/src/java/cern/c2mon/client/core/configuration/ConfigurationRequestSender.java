@@ -42,7 +42,7 @@ public class ConfigurationRequestSender {
   @Autowired
   private JmsSender jmsSender;
 
-  @Value("${jms.config.destination}")
+  @Value("${c2mon.client.jms.config.queue}")
   private String jmsConfigDestination;
 
   /**
