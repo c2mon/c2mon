@@ -633,7 +633,7 @@ public class DriverKernel implements ApplicationContextAware {
 
     EquipmentMessageHandler equnit = null;
 
-    boolean dynamicTimeDeadbandEnabled = environment.getProperty(Options.DYNAMIC_DEADBAND_ENABLED, Boolean.class);
+    boolean dynamicTimeDeadbandEnabled = environment.getRequiredProperty(Options.DYNAMIC_DEADBAND_ENABLED, Boolean.class);
     conf.setDynamicTimeDeadbandEnabled(dynamicTimeDeadbandEnabled);
 
     LOGGER.info("onEquipmentUnitAdd - Dynamic timedeadband enabled for equipment id: " + conf.getId() + " enabled: " + dynamicTimeDeadbandEnabled);

@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:resources/daq-core-service.xml"})
-@TestPropertySource(properties = "c2mon.daq.name=P_TEST")
+@TestPropertySource(properties = {"c2mon.daq.name=P_TEST","c2mon.daq.deadband.dynamic.enabled=false"})
 public class EquipmentUnitAddRemoveTest {
 
   @Autowired

@@ -42,8 +42,4 @@
     </property>
   </bean>
 
-  <bean id="environment" class="org.springframework.core.env.StandardEnvironment">
-
-  </bean>
-
 </beans>
