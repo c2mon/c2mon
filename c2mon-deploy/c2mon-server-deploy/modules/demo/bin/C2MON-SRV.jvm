@@ -55,7 +55,11 @@ fi
 # if $C2MON_RECOVERY_ENABLED is set, we add C2MON recovery option
 [[ -n "${C2MON_RECOVERY_ENABLED+set}" ]] && JVM_OTHER_OPTS+=(-Dc2mon.recovery=true)
 
+LOGGING_CONFIG="-Dlogging.config=$C2MON_HOME/conf/logback.xml -Dlogging.path=$C2MON_HOME/log"
+# if $RUN_FOREGROUND is set, we disable logging to a file
+if [ -n "${RUN_FOREGROUND+set}" ] ; then
+  LOGGING_CONFIG="";
+fi
 
 exec -a `basename $0` $JAVA -cp "$CLASSPATH" -Dc2mon.server.home="$C2MON_HOME" -Dc2mon.server.properties="file://$C2MON_HOME/conf/c2mon.properties" \
-  -Dlogging.config=$C2MON_HOME/conf/logback.xml -Dlogging.path=$C2MON_HOME/log \
-  $JVM_MEM "${JVM_OTHER_OPTS[@]}" cern.c2mon.server.ServerStartup
+  $LOGGING_CONFIG  $JVM_MEM "${JVM_OTHER_OPTS[@]}" cern.c2mon.server.ServerStartup
