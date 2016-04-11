@@ -6,7 +6,7 @@
     <application name="default">
 
       <startscript name="DMN2-SRV">
-        <main-class name="cern.c2mon.server.lifecycle.ServerStartup">
+        <main-class name="cern.c2mon.server.ServerStartup">
           <output>
             <file name="log/out.log"/>
           </output>
@@ -16,7 +16,6 @@
         <!-- the following property defines if C2MON server caches shall be preloaded from database at start-up -->
         <property name="c2mon.server.cache.skipPreloading" value="true"/>
 
-        <property name="c2mon.server.name" value="DMN2-SRV"/>
         <property name="c2mon.server.cache.mode" value="single"/>
         <property name="c2mon.server.home" value="$INSTALL_DIR"/>
         <property name="com.sun.management.jmxremote.port" value="9523"/>

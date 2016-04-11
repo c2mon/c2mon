@@ -39,7 +39,7 @@
   <modules>
     <module>modules/demo</module>
     <module>modules/tim2</module>
-    <!--<module>modules/dmn2</module>-->
+    <module>modules/dmn2</module>
     <!--<module>modules/dipcm</module>-->
   </modules>
 

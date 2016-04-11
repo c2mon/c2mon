@@ -1,121 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <assembly
-	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+    xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
 
-	<id>dmn2</id>
+  <id>dmn2</id>
 
-	<formats>
-		<format>tar.gz</format>
-	</formats>
+  <formats>
+    <format>tar.gz</format>
+  </formats>
 
-	<!--  do not include base directory -->
-	<includeBaseDirectory>false</includeBaseDirectory>
+  <!--  do not include base directory -->
+  <includeBaseDirectory>false</includeBaseDirectory>
 
-	<componentDescriptors>
-		<componentDescriptor>src/assembly/assembly-common.xml
-		</componentDescriptor>
-	</componentDescriptors>
+  <componentDescriptors>
+    <componentDescriptor>src/assembly/assembly-common.xml
+    </componentDescriptor>
+  </componentDescriptors>
 
-	<files>
-	
-		<!-- copy the starting script -->
-		<file>
-			<source>${basedir}/bin/dmn2-c2mon.sh</source>
-			<outputDirectory>bin/</outputDirectory>
-			<destName>c2mon.sh</destName>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0755</fileMode>
-		</file>
-	
-		<!-- copy changelog -->
-		<file>
-			<source>${basedir}/changelog/dmn2-srv-changelog.txt</source>
-			<outputDirectory>/</outputDirectory>
-			<destName>changelog.txt</destName>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>
-	
-		<!-- deployment descriptor -->
-		<file>
-			<source>${basedir}/conf/dmn2-deployment.xml</source>
-			<outputDirectory>/</outputDirectory>
-			<destName>deployment.xml</destName>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>
-	
-		<!-- log4j configuration -->
-		<!-- don't take log4j configuration. it will be put in correct place by 
-			deployment tool -->
-		<!-- <file> -->
-		<!-- <source>${basedir}/conf/dmn2-log4j.xml</source> -->
-		<!-- <outputDirectory>conf/</outputDirectory> -->
-		<!-- <destName>log4j.xml</destName> -->
-		<!-- <lineEnding>unix</lineEnding> -->
-		<!-- <fileMode>0444</fileMode> -->
-		<!-- </file> -->
-	
-		<file>
-			<source>${basedir}/conf/dmn2-cache.properties</source>
-			<outputDirectory>conf/</outputDirectory>
-			<destName>c2mon-cache.properties</destName>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>
-		<file>
-			<source>${basedir}/conf/dmn2-datasource.properties</source>
-			<outputDirectory>conf/</outputDirectory>
-			<destName>c2mon-datasource.properties</destName>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>
-		<file>
-			<source>${basedir}/conf/dmn2-jms.properties</source>
-			<outputDirectory>conf/</outputDirectory>
-			<destName>c2mon-jms.properties</destName>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>
-		<file>
-			<source>${basedir}/conf/dmn2-modules.xml</source>
-			<outputDirectory>conf/</outputDirectory>
-			<destName>c2mon-modules.xml</destName>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>
-		<file>
-			<source>${basedir}/conf/dmn2-datasource.xml</source>
-			<outputDirectory>conf/</outputDirectory>
-			<destName>c2mon-datasource.xml</destName>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>
-		<file>
-			<source>${basedir}/conf/dmn2-tc-config.xml</source>
-			<outputDirectory>conf/</outputDirectory>
-			<destName>c2mon-tc-config.xml</destName>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>
-		<!-- copy the license file for Terracotta -->
-		<file>
-			<source>${basedir}/conf/terracotta-license.key</source>
-			<outputDirectory>conf/</outputDirectory>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>
-	
-		<!-- copy the version file -->
-		<file>
-			<source>${project.build.outputDirectory}/version.txt</source>
-			<outputDirectory>/</outputDirectory>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>
-		
-	</files>
-	
+  <files>
+
+    <!-- copy the start script -->
+    <file>
+      <source>${basedir}/bin/dmn2-c2mon.sh</source>
+      <outputDirectory>bin/</outputDirectory>
+      <destName>c2mon.sh</destName>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0755</fileMode>
+    </file>
+
+    <!-- deployment descriptor -->
+    <file>
+      <source>${basedir}/conf/deployment.xml</source>
+      <outputDirectory>/</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
+
+    <!-- log4j configuration -->
+    <!-- don't take log4j configuration. it will be put in correct place by
+      deployment tool -->
+    <!-- <file> -->
+    <!-- <source>${basedir}/conf/dmn2-log4j.xml</source> -->
+    <!-- <outputDirectory>conf/</outputDirectory> -->
+    <!-- <destName>log4j.xml</destName> -->
+    <!-- <lineEnding>unix</lineEnding> -->
+    <!-- <fileMode>0444</fileMode> -->
+    <!-- </file> -->
+
+
+    <file>
+      <source>${basedir}/conf/dmn2-tc-config.xml</source>
+      <outputDirectory>conf/</outputDirectory>
+      <destName>c2mon-tc-config.xml</destName>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
+
+    <!-- copy the license file for Terracotta -->
+    <file>
+      <source>${basedir}/conf/terracotta-license.key</source>
+      <outputDirectory>conf/</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
+
+    <!-- copy the version file -->
+    <file>
+      <source>${project.build.outputDirectory}/version.txt</source>
+      <outputDirectory>/</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
+
+  </files>
+
 </assembly>

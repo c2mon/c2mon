@@ -9,34 +9,17 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <groupId>cern.c2mon.c2mon-deploy</groupId>
-  <artifactId>c2mon-srv-dmn2</artifactId>
-  <name>The DMN2 SRV module</name>
+  <groupId>cern.c2mon.c2mon-server.dmn2</groupId>
+  <artifactId>c2mon-server</artifactId>
+  <name>c2mon-server-dmn2</name>
   <version>1.7.3-SNAPSHOT</version>
 
   <description>C2MON server assembling all required modules and configuration files for DMN2</description>
-  <url></url>
 
   <dependencies>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-cachepersistence</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
-    </dependency>
-    <!-- <dependency> -->
-    <!-- <groupId>cern.c2mon.c2mon-server</groupId> -->
-    <!-- <artifactId>c2mon-server-benchmark</artifactId> -->
-    <!-- <version>[1.5.0, 2.0.0)</version> -->
-    <!-- </dependency> -->
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-command</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-client</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
+      <artifactId>c2mon-server-all</artifactId>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
