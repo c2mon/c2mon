@@ -43,7 +43,7 @@
 
 	<bean id="historySqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="configLocation"
-			value="classpath:cern/c2mon/client/ext/history/dbaccess/config/history-ibatis.xml" />
+			value="classpath:history-ibatis.xml" />
 		<property name="dataSource" ref="historyDataSource" />
 		<property name="databaseIdProvider" ref="databaseIdProvider"/>
 	</bean>

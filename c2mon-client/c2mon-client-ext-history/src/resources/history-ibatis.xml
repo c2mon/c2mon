@@ -29,8 +29,8 @@
   </typeHandlers>
   
   <mappers>
-    <mapper resource="cern/c2mon/client/ext/history/dbaccess/sqlmaps/history-mapping.xml"/>
-    <mapper resource="cern/c2mon/client/ext/history/dbaccess/sqlmaps/saved-history-mapping.xml"/>
-    <mapper resource="cern/c2mon/client/ext/history/dbaccess/sqlmaps/saved-history-events-mapping.xml"/>
+    <mapper resource="sqlmaps/history-mapping.xml"/>
+    <mapper resource="sqlmaps/saved-history-mapping.xml"/>
+    <mapper resource="sqlmaps/saved-history-events-mapping.xml"/>
   </mappers>
 </configuration>

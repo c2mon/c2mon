@@ -9,5 +9,5 @@ import org.springframework.context.annotation.PropertySource;
  */
 @Configuration
 @PropertySource("classpath:history.properties")
-@ImportResource("classpath:cern/c2mon/client/ext/history/config/spring-history.xml")
+@ImportResource("classpath:spring-history.xml")
 public class HistoryConfig {}
