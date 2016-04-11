@@ -13,11 +13,14 @@
         </main-class>
         <java-vm-args>-Xms4G -Xmx4G -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
 
-        <!-- the following property defines if C2MON server caches shall be preloaded from database at start-up -->
+        <property name="c2mon.server.home" value="${INSTALL_DIR}" />
+        <property name="c2mon.server.properties" value="conf/c2mon.properties" />
         <property name="c2mon.server.cache.skipPreloading" value="true"/>
-
         <property name="c2mon.server.cache.mode" value="single"/>
-        <property name="c2mon.server.home" value="$INSTALL_DIR"/>
+
+        <property name="logging.config" value="${INSTALL_DIR}/conf/log4j.xml" />
+        <property name="logging.path" value="${INSTALL_DIR}/log/" />
+
         <property name="com.sun.management.jmxremote.port" value="9523"/>
         <property name="com.sun.management.jmxremote.password.file" value="conf/.jmxremote.passwd"/>
         <property name="com.sun.management.jmxremote.access.file" value="conf/.jmxremote.access"/>
