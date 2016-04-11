@@ -93,7 +93,7 @@ public abstract class AbstractGenericJapcMessageHandlerTst extends GenericMessag
 
         // GenericJapcMessageHandler.MSTART_RETRY_TIMOUT = getStartMonitoringTimeout();
 
-        configurationController = new ConfigurationController(null, null);
+        configurationController = new ConfigurationController();
 
         configurationController.setProcessConfiguration(pconf);
 

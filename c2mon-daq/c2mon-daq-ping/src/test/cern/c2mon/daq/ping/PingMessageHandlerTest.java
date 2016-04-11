@@ -80,7 +80,7 @@ public class PingMessageHandlerTest extends GenericMessageHandlerTst {
         log.info("entering beforeTest()..");
         pingHandler = (PingMessageHandler) msgHandler;
 
-        configurationController = new ConfigurationController(null, null);
+        configurationController = new ConfigurationController();
         configurationController.setProcessConfiguration(pconf);
         pconf.getEquipmentConfigurations().put(equipmentConfiguration.getId(), equipmentConfiguration);
         configurationController.putImplementationDataTagChanger(equipmentConfiguration.getId(), pingHandler);

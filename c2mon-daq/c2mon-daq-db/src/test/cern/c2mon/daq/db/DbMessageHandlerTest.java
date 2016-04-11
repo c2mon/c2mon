@@ -113,7 +113,7 @@ public class DbMessageHandlerTest {
         String path = turl.getPath();
         Document xmlDoc = processLoader.fromFiletoDOC(path);
         ProcessConfiguration processConfig = processLoader.createProcessConfiguration("P_DBDAQ01", 1234L, xmlDoc, true);
-        ConfigurationController controller = new ConfigurationController(null, null);
+        ConfigurationController controller = new ConfigurationController();
         controller.setProcessConfiguration(processConfig);
         long equId = processConfig.getEquipmentConfigurations().keySet().iterator().next();
         processConfig.getEquipmentConfiguration(equId).setAddress(equAddress);

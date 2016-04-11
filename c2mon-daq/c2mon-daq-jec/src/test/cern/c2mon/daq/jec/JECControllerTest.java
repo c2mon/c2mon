@@ -64,7 +64,7 @@ public class JECControllerTest {
         equipmentConfiguration.setHandlerClassName("asd");
         ProcessConfiguration processConfiguration = new ProcessConfiguration();
         processConfiguration.setProcessName("asd");
-        EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(equipmentConfiguration, processConfiguration, new RunOptions());
+        EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(equipmentConfiguration, processConfiguration, true, true);
         jecController = new JECController(plcFactory, connectionSampler, jecCommandRunner, equipmentMessageSender, equipmentLoggerFactory);
     }
     

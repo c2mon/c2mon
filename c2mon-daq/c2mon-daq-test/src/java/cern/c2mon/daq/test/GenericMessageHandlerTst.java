@@ -147,7 +147,7 @@ public abstract class GenericMessageHandlerTst {
                     medDynamicTimeDeadbandFilterActivator, lowDynamicTimeDeadbandFilterActivator);
 
             RunOptions roptions = new RunOptions();
-            configurationController = new ConfigurationController(roptions, null);
+            configurationController = new ConfigurationController();
             configurationController.setProcessConfiguration(pconf);
             roptions.setEqAppendersOnly(false);
             roptions.setEqLoggers(false);
@@ -186,7 +186,7 @@ public abstract class GenericMessageHandlerTst {
 
             equipmentConfiguration = EquipmentConfigurationFactory.getInstance().createEquipmentConfiguration(rootConfElement);
             long equipmentId = equipmentConfiguration.getId();
-            EquipmentLoggerFactory factory = EquipmentLoggerFactory.createFactory(equipmentConfiguration, pconf, roptions);
+            EquipmentLoggerFactory factory = EquipmentLoggerFactory.createFactory(equipmentConfiguration, pconf, false, false);
             msgHandler = EquipmentMessageHandler.createEquipmentMessageHandler(
                     equipmentConfiguration.getHandlerClassName(),
                     new EquipmentCommandHandler(equipmentId, new RequestController(configurationController)),
