@@ -20,15 +20,6 @@
 
   <files>
 
-    <!-- copy the start script -->
-    <file>
-      <source>${basedir}/bin/dmn2-c2mon.sh</source>
-      <outputDirectory>bin/</outputDirectory>
-      <destName>c2mon.sh</destName>
-      <lineEnding>unix</lineEnding>
-      <fileMode>0755</fileMode>
-    </file>
-
     <!-- deployment descriptor -->
     <file>
       <source>${basedir}/conf/deployment.xml</source>
@@ -47,15 +38,6 @@
     <!-- <lineEnding>unix</lineEnding> -->
     <!-- <fileMode>0444</fileMode> -->
     <!-- </file> -->
-
-
-    <file>
-      <source>${basedir}/conf/dmn2-tc-config.xml</source>
-      <outputDirectory>conf/</outputDirectory>
-      <destName>c2mon-tc-config.xml</destName>
-      <lineEnding>unix</lineEnding>
-      <fileMode>0444</fileMode>
-    </file>
 
     <!-- copy the license file for Terracotta -->
     <file>
