@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging;
 
+import cern.c2mon.shared.common.process.ProcessConfiguration;
 import org.w3c.dom.Document;
 
 import cern.c2mon.shared.daq.process.ProcessConfigurationResponse;
@@ -39,7 +40,7 @@ public interface ProcessRequestSender {
    * 
    * @return the ProcessConfigurationResponse object
    */
-  ProcessConfigurationResponse sendProcessConfigurationRequest();
+  ProcessConfigurationResponse sendProcessConfigurationRequest(final String processName);
 
   /**
    * This method publishes the unique Process Id Key (PIK) message on the configured topic. 
@@ -49,10 +50,10 @@ public interface ProcessRequestSender {
    * 
    * @return the parsed XML processConnectionResponse object
    */
-  ProcessConnectionResponse sendProcessConnectionRequest();
+  ProcessConnectionResponse sendProcessConnectionRequest(final String processName);
 
   /**
    *  Send a ProcessDisconnectionRequest to the server. No reply is expected.
    */
-  void sendProcessDisconnectionRequest();
+  void sendProcessDisconnectionRequest(final ProcessConfiguration processConfiguration, final long startupTime);
 }

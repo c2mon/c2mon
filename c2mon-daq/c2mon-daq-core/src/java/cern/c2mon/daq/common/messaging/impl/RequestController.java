@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -48,12 +48,15 @@ import cern.c2mon.shared.daq.config.SubEquipmentUnitAdd;
 import cern.c2mon.shared.daq.config.SubEquipmentUnitRemove;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * The RequestController is to direct request to the core to the right place in the core.
  *
  * @author Andreas Lang
  */
+@Component
 public class RequestController {
     /**
      * The logger of this class.
@@ -306,7 +309,6 @@ public class RequestController {
         Long processId = configurationController.getProcessConfiguration().getProcessID();
         Long processPIK = this.configurationController.getProcessConfiguration().getprocessPIK();
 
-        RunOptions runOptions = this.configurationController.getRunOptions();
         // We add the PIK to our communication process
         DataTagValueUpdate dataTagValueUpdate;
         dataTagValueUpdate = new DataTagValueUpdate(processId, processPIK);

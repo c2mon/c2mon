@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -19,22 +19,23 @@ package cern.c2mon.daq.common.conf.core;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import javax.jms.TextMessage;
 import javax.xml.parsers.ParserConfigurationException;
 
+import cern.c2mon.daq.config.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.xerces.parsers.DOMParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jms.support.converter.MessageConversionException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
-import cern.c2mon.daq.common.messaging.impl.ProcessMessageSender;
 import cern.c2mon.daq.tools.processexceptions.ConfRejectedTypeException;
 import cern.c2mon.daq.tools.processexceptions.ConfUnknownTypeException;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
@@ -51,6 +52,7 @@ import cern.c2mon.shared.util.parser.SimpleXMLParser;
  *
  * @author Andreas Lang
  */
+@Component
 public class ProcessConfigurationLoader extends XMLTagValueExtractor implements ConfigurationXMLConstants {
   /**
    * The logger.
@@ -60,6 +62,7 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
   /**
    * JMS DAq queue trunk
    */
+  @Value("${c2mon.jms.daq.queue.trunk}")
   private String jmsDaqQueueTrunk;
 
   /**
@@ -70,12 +73,15 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
   @Qualifier("primaryRequestSender")
   private ProcessRequestSender processRequestSender;
 
+  @Autowired
+  private Environment environment;
+
   private EquipmentConfigurationFactory equipmentConfigurationFactory;
 
-  /**
-   * The process message sender used during the creation of the configuration to send commFaults.
-   */
-  private ProcessMessageSender processMessageSender;
+//  /**
+//   * The process message sender used during the creation of the configuration to send commFaults.
+//   */
+//  private ProcessMessageSender processMessageSender;
 
 
   @Autowired
@@ -83,17 +89,14 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
     this.equipmentConfigurationFactory = eqConfFactory;
   }
 
-  @Autowired
-  public void setJmsDaqQueueTrunk(String jmsDaqQueueTrunk) {
-    this.jmsDaqQueueTrunk = jmsDaqQueueTrunk;
-  }
+//  @Autowired
+//  public void setJmsDaqQueueTrunk(String jmsDaqQueueTrunk) {
+//    this.jmsDaqQueueTrunk = jmsDaqQueueTrunk;
+//  }
 
   /**
    * Gets the Process configuration from the server and saves it to the provided location.
    * If ProcessConfigurationResponse returned null the DAQ start up process is stopped.
-   *
-   * @param saveLocation The location to save the object.
-
    *
    * @return The Process Configuration Response. It will never return null.
    */
@@ -101,12 +104,10 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
     ProcessConfigurationResponse processConfigurationResponse;
     LOGGER.trace("getProcessConfiguration - getting Process Configuration");
 
-    processConfigurationResponse = processRequestSender.sendProcessConfigurationRequest();
+    processConfigurationResponse = processRequestSender.sendProcessConfigurationRequest(environment.getRequiredProperty(Options.C2MON_DAQ_NAME));
 
     if (processConfigurationResponse == null) {
-      LOGGER.warn("getProcessConfiguration - Configuration request to server: timeout waiting for server response.");
-      LOGGER.info("getProcessConfiguration - Could not receive any configuration - stopping the DAQ process...");
-      System.exit(0);
+      throw new RuntimeException("Configuration request to server: timeout waiting for server response");
     }
     LOGGER.info("getProcessConfiguration - Configuration XML received from server and parsed");
     return processConfigurationResponse;
@@ -123,12 +124,10 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
     LOGGER.trace("getProcessConnection - getting Process Connection");
 
     // Ask for XML file to the server
-    processConnectionResponse = processRequestSender.sendProcessConnectionRequest();
+    processConnectionResponse = processRequestSender.sendProcessConnectionRequest(environment.getRequiredProperty(Options.C2MON_DAQ_NAME));
 
     if (processConnectionResponse == null) {
-      LOGGER.warn("getProcessConnection - Connection request to server: timeout waiting for server response.");
-      LOGGER.trace("getProcessConnection - Could not receive any Process Identifier Key (PIK) - stopping the DAQ start up process...");
-      System.exit(0);
+      throw new RuntimeException("Connection request to server: timeout waiting for server response");
     }
     LOGGER.info("getProcessConnection - Process Identifier Key (PIK) received from server: " + processConnectionResponse.getProcessPIK());
     return processConnectionResponse;

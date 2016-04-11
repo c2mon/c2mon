@@ -1,36 +1,22 @@
-/******************************************************************************
+/*******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
- *****************************************************************************/
+ ******************************************************************************/
 package cern.c2mon.daq.common;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import javax.annotation.PostConstruct;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-
+import cern.c2mon.daq.config.Options;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationFactory;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationHandler;
@@ -58,6 +44,20 @@ import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
 import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * This Kernel is the main class of the daq. It aggregates other classes
@@ -65,44 +65,55 @@ import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
  * ProcessRequestHandler, ProcessMessageSender. Try to keep Spring code out of
  * this class to keep it generic! (only @Service at the moment)
  */
+@Component
 public class DriverKernel implements ApplicationContextAware {
 
   /**
    * The daq's internal logger
    */
-  private static final Logger LOGGER = Logger.getLogger(DriverKernel.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DriverKernel.class);
 
   /**
    * The name of the equipment message sender in the Spring context.
    */
   public static final String EQUIPMENT_MESSAGE_SENDER = "equipmentMessageSender";
 
+  @Autowired
+  private Environment environment;
+
   /**
    * The reference to the static ProcessMessageSender object
    */
+  @Autowired
   private ProcessMessageSender processMessageSender;
 
   /**
    * Reference to the static FilterMessageSender object
    */
+  @Autowired
   private JmsLifecycle filterMessageSender;
 
   /**
    * The reference to the primary ProcessRequestSender: the primary sender also
    * requests the XML config at startup.
    */
+  @Autowired
+  @Qualifier("primaryRequestSender")
   private ProcessRequestSender primaryRequestSender;
 
   /**
    * Ref to the secondary request sender, which only sends out disconnect
    * notifications. !May be null!
    */
+  @Autowired(required = false)
+  @Qualifier("secondaryRequestSender")
   private ProcessRequestSender secondaryRequestSender;
 
   /**
    * The reference to the ProcessMessageReceiver beans.
    */
-  private List<ProcessMessageReceiver> processMessageReceivers = new ArrayList<ProcessMessageReceiver>();
+  @Autowired
+  private ProcessMessageReceiver processMessageReceiver;
 
   /**
    * This hashtable contains all registered EquipmentMessageHandlers
@@ -124,13 +135,16 @@ public class DriverKernel implements ApplicationContextAware {
    * The ConfigurationController managing the configuration life cycle and
    * allows to access and change the current configuration.
    */
+  @Autowired
   private ConfigurationController configurationController;
 
   /**
    * This controller is to forward request to different parts of the core.
    */
+  @Autowired
   private RequestController requestController;
 
+  @Autowired
   private EquipmentConfigurationFactory equipmentConfigurationFactory;
 
   /**
@@ -168,13 +182,11 @@ public class DriverKernel implements ApplicationContextAware {
 
       LOGGER.debug("\tstopping listener for server commands/requests...");
 
-      for (ProcessMessageReceiver receiver : processMessageReceivers) {
-        receiver.shutdown();
-      }
+      processMessageReceiver.shutdown();
 
       LOGGER.debug("\tcalling ProcessRequestSender's sendProcessDisconnection()..");
       if (primaryRequestSender != null) {
-        primaryRequestSender.sendProcessDisconnectionRequest();
+        primaryRequestSender.sendProcessDisconnectionRequest(configurationController.getProcessConfiguration(), configurationController.getStartUp());
       }
 
       // send in separate thread as may block if broker problem
@@ -182,7 +194,7 @@ public class DriverKernel implements ApplicationContextAware {
         Thread disconnectSend = new Thread(new Runnable() {
           @Override
           public void run() {
-            secondaryRequestSender.sendProcessDisconnectionRequest();
+            secondaryRequestSender.sendProcessDisconnectionRequest(configurationController.getProcessConfiguration(), configurationController.getStartUp());
           }
         });
         disconnectSend.setDaemon(true);
@@ -196,58 +208,56 @@ public class DriverKernel implements ApplicationContextAware {
         try {
           emhandler.shutdown();
         } catch (EqIOException ex) {
-          LOGGER.warn("a problem occured while calling disconnectFromDataSourc() of EquipmentMessageHandler id :"
-              + emhandler.getEquipmentConfiguration().getId() + ", name :" + emhandler.getEquipmentConfiguration().getName());
+          LOGGER.warn("a problem occured while calling disconnectFromDataSourc() of EquipmentMessageHandler id :" + emhandler.getEquipmentConfiguration()
+              .getId() + ", name :" + emhandler.getEquipmentConfiguration().getName());
         }
       }
 
       LOGGER.debug("\tdisconnecting FilterMessageSenders...");
-      if (filterMessageSender != null)
-        filterMessageSender.shutdown();
+      if (filterMessageSender != null) filterMessageSender.shutdown();
       LOGGER.debug("\tdisconnecting JmsSenders for tag update connection...");
       // ActiveMQ JmsSender also closes all the ActiveMQ JMS connections so keep
       // as last
-      if (processMessageSender != null)
-        processMessageSender.shutdown();
+      if (processMessageSender != null) processMessageSender.shutdown();
       LOGGER.info("DAQ shutdown completed successfully");
     }
   }
 
-  /**
-   * Unique constructor used to construct the DriverKernel bean.
-   *
-   * @param processMessageSender the ProcessMessageSender
-   * @param filterMessageSender the FilterMessageSender
-   * @param configurationController The configuration controller to access and
-   *          manage the configuration.
-   * @param processRequestSender the ProcessRequestSender
-   * @param requestController The message handler which handles incoming
-   *          messages.
-   */
-  @Autowired
-  public DriverKernel(final ProcessMessageSender processMessageSender,
-                      final JmsLifecycle filterMessageSender,
-                      final ConfigurationController configurationController,
-                      final RequestController requestController,
-                      EquipmentConfigurationFactory equipmentConfigurationFactory) {
-    super();
-    this.processMessageSender = processMessageSender;
-    this.filterMessageSender = filterMessageSender;
-    this.configurationController = configurationController;
-    this.requestController = requestController;
-    this.equipmentConfigurationFactory = equipmentConfigurationFactory;
-
-  }
+  //  /**
+  //   * Unique constructor used to construct the DriverKernel bean.
+  //   *
+  //   * @param processMessageSender the ProcessMessageSender
+  //   * @param filterMessageSender the FilterMessageSender
+  //   * @param configurationController The configuration controller to access and
+  //   *          manage the configuration.
+  //   * @param requestController The message handler which handles incoming
+  //   *          messages.
+  //   */
+  //  @Autowired
+  //  public DriverKernel(Environment environment,
+  //                      final ProcessMessageSender processMessageSender,
+  //                      final JmsLifecycle filterMessageSender,
+  //                      final ConfigurationController configurationController,
+  //                      final RequestController requestController,
+  //                      EquipmentConfigurationFactory equipmentConfigurationFactory) {
+  //    super();
+  //    this.environment = environment;
+  //    this.processMessageSender = processMessageSender;
+  //    this.filterMessageSender = filterMessageSender;
+  //    this.configurationController = configurationController;
+  //    this.requestController = requestController;
+  //    this.equipmentConfigurationFactory = equipmentConfigurationFactory;
+  //  }
 
   /**
    * Initialization of the DriverKernel at startup, once all dependencies have
    * been set.
    *
    * @throws ConfRejectedTypeException Throws a configuration rejected exception
-   *           if the server rejected the configuration request of the DAQ.
-   * @throws ConfUnknownTypeException Throws a configuration unknown type
-   *           exception if the configuration requested was unknown on the
-   *           server.
+   *                                   if the server rejected the configuration request of the DAQ.
+   * @throws ConfUnknownTypeException  Throws a configuration unknown type
+   *                                   exception if the configuration requested was unknown on the
+   *                                   server.
    */
   @PostConstruct
   public final void init() throws ConfUnknownTypeException, ConfRejectedTypeException {
@@ -264,9 +274,7 @@ public class DriverKernel implements ApplicationContextAware {
    * the usual runtime environment).
    */
   public void terminateDAQ() {
-    for (ProcessMessageReceiver receiver : processMessageReceivers) {
-      receiver.shutdown();
-    }
+    processMessageReceiver.shutdown();
     this.processMessageSender.shutdown();
     this.processMessageSender.closeSourceDataTagsBuffers();
 
@@ -274,9 +282,9 @@ public class DriverKernel implements ApplicationContextAware {
     // and perform and shutdown logic
     filterMessageSender.shutdown();
 
-    this.primaryRequestSender.sendProcessDisconnectionRequest();
+    this.primaryRequestSender.sendProcessDisconnectionRequest(configurationController.getProcessConfiguration(), configurationController.getStartUp());
     if (secondaryRequestSender != null) {
-      secondaryRequestSender.sendProcessDisconnectionRequest();
+      secondaryRequestSender.sendProcessDisconnectionRequest(configurationController.getProcessConfiguration(), configurationController.getStartUp());
     }
 
     LOGGER.info("terminateDAQ - Process terminated gently");
@@ -287,11 +295,11 @@ public class DriverKernel implements ApplicationContextAware {
    * This method does all the daq's configuration job, basing on a DOM
    * configuration XML document given as an argument.
    *
-   * @throws ConfUnknownTypeException Thrown if the configuration type is
-   *           unknown. That means that the server does not no the requested
-   *           configuration.
+   * @throws ConfUnknownTypeException  Thrown if the configuration type is
+   *                                   unknown. That means that the server does not no the requested
+   *                                   configuration.
    * @throws ConfRejectedTypeException Thrown if the configuration type
-   *           indicates that the server rejected the startup request.
+   *                                   indicates that the server rejected the startup request.
    */
   public void configure() throws ConfUnknownTypeException, ConfRejectedTypeException {
     LOGGER.debug("configure - entering configure()..");
@@ -321,7 +329,7 @@ public class DriverKernel implements ApplicationContextAware {
 
     EquipmentMessageHandler equnit = null;
     ProcessConfiguration processConfiguration = configurationController.getProcessConfiguration();
-    boolean dynamicTimeDeadbandEnabled = !configurationController.getCommandParamsHandler().hasParam("-noDeadband");
+    boolean dynamicTimeDeadbandEnabled = environment.getProperty(Options.DYNAMIC_DEADBAND_ENABLED, Boolean.class, true);
 
     int eqUnitsConnectedProperly = 0;
     // for each equipment unit defined in the ProcessConfiguration XML
@@ -329,7 +337,9 @@ public class DriverKernel implements ApplicationContextAware {
       long equipmentId = conf.getId();
       LOGGER.info("configure - Dynamic timedeadband enabled for equipment id: " + equipmentId + " enabled: " + dynamicTimeDeadbandEnabled);
       conf.setDynamicTimeDeadbandEnabled(dynamicTimeDeadbandEnabled);
-      EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(conf, processConfiguration, configurationController.getRunOptions());
+      EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(conf, processConfiguration,
+          environment.getProperty("c2mon.daq.logging.useEquipmentLoggers", Boolean.class, false),
+          environment.getProperty("c2mon.daq.logging.useEquipmentAppendersOnly", Boolean.class, false));
 
       EquipmentMessageSender equipmentMessageSender = (EquipmentMessageSender) applicationContext.getBean(EQUIPMENT_MESSAGE_SENDER);
       // equipmentMessageSender.setEquipmentConfiguration(conf);
@@ -340,8 +350,8 @@ public class DriverKernel implements ApplicationContextAware {
       try {
         validateDataTags(conf, equipmentMessageSender);
         validateCommandTags(conf, equipmentMessageSender);
-        equnit = EquipmentMessageHandler.createEquipmentMessageHandler(conf.getHandlerClassName(), new EquipmentCommandHandler(equipmentId, requestController),
-            new EquipmentConfigurationHandler(equipmentId, configurationController), equipmentMessageSender);
+        equnit = EquipmentMessageHandler.createEquipmentMessageHandler(conf.getHandlerClassName(), new EquipmentCommandHandler(equipmentId,
+            requestController), new EquipmentConfigurationHandler(equipmentId, configurationController), equipmentMessageSender);
         equnit.setEquipmentLoggerFactory(equipmentLoggerFactory);
       } catch (InstantiationException e) {
         String msg = "Error while instantiating " + conf.getHandlerClassName();
@@ -364,9 +374,7 @@ public class DriverKernel implements ApplicationContextAware {
     } // for
 
     // try to establish ProcessMessageReceiver's JMS topic connection
-    for (ProcessMessageReceiver receiver : processMessageReceivers) {
-      receiver.connect();
-    }
+    processMessageReceiver.connect();
 
     // LOGGER.info("Number of supervised equipment units : " +
     // eqLookupTable.size());
@@ -395,7 +403,7 @@ public class DriverKernel implements ApplicationContextAware {
    * This will validate the data tags of this configuration and invalidate them
    * via the equipment message sender if necessary.
    *
-   * @param conf The configuration to use.
+   * @param conf                   The configuration to use.
    * @param equipmentMessageSender The sender to use.
    */
   private void validateDataTags(final EquipmentConfiguration conf, final EquipmentMessageSender equipmentMessageSender) {
@@ -419,7 +427,7 @@ public class DriverKernel implements ApplicationContextAware {
    *
    * @param equipmentConfiguration The configuration to use.
    * @param equipmentMessageSender The sender to use. TODO Invalidation of
-   *          command tags not possible. Find a solution.
+   *                               command tags not possible. Find a solution.
    */
   private void validateCommandTags(final EquipmentConfiguration equipmentConfiguration, final EquipmentMessageSender equipmentMessageSender) {
     Iterator<SourceCommandTag> commandTagIterator = equipmentConfiguration.getCommandTags().values().iterator();
@@ -443,6 +451,7 @@ public class DriverKernel implements ApplicationContextAware {
    * refreshing data tags).
    *
    * @param equipmentMessageHandler The equipment message handler to start.
+   *
    * @return True if the start was successful else false.
    */
   private boolean startEquipmentMessageHandler(final EquipmentMessageHandler equipmentMessageHandler) {
@@ -452,15 +461,15 @@ public class DriverKernel implements ApplicationContextAware {
       equipmentMessageHandler.connectToDataSource();
       equipmentMessageHandler.refreshAllDataTags();
     } catch (EqIOException ex) {
-      LOGGER.error("startEquipmentMessageHandler - Could not connect EquipmentUnit to its data source. EquipmentMessageHandler name :"
-          + equipmentConfiguration.getName() + " id :" + equipmentConfiguration.getId());
+      LOGGER.error("startEquipmentMessageHandler - Could not connect EquipmentUnit to its data source. EquipmentMessageHandler name :" +
+          equipmentConfiguration.getName() + " id :" + equipmentConfiguration.getId());
       String errMsg = "EqIOException : code = " + ex.getErrorCode() + " message = " + ex.getErrorDescription();
       LOGGER.error(errMsg);
       equipmentMessageHandler.getEquipmentMessageSender().confirmEquipmentStateIncorrect(errMsg);
       success = false;
     } catch (Exception ex) {
-      LOGGER.error("startEquipmentMessageHandler - Could not connect EquipmentUnit to its data source. EquipmentMessageHandler name :"
-          + equipmentMessageHandler.getEquipmentConfiguration().getName() + " id :" + equipmentMessageHandler.getEquipmentConfiguration().getId());
+      LOGGER.error("startEquipmentMessageHandler - Could not connect EquipmentUnit to its data source. EquipmentMessageHandler name :" +
+          equipmentMessageHandler.getEquipmentConfiguration().getName() + " id :" + equipmentMessageHandler.getEquipmentConfiguration().getId());
       String errMsg = "Unexpected exception caught whilst connecting to equipment: ";
       LOGGER.error(errMsg, ex);
       equipmentMessageHandler.getEquipmentMessageSender().confirmEquipmentStateIncorrect(errMsg + ex.getMessage());
@@ -499,66 +508,66 @@ public class DriverKernel implements ApplicationContextAware {
     return eqLookupTable;
   }
 
-  /**
-   * This method is responsible for changing the log4j's root logger treshold
-   *
-   * @param level - the level to set
-   */
-  public void setRootLoggerLevel(final String level) {
-    LOGGER.info("setRootLoggerLevel - changing current process logger's treshold to " + level);
-    Level newLevel = stringToLog4jLevel(level);
-    if (newLevel != null) {
-      Logger.getRootLogger().setLevel(newLevel);
-    } else {
-      LOGGER.error("setRootLoggerLevel - could not change logging level to : " + level);
-    }
-  }
-
-  /**
-   * This method is responsible for changing the log4j's root logger treshold
-   *
-   * @param eqID equipment unit unique identifier
-   * @param eqName equipment unit name
-   * @param level the level to set
-   */
-  public void setEqLoggerLevel(final Long eqID, final String eqName, final String level) {
-    LOGGER.info("changing eqUnit\'s [" + eqID + "," + eqName + "] logger treshold to " + level);
-    Level newLevel = stringToLog4jLevel(level);
-    if (newLevel != null) {
-      // TODO not perfect will override all loggers of this equipment
-      EquipmentLoggerFactory.setLevel(eqName, newLevel);
-    } else {
-      LOGGER.error("setEqLoggerLevel - could not change logging level of logger [" + eqID + "," + eqName + "] to level : " + level);
-    }
-  }
-
-  /**
-   * This method converts string representation of the logging level to log4j's
-   * Level object
-   *
-   * @param level the string representation of the logging level
-   * @return The Level object or null if the String did not match a log4j level.
-   */
-  private Level stringToLog4jLevel(final String level) {
-    Level result = null;
-
-    if (level.equalsIgnoreCase("OFF"))
-      result = Level.OFF;
-    else if (level.equalsIgnoreCase("INFO"))
-      result = Level.INFO;
-    else if (level.equalsIgnoreCase("WARN"))
-      result = Level.WARN;
-    else if (level.equalsIgnoreCase("ERROR"))
-      result = Level.ERROR;
-    else if (level.equalsIgnoreCase("FATAL"))
-      result = Level.FATAL;
-    else if (level.equalsIgnoreCase("DEBUG"))
-      result = Level.DEBUG;
-    else if (level.equalsIgnoreCase("ALL"))
-      result = Level.ALL;
-
-    return result;
-  }
+  //  /**
+  //   * This method is responsible for changing the log4j's root logger treshold
+  //   *
+  //   * @param level - the level to set
+  //   */
+  //  public void setRootLoggerLevel(final String level) {
+  //    LOGGER.info("setRootLoggerLevel - changing current process logger's treshold to " + level);
+  //    Level newLevel = stringToLog4jLevel(level);
+  //    if (newLevel != null) {
+  //      Logger.getRootLogger().setLevel(newLevel);
+  //    } else {
+  //      LOGGER.error("setRootLoggerLevel - could not change logging level to : " + level);
+  //    }
+  //  }
+  //
+  //  /**
+  //   * This method is responsible for changing the log4j's root logger treshold
+  //   *
+  //   * @param eqID equipment unit unique identifier
+  //   * @param eqName equipment unit name
+  //   * @param level the level to set
+  //   */
+  //  public void setEqLoggerLevel(final Long eqID, final String eqName, final String level) {
+  //    LOGGER.info("changing eqUnit\'s [" + eqID + "," + eqName + "] logger treshold to " + level);
+  //    Level newLevel = stringToLog4jLevel(level);
+  //    if (newLevel != null) {
+  //      // TODO not perfect will override all loggers of this equipment
+  //      EquipmentLoggerFactory.setLevel(eqName, newLevel);
+  //    } else {
+  //      LOGGER.error("setEqLoggerLevel - could not change logging level of logger [" + eqID + "," + eqName + "] to level : " + level);
+  //    }
+  //  }
+  //
+  //  /**
+  //   * This method converts string representation of the logging level to log4j's
+  //   * Level object
+  //   *
+  //   * @param level the string representation of the logging level
+  //   * @return The Level object or null if the String did not match a log4j level.
+  //   */
+  //  private Level stringToLog4jLevel(final String level) {
+  //    Level result = null;
+  //
+  //    if (level.equalsIgnoreCase("OFF"))
+  //      result = Level.OFF;
+  //    else if (level.equalsIgnoreCase("INFO"))
+  //      result = Level.INFO;
+  //    else if (level.equalsIgnoreCase("WARN"))
+  //      result = Level.WARN;
+  //    else if (level.equalsIgnoreCase("ERROR"))
+  //      result = Level.ERROR;
+  //    else if (level.equalsIgnoreCase("FATAL"))
+  //      result = Level.FATAL;
+  //    else if (level.equalsIgnoreCase("DEBUG"))
+  //      result = Level.DEBUG;
+  //    else if (level.equalsIgnoreCase("ALL"))
+  //      result = Level.ALL;
+  //
+  //    return result;
+  //  }
 
   /**
    * Implementation of a spring interface to get the application context.
@@ -568,13 +577,6 @@ public class DriverKernel implements ApplicationContextAware {
   @Override
   public void setApplicationContext(final ApplicationContext applicationContext) {
     this.applicationContext = applicationContext;
-  }
-
-  /**
-   * @param processMessageReceivers the processMessageReceivers to set
-   */
-  public void setProcessMessageReceivers(final List<ProcessMessageReceiver> processMessageReceivers) {
-    this.processMessageReceivers = processMessageReceivers;
   }
 
   /**
@@ -600,7 +602,8 @@ public class DriverKernel implements ApplicationContextAware {
   /**
    * Updates the DAQ by injecting new Equipment Unit
    *
-   * @param EquipmentUnitAdd The newly injected equipment unit
+   * @param equipmentUnitAdd The newly injected equipment unit
+   *
    * @return A change report with information about the success of the update.
    */
 
@@ -630,12 +633,14 @@ public class DriverKernel implements ApplicationContextAware {
 
     EquipmentMessageHandler equnit = null;
 
-    boolean dynamicTimeDeadbandEnabled = !configurationController.getCommandParamsHandler().hasParam("-noDeadband");
+    boolean dynamicTimeDeadbandEnabled = environment.getProperty(Options.DYNAMIC_DEADBAND_ENABLED, Boolean.class);
     conf.setDynamicTimeDeadbandEnabled(dynamicTimeDeadbandEnabled);
 
     LOGGER.info("onEquipmentUnitAdd - Dynamic timedeadband enabled for equipment id: " + conf.getId() + " enabled: " + dynamicTimeDeadbandEnabled);
 
-    EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(conf, processConfiguration, configurationController.getRunOptions());
+    EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(conf, processConfiguration,
+        environment.getProperty("c2mon.daq.logging.useEquipmentLoggers", Boolean.class, false),
+        environment.getProperty("c2mon.daq.logging.useEquipmentAppendersOnly", Boolean.class, false));
 
     EquipmentMessageSender equipmentMessageSender = (EquipmentMessageSender) applicationContext.getBean(EQUIPMENT_MESSAGE_SENDER);
     // equipmentMessageSender.setEquipmentConfiguration(conf);
@@ -647,8 +652,8 @@ public class DriverKernel implements ApplicationContextAware {
     try {
       validateDataTags(conf, equipmentMessageSender);
       validateCommandTags(conf, equipmentMessageSender);
-      equnit = EquipmentMessageHandler.createEquipmentMessageHandler(conf.getHandlerClassName(), new EquipmentCommandHandler(conf.getId(), requestController),
-          new EquipmentConfigurationHandler(conf.getId(), configurationController), equipmentMessageSender);
+      equnit = EquipmentMessageHandler.createEquipmentMessageHandler(conf.getHandlerClassName(), new EquipmentCommandHandler(conf.getId(), requestController)
+          , new EquipmentConfigurationHandler(conf.getId(), configurationController), equipmentMessageSender);
       equnit.setEquipmentLoggerFactory(equipmentLoggerFactory);
 
       // put the equipment configuration into the process configuration's map
@@ -680,7 +685,8 @@ public class DriverKernel implements ApplicationContextAware {
   /**
    * Updates the DAQ by removing a whole EquipmentUnit
    *
-   * @param EquipmentUnitRemove The equipment unit to be removed
+   * @param equipmentUnitRemove The equipment unit to be removed
+   *
    * @return A change report with information about the success of the update.
    */
   public ChangeReport onEquipmentUnitRemove(final EquipmentUnitRemove equipmentUnitRemove) {

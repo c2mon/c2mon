@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -51,82 +51,82 @@ import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
 
 public class RequestControllerTest {
     private ConfigurationController configurationControllerMock;
-    
+
     @Before
     public void setUp() {
         Class<ConfigurationController> clazz = ConfigurationController.class;
         configurationControllerMock = createMock(clazz, clazz.getMethods());
     }
-    
+
     @Test
     public void testApplyChange() {
         RequestController requestController = new RequestController(configurationControllerMock);
         List<Change> changes = new ArrayList<Change>();
         /*
          *  Values in this case don't matter.
-         *  Just add to the configuration controller and check 
+         *  Just add to the configuration controller and check
          *  if the MessageHandler does the right thing.
          */
         DataTagAdd dataTagAdd = new DataTagAdd();
         changes.add(dataTagAdd);
         configurationControllerMock.onDataTagAdd(dataTagAdd);
         expectLastCall().andReturn(new ChangeReport(1L));
-        
+
         DataTagRemove dataTagRemove = new DataTagRemove();
         changes.add(dataTagRemove);
         configurationControllerMock.onDataTagRemove(dataTagRemove);
         expectLastCall().andReturn(new ChangeReport(1L));
-        
+
         DataTagUpdate dataTagUpdate = new DataTagUpdate();
         changes.add(dataTagUpdate);
         configurationControllerMock.onDataTagUpdate(dataTagUpdate);
         expectLastCall().andReturn(new ChangeReport(1L));
-        
+
         CommandTagAdd commandTagAdd = new CommandTagAdd();
         changes.add(commandTagAdd);
         configurationControllerMock.onCommandTagAdd(commandTagAdd);
         expectLastCall().andReturn(new ChangeReport(1L));
-        
+
         CommandTagRemove commandTagremove = new CommandTagRemove();
         changes.add(commandTagremove);
         configurationControllerMock.onCommandTagRemove(commandTagremove);
         expectLastCall().andReturn(new ChangeReport(1L));
-        
+
         CommandTagUpdate commandTagUpdate = new CommandTagUpdate();
         changes.add(commandTagUpdate);
         configurationControllerMock.onCommandTagUpdate(commandTagUpdate);
         expectLastCall().andReturn(new ChangeReport(1L));
-        
+
         EquipmentConfigurationUpdate equipmentConfigurationUpdate = new EquipmentConfigurationUpdate();
         changes.add(equipmentConfigurationUpdate);
         configurationControllerMock.onEquipmentConfigurationUpdate(equipmentConfigurationUpdate);
         expectLastCall().andReturn(new ChangeReport(1L));
-        
+
         ProcessConfigurationUpdate processConfigurationUpdate = new ProcessConfigurationUpdate();
         changes.add(processConfigurationUpdate);
         configurationControllerMock.onProcessConfigurationUpdate(processConfigurationUpdate);
         expectLastCall().andReturn(new ChangeReport(1L));
-        
+
         replay(configurationControllerMock);
         for (Change change : changes) {
             requestController.applyChange(change);
         }
         verify(configurationControllerMock);
     }
-    
+
     @Test
     public void testExecuteCommand() throws EqCommandTagException {
         ConfigurationController configurationController = getBasicConfigurationController();
-        
+
         ICommandRunner commandRunner = createMock(ICommandRunner.class);
         RequestController requestController = new RequestController(configurationController);
         requestController.putCommandRunner(1L, commandRunner);
-        
+
         SourceCommandTagValue sourceCommandTagValue = new SourceCommandTagValue(1L, null, 1L, (short) 0, null, null);
         // MessageHandler should try to call this.
         commandRunner.runCommand(sourceCommandTagValue);
         expectLastCall().andReturn("");
-        
+
         replay(commandRunner);
         requestController.executeCommand(sourceCommandTagValue);
         verify(commandRunner);
@@ -135,28 +135,28 @@ public class RequestControllerTest {
     @Test
     public void testOnSourceDataTagValueUpdateRequestProcess() {
         ConfigurationController configurationController = getBasicConfigurationController();
-        
+
         RequestController handler = new RequestController(configurationController);
-        SourceDataTagValueRequest valueRequest = 
+        SourceDataTagValueRequest valueRequest =
             new SourceDataTagValueRequest(SourceDataTagValueRequest.TYPE_PROCESS, 1L);
-        
-        SourceDataTagValueResponse response = 
+
+        SourceDataTagValueResponse response =
             handler.onSourceDataTagValueUpdateRequest(valueRequest);
-        
+
         assertTrue(response.getAllDataTagValueObjects().size() == 3);
     }
-    
+
     @Test
     public void testOnSourceDataTagValueUpdateRequestWrongProcessId() {
         ConfigurationController configurationController = getBasicConfigurationController();
-        
+
         RequestController handler = new RequestController(configurationController);
-        SourceDataTagValueRequest valueRequest = 
+        SourceDataTagValueRequest valueRequest =
             new SourceDataTagValueRequest(SourceDataTagValueRequest.TYPE_PROCESS, 2L);
-        
-        SourceDataTagValueResponse response = 
+
+        SourceDataTagValueResponse response =
             handler.onSourceDataTagValueUpdateRequest(valueRequest);
-        
+
         assertTrue(response.getAllDataTagValueObjects().size() == 0);
         assertFalse(response.isStatusOK());
         assertTrue(response.getErrorMessage().contains("does not have id: " + 2));
@@ -165,28 +165,28 @@ public class RequestControllerTest {
     @Test
     public void testOnSourceDataTagValueUpdateRequestEquipment() {
         ConfigurationController configurationController = getBasicConfigurationController();
-        
+
         RequestController handler = new RequestController(configurationController);
-        SourceDataTagValueRequest valueRequest = 
+        SourceDataTagValueRequest valueRequest =
             new SourceDataTagValueRequest(SourceDataTagValueRequest.TYPE_EQUIPMENT, 2L);
-        
-        SourceDataTagValueResponse response = 
+
+        SourceDataTagValueResponse response =
             handler.onSourceDataTagValueUpdateRequest(valueRequest);
-        
+
         assertTrue(response.getAllDataTagValueObjects().size() == 2);
     }
-    
+
     @Test
     public void testOnSourceDataTagValueUpdateRequestEquipmentWrongId() {
         ConfigurationController configurationController = getBasicConfigurationController();
-        
+
         RequestController handler = new RequestController(configurationController);
-        SourceDataTagValueRequest valueRequest = 
+        SourceDataTagValueRequest valueRequest =
             new SourceDataTagValueRequest(SourceDataTagValueRequest.TYPE_EQUIPMENT, 20L);
-        
-        SourceDataTagValueResponse response = 
+
+        SourceDataTagValueResponse response =
             handler.onSourceDataTagValueUpdateRequest(valueRequest);
-        
+
         assertTrue(response.getAllDataTagValueObjects().size() == 0);
         assertFalse(response.isStatusOK());
         assertTrue(response.getErrorMessage().contains("does not have equipment with id: " + 20L));
@@ -195,33 +195,33 @@ public class RequestControllerTest {
     @Test
     public void testOnSourceDataTagValueUpdateRequestDataTag() {
         ConfigurationController configurationController = getBasicConfigurationController();
-        
+
         RequestController handler = new RequestController(configurationController);
-        SourceDataTagValueRequest valueRequest = 
+        SourceDataTagValueRequest valueRequest =
             new SourceDataTagValueRequest(SourceDataTagValueRequest.TYPE_DATATAG, 1L);
-        
-        SourceDataTagValueResponse response = 
+
+        SourceDataTagValueResponse response =
             handler.onSourceDataTagValueUpdateRequest(valueRequest);
-        
+
         assertTrue(response.getAllDataTagValueObjects().size() == 1);
     }
-    
+
     @Test
     public void testOnSourceDataTagValueUpdateRequestDataTagWrongId() {
         ConfigurationController configurationController = getBasicConfigurationController();
-        
+
         RequestController handler = new RequestController(configurationController);
-        SourceDataTagValueRequest valueRequest = 
+        SourceDataTagValueRequest valueRequest =
             new SourceDataTagValueRequest(SourceDataTagValueRequest.TYPE_DATATAG, 20L);
-        
-        SourceDataTagValueResponse response = 
+
+        SourceDataTagValueResponse response =
             handler.onSourceDataTagValueUpdateRequest(valueRequest);
-        
+
         assertTrue(response.getAllDataTagValueObjects().size() == 0);
         assertFalse(response.isStatusOK());
         assertTrue(response.getErrorMessage().contains(" does not have a data tag with id: " + 20L));
     }
-    
+
     /**
      * @return configurationController
      */
@@ -229,7 +229,7 @@ public class RequestControllerTest {
       // We need run options for being use with fir the new PIK (default is we send the PIK)
       RunOptions runOptions = new RunOptions();
 
-      ConfigurationController configurationController = new ConfigurationController(runOptions, null);
+      ConfigurationController configurationController = new ConfigurationController();
       ProcessConfiguration processConfiguration = new ProcessConfiguration();
       EquipmentConfiguration equipmentConfiguration = new EquipmentConfiguration();
       EquipmentConfiguration equipmentConfiguration2 = new EquipmentConfiguration();

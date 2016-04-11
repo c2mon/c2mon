@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -27,98 +27,100 @@ import cern.c2mon.daq.common.jmx.JmsSenderMXBean;
 import cern.c2mon.daq.common.messaging.JmsSender;
 import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
 /**
  * this class is used for testing purposes and for the TestMode
- * 
- * @author ${user} 
+ *
+ * @author ${user}
  * @version $Revision$, $Date$, $Author$
  */
 public class DummyJmsSender implements JmsSender, JmsSenderMXBean {
 
-    
-    private List<SourceDataTagValue> messages = new ArrayList<SourceDataTagValue>();
-    
-    /**
-     * Enabling/disabling the action of sending information to the brokers
-     */
-    private boolean isEnabled = true;
-    
-    /**
-     * The Spring name for the ActiveJmsSender
-     */
-    private String beanName;
-    
-    @Override
-    public void connect() {
-        // TODO Auto-generated method stub
 
-    }
+  private List<SourceDataTagValue> messages = new ArrayList<SourceDataTagValue>();
 
-    @Override
-    public void disconnect() {
-        // TODO Auto-generated method stub
+  /**
+   * Enabling/disabling the action of sending information to the brokers
+   */
+  private boolean isEnabled = true;
 
-    }
+//  /**
+//   * The Spring name for the ActiveJmsSender
+//   */
+//  private String beanName;
 
-    @Override
-    public void processValue(SourceDataTagValue sourceDataTagValue) throws JMSException {
-        messages.add(sourceDataTagValue);
+  @Override
+  public void connect() {
+    // TODO Auto-generated method stub
 
-    }
+  }
 
-    @Override
-    public void processValues(DataTagValueUpdate dataTagValueUpdate) throws JMSException {
-        // TODO Auto-generated method stub
+  @Override
+  public void disconnect() {
+    // TODO Auto-generated method stub
 
-    }
+  }
 
-    @Override
-    public void shutdown() {
-        // TODO Auto-generated method stub
+  @Override
+  public void processValue(SourceDataTagValue sourceDataTagValue) throws JMSException {
+    messages.add(sourceDataTagValue);
 
-    }
-    
-    public List<SourceDataTagValue> getMessages() {
-        return this.messages;
-    }
+  }
 
-    /**
-     * Sets the isEnabled current value
-     * 
-     * @param value Enabling/disabling the action of sending information to the brokers
-     */
-    @Override
-    public final void setEnabled(final boolean value) {
-      this.isEnabled = value;
-    }
-    
-    /**
-     * Gets the isEnabled current value
-     * 
-     * @return isEnabled Current status of the action of sending information to the brokers
-     */
-    @Override
-    public final boolean getEnabled() {
-      return this.isEnabled;
-    }
-    
-    /**
-     * Sets the Spring name for the ActiveJmsSender
-     */
-    @Required
-    public final void setBeanName(final String name) {
-      this.beanName = name;
-    }
-    
-    @Override
-    public final String getBeanName() {
-      return this.beanName;
-    }
+  @Override
+  public void processValues(DataTagValueUpdate dataTagValueUpdate) throws JMSException {
+    // TODO Auto-generated method stub
 
-    @Override
-    public final void jmsBrokerDataConnectionEnable(final boolean value) {
-      this.setEnabled(value);
-    }
-    
+  }
+
+  @Override
+  public void shutdown() {
+    // TODO Auto-generated method stub
+
+  }
+
+  public List<SourceDataTagValue> getMessages() {
+    return this.messages;
+  }
+
+  /**
+   * Sets the isEnabled current value
+   *
+   * @param value Enabling/disabling the action of sending information to the brokers
+   */
+  @Override
+  public final void setEnabled(final boolean value) {
+    this.isEnabled = value;
+  }
+
+  /**
+   * Gets the isEnabled current value
+   *
+   * @return isEnabled Current status of the action of sending information to the brokers
+   */
+  @Override
+  public final boolean getEnabled() {
+    return this.isEnabled;
+  }
+
+//  /**
+//   * Sets the Spring name for the ActiveJmsSender
+//   */
+//  @Required
+//  public final void setBeanName(final String name) {
+//    this.beanName = name;
+//  }
+//
+//  @Override
+//  public final String getBeanName() {
+//    return this.beanName;
+//  }
+
+  @Override
+  public final void jmsBrokerDataConnectionEnable(final boolean value) {
+    this.setEnabled(value);
+  }
+
 }

@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -39,6 +39,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.listener.SessionAwareMessageListener;
@@ -48,8 +49,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.daq.common.conf.core.CommonConfiguration;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.common.conf.core.RunOptions;
-import cern.c2mon.daq.tools.CommandParamsHandler;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
 import cern.c2mon.shared.daq.process.ProcessConfigurationResponse;
@@ -63,12 +62,12 @@ import cern.c2mon.shared.daq.process.XMLConverter;
 /**
  * Integration test of ActiveRequestSenderTest with broker.
  * Testing PIK process request
- * 
+ *
  * @author Nacho Vilches
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:resources/daq-test-properties.xml" , "classpath:resources/daq-activemq.xml", 
+@ContextConfiguration({ "classpath:resources/daq-test-properties.xml" , "classpath:daq-activemq.xml",
 "classpath:resources/daq-test-activerequestsender.xml"})
 public class ActiveRequestSenderTest {
 
@@ -101,9 +100,9 @@ public class ActiveRequestSenderTest {
    * Test Type enum
    */
   public static enum TestType {
-    CONNECT_SUCCESS("testSuccessfullSendprocessConnectionRequest"), 
-    CONNECT_REJECT("testRejectSendprocessConnectionRequest"), 
-    CONNECT_BAD_XML("testBadXMLSendprocessConnectionRequest"), 
+    CONNECT_SUCCESS("testSuccessfullSendprocessConnectionRequest"),
+    CONNECT_REJECT("testRejectSendprocessConnectionRequest"),
+    CONNECT_BAD_XML("testBadXMLSendprocessConnectionRequest"),
     CONNECT_TIME_OUT("testTimeOutSendprocessConnectionRequest"),
     CONNECT_BAD_PIK_OBJECT("testBadPIKObjectSendprocessConnectionRequest"),
     DISCONNECT("testSendProcessDisconnectionRequest"),
@@ -116,7 +115,7 @@ public class ActiveRequestSenderTest {
 
     /**
      * Set test name
-     * 
+     *
      * @param name Test name
      */
     TestType(final String name) {
@@ -125,7 +124,7 @@ public class ActiveRequestSenderTest {
 
     /**
      * Get test name
-     * 
+     *
      * @return Test name
      */
     public final String getName() {
@@ -138,8 +137,8 @@ public class ActiveRequestSenderTest {
    */
   private static TestType testType;
 
-  /** 
-   * The class to test 
+  /**
+   * The class to test
    */
   private ActiveRequestSender activeRequestSender = null;
 
@@ -156,6 +155,8 @@ public class ActiveRequestSenderTest {
   @Autowired
   private DefaultMessageListenerContainer testMessageListenerContainer;
 
+  private Environment environmentMock = null;
+
   /**
    * Mock
    * Configuration controller as access point to the configuration.
@@ -164,22 +165,10 @@ public class ActiveRequestSenderTest {
 
   /**
    * Mock
-   * Reference to the command line parameter object.
-   */
-  private CommandParamsHandler commandParamsHandlerMock = null;
-  
-  /**
-   * Mock
-   * The run options of the DAQ process.
-   */
-  private RunOptions runOptionsMock = null;
-  
-  /**
-   * Mock
    * The process configuration object.
    */
   private ProcessConfiguration processConfigurationMock;
-  
+
   /**
    * Mock
    * The CommonConfiguration object to be used in the Configuration test call
@@ -191,7 +180,7 @@ public class ActiveRequestSenderTest {
    * Before each tests
    */
   @Before
-  public final void setUp() {  
+  public final void setUp() {
     LOGGER.debug("Setting up");
 
     // Start listener
@@ -199,40 +188,26 @@ public class ActiveRequestSenderTest {
 
     // Use of org.easymock.classextension.EasyMoc to mock classes
 
-    // Mock for CommandParamsHandler to use getParamValue(String) 
-    // String[] args = {"-processName", "P_TESTHANDLER03"};
-    this.commandParamsHandlerMock = EasyMock.createMockBuilder(CommandParamsHandler.class).
-        //        withConstructor(String[].class).
-        //        withArgs((Object)args).
-        addMockedMethod("getParamValue", String.class).
-        createMock();
-    
-    this.runOptionsMock = EasyMock.createMockBuilder(RunOptions.class).
-        addMockedMethod("getStartUp").
-        createMock();
+    this.environmentMock = EasyMock.createMock(Environment.class);
 
     // Mock for configurationController to use getCommandParamsHandler()
     // The run options of the DAQ process
     this.configurationControllerMock = EasyMock.createMockBuilder(ConfigurationController.class).
-        withConstructor(RunOptions.class, CommonConfiguration.class).
-        withArgs(null, null).
-        addMockedMethod("getCommandParamsHandler").
-        addMockedMethod("getRunOptions").
         addMockedMethod("getProcessConfiguration").
-        createMock();  
-    
+        createMock();
+
     this.processConfigurationMock = EasyMock.createMockBuilder(ProcessConfiguration.class).
         addMockedMethod("getProcessID").
         addMockedMethod("getProcessName").
         addMockedMethod("getprocessPIK").
-        createMock(); 
-    
+        createMock();
+
     this.commonConfigurationMock  = EasyMock.createMockBuilder(CommonConfiguration.class).
         addMockedMethod("getRequestTimeout").
-        createMock(); 
+        createMock();
 
     // Class to test ActiveRequestSender
-    this.activeRequestSender = new ActiveRequestSender(this.commonConfigurationMock, this.jmsTemplate, this.configurationControllerMock);
+    this.activeRequestSender = new ActiveRequestSender(this.commonConfigurationMock, this.jmsTemplate);
   }
 
   /**
@@ -295,22 +270,22 @@ public class ActiveRequestSenderTest {
   /**
    * This method do all the mocking work before and after calling the sendprocessConnectionRequest()
    * function. It is common for all tests cause the differences are in the reply messages
-   * 
+   *
    */
   private void sendProcessConnectionRequest() {
     // Expectations.
-    EasyMock.expect(this.configurationControllerMock.getCommandParamsHandler()).andReturn(this.commandParamsHandlerMock).times(1);
-    EasyMock.expect(this.commandParamsHandlerMock.getParamValue("-processName")).andReturn(PROCESS_NAME).times(1);
-    
-    EasyMock.expect(this.configurationControllerMock.getRunOptions()).andReturn(this.runOptionsMock).times(1);
+//    EasyMock.expect(this.configurationControllerMock.getCommandParamsHandler()).andReturn(this.commandParamsHandlerMock).times(1);
+    EasyMock.expect(this.environmentMock.getProperty(EasyMock.<String>anyObject())).andReturn(PROCESS_NAME).times(1);
+
+//    EasyMock.expect(this.configurationControllerMock.getRunOptions()).andReturn(this.runOptionsMock).times(1);
     //EasyMock.expect(this.runOptionsMock.setStartUp(System.currentTimeMillis())).times(1);
 
     // Start mock replay
-    EasyMock.replay(this.commandParamsHandlerMock, this.configurationControllerMock, this.runOptionsMock);  
+    EasyMock.replay(this.environmentMock, this.configurationControllerMock);
 
     // Here, the real test starts
-    ProcessConnectionResponse processConnectionResponse = this.activeRequestSender.sendProcessConnectionRequest();
-    
+    ProcessConnectionResponse processConnectionResponse = this.activeRequestSender.sendProcessConnectionRequest(PROCESS_NAME);
+
 //    try {
 //      Thread.sleep(2000);
 //    }
@@ -320,13 +295,13 @@ public class ActiveRequestSenderTest {
 
     // onMessage call will take over the reply. No need top wait since the call will never come back before without a reply
 
-    // Check return result of sendprocessConnectionRequest() and compare it against your emulated server answer.    
+    // Check return result of sendprocessConnectionRequest() and compare it against your emulated server answer.
     compareConnection(processConnectionResponse);
 
     // Verify configurationController Mock to check that sendprocessConnectionRequest() called what we expected
-    EasyMock.verify(this.commandParamsHandlerMock, this.configurationControllerMock, this.runOptionsMock);
+    EasyMock.verify(this.configurationControllerMock);
   }
-  
+
   /**
    * Test Send ProcessDisconnection Request
    */
@@ -338,32 +313,30 @@ public class ActiveRequestSenderTest {
     // Call the sending process disconnection
     sendProcessDisconnectionRequest();
   }
-  
+
   /**
    * This method do all the mocking work before and after calling the sendProcessDisonnectionRequest()
    * function. It is common for all tests cause the differences are in the reply messages
-   * 
+   *
    */
   private void sendProcessDisconnectionRequest() {
     // Expectations.
-    EasyMock.expect(this.configurationControllerMock.getRunOptions()).andReturn(this.runOptionsMock).times(1);
-    EasyMock.expect(this.runOptionsMock.getStartUp()).andReturn(System.currentTimeMillis()).times(1);
-    
+
     EasyMock.expect(this.configurationControllerMock.getProcessConfiguration()).andReturn(this.processConfigurationMock).times(1);
     EasyMock.expect(this.processConfigurationMock.getProcessID()).andReturn(-1L).times(1, 2);
     EasyMock.expect(this.processConfigurationMock.getProcessName()).andReturn(PROCESS_NAME).times(1, 3);
     EasyMock.expect(this.processConfigurationMock.getprocessPIK()).andReturn(PROCESS_PIK).times(1, 2);
 
     // Start mock replay
-    EasyMock.replay(this.configurationControllerMock, this.runOptionsMock, this.processConfigurationMock);  
+    EasyMock.replay(this.configurationControllerMock, this.processConfigurationMock);
 
     // Here, the real test starts
-    this.activeRequestSender.sendProcessDisconnectionRequest();
+    this.activeRequestSender.sendProcessDisconnectionRequest(this.configurationControllerMock.getProcessConfiguration(), -1L);
 
     // Verify configurationController Mock to check that sendprocessConnectionRequest() called what we expected
-    EasyMock.verify(this.configurationControllerMock, this.runOptionsMock, this.processConfigurationMock);
+    EasyMock.verify(this.configurationControllerMock, this.processConfigurationMock);
   }
-  
+
   /**
    * Test Send ProcessDisconnection Request
    */
@@ -375,51 +348,52 @@ public class ActiveRequestSenderTest {
     // Call the sending process configuration
     sendProcessConfigurationRequest();
   }
-  
+
   /**
    * This method do all the mocking work before and after calling the sendProcessConfigurationRequest()
    * function. It is common for all tests cause the differences are in the reply messages
-   * 
+   *
    */
   private void sendProcessConfigurationRequest() {
     // Expectations.
-    EasyMock.expect(this.configurationControllerMock.getCommandParamsHandler()).andReturn(this.commandParamsHandlerMock).times(1);
-    EasyMock.expect(this.commandParamsHandlerMock.getParamValue("-processName")).andReturn(PROCESS_NAME).times(1);
+//    EasyMock.expect(this.configurationControllerMock.getCommandParamsHandler()).andReturn(this.commandParamsHandlerMock).times(1);
+//    EasyMock.expect(this.commandParamsHandlerMock.getParamValue("-processName")).andReturn(PROCESS_NAME).times(1);
+    EasyMock.expect(this.environmentMock.getProperty(EasyMock.<String>anyObject())).andReturn(PROCESS_NAME).times(1);
     EasyMock.expect(this.commonConfigurationMock.getRequestTimeout()).andReturn(TEST_RESULTS_TIMEOUT).times(2);
-    EasyMock.expect(this.configurationControllerMock.getProcessConfiguration()).andReturn(this.processConfigurationMock).times(1);
-    EasyMock.expect(this.processConfigurationMock.getprocessPIK()).andReturn(PROCESS_PIK).times(1);
+//    EasyMock.expect(this.configurationControllerMock.getProcessConfiguration()).andReturn(this.processConfigurationMock).times(1);
+//    EasyMock.expect(this.processConfigurationMock.getprocessPIK()).andReturn(PROCESS_PIK).times(1);
 
     // Start mock replay
-    EasyMock.replay(this.commandParamsHandlerMock, this.configurationControllerMock, this.commonConfigurationMock, this.processConfigurationMock); 
+    EasyMock.replay(this.environmentMock, this.configurationControllerMock, this.commonConfigurationMock, this.processConfigurationMock);
 
     // Here, the real test starts
-    ProcessConfigurationResponse processConfigurationResponse = this.activeRequestSender.sendProcessConfigurationRequest();
-    
-    // Check return result of sendProcessConfigurationRequest() and compare it against your emulated server answer.    
+    ProcessConfigurationResponse processConfigurationResponse = this.activeRequestSender.sendProcessConfigurationRequest(PROCESS_NAME);
+
+    // Check return result of sendProcessConfigurationRequest() and compare it against your emulated server answer.
     compareConfiguration(processConfigurationResponse);
-    
+
     // Verify configurationController Mock to check that sendprocessConnectionRequest() called what we expected
-    EasyMock.verify(this.commandParamsHandlerMock, this.configurationControllerMock, this.commonConfigurationMock);
+    EasyMock.verify(this.configurationControllerMock, this.commonConfigurationMock);
   }
-  
-  
+
+
 
   /**
    * Listener declared
    *  in daq-test-activerequestsender.xml and used for
    * emulating the server
-   * 
+   *
    * @author Nacho Vilches
    *
    */
   static class TestMessageListener implements SessionAwareMessageListener<Message> {
-    
-    
+
+
     /**
      * ProcessMessageConverter helper class (fromMessage/ToMessage)
      */
     private ProcessMessageConverter processMessageConverter = new ProcessMessageConverter();
-    
+
     /**
      * XML Converter helper class
      */
@@ -431,33 +405,33 @@ public class ActiveRequestSenderTest {
         LOGGER.debug("onMessage() - Message coming " + message);
         ProcessRequest processRequest = (ProcessRequest) this.processMessageConverter.fromMessage(message);
         LOGGER.debug("onMessage() - Message converted " + processRequest.toString());
-        
+
         // ProcessDisconnectionRequest
-        if (processRequest instanceof ProcessDisconnectionRequest) {          
+        if (processRequest instanceof ProcessDisconnectionRequest) {
           LOGGER.debug("onMessage() - Process disconnection completed for DAQ " + ((ProcessDisconnectionRequest) processRequest).getProcessName());
-      
-        } 
+
+        }
         // ProcessConnectionRequest
-        else if (processRequest instanceof ProcessConnectionRequest) {  
+        else if (processRequest instanceof ProcessConnectionRequest) {
           ProcessConnectionRequest processConnectionRequest = (ProcessConnectionRequest)processRequest;
           LOGGER.info("onMessage - DAQ Connection request received from DAQ " + processConnectionRequest.getProcessName());
-          
+
           // Replace the server original call
           //String processConnectionResponse = supervisionManager.onProcessConnection(processConnectionRequest);
           String stringProcessConnectionResponse = null;
-          
+
           // Create the ProcessConnectionResponse
           ProcessConnectionResponse processConnectionResponse = new ProcessConnectionResponse();
           processConnectionResponse.setProcessName(processConnectionRequest.getProcessName());
-          
+
           // Different tests types
-          if (ActiveRequestSenderTest.testType != TestType.CONNECT_TIME_OUT) {   
+          if (ActiveRequestSenderTest.testType != TestType.CONNECT_TIME_OUT) {
             if (ActiveRequestSenderTest.testType == TestType.CONNECT_SUCCESS) {
               // With the emulated good server reply
               processConnectionResponse.setprocessPIK(PROCESS_PIK);
               stringProcessConnectionResponse = this.xmlConverter.toXml(processConnectionResponse);
               LOGGER.debug("Good reply sent to PIK Request");
-            } 
+            }
             else if (ActiveRequestSenderTest.testType == TestType.CONNECT_REJECT) {
               // With the emulated Rejected server reply
               processConnectionResponse.setprocessPIK(PIK_REJECTED);
@@ -468,8 +442,8 @@ public class ActiveRequestSenderTest {
               // Modify the XML
               stringProcessConnectionResponse = this.xmlConverter.toXml("Nacho testing XML");
               LOGGER.debug("Bad XML reply sent to PIK Request");
-            }         
-          } 
+            }
+          }
           else {
             // Time Out (normally it is 12000 for the timeout)
             try {
@@ -480,9 +454,9 @@ public class ActiveRequestSenderTest {
             }
             LOGGER.debug("No reply sent to PIK Request");
           }
-          
+
           LOGGER.debug("onMessage - Sending Connection response to DAQ " + processConnectionRequest.getProcessName());
-          
+
           MessageProducer messageProducer = session.createProducer(message.getJMSReplyTo());
           try {
             TextMessage replyMessage = session.createTextMessage();
@@ -490,29 +464,29 @@ public class ActiveRequestSenderTest {
             messageProducer.send(replyMessage);
           } finally {
             messageProducer.close();
-          }          
-        } 
+          }
+        }
         // ProcessConfigurationRequest
-        else if (processRequest instanceof ProcessConfigurationRequest) {     
+        else if (processRequest instanceof ProcessConfigurationRequest) {
           ProcessConfigurationRequest processConfigurationRequest = (ProcessConfigurationRequest) processRequest;
           LOGGER.info("onMessage - DAQ configuration request received from DAQ " + processConfigurationRequest.getProcessName());
-          
+
           ProcessConfigurationResponse processConfigurationResponse = new ProcessConfigurationResponse();
           processConfigurationResponse.setProcessName(processConfigurationRequest.getProcessName());
-          
+
           // Replace the server original call
 //          String processConfiguration = supervisionManager.onProcessConfiguration(processConfigurationRequest);
-          
+
           // We get the configuration XML file (empty by default)
           URL url = Test.class.getClassLoader().getResource("resources/P_JECTEST01-testhandler.xml");
-          processConfigurationResponse.setConfigurationXML(readFile(url.getPath())); 
-         
-          
-          
+          processConfigurationResponse.setConfigurationXML(readFile(url.getPath()));
+
+
+
           String processConfiguration = this.xmlConverter.toXml(processConfigurationResponse);
-          
+
           LOGGER.debug("onMessage - Sending Configuration Response to DAQ " + processConfigurationResponse.getProcessName());
-          
+
           MessageProducer messageProducer = session.createProducer(message.getJMSReplyTo());
           try {
             TextMessage replyMessage = session.createTextMessage();
@@ -520,15 +494,15 @@ public class ActiveRequestSenderTest {
             messageProducer.send(replyMessage);
           } finally {
             messageProducer.close();
-          }              
+          }
         } else {
-          LOGGER.error("onMessage - Incoming ProcessRequest object not recognized! - ignoring the request");      
+          LOGGER.error("onMessage - Incoming ProcessRequest object not recognized! - ignoring the request");
         }
       } catch (MessageConversionException e) {
         LOGGER.error("onMessage - Exception caught while converting incoming DAQ request - unable to process request", e);
-      }   
+      }
     }
-    
+
     public String readFile(String filename)
     {
       String content = null;
@@ -550,7 +524,7 @@ public class ActiveRequestSenderTest {
 
   /**
    * This method checks all the Connection replies behave as expected.
-   * 
+   *
    * @param processConnectionResponse the processConnectionResponse object returned from the sendprocessConnectionRequest()
    */
   private synchronized static void compareConnection(final ProcessConnectionResponse processConnectionResponse) {
@@ -570,17 +544,17 @@ public class ActiveRequestSenderTest {
     else {
       assertNotNull(null, "ERROR - No test for PIK was found.");
     }
-  }  
-  
+  }
+
   /**
    * This method checks all the Configuration replies behave as expected.
-   * 
-   * @param processConnectionResponse the processConnectionResponse object returned from the sendprocessConnectionRequest()
+   *
+   * @param processConfigurationResponse
    */
   private synchronized static void compareConfiguration(final ProcessConfigurationResponse processConfigurationResponse) {
     if (ActiveRequestSenderTest.testType == TestType.CONFIG) {
       assertNotNull(processConfigurationResponse);
       assertEquals(PROCESS_NAME, processConfigurationResponse.getProcessName());
     }
-  }  
+  }
 }

@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -372,28 +372,30 @@ public abstract class ProcessMessageReceiver {
     try {
       LOGGER.debug("entering onChangeLoggingLevel()..");
 
-      Element rootEl = doc.getDocumentElement();
-      NodeList n1 = rootEl.getElementsByTagName("process");
-      if (n1.getLength() == 1) {
-        if (LOGGER.isDebugEnabled())
-          LOGGER.debug("calling kernel\'s setRootLoggerLevel() with level : " + n1.item(0).getFirstChild().getNodeValue());
+      LOGGER.debug("Not doing anything as this feature has been disabled");
 
-        this.kernel.setRootLoggerLevel(n1.item(0).getFirstChild().getNodeValue());
-      }
-
-      Element eqUnitsBlock = (Element) rootEl.getElementsByTagName("EquipmentUnits").item(0);
-      NodeList eqUnits = eqUnitsBlock.getElementsByTagName("EquipmentUnit");
-      for (int i = 0; i < eqUnits.getLength(); i++) {
-        Element eqUnit = (Element) eqUnits.item(i);
-        String eqID = eqUnit.getAttribute("id");
-        String eqName = eqUnit.getAttribute("name");
-
-        if (LOGGER.isDebugEnabled())
-          LOGGER.debug("calling kernel\'s setEqLoggerLevel() for eqUnit id : " + eqID + " name : " + eqName + " with level : "
-              + eqUnit.getFirstChild().getNodeValue());
-
-        this.kernel.setEqLoggerLevel(Long.getLong(eqID), eqName, eqUnit.getFirstChild().getNodeValue());
-      }
+//      Element rootEl = doc.getDocumentElement();
+//      NodeList n1 = rootEl.getElementsByTagName("process");
+//      if (n1.getLength() == 1) {
+//        if (LOGGER.isDebugEnabled())
+//          LOGGER.debug("calling kernel\'s setRootLoggerLevel() with level : " + n1.item(0).getFirstChild().getNodeValue());
+//
+//        this.kernel.setRootLoggerLevel(n1.item(0).getFirstChild().getNodeValue());
+//      }
+//
+//      Element eqUnitsBlock = (Element) rootEl.getElementsByTagName("EquipmentUnits").item(0);
+//      NodeList eqUnits = eqUnitsBlock.getElementsByTagName("EquipmentUnit");
+//      for (int i = 0; i < eqUnits.getLength(); i++) {
+//        Element eqUnit = (Element) eqUnits.item(i);
+//        String eqID = eqUnit.getAttribute("id");
+//        String eqName = eqUnit.getAttribute("name");
+//
+//        if (LOGGER.isDebugEnabled())
+//          LOGGER.debug("calling kernel\'s setEqLoggerLevel() for eqUnit id : " + eqID + " name : " + eqName + " with level : "
+//              + eqUnit.getFirstChild().getNodeValue());
+//
+//        this.kernel.setEqLoggerLevel(Long.getLong(eqID), eqName, eqUnit.getFirstChild().getNodeValue());
+//      }
 
       LOGGER.debug("leaving onChangeLoggingLevel()");
     } finally {

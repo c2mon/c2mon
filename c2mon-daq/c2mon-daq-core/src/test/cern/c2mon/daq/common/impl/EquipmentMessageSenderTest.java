@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -109,7 +109,7 @@ public class EquipmentMessageSenderTest {
 //        equipmentMessageSender.setEquipmentLoggerFactory(EquipmentLoggerFactory.createFactory(equipmentConfiguration,
 //                processConf, new RunOptions()));
         EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(equipmentConfiguration,
-                processConf, new RunOptions());
+                processConf, false, false);
 
         this.equipmentMessageSender.init(equipmentConfiguration, equipmentLoggerFactory);
 
@@ -528,7 +528,7 @@ public class EquipmentMessageSenderTest {
 
       verify(this.processMessageSenderMock, this.filterMessageSenderMock);
     }
-    
+
     @Test
     public void testSendInvalidTagWithValueConversionFloat2Boolean() {
       // Add value to the SourceDatTag
@@ -563,8 +563,8 @@ public class EquipmentMessageSenderTest {
 
       verify(this.processMessageSenderMock, this.filterMessageSenderMock);
     }
-    
-    
+
+
     /**
      * Note: Value-based deadband filtering is enabled for the process (we use sdt2)
      */
@@ -602,7 +602,7 @@ public class EquipmentMessageSenderTest {
 
       verify(this.processMessageSenderMock, this.filterMessageSenderMock);
     }
-    
+
     @Test
     public void testSendInvalidTagWithValueConversionShort2Integer() {
       // Add value to the SourceDatTag
@@ -726,7 +726,7 @@ public class EquipmentMessageSenderTest {
         equipmentConfiguration.setHandlerClassName("asd");
 
         equipmentMessageSender.init(equipmentConfiguration, EquipmentLoggerFactory.createFactory(equipmentConfiguration,
-                processConf, new RunOptions()));
+                processConf, false, false));
 
         // setup calls should not affect later tests
         reset(filterMessageSenderMock, processMessageSenderMock);
@@ -1204,7 +1204,7 @@ public class EquipmentMessageSenderTest {
 
       verify(this.processMessageSenderMock, this.filterMessageSenderMock);
     }
-    
+
     @Test
     public void testSendTagFilteredWithValueConversionShort2Boolean() {
       // update the value
@@ -1222,7 +1222,7 @@ public class EquipmentMessageSenderTest {
 
       verify(this.processMessageSenderMock, this.filterMessageSenderMock);
     }
-    
+
     @Test
     public void testSendTagFilteredWithValueConversionShort2Float() {
       // update the value
@@ -1240,8 +1240,8 @@ public class EquipmentMessageSenderTest {
 
       verify(this.processMessageSenderMock, this.filterMessageSenderMock);
     }
-    
-    
+
+
     @Test
     public void testSendTagFilteredWithValueConversionFloat2Integer() {
       // update the value

@@ -1,23 +1,26 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
+import cern.c2mon.shared.common.process.ProcessConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
@@ -27,25 +30,25 @@ import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
 public class TestModeRequestSender implements ProcessRequestSender {
 
   private final ProcessRequestSender wrapperRequestSender;
-  
+
   @Autowired
   public TestModeRequestSender(@Qualifier("activeRequestSender") final ProcessRequestSender wrapper) {
     this.wrapperRequestSender = wrapper;
   }
-  
+
   @Override
-  public ProcessConfigurationResponse sendProcessConfigurationRequest() {
-    return wrapperRequestSender.sendProcessConfigurationRequest();
+  public ProcessConfigurationResponse sendProcessConfigurationRequest(final String processName) {
+    return wrapperRequestSender.sendProcessConfigurationRequest(processName);
   }
 
   @Override
-  public ProcessConnectionResponse sendProcessConnectionRequest() {
+  public ProcessConnectionResponse sendProcessConnectionRequest(final String processName) {
     return new ProcessConnectionResponse(ProcessConnectionResponse.NO_PROCESS, 123456L);
   }
 
   @Override
-  public void sendProcessDisconnectionRequest() {
+  public void sendProcessDisconnectionRequest(ProcessConfiguration processConfiguration, long startupTime) {
     // TODO Auto-generated method stub
-    
+
   }
 }

@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -33,49 +33,50 @@ import cern.c2mon.shared.util.buffer.PullEvent;
 import cern.c2mon.shared.util.buffer.PullException;
 import cern.c2mon.shared.util.buffer.SynchroBuffer;
 import cern.c2mon.shared.util.buffer.SynchroBufferListener;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
 /**
  * This class wraps a JMSSender so that all JMS sending occurs on separate threads from
  * the main application (in fact only needed for the processValue method since processValues
  * already runs on a separate thread in ProcessMessageSender).
- * 
+ *
  * It also puts all messages through FIFO buffers to prevent out of memory problems.
- * 
+ *
  * It can be wired in place of the usual JMSSender.
- * 
+ *
  * @author mbrightw
  *
  */
-
 public class ProxyJmsSender implements JmsSender, JmsSenderMXBean {
-  
-  
+
+
   /**
    * The logger.
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(ProxyJmsSender.class);
-  
+
   /**
    * The JMSSender to wrap.
    */
   private JmsSender wrappedSender;
-  
+
   /**
    * Buffer storing the high priority messages
    * (sent with processValue).
    */
   private SynchroBuffer highPriorityBuffer;
-  
+
   /**
    * Buffer storing the low priority messages
    * (sent with processValues).
    */
   private SynchroBuffer lowPriorityBuffer;
-  
-  /**
-   * The Spring name for the ProxyJmsSender
-   */
-  private String beanName;
+
+//  /**
+//   * The Spring name for the ProxyJmsSender
+//   */
+//  private String beanName;
 
   /**
    * Init method called on bean initialization.
@@ -86,7 +87,7 @@ public class ProxyJmsSender implements JmsSender, JmsSenderMXBean {
     highPriorityBuffer = new SynchroBuffer(100, 200, 100, SynchroBuffer.DUPLICATE_OK, 10000);
     highPriorityBuffer.setSynchroBufferListener(new HighPriorityListener());
     highPriorityBuffer.enable();
-    
+
     lowPriorityBuffer = new SynchroBuffer(100, 500, 100, SynchroBuffer.DUPLICATE_OK, 10000);
     lowPriorityBuffer.setSynchroBufferListener(new LowPriorityListener());
     lowPriorityBuffer.enable();
@@ -97,13 +98,13 @@ public class ProxyJmsSender implements JmsSender, JmsSenderMXBean {
   @Override
   public final void connect() {
     Thread proxyConnectorThread = new Thread(new Runnable() {
-      
+
       @Override
       public void run() {
         wrappedSender.connect();
       }
     }, "Proxy sender connection thread");
-    
+
     proxyConnectorThread.start();
   }
 
@@ -147,8 +148,8 @@ public class ProxyJmsSender implements JmsSender, JmsSenderMXBean {
   public final void setWrappedSender(final JmsSender wrappedSender) {
     this.wrappedSender = wrappedSender;
   }
-  
-  
+
+
    /**
    * The buffer used to store the received collections of updates.
    * @author mbrightw
@@ -160,16 +161,16 @@ public class ProxyJmsSender implements JmsSender, JmsSenderMXBean {
      * Retrieve the DataTagValueUpdate objects and call the wrapped processValues method for each
      * of these.
      * @param event pull event
-     * @throws PullException not used 
+     * @throws PullException not used
      */
     @Override
     public void pull(final PullEvent event) throws PullException {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("entering pull() of proxy low priority buffer...");
-        LOGGER.debug("\t Number of pulled dataTagValueUpdate objects (collections!) : " + event.getPulled().size());        
+        LOGGER.debug("\t Number of pulled dataTagValueUpdate objects (collections!) : " + event.getPulled().size());
       }
-      
-      Iterator<DataTagValueUpdate> it = event.getPulled().iterator();      
+
+      Iterator<DataTagValueUpdate> it = event.getPulled().iterator();
 
       while (it.hasNext()) {
         //catch and log JMSExceptions (proxy should shield DAQ)
@@ -177,16 +178,16 @@ public class ProxyJmsSender implements JmsSender, JmsSenderMXBean {
           wrappedSender.processValues(it.next());
         }
         catch (Exception ex) {
-          LOGGER.error("JMSException caught when calling the proxied JMSSender's processValue method: " + ex.getMessage());
-        }        
+          LOGGER.error("JMSException caught when calling the proxied JMSSender's processValue method", ex);
+        }
       }
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("leaving pull()...");
       }
     }
-    
+
   }
-  
+
   /**
    * The buffer used to store the single data tag source values.
    * @author mbrightw
@@ -196,7 +197,7 @@ public class ProxyJmsSender implements JmsSender, JmsSenderMXBean {
 
     /**
      * Method called when the buffer triggers and event.
-     * 
+     *
      * Simply call the processValue method on the wrapped JMSSender for each
      * {@link SourceDataTagValue} in the buffer.
      * @param event the pull event
@@ -206,10 +207,10 @@ public class ProxyJmsSender implements JmsSender, JmsSenderMXBean {
     public void pull(final PullEvent event) throws PullException {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("entering pull() of proxy high priority buffer...");
-        LOGGER.debug("\t Number of pulled objects : " + event.getPulled().size());        
+        LOGGER.debug("\t Number of pulled objects : " + event.getPulled().size());
       }
-      
-      Iterator<SourceDataTagValue> it = event.getPulled().iterator();      
+
+      Iterator<SourceDataTagValue> it = event.getPulled().iterator();
 
       while (it.hasNext()) {
         //catch and log JMSExceptions (proxy should shield DAQ)
@@ -217,53 +218,53 @@ public class ProxyJmsSender implements JmsSender, JmsSenderMXBean {
           wrappedSender.processValue(it.next());
         }
         catch (Exception ex) {
-          LOGGER.error("Exception caught when calling the proxied JMSSender's processValue method: " + ex.getMessage());
-        }        
+          LOGGER.error("Exception caught when calling the proxied JMSSender's processValue method: " , ex);
+        }
       }
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("leaving pull()...");
-      }      
+      }
     }
-    
+
   }
 
   @Override
   public void shutdown() {
     wrappedSender.shutdown();
   }
-  
+
   /**
    * Sets the isEnabled current value
-   * 
+   *
    * @param value Enabling/disabling the action of sending information to the brokers
    */
   @Override
   public final void setEnabled(final boolean value) {
     this.wrappedSender.setEnabled(value);
   }
-  
+
   /**
    * Gets the isEnabled current value
-   * 
+   *
    * @return isEnabled Current status of the action of sending information to the brokers
    */
   @Override
   public final boolean getEnabled() {
     return this.wrappedSender.getEnabled();
   }
-  
-  /**
-   * Sets the Spring name for the ProxyJmsSender
-   */
-  @Required
-  public final void setBeanName(final String name) {
-    this.beanName = name;
-  }
-  
-  @Override
-  public final String getBeanName() {
-    return this.beanName;
-  }
+
+//  /**
+//   * Sets the Spring name for the ProxyJmsSender
+//   */
+//  @Required
+//  public final void setBeanName(final String name) {
+//    this.beanName = name;
+//  }
+//
+//  @Override
+//  public final String getBeanName() {
+//    return this.beanName;
+//  }
 
   @Override
   public final void jmsBrokerDataConnectionEnable(final boolean value) {

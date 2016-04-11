@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -43,7 +43,7 @@ import cern.c2mon.shared.util.buffer.SynchroBufferListener;
 /**
  * The ProcessMessageSender class is responsible for sending JMS messages from
  * the DAQ to the application server. <p>
- * 
+ *
  * This class supports sending the updates to
  * multiple JMS connections. The sending itself is performed by a JMSSender
  * class. Several of these can be specified in the jmsSenders collection field.
@@ -252,15 +252,12 @@ public class ProcessMessageSender implements IProcessMessageSender {
    * implement this on separate threads if the connection is unessential).
    */
   public final void connect() {
-    Iterator<JmsSender> it = jmsSenders.iterator();
-    while (it.hasNext()) {
-      JmsSender jmsSender = it.next();
-
-      // Helper class for registering the MXBean to the current server
-      JmxRegistrationMXBean jmxRegistrationMXBean = new JmxRegistrationMXBean(JmxRegistrationMXBean.MBeanType.JMS, jmsSender.getBeanName());
-
-      // Register JmsSender as MXBean
-      jmxRegistrationMXBean.registerMBean(jmsSender);
+    for (JmsSender jmsSender : jmsSenders) {
+//      // Helper class for registering the MXBean to the current server
+//      JmxRegistrationMXBean jmxRegistrationMXBean = new JmxRegistrationMXBean(JmxRegistrationMXBean.MBeanType.JMS, jmsSender.getBeanName());
+//
+//      // Register JmsSender as MXBean
+//      jmxRegistrationMXBean.registerMBean(jmsSender);
 
       // Connection
       jmsSender.connect();
@@ -285,12 +282,10 @@ public class ProcessMessageSender implements IProcessMessageSender {
    * @throws JMSException if one of the senders fails
    */
   private void distributeValue(final SourceDataTagValue sourceDataTagValue) throws JMSException {
-    Iterator<JmsSender> it = jmsSenders.iterator();
-    while (it.hasNext()) {
+    for (JmsSender jmsSender : jmsSenders) {
       try {
-        it.next().processValue(sourceDataTagValue);
-      }
-      catch (Exception e) {
+        jmsSender.processValue(sourceDataTagValue);
+      } catch (Exception e) {
         LOGGER.error("Unhandled exception caught while sending a source value (tag id " + sourceDataTagValue.getId() + ") - the value update will be lost.", e);
       }
     }
@@ -306,12 +301,10 @@ public class ProcessMessageSender implements IProcessMessageSender {
    * @param dataTagValueUpdate the values to send
    */
   private void distributeValues(final DataTagValueUpdate dataTagValueUpdate) throws JMSException {
-    Iterator<JmsSender> it = jmsSenders.iterator();
-    while (it.hasNext()) {
+    for (JmsSender jmsSender : jmsSenders) {
       try {
-        it.next().processValues(dataTagValueUpdate);
-      }
-      catch (Exception e) {
+        jmsSender.processValues(dataTagValueUpdate);
+      } catch (Exception e) {
         LOGGER.error("Unhandled exception caught while sending a collection of source values - the updates will be lost.", e);
       }
     }

@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -82,7 +82,7 @@ public class ConfigurationControllerTest {
 
     @Before
     public void setUp() {
-        configurationController = new ConfigurationController(null, null);
+        configurationController = new ConfigurationController();
         processConfiguration = new ProcessConfiguration();
         processConfiguration.setProcessID(TEST_PROCESS_ID);
         configurationController.setProcessConfiguration(processConfiguration);
@@ -127,7 +127,7 @@ public class ConfigurationControllerTest {
     // configurationController.setProcessRequestSender(processRequestSender);
     // configurationController.setCommandParamsHandler(commandParamsHandler);
     // configurationController.setProcessConfigurationLoader(processConfigurationLoader);
-    //        
+    //
     // processRequestSender.sendProcessDisconnection();
     // replay(processRequestSender);
     // configurationController.loadProcessConfiguration();
@@ -135,7 +135,7 @@ public class ConfigurationControllerTest {
     // assertEquals(configurationController.getProcessConfiguration().getProcessName(), "TST");
     // assertEquals(configurationController.getProcessConfiguration().getProcessID().longValue(), -1L);
     // }
-    //    
+    //
     // @Test
     // public void testConfigurationUnknown() {
     // String path = ProcessConfigurationLoaderTest.class.getResource(PROCESS_CONFIGURATION_UNKNOWN_TYPE_XML).getPath();
@@ -146,7 +146,7 @@ public class ConfigurationControllerTest {
     // configurationController.setProcessRequestSender(processRequestSender);
     // configurationController.setCommandParamsHandler(commandParamsHandler);
     // configurationController.setProcessConfigurationLoader(processConfigurationLoader);
-    //        
+    //
     // processRequestSender.sendProcessDisconnection();
     // replay(processRequestSender);
     // configurationController.loadProcessConfiguration();

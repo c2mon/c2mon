@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -50,6 +50,7 @@ import cern.c2mon.daq.tools.CommandParamsHandler;
  *
  * @author Mark Brightwell
  *
+ * @deprecated use {@link cern.c2mon.daq.DaqStartup} instead
  */
 public final class DaqStartup {
 
@@ -200,7 +201,7 @@ public final class DaqStartup {
         logger.info("The DAQ process is starting in TEST mode (no JMS connections will be opened, no real PIK will be requested from the server)");
 
         logger.info("Loading testMode Spring context configuration file from classpath");
-        xmlContext = new ClassPathXmlApplicationContext(new String[] { "resources/daq-core-service-testmode.xml" }, ctx);
+        xmlContext = new ClassPathXmlApplicationContext(new String[] {"config-old/daq-core-service-testmode.xml"}, ctx);
       }
       else {
         if (System.getProperty("c2mon.daq.spring.context") != null) {
@@ -289,6 +290,13 @@ public final class DaqStartup {
 
   /**
    * Helper method to HOME path location of the DAQ process
+   *
+   * -c2monProperties
+   /home/jsalmon/afs/workspace/c2mon/c2mon-deploy/c2mon-daq-testhandler-demo-deploy/conf/demo-c2mon.properties
+   -log4j
+   /home/jsalmon/afs/workspace/c2mon/c2mon-deploy/c2mon-daq-testhandler-demo-deploy/conf/demo-log4j-standardout.xml
+   -daqConf
+   /home/jsalmon/afs/workspace/c2mon/c2mon-deploy/c2mon-daq-testhandler-demo-deploy/conf/demo-daq.conf
    *
    * @return The default conf/ directory path
    */

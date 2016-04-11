@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -24,14 +24,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 
+import cern.c2mon.daq.config.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
@@ -41,7 +43,6 @@ import cern.c2mon.daq.common.conf.equipment.ICoreEquipmentConfigurationChanger;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
-import cern.c2mon.daq.tools.CommandParamsHandler;
 import cern.c2mon.daq.tools.StackTraceHelper;
 import cern.c2mon.daq.tools.processexceptions.ConfUnknownTypeException;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -74,36 +75,21 @@ import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
  * @author Andreas Lang
  * @author vilches (refactoring updates)
  */
+@Component
 public class ConfigurationController {
-  /**
-   * Constant of the configuration command line argument.
-   */
-  private static final String CONFIGURATION_PARAM = "-c";
-  /**
-   * Constant of the save location command line argument.
-   */
-  private static final String SAVE_PARAM = "-s";
-  /**
-   * Constant of the process name command line argument.
-   */
-  private static final String PROCESS_NAME_PARAM = "-processName";
-  /**
-   * The logger.
-   */
+
   private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationController.class);
-  /**
-   * Reference to the command line parameter object.
-   */
-  @Resource
-  private CommandParamsHandler commandParamsHandler;
-  /**
-   * The run options of the DAQ process.
-   */
-  private RunOptions runOptions;
+
+  @Autowired
+  private Environment environment;
+
+  private long startUp;
+
   /**
    * The common configuration object shared over all DAQs. This is loaded from a
    * local configuration file.
    */
+  @Autowired
   private CommonConfiguration commonConfiguration;
   /**
    * The process configuration object.
@@ -112,6 +98,7 @@ public class ConfigurationController {
   /**
    * The process configuration loader used at startup.
    */
+  @Autowired
   private ProcessConfigurationLoader processConfigurationLoader;
   /**
    * The updater which applies changes to source data tags.
@@ -159,20 +146,7 @@ public class ConfigurationController {
   /**
    * The core equipment configuration changers.
    */
-  private Map<Long, List<ICoreEquipmentConfigurationChanger>> coreEquipmentConfigurationChangers = new HashMap<Long, List<ICoreEquipmentConfigurationChanger>>();
-
-  /**
-   * The constructor of the configuration controller. It is auto wired of
-   * spring.
-   *
-   * @param runOptions The run options.
-   * @param commonConfiguration The common configuration.
-   */
-  @Autowired
-  public ConfigurationController(final RunOptions runOptions, final CommonConfiguration commonConfiguration) {
-    this.runOptions = runOptions;
-    this.commonConfiguration = commonConfiguration;
-  }
+  private Map<Long, List<ICoreEquipmentConfigurationChanger>> coreEquipmentConfigurationChangers = new HashMap<>();
 
   /**
    * Loads configurations: Process PIK and Process Configuration. Catches
@@ -181,11 +155,20 @@ public class ConfigurationController {
    */
   @PostConstruct
   public void initProcess() {
-    // Catch spring Exceptions coming most likely from XML parsing
+    this.startUp = System.currentTimeMillis();
+
+    // check if the filtering should be turned off (default is on)
+//    setFilterMode(optionsManager.getOption(Options.NO_FILTER, Boolean.class));
+//    if (!isFilterMode()) {
+//      LOGGER.info("The DAQ process is starting without filtering (no JMS connections will be opened with Filter module)");
+//    }
+
+//    setUseEquipmentLoggers(environment.getProperty(USE_EQUIPMENT_LOGGERS, Boolean.class, false));
+//    if (useEquipmentLoggers()) {
+//      setUseEquipmentAppendersOnly(environment.getProperty(USE_EQUIPMENT_APPENDERS_ONLY, Boolean.class, false));
+//    }
+
     try {
-
-      // Connection
-
       // Get the PIK from the server
       LOGGER.trace("initProcess - Process Connection called.");
       this.loadProcessConnection();
@@ -196,9 +179,7 @@ public class ConfigurationController {
       this.loadProcessConfiguration();
 
     } catch (Exception ex) {
-      LOGGER.error(ex.toString());
-      LOGGER.info("initProcess - Stopping the DAQ start up process...");
-      System.exit(0);
+      throw new RuntimeException("Exception caught during DAQ startup", ex);
     }
   }
 
@@ -213,9 +194,7 @@ public class ConfigurationController {
 
     // If Process PIK is REJECTED we exit
     if (processConnectionResponse.getProcessPIK() == null || processConnectionResponse.getProcessPIK() <= ProcessConnectionResponse.PIK_REJECTED) {
-      LOGGER.info("loadProcessConnection - PIK_REJECTED received!");
-      LOGGER.info("loadProcessConnection - stopping the DAQ start up process...");
-      System.exit(0);
+      throw new RuntimeException("PIK_REJECTED received");
     }
 
     // Set process PIK for future communications with the server (if it exists)
@@ -235,20 +214,24 @@ public class ConfigurationController {
     LOGGER.trace("loadProcessConfiguration - Configuration process started");
 
     boolean localConfiguration = false;
-    if (getCommandParamsHandler().hasParam(CONFIGURATION_PARAM)) {
+
+    //    if (getCommandParamsHandler().hasParam(CONFIGURATION_PARAM)) {
+    if (environment.containsProperty(Options.LOCAL_CONFIG_FILE)) {
+
       LOGGER.info("loadProcessConfiguration - Taking Configuration from file");
       localConfiguration = true;
-      String fileSystemLocation = getCommandParamsHandler().getParamValue(CONFIGURATION_PARAM);
+      String fileSystemLocation = environment.getProperty(Options.LOCAL_CONFIG_FILE);
       xmlConfiguration = this.processConfigurationLoader.fromFiletoDOC(fileSystemLocation);
+
+
     } else {
       LOGGER.info("loadProcessConfiguration - Taking Configuration from remote server");
       processConfigurationResponse = this.processConfigurationLoader.getProcessConfiguration();
 
       // If Process Configuration is REJECTED we exit
       if (processConfigurationResponse.getConfigurationXML().equals(ProcessConfigurationResponse.CONF_REJECTED)) {
-        LOGGER.error("loadProcessConfiguration - CONF_REJECTED received!");
         sendDisconnectionNotification();
-        System.exit(0);
+        throw new RuntimeException("CONF_REJECTED received");
       }
 
       // processConfigurationResponse will never be null at this point
@@ -257,13 +240,12 @@ public class ConfigurationController {
 
     // If XML Configuration is wrong and cannot be parsed we exit
     if (xmlConfiguration == null) {
-      LOGGER.error("loadProcessConfiguration - Could not parse XML configuration");
       sendDisconnectionNotification();
-      System.exit(0);
+      throw new RuntimeException("Could not parse XML configuration");
     }
 
     // Save config if it was the option and it is not local config (pointless)
-    if (getCommandParamsHandler().hasParam(SAVE_PARAM)) {
+    if (environment.containsProperty(Options.REMOTE_CONFIG_FILE)) {
       if (!localConfiguration) {
         saveConfiguration(xmlConfiguration);
       } else {
@@ -276,19 +258,17 @@ public class ConfigurationController {
     // try to create process configuration object (with the PIK saved in the
     // provisional ProcessConfiguration)
     try {
-      this.processConfiguration = this.processConfigurationLoader.createProcessConfiguration(this.processConfiguration.getProcessName(),
-          this.processConfiguration.getprocessPIK(), xmlConfiguration, localConfiguration);
+      this.processConfiguration = this.processConfigurationLoader.createProcessConfiguration(this.processConfiguration.getProcessName(), this
+          .processConfiguration.getprocessPIK(), xmlConfiguration, localConfiguration);
 
       LOGGER.debug("loadProcessConfiguration - ... properties loaded successfully.");
     } catch (ConfUnknownTypeException ex) {
-      LOGGER.info("loadProcessConfiguration - UNKNOWN configuration received!");
       sendDisconnectionNotification();
-      System.exit(0);
+      throw new RuntimeException("UNKNOWN configuration received");
+
     } catch (Exception ex) {
-      LOGGER.error("loadProcessConfiguration - Exception caught while trying to configure the driver! Ex. message =", ex);
-      LOGGER.info("loadProcessConfiguration - The ProcessConfiguration XML might contain some errors ! Check it please.");
       sendDisconnectionNotification();
-      System.exit(0);
+      throw new RuntimeException("Exception caught while configuring the DAQ. Check the configuration XML", ex);
     }
   }
 
@@ -296,7 +276,7 @@ public class ConfigurationController {
    * Saves the process configuration.
    */
   private void saveConfiguration(Document docXMLConfig) {
-    String fileToSaveConf = getCommandParamsHandler().getParamValue(SAVE_PARAM);
+    String fileToSaveConf = environment.getProperty(Options.REMOTE_CONFIG_FILE);
     if (fileToSaveConf.length() > 0 && docXMLConfig != null) {
       LOGGER.info("saveConfiguration - saving the process configuration XML in a file " + fileToSaveConf + " due to user request");
       FileWriter fwr = null;
@@ -317,7 +297,7 @@ public class ConfigurationController {
    */
   private void sendDisconnectionNotification() {
     LOGGER.trace("sendDisconnectionNotification - Primary Request Sender disconnection");
-    primaryRequestSender.sendProcessDisconnectionRequest();
+    primaryRequestSender.sendProcessDisconnectionRequest(processConfiguration, startUp);
 
     // send in separate thread as may block if broker problem
     if (secondaryRequestSender != null) {
@@ -325,7 +305,7 @@ public class ConfigurationController {
       Thread disconnectSend = new Thread(new Runnable() {
         @Override
         public void run() {
-          secondaryRequestSender.sendProcessDisconnectionRequest();
+          secondaryRequestSender.sendProcessDisconnectionRequest(processConfiguration, startUp);
         }
       });
       disconnectSend.setDaemon(true);
@@ -339,12 +319,12 @@ public class ConfigurationController {
    * perform the changes.
    *
    * @param dataTagAddChange The data tag add change.
+   *
    * @return A report with information if the change was successful.
    */
   public synchronized ChangeReport onDataTagAdd(final DataTagAdd dataTagAddChange) {
     LOGGER.debug("onDataTagAdd - entering onDataTagAdd()");
-    if (LOGGER.isDebugEnabled())
-      LOGGER.debug("changeId: " + dataTagAddChange.getChangeId());
+    if (LOGGER.isDebugEnabled()) LOGGER.debug("changeId: " + dataTagAddChange.getChangeId());
 
     ChangeReport changeReport = new ChangeReport(dataTagAddChange);
     Long equipmentId = dataTagAddChange.getEquipmentId();
@@ -376,8 +356,8 @@ public class ConfigurationController {
 
     if (sourceDataTags.containsKey(dataTagId)) {
 
-      LOGGER.warn("onDataTagAdd - cannot add data tag id: " + dataTagId + " to equipment id: " + dataTagAddChange.getEquipmentId()
-          + " This equipment already has tag with that id");
+      LOGGER.warn("onDataTagAdd - cannot add data tag id: " + dataTagId + " to equipment id: " + dataTagAddChange.getEquipmentId() + " This equipment already" +
+          " has tag with that id");
 
       changeReport.appendError("DataTag " + dataTagId + " is already in equipment " + equipmentId);
     } else {
@@ -408,12 +388,12 @@ public class ConfigurationController {
    * perform the changes.
    *
    * @param commandTagAddChange The command tag add change.
+   *
    * @return A report with information if the change was successful.
    */
   public synchronized ChangeReport onCommandTagAdd(final CommandTagAdd commandTagAddChange) {
     LOGGER.debug("entering onCommandTagAdd()");
-    if (LOGGER.isDebugEnabled())
-      LOGGER.debug("changeId: " + commandTagAddChange.getChangeId());
+    if (LOGGER.isDebugEnabled()) LOGGER.debug("changeId: " + commandTagAddChange.getChangeId());
 
     ChangeReport changeReport = new ChangeReport(commandTagAddChange);
     Long equipmentId = commandTagAddChange.getEquipmentId();
@@ -444,8 +424,8 @@ public class ConfigurationController {
     Long commandTagId = sourceCommandTag.getId();
     if (sourceCommandTags.containsKey(commandTagId)) {
 
-      LOGGER.warn("cannot add command tag id: " + commandTagId + " to equipment id: " + commandTagAddChange.getEquipmentId()
-          + " This equipment already has tag with that id");
+      LOGGER.warn("cannot add command tag id: " + commandTagId + " to equipment id: " + commandTagAddChange.getEquipmentId() + " This equipment already has " +
+          "tag with that id");
 
       changeReport.appendError("CommandTag " + commandTagId + " is already in equipment " + equipmentId);
     } else {
@@ -473,6 +453,7 @@ public class ConfigurationController {
    * Removes a data tag from an equipment.
    *
    * @param dataTagRemoveChange The change with all the data to remove the tag.
+   *
    * @return A change report with success information.
    */
   public synchronized ChangeReport onDataTagRemove(final DataTagRemove dataTagRemoveChange) {
@@ -514,12 +495,12 @@ public class ConfigurationController {
       sourceDataTags.remove(dataTagRemoveChange.getDataTagId());
 
     } else {
-      LOGGER.debug("onDataTagRemove - The data tag with id " + dataTagRemoveChange.getDataTagId() + " to remove was not found" + " in equipment with id "
-          + equipmentId);
+      LOGGER.debug("onDataTagRemove - The data tag with id " + dataTagRemoveChange.getDataTagId() + " to remove was not found" + " in equipment with id " +
+          equipmentId);
       // The data tag which should be removed was not found which means the same
       // result as foudn and removed.
-      changeReport.appendWarn("The data tag with id " + dataTagRemoveChange.getDataTagId() + " to remove was not found" + " in equipment with id "
-          + equipmentId);
+      changeReport.appendWarn("The data tag with id " + dataTagRemoveChange.getDataTagId() + " to remove was not found" + " in equipment with id " +
+          equipmentId);
       changeReport.setState(CHANGE_STATE.SUCCESS);
     }
 
@@ -532,8 +513,9 @@ public class ConfigurationController {
    * Updates a data tag.
    *
    * @param dataTagUpdateChange The object with all necessary to update the tag.
+   *
    * @return A change report containing information about the success of the
-   *         update.
+   * update.
    */
   public synchronized ChangeReport onDataTagUpdate(final DataTagUpdate dataTagUpdateChange) {
     ChangeReport changeReport = new ChangeReport(dataTagUpdateChange);
@@ -598,7 +580,8 @@ public class ConfigurationController {
    * Removes a command tag from an equipment.
    *
    * @param commandTagRemoveChange The change object with all the information to
-   *          remove the command tag.
+   *                               remove the command tag.
+   *
    * @return A report with information about success of the change.
    */
   public synchronized ChangeReport onCommandTagRemove(final CommandTagRemove commandTagRemoveChange) {
@@ -629,8 +612,8 @@ public class ConfigurationController {
     } else {
       // The command tag which should be removed was not found which means the
       // same result as foudn and removed.
-      changeReport.appendWarn("The command tag with id " + commandTagRemoveChange.getCommandTagId() + " to remove was not found" + " in equipment with id "
-          + equipmentId);
+      changeReport.appendWarn("The command tag with id " + commandTagRemoveChange.getCommandTagId() + " to remove was not found" + " in equipment with id " +
+          equipmentId);
       changeReport.setState(CHANGE_STATE.SUCCESS);
     }
     return changeReport;
@@ -640,7 +623,8 @@ public class ConfigurationController {
    * Updates a command tag.
    *
    * @param commandTagUpdateChange The object with all the information to update
-   *          the tag.
+   *                               the tag.
+   *
    * @return A change report with information about the success of the update.
    */
   public synchronized ChangeReport onCommandTagUpdate(final CommandTagUpdate commandTagUpdateChange) {
@@ -705,6 +689,7 @@ public class ConfigurationController {
    * EquipmentConfigurationUpdate.
    *
    * @param equipmentConfigurationUpdate The update with the changed values.
+   *
    * @return A change report with information about the success of the update.
    */
   public synchronized ChangeReport onEquipmentConfigurationUpdate(final EquipmentConfigurationUpdate equipmentConfigurationUpdate) {
@@ -753,6 +738,7 @@ public class ConfigurationController {
    * ProcessConfigurationUpdate.
    *
    * @param processConfigurationUpdate The update with the changed values.
+   *
    * @return A change report with information about the success of the update.
    */
   public synchronized ChangeReport onProcessConfigurationUpdate(final ProcessConfigurationUpdate processConfigurationUpdate) {
@@ -778,6 +764,7 @@ public class ConfigurationController {
    * Updates the DAQ by removing a whole SubEquipment.
    *
    * @param subEquipmentUnitRemove the subequipment unit to be removed
+   *
    * @return a change report with information about the success of the update.
    */
   public ChangeReport onSubEquipmentUnitRemove(SubEquipmentUnitRemove subEquipmentUnitRemove) {
@@ -789,8 +776,8 @@ public class ConfigurationController {
     // Check if the parent equipment exists
     EquipmentConfiguration parentEquipmentConfiguration = processConfiguration.getEquipmentConfiguration(subEquipmentUnitRemove.getParentEquipmentId());
     if (parentEquipmentConfiguration == null) {
-      changeReport.appendError("Parent Equipment unit id: " + subEquipmentUnitRemove.getParentEquipmentId() + " for SubEquipment unit "
-          + subEquipmentUnitRemove.getSubEquipmentId() + " is unknown");
+      changeReport.appendError("Parent Equipment unit id: " + subEquipmentUnitRemove.getParentEquipmentId() + " for SubEquipment unit " +
+          subEquipmentUnitRemove.getSubEquipmentId() + " is unknown");
       changeReport.setState(CHANGE_STATE.FAIL);
       return changeReport;
     }
@@ -810,6 +797,7 @@ public class ConfigurationController {
    * Updates the DAQ by injecting a new SubEquipment Unit.
    *
    * @param subEquipmentUnitAdd the newly injected sub equipment unit
+   *
    * @return a change report with information about the success of the update.
    */
 
@@ -822,8 +810,8 @@ public class ConfigurationController {
     // Check if the parent equipment exists
     EquipmentConfiguration parentEquipmentConfiguration = processConfiguration.getEquipmentConfiguration(subEquipmentUnitAdd.getParentEquipmentId());
     if (parentEquipmentConfiguration == null) {
-      changeReport.appendError("Parent Equipment unit id: " + subEquipmentUnitAdd.getParentEquipmentId() + " for SubEquipment unit "
-          + subEquipmentUnitAdd.getSubEquipmentId() + " is unknown");
+      changeReport.appendError("Parent Equipment unit id: " + subEquipmentUnitAdd.getParentEquipmentId() + " for SubEquipment unit " + subEquipmentUnitAdd
+          .getSubEquipmentId() + " is unknown");
       changeReport.setState(CHANGE_STATE.FAIL);
       return changeReport;
     }
@@ -857,6 +845,7 @@ public class ConfigurationController {
    * Gets the source command tags for a provided equipment id.
    *
    * @param equipmentId The equipment id to get the source command tags.
+   *
    * @return The SourceCommandTags or null if the equipment does not exist.
    */
   private Map<Long, SourceCommandTag> getSourceCommandTags(final Long equipmentId) {
@@ -875,6 +864,7 @@ public class ConfigurationController {
    * Gets the source data tags for a provided equipment id.
    *
    * @param equipmentId The equipment id to get the source command tags.
+   *
    * @return The SourceDataTags or null if the equipment does not exist.
    */
   private Map<Long, SourceDataTag> getSourceDataTags(final Long equipmentId) {
@@ -897,14 +887,14 @@ public class ConfigurationController {
     return sourceDataTags;
   }
 
-  /**
-   * gets the run options.
-   *
-   * @return The run options of this process.
-   */
-  public RunOptions getRunOptions() {
-    return runOptions;
-  }
+  //  /**
+  //   * gets the run options.
+  //   *
+  //   * @return The run options of this process.
+  //   */
+  //  public RunOptions getRunOptions() {
+  //    return runOptions;
+  //  }
 
   /**
    * Gets the common configuration of this DAQ process.
@@ -942,21 +932,21 @@ public class ConfigurationController {
     this.processConfigurationLoader = processConfigurationLoader;
   }
 
-  /**
-   * Gets the command parameter handler which holds the provided startup
-   * arguments.
-   *
-   * @return The Command parameter handler.
-   */
-  public CommandParamsHandler getCommandParamsHandler() {
-    return commandParamsHandler;
-  }
+  //  /**
+  //   * Gets the command parameter handler which holds the provided startup
+  //   * arguments.
+  //   *
+  //   * @return The Command parameter handler.
+  //   */
+  //  public CommandParamsHandler getCommandParamsHandler() {
+  //    return commandParamsHandler;
+  //  }
 
   /**
    * Adds a core data tag changer to the configuration controller. This changers
    * should never fail to maintain a proper state of the DAQ.
    *
-   * @param equipmentId The equipment id to add the changer to.
+   * @param equipmentId    The equipment id to add the changer to.
    * @param dataTagChanger The changer to add.
    */
   public void addCoreDataTagChanger(final Long equipmentId, final ICoreDataTagChanger dataTagChanger) {
@@ -972,7 +962,7 @@ public class ConfigurationController {
    * Adds a core command tag changer to the configuration controller. This
    * changers should never fail to maintain a proper state of the DAQ.
    *
-   * @param equipmentId The equipment id to add the changer to.
+   * @param equipmentId       The equipment id to add the changer to.
    * @param commandTagChanger The changer to add.
    */
   public void addCoreCommandTagChanger(final Long equipmentId, final ICoreCommandTagChanger commandTagChanger) {
@@ -987,7 +977,7 @@ public class ConfigurationController {
   /**
    * Adds a core equipment configuration changer to the controller.
    *
-   * @param equipmentId The equipment id to add the controller to.
+   * @param equipmentId                       The equipment id to add the controller to.
    * @param coreEquipmentConfigurationChanger The changer to add.
    */
   public void addCoreEquipmentConfigurationChanger(final long equipmentId, final ICoreEquipmentConfigurationChanger coreEquipmentConfigurationChanger) {
@@ -1003,39 +993,35 @@ public class ConfigurationController {
    * Puts an implementation command tag changer to this controller. There can
    * only be one per equipment.
    *
-   * @param equipmentId The equipment id to add the changer to.
+   * @param equipmentId       The equipment id to add the changer to.
    * @param commandTagChanger The changer to add.
    */
   public void putImplementationCommandTagChanger(final long equipmentId, final ICommandTagChanger commandTagChanger) {
     // if null is passed, remove the existing changer for given equipment (if
     // exist)
-    if (commandTagChanger == null)
-      commandTagChangers.remove(equipmentId);
-    else
-      commandTagChangers.put(equipmentId, commandTagChanger);
+    if (commandTagChanger == null) commandTagChangers.remove(equipmentId);
+    else commandTagChangers.put(equipmentId, commandTagChanger);
   }
 
   /**
    * Puts an implementation data tag changer to this controller. There can only
    * be one per equipment.
    *
-   * @param equipmentId The equipment id to add the changer to.
+   * @param equipmentId    The equipment id to add the changer to.
    * @param dataTagChanger The changer to add.
    */
   public void putImplementationDataTagChanger(final long equipmentId, final IDataTagChanger dataTagChanger) {
     // if null is passed, remove the existing changer for given equipment (if
     // exist)
-    if (dataTagChanger == null)
-      dataTagChangers.remove(equipmentId);
-    else
-      dataTagChangers.put(equipmentId, dataTagChanger);
+    if (dataTagChanger == null) dataTagChangers.remove(equipmentId);
+    else dataTagChangers.put(equipmentId, dataTagChanger);
   }
 
   /**
    * Puts an implementation equipment configuration changer to this controller.
    * There can only be one per equipment.
    *
-   * @param equipmentId The equipment id to add the changer to.
+   * @param equipmentId                   The equipment id to add the changer to.
    * @param equipmentConfigurationChanger The changer to add.
    */
   public void putImplementationEquipmentConfigurationChanger(final long equipmentId, final IEquipmentConfigurationChanger equipmentConfigurationChanger) {
@@ -1046,8 +1032,9 @@ public class ConfigurationController {
    * Gets the equipment configuration.
    *
    * @param equipmentId The id of the equipment configuration.
+   *
    * @return The equipment configuration with the provided id or null if there
-   *         is none.
+   * is none.
    */
   public EquipmentConfiguration getEquipmentConfiguration(final Long equipmentId) {
     return getProcessConfiguration().getEquipmentConfiguration(equipmentId);
@@ -1057,6 +1044,7 @@ public class ConfigurationController {
    * Searches a data tag with the provided id and returns the first found.
    *
    * @param dataTagId The data tag id to search for.
+   *
    * @return The first found data tag or null if none is found.
    */
   public ISourceDataTag findDataTag(final Long dataTagId) {
@@ -1073,6 +1061,7 @@ public class ConfigurationController {
    * Searches a command tag with the provided id and returns the first found.
    *
    * @param commandTagId The command tag id to search for.
+   *
    * @return The first found command tag or null if none is found.
    */
   public ISourceCommandTag findCommandTag(final Long commandTagId) {
@@ -1085,10 +1074,104 @@ public class ConfigurationController {
     return null;
   }
 
+//  /**
+//   * Flag indicating whether the filtered messages should or should not be
+//   * sent to the filter module.
+//   */
+//  private boolean filterMode = true;
+//
+//  /**
+//   * This flag is used for switching on/off separate equipment logger's
+//   * appenders
+//   */
+//  private boolean useEquipmentLoggers = false;
+//
+//  /**
+//   * This flag is used in pair with eqLoggers flag, to define whether
+//   * equipment loggers should append both process and equipment appenders or
+//   * only equipment
+//   */
+//  private boolean useEquipmentAppendersOnly = false;
+//
+//  /**
+//   * returns the filterMode of the process
+//   *
+//   * @return the filterMode
+//   */
+//  public final boolean isFilterMode() {
+//    return filterMode;
+//  }
+//
+//  /**
+//   * sets the filterMode for the process
+//   *
+//   * @param filterMode to be set
+//   */
+//  public final void setFilterMode(final boolean filterMode) {
+//    this.filterMode = filterMode;
+//  }
+//
+//  /**
+//   * This method sets the useEquipmentLoggers boolean flag
+//   *
+//   * @param useEquipmentLoggers boolean flag stating whether each equipment unit should have
+//   *                            separate file appender or not
+//   */
+//  public final void setUseEquipmentLoggers(final boolean useEquipmentLoggers) {
+//    this.useEquipmentLoggers = useEquipmentLoggers;
+//  }
+//
+//  /**
+//   * This method returns eqLoggers boolean flag
+//   *
+//   * @return boolean
+//   */
+//  public boolean useEquipmentLoggers() {
+//    return useEquipmentLoggers;
+//  }
+//
+//  /**
+//   * This method sets the useEquipmentAppendersOnly boolean flag
+//   *
+//   * @param useEquipmentAppendersOnly boolean flag stating whether each equipment logger should
+//   *                                  append only its related appender or also the process logger's
+//   *                                  appender.
+//   */
+//  public final void setUseEquipmentAppendersOnly(final boolean useEquipmentAppendersOnly) {
+//    this.useEquipmentAppendersOnly = useEquipmentAppendersOnly;
+//  }
+//
+//  /**
+//   * This method returns eqAppendersOnly boolean flag
+//   *
+//   * @return boolean
+//   */
+//  public boolean useEquipmentAppendersOnly() {
+//    return useEquipmentAppendersOnly;
+//  }
+
   /**
-   * @param commandParamsHandler the commandParamsHandler to set
+   * This method sets the startup time of the process (in milliseconds)
+   *
+   * @param pStartUp time in milliseconds
    */
-  public void setCommandParamsHandler(final CommandParamsHandler commandParamsHandler) {
-    this.commandParamsHandler = commandParamsHandler;
+  public final void setStartUp(final long pStartUp) {
+    startUp = pStartUp;
   }
+
+  /**
+   * This method gets the startup time of the process (in milliseconds)
+   *
+   * @return long
+   */
+  public long getStartUp() {
+    return startUp;
+  }
+
+  //  /**
+  //   * @param commandParamsHandler the commandParamsHandler to set
+  //   */
+  //  public void setCommandParamsHandler(final CommandParamsHandler commandParamsHandler) {
+  //    this.commandParamsHandler = commandParamsHandler;
+  //  }
 }

@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import cern.c2mon.shared.common.process.ProcessConfiguration;
 import org.apache.xerces.parsers.DOMParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
@@ -38,18 +39,18 @@ public class DummyRequestSender implements ProcessRequestSender {
     }
 
     @Override
-    public void sendProcessDisconnectionRequest() {
+    public void sendProcessDisconnectionRequest(ProcessConfiguration processConfiguration, long startupTime) {
         // TODO Auto-generated method stub
 
     }    
     
     @Override
-    public ProcessConnectionResponse sendProcessConnectionRequest() {
+    public ProcessConnectionResponse sendProcessConnectionRequest(String processName) {
       return new ProcessConnectionResponse("P_NACHO", new Long(12345));
     }
 
     @Override
-    public ProcessConfigurationResponse sendProcessConfigurationRequest() {
+    public ProcessConfigurationResponse sendProcessConfigurationRequest(String processName) {
       //return (ProcessConfigurationResponse) loadConfigLocal(processConfigurationFilePath); 
       ProcessConfigurationResponse processConfigurationResponse = new ProcessConfigurationResponse();
       //processConfigurationResponse.setProcessName(processConfigurationRequest.getProcessName());

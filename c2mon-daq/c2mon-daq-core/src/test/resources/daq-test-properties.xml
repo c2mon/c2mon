@@ -26,7 +26,7 @@
         <!-- TEST PROPERTIES -->
         <prop key="jms.daq.user">user-default</prop>
         <prop key="jms.daq.password">password-default</prop>
-        <prop key="c2mon.process.name">C2MON-DAQ-TEST_PROCESS</prop>
+        <prop key="c2mon.daq.name">C2MON-DAQ-TEST_PROCESS</prop>
         <prop key="c2mon.jms.daq.queue.trunk">c2mon.process</prop>
 
         <prop key="c2mon.jms.statistics.url">nacho</prop>
