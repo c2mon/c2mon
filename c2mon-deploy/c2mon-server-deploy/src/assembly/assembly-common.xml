@@ -12,23 +12,25 @@
  <!-- create default tmp, log and reports folders in the assembly -->
  <fileSets>
   <fileSet>
-   <includes>
-    <include>tmp/</include>
-   </includes>
-   <fileMode>0755</fileMode>
+   <directory>./</directory>
+   <outputDirectory>/tmp</outputDirectory>
+   <excludes>
+    <exclude>*/**</exclude>
+   </excludes>
   </fileSet>
   <fileSet>
-   <includes>
-    <include>reports/</include>
-   </includes>
-   <fileMode>0755</fileMode>
+   <directory>./</directory>
+   <outputDirectory>/reports</outputDirectory>
+   <excludes>
+    <exclude>*/**</exclude>
+   </excludes>
   </fileSet>
   <fileSet>
-   <includes>
-    <include>log/</include>
-   </includes>
-   <fileMode>0755</fileMode>
-   <directoryMode>0755</directoryMode>
+   <directory>./</directory>
+   <outputDirectory>/log</outputDirectory>
+   <excludes>
+    <exclude>*/**</exclude>
+   </excludes>
   </fileSet>
  </fileSets>
 
