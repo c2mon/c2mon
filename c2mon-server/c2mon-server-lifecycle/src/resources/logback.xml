@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration scan="true">
-  <include resource="org/springframework/boot/logging/logback/base.xml"/>
+<configuration>
+  <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+  <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
 
   <logger name="cern.c2mon" level="INFO"/>
   <logger name="org.springframework" level="INFO"/>
   <logger name="org.apache.activemq" level="INFO"/>
+
+  <root level="INFO">
+    <appender-ref ref="CONSOLE" />
+  </root>
 </configuration>
