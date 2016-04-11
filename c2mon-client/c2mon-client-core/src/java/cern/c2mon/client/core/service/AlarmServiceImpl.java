@@ -34,7 +34,8 @@ import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import lombok.extern.slf4j.Slf4j;
 
-@Service @Slf4j
+@Service("alarmService")
+@Slf4j
 public class AlarmServiceImpl implements AlarmService, AlarmListener {
   
   /** Lock for accessing the <code>listeners</code> variable */

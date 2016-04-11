@@ -33,7 +33,7 @@ import javax.jms.JMSException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-@Service
+@Service("configurationService")
 @Slf4j
 public class ConfigurationServiceImpl implements ConfigurationService {
 
