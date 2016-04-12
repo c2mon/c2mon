@@ -11,7 +11,7 @@
 
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-lifecycle</artifactId>
-  <version>1.7.0</version>
+  <version>1.7.0-SNAPSHOT</version>
   <name>c2mon-server-lifecycle</name>
   <packaging>jar</packaging>
   <description>
@@ -158,11 +158,6 @@
     </dependency>
 
     <!-- Test dependencies -->
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-test</artifactId>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-test</artifactId>
