@@ -32,7 +32,7 @@
       <fileMode>0444</fileMode>
     </file>
 
-    <!-- log4j configuration -->
+    <!-- logging configuration -->
     <file>
       <source>${basedir}/conf/logback.xml</source>
       <outputDirectory>conf/</outputDirectory>

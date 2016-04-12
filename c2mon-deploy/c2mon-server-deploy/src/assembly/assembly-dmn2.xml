@@ -28,16 +28,13 @@
       <fileMode>0444</fileMode>
     </file>
 
-    <!-- log4j configuration -->
-    <!-- don't take log4j configuration. it will be put in correct place by
-      deployment tool -->
-    <!-- <file> -->
-    <!-- <source>${basedir}/conf/dmn2-log4j.xml</source> -->
-    <!-- <outputDirectory>conf/</outputDirectory> -->
-    <!-- <destName>log4j.xml</destName> -->
-    <!-- <lineEnding>unix</lineEnding> -->
-    <!-- <fileMode>0444</fileMode> -->
-    <!-- </file> -->
+    <!-- logging configuration -->
+    <file>
+      <source>${basedir}/conf/logback.xml</source>
+      <outputDirectory>conf/</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0644</fileMode>
+    </file>
 
     <!-- copy the license file for Terracotta -->
     <file>

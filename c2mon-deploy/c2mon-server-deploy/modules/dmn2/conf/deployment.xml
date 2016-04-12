@@ -18,7 +18,7 @@
         <property name="c2mon.server.cache.skipPreloading" value="true"/>
         <property name="c2mon.server.cache.mode" value="single"/>
 
-        <property name="logging.config" value="${INSTALL_DIR}/conf/log4j.xml" />
+        <property name="logging.config" value="${INSTALL_DIR}/conf/logback.xml" />
         <property name="logging.path" value="${INSTALL_DIR}/log/" />
 
         <property name="com.sun.management.jmxremote.port" value="9523"/>
@@ -64,7 +64,7 @@
           <file name=".jmxremote.access" sourceDir="~diamonop/c2mon/server" mask="400"/>
           <file name="c2mon.properties" sourceDir="~diamonop/c2mon/server" mask="400"/>
           <!-- copy over pro. server's log4j configuration -->
-          <file name="log4j.xml" sourceDir="~diamonop/c2mon/server" mask="444"/>
+          <!--<file name="log4j.xml" sourceDir="~diamonop/c2mon/server" mask="444"/>-->
         </directory>
 
         <notification>
@@ -86,7 +86,7 @@
           <file name=".jmxremote.access" sourceDir="~dmndev/c2mon/server" mask="400"/>
           <file name="c2mon.properties" sourceDir="~dmndev/c2mon/server" mask="400"/>
           <!-- copy over pro. server's log4j configuration -->
-          <file name="log4j.xml" sourceDir="~dmndev/c2mon/server" mask="444"/>
+          <!--<file name="log4j.xml" sourceDir="~dmndev/c2mon/server" mask="444"/>-->
         </directory>
       </deployment>
     </application>
