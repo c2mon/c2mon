@@ -11,7 +11,7 @@
 
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-lifecycle</artifactId>
-  <version>1.7.0-SNAPSHOT</version>
+  <version>1.7.0</version>
   <name>c2mon-server-lifecycle</name>
   <packaging>jar</packaging>
   <description>
@@ -153,16 +153,16 @@
 
     <!-- The following dependencies are required for using Ehcache. -->
     <dependency>
-      <groupId>net.sf.ehcache</groupId><dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-test</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
-      <scope>test</scope>
-    
+      <groupId>net.sf.ehcache</groupId>
       <artifactId>ehcache-core</artifactId>
     </dependency>
 
     <!-- Test dependencies -->
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-test</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-test</artifactId>
