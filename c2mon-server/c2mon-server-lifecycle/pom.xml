@@ -11,7 +11,7 @@
 
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-lifecycle</artifactId>
-  <version>1.6.3-SNAPSHOT</version>
+  <version>1.7.0</version>
   <name>c2mon-server-lifecycle</name>
   <packaging>jar</packaging>
   <description>
