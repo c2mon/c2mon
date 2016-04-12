@@ -11,7 +11,7 @@
 
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-lifecycle</artifactId>
-  <version>1.7.0</version>
+  <version>1.7.0-SNAPSHOT</version>
   <name>c2mon-server-lifecycle</name>
   <packaging>jar</packaging>
   <description>
@@ -123,12 +123,6 @@
       <artifactId>c2mon-server-shorttermlog</artifactId>
       <version>[1.5.0, 2.0.0)</version>
     </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-test</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
-      <scope>compile</scope>
-    </dependency>
 
     <dependency>
       <groupId>org.hsqldb</groupId>
@@ -159,27 +153,19 @@
 
     <!-- The following dependencies are required for using Ehcache. -->
     <dependency>
-      <groupId>net.sf.ehcache</groupId>
+      <groupId>net.sf.ehcache</groupId><dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-test</artifactId>
+      <version>[1.5.0, 2.0.0)</version>
+      <scope>test</scope>
+    
       <artifactId>ehcache-core</artifactId>
-      <scope>provided</scope>
     </dependency>
-
-    <!--<dependency>-->
-      <!--<groupId>net.sf.ehcache</groupId>-->
-      <!--<artifactId>ehcache</artifactId>-->
-      <!--<version>2.10.1</version>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-      <!--<groupId>org.terracotta</groupId>-->
-      <!--<artifactId>terracotta-toolkit-runtime</artifactId>-->
-      <!--<version>4.3.1</version>-->
-    <!--</dependency>-->
 
     <!-- Test dependencies -->
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-test</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -188,19 +174,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache-core</artifactId>
-      <version>2.6.6</version>
     </dependency>
   </dependencies>
 
