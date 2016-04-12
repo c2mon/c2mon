@@ -3,6 +3,6 @@
   <include resource="org/springframework/boot/logging/logback/base.xml"/>
 
   <logger name="cern.c2mon" level="INFO"/>
-  <logger name="SourceDataTagLogger" level="WARN"/>
+  <logger name="SourceDataTagLogger" level="INFO"/>
   <logger name="org.apache.activemq" level="INFO"/>
 </configuration>
