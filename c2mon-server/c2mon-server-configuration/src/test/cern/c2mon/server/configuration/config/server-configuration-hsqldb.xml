@@ -7,7 +7,7 @@
 
   <!-- creates test tables in in-memory HSQLDB with required preloaded data -->
   <jdbc:embedded-database id="configurationDataSource">
-    <jdbc:script location="classpath:cern/c2mon/server/configuration/sql/configuration-schema-generic.sql" />
+    <jdbc:script location="classpath:resources/sql/config-schema-hsqldb.sql" />
     <jdbc:script location="classpath:cern/c2mon/server/configuration/sql/config-test-data.sql" />
   </jdbc:embedded-database>
 

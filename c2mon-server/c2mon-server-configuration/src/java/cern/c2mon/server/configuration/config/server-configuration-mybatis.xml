@@ -5,6 +5,7 @@
   <bean id="configSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
     <property name="configLocation" value="classpath:cern/c2mon/server/configuration/sqlmap/sql-map-config.xml" />
     <property name="dataSource" ref="configurationDataSource" />
+    <property name="databaseIdProvider" ref="databaseIdProvider"/>
   </bean>
 
   <bean id="configurationMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">

@@ -25,7 +25,6 @@
   <jdbc:embedded-database id="cacheDataSource">
     <jdbc:script location="classpath:cern/c2mon/server/test/sql/cache-schema-generic.sql"/>
   </jdbc:embedded-database>
-  
 
   <!-- import properties -->
   <import resource="classpath:cern/c2mon/server/test/server-test-properties.xml" />
