@@ -12,4 +12,19 @@
     <property name="mapperInterface" value="cern.c2mon.server.configuration.mybatis.ConfigurationMapper" />
   </bean>
 
+  <bean id="vendorProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+    <property name="properties">
+      <props>
+        <prop key="HSQL">oracle</prop>
+        <prop key="H2">h2</prop>
+        <prop key="Oracle">oracle</prop>
+        <prop key="MySQL">mysql</prop>
+      </props>
+    </property>
+  </bean>
+
+  <bean id="databaseIdProvider" class="org.apache.ibatis.mapping.VendorDatabaseIdProvider">
+    <property name="properties" ref="vendorProperties"/>
+  </bean>
+
 </beans>

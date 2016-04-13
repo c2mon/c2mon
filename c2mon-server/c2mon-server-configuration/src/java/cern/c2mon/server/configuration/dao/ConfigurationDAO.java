@@ -76,5 +76,8 @@ public interface ConfigurationDAO {
    * @param id of the configuration that has been applied
    */
   void markAsApplied(int id);
-  
+
+  Long getNextConfigId();
+
+  Long getNextProcessId();
 }

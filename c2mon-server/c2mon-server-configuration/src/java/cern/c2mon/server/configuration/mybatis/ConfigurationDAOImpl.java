@@ -83,4 +83,11 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
     configurationMapper.markAsApplied(id);
   }
 
+  public Long getNextConfigId() {
+    return configurationMapper.getNextConfigId();
+  }
+
+  public Long getNextProcessId() {
+    return configurationMapper.getNextProcessId();
+  }
 }

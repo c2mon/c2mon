@@ -43,6 +43,22 @@
        WHERE E.CONFIGID = #{configId}
        ORDER BY E.SEQID
     </select>
+
+  <select id="getNextConfigId" databaseId="oracle" resultType="java.lang.Long">
+    CALL NEXT VALUE FOR CONFIG_ID_SEQUENCE
+  </select>
+
+  <select id="getNextConfigId" databaseId="mysql" resultType="java.lang.Long">
+    SELECT NEXTVAL('CONFIG_ID');
+  </select>
+
+  <select id="getNextProcessId" databaseId="oracle" resultType="java.lang.Long">
+    CALL NEXT VALUE FOR PROCESS_ID_SEQUENCE
+  </select>
+
+  <select id="getNextProcessId" databaseId="mysql" resultType="java.lang.Long">
+    SELECT NEXTVAL('PROCESS_ID');
+  </select>
     
     <update id="saveStatusInfo" parameterType="ConfigurationElement">
       UPDATE TIMCONFIGELT

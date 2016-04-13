@@ -56,5 +56,8 @@ public interface ConfigurationMapper {
    * @param id the id of the configuration
    */
   void markAsApplied(int id);
-  
+
+  Long getNextConfigId();
+
+  Long getNextProcessId();
 }

@@ -186,6 +186,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   @Override
   public ConfigurationReport applyConfiguration(Configuration configuration) {
     LOGGER.info(String.format("Applying configuration for %d process(es)", configuration.getProcesses().size()));
+    Long configId = configurationDAO.getNextConfigId();
     ConfigurationReport report = null;
 
     // Try to acquire the configuration lock.
@@ -193,18 +194,18 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       try {
         List<ConfigurationElement> configurationElements = configParser.parse(configuration);
 
-        report = applyConfiguration(configuration.getConfigurationId().intValue(), configuration.getName(), configurationElements, null);
+        report = applyConfiguration(configId.intValue(), configuration.getName(), configurationElements, null);
 
       } catch (Exception ex) {
         LOGGER.error("Exception caught while applying configuration " + configuration.getName(), ex);
-          report = new ConfigurationReport(-1, configuration.getName(), "", Status.FAILURE,
+          report = new ConfigurationReport(configId, configuration.getName(), "", Status.FAILURE,
               "Exception caught when applying configuration with name <" + configuration.getName() + ">.");
           report.setExceptionTrace(ex);
         throw new ConfigurationException(report, ex);
       } finally {
         clusterCache.releaseWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY);
         if (report != null) {
-          archiveReport(configuration.getName(), report.toXML());
+          archiveReport(configId.toString(), report.toXML());
         }
       }
     }
@@ -212,7 +213,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     else {
       // If we couldn't acquire the configuration lock, reject the request.
       LOGGER.warn("Unable to apply configuration - another configuration is already running.");
-      return new ConfigurationReport(-1, configuration.getName(), configuration.getUser(), Status.FAILURE,
+      return new ConfigurationReport(configId, configuration.getName(), configuration.getUser(), Status.FAILURE,
           "Your configuration request has been rejected since another configuration is still running. Please try again later.");
     }
 

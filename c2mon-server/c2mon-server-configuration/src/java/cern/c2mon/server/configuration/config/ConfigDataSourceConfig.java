@@ -32,7 +32,7 @@ public class ConfigDataSourceConfig {
     String url = environment.getProperty("c2mon.server.configuration.jdbc.url");
 
     if (url.contains("hsql")) {
-      return new HsqlDatabaseBuilder().setUrl(url).addScript(new ClassPathResource("resources/sql/config-schema-generic.sql")).build();
+      return new HsqlDatabaseBuilder().setUrl(url).addScript(new ClassPathResource("resources/sql/config-schema-hsqldb.sql")).build();
     } else {
       return DataSourceBuilder.create().build();
     }
