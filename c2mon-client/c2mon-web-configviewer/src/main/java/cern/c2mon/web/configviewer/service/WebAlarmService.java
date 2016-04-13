@@ -34,12 +34,12 @@ import cern.c2mon.shared.client.alarm.AlarmValueImpl;
  * Alarm service providing the XML representation of a given alarm
  */
 @Service
-public class AlarmService {
+public class WebAlarmService {
 
   /**
    * AlarmService logger
    */
-  private static Logger logger = LoggerFactory.getLogger(AlarmService.class);
+  private static Logger logger = LoggerFactory.getLogger(WebAlarmService.class);
 
   /**
    * Gateway to C2monService

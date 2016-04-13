@@ -229,12 +229,12 @@ case "$1" in
     start
  ;;
 
- 'recover')
-    start
- ;;
-
  'stop')
     stop
+ ;;
+
+ 'restart')
+    stop; start
  ;;
 
  'status')
@@ -243,7 +243,7 @@ case "$1" in
 
  *)
   echo
-  echo $"Usage: $0 {start|stop|status}"
+  echo $"Usage: $0 {start|stop|restart|status}"
   exit 1
 esac
 

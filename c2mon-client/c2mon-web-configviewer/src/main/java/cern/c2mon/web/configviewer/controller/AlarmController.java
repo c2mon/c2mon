@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
-import cern.c2mon.web.configviewer.service.AlarmService;
+import cern.c2mon.web.configviewer.service.WebAlarmService;
 import cern.c2mon.web.configviewer.service.TagIdException;
 import cern.c2mon.web.configviewer.util.FormUtility;
 
@@ -80,7 +80,7 @@ public class AlarmController {
    * An alarm service
    */
   @Autowired
-  private AlarmService service;
+  private WebAlarmService service;
 
   /**
    * AlarmController logger
