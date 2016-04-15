@@ -24,7 +24,7 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
       <artifactId>c2mon-client-core</artifactId>
-      <version>1.7.2-SNAPSHOT</version>
+      <version>1.7.2</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
@@ -35,7 +35,7 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
       <artifactId>c2mon-client-ext-rbac</artifactId>
-       <version>[1.6.0, 2.0.0)</version>
+       <version>1.7.2</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
@@ -46,7 +46,7 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
       <artifactId>c2mon-client-ext-history</artifactId>
-      <version>[1.5.2, 2.0.0)</version>
+      <version>1.7.2</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
