@@ -26,5 +26,5 @@ public class Options {
   public static final String REMOTE_CONFIG_FILE = "c2mon.daq.config.remote.file";
   public static final String JMS_MODE = "c2mon.daq.jms.mode";
   public static final String FILTER_ENABLED = "c2mon.daq.filter.enabled";
-  public static final String DYNAMIC_DEADBAND_ENABLED = "c2mon.daq.deadband.dynamic.enabled";
+  public static final String DYNAMIC_TIME_DEADBAND_ENABLED = "c2mon.daq.deadband.dynamic.enabled";
 }
