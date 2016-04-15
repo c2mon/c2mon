@@ -123,8 +123,8 @@ public class ProxyJmsSender implements JmsSender, JmsSenderMXBean {
    */
   @Override
   public final void processValue(final SourceDataTagValue sourceDataTagValue) throws JMSException {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("pushing SourceDataTagValue into proxy buffer");
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("pushing SourceDataTagValue into proxy buffer");
     }
     highPriorityBuffer.push(sourceDataTagValue);
   }
@@ -135,8 +135,8 @@ public class ProxyJmsSender implements JmsSender, JmsSenderMXBean {
    */
   @Override
   public final void processValues(final DataTagValueUpdate dataTagValueUpdate) throws JMSException {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("pushing DataTagValueUpdate into proxy buffer");
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("pushing DataTagValueUpdate into proxy buffer");
     }
     lowPriorityBuffer.push(dataTagValueUpdate);
   }
@@ -165,9 +165,9 @@ public class ProxyJmsSender implements JmsSender, JmsSenderMXBean {
      */
     @Override
     public void pull(final PullEvent event) throws PullException {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("entering pull() of proxy low priority buffer...");
-        LOGGER.debug("\t Number of pulled dataTagValueUpdate objects (collections!) : " + event.getPulled().size());
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace("entering pull() of proxy low priority buffer...");
+        LOGGER.trace("\t Number of pulled dataTagValueUpdate objects (collections!) : " + event.getPulled().size());
       }
 
       Iterator<DataTagValueUpdate> it = event.getPulled().iterator();
@@ -181,8 +181,8 @@ public class ProxyJmsSender implements JmsSender, JmsSenderMXBean {
           LOGGER.error("JMSException caught when calling the proxied JMSSender's processValue method", ex);
         }
       }
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("leaving pull()...");
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace("leaving pull()...");
       }
     }
 
@@ -205,9 +205,9 @@ public class ProxyJmsSender implements JmsSender, JmsSenderMXBean {
      */
     @Override
     public void pull(final PullEvent event) throws PullException {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("entering pull() of proxy high priority buffer...");
-        LOGGER.debug("\t Number of pulled objects : " + event.getPulled().size());
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace("entering pull() of proxy high priority buffer...");
+        LOGGER.trace("\t Number of pulled objects : " + event.getPulled().size());
       }
 
       Iterator<SourceDataTagValue> it = event.getPulled().iterator();
@@ -221,8 +221,8 @@ public class ProxyJmsSender implements JmsSender, JmsSenderMXBean {
           LOGGER.error("Exception caught when calling the proxied JMSSender's processValue method: " , ex);
         }
       }
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("leaving pull()...");
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace("leaving pull()...");
       }
     }
 
