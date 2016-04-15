@@ -19,6 +19,8 @@ package cern.c2mon.client.core;
 import cern.c2mon.client.core.config.C2monAutoConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.Banner;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -192,7 +194,7 @@ public class C2monServiceGateway {
     if (context == null) {
       LOG.info("Starting C2MON client core.");
 
-      context = new AnnotationConfigApplicationContext(C2monAutoConfiguration.class);
+      context = new SpringApplicationBuilder().sources(C2monAutoConfiguration.class).bannerMode(Banner.Mode.OFF).run();
       initiateGatewayFields(context);
 
       ((AnnotationConfigApplicationContext) context).registerShutdownHook();

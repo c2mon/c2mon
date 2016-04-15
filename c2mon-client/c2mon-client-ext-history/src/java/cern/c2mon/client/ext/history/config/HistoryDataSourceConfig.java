@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
-import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 /**
@@ -15,12 +14,9 @@ import javax.sql.DataSource;
 @Configuration
 public class HistoryDataSourceConfig {
 
-  @Resource
-  Environment environment;
-
   @Bean
   @ConfigurationProperties(prefix = "c2mon.client.history.jdbc")
-  public DataSource historyDataSource() {
+  public DataSource historyDataSource(Environment environment) {
     String url = environment.getRequiredProperty("c2mon.client.history.jdbc.url");
     String username = environment.getRequiredProperty("c2mon.client.history.jdbc.username");
     String password = environment.getRequiredProperty("c2mon.client.history.jdbc.password");
