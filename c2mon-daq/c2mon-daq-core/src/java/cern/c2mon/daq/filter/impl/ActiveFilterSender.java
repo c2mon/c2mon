@@ -84,13 +84,13 @@ public class ActiveFilterSender extends FilterMessageSender implements IFilterMe
 
   @Override
   protected void processValues(final FilteredDataTagValueUpdate filteredDataTagValueUpdate) throws JMSException {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("entering FilterMessageSender processValues()...");
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("entering FilterMessageSender processValues()...");
     }
 
 
     // skip this part if in test mode or filtering is not enabled,
-    if (!environment.containsProperty(Options.FILTER_ENABLED) && environment.getProperty(Options.FILTER_ENABLED, Boolean.class)) {
+    if (environment.getRequiredProperty(Options.FILTER_ENABLED, Boolean.class)) {
         // prepare the message
         filterTemplate.send(new MessageCreator() {
 
@@ -101,13 +101,13 @@ public class ActiveFilterSender extends FilterMessageSender implements IFilterMe
             return msg;
           }
         });
-
     }
 
     // log the filtered values in the log file
     filteredDataTagValueUpdate.log();
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("leaving FilterMessageSender processValues()");
+    
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("leaving FilterMessageSender processValues()");
     }
   }
 

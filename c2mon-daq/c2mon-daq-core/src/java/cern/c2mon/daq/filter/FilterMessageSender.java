@@ -127,15 +127,15 @@ public abstract class FilterMessageSender implements IFilterMessageSender, JmsLi
    */
   @Override
   public final void addValue(final FilteredDataTagValue dataTagValue) {
-      if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("entering addValue()...");
-          LOGGER.debug("\tadding value to buffer");
+      if (LOGGER.isTraceEnabled()) {
+          LOGGER.trace("entering addValue()...");
+          LOGGER.trace("\tadding value to buffer");
       }
 
       tagBuffer.push(dataTagValue);
 
-      if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("...leaving addValue()");
+      if (LOGGER.isTraceEnabled()) {
+          LOGGER.trace("...leaving addValue()");
       }
 
   }
@@ -183,10 +183,10 @@ public abstract class FilterMessageSender implements IFilterMessageSender, JmsLi
        *             exception in SychroBuffer pull method
        */
       public void pull(final PullEvent event) throws PullException {
-          if (LOGGER.isDebugEnabled()) {
-              LOGGER.debug("entering FilterMessageSender pull()...");
-              LOGGER.debug("\t Number of pulled objects : " + event.getPulled().size());
+          if (LOGGER.isTraceEnabled()) {
+              LOGGER.trace("entering FilterMessageSender pull()...");
           }
+          LOGGER.debug("\t Number of pulled objects : " + event.getPulled().size());
           ProcessConfiguration pconf = configurationController.getProcessConfiguration();
           FilteredDataTagValueUpdate dataTagValueUpdate = new FilteredDataTagValueUpdate(pconf.getProcessID());
 
@@ -244,8 +244,8 @@ public abstract class FilterMessageSender implements IFilterMessageSender, JmsLi
                   LOGGER.error("\t pull : JMSException caught while invoking processValue method :" + ex.getMessage());
               }
           } // if
-          if (LOGGER.isDebugEnabled()) {
-              LOGGER.debug("leaving FilterMessageSender pull method");
+          if (LOGGER.isTraceEnabled()) {
+              LOGGER.trace("leaving FilterMessageSender pull method");
           }
       }
   }
