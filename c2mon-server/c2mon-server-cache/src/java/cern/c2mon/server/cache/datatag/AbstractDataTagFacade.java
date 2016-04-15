@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -44,6 +44,8 @@ import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
+
+import static cern.c2mon.shared.common.type.TypeConverter.isKnownClass;
 
 /**
  * {@link DataTagFacade} and {@link ControlTagFacade} have some functionalities in common which
@@ -235,31 +237,42 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
     //(2)if not, use the source timestamps
     //TODO change here once the source value has both DAQ and src timestamps
     Timestamp dataTagTimestamp, sourceTagTimestamp;
+
     if (dataTag.getDaqTimestamp() != null && sourceDataTagValue.getDaqTimestamp() != null) {
+
       dataTagTimestamp = dataTag.getDaqTimestamp();
       sourceTagTimestamp = sourceDataTagValue.getDaqTimestamp();
+
     } else if (dataTag.getSourceTimestamp() != null && sourceDataTagValue.getTimestamp() != null) {
+
       //only for backwards compatibility until all DAQs are sending DAQ timestamps
       dataTagTimestamp = dataTag.getSourceTimestamp();
       sourceTagTimestamp = sourceDataTagValue.getTimestamp();
+
     } else {
+
       return false; //since only server timestamp is set on dataTag, all incoming source values should be accepted
     }
 
     //neither timestamps should be null from here
 
     /*
-     * Do NOT update the tag if the new timestamp is OLDER. EXCEPTION: If the
-     * datatag is currently marked as INACCESSIBLE, we can override the value BUT
-     * the timestamp will be the current time. EXCEPTION2: If the user sets the
-     * forceUpdate flag, we perform the update regardless of whether all other
+     * Do NOT update the tag if the new timestamp is OLDER.
+     * EXCEPTION:
+     * If the datatag is currently marked as INACCESSIBLE, we can override the value BUT
+     * the timestamp will be the current time.
+     * EXCEPTION2:
+     * If the user sets the forceUpdate flag, we perform the update regardless of whether all other
      * conditions are met. This flag must be used with great care.
      */
     //removed forceUpdate below
     if (sourceTagTimestamp.before(dataTagTimestamp)) {
+
       if (dataTag.getDataTagQuality() == null || dataTag.getDataTagQuality().isAccessible()) {
+
         LOGGER.debug("update() : older timestamp and not inaccessible -> reject update");
         return true;
+
       }
       else {
         LOGGER.debug("update() : older timestamp but tag currently inaccessible -> update with older timestamp");
@@ -277,6 +290,7 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
     if (sourceTagTimestamp.equals(dataTagTimestamp) && dataTag.getValue() != null
         && sourceDataTagValue.getValue().equals(dataTag.getValue()) && dataTag.getDataTagQuality().isValid()
         && sourceDataTagValue.getQuality() != null  && sourceDataTagValue.getQuality().isValid()) {
+
       LOGGER.debug("update() : values and timestamps are equal, so nothing to update -> reject update");
       return true;
     }
@@ -324,6 +338,7 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
     if (sourceDataTagValue != null) {
       if (!filterout(dataTag, sourceDataTagValue)) {
         if (sourceDataTagValue.getValue() == null) {
+
           if (sourceDataTagValue.isValid()) {
             if (LOGGER.isDebugEnabled()) {
               LOGGER.debug("Null value received from source for datatag " + sourceDataTagValue.getId() + " - invalidating with quality UNKNOWN_REASON");
@@ -332,18 +347,25 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
                                 "Null value received from DAQ",
                                 new Timestamp(System.currentTimeMillis()));
           } else {
+
             DataTagQuality newTagQuality = qualityConverter.convert(sourceDataTagValue.getQuality());
             dataTagCacheObjectFacade.setQuality(dataTag, newTagQuality, new Timestamp(System.currentTimeMillis()));
           }
+
         } else {
+
           if (sourceDataTagValue.isValid()) {
+
             updateAndValidateQuietly(dataTag, sourceDataTagValue.getValue(), sourceDataTagValue.getValueDescription(),
                 sourceDataTagValue.getTimestamp(), sourceDataTagValue.getDaqTimestamp(), new Timestamp(System.currentTimeMillis()));
+
           } else {
+
             DataTagQuality newTagQuality = qualityConverter.convert(sourceDataTagValue.getQuality()); //TODO redesign so no object creation here
             dataTagCacheObjectFacade.updateAndInvalidate(dataTag, sourceDataTagValue.getValue(), sourceDataTagValue.getValueDescription(),
                 sourceDataTagValue.getTimestamp(), sourceDataTagValue.getDaqTimestamp(), new Timestamp(System.currentTimeMillis()), newTagQuality);
           }
+
         }
         updated = true;
       } else {
@@ -376,6 +398,18 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
     tagCache.acquireWriteLockOnKey(dataTagId);
     try {
       T dataTag = tagCache.get(dataTagId);
+
+
+      // Before updating the new value to the cache convert the value to the proper type.
+      // In the process of the deserialization the dataType can still divert from the defined dataType.
+      // If the dataType is an arbitrary object do nothing because the server don't work with this kind of values at all.
+      if(sourceDataTagValue != null
+          && sourceDataTagValue.getValue() != null
+          && isKnownClass(dataTag.getDataType())){
+        Object convertedValue = TypeConverter.cast(sourceDataTagValue.getValue(), dataTag.getDataType());
+        sourceDataTagValue.setValue(convertedValue);
+      }
+
       Event<Boolean> returnEvent = updateFromSource(dataTag, sourceDataTagValue);
       if (returnEvent.getReturnValue()) {
         tagCache.put(dataTagId, dataTag);

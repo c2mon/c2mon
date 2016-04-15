@@ -1,31 +1,32 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.sql.Timestamp;
-import java.util.List;
-
+import cern.c2mon.server.cache.dbaccess.structure.DBBatch;
+import cern.c2mon.server.cache.dbaccess.test.TestDataHelper;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.shared.common.datatag.*;
 import cern.c2mon.shared.common.metadata.Metadata;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Builder;
+import lombok.Data;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,15 +37,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import cern.c2mon.server.cache.dbaccess.structure.DBBatch;
-import cern.c2mon.server.cache.dbaccess.test.TestDataHelper;
-import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
-import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.DataTagValueDictionary;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-test.xml"})
@@ -78,6 +78,122 @@ public class DataTagMapperTest {
   @After
   public void cleanDb() {
     testDataHelper.removeTestData();
+  }
+
+  @Test
+  public void testDatTagWithIntegerArray() {
+    DataTagCacheObject cacheObject = new DataTagCacheObject();
+    cacheObject.setId(new Long(100004));  //must be non null in DB
+    cacheObject.setName("Junit_test_datatag4"); //non null
+    cacheObject.setDescription("test description");
+    cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
+    cacheObject.setDataType(Integer[].class.getName()); // non null
+    //cacheObject.setTopic("tim.testdatatag.XADDRESS");
+    cacheObject.setLogged(false); //null allowed
+    cacheObject.setUnit("test unit");
+    cacheObject.setDipAddress("testDIPaddress");
+    cacheObject.setJapcAddress("testJAPCaddress");
+    cacheObject.setValue(new Integer[]{1,2,3,4,5});
+    cacheObject.setValueDescription("test value description");
+    cacheObject.setSimulated(false); //null allowed
+    cacheObject.setEquipmentId(new Long(150)); //need test equipment inserted
+    cacheObject.setValueDictionary(new DataTagValueDictionary());
+    cacheObject.setAddress(new DataTagAddress());
+    cacheObject.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.EQUIPMENT_DOWN));
+    cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
+    cacheObject.setDaqTimestamp(new Timestamp(System.currentTimeMillis()));
+    cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
+    cacheObject.setProcessId(50L);
+    dataTagMapper.insertDataTag(cacheObject);
+
+    DataTagCacheObject retrievedObject = (DataTagCacheObject) dataTagMapper.getItem(cacheObject.getId());
+
+    assertEquals(cacheObject.getId(), retrievedObject.getId());
+    assertEquals(cacheObject.getName(), retrievedObject.getName());
+    assertEquals(cacheObject.getDescription(), retrievedObject.getDescription());
+    assertEquals(cacheObject.getMode(), retrievedObject.getMode());
+    assertEquals(cacheObject.getDataType(), retrievedObject.getDataType());
+    assertEquals(cacheObject.isLogged(), retrievedObject.isLogged());
+    assertEquals(cacheObject.getUnit(), retrievedObject.getUnit());
+    assertEquals(cacheObject.getDipAddress(), retrievedObject.getDipAddress());
+    assertEquals(cacheObject.getJapcAddress(), retrievedObject.getJapcAddress());
+    assertTrue(Arrays.equals((Object[])cacheObject.getValue(), (Object[])retrievedObject.getValue()));
+    assertEquals(cacheObject.getValueDescription(), retrievedObject.getValueDescription());
+    assertEquals(cacheObject.isSimulated(), retrievedObject.isSimulated());
+    assertEquals(cacheObject.getEquipmentId(), retrievedObject.getEquipmentId());
+    assertEquals(cacheObject.getProcessId(), retrievedObject.getProcessId());
+    assertEquals(null, retrievedObject.getMinValue()); // min value is not persisted for boolean data types
+    assertEquals(null, retrievedObject.getMaxValue()); // max value is not persisted for boolean data types
+    assertEquals(cacheObject.getValueDictionary().toXML(), retrievedObject.getValueDictionary().toXML()); //compare XML of value dictionary
+    assertEquals(cacheObject.getAddress(), retrievedObject.getAddress());
+    assertEquals(cacheObject.getDataTagQuality(), retrievedObject.getDataTagQuality());
+    assertEquals(cacheObject.getTimestamp(), retrievedObject.getTimestamp());
+    assertEquals(cacheObject.getSourceTimestamp(), retrievedObject.getSourceTimestamp());
+  }
+
+  @Test
+  public void testDatTagWithArbitraryObject() {
+    ObjectMapper mapper = new ObjectMapper().enable(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY);
+    try {
+      String valueString = mapper.writeValueAsString(ArbitraryObject.builder().fields(new Integer[]{1,2,3,4,5}).field1("Test").field2(1.3f).build());
+      Object value = mapper.readValue(valueString, Object.class);
+
+      DataTagCacheObject cacheObject = new DataTagCacheObject();
+      cacheObject.setId(new Long(100005));  //must be non null in DB
+      cacheObject.setName("Junit_test_datatag5"); //non null
+      cacheObject.setDescription("test description");
+      cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
+      cacheObject.setDataType(ArbitraryObject[].class.getName()); // non null
+      //cacheObject.setTopic("tim.testdatatag.XADDRESS");
+      cacheObject.setLogged(false); //null allowed
+      cacheObject.setUnit("test unit");
+      cacheObject.setDipAddress("testDIPaddress");
+      cacheObject.setJapcAddress("testJAPCaddress");
+      cacheObject.setValue(value);
+      cacheObject.setValueDescription("test value description");
+      cacheObject.setSimulated(false); //null allowed
+      cacheObject.setEquipmentId(new Long(150)); //need test equipment inserted
+      cacheObject.setValueDictionary(new DataTagValueDictionary());
+      cacheObject.setAddress(new DataTagAddress());
+      cacheObject.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.EQUIPMENT_DOWN));
+      cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
+      cacheObject.setDaqTimestamp(new Timestamp(System.currentTimeMillis()));
+      cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
+      cacheObject.setProcessId(50L);
+      dataTagMapper.insertDataTag(cacheObject);
+
+      DataTagCacheObject retrievedObject = (DataTagCacheObject) dataTagMapper.getItem(cacheObject.getId());
+
+      assertEquals(cacheObject.getId(), retrievedObject.getId());
+      assertEquals(cacheObject.getName(), retrievedObject.getName());
+      assertEquals(cacheObject.getDescription(), retrievedObject.getDescription());
+      assertEquals(cacheObject.getMode(), retrievedObject.getMode());
+      assertEquals(cacheObject.getDataType(), retrievedObject.getDataType());
+      assertEquals(cacheObject.isLogged(), retrievedObject.isLogged());
+      assertEquals(cacheObject.getUnit(), retrievedObject.getUnit());
+      assertEquals(cacheObject.getDipAddress(), retrievedObject.getDipAddress());
+      assertEquals(cacheObject.getJapcAddress(), retrievedObject.getJapcAddress());
+      assertEquals(cacheObject.getValueDescription(), retrievedObject.getValueDescription());
+      assertEquals(cacheObject.isSimulated(), retrievedObject.isSimulated());
+      assertEquals(cacheObject.getEquipmentId(), retrievedObject.getEquipmentId());
+      assertEquals(cacheObject.getProcessId(), retrievedObject.getProcessId());
+      assertEquals(null, retrievedObject.getMinValue()); // min value is not persisted for boolean data types
+      assertEquals(null, retrievedObject.getMaxValue()); // max value is not persisted for boolean data types
+      assertEquals(cacheObject.getValueDictionary().toXML(), retrievedObject.getValueDictionary().toXML()); //compare XML of value dictionary
+      assertEquals(cacheObject.getAddress(), retrievedObject.getAddress());
+      assertEquals(cacheObject.getDataTagQuality(), retrievedObject.getDataTagQuality());
+      assertEquals(cacheObject.getTimestamp(), retrievedObject.getTimestamp());
+      assertEquals(cacheObject.getSourceTimestamp(), retrievedObject.getSourceTimestamp());
+
+      if(cacheObject.getValue() instanceof LinkedHashMap && retrievedObject.getValue() instanceof LinkedHashMap){
+        compareLinkedHashMap((LinkedHashMap)cacheObject.getValue(), (LinkedHashMap)retrievedObject.getValue());
+      }
+
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   @Test
@@ -230,7 +346,7 @@ public class DataTagMapperTest {
     assertTrue(dataTagMapper.isInDb(cacheObject.getId()));
 
     //retrieve from database
-    DataTagCacheObject retrievedObject = 
+    DataTagCacheObject retrievedObject =
         (DataTagCacheObject) dataTagMapper.getItem
         (new Long(150001));
 
@@ -325,12 +441,47 @@ public class DataTagMapperTest {
     assertFalse(dataTagMapper.isInDb(60010L));
   }
 
-  /**
-   * Make sure the test DataTag is deleted after each method.
-   */
+
+  private void compareLinkedHashMap(LinkedHashMap<String, Object> map1, LinkedHashMap<String, Object> map2){
+    assertEquals(map1.size(), map2.size());
+
+    for(Map.Entry<String, Object> entry : map1.entrySet()){
+      String key1 = entry.getKey();
+      assertTrue(map2.containsKey(key1));
+
+      Object value1 = entry.getValue();
+      Object value2 = map2.get(key1);
+
+      if (value1 instanceof LinkedHashMap &&  value2 instanceof LinkedHashMap){
+        compareLinkedHashMap((LinkedHashMap) value1, (LinkedHashMap) value2);
+      } else if(value1 instanceof Object[] &&  value2 instanceof Object[]){
+
+        assertTrue(Arrays.equals((Object[])value1, (Object[])value2));
+
+      } else {
+
+        assertEquals(value1, value2);
+      }
+    }
+  }
+
+  @Data
+  @Builder
+  static class ArbitraryObject{
+    private Integer[] fields;
+
+    private String field1;
+
+    private Float field2;
+  }
+
+}
+
+/**
+ * Make sure the test DataTag is deleted after each method.
+ */
 //  @After
 //  public void deleteTestDataTag() {
 //    dataTagMapper.deleteDataTag(dataTag.getId());
 //  }
 
-}

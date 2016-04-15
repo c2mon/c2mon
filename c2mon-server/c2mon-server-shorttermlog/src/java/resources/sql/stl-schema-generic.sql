@@ -6,7 +6,7 @@ tagid             INTEGER     NOT NULL,
 tagname           VARCHAR(60),
 tagvalue          VARCHAR(4000),
 TAGVALUEDESC      VARCHAR(1000),
-tagdatatype       VARCHAR(10),
+tagdatatype       VARCHAR(200),
 tagtime           TIMESTAMP(6),
 tagservertime     TIMESTAMP(6) NOT NULL,
 tagdaqtime        TIMESTAMP(6),
@@ -30,7 +30,7 @@ logdate       DATE
 ,tagid         INTEGER      NOT NULL
 ,tagname       VARCHAR(60)
 ,tagvalue      VARCHAR(4000)
-,tagdatatype   VARCHAR(10)
+,tagdatatype   VARCHAR(200)
 ,tagtime       TIMESTAMP(6)
 ,tagservertime TIMESTAMP(6)
 ,tagdaqtime    TIMESTAMP(6)
@@ -59,7 +59,7 @@ cmdreportdesc   VARCHAR(100)
 CREATE TABLE IF NOT EXISTS SERVER_LIFECYCLE_LOG (
     SLL_EVENT_TYPE      VARCHAR(10) NOT NULL,
     SLL_SERVER_NAME     VARCHAR(20) NOT NULL,
-    SLL_TIME            TIMESTAMP(6) NOT NULL   
+    SLL_TIME            TIMESTAMP(6) NOT NULL
 );
 
 

@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -20,6 +20,7 @@ package cern.c2mon.shared.common.datatag;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -71,12 +72,15 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
   // ----------------------------------------------------------------------------
 
   /** Unique numeric identifier of the tag */
+  @Setter
   protected Long id;
 
   /** Unique name of the tag */
+  @Setter
   protected String name;
 
   /** Flag indicating whether the tag is used for system supervision */
+  @Setter
   protected boolean controlTag;
 
   /** Current value of the tag (may be null if invalid) */
@@ -95,6 +99,7 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
    * Timestamp set locally when the value was last updated
    * (the DAQ server system time at the time the update was performed).
    */
+  @Setter
   protected Timestamp daqTimestamp;
 
   /** Priority with which the tag value has to be sent to the server:
@@ -106,6 +111,7 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
    * Flag indicating whether a guaranteed delivery mechanism has to be used
    * for transmitting the value to the server.
    */
+  @Setter
   protected boolean guaranteedDelivery;
 
   /**
@@ -235,6 +241,8 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
         //override new DAQ timestamp set by constructor
         this.daqTimestamp = pOld.daqTimestamp;
   }
+
+  public SourceDataTagValue(){}
 
   // ----------------------------------------------------------------------------
   // READ-ONLY MEMBER ACCESSORS and UTILITY METHODS
@@ -709,9 +717,7 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
 	}
 	return result;
   }
-  
-  
-  
+
   @Override
   public String toString() {
     StringBuffer str = new StringBuffer();
@@ -739,8 +745,8 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
       // remove all \n and replace all \t characters of the value description string
       str.append(getValueDescription().replace("\n", "").replace("\t", "  ") );
     }
-    
-    return str.toString(); 
+
+    return str.toString();
   }
 
 }

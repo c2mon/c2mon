@@ -1,45 +1,48 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.shared.common.type;
 
-import java.awt.Color;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This helper class provides methods to cast a given raw type object into
  * another type.
  *
  * @author Matthias Braeger
+ * @author Franz Ritter
  */
 public final class TypeConverter  {
+
+
   private static final Logger LOG = LoggerFactory.getLogger(TypeConverter.class);
-  
+
   /**
    * Hidden default constructor
    */
   private TypeConverter() {
     // Do nothing
   }
-  
+
   /**
    * Checks whether the given value can be casted into the given class type.
    * @param value The object to be casted
@@ -52,7 +55,7 @@ public final class TypeConverter  {
 
   /**
    * Checks whether the given value can be casted into the given class type. The
-   * following shortcut type strings are supported: <code>Boolean, Integer, Float, String, 
+   * following shortcut type strings are supported: <code>Boolean, Integer, Float, String,
    * Double, Long, Short</code>
    * @param value The object to be casted
    * @param className the class cast type as name
@@ -62,9 +65,9 @@ public final class TypeConverter  {
   public static final boolean isConvertible(final Object value, final String className) {
     return (cast(value, className) != null);
   }
-  
+
   /**
-   * Tries to cast the given object value into the specified class type. In case you are 
+   * Tries to cast the given object value into the specified class type. In case you are
    * casting a Float or Double to an Integer or Short, the value will be rounded.
    * @param value The object to be casted
    * @param clazz the resulting class cast type
@@ -75,9 +78,9 @@ public final class TypeConverter  {
   public static final <T> T castToType(final Object value, final Class<T> clazz) {
     return (T) cast(value, clazz);
   }
-  
+
   /**
-   * Tries to cast the given object value into the specified class type. In case you are 
+   * Tries to cast the given object value into the specified class type. In case you are
    * casting a Float or Double to an Integer or Short, the value will be rounded.
    * @param pValue The object to be casted
    * @param pTargetType the resulting class cast type
@@ -89,10 +92,10 @@ public final class TypeConverter  {
     if (pValue == null || pTargetType == null) {
       return null;
     }
-    
+
     Class< ? > inputType = pValue.getClass();
     Object inputValue = pValue;
-    
+
 
     // If no cast is necessary, return the original value
     if (inputType.equals(pTargetType)) {
@@ -105,7 +108,7 @@ public final class TypeConverter  {
     if (String.class.isAssignableFrom(pTargetType)) {
       return pValue.toString();
     }
-    
+
 
     if (String.class.isAssignableFrom(inputType)) {
       try {
@@ -118,8 +121,8 @@ public final class TypeConverter  {
         // an exception is not needed
       }
     }
-    
-    
+
+
     if (Boolean.class.isAssignableFrom(pTargetType)) {
       if (String.class.isAssignableFrom(inputType)) {
         if (((String)inputValue).equalsIgnoreCase("true")) {
@@ -178,7 +181,7 @@ public final class TypeConverter  {
         }
         else {
           return new Integer(0);
-        }          
+        }
       }
       else {
         throw new ClassCastException(new StringBuffer("Cannot convert value of type ").append(inputType.getName()).append(" to ").append(pTargetType.getName()).append(".").toString());
@@ -214,7 +217,43 @@ public final class TypeConverter  {
         }
         else {
           return new Short((short)0);
-        }          
+        }
+      }
+      else {
+        throw new ClassCastException(new StringBuffer("Cannot convert value of type ").append(inputType.getName()).append(" to ").append(pTargetType.getName()).append(".").toString());
+      }
+    }
+    else if (Byte.class.isAssignableFrom(pTargetType)) {
+      if (Number.class.isAssignableFrom(inputType)) {
+        long x = Math.round(((Number) inputValue).doubleValue());
+        if (x > Byte.MAX_VALUE || x < Byte.MIN_VALUE) {
+          throw new ClassCastException(new StringBuffer("Numeric value ").append(x).append(" to big to be converted to Byte.").toString());
+        }
+        return new Byte((byte)x);
+      }
+      else if (String.class.isAssignableFrom(inputType)) {
+        if (((String)inputValue).trim().equalsIgnoreCase("false")) {
+          return Byte.valueOf((byte) 0);
+        }
+        else if (((String)inputValue).trim().equalsIgnoreCase("true")) {
+          return Byte.valueOf((byte) 1);
+        }
+        else {
+          try {
+            return Byte.valueOf((String)inputValue);
+          }
+          catch (Exception e) {
+            throw new ClassCastException(new StringBuffer("Cannot convert String value \"").append(inputValue).append("\" to Byte.").toString());
+          }
+        }
+      }
+      else if (Boolean.class.isAssignableFrom(inputType)) {
+        if (inputValue.equals(Boolean.TRUE)) {
+          return new Byte((byte)1);
+        }
+        else {
+          return new Byte((byte)0);
+        }
       }
       else {
         throw new ClassCastException(new StringBuffer("Cannot convert value of type ").append(inputType.getName()).append(" to ").append(pTargetType.getName()).append(".").toString());
@@ -246,7 +285,7 @@ public final class TypeConverter  {
         }
         else {
           return Long.valueOf(0l);
-        }          
+        }
       }
       else {
         throw new ClassCastException(new StringBuffer("Cannot convert value of type ").append(inputType.getName()).append(" to ").append(pTargetType.getName()).append(".").toString());
@@ -284,7 +323,7 @@ public final class TypeConverter  {
         }
         else {
           return new Float(0);
-        }          
+        }
       }
       else {
         throw new ClassCastException(new StringBuffer("Cannot convert value of type ").append(inputType.getName()).append(" to ").append(pTargetType.getName()).append(".").toString());
@@ -301,7 +340,7 @@ public final class TypeConverter  {
         }
       }
       catch (Exception e) {
-        throw new ClassCastException(String.format("Failed to convert '%s' of type '%s' into a '%s' (%s)", 
+        throw new ClassCastException(String.format("Failed to convert '%s' of type '%s' into a '%s' (%s)",
             inputValue, inputValue.getClass().getName(), pTargetType.getName(), e.getMessage()));
       }
     }
@@ -334,7 +373,7 @@ public final class TypeConverter  {
         }
         else {
           return new Double(0);
-        }          
+        }
       }
       else {
         throw new ClassCastException(new StringBuffer("Cannot convert value of type ").append(inputType.getName()).append(" to ").append(pTargetType.getName()).append(".").toString());
@@ -342,25 +381,25 @@ public final class TypeConverter  {
     } else if (pTargetType.isEnum() && String.class.isAssignableFrom(inputType)) {
       try {
         Class< ? extends Enum> enumClass = (Class< ? extends Enum>) pTargetType;
-        return Enum.valueOf(enumClass, (String) inputValue);        
+        return Enum.valueOf(enumClass, (String) inputValue);
       } catch (Exception e) {
-        // Tries the incase sensitive method instead 
-      } 
-      
+        // Tries the incase sensitive method instead
+      }
+
       final String enumName = String.class.cast(inputValue);
       final Object constants[] = pTargetType.getEnumConstants();
-      
+
       for (final Object constant : constants) {
         if (constant.toString().compareToIgnoreCase(enumName) == 0) {
           return constant;
         }
       }
-      
+
       //only throw cast exception to be consistent with rest of this class...
       throw new ClassCastException(String.format("Unable to convert the string '%s' into an enum of type '%s'",
           inputValue.toString(), pTargetType.getName()));
     }
-    else if (pTargetType.isPrimitive() 
+    else if (pTargetType.isPrimitive()
         && (Number.class.isAssignableFrom(inputType)
             || inputType == byte.class
             || inputType == short.class
@@ -369,7 +408,7 @@ public final class TypeConverter  {
             || inputType == float.class
             || inputType == double.class
             )) {
-      
+
       Number numberValue;
       if (inputType.isPrimitive()) {
         if (byte.class == inputType) {
@@ -397,7 +436,7 @@ public final class TypeConverter  {
       else {
         numberValue = Number.class.cast(inputValue);
       }
-      
+
       if (double.class == pTargetType) {
         return numberValue.doubleValue();
       }
@@ -419,17 +458,21 @@ public final class TypeConverter  {
       else {
         throw new ClassCastException(String.format("Failed to convert a '%s' to a '%s'.", inputType.getSimpleName(), pTargetType.getSimpleName()));
       }
-      
+
     }
+
+    // Array handling:
     else if (inputType.isArray() && pTargetType.isArray()) {
       int inputArrayLength = Array.getLength(inputValue);
       final Class< ? > elementTargetType = pTargetType.getComponentType();
       final Object result = Array.newInstance(elementTargetType, inputArrayLength);
       for (int i = 0; i < inputArrayLength; i++) {
-        Array.set(result, i, castToType(Array.get(inputValue, i), elementTargetType));
+        Array.set(result, i, cast(Array.get(inputValue, i), elementTargetType.getName()));
       }
       return result;
     }
+
+    // SQL Timestamp handling:
     else if (inputType == java.sql.Timestamp.class) {
       return cast(((java.sql.Timestamp) inputValue).getTime(), pTargetType);
     }
@@ -445,12 +488,14 @@ public final class TypeConverter  {
         return new java.sql.Timestamp(milliseconds);
       }
       catch (Exception e) { }
-      
+
       throw new ClassCastException(String.format("Could not convert '%s' into a '%s'", inputValue.toString(), java.sql.Timestamp.class.getName()));
     }
+
+    // Color handling:
     else if (inputType == String.class && pTargetType == Color.class) {
       String str = (String) inputValue;
-      
+
       // Tests first if the string is a hex string which can be translated into a color
       try {
         String hexStr = str;
@@ -460,24 +505,27 @@ public final class TypeConverter  {
         return new Color(Integer.parseInt(hexStr, 16));
       }
       catch (Exception e) { }
-      
+
       // Checks if the color string is a field in the Color class
       try {
           Field field = Color.class.getField(str);
           return (Color)field.get(null);
       } catch (Exception e) {
       }
-      
+
       throw new ClassCastException(String.format("Could not convert '%s' into a Color", str));
     }
+
+    // default:
     else {
       throw new ClassCastException(new StringBuffer("Cannot convert value of type ").append(inputType.getName()).append(" to ").append(pTargetType.getName()).append(".").toString());
     }
   }
 
+
   /**
    * This method tries to cast any kind of Object into the given raw value type. The
-   * following shortcut type strings are supported: <code>Boolean, Integer, Float, String, 
+   * following shortcut type strings are supported: <code>Boolean, Integer, Float, String,
    * Double, Long, Short</code>
    * @param value The object that shall be casted into the specific raw value type
    * @param className The raw type class as Sting and without the <code>java.lang.</code>
@@ -486,48 +534,74 @@ public final class TypeConverter  {
    */
   public static final Object cast(final Object value, final String className) {
     Object result = null;
+
     if (value != null && className != null && !className.isEmpty()) {
       try {
-        if (className.equals("Boolean")) {
-          result = castToType(value, Boolean.class);
+
+        Class type = getType(className);
+
+        if (type != null) {
+
+          if (type.equals(String.class)) {
+            result = value.toString();
+          } else {
+            result = castToType(value, type);
+          }
         }
-        else if (className.equals("Integer")) {
-          result = castToType(value, Integer.class);
-        }
-        else if (className.equals("Float")) {
-          result = castToType(value, Float.class);
-        }
-        else if (className.equals("String")) {
-          result = value;
-        }
-        else if (className.equals("Double")) {
-          result = castToType(value, Double.class);
-        }
-        else if (className.equals("Long")) {
-          result = castToType(value, Long.class);
-        }
-        else if (className.equals("Short")) {
-          result = castToType(value, Short.class);
-        }
-        else {
-          result = castToType(value, Class.forName(className));
-        }
-        
+
         if (result == null) {
-          LOG.error("cast() : Conversion error. Could not cast input value [" + value + "] of type " 
+          LOG.error("cast() : Conversion error. Could not cast input value [" + value + "] of type "
               + value.getClass().getName() + " to resulting type " + className);
         }
-      }
-      catch (ClassCastException cce) {
+      } catch (ClassCastException cce) {
         LOG.error("cast() : Conversion error", cce);
         result = null;
       }
-      catch (ClassNotFoundException cnf) {
-        LOG.error("cast() : Conversion error. Could not find class with name: ", cnf);
-        result = null;
-      }
     }
-    
+
     return result;
+  }
+
+
+  //===========================================================================
+  // Type checking methods based on a type in string representation
+  //===========================================================================
+
+  /**
+   * checks if the given data type is a Number.
+   * Because of the old representation of data type without the full class name java.lang
+   * the check have to be done separate for all subclasses of {@link Number}.
+   * @param dataType the String name of the data type
+   * @return returns true if the data type is a subclass of {@link Number}.
+   */
+  public static boolean isNumber(String dataType) {
+
+    Class type = getType(dataType);
+
+    return type != null && Number.class.isAssignableFrom(type);
+
+  }
+
+
+  public static boolean isKnownClass(String typeName) {
+
+    Class<?> result = typeName!=null ? getType(typeName): null;
+
+    return result != null;
+
+  }
+
+  public static Class<?> getType(String typeName){
+
+    String fullPath = !typeName.contains(".") ? "java.lang."+typeName : typeName;
+
+    try{
+
+      return Class.forName(fullPath);
+
+    } catch (ClassNotFoundException e) {
+      return null;
+    }
+
   }
 }

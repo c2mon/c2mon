@@ -1,42 +1,38 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.cache.datatag;
 
-import java.sql.Timestamp;
-import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import cern.c2mon.server.cache.AlarmCache;
-import cern.c2mon.server.cache.AlarmFacade;
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.DataTagFacade;
-import cern.c2mon.server.cache.EquipmentFacade;
-import cern.c2mon.server.cache.SubEquipmentFacade;
+import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
+import java.util.Properties;
+
+import static cern.c2mon.shared.common.type.TypeConverter.getType;
 
 /**
  * Manages the update logic to DataTag cache objects (including ControlTags, which currently
@@ -260,7 +256,7 @@ public class DataTagFacadeImpl extends AbstractDataTagFacade<DataTag> implements
     // Make sure that the minValue is of the right class if not null
     if (dataTagCacheObject.getMinValue() != null) {
       try {
-        Class<?> minValueClass = Class.forName("java.lang." + dataTagCacheObject.getDataType());
+        Class<?> minValueClass = getType(dataTagCacheObject.getDataType());
         if (!minValueClass.isInstance(dataTagCacheObject.getMinValue())) {
           throw new ConfigurationException(
               ConfigurationException.INVALID_PARAMETER_VALUE,
@@ -276,7 +272,7 @@ public class DataTagFacadeImpl extends AbstractDataTagFacade<DataTag> implements
     // Make sure that the maxValue is of the right class if not null
     if (dataTagCacheObject.getMaxValue() != null) {
       try {
-        Class<?> maxValueClass = Class.forName("java.lang." + dataTagCacheObject.getDataType());
+        Class<?> maxValueClass = getType(dataTagCacheObject.getDataType());
         if (!maxValueClass.isInstance(dataTagCacheObject.getMaxValue())) {
           throw new ConfigurationException(
               ConfigurationException.INVALID_PARAMETER_VALUE,
