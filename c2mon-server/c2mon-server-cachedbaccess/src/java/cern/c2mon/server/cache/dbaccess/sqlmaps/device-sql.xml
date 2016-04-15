@@ -55,7 +55,7 @@
            DEVICECOMMAND.DVCVALUE as command_value,
            DEVICECOMMAND.DVCCATEGORY as command_category,
            DEVICECOMMAND.DVCRESULTTYPE as command_result_type
-      FROM DEVICE 
+      FROM DEVICE
            LEFT OUTER JOIN DEVICEPROPERTY
         ON DEVICE.DEVID = DEVICEPROPERTY.DVPDEVID
            LEFT OUTER JOIN PROPERTYFIELD
@@ -84,7 +84,7 @@
            DEVICECOMMAND.DVCVALUE as command_value,
            DEVICECOMMAND.DVCCATEGORY as command_category,
            DEVICECOMMAND.DVCRESULTTYPE as command_result_type
-      FROM DEVICE 
+      FROM DEVICE
            LEFT OUTER JOIN DEVICEPROPERTY
         ON DEVICE.DEVID = DEVICEPROPERTY.DVPDEVID
            LEFT OUTER JOIN PROPERTYFIELD
@@ -103,19 +103,19 @@
 
   <insert id="insertDeviceProperty">
     INSERT INTO DEVICEPROPERTY (DVPPROPID, DVPNAME, DVPVALUE, DVPCATEGORY, DVPRESULTTYPE, DVPDEVID)
-    VALUES (#{property.id}, #{property.name}, #{property.value,jdbcType=VARCHAR}, #{property.category,jdbcType=VARCHAR},
+    VALUES (#{property.id}, #{property.name}, #{property.value,javaType=String ,jdbcType=VARCHAR}, #{property.category,javaType=String, jdbcType=VARCHAR},
             #{property.resultType}, #{id})
   </insert>
 
   <insert id="insertPropertyField">
     INSERT INTO PROPERTYFIELD (PRFFIELDID, PRFFIELDNAME, PRFVALUE, PRFCATEGORY, PRFRESULTTYPE, PRFPROPID, PRFDEVID)
-    VALUES (#{field.id}, #{field.name}, #{field.value,jdbcType=VARCHAR}, #{field.category},
+    VALUES (#{field.id}, #{field.name}, #{field.value,javaType=String, jdbcType=VARCHAR}, #{field.category},
             #{field.resultType}, #{propertyId}, #{deviceId})
   </insert>
 
   <insert id="insertDeviceCommand">
     INSERT INTO DEVICECOMMAND (DVCCMDID, DVCNAME, DVCVALUE, DVCCATEGORY, DVCRESULTTYPE, DVCDEVID)
-    VALUES (#{command.id}, #{command.name}, #{command.value}, #{command.category}, #{command.resultType}, 
+    VALUES (#{command.id}, #{command.name}, #{command.value}, #{command.category}, #{command.resultType},
             #{id})
   </insert>
 
