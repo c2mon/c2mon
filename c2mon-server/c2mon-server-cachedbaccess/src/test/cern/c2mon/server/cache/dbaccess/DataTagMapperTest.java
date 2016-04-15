@@ -81,7 +81,7 @@ public class DataTagMapperTest {
   }
 
   @Test
-  public void testDatTagWithIntegerArray() {
+  public void testDataTagWithIntegerArray() {
     DataTagCacheObject cacheObject = new DataTagCacheObject();
     cacheObject.setId(new Long(100004));  //must be non null in DB
     cacheObject.setName("Junit_test_datatag4"); //non null
@@ -132,7 +132,7 @@ public class DataTagMapperTest {
   }
 
   @Test
-  public void testDatTagWithArbitraryObject() {
+  public void testDataTagWithArbitraryObject() {
     ObjectMapper mapper = new ObjectMapper().enable(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY);
     try {
       String valueString = mapper.writeValueAsString(ArbitraryObject.builder().fields(new Integer[]{1,2,3,4,5}).field1("Test").field2(1.3f).build());
