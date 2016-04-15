@@ -243,17 +243,17 @@ public class C2monServiceGateway {
   /**
    * Initiate the static fields, retrieving it from the <code>context</code>
    *
-   * @param xmlContext the application context
+   * @param context the application context
    */
-  private static void initiateGatewayFields(final ApplicationContext xmlContext) {
-    tagManager = xmlContext.getBean(TagManager.class);
-    supervisionManager = xmlContext.getBean(SupervisionManager.class);
-    commandManager = xmlContext.getBean(CommandManager.class);
+  private static void initiateGatewayFields(final ApplicationContext context) {
+    tagManager = context.getBean(TagManager.class);
+    supervisionManager = context.getBean(SupervisionManager.class);
+    commandManager = context.getBean(CommandManager.class);
 
-    alarmService = xmlContext.getBean(AlarmService.class);
-    configurationService = xmlContext.getBean(ConfigurationService.class);
-    statisticsService = xmlContext.getBean(StatisticsService.class);
-    tagService = xmlContext.getBean(TagService.class);
+    alarmService = context.getBean(AlarmService.class);
+    configurationService = context.getBean(ConfigurationService.class);
+    statisticsService = context.getBean(StatisticsService.class);
+    tagService = context.getBean(TagService.class);
   }
 
   /**
