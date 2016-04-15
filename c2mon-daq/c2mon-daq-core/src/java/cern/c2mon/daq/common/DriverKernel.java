@@ -329,7 +329,7 @@ public class DriverKernel implements ApplicationContextAware {
 
     EquipmentMessageHandler equnit = null;
     ProcessConfiguration processConfiguration = configurationController.getProcessConfiguration();
-    boolean dynamicTimeDeadbandEnabled = environment.getProperty(Options.DYNAMIC_DEADBAND_ENABLED, Boolean.class, true);
+    boolean dynamicTimeDeadbandEnabled = environment.getProperty(Options.DYNAMIC_DEADBAND_ENABLED, Boolean.class, false);
 
     int eqUnitsConnectedProperly = 0;
     // for each equipment unit defined in the ProcessConfiguration XML
