@@ -40,7 +40,7 @@ JVM_MEM="-Xms256m -Xmx256m"
 JVM_OTHER_OPTS=()
 
 [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
-[[ -z $ADDITIONAL_PARAMS ]] && echo "ADDITIONAL_PARAMS not set!" && exit 1
+[[ -z $ADDITIONAL_PARAMS ]] && ADDITIONAL_PARAMS=""
 
 LOGGING_CONFIG="-Dlogging.config=$DAQ_HOME/conf/logback.xml -Dlogging.path=$DAQ_HOME/log"
 # if $RUN_FOREGROUND is set, we disable logging to a file
@@ -48,4 +48,4 @@ if [ -n "${RUN_FOREGROUND+set}" ] ; then
   LOGGING_CONFIG="";
 fi
 
-exec -a `basename $0` $JAVA -cp "$CLASSPATH" -Dc2mon.daq.name ${PROCESS_NAME} -DJINTEGRA_LOG_LEVEL="1" -DJINTEGRA_LOG_ROLLOVER_LINECOUNT="100000" -DJINTEGRA_LOG_FILE="$DAQ_HOME/log/${PROCESS_NAME}.jintegra.log" $LOGGING_CONFIG $JVM_MEM "${JVM_OTHER_OPTS[@]}" cern.c2mon.daq.common.startup.DaqStartup  ${ADDITIONAL_PARAMS}
+exec -a `basename $0` $JAVA -cp "$CLASSPATH" -Dc2mon.daq.name="${PROCESS_NAME}" -DJINTEGRA_LOG_LEVEL="1" -DJINTEGRA_LOG_ROLLOVER_LINECOUNT="100000" -DJINTEGRA_LOG_FILE="$DAQ_HOME/log/${PROCESS_NAME}.jintegra.log" $LOGGING_CONFIG $JVM_MEM "${JVM_OTHER_OPTS[@]}" cern.c2mon.daq.DaqStartup  ${ADDITIONAL_PARAMS}
