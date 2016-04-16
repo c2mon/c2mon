@@ -1,0 +1,51 @@
+#!/bin/bash
+#
+# Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+# 
+# This file is part of the CERN Control and Monitoring Platform 'C2MON'.
+# C2MON is free software: you can redistribute it and/or modify it under the
+# terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation, either version 3 of the license.
+# 
+# C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+# more details.
+# 
+# You should have received a copy of the GNU Lesser General Public License
+# along with C2MON. If not, see <http://www.gnu.org/licenses/>.
+##
+
+# Start script for C2MON-DAQ-STARTUP.jvm
+
+# check if JAVA_HOME is set
+if [ -z $JAVA_HOME ]; then
+   # try to find java if not
+   export JAVA="$(readlink -f $(which java))"
+else
+   export JAVA=$JAVA_HOME/bin/java
+fi
+
+if [ -z "$DAQ_HOME" ] ; then
+ # get the current location 
+ SCRIPT=`readlink -f $(which $0)`
+ SCRIPTPATH=`dirname $SCRIPT`
+ DAQ_HOME="$(dirname "$SCRIPTPATH")"
+fi
+
+CLASSPATH=`ls $DAQ_HOME/lib/*.jar | tr -s '\n' ':'`
+cd $DAQ_HOME
+
+JVM_MEM="-Xms256m -Xmx256m"
+JVM_OTHER_OPTS=()
+
+[[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
+[[ -z $ADDITIONAL_PARAMS ]] && echo "ADDITIONAL_PARAMS not set!" && exit 1
+
+LOGGING_CONFIG="-Dlogging.config=$DAQ_HOME/conf/logback.xml -Dlogging.path=$DAQ_HOME/log"
+# if $RUN_FOREGROUND is set, we disable logging to a file
+if [ -n "${RUN_FOREGROUND+set}" ] ; then
+  LOGGING_CONFIG="";
+fi
+
+exec -a `basename $0` $JAVA -cp "$CLASSPATH" -Dc2mon.daq.name ${PROCESS_NAME} -DJINTEGRA_LOG_LEVEL="1" -DJINTEGRA_LOG_ROLLOVER_LINECOUNT="100000" -DJINTEGRA_LOG_FILE="$DAQ_HOME/log/${PROCESS_NAME}.jintegra.log" $LOGGING_CONFIG $JVM_MEM "${JVM_OTHER_OPTS[@]}" cern.c2mon.daq.common.startup.DaqStartup  ${ADDITIONAL_PARAMS}
