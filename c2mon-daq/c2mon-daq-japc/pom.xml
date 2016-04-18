@@ -10,7 +10,7 @@
   <groupId>cern.c2mon.c2mon-daq</groupId>
   <artifactId>c2mon-daq-japc</artifactId>
   <name>c2mon-daq-japc</name>
-  <version>1.6.1-SNAPSHOT</version>
+  <version>1.7.0-SNAPSHOT</version>
 
   <packaging>jar</packaging>
   <description>C2MON data acquisition component for JAPC.</description>
@@ -100,5 +100,29 @@
   </dependencies>
 
   <developers />
+  
+  <build>
+    <plugins>
+      <!-- Generates general distribution tarball -->
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptors>
+            <descriptor>src/dist/assembly.xml</descriptor>
+          </descriptors>
+
+        </configuration>
+        <executions>
+          <execution>
+            <id>create-assembly-file</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
