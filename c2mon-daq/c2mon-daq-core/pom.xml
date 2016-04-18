@@ -9,7 +9,7 @@
 
   <groupId>cern.c2mon.c2mon-daq</groupId>
   <artifactId>c2mon-daq-core</artifactId>
-  <version>1.6.3-SNAPSHOT</version>
+  <version>1.7.0-SNAPSHOT</version>
   <name>c2mon-daq-core</name>
   <packaging>jar</packaging>
   <description>
@@ -62,12 +62,6 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
       <version>1.3.0.RELEASE</version>
-      <!--<exclusions>-->
-        <!--<exclusion>-->
-          <!--<groupId>org.slf4j</groupId>-->
-          <!--<artifactId>log4j-over-slf4j</artifactId>-->
-        <!--</exclusion>-->
-      <!--</exclusions>-->
     </dependency>
 
     <dependency>
