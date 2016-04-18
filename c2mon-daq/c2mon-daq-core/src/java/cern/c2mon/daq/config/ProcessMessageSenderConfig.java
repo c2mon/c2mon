@@ -26,6 +26,8 @@ import cern.c2mon.daq.common.messaging.impl.ProxyJmsSender;
 import cern.c2mon.daq.filter.FilterMessageSender;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.filter.impl.ActiveFilterSender;
+import cern.c2mon.daq.filter.impl.DummyFilterSender;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -114,7 +116,20 @@ public class ProcessMessageSenderConfig {
   }
 
   @Bean
-  public JmsLifecycle filterMessageSender() {
+  @Profile("single")
+  public JmsLifecycle singleFilterMessageSender() {
     return new ActiveFilterSender(configurationController, sourceUpdateJmsTemplate);
+  }
+  
+  @Bean
+  @Profile("double")
+  public JmsLifecycle doubleFilterMessageSender() {
+    return new ActiveFilterSender(configurationController, sourceUpdateJmsTemplate);
+  }
+  
+  @Bean
+  @Profile("test")
+  public JmsLifecycle testFilterMessageSender() {
+    return new DummyFilterSender();
   }
 }
