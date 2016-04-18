@@ -21,12 +21,12 @@
 function usage {
   echo "usage: $0 [-dft] [-c file] [-s file] process_name";
   echo
-  echo " The additional options are :                                                                "
-  echo "  -c filename    starts the DAQ using predefined conf. file,instead of asking the app.server "
-  echo "  -d             disables all dynamic time deadband filtering; static deadbands remain active"
-  echo "  -f             logs only on the console                                                    "
-  echo "  -s filename    saves received conf.xml in a file                                           "
-  echo "  -t             starts the DAQ in test mode. no JMS connections will be established         "
+  echo " The additional options are :                                                             "
+  echo "  -c filename    starts the DAQ with a local configuration file, instead of asking C2MON  "
+  echo "  -d             disables dynamic time deadband filtering; static deadbands remain active "
+  echo "  -f             logs only on the console                                                 "
+  echo "  -s filename    saves received conf.xml in a file                                        "
+  echo "  -t             starts the DAQ in test mode. No JMS connections will be established      "
 }
 
 # check if JAVA_HOME is set
