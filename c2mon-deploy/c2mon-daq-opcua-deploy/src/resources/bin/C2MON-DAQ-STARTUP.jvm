@@ -18,6 +18,10 @@
 
 # Start script for C2MON-DAQ-STARTUP.jvm
 
+function usage {
+  echo "usage: $0 [-dft] [-c file] [-s file] process_name";
+}
+
 # check if JAVA_HOME is set
 if [ -z $JAVA_HOME ]; then
    # try to find java if not
@@ -26,6 +30,7 @@ else
    export JAVA=$JAVA_HOME/bin/java
 fi
 
+# set DAQ home path
 if [ -z "$DAQ_HOME" ] ; then
  # get the current location 
  SCRIPT=`readlink -f $(which $0)`
@@ -36,16 +41,48 @@ fi
 CLASSPATH=`ls $DAQ_HOME/lib/*.jar | tr -s '\n' ':'`
 cd $DAQ_HOME
 
+
+# Default values
+LOGGING_CONFIG="-Dlogging.config=\"$DAQ_HOME/conf/logback.xml\" -Dlogging.path=\"$DAQ_HOME/log\"";
+ADDITIONAL_PROPERTIES="";
 JVM_MEM="-Xms256m -Xmx256m"
 JVM_OTHER_OPTS=()
 
-[[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
-[[ -z $ADDITIONAL_PARAMS ]] && ADDITIONAL_PARAMS=""
+#
+# Read extra options
+#
+while getopts c:dfs:t flag; do
+  case $flag in
+    c)
+      ADDITIONAL_PROPERTIES="$ADDITIONAL_PROPERTIES -Dc2mon.daq.config.local.file=\"$OPTARG\"";
+      ;;
+    d)
+      ADDITIONAL_PROPERTIES="$ADDITIONAL_PROPERTIES -Dc2mon.daq.deadband.dynamic.enabled=true";
+      ;;
+    f)
+      LOGGING_CONFIG="";
+      ;;
+    s)
+      ADDITIONAL_PROPERTIES="$ADDITIONAL_PROPERTIES -Dc2mon.daq.config.remote.file=\"$OPTARG\"";
+      ;;
+    t)
+      ADDITIONAL_PROPERTIES="$ADDITIONAL_PROPERTIES -Dc2mon.daq.jms.mode=test";
+      ;;
+    ?)
+      usage;
+      exit 1;
+      ;;
+  esac
+done
 
-LOGGING_CONFIG="-Dlogging.config=$DAQ_HOME/conf/logback.xml -Dlogging.path=$DAQ_HOME/log"
-# if $RUN_FOREGROUND is set, we disable logging to a file
-if [ -n "${RUN_FOREGROUND+set}" ] ; then
-  LOGGING_CONFIG="";
-fi
+shift $(( OPTIND - 1 ));
 
-exec -a `basename $0` $JAVA -cp "$CLASSPATH" -Dc2mon.daq.name="${PROCESS_NAME}" -DJINTEGRA_LOG_LEVEL="1" -DJINTEGRA_LOG_ROLLOVER_LINECOUNT="100000" -DJINTEGRA_LOG_FILE="$DAQ_HOME/log/${PROCESS_NAME}.jintegra.log" $LOGGING_CONFIG $JVM_MEM "${JVM_OTHER_OPTS[@]}" cern.c2mon.daq.DaqStartup  ${ADDITIONAL_PARAMS}
+
+# Process name must be given on the first argument
+[[ -z $1 ]] && usage && exit 1
+PROCESS_NAME=$1
+
+
+JINTEGRA_ARGS="-DJINTEGRA_LOG_LEVEL=1 -DJINTEGRA_LOG_ROLLOVER_LINECOUNT=100000 -DJINTEGRA_LOG_FILE=\"$DAQ_HOME/log/${PROCESS_NAME}.jintegra.log\""
+
+exec -a `basename $0` $JAVA -cp ${CLASSPATH} -Dc2mon.daq.name=${PROCESS_NAME} ${ADDITIONAL_PROPERTIES} ${JINTEGRA_ARGS} ${LOGGING_CONFIG} ${JVM_MEM} "${JVM_OTHER_OPTS[@]}" cern.c2mon.daq.DaqStartup
