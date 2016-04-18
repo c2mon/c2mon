@@ -115,5 +115,28 @@
     </dependency>
   </dependencies>
   <developers />
+  
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptors>
+            <descriptor>src/dist/assembly.xml</descriptor>
+          </descriptors>
+
+        </configuration>
+        <executions>
+          <execution>
+            <id>create-assembly-file</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
 

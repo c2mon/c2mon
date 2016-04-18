@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+
+  <id>dist</id>
+
+  <formats>
+    <format>tar.gz</format>
+  </formats>
+
+  <baseDirectory>c2mon-daq-opcua</baseDirectory>
+
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/lib</outputDirectory>
+      <fileMode>0644</fileMode>
+      <useProjectArtifact>false</useProjectArtifact>
+    </dependencySet>
+  </dependencySets>
+
+  <fileSets>
+
+    <!-- create default bin and tmp folders in the assembly -->
+
+    <fileSet>
+      <directory>./</directory>
+      <outputDirectory>/tmp</outputDirectory>
+      <excludes>
+        <exclude>*/**</exclude>
+      </excludes>
+    </fileSet>
+
+    <fileSet>
+      <directory>./</directory>
+      <outputDirectory>/log</outputDirectory>
+      <excludes>
+        <exclude>*/**</exclude>
+      </excludes>
+    </fileSet>
+
+    <fileSet>
+      <directory>./</directory>
+      <outputDirectory>/conf/local</outputDirectory>
+      <excludes>
+        <exclude>*/**</exclude>
+      </excludes>
+    </fileSet>
+
+    <fileSet>
+      <outputDirectory>/bin</outputDirectory>
+      <includes>
+        <include>*</include>
+      </includes>
+      <directory>src/dist/bin/</directory>
+      <fileMode>0755</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+
+    <!-- Copies all configuration files -->
+    <fileSet>
+      <outputDirectory>/conf</outputDirectory>
+      <includes>
+        <include>*</include>
+      </includes>
+      <directory>src/dist/conf/</directory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+  </fileSets>
+
+  <files>
+    <!-- copy the version file -->
+    <file>
+      <source>${project.build.outputDirectory}/version.txt</source>
+      <outputDirectory>/</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
+  </files>
+
+</assembly>
