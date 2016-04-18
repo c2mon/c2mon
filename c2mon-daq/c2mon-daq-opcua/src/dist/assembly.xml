@@ -14,7 +14,7 @@
     <dependencySet>
       <outputDirectory>/lib</outputDirectory>
       <fileMode>0644</fileMode>
-      <useProjectArtifact>false</useProjectArtifact>
+      <useProjectArtifact>true</useProjectArtifact>
     </dependencySet>
   </dependencySets>
 
