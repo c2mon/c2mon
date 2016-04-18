@@ -1,66 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>cern.c2mon.c2mon-daq</groupId>
-		<artifactId>c2mon-daq-pom</artifactId>
-		<version>RELEASE</version>
-	</parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.c2mon.c2mon-daq</groupId>
+    <artifactId>c2mon-daq-pom</artifactId>
+    <version>RELEASE</version>
+  </parent>
 
   <groupId>cern.c2mon.c2mon-daq</groupId>
-	<artifactId>c2mon-daq-testhandler</artifactId>
-	<version>1.5.5-SNAPSHOT</version>
-	<name>c2mon-daq-testhandler</name>
-	<packaging>jar</packaging>
-	<description>This is a C2MON Testing DAQ.  This DAQ simulates the behavior of a DAQ connected to some equipment. It reads a DAQ configuration XML file to determine the tags that the equipment should produce, and sends simulated values of these to the C2MON server.
+  <artifactId>c2mon-daq-testhandler</artifactId>
+  <version>1.7.0-SNAPSHOT</version>
+  <name>c2mon-daq-testhandler</name>
+  <packaging>jar</packaging>
+  <description>This is a C2MON Testing DAQ.  This DAQ simulates the behavior of a DAQ connected to some equipment. It reads a DAQ configuration XML file to determine the tags that the equipment should produce, and sends simulated values of these to the C2MON server.
 
     </description>
-	<url />
+  <url />
 
-	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-daq-testhandler</developerConnection>
-	</scm>
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-daq-testhandler</developerConnection>
+  </scm>
 
-	<dependencies>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-daq</groupId>
-			<artifactId>c2mon-daq-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-shared</groupId>
-			<artifactId>c2mon-shared-common</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-shared</groupId>
-			<artifactId>c2mon-shared-daq</artifactId>
-		</dependency>
+  <dependencies>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-daq</groupId>
+      <artifactId>c2mon-daq-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <artifactId>c2mon-shared-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <artifactId>c2mon-shared-daq</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>cern.c2mon.c2mon-daq</groupId>
-			<artifactId>c2mon-daq-test</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymock</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymockclassextension</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-daq</groupId>
+      <artifactId>c2mon-daq-test</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymockclassextension</artifactId>
+    </dependency>
 
-	</dependencies>
+  </dependencies>
 
-	<build>
+  <build>
+    <plugins>
+      <!-- Generates general distribution tarball -->
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptors>
+            <descriptor>src/dist/assembly.xml</descriptor>
+          </descriptors>
 
-		<plugins />
+        </configuration>
+        <executions>
+          <execution>
+            <id>create-assembly-file</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
-	</build>
-
-	<developers />
+  <developers />
 </project>
