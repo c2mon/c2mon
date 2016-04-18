@@ -43,7 +43,7 @@ cd $DAQ_HOME
 
 
 # Default values
-LOGGING_CONFIG="-Dlogging.config=\"$DAQ_HOME/conf/logback.xml\" -Dlogging.path=\"$DAQ_HOME/log\"";
+LOGGING_CONFIG="-Dlogging.config=$DAQ_HOME/conf/logback.xml -Dlogging.path=$DAQ_HOME/log";
 ADDITIONAL_PROPERTIES="";
 JVM_MEM="-Xms256m -Xmx256m"
 JVM_OTHER_OPTS=()
@@ -85,4 +85,4 @@ PROCESS_NAME=$1
 
 JINTEGRA_ARGS="-DJINTEGRA_LOG_LEVEL=1 -DJINTEGRA_LOG_ROLLOVER_LINECOUNT=100000 -DJINTEGRA_LOG_FILE=\"$DAQ_HOME/log/${PROCESS_NAME}.jintegra.log\""
 
-exec -a `basename $0` $JAVA -cp ${CLASSPATH} -Dc2mon.daq.name=${PROCESS_NAME} ${ADDITIONAL_PROPERTIES} ${JINTEGRA_ARGS} ${LOGGING_CONFIG} ${JVM_MEM} "${JVM_OTHER_OPTS[@]}" cern.c2mon.daq.DaqStartup
+exec -a `basename $0` $JAVA -cp "$CLASSPATH" -Dc2mon.daq.name="${PROCESS_NAME}" $ADDITIONAL_PROPERTIES $JINTEGRA_ARGS $LOGGING_CONFIG $JVM_MEM "${JVM_OTHER_OPTS[@]}" cern.c2mon.daq.DaqStartup
