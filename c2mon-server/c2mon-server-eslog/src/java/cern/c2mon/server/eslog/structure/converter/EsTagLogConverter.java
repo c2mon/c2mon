@@ -20,12 +20,10 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
-import cern.c2mon.server.eslog.structure.types.*;
-import cern.c2mon.shared.common.metadata.Metadata;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.google.gson.Gson;
 
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
@@ -37,12 +35,16 @@ import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.eslog.structure.mappings.EsMapping.ValueType;
+import cern.c2mon.server.eslog.structure.types.EsTagBoolean;
 import cern.c2mon.server.eslog.structure.types.EsTagImpl;
+import cern.c2mon.server.eslog.structure.types.EsTagNumeric;
 import cern.c2mon.server.eslog.structure.types.EsTagString;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.metadata.Metadata;
 import cern.c2mon.shared.util.json.GsonFactory;
-import lombok.extern.slf4j.Slf4j;
+
+import com.google.gson.Gson;
 
 /**
  * Converts the dataTags from the server to the ElasticSearch format {@link EsTagImpl}.

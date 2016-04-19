@@ -16,13 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.mappings;
 
-import cern.c2mon.server.eslog.structure.mappings.EsMapping.ValueType;
+import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertTrue;
+import cern.c2mon.server.eslog.structure.mappings.EsMapping.ValueType;
 
 /**
  * Test the good behaviour of the EsNumericTagMapping class.

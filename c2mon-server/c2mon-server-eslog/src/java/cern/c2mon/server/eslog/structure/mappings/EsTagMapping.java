@@ -16,9 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.mappings;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Allows to create dynamic mappings for the different types that exist in ElasticSearch.

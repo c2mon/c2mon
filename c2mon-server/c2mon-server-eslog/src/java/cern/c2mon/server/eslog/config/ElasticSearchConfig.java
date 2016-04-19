@@ -16,7 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.config;
 
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
 
 /**
  * This class is responsible for configuring the Spring context for the eslog

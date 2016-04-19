@@ -16,10 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.mappings;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * EsMapping for {@link cern.c2mon.server.eslog.structure.types.EsSupervisionEvent} in ElasticSearch.

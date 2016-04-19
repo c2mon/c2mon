@@ -16,11 +16,12 @@ package cern.c2mon.server.eslog.alarm;
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-import cern.c2mon.pmanager.IAlarmListener;
+import java.io.File;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import cern.c2mon.pmanager.IAlarmListener;
 
 /**
  * Fallback alarm listener that send emails/SMS Slf4j.

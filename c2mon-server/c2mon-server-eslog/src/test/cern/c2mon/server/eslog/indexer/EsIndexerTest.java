@@ -16,6 +16,39 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.indexer;
 
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.eslog.connector.TransportConnector;
 import cern.c2mon.server.eslog.structure.mappings.EsMapping;
@@ -23,28 +56,6 @@ import cern.c2mon.server.eslog.structure.mappings.EsStringTagMapping;
 import cern.c2mon.server.eslog.structure.types.EsTagBoolean;
 import cern.c2mon.server.eslog.structure.types.EsTagImpl;
 import cern.c2mon.server.eslog.structure.types.EsTagString;
-import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
-import org.elasticsearch.action.admin.indices.exists.types.TypesExistsRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.junit.*;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
-import static junit.framework.TestCase.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Test the EsIndexer methods for sending the right data to the Connector.
@@ -113,7 +124,6 @@ public class EsIndexerTest {
     connector.getClient().admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
     connector.getClient().admin().indices().prepareRefresh().execute().actionGet();
     indexer.getCacheIndicesTypes().clear();
-    indexer.getCacheIndicesAliases().clear();
 //    connector.closeBulk();
   }
 
@@ -121,7 +131,6 @@ public class EsIndexerTest {
   public void testInit() {
     assertTrue(indexer.isAvailable());
     assertNotNull(indexer.getCacheIndicesTypes());
-    assertNotNull(indexer.getCacheIndicesAliases());
   }
 
   @Test
@@ -210,9 +219,6 @@ public class EsIndexerTest {
     Set<String> expected = new HashSet<>();
     expected.add(alias);
     indexer.addIndex(index);
-    indexer.addAlias(index, alias);
-    assertEquals(expected, indexer.getCacheIndicesAliases().get(index));
-    indexer.getCacheIndicesAliases().clear();
   }
 
   @Test
@@ -282,16 +288,9 @@ public class EsIndexerTest {
 
     Set<String> resultIndices = indexer.getCacheIndicesTypes().keySet();
     Set<String> resultTypes = indexer.getCacheIndicesTypes().get(indexName);
-    Set<String> resultAliases = indexer.getCacheIndicesAliases().get(indexName);
 
     List<String> liveIndices = connector.getListOfIndicesFromES();
     List<String> liveTypes = connector.getListOfTypesFromES(indexName);
-    List<String> liveAliases = connector.getListOfAliasesFromES(indexName);
-
-    for (String a : connector.getListOfAliasesFromES(indexName)) {
-      log.debug(a);
-    }
-
 
     SearchResponse response = getResponse(connector.getClient(), new String[]{indexName});
 
@@ -301,15 +300,12 @@ public class EsIndexerTest {
 
     assertEquals(size, response.getHits().getTotalHits());
     assertTrue(resultIndices.size() == liveIndices.size());
-    assertTrue(resultAliases.size() == size && liveAliases.size() == size);
 
     assertTrue(resultTypes.contains("tag_string") && resultTypes.size() == 1);
     assertTrue(resultIndices.containsAll(listIndices) && resultIndices.size() == listIndices.size());
-    assertTrue(resultAliases.containsAll(listAliases) && resultAliases.size() == listAliases.size()) ;
 
     assertTrue(liveIndices.containsAll(resultIndices));
     assertTrue(liveTypes.containsAll(resultTypes));
-    assertTrue(liveAliases.containsAll(resultAliases));
   }
 
   @Test

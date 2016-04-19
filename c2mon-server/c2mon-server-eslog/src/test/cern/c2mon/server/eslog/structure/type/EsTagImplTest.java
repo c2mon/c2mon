@@ -16,19 +16,21 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.type;
 
-import cern.c2mon.server.eslog.structure.types.EsTagImpl;
-import cern.c2mon.server.eslog.structure.types.EsTagString;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import org.junit.Before;
-import org.junit.Test;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.fail;
+import org.junit.Before;
+import org.junit.Test;
+
+import cern.c2mon.server.eslog.structure.types.EsTagImpl;
+import cern.c2mon.server.eslog.structure.types.EsTagString;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 /**
  * @author Alban Marguet

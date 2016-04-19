@@ -16,25 +16,34 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.indexer;
 
-import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.eslog.connector.Connector;
-import cern.c2mon.server.eslog.structure.mappings.*;
-import cern.c2mon.server.eslog.structure.mappings.EsBooleanTagMapping;
-import cern.c2mon.server.eslog.structure.mappings.EsStringTagMapping;
-import cern.c2mon.server.eslog.structure.types.EsTagImpl;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.PostConstruct;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
+
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.index.IndexRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.eslog.connector.Connector;
+import cern.c2mon.server.eslog.structure.mappings.EsBooleanTagMapping;
+import cern.c2mon.server.eslog.structure.mappings.EsMapping;
+import cern.c2mon.server.eslog.structure.mappings.EsNumericTagMapping;
+import cern.c2mon.server.eslog.structure.mappings.EsStringTagMapping;
+import cern.c2mon.server.eslog.structure.types.EsTagImpl;
 
 /**
  * Used to write (a.k.a. index) the data to elasticSearch.
@@ -48,12 +57,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class EsTagIndexer extends EsIndexer {
-  /** Contains in-memory the content of the Indices, types and aliases present in the cluster. */
+  /** Contains in-memory the content of the Indices and types present in the cluster. */
   private final Map<String, Set<String>> cacheIndicesTypes = new ConcurrentHashMap<>();
-  private final Map<String, Set<String>> cacheIndicesAliases = new ConcurrentHashMap<>();
 
   /**
-   * Autowired constructor.
    * @param connector handling the connection to ElasticSearch.
    */
   @Autowired
@@ -68,10 +75,10 @@ public class EsTagIndexer extends EsIndexer {
   }
 
   @Override
-  public void storeData(IFallback object) throws IDBPersistenceException {
+  public void storeData(IFallback fallbackObject) throws IDBPersistenceException {
     try {
-      if (object != null && object instanceof EsTagImpl) {
-        sendTagToBatch((EsTagImpl) object);
+      if (fallbackObject != null && fallbackObject instanceof EsTagImpl) {
+        sendTagToBatch((EsTagImpl) fallbackObject);
       }
     }
     catch (ElasticsearchException e) {
@@ -106,7 +113,6 @@ public class EsTagIndexer extends EsIndexer {
    */
   public synchronized void indexTags(Collection<EsTagImpl> tags) {
     log.debug("indexTags() - Received a collection of " + tags.size() +  " tags to send by batch.");
-    Map<String, EsTagImpl> aliases = new HashMap<>();
 
     if (tags.size() == 0) {
       log.debug("indexTags() - Received a null List of tags to log to ElasticSearch.");
@@ -117,8 +123,6 @@ public class EsTagIndexer extends EsIndexer {
       for (EsTagImpl tag : tags) {
         if (sendTagToBatch(tag)) {
           counter++;
-          // 1 by 1 = long running
-          aliases.put(generateAliasName(tag.getIdAsLong()), tag);
         }
       }
 
@@ -127,13 +131,9 @@ public class EsTagIndexer extends EsIndexer {
       log.debug("indexTags() - closing bulk.");
       connector.getBulkProcessor().flush();
       connector.refreshClusterStats();
-//      connector.closeBulk();
-
-      for (String alias : aliases.keySet()) {
-        addAliasFromBatch(generateTagIndex(aliases.get(alias).getServerTimestamp()), aliases.get(alias));
-      }
-
+      
       updateCache();
+      
     }
   }
 
@@ -286,32 +286,6 @@ public class EsTagIndexer extends EsIndexer {
     }
   }
 
-  /** Requires to be called by indexTags() since we need the index to be existing in the cluster to add the new alias. */
-  private boolean addAliasFromBatch(String indexMonth, EsTagImpl tag) {
-    if (tag == null || !checkIndex(indexMonth)) {
-      throw new IllegalArgumentException("addAliasFromBatch() - IllegalArgument (tag = " + tag + ", index = " + indexMonth + ").");
-    }
-
-    long id = tag.getIdAsLong();
-    String aliasName = generateAliasName(id);
-
-    boolean canBeAdded = cacheIndicesAliases.keySet().contains(indexMonth) && !cacheIndicesAliases.get(indexMonth).contains(aliasName) && checkIndex(indexMonth) && checkAlias(aliasName);
-    return canBeAdded && connector.handleAliasQuery(indexMonth, aliasName);
-  }
-
-  /**
-   * Utility method. Aliases have the following format: "tag_tagId".
-   * @param id tag of the EsTagImpl for which to create Alias.
-   * @return name of the alias for a given id.
-   */
-  private String generateAliasName(long id) {
-    return typePrefix + id;
-  }
-
-  /** Check if an alias has the right format: tag_tagId. */
-  private boolean checkAlias(String alias) {
-    return alias.matches("^" + typePrefix + "\\d+$");
-  }
 
   /**
    * Add an index in-memory cache after it has been created in ElasticSearch. Called by the writing of a new Index if it was successful.
@@ -320,7 +294,6 @@ public class EsTagIndexer extends EsIndexer {
   public synchronized void addIndex(String indexName) {
     if (checkIndex(indexName)) {
       cacheIndicesTypes.put(indexName, new HashSet<String>());
-      cacheIndicesAliases.put(indexName, new HashSet<String>());
       log.debug("addIndex() - Added index " + indexName + " in memory list.");
     }
     else {
@@ -343,34 +316,18 @@ public class EsTagIndexer extends EsIndexer {
   }
 
   /**
-   * Add an alias in-memory cache. Called by the writing of a new alias if it was successful.
-   * @param aliasName name of the alias to give.
-   */
-  public synchronized void addAlias(String index, String aliasName) {
-    if (checkAlias(aliasName) && cacheIndicesAliases.containsKey(index)) {
-      cacheIndicesAliases.get(index).add(aliasName);
-      log.debug("addAlias() - Added alias " + aliasName + " in memory list.");
-    }
-    else {
-      throw new IllegalArgumentException("Aliases must follow the format \"tag_tagId\".");
-    }
-  }
-
-  /**
-   * Query the ElasticSearch cluster to retrieve all the indices, types
-   * and aliases present already at startup. Store them in-memory caches.
+   * Query the ElasticSearch cluster to retrieve all the indices and types,
+   * that are present already at startup. Store them in-memory caches.
    */
   public void updateCache() {
     clearCache();
     updateCacheIndices();
     updateCacheTypes();
-    updateCacheAliases();
   }
 
   private synchronized void updateCacheIndices() {
     for (String index : connector.retrieveIndicesFromES()) {
       cacheIndicesTypes.put(index, new HashSet<String>());
-      cacheIndicesAliases.put(index, new HashSet<String>());
     }
   }
 
@@ -380,15 +337,9 @@ public class EsTagIndexer extends EsIndexer {
     }
   }
 
-  private synchronized void updateCacheAliases() {
-    for (String index : cacheIndicesAliases.keySet()) {
-      cacheIndicesAliases.get(index).addAll(connector.retrieveAliasesFromES(index));
-    }
-  }
 
   private synchronized void clearCache() {
     cacheIndicesTypes.clear();
-    cacheIndicesAliases.clear();
   }
 
   private void displayCache() {
@@ -404,11 +355,6 @@ public class EsTagIndexer extends EsIndexer {
         for (String type : types) {
           log.trace(type);
         }
-
-//      log.trace("and aliases:");
-//      for (String alias : cacheIndicesAliases) {
-//        log.trace(alias);
-//      }
       }
     }
   }

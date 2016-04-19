@@ -16,9 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.converter;
 
+import org.springframework.stereotype.Component;
+
 import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import org.springframework.stereotype.Component;
 
 /**
  * Converts a SupervisionEvent to a {@link EsSupervisionEvent} used in ElasticSearch.

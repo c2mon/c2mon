@@ -16,16 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.types;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Represents an Alarm Event for ElasticSearch.

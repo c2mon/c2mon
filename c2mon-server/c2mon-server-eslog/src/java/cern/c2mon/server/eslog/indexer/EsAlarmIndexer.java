@@ -16,25 +16,28 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.indexer;
 
-import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.eslog.connector.Connector;
-import cern.c2mon.server.eslog.structure.mappings.EsAlarmMapping;
-import cern.c2mon.server.eslog.structure.types.EsAlarm;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.PostConstruct;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
+
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.eslog.connector.Connector;
+import cern.c2mon.server.eslog.structure.mappings.EsAlarmMapping;
+import cern.c2mon.server.eslog.structure.types.EsAlarm;
 
 /**
  * Allows to send the data to ElasticSearch through {@link Connector}.

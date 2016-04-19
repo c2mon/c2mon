@@ -22,13 +22,15 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
-import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.server.eslog.structure.types.EsTagString;
 import lombok.extern.slf4j.Slf4j;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.server.eslog.structure.types.EsTagString;
 
 /**
  * Tests the good behaviour of the EsTagString class.

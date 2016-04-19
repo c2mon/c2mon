@@ -16,19 +16,21 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.type;
 
-import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertTrue;
 import lombok.extern.slf4j.Slf4j;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.fail;
-import static org.junit.Assert.assertTrue;
+import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 /**
  * @author Alban Marguet

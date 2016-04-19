@@ -16,7 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.converter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -25,13 +29,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import cern.c2mon.server.eslog.structure.types.EsTagImpl;
-import cern.c2mon.server.eslog.structure.types.EsTagBoolean;
-import cern.c2mon.server.eslog.structure.types.EsTagNumeric;
-import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
-import cern.c2mon.shared.common.metadata.Metadata;
 import lombok.extern.slf4j.Slf4j;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -47,8 +46,14 @@ import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.eslog.structure.mappings.EsMapping.ValueType;
+import cern.c2mon.server.eslog.structure.types.EsTagBoolean;
+import cern.c2mon.server.eslog.structure.types.EsTagImpl;
+import cern.c2mon.server.eslog.structure.types.EsTagNumeric;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.metadata.Metadata;
 
 /**
  * Checks on the fields of data appened/set to EsTagImpl.

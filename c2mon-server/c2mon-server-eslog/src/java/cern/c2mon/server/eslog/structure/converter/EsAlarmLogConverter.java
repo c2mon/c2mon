@@ -16,14 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.converter;
 
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.eslog.structure.types.EsAlarm;
-import cern.c2mon.shared.common.metadata.Metadata;
-import org.springframework.stereotype.Component;
-
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.stereotype.Component;
+
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.eslog.structure.types.EsAlarm;
+import cern.c2mon.shared.common.metadata.Metadata;
 
 /**
  * Convert an Alarm to an {@link EsAlarm} for ElasticSearch writing.

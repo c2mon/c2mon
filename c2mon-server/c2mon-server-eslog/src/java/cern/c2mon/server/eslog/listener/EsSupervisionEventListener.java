@@ -16,15 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.listener;
 
-import cern.c2mon.pmanager.persistence.IPersistenceManager;
-import cern.c2mon.server.common.component.Lifecycle;
-import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.eslog.structure.converter.EsSupervisionEventConverter;
-import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
-import cern.c2mon.server.supervision.SupervisionListener;
-import cern.c2mon.server.supervision.SupervisionNotifier;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import javax.annotation.PostConstruct;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
@@ -33,7 +28,14 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
+import cern.c2mon.pmanager.persistence.IPersistenceManager;
+import cern.c2mon.server.common.component.Lifecycle;
+import cern.c2mon.server.common.config.ServerConstants;
+import cern.c2mon.server.eslog.structure.converter.EsSupervisionEventConverter;
+import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
+import cern.c2mon.server.supervision.SupervisionListener;
+import cern.c2mon.server.supervision.SupervisionNotifier;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
 /**
  * Listens for Supervision notifications and send the corresponding {@link EsSupervisionEvent} to ElasticSearch.
  * @author Alban Marguet

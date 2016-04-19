@@ -16,27 +16,31 @@ package cern.c2mon.server.eslog.listener;
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.SmartLifecycle;
+import org.springframework.stereotype.Service;
+
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.server.cache.BufferedTimCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.eslog.structure.converter.EsTagLogConverter;
-import cern.c2mon.server.eslog.structure.types.*;
-import cern.c2mon.server.eslog.structure.types.EsTagImpl;
-import cern.c2mon.server.eslog.structure.types.EsTagString;
 import cern.c2mon.server.eslog.indexer.EsTagIndexer;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.SmartLifecycle;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import cern.c2mon.server.eslog.structure.converter.EsTagLogConverter;
+import cern.c2mon.server.eslog.structure.types.EsTagBoolean;
+import cern.c2mon.server.eslog.structure.types.EsTagImpl;
+import cern.c2mon.server.eslog.structure.types.EsTagNumeric;
+import cern.c2mon.server.eslog.structure.types.EsTagString;
 
 /**
  * Listens to updates in the Rule and DataTag caches and calls the {@link EsTagIndexer} for logging these to ElasticSearch.

@@ -16,15 +16,16 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.indexer;
 
-import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.eslog.connector.TransportConnector;
-import cern.c2mon.server.eslog.structure.converter.EsAlarmLogConverter;
-import cern.c2mon.server.eslog.structure.mappings.EsAlarmMapping;
-import cern.c2mon.server.eslog.structure.mappings.EsMapping;
-import cern.c2mon.server.eslog.structure.types.EsAlarm;
-import cern.c2mon.server.test.CacheObjectCreation;
+import static junit.framework.TestCase.assertTrue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.sql.Timestamp;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,14 +34,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.sql.Timestamp;
-
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.eslog.connector.TransportConnector;
+import cern.c2mon.server.eslog.structure.converter.EsAlarmLogConverter;
+import cern.c2mon.server.eslog.structure.mappings.EsAlarmMapping;
+import cern.c2mon.server.eslog.structure.mappings.EsMapping;
+import cern.c2mon.server.eslog.structure.types.EsAlarm;
+import cern.c2mon.server.test.CacheObjectCreation;
 
 /**
  * Test the EsAlarmIndexer methods.
