@@ -93,9 +93,8 @@ DAQ_SCRIPT=${DAQ_HOME}/bin/C2MON-DAQ-STARTUP.jvm
 
 # Variables declared as global variales (export) are also
 # required by the C2MON-DAQ-STARTUP.jvm script
-export DAQ_LOG_HOME=${DAQ_HOME}/log
-export DAQ_CONF_HOME=$DAQ_HOME/conf
-export C2MON_PROPERTIES_FILE=$DAQ_CONF_HOME/c2mon.properties
+DAQ_LOG_HOME=${DAQ_HOME}/log
+DAQ_CONF_HOME=$DAQ_HOME/conf
 DAQ_LOG_FILE=${DAQ_LOG_HOME}/daqprocess.log
 
 # the name of the parameter determining that the DAQ start-up script
@@ -116,12 +115,9 @@ fi
 # Setting PID file name
 PID_FILE="${DAQ_HOME}/tmp/${PROCESS_NAME}.pid"
 
-# Check which log4j configuration script should be used
-if [ -f ${DAQ_CONF_HOME}/${PROCESS_NAME}_log4j.xml ] ; then
-  export  LOG4J_CONF_FILE=${DAQ_CONF_HOME}/${PROCESS_NAME}_log4j.xml
-else
-  # set the default one
-  export LOG4J_CONF_FILE=${DAQ_CONF_HOME}/log4j.xml
+# Check which logback configuration script should be used
+if [ -f ${DAQ_CONF_HOME}/${PROCESS_NAME}_logback.xml ] ; then
+  ADDITIONAL_PARAMS="$ADDITIONAL_PARAMS -l ${DAQ_CONF_HOME}/${PROCESS_NAME}_logback.xml"
 fi
 
 RETVAL=0
@@ -424,23 +420,23 @@ DAQ_restart() {
 # In particular it explains the supported arguments/options and how to use them.
 DAQ_printBasicUsageInfo() {
   if [ $USE_XML_PROTOCOL -eq 0 ] ; then
-    echo "*****************************************************************************"
-    echo " usage:                                                                      "
-    echo " $0 [-xml] start|stop|restart|status process_name [additional options]       "
     echo
-    echo " if -xml parameter is specified, only the XML output will be served          "
+    echo " usage:                                                                               "
+    echo " $0 [-xml] start|stop|restart|status process_name [additional options]                "
     echo
-    echo " The additional options are :                                                "
-    echo "  -s filename       {saves received conf.xml in a file}                      "
-    echo "  -c filename       {starts the DAQ using predefined conf. file,instead of   "
-    echo "                     asking the app.server}                                  "
-    echo "  -t                {starts the DAQ in test mode. no JMS connections will be "
-    echo "                     established}                                            "
-    echo "  -d                {disables all dynamic time deadband filtering; static    "
-    echo "                     deadbands remain active}                                "
-    echo "                                                                             "
-    echo " e.g: $0 start P_TEST01 -t -c /tmp/testconf.xml                       "
-    echo "*****************************************************************************"
+    echo " if -xml parameter is specified, only the XML output will be served                   "
+    echo
+    echo " The additional options are :                                                         "
+    echo " The additional options are :                                                         "
+    echo "  -c file    Starts the DAQ with a local configuration file, instead of asking C2MON. "
+    echo "  -d         Enables dynamic time deadband filtering for all DataTags                 "
+    echo "  -f         Logs only on the console. Cannot be mixed with -l option.                "
+    echo "  -p URI     Alternative URI of the C2MON properties file.                            "
+    echo "  -s file    Saves received conf.xml in a file.                                       "
+    echo "  -t         Starts the DAQ in test mode. No JMS connections will be established.     "
+    echo "                                                                                      "
+    echo " e.g: $0 start P_TEST01 -t -c /tmp/testconf.xml                                       "
+    echo
   else
     DAQ_EchoXMLFeedback -1 "Improper entry arguments for the C2MON DAQ start-up script detected. Check the configuration, please"
   fi

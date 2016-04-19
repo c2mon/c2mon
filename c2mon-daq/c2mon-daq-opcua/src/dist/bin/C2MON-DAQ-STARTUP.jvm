@@ -19,14 +19,16 @@
 # Start script for C2MON-DAQ-STARTUP.jvm
 
 function usage {
-  echo "usage: $0 [-dft] [-c file] [-s file] process_name";
+  echo "usage: $0 [-dft] [-c file] [-l file] [-p URI] [-s file] process_name";
   echo
-  echo " The additional options are :                                                             "
-  echo "  -c filename    starts the DAQ with a local configuration file, instead of asking C2MON  "
-  echo "  -d             disables dynamic time deadband filtering; static deadbands remain active "
-  echo "  -f             logs only on the console                                                 "
-  echo "  -s filename    saves received conf.xml in a file                                        "
-  echo "  -t             starts the DAQ in test mode. No JMS connections will be established      "
+  echo " The additional options are :                                                         "
+  echo "  -c file    Starts the DAQ with a local configuration file, instead of asking C2MON. "
+  echo "  -d         Enables dynamic time deadband filtering for all DataTags                 "
+  echo "  -f         Logs only on the console. Cannot be mixed with -l option.                "
+  echo "  -l file    Allows to specify and alternative log configuration file.                "
+  echo "  -p URI     Altenative URI of the C2MON properties file.                             "
+  echo "  -s file    Saves received conf.xml in a file.                                       "
+  echo "  -t         Starts the DAQ in test mode. No JMS connections will be established.     "
 }
 
 # check if JAVA_HOME is set
@@ -51,6 +53,7 @@ cd $DAQ_HOME
 
 # Default values
 LOGGING_CONFIG="-Dlogging.config=$DAQ_HOME/conf/logback.xml -Dlogging.path=$DAQ_HOME/log";
+DAQ_PROPERTIES_FILE="-Dc2mon.daq.properties.location=\"file://$DAQ_HOME/conf/c2mon.properties\""
 ADDITIONAL_PROPERTIES="";
 JVM_MEM="-Xms256m -Xmx256m"
 JVM_OTHER_OPTS=()
@@ -58,7 +61,7 @@ JVM_OTHER_OPTS=()
 #
 # Read extra options
 #
-while getopts c:dfs:t flag; do
+while getopts c:dfl:p:s:t flag; do
   case $flag in
     c)
       ADDITIONAL_PROPERTIES="$ADDITIONAL_PROPERTIES -Dc2mon.daq.config.local.file=\"$OPTARG\"";
@@ -68,6 +71,12 @@ while getopts c:dfs:t flag; do
       ;;
     f)
       LOGGING_CONFIG="";
+      ;;
+    l)
+      LOGGING_CONFIG="-Dlogging.config=$OPTARG -Dlogging.path=$DAQ_HOME/log";
+      ;;
+    p)
+      DAQ_PROPERTIES_FILE="-Dc2mon.daq.properties.location=\"$OPTARG\"";
       ;;
     s)
       ADDITIONAL_PROPERTIES="$ADDITIONAL_PROPERTIES -Dc2mon.daq.config.remote.file=\"$OPTARG\"";
@@ -92,4 +101,4 @@ PROCESS_NAME=$1
 
 JINTEGRA_ARGS="-DJINTEGRA_LOG_LEVEL=1 -DJINTEGRA_LOG_ROLLOVER_LINECOUNT=100000 -DJINTEGRA_LOG_FILE=\"$DAQ_HOME/log/${PROCESS_NAME}.jintegra.log\""
 
-exec -a `basename $0` $JAVA -cp "$CLASSPATH" -Dc2mon.daq.name="${PROCESS_NAME}" $ADDITIONAL_PROPERTIES $JINTEGRA_ARGS $LOGGING_CONFIG $JVM_MEM "${JVM_OTHER_OPTS[@]}" cern.c2mon.daq.DaqStartup
+exec -a `basename $0` $JAVA -cp "$CLASSPATH" -Dc2mon.daq.name="${PROCESS_NAME}" $DAQ_PROPERTIES_FILE $ADDITIONAL_PROPERTIES $JINTEGRA_ARGS $LOGGING_CONFIG $JVM_MEM "${JVM_OTHER_OPTS[@]}" cern.c2mon.daq.DaqStartup
