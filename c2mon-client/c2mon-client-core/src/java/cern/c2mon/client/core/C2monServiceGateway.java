@@ -100,6 +100,8 @@ public class C2monServiceGateway {
    */
   @Deprecated
   public static C2monCommandManager getCommandManager() {
+    startC2monClientSynchronous();
+    
     return commandManager;
   }
 
@@ -108,6 +110,8 @@ public class C2monServiceGateway {
    *         for executing commands
    */
   public static CommandService getCommandService() {
+    startC2monClientSynchronous();
+    
     return commandManager;
   }
 
@@ -118,6 +122,8 @@ public class C2monServiceGateway {
    */
   @Deprecated
   public static C2monTagManager getTagManager() {
+    startC2monClientSynchronous();
+    
     return tagManager;
   }
 
@@ -126,6 +132,8 @@ public class C2monServiceGateway {
    *         methods for alarm subscription and unsubscription.
    */
   public static AlarmService getAlarmService() {
+    startC2monClientSynchronous();
+    
     return alarmService;
   }
 
@@ -134,6 +142,8 @@ public class C2monServiceGateway {
    *         to retrieve the statistics report.
    */
   public static StatisticsService getStatisticsService() {
+    startC2monClientSynchronous();
+    
     return statisticsService;
   }
 
@@ -142,6 +152,8 @@ public class C2monServiceGateway {
    *         to manage the server configuration
    */
   public static ConfigurationService getConfigurationService() {
+    startC2monClientSynchronous();
+    
     return configurationService;
   }
 
@@ -151,6 +163,8 @@ public class C2monServiceGateway {
    *         methods for tag subscription and unsubscription.
    */
   public static TagService getTagService() {
+    startC2monClientSynchronous();
+    
     return tagService;
   }
 
@@ -160,6 +174,8 @@ public class C2monServiceGateway {
    */
   @Deprecated
   public static C2monSupervisionManager getSupervisionManager() {
+    startC2monClientSynchronous();
+    
     return supervisionManager;
   }
 
@@ -170,6 +186,8 @@ public class C2monServiceGateway {
    * @return Instance of the {@link SupervisionService}
    */
   public static SupervisionService getSupervisionService() {
+    startC2monClientSynchronous();
+    
     return supervisionManager;
   }
 
@@ -200,7 +218,7 @@ public class C2monServiceGateway {
       ((AnnotationConfigApplicationContext) context).registerShutdownHook();
     }
     else {
-      LOG.warn("startC2monClient() - C2MON client core already started.");
+      LOG.debug("startC2monClient() - C2MON client core already started.");
     }
   }
 
@@ -225,21 +243,23 @@ public class C2monServiceGateway {
    * @see #startC2monClient()
    */
   public static synchronized void startC2monClientSynchronous() throws RuntimeException {
-    startC2monClient();
-
-    LOG.info("Waiting for C2MON server connection (max " + MAX_INITIALIZATION_TIME / 1000  + " sec)...");
-
-    Long startTime = System.currentTimeMillis();
-    while (!supervisionManager.isServerConnectionWorking()) {
-      try { Thread.sleep(200); } catch (InterruptedException ie) { /* Do nothing */ }
-      if (System.currentTimeMillis() - startTime >= MAX_INITIALIZATION_TIME) {
-        throw new RuntimeException(
-            "Waited "
-            + MAX_INITIALIZATION_TIME / 1000
-            + " seconds and the connection to C2MON server could still not be established.");
+    if (context == null) {
+      startC2monClient();
+  
+      LOG.info("Waiting for C2MON server connection (max " + MAX_INITIALIZATION_TIME / 1000  + " sec)...");
+  
+      Long startTime = System.currentTimeMillis();
+      while (!supervisionManager.isServerConnectionWorking()) {
+        try { Thread.sleep(200); } catch (InterruptedException ie) { /* Do nothing */ }
+        if (System.currentTimeMillis() - startTime >= MAX_INITIALIZATION_TIME) {
+          throw new RuntimeException(
+              "Waited "
+              + MAX_INITIALIZATION_TIME / 1000
+              + " seconds and the connection to C2MON server could still not be established.");
+        }
       }
+      LOG.info("C2MON server connection established!");
     }
-    LOG.info("C2MON server connection established!");
   }
 
   /**
