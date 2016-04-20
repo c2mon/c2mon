@@ -427,10 +427,9 @@ DAQ_printBasicUsageInfo() {
     echo " if -xml parameter is specified, only the XML output will be served                   "
     echo
     echo " The additional options are :                                                         "
-    echo " The additional options are :                                                         "
     echo "  -c file    Starts the DAQ with a local configuration file, instead of asking C2MON. "
     echo "  -d         Enables dynamic time deadband filtering for all DataTags                 "
-    echo "  -f         Logs only on the console. Cannot be mixed with -l option.                "
+    echo "  -l file    Allows to specify and alternative log configuration file.                "
     echo "  -p URI     Alternative URI of the C2MON properties file.                            "
     echo "  -s file    Saves received conf.xml in a file.                                       "
     echo "  -t         Starts the DAQ in test mode. No JMS connections will be established.     "

@@ -26,7 +26,7 @@ function usage {
   echo "  -d         Enables dynamic time deadband filtering for all DataTags                 "
   echo "  -f         Logs only on the console. Cannot be mixed with -l option.                "
   echo "  -l file    Allows to specify and alternative log configuration file.                "
-  echo "  -p URI     Altenative URI of the C2MON properties file.                             "
+  echo "  -p URI     Alternative URI of the C2MON properties file.                            "
   echo "  -s file    Saves received conf.xml in a file.                                       "
   echo "  -t         Starts the DAQ in test mode. No JMS connections will be established.     "
 }
