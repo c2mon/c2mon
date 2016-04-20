@@ -11,7 +11,7 @@
 
   <groupId>cern.c2mon.c2mon-server.tim2</groupId>
   <artifactId>c2mon-server</artifactId>
-  <version>1.7.3</version>
+  <version>1.7.3-SNAPSHOT</version>
   <name>c2mon-server-tim2</name>
 
   <description>C2MON server assembling all required modules and configuration files for TIM2</description>

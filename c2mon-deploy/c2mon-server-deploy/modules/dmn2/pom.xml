@@ -12,7 +12,7 @@
   <groupId>cern.c2mon.c2mon-server.dmn2</groupId>
   <artifactId>c2mon-server</artifactId>
   <name>c2mon-server-dmn2</name>
-  <version>1.7.3</version>
+  <version>1.7.3-SNAPSHOT</version>
 
   <description>C2MON server assembling all required modules and configuration files for DMN2</description>
 
