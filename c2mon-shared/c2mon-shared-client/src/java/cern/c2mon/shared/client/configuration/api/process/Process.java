@@ -22,9 +22,9 @@ import java.util.List;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.tag.AliveTag;
 import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
-import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationObject;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
+import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
@@ -65,7 +65,7 @@ public class Process implements ConfigurationObject {
   /**
    * Interval in milliseconds at which the alive tag is expected to change.
    */
-  @DefaultValue("60000")
+  @DefaultValue("10000")
   private Integer aliveInterval;
 
   /**
