@@ -11,7 +11,7 @@
     <constructor-arg value="cern.c2mon.client.jms.JmsProxy"/>
   </bean>
 
-  <bean id="requestHandler" class="org.easymock.EasyMock" factory-method="createMock">
+  <bean id="coreRequestHandler" class="org.easymock.EasyMock" factory-method="createMock">
     <constructor-arg value="cern.c2mon.client.jms.RequestHandler"/>
   </bean>
 

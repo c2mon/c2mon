@@ -31,6 +31,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -50,8 +51,8 @@ import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:cern/c2mon/client/core/manager/c2mon-tagmanager-test.xml" })
-public class TagManagerTest {
+@ContextConfiguration({ "classpath:cern/c2mon/client/core/manager/c2mon-tagservice-test.xml" })
+public class TagServiceTest {
 
   /**
    * Component to test
@@ -60,6 +61,7 @@ public class TagManagerTest {
   private TagService tagService;
 
   @Autowired
+  @Qualifier("coreRequestHandler")
   private RequestHandler requestHandlerMock;
 
   @Autowired
