@@ -42,6 +42,7 @@ import cern.c2mon.client.core.manager.CoreSupervisionManager;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.tag.TagUpdate;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.rule.RuleFormatException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -342,6 +343,7 @@ public class TagServiceImpl implements AdvancedTagService {
               supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
             }
             
+            missingTags.remove(cdt.getId());
             resultList.add(cdt.clone());
 
             if (!tagUpdate.isControlTag() || tagUpdate.isAliveTag()) {
@@ -355,6 +357,10 @@ public class TagServiceImpl implements AdvancedTagService {
         }
       } catch (JMSException e) {
         log.error("get() - JMS connection lost -> Could not retrieve missing tags from the C2MON server.", e);
+      }
+      
+      for (Long tagId : missingTags) {
+        resultList.add(new ClientDataTagImpl(tagId, true));
       }
     }
 
@@ -374,7 +380,7 @@ public class TagServiceImpl implements AdvancedTagService {
       return cdt;
     }
 
-    return new ClientDataTagImpl(tagId);
+    return new ClientDataTagImpl(tagId, true);
   }
 
   @Override
