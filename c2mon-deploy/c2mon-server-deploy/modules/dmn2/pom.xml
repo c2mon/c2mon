@@ -55,6 +55,11 @@
       <artifactId>ehcache-ee</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+    	<groupId>cern.c2mon.c2mon-server</groupId>
+    	<artifactId>c2mon-server-eslog</artifactId>
+    	<version>[1.7.0,2.0.0]</version>
+    </dependency>
   </dependencies>
 
   <developers />
