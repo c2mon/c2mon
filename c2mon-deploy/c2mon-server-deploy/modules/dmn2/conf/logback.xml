@@ -13,6 +13,8 @@
   <property name="BENCHMARK_PRIORITY_LOG_FILE" value="${LOG_PATH:-/tmp}/c2mon.benchmark.priority.log"/>
   <property name="LASER_ALARM_LOG_FILE"        value="${LOG_PATH:-/tmp}/c2mon.laser.log"/>
   <property name="STL_LOG_FILE"                value="${LOG_PATH:-/tmp}/c2mon.shortterm.log"/>
+  <property name="ES_MODULE_LOG_FILE"          value="${LOG_PATH:-/tmp}/c2mon.es-module.log"/>
+  
 
 
   <appender name="FileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -152,6 +154,23 @@
   </appender>
 
 
+  <appender name="ElasticseachLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${ES_MODULE_LOG_FILE}</file>
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${ES_MODULE_LOG_FILE}.%i</fileNamePattern>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>10MB</MaxFileSize>
+    </triggeringPolicy>
+  </appender>
+
+  <logger name="ElasticsearchLogger" level="INFO">
+    <appender-ref ref="ElasticseachLogAppender"/>
+  </logger>
+  
   <!-- TODO: add CMW central logging appender -->
 
 
@@ -179,6 +198,10 @@
   <logger name="cern.c2mon.server.cachepersistence" level="DEBUG">
     <appender-ref ref="PersistenceAppender"/>
   </logger>
+  
+  <!-- reduces noise from NULL tag values reported by the DB module -->
+  <logger name="cern.c2mon.server.cache.dbaccess.type.ObjectTypeHandler" level="OFF"/>
+  
   <logger name="AdminSmsLogger" level="INFO">
     <appender-ref ref="AdminSmsAppender"/>
     <appender-ref ref="AdminEmailAppender"/>
