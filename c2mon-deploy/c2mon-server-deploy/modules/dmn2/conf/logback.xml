@@ -167,7 +167,10 @@
     </triggeringPolicy>
   </appender>
 
-  <logger name="ElasticsearchLogger" level="INFO">
+  <logger name="cern.c2mon.server.eslog" level="INFO">
+    <appender-ref ref="ElasticseachLogAppender"/>
+  </logger>
+  <logger name="org.elasticsearch" level="DEBUG">
     <appender-ref ref="ElasticseachLogAppender"/>
   </logger>
   
