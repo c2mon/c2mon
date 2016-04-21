@@ -28,6 +28,7 @@ import cern.c2mon.client.common.service.SessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.tag.ClientCommandTag;
@@ -81,7 +82,7 @@ public class CommandManager implements C2monCommandManager, CommandService {
    *          server
    */
   @Autowired
-  protected CommandManager(final RequestHandler pRequestHandler) {
+  protected CommandManager(final @Qualifier("coreRequestHandler") RequestHandler pRequestHandler) {
     this.clientRequestHandler = pRequestHandler;
   }
 

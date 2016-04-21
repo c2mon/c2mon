@@ -19,6 +19,7 @@ package cern.c2mon.client.core.service;
 import javax.jms.JMSException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.core.StatisticsService;
@@ -39,7 +40,7 @@ public class StatisticsServiceImpl implements StatisticsService {
    * @param requestHandler Provides methods for requesting tag information from the C2MON server
    */
   @Autowired
-  protected StatisticsServiceImpl(final RequestHandler requestHandler) {
+  protected StatisticsServiceImpl(final @Qualifier("coreRequestHandler") RequestHandler requestHandler) {
     this.clientRequestHandler = requestHandler;
   }
   

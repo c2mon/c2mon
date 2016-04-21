@@ -30,6 +30,7 @@ import javax.jms.JMSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.core.listener.HeartbeatListener;
@@ -120,10 +121,10 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
    *          to the thread locks.
    */
   @Autowired
-  public CacheSynchronizerImpl(final JmsProxy pJmsProxy,
-                               final RequestHandler pRequestHandler,
-                               final CoreSupervisionManager pSupervisionManager,
-                               final CacheController pCacheController) {
+  public CacheSynchronizerImpl(JmsProxy pJmsProxy,
+                               @Qualifier("coreRequestHandler") RequestHandler pRequestHandler,
+                               CoreSupervisionManager pSupervisionManager,
+                               CacheController pCacheController) {
     this.jmsProxy = pJmsProxy;
     this.tagRequestHandler = pRequestHandler;
     this.supervisionManager = pSupervisionManager;

@@ -37,6 +37,9 @@ public class C2monHistoryGateway {
   public static synchronized void initialize() {
     if (C2monServiceGateway.getApplicationContext() == null) {
       C2monServiceGateway.startC2monClientSynchronous();
+    }
+    
+    if (context == null) {
       context = C2monServiceGateway.getApplicationContext();
       historyManager = context.getBean(C2monHistoryManager.class);
       alarmHistoryService = context.getBean(AlarmHistoryService.class);

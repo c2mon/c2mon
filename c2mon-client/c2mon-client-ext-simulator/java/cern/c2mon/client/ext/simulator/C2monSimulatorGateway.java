@@ -16,57 +16,29 @@
  *****************************************************************************/
 package cern.c2mon.client.ext.simulator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import cern.c2mon.client.core.C2monServiceGateway;
 
 public class C2monSimulatorGateway {
-  /** Class logger */
-  private static final Logger LOG = LoggerFactory.getLogger(C2monSimulatorGateway.class);
-  
-  /** The path to the core Spring XML */
-  private static final String APPLICATION_SPRING_XML_PATH = "cern/c2mon/client/ext/simulator/config/c2mon-client-ext-simulator.xml";
-  
-  /** The extended SPRING application context for this gateway */
-  private static ApplicationContext context;
-  
-  /** Static reference to the <code>C2monSessionManager</code> singleton instance */
+
   private static TagSimulator tagSimulator = null;
   
+  private static ApplicationContext context;
+
+  private C2monSimulatorGateway() {}
+
   /**
-   * Hidden default constructor
-   */
-  private C2monSimulatorGateway() {
-    // Do nothing
-  }
-  
-  
-  /**
-   * Initializes the C2MON Simulator. Must be called before using for the
-   * first time {@link #getTagSimulator()}.
-   * @see #startC2monClientSynchronous(Module...)
+   * Initializes the C2MON Simulator.
    */
   public static synchronized void initialize() {
     if (C2monServiceGateway.getApplicationContext() == null) {
       C2monServiceGateway.startC2monClientSynchronous();
     }
-    initiateTagSimulator();
-  }
-
-  /**
-   * Private method which initiates the static field(s) of this gateway by retrieving
-   * it from the extended gateway {@link #context}.
-   */
-  private static void initiateTagSimulator() {
+    
     if (context == null) {
-      context = new ClassPathXmlApplicationContext(new String[]{APPLICATION_SPRING_XML_PATH}, C2monServiceGateway.getApplicationContext());
+      context = C2monServiceGateway.getApplicationContext();
       tagSimulator = context.getBean(TagSimulator.class);
-    }
-    else {
-      LOG.warn("C2monTagSimulator is already initialized.");
     }
   }
 

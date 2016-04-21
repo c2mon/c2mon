@@ -16,18 +16,29 @@
  *****************************************************************************/
 package cern.c2mon.client.core.configuration;
 
+import java.lang.reflect.Type;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.tag.Tag;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.util.jms.JmsSender;
-import com.google.gson.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import java.lang.reflect.Type;
 
 /**
  * JMS sender class for sending the Configuration request to the server and waiting for the response.
@@ -41,9 +52,9 @@ public class ConfigurationRequestSender {
 
   @Autowired
   private JmsSender jmsSender;
-
-  @Value("${c2mon.client.jms.config.queue}")
-  private String jmsConfigDestination;
+  
+  @Autowired
+  private Environment environment;
 
   /**
    * @param configuration
@@ -57,7 +68,8 @@ public class ConfigurationRequestSender {
         .registerTypeAdapter(Tag.class, new InterfaceAdapter<Tag>())
         .create();
     String message = gson.toJson(configuration);
-    String reply = jmsSender.sendRequestToQueue(message, jmsConfigDestination, DEFAULT_TIMEOUT);
+    String destination = environment.getRequiredProperty("c2mon.client.jms.config.queue");
+    String reply = jmsSender.sendRequestToQueue(message, destination, DEFAULT_TIMEOUT);
     return gson.fromJson(reply, ConfigurationReport.class);
   }
 

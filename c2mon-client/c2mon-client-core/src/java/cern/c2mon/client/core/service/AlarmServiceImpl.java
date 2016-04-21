@@ -25,6 +25,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.jms.JMSException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.core.AlarmService;
@@ -58,7 +59,7 @@ public class AlarmServiceImpl implements AlarmService, AlarmListener {
    */
   @Autowired
   protected AlarmServiceImpl(final JmsProxy jmsProxy,
-      final RequestHandler requestHandler) {
+      @Qualifier("coreRequestHandler") final RequestHandler requestHandler) {
 
     this.jmsProxy = jmsProxy;
     this.clientRequestHandler = requestHandler;

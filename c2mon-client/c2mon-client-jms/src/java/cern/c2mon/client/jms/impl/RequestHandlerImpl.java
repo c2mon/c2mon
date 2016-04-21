@@ -63,7 +63,7 @@ import cern.c2mon.shared.client.tag.TagValueUpdate;
  * @author Mark Brightwell
  *
  */
-@Service
+@Service("coreRequestHandler")
 public class RequestHandlerImpl implements RequestHandler {
 
   /**

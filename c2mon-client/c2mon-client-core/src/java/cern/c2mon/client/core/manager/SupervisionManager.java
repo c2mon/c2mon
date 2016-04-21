@@ -28,6 +28,7 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.core.listener.HeartbeatListener;
@@ -42,10 +43,11 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
 /**
  * The supervision manager allows registering listeners to get informed about
- * the connection state to the JMS brokers and the heartbeat of the C2MON server.
- * Furthermore it manages the supervision status information of the DAQ processes
- * and their equipment. Those information are only accessible through the
- * {@link CoreSupervisionManager} interface for other C2MON managers in the core API.
+ * the connection state to the JMS brokers and the heartbeat of the C2MON
+ * server. Furthermore it manages the supervision status information of the DAQ
+ * processes and their equipment. Those information are only accessible through
+ * the {@link CoreSupervisionManager} interface for other C2MON managers in the
+ * core API.
  *
  * @author Matthias Braeger
  */
@@ -55,10 +57,15 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
   /** Log4j logger instance */
   private static final Logger LOG = LoggerFactory.getLogger(SupervisionManager.class);
 
-  /** Set to <code>true</code>, if the supervision  cache is correctly initialized */
+  /**
+   * Set to <code>true</code>, if the supervision cache is correctly initialized
+   */
   private volatile boolean c2monConnectionEstablished = false;
 
-  /** <code>true</code>, if JmsProxy sent a <code>onConnection()</code> notification */
+  /**
+   * <code>true</code>, if JmsProxy sent a <code>onConnection()</code>
+   * notification
+   */
   private volatile boolean jmsConnectionUp = false;
 
   /** Lock for changes on the listeners maps */
@@ -67,29 +74,41 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
   /** Lock for changes on the cache maps */
   private final ReentrantReadWriteLock cacheLock = new ReentrantReadWriteLock();
 
-  /** Lookup table for all registered listeners on a given process supervision event */
-  private final Map<Long, Set<SupervisionListener>> processSupervisionListeners =
-    new HashMap<Long, Set<SupervisionListener>>();
+  /**
+   * Lookup table for all registered listeners on a given process supervision
+   * event
+   */
+  private final Map<Long, Set<SupervisionListener>> processSupervisionListeners = new HashMap<Long, Set<SupervisionListener>>();
 
-  /** Lookup table for all registered listeners on a given equipment supervision event */
-  private final Map<Long, Set<SupervisionListener>> equipmentSupervisionListeners =
-    new HashMap<Long, Set<SupervisionListener>>();
+  /**
+   * Lookup table for all registered listeners on a given equipment supervision
+   * event
+   */
+  private final Map<Long, Set<SupervisionListener>> equipmentSupervisionListeners = new HashMap<Long, Set<SupervisionListener>>();
 
-  /** Lookup table for all registered listeners on a given sub equipment supervision event */
-  private final Map<Long, Set<SupervisionListener>> subEquipmentSupervisionListeners =
-    new HashMap<Long, Set<SupervisionListener>>();
+  /**
+   * Lookup table for all registered listeners on a given sub equipment
+   * supervision event
+   */
+  private final Map<Long, Set<SupervisionListener>> subEquipmentSupervisionListeners = new HashMap<Long, Set<SupervisionListener>>();
 
-  /** Map containing the latest process supervision events. The key of the map is the process id. */
-  private final Map<Long, SupervisionEvent> processEventCache =
-    new HashMap<Long, SupervisionEvent>();
+  /**
+   * Map containing the latest process supervision events. The key of the map is
+   * the process id.
+   */
+  private final Map<Long, SupervisionEvent> processEventCache = new HashMap<Long, SupervisionEvent>();
 
-  /** Map containing the latest equipment supervision events. The key of the map is the equipment id. */
-  private final Map<Long, SupervisionEvent> equipmentEventCache =
-    new HashMap<Long, SupervisionEvent>();
+  /**
+   * Map containing the latest equipment supervision events. The key of the map
+   * is the equipment id.
+   */
+  private final Map<Long, SupervisionEvent> equipmentEventCache = new HashMap<Long, SupervisionEvent>();
 
-  /** Map containing the latest sub equipment supervision events. The key of the map is the sub equipment id. */
-  private final Map<Long, SupervisionEvent> subEquipmentEventCache =
-    new HashMap<Long, SupervisionEvent>();
+  /**
+   * Map containing the latest sub equipment supervision events. The key of the
+   * map is the sub equipment id.
+   */
+  private final Map<Long, SupervisionEvent> subEquipmentEventCache = new HashMap<Long, SupervisionEvent>();
 
   /** Reference to the <code>JmsProxy</code> singleton instance */
   private final JmsProxy jmsProxy;
@@ -104,8 +123,8 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
   private final ClientHealthMonitor jmsHealthMonitor;
 
   @Autowired
-  protected SupervisionManager(final JmsProxy pJmsProxy, final RequestHandler pRequestHandler, final HeartbeatListenerManager pHeartbeatManager,
-                                final ClientHealthMonitor pJmsHealthMonitor) {
+  protected SupervisionManager(final JmsProxy pJmsProxy, final @Qualifier("coreRequestHandler") RequestHandler pRequestHandler, final HeartbeatListenerManager pHeartbeatManager,
+      final ClientHealthMonitor pJmsHealthMonitor) {
     jmsProxy = pJmsProxy;
     clientRequestHandler = pRequestHandler;
     heartbeatManager = pHeartbeatManager;
@@ -151,18 +170,18 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
       listenersLock.readLock().lock();
       try {
         switch (supervisionEvent.getEntity()) {
-          case PROCESS:
-            fireProcessSupervisionUpdate(supervisionEvent);
-            break;
-          case EQUIPMENT:
-            fireEquipmentSupervisionUpdate(supervisionEvent);
-            break;
-          case SUBEQUIPMENT:
-            fireSubEquipmentSupervisionUpdate(supervisionEvent);
-            break;
-          default:
-            String errMsg = supervisionEvent.getEntity() + " SupervisionEvent is not supported by this client - not taking any action";
-            LOG.debug("onSupervisionUpdate() - " + errMsg);
+        case PROCESS:
+          fireProcessSupervisionUpdate(supervisionEvent);
+          break;
+        case EQUIPMENT:
+          fireEquipmentSupervisionUpdate(supervisionEvent);
+          break;
+        case SUBEQUIPMENT:
+          fireSubEquipmentSupervisionUpdate(supervisionEvent);
+          break;
+        default:
+          String errMsg = supervisionEvent.getEntity() + " SupervisionEvent is not supported by this client - not taking any action";
+          LOG.debug("onSupervisionUpdate() - " + errMsg);
         }
       }
       finally {
@@ -173,8 +192,10 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
 
   /**
    * Inner method to update supervision event cache maps
+   * 
    * @param supervisionEvent The new event
-   * @return <code>true</code>, if the cache was updated otherwise <code>false</code>
+   * @return <code>true</code>, if the cache was updated otherwise
+   *         <code>false</code>
    */
   private boolean updateEventCache(final SupervisionEvent supervisionEvent) {
     final Long id = supervisionEvent.getEntityId();
@@ -182,43 +203,43 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
     cacheLock.writeLock().lock();
     try {
       switch (supervisionEvent.getEntity()) {
-        case PROCESS:
-          if (!processEventCache.containsKey(id)) {
-            processEventCache.put(supervisionEvent.getEntityId(), supervisionEvent);
-          }
-          else if (!processEventCache.get(id).equals(supervisionEvent)) {
-            processEventCache.put(supervisionEvent.getEntityId(), supervisionEvent);
-          }
-          else {
-            updated = false;
-          }
-          break;
-        case EQUIPMENT:
-          if (!equipmentEventCache.containsKey(id)) {
-            equipmentEventCache.put(supervisionEvent.getEntityId(), supervisionEvent);
-          }
-          else if (!equipmentEventCache.get(id).equals(supervisionEvent)) {
-            equipmentEventCache.put(supervisionEvent.getEntityId(), supervisionEvent);
-          }
-          else {
-            updated = false;
-          }
-          break;
-        case SUBEQUIPMENT:
-          if (!subEquipmentEventCache.containsKey(id)) {
-            subEquipmentEventCache.put(supervisionEvent.getEntityId(), supervisionEvent);
-          }
-          else if (!subEquipmentEventCache.get(id).equals(supervisionEvent)) {
-            subEquipmentEventCache.put(supervisionEvent.getEntityId(), supervisionEvent);
-          }
-          else {
-            updated = false;
-          }
-          break;
-        default:
-          String errMsg = supervisionEvent.getEntity() + " SupervisionEvent is not supported by this client - ignoring the event";
-          LOG.debug("updateEventCache() - " + errMsg);
+      case PROCESS:
+        if (!processEventCache.containsKey(id)) {
+          processEventCache.put(supervisionEvent.getEntityId(), supervisionEvent);
+        }
+        else if (!processEventCache.get(id).equals(supervisionEvent)) {
+          processEventCache.put(supervisionEvent.getEntityId(), supervisionEvent);
+        }
+        else {
           updated = false;
+        }
+        break;
+      case EQUIPMENT:
+        if (!equipmentEventCache.containsKey(id)) {
+          equipmentEventCache.put(supervisionEvent.getEntityId(), supervisionEvent);
+        }
+        else if (!equipmentEventCache.get(id).equals(supervisionEvent)) {
+          equipmentEventCache.put(supervisionEvent.getEntityId(), supervisionEvent);
+        }
+        else {
+          updated = false;
+        }
+        break;
+      case SUBEQUIPMENT:
+        if (!subEquipmentEventCache.containsKey(id)) {
+          subEquipmentEventCache.put(supervisionEvent.getEntityId(), supervisionEvent);
+        }
+        else if (!subEquipmentEventCache.get(id).equals(supervisionEvent)) {
+          subEquipmentEventCache.put(supervisionEvent.getEntityId(), supervisionEvent);
+        }
+        else {
+          updated = false;
+        }
+        break;
+      default:
+        String errMsg = supervisionEvent.getEntity() + " SupervisionEvent is not supported by this client - ignoring the event";
+        LOG.debug("updateEventCache() - " + errMsg);
+        updated = false;
       }
     }
     finally {
@@ -229,7 +250,9 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
   }
 
   /**
-   * Inner method to inform all subscribed listeners of the process supervision event
+   * Inner method to inform all subscribed listeners of the process supervision
+   * event
+   * 
    * @param supervisionEvent The event
    */
   private void fireProcessSupervisionUpdate(final SupervisionEvent supervisionEvent) {
@@ -242,7 +265,9 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
   }
 
   /**
-   * Inner method to inform all subscribed listeners of the equipment supervision event
+   * Inner method to inform all subscribed listeners of the equipment
+   * supervision event
+   * 
    * @param supervisionEvent The event
    */
   private void fireEquipmentSupervisionUpdate(final SupervisionEvent supervisionEvent) {
@@ -255,7 +280,9 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
   }
 
   /**
-   * Inner method to inform all subscribed listeners of the sub equipment supervision event
+   * Inner method to inform all subscribed listeners of the sub equipment
+   * supervision event
+   * 
    * @param supervisionEvent The event
    */
   private void fireSubEquipmentSupervisionUpdate(final SupervisionEvent supervisionEvent) {

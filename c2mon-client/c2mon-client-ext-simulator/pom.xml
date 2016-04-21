@@ -12,9 +12,10 @@
   <version>1.7.1-SNAPSHOT</version>
   <name>c2mon-client-ext-simulator</name>
   <packaging>jar</packaging>
-	<url>http://timweb.cern.ch</url>
-	<dependencies>
-		<!-- C2MON dependencies -->
+  <description>Provides an API to overwrite in the local cache the data received from the C2MON server.</description>
+  
+  <dependencies>
+    <!-- C2MON dependencies -->
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
       <artifactId>c2mon-client-all</artifactId>
@@ -25,11 +26,19 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
-	</dependencies>
-	<developers />
+  </dependencies>
+  <developers />
 
-	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-ext-simulator</developerConnection>
-	</scm>
-	<description>Provides an API to overwrite in the local cache the data received from the C2MON server.</description>
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-ext-simulator</developerConnection>
+  </scm>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/resources</directory>
+      </resource>
+    </resources>
+  </build>
+
 </project>

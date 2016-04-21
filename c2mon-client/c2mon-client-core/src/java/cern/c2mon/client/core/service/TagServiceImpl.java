@@ -27,6 +27,7 @@ import java.util.Set;
 import javax.jms.JMSException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.BaseListener;
@@ -82,7 +83,7 @@ public class TagServiceImpl implements AdvancedTagService {
   @Autowired
   protected TagServiceImpl(final CoreSupervisionManager supervisionManager, 
                            final ClientDataTagCache cache,
-                           final RequestHandler requestHandler) {
+                           final @Qualifier("coreRequestHandler") RequestHandler requestHandler) {
 
     this.supervisionManager = supervisionManager;
     this.cache = cache;

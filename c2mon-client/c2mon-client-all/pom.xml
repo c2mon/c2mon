@@ -32,11 +32,6 @@
       <artifactId>c2mon-client-core</artifactId>
       <version>[1.5.7, 2.0.0)</version>
     </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-    </dependency>
   </dependencies>
 
   <developers/>

@@ -30,12 +30,6 @@
       <version>[1.5.0, 2.0.0)</version>
     </dependency>
 
-    <!-- We need log4j directly here because we use ObjectRenderers -->
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-    </dependency>
-
     <!-- test dependencies -->
     <dependency>
       <groupId>junit</groupId>

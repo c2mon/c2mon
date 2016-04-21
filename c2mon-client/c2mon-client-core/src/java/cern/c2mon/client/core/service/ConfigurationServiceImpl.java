@@ -27,6 +27,7 @@ import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.tag.TagConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.jms.JMSException;
@@ -50,7 +51,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
    * @param requestHandler Provides methods for requesting tag information from the C2MON server
    */
   @Autowired
-  protected ConfigurationServiceImpl(final RequestHandler requestHandler, final ConfigurationRequestSender configurationRequestSender) {
+  protected ConfigurationServiceImpl(final @Qualifier("coreRequestHandler") RequestHandler requestHandler, final ConfigurationRequestSender configurationRequestSender) {
     this.clientRequestHandler = requestHandler;
     this.configurationRequestSender = configurationRequestSender;
   }
