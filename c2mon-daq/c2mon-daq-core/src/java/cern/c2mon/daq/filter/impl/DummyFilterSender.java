@@ -36,8 +36,6 @@ import org.springframework.stereotype.Component;
  *
  * @author mbrightw
  */
-@Component("filterMessageSender")
-@Profile("test")
 public class DummyFilterSender implements IFilterMessageSender, JmsLifecycle {
 
   /*

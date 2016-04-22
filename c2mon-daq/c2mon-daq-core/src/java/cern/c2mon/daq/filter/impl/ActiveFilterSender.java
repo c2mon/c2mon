@@ -43,8 +43,6 @@ import javax.jms.TextMessage;
  * @author Mark Brightwell
  *
  */
-@Component//("filterMessageSender")
-@Profile({ "single", "double" })
 public class ActiveFilterSender extends FilterMessageSender implements IFilterMessageSender {
 
   /**
@@ -57,19 +55,18 @@ public class ActiveFilterSender extends FilterMessageSender implements IFilterMe
    */
   private JmsTemplate filterTemplate;
 
-  @Autowired
   private Environment environment;
 
   /**
-   * Constructor called by Spring.
    * @param configurationController to access the configuration (run options)
    * @param filterTemplate the Spring template to send the message (defined in XML)
    */
-  @Autowired
   public ActiveFilterSender(final ConfigurationController configurationController,
-                            @Qualifier("filterJmsTemplate") final JmsTemplate filterTemplate) {
+                            @Qualifier("filterJmsTemplate") final JmsTemplate filterTemplate,
+                            Environment environment) {
     super(configurationController);
     this.filterTemplate = filterTemplate;
+    this.environment = environment;
   }
 
   @Override

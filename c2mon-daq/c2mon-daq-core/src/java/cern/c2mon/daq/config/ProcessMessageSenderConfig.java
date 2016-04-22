@@ -17,13 +17,11 @@
 package cern.c2mon.daq.config;
 
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.common.messaging.JmsLifecycle;
 import cern.c2mon.daq.common.messaging.JmsSender;
 import cern.c2mon.daq.common.messaging.impl.ActiveJmsSender;
 import cern.c2mon.daq.common.messaging.impl.DummyJmsSender;
 import cern.c2mon.daq.common.messaging.impl.ProcessMessageSender;
 import cern.c2mon.daq.common.messaging.impl.ProxyJmsSender;
-import cern.c2mon.daq.filter.FilterMessageSender;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.filter.impl.ActiveFilterSender;
 import cern.c2mon.daq.filter.impl.DummyFilterSender;
@@ -34,6 +32,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
 
 import java.util.Arrays;
@@ -57,6 +56,9 @@ import java.util.Collections;
     "classpath:daq-activemq-second.xml"
 })
 public class ProcessMessageSenderConfig {
+
+  @Autowired
+  Environment environment;
 
   @Autowired
   ConfigurationController configurationController;
@@ -115,21 +117,21 @@ public class ProcessMessageSenderConfig {
     return new DummyJmsSender();
   }
 
-  @Bean
+  @Bean(name = "filterMessageSender")
   @Profile("single")
-  public JmsLifecycle singleFilterMessageSender() {
-    return new ActiveFilterSender(configurationController, sourceUpdateJmsTemplate);
+  public IFilterMessageSender singleFilterMessageSender() {
+    return new ActiveFilterSender(configurationController, sourceUpdateJmsTemplate, environment);
   }
   
-  @Bean
+  @Bean(name = "filterMessageSender")
   @Profile("double")
-  public JmsLifecycle doubleFilterMessageSender() {
-    return new ActiveFilterSender(configurationController, sourceUpdateJmsTemplate);
+  public IFilterMessageSender doubleFilterMessageSender() {
+    return new ActiveFilterSender(configurationController, sourceUpdateJmsTemplate, environment);
   }
-  
-  @Bean
+
+  @Bean(name = "filterMessageSender")
   @Profile("test")
-  public JmsLifecycle testFilterMessageSender() {
+  public IFilterMessageSender testFilterMessageSender() {
     return new DummyFilterSender();
   }
 }
