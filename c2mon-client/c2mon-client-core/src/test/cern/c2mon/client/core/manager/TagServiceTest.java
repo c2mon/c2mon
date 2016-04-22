@@ -253,6 +253,42 @@ public class TagServiceTest {
     // check test success
     EasyMock.verify(requestHandlerMock, jmsProxyMock);
   }
+  
+  @Test @DirtiesContext
+  public void testGetUnknownTag() throws JMSException, Exception {
+    // Test setup
+    Collection<Long> tagId = new ArrayList<>();
+    tagId.add(1L);
+    EasyMock.expect(requestHandlerMock.requestTags(tagId)).andReturn(new ArrayList<TagUpdate>());
+    EasyMock.replay(requestHandlerMock);
+    
+    // run test
+    Tag unknownTag = tagService.get(1L);
+    Assert.assertFalse(unknownTag.getDataTagQuality().isExistingTag());
+    
+    // check test success
+    EasyMock.verify(requestHandlerMock);
+  }
+  
+  @Test @DirtiesContext
+  public void testGetUnknownTags() throws JMSException, Exception {
+    // Test setup
+    Collection<Long> tagIds = new ArrayList<>();
+    tagIds.add(1L);
+    tagIds.add(2L);
+    EasyMock.expect(requestHandlerMock.requestTags(tagIds)).andReturn(new ArrayList<TagUpdate>());
+    EasyMock.replay(requestHandlerMock);
+    
+    // run test
+    Collection<Tag> unknownTags = tagService.get(tagIds);
+    Assert.assertTrue(unknownTags.size() == 2);
+    for (Tag unknownTag : unknownTags) {
+      Assert.assertFalse(unknownTag.getDataTagQuality().isExistingTag());
+    }
+    
+    // check test success
+    EasyMock.verify(requestHandlerMock);
+  }
 
 
   /**
