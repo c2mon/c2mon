@@ -1,66 +1,67 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>cern.c2mon.c2mon-client</groupId>
-    <artifactId>c2mon-client-pom</artifactId>
-    <version>RELEASE</version>
-  </parent>
-  <groupId>cern.c2mon.c2mon-publisher</groupId>
-  <artifactId>c2mon-publisher-mobicall</artifactId>
-  <name>The C2MON Publisher for alarms to Mobicall</name>
-  <version>1.0.1-SNAPSHOT</version>
-  <description>This project is used to publish alarms to Mobicall</description>
-  <scm>
-    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-publisher/c2mon-publisher-mobicall</developerConnection>
-  </scm>
-  <dependencies>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>cern.c2mon.c2mon-client</groupId>
+		<artifactId>c2mon-client-pom</artifactId>
+		<version>RELEASE</version>
+	</parent>
+	<groupId>cern.c2mon.c2mon-publisher</groupId>
+	<artifactId>c2mon-publisher-mobicall</artifactId>
+	<name>The C2MON Publisher for alarms to Mobicall</name>
+	<version>1.0.1-SNAPSHOT</version>
+	<description>This project is used to publish alarms to Mobicall</description>
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-publisher/c2mon-publisher-mobicall</developerConnection>
+	</scm>
+	<dependencies>
 
-    <!-- C2MON Client API dependencies -->
-    <dependency>
-      <groupId>cern.c2mon.c2mon-client</groupId>
-      <artifactId>c2mon-client-all</artifactId>
-      <version>1.6.1</version><!--$NO-MVN-MAN-VER$-->
-    </dependency>
+		<!-- C2MON Client API dependencies -->
+		<dependency>
+			<groupId>cern.c2mon.c2mon-client</groupId>
+			<artifactId>c2mon-client-all</artifactId>
+		</dependency>
 
-    <!-- CERN 3rd party dependencies -->
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cern.accsoft.commons</groupId>
-      <artifactId>accsoft-commons-jmxdirectory-registration-client</artifactId>
-      <version>1.1.8</version>
-    </dependency>
-    
-	<dependency>
-		 <groupId>org.snmp4j</groupId>
-		  <artifactId>snmp4j</artifactId>
-		  <version>1.8.1</version>
-	</dependency>
+		<!-- CERN 3rd party dependencies -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.accsoft.commons</groupId>
+			<artifactId>accsoft-commons-jmxdirectory-registration</artifactId>
+			<version>1.1.18</version>
+		</dependency>
 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-    </dependency>
+		<dependency>
+			<groupId>org.snmp4j</groupId>
+			<artifactId>snmp4j</artifactId>
+			<version>1.8.1</version>
+		</dependency>
 
-    <!-- Test dependencies -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
-      <scope>test</scope>
-    </dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+		</dependency>
 
-    <dependency>
-    	<groupId>com.oracle</groupId>
-    	<artifactId>ojdbc14</artifactId>
-    	<version>10.2.0.4</version>
-    </dependency>
-  </dependencies>
+		<!-- Test dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc14</artifactId>
+			<version>10.2.0.4</version>
+		</dependency>
+	</dependencies>
+
+	 	
 </project>
