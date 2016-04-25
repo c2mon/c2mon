@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
  */
 public class MobicallConfigurator implements Runnable {
 
+    public static final String MOBICALL_CONFIG_REFRESH = "mobicall.config.refresh";
+
     // in seconds, = sleep slice and wait time to let the thread complete on stop
     public static final int LATENCY = 5;
 
@@ -52,7 +54,7 @@ public class MobicallConfigurator implements Runnable {
     public MobicallConfigurator(MobicallConfigLoaderIntf loader) {
         this.loader = loader;
         refreshInterval = Integer
-                .parseInt(System.getProperty("mobicall.config.refresh", "" + DEFAULT_REFRESH_INTERVAL));
+                .parseInt(System.getProperty(MOBICALL_CONFIG_REFRESH, "" + DEFAULT_REFRESH_INTERVAL));
     }
 
     //

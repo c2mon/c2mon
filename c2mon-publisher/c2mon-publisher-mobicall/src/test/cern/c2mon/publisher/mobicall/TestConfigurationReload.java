@@ -42,7 +42,7 @@ public class TestConfigurationReload {
     @BeforeClass
     public static void initClass() throws Exception {        
         // set config reloading interval to 1 minute, otherwise testing it would be too long
-        System.setProperty("mobicall.config.refresh","1");
+        System.setProperty(MobicallConfigurator.MOBICALL_CONFIG_REFRESH,"1");
         
         TestUtil.init();
         TestUtil.startTestPublisher();
