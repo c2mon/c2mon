@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -21,7 +21,6 @@ import java.util.Properties;
 import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.AliveTag;
 import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
-import cern.c2mon.shared.client.configuration.api.util.DataType;
 
 //@Service
 public class ConfigurationProcessUtil {
@@ -44,7 +43,7 @@ public class ConfigurationProcessUtil {
     props.setProperty("name", "Prozess");
     props.setProperty("description", "foo");
     props.setProperty("stateTagId", String.valueOf(0l));
-    props.setProperty("aliveInterval", String.valueOf(60000));
+    props.setProperty("aliveInterval", String.valueOf(10000));
     props.setProperty("aliveTagId", String.valueOf(1l));
     props.setProperty("maxMessageDelay", String.valueOf(1000));
     props.setProperty("maxMessageSize", String.valueOf(100));
@@ -89,7 +88,7 @@ public class ConfigurationProcessUtil {
     props.setProperty("name", "Prozess");
     props.setProperty("description", "foo");
     props.setProperty("stateTagId", String.valueOf(0l));
-    props.setProperty("aliveInterval", String.valueOf(60000));
+    props.setProperty("aliveInterval", String.valueOf(10000));
     props.setProperty("aliveTagId", String.valueOf(1l));
     props.setProperty("maxMessageDelay", String.valueOf(1000));
     props.setProperty("maxMessageSize", String.valueOf(100));
@@ -161,7 +160,7 @@ public class ConfigurationProcessUtil {
     props.setProperty("name", "P_TEST");
     props.setProperty("description", "foo");
     props.setProperty("stateTagId", String.valueOf(statusTagId));
-    props.setProperty("aliveInterval", String.valueOf(60000));
+    props.setProperty("aliveInterval", String.valueOf(10000));
     props.setProperty("maxMessageDelay", String.valueOf(1000));
     props.setProperty("maxMessageSize", String.valueOf(100));
     props.setProperty("aliveTagId", String.valueOf(aliveTagId));
