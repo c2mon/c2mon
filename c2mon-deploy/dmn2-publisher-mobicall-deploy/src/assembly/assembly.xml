@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<assembly
-	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
 
-	<id>assembly</id>
+	<id>install</id>
 
 	<formats>
 		<format>tar.gz</format>
 	</formats>
 
-	<!--  do not include base directory -->
+	<!-- do not include base directory -->
 	<includeBaseDirectory>false</includeBaseDirectory>
 
-	<dependencySets>
 
+	<dependencySets>
 		<dependencySet>
 			<outputDirectory>/lib</outputDirectory>
+			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
 			<fileMode>0644</fileMode>
 		</dependencySet>
 
@@ -24,36 +23,38 @@
 
 	<fileSets>
 		<fileSet>
+			<outputDirectory>/lib</outputDirectory>
 			<includes>
-				<include>log/</include>
+				<include>*.jar</include>
 			</includes>
-			<fileMode>0755</fileMode>
+			<fileMode>0644</fileMode>
 			<directoryMode>0755</directoryMode>
+			<directory>${project.build.directory}/lib/</directory>
 		</fileSet>
+
+		<fileSet>
+			<outputDirectory>/conf</outputDirectory>
+			<includes>
+				<include>*.properties</include>
+			</includes>
+			<fileMode>0444</fileMode>
+			<directoryMode>0755</directoryMode>
+			<directory>${project.basedir}/conf/</directory>
+		</fileSet>
+
 	</fileSets>
 
-	<files>
 
-		<!--  deployment descriptor -->
+	<files>
 		<file>
 			<source>conf/deployment.xml</source>
 			<outputDirectory>/</outputDirectory>
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-
-		<!--  copy the version file -->
 		<file>
-			<source>version.txt</source>
-			<outputDirectory>/</outputDirectory>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>
-		<file>
-			<source>log4j.properties</source>
-			<outputDirectory>/conf</outputDirectory>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
+			<source>${project.build.directory}/${project.name}.jar</source>
+			<outputDirectory>lib/</outputDirectory>
 		</file>
 	</files>
 

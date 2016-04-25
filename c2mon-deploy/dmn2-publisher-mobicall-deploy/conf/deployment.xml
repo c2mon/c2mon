@@ -2,40 +2,45 @@
 <products>
 	<product name="c2mon-publisher-mobicall">
 
-		<!-- this application section is a parent configuration for both PROD and TEST -->
+		<!-- Application template, not for installation -->
 		<application>
+			<deployment installLocation="/opt/tim2-mobicall">
+				<backupPolicy keepBackups="2">
+					<preserve type="dir" name="log" />
+					<preserve type="dir" name="conf" />
+				</backupPolicy>
+			</deployment>
 			<startscript>
-				<main-class name="cern.c2mon.publisher.mobicall.MobicallAlarmsMain">
-					<arg></arg>
-				</main-class>
+				<initial-heap-size>128M</initial-heap-size>
+				<max-heap-size>128M</max-heap-size>
+				<property name="jmx.mgt.port" value="1095" />
 				<property name="log4j.configuration" value="file:conf/log4j.properties" />
-				<property name="c2mon.client.conf.url" value="file:conf/client.properties" />
-				<property name="oracle.net.tns_admin" value="/etc" />				
+				<main-class name="cern.c2mon.publisher.mobicall.MobicallAlarmsMain" />
+			</startscript>
+			<startscript>
+				<initial-heap-size>128M</initial-heap-size>
+				<max-heap-size>128M</max-heap-size>
 			</startscript>
 		</application>
 
-		<application name="dmn2-publisher-mobicall-pro">
-			<deployment installLocation="/opt/dmn2/dmn2-publisher-mobicall">
-				<directory name="conf">
-					<file name="client.properties" sourceDir="~diamonop/repo/c2mon/client" mask="400" />
-				</directory>
-				<notification>
-					<mail address="diamon-developers@cern.ch" />
-				</notification>
-			</deployment>
-			<startscript name="DMN2-PUBLISHER-MOBICALL">
+
+		<!-- 
+			TIM Mobicall Service application 
+		-->
+		<application name="tim-mobicall-pro">
+			<deployment installLocation="/opt/tim2-mobicall" />
+			<startscript>
+				<property name="c2mon.client.conf.url" value="http://timweb/conf/c2mon-client.properties"/>
+				<property name="jmx.mgt.port" value="1095" />
 			</startscript>
 		</application>
-
-		<application name="dmn2-publisher-mobicall-dev">
-			<deployment installLocation="/opt/dmn2/dmn2-publisher-mobicall-dev">
-				<directory name="conf">
-					<file name="client.properties" sourceDir="~dmndev/repo/c2mon/client" mask="400" />
-				</directory>
-			</deployment>
-			<startscript name="DMN2-PUBLISHER-MOBICALL-DEV">
+		<application name="tim-mobicall-test">
+			<deployment installLocation="/opt/tim2-mobicall-test" />
+			<startscript>
+				<property name="c2mon.client.conf.url" value="http://timweb/test/conf/c2mon-client.properties"/>
+				<property name="jmx.mgt.port" value="1095" />
 			</startscript>
 		</application>
-
+		
 	</product>
 </products>
