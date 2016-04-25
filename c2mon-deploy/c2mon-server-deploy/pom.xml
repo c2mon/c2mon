@@ -25,11 +25,6 @@
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-all</artifactId>
     </dependency>
-    <!--<dependency>-->
-    	<!--<groupId>org.slf4j</groupId>-->
-    	<!--<artifactId>slf4j-log4j12</artifactId>-->
-    	<!--<version>1.7.5</version>-->
-    <!--</dependency>-->
   </dependencies>
 
   <scm>
@@ -40,7 +35,6 @@
     <module>modules/demo</module>
     <module>modules/tim2</module>
     <module>modules/dmn2</module>
-    <!--<module>modules/dipcm</module>-->
   </modules>
 
 </project>
