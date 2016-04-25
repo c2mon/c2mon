@@ -28,6 +28,8 @@ import cern.c2mon.shared.client.alarm.AlarmValue;
  */
 public final class MobicallAlarmsPublisher implements AlarmListener {
 
+    private static final String MOBICALL_RESEND_DELAY = "mobicall.resend.delay";
+
     public static final int DEFAULT_RESEND_ON_START = 60;
     
     static final Logger LOG = LoggerFactory.getLogger(MobicallAlarmsPublisher.class);
@@ -53,8 +55,8 @@ public final class MobicallAlarmsPublisher implements AlarmListener {
         this.c2mon = c2mon;
         this.sender = sender;
         
-        if (System.getProperty("mobicall.resend.delay") != null) {
-            this.resendDelayOnStart = Integer.parseInt(System.getProperty("mobicall.resend.delay"));            
+        if (System.getProperty(MOBICALL_RESEND_DELAY) != null) {
+            this.resendDelayOnStart = Integer.parseInt(System.getProperty(MOBICALL_RESEND_DELAY));            
         }
         LOG.info("Publisher ready.");
     }
