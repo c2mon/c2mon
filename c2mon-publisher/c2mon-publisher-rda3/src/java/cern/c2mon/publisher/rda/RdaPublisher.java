@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.tag.Tag;
-import cern.c2mon.client.common.tag.TagRenderer;
 import cern.c2mon.publisher.Publisher;
 import cern.c2mon.publisher.core.Gateway;
 import cern.c2mon.shared.client.tag.TagConfig;
@@ -69,9 +68,6 @@ public final class RdaPublisher implements Publisher {
     private final Server server;
     private Thread srvThread;
 
-    /** used to render the {@link Tag} objects for log4j */
-    private final ObjectRenderer log4jObjectRenderer;
-
     /**
      * Default constructor
      *
@@ -80,7 +76,6 @@ public final class RdaPublisher implements Publisher {
      */
     @Autowired
     public RdaPublisher(@Value("${c2mon.publisher.rda.server.name}") final String serverName) throws RdaException {
-        log4jObjectRenderer = new TagRenderer();
 
         ServerBuilder builder = ServerBuilder.newInstance();
         builder.setServerName(serverName);
@@ -208,7 +203,7 @@ public final class RdaPublisher implements Publisher {
     public void onUpdate(final Tag cdt, final TagConfig cdtConfig) {
         // Saves the received value into a separate file
         Logger logger = LoggerFactory.getLogger("ClientDataTagLogger");
-        logger.debug(log4jObjectRenderer.doRender(cdt));
+        logger.debug(cdt.toString());
 
         if (cdt.getDataTagQuality().isExistingTag() && cdtConfig != null) {
             try {
