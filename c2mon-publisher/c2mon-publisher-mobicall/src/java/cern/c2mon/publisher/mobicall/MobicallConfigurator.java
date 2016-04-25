@@ -91,7 +91,7 @@ public class MobicallConfigurator implements Runnable {
                 }
                 
             } else {                
-                LOG.warn("Time to reload config ...");
+                LOG.debug("Loading from db...");
                 loader.loadConfig();
                 lastLoadTs = System.currentTimeMillis();
                 if (failures > 0) {
@@ -101,7 +101,7 @@ public class MobicallConfigurator implements Runnable {
                         success = 0;
                     }
                 }
-                LOG.warn("Config reloaded OK.");
+                LOG.info("Loaded config within {}msec", (System.currentTimeMillis() - lastLoadTs));
             }
             if (cont) {
                 try {
@@ -111,7 +111,7 @@ public class MobicallConfigurator implements Runnable {
                         slept += LATENCY;
                     }
                 } catch (InterruptedException e) {
-                    LOG.warn("Sleep in MobicallConfigurator thread interrupted");
+                    LOG.info("Sleep in MobicallConfigurator thread interrupted");
                 }
             }
         }

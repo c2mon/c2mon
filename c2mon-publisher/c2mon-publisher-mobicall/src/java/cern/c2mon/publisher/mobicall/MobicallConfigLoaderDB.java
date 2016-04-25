@@ -17,7 +17,10 @@
 
 package cern.c2mon.publisher.mobicall;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -39,12 +42,21 @@ import org.slf4j.LoggerFactory;
  */
 public class MobicallConfigLoaderDB implements MobicallConfigLoaderIntf {
 
+    private static final String ORACLE_NET_TNS_ADMIN = "oracle.net.tns_admin";
+
+    private static final String ALARM_JDBC_PASSWORD = "alarm.jdbc.password";
+
+    private static final String ALARM_JDBC_USER = "alarm.jdbc.user";
+
+    private static final String ALARM_JDBC_URL = "alarm.jdbc.url";
+
+    private static final String ALARM_JDBC_DRIVER_CLASS = "alarm.jdbc.driverClass";
+
     private static MobicallConfigLoaderDB loader;
     
     static final Logger LOG = LoggerFactory.getLogger(MobicallAlarm.class);
     
-    private static final String DBPWD = ".dbpwd.properties";
-    private static final String DBCONN = "/database.properties";
+    private static final String SYS_PROP_DATABASE_PROPERTIES = "database.properties";
     
     private ConcurrentHashMap<String, MobicallAlarm> alarms;
     private Connection conn;
@@ -55,24 +67,32 @@ public class MobicallConfigLoaderDB implements MobicallConfigLoaderIntf {
     //
     private MobicallConfigLoaderDB() throws Exception {
         alarms = new ConcurrentHashMap<String, MobicallAlarm>();
-            
+        
         Properties dbProps = new Properties();
-        try (FileInputStream fisPwd = new FileInputStream(DBPWD)) {
-            System.setProperty("oracle.net.tns_admin", "/etc");
-            dbProps.load(this.getClass().getResourceAsStream(DBCONN));
-                
-            // show configuration in LOG without password!
-            LOG.info(dbProps.toString());
-            dbProps.load(fisPwd);
-                    
-            Class.forName(dbProps.getProperty("alarm.jdbc.driverClass"));   
-            conn = DriverManager.getConnection(
-                    dbProps.getProperty("alarm.jdbc.url"),
-                    dbProps.getProperty("alarm.jdbc.user"),
-                    dbProps.getProperty("alarm.jdbc.password"));
-        } catch (Exception e) {
-            throw e;
+        
+        if (System.getProperty(SYS_PROP_DATABASE_PROPERTIES) != null) {
+            File file = new File(System.getProperty(SYS_PROP_DATABASE_PROPERTIES));
+            
+            try (InputStream is = new FileInputStream(file)) {
+                dbProps.load(is);
+            }
+        } else {
+            throw new IOException("Please set the location of the database properties file using -D" + SYS_PROP_DATABASE_PROPERTIES);
         }
+        
+        if (((String)dbProps.get(ALARM_JDBC_DRIVER_CLASS)).toLowerCase().contains("oracle") && System.getProperty(ORACLE_NET_TNS_ADMIN) == null) {
+            LOG.info("Careful => No TNS_HOME set but you are using Oracle. You might like to set -D" + ORACLE_NET_TNS_ADMIN);
+        }
+        
+        LOG.info("Connecting to database using user {} on {} ", 
+                dbProps.getProperty(ALARM_JDBC_USER), 
+                dbProps.getProperty(ALARM_JDBC_URL));
+        
+        Class.forName(dbProps.getProperty(ALARM_JDBC_DRIVER_CLASS));   
+        conn = DriverManager.getConnection(
+                dbProps.getProperty(ALARM_JDBC_URL),
+                dbProps.getProperty(ALARM_JDBC_USER),
+                dbProps.getProperty(ALARM_JDBC_PASSWORD));
     }
     
     public static MobicallConfigLoaderIntf getLoader() throws Exception {
@@ -151,7 +171,7 @@ public class MobicallConfigLoaderDB implements MobicallConfigLoaderIntf {
             if (count > 0) {
                 synchronized(alarms) {
                     alarms = tmpAlarms;
-                    LOG.info("Size of Mobicall alarm map: " + alarms.size());
+                    LOG.info("New Mobicall alarm map size : {} ", alarms.size());
                 }
             } else {
                 LOG.warn("No alarm definitions found, keep previous configuration.");                
