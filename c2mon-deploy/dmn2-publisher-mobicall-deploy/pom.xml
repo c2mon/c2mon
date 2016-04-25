@@ -10,7 +10,7 @@
 	</parent>
 
 	<groupId>cern.c2mon</groupId>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<name>c2mon-publisher-mobicall-deploy</name>
 	<artifactId>c2mon-publisher-mobicall-deploy</artifactId>
 
