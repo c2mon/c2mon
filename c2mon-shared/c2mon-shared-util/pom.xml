@@ -10,7 +10,7 @@
 
   <groupId>cern.c2mon.c2mon-shared</groupId>
   <artifactId>c2mon-shared-util</artifactId>
-  <version>1.7.1</version>
+  <version>1.7.1-SNAPSHOT</version>
   <name>c2mon-shared-util</name>
   <packaging>jar</packaging>
   <description>
@@ -49,16 +49,23 @@
       <artifactId>activemq-all</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jms</artifactId>
+    </dependency>
+    
+    <!-- Test dependencies -->
+    <dependency>
+     <groupId>org.slf4j</groupId>
+     <artifactId>slf4j-log4j12</artifactId>
+     <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-jms</artifactId>
     </dependency>
   </dependencies>
   <developers />
