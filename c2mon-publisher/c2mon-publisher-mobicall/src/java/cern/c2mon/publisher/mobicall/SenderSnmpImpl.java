@@ -63,7 +63,7 @@ public class SenderSnmpImpl implements SenderIntf {
     /**
      * The location for the database properties 
      */
-    private static final String DATABASE_PROPERTIES = "database.properties";
+    private static final String SYS_PROP_MOBICALL_PROPERTIES = "mobicall.properties";
     private static final Logger LOG = LoggerFactory.getLogger(SenderSnmpImpl.class);
     private static final Logger JRN = LoggerFactory.getLogger("MOBICALL_JOURNAL");
 
@@ -90,14 +90,16 @@ public class SenderSnmpImpl implements SenderIntf {
         snmpTargets = new Vector<CommunityTarget>();
         snmpConfig = new Properties();
         
-        if (System.getProperty(DATABASE_PROPERTIES) != null) {
-            File file = new File(System.getProperty(DATABASE_PROPERTIES));
+        if (System.getProperty(SYS_PROP_MOBICALL_PROPERTIES) != null) {
+            File file = new File(System.getProperty(SYS_PROP_MOBICALL_PROPERTIES));
             
             try (InputStream is = new FileInputStream(file)) {
                 snmpConfig.load(is);
             }
         } else {
-            throw new IOException("Please set the location of the database properties file using -D'" + DATABASE_PROPERTIES + "'");
+            try (InputStream is = SenderSnmpImpl.class.getResourceAsStream(SYS_PROP_MOBICALL_PROPERTIES)) {
+                snmpConfig.load(is);
+            }
         }
         
         this.delay = Integer.parseInt(snmpConfig.getProperty(MOBICALL_DELAY));
