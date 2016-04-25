@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>cern.dmn2.client</groupId>
 		<artifactId>dmn2-client-pom</artifactId>
-		<version>1.0.22</version>
+		<version>RELEASE</version>
 	</parent>
 
 	<groupId>cern.c2mon</groupId>
