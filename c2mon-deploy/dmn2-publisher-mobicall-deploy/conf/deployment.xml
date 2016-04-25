@@ -17,6 +17,7 @@
 				<property name="log4j.configuration" value="file:conf/log4j.properties" />
 				<property name="mobicall.properties" value="conf/mobicall.properties" />
 				<property name="database.properties" value="conf/database.properties" />
+				<property name="oracle.net.tns_admin" value="/etc/" />
 				<main-class name="cern.c2mon.publisher.mobicall.MobicallAlarmsMain" />
 			</startscript>
 			<startscript>
