@@ -17,7 +17,10 @@
 
 package cern.c2mon.publisher.mobicall;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -45,6 +48,22 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
  */
 public class SenderSnmpImpl implements SenderIntf {
 
+    /**
+     * Property to indicate if the traps should really be send to the remote server. [true|false]
+     */
+    private static final String MOBICALL_ACTIVE = "mobicall.active";
+    private static final String MOBICALL_SERVER_DEBUG = "mobicall.server.debug";
+    private static final String MOBICALL_SERVER_BACKUP = "mobicall.server.backup";
+    private static final String MOBICALL_SERVER_MAIN = "mobicall.server.main";
+    private static final String MOBICALL_PROTOCOL = "mobicall.protocol";
+    /**
+     * A time interval in which subsequent notifications are suppressed [sec]
+     */
+    private static final String MOBICALL_DELAY = "mobicall.delay";
+    /**
+     * The location for the database properties 
+     */
+    private static final String DATABASE_PROPERTIES = "database.properties";
     private static final Logger LOG = LoggerFactory.getLogger(SenderSnmpImpl.class);
     private static final Logger JRN = LoggerFactory.getLogger("MOBICALL_JOURNAL");
 
@@ -70,16 +89,26 @@ public class SenderSnmpImpl implements SenderIntf {
     
         snmpTargets = new Vector<CommunityTarget>();
         snmpConfig = new Properties();
-        snmpConfig.load(this.getClass().getResourceAsStream("/mobicall.properties"));
-        this.delay = Integer.parseInt(snmpConfig.getProperty("mobicall.delay"));
-        this.protocol = snmpConfig.getProperty("mobicall.protocol");
-        MobicallServers.add(snmpConfig.getProperty("mobicall.server.main"));
-        MobicallServers.add(snmpConfig.getProperty("mobicall.server.backup"));
-
-        if (snmpConfig.getProperty("mobicall.server.debug") != null) {
-            MobicallServers.add(snmpConfig.getProperty("mobicall.server.debug"));
+        
+        if (System.getProperty(DATABASE_PROPERTIES) != null) {
+            File file = new File(System.getProperty(DATABASE_PROPERTIES));
+            
+            try (InputStream is = new FileInputStream(file)) {
+                snmpConfig.load(is);
+            }
+        } else {
+            throw new IOException("Please set the location of the database properties file using -D'" + DATABASE_PROPERTIES + "'");
         }
-        sendTraps = Boolean.parseBoolean(snmpConfig.getProperty("mobicall.active"));
+        
+        this.delay = Integer.parseInt(snmpConfig.getProperty(MOBICALL_DELAY));
+        this.protocol = snmpConfig.getProperty(MOBICALL_PROTOCOL);
+        MobicallServers.add(snmpConfig.getProperty(MOBICALL_SERVER_MAIN));
+        MobicallServers.add(snmpConfig.getProperty(MOBICALL_SERVER_BACKUP));
+
+        if (snmpConfig.getProperty(MOBICALL_SERVER_DEBUG) != null) {
+            MobicallServers.add(snmpConfig.getProperty(MOBICALL_SERVER_DEBUG));
+        }
+        sendTraps = Boolean.parseBoolean(snmpConfig.getProperty(MOBICALL_ACTIVE));
         LOG.info("-> " + snmpConfig.toString());
         
         LOG.info("... setting up SNMP communication ...");
