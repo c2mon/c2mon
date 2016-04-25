@@ -10,7 +10,7 @@
 
   <groupId>cern.c2mon.c2mon-shared</groupId>
   <artifactId>c2mon-shared-util</artifactId>
-  <version>1.7.1</version>
+  <version>1.7.2-SNAPSHOT</version>
   <name>c2mon-shared-util</name>
   <packaging>jar</packaging>
   <description>
