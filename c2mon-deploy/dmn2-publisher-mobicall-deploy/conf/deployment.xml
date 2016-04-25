@@ -15,6 +15,8 @@
 				<max-heap-size>128M</max-heap-size>
 				<property name="jmx.mgt.port" value="1095" />
 				<property name="log4j.configuration" value="file:conf/log4j.properties" />
+				<property name="mobicall.properties" value="conf/mobicall.properties" />
+				<property name="database.properties" value="conf/database.properties" />
 				<main-class name="cern.c2mon.publisher.mobicall.MobicallAlarmsMain" />
 			</startscript>
 			<startscript>
