@@ -28,16 +28,35 @@
 			TIM Mobicall Service application 
 		-->
 		<application name="tim-mobicall-pro">
-			<deployment installLocation="/opt/tim2-mobicall" />
+			<deployment installLocation="/opt/tim2-publisher-mobicall" />
 			<startscript>
 				<property name="c2mon.client.conf.url" value="http://timweb/conf/c2mon-client.properties"/>
 				<property name="jmx.mgt.port" value="1095" />
 			</startscript>
 		</application>
 		<application name="tim-mobicall-test">
-			<deployment installLocation="/opt/tim2-mobicall-test" />
+			<deployment installLocation="/opt/tim2--publisher-mobicall-test" />
 			<startscript>
 				<property name="c2mon.client.conf.url" value="http://timweb/test/conf/c2mon-client.properties"/>
+				<property name="jmx.mgt.port" value="1095" />
+			</startscript>
+		</application>
+		
+		
+		<!-- 
+			DIAMON Mobicall Service application 
+		-->
+		<application name="dmn2-mobicall-pro">
+			<deployment installLocation="/opt/dmn2-publisher-mobicall" />
+			<startscript>
+				<property name="c2mon.client.conf.url" value="http://abwww/~diamonop/c2mon/client/client.properties"/>
+				<property name="jmx.mgt.port" value="1095" />
+			</startscript>
+		</application>
+		<application name="dmn2-mobicall-dev">
+			<deployment installLocation="/opt/dmn2-publisher-mobicall-dev" />
+			<startscript>
+				<property name="c2mon.client.conf.url" value="http://abwww/~dmndev/c2mon/client/client.properties"/>
 				<property name="jmx.mgt.port" value="1095" />
 			</startscript>
 		</application>
