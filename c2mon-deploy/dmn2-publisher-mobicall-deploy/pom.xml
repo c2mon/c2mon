@@ -14,7 +14,6 @@
 	<name>c2mon-publisher-mobicall-deploy</name>
 	<artifactId>c2mon-publisher-mobicall-deploy</artifactId>
 
-	<description>DMN2 Mobicall alarms publishers</description>
 
 	<scm>
 		<developerConnection>https://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/dmn2-publisher-mobicall-deploy</developerConnection>
@@ -24,22 +23,12 @@
     <dependency>
 	  	<groupId>cern.c2mon.c2mon-publisher</groupId>
   		<artifactId>c2mon-publisher-mobicall</artifactId>
-	  	<version>RELEASE</version>
+	  	<version>[1.0.0,2.0.0]</version>
     </dependency>
 
 
     <!-- C2MON Client API dependencies -->
-    <dependency>
-      <groupId>cern.c2mon.c2mon-client</groupId>
-      <artifactId>c2mon-client-all</artifactId>
-      <version>1.6.1</version><!--$NO-MVN-MAN-VER$-->
-    </dependency>
 
-	<dependency>
-  		<groupId>cern.accsoft.commons</groupId>
-  		<artifactId>accsoft-commons-jmxdirectory-registration-client</artifactId>
-  		<version>1.1.8</version>
-  	</dependency>
 
 
 	</dependencies>
@@ -73,6 +62,9 @@
 		</plugins>
 	</build>
 
+	<description>MobiCall publisher for C2mon. 
+
+For information on mobicall check http://www.mobilisierung.com</description>
 </project>
 
 
