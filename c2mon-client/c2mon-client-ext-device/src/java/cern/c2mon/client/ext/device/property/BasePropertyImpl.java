@@ -56,7 +56,7 @@ public class BasePropertyImpl implements BaseProperty {
   private Tag tag;
 
   /**
-   * Reference to the {@link C2monTagManager}, used to lazy-load data tags.
+   * Reference to the {@link TagService}, used to lazy-load data tags.
    */
   protected TagService tagService;
 
@@ -73,7 +73,6 @@ public class BasePropertyImpl implements BaseProperty {
     this.name = name;
     this.category = category;
     this.tagId = tagId;
-    this.tagService = C2monServiceGateway.getTagService();
   }
 
   /**
@@ -92,7 +91,6 @@ public class BasePropertyImpl implements BaseProperty {
     if (isDataTag()) {
       this.tagId = Tag.getId();
     }
-    this.tagService = C2monServiceGateway.getTagService();
   }
 
   @Override
@@ -176,6 +174,10 @@ public class BasePropertyImpl implements BaseProperty {
   private Tag loadTag() {
     Tag value = this.tag;
 
+    if (this.tagService == null) {
+      this.tagService = C2monServiceGateway.getTagService();
+    }
+
     // If the internal value is a Long, then we lazy load the data tag
     if (isDataTag() && !isValueLoaded()) {
       value = tagService.get(getTagId());
@@ -198,7 +200,7 @@ public class BasePropertyImpl implements BaseProperty {
   }
 
   /**
-   * Manually set the reference to the {@link C2monTagManager} on the property.
+   * Manually set the reference to the {@link TagService} on the property.
    * Used for testing purposes.
    *
    * @param tagManager the tag manager to use
