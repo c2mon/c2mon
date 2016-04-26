@@ -304,6 +304,10 @@ public class DeviceManagerTest {
     Assert.assertNotNull(device);
     Assert.assertTrue(device.getId() == device1.getId());
 
+    for (Property property : device1.getProperties()) {
+      ((PropertyImpl) property).setTagManager(tagServiceMock);
+    }
+
     Assert.assertTrue(device.getProperty("test_property_name_1").getTag().getId().equals(100000L));
     Assert.assertTrue(device.getProperty("test_property_name_2").getTag().getId().equals(200000L));
 
@@ -366,6 +370,10 @@ public class DeviceManagerTest {
 
     // Check all properties are subscribed to at this point
     Assert.assertTrue(areAllPropertiesAndFieldsSubscribed(listener.getDevices()));
+
+    for (Property property : device.getProperties()) {
+      ((PropertyImpl) property).setTagManager(tagServiceMock);
+    }
 
     Assert.assertTrue(device.getProperty("test_property_name_1").getTag().getId().equals(100000L));
     Assert.assertTrue(device.getProperty("test_property_name_2").getTag().getId().equals(200000L));
@@ -522,6 +530,10 @@ public class DeviceManagerTest {
     Assert.assertNotNull(device2);
     Assert.assertTrue(device2.getId() == listener.getDevice().getId());
 
+    for (Property property : device2.getProperties()) {
+      ((PropertyImpl) property).setTagManager(tagServiceMock);
+    }
+
     Assert.assertTrue(listener.getDevice().getProperty("TEST_PROPERTY_1").getTag().getId().equals(100430L));
 
     // Verify that everything happened as expected
@@ -639,6 +651,10 @@ public class DeviceManagerTest {
     Device device2 = listener.getDevice();
     Assert.assertNotNull(device2);
     Assert.assertTrue(device2.getId() == listener.getDevice().getId());
+
+    for (Property property : device2.getProperties()) {
+      ((PropertyImpl) property).setTagManager(tagServiceMock);
+    }
 
     Assert.assertTrue(listener.getDevice().getProperty("TEST_PROPERTY_1").getTag().getId().equals(100430L));
 
