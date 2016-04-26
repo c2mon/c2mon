@@ -26,7 +26,7 @@ public class C2monApplicationListener implements ApplicationListener {
 
       if (propertySource != null) {
         try {
-          environment.getPropertySources().addFirst(new ResourcePropertySource(propertySource));
+          environment.getPropertySources().addAfter("systemEnvironment", new ResourcePropertySource(propertySource));
         } catch (IOException e) {
           throw new RuntimeException("Could not read property source", e);
         }
