@@ -14,7 +14,7 @@
 				</main-class>
 
 				<!-- JVM arguments -->
-				<property name="log4j.configuration" value="file://${INSTALL_DIR}/conf/log4j.xml" />
+				<property name="logging.config" value="file://${INSTALL_DIR}/conf/log4j.xml" />
 				<property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
 				<property name="c2mon.process.name" value="dmn2-views-gen" />
 				<property name="db.properties"

@@ -89,7 +89,7 @@ print "    <property name=\"app.version\" value=\"$viewerVersion\"/>\n";
 # JMS configuration parameters needed by C2MON client API
 print "    <property name=\"c2mon.client.conf.url\" value=\"$c2monClientPropertiesURL\"/>\n";
 # log4j configuration URL
-print "    <property name=\"log4j.configuration\" value=\"$log4jURL\"/>\n";
+print "    <property name=\"logging.config\" value=\"$log4jURL\"/>\n";
 # Defines the timezone, which is not always correctly picked up from Linux
 print "    <property name=\"user.timezone\" value=\"Europe/Zurich\"/>\n";
 
