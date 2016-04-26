@@ -31,7 +31,7 @@ public class HistoryDataSourceConfig {
       dataSource.setDriverClassName("oracle.jdbc.OracleDriver");
 
       // In oracle mode, reduce the connection timeout to 5 seconds
-      dataSource.addConnectionProperty("oracle.net.CONNECT_TIMEOUT", "50");
+      dataSource.addConnectionProperty("oracle.net.CONNECT_TIMEOUT", "5000");
     }
     else if (url.contains("mysql")) {
       dataSource.setDriverClassName("com.mysql.jdbc.Driver");
