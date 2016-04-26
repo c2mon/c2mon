@@ -436,6 +436,8 @@ public class DeviceManagerTest {
     Assert.assertTrue(areAllPropertiesAndFieldsSubscribed(listener.getDevices()));
 
     Property propertyWithFields = device.getProperty("test_property_name");
+    ((PropertyImpl) propertyWithFields).setTagManager(tagServiceMock);
+
     Assert.assertTrue(propertyWithFields.getCategory().equals(Category.MAPPED_PROPERTY));
     for (int i = 0; i < 1000; i++) {
       Tag tag = propertyWithFields.getField("test_field_name_" + i).getTag();
