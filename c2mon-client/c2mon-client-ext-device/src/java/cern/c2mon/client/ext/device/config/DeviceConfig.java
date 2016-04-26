@@ -16,12 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.client.ext.device.config;
 
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
 
 /**
  * @author Justin Lewis Salmon
  */
 @Configuration
-@ImportResource("classpath:c2mon-client-ext-device.xml")
+@ComponentScan("cern.c2mon.client.ext.device")
 public class DeviceConfig {}

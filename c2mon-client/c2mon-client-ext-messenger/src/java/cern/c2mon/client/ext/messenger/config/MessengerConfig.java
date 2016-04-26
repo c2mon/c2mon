@@ -16,12 +16,26 @@
  *****************************************************************************/
 package cern.c2mon.client.ext.messenger.config;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
+import org.apache.activemq.command.ActiveMQTopic;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
+
+import javax.jms.Destination;
 
 /**
  * @author Justin Lewis Salmon
  */
 @Configuration
-@ImportResource("classpath:c2mon-client-ext-messenger.xml")
-public class MessengerConfig {}
+@PropertySource("classpath:messenger.properties")
+@ComponentScan("cern.c2mon.client.ext.messenger")
+public class MessengerConfig {
+
+  @Autowired
+  private Environment environment;
+
+  @Bean
+  public Destination broadcastMessageTopic() {
+    return new ActiveMQTopic(environment.getRequiredProperty("c2mon.client.jms.broadcast.topic"));
+  }
+}

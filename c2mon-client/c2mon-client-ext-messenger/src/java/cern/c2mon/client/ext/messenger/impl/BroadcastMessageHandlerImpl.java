@@ -24,6 +24,7 @@ import cern.c2mon.client.jms.BroadcastMessageListener;
 import cern.c2mon.client.jms.JmsProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.jms.Destination;
@@ -48,15 +49,12 @@ public class BroadcastMessageHandlerImpl implements BroadcastMessageHandler {
   private final long messageTimeout;
 
   @Autowired
-  public BroadcastMessageHandlerImpl(
-      final JmsProxy jmsProxy, 
-      @Qualifier("broadcastMessageTopic") final Destination broadcastMessageTopic,
-      @Qualifier("broadcastMessageTopicName") final String broadcastMessageTopicName,
-      @Qualifier("broadcastMessageTimeout") final Long broadcastMessageTimeout) {
-    
+  public BroadcastMessageHandlerImpl(final JmsProxy jmsProxy,
+                                     @Qualifier("broadcastMessageTopic") final Destination broadcastMessageTopic,
+                                     Environment environment) {
     this.jmsProxy = jmsProxy;
-    this.messageTopicName = broadcastMessageTopicName;
-    this.messageTimeout = broadcastMessageTimeout;
+    this.messageTopicName = environment.getRequiredProperty("c2mon.client.jms.broadcast.topic");
+    this.messageTimeout = environment.getRequiredProperty("c2mon.client.jms.broadcast.timeout", Long.class);
     this.jmsProxy.setBroadcastMessageTopic(broadcastMessageTopic);
   }
 
@@ -86,5 +84,4 @@ public class BroadcastMessageHandlerImpl implements BroadcastMessageHandler {
       throw new BroadcastMessageDeliveryException("Failed to deliver the broadcast message", e);
     }
   }
-
 }

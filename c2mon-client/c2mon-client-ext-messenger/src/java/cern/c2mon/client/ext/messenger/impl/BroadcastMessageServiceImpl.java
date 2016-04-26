@@ -29,7 +29,7 @@ import cern.c2mon.shared.common.command.AuthorizationDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -76,22 +76,12 @@ public class BroadcastMessageServiceImpl implements BroadcastMessageService, Bro
    * Constructor
    *
    * @param broadcastMessageHandler the message handler
-   * @param sessionManager the session manager
    */
   @Autowired
-  protected BroadcastMessageServiceImpl(final BroadcastMessageHandler broadcastMessageHandler) {
-
+  protected BroadcastMessageServiceImpl(final BroadcastMessageHandler broadcastMessageHandler, Environment environment) {
     this.broadcastMessageHandler = broadcastMessageHandler;
     this.broadcastMessageListeners = new ConcurrentSet<>();
-  }
-
-  /**
-   * Sets the RBAC authorization details String 
-   * @param authDetails The RBAC authorization details given as RBAC class/device/property tuple
-   */
-  @Autowired
-  public void setAuthDetails(@Value("${c2mon.client.rbac.admin}") final String authDetails) {
-    rbacAdminAuthorizationDetails = authDetails;
+    this.rbacAdminAuthorizationDetails = environment.getRequiredProperty("c2mon.client.rbac.admin");
   }
 
   /**

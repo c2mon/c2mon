@@ -34,8 +34,6 @@
     <constructor-arg value="deviceManager" />
   </bean>
 
-  <!-- import jms properties -->
-  <import
-    resource="classpath:cern/c2mon/client/ext/device/config/jms-properties.xml" />
+  <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer" />
 
 </beans>

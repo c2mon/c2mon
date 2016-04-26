@@ -44,6 +44,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.common.listener.TagListener;
@@ -79,7 +80,17 @@ import cern.c2mon.shared.rule.RuleFormatException;
  * @author Justin Lewis Salmon
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:cern/c2mon/client/ext/device/config/c2mon-devicemanager-test.xml" })
+@ContextConfiguration({
+    "classpath:cern/c2mon/client/ext/device/config/c2mon-devicemanager-test.xml"
+})
+@TestPropertySource(
+    locations = "classpath:c2mon-client.properties",
+    properties = {
+        "c2mon.client.jms.url=vm://localhost",
+        "c2mon.client.jms.user=",
+        "c2mon.client.jms.password="
+    }
+)
 public class DeviceManagerTest {
 
   private Logger LOG = LoggerFactory.getLogger(DeviceManagerTest.class);
