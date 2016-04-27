@@ -9,7 +9,7 @@
 
   <groupId>cern.c2mon.c2mon-daq</groupId>
   <artifactId>c2mon-daq-dip</artifactId>
- <version>1.7.3</version>
+ <version>1.7.4-SNAPSHOT</version>
   <name>c2mon-daq-dip</name>
   <packaging>jar</packaging>
   <description>C2MON data acquisition component for DIP.</description>
