@@ -9,7 +9,7 @@
 
   <groupId>cern.c2mon.c2mon-daq</groupId>
   <artifactId>c2mon-daq-rest</artifactId>
-  <version>1.7.1</version>
+  <version>1.7.2-SNAPSHOT</version>
   <name>c2mon-daq-rest</name>
 
   <scm>
