@@ -7,7 +7,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
  * @author Justin Lewis Salmon
  */
 @Configuration
-@PropertySource("classpath:c2mon-client.properties")
+@PropertySource("classpath:c2mon-client-default.properties")
 @ImportResource("classpath:c2mon-client.xml")
 @ComponentScan("cern.c2mon")
 public class C2monAutoConfiguration {
