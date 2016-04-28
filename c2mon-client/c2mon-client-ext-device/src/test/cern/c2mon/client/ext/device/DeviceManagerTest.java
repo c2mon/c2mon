@@ -84,11 +84,9 @@ import cern.c2mon.shared.rule.RuleFormatException;
     "classpath:cern/c2mon/client/ext/device/config/c2mon-devicemanager-test.xml"
 })
 @TestPropertySource(
-    locations = "classpath:c2mon-client.properties",
+    locations = "classpath:c2mon-client-default.properties",
     properties = {
-        "c2mon.client.jms.url=vm://localhost",
-        "c2mon.client.jms.user=",
-        "c2mon.client.jms.password="
+        "c2mon.client.jms.url=vm://localhost"
     }
 )
 public class DeviceManagerTest {

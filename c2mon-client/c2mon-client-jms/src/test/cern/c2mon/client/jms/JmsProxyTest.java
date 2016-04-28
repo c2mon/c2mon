@@ -78,11 +78,9 @@ import cern.c2mon.shared.util.json.GsonFactory;
 @ContextConfiguration({ "classpath:cern/c2mon/client/jms/config/c2mon-client-jms.xml",
                          "classpath:cern/c2mon/client/jms/config/c2mon-client-jms-properties.xml" })
 @TestPropertySource(
-    locations = "classpath:c2mon-client.properties",
+    locations = "classpath:c2mon-client-default.properties",
     properties = {
-        "c2mon.client.jms.url=vm://localhost",
-        "c2mon.client.jms.user=",
-        "c2mon.client.jms.password="
+        "c2mon.client.jms.url=vm://localhost"
     }
 )
 public class JmsProxyTest {

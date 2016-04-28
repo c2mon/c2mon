@@ -54,11 +54,9 @@ import cern.c2mon.shared.rule.SimpleRuleExpression;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({ "classpath:cern/c2mon/client/ext/device/config/c2mon-deviceimpl-test.xml" })
 @TestPropertySource(
-    locations = "classpath:c2mon-client.properties",
+    locations = "classpath:c2mon-client-default.properties",
     properties = {
-        "c2mon.client.jms.url=vm://localhost",
-        "c2mon.client.jms.user=",
-        "c2mon.client.jms.password="
+        "c2mon.client.jms.url=vm://localhost"
     }
 )
 public class DeviceImplTest {
