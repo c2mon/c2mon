@@ -17,6 +17,7 @@
          <startscript>
             <main-class name="cern.c2mon.notification.Main" />
             <property name="log4j.configuration" value="conf/log4j.properties" />
+            <property name="logging.config" value="conf/log4j.properties" />
             <property name="oracle.net.tns_admin" value="/etc/" />
             <initial-heap-size>256m</initial-heap-size>
             <max-heap-size>256m</max-heap-size>
