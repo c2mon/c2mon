@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -33,8 +32,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.notification.Mailer;
 import cern.c2mon.notification.SubscriptionRegistry;
@@ -46,11 +44,8 @@ import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
-import cern.c2mon.shared.rule.RuleEvaluationException;
 import cern.c2mon.shared.rule.RuleExpression;
-import cern.c2mon.shared.rule.RuleExpression.RuleType;
 import cern.c2mon.shared.rule.RuleFormatException;
-import cern.c2mon.shared.rule.RuleValidationReport;
 import cern.dmn2.core.Status;
 
 /**
@@ -121,6 +116,16 @@ public class NotifierImplTest {
 	    }
 	    
 	    @Override
+	    protected void startC2monSubscription(Subscription sub, HashSet<Long> toSubscribeTo, TagListener listener) {
+	        listener.onInitialUpdate(getLatestFromServer(toSubscribeTo));
+	        
+	    }
+	    @Override
+	    protected void unsubscribeFirstUpdateListener(TagListener initialReportTagListener) {
+	        //
+	    }
+	    
+	    @Override
 	    public Tag resolveSubTags(Long l) {
 	        Tag parent = super.resolveSubTags(l);
 	        
@@ -148,30 +153,12 @@ public class NotifierImplTest {
 	    
 	    	    
 	    @Override
-	    public Collection<ClientDataTagValue> getLatestFromServer(HashSet<Long> toSubscribeTo) {
-	        ArrayList<ClientDataTagValue> result = new ArrayList<ClientDataTagValue>();
+	    public Collection<cern.c2mon.client.common.tag.Tag> getLatestFromServer(HashSet<Long> toSubscribeTo) {
+	        ArrayList<cern.c2mon.client.common.tag.Tag> result = new ArrayList<cern.c2mon.client.common.tag.Tag>();
 	        for (Long t : toSubscribeTo) {
 	            result.add(cache.get(t).getLatestUpdate());
 	        }
 	        return result;
-	    }
-	    @Override
-	    public void cancelSubscriptionFor(HashSet<Long> toCancel) {
-	        // IGNORE
-	    }
-	    
-	    @Override
-	    protected void startSubscriptionFor(HashSet<Long> l) {
-	        // IGNORE
-	    }
-	    @Override
-	    protected DataTagUpdateListener startSubscriptionWithoutNotification(HashSet<Long> list) {
-	        return null;
-        }
-	    
-	    @Override
-	    void unsubscribeFirstUpdateListener(DataTagUpdateListener initialReportTagListener) {
-	        //
 	    }
 	    
 	    @Override
@@ -1109,7 +1096,7 @@ public class NotifierImplTest {
          * test the source down message :
          * we have to set the quality for tags 1,2,3, to invalid. 
          */
-	    ClientDataTagValue 
+        cern.c2mon.client.common.tag.Tag 
 	    c = getClientDataTagFakeUpdateFor(new Tag(3L, false), 3.65D);
 	    c.getDataTagQuality().addInvalidStatus(TagQualityStatus.INACCESSIBLE);
 	    m.onUpdate(c);
@@ -1158,7 +1145,7 @@ public class NotifierImplTest {
      * @throws Exception in case the passed id is not a metric
      */
 	private void sendUpdateRuleTag(long id, int status) throws Exception {
-	    ClientDataTagValue ruleUpdate = getClientDataTagFakeUpdateFor(m.get(id), new Double(status));
+	    cern.c2mon.client.common.tag.Tag ruleUpdate = getClientDataTagFakeUpdateFor(m.get(id), new Double(status));
         m.onUpdate(ruleUpdate);
 	}
 	
@@ -1169,12 +1156,12 @@ public class NotifierImplTest {
 	 * @throws Exception in case the passed id is not a metric
 	 */
 	private void sendUpdateMetricTag(long id, double value) throws Exception {
-	    ClientDataTagValue metricUpdate = getClientDataTagFakeUpdateFor(m.get(id), value);
+	    cern.c2mon.client.common.tag.Tag metricUpdate = getClientDataTagFakeUpdateFor(m.get(id), value);
         m.onUpdate(metricUpdate);
 	}
 	
 	
-	ClientDataTagValue getClientDataTagFakeUpdateFor(Tag tag, Double value) throws RuleFormatException {
+	cern.c2mon.client.common.tag.Tag getClientDataTagFakeUpdateFor(Tag tag, Double value) throws RuleFormatException {
 	    ClientDataTagImpl result = null;
 	    Long id = tag.getId();
 	    if (tag.isRule()) {

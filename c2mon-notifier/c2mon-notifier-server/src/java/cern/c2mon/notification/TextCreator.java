@@ -33,7 +33,6 @@ import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.notification.impl.TagCache;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.rule.ConditionedRuleExpression;
@@ -197,7 +196,7 @@ public class TextCreator {
         SimpleDateFormat df = new SimpleDateFormat("MM.dd.yyyy HH:mm:ss,SSS");
         HashMap<String, Object> root = new HashMap<String, Object>();
 
-        ClientDataTagValue cdtv = metricUpdate.getLatestUpdate();
+        cern.c2mon.client.common.tag.Tag cdtv = metricUpdate.getLatestUpdate();
 
         root.put("parentStatus", parent.getLatestStatus());
         root.put("parentTagId", parent.getId());
@@ -222,7 +221,7 @@ public class TextCreator {
         return out.toString();
     }
 
-    public static String statusToTransitionText(ClientDataTagValue update) {
+    public static String statusToTransitionText(cern.c2mon.client.common.tag.Tag update) {
         int status = ((Double) update.getValue()).intValue();
         if (status == 1 || status == 2) {
             return "PROBLEM";
@@ -249,7 +248,7 @@ public class TextCreator {
             throw new IllegalArgumentException("Passed argument for Tag was null! ");
         }
 
-        ClientDataTagValue cdtv = update.getLatestUpdate();
+        cern.c2mon.client.common.tag.Tag cdtv = update.getLatestUpdate();
 
         // Create the root hash
         HashMap<String, Object> root = new HashMap<>();
@@ -338,7 +337,7 @@ public class TextCreator {
 //        }
         
         for (Tag tag : list) {
-            ClientDataTagValue c = tag.getLatestUpdate();
+            cern.c2mon.client.common.tag.Tag c = tag.getLatestUpdate();
             HashMap<String, Object> child = new HashMap<String, Object>();
             child.put("ruleId", Long.toString(c.getId()));
             child.put("ruleStatus", tag.getLatestStatus().toString());
@@ -404,7 +403,7 @@ public class TextCreator {
         HashMap<String, Object> root = new HashMap<String, Object>();
 
         DataTagQuality quality = update.getLatestUpdate().getDataTagQuality();
-        ClientDataTagValue cdtv = update.getLatestUpdate();
+        cern.c2mon.client.common.tag.Tag cdtv = update.getLatestUpdate();
         if (cdtv != null) {
             root.put("notificationType", quality.getDescription());
             root.put("tagId", Long.toString(update.getId()));
@@ -423,7 +422,7 @@ public class TextCreator {
     
     public String getProblemDescription(Tag ruleTag, TagCache cache) {
         
-        ClientDataTagValue cdtv = ruleTag.getLatestUpdate();
+        cern.c2mon.client.common.tag.Tag cdtv = ruleTag.getLatestUpdate();
         if ( cdtv.getRuleExpression() instanceof SimpleRuleExpression) {
             return "";
         }

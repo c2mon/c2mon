@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Required;
 
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.listener.HeartbeatListener;
+import cern.c2mon.client.jms.ClientHealthListener;
 import cern.c2mon.notification.Mailer;
 import cern.c2mon.notification.Notifier;
 import cern.c2mon.notification.SubscriptionRegistry;
@@ -486,10 +487,9 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
         /**
          * Tag has recovered:
          */
-        // if (update.hasStatusRecovered()) {
-        // sendTagRecoveredMessage(update);
-        // return;
-        // }
+//         if (!update.hasStatusRecovered()) {
+//             return;
+//         }
 
         /**
          * Check more detailed on the problem and collect info
@@ -676,6 +676,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                         quality.getInvalidQualityStates());
             }
         }
+        
         return false;
     }
 

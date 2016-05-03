@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.TypeNumeric;
 import cern.c2mon.notification.shared.Subscription;
 import cern.dmn2.core.Status;
@@ -48,8 +47,8 @@ public class Tag {
     
     private final String name;
     
-    private ClientDataTagValue latest = null;
-    private ClientDataTagValue previous = null;
+    private cern.c2mon.client.common.tag.Tag latest = null;
+    private cern.c2mon.client.common.tag.Tag previous = null;
 
     /**
      * only if we are a rule this field is used.
@@ -78,7 +77,7 @@ public class Tag {
         this(id, "Tag #" + id, isRule);
     }
     
-    Tag(ClientDataTagValue from) {
+    Tag(cern.c2mon.client.common.tag.Tag from) {
         this(from.getId(), from.getName(), from.isRuleResult());
         update(from);
     }
@@ -331,7 +330,7 @@ public class Tag {
      * 
      * @param update the {@link ClientDataTagValue}
      */
-    public void update(ClientDataTagValue update) {
+    public void update(cern.c2mon.client.common.tag.Tag update) {
         int newStatus = Status.UNKNOWN.toInt();
 
         if (update.isRuleResult()) {
@@ -382,10 +381,13 @@ public class Tag {
         return (HashMap<Long, Tag>) parents.clone();
     }
 
-    public ClientDataTagValue getLatestUpdate() {
+    public cern.c2mon.client.common.tag.Tag getLatestUpdate() {
         return latest;
     }
 
+    public cern.c2mon.client.common.tag.Tag getPreviousUpdate() {
+        return previous;
+    }
     
     public boolean hasStatusRecovered() {
         return getPreviousStatus().worserThan(Status.OK) && getLatestStatus().equals(Status.OK);
@@ -461,7 +463,7 @@ public class Tag {
      * @param after the value after
      * @return TRUE in case the two passed (numerical) values are different.
      */
-    public static boolean hasValueChanged(ClientDataTagValue before, ClientDataTagValue after) {
+    public static boolean hasValueChanged(cern.c2mon.client.common.tag.Tag before, cern.c2mon.client.common.tag.Tag after) {
         boolean result = false;
         if (before.getTypeNumeric().equals(TypeNumeric.TYPE_DOUBLE)) {
             result = (Double) before.getValue() != (Double) after.getValue();
