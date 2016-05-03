@@ -5,13 +5,13 @@
    <parent>
     <artifactId>c2mon-client-pom</artifactId>
     <groupId>cern.c2mon.c2mon-client</groupId>
-    <version>1.6.0</version>
+    <version>RELEASE</version>
    </parent>
 
 
 	<groupId>cern.c2mon.notification</groupId>
 	<artifactId>c2mon-server-notification</artifactId>
-	<version>1.0.12</version>
+	<version>1.0.12-SNAPSHOT</version>
 	<name>notifier</name>
 	<packaging>jar</packaging>
 
@@ -123,12 +123,10 @@
 		<dependency>
 		   <groupId>org.slf4j</groupId>
 		   <artifactId>slf4j-api</artifactId>
-		   <version>1.7.5</version>
 		</dependency>
 		<dependency>
 		   <groupId>org.slf4j</groupId>
 		   <artifactId>slf4j-log4j12</artifactId>
-		   <version>1.7.5</version>
 		</dependency>
 		<dependency>
 		   <groupId>org.apache.activemq</groupId>
