@@ -34,11 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.listener.TagListener;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.C2monServiceGateway;
-import cern.c2mon.client.core.manager.TagManager;
 import cern.c2mon.notification.Notifier;
 import cern.c2mon.notification.SubscriptionRegistry;
 import cern.c2mon.notification.Tag;
@@ -492,7 +489,7 @@ public class TagCache implements TagListener {
     
     
     /** Resolves all sub-metrics from each element in <code>s</code> and using {@link TagCache#metricTagResolver(Tag, HashMap)} 
-     *   and calls {@link TagManager#subscribeDataTags(java.util.Set, DataTagUpdateListener)}
+     *   and calls {@link #startC2monSubscription(Subscription, HashSet, TagListener)}
      * 
      * @param list the list of tags to subscribe to.
      * @throws TagNotFoundException in case one of the passed tagid cannot be subscribed to.
