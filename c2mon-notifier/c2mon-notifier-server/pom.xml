@@ -11,7 +11,7 @@
 
 	<groupId>cern.c2mon.notification</groupId>
 	<artifactId>c2mon-server-notification</artifactId>
-	<version>1.0.12</version>
+	<version>1.0.12-SNAPSHOT</version>
 	<name>notifier</name>
 	<packaging>jar</packaging>
 
@@ -88,8 +88,7 @@
 		<dependency>
 			<groupId>cern.c2mon.notification</groupId>
 			<artifactId>c2mon-notification-shared</artifactId>
-			<version>[1.0.0,2.0.0)</version>
-			<type>jar</type>
+			<version>[1.0.11,2.0.0)</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -118,7 +117,7 @@
 		<dependency>
 			<groupId>cern.dmn2.shared</groupId>
 			<artifactId>dmn2-db-service</artifactId>
-			<version>1.0.35</version>
+			<version>1.0.37</version>
 		</dependency>
 		<dependency>
 		   <groupId>org.slf4j</groupId>
