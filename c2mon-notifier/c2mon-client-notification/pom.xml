@@ -13,20 +13,18 @@
   <dependencies>
   	<dependency>
   		<groupId>org.apache.activemq</groupId>
-  		<artifactId>activemq-all</artifactId>
-  		<version>5.5.1-fuse-08-15</version>
+  		<artifactId>activemq-client</artifactId>
+  		<version>5.12.2</version>
   	</dependency>
   	<dependency>
   		<groupId>cern.c2mon.notification</groupId>
   		<artifactId>c2mon-notification-shared</artifactId>
-  		<version>[1.0.7,2.0.0]</version>
-  		<type>jar</type>
-  		<scope>compile</scope>
+  		<version>[1.0.11,2.0.0]</version>
   	</dependency>
   	<dependency>
   		<groupId>cern.accsoft.commons</groupId>
   		<artifactId>accsoft-commons-util</artifactId>
-  		<version>2.0.9</version>
+  		<version>3.1.2</version>
   	</dependency>
   	<dependency>
   		<groupId>com.google.code.gson</groupId>
