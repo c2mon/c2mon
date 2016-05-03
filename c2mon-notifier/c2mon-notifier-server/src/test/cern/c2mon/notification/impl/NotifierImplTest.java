@@ -671,6 +671,8 @@ public class NotifierImplTest {
         sendUpdateRuleTag(10L, Status.WARNING.toInt());
         notifier.checkCacheForChanges();
         
+        Timestamp lastNotifcationForFirstSubscriber 
+                    = s.getSubscription(toBeNotifiedFor.getId()).getLastNotification();
         
         Subscriber s2 = new Subscriber("test2", "test@cern.ch", "");
         s2.addSubscription(new Subscription(s2.getUserName(), toBeNotifiedFor.getId()));
@@ -683,6 +685,10 @@ public class NotifierImplTest {
         assertTrue(s.getSubscription(toBeNotifiedFor.getId()).getLastStatusForResolvedSubTag(2L).equals(Status.ERROR));
         assertTrue(s.getSubscription(toBeNotifiedFor.getId()).getLastStatusForResolvedSubTag(1L).equals(Status.ERROR));
         assertTrue(s.getSubscription(toBeNotifiedFor.getId()).getLastStatusForResolvedSubTag(10L).equals(Status.WARNING));
+
+        // check also if the the first one was not re-notified
+        s = reg.getSubscriber(s2.getUserName());
+        assertTrue("BAD: The first subscriber was also notified!",!lastNotifcationForFirstSubscriber.equals(s.getSubscription(toBeNotifiedFor.getId()).getLastNotification()));
         
         EasyMock.verify(mailer);        
 	}
@@ -1130,6 +1136,9 @@ public class NotifierImplTest {
          
 	}
 	
+	public void testNoRenotificationForSameSubscription() {
+	    
+	}
 	
 	
 	// --- HELPERS
