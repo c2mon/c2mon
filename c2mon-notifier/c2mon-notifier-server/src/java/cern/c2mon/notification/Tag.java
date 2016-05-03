@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.TypeNumeric;
 import cern.c2mon.notification.shared.Subscription;
 import cern.dmn2.core.Status;

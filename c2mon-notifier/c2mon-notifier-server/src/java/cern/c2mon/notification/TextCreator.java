@@ -33,6 +33,7 @@ import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
+import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.notification.impl.TagCache;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.rule.ConditionedRuleExpression;

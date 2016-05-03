@@ -35,7 +35,6 @@ import org.springframework.beans.factory.annotation.Required;
 
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.listener.HeartbeatListener;
-import cern.c2mon.client.jms.ClientHealthListener;
 import cern.c2mon.notification.Mailer;
 import cern.c2mon.notification.Notifier;
 import cern.c2mon.notification.SubscriptionRegistry;

@@ -37,8 +37,8 @@ import org.springframework.jms.core.MessageCreator;
 
 import cern.c2mon.notification.SubscriptionRegistry;
 import cern.c2mon.notification.jms.ClientRequest;
-import cern.c2mon.notification.jms.ClientResponse;
 import cern.c2mon.notification.jms.ClientRequest.Type;
+import cern.c2mon.notification.jms.ClientResponse;
 import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
 import cern.c2mon.notification.shared.TagNotFoundException;
