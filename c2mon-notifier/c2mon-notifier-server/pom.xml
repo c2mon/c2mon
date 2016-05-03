@@ -92,9 +92,7 @@
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.10</version><!--$NO-MVN-MAN-VER$-->
-			<type>jar</type>
+			<artifactId>junit</artifactId><!--$NO-MVN-MAN-VER$-->
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -135,7 +133,7 @@
 		<dependency>
 			<groupId>cern.cmw</groupId>
 			<artifactId>cmw-log-log4j</artifactId>
-			<version>1.5.8</version>
+			<version>1.6.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
