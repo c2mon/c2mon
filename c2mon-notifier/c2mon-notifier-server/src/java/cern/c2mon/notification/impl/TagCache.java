@@ -408,7 +408,6 @@ public class TagCache implements TagListener {
                 logger.warn("TagID={} There are no subscribers associated. Removing the C2Mon subscription.", tagUpdate.getId());
                 Set<Long> toRemove  = tag.getAllChildTagsRecursive().stream().map(Tag::getId).collect(Collectors.toSet());
                 C2monServiceGateway.getTagService().unsubscribe(toRemove, null);
-                C2monServiceGateway.getTagService().unsubscribe(toRemove, null);
                 return;
             }
             
