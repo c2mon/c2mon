@@ -5,13 +5,13 @@
    <parent>
     <artifactId>c2mon-client-pom</artifactId>
     <groupId>cern.c2mon.c2mon-client</groupId>
-    <version>RELEASE</version>
+    <version>1.6.0</version>
    </parent>
 
 
 	<groupId>cern.c2mon.notification</groupId>
 	<artifactId>c2mon-server-notification</artifactId>
-	<version>1.0.13</version>
+	<version>1.0.13-SNAPSHOT</version>
 	<name>notifier</name>
 	<packaging>jar</packaging>
 
