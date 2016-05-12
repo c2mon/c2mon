@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>cern.c2mon.docker</groupId>
+    <artifactId>server</artifactId>
+    <packaging>jar</packaging>
+    <version>1.7.5</version>
+    <name>C2MON Server Docker Image</name>
+    <description>Docker Image for C2MON Server build and deployment</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>cern.c2mon.c2mon-server.demo</groupId>
+            <artifactId>c2mon-server</artifactId>
+            <version>${project.version}</version>
+            <classifier>demo</classifier>
+            <type>tar.gz</type>
+        </dependency>
+        <dependency>
+            <groupId>cern.c2mon.c2mon-server</groupId>
+            <artifactId>c2mon-server-eslog</artifactId>
+            <version>${eslog.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+        
+          <plugin>
+             <groupId>org.apache.maven.plugins</groupId>
+             <artifactId>maven-dependency-plugin</artifactId>
+             <version>2.10</version>
+             <executions>
+               <execution>
+                 <id>unpack</id>
+                 <phase>generate-sources</phase>
+                 <goals>
+                   <goal>unpack</goal>
+                 </goals>
+                 <configuration>
+                   <artifactItems>
+                     <artifactItem>
+                       <groupId>cern.c2mon.c2mon-server.demo</groupId>
+                       <artifactId>c2mon-server</artifactId>
+                       <classifier>demo</classifier>
+                       <type>tar.gz</type>
+                     </artifactItem>
+                   </artifactItems>
+                   <outputDirectory>${project.build.directory}/c2mon-${project.version}/c2mon-server</outputDirectory>
+                   <overWriteReleases>false</overWriteReleases>
+                   <overWriteSnapshots>true</overWriteSnapshots>
+                 </configuration>
+               </execution>
+               <execution>
+                 <id>copy</id>
+                 <phase>generate-sources</phase>
+                 <goals>
+                   <goal>copy-dependencies</goal>
+                 </goals>
+                 <configuration>
+                   <artifactItems>
+                     <artifactItem>
+                       <groupId>cern.c2mon.c2mon-server</groupId>
+                       <artifactId>c2mon-server-eslog</artifactId>
+                     </artifactItem>
+                   </artifactItems>
+                   <outputDirectory>${project.build.directory}/c2mon-${project.version}/c2mon-server/lib</outputDirectory>
+                   <overWriteReleases>false</overWriteReleases>
+                   <overWriteSnapshots>true</overWriteSnapshots>
+                 </configuration>
+               </execution>
+             </executions>
+           </plugin>        
+        
+          <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.4.5</version>
+                <executions>
+                     <execution>
+                       <id>build-image</id>
+                       <phase>compile</phase>
+                       <goals> <goal>build</goal> </goals>
+                     </execution>
+                     <execution>
+                      <id>push-image</id>
+                      <phase>deploy</phase>
+                      <goals>
+                        <goal>push</goal>
+                      </goals>
+                      <configuration>
+                        <imageName>docker.cern.ch/c2mon-project/${arch.prefix}-${project.artifactId}</imageName>
+                      </configuration>
+                    </execution>    
+                </executions>
+                <configuration>
+                    <imageName>docker.cern.ch/c2mon-project/${arch.prefix}-${project.artifactId}</imageName>
+                    <baseImage>${base.image}</baseImage>
+                    <!--server-id>cern-docker</server-id-->
+                    <useConfigFile>true</useConfigFile>
+                    <forceTags>true</forceTags>
+                    <imageTags>
+                       <imageTag>${project.version}</imageTag>
+                       <!--imageTag>latest</imageTag-->
+                    </imageTags>
+                    <workdir>/opt/c2mon/server</workdir>
+                    <cmd>["bin/c2mon.sh","run"]</cmd>
+                    <exposes>
+                      <expose>61616</expose> <expose>9001</expose> <expose>1099</expose>  
+                    </exposes>
+                    <runs>
+                      <run>chmod 755 /opt/c2mon/server/bin/*</run>
+                    </runs>
+                    <volumes>
+                      <volume>/opt/c2mon/server/log</volume>
+                      <volume>/opt/c2mon/server/conf</volume>
+                    </volumes>
+                    <resources>
+                       <resource>
+                         <directory>${project.build.directory}/c2mon-${project.version}/c2mon-server</directory>
+                         <targetPath>/opt/c2mon/server</targetPath>
+                       </resource>
+                       <resource>
+                         <directory>${project.build.directory}/classes/conf</directory>
+                         <targetPath>/opt/c2mon/server/conf</targetPath>
+                       </resource>
+                    </resources>
+                </configuration>
+              </plugin>
+        </plugins>
+
+    </build>
+
+    <profiles>
+		<profile>
+		  <id>rpi</id>
+		  <properties>
+		    <base.image>hypriot/rpi-java</base.image>
+		    <arch.prefix>arm</arch.prefix>
+		  </properties>
+		</profile>
+    </profiles>
+
+    <properties>
+      <eslog.version>1.7.3-SNAPSHOT</eslog.version>
+      <base.image>java:8-jdk</base.image>
+      <arch.prefix>amd64</arch.prefix>
+    </properties>
+
+</project>
