@@ -96,7 +96,7 @@
                     </execution>    
                 </executions>
                 <configuration>
-                    <imageName>docker.cern.ch/c2mon-project/${arch.prefix}-${project.artifactId}</imageName>
+                    <imageName>docker.cern.ch/c2mon-project/${project.artifactId}${arch.suffix}</imageName>
                     <baseImage>${base.image}</baseImage>
                     <!--server-id>cern-docker</server-id-->
                     <useConfigFile>true</useConfigFile>
@@ -138,7 +138,7 @@
 		  <id>rpi</id>
 		  <properties>
 		    <base.image>hypriot/rpi-java</base.image>
-		    <arch.prefix>arm</arch.prefix>
+		    <arch.suffix>-arm</arch.suffix>
 		  </properties>
 		</profile>
     </profiles>
@@ -146,7 +146,7 @@
     <properties>
       <eslog.version>1.7.3-SNAPSHOT</eslog.version>
       <base.image>java:8-jdk</base.image>
-      <arch.prefix>amd64</arch.prefix>
+      <arch.suffix></arch.suffix>
     </properties>
 
 </project>
