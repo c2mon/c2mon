@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import cern.c2mon.server.cache.loading.SequenceDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.simpleframework.xml.Serializer;
@@ -109,6 +110,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   private ConfigurationDAO configurationDAO;
 
+  private SequenceDAO sequenceDAO;
+
   private DataTagConfigHandler dataTagConfigHandler;
 
   private ControlTagConfigHandler controlTagConfigHandler;
@@ -149,7 +152,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   private volatile boolean cancelRequested = false;
 
   private ClusterCache clusterCache;
-  
+
   /**
    * singelton helper-object for parsing POJO Configuration objects into ConfigurationElements
    */
@@ -163,7 +166,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       EquipmentConfigHandler equipmentConfigHandler, SubEquipmentConfigHandler subEquipmentConfigHandler,
       ProcessConfigHandler processConfigHandler, ProcessFacade processFacade, ClusterCache clusterCache,
       ProcessCache processCache, DeviceClassConfigHandler deviceClassConfigHandler,
-      DeviceConfigHandler deviceConfigHandler, ConfigurationParser configParser) {
+      DeviceConfigHandler deviceConfigHandler, ConfigurationParser configParser, SequenceDAO sequenceDAO) {
     super();
     this.processCommunicationManager = processCommunicationManager;
     this.configurationDAO = configurationDAO;
@@ -181,12 +184,13 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     this.deviceClassConfigHandler = deviceClassConfigHandler;
     this.deviceConfigHandler = deviceConfigHandler;
     this.configParser = configParser;
+    this.sequenceDAO = sequenceDAO;
   }
 
   @Override
   public ConfigurationReport applyConfiguration(Configuration configuration) {
     LOGGER.info(String.format("Applying configuration for %d process(es)", configuration.getProcesses().size()));
-    Long configId = configurationDAO.getNextConfigId();
+    Long configId = sequenceDAO.getNextConfigId();
     ConfigurationReport report = null;
 
     // Try to acquire the configuration lock.

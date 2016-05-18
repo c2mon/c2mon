@@ -1,24 +1,23 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.test;
 
-import java.sql.Timestamp;
-
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
@@ -30,24 +29,21 @@ import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.command.CommandExecutionDetails;
-import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
-import cern.c2mon.shared.common.datatag.DataTagQuality;
-import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.DataTagValueDictionary;
+import cern.c2mon.shared.common.datatag.*;
+import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 import cern.c2mon.shared.common.metadata.Metadata;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
-import cern.c2mon.server.common.alarm.AlarmCondition;
-import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
+
+import java.sql.Timestamp;
 
 /**
  * Contains static methods for creating test cache objects.
- * 
+ *
  * @author Mark Brightwell
  *
  */
 public final class CacheObjectCreation {
-  
+
   /**
    * Hide constructor.
    */
@@ -69,10 +65,10 @@ public final class CacheObjectCreation {
     alarm1.setInfo("alarm info");
     alarm1.setState(AlarmCondition.TERMINATE);
     alarm1.setTimestamp(new Timestamp(System.currentTimeMillis() - 2000));
-    alarm1.setDataTagId(100003L);   
+    alarm1.setDataTagId(100003L);
     return alarm1;
   }
-  
+
   /**
    * Does not set reference to tag id.
    * @return the alamr
@@ -114,7 +110,7 @@ public final class CacheObjectCreation {
     alarm1.setTimestamp(new Timestamp(System.currentTimeMillis() - 2000));
     return alarm1;
   }
-  
+
   /**
    * Constructs a test ControlTag.
    * @return the ControlTag
@@ -137,11 +133,11 @@ public final class CacheObjectCreation {
     cacheObject.setValue(new Float(1000));
     cacheObject.setValueDescription("test value description");
     cacheObject.setSimulated(false); //null allowed
-    cacheObject.setEquipmentId(new Long(150)); //need test equipment inserted 
+    cacheObject.setEquipmentId(new Long(150)); //need test equipment inserted
     cacheObject.setMinValue(new Float(100));
     cacheObject.setMaxValue(new Float(2000));
     cacheObject.setValueDictionary(new DataTagValueDictionary());
-    cacheObject.setAddress(new DataTagAddress());   
+    cacheObject.setAddress(new DataTagAddress());
     cacheObject.setDataTagQuality(createValidQuality());
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setDaqTimestamp(new Timestamp(System.currentTimeMillis()));
@@ -149,7 +145,7 @@ public final class CacheObjectCreation {
     cacheObject.setRuleIdsString(""); //same as setting to null
     return cacheObject;
   }
-  
+
   /**
    * Need to first insert test equipment using EquipmentMapper
    * @return the DataTag
@@ -170,7 +166,7 @@ public final class CacheObjectCreation {
     cacheObject.setValue(Boolean.TRUE);
     cacheObject.setValueDescription("test value description");
     cacheObject.setSimulated(false); //null allowed
-    cacheObject.setEquipmentId(new Long(100)); //need test equipment inserted 
+    cacheObject.setEquipmentId(new Long(100)); //need test equipment inserted
     cacheObject.setMinValue(new Float(23.3));
     cacheObject.setMaxValue(new Float(12.2));
     cacheObject.setValueDictionary(new DataTagValueDictionary());
@@ -182,7 +178,7 @@ public final class CacheObjectCreation {
     cacheObject.setRuleIdsString("130");
     return cacheObject;
   }
-  
+
   /**
    * Constructs second DataTag.
    * @return the DataTag.
@@ -214,7 +210,7 @@ public final class CacheObjectCreation {
     cacheObject.setRuleIdsString("130");
     return cacheObject;
   }
-  
+
   /**
    * Need to first insert test equipment using EquipmentMapper
    * @return the DataTag
@@ -235,7 +231,7 @@ public final class CacheObjectCreation {
     cacheObject.setValue("DOWN");
     cacheObject.setValueDescription("test value description");
     cacheObject.setSimulated(false); //null allowed
-    cacheObject.setEquipmentId(new Long(100)); //need test equipment inserted 
+    cacheObject.setEquipmentId(new Long(100)); //need test equipment inserted
     cacheObject.setMinValue(new Float(23.3));
     cacheObject.setMaxValue(new Float(12.2));
     cacheObject.setValueDictionary(new DataTagValueDictionary());
@@ -243,12 +239,13 @@ public final class CacheObjectCreation {
     cacheObject.setDataTagQuality(createValidQuality());
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setDaqTimestamp(new Timestamp(System.currentTimeMillis()));
-    cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));  
+    cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.getAlarmIds().add(1L);
-    cacheObject.getAlarmIds().add(3L); 
+    cacheObject.getAlarmIds().add(3L);
     return cacheObject;
   }
-  
+
+
   /**
    * Creates test equipment (uses JECTEST03 foreign keys).
    * @return the Equipment
@@ -271,7 +268,7 @@ public final class CacheObjectCreation {
     equipmentCacheObject.setSupervisionStatus(SupervisionStatus.DOWN);
     return equipmentCacheObject;
   }
-  
+
   /**
    * Creates a test SubEquipment of the created Equipment.
    * Again uses tags from JECTEST03.
@@ -282,19 +279,19 @@ public final class CacheObjectCreation {
                                                                         new Long(101),
                                                                         "Test SubEquipment",
                                                                         "Test desc",
-                                                                        "Test class name",                                                                          
+                                                                        "Test class name",
                                                                         new Long(1222), //keep same as parent eq (not correct configuration, only for testing)
                                                                         new Long(5000300), //keep same as parent eq
                                                                         10,
                                                                         new Long(1223),
-                                                                        new Long(100)          
+                                                                        new Long(100)
                                                                         );
     subEquipmentCacheObject.setStatusDescription("Status description");
     subEquipmentCacheObject.setStatusTime(new Timestamp(System.currentTimeMillis()));
     subEquipmentCacheObject.setSupervisionStatus(SupervisionStatus.DOWN);
     return subEquipmentCacheObject;
   }
-  
+
   /**
    * Creates a second test SubEquipment of the created Equipment.
    * Again uses tags from JECTEST03.
@@ -305,19 +302,19 @@ public final class CacheObjectCreation {
                                                                         new Long(102),
                                                                         "Test SubEquipment 2",
                                                                         "Test desc 2",
-                                                                        "Test class name 2",                                                                          
+                                                                        "Test class name 2",
                                                                         new Long(1222), //keep same as parent eq (not correct configuration, only for testing)
                                                                         new Long(5000300), //keep same as parent eq
                                                                         10,
                                                                         new Long(1223),
-                                                                        new Long(100)          
+                                                                        new Long(100)
                                                                         );
     subEquipmentCacheObject.setStatusDescription("Status description");
     subEquipmentCacheObject.setStatusTime(new Timestamp(System.currentTimeMillis()));
     subEquipmentCacheObject.setSupervisionStatus(SupervisionStatus.DOWN);
     return subEquipmentCacheObject;
   }
-  
+
   /**
    * Uses JECTEST01 alive id and state id (for FK constraints).
    * @return the Process
@@ -340,10 +337,10 @@ public final class CacheObjectCreation {
     processCacheObject.setRequiresReboot(false);
     processCacheObject.setProcessPIK(12345L);
     processCacheObject.setLocalConfig(LocalConfig.Y);
-    
+
     return processCacheObject;
   }
-  
+
   /**
    * Returns a test rule tag object
    * @return the RuleTag
@@ -366,14 +363,14 @@ public final class CacheObjectCreation {
     cacheObject.setJapcAddress("testJAPCaddress");
     cacheObject.setValue(new Integer(1000));
     cacheObject.setValueDescription("test value description");
-    cacheObject.setSimulated(false); //null allowed    
-    cacheObject.setValueDictionary(new DataTagValueDictionary());    
+    cacheObject.setSimulated(false); //null allowed
+    cacheObject.setValueDictionary(new DataTagValueDictionary());
     cacheObject.setDataTagQuality(createValidQuality());
-    cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis())); 
+    cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setRuleIdsString("");
     return cacheObject;
   }
-  
+
   /**
    * Creates an AliveTimer for a Process
    * @return the ControlTag
@@ -407,7 +404,7 @@ public final class CacheObjectCreation {
     cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
     return cacheObject;
   }
-  
+
   /**
    * Creates a an AliveTimer for the Equipment.
    * @return the ControlTag
@@ -441,7 +438,7 @@ public final class CacheObjectCreation {
     cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
     return cacheObject;
   }
-  
+
   /**
    * Creates a test AliveTimer for a SubEquipment.
    * @return the ControlTag
@@ -475,15 +472,15 @@ public final class CacheObjectCreation {
     cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
     return cacheObject;
   }
-  
+
   /**
    * Creates a test CommandTag
    * @return the test CommandTag
    */
   public static CommandTagCacheObject createTestCommandTag() {
-    CommandTagCacheObject commandTag = 
-      new CommandTagCacheObject(Long.valueOf(2000), "Test command tag", 
-                                "Test command tag desc", "Float", DataTagConstants.MODE_OPERATIONAL);           
+    CommandTagCacheObject commandTag =
+      new CommandTagCacheObject(Long.valueOf(2000), "Test command tag",
+                                "Test command tag desc", "Float", DataTagConstants.MODE_OPERATIONAL);
       commandTag.setEquipmentId(Long.valueOf(100));
       commandTag.setMaximum(Float.valueOf(5));
       commandTag.setMinimum(Float.valueOf(1));
@@ -495,28 +492,28 @@ public final class CacheObjectCreation {
       commandTag.setClientTimeout(10000);
       try {
         commandTag.setHardwareAddress(new OPCHardwareAddressImpl("test"));
-      } catch (ConfigurationException e) {        
+      } catch (ConfigurationException e) {
         e.printStackTrace();
       }
       commandTag.setSourceTimeout(10000);
       commandTag.setSourceRetries(4);
       commandTag.setExecTimeout(10000);
-      
+
       //set process field - usually loaded using join from DB -  here must set to parent of Eq 300000
       commandTag.setProcessId(Long.valueOf(90));
-      
+
       CommandExecutionDetails<Long> commandExecutionDetails = new CommandExecutionDetails<Long>();
       commandExecutionDetails.setExecutionStartTime(new Timestamp(System.currentTimeMillis() - 1000));
       commandExecutionDetails.setExecutionEndTime(new Timestamp(System.currentTimeMillis()));
-      commandExecutionDetails.setValue(10L);      
+      commandExecutionDetails.setValue(10L);
       commandTag.setCommandExecutionDetails(commandExecutionDetails);
       return commandTag;
   }
-  
+
   private static DataTagQuality createValidQuality() {
     DataTagQuality dataTagQuality = new DataTagQualityImpl();
     dataTagQuality.validate();
     return dataTagQuality;
   }
-  
+
 }

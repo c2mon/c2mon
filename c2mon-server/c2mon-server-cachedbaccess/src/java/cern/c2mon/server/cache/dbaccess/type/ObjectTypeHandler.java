@@ -77,7 +77,7 @@ public class ObjectTypeHandler implements TypeHandler {
         }
       }
     } catch (Exception ex) {
-      LOGGER.error("Unexpected exception caught when constructing a java.lang.Comparable from the database (it could be just a NULL DB column value):", ex);
+      LOGGER.error("Unexpected exception caught when constructing a value from the column "+columnName+" from the database (it could be just a NULL DB column value):", ex);
     }
     return result;
   }

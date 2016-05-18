@@ -1,25 +1,20 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.sql.Timestamp;
 import java.util.LinkedList;
@@ -48,64 +43,66 @@ import cern.c2mon.server.test.CacheObjectComparison;
 import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 
+import static org.junit.Assert.*;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-test.xml"})
 @TransactionConfiguration(transactionManager="cacheTransactionManager", defaultRollback=true)
 @Transactional
-public class EquipmentMapperTest {   
+public class EquipmentMapperTest {
 
     /**
      * Class to test
      */
     @Autowired
     private EquipmentMapper equipmentMapper;
-    
+
     /**
      * Used to create subequipments of the test equipment.
      */
     @Autowired
     private SubEquipmentMapper subEquipmentMapper;
-    
+
     /**
      * Used to create test datatag.
      */
     @Autowired
     private DataTagMapper dataTagMapper;
-    
+
     @Autowired
     private TestDataHelper testDataHelper;
 
     private EquipmentCacheObject equipmentCacheObject;
 
     private SubEquipmentCacheObject subEquipmentCacheObject;
-    
+
     private SubEquipmentCacheObject subEquipmentCacheObject2;
 
     private DataTagCacheObject dataTagCacheObject1;
-    
+
     private DataTagCacheObject dataTagCacheObject2;
-    
+
     private CommandTag commandTag;
-    
-    
+
+
 //    @After
 //    public void deleteTestProcess() {
 //      equipmentMapper.deleteProcess(Long.valueOf(100000));
 //    }
-    
+
     /**
-     * Test does not insert associated equipment yet and test equipment retrieval 
+     * Test does not insert associated equipment yet and test equipment retrieval
      *  - add later TODO
      */
 //    @Test
 //    public void testInsertAndRetrieve() {
 //      ProcessCacheObject originalProcess = createTestProcess1();
 //      equipmentMapper.insertProcess(originalProcess);
-//      
+//
 //      ProcessCacheObject retrievedProcess = (ProcessCacheObject) equipmentMapper.getItem(originalProcess.getId());
-//      
+//
 //      assertNotNull(retrievedProcess);
-//      
+//
 //      assertEquals(originalProcess.getId(), retrievedProcess.getId());
 //      assertEquals(originalProcess.getName(), retrievedProcess.getName());
 //      assertEquals(originalProcess.getDescription(), retrievedProcess.getDescription());
@@ -117,9 +114,9 @@ public class EquipmentMapperTest {
 //      assertEquals(originalProcess.getState(), retrievedProcess.getState());
 //      assertEquals(originalProcess.getStartupTime(), retrievedProcess.getStartupTime());
 //      assertEquals(originalProcess.getCurrentHost(), retrievedProcess.getCurrentHost());
-//      
+//
 //    }
-    
+
     /**
      * Tests the result set is none empty.
      */
@@ -128,7 +125,7 @@ public class EquipmentMapperTest {
       List<Equipment> returnList = equipmentMapper.getAll();
       assertTrue(returnList.size() > 0);
     }
-    
+
     /**
      * Tests the batch loading method.
      */
@@ -137,20 +134,20 @@ public class EquipmentMapperTest {
       DBBatch dbBatch = new DBBatch(150L, 160L);
       List<Equipment> equipments = equipmentMapper.getRowBatch(dbBatch);
       assertNotNull(equipments);
-      assertTrue(equipments.size() == 2); 
-      
+      assertTrue(equipments.size() == 2);
+
       DBBatch dbBatch2 = new DBBatch(150L, 159L);
       List<Equipment> equipments2 = equipmentMapper.getRowBatch(dbBatch2);
       assertNotNull(equipments2);
-      assertTrue(equipments2.size() == 1);   
+      assertTrue(equipments2.size() == 1);
     }
-    
+
     @Test
     public void testInsertAndRetrieve() {
 //      EquipmentCacheObject equipmentCacheObject = createTestEquipment();
 //      equipmentMapper.insertEquipment(equipmentCacheObject);
 //      SubEquipmentCacheObject subEquipmentCacheObject = createTestSubEquipment();
-//      subEquipmentMapper.insertSubEquipment(subEquipmentCacheObject);      
+//      subEquipmentMapper.insertSubEquipment(subEquipmentCacheObject);
 //      DataTagCacheObject dataTagCacheObject = DataTagMapperTest.createTestDataTag();
 //      dataTagMapper.insertDataTag(dataTagCacheObject);
       EquipmentCacheObject retrievedObject = (EquipmentCacheObject) equipmentMapper.getItem(equipmentCacheObject.getId());
@@ -166,19 +163,34 @@ public class EquipmentMapperTest {
       assertEquals(equipmentCacheObject.getProcessId(), retrievedObject.getProcessId());
       assertEquals(equipmentCacheObject.getStateTagId(), retrievedObject.getStateTagId());
       assertEquals(equipmentCacheObject.getHandlerClassName(), retrievedObject.getHandlerClassName());
-      assertEquals(equipmentCacheObject.getDescription(), retrievedObject.getDescription()); 
+      assertEquals(equipmentCacheObject.getDescription(), retrievedObject.getDescription());
       //2 sub-equipments defined for this equipment
       List<Long> subEquipmentIds = new LinkedList<Long>();
       subEquipmentIds.add(subEquipmentCacheObject.getId());
-      subEquipmentIds.add(subEquipmentCacheObject2.getId());      
+      subEquipmentIds.add(subEquipmentCacheObject2.getId());
       assertEquals(subEquipmentIds, retrievedObject.getSubEquipmentIds());
       assertTrue(retrievedObject.getDataTagIds().contains(dataTagCacheObject1.getId())); //contains 2 datatags - check for one ...
       assertTrue(retrievedObject.getDataTagIds().contains(dataTagCacheObject2.getId())); // ... check for the other
       assertTrue(retrievedObject.getCommandTagIds().contains(commandTag.getId())); //check it contains the commandtag
-      
+
       //assertEquals(dataTagCacheObject.getId(), retrievedObject.getDataTagIds().iterator().next()); //TODO just one in array so far
     }
-    
+
+  @Test
+  public void getByName() {
+    Long retrievedId = equipmentMapper.getIdByName("Test Equipment");
+
+    assertEquals((long)retrievedId, 100L);
+
+  }
+
+  @Test
+  public void getByNameFailure() {
+    Long retrievedId = equipmentMapper.getIdByName("Test Equipment not there");
+
+    assertNull(retrievedId);
+
+  }
     /**
      * May fail if changes done to test DB.
      */
@@ -188,7 +200,7 @@ public class EquipmentMapperTest {
       assertEquals(6, equipment.getDataTagIds().size());
       assertEquals(2, equipment.getCommandTagIds().size());
     }
-    
+
     @Test
     public void testUpdateConfig() {
       assertEquals(new Long(5000200), equipmentCacheObject.getAliveTagId());
@@ -199,10 +211,10 @@ public class EquipmentMapperTest {
       Equipment updatedEquipment = equipmentMapper.getItem(equipmentCacheObject.getId());
       assertEquals(new Long(1251), updatedEquipment.getAliveTagId());
       assertEquals(new Long(1252), updatedEquipment.getCommFaultTagId());
-      assertEquals(new Long(1250), updatedEquipment.getStateTagId());      
+      assertEquals(new Long(1250), updatedEquipment.getStateTagId());
     }
-    
-    
+
+
     @Before
     public void insertTestData() {
       testDataHelper.removeTestData();
@@ -210,20 +222,20 @@ public class EquipmentMapperTest {
       testDataHelper.insertTestDataIntoDB();
       equipmentCacheObject = testDataHelper.getEquipment();
       subEquipmentCacheObject = testDataHelper.getSubEquipment();
-      subEquipmentCacheObject2 = testDataHelper.getSubEquipment2();      
+      subEquipmentCacheObject2 = testDataHelper.getSubEquipment2();
       dataTagCacheObject1 = testDataHelper.getDataTag();
       dataTagCacheObject2 = testDataHelper.getDataTag2();
       commandTag = testDataHelper.getCommandTag();
     }
-    
+
     @After
     public void cleanDatabase() {
       testDataHelper.removeTestData();
 //      dataTagMapper.deleteDataTag(new Long(1000000));
 //      subEquipmentMapper.deleteSubEquipment(new Long(300100));
-//      equipmentMapper.deleteEquipment(new Long(300000));            
-    } 
-    
+//      equipmentMapper.deleteEquipment(new Long(300000));
+    }
+
     @Test
     public void testGetMaxId() {
       //only based on data already in DB
@@ -231,21 +243,21 @@ public class EquipmentMapperTest {
       Long max = equipmentMapper.getMaxId();
       assertEquals(max, Long.valueOf(170));
     }
-    
+
     @Test
     public void testGetMinId() {
       cleanDatabase();
       Long max = equipmentMapper.getMinId();
       assertEquals(max, Long.valueOf(150));
     }
-    
+
     @Test
     public void testGetNumberItems() {
       cleanDatabase();
       int nbItems = equipmentMapper.getNumberItems();
       assertEquals(3, nbItems);
     }
-    
+
     /**
      * Tests the cache persistence method.
      */
@@ -253,28 +265,28 @@ public class EquipmentMapperTest {
     @DirtiesContext
     public void testUpdate() {
       assertFalse(equipmentCacheObject.getSupervisionStatus().equals(SupervisionStatus.RUNNING));
-      equipmentCacheObject.setSupervisionStatus(SupervisionStatus.RUNNING); 
+      equipmentCacheObject.setSupervisionStatus(SupervisionStatus.RUNNING);
       Timestamp ts = new Timestamp(System.currentTimeMillis() + 1000);
       equipmentCacheObject.setStatusDescription("New status description.");
       equipmentCacheObject.setStatusTime(ts);
       equipmentMapper.updateCacheable(equipmentCacheObject);
-      
+
       EquipmentCacheObject retrievedEquipment = (EquipmentCacheObject) equipmentMapper.getItem(equipmentCacheObject.getId());
       assertEquals(SupervisionStatus.RUNNING, retrievedEquipment.getSupervisionStatus());
       assertEquals(ts, retrievedEquipment.getStatusTime());
       assertEquals("New status description.", retrievedEquipment.getStatusDescription());
     }
-    
+
     @Test
     public void testIsInDB() {
       assertTrue(equipmentMapper.isInDb(150L));
     }
-    
+
     @Test
     public void testNotInDB() {
       assertFalse(equipmentMapper.isInDb(250L));
     }
-      
+
 }
 
 //    /**
@@ -295,7 +307,7 @@ public class EquipmentMapperTest {
 //      processCacheObject.setCurrentHost("test host");
 //      return processCacheObject;
 //    }
-//    
+//
 //    public static ProcessCacheObject createTestProcess2() {
 //      return null;
 //    }

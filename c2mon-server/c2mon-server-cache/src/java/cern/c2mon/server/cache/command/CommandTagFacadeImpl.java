@@ -1,28 +1,20 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.cache.command;
-
-import java.lang.reflect.Field;
-import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.CommandTagCache;
 import cern.c2mon.server.cache.CommandTagFacade;
@@ -38,9 +30,15 @@ import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
-import cern.c2mon.shared.common.type.TagDataType;
 import cern.c2mon.shared.daq.config.CommandTagUpdate;
 import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.lang.reflect.Field;
+import java.util.Properties;
 
 
 /**
@@ -48,22 +46,22 @@ import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
  */
 @Service
 public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements CommandTagFacade {
-  
+
   /**
    * Private class logger.
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(CommandTagFacadeImpl.class);
-  
+
   /**
    * Reference to the cache.
    */
   private CommandTagCache commandTagCache;
-  
+
   /**
    * Equipment cache.
    */
   private EquipmentCache equipmentCache;
-  
+
   @Autowired
   public CommandTagFacadeImpl(CommandTagCache commandTagCache, EquipmentCache equipmentCache) {
     super();
@@ -81,35 +79,35 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
     String returnValue = "";
     try {
       CommandTag commandTag = commandTagCache.getCopy(id);
-      returnValue = generateSourceXML(commandTag); //old version: SourceDataTag.toConfigXML(tag);     
+      returnValue = generateSourceXML(commandTag); //old version: SourceDataTag.toConfigXML(tag);
     } catch (CacheElementNotFoundException cacheEx) {
       LOGGER.error("Failed to locate command tag with id " + id + " in the cache (returning empty String config).");
-    }    
-    return returnValue;    
+    }
+    return returnValue;
   }
 
   @Override
   public CommandTag createCacheObject(Long id, Properties properties) throws IllegalAccessException {
-    CommandTag commandTag = new CommandTagCacheObject(id);        
+    CommandTag commandTag = new CommandTagCacheObject(id);
     configureCacheObject(commandTag, properties);
     validateConfig(commandTag);
     //invalidateQuietly(dataTag, new DataTagQuality(DataTagQuality.UNINITIALISED, "DataTag created"), new Timestamp(System.currentTimeMillis()));
-    return commandTag; 
+    return commandTag;
   }
-  
+
   /**
    * Also called from ControlTagFacade.
    */
   @Override
   public SourceCommandTag generateSourceCommandTag(CommandTag commandTag) {
-    SourceCommandTag sourceCommandTag = new SourceCommandTag(commandTag.getId(), 
-                                                             commandTag.getName(), 
-                                                             commandTag.getSourceTimeout(), 
-                                                             commandTag.getSourceRetries(), 
-                                                             commandTag.getHardwareAddress());    
+    SourceCommandTag sourceCommandTag = new SourceCommandTag(commandTag.getId(),
+                                                             commandTag.getName(),
+                                                             commandTag.getSourceTimeout(),
+                                                             commandTag.getSourceRetries(),
+                                                             commandTag.getHardwareAddress());
     return sourceCommandTag;
   }
-  
+
   @Override
   public CommandTagUpdate configureCacheObject(CommandTag commandTag, Properties properties) {
     String tmpStr = null;
@@ -129,12 +127,12 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
     if ((tmpStr = properties.getProperty("name")) != null) {
       commandTagCacheObject.setName(tmpStr);
       commandTagUpdate.setName(tmpStr);
-    }    
+    }
     // description (String)
-    tmpStr = properties.getProperty("description"); 
+    tmpStr = properties.getProperty("description");
     if (tmpStr != null) {
-      commandTagCacheObject.setDescription(tmpStr);     
-    }    
+      commandTagCacheObject.setDescription(tmpStr);
+    }
     // mode (short)
     if ((tmpStr = properties.getProperty("mode")) != null) {
       try {
@@ -147,8 +145,8 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
     // dataType (String)
     if (properties.getProperty("dataType") != null) {
       commandTagCacheObject.setDataType(properties.getProperty("dataType"));
-    }    
-    
+    }
+
     // sourceRetries (int)
     if ((tmpStr = properties.getProperty("sourceRetries")) != null) {
       try {
@@ -172,7 +170,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
     // execTimeout (int)
     if ((tmpStr = properties.getProperty("execTimeout")) != null) {
       try {
-        commandTagCacheObject.setExecTimeout(Integer.parseInt(tmpStr)); 
+        commandTagCacheObject.setExecTimeout(Integer.parseInt(tmpStr));
       }
       catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"execTimeout\" to int: " + tmpStr);
@@ -219,7 +217,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
         }
       }
       catch (NumberFormatException e) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
             "NumberFormatException: Unable to convert parameter \"minValue\" to " + commandTagCacheObject.getDataType() + ": " + tmpStr);
       }
     }
@@ -243,7 +241,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
         }
       }
       catch (NumberFormatException e) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
             "NumberFormatException: Unable to convert parameter \"maxValue\" to " + commandTagCacheObject.getDataType() + ": " + tmpStr);
       }
     }
@@ -269,9 +267,9 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
       authorizationDetails.setRbacProperty(commandTagCacheObject.getAuthorizationDetails().getRbacProperty());
     }
     if (configureAuthorization) {
-      commandTagCacheObject.setAuthorizationDetails(authorizationDetails);   
+      commandTagCacheObject.setAuthorizationDetails(authorizationDetails);
     }
-    
+
     // equipmentId (Long) - not currently used, as need to remove and add for this change
     if ((tmpStr = properties.getProperty("equipmentId")) != null) {
       try {
@@ -289,8 +287,8 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
    * Sets the {@link HardwareAddress} field in the {@link CommandTagUpdate}.
    * @param hardwareAddress the new {@link HardwareAddress}
    * @param commandTagUpdate the update object that will be sent to the DAQ
-   * @throws IllegalAccessException 
-   * @throws  
+   * @throws IllegalAccessException
+   * @throws
    */
   private void setUpdateHardwareAddress(HardwareAddress hardwareAddress, CommandTagUpdate commandTagUpdate) throws IllegalAccessException {
     HardwareAddressUpdate hardwareAddressUpdate = new HardwareAddressUpdate(hardwareAddress.getClass().getName());
@@ -330,35 +328,32 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
       default :
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Invalid value for parameter \"mode\" : " + commandTag.getMode());
     }
-    
+
     if (commandTag.getDataType() == null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"dataType\" cannot be null");
     }
-    if (!TagDataType.isValidDataType(commandTag.getDataType())) {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"dataType\" can only be Boolean, Integer, Float, Double, Long or String");
-    }
-    
+
     if (commandTag.getSourceRetries() < 0 || commandTag.getSourceRetries() > 3) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"sourceRetries\" must be between 0 and 3");
     }
-    
+
     if (commandTag.getSourceTimeout() < 100) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"sourceTimeout\" must be >= 100");
     }
-    
+
     if (commandTag.getClientTimeout() < 5000) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"clientTimeout\" must be >= 5000");
     }
-    
+
     if (commandTag.getClientTimeout() < commandTag.getExecTimeout()) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"clientTimeout\" must be greater than execTimeout");
     }
-    
+
     if (commandTag.getExecTimeout() < (commandTag.getSourceTimeout() * (commandTag.getSourceRetries() + 1))) {
       LOGGER.debug("sourceTimeout: " + commandTag.getSourceTimeout() + " sourceRetries: " + commandTag.getSourceRetries() + " execTimeout: " + commandTag.getExecTimeout());
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"execTimeout\" must be greater than (sourceRetries + 1) * sourceTimeout");
     }
-    
+
     if (commandTag.getMinimum() != null) {
       try {
         Class minValueClass = Class.forName("java.lang." + commandTag.getDataType());
@@ -369,9 +364,9 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
       catch (Exception e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Error validating parameter \"minimum\": " + e.getMessage());
       }
-      
+
     }
-    
+
     if (commandTag.getMaximum() != null ) {
       try {
         Class maxValueClass = Class.forName("java.lang." + commandTag.getDataType());
@@ -382,9 +377,9 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
       catch (Exception e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Error validating parameter \"maximum\": " + e.getMessage());
       }
-      
+
     }
-    
+
     if (commandTag.getEquipmentId() == null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"equipmentId\" cannot be null");
     }
@@ -392,7 +387,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Authorization details cannot be null.");
     }
   }
-  
+
   /**
    * Used to be implemented in SourceCommandTag object (TODO still be be removed there)
    * @param cmd
@@ -419,8 +414,8 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
     }
 
     str.append("    </CommandTag>\n");
-    return str.toString();   
+    return str.toString();
   }
-  
-  
+
+
 }

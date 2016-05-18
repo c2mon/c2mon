@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -48,16 +48,16 @@ public class SubEquipmentDAOImpl extends AbstractDefaultLoaderDAO<SubEquipment> 
    * Reference to iBatis mapper.
    */
   private SubEquipmentMapper subEquipmentMapper;
-  
+
   @Autowired
   public SubEquipmentDAOImpl(SubEquipmentMapper subEquipmentMapper) {
     super(500, subEquipmentMapper);
     this.subEquipmentMapper = subEquipmentMapper;
   }
-  
+
   /**
    * Creates a new subEquipment entity in the database
-   * 
+   *
    * @param subEquipment
    *          The information representing the subEquipment to be stored
    * @throws SubEquipmentException
@@ -69,7 +69,7 @@ public class SubEquipmentDAOImpl extends AbstractDefaultLoaderDAO<SubEquipment> 
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("create() - Create a subEquipment with the id: " + subEquipment.getId());
     }
-    try {      
+    try {
       subEquipmentMapper.insertSubEquipment(subEquipment);
     } catch (DataAccessException e) {
       //TODO add these catch clauses to all the DAO classes...
@@ -79,7 +79,7 @@ public class SubEquipmentDAOImpl extends AbstractDefaultLoaderDAO<SubEquipment> 
 
   /**
    * Retrieves the subEquipment entity specified by its id
-   * 
+   *
    * @param subEquipmentId
    *          The id of the subEquipment to be retrieved
    * @return A SubEquipmentCacheObject representing a row of the equipment table
@@ -93,7 +93,7 @@ public class SubEquipmentDAOImpl extends AbstractDefaultLoaderDAO<SubEquipment> 
       LOGGER.debug("getSubEquipmentById() - Getting the subEquipment with id: " + subEquipmentId);
     }
     try {
-      eq = (SubEquipment) getItem(subEquipmentId);      
+      eq = (SubEquipment) getItem(subEquipmentId);
     } catch (DataAccessException e) {
       throw new SubEquipmentException(e.getMessage());
     }
@@ -102,7 +102,7 @@ public class SubEquipmentDAOImpl extends AbstractDefaultLoaderDAO<SubEquipment> 
 
   /**
    * Retrieves all the subEquipments attached to the indicated equipment
-   * 
+   *
    * @param equipmentId
    *          The id of the equipment for which we want to retrieve its
    *          subEquipments
@@ -117,7 +117,7 @@ public class SubEquipmentDAOImpl extends AbstractDefaultLoaderDAO<SubEquipment> 
       LOGGER.debug("getSubEquipmentsByEquipment() - Retrieving the subEquipments attached to the equipment with id " + equipmentId);
     }
     try {
-      subEquipments = subEquipmentMapper.selectSubEquipmentsByEquipment(equipmentId);      
+      subEquipments = subEquipmentMapper.selectSubEquipmentsByEquipment(equipmentId);
     } catch (DataAccessException e) {
       throw new SubEquipmentException(e.getMessage());
     }
@@ -125,11 +125,11 @@ public class SubEquipmentDAOImpl extends AbstractDefaultLoaderDAO<SubEquipment> 
   }
 
   @Override
-  public void deleteItem(final Long id) {    
+  public void deleteItem(final Long id) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("remove() - Removing the SubEquipment with id " + id);
     }
-    subEquipmentMapper.deleteSubEquipment(id);         
+    subEquipmentMapper.deleteSubEquipment(id);
   }
 
   @Override
@@ -148,6 +148,10 @@ public class SubEquipmentDAOImpl extends AbstractDefaultLoaderDAO<SubEquipment> 
     return item;
   }
 
+  @Override
+  public Long getIdByName(String name) {
+    return subEquipmentMapper.getIdByName(name);
+  }
 
 
 }

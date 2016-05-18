@@ -1,25 +1,20 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -39,6 +34,8 @@ import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject.LocalConfig;
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-test.xml"})
@@ -102,6 +99,22 @@ public class ProcessMapperTest {
     assertEquals(originalProcess.getStatusDescription(), retrievedProcess.getStatusDescription());
     assertEquals(originalProcess.getProcessPIK(), retrievedProcess.getProcessPIK());
     assertEquals(originalProcess.getLocalConfig(), retrievedProcess.getLocalConfig());
+
+  }
+
+  @Test
+  public void getByName() {
+    Long retrievedId = processMapper.getIdByName("Test Process");
+
+    assertEquals((long)retrievedId, 90L);
+
+  }
+
+  @Test
+  public void getByNameFailure() {
+    Long retrievedId = processMapper.getIdByName("Test Process not there");
+
+    assertNull(retrievedId);
 
   }
 

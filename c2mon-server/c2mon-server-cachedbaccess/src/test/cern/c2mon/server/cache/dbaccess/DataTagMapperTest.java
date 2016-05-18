@@ -81,14 +81,13 @@ public class DataTagMapperTest {
   }
 
   @Test
-  public void testDataTagWithIntegerArray() {
+  public void mapDataTagWithIntegerArray() {
     DataTagCacheObject cacheObject = new DataTagCacheObject();
     cacheObject.setId(new Long(100004));  //must be non null in DB
     cacheObject.setName("Junit_test_datatag4"); //non null
     cacheObject.setDescription("test description");
     cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
     cacheObject.setDataType(Integer[].class.getName()); // non null
-    //cacheObject.setTopic("tim.testdatatag.XADDRESS");
     cacheObject.setLogged(false); //null allowed
     cacheObject.setUnit("test unit");
     cacheObject.setDipAddress("testDIPaddress");

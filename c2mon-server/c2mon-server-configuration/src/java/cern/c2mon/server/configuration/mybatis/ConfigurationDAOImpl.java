@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -29,7 +29,7 @@ import cern.c2mon.shared.client.configuration.ConfigurationElement;
 /**
  * Mybatis implementation of the ConfigurationDAO for the server
  * configuration module.
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -41,12 +41,12 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
    */
   @Autowired
   private ConfigurationMapper configurationMapper;
-  
+
   @Override
   public String getConfigName(int configId) {
     return configurationMapper.getConfigName(configId);
   }
-  
+
   @Override
   public ConfigurationDescriptor getConfiguration(int configId) {
     //TODO implement this method for retrieving a configuration from the DB
@@ -69,8 +69,8 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
             + "please check none of the element key-value pairs you are trying to load are null!", e);
       } else {
         throw e;
-      }        
-    }    
+      }
+    }
   }
 
   @Override
@@ -81,13 +81,5 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
   @Override
   public void markAsApplied(int id) {
     configurationMapper.markAsApplied(id);
-  }
-
-  public Long getNextConfigId() {
-    return configurationMapper.getNextConfigId();
-  }
-
-  public Long getNextProcessId() {
-    return configurationMapper.getNextProcessId();
   }
 }

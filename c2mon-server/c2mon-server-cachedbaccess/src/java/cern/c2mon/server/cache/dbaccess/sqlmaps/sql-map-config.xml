@@ -44,5 +44,6 @@
     <mapper resource="cern/c2mon/server/cache/dbaccess/sqlmaps/alarm-sql.xml"/>
     <mapper resource="cern/c2mon/server/cache/dbaccess/sqlmaps/device-sql.xml"/>
     <mapper resource="cern/c2mon/server/cache/dbaccess/sqlmaps/deviceclass-sql.xml"/>
+    <mapper resource="cern/c2mon/server/cache/dbaccess/sqlmaps/sequence-sql.xml"/>
   </mappers>
 </configuration>

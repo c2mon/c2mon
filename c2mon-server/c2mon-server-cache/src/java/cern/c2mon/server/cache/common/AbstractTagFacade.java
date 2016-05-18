@@ -1,28 +1,20 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.cache.common;
-
-import java.lang.reflect.Field;
-import java.sql.Timestamp;
-import java.util.*;
-
-import cern.c2mon.shared.common.metadata.Metadata;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
@@ -35,16 +27,18 @@ import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.SimpleTypeReflectionHandler;
-import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
-import cern.c2mon.shared.common.datatag.DataTagDeadband;
-import cern.c2mon.shared.common.datatag.DataTagValueDictionary;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
-import cern.c2mon.shared.common.type.TagDataType;
+import cern.c2mon.shared.common.datatag.*;
+import cern.c2mon.shared.common.metadata.Metadata;
 import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.daq.config.DataTagAddressUpdate;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
 import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Field;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * Common implementation of the Tag facade logic.
@@ -267,9 +261,6 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
 //      }
       if (tag.getDataType() == null) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"dataType\" cannot be null");
-      }
-      if (!TagDataType.isValidDataType(tag.getDataType())) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"dataType\" must be Boolean, String, Integer, Float, Double or Long");
       }
 //      if (tag.getValueDictionary() == null) {
 //        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"valueDictionary\" cannot be null");
@@ -550,7 +541,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
   public boolean filteroutValid(T tag, Object value, String valueDescription, Timestamp timestamp) {
     return filterout(tag, value, valueDescription, null, null, timestamp);
   }
-  
+
   @Override
   public boolean isInTagCache(Long id) {
     return this.tagCache.hasKey(id);
