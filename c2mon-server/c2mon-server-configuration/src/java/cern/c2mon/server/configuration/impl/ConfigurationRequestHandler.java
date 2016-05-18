@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.impl;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 
 import javax.jms.Destination;
@@ -25,7 +26,12 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import cern.c2mon.shared.client.configuration.api.tag.Tag;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
+import cern.c2mon.shared.client.configuration.serialisation.HardwareAddressDeserializer;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,18 +73,26 @@ public class ConfigurationRequestHandler implements SessionAwareMessageListener<
 
   @Override
   public void onMessage(Message message, Session session) throws JMSException {
-    Gson gson = new GsonBuilder()
-        .registerTypeAdapter(HardwareAddress.class, new InterfaceAdapter<HardwareAddress>())
-        .registerTypeAdapter(Tag.class, new InterfaceAdapter<Tag>())
-        .create();
-    Configuration configuration = gson.fromJson(TextMessage.class.cast(message).getText(), Configuration.class);
-    log.info(String.format("Configuration request received"));
+    ObjectMapper mapper = new ObjectMapper();
+    SimpleModule module = new SimpleModule();
+    module.addDeserializer(HardwareAddress.class, new HardwareAddressDeserializer());
+    mapper.registerModule(module);
+    mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     ConfigurationReport configurationReport;
     try {
+      Configuration configuration = mapper.readValue(TextMessage.class.cast(message).getText(),Configuration.class);
+
+    log.info(String.format("Configuration request received"));
+
       configurationReport = configurationLoader.applyConfiguration(configuration);
     } catch (ConfigurationException ex) {
       configurationReport = ex.getConfigurationReport();
+    } catch (IOException e) {
+      configurationReport = new ConfigurationReport();
+      configurationReport.setExceptionTrace(e);
+      configurationReport.setStatus(ConfigConstants.Status.FAILURE);
+      configurationReport.setStatusDescription("Serialization or Deserialization of Configuration on Server side failed");
     }
 
     // Extract reply topic
@@ -95,12 +109,14 @@ public class ConfigurationRequestHandler implements SessionAwareMessageListener<
       try {
         messageProducer = session.createProducer(replyDestination);
         TextMessage replyMessage = session.createTextMessage();
-        replyMessage.setText(gson.toJson(configurationReport));
+        replyMessage.setText(mapper.writeValueAsString(configurationReport));
         if (log.isDebugEnabled()) {
           log.debug("Sending reconfiguration report to client.");
         }
         log.info("Sending reconfiguration report to client.");
         messageProducer.send(replyMessage);
+      } catch (JsonProcessingException e) {
+        log.error("error while serializing the configurationReport: "+ e.getMessage());
       } finally {
         if (messageProducer != null) {
             messageProducer.close();

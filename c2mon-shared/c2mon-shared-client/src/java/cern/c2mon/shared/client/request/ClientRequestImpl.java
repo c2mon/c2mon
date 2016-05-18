@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -26,6 +26,8 @@ import java.util.Set;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import cern.c2mon.shared.client.serializer.TransferTagSerializer;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -92,7 +94,7 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
   /** List of ids. Please note this field should one day be renamed to ids. */
   @Size(min = 0) @Getter(onMethod=@__({@Deprecated}))
   private final Collection<Long> tagIds = new HashSet<Long>();
-  
+
   /** List of regular expressions, which is e.g. used to search via tag name */
   @Size(min = 0) @Getter
   private final Collection<String> regexList = new HashSet<String>();
@@ -196,8 +198,8 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
           "The result type " + clazz + " is not supported by this class.");
     }
   }
-  
-  
+
+
   public Collection<Long> getIds() {
     return this.tagIds;
   }
@@ -265,9 +267,9 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
       }
     }
   }
-  
+
   /**
-   * Adds (tag) name or a regular search expression 
+   * Adds (tag) name or a regular search expression
    * @param regex (tag) name or a regular search expression
    * @return <code>true</code>, if the request did not already contain the
    *         specified string.
@@ -347,17 +349,18 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
   @Override
   public final Collection<T> fromJsonResponse(final String jsonString) throws JsonSyntaxException {
     Type collectionType;
+    TypeReference jacksonCollectionType;
     JsonReader jsonReader = new JsonReader(new StringReader(jsonString));
     jsonReader.setLenient(true);
 
     try {
       switch (resultType) {
         case TRANSFER_TAG_LIST:
-          collectionType = new TypeToken<Collection<TransferTagImpl>>() { } .getType();
-          return TransferTagImpl.getGson().fromJson(jsonReader, collectionType);
+          jacksonCollectionType =  new TypeReference<Collection<TransferTagImpl>>() { };
+          return TransferTagSerializer.fromCollectionJson(jsonString, jacksonCollectionType);
         case TRANSFER_TAG_VALUE_LIST:
-          collectionType = new TypeToken<Collection<TransferTagValueImpl>>() { } .getType();
-          return TransferTagValueImpl.getGson().fromJson(jsonReader, collectionType);
+          jacksonCollectionType =  new TypeReference<Collection<TransferTagValueImpl>>() { };
+          return TransferTagSerializer.fromCollectionJson(jsonString, jacksonCollectionType);
         case SUPERVISION_EVENT_LIST:
           collectionType = new TypeToken<Collection<SupervisionEventImpl>>() { } .getType();
           return getGson().fromJson(jsonReader, collectionType);
@@ -400,8 +403,7 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
         default:
           throw new JsonSyntaxException("Unknown result type specified");
       }
-    }
-    finally  {
+    } finally  {
       try { jsonReader.close(); } catch (IOException e) {}
     }
   }

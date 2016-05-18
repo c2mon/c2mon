@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -27,6 +27,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
+import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -215,7 +216,7 @@ public class TagValuePublisherTest {
           template.setReceiveTimeout(1000);
           synchronized (updateLock) {
             Message message = template.receive(new ActiveMQTopic(tag.getTopic()));
-            update = TransferTagValueImpl.fromJson(((TextMessage) message).getText());
+            update = TransferTagSerializer.fromJson(((TextMessage) message).getText(), TransferTagValueImpl.class);
           }
         } catch (Exception e) {
           synchronized (updateLock) {
@@ -242,7 +243,7 @@ public class TagValuePublisherTest {
           template.setReceiveTimeout(5000);
           synchronized (updateLock) {
             Message message = template.receive(new ActiveMQTopic(tag.getTopic()));
-            updateFromConfig = TransferTagImpl.fromJson(((TextMessage) message).getText());
+            updateFromConfig = TransferTagSerializer.fromJson(((TextMessage) message).getText(), TransferTagImpl.class);
           }
         } catch (Exception e) {
           synchronized (updateLock) {

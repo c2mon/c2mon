@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -24,6 +24,7 @@ import javax.validation.constraints.Size;
 
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.rule.RuleExpression;
+import lombok.Data;
 
 /**
  * This class implements the <code>TransferTag</code> interface which defines
@@ -32,6 +33,7 @@ import cern.c2mon.shared.rule.RuleExpression;
  *
  * @author Matthias Braeger
  */
+@Data
 public final class TransferTagImpl extends TransferTagValueImpl implements TagUpdate {
 
   /**
@@ -70,17 +72,17 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
 
   /** The unique name of the tag */
   @NotNull
-  private final String tagName;
+  private final String name;
 
   /** Unit of the tag */
   private String unit = null;
 
   /** In case of a rule tag this field should not be null */
-  private String ruleExpressionStr = null;
-  
+  private String ruleExpression = null;
+
   /** In case of a Control tag update, this field is set to <code>true</code> */
   private boolean controlTag = false;
-  
+
   /** In case of an Alive Control tag update, this field is set to <code>true</code> */
   private boolean aliveTag = false;
 
@@ -126,7 +128,7 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
                          final String pTopicName) {
     super(pTagId, pTagValue, pTagValueDescription, pTagQuality, pMode, pSourceTimestamp, pDaqTimestamp, pServerTimestamp, pDescription);
 
-    tagName = pTagName;
+    name = pTagName;
     topicName = pTopicName;
   }
 
@@ -185,14 +187,6 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
   }
 
   /**
-   * @return A copy of the list of sub equipment id's
-   */
-  @Override
-  public Collection<Long> getSubEquipmentIds() {
-    return new ArrayList<Long>(subEquipmentIds);
-  }
-
-  /**
    * Adds the process id as dependency to this tag
    * @param processId The process id
    * @return <code>true</code>, if the process id was added, else <code>false</code>
@@ -224,61 +218,11 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
   }
 
   /**
-   * @return A <code>String</code> representation of the JMS destination where the DataTag
-   *         is published on change.
-   */
-  @Override
-  public String getTopicName() {
-    return topicName;
-  }
-
-  @Override
-  public String getName() {
-    return tagName;
-  }
-
-  /**
    * In case of a rule tag this value shall be set.
    * @param ruleExpression The rule which was used to compute the tag value
    */
-  public void setRuleExpression(final RuleExpression ruleExpression) {
-    ruleExpressionStr = ruleExpression.getExpression();
-  }
-
-  @Override
-  public String getRuleExpression() {
-    return ruleExpressionStr;
-  }
-
-  /**
-   * @param pUnit The value unit description of the tag
-   */
-  public void setUnit(final String pUnit) {
-    unit = pUnit;
-  }
-
-  @Override
-  public String getUnit() {
-    return unit;
-  }
-
-  /**
-   * Deserialized the JSON string into a <code>TransferTag</code> object instance
-   * @param json A JSON string representation of a <code>TransferTagImpl</code> class
-   * @return The deserialized <code>TransferTag</code> instance of the JSON message
-   */
-  public static TagUpdate fromJson(final String json) {
-    return getGson().fromJson(json, TransferTagImpl.class);
-  }
-
-  @Override
-  public boolean isControlTag() {
-    return controlTag;
-  }
-
-  @Override
-  public boolean isAliveTag() {
-    return aliveTag;
+  public void defineRuleExpression(final RuleExpression ruleExpression) {
+    this.ruleExpression = ruleExpression.getExpression();
   }
 
   /**
@@ -289,7 +233,7 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
    */
   public final void setControlTagFlag(boolean controlTag) {
     this.controlTag = controlTag;
-    
+
     if (!controlTag) {
       this.aliveTag = false;
     }
@@ -297,31 +241,15 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
 
   /**
    * @param aliveTag the aliveTag flag is set to <code>true</code>,
-   *        if the update is from an Alive Control tag. Please note, 
+   *        if the update is from an Alive Control tag. Please note,
    *        that for <code>true</code>, the controlTag flag will automatically
    *        also be set to <code>true</code>.
    */
   public final void setAliveTagFlag(boolean aliveTag) {
     this.aliveTag = aliveTag;
-    
+
     if (aliveTag) {
       this.controlTag = true;
     }
-  }
-
-  /**
-   * Set the field metadata.
-   * @param metadata the data to set.
-   */
-  public void setMetadata(Map<String, Object> metadata){
-    this.metadata = metadata;
-  }
-
-  /**
-   * Returns the metadata to the corresponding tag.
-   * @return the metadata of the object.
-   */
-  public Map<String, Object> getMetadata(){
-    return this.metadata;
   }
 }

@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -85,12 +85,13 @@ public abstract class TransferObjectFactory {
       transferTag.addEquipmentIds(tag.getEquipmentIds());
       transferTag.addSubEquipmentIds(tag.getSubEquipmentIds());
       transferTag.addProcessIds(tag.getProcessIds());
+      transferTag.setValueClassName(tag.getDataType());
       if(tag.getMetadata()!= null){
         transferTag.setMetadata(tag.getMetadata().getMetadata());
       }
 
       if (tag instanceof RuleTag) {
-        transferTag.setRuleExpression(((RuleTag) tag).getRuleExpression());
+        transferTag.defineRuleExpression(((RuleTag) tag).getRuleExpression());
       } else if (tag instanceof ControlTag) {
         transferTag.setControlTagFlag(true);
         transferTag.setAliveTagFlag(aliveTag);
@@ -122,6 +123,7 @@ public abstract class TransferObjectFactory {
               tag.getCacheTimestamp(),
               tag.getDescription());
 
+      tagValue.setValueClassName(tag.getDataType());
       addAlarmValues(tagValue, tagWithAlarms.getAlarms());
       tagValue.setSimulated(tag.isSimulated());
     }

@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -21,6 +21,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.simpleframework.xml.Element;
@@ -42,7 +43,7 @@ public class ConfigurationElementReport {
 
   /** log4j logger instance */
   private static final Logger LOG = LoggerFactory.getLogger(ConfigurationElementReport.class);
-  
+
   /**
    * The action of the {@link ConfigurationElement}.
    */
@@ -155,7 +156,7 @@ public class ConfigurationElementReport {
   public String getStatusMessage() {
     return this.statusMessage;
   }
-  
+
   /**
    * Set a message describing why the configuration operation failed.
    */
@@ -221,6 +222,7 @@ public class ConfigurationElementReport {
    * non-null, appends the new message to the existing one.
    * @param pFailureMessage the message
    */
+  @JsonIgnore
   public void setFailure(final String pFailureMessage) {
     this.status = ConfigConstants.Status.FAILURE;
     if (statusMessage != null) {

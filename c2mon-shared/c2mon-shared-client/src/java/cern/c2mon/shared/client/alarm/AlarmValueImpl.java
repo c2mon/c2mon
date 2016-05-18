@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -25,6 +25,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
@@ -42,11 +43,12 @@ import cern.c2mon.shared.client.request.ClientRequestReport;
  * into the <code>TransferTagValue</code> object.
  *
  * @author Matthias Braeger
- * 
+ *
  * @see cern.c2mon.shared.client.alarm.AlarmValue
  * @see cern.c2mon.shared.client.tag.TagValueUpdate
  */
 @Root(name = "AlarmValue")
+@Data
 @Slf4j
 public final class AlarmValueImpl extends ClientRequestReport implements AlarmValue, Cloneable {
 
@@ -54,40 +56,40 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   @NotNull @Min(1)
   @Attribute
   private Long id;
-  
+
   /** LASER alarm fault code */
   @NotNull
   @Element
   private int faultCode;
-  
+
   /** LASER alarm fault family */
   @NotNull
   @Element
   private String faultFamily;
-  
+
   /** LASER alarm fault member */
   @NotNull
   @Element
-  private String faultMemeber;
-  
+  private String faultMember;
+
   /** Free text for additional information about the alarm */
   @Element(required = false)
   private String info;
-  
+
   /** Unique identifier of the Tag to which the alarm is attached */
   @NotNull @Min(1)
   @Element
   private Long tagId;
-  
+
   /** Description for the Tag to which the alarm is attached */
   @Element(required = false)
-  private String tagDescription;  
-  
+  private String tagDescription;
+
   /** UTC timestamp of the alarm's last state change */
   @NotNull @Past
   @Element
   private Timestamp timestamp;
-  
+
   /** <code>true</code>, if the alarm is active */
   @Element
   private boolean active;
@@ -104,7 +106,7 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   private AlarmValueImpl() {
     this(null, -1, null, null, null, null, null, false);
   }
-  
+
   /**
    * Default Constructor
    * @param pId Alarm id
@@ -126,14 +128,14 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
                         final boolean isActive) {
     id = pId;
     faultCode = pFaultCode;
-    faultMemeber = pFaultMember;
+    faultMember = pFaultMember;
     faultFamily = pFaultFamily;
     info = pInfo;
     tagId = pTagId;
     timestamp = pTimestamp;
     active = isActive;
   }
-  
+
   /**
    * Default Constructor
    * @param pId Alarm id
@@ -157,85 +159,13 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
                         final boolean isActive) {
     id = pId;
     faultCode = pFaultCode;
-    faultMemeber = pFaultMember;
+    faultMember = pFaultMember;
     faultFamily = pFaultFamily;
     info = pInfo;
     tagId = pTagId;
     tagDescription = pTagDescription;
     timestamp = pTimestamp;
     active = isActive;
-  }
-  
-  @Override
-  public int getFaultCode() {
-    return faultCode;
-  }
-
-  @Override
-  public String getFaultFamily() {
-    return faultFamily;
-  }
-
-  @Override
-  public String getFaultMember() {
-    return faultMemeber;
-  }
-
-  @Override
-  public Long getId() {
-    return id;
-  }
-
-  @Override
-  public String getInfo() {
-    return info;
-  }
-
-  @Override
-  public Long getTagId() {
-    return tagId;
-  }
-
-  @Override
-  public Timestamp getTimestamp() {
-    return timestamp;
-  }
-
-  @Override
-  public boolean isActive() {
-    return active;
-  }
-
-  /* (non-Javadoc)
-   * @see java.lang.Object#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((id == null) ? 0 : id.hashCode());
-    return result;
-  }
-
-  /* (non-Javadoc)
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    AlarmValueImpl other = (AlarmValueImpl) obj;
-    if (id == null) {
-      if (other.id != null)
-        return false;
-    }
-    else if (!id.equals(other.id))
-      return false;
-    return true;
   }
 
   @Override
@@ -267,7 +197,7 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
     log.error("Cloning of in metadata failed. the Object ist not serializable");
     throw  new RuntimeException("Cloning of in metadata failed. the Object ist not serializable");
   }
-  
+
   public String getXml() {
       Serializer serializer = new Persister(new AnnotationStrategy());
       StringWriter fw = null;
@@ -290,8 +220,8 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
       }
       return result;
   }
-  
-  
+
+
   public static AlarmValueImpl fromXml(final String xml) throws Exception {
 
       AlarmValueImpl alarmVal = null;
@@ -310,8 +240,8 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
 
       return alarmVal;
   }
-  
-  
+
+
   @Override
   public String toString() {
       return this.getXml();
@@ -319,34 +249,7 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
 
   @Override
   public boolean isMoreRecentThan(final AlarmValue alarm) {
-    
+
     return this.getTimestamp().after(alarm.getTimestamp());
-  }
-
-  @Deprecated
-  public void setTagDescription(String tagDescription) {
-    this.tagDescription = tagDescription;
-  }
-
-  @Deprecated
-  @Override
-  public String getTagDescription() {
-    return tagDescription;
-  }
-
-  /**
-   * Set the field metadata.
-   * @param metadata the data to set.
-   */
-  public void setMetadata(Map<String, Object> metadata){
-    this.metadata = metadata;
-  }
-
-  /**
-   * Returns the metadata to the corresponding tag.
-   * @return the metadata of the object.
-   */
-  public Map<String, Object> getMetadata(){
-    return this.metadata;
   }
 }

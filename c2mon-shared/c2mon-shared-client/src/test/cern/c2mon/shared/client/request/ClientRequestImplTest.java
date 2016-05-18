@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -63,6 +63,8 @@ import cern.c2mon.shared.util.json.GsonFactory;
 import com.google.gson.Gson;
 
 public class ClientRequestImplTest {
+
+  static Gson gson = GsonFactory.createGsonBuilder().create();
 
   @Test
   public void testReports() {
@@ -387,7 +389,6 @@ public class ClientRequestImplTest {
     Collection<ProcessNameResponse> responseList = new ArrayList<ProcessNameResponse>();
     responseList.add(processResponse);
 
-    Gson gson = TransferTagValueImpl.getGson();
     String jsonResponse = gson.toJson(responseList);
 
     Collection<ProcessNameResponse> receivedResponse = processNameRequest.fromJsonResponse(jsonResponse);
@@ -412,7 +413,6 @@ public class ClientRequestImplTest {
     Collection<ProcessXmlResponse> responseList = new ArrayList<ProcessXmlResponse>();
     responseList.add(xmlResponse);
 
-    Gson gson = TransferTagValueImpl.getGson();
     String jsonResponse = gson.toJson(responseList);
 
 
@@ -434,7 +434,6 @@ public class ClientRequestImplTest {
     responseList.add(className1);
     responseList.add(className2);
 
-    Gson gson = TransferTagValueImpl.getGson();
     String jsonResponse = gson.toJson(responseList);
 
     List<DeviceClassNameResponse> receivedResponse = (List<DeviceClassNameResponse>) deviceClassNamesRequest.fromJsonResponse(jsonResponse);
@@ -459,7 +458,6 @@ public class ClientRequestImplTest {
     responseList.add(device1);
     responseList.add(device2);
 
-    Gson gson = TransferTagValueImpl.getGson();
     String jsonResponse = gson.toJson(responseList);
 
     List<TransferDevice> receivedResponse = (List<TransferDevice>) devicesRequest.fromJsonResponse(jsonResponse);
@@ -681,7 +679,7 @@ public class ClientRequestImplTest {
   }
 
   private TransferTagImpl createTag(final Long tagId, final Object tagValue) {
-    return new TransferTagImpl(
+    TransferTagImpl result = new TransferTagImpl(
         tagId,
         tagValue,
         "test value desc",
@@ -692,6 +690,8 @@ public class ClientRequestImplTest {
         new Timestamp(System.currentTimeMillis()),
         "test description",
         "tag name",
-    "tag:topic");
+        "tag:topic");
+    result.setValueClassName(tagValue.getClass().getName());
+    return result;
   }
 }

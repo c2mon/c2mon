@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -28,6 +28,7 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.validation.Valid;
 
+import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,17 +60,17 @@ public class ClientRequestDelegator implements SessionAwareMessageListener<Messa
 
   /** Private class logger */
   private static final Logger LOG = LoggerFactory.getLogger(ClientRequestDelegator.class);
-  
+
   private final ClientAlarmRequestHandler clientAlarmRequestHandler;
-  
+
   private final ClientCommandRequestHandler clientCommandRequestHandler;
-  
+
   private final ClientTagRequestHelper tagrequestHelper;
-  
+
   private final ClientDeviceRequestHelper clientDeviceRequestHelper;
-  
+
   private final ClientConfigurationRequestHandler clientConfigurationRequestHandler;
-  
+
   private final ClientProcessRequestHandler clientProcessRequestHandler;
 
   /**
@@ -155,7 +156,15 @@ public class ClientRequestDelegator implements SessionAwareMessageListener<Messa
           } else {
 
             // Send response as Json message
-            replyMessage = session.createTextMessage(GSON.toJson(response));
+            // use the Jackson parser for TransferTagValues
+            switch (clientRequest.getResultType()){
+              case TRANSFER_TAG_LIST:
+              case TRANSFER_TAG_VALUE_LIST:
+                replyMessage = session.createTextMessage(TransferTagSerializer.getJacksonParser().writeValueAsString(response));
+                break;
+              default:
+                replyMessage = session.createTextMessage(GSON.toJson(response));
+            }
           }
 
           if (LOG.isDebugEnabled()) {

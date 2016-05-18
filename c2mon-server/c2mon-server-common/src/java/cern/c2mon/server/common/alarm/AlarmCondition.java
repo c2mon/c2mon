@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -23,6 +23,7 @@ import java.lang.reflect.Modifier;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import cern.c2mon.shared.common.type.TypeConverter;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -32,7 +33,7 @@ import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 /**
  * <b>Imported as-is into C2MON.</b>
- * 
+ *
  * <p>Common interface for defining TIM alarm conditions.
  *
  * AlarmCondition objects are used in the TIM system (by the AlarmCacheObject
@@ -56,14 +57,14 @@ public abstract class AlarmCondition implements Serializable {
   /** Serial version UID */
   private static final long serialVersionUID = 963875467077605494L;
 
-  /** 
+  /**
    * The active fault state descriptor. Copied from
    * <code>cern.laser.source.alarmsysteminterface.FaultState</code>
    * to avoid dependencies.
    */
   public final static String ACTIVE = "ACTIVE";
-  
-  /** 
+
+  /**
    * The terminate fault state descriptor. Copied from
    * <code>cern.laser.source.alarmsysteminterface.FaultState</code>
    * to avoid dependencies.
@@ -75,7 +76,7 @@ public abstract class AlarmCondition implements Serializable {
 
   /**
    * Returns the appropriate alarm state (i.e. the fault state descriptor
-   * in LASER) for the given tag value. 
+   * in LASER) for the given tag value.
    * The only allowed return values are FaultState.TERMINATE or FaultState.ACTIVE.
    */
   public abstract String evaluateState(Object value);
@@ -85,11 +86,11 @@ public abstract class AlarmCondition implements Serializable {
    * @return a deep clone of this AlarmCondition object.
    */
   public abstract Object clone();
-  
 
-  /** 
+
+  /**
    * Returns a standardised XML representation of the AlarmCondition object.
-   * 
+   *
    * @throws RuntimeException if errors occur during encoding to XML
    */
   public final synchronized String toConfigXML() {
@@ -148,7 +149,7 @@ public abstract class AlarmCondition implements Serializable {
 
   /**
    * Create an AlarmCondition object from its standardized XML representation.
-   * @param pElement DOM element containing the XML representation of an 
+   * @param pElement DOM element containing the XML representation of an
    * AlarmCondition object, as created by the toConfigXML() method.
    */
   public static final synchronized AlarmCondition fromConfigXML(Element pElement) {
@@ -167,8 +168,8 @@ public abstract class AlarmCondition implements Serializable {
     } catch (InstantiationException ie) {
       ie.printStackTrace();
       throw new RuntimeException(ie);
-    }          
-    
+    }
+
     NodeList fields = pElement.getChildNodes();
     Node fieldNode = null;
     int fieldsCount = fields.getLength();
@@ -181,37 +182,11 @@ public abstract class AlarmCondition implements Serializable {
         fieldName = fieldNode.getNodeName();
         fieldValueString = fieldNode.getFirstChild().getNodeValue();
         try {
+
           Field field = alarmConditionClass.getDeclaredField(decodeFieldName(fieldName));
           String fieldTypeName = fieldNode.getAttributes().getNamedItem("type").getNodeValue();
-          if (fieldTypeName.equals("Integer")) {
-            field.set(alarmCondition, Integer.valueOf(fieldValueString));
-          } else if (fieldTypeName.equals("Boolean")) {
-            field.set(alarmCondition, Boolean.valueOf(fieldValueString));
-          } else if (fieldTypeName.equals("Float")) {
-            field.set(alarmCondition, Float.valueOf(fieldValueString));
-          } else if (fieldTypeName.equals("Double")) {
-            field.set(alarmCondition, Double.valueOf(fieldValueString));
-          } else if (fieldTypeName.equals("Short")) {
-            field.set(alarmCondition, Short.valueOf(fieldValueString));
-          } else if (fieldTypeName.equals("short")) {
-            field.setShort(alarmCondition, Short.parseShort(fieldValueString));
-          } else if (fieldTypeName.equals("int")) {
-            field.setInt(alarmCondition, Integer.parseInt(fieldValueString));
-          } else if (fieldTypeName.equals("float")) {
-            field.setFloat(alarmCondition, Float.parseFloat(fieldValueString));
-          } else if (fieldTypeName.equals("double")) {
-            field.setDouble(alarmCondition, Double.parseDouble(fieldValueString));
-          } else if (fieldTypeName.equals("long")) {
-            field.setLong(alarmCondition, Long.parseLong(fieldValueString));
-          } else if (fieldTypeName.equals("byte")) {
-            field.setByte(alarmCondition, Byte.parseByte(fieldValueString));
-          } else if (fieldTypeName.equals("char")) {
-            field.setChar(alarmCondition, fieldValueString.charAt(0));
-          } else if (fieldTypeName.equals("boolean")) {
-            field.setBoolean(alarmCondition, Boolean.getBoolean(fieldValueString));          
-          } else {
-            field.set(alarmCondition, fieldValueString);
-          }
+          field.set(alarmCondition, TypeConverter.cast(fieldValueString, fieldTypeName));
+
         } catch (NoSuchFieldException nsfe) {
           nsfe.printStackTrace();
           throw new RuntimeException(nsfe);
@@ -227,10 +202,10 @@ public abstract class AlarmCondition implements Serializable {
 
   /**
    * Create an AlarmCondition object from its standardized XML representation.
-   * 
+   *
    * @param pElement DOM element containing the XML representation of an
    * AlarmCondition object, as created by the toConfigXML() method.
-   * 
+   *
    * @throws RuntimeException if errors occur during parsing of XML
    */
   public static final synchronized AlarmCondition fromConfigXML(String pXML) {
@@ -241,9 +216,9 @@ public abstract class AlarmCondition implements Serializable {
         throw new RuntimeException(e);
       }
     }
-    return fromConfigXML(xmlParser.parse(pXML).getDocumentElement());    
+    return fromConfigXML(xmlParser.parse(pXML).getDocumentElement());
   }
-  
+
 
   //----------------------------------------------------------------------------
   // Private utility methods
@@ -270,7 +245,7 @@ public abstract class AlarmCondition implements Serializable {
     }
     return str.toString();
   }
-  
+
   /**
    * Encodes a field name in Java notation (e.g. myFieldName) to an XML
    * field name (e.g. my-field-name).
@@ -281,7 +256,7 @@ public abstract class AlarmCondition implements Serializable {
     // Number of characters in the field name
     int fieldNameLength = pFieldName.length();
 
-    char currentChar;    
+    char currentChar;
     for (int i= 0; i != fieldNameLength; i++) {
       currentChar =  pFieldName.charAt(i);
       if (Character.isUpperCase(currentChar)) {
@@ -293,7 +268,7 @@ public abstract class AlarmCondition implements Serializable {
     }
     return str.toString();
   }
-  
+
 //  public static void main(String[] args) {
 //    try {
 //      SimpleXMLParser parser = new SimpleXMLParser();

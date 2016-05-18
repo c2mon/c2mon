@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -22,6 +22,7 @@ import static junit.framework.Assert.assertTrue;
 
 import java.sql.Timestamp;
 
+import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 import org.junit.Test;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
@@ -36,7 +37,9 @@ public class TransferTagValueImplTest {
    * @param tagValue The tag value
    * @return A new <code>TransferTagValueImpl</code> test object
    */
-  private static TransferTagValueImpl createTagForValue(final Object tagValue) {
+  public static TransferTagValueImpl createTagForValue(final Object tagValue) {
+    TransferTagValueImpl result;
+
     DataTagQualityImpl tagQuality = new DataTagQualityImpl(TagQualityStatus.PROCESS_DOWN, "Process Down");
     Timestamp sourceTimestamp = new Timestamp(System.currentTimeMillis());
     Timestamp daqTimestamp = new Timestamp(System.currentTimeMillis());
@@ -44,16 +47,19 @@ public class TransferTagValueImplTest {
     String descr = "Test transfer tag";
     String valDesc = "Test val desc {{ \"aaa:\" \"342343\" } \n , ] }";
 
-    return new TransferTagValueImpl(
+    result = new TransferTagValueImpl(
         1234L, tagValue, valDesc, tagQuality, TagMode.TEST,
         sourceTimestamp, daqTimestamp, serverTimestamp, descr);
+
+    result.setValueClassName(tagValue.getClass().getName());
+    return result;
   }
 
   @Test
   public void testFloatJsonMsg() {
     Float value = Float.valueOf(3.34535f);
-    String gsonString = createTagForValue(value).toJson();
-    TagValueUpdate receivedTag = TransferTagValueImpl.fromJson(gsonString);
+    String jacksonString = TransferTagSerializer.toJson(createTagForValue(value));
+    TagValueUpdate receivedTag = TransferTagSerializer.fromJson(jacksonString, TransferTagValueImpl.class);
     assertTrue(receivedTag.getValue() instanceof Float);
     assertEquals(value, receivedTag.getValue());
   }
@@ -62,8 +68,8 @@ public class TransferTagValueImplTest {
   @Test
   public void testIntegerJsonMsg() {
     Integer value = Integer.valueOf(3);
-    String gsonString = createTagForValue(value).toJson();
-    TagValueUpdate receivedTag = TransferTagValueImpl.fromJson(gsonString);
+    String jacksonString = TransferTagSerializer.toJson(createTagForValue(value));
+    TagValueUpdate receivedTag = TransferTagSerializer.fromJson(jacksonString, TransferTagValueImpl.class);
     assertTrue(receivedTag.getValue() instanceof Integer);
     assertEquals(value, receivedTag.getValue());
   }
@@ -71,8 +77,8 @@ public class TransferTagValueImplTest {
   @Test
   public void testLongJsonMsg() {
     Long value = Long.valueOf(23453534634563246L);
-    String gsonString = createTagForValue(value).toJson();
-    TagValueUpdate receivedTag = TransferTagValueImpl.fromJson(gsonString);
+    String jacksonString = TransferTagSerializer.toJson(createTagForValue(value));
+    TagValueUpdate receivedTag = TransferTagSerializer.fromJson(jacksonString, TransferTagValueImpl.class);
     assertTrue(receivedTag.getValue() instanceof Long);
     assertEquals(value, receivedTag.getValue());
   }
@@ -80,8 +86,8 @@ public class TransferTagValueImplTest {
   @Test
   public void testDoubleJsonMsg() {
     Double value = Double.valueOf(2345356324.3245325D);
-    String gsonString = createTagForValue(value).toJson();
-    TagValueUpdate receivedTag = TransferTagValueImpl.fromJson(gsonString);
+    String jacksonString = TransferTagSerializer.toJson(createTagForValue(value));
+    TagValueUpdate receivedTag = TransferTagSerializer.fromJson(jacksonString, TransferTagValueImpl.class);
     assertTrue(receivedTag.getValue() instanceof Double);
     assertEquals(value, receivedTag.getValue());
   }
@@ -89,8 +95,8 @@ public class TransferTagValueImplTest {
   @Test
   public void testShortJsonMsg() {
     Short value = Short.valueOf("077");
-    String gsonString = createTagForValue(value).toJson();
-    TagValueUpdate receivedTag = TransferTagValueImpl.fromJson(gsonString);
+    String jacksonString = TransferTagSerializer.toJson(createTagForValue(value));
+    TagValueUpdate receivedTag = TransferTagSerializer.fromJson(jacksonString, TransferTagValueImpl.class);
     assertTrue(receivedTag.getValue() instanceof Short);
     assertEquals(value, receivedTag.getValue());
   }
@@ -98,8 +104,8 @@ public class TransferTagValueImplTest {
   @Test
   public void testByteJsonMsg() {
     Byte value = Byte.valueOf((byte) 0x000A);
-    String gsonString = createTagForValue(value).toJson();
-    TagValueUpdate receivedTag = TransferTagValueImpl.fromJson(gsonString);
+    String jacksonString = TransferTagSerializer.toJson(createTagForValue(value));
+    TagValueUpdate receivedTag = TransferTagSerializer.fromJson(jacksonString, TransferTagValueImpl.class);
     assertTrue(receivedTag.getValue() instanceof Byte);
     assertEquals(value, receivedTag.getValue());
   }
@@ -107,21 +113,21 @@ public class TransferTagValueImplTest {
   @Test
   public void testBooleanJsonMsg() {
     Boolean value = Boolean.TRUE;
-    String gsonString = createTagForValue(value).toJson();
-    TagValueUpdate receivedTag = TransferTagValueImpl.fromJson(gsonString);
+    String jacksonString = TransferTagSerializer.toJson(createTagForValue(value));
+    TagValueUpdate receivedTag = TransferTagSerializer.fromJson(jacksonString, TransferTagValueImpl.class);
     assertTrue(receivedTag.getValue() instanceof Boolean);
     assertEquals(value, receivedTag.getValue());
   }
 
   @Test
   public void testStringJsonMsg() {
-    String gsonString = createTagForValue("This is a test String value message!").toJson();
-    TagValueUpdate receivedTag = TransferTagValueImpl.fromJson(gsonString);
+    String jacksonString = TransferTagSerializer.toJson(createTagForValue("This is a test String value message!"));
+    TagValueUpdate receivedTag = TransferTagSerializer.fromJson(jacksonString, TransferTagValueImpl.class);
     assertEquals("This is a test String value message!", receivedTag.getValue());
 
     String floatStr = "45234326.324";
-    gsonString = createTagForValue(floatStr).toJson();
-    receivedTag = TransferTagValueImpl.fromJson(gsonString);
+    jacksonString = TransferTagSerializer.toJson(createTagForValue(floatStr));
+    receivedTag = TransferTagSerializer.fromJson(jacksonString, TransferTagValueImpl.class);
     assertTrue(receivedTag.getValue() instanceof String);
     assertEquals(floatStr, receivedTag.getValue());
   }
@@ -142,7 +148,7 @@ public class TransferTagValueImplTest {
     assertFalse(tagValue.addAlarmValue(alarmInvalid));
 
     assertEquals(1, tagValue.getAlarms().size());
-    TagValueUpdate receivedTag = TransferTagValueImpl.fromJson(tagValue.toJson());
+    TagValueUpdate receivedTag = TransferTagSerializer.fromJson(TransferTagSerializer.toJson(tagValue), TransferTagValueImpl.class);
     assertEquals(1, receivedTag.getAlarms().size());
     assertEquals(alarmValid, receivedTag.getAlarms().toArray()[0]);
 
@@ -162,7 +168,7 @@ public class TransferTagValueImplTest {
   public void testTagQuality() {
     TransferTagValueImpl tagValue = createTagForValue(Integer.valueOf(234234));
     tagValue.getDataTagQuality().addInvalidStatus(TagQualityStatus.VALUE_EXPIRED, "Value has expired");
-    TagValueUpdate receivedTag = TransferTagValueImpl.fromJson(tagValue.toJson());
+    TagValueUpdate receivedTag = TransferTagSerializer.fromJson(TransferTagSerializer.toJson(tagValue), TransferTagValueImpl.class);
     assertEquals(tagValue.getDataTagQuality().getInvalidQualityStates().size(), receivedTag.getDataTagQuality().getInvalidQualityStates().size());
     assertTrue(receivedTag.getDataTagQuality().isInvalidStatusSet(TagQualityStatus.VALUE_EXPIRED));
     assertEquals(tagValue.getDataTagQuality().getInvalidQualityStates().get(TagQualityStatus.VALUE_EXPIRED),
@@ -190,15 +196,15 @@ public class TransferTagValueImplTest {
   public void testStringBackwardsCompatibility() {
 
     //current publication format of Tag + associated alarm values
-    String jsonString = "{\"tagId\":100003," +
+    String jsonString = "{\"id\":100003," +
     		"\"valueClassName\":\"java.lang.String\"," +
-    		"\"tagValue\":\"DOWN\"," +
+    		"\"value\":\"DOWN\"," +
     		"\"mode\":\"TEST\"," +
     		"\"simulated\":false," +
-    		"\"alarmValues\":[{\"id\":1," +
+    		"\"alarms\":[{\"id\":1," +
     				                "\"faultCode\":0," +
     				                "\"faultFamily\":\"fault family\"," +
-    				                "\"faultMemeber\":\"fault member\"," +
+    				                "\"faultMember\":\"fault member\"," +
     				                "\"info\":\"alarm info\"," +
     				                "\"tagId\":100003," +
     				                "\"timestamp\":1343809447020," +
@@ -211,7 +217,7 @@ public class TransferTagValueImplTest {
     				                "{\"id\":3," +
     				                "\"faultCode\":0," +
     				                "\"faultFamily\":\"fault family\"," +
-    				                "\"faultMemeber\":\"fault member\"," +
+    				                "\"faultMember\":\"fault member\"," +
     				                "\"info\":\"alarm info\"," +
     				                "\"tagId\":100003," +
     				                "\"timestamp\":1343809447020," +
@@ -221,7 +227,7 @@ public class TransferTagValueImplTest {
     				                "\"currentOperation\":0," +
     				                "\"totalParts\":0," +
     				                "\"currentPart\":0}]," +
-    			"\"tagQuality\":{\"invalidQualityStates\":{},\"isValid\":false}," +
+    			"\"dataTagQuality\":{\"invalidQualityStates\":{},\"isValid\":false}," +
     			"\"description\":\"test description\"," +
     			"\"valueDescription\":\"test value description\"," +
     			"\"sourceTimestamp\":1343809448989," +
@@ -232,7 +238,7 @@ public class TransferTagValueImplTest {
     			"\"totalParts\":0," +
     			"\"currentPart\":0}";
 
-    TagValueUpdate receivedTag = TransferTagValueImpl.fromJson(jsonString);
+    TagValueUpdate receivedTag = TransferTagSerializer.fromJson(jsonString, TransferTagValueImpl.class);
 
     assertEquals(((TransferTagValueImpl)receivedTag).getValueClassName(), "java.lang.String");
     assertEquals(receivedTag.getId(), Long.valueOf(100003));
@@ -258,15 +264,15 @@ public class TransferTagValueImplTest {
   public void testLongBackwardsCompatibility() {
 
     //current publication format of Tag + associated alarm values
-    String jsonString = "{\"tagId\":100003," +
+    String jsonString = "{\"id\":100003," +
         "\"valueClassName\":\"java.lang.Long\"," +
-        "\"tagValue\":1843809447020," +
+        "\"value\":1843809447020," +
         "\"mode\":\"TEST\"," +
         "\"simulated\":false," +
-        "\"alarmValues\":[{\"id\":1," +
+        "\"alarms\":[{\"id\":1," +
                             "\"faultCode\":0," +
                             "\"faultFamily\":\"fault family\"," +
-                            "\"faultMemeber\":\"fault member\"," +
+                            "\"faultMember\":\"fault member\"," +
                             "\"info\":\"alarm info\"," +
                             "\"tagId\":100003," +
                             "\"timestamp\":1343809447020," +
@@ -279,7 +285,7 @@ public class TransferTagValueImplTest {
                             "{\"id\":3," +
                             "\"faultCode\":0," +
                             "\"faultFamily\":\"fault family\"," +
-                            "\"faultMemeber\":\"fault member\"," +
+                            "\"faultMember\":\"fault member\"," +
                             "\"info\":\"alarm info\"," +
                             "\"tagId\":100003," +
                             "\"timestamp\":1343809447020," +
@@ -289,7 +295,7 @@ public class TransferTagValueImplTest {
                             "\"currentOperation\":0," +
                             "\"totalParts\":0," +
                             "\"currentPart\":0}]," +
-          "\"tagQuality\":{\"invalidQualityStates\":{},\"isValid\":false}," +
+          "\"dataTagQuality\":{\"invalidQualityStates\":{},\"isValid\":false}," +
           "\"description\":\"test description\"," +
           "\"valueDescription\":\"test value description\"," +
           "\"sourceTimestamp\":1343809448989," +
@@ -300,15 +306,10 @@ public class TransferTagValueImplTest {
           "\"totalParts\":0," +
           "\"currentPart\":0}";
 
-    TagValueUpdate receivedTag = TransferTagValueImpl.fromJson(jsonString);
+    TagValueUpdate receivedTag = TransferTagSerializer.fromJson(jsonString, TransferTagValueImpl.class);
 
     assertEquals("java.lang.Long", ((TransferTagValueImpl)receivedTag).getValueClassName());
     assertEquals(Long.valueOf("1843809447020"), receivedTag.getValue());
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testArbitraryValueTypeNotSupported() {
-    new TransferTagValueImpl(1L, new Object(), null, null, TagMode.OPERATIONAL, null, null, null, null);
   }
 
 }
