@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>daq-opcua</artifactId>
     <packaging>jar</packaging>
-    <version>1.7.0</version>
+    <version>1.7.1</version>
     <name>C2MON OPC-UA DAQ Docker Image</name>
     <description>Docker Image for C2MON OPC-UA DAQ deployment</description>
 
