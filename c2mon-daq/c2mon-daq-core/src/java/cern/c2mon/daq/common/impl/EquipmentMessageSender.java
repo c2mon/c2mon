@@ -266,7 +266,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
     if (isAliveTag(tagID)) {
       successfulSent = this.equipmentAliveSender.sendEquipmentAlive(tag, tagValue, sourceTimestamp, pValueDescr);
     } else {
-      successfulSent = this.equipmentSenderValid.sendTagFiltered(tag, tagValue, sourceTimestamp, pValueDescr, sentByValueCheckMonitor);
+      successfulSent = this.equipmentSenderValid.sendTagFiltered(tag, tagValue, sourceTimestamp, pValueDescr);
     }
 
     this.equipmentLogger.trace("sendTagFiltered - leaving sendTagFiltered()");

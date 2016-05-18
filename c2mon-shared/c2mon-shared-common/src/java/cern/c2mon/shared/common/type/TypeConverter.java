@@ -19,7 +19,7 @@ package cern.c2mon.shared.common.type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
+import java.awt.Color;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.text.DateFormat;

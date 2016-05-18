@@ -16,19 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
-import static org.easymock.classextension.EasyMock.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.junit.Assert.*;
 import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.conf.core.RunOptions;
-import cern.c2mon.daq.common.messaging.impl.RequestController;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
@@ -36,18 +26,18 @@ import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
-import cern.c2mon.shared.daq.config.Change;
-import cern.c2mon.shared.daq.config.ChangeReport;
-import cern.c2mon.shared.daq.config.CommandTagAdd;
-import cern.c2mon.shared.daq.config.CommandTagRemove;
-import cern.c2mon.shared.daq.config.CommandTagUpdate;
-import cern.c2mon.shared.daq.config.DataTagAdd;
-import cern.c2mon.shared.daq.config.DataTagRemove;
-import cern.c2mon.shared.daq.config.DataTagUpdate;
-import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
-import cern.c2mon.shared.daq.config.ProcessConfigurationUpdate;
+import cern.c2mon.shared.daq.config.*;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.easymock.classextension.EasyMock.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class RequestControllerTest {
     private ConfigurationController configurationControllerMock;

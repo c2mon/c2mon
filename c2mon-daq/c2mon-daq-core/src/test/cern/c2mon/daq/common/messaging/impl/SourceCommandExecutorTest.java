@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -38,7 +38,7 @@ public class SourceCommandExecutorTest {
         command = new SourceCommandTagValue(1L, "name", 1L, (short) 1, "asd", "Boolean");
         commandRunner = createMock(ICommandRunner.class);
     }
-    
+
     @Test
     public void testCallSuccess() throws InterruptedException, EqCommandTagException {
         SourceCommandExecutor executor = new SourceCommandExecutor(commandRunner, command);
@@ -51,7 +51,7 @@ public class SourceCommandExecutorTest {
         assertNull(executor.getSourceCommandTagReport().getDescription());
         verify(commandRunner);
     }
-    
+
     @Test
     public void testCallSuccessReturnHello() throws InterruptedException, EqCommandTagException {
         SourceCommandExecutor executor = new SourceCommandExecutor(
@@ -62,11 +62,11 @@ public class SourceCommandExecutorTest {
                     }
                 }, command);
         executor.start();
-        Thread.sleep(10);
+        Thread.sleep(20);
         assertTrue(executor.getSourceCommandTagReport().getStatus() == SourceCommandTagReport.STATUS_OK);
         assertEquals(executor.getSourceCommandTagReport().getReturnValue(), "hello");
     }
-    
+
     @Test
     public void testCallNoResponse() throws InterruptedException {
         SourceCommandExecutor executor = new SourceCommandExecutor(
@@ -85,7 +85,7 @@ public class SourceCommandExecutorTest {
         Thread.sleep(10);
         assertTrue(executor.getSourceCommandTagReport().getStatus() == SourceCommandTagReport.STATUS_NOK_TIMEOUT);
     }
-    
+
     @Test
     public void testException() throws InterruptedException {
         SourceCommandExecutor executor = new SourceCommandExecutor(

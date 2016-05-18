@@ -23,10 +23,18 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 
+import cern.c2mon.shared.common.type.TypeConverter;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Builder;
+import lombok.Data;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -66,6 +74,9 @@ public class EquipmentMessageSenderTest {
     private SourceDataTag sdt1;
     private SourceDataTag sdt2;
     private SourceDataTag sdt3;
+    private SourceDataTag sdt4;
+    private SourceDataTag sdt5;
+    private SourceDataTag sdt6;
     private SourceDataTag alive;
 
     private EquipmentMessageSender equipmentMessageSender;
@@ -90,12 +101,21 @@ public class EquipmentMessageSenderTest {
                 DataTagConstants.PRIORITY_MEDIUM, false);
         sdt3 = createSourceDataTag(3L, "sdt3", "Integer", DataTagDeadband.DEADBAND_PROCESS_RELATIVE_VALUE_DESCR_CHANGE,
                 DataTagConstants.PRIORITY_LOW, false);
+        sdt4 = createSourceDataTag(4L, "sdt4", Integer[].class.getName(), DataTagDeadband.DEADBAND_NONE,
+            DataTagConstants.PRIORITY_LOW, false);
+        sdt5 = createSourceDataTag(5L, "sdt5", ArbitraryObject.class.getName(), DataTagDeadband.DEADBAND_NONE,
+            DataTagConstants.PRIORITY_LOW, false);
+        sdt6 = createSourceDataTag(6L, "sdt6", "my.random.own.MyObject", DataTagDeadband.DEADBAND_NONE,
+            DataTagConstants.PRIORITY_LOW, false);
 
         alive = createSourceDataTag(EQ_ALIVE_ID, "eqalive", "String", DataTagDeadband.DEADBAND_NONE, DataTagConstants.PRIORITY_HIGH, false);
 
         equipmentConfiguration.getDataTags().put(1L, sdt1);
         equipmentConfiguration.getDataTags().put(2L, sdt2);
         equipmentConfiguration.getDataTags().put(3L, sdt3);
+        equipmentConfiguration.getDataTags().put(4L, sdt4);
+        equipmentConfiguration.getDataTags().put(5L, sdt5);
+        equipmentConfiguration.getDataTags().put(6L, sdt6);
         equipmentConfiguration.getDataTags().put(0L, alive);
 
         equipmentConfiguration.getSubEquipmentConfigurations().put(10L, new SubEquipmentConfiguration(10L, "test1", SUB_KEY1, false));
@@ -772,8 +792,8 @@ public class EquipmentMessageSenderTest {
 
     @Test
     public void testSendTagFiltered() {
-        lowDynamicTimeDeadbandFilterActivatorMock.newTagValueSent(sdt1.getId());
-        processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+      lowDynamicTimeDeadbandFilterActivatorMock.newTagValueSent(sdt1.getId());
+      processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
 
         replay(lowDynamicTimeDeadbandFilterActivatorMock, processMessageSenderMock);
         sdt1.getAddress().setTimeDeadband(0);
@@ -783,6 +803,110 @@ public class EquipmentMessageSenderTest {
 
         verify(lowDynamicTimeDeadbandFilterActivatorMock, processMessageSenderMock);
     }
+
+  @Test
+  public void testSendTagFilteredWithIntegerArray() {
+    processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+    lowDynamicTimeDeadbandFilterActivatorMock.newTagValueSent(sdt4.getId());
+
+    replay(lowDynamicTimeDeadbandFilterActivatorMock, processMessageSenderMock);
+    sdt4.getAddress().setTimeDeadband(0);
+    equipmentMessageSender.sendTagFiltered(sdt4, new Integer[]{1,2,3,4,5}, System.currentTimeMillis() + 1L);
+
+    assertEquals(SourceDataQuality.OK, sdt4.getCurrentValue().getQuality().getQualityCode());
+
+    verify(lowDynamicTimeDeadbandFilterActivatorMock, processMessageSenderMock);
+  }
+
+  @Test
+  public void testSendTagFilteredWithIntArray() {
+    processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+    lowDynamicTimeDeadbandFilterActivatorMock.newTagValueSent(sdt4.getId());
+
+    replay(lowDynamicTimeDeadbandFilterActivatorMock, processMessageSenderMock);
+    sdt4.getAddress().setTimeDeadband(0);
+    equipmentMessageSender.sendTagFiltered(sdt4, new int[]{1,2,3,4,5}, System.currentTimeMillis() + 1L);
+
+    assertEquals(SourceDataQuality.OK, sdt4.getCurrentValue().getQuality().getQualityCode());
+
+    verify(lowDynamicTimeDeadbandFilterActivatorMock, processMessageSenderMock);
+  }
+
+  @Test
+  public void testSendTagFilteredWithArbitraryObject() {
+
+    processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+    lowDynamicTimeDeadbandFilterActivatorMock.newTagValueSent(sdt5.getId());
+
+    replay(lowDynamicTimeDeadbandFilterActivatorMock, processMessageSenderMock);
+
+    sdt5.getAddress().setTimeDeadband(0);
+
+    Object arbitraryObject = ArbitraryObject.builder().fields(new Integer[]{1,2,3,4,5}).field1("Test").field2(1.3f).build();
+    equipmentMessageSender.sendTagFiltered(sdt5, arbitraryObject, System.currentTimeMillis() + 1L);
+
+    assertEquals(SourceDataQuality.OK, sdt5.getCurrentValue().getQuality().getQualityCode());
+
+    verify(lowDynamicTimeDeadbandFilterActivatorMock, processMessageSenderMock);
+  }
+
+  @Test
+  public void testSendTagFilteredWithArbitraryObjectWithWrongValue() {
+
+    processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+    lowDynamicTimeDeadbandFilterActivatorMock.newTagValueSent(sdt5.getId());
+
+    replay(lowDynamicTimeDeadbandFilterActivatorMock, processMessageSenderMock);
+
+    sdt5.getAddress().setTimeDeadband(0);
+
+    Object wrongArbitraryObject =  "{ \"test\" : value } " ;
+    equipmentMessageSender.sendTagFiltered(sdt5, wrongArbitraryObject, System.currentTimeMillis() + 1L);
+
+    assertEquals(SourceDataQuality.CONVERSION_ERROR, sdt5.getCurrentValue().getQuality().getQualityCode());
+
+    verify(lowDynamicTimeDeadbandFilterActivatorMock, processMessageSenderMock);
+  }
+
+  @Test
+  public void testSendTagFilteredWithArbitraryObjectWithCurrentValue() {
+
+    processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+    lowDynamicTimeDeadbandFilterActivatorMock.newTagValueSent(sdt5.getId());
+
+    replay(lowDynamicTimeDeadbandFilterActivatorMock, processMessageSenderMock);
+
+    // setUp current SourceDataTagValue:
+    Object currentArbitraryObject = ArbitraryObject.builder().field1("TestCurrent").field2(9.87f).build();
+    sdt5.getAddress().setTimeDeadband(0);
+    sdt5.update(currentArbitraryObject );
+
+    Object arbitraryObject = ArbitraryObject.builder().field1("Test").field2(1.3f).build();
+    equipmentMessageSender.sendTagFiltered(sdt5, arbitraryObject, System.currentTimeMillis() + 1L);
+
+    assertEquals(SourceDataQuality.OK, sdt5.getCurrentValue().getQuality().getQualityCode());
+
+    verify(lowDynamicTimeDeadbandFilterActivatorMock, processMessageSenderMock);
+  }
+
+  @Test
+  public void testSendTagFilteredWithUnknownArbitraryObject() {
+
+    processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+    lowDynamicTimeDeadbandFilterActivatorMock.newTagValueSent(sdt6.getId());
+
+    replay(lowDynamicTimeDeadbandFilterActivatorMock, processMessageSenderMock);
+
+    sdt6.getAddress().setTimeDeadband(0);
+
+    Object unknownObject = "{ \"test\" : value } " ;
+    equipmentMessageSender.sendTagFiltered(sdt6, unknownObject, System.currentTimeMillis() + 1L);
+
+    assertEquals(SourceDataQuality.OK, sdt6.getCurrentValue().getQuality().getQualityCode());
+
+    verify(lowDynamicTimeDeadbandFilterActivatorMock, processMessageSenderMock);
+  }
+
 
     @Test
     public void testSendTagFilteredInvalidTimestamp() throws Exception {
@@ -1086,6 +1210,94 @@ public class EquipmentMessageSenderTest {
       verify(filterMessageSenderMock, processMessageSenderMock);
     }
 
+  @Test
+  public void testSendIntegerArrayTagFilteredTwiceSame() {
+    filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
+    processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+    Boolean sendSuccess;
+
+    replay(filterMessageSenderMock, processMessageSenderMock);
+
+    sdt4.getAddress().setTimeDeadband(0);
+    Object arbitraryObject1 = new Integer[]{1,2,3,4,5};
+    Object arbitraryObject2 = new Integer[]{1,2,3,4,5};
+
+    // Sent
+    sendSuccess = equipmentMessageSender.sendTagFiltered(sdt4, arbitraryObject1, System.currentTimeMillis() + 1L);
+    assertTrue(sendSuccess);
+    // Filter with REPEATED_VALUE
+    sendSuccess = equipmentMessageSender.sendTagFiltered(sdt4, arbitraryObject2, System.currentTimeMillis() + 2L);
+    assertFalse(sendSuccess);
+
+    verify(filterMessageSenderMock, processMessageSenderMock);
+  }
+
+  @Test
+  public void testSendIntegerArrayTagFilteredTwiceNotSame() {
+    processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+    processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+    Boolean sendSuccess;
+
+    replay(processMessageSenderMock);
+
+    sdt4.getAddress().setTimeDeadband(0);
+    Object arbitraryObject1 = new Integer[]{1,2,3,4,5};
+    Object arbitraryObject2 = new Integer[]{1,2,3,4};
+
+    // Sent
+    sendSuccess = equipmentMessageSender.sendTagFiltered(sdt4, arbitraryObject1, System.currentTimeMillis() + 1L);
+    assertTrue(sendSuccess);
+    // Filter with REPEATED_VALUE
+    sendSuccess = equipmentMessageSender.sendTagFiltered(sdt4, arbitraryObject2, System.currentTimeMillis() + 2L);
+    assertTrue(sendSuccess);
+
+    verify(processMessageSenderMock);
+  }
+
+  @Test
+  public void testSendArbitraryObjectTagFilteredTwiceSame() {
+    filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
+    processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+    Boolean sendSuccess;
+
+    replay(filterMessageSenderMock, processMessageSenderMock);
+
+    sdt5.getAddress().setTimeDeadband(0);
+    Object arbitraryObject1 = ArbitraryObject.builder().field1("TestTwice").field2(1.01f).build();
+    Object arbitraryObject2 = ArbitraryObject.builder().field1("TestTwice").field2(1.01f).build();
+
+    // Sent
+    sendSuccess = equipmentMessageSender.sendTagFiltered(sdt5, arbitraryObject1, System.currentTimeMillis() + 1L);
+    assertTrue(sendSuccess);
+    // Filter with REPEATED_VALUE
+    sendSuccess = equipmentMessageSender.sendTagFiltered(sdt5, arbitraryObject2, System.currentTimeMillis() + 2L);
+    assertFalse(sendSuccess);
+
+    verify(filterMessageSenderMock, processMessageSenderMock);
+  }
+
+  @Test
+  public void testSendArbitraryObjectTagFilteredNotSame() {
+    processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+    processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+    Boolean sendSuccess;
+
+    replay(processMessageSenderMock);
+
+    sdt5.getAddress().setTimeDeadband(0);
+    Object arbitraryObject1 = ArbitraryObject.builder().field1("TestTwice").field2(1.01f).build();
+    Object arbitraryObject2 = ArbitraryObject.builder().field1("TestTwice2").field2(1.01f).build();
+
+    // Sent
+    sendSuccess = equipmentMessageSender.sendTagFiltered(sdt5, arbitraryObject1, System.currentTimeMillis() + 1L);
+    assertTrue(sendSuccess);
+    // Filter with REPEATED_VALUE
+    sendSuccess = equipmentMessageSender.sendTagFiltered(sdt5, arbitraryObject2, System.currentTimeMillis() + 2L);
+    assertTrue(sendSuccess);
+
+    verify(processMessageSenderMock);
+  }
+
     @Test
     public void testSendTagFilteredTwiceSameValuesButDiffValueDesc() throws Exception {
       processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
@@ -1261,9 +1473,65 @@ public class EquipmentMessageSenderTest {
     }
 
     private SourceDataTag createSourceDataTag(long id, String name, String dataType, short deadBandType, int priority,
-            boolean guaranteed) {
-        DataTagAddress address = new DataTagAddress(null, 100, deadBandType, VALUE_DEADBAND, 0, priority, guaranteed);
+                                              boolean guaranteed) {
+      DataTagAddress address = new DataTagAddress(null, 100, deadBandType, VALUE_DEADBAND, 0, priority, guaranteed);
         return new SourceDataTag(id, name, false, DataTagConstants.MODE_OPERATIONAL, dataType, address);
     }
+
+  @Data
+  @Builder
+  static class ArbitraryObject{
+    private Integer[] fields;
+
+    private String field1;
+
+    private Float field2;
+  }
+
+  @Test
+  public void privateTempTestToJSON(){
+    try {
+
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+      mapper.enable(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY);
+
+      File tempOut = new File("temp.json");
+
+      // Test Integer:
+      SourceDataTagValue valueToWrite = sdt3.update(1, "test", new Timestamp(System.currentTimeMillis()));
+
+      mapper.writeValue(tempOut, valueToWrite);
+
+      SourceDataTagValue readValue = mapper.readValue(tempOut, SourceDataTagValue.class);
+      assertTrue(readValue.equals(valueToWrite));
+
+      // Test IntegerArray
+      Integer[] integerArray = {7,8,9};
+      valueToWrite = sdt3.update(integerArray, "test", new Timestamp(System.currentTimeMillis()));
+
+      mapper.writeValue(tempOut, valueToWrite);
+
+      readValue = mapper.readValue(tempOut, SourceDataTagValue.class);
+      Integer[] tempArray = (Integer[]) TypeConverter.cast(readValue.getValue(), Integer.class.getSimpleName());
+
+      // Object Test
+      SourceDataTagValue objectValue = sdt1.update("Tach", "test2", new Timestamp(System.currentTimeMillis()));
+      valueToWrite = sdt3.update(objectValue, "test", new Timestamp(System.currentTimeMillis()));
+
+      mapper.writeValue(tempOut, valueToWrite);
+
+      readValue = mapper.readValue(tempOut, SourceDataTagValue.class);
+      String blub = mapper.writeValueAsString(123456L);
+      Object reBlub = mapper.readValue(blub, Object.class);
+      System.out.println("Hallo");
+
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+
+  }
 
 }

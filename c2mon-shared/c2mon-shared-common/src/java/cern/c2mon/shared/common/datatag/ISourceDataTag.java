@@ -16,11 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.shared.common.datatag;
 
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+
 import java.sql.Timestamp;
 import java.util.Map;
-
-import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import cern.c2mon.shared.common.type.TagDataType;
 /**
  * The Source Data Tag interface which is used to cover most of the information
  * for the implementation layer.
@@ -44,12 +43,6 @@ public interface ISourceDataTag {
      * @return The data tag data type.
      */
     String getDataType();
-    /**
-     * Gets the numeric representation of the data type.
-     * @return The numeric representation of the data type. See {@link TagDataType}
-     * constants for details.
-     */
-    int getDataTypeNumeric();
     /**
      * Gets the value deadband type.
      * @return The value deadband type.

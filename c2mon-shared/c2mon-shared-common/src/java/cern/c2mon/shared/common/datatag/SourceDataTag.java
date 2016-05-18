@@ -16,13 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.shared.common.datatag;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.Map;
-
+import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.filter.FilteredDataTagValue;
+import cern.c2mon.shared.common.type.TypeConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.ArrayUtils;
 import org.simpleframework.xml.Attribute;
@@ -30,11 +27,12 @@ import org.simpleframework.xml.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import cern.c2mon.shared.common.ConfigurationException;
-import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import cern.c2mon.shared.common.filter.FilteredDataTagValue;
-import cern.c2mon.shared.common.type.TagDataType;
-import cern.c2mon.shared.common.type.TypeConverter;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Map;
 
 /**
  * The SourceDataTag class is the representation of a DataTag on the driver side. It contains all tag-specific
@@ -192,16 +190,6 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      */
     public void setDataType(final String newDataType) {
         this.dataType = newDataType;
-    }
-
-    /**
-     * Gets the numeric representation of the data type.
-     *
-     * @return The numeric representation of the data type. See {@link TagDataType} constants for details.
-     */
-    @Override
-    public int getDataTypeNumeric() {
-        return TagDataType.getDataTypeNumeric(dataType);
     }
 
     /**
@@ -841,10 +829,6 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
         }// for
 
         return result;
-    }
-
-    public void setDataTypeNumeric(int dataType) {
-        this.dataType = TagDataType.getDataTypeString(dataType);
     }
 
 

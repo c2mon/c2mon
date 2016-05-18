@@ -40,7 +40,7 @@
       <artifactId>spring-core</artifactId>
     </dependency>
 
-    <!--3. party dependencies-->
+    <!--3rd party dependencies-->
     <dependency>
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>

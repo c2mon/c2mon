@@ -57,15 +57,15 @@ public class SDTTimeDeadbandSchedulerTest {
 
   private static final float VALUE_DEADBAND = 25.0f;
 
-  private SDTTimeDeadbandScheduler scheduler;
-  private SourceDataTag tag;
-  private EquipmentMessageSender equipmentMessageSender;
-  private Throwable exception = null;
+	private SDTTimeDeadbandScheduler scheduler;
+	private SourceDataTag tag;
+	private EquipmentMessageSender equipmentMessageSender;
+	private Throwable exception = null;
 
-  private DataTagValueFilter dataTagValueFilter;
-  private EquipmentConfiguration conf = new EquipmentConfiguration();
+	private DataTagValueFilter dataTagValueFilter;
+	private EquipmentConfiguration conf = new EquipmentConfiguration();
 
-  /**
+	/**
    * The class with the message sender to send filtered tag values
    */
   private EquipmentSenderFilterModule equipmentSenderFilterModule;
@@ -80,107 +80,107 @@ public class SDTTimeDeadbandSchedulerTest {
   //  private RunOptions runOptionsMock;
   private IDynamicTimeDeadbandFilterer dynamicTimeDeadbandFiltererMock;
 
-  @Before
-  public void setUp() {
-    this.processMessageSenderMock = createMock(IProcessMessageSender.class);
-    this.filterMessageSenderMock = createMock(IFilterMessageSender.class);
-    this.dynamicTimeDeadbandFiltererMock = createMock(IDynamicTimeDeadbandFilterer.class);
+	 @Before
+	 public void setUp() {
+		 this.processMessageSenderMock = createMock(IProcessMessageSender.class);
+		 this.filterMessageSenderMock = createMock(IFilterMessageSender.class);
+		 this.dynamicTimeDeadbandFiltererMock = createMock(IDynamicTimeDeadbandFilterer.class);
 
-    // Mock for configurationController to use getCommandParamsHandler()
-    // The run options of the DAQ process
-    this.configurationControllerMock = EasyMock.createMockBuilder(ConfigurationController.class).
-        addMockedMethod("getProcessConfiguration").
-        createMock();
+		 // Mock for configurationController to use getCommandParamsHandler()
+		 // The run options of the DAQ process
+		 this.configurationControllerMock = EasyMock.createMockBuilder(ConfigurationController.class).
+				 addMockedMethod("getProcessConfiguration").
+				 createMock();
 
-    this.processConfigurationMock = EasyMock.createMockBuilder(ProcessConfiguration.class).
-        addMockedMethod("getProcessName").
-        createMock();
+		 this.processConfigurationMock = EasyMock.createMockBuilder(ProcessConfiguration.class).
+				 addMockedMethod("getProcessName").
+				 createMock();
 
-    IDynamicTimeDeadbandFilterActivator activatorMock = createMock(IDynamicTimeDeadbandFilterActivator.class);
+		 IDynamicTimeDeadbandFilterActivator activatorMock = createMock(IDynamicTimeDeadbandFilterActivator.class);
     this.equipmentMessageSender = new EquipmentMessageSender(this.filterMessageSenderMock, this.processMessageSenderMock, activatorMock, activatorMock);
 
     this.tag = createSourceDataTag(1L, "sdt1", "Boolean", DataTagDeadband.DEADBAND_NONE, DataTagConstants.PRIORITY_LOW, false);
-    this.tag.getAddress().setTimeDeadband(30);
+		 this.tag.getAddress().setTimeDeadband(30);
 
-    this.conf.getDataTags().put(1L, tag);
-    //        equipmentMessageSender.setEquipmentConfiguration(conf);
+		 this.conf.getDataTags().put(1L, tag);
+		 //        equipmentMessageSender.setEquipmentConfiguration(conf);
 
-    tag.update("");
-    Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-      @Override
-      public void uncaughtException(Thread t, Throwable e) {
-        exception = e;
-      }
+		 tag.update("");
+		 Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+			 @Override
+			 public void uncaughtException(Thread t, Throwable e) {
+				 exception = e;
+			 }
 
-    });
+		 });
 
-    this.conf.setHandlerClassName(getClass().getName());
-  }
+		 this.conf.setHandlerClassName(getClass().getName());
+	 }
 
-  /**
-   * Send value
-   *
-   * @throws Exception
-   */
-  @Test
-  public void testSchedule() throws Exception {
-    // Tag update
-    this.tag.update(true, "test", new Timestamp(System.currentTimeMillis()));
+	 /**
+	  * Send value
+	  *
+	  * @throws Exception
+	  */
+	 @Test
+	 public void testSchedule() throws Exception {
+	   // Tag update
+     this.tag.update(true, "test", new Timestamp(System.currentTimeMillis()));
 
-    EasyMock.expect(this.configurationControllerMock.getProcessConfiguration()).andReturn(this.processConfigurationMock);
-    EasyMock.expect(this.processConfigurationMock.getProcessName()).andReturn("TEST_PROCESS_NAME");
+		 EasyMock.expect(this.configurationControllerMock.getProcessConfiguration()).andReturn(this.processConfigurationMock);
+		 EasyMock.expect(this.processConfigurationMock.getProcessName()).andReturn("TEST_PROCESS_NAME");
 
-    // No Dymanic Time Deadband
-    EasyMock.expect(this.dynamicTimeDeadbandFiltererMock.isDynamicTimeDeadband(tag)).andReturn(false);
+		 // No Dymanic Time Deadband
+		 EasyMock.expect(this.dynamicTimeDeadbandFiltererMock.isDynamicTimeDeadband(tag)).andReturn(false);
 
-    // This message will be sent since it is the first one
-    this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+		 // This message will be sent since it is the first one
+		 this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
 
     replay(this.processMessageSenderMock, this.configurationControllerMock, this.processConfigurationMock, this.dynamicTimeDeadbandFiltererMock);
 
     EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(this.conf, this.configurationControllerMock.getProcessConfiguration
         (), false, false);
 
-    this.equipmentMessageSender.init(this.conf, equipmentLoggerFactory);
+		 this.equipmentMessageSender.init(this.conf, equipmentLoggerFactory);
 
-    this.dataTagValueFilter = new DataTagValueFilter(equipmentLoggerFactory);
+		 this.dataTagValueFilter = new DataTagValueFilter(equipmentLoggerFactory);
 
-    // Filter module
-    this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSenderMock, equipmentLoggerFactory);
+		 // Filter module
+     this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSenderMock, equipmentLoggerFactory);
 
-    //        EquipmentLogger equipmentLogger = new EquipmentLogger("asd", "asd", "asd");
+		 //        EquipmentLogger equipmentLogger = new EquipmentLogger("asd", "asd", "asd");
     this.scheduler = new SDTTimeDeadbandScheduler(tag, this.processMessageSenderMock, this.equipmentSenderFilterModule, new Timer(true), this
         .dataTagValueFilter, this.dynamicTimeDeadbandFiltererMock);
 
-    this.scheduler.scheduleValueForSending();
-    this.scheduler.run();
+		 this.scheduler.scheduleValueForSending();
+		 this.scheduler.run();
 
-    verify(this.processMessageSenderMock);
+		 verify(this.processMessageSenderMock);
 
     if (this.exception != null) throw new Exception(this.exception);
-  }
+	 }
 
-  /**
-   * Send value
-   *
-   * @throws Exception
-   */
-  @Test
-  public void testScheduleNoFiltering() throws Exception {
-    // Tag update
-    this.tag.update(true, "test", new Timestamp(System.currentTimeMillis()));
+	 /**
+    * Send value
+    *
+    * @throws Exception
+    */
+   @Test
+   public void testScheduleNoFiltering() throws Exception {
+     // Tag update
+     this.tag.update(true, "test", new Timestamp(System.currentTimeMillis()));
 
     //    EasyMock.expect(this.configurationControllerMock.getRunOptions()).andReturn(this.runOptionsMock);
 
-    EasyMock.expect(this.configurationControllerMock.getProcessConfiguration()).andReturn(this.processConfigurationMock);
-    EasyMock.expect(this.processConfigurationMock.getProcessName()).andReturn("TEST_PROCESS_NAME");
+     EasyMock.expect(this.configurationControllerMock.getProcessConfiguration()).andReturn(this.processConfigurationMock);
+     EasyMock.expect(this.processConfigurationMock.getProcessName()).andReturn("TEST_PROCESS_NAME");
 
-    // No Dymanic Time Deadband
-    EasyMock.expect(this.dynamicTimeDeadbandFiltererMock.isDynamicTimeDeadband(tag)).andReturn(false);
+     // No Dymanic Time Deadband
+     EasyMock.expect(this.dynamicTimeDeadbandFiltererMock.isDynamicTimeDeadband(tag)).andReturn(false);
 
-    // This message will be sent since it is the first one
-    this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
-    expectLastCall().times(2);
+     // This message will be sent since it is the first one
+     this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+     expectLastCall().times(2);
 
     replay(this.processMessageSenderMock, this.configurationControllerMock, this.processConfigurationMock, this
         .dynamicTimeDeadbandFiltererMock);
@@ -188,149 +188,149 @@ public class SDTTimeDeadbandSchedulerTest {
     EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(this.conf, this.configurationControllerMock.getProcessConfiguration
         (), false, false);
 
-    this.equipmentMessageSender.init(this.conf, equipmentLoggerFactory);
+     this.equipmentMessageSender.init(this.conf, equipmentLoggerFactory);
 
-    this.dataTagValueFilter = new DataTagValueFilter(equipmentLoggerFactory);
+     this.dataTagValueFilter = new DataTagValueFilter(equipmentLoggerFactory);
 
-    // Filter module
-    this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSenderMock, equipmentLoggerFactory);
+     // Filter module
+     this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSenderMock, equipmentLoggerFactory);
 
-    //        EquipmentLogger equipmentLogger = new EquipmentLogger("asd", "asd", "asd");
+     //        EquipmentLogger equipmentLogger = new EquipmentLogger("asd", "asd", "asd");
     this.scheduler = new SDTTimeDeadbandScheduler(tag, this.processMessageSenderMock, this.equipmentSenderFilterModule, new Timer(true), this
         .dataTagValueFilter, this.dynamicTimeDeadbandFiltererMock);
 
-    this.scheduler.scheduleValueForSending();
-    this.scheduler.run();
+     this.scheduler.scheduleValueForSending();
+     this.scheduler.run();
 
-    // New value
-    this.tag.update(false, "nacho New", new Timestamp(System.currentTimeMillis()));
-    scheduler.scheduleValueForSending();
-    this.scheduler.run();
+     // New value
+     this.tag.update(false, "nacho New", new Timestamp(System.currentTimeMillis()));
+     scheduler.scheduleValueForSending();
+     this.scheduler.run();
 
-    verify(this.processMessageSenderMock);
+     verify(this.processMessageSenderMock);
 
     if (this.exception != null) throw new Exception(this.exception);
-  }
+   }
 
-  /**
-   * filter value: REPEATED_VALUE
-   *
-   * @throws Exception
-   */
-  @Test
-  public void testScheduleFilterRepeatedValue() throws Exception {
+	 /**
+	  * filter value: REPEATED_VALUE
+	  *
+	  * @throws Exception
+	  */
+	 @Test
+	 public void testScheduleFilterRepeatedValue() throws Exception {
 
-    // Tag update
-    this.tag.update(true, "test", new Timestamp(System.currentTimeMillis()));
+	   // Tag update
+	   this.tag.update(true, "test", new Timestamp(System.currentTimeMillis()));
 
-    EasyMock.expect(this.configurationControllerMock.getProcessConfiguration()).andReturn(this.processConfigurationMock);
-    EasyMock.expect(this.processConfigurationMock.getProcessName()).andReturn("TEST_PROCESS_NAME");
+		 EasyMock.expect(this.configurationControllerMock.getProcessConfiguration()).andReturn(this.processConfigurationMock);
+		 EasyMock.expect(this.processConfigurationMock.getProcessName()).andReturn("TEST_PROCESS_NAME");
 
-    // No Dymanic Time Deadband
-    EasyMock.expect(this.dynamicTimeDeadbandFiltererMock.isDynamicTimeDeadband(tag)).andReturn(false);
+		 // No Dymanic Time Deadband
+		 EasyMock.expect(this.dynamicTimeDeadbandFiltererMock.isDynamicTimeDeadband(tag)).andReturn(false);
 
-    // This message will be sent since it is the first one
-    this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
-    // This message will be filtered with filter type REPEATED_VALUE
-    this.filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
+		 // This message will be sent since it is the first one
+		 this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+		 // This message will be filtered with filter type REPEATED_VALUE
+		 this.filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
 
-    replay(this.processMessageSenderMock, this.filterMessageSenderMock, this.configurationControllerMock, this.processConfigurationMock,
+		 replay(this.processMessageSenderMock, this.filterMessageSenderMock, this.configurationControllerMock, this.processConfigurationMock,
         this.dynamicTimeDeadbandFiltererMock);
 
     EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(this.conf, this.configurationControllerMock.getProcessConfiguration
         (), false, false);
 
-    this.equipmentMessageSender.init(this.conf, equipmentLoggerFactory);
+		 this.equipmentMessageSender.init(this.conf, equipmentLoggerFactory);
 
-    this.dataTagValueFilter = new DataTagValueFilter(equipmentLoggerFactory);
+		 this.dataTagValueFilter = new DataTagValueFilter(equipmentLoggerFactory);
 
-    // Filter module
-    this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSenderMock, equipmentLoggerFactory);
+		 // Filter module
+     this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSenderMock, equipmentLoggerFactory);
 
-    //		 EquipmentLogger equipmentLogger = new EquipmentLogger("asd", "asd", "asd");
+//		 EquipmentLogger equipmentLogger = new EquipmentLogger("asd", "asd", "asd");
     this.scheduler = new SDTTimeDeadbandScheduler(tag, this.processMessageSenderMock, this.equipmentSenderFilterModule, new Timer(true), this
         .dataTagValueFilter, this.dynamicTimeDeadbandFiltererMock);
 
-    this.scheduler.scheduleValueForSending();
-    this.scheduler.run();
+		 this.scheduler.scheduleValueForSending();
+		 this.scheduler.run();
 
-    // Repeated value
-    this.scheduler.scheduleValueForSending();
-    this.scheduler.run();
+		 // Repeated value
+		 this.scheduler.scheduleValueForSending();
+		 this.scheduler.run();
 
-    verify(this.processMessageSenderMock, this.filterMessageSenderMock);
+		 verify(this.processMessageSenderMock, this.filterMessageSenderMock);
 
     if (this.exception != null) throw new Exception(this.exception);
-  }
+	 }
 
-  /**
-   * filter value: REPEATED_VALUE
-   *
-   * @throws Exception
-   */
-  @Test
-  public void testScheduleFlashAndReset() throws Exception {
+	 /**
+    * filter value: REPEATED_VALUE
+    *
+    * @throws Exception
+    */
+   @Test
+   public void testScheduleFlashAndReset() throws Exception {
 
-    // Tag update
-    this.tag.update(true, "test", new Timestamp(System.currentTimeMillis()));
+     // Tag update
+     this.tag.update(true, "test", new Timestamp(System.currentTimeMillis()));
 
-    EasyMock.expect(this.configurationControllerMock.getProcessConfiguration()).andReturn(this.processConfigurationMock);
-    EasyMock.expect(this.processConfigurationMock.getProcessName()).andReturn("TEST_PROCESS_NAME");
+     EasyMock.expect(this.configurationControllerMock.getProcessConfiguration()).andReturn(this.processConfigurationMock);
+     EasyMock.expect(this.processConfigurationMock.getProcessName()).andReturn("TEST_PROCESS_NAME");
 
-    // No Dymanic Time Deadband
-    EasyMock.expect(this.dynamicTimeDeadbandFiltererMock.isDynamicTimeDeadband(tag)).andReturn(false);
+     // No Dymanic Time Deadband
+     EasyMock.expect(this.dynamicTimeDeadbandFiltererMock.isDynamicTimeDeadband(tag)).andReturn(false);
 
-    // This message will be sent 2 times to the server since the timer is cancelled and started again
-    this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
-    EasyMock.expectLastCall().times(2);
+     // This message will be sent 2 times to the server since the timer is cancelled and started again
+     this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+     EasyMock.expectLastCall().times(2);
 
-    replay(this.processMessageSenderMock, this.filterMessageSenderMock, this.configurationControllerMock, this.processConfigurationMock,
+     replay(this.processMessageSenderMock, this.filterMessageSenderMock, this.configurationControllerMock, this.processConfigurationMock,
         this.dynamicTimeDeadbandFiltererMock);
 
     EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(this.conf, this.configurationControllerMock.getProcessConfiguration
         (), false, false);
 
-    this.equipmentMessageSender.init(this.conf, equipmentLoggerFactory);
+     this.equipmentMessageSender.init(this.conf, equipmentLoggerFactory);
 
-    this.dataTagValueFilter = new DataTagValueFilter(equipmentLoggerFactory);
+     this.dataTagValueFilter = new DataTagValueFilter(equipmentLoggerFactory);
 
-    // Filter module
-    this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSenderMock, equipmentLoggerFactory);
+     // Filter module
+     this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSenderMock, equipmentLoggerFactory);
 
-    //     EquipmentLogger equipmentLogger = new EquipmentLogger("asd", "asd", "asd");
+//     EquipmentLogger equipmentLogger = new EquipmentLogger("asd", "asd", "asd");
     this.scheduler = new SDTTimeDeadbandScheduler(tag, this.processMessageSenderMock, this.equipmentSenderFilterModule, new Timer(true), this
         .dataTagValueFilter, this.dynamicTimeDeadbandFiltererMock);
 
-    this.scheduler.scheduleValueForSending();
-    this.scheduler.run();
+     this.scheduler.scheduleValueForSending();
+     this.scheduler.run();
 
-    // FlushAndReset
-    this.scheduler.flushAndCancel();
-    // Start the new task
+     // FlushAndReset
+     this.scheduler.flushAndCancel();
+     // Start the new task
     this.scheduler = new SDTTimeDeadbandScheduler(tag, this.processMessageSenderMock, this.equipmentSenderFilterModule, new Timer(true), this
         .dataTagValueFilter, this.dynamicTimeDeadbandFiltererMock);
 
-    // Repeated value (should pass cause it was flush and reset)
-    this.scheduler.scheduleValueForSending();
-    this.scheduler.run();
+     // Repeated value (should pass cause it was flush and reset)
+     this.scheduler.scheduleValueForSending();
+     this.scheduler.run();
 
-    verify(this.processMessageSenderMock, this.filterMessageSenderMock);
+     verify(this.processMessageSenderMock, this.filterMessageSenderMock);
 
     if (this.exception != null) throw new Exception(this.exception);
-  }
+   }
 
-  /**
-   * @param id
-   * @param name
-   * @param dataType
-   * @param deadBandType
-   * @param priority
-   * @param guaranteed
+	 /**
+	  * @param id
+	  * @param name
+	  * @param dataType
+	  * @param deadBandType
+	  * @param priority
+	  * @param guaranteed
    *
-   * @return
-   */
+	  * @return
+	  */
   private SourceDataTag createSourceDataTag(long id, String name, String dataType, short deadBandType, int priority, boolean guaranteed) {
-    DataTagAddress address = new DataTagAddress(null, 100, deadBandType, VALUE_DEADBAND, 0, priority, guaranteed);
-    return new SourceDataTag(id, name, false, DataTagConstants.MODE_OPERATIONAL, dataType, address);
-  }
+			 DataTagAddress address = new DataTagAddress(null, 100, deadBandType, VALUE_DEADBAND, 0, priority, guaranteed);
+   return new SourceDataTag(id, name, false, DataTagConstants.MODE_OPERATIONAL, dataType, address);
+	 }
 }

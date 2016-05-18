@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -19,15 +19,11 @@ package cern.c2mon.shared.daq.command;
 
 import java.io.Serializable;
 
-import javax.jms.Topic;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import cern.c2mon.shared.common.type.TagDataType;
 
 
 /**
@@ -66,11 +62,6 @@ public class SourceCommandTagValue implements Serializable, Cloneable {
    * Data type of the command tag's value
    */
   protected String dataType;
-
-  /**
-   * Numeric representation of the data type of the command tag's value
-   */
-  protected int dataTypeNumeric;
 
   /**
    * Mode of the command tag.
@@ -112,7 +103,6 @@ public class SourceCommandTagValue implements Serializable, Cloneable {
     this.mode = pMode;
     this.value = pValue;
     this.dataType = pDataType;
-    this.dataTypeNumeric = TagDataType.getDataTypeNumeric(pDataType);
   }
 
   /**
@@ -167,10 +157,6 @@ public class SourceCommandTagValue implements Serializable, Cloneable {
 //    } else {
 //      return null;
 //    }
-  }
-
-  public int getDataTypeNumeric() {
-    return this.dataTypeNumeric;
   }
 
   public String toXML() {
@@ -237,7 +223,6 @@ public class SourceCommandTagValue implements Serializable, Cloneable {
 
         if (fieldName.equals("value")) {
           cmd.dataType = fieldNode.getAttributes().item(0).getNodeValue();
-          cmd.dataTypeNumeric = TagDataType.getDataTypeNumeric(cmd.dataType);
 
           if (cmd.dataType.equals("Integer")) {
             cmd.value = Integer.valueOf(fieldValueString);
