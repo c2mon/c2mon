@@ -79,7 +79,7 @@ public class CRUDConfigurationParser {
    * @param configuration
    * @return
    */
-  private List<SequenceTask> parseCRUDList(List<ConfigurationObject> configurations) {
+  private List<SequenceTask> parseCRUDList(List<? extends ConfigurationObject> configurations) {
     List<SequenceTask> taskResultList = new ArrayList<>();
     SequenceTask tempConfigurationTask;
 
