@@ -373,7 +373,7 @@ public class HistoryService {
     if (size > 0) {
       final HistoryTagValueUpdate h = historyValues.iterator().next();
       final String type = h.getValueClassName();
-      final boolean isBooleanData = type.equals("Boolean");
+      final boolean isBooleanData = type.equals("Boolean") || type.equals("java.lang.Boolean");
       return isBooleanData;
     }
     return false;
