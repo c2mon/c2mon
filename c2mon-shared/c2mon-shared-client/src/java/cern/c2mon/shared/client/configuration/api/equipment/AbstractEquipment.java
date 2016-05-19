@@ -73,7 +73,7 @@ public abstract class AbstractEquipment implements ConfigurationObject {
   /**
    * Free-text description of the equipment.
    */
-  @DefaultValue("")
+  @DefaultValue("<no description provided>")
   private String description;
 
   /**

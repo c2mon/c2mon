@@ -77,7 +77,7 @@ public class Process implements ConfigurationObject {
   /**
    * A description of the process.
    */
-  @DefaultValue("")
+  @DefaultValue("<no description provided>")
   private String description;
 
   /**

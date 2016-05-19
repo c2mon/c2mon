@@ -76,7 +76,7 @@ public abstract class Tag implements ConfigurationObject {
   /**
    * Free-text description of the tag
    */
-  @DefaultValue("")
+  @DefaultValue("<no description provided>")
   private String description;
 
   /**
