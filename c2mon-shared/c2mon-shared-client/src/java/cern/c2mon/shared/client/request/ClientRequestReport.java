@@ -166,57 +166,41 @@ public abstract class ClientRequestReport implements ClientRequestProgressReport
 
   @Override
   public int getTotalProgressParts() {
-    if (!reportType.equals(ReportType.PROGRESS))
-      log.warn("This method is only supported for progress reports!");
     return totalParts;
   }
 
   @Override
   public int getCurrentProgressPart() {
-    if (!reportType.equals(ReportType.PROGRESS))
-      log.warn("This method is only supported for progress reports!");
     return currentPart;
   }
 
   @Override
   public String getProgressDescription() {
-    if (!reportType.equals(ReportType.PROGRESS))
-      log.warn("This method is only supported for progress reports!");
     return progressDescription;
   }
 
   @Override
   public boolean executedSuccessfully() {
-    if (!reportType.equals(ReportType.ERROR))
-      log.warn("This method is only supported for error reports!");
     return getRequestExecutionStatus() == RequestExecutionStatus.REQUEST_EXECUTED_SUCCESSFULLY;
   }
 
   @Override
   public String getErrorMessage() {
-    if (!reportType.equals(ReportType.ERROR))
-      log.warn("This method is only supported for error reports!");
     return errorMessage;
   }
 
   @Override
   public RequestExecutionStatus getRequestExecutionStatus() {
-    if (!reportType.equals(ReportType.ERROR))
-      log.warn("This method is only supported for error reports!");
     return requestStatus;
   }
 
   @Override
   public int getCurrentOperation() {
-    if (!reportType.equals(ReportType.PROGRESS))
-      log.warn("This method is only supported for progress reports!");
     return currentOperation;
   }
 
   @Override
   public int getTotalOperationsCount() {
-    if (!reportType.equals(ReportType.PROGRESS))
-      log.warn("This method is only supported for progress reports!");
     return totalOperations;
   }
 
