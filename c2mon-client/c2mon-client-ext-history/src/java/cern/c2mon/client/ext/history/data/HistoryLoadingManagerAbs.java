@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -53,15 +53,15 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEnti
  * This class implements the logical functions of a history loading manager. Ie.
  * does not implement the retrival using the history provider. And does not fire
  * events.
- * 
+ *
  * @author vdeila
- * 
+ *
  */
 abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
 
   /** Log4j logger for this class */
   private static final Logger LOG = LoggerFactory.getLogger(HistoryLoadingManagerAbs.class);
-  
+
   /** <code>true</code> if currently loading */
   private boolean loading;
 
@@ -79,22 +79,22 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
 
   /** List of the supervision events that should be loaded */
   private Set<SupervisionEventId> supervisionEventsToLoad;
-  
+
   /** Comparator which sorts by execution time ascending */
   private final Comparator<HistoryUpdate> sortByExecutionTime;
 
   /** Map of loaded updates */
   private final Map<Long, List<HistoryTagValueUpdate>> loadedHistoryTagValueUpdates;
-  
+
   /** Lock for {@link #loadedHistoryTagValueUpdates} */
   private final ReentrantReadWriteLock loadedHistoryTagValueUpdatesLock;
-  
+
   /** Map of supervision events */
   private final Map<SupervisionEventId, List<HistorySupervisionEvent>> loadedHistorySupervisionEvents;
-  
+
   /** Lock for {@link #loadedHistorySupervisionEvents} */
   private final ReentrantReadWriteLock loadedHistorySupervisionEventsLock;
-  
+
   /**
    * Constructor
    */
@@ -105,12 +105,12 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
     this.tagToSupervisionIds = new KeyForValuesMap<Long, SupervisionEventId>();
     this.tagsToLoad = new HashMap<>();
     this.supervisionEventsToLoad = new HashSet<SupervisionEventId>();
-    
+
     this.loadedHistoryTagValueUpdates = new HashMap<Long, List<HistoryTagValueUpdate>>();
     this.loadedHistorySupervisionEvents = new HashMap<SupervisionEventId, List<HistorySupervisionEvent>>();
     this.loadedHistoryTagValueUpdatesLock = new ReentrantReadWriteLock();
     this.loadedHistorySupervisionEventsLock = new ReentrantReadWriteLock();
-    
+
     this.sortByExecutionTime = new Comparator<HistoryUpdate>() {
       @Override
       public int compare(final HistoryUpdate o1, final HistoryUpdate o2) {
@@ -122,7 +122,7 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
   @Override
   public void addClientDataTagForLoading(final Tag tag) {
     tagsToLoad.put(tag.getId(), tag);
-    
+
     connectTagToSupervision(tag.getId(), SupervisionEntity.PROCESS, tag.getProcessIds());
     connectTagToSupervision(tag.getId(), SupervisionEntity.EQUIPMENT, tag.getEquipmentIds());
     // Uncomment when sub equipment is available..
@@ -132,7 +132,7 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
   /**
    * Connects the <code>tagId</code> to the supervision entity with the given
    * ids.
-   * 
+   *
    * @param tagId
    *          the tag id
    * @param entity
@@ -171,7 +171,7 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
 
   /**
    * The default comparator sorts by execution timestamp ascending
-   * 
+   *
    * @return the comparator used before returning a list of HistoryUpdates. Or
    *         <code>null</code> if sorting shouldn't be done.
    */
@@ -182,16 +182,16 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
   @Override
   public Collection<HistoryTagValueUpdate> getAllHistoryConverted(final Long tagId) {
     final HistoryUpdate[] historyUpdates = getAllHistory(tagId).toArray(new HistoryUpdate[0]);
-    
+
     // Sorts by execution time, ascending
     Arrays.sort(historyUpdates, sortByExecutionTime);
-    
+
     final Tag clientTag = tagsToLoad.get(tagId);
     if (clientTag == null) {
       // Shouldn't happen
       throw new RuntimeException("The client data tag have been removed!");
     }
-    
+
     final SupervisionListener clientDataTagSupervision;
     if (clientTag instanceof SupervisionListener) {
       clientDataTagSupervision = (SupervisionListener) clientTag;
@@ -203,7 +203,7 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
         throw new RuntimeException("The client data tag must be an instance of SupervisionListener!");
       }
     }
-    
+
     // Setting the data type
     String dataType = "String";
     if (clientTag != null && clientTag.getType() != null) {
@@ -211,43 +211,43 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
     }
     for (HistoryUpdate historyUpdate : historyUpdates) {
       if (historyUpdate instanceof HistoryTagValueUpdate) {
-        dataType = ((HistoryTagValueUpdate) historyUpdate).getDataType();
+        dataType = ((HistoryTagValueUpdate) historyUpdate).getValueClassName();
         break;
       }
     }
-    
+
     ((ClientDataTagImpl) clientTag).clean();
-    
+
     final boolean removeRedundantData = configuration.isRemoveRedundantData();
-    
+
     final List<HistoryTagValueUpdate> result = new ArrayList<HistoryTagValueUpdate>();
-    
+
     HistoryTagValueUpdateImpl previousAddedValue = null;
-    
+
     for (int index = 0; index < historyUpdates.length; index++) {
       final HistoryUpdate historyUpdate = historyUpdates[index];
       if (historyUpdate instanceof HistoryTagValueUpdate) {
-        
+
         final HistoryTagValueUpdate historyTagValueUpdate = (HistoryTagValueUpdate) historyUpdate;
         final boolean wasUpdatedSuccesfully = ((ClientDataTagImpl) clientTag).onUpdate(historyTagValueUpdate);
-        
+
         if (!wasUpdatedSuccesfully) // only Valid updates should be added in the history
           continue; // => the rest are ignored
-        
+
         try {
           final HistoryTagValueUpdateImpl update = new HistoryTagValueUpdateImpl(
-              clientTag.getId(), 
-              clientTag.getDataTagQuality().clone(), 
-              clientTag.getValue(), 
-              historyTagValueUpdate.getSourceTimestamp(), 
-              historyTagValueUpdate.getDaqTimestamp(), 
-              clientTag.getServerTimestamp(), 
-              historyTagValueUpdate.getLogTimestamp(), 
-              clientTag.getDescription(), 
-              clientTag.getAlarms().toArray(new AlarmValue[0]), 
+              clientTag.getId(),
+              clientTag.getDataTagQuality().clone(),
+              clientTag.getValue(),
+              historyTagValueUpdate.getSourceTimestamp(),
+              historyTagValueUpdate.getDaqTimestamp(),
+              clientTag.getServerTimestamp(),
+              historyTagValueUpdate.getLogTimestamp(),
+              clientTag.getDescription(),
+              clientTag.getAlarms().toArray(new AlarmValue[0]),
               clientTag.getMode());
           update.setInitialValue(historyTagValueUpdate.isInitialValue());
-          update.setDataType(dataType);
+          update.setValueClassName(dataType);
           update.setDaqTimestamp(historyTagValueUpdate.getDaqTimestamp());
           result.add(update);
           previousAddedValue = update;
@@ -259,23 +259,23 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
       else if (historyUpdate instanceof HistorySupervisionEvent) {
         final HistorySupervisionEvent historyEvent = (HistorySupervisionEvent) historyUpdate;
         clientDataTagSupervision.onSupervisionUpdate(historyEvent);
-        
+
         // Adds the client data tag only if it is initialized.
         if (clientTag.getDataTagQuality().isInitialised()) {
           try {
             final HistoryTagValueUpdateImpl update = new HistoryTagValueUpdateImpl(
-                clientTag.getId(), 
-                clientTag.getDataTagQuality().clone(), 
-                clientTag.getValue(), 
-                null, 
-                null, 
-                historyEvent.getEventTime(), 
-                null, 
-                clientTag.getDescription(), 
-                clientTag.getAlarms().toArray(new AlarmValue[0]), 
+                clientTag.getId(),
+                clientTag.getDataTagQuality().clone(),
+                clientTag.getValue(),
+                null,
+                null,
+                historyEvent.getEventTime(),
+                null,
+                clientTag.getDescription(),
+                clientTag.getAlarms().toArray(new AlarmValue[0]),
                 clientTag.getMode());
             update.setInitialValue(historyEvent.isInitialValue());
-            update.setDataType(dataType);
+            update.setValueClassName(dataType);
             if (!removeRedundantData || !isRedundantData(previousAddedValue, update)) {
               result.add(update);
               previousAddedValue = update;
@@ -292,14 +292,14 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
     }
     return result;
   }
-  
+
   /**
    * @param previousRecord the previous record
    * @param newRecord the record to check if it is redundant.
    * @return <code>true</code> of the <code>newRecord</code> is redundant because of the previous record
    */
   private static boolean isRedundantData(final HistoryTagValueUpdate previousRecord, final HistoryTagValueUpdate newRecord) {
-    return 
+    return
       newRecord == null // Returns true if the value is null.
       ||
       previousRecord != null
@@ -310,12 +310,12 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
       && (
           previousRecord.getDataTagQuality() == newRecord.getDataTagQuality()
           ||
-          previousRecord.getDataTagQuality() != null 
+          previousRecord.getDataTagQuality() != null
           && newRecord.getDataTagQuality() != null
           && objEquals(previousRecord.getDataTagQuality().getDescription(), newRecord.getDataTagQuality().getDescription())
           );
   }
-  
+
   /**
    * @param obj1 an object
    * @param obj2 another object
@@ -323,9 +323,9 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
    */
   private static boolean objEquals(final Object obj1, final Object obj2) {
     return obj1 == obj2
-      || 
-      obj1 != null 
-      && obj2 != null 
+      ||
+      obj1 != null
+      && obj2 != null
       && obj1.equals(obj2);
   }
 
@@ -345,10 +345,10 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
       }
     }
     else {
-      return new ArrayList<HistoryTagValueUpdate>(); 
+      return new ArrayList<HistoryTagValueUpdate>();
     }
   }
-  
+
   /**
    * Counts how many history records have been loaded per tag
    * @return A map with tag ids as keys and the history count as value
@@ -358,17 +358,17 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
 
     this.loadedHistoryTagValueUpdatesLock.readLock().lock();
     try {
-    
+
       for (Entry<Long,List<HistoryTagValueUpdate>> entry : this.loadedHistoryTagValueUpdates.entrySet()) {
         Long tagId = entry.getKey();
         counterMap.put(tagId, entry.getValue().size());
       }
-      
+
     }
     finally {
       this.loadedHistoryTagValueUpdatesLock.readLock().unlock();
     }
-    
+
     return counterMap;
   }
 
@@ -388,7 +388,7 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
       }
     }
     else {
-      return new ArrayList<HistorySupervisionEvent>(); 
+      return new ArrayList<HistorySupervisionEvent>();
     }
   }
 
@@ -396,7 +396,7 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
   public Collection<HistorySupervisionEvent> getHistory(final SupervisionEntity entity, final Long entityId) {
     return getHistory(new SupervisionEventId(entity, entityId));
   }
-  
+
   @Override
   public Collection<Long> getLoadedTagIds() {
     this.loadedHistoryTagValueUpdatesLock.readLock().lock();
@@ -410,7 +410,7 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
 
   /**
    * Adds records to the data store
-   * 
+   *
    * @param records the records to add
    */
   protected void addTagValueUpdates(final Collection<HistoryTagValueUpdate> records) {
@@ -431,10 +431,10 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
       this.loadedHistoryTagValueUpdatesLock.writeLock().unlock();
     }
   }
-  
+
   /**
    * Adds records to the data store
-   * 
+   *
    * @param records the records to add
    */
   protected void addSupervisionEvents(final Collection<HistorySupervisionEvent> records) {
@@ -456,7 +456,7 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
       this.loadedHistorySupervisionEventsLock.writeLock().unlock();
     }
   }
-  
+
   @Override
   public void addClientDataTagsForLoading(final Collection<Tag> tags) {
     for (Tag cdt : tags) {
@@ -513,7 +513,7 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
   }
 
   /**
-   * 
+   *
    * @return all the listeners
    */
   protected Collection<HistoryLoadingManagerListener> getListeners() {
@@ -526,7 +526,7 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
   protected Map<Long, Tag> getTagsToLoad() {
     return new HashMap<Long, Tag>(tagsToLoad);
   }
-  
+
   /**
    * @return a list of tags ids to load
    */
@@ -540,6 +540,6 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
   protected Collection<SupervisionEventId> getSupervisionEventsToLoad() {
     return new HashSet<SupervisionEventId>(supervisionEventsToLoad);
   }
-  
-  
+
+
 }

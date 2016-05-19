@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -53,33 +53,33 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStat
 /**
  * This test is testing the {@link HistoryPlayerImpl} class, and checks that the
  * supervision events plays in the correct order relative to a history record.
- * 
- * 
+ *
+ *
  * @author vdeila
  */
 public class HistoryPlayerImplTest2 {
 
   /** The TIMESPAN which will be used for playback */
-  private static final Timespan TIMESPAN = 
+  private static final Timespan TIMESPAN =
     new Timespan(
         new GregorianCalendar(2011, 06, 05, 12, 00).getTime(),
         new GregorianCalendar(2011, 06, 07, 12, 00).getTime());
-  
+
   /** The playback speed multiplier to use */
   private static final double PLAYBACK_SPEED_MULTIPLIER = 24 * 60 * 60 * 1000; // 24 hours per real second
-  
+
   /** The class under test */
   private HistoryPlayerImpl historyPlayer;
-  
+
   /** Counts down when the history is loaded */
   private CountDownLatch historyLoadedLatch;
-  
+
   /** The timeout to wait for the history to load */
   private static final Long HISTORY_LOADING_TIMEOUT = 10000L;
-  
+
   /** The timeout to wait for the playback */
-  private static final Long HISTORY_PLAYBACK_TIMEOUT = 10000L; 
-  
+  private static final Long HISTORY_PLAYBACK_TIMEOUT = 10000L;
+
   @Before
   public void setUp() throws Exception {
     historyPlayer = new HistoryPlayerImpl();
@@ -90,7 +90,7 @@ public class HistoryPlayerImplTest2 {
         historyLoadedLatch.countDown();
       }
     });
-    
+
     UncaughtExceptionSetup.setUpUncaughtException();
   }
 
@@ -104,91 +104,91 @@ public class HistoryPlayerImplTest2 {
     final IMocksControl mockCtrl = EasyMock.createStrictControl();
     final TagUpdateListener tagUpdateListener = mockCtrl.createMock(TagUpdateListener.class);
     final SupervisionListener supervisionListener = mockCtrl.createMock(SupervisionListener.class);
-    
+
     final List<HistoryTagValueUpdate> initialTagRecords = new ArrayList<HistoryTagValueUpdate>();
     final List<HistoryTagValueUpdate> tagRecords = new ArrayList<HistoryTagValueUpdate>();
     final List<HistorySupervisionEvent> initialSupervisionRecords = new ArrayList<HistorySupervisionEvent>();
     final List<HistorySupervisionEvent> supervisionRecords = new ArrayList<HistorySupervisionEvent>();
-    
+
     //
     // Creates initial tag records
     //
-    final HistoryTagValueUpdateImpl initialHistoryRecord = 
+    final HistoryTagValueUpdateImpl initialHistoryRecord =
       new HistoryTagValueUpdateImpl(
-          10000L, 
-          new DataTagQualityImpl(), 
-          Integer.valueOf(40000), 
-          new Timestamp(TIMESPAN.getStart().getTime() - 2 * 60 * 60 * 1000), 
-          new Timestamp(TIMESPAN.getStart().getTime() - 2 * 60 * 60 * 1000), 
-          new Timestamp(TIMESPAN.getStart().getTime() - 2 * 60 * 60 * 1000), 
+          10000L,
+          new DataTagQualityImpl(),
+          Integer.valueOf(40000),
+          new Timestamp(TIMESPAN.getStart().getTime() - 2 * 60 * 60 * 1000),
+          new Timestamp(TIMESPAN.getStart().getTime() - 2 * 60 * 60 * 1000),
+          new Timestamp(TIMESPAN.getStart().getTime() - 2 * 60 * 60 * 1000),
           null,
-          "Test tag", 
+          "Test tag",
           TagMode.OPERATIONAL);
     initialTagRecords.add(initialHistoryRecord);
-    
+
     //
     // Creates tag records
     //
     final long historyRecordTime = (long) (TIMESPAN.getStart().getTime() + (TIMESPAN.getEnd().getTime() - TIMESPAN.getStart().getTime()) * 0.5);
-    final HistoryTagValueUpdateImpl historyRecord = 
+    final HistoryTagValueUpdateImpl historyRecord =
       new HistoryTagValueUpdateImpl(
-          10000L, 
-          new DataTagQualityImpl(), 
+          10000L,
+          new DataTagQualityImpl(),
           Integer.valueOf(100000), // Random value
-          new Timestamp(historyRecordTime), 
-          new Timestamp(historyRecordTime), 
-          new Timestamp(historyRecordTime), 
+          new Timestamp(historyRecordTime),
+          new Timestamp(historyRecordTime),
+          new Timestamp(historyRecordTime),
           null,
-          "Test tag", 
+          "Test tag",
           TagMode.OPERATIONAL);
-    historyRecord.setDataType("Integer");
+    historyRecord.setValueClassName("Integer");
     tagRecords.add(historyRecord);
-    
+
     //
     // Creates initial supervision record
     //
     final long initialSupervisionEventTime = (long) (TIMESPAN.getStart().getTime() - 1 * 60 * 60 * 1000);
-    final HistorySupervisionEvent initialSupervisionEvent = 
+    final HistorySupervisionEvent initialSupervisionEvent =
       new HistorySupervisionEventImpl(
-          SupervisionEntity.EQUIPMENT, 
-          5400L, 
-          SupervisionStatus.DOWN, 
-          new Timestamp(initialSupervisionEventTime), 
+          SupervisionEntity.EQUIPMENT,
+          5400L,
+          SupervisionStatus.DOWN,
+          new Timestamp(initialSupervisionEventTime),
           "Testing. Is down..");
     initialSupervisionRecords.add(initialSupervisionEvent);
-    
+
     //
     // Creates supervision record
     //
     final long supervisionEventTime = (long) (TIMESPAN.getStart().getTime() + (TIMESPAN.getEnd().getTime() - TIMESPAN.getStart().getTime()) * 0.75);
-    final HistorySupervisionEvent supervisionEvent = 
+    final HistorySupervisionEvent supervisionEvent =
       new HistorySupervisionEventImpl(
-          SupervisionEntity.EQUIPMENT, 
-          5400L, 
-          SupervisionStatus.DOWN, 
-          new Timestamp(supervisionEventTime), 
+          SupervisionEntity.EQUIPMENT,
+          5400L,
+          SupervisionStatus.DOWN,
+          new Timestamp(supervisionEventTime),
           "Testing. Is down..");
     supervisionRecords.add(supervisionEvent);
-    
-    final HistoryProvider historyProvider = 
+
+    final HistoryProvider historyProvider =
       new HistoryProviderSimpleImpl(
-          initialTagRecords, 
+          initialTagRecords,
           tagRecords,
           initialSupervisionRecords,
           supervisionRecords);
-    
+
     mockCtrl.resetToNice();
-    
+
     historyPlayer.configure(historyProvider, TIMESPAN);
     historyPlayer.activateHistoryPlayer();
-    
+
     historyPlayer.registerTagUpdateListener(
-        tagUpdateListener, 
-        historyRecord.getId(), 
+        tagUpdateListener,
+        historyRecord.getId(),
         null);
-    
+
     historyPlayer.registerSupervisionListener(
-        supervisionEvent.getEntity(), 
+        supervisionEvent.getEntity(),
         supervisionListener,
         Arrays.asList(supervisionEvent.getEntityId()));
 
@@ -197,23 +197,23 @@ public class HistoryPlayerImplTest2 {
     //
     mockCtrl.resetToStrict();
     mockCtrl.checkOrder(false);
-    
+
     supervisionListener.onSupervisionUpdate(EasyMock.eq(initialSupervisionEvent));
     EasyMock.expectLastCall().atLeastOnce();
     EasyMock.expect(tagUpdateListener.onUpdate(EasyMock.eq(initialHistoryRecord))).andReturn(true);
     EasyMock.expectLastCall().atLeastOnce();
-    
-    
+
+
     mockCtrl.checkOrder(true);
-    
+
     EasyMock.expect(tagUpdateListener.onUpdate(EasyMock.eq(historyRecord))).andReturn(true);
-    
+
     supervisionListener.onSupervisionUpdate(EasyMock.eq(supervisionEvent));
-    
+
     //
     // Adding stubs for the initial invalidations
     //
-    
+
     // Stub for the tagUpdateListener
     final TagUpdateListener tagUpdateListenerDelegate = new TagUpdateListener() {
       @Override
@@ -227,7 +227,7 @@ public class HistoryPlayerImplTest2 {
     };
     tagUpdateListener.onUpdate(EasyMock.<TagValueUpdate>anyObject());
     EasyMock.expectLastCall().andStubDelegateTo(tagUpdateListenerDelegate);
-    
+
     // Stub for the supervisionListener
     final SupervisionListener supervisionListenerDelegate = new SupervisionListener() {
       @Override
@@ -239,19 +239,19 @@ public class HistoryPlayerImplTest2 {
     };
     supervisionListener.onSupervisionUpdate(
         EasyMock.and(
-            EasyMock.not(EasyMock.eq(initialSupervisionEvent)), 
+            EasyMock.not(EasyMock.eq(initialSupervisionEvent)),
             EasyMock.<SupervisionEvent>anyObject()));
     EasyMock.expectLastCall().andStubDelegateTo(supervisionListenerDelegate);
-    
-    
+
+
     //
     // Replays
     //
     mockCtrl.replay();
-    
+
     final CountDownLatch playbackStoppedLatch = new CountDownLatch(1);
     final CountDownLatch playbackStartedLatch = new CountDownLatch(1);
-    
+
     new Thread(new Runnable() {
       @Override
       public void run() {
@@ -272,25 +272,25 @@ public class HistoryPlayerImplTest2 {
         playbackStoppedLatch.countDown();
       }
     }).start();
-    
+
     historyPlayer.beginLoading();
     if (!historyLoadedLatch.await(HISTORY_LOADING_TIMEOUT, TimeUnit.MILLISECONDS)) {
       Assert.fail("The loading timed out.");
     }
-    
+
     historyPlayer.getPlaybackControl().setPlaybackSpeed(PLAYBACK_SPEED_MULTIPLIER);
     historyPlayer.getPlaybackControl().resume();
     playbackStartedLatch.countDown();
-    
+
     if (!playbackStoppedLatch.await(HISTORY_PLAYBACK_TIMEOUT, TimeUnit.MILLISECONDS)) {
       historyPlayer.getPlaybackControl().pause();
       playbackStoppedLatch.countDown();
       Assert.fail("The playback timed out.");
     }
-    
+
     // If the schedule slower than the clock
     Thread.sleep(500);
-    
+
     mockCtrl.verify();
   }
 

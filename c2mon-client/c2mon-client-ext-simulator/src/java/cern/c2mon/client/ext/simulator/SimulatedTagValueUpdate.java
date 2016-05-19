@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -30,38 +30,38 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
 /**
- * This class is used internally by {@link TagSimulatorImpl} making a cache 
+ * This class is used internally by {@link TagSimulatorImpl} making a cache
  * update. When setting the simulated value this class creates a new timestamp.
  * Source-, DAQ- and Server timestamp are then the same.
  *
  * @author Matthias Braeger
  */
 class SimulatedTagValueUpdate implements TagValueUpdate {
-  
+
   /** The client data tag clone */
   private Tag tag;
-  
+
   /** The simulated quality object */
   private final DataTagQualityImpl quality = new DataTagQualityImpl();
-  
+
   /** The new value */
   private Object simulatedValue = null;
-  
+
   /** The simulated source timestamp */
   private Timestamp simulatedTimestamp = null;
-  
+
   /**
    * Copy constructor
-   * 
+   *
    * @param cdt The tag that will receive a simulated value
-   * @throws CloneNotSupportedException In case that the Tag instance is not 
+   * @throws CloneNotSupportedException In case that the Tag instance is not
    *         clonable.
    */
   protected SimulatedTagValueUpdate(final Tag cdt) {
     this.tag = ((ClientDataTagImpl) cdt).clone();
     quality.validate();
   }
-  
+
   /**
    * Sets the simulated value and generates at the same time a new source timestamp
    * @param value The simulated value
@@ -69,9 +69,9 @@ class SimulatedTagValueUpdate implements TagValueUpdate {
    *            type as the tag.
    * @see Tag#getType()
    */
-  void setValue(final Object value) throws ClassCastException {
+  public void setValue(final Object value) throws ClassCastException {
     boolean setValue = false;
-    
+
     if (tag.getDataTagQuality().isInitialised()) {
       if (tag.getType().isInstance(value)) {
         setValue = true;
@@ -84,14 +84,14 @@ class SimulatedTagValueUpdate implements TagValueUpdate {
     else {
       setValue = true;
     }
-    
+
     if (setValue) {
       this.simulatedValue = value;
       quality.validate();
       simulatedTimestamp = new Timestamp(System.currentTimeMillis());
     }
   }
-  
+
   void invalidateTag(final TagQualityStatus status) {
     quality.addInvalidStatus(status);
     simulatedTimestamp = new Timestamp(System.currentTimeMillis());
@@ -175,5 +175,10 @@ class SimulatedTagValueUpdate implements TagValueUpdate {
   @Override
   public String getValueDescription() {
     return tag.getValueDescription();
+  }
+
+  @Override
+  public String getValueClassName() {
+    return tag.getClass().getName();
   }
 }

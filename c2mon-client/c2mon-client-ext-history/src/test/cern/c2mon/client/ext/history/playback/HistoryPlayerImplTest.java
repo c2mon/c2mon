@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -52,61 +52,61 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 /**
  * This test is testing the {@link HistoryPlayerImpl} class, and checks that the
  * data is played in the correct order.
- * 
- * 
+ *
+ *
  * @author vdeila
  */
 public class HistoryPlayerImplTest {
 
   /*
-   * Static test variables 
+   * Static test variables
    */
-  
+
   /** The TIMESPAN which will be used for playback */
-  private static final Timespan TIMESPAN = 
+  private static final Timespan TIMESPAN =
     new Timespan(
         new GregorianCalendar(2011, 06, 05, 12, 00).getTime(),
         new GregorianCalendar(2011, 06, 07, 12, 00).getTime());
-  
+
   /** The number of tags which will be generated */
   private static final int NUMBER_OF_TAGS = 10;
-  
+
   /**
    * The maximum number of milliseconds to wait for the loading to finish
    */
   private static final Long LOADING_TIMEOUT = 15000L;
-  
+
   /** The maximum number of milliseconds to wait for the playback to finish */
   private static final Long PLAYBACK_TIMEOUT = 40000L;
-  
+
   /** The multiplier to have for the playback speed (multiplied by real time) */
   private static final double PLAYBACK_SPEED_MULTIPLIER = 60 * 60 * 6; // playing 6 hours per second
-  
+
   /** The multiplier to have for the playback speed the second time when there are no listeners */
   private static final double PLAYBACK_SPEED_MULTIPLIER_SECOND = 60 * 60 * 24 * 4; // playing 4 days per second
-  
+
   /*
    * Components
    */
-  
+
   /** The class under test */
   private HistoryPlayerImpl historyPlayer;
-  
+
   /** All initial records */
   private List<HistoryTagValueUpdate> initialRecords;
-  
+
   /** All history records */
   private List<HistoryTagValueUpdate> historyRecords;
-  
-  /** The "real time" tags which is already subscribed to when starting the history player */ 
+
+  /** The "real time" tags which is already subscribed to when starting the history player */
   private Map<Long, TagUpdateListener> tagUpdateListenersMock;
-  
+
   /** Is true when the history have been loaded */
   private AtomicBoolean historyLoaded;
-  
+
   /** Control to check the order of the calls on the mocks */
   private IMocksControl mockCtrl;
-  
+
   @Before
   public void setUp() throws Exception {
     mockCtrl = EasyMock.createStrictControl();
@@ -114,79 +114,79 @@ public class HistoryPlayerImplTest {
     initialRecords = new ArrayList<HistoryTagValueUpdate>();
     historyRecords = new ArrayList<HistoryTagValueUpdate>();
     tagUpdateListenersMock = new HashMap<Long, TagUpdateListener>();
-    
+
     // Generates initial records and history records
-    
+
     for (int i = 0; i < NUMBER_OF_TAGS; i++) {
       final long tagId = 10000 + i;
       final TagUpdateListener tagUpdateListenerMock = mockCtrl.createMock(TagUpdateListener.class);
 
       // Adds it to the subscribed tags
       tagUpdateListenersMock.put(tagId, tagUpdateListenerMock);
-      
-      // Creates a TagValueUpdate record 
-      final HistoryTagValueUpdateImpl initialHistoryRecord = 
+
+      // Creates a TagValueUpdate record
+      final HistoryTagValueUpdateImpl initialHistoryRecord =
         new HistoryTagValueUpdateImpl(
-            tagId, 
-            new DataTagQualityImpl(), 
-            Integer.valueOf(i+40000), 
-            new Timestamp(TIMESPAN.getStart().getTime() - 1 * 60 * 60 * 1000), 
-            new Timestamp(TIMESPAN.getStart().getTime() - 1 * 60 * 60 * 1000), 
-            new Timestamp(TIMESPAN.getStart().getTime() - 1 * 60 * 60 * 1000), 
+            tagId,
+            new DataTagQualityImpl(),
+            Integer.valueOf(i+40000),
+            new Timestamp(TIMESPAN.getStart().getTime() - 1 * 60 * 60 * 1000),
+            new Timestamp(TIMESPAN.getStart().getTime() - 1 * 60 * 60 * 1000),
+            new Timestamp(TIMESPAN.getStart().getTime() - 1 * 60 * 60 * 1000),
             null,
-            "Test tag", 
+            "Test tag",
             TagMode.OPERATIONAL);
-      initialHistoryRecord.setDataType("Integer");
-      
+      initialHistoryRecord.setValueClassName("Integer");
+
       // Adds the initial record to the list of initialization records
       initialRecords.add(initialHistoryRecord);
-      
+
       // Generating history records
       final Random random = new Random(i);
       long currentTime = TIMESPAN.getStart().getTime();
-      
+
       while (true) {
         // Adds a time periode of between one minute and one day.
         currentTime += 60*1000 + (long)(random.nextDouble() * 60.0 * 60.0 * 1000.0);
         if (currentTime > TIMESPAN.getEnd().getTime()) {
           break;
         }
-        
-        // Creates a TagValueUpdate record 
-        final HistoryTagValueUpdateImpl historyRecord = 
+
+        // Creates a TagValueUpdate record
+        final HistoryTagValueUpdateImpl historyRecord =
           new HistoryTagValueUpdateImpl(
-              tagId, 
-              new DataTagQualityImpl(), 
+              tagId,
+              new DataTagQualityImpl(),
               Integer.valueOf((int) (currentTime % 100000)), // Random value
-              new Timestamp(currentTime), 
-              new Timestamp(currentTime), 
+              new Timestamp(currentTime),
+              new Timestamp(currentTime),
               new Timestamp(currentTime),
               null,
-              "Test tag", 
+              "Test tag",
               TagMode.OPERATIONAL);
-        historyRecord.setDataType("Integer");
-        
+        historyRecord.setValueClassName("Integer");
+
         // Adds it to the list of records
         historyRecords.add(historyRecord);
       }
     }
-    
+
     historyPlayer = new HistoryPlayerImpl();
-    
+
     historyPlayer.addHistoryPlayerListener(new HistoryPlayerAdapter() {
       @Override
       public void onHistoryIsFullyLoaded() {
         historyLoaded.set(true);
       }
     });
-    
+
     UncaughtExceptionSetup.setUpUncaughtException();
   }
 
   @After
   public void tearDown() throws Exception {
     UncaughtExceptionSetup.tearDownUncaughtException();
-    
+
   }
 
   /** Waits for the history to finish loading */
@@ -204,7 +204,7 @@ public class HistoryPlayerImplTest {
       Assert.fail("The loading of history have timed out.");
     }
   }
-  
+
   /** Wait for the history player to finish playing */
   private void waitForPlaybackToFinish() {
     final Long playbackTimeout = System.currentTimeMillis() + PLAYBACK_TIMEOUT;
@@ -226,17 +226,17 @@ public class HistoryPlayerImplTest {
       catch (InterruptedException e) { }
     }
   }
-  
+
   @Test
   public void testPlayback() {
-    
-    final HistoryProvider historyProvider = 
+
+    final HistoryProvider historyProvider =
       new HistoryProviderSimpleImpl(
-        initialRecords, 
+        initialRecords,
         historyRecords,
         new ArrayList<HistorySupervisionEvent>(),
         new ArrayList<HistorySupervisionEvent>());
-    
+
     // Sort the records to the correct order
     final TagValueUpdate[] orderedRecords = historyRecords.toArray(new TagValueUpdate[0]);
     Arrays.sort(orderedRecords, new Comparator<TagValueUpdate>() {
@@ -249,49 +249,49 @@ public class HistoryPlayerImplTest {
         return result;
       }
     });
-    
+
     //
     // Lets the history player load the data before starting the test
-    // 
+    //
     mockCtrl.resetToNice();
-    
+
     historyPlayer.configure(historyProvider, TIMESPAN);
     historyPlayer.activateHistoryPlayer();
-    
+
     // Registers update listeners
     for (final Long tagId : tagUpdateListenersMock.keySet()) {
       final TagUpdateListener listenerMock = tagUpdateListenersMock.get(tagId);
       historyPlayer.registerTagUpdateListener(listenerMock, tagId, null);
     }
-    
+
     //
     // Record
     //
-    
+
     mockCtrl.resetToStrict();
-    
+
     // Unordered calls, the initial history
     mockCtrl.checkOrder(false);
-    
+
     for (final TagValueUpdate update : initialRecords) {
 
       EasyMock.expect(tagUpdateListenersMock.get(update.getId())
           .onUpdate(EasyMock.eq(update))).andReturn(true);
       EasyMock.expectLastCall().atLeastOnce();
     }
-    
+
     // Ordered calls, the history
     mockCtrl.checkOrder(true);
-    
+
     for (final TagValueUpdate update : orderedRecords) {
-      
+
       EasyMock.expect(tagUpdateListenersMock.get(update.getId())
           .onUpdate(EasyMock.eq(update))).andReturn(true);
       EasyMock.expectLastCall().once();
     }
-    
+
     // Stubs
-    
+
     final TagUpdateListener tagUpdateListenerDelegate = new TagUpdateListener() {
       @Override
       public boolean onUpdate(final TagValueUpdate tagValueUpdate) {
@@ -301,61 +301,61 @@ public class HistoryPlayerImplTest {
         return true;
       }
     };
-    
+
     for (final TagUpdateListener listener : tagUpdateListenersMock.values()) {
             listener.onUpdate(EasyMock.<TagValueUpdate>anyObject());
       EasyMock.expectLastCall().andStubDelegateTo(tagUpdateListenerDelegate);
     }
-    
+
     //
     // Replay
     //
-    
+
     mockCtrl.replay();
-    
+
     // Loads the data
     historyPlayer.beginLoading();
     waitForHistoryToLoad();
-    
+
     // Plays back the data
     historyPlayer.getPlaybackControl().resume();
     historyPlayer.getPlaybackControl().setPlaybackSpeed(PLAYBACK_SPEED_MULTIPLIER);
-    
+
     // Waiting for the playback to finish
     waitForPlaybackToFinish();
-    
+
     historyPlayer.unregisterTags(this.tagUpdateListenersMock.keySet());
-    
+
     historyPlayer.getPlaybackControl().setClockTime(historyPlayer.getStart().getTime());
     historyPlayer.getPlaybackControl().resume();
     historyPlayer.getPlaybackControl().setPlaybackSpeed(PLAYBACK_SPEED_MULTIPLIER_SECOND);
-    
+
     // Waiting for the playback to finish
     waitForPlaybackToFinish();
-    
+
     historyPlayer.deactivateHistoryPlayer();
-    
+
     // Verifies
     mockCtrl.verify();
   }
-  
+
   @Test
   public void testClockSynchronization() throws InterruptedException {
     // This tests if the clock synchronization works correctly
-    
-    final double playbackTime = 
-          ((TIMESPAN.getEnd().getTime() - TIMESPAN.getStart().getTime()) 
+
+    final double playbackTime =
+          ((TIMESPAN.getEnd().getTime() - TIMESPAN.getStart().getTime())
             / (double) PLAYBACK_SPEED_MULTIPLIER);
-    
+
     // Make the playback use at least the double amount of time than the actual
     // playback speed would use
-    final double timeToDelayPerUpdate = 
+    final double timeToDelayPerUpdate =
       (2.0 * (playbackTime / (double) (initialRecords.size() + historyRecords.size())));
-    
+
     // Splits the time into milli seconds and nano seconds
     final long millisecondsToDelay = (long) timeToDelayPerUpdate;
     final int nanosecondsToDelay = 1 + (int) ((timeToDelayPerUpdate - millisecondsToDelay) * 1000000.0);
-    
+
     final TagUpdateListener tagUpdateListener = new TagUpdateListener() {
       @Override
       public boolean onUpdate(final TagValueUpdate update) {
@@ -367,68 +367,68 @@ public class HistoryPlayerImplTest {
         return true;
       }
     };
-    
-    final HistoryProvider historyProvider = 
+
+    final HistoryProvider historyProvider =
       new HistoryProviderSimpleImpl(
-          initialRecords, 
+          initialRecords,
           historyRecords,
           new ArrayList<HistorySupervisionEvent>(),
           new ArrayList<HistorySupervisionEvent>());
 
     //
     // Configuring the history player, and registering the mock listeners
-    // 
+    //
     mockCtrl.resetToNice();
-    
+
     historyPlayer.configure(historyProvider, TIMESPAN);
     historyPlayer.activateHistoryPlayer();
-    
+
     // Registers update listeners
     for (final Long tagId : tagUpdateListenersMock.keySet()) {
       final TagUpdateListener listenerMock = tagUpdateListenersMock.get(tagId);
       historyPlayer.registerTagUpdateListener(listenerMock, tagId, null);
     }
-    
-    
+
+
     //
     // Record
     //
-    
+
     mockCtrl.resetToDefault();
-    
+
     // Unordered calls
     mockCtrl.checkOrder(false);
-    
+
     // Makes expectations about how many calls each listener will have,
     // based on how many records they have.
     for (final Long tagId : tagUpdateListenersMock.keySet()) {
       final TagUpdateListener listenerMock = tagUpdateListenersMock.get(tagId);
       final int numberOfRecords = historyProvider.getHistory(new Long[] { tagId }, TIMESPAN.getStart(), TIMESPAN.getEnd()).size();
-      
+
       // At least the number of records, no maximum value
       listenerMock.onUpdate(EasyMock.<TagValueUpdate>anyObject());
       EasyMock.expectLastCall().andDelegateTo(tagUpdateListener)
         .times(numberOfRecords, Integer.MAX_VALUE);
     }
-    
-    
+
+
     //
     // Replay
     //
-    
+
     mockCtrl.replay();
-    
+
     historyPlayer.beginLoading();
     waitForHistoryToLoad();
-    
+
     // Plays back the data
     historyPlayer.getPlaybackControl().setPlaybackSpeed(PLAYBACK_SPEED_MULTIPLIER);
     historyPlayer.getPlaybackControl().resume();
-    
+
     waitForPlaybackToFinish();
-    
+
     // Verifies that all updates have come.
-    // If some updates have not come the clock have not been synchronized and the test will fail. 
+    // If some updates have not come the clock have not been synchronized and the test will fail.
     mockCtrl.verify();
   }
 }

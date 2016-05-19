@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -18,6 +18,7 @@ package cern.c2mon.client.ext.history.dbaccess.util;
 
 import java.sql.Timestamp;
 
+import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,7 @@ import cern.c2mon.shared.common.type.TypeConverter;
 
 /**
  * Converts beans into common interfaces
- * 
+ *
  * @author vdeila
  */
 public final class BeanConverterUtil {
@@ -45,7 +46,7 @@ public final class BeanConverterUtil {
 
     /**
      * Converts a {@link HistoryRecordBean} object to a {@link TagValueUpdate}
-     * 
+     *
      * @param bean the bean to convert
      * @return the converted object
      */
@@ -55,7 +56,7 @@ public final class BeanConverterUtil {
 
     /**
      * Converts a {@link HistoryRecordBean} object to a {@link TagValueUpdate}
-     * 
+     *
      * @param bean the bean to convert
      * @param clientDataTagRequestCallback Callback to get access to attributes in the {@link Tag}.
      * @return the converted object
@@ -75,16 +76,17 @@ public final class BeanConverterUtil {
                 bean.getDataTagQuality(), TypeConverter.cast(bean.getTagValue(), bean.getTagDataType()),
                 bean.getTagTime(), bean.getDaqTime(), bean.getServerTime(), new Timestamp(bean.getLogDate().getTime()),
                 bean.getTagValueDesc() == null ? "" : bean.getTagValueDesc(), mode);
-        value.setDataType(bean.getTagDataType());
+        value.setValueClassName(bean.getTagDataType());
         value.setDaqTimestamp(bean.getDaqTime());
         value.setInitialValue(bean.isFromInitialSnapshot());
+        value.setValue(TransferTagSerializer.convertTagValue(value));
 
         return value;
     }
 
     /**
      * Converts a {@link SupervisionRecordBean} object to a {@link SupervisionEvent}
-     * 
+     *
      * @param bean the bean to convert
      * @return the converted object
      */
