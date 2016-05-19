@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -115,7 +115,7 @@ public class ConfigurationParseEquipmentTest {
   public void equipmentUpdate_notExistingInstance() {
     // Setup Exception
     equipmentUpdate.expect(ConfigurationParseException.class);
-    equipmentUpdate.expectMessage("Creating Equipment (id = 1) failed. Not enough arguments.");
+    equipmentUpdate.expectMessage("Creating Equipment (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<Equipment, Properties> pair = buildUpdateEquipmentWithSomeFields(1l);
@@ -124,7 +124,7 @@ public class ConfigurationParseEquipmentTest {
     // Setup Mock
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(equipmentCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(equipmentCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache);
@@ -256,7 +256,7 @@ public class ConfigurationParseEquipmentTest {
   public void equipmentCreate_withNoFields() {
     // Setup Exception
     equipmentCreate.expect(ConfigurationParseException.class);
-    equipmentCreate.expectMessage("Creating Equipment (id = 1) failed. Not enough arguments.");
+    equipmentCreate.expectMessage("Creating Equipment (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Configuration configuration = getConfBuilderEquipment(buildEquipmentWtihId(1L)._1);
@@ -264,7 +264,7 @@ public class ConfigurationParseEquipmentTest {
     // Setup Mock
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache);
@@ -287,9 +287,9 @@ public class ConfigurationParseEquipmentTest {
     // Setup Mock
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(equipmentCache.hasKey(1l)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false);
-    EasyMock.expect(commFaultTagCache.hasKey(2l)).andReturn(false);
+    EasyMock.expect(equipmentCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false).times(2);
+    EasyMock.expect(commFaultTagCache.hasKey(2l)).andReturn(false).times(2);
 
 
     // Switch to replay mode
@@ -312,7 +312,7 @@ public class ConfigurationParseEquipmentTest {
   @Test
   public void equipmentCreate_withNotExistingSupClass() {
     equipmentCreate.expect(ConfigurationParseException.class);
-    equipmentCreate.expectMessage("Creating Process (id = 1) failed. Not enough arguments.");
+    equipmentCreate.expectMessage("Creating Process (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<Equipment, Properties> pair = buildEquipmentWithPrimFields(1l);
@@ -320,7 +320,7 @@ public class ConfigurationParseEquipmentTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache);
@@ -342,10 +342,10 @@ public class ConfigurationParseEquipmentTest {
     // Setup Mock
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(equipmentCache.hasKey(1l)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false);
-    EasyMock.expect(commFaultTagCache.hasKey(2l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(equipmentCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false).times(2);
+    EasyMock.expect(commFaultTagCache.hasKey(2l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
 
     // Switch to replay mode
@@ -374,9 +374,9 @@ public class ConfigurationParseEquipmentTest {
     // Setup Mock
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(equipmentCache.hasKey(1l)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false);
-    EasyMock.expect(commFaultTagCache.hasKey(2l)).andReturn(false);
+    EasyMock.expect(equipmentCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false).times(2);
+    EasyMock.expect(commFaultTagCache.hasKey(2l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, statusTagCache, commFaultTagCache);
@@ -410,30 +410,30 @@ public class ConfigurationParseEquipmentTest {
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
 
-    EasyMock.expect(equipmentCache.hasKey(1l)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false);
-    EasyMock.expect(commFaultTagCache.hasKey(2l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(equipmentCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false).times(2);
+    EasyMock.expect(commFaultTagCache.hasKey(2l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
-    EasyMock.expect(equipmentCache.hasKey(2l)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false);
-    EasyMock.expect(commFaultTagCache.hasKey(2l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(equipmentCache.hasKey(2l)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false).times(2);
+    EasyMock.expect(commFaultTagCache.hasKey(2l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
-    EasyMock.expect(equipmentCache.hasKey(3l)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false);
-    EasyMock.expect(commFaultTagCache.hasKey(2l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(equipmentCache.hasKey(3l)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false).times(2);
+    EasyMock.expect(commFaultTagCache.hasKey(2l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
-    EasyMock.expect(equipmentCache.hasKey(4l)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false);
-    EasyMock.expect(commFaultTagCache.hasKey(2l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(equipmentCache.hasKey(4l)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false).times(2);
+    EasyMock.expect(commFaultTagCache.hasKey(2l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
-    EasyMock.expect(equipmentCache.hasKey(5l)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false);
-    EasyMock.expect(commFaultTagCache.hasKey(2l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(equipmentCache.hasKey(5l)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false).times(2);
+    EasyMock.expect(commFaultTagCache.hasKey(2l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, statusTagCache, commFaultTagCache, aliveTagCache);
@@ -486,7 +486,7 @@ public class ConfigurationParseEquipmentTest {
     // Set expectations
     EasyMock.expect(processCache.hasKey(1l)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(0l)).andReturn(true);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, aliveTagCache);
@@ -502,8 +502,8 @@ public class ConfigurationParseEquipmentTest {
   @Test
   public void equipmentDelete_NotExistingInstance() {
     // Setup Exception
-//    equipmentDelete.expect(ConfigurationParseException.class);
-//    equipmentDelete.expectMessage("Deleting Equipment 1 failed. Equipment do not exist in the cache.");
+    equipmentDelete.expect(ConfigurationParseException.class);
+    equipmentDelete.expectMessage("Deleting of Equipment (id = 1) failed: The object is unknown to the sever.");
 
     // Setup Configuration Instance
     Equipment equipment = buildDeleteEquipment(1l);
@@ -512,11 +512,10 @@ public class ConfigurationParseEquipmentTest {
     // Setup Mock
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
-//    EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(false);
 
     // Switch to replay mode
-    EasyMock.replay(processCache);
-//    EasyMock.replay(equipmentCache);
+    EasyMock.replay(processCache, equipmentCache);
 
     // Run the code to be tested
     List<ConfigurationElement> elements = configurationParser.parse(configuration);
@@ -528,7 +527,7 @@ public class ConfigurationParseEquipmentTest {
     assertTrue(elements.get(0).getAction().equals(Action.REMOVE));
 
     // Verify mock methods were called
-    EasyMock.verify(processCache);
+    EasyMock.verify(processCache, equipmentCache);
   }
 
   /**
@@ -544,10 +543,10 @@ public class ConfigurationParseEquipmentTest {
     // Setup Mock
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
-//    EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
+    EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
 
     // Switch to replay mode
-    EasyMock.replay(processCache);
+    EasyMock.replay(processCache, equipmentCache);
 //    EasyMock.replay(equipmentCache);
 
     // Run the code to be tested
@@ -560,7 +559,7 @@ public class ConfigurationParseEquipmentTest {
     assertTrue(elements.get(0).getAction().equals(Action.REMOVE));
 
     // Verify mock methods were called
-    EasyMock.verify(processCache);
+    EasyMock.verify(processCache, equipmentCache);
   }
 
   @Test
@@ -576,10 +575,11 @@ public class ConfigurationParseEquipmentTest {
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
 
     EasyMock.expect(equipmentCache.hasKey(2L)).andReturn(true);
-    EasyMock.expect(equipmentCache.hasKey(3L)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false);
-    EasyMock.expect(commFaultTagCache.hasKey(2l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(equipmentCache.hasKey(3L)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false).times(2);
+    EasyMock.expect(commFaultTagCache.hasKey(2l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(equipmentCache.hasKey(1l)).andReturn(true);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, statusTagCache, commFaultTagCache, aliveTagCache);

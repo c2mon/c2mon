@@ -1,22 +1,21 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration.api.alarm;
 
-import cern.c2mon.shared.client.configuration.api.util.DataType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -47,7 +46,7 @@ public class RangeCondition extends AlarmCondition {
   }
 
   @Builder
-  public RangeCondition(DataType dataType, Integer minValue, Integer maxValue) {
+  public RangeCondition(Class<?> dataType, Integer minValue, Integer maxValue) {
     super(dataType);
     this.minValue = minValue;
     this.maxValue = maxValue;
@@ -57,8 +56,8 @@ public class RangeCondition extends AlarmCondition {
   public String getXMLCondition() {
     String result = "";
     result += "<AlarmCondition class=\"cern.c2mon.server.common.alarm.RangeAlarmCondition\">\n";
-    result += minValue != null ? "<min-value type=\"" + getDataType() + "\">" + minValue.toString() + "</min-value>\n" : "";
-    result += minValue != null ? "<max-value type=\"" + getDataType() + "\">" + maxValue.toString() + "</max-value>\n" : "";
+    result += minValue != null ? "<min-value type=\"" + getDataType().getName() + "\">" + minValue.toString() + "</min-value>\n" : "";
+    result += minValue != null ? "<max-value type=\"" + getDataType().getName() + "\">" + maxValue.toString() + "</max-value>\n" : "";
     result += "</AlarmCondition>";
     return result;
   }

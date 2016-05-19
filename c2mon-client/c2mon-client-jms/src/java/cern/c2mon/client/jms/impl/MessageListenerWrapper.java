@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -27,6 +27,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
+import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +43,7 @@ import cern.c2mon.shared.client.tag.TransferTagValueImpl;
  * wrapper listens on a the given topic and notifies {@link TagUpdateListener}s when an update is received for the
  * corresponding Tag. Notice only one TagUpdateListener will be registered for a given id (the latest one added). In
  * other words, this wrapper also functions as a filter on the topic, with undesired messages being filtered out.
- * 
+ *
  * @author Mark Brightwell
  */
 class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
@@ -56,7 +57,7 @@ class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
      * Wrapped listener. Methods accessing this field are synchronized.
      */
     private Map<Long, TagUpdateListener> listeners = new HashMap<Long, TagUpdateListener>();
-    
+
     /**
      * Timestamps of tag updates used to filter out older events.
      */
@@ -64,7 +65,7 @@ class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
 
     /**
      * Constructor. Adds the listener to receive updates for the specified Tag id.
-     * 
+     *
      * @param tagId the ClientDataTag id
      * @param serverUpdateListener the listener that should be registered
      * @param executorService thread pool polling the queue
@@ -79,7 +80,7 @@ class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
     /**
      * Registers the listener for update notifications for the specified Tag. Assumes this object is registered as JMS
      * listener on the correct topic for the given Tag.
-     * 
+     *
      * @param listener the listener to notify on update
      * @param tagId listens to updates for the ClientDataTag with this id
      */
@@ -89,7 +90,7 @@ class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
 
     /**
      * Removes any listener registered for update notifications for this Tag.
-     * 
+     *
      * @param tagId the id of the Tag
      */
     public synchronized void removeListener(final Long tagId) {
@@ -100,7 +101,7 @@ class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
     /**
      * Returns true if their are currently no listeners registered for this topic (the wrapper class can then
      * unsubscribe).
-     * 
+     *
      * @return true if no listeners
      */
     public synchronized boolean isEmpty() {
@@ -109,21 +110,21 @@ class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
 
     @Override
     protected TagValueUpdate convertMessage(Message message) throws JMSException {
-        return TransferTagValueImpl.fromJson(((TextMessage) message).getText());
+      return TransferTagSerializer.fromJson(((TextMessage) message).getText(), TransferTagValueImpl.class);
     }
 
     @Override
     protected synchronized void notifyListeners(TagValueUpdate tagValueUpdate) {
 
         if (listeners.containsKey(tagValueUpdate.getId())) {
-            if (!filterout(tagValueUpdate)) { 
+            if (!filterout(tagValueUpdate)) {
               if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace(format(
                         "notifying listener about TagValueUpdate event. tag id: %d  value: %s timestamp: %s",
                         tagValueUpdate.getId(), tagValueUpdate.getValue(), tagValueUpdate.getServerTimestamp()));
               }
-              listeners.get(tagValueUpdate.getId()).onUpdate(tagValueUpdate);                           
-            }                       
+              listeners.get(tagValueUpdate.getId()).onUpdate(tagValueUpdate);
+            }
         } else {
           if (LOGGER.isTraceEnabled()) {
               LOGGER.trace(format(
@@ -131,10 +132,10 @@ class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
                       tagValueUpdate.getId(), tagValueUpdate.getValue(), tagValueUpdate.getServerTimestamp()));
           }
         }
-          
+
     }
 
-    private boolean filterout(TagValueUpdate tagValueUpdate) {      
+    private boolean filterout(TagValueUpdate tagValueUpdate) {
       Long oldTime = eventTimes.get(tagValueUpdate.getId());
       Long newTime = tagValueUpdate.getServerTimestamp().getTime();
       if (oldTime == null || oldTime <= newTime) {

@@ -16,18 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.parser.tasks;
 
-import cern.c2mon.server.cache.*;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
+import cern.c2mon.server.configuration.parser.tasks.util.ConfigurationObjectTypeHandler;
 import cern.c2mon.server.configuration.parser.tasks.util.TaskOrder;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
-import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
-import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.alarm.AlarmCondition;
-import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
-import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
-import cern.c2mon.shared.client.configuration.api.process.Process;
-import cern.c2mon.shared.client.configuration.api.tag.*;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationObject;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
@@ -59,31 +53,12 @@ public class SequenceTaskFactory {
 
   private static final Logger log = LoggerFactory.getLogger(SequenceTaskFactory.class);
 
-  private ProcessCache processCache;
-  private EquipmentCache equipmentCache;
-  private SubEquipmentCache subEquipmentCache;
-  private ControlTagCache controlTagCache;
-  private AliveTimerCache aliveTagCache;
-  private CommFaultTagCache commFaultTagCache;
-  private DataTagCache dataTagCache;
-  private RuleTagCache ruleTagCache;
-  private AlarmCache alarmCache;
-  private CommandTagCache commandTagCache;
+  private ConfigurationObjectTypeHandler typeChecker;
+
 
   @Autowired
-  public SequenceTaskFactory(ProcessCache processCache, EquipmentCache equipmentCache, SubEquipmentCache subEquipmentCache, ControlTagCache controlTagCache,
-                             AliveTimerCache aliveTagCache, CommFaultTagCache commFaultTagCache, DataTagCache dataTagCache, RuleTagCache ruleTagCache,
-                             AlarmCache alarmCache, CommandTagCache commandTagCache) {
-    this.processCache = processCache;
-    this.equipmentCache = equipmentCache;
-    this.subEquipmentCache = subEquipmentCache;
-    this.aliveTagCache = aliveTagCache;
-    this.commFaultTagCache = commFaultTagCache;
-    this.controlTagCache = controlTagCache;
-    this.dataTagCache = dataTagCache;
-    this.ruleTagCache = ruleTagCache;
-    this.alarmCache = alarmCache;
-    this.commandTagCache = commandTagCache;
+  public SequenceTaskFactory(ConfigurationObjectTypeHandler configurationObjectTypeHandler) {
+    this.typeChecker = configurationObjectTypeHandler;
   }
 
   /**
@@ -103,9 +78,53 @@ public class SequenceTaskFactory {
    * @param confObject Object which holds the Information to create a {@link SequenceTask}
    * @return SequenceTask based on the {@link ConfigurationObject}
    */
-  public SequenceTask createUpdateSequenceTask(ConfigurationObject confObject) {
-    return buildUpdateSequenceTask(confObject, confObject.getClass());
+  public <T extends ConfigurationObject> SequenceTask createUpdateSequenceTask(ConfigurationObject confObject) {
+    Class<T> clazz = (Class<T>) confObject.getClass();
+    T object = clazz.cast(confObject);
+
+    if (typeChecker.cacheHasId(object.getId(), clazz)) {
+
+      ConfigurationElement element = createSetupConfigurationElement(confObject, clazz);
+
+      return buildUpdateSequenceTask(element, object, clazz);
+
+    } else {
+      throw new ConfigurationParseException("Updating of " + clazz.getSimpleName() + " (id = " + object.getId() + ") failed: The object is unknown to the sever.");
+    }
   }
+
+  /**
+   * Takes a {@link ConfigurationObject} and the type of the object and creates a {@link SequenceTask}.
+   * The object must hold the information for a creation. Otherwise this method throw an exception which is than reported to the client.
+   *
+   * @param confObject Object which holds the Information to create a {@link SequenceTask}
+   * @return SequenceTask based on the {@link ConfigurationObject}
+   */
+  public <T extends ConfigurationObject> SequenceTask createCreateSequenceTask(ConfigurationObject confObject) {
+    Class<T> clazz = (Class<T>) confObject.getClass();
+    T object = clazz.cast(confObject);
+
+    ConfigurationElement element = createSetupConfigurationElement(confObject, clazz);
+
+    return buildCreateSequenceTask(element, object);
+  }
+
+  /**
+   * Takes a {@link ConfigurationObject} and the type of the object and creates a {@link SequenceTask}.
+   * The object must hold the information for a creation. Otherwise this method throw an exception which is than reported to the client.
+   *
+   * @param confObject Object which holds the Information to create a {@link SequenceTask}
+   * @return SequenceTask based on the {@link ConfigurationObject}
+   */
+  public <T extends ConfigurationObject> SequenceTask createDeleteSequenceTask(ConfigurationObject confObject) {
+    Class<T> clazz = (Class<T>) confObject.getClass();
+    T obj = clazz.cast(confObject);
+
+    ConfigurationElement element = createSetupConfigurationElement(confObject, clazz);
+
+    return buildDeleteSequenceTask(element, obj);
+  }
+
 
   /**
    * Build a {@link SequenceTask} based on the information of the {@link ConfigurationObject}.
@@ -119,75 +138,80 @@ public class SequenceTaskFactory {
    * only serves as empty container.
    */
   private <T extends ConfigurationObject> SequenceTask buildSequenceTask(ConfigurationObject confObj, Class<T> clazz) {
-    ConfigurationElement element = new ConfigurationElement();
-    TaskOrder order;
-    Properties properties = new Properties();
-    //downcast the confObj to the actual type
-    T obj = clazz.cast(confObj);
+    SequenceTask result;
 
-    // set basic information of the ConfigurationElement, based on the type of the confObj
-    element.setEntity(getEntity(clazz));
-    element.setEntityId(confObj.getId());
-    element.setSequenceId(-1l);
+    ConfigurationElement element = createSetupConfigurationElement(confObj, clazz);
+
+    // downcast the confObj to the actual type
+    T object = clazz.cast(confObj);
 
     // receive the properties information out of the confObj
     // check if the the ConfigurationObject holds the information to delete a instance
-    if (obj.isDeleted()) {
-      element.setAction(Action.REMOVE);
-      order = getDeleteTaskOrder(obj);
+    if (object.isDeleted()) {
+
+      result = buildDeleteSequenceTask(element, object);
+
     } else {
 
       // if the tag already exists try to create a update
-      if (cacheHasId(obj.getId(), clazz)) {
-        element.setAction(Action.UPDATE);
-        order = getUpdateTaskOrder(obj);
-        properties = extractPropertiesFromField(obj, clazz);
+      if (typeChecker.cacheHasId(object.getId(), clazz)) {
+
+        result = buildUpdateSequenceTask(element, object, clazz);
+
       } else {
 
-        // look if all fields are given to crate a new instance
-        if (obj.requiredFieldsGiven()) {
-          element.setAction(Action.CREATE);
-          order = getCreateTaskOrder(obj);
-          properties = extractPropertiesFromField(obj, obj.getClass());
-          setDefaultValues(properties, obj);
-        } else {
-          throw new ConfigurationParseException("Creating " + clazz.getSimpleName() + " (id = " + obj.getId() + ") failed. Not enough arguments.");
-        }
+        result = buildCreateSequenceTask(element, object);
       }
     }
 
-    // put the received properties from the confObj into the ConfigurationElement
-    element.setElementProperties(properties);
+    return result;
+  }
 
-    // checks if the property have some information.
-    // if not the ConfigurationObject served as shell object for a underlying ConfigurationObject
-    if (properties.isEmpty() && !element.getAction().equals(Action.REMOVE)) {
-      return null;
+  //===========================================================================
+  // separate parser methods (create, delete, update)
+  //===========================================================================
+
+  private <T extends ConfigurationObject> SequenceTask buildCreateSequenceTask(ConfigurationElement element, T object) {
+
+    Properties properties;
+    TaskOrder order;
+    Long objectId = object.getId();
+
+    // check if the id ist set. If not set it automatically
+    if (objectId == null) {
+      objectId = typeChecker.getAutoGeneratedId(object);
+
+      object.setId(objectId);
+      element.setEntityId(objectId);
+    }
+
+    if (typeChecker.cacheHasId(objectId, object.getClass())) {
+      throw new IllegalArgumentException("Error while parsing a 'create' Configuration:" +
+          " Id " + objectId + " of the class "+object.getClass().getSimpleName()+" already known to the server");
+    }
+
+    // parsing of the object parameters
+    if (object.requiredFieldsGiven()) {
+
+      element.setAction(Action.CREATE);
+      order = typeChecker.getCreateTaskOrder(object);
+      properties = extractPropertiesFromField(object, object.getClass());
+      setDefaultValues(properties, object);
+
+      element.setElementProperties(properties);
+
+      return typeChecker.buildTaskInstance(element, order, object.getClass());
+
     } else {
-      return buildTaskInstance(element, order, clazz);
+      throw new ConfigurationParseException("Creating " + object.getClass().getSimpleName() + " (id = " + object.getId() + ") failed: Not enough arguments.");
     }
   }
 
+  private <T extends ConfigurationObject> SequenceTask buildUpdateSequenceTask(ConfigurationElement element, T object, final Class<T> clazz) {
 
-  private <T extends ConfigurationObject> SequenceTask buildUpdateSequenceTask(ConfigurationObject object, Class<T> clazz){
-    ConfigurationElement element = new ConfigurationElement();
-    TaskOrder order;
-    Properties properties = new Properties();
-    //downcast the confObj to the actual type
-    T obj = clazz.cast(object);
-
-    // set basic information of the ConfigurationElement, based on the type of the confObj
-    element.setEntity(getEntity(clazz));
-    element.setEntityId(obj.getId());
-    element.setSequenceId(-1l);
-
-    if (cacheHasId(obj.getId(), clazz)) {
-      element.setAction(Action.UPDATE);
-      order = getUpdateTaskOrder(obj);
-      properties = extractPropertiesFromField(obj, clazz);
-    } else {
-      throw new ConfigurationParseException("Updating of" + clazz.getSimpleName() + " (id = " + obj.getId() + ") failed. The object is unknown to the sever.");
-    }
+    element.setAction(Action.UPDATE);
+    TaskOrder order = typeChecker.getUpdateTaskOrder(object);
+    Properties properties = extractPropertiesFromField(object, clazz);
 
     // put the received properties from the confObj into the ConfigurationElement
     element.setElementProperties(properties);
@@ -195,9 +219,42 @@ public class SequenceTaskFactory {
     if (properties.isEmpty()) {
       return null;
     } else {
-      return buildTaskInstance(element, order, clazz);
+      return typeChecker.buildTaskInstance(element, order, clazz);
     }
   }
+
+  /**
+   * Build a {@link SequenceTask} which holds all information for deleting a object of the server.
+   * Only call this method if the @param object isDelete method resolves true.
+   *
+   * @param element The predefined Configuration Element for the server configuration.
+   * @param object  the configuration objects which holds all information for the {@link ConfigurationElement}
+   * @param <T>     The type of the ConfigurationObject.
+   * @return the Sequence Task for deleting.
+   */
+  private <T extends ConfigurationObject> SequenceTask buildDeleteSequenceTask(ConfigurationElement element, T object) {
+
+    Properties properties = new Properties();
+    TaskOrder order;
+
+
+    if (typeChecker.cacheHasId(object.getId(), object.getClass())) {
+
+      element.setAction(Action.REMOVE);
+      order = typeChecker.getDeleteTaskOrder(object);
+
+      element.setElementProperties(properties);
+
+    } else {
+      throw new ConfigurationParseException("Deleting of " + object.getClass().getSimpleName() + " (id = " + object.getId() + ") failed: The object is unknown to the sever.");
+    }
+
+    return typeChecker.buildTaskInstance(element, order, object.getClass());
+  }
+
+  //===========================================================================
+  // parsing helper methods
+  //===========================================================================
 
   /**
    * Extract all data from the given POJO {@link ConfigurationObject} to a {@link Properties} object.
@@ -305,6 +362,7 @@ public class SequenceTaskFactory {
 
           // extract all default values from fields which Type is no enum
           if (field.getType().getEnumConstants() == null) {
+
             properties.setProperty(field.getName(), field.getType().getDeclaredConstructor(String.class).newInstance(field.getAnnotation(DefaultValue.class)
                 .value()).toString());
 
@@ -328,205 +386,18 @@ public class SequenceTaskFactory {
     return properties;
   }
 
-  /**
-   * Checks the corresponding cache of a given ConfigurationObject class if a instance with the id already exists.
-   *
-   * @param id    id which is checked in the cache if its already there.
-   * @param klass class type of a {@link ConfigurationObject}
-   * @return boolean value if the id exists in the cache
-   */
-  private <T extends ConfigurationObject> boolean cacheHasId(long id, Class<T> klass) {
-    if (klass.equals(Process.class)) {
-      return processCache.hasKey(id);
-    }
-    if (klass.equals(Equipment.class)) {
-      return equipmentCache.hasKey(id);
-    }
-    if (klass.equals(SubEquipment.class)) {
-      return subEquipmentCache.hasKey(id);
-    }
-    if (klass.equals(AliveTag.class)) {
-      return aliveTagCache.hasKey(id);
-    }
-    if (klass.equals(CommFaultTag.class)) {
-      return commFaultTagCache.hasKey(id);
-    }
-    if (klass.equals(StatusTag.class)) {
-      return controlTagCache.hasKey(id);
-    }
-    if (klass.equals(DataTag.class)) {
-      return dataTagCache.hasKey(id);
-    }
-    if (klass.equals(RuleTag.class)) {
-      return ruleTagCache.hasKey(id);
-    }
-    if (klass.equals(Alarm.class)) {
-      return alarmCache.hasKey(id);
-    }
-    if (klass.equals(CommandTag.class)) {
-      return commandTagCache.hasKey(id);
-    }
+  //===========================================================================
+  // other helper methods
+  //===========================================================================
 
-    throw new IllegalArgumentException("No Cache for the Instances of class " + klass + " given");
+  private <T extends ConfigurationObject> ConfigurationElement createSetupConfigurationElement(ConfigurationObject confObj, Class<T> clazz) {
+    ConfigurationElement element = new ConfigurationElement();
+
+    // set basic information of the ConfigurationElement, based on the type of the confObj
+    element.setEntity(typeChecker.getEntity(clazz));
+    element.setEntityId(confObj.getId());
+    element.setSequenceId(-1L);
+
+    return element;
   }
-
-  /**
-   * Retreives a {@link Entity} object based on the class type of a a {@link ConfigurationObject}
-   *
-   * @param klass type of the class
-   * @param <T>   generic type
-   * @return {@link Entity} instance based on the class type
-   */
-  private <T extends ConfigurationObject> Entity getEntity(Class<T> klass) {
-    if (klass.equals(Process.class)) {
-      return Entity.PROCESS;
-    }
-    if (klass.equals(Equipment.class)) {
-      return Entity.EQUIPMENT;
-    }
-    if (klass.equals(SubEquipment.class)) {
-      return Entity.SUBEQUIPMENT;
-    }
-    if (klass.equals(CommFaultTag.class) || klass.equals(AliveTag.class) || klass.equals(StatusTag.class)) {
-      return Entity.CONTROLTAG;
-    }
-    if (klass.equals(DataTag.class)) {
-      return Entity.DATATAG;
-    }
-    if (klass.equals(RuleTag.class)) {
-      return Entity.RULETAG;
-    }
-    if (klass.equals(Alarm.class)) {
-      return Entity.ALARM;
-    }
-    if (klass.equals(CommandTag.class)) {
-      return Entity.COMMANDTAG;
-    }
-
-    throw new IllegalArgumentException("No Entity for the Instances of class " + klass + " given");
-  }
-
-  /**
-   * Method to build a SequenceTask.
-   *
-   * @param element {@link ConfigurationElement} which is wrapped in the instance of the SequenceTask.
-   * @param order   Order of the ConfigurationElement.
-   * @param klass   Type of a {@link ConfigurationObject} which the defines the {@link ConfigurationElement} in the SequenceTask
-   * @param <T>     generic type
-   * @return Instance of the SequenceTask
-   */
-  private <T extends ConfigurationObject> SequenceTask buildTaskInstance(ConfigurationElement element, TaskOrder order, Class<T> klass) {
-    if (!(klass.equals(Alarm.class) || klass.equals(SubEquipment.class) || klass.equals(Equipment.class) || klass.equals(Process.class)
-        || klass.equals(AliveTag.class) || klass.equals(CommFaultTag.class) || klass.equals(StatusTag.class) || klass.equals(RuleTag.class)
-        || klass.equals(DataTag.class) || klass.equals(CommandTag.class))) {
-
-      throw new IllegalArgumentException("Not possible to create a SequenceTask object with the ConfigurationElement " + klass + ".");
-    }
-
-    return new SequenceTask(element, order);
-  }
-
-
-  /**
-   * get the Order of a {@link ConfigurationObject} related to deleting
-   *
-   * @param object {@link ConfigurationObject} which determine the order to the {@link SequenceTask}
-   * @return Order which will be added to a instance of {@link SequenceTask}
-   */
-  private TaskOrder getDeleteTaskOrder(ConfigurationObject object) {
-    if (object instanceof Process) {
-      return TaskOrder.PROCESS_DELETE;
-    }
-    if (object instanceof SubEquipment) {
-      return TaskOrder.SUBEQUIPMENT_DELETE;
-    }
-    if (object instanceof Equipment) {
-      return TaskOrder.EQUIPMENT_DELETE;
-    }
-    if (object instanceof Alarm) {
-      return TaskOrder.ALARM_DELETE;
-    }
-    if (object instanceof ControlTag) {
-      return TaskOrder.CONTROLTAG_DELETE;
-    }
-    if (object instanceof RuleTag) {
-      return TaskOrder.RULETAG_DELETE;
-    }
-    if (object instanceof DataTag) {
-      return TaskOrder.DATATAG_DELETE;
-    }
-    if (object instanceof CommandTag) {
-      return TaskOrder.COMMANDTAG_DELETE;
-    }
-    return null;
-  }
-
-  /**
-   * get the Order of a {@link ConfigurationObject} related to updating
-   *
-   * @param object {@link ConfigurationObject} which determine the order to the {@link SequenceTask}
-   * @return Order which will be added to a instance of {@link SequenceTask}
-   */
-  private TaskOrder getUpdateTaskOrder(ConfigurationObject object) {
-    if (object instanceof Process) {
-      return TaskOrder.PROCESS_UPDATE;
-    }
-    if (object instanceof SubEquipment) {
-      return TaskOrder.SUBEQUIPMENT_UPDATE;
-    }
-    if (object instanceof Equipment) {
-      return TaskOrder.EQUIPMENT_UPDATE;
-    }
-    if (object instanceof Alarm) {
-      return TaskOrder.ALARM_UPDATE;
-    }
-    if (object instanceof ControlTag) {
-      return TaskOrder.CONTROLTAG_UPDATE;
-    }
-    if (object instanceof RuleTag) {
-      return TaskOrder.RULETAG_UPDATE;
-    }
-    if (object instanceof DataTag) {
-      return TaskOrder.DATATAG_UPDATE;
-    }
-    if (object instanceof CommandTag) {
-      return TaskOrder.COMMANDTAG_UPDATE;
-    }
-    return null;
-  }
-
-  /**
-   * get the Order of a {@link ConfigurationObject} related to creating
-   *
-   * @param object {@link ConfigurationObject} which determine the order to the {@link SequenceTask}
-   * @return Order which will be added to a instance of {@link SequenceTask}
-   */
-  private TaskOrder getCreateTaskOrder(ConfigurationObject object) {
-    if (object instanceof Process) {
-      return TaskOrder.PROCESS_CREATE;
-    }
-    if (object instanceof SubEquipment) {
-      return TaskOrder.SUBEQUIPMENT_CREATE;
-    }
-    if (object instanceof Equipment) {
-      return TaskOrder.EQUIPMENT_CREATE;
-    }
-    if (object instanceof Alarm) {
-      return TaskOrder.ALARM_CREATE;
-    }
-    if (object instanceof ControlTag) {
-      return TaskOrder.CONTROLTAG_CREATE;
-    }
-    if (object instanceof RuleTag) {
-      return TaskOrder.RULETAG_CREATE;
-    }
-    if (object instanceof DataTag) {
-      return TaskOrder.DATATAG_CREATE;
-    }
-    if (object instanceof CommandTag) {
-      return TaskOrder.COMMANDTAG_CREATE;
-    }
-    return null;
-  }
-
 }

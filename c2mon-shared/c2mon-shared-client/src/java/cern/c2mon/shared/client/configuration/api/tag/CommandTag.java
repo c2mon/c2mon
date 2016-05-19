@@ -1,26 +1,25 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration.api.tag;
 
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
-import cern.c2mon.shared.common.metadata.Metadata;
-import cern.c2mon.shared.client.configuration.api.util.DataType;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.metadata.Metadata;
 import lombok.*;
 
 import java.util.List;
@@ -82,7 +81,7 @@ public class CommandTag extends Tag {
   /**
    * Expected data type for the tag's value
    */
-  private DataType dataType;
+  private String dataType;
 
   /**
    * Hardware address of the CommandTag. The Hardware address is required by the data source to actually execute the
@@ -92,11 +91,11 @@ public class CommandTag extends Tag {
   private HardwareAddress hardwareAddress;
 
   @Builder
-  protected CommandTag(boolean deleted, Long id, String name, String description, DataType dataType, TagMode mode, @Singular List<Alarm> alarms
+  protected CommandTag(boolean deleted, Long id, String name, String description, Class<?> dataType, TagMode mode, @Singular List<Alarm> alarms
       , Integer clientTimeout, Integer execTimeout, Integer sourceTimeout, Integer sourceRetries, String rbacClass, String rbacDevice, String rbacProperty,
                     HardwareAddress hardwareAddress, Metadata metadata) {
     super(deleted, id, name, description, mode, alarms, metadata);
-    this.dataType = dataType;
+    this.dataType = dataType!= null ? dataType.getName() : null;
     this.clientTimeout = clientTimeout;
     this.execTimeout = execTimeout;
     this.sourceTimeout = sourceTimeout;

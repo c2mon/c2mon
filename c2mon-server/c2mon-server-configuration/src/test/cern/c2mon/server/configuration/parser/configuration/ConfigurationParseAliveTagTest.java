@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -29,7 +29,6 @@ import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.tag.AliveTag;
 import org.easymock.EasyMock;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -89,7 +88,6 @@ public class ConfigurationParseAliveTagTest {
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(aliveTagCache.hasKey(1L)).andReturn(true);
 
-
     // Switch to replay mode
     EasyMock.replay(processCache);
     EasyMock.replay(aliveTagCache);
@@ -109,7 +107,7 @@ public class ConfigurationParseAliveTagTest {
   public void aliveTagUpdate_notExistingInstance() {
     // Setup Exception
     aliveTagUpdate.expect(ConfigurationParseException.class);
-    aliveTagUpdate.expectMessage("Creating AliveTag (id = 1) failed. Not enough arguments.");
+    aliveTagUpdate.expectMessage("Creating AliveTag (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<AliveTag,Properties> pair = buildUpdateAliveTagWithSomeFields(1l);
@@ -117,8 +115,8 @@ public class ConfigurationParseAliveTagTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1L)).andReturn(true).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache);
@@ -195,16 +193,16 @@ public class ConfigurationParseAliveTagTest {
   public void aliveTagCreate_withNoFields() {
     // Setup Exception
     aliveTagCreate.expect(ConfigurationParseException.class);
-    aliveTagCreate.expectMessage("Creating AliveTag (id = 1) failed. Not enough arguments.");
+    aliveTagCreate.expectMessage("Creating AliveTag (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Configuration configuration = getConfBuilderAliveTagP(buildAliveTagWtihId(1L)._1);
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(controlTagCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(controlTagCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache,controlTagCache ,aliveTagCache);
@@ -224,9 +222,9 @@ public class ConfigurationParseAliveTagTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(controlTagCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(controlTagCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache,controlTagCache ,aliveTagCache);
@@ -248,7 +246,7 @@ public class ConfigurationParseAliveTagTest {
   @Test
   public void aliveTagCreate_withNotExistingSupClass() {
     aliveTagCreate.expect(ConfigurationParseException.class);
-    aliveTagCreate.expectMessage("Creating Process (id = 1) failed. Not enough arguments.");
+    aliveTagCreate.expectMessage("Creating Process (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<AliveTag,Properties> pair = buildAliveTagWithPrimFields(1l);
@@ -256,7 +254,7 @@ public class ConfigurationParseAliveTagTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache);
@@ -276,9 +274,9 @@ public class ConfigurationParseAliveTagTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(controlTagCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(controlTagCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache,controlTagCache ,aliveTagCache);
@@ -305,9 +303,9 @@ public class ConfigurationParseAliveTagTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(controlTagCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(controlTagCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache,controlTagCache ,aliveTagCache);

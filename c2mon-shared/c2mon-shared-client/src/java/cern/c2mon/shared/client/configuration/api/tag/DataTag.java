@@ -16,15 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration.api.tag;
 
-import java.util.List;
-
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
-import cern.c2mon.shared.common.metadata.Metadata;
-import cern.c2mon.shared.client.configuration.api.util.DataType;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.metadata.Metadata;
 import lombok.*;
+
+import java.util.List;
 
 /**
  * Configuration object for a DataTag.
@@ -81,7 +80,7 @@ public class DataTag extends Tag {
   /**
    * Expected data type for the tag's value
    */
-  private DataType dataType;
+  private String dataType;
 
   /**
    * Indicates whether this tag's value changes shall be logged to the
@@ -111,10 +110,10 @@ public class DataTag extends Tag {
    * @param japcAddress Defines the japcAddress of the DataTag which belongs to this configuration.
    */
   @Builder
-  public DataTag(boolean deleted, Long id, String name, String description, DataType dataType, TagMode mode, @Singular List<Alarm> alarms,
+  public DataTag(boolean deleted, Long id, String name, String description, Class<?> dataType, TagMode mode, @Singular List<Alarm> alarms,
                  Boolean isLogged, String unit, Number minValue, Number maxValue, DataTagAddress address, String dipAddress, String japcAddress, Metadata metadata) {
     super(deleted, id, name, description, mode, alarms, metadata);
-    this.dataType = dataType;
+    this.dataType = dataType != null ? dataType.getName() : null;
     this.minValue = minValue;
     this.maxValue = maxValue;
     this.address = address;
@@ -129,7 +128,147 @@ public class DataTag extends Tag {
 
   @Override
   public boolean requiredFieldsGiven() {
-    return super.requiredFieldsGiven() && (getDataType() != null);
+    return super.requiredFieldsGiven() && (dataType != null);
   }
 
+  public static CreateBuilder create(String name, Class dataType, DataTagAddress address) {
+
+    DataTag iniTag = DataTag.builder().name(name).dataType(dataType).address(address).build();
+
+    return iniTag.toCreateBuilder(iniTag);
+  }
+
+  public static UpdateBuilder update(Long id) {
+
+    DataTag iniTag = DataTag.builder().id(id).build();
+
+    return iniTag.toUpdateBuilder(iniTag);
+  }
+
+  public static UpdateBuilder update(String name) {
+
+    DataTag iniTag = DataTag.builder().name(name).build();
+
+    return iniTag.toUpdateBuilder(iniTag);
+  }
+
+  private DataTag.CreateBuilder toCreateBuilder(DataTag initializationTag) {
+    return new CreateBuilder(initializationTag);
+  }
+
+  private UpdateBuilder toUpdateBuilder(DataTag initializationTag) {
+    return new UpdateBuilder(initializationTag);
+  }
+
+
+  public static class CreateBuilder {
+
+    private DataTag builderTag;
+
+    CreateBuilder(DataTag initializationTag) {
+      this.builderTag = initializationTag;
+    }
+
+    public DataTag.CreateBuilder id(Long id) {
+      this.builderTag.setId(id);
+      return this;
+    }
+
+    public DataTag.CreateBuilder description(String description) {
+      this.builderTag.setDescription(description);
+      return this;
+    }
+
+    public DataTag.CreateBuilder unit(String unit) {
+      this.builderTag.setUnit(unit);
+      return this;
+    }
+
+    public DataTag.CreateBuilder mode(TagMode mode) {
+      this.builderTag.setMode(mode);
+      return this;
+    }
+
+    public DataTag.CreateBuilder isLogged(Boolean isLogged) {
+      this.builderTag.setIsLogged(isLogged);
+      return this;
+    }
+
+    public DataTag.CreateBuilder minValue(Number minValue) {
+      this.builderTag.setMinValue(minValue);
+      return this;
+    }
+
+    public DataTag.CreateBuilder maxValue(Number maxValue) {
+      this.builderTag.setMaxValue(maxValue);
+      return this;
+    }
+
+    public DataTag.CreateBuilder metadata(Metadata metadata) {
+      this.builderTag.setMetadata(metadata);
+      return this;
+    }
+
+    public DataTag build() {
+
+      builderTag.setCreate(true);
+      return  this.builderTag;
+    }
+
+  }
+
+  public static class UpdateBuilder {
+
+    private DataTag builderTag;
+
+    UpdateBuilder(DataTag initializationTag) {
+      this.builderTag = initializationTag;
+    }
+
+    public DataTag.UpdateBuilder name(String name) {
+      this.builderTag.setName(name);
+      return this;
+    }
+
+    public DataTag.UpdateBuilder mode(TagMode mode) {
+      this.builderTag.setMode(mode);
+      return this;
+    }
+
+    public DataTag.UpdateBuilder isLogged(Boolean isLogged) {
+      this.builderTag.setIsLogged(isLogged);
+      return this;
+    }
+
+    public DataTag.UpdateBuilder minValue(Number minValue) {
+      this.builderTag.setMinValue(minValue);
+      return this;
+    }
+
+    public DataTag.UpdateBuilder maxValue(Number maxValue) {
+      this.builderTag.setMaxValue(maxValue);
+      return this;
+    }
+
+    public DataTag.UpdateBuilder address(DataTagAddress address) {
+      this.builderTag.setAddress(address);
+      return this;
+    }
+
+    public DataTag.UpdateBuilder metadata(Metadata metadata) {
+      this.builderTag.setMetadata(metadata);
+      return this;
+    }
+
+    public DataTag.UpdateBuilder description(String description) {
+      this.builderTag.setDescription(description);
+      return this;
+    }
+
+    public DataTag build() {
+
+      builderTag.setUpdate(true);
+      return this.builderTag;
+    }
+  }
 }

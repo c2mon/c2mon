@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -37,6 +37,24 @@ import lombok.Singular;
 @Data
 public abstract class Tag implements ConfigurationObject {
 
+  @IgnoreProperty
+  private boolean update = false;
+
+  @IgnoreProperty
+  private boolean create = false;
+
+  /**
+   * The id of the overlying Object. This field should never set by the user directly.
+   */
+  @IgnoreProperty
+  private Long parentId;
+
+  /**
+   * The name of the overlying Object. This field should never set by the user directly.
+   */
+  @IgnoreProperty
+  private String parentName;
+
   /**
    * determine if the instance of this class defines a DELETE command
    */
@@ -58,6 +76,7 @@ public abstract class Tag implements ConfigurationObject {
   /**
    * Free-text description of the tag
    */
+  @DefaultValue("")
   private String description;
 
   /**
@@ -81,7 +100,7 @@ public abstract class Tag implements ConfigurationObject {
   public Tag(boolean deleted, Long id, String name, String description, TagMode mode, @Singular List<Alarm> alarms, Metadata metadata) {
     super();
     this.deleted = deleted;
-    this.id = id;
+    this.id = id ;
     this.name = name;
     this.description = description;
     this.mode = mode;
@@ -99,7 +118,7 @@ public abstract class Tag implements ConfigurationObject {
    */
   @Override
   public boolean requiredFieldsGiven() {
-    return (getId() != null) && (getName() != null) && (description != null);
+    return (getId() != null) && (getName() != null);
   }
 
 }

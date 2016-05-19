@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- *
+ * <p/>
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- *
+ * <p/>
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- *
+ * <p/>
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -53,7 +53,7 @@ import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:cern/c2mon/server/configuration/config/server-configuration-parser-test.xml" })
+@ContextConfiguration({"classpath:cern/c2mon/server/configuration/config/server-configuration-parser-test.xml"})
 public class ConfigurationParseDataTagTest {
 
   @Autowired
@@ -115,7 +115,7 @@ public class ConfigurationParseDataTagTest {
   public void dataTagUpdate_notExistingInstance() {
     // Setup Exception
     dataTagUpdate.expect(ConfigurationParseException.class);
-    dataTagUpdate.expectMessage("Creating DataTag (id = 1) failed. Not enough arguments.");
+    dataTagUpdate.expectMessage("Creating DataTag (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<DataTag, Properties> pair = buildUpdateDataTagWithSomeFields(1l);
@@ -125,7 +125,7 @@ public class ConfigurationParseDataTagTest {
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(dataTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(dataTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, dataTagCache);
@@ -264,7 +264,7 @@ public class ConfigurationParseDataTagTest {
   public void dataTagCreate_withNoFields() {
     // Setup Exception
     dataTagCreate.expect(ConfigurationParseException.class);
-    dataTagCreate.expectMessage("Creating DataTag (id = 1) failed. Not enough arguments.");
+    dataTagCreate.expectMessage("Creating DataTag (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Configuration configuration = getConfBuilderDataTagE(buildDataTagWithId(1L)._1);
@@ -273,7 +273,7 @@ public class ConfigurationParseDataTagTest {
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(dataTagCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(dataTagCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, dataTagCache);
@@ -297,7 +297,7 @@ public class ConfigurationParseDataTagTest {
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(dataTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(dataTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, dataTagCache);
@@ -321,7 +321,7 @@ public class ConfigurationParseDataTagTest {
   @Test
   public void dataTagCreate_withNotExistingSupClass() {
     dataTagCreate.expect(ConfigurationParseException.class);
-    dataTagCreate.expectMessage("Creating Process (id = 1) failed. Not enough arguments.");
+    dataTagCreate.expectMessage("Creating Process (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<DataTag, Properties> pair = buildDataTagWithPrimFields(1l);
@@ -329,7 +329,7 @@ public class ConfigurationParseDataTagTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache);
@@ -351,7 +351,7 @@ public class ConfigurationParseDataTagTest {
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(dataTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(dataTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, dataTagCache);
@@ -382,7 +382,7 @@ public class ConfigurationParseDataTagTest {
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(dataTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(dataTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, dataTagCache);
@@ -419,11 +419,11 @@ public class ConfigurationParseDataTagTest {
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
 
-    EasyMock.expect(dataTagCache.hasKey(1l)).andReturn(false);
-    EasyMock.expect(dataTagCache.hasKey(2l)).andReturn(false);
-    EasyMock.expect(dataTagCache.hasKey(3l)).andReturn(false);
-    EasyMock.expect(dataTagCache.hasKey(4l)).andReturn(false);
-    EasyMock.expect(dataTagCache.hasKey(5l)).andReturn(false);
+    EasyMock.expect(dataTagCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(dataTagCache.hasKey(2l)).andReturn(false).times(2);
+    EasyMock.expect(dataTagCache.hasKey(3l)).andReturn(false).times(2);
+    EasyMock.expect(dataTagCache.hasKey(4l)).andReturn(false).times(2);
+    EasyMock.expect(dataTagCache.hasKey(5l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, dataTagCache);
@@ -468,9 +468,8 @@ public class ConfigurationParseDataTagTest {
   @Test
   public void dataTagDelete_NotExistingInstance() {
     // Setup Exception
-    // dataTagDelete.expect(ConfigurationParseException.class);
-    // dataTagDelete.expectMessage("Deleting DataTag 1 failed.
-    // DataTag do not exist in the cache.");
+    dataTagDelete.expect(ConfigurationParseException.class);
+    dataTagDelete.expectMessage("Deleting of DataTag (id = 1) failed: The object is unknown to the sever.");
 
     // Setup Configuration Instance
     DataTag dataTag = buildDeleteDataTag(1l);
@@ -480,11 +479,10 @@ public class ConfigurationParseDataTagTest {
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
-    // EasyMock.expect(dataTagCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(dataTagCache.hasKey(1L)).andReturn(false);
 
     // Switch to replay mode
-    EasyMock.replay(processCache, equipmentCache);
-    // EasyMock.replay(dataTagCache);
+    EasyMock.replay(processCache, equipmentCache, dataTagCache);
 
     // Run the code to be tested
     List<ConfigurationElement> elements = configurationParser.parse(configuration);
@@ -496,8 +494,7 @@ public class ConfigurationParseDataTagTest {
     assertTrue(elements.get(0).getAction().equals(Action.REMOVE));
 
     // Verify mock methods were called
-    EasyMock.verify(processCache);
-    EasyMock.verify(equipmentCache);
+    EasyMock.verify(processCache, equipmentCache, dataTagCache);
   }
 
   /**
@@ -514,10 +511,10 @@ public class ConfigurationParseDataTagTest {
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
+    EasyMock.expect(dataTagCache.hasKey(1L)).andReturn(true);
 
     // Switch to replay mode
-    EasyMock.replay(processCache, equipmentCache );
-    // EasyMock.replay(dataTagCache);
+    EasyMock.replay(processCache, equipmentCache, dataTagCache);
 
     // Run the code to be tested
     List<ConfigurationElement> elements = configurationParser.parse(configuration);
@@ -529,8 +526,7 @@ public class ConfigurationParseDataTagTest {
     assertTrue(elements.get(0).getAction().equals(Action.REMOVE));
 
     // Verify mock methods were called
-    EasyMock.verify(processCache);
-    EasyMock.verify(equipmentCache);
+    EasyMock.verify(processCache, equipmentCache, dataTagCache);
   }
 
   @Test
@@ -547,7 +543,8 @@ public class ConfigurationParseDataTagTest {
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
 
     EasyMock.expect(dataTagCache.hasKey(2L)).andReturn(true);
-    EasyMock.expect(dataTagCache.hasKey(3L)).andReturn(false);
+    EasyMock.expect(dataTagCache.hasKey(3L)).andReturn(false).times(2);
+    EasyMock.expect(dataTagCache.hasKey(1L)).andReturn(true);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, dataTagCache);

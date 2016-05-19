@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -27,7 +27,6 @@ import java.util.Properties;
 import cern.c2mon.server.cache.AliveTimerCache;
 import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
-import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Rule;
@@ -112,7 +111,7 @@ public class ConfigurationParseProcessTest {
   public void processUpdate_notExistingInstance() {
     // Setup Exception
     processUpdate.expect(ConfigurationParseException.class);
-    processUpdate.expectMessage("Creating Process (id = 1) failed. Not enough arguments.");
+    processUpdate.expectMessage("Creating Process (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<Process,Properties> pair = buildUpdateProcessWtihSomeFields(1l);
@@ -120,7 +119,7 @@ public class ConfigurationParseProcessTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache);
@@ -240,14 +239,14 @@ public class ConfigurationParseProcessTest {
   public void processCreate_withNoFields() {
     // Setup Exception
     processCreate.expect(ConfigurationParseException.class);
-    processCreate.expectMessage("Creating Process (id = 1) failed. Not enough arguments.");
+    processCreate.expectMessage("Creating Process (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Configuration configuration = getConfBuilderProcess(buildProcessWtihId(1L)._1);
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache);
@@ -267,9 +266,9 @@ public class ConfigurationParseProcessTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1l)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache,statusTagCache, aliveTagCache);
@@ -296,9 +295,9 @@ public class ConfigurationParseProcessTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1l)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, statusTagCache, aliveTagCache);
@@ -325,9 +324,9 @@ public class ConfigurationParseProcessTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1l)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, statusTagCache, aliveTagCache);
@@ -359,25 +358,25 @@ public class ConfigurationParseProcessTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1l)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
-    EasyMock.expect(processCache.hasKey(2l)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(2l)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
-    EasyMock.expect(processCache.hasKey(3l)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(3l)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
-    EasyMock.expect(processCache.hasKey(4l)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(4l)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
-    EasyMock.expect(processCache.hasKey(5l)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(5l)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, statusTagCache, aliveTagCache);
@@ -429,7 +428,7 @@ public class ConfigurationParseProcessTest {
     // Setup Mock
     // Set expectations
     EasyMock.expect(processCache.hasKey(0l)).andReturn(true);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache,aliveTagCache);
@@ -445,8 +444,8 @@ public class ConfigurationParseProcessTest {
   @Test
   public void processDelete_NotExistingInstance() {
     // Setup Exception
-//    processDelete.expect(ConfigurationParseException.class);
-//    processDelete.expectMessage("Deleting Process 1 failed. Process do not exist in the cache.");
+    processDelete.expect(ConfigurationParseException.class);
+    processDelete.expectMessage("Deleting of Process (id = 1) failed: The object is unknown to the sever.");
 
     // Setup Configuration Instance
     Process process = buildDeleteProcess(1l);
@@ -454,10 +453,10 @@ public class ConfigurationParseProcessTest {
 
     // Setup Mock
     // Set expectations
-//    EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
 
     // Switch to replay mode
-//    EasyMock.replay(processCache);
+    EasyMock.replay(processCache);
 
     // Run the code to be tested
     List<ConfigurationElement> elements = configurationParser.parse(configuration);
@@ -469,7 +468,7 @@ public class ConfigurationParseProcessTest {
     assertTrue(elements.get(0).getAction().equals(Action.REMOVE));
 
     // Verify mock methods were called
-//    EasyMock.verify(processCache);
+    EasyMock.verify(processCache);
   }
 
   /**
@@ -484,10 +483,10 @@ public class ConfigurationParseProcessTest {
 
     // Setup Mock
     // Set expectations
-//    EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
+    EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
 
     // Switch to replay mode
-//    EasyMock.replay(processCache);
+    EasyMock.replay(processCache);
 
     // Run the code to be tested
     List<ConfigurationElement> elements = configurationParser.parse(configuration);
@@ -499,7 +498,7 @@ public class ConfigurationParseProcessTest {
     assertTrue(elements.get(0).getAction().equals(Action.REMOVE));
 
     // Verify mock methods were called
-//    EasyMock.verify(processCache);
+    EasyMock.verify(processCache);
   }
 
   @Test
@@ -513,9 +512,10 @@ public class ConfigurationParseProcessTest {
     // Setup Mock
     // Set expectations
     EasyMock.expect(processCache.hasKey(2L)).andReturn(true);
-    EasyMock.expect(processCache.hasKey(3L)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(3L)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(0l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(processCache.hasKey(1l)).andReturn(true);
 
     // Switch to replay mode
     EasyMock.replay(processCache, statusTagCache, aliveTagCache);

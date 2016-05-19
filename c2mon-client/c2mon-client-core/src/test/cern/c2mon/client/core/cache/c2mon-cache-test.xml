@@ -39,6 +39,7 @@
   </bean>
 
   <context:component-scan base-package="cern.c2mon.client.core.service"/>
+  <context:component-scan base-package="cern.c2mon.client.core.configuration"/>
   <context:annotation-config/>
 
   <bean id="tagManager" class="cern.c2mon.client.core.manager.TagManager">

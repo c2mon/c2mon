@@ -16,14 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.parser.util;
 
-import java.util.Properties;
-
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
-import cern.c2mon.shared.client.configuration.api.util.DataType;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
 import cern.c2mon.shared.common.metadata.Metadata;
+
+import java.util.Properties;
 
 //@Service
 public class ConfigurationDataTagUtil {
@@ -39,14 +38,14 @@ public class ConfigurationDataTagUtil {
         .name("DataTag")
         .description("foo")
         .mode(TagMode.OPERATIONAL)
-        .dataType(DataType.INTEGER)
+        .dataType(Integer.class)
         .build();
 
     Properties props = new Properties();
     props.setProperty("name", "DataTag");
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("dataType", DataType.INTEGER.toString());
+    props.setProperty("dataType", Integer.class.getName());
     props.setProperty("isLogged", String.valueOf(true));
     props.setProperty("equipmentId", String.valueOf(1l));
 
@@ -59,7 +58,7 @@ public class ConfigurationDataTagUtil {
         .name("DataTag")
         .description("foo")
         .mode(TagMode.OPERATIONAL)
-        .dataType(DataType.INTEGER)
+        .dataType(Integer.class)
         .isLogged(false)
         .minValue(0)
         .maxValue(10)
@@ -72,7 +71,7 @@ public class ConfigurationDataTagUtil {
     props.setProperty("name", "DataTag");
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("dataType", DataType.INTEGER.toString());
+    props.setProperty("dataType", Integer.class.getName());
     props.setProperty("isLogged", String.valueOf(false));
     props.setProperty("minValue", String.valueOf(0));
     props.setProperty("maxValue", String.valueOf(10));
@@ -89,14 +88,14 @@ public class ConfigurationDataTagUtil {
         .id(id)
         .name("DataTag")
         .description("foo")
-        .dataType(DataType.INTEGER)
+        .dataType(Integer.class)
         .build();
 
     Properties props = new Properties();
     props.setProperty("name", "DataTag");
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", DataType.INTEGER.toString());
+    props.setProperty("dataType", Integer.class.getName());
     props.setProperty("isLogged", String.valueOf(true));
     props.setProperty("equipmentId", String.valueOf(1l));
 
@@ -109,7 +108,7 @@ public class ConfigurationDataTagUtil {
         .name("DataTag_Update")
         .description("foo_Update")
         .mode(TagMode.OPERATIONAL)
-        .dataType(DataType.DOUBLE)
+        .dataType(Double.class)
         .isLogged(true)
         .minValue(1)
         .maxValue(11)
@@ -122,7 +121,7 @@ public class ConfigurationDataTagUtil {
     props.setProperty("name", "DataTag_Update");
     props.setProperty("description", "foo_Update");
     props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("dataType", DataType.DOUBLE.toString());
+    props.setProperty("dataType", Double.class.getName());
     props.setProperty("isLogged", String.valueOf(true));
     props.setProperty("minValue", String.valueOf(1));
     props.setProperty("maxValue", String.valueOf(11));
@@ -169,13 +168,13 @@ public class ConfigurationDataTagUtil {
         .name("DataTag")
         .description("foo")
         .mode(TagMode.OPERATIONAL)
-        .dataType(DataType.INTEGER);
+        .dataType(Integer.class);
 
     Properties props = new Properties();
     props.setProperty("name", "DataTag");
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("dataType", DataType.INTEGER.toString());
+    props.setProperty("dataType", Integer.class.getName());
     props.setProperty("isLogged", String.valueOf(true));
     switch(parent){
       case "equipment" : props.setProperty("equipmentId", String.valueOf(parentId)); break;
@@ -191,8 +190,7 @@ public class ConfigurationDataTagUtil {
         .id(id)
         .name("DataTag")
         .description("foo")
-        .mode(TagMode.OPERATIONAL)
-        .dataType(DataType.INTEGER)
+        .dataType(Integer.class)
         .isLogged(false)
         .minValue(0)
         .maxValue(10)
@@ -206,8 +204,8 @@ public class ConfigurationDataTagUtil {
     Properties props = new Properties();
     props.setProperty("name", "DataTag");
     props.setProperty("description", "foo");
-    props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("dataType", DataType.INTEGER.toString());
+    props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
+    props.setProperty("dataType", Integer.class.getName());
     props.setProperty("isLogged", String.valueOf(false));
     props.setProperty("minValue", String.valueOf(0));
     props.setProperty("maxValue", String.valueOf(10));

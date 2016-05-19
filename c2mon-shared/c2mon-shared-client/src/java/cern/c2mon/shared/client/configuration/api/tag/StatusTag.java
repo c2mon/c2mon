@@ -1,26 +1,25 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration.api.tag;
 
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
-import cern.c2mon.shared.common.metadata.Metadata;
-import cern.c2mon.shared.client.configuration.api.util.DataType;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.tag.TagMode;
+import cern.c2mon.shared.common.metadata.Metadata;
 import lombok.*;
 
 import java.util.List;
@@ -41,8 +40,8 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class StatusTag extends ControlTag {
 
-  @DefaultValue("String")
-  private DataType dataType = null;
+  @DefaultValue("java.lang.String")
+  private String dataType = null;
 
   @DefaultValue("true")
   private Boolean isLogged = true;
@@ -72,8 +71,60 @@ public class StatusTag extends ControlTag {
   public StatusTag() {
   }
 
+
   @Override
   public boolean requiredFieldsGiven() {
     return super.requiredFieldsGiven();
+  }
+
+  public static CreateBuilder create(String name) {
+
+    StatusTag iniTag = StatusTag.builder().name(name).build();
+
+    return iniTag.toCreateBuilder(iniTag);
+  }
+
+  private StatusTag.CreateBuilder toCreateBuilder(StatusTag initializationTag) {
+    return new StatusTag.CreateBuilder(initializationTag);
+  }
+
+  public static class CreateBuilder {
+
+    private StatusTag builderTag;
+
+    CreateBuilder(StatusTag initializationTag) {
+
+      initializationTag.setCreate(true);
+      this.builderTag = initializationTag;
+    }
+
+    public StatusTag.CreateBuilder id(Long id) {
+      this.builderTag.setId(id);
+      return this;
+    }
+
+    public StatusTag.CreateBuilder description(String description) {
+      this.builderTag.setDescription(description);
+      return this;
+    }
+
+    public StatusTag.CreateBuilder mode(TagMode mode) {
+      this.builderTag.setMode(mode);
+      return this;
+    }
+
+    public StatusTag.CreateBuilder isLogged(Boolean isLogged) {
+      this.builderTag.setIsLogged(isLogged);
+      return this;
+    }
+
+    public StatusTag.CreateBuilder metadata(Metadata metadata) {
+      this.builderTag.setMetadata(metadata);
+      return this;
+    }
+
+    public StatusTag build() {
+      return this.builderTag;
+    }
   }
 }

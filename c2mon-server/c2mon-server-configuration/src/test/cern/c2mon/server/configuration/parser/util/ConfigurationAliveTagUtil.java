@@ -1,28 +1,27 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.configuration.parser.util;
 
-import java.util.Properties;
-
 import cern.c2mon.shared.client.configuration.api.tag.AliveTag;
-import cern.c2mon.shared.client.configuration.api.util.DataType;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
+
+import java.util.Properties;
 
 //@Service
 public class ConfigurationAliveTagUtil {
@@ -43,7 +42,7 @@ public class ConfigurationAliveTagUtil {
     props.setProperty("name", "AliveTag");
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", DataType.LONG.toString());
+    props.setProperty("dataType", Long.class.getName());
     props.setProperty("isLogged", "false");
     props.setProperty("processId", "1");
 
@@ -63,7 +62,7 @@ public class ConfigurationAliveTagUtil {
     props.setProperty("name", "AliveTag");
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", DataType.LONG.toString());
+    props.setProperty("dataType", Long.class.getName());
     props.setProperty("isLogged", "false");
     props.setProperty("address", new DataTagAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress")).toConfigXML());
     props.setProperty("processId", "1");
@@ -82,7 +81,7 @@ public class ConfigurationAliveTagUtil {
     props.setProperty("name", "AliveTag");
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", DataType.LONG.toString());
+    props.setProperty("dataType", Long.class.getName());
     props.setProperty("isLogged", "false");
     props.setProperty("processId", "1");
 
@@ -131,7 +130,7 @@ public class ConfigurationAliveTagUtil {
     props.setProperty("name", "AliveTag"+parent);
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", DataType.LONG.toString());
+    props.setProperty("dataType", Long.class.getName());
     props.setProperty("isLogged", "false");
     switch(parent){
       case "process" : props.setProperty("processId", Long.toString(parentId)); break;
@@ -154,7 +153,7 @@ public class ConfigurationAliveTagUtil {
     props.setProperty("name", "AliveTag"+parent);
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", DataType.LONG.toString());
+    props.setProperty("dataType", Long.class.getName());
     props.setProperty("isLogged", "false");
     props.setProperty("address", new DataTagAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress")).toConfigXML());
     switch(parent){

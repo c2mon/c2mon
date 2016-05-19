@@ -43,7 +43,27 @@ public interface ConfigurationObject {
   Long getId();
 
   /**
-   * determine if the instance of the ConfigurationObject holds the inormation to create a DELETE {@link cern.c2mon.shared.client.configuration.ConfigurationElement}
+   * Set the id to the configuration object
+   * @param defaultId the id to set
+   */
+  void setId(Long defaultId);
+
+  /**
+   * determine if the configuration objects serves as create.
+   *
+   * @return true if its a create.
+   */
+  boolean isCreate();
+
+  /**
+   * determine if the configuration objects serves as update.
+   *
+   * @return true if its a update.
+   */
+  boolean isUpdate();
+
+  /**
+   * determine if the instance of the ConfigurationObject holds the information to create a DELETE {@link cern.c2mon.shared.client.configuration.ConfigurationElement}
    *
    * @return boolean value if this object is a delete object
    */

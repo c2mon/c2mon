@@ -16,9 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration.api.process;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.tag.AliveTag;
 import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
@@ -28,6 +25,9 @@ import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Configuration object for a Process.
@@ -42,6 +42,12 @@ import lombok.Singular;
  */
 @Data
 public class Process implements ConfigurationObject {
+
+  @IgnoreProperty
+  private boolean update = false;
+
+  @IgnoreProperty
+  private boolean create = false;
 
   /**
    * Determine if the instance of this class defines a DELETE command
@@ -71,6 +77,7 @@ public class Process implements ConfigurationObject {
   /**
    * A description of the process.
    */
+  @DefaultValue("")
   private String description;
 
   /**
@@ -143,6 +150,126 @@ public class Process implements ConfigurationObject {
 
   @Override
   public boolean requiredFieldsGiven() {
-    return (id != null) && (name != null) && (description != null) && (statusTag != null) && (aliveTag != null);
+    return (id != null) && (name != null) ;
+  }
+
+  public static CreateBuilder create(String name) {
+
+    Process iniProcess = Process.builder().name(name).build();
+
+    return iniProcess.toCreateBuilder(iniProcess);
+  }
+
+  public static UpdateBuilder update(Long id) {
+
+    Process iniProcess = Process.builder().id(id).build();
+
+    return iniProcess.toUpdateBuilder(iniProcess);
+  }
+
+  public static UpdateBuilder update(String name) {
+
+    Process iniProcess = Process.builder().name(name).build();
+
+    return iniProcess.toUpdateBuilder(iniProcess);
+  }
+
+  private CreateBuilder toCreateBuilder(Process initializationProcess) {
+    return new CreateBuilder(initializationProcess);
+  }
+
+  private UpdateBuilder toUpdateBuilder(Process initializationProcess) {
+    return new UpdateBuilder(initializationProcess);
+  }
+
+  public static class CreateBuilder {
+
+    private Process builderProcess;
+
+    CreateBuilder(Process initializationProcess) {
+
+      initializationProcess.setCreate(true);
+      this.builderProcess = initializationProcess;
+    }
+
+    public Process.CreateBuilder id(Long id) {
+      this.builderProcess.setId(id);
+      return this;
+    }
+
+    public Process.CreateBuilder aliveTag(AliveTag aliveTag, Integer aliveInterval) {
+
+      this.builderProcess.setAliveInterval(aliveInterval);
+      this.builderProcess.setAliveTag(aliveTag);
+
+      if(!aliveTag.isCreate()){
+        builderProcess.setCreate(false);
+      }
+
+      return this;
+    }
+
+    public Process.CreateBuilder statusTag(StatusTag statusTag) {
+      this.builderProcess.setStatusTag(statusTag);
+
+      if(!statusTag.isCreate()){
+        builderProcess.setCreate(false);
+      }
+
+      return this;
+    }
+
+    public Process.CreateBuilder description(String description) {
+      this.builderProcess.setDescription(description);
+      return this;
+    }
+
+    public Process.CreateBuilder maxMessageSize(Integer maxMessageSize) {
+      this.builderProcess.setMaxMessageSize(maxMessageSize);
+      return this;
+    }
+
+    public Process.CreateBuilder maxMessageDelay(Integer maxMessageDelay) {
+      this.builderProcess.setMaxMessageDelay(maxMessageDelay);
+      return this;
+    }
+
+    public Process build() {
+      return this.builderProcess;
+    }
+  }
+
+  public static class UpdateBuilder {
+
+    private Process builderProcess;
+
+    UpdateBuilder(Process initializationProcess) {
+      this.builderProcess = initializationProcess;
+    }
+
+    public Process.UpdateBuilder aliveInterval(Integer aliveInterval) {
+      this.builderProcess.setAliveInterval(aliveInterval);
+      return this;
+    }
+
+    public Process.UpdateBuilder description(String description) {
+      this.builderProcess.setDescription(description);
+      return this;
+    }
+
+    public Process.UpdateBuilder maxMessageSize(Integer maxMessageSize) {
+      this.builderProcess.setMaxMessageSize(maxMessageSize);
+      return this;
+    }
+
+    public Process.UpdateBuilder maxMessageDelay(Integer maxMessageDelay) {
+      this.builderProcess.setMaxMessageDelay(maxMessageDelay);
+      return this;
+    }
+
+    public Process build() {
+      builderProcess.setUpdate(true);
+      return this.builderProcess;
+    }
   }
 }

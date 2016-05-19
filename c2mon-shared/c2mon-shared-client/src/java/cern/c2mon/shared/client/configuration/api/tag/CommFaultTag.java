@@ -1,30 +1,29 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration.api.tag;
 
-import java.util.List;
-
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
-import cern.c2mon.shared.common.metadata.Metadata;
-import cern.c2mon.shared.client.configuration.api.util.DataType;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.metadata.Metadata;
 import lombok.*;
+
+import java.util.List;
 
 /**
  * Configuration object for a CommFaultTag.
@@ -47,8 +46,8 @@ public class CommFaultTag extends ControlTag {
    */
   private DataTagAddress address;
 
-  @DefaultValue("Boolean")
-  private DataType dataType = null;
+  @DefaultValue("java.lang.Boolean")
+  private String dataType = null;
 
   @DefaultValue("true")
   private Boolean isLogged = true;
@@ -85,5 +84,61 @@ public class CommFaultTag extends ControlTag {
   @Override
   public boolean requiredFieldsGiven() {
     return super.requiredFieldsGiven();
+  }
+
+  public static CreateBuilder create(String name) {
+
+    CommFaultTag iniTag = CommFaultTag.builder().name(name).build();
+
+    return iniTag.toCreateBuilder(iniTag);
+  }
+
+  private CommFaultTag.CreateBuilder toCreateBuilder(CommFaultTag initializationTag) {
+    return new CommFaultTag.CreateBuilder(initializationTag);
+  }
+
+  public static class CreateBuilder {
+
+    private CommFaultTag builderTag;
+
+    CreateBuilder(CommFaultTag initializationTag) {
+
+      initializationTag.setCreate(true);
+      this.builderTag = initializationTag;
+    }
+
+    public CommFaultTag.CreateBuilder id(Long id) {
+      this.builderTag.setId(id);
+      return this;
+    }
+
+    public CommFaultTag.CreateBuilder description(String description) {
+      this.builderTag.setDescription(description);
+      return this;
+    }
+
+    public CommFaultTag.CreateBuilder mode(TagMode mode) {
+      this.builderTag.setMode(mode);
+      return this;
+    }
+
+    public CommFaultTag.CreateBuilder isLogged(Boolean isLogged) {
+      this.builderTag.setIsLogged(isLogged);
+      return this;
+    }
+
+    public CommFaultTag.CreateBuilder address(DataTagAddress address) {
+      this.builderTag.setAddress(address);
+      return this;
+    }
+
+    public CommFaultTag.CreateBuilder metadata(Metadata metadata) {
+      this.builderTag.setMetadata(metadata);
+      return this;
+    }
+
+    public CommFaultTag build() {
+      return this.builderTag;
+    }
   }
 }

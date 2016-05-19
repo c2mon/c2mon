@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -112,7 +112,7 @@ public class ConfigurationParseCommFaultTagTest {
   public void commFaultTagUpdate_notExistingInstance() {
     // Setup Exception
     commFaultTagUpdate.expect(ConfigurationParseException.class);
-    commFaultTagUpdate.expectMessage("Creating CommFaultTag (id = 1) failed. Not enough arguments.");
+    commFaultTagUpdate.expectMessage("Creating CommFaultTag (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<CommFaultTag,Properties> pair = buildUpdateCommFaultTagWithSomeFields(1l);
@@ -122,7 +122,7 @@ public class ConfigurationParseCommFaultTagTest {
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(commFaultTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(commFaultTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(equipmentCache,processCache,commFaultTagCache);
@@ -195,7 +195,7 @@ public class ConfigurationParseCommFaultTagTest {
   public void commFaultTagCreate_withNoFields() {
     // Setup Exception
     commFaultTagCreate.expect(ConfigurationParseException.class);
-    commFaultTagCreate.expectMessage("Creating CommFaultTag (id = 1) failed. Not enough arguments.");
+    commFaultTagCreate.expectMessage("Creating CommFaultTag (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Configuration configuration = getConfBuilderCommFaultTagE(buildCommFaultTagWithId(1L)._1);
@@ -203,19 +203,19 @@ public class ConfigurationParseCommFaultTagTest {
     // Setup Mock
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(commFaultTagCache.hasKey(1l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(commFaultTagCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
-    EasyMock.replay(equipmentCache,processCache,commFaultTagCache);
+    EasyMock.replay(equipmentCache,processCache,commFaultTagCache,statusTagCache);
 
     // Run the code to be tested
     configurationParser.parse(configuration);
 
     // Verify mock methods were called
-    EasyMock.verify(equipmentCache,processCache,commFaultTagCache);
+    EasyMock.verify(equipmentCache,processCache,commFaultTagCache, statusTagCache);
   }
 
   @Test
@@ -227,10 +227,10 @@ public class ConfigurationParseCommFaultTagTest {
     // Setup Mock
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(commFaultTagCache.hasKey(1l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(commFaultTagCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(equipmentCache,processCache,commFaultTagCache, statusTagCache, aliveTagCache);
@@ -252,7 +252,7 @@ public class ConfigurationParseCommFaultTagTest {
   @Test
   public void commFaultTagCreate_withNotExistingSupClass() {
     commFaultTagCreate.expect(ConfigurationParseException.class);
-    commFaultTagCreate.expectMessage("Creating Process (id = 1) failed. Not enough arguments.");
+    commFaultTagCreate.expectMessage("Creating Process (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<CommFaultTag,Properties> pair = buildCommFaultTagWithPrimFields(1l);
@@ -260,7 +260,7 @@ public class ConfigurationParseCommFaultTagTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(equipmentCache,processCache,commFaultTagCache);
@@ -281,10 +281,10 @@ public class ConfigurationParseCommFaultTagTest {
     // Setup Mock
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(commFaultTagCache.hasKey(1l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(commFaultTagCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(equipmentCache,processCache,commFaultTagCache, statusTagCache, aliveTagCache);
@@ -312,10 +312,10 @@ public class ConfigurationParseCommFaultTagTest {
     // Setup Mock
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(commFaultTagCache.hasKey(1l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(commFaultTagCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(equipmentCache,processCache,commFaultTagCache, statusTagCache, aliveTagCache);

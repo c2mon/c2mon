@@ -43,7 +43,12 @@ import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.process.Process;
-import cern.c2mon.shared.client.configuration.api.tag.*;
+import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
+import cern.c2mon.shared.client.configuration.api.tag.AliveTag;
+import cern.c2mon.shared.client.configuration.api.tag.CommFaultTag;
+import cern.c2mon.shared.client.configuration.api.tag.DataTag;
+import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
+import cern.c2mon.shared.client.configuration.api.tag.RuleTag;
 import cern.c2mon.shared.common.NoSimpleValueParseException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
@@ -53,7 +58,6 @@ import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
-import com.google.gson.Gson;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.After;
@@ -70,6 +74,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -80,7 +85,6 @@ import static cern.c2mon.server.configuration.parser.util.ConfigurationAlarmUtil
 import static cern.c2mon.server.configuration.parser.util.ConfigurationAliveTagUtil.builderAliveTagUpdate;
 import static cern.c2mon.server.configuration.parser.util.ConfigurationAliveTagUtil.builderAliveTagWithAllFields;
 import static cern.c2mon.server.configuration.parser.util.ConfigurationAliveTagUtil.builderAliveTagWithPrimFields;
-import static cern.c2mon.server.configuration.parser.util.ConfigurationAllTogetherUtil.buildAllMandatory;
 import static cern.c2mon.server.configuration.parser.util.ConfigurationCommFaultTagUtil.builderCommFaultTagUpdate;
 import static cern.c2mon.server.configuration.parser.util.ConfigurationCommFaultTagUtil.builderCommFaultTagWithAllFields;
 import static cern.c2mon.server.configuration.parser.util.ConfigurationCommFaultTagUtil.builderCommFaultTagWithPrimFields;
@@ -199,13 +203,6 @@ public class ConfigurationLoaderTest {
   @After
   public void afterTest() throws IOException {
     testDataInserter.removeTestData();
-  }
-
-  @Test
-  public void serialiseToJson() {
-    Configuration insert =  buildAllMandatory()._1;
-
-    new Gson().toJson(insert);
   }
 
   @Test
@@ -1399,8 +1396,14 @@ public class ConfigurationLoaderTest {
     // TEST:
     // Build configuration to update the test DataTag
     Pair<DataTag.DataTagBuilder, Properties> dataTagUpdate = builderDataTagUpdate(100L);
-    Configuration configuration = Configuration.builder().confId(1L).application("configuration test - application").name("configuration test name").updateTag
-        (dataTagUpdate._1.build()).build();
+    Configuration configuration = Configuration.builder().confId(1L).application("configuration test - application").name("configuration test name").build();
+
+    List<DataTag> updateList = new ArrayList<>();
+    DataTag tag = dataTagUpdate._1.build();
+    tag.setUpdate(true);
+    updateList.add(tag);
+
+    configuration.setConfigurationItems(updateList);
 
     //apply the configuration to the server
     ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
@@ -2351,8 +2354,14 @@ public class ConfigurationLoaderTest {
 
     // TEST:Build configuration to update the test Alarm
     Pair<Alarm.AlarmBuilder, Properties> alarmUpdate = builderAlarmUpdate(666L, 100L);
-    Configuration configuration = Configuration.builder().confId(1L).application("configuration test - application").name("configuration test name").updateAlarm
-        (alarmUpdate._1.build()).build();
+    Configuration configuration = Configuration.builder().confId(1L).application("configuration test - application").name("configuration test name").build();
+
+    List<Alarm> alarmUpdates = new ArrayList<Alarm>();
+    Alarm alarmBuild = alarmUpdate._1.build();
+    alarmBuild.setUpdate(true);
+    alarmUpdates.add(alarmBuild);
+    configuration.setConfigurationItems(alarmUpdates);
+
     //apply the configuration to the server
     ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
 

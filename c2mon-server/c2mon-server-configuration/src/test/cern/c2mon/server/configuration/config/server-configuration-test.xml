@@ -4,38 +4,38 @@
 	xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
 	                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
-  
+
   <!-- for inserting test data -->
   <import resource="classpath:cern/c2mon/server/test/server-test-data.xml"/>
-  
-  <!-- requires all DB and cache modules for component testing of the configuration module -->  
+
+  <!-- requires all DB and cache modules for component testing of the configuration module -->
   <import resource="classpath:cern/c2mon/server/cache/config/server-cache-nonpersistent-server.xml"/>
-  <import resource="classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-common.xml"/>   
+  <import resource="classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-common.xml"/>
   <import resource="classpath:cern/c2mon/server/cache/loading/config/server-cacheloading.xml"/>
   <import resource="classpath:cern/c2mon/server/rule/config/server-rule.xml"/>
-  
+
   <!-- mock the communication bean; needs to be before the configloader class -->
   <bean id="processCommunicationManager" class="org.easymock.EasyMock" factory-method="createStrictMock">
-    <constructor-arg value="cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager"/>  
+    <constructor-arg value="cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager"/>
   </bean>
-  
+
   <!-- mock daq-in module dependency -->
   <bean id="jmsContainerManager" class="org.easymock.EasyMock" factory-method="createStrictMock">
-    <constructor-arg value="cern.c2mon.server.daqcommunication.in.JmsContainerManager"/>  
+    <constructor-arg value="cern.c2mon.server.daqcommunication.in.JmsContainerManager"/>
   </bean>
-  
+
   <bean id="testDataHelper" class="cern.c2mon.server.cache.dbaccess.test.TestDataHelper"/>
-  
+
   <bean id="configurationLoader" class="cern.c2mon.server.configuration.impl.ConfigurationLoaderImpl" autowire="constructor">
     <property name="daqConfigEnabled" value="true"/>
     <property name="reportDirectory" value="/tmp/reports"/>
   </bean>
   <bean id="configurationDAO" class="cern.c2mon.server.configuration.mybatis.ConfigurationDAOImpl"/>
-  
+
   <bean id="configurationUpdate" class="cern.c2mon.server.configuration.impl.ConfigurationUpdateImpl"/>
-  
+
   <bean id="controlTagLoaderDAO" class="cern.c2mon.server.cache.loading.impl.ControlTagLoaderDAOImpl" autowire="constructor"/>
-    
+
   <bean id="dataTagConfigHandler" class="cern.c2mon.server.configuration.handler.impl.DataTagConfigHandlerImpl" autowire="constructor"/>
   <bean id="controlTagConfigHandler" class="cern.c2mon.server.configuration.handler.impl.ControlTagConfigHandlerImpl" autowire="constructor"/>
   <bean id="commandTagConfigHandler" class="cern.c2mon.server.configuration.handler.impl.CommandTagConfigHandler"/>
@@ -46,15 +46,12 @@
   <bean id="ruleTagConfigHandler" class="cern.c2mon.server.configuration.handler.impl.RuleTagConfigHandlerImpl" autowire="constructor"/>
   <bean id="deviceClassConfigHandler" class="cern.c2mon.server.configuration.handler.impl.DeviceClassConfigHandlerImpl" autowire="constructor"/>
   <bean id="deviceConfigHandler" class="cern.c2mon.server.configuration.handler.impl.DeviceConfigHandlerImpl" autowire="constructor"/>
-  
-  <bean id="tagConfigGateway" class="cern.c2mon.server.configuration.handler.impl.TagConfigGateway" autowire="constructor"/> 
-  
+
+  <bean id="tagConfigGateway" class="cern.c2mon.server.configuration.handler.impl.TagConfigGateway" autowire="constructor"/>
+
   <context:annotation-config/>
   <context:component-scan base-package="cern.c2mon.server.configuration.handler.transacted"/>
+  <context:component-scan base-package="cern.c2mon.server.configuration.parser" />
 
-  <bean class="cern.c2mon.server.configuration.parser.impl.ConfigurationParserImpl">
-    <constructor-arg name="sequenceTaskFactory" ref="sequenceTaskFactory"/>
-  </bean>
 
-  <bean id="sequenceTaskFactory" class="cern.c2mon.server.configuration.parser.tasks.SequenceTaskFactory"/>
 </beans>

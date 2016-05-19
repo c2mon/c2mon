@@ -53,8 +53,33 @@
 		  factory-method="createStrictMock">
 		<constructor-arg value="cern.c2mon.server.cache.CommandTagCache" />
 	</bean>
-	
+
+	<bean id="sequenceDAO" class="org.easymock.EasyMock"
+		  factory-method="createStrictMock">
+		<constructor-arg value="cern.c2mon.server.cache.loading.SequenceDAO" />
+	</bean>
+
+	<bean id="processDAO" class="org.easymock.EasyMock"
+		  factory-method="createStrictMock">
+		<constructor-arg value="cern.c2mon.server.cache.loading.ProcessDAO" />
+	</bean>
+
+	<bean id="equipmentDAO" class="org.easymock.EasyMock"
+		  factory-method="createStrictMock">
+		<constructor-arg value="cern.c2mon.server.cache.loading.EquipmentDAO" />
+	</bean>
+
+	<bean id="subEquipmentDAO" class="org.easymock.EasyMock"
+		  factory-method="createStrictMock">
+		<constructor-arg value="cern.c2mon.server.cache.loading.SubEquipmentDAO" />
+	</bean>
+
+	<bean id="tagFacadeGateway" class="org.easymock.EasyMock"
+		  factory-method="createStrictMock">
+		<constructor-arg value="cern.c2mon.server.cache.TagFacadeGateway" />
+	</bean>
+
 	<context:annotation-config />
 	<context:component-scan base-package="cern.c2mon.server.configuration.parser" />
-	
+
 </beans>

@@ -1,23 +1,22 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.configuration.parser.util;
 
 import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
-import cern.c2mon.shared.client.configuration.api.util.DataType;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
 
@@ -36,7 +35,7 @@ public class ConfigurationCommandTagUtil {
         .id(id)
         .name("CommandTag")
         .description("foo")
-        .dataType(DataType.STRING)
+        .dataType(String.class)
         .hardwareAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress"))
         .clientTimeout(30000)
         .execTimeout(6000)
@@ -51,7 +50,7 @@ public class ConfigurationCommandTagUtil {
     props.setProperty("name", "CommandTag");
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", DataType.STRING.toString());
+    props.setProperty("dataType", String.class.getName());
     props.setProperty("hardwareAddress", new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress").toConfigXML());
     props.setProperty("equipmentId", String.valueOf(1l));
     props.setProperty("clientTimeout", String.valueOf(30000));
@@ -72,7 +71,7 @@ public class ConfigurationCommandTagUtil {
         .name("CommandTag")
         .description("foo")
         .mode(TagMode.OPERATIONAL)
-        .dataType(DataType.STRING)
+        .dataType(String.class)
         .hardwareAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress"))
         .clientTimeout(30000)
         .execTimeout(6000)
@@ -87,7 +86,7 @@ public class ConfigurationCommandTagUtil {
     props.setProperty("name", "CommandTag");
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("dataType", DataType.STRING.toString());
+    props.setProperty("dataType", String.class.getName());
     props.setProperty("hardwareAddress", new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress").toConfigXML());
     props.setProperty("equipmentId", String.valueOf(1l));
     props.setProperty("clientTimeout", String.valueOf(30000));
@@ -107,7 +106,7 @@ public class ConfigurationCommandTagUtil {
         .id(id)
         .name("CommandTag")
         .description("foo")
-        .dataType(DataType.STRING)
+        .dataType(String.class)
         .hardwareAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress"))
         .clientTimeout(30000)
         .execTimeout(6000)
@@ -122,7 +121,7 @@ public class ConfigurationCommandTagUtil {
     props.setProperty("name", "CommandTag");
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", DataType.STRING.toString());
+    props.setProperty("dataType", String.class.getName());
     props.setProperty("hardwareAddress", new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress").toConfigXML());
     props.setProperty("equipmentId", String.valueOf(1l));
     props.setProperty("clientTimeout", String.valueOf(30000));
@@ -208,7 +207,7 @@ public class ConfigurationCommandTagUtil {
         .id(id)
         .name("CommandTag")
         .description("foo")
-        .dataType(DataType.STRING)
+        .dataType(String.class)
         .hardwareAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress"))
         .clientTimeout(30000)
         .execTimeout(6000)
@@ -222,7 +221,7 @@ public class ConfigurationCommandTagUtil {
     props.setProperty("name", "CommandTag");
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", DataType.STRING.toString());
+    props.setProperty("dataType", String.class.getName());
     props.setProperty("hardwareAddress", new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress").toConfigXML());
     props.setProperty("equipmentId", String.valueOf(parentId));
     props.setProperty("clientTimeout", String.valueOf(30000));
@@ -242,7 +241,7 @@ public class ConfigurationCommandTagUtil {
         .name("CommandTag")
         .description("foo")
         .mode(TagMode.OPERATIONAL)
-        .dataType(DataType.STRING)
+        .dataType(String.class)
         .hardwareAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress"))
         .clientTimeout(30000)
         .execTimeout(6000)
@@ -256,7 +255,7 @@ public class ConfigurationCommandTagUtil {
     props.setProperty("name", "CommandTag");
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("dataType", DataType.STRING.toString());
+    props.setProperty("dataType", String.class.getName());
     props.setProperty("hardwareAddress", new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress").toConfigXML());
     props.setProperty("equipmentId", String.valueOf(parentId));
     props.setProperty("clientTimeout", String.valueOf(30000));

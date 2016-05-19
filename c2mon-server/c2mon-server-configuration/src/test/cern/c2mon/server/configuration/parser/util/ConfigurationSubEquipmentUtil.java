@@ -1,27 +1,25 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.configuration.parser.util;
 
-import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.tag.AliveTag;
 import cern.c2mon.shared.client.configuration.api.tag.CommFaultTag;
 import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
-import cern.c2mon.shared.client.configuration.api.util.DataType;
 
 import java.util.Properties;
 
@@ -30,11 +28,11 @@ public class ConfigurationSubEquipmentUtil {
 
 
   public static Pair<SubEquipment, Properties> buildSubEquipmentWithId(Long id) {
-    return new Pair<>(SubEquipment.builderSubEquipment().id(id).build(), new Properties());
+    return new Pair<>(SubEquipment.builder().id(id).build(), new Properties());
   }
 
   public static Pair<SubEquipment, Properties> buildSubEquipmentWtihPrimFields(Long id) {
-    SubEquipment pro = SubEquipment.builderSubEquipment()
+    SubEquipment pro = SubEquipment.builder()
         .id(id)
         .name("SubEquipment")
         .description("foo")
@@ -56,7 +54,7 @@ public class ConfigurationSubEquipmentUtil {
   }
 
   public static Pair<SubEquipment, Properties> buildSubEquipmentWithAllFields(Long id) {
-    SubEquipment pro = SubEquipment.builderSubEquipment()
+    SubEquipment pro = SubEquipment.builder()
         .id(id)
         .name("SubEquipment")
         .description("foo")
@@ -81,7 +79,7 @@ public class ConfigurationSubEquipmentUtil {
   }
 
   public static Pair<SubEquipment, Properties> buildSubEquipmentWithoutDefaultFields(Long id) {
-    SubEquipment pro = SubEquipment.builderSubEquipment()
+    SubEquipment pro = SubEquipment.builder()
         .id(id)
         .name("SubEquipment")
         .description("foo")
@@ -103,14 +101,14 @@ public class ConfigurationSubEquipmentUtil {
   }
 
   public static SubEquipment buildUpdateSubEquipmentNewControlTag(Long id) {
-    return SubEquipment.builderSubEquipment()
+    return SubEquipment.builder()
         .id(0l)
         .aliveTag(AliveTag.builder().id(1l).name("").description("").build())
         .build();
   }
 
   public static Pair<SubEquipment, Properties> buildUpdateSubEquipmentWithAllFields(Long id) {
-    SubEquipment pro = SubEquipment.builderSubEquipment()
+    SubEquipment pro = SubEquipment.builder()
         .id(id)
         .name("SubEquipment_Update")
         .description("foo_Update")
@@ -128,15 +126,13 @@ public class ConfigurationSubEquipmentUtil {
   }
 
   public static Pair<SubEquipment, Properties> buildUpdateSubEquipmentWithSomeFields(Long id) {
-    SubEquipment pro = SubEquipment.builderSubEquipment()
+    SubEquipment pro = SubEquipment.builder()
         .id(id)
-        .name("SubEquipment_Update")
         .description("foo_Update")
         .handlerClass("cern.c2mon.driver.")
         .build();
 
     Properties props = new Properties();
-    props.setProperty("name", "SubEquipment_Update");
     props.setProperty("description", "foo_Update");
     props.setProperty("handlerClass", "cern.c2mon.driver.");
 
@@ -144,7 +140,7 @@ public class ConfigurationSubEquipmentUtil {
   }
 
   public static SubEquipment buildDeleteSubEquipment(Long id) {
-    SubEquipment pro = SubEquipment.builderSubEquipment()
+    SubEquipment pro = SubEquipment.builder()
         .id(id)
         .deleted(true)
         .build();
@@ -154,7 +150,7 @@ public class ConfigurationSubEquipmentUtil {
   // ##################### Builder #####################
 
   public static Pair<SubEquipment.SubEquipmentBuilder, Properties> builderSubEquipmentWithPrimFields(Long id, Long parentId, Long statusTagId, Long aliveTagId, Long commFaultId) {
-    SubEquipment.SubEquipmentBuilder pro = SubEquipment.builderSubEquipment()
+    SubEquipment.SubEquipmentBuilder pro = SubEquipment.builder()
         .id(id)
         .name("SubEquipment")
         .description("foo")
@@ -176,8 +172,8 @@ public class ConfigurationSubEquipmentUtil {
     return new Pair<>(pro, props);
   }
 
-  public static Pair<SubEquipment.SubEquipmentBuilder, Properties> builderSubEquipmentWithAllFields(Long id, Long parentId, Long statusTagId, Long commFaultId,Long aliveTagId ) {
-    SubEquipment.SubEquipmentBuilder pro = SubEquipment.builderSubEquipment()
+  public static Pair<SubEquipment.SubEquipmentBuilder, Properties> builderSubEquipmentWithAllFields(Long id, Long parentId, Long statusTagId, Long commFaultId, Long aliveTagId ) {
+    SubEquipment.SubEquipmentBuilder pro = SubEquipment.builder()
         .id(id)
         .name("SubEquipment")
         .description("foo")
@@ -198,7 +194,7 @@ public class ConfigurationSubEquipmentUtil {
   }
 
   public static Pair<SubEquipment.SubEquipmentBuilder, Properties> builderSubEquipmentUpdate(Long id) {
-    SubEquipment.SubEquipmentBuilder pro = SubEquipment.builderSubEquipment()
+    SubEquipment.SubEquipmentBuilder pro = SubEquipment.builder()
         .id(id)
         .description("foo_update");
 

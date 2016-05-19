@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -61,7 +61,7 @@ public class ConfigurationParseStatusTagTest {
 
   @Autowired
   AliveTimerCache aliveTagCache;
-  
+
   @Rule
   public ExpectedException statusTagUpdate = ExpectedException.none();
 
@@ -106,7 +106,7 @@ public class ConfigurationParseStatusTagTest {
   public void statusTagUpdate_notExistingInstance() {
     // Setup Exception
     statusTagUpdate.expect(ConfigurationParseException.class);
-    statusTagUpdate.expectMessage("Creating StatusTag (id = 1) failed. Not enough arguments.");
+    statusTagUpdate.expectMessage("Creating StatusTag (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<StatusTag,Properties> pair = buildUpdateStatusTagWithSomeFields(1l);
@@ -115,7 +115,7 @@ public class ConfigurationParseStatusTagTest {
     // Setup Mock
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(statusTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(statusTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache);
@@ -192,16 +192,16 @@ public class ConfigurationParseStatusTagTest {
   public void statusTagCreate_withNoFields() {
     // Setup Exception
     statusTagCreate.expect(ConfigurationParseException.class);
-    statusTagCreate.expectMessage("Creating StatusTag (id = 1) failed. Not enough arguments.");
+    statusTagCreate.expectMessage("Creating StatusTag (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Configuration configuration = getConfBuilderStatusTagP(buildStatusTagWithId(1L)._1);
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(1l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache,statusTagCache ,aliveTagCache);
@@ -221,9 +221,9 @@ public class ConfigurationParseStatusTagTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(1l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache,statusTagCache ,aliveTagCache);
@@ -245,7 +245,7 @@ public class ConfigurationParseStatusTagTest {
   @Test
   public void statusTagCreate_withNotExistingSupClass() {
     statusTagCreate.expect(ConfigurationParseException.class);
-    statusTagCreate.expectMessage("Creating Process (id = 1) failed. Not enough arguments.");
+    statusTagCreate.expectMessage("Creating Process (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<StatusTag,Properties> pair = buildStatusTagWithPrimFields(1l);
@@ -253,7 +253,7 @@ public class ConfigurationParseStatusTagTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache);
@@ -273,9 +273,9 @@ public class ConfigurationParseStatusTagTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(1l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache,statusTagCache ,aliveTagCache);
@@ -302,9 +302,9 @@ public class ConfigurationParseStatusTagTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(1l)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache,statusTagCache ,aliveTagCache);

@@ -1,22 +1,23 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.client.core;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
+import cern.c2mon.client.core.configuration.*;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
 import cern.c2mon.shared.client.configuration.api.Configuration;
@@ -33,7 +34,8 @@ import java.util.Collection;
  *
  * @author Matthias Braeger
  */
-public interface ConfigurationService {
+public interface ConfigurationService extends ProcessConfiguration,
+    EquipmentConfiguration, SubEquipmentConfiguration, DataTagConfiguration, RuleTagConfiguration, AlarmConfiguration {
 
   /**
    * Returns a TagConfiguration object for every valid id on the list.
@@ -52,29 +54,28 @@ public interface ConfigurationService {
    * However, in case of a connection error or an unknown configuration Id the corresponding
    * tag might be missing.
    *
-   * @see TagService#applyConfiguration(Long, ClientRequestReportListener) that also sends
-   * reports for the progress of the operation
-   *
    * @param configurationId The configuration id used to fetch the Configuration Report object
    * @return A Configuration Report object
+   * @see TagService#applyConfiguration(Long, ClientRequestReportListener) that also sends
+   * reports for the progress of the operation
    */
   ConfigurationReport applyConfiguration(final Long configurationId);
 
   /**
    * Applies the configuration and returns a Configuration Report.
    * The values are fetched from the server.
-   *
+   * <p/>
    * Has an extra parameter that allows the caller
    * to be informed for the progress of the operation.
-   *
+   * <p/>
    * However, in case of a connection error or an unknown configuration Id the corresponding
    * tag might be missing.
    *
    * @param configurationId The configuration id used to fetch the Configuration Report object
-   * @param reportListener Is informed about the progress of the operation on the server side.
+   * @param reportListener  Is informed about the progress of the operation on the server side.
+   * @return A {@link ConfigurationReport} object
    * @see ClientRequestProgressReport
    * @see ClientRequestErrorReport
-   * @return A {@link ConfigurationReport} object
    */
   ConfigurationReport applyConfiguration(final Long configurationId, final ClientRequestReportListener reportListener);
 
@@ -84,13 +85,13 @@ public interface ConfigurationService {
    * This includes the common operations CREATE, DELETE  and UPDATE.
    * <p/>
    * For more information of the configuration object read the documentation of {@link Configuration}
-   * or folloe the instruction in the @see <a href="http://c2mon.web.cern.ch/c2mon/docs/#_offline_configuration_via_c2mon_database_test_purpose_only">c2mon documentation</a>.
+   * or follow the instruction in the <a href="http://c2mon.web.cern.ch/c2mon/docs/#_offline_configuration_via_c2mon_database_test_purpose_only">c2mon documentation</a>.
    *
    * @param configuration
    * @param listener
-   *
-   * @return
+   * @return A {@link ConfigurationReport} object
    */
+  @Deprecated
   ConfigurationReport applyConfiguration(final Configuration configuration, final ClientRequestReportListener listener);
 
   /**
@@ -98,7 +99,7 @@ public interface ConfigurationService {
    * server. Note that this method will only return partial information about
    * each report. This is done to reduce the size of the message returned by the
    * server.
-   *
+   * <p/>
    * To get the full report(s) for a particular configuration, use
    * {@link TagService#getConfigurationReports(Long)}.
    *
@@ -113,7 +114,7 @@ public interface ConfigurationService {
    *
    * @param id the id of the configuration report
    * @return the full configuration report(s) if the configuration was run more
-   *         than once
+   * than once
    */
   Collection<ConfigurationReport> getConfigurationReports(Long id);
 

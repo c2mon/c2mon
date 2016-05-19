@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -25,13 +25,11 @@ import static junit.framework.Assert.assertTrue;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
-import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import cern.c2mon.shared.common.metadata.Metadata;
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -75,6 +73,7 @@ public class ClientDataTagImplTest {
             "Test description",
             "My.data.tag.name",
             "My.jms.topic");
+    tagUpdate.setValueClassName(value !=null ? value.getClass().getName() : null);
     tagUpdate.setMetadata(metadata.getMetadata());
     tagUpdate.addAlarmValue(createAlarmValue(tagId));
     return tagUpdate;
@@ -218,15 +217,6 @@ public class ClientDataTagImplTest {
     ((ClientDataTagImpl) cdt).clean();
     ((ClientDataTagImpl) cdt).onUpdate(createValidTransferTag(1234L, null));
     assertEquals(TypeNumeric.TYPE_UNKNOWN, cdt.getTypeNumeric());
-  }
-
-  /**
-   * Arbitrary types are no longer supported.
-   */
-  @Test(expected = IllegalArgumentException.class)
-  public void testArbitraryTypeNotSupported() {
-    final Tag cdt = new ClientDataTagImpl(1234L);
-    ((ClientDataTagImpl) cdt).onUpdate(createValidTransferTag(1234L, new Object()));
   }
 
   @Test

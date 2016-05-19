@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -108,7 +108,7 @@ public class ConfigurationParseCommandTagTest {
   public void commandTagUpdate_notExistingInstance() {
     // Setup Exception
     commandTagUpdate.expect(ConfigurationParseException.class);
-    commandTagUpdate.expectMessage("Creating CommandTag (id = 1) failed. Not enough arguments.");
+    commandTagUpdate.expectMessage("Creating CommandTag (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<CommandTag, Properties> pair = buildUpdateCommandTagWithSomeFields(1l);
@@ -118,7 +118,7 @@ public class ConfigurationParseCommandTagTest {
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(commandTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(commandTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, commandTagCache);
@@ -257,7 +257,7 @@ public class ConfigurationParseCommandTagTest {
   public void commandTagCreate_withNoFields() {
     // Setup Exception
     commandTagCreate.expect(ConfigurationParseException.class);
-    commandTagCreate.expectMessage("Creating CommandTag (id = 1) failed. Not enough arguments.");
+    commandTagCreate.expectMessage("Creating CommandTag (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Configuration configuration = getConfBuilderCommandTag(1L, 1L, buildCommandTagWithId(1L)._1);
@@ -266,7 +266,7 @@ public class ConfigurationParseCommandTagTest {
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(commandTagCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(commandTagCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, commandTagCache);
@@ -290,7 +290,7 @@ public class ConfigurationParseCommandTagTest {
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(commandTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(commandTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, commandTagCache);
@@ -314,7 +314,7 @@ public class ConfigurationParseCommandTagTest {
   @Test
   public void commandTagCreate_withNotExistingSupClass() {
     commandTagCreate.expect(ConfigurationParseException.class);
-    commandTagCreate.expectMessage("Creating Process (id = 1) failed. Not enough arguments.");
+    commandTagCreate.expectMessage("Creating Process (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<CommandTag, Properties> pair = buildCommandTagWithPrimFields(1l);
@@ -322,7 +322,7 @@ public class ConfigurationParseCommandTagTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache);
@@ -344,7 +344,7 @@ public class ConfigurationParseCommandTagTest {
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(commandTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(commandTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, commandTagCache);
@@ -375,7 +375,7 @@ public class ConfigurationParseCommandTagTest {
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(commandTagCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(commandTagCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, commandTagCache);
@@ -412,11 +412,11 @@ public class ConfigurationParseCommandTagTest {
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
 
-    EasyMock.expect(commandTagCache.hasKey(1l)).andReturn(false);
-    EasyMock.expect(commandTagCache.hasKey(2l)).andReturn(false);
-    EasyMock.expect(commandTagCache.hasKey(3l)).andReturn(false);
-    EasyMock.expect(commandTagCache.hasKey(4l)).andReturn(false);
-    EasyMock.expect(commandTagCache.hasKey(5l)).andReturn(false);
+    EasyMock.expect(commandTagCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(commandTagCache.hasKey(2l)).andReturn(false).times(2);
+    EasyMock.expect(commandTagCache.hasKey(3l)).andReturn(false).times(2);
+    EasyMock.expect(commandTagCache.hasKey(4l)).andReturn(false).times(2);
+    EasyMock.expect(commandTagCache.hasKey(5l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, commandTagCache);
@@ -461,9 +461,8 @@ public class ConfigurationParseCommandTagTest {
   @Test
   public void commandTagDelete_NotExistingInstance() {
     // Setup Exception
-    // commandTagDelete.expect(ConfigurationParseException.class);
-    // commandTagDelete.expectMessage("Deleting CommandTag 1 failed.
-    // CommandTag do not exist in the cache.");
+     commandTagDelete.expect(ConfigurationParseException.class);
+     commandTagDelete.expectMessage("Deleting of CommandTag (id = 1) failed: The object is unknown to the sever.");
 
     // Setup Configuration Instance
     CommandTag commandTag = buildDeleteCommandTag(1l);
@@ -473,11 +472,10 @@ public class ConfigurationParseCommandTagTest {
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
-    // EasyMock.expect(commandTagCache.hasKey(1L)).andReturn(false);
+     EasyMock.expect(commandTagCache.hasKey(1L)).andReturn(false);
 
     // Switch to replay mode
-    EasyMock.replay(processCache, equipmentCache);
-    // EasyMock.replay(commandTagCache);
+    EasyMock.replay(processCache, equipmentCache, commandTagCache);
 
     // Run the code to be tested
     List<ConfigurationElement> elements = configurationParser.parse(configuration);
@@ -489,8 +487,7 @@ public class ConfigurationParseCommandTagTest {
     assertTrue(elements.get(0).getAction().equals(Action.REMOVE));
 
     // Verify mock methods were called
-    EasyMock.verify(processCache);
-    EasyMock.verify(equipmentCache);
+    EasyMock.verify(processCache, equipmentCache, commandTagCache);
   }
 
   /**
@@ -507,9 +504,10 @@ public class ConfigurationParseCommandTagTest {
     // Set expectations
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
+    EasyMock.expect(commandTagCache.hasKey(1L)).andReturn(true);
 
     // Switch to replay mode
-    EasyMock.replay(processCache, equipmentCache );
+    EasyMock.replay(processCache, equipmentCache , commandTagCache);
     // EasyMock.replay(commandTagCache);
 
     // Run the code to be tested
@@ -522,8 +520,7 @@ public class ConfigurationParseCommandTagTest {
     assertTrue(elements.get(0).getAction().equals(Action.REMOVE));
 
     // Verify mock methods were called
-    EasyMock.verify(processCache);
-    EasyMock.verify(equipmentCache);
+    EasyMock.verify(processCache, equipmentCache, commandTagCache);
   }
 
   @Test
@@ -540,7 +537,8 @@ public class ConfigurationParseCommandTagTest {
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
 
     EasyMock.expect(commandTagCache.hasKey(2L)).andReturn(true);
-    EasyMock.expect(commandTagCache.hasKey(3L)).andReturn(false);
+    EasyMock.expect(commandTagCache.hasKey(3L)).andReturn(false).times(2);
+    EasyMock.expect(commandTagCache.hasKey(1L)).andReturn(true);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, commandTagCache);

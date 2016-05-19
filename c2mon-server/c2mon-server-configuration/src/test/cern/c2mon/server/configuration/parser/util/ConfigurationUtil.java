@@ -21,10 +21,14 @@ import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.process.Process;
-import cern.c2mon.shared.client.configuration.api.tag.*;
+import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
+import cern.c2mon.shared.client.configuration.api.tag.AliveTag;
+import cern.c2mon.shared.client.configuration.api.tag.CommFaultTag;
+import cern.c2mon.shared.client.configuration.api.tag.DataTag;
+import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
+import cern.c2mon.shared.client.configuration.api.tag.RuleTag;
 
 import static cern.c2mon.server.configuration.parser.util.ConfigurationAliveTagUtil.builderAliveTagWithPrimFields;
-import static cern.c2mon.server.configuration.parser.util.ConfigurationCommFaultTagUtil.builderCommFaultTagWithPrimFields;
 import static cern.c2mon.server.configuration.parser.util.ConfigurationEquipmentUtil.builderEquipmentWithPrimFields;
 import static cern.c2mon.server.configuration.parser.util.ConfigurationProcessUtil.builderProcessWithPrimFields;
 import static cern.c2mon.server.configuration.parser.util.ConfigurationStatusTagUtil.builderStatusTagWithPrimFields;
@@ -224,7 +228,7 @@ public class ConfigurationUtil {
   @SafeVarargs
   public static Configuration getConfBuilderDataTagS(Long subEquipmentId, Long equipmentId, Long processId, DataTag... elements) {
     Equipment.EquipmentBuilder tempBuildE = Equipment.builder().id(equipmentId);
-    SubEquipment.SubEquipmentBuilder tempBuildS = SubEquipment.builderSubEquipment().id(subEquipmentId);
+    SubEquipment.SubEquipmentBuilder tempBuildS = SubEquipment.builder().id(subEquipmentId);
     for (DataTag element : elements) {
       tempBuildS.dataTag(element);
     }

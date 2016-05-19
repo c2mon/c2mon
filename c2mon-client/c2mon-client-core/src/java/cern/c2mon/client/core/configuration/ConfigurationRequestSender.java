@@ -16,29 +16,23 @@
  *****************************************************************************/
 package cern.c2mon.client.core.configuration;
 
-import java.lang.reflect.Type;
-
+import cern.c2mon.client.common.listener.ClientRequestReportListener;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.api.Configuration;
+import cern.c2mon.shared.client.configuration.serialisation.HardwareAddressSerializer;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.util.jms.JmsSender;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.google.gson.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-
-import cern.c2mon.client.common.listener.ClientRequestReportListener;
-import cern.c2mon.shared.client.configuration.ConfigurationReport;
-import cern.c2mon.shared.client.configuration.api.Configuration;
-import cern.c2mon.shared.client.configuration.api.tag.Tag;
-import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import cern.c2mon.shared.util.jms.JmsSender;
+import java.io.IOException;
+import java.lang.reflect.Type;
 
 /**
  * JMS sender class for sending the Configuration request to the server and waiting for the response.
@@ -52,9 +46,19 @@ public class ConfigurationRequestSender {
 
   @Autowired
   private JmsSender jmsSender;
-  
+
   @Autowired
   private Environment environment;
+
+  private ObjectMapper mapper;
+
+  public ConfigurationRequestSender() {
+    mapper = new ObjectMapper();
+    SimpleModule module = new SimpleModule();
+    module.addSerializer(HardwareAddress.class, new HardwareAddressSerializer());
+    mapper.registerModule(module);
+    mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+  }
 
   /**
    * @param configuration
@@ -63,14 +67,23 @@ public class ConfigurationRequestSender {
    * @return
    */
   public ConfigurationReport applyConfiguration(Configuration configuration, ClientRequestReportListener listener) {
-    Gson gson = new GsonBuilder()
-        .registerTypeAdapter(HardwareAddress.class, new InterfaceAdapter<HardwareAddress>())
-        .registerTypeAdapter(Tag.class, new InterfaceAdapter<Tag>())
-        .create();
-    String message = gson.toJson(configuration);
-    String destination = environment.getRequiredProperty("c2mon.client.jms.config.queue");
-    String reply = jmsSender.sendRequestToQueue(message, destination, DEFAULT_TIMEOUT);
-    return gson.fromJson(reply, ConfigurationReport.class);
+    try {
+      String message = mapper.writeValueAsString(configuration);
+      String destination = environment.getRequiredProperty("c2mon.client.jms.config.queue");
+      String reply = jmsSender.sendRequestToQueue(message, destination, DEFAULT_TIMEOUT);
+
+      return mapper.readValue(reply, ConfigurationReport.class);
+
+    } catch (IOException e) {
+
+      ConfigurationReport failureReport = new ConfigurationReport();
+      failureReport.setExceptionTrace(e);
+      failureReport.setStatus(ConfigConstants.Status.FAILURE);
+      failureReport.setStatusDescription("Serialization or Deserialization of Configuration on Client side failed");
+
+      return failureReport;
+
+    }
   }
 
   /**

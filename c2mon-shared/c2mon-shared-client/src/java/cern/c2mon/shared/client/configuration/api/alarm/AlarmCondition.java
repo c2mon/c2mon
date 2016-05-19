@@ -16,12 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration.api.alarm;
 
-import cern.c2mon.shared.client.configuration.api.util.DataType;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-//import static cern.c2mon.server.configuration.parser.util.ConfigurationAllTogetherUtil.buildAllMandatory;
 
 /**
  * Alarm condition to a {@link Alarm}
@@ -36,7 +33,7 @@ public abstract class AlarmCondition {
   /**
    * Datatype of the alarm condition
    */
-  private DataType dataType;
+  private Class<?> dataType;
 
   abstract public String getXMLCondition();
 

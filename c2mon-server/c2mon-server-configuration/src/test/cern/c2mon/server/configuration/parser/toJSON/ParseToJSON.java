@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- *
+ * <p/>
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- *
+ * <p/>
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- *
+ * <p/>
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -21,41 +21,189 @@ import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
-import cern.c2mon.shared.common.metadata.Metadata;
-import org.codehaus.jackson.map.ObjectMapper;
+import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
+import cern.c2mon.shared.client.configuration.api.util.ConfigurationObject;
+import cern.c2mon.shared.client.configuration.serialisation.HardwareAddressDeserializer;
+import cern.c2mon.shared.client.configuration.serialisation.HardwareAddressSerializer;
+import cern.c2mon.shared.common.datatag.address.ENSHardwareAddress;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.datatag.address.impl.*;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import static cern.c2mon.server.configuration.parser.util.ConfigurationAllTogetherUtil.buildAllMandatoryWithMetadata;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationAllTogetherUtil.buildAllWithAllFields;
+import static cern.c2mon.shared.common.datatag.address.JMXHardwareAddress.ReceiveMethod.poll;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by fritter on 30/11/15.
+ * @author Franz Ritter
  */
 public class ParseToJSON {
 
-  @Test
-  public void parseComplexConfiguration() {
-    Configuration insert = buildAllMandatoryWithMetadata();
+  private static ObjectMapper mapper = new ObjectMapper();
 
-    ObjectMapper mapper = new ObjectMapper();
+  @BeforeClass
+  public static void setUpParser(){
+    SimpleModule module = new SimpleModule();
+    module.addSerializer(HardwareAddress.class, new HardwareAddressSerializer());
+    module.addDeserializer(HardwareAddress.class,new HardwareAddressDeserializer());
+    mapper.registerModule(module);
+    mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+  }
+
+  @Test
+  public void parseTagWithDBHardwareAddress(){
+
+    HardwareAddress address = new DBHardwareAddressImpl("itemName");
+    HardwareAddress readAddress = serializeDeserializeAddress(address);
+
+    assertEquals(address, readAddress);
+  }
+
+  @Test
+  public void parseTagWithDIPHardwareAddress(){
+
+    HardwareAddress address = new DIPHardwareAddressImpl("itemName", "fieldName", 1);
+    HardwareAddress readAddress = serializeDeserializeAddress(address);
+
+    assertEquals(address, readAddress);
+
+  }
+
+  @Test
+  public void parseTagWithENSHardwareAddress(){
+
+    HardwareAddress address = new ENSHardwareAddressImpl("pAddress", ENSHardwareAddress.TYPE_ANALOG);
+    HardwareAddress readAddress = serializeDeserializeAddress(address);
+
+    assertEquals(address, readAddress);
+
+  }
+
+  @Test
+  public void parseTagWithJAPCHardwareAddress(){
+
+    HardwareAddress address = new JAPCHardwareAddressImpl("pDeviceName","pPropertyName", "dataFieldName", "commandType", "contextField",  "filter");
+    HardwareAddress readAddress = serializeDeserializeAddress(address);
+
+    assertEquals(address, readAddress);
+
+  }
+
+  @Test
+  public void parseTagWithJMXHardwareAddress(){
+
+    HardwareAddress address = new JMXHardwareAddressImpl("objectName", "attribute", "callMethod", 100, "compositeField","mapField", poll.toString());
+    HardwareAddress readAddress = serializeDeserializeAddress(address);
+
+    assertEquals(address, readAddress);
+
+  }
+
+  @Test
+  public void parseTagWithOPCHardwareAddress(){
+
+    HardwareAddress address = new OPCHardwareAddressImpl("pItemName", 100);
+    HardwareAddress readAddress = serializeDeserializeAddress(address);
+
+    assertEquals(address, readAddress);
+
+  }
+
+  @Test
+  public void parseTagWithPLCHardwareAddress(){
+
+    HardwareAddress address = new PLCHardwareAddressImpl(1, 2, 3, 4, 4.0f, 5.0f, "pNativeAddress", 5000);
+    HardwareAddress readAddress = serializeDeserializeAddress(address);
+
+    assertEquals(address, readAddress);
+
+  }
+
+  @Test
+  public void parseTagWithSimpleHardwareAddress(){
+
+    HardwareAddress address = new SimpleHardwareAddressImpl("simpleName");
+    HardwareAddress readAddress = serializeDeserializeAddress(address);
+
+    assertEquals(address, readAddress);
+
+  }
+
+  @Test
+  public void parseTagWithSSHHardwareAddress(){
+
+    HardwareAddress address = new SSHHardwareAddressImpl("pServerAlias","pUserName","pUserPasswd", "pSystemCall",
+        100L, 50L,SSHHardwareAddressImpl.XML_PROTOCOL,"pSshKey", "pKeyPassphrase");
+    HardwareAddress readAddress = serializeDeserializeAddress(address);
+
+    assertEquals(address, readAddress);
+
+  }
+
+  private HardwareAddress serializeDeserializeAddress(HardwareAddress address){
     try {
-      mapper.writeValue(new File("test.json"), insert);
-      Configuration confRead = mapper.readValue(new File("test.json"), Configuration.class);
+      String jsonMessage = mapper.writeValueAsString(address);
 
-      assertEquals(confRead, insert);
+      return mapper.readValue(jsonMessage, HardwareAddress.class);
     } catch (IOException e) {
-      e.printStackTrace();
+      return null;
     }
+
+  }
+
+
+  @Test
+  public void parseCrudConfiguration() {
+
+    Configuration insertConfig = Configuration.builder().name("Default configuration").confId(-1L).application("No application defined").build();
+
+    Process createProcess = Process.create("P_TEST").statusTag(StatusTag.create("Status_P").build()).build();
+    Equipment createEquipment = Equipment.create("E_TEST", "handlerClassName").id(33L).build();
+    createEquipment.setParentProcessName("P_TEST");
+    DataTag updateTag = DataTag.update("The DataTag").maxValue(10).description("dataTagUpdate").build();
+
+    List<ConfigurationObject> configList = new ArrayList<>();
+    configList.add(createProcess);
+    configList.add(createEquipment);
+    configList.add(updateTag);
+
+    insertConfig.setConfigurationItems(configList);
+
+    Configuration readConfig = serializeDeserializeConfiguration(insertConfig);
+
+    assertEquals(insertConfig, readConfig);
   }
 
   @Test
-  public void simpleConf(){
-    Configuration conf = Configuration.builder()
-        .process(Process.builder().id(1L)
-            .equipment(Equipment.builder().id(2L)
-                .dataTag(DataTag.builder().id(1377L).metadata(Metadata.builder().addMetadata("Str",1).build()).build()).build()).build()).build();
+  public void parseComplexConfiguration2() {
+
+    Configuration insert = buildAllWithAllFields()._1;
+    Configuration confRead = serializeDeserializeConfiguration(insert);
+
+    assertEquals(insert, confRead);
   }
+
+//  @Test
+
+
+  private Configuration serializeDeserializeConfiguration(Configuration config){
+    try {
+      String jsonMessage = mapper.writeValueAsString(config);
+
+      return mapper.readValue(jsonMessage, Configuration.class);
+    } catch (IOException e) {
+      return null;
+    }
+
+  }
+
 }

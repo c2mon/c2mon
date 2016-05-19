@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -101,35 +101,35 @@ public class ConfigurationParseAllTogetherTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(0L)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(24L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(21L)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(6L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(13L)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(0L)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(24L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(21L)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(6L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(13L)).andReturn(false).times(2);
 
-    EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(25L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(22L)).andReturn(false);
-    EasyMock.expect(commFaultTagCache.hasKey(4L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(14L)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(7L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(15L)).andReturn(false);
-    EasyMock.expect(dataTagCache.hasKey(9L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(16L)).andReturn(false);
-    EasyMock.expect(commandtagCache.hasKey(27L)).andReturn(false);
+    EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(25L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(22L)).andReturn(false).times(2);
+    EasyMock.expect(commFaultTagCache.hasKey(4L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(14L)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(7L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(15L)).andReturn(false).times(2);
+    EasyMock.expect(dataTagCache.hasKey(9L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(16L)).andReturn(false).times(2);
+    EasyMock.expect(commandtagCache.hasKey(27L)).andReturn(false).times(2);
 
-    EasyMock.expect(subEquipmentCache.hasKey(2L)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(26L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(23L)).andReturn(false);
-    EasyMock.expect(commFaultTagCache.hasKey(5L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(17L)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(8L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(18L)).andReturn(false);
-    EasyMock.expect(dataTagCache.hasKey(10L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(19L)).andReturn(false);
+    EasyMock.expect(subEquipmentCache.hasKey(2L)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(26L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(23L)).andReturn(false).times(2);
+    EasyMock.expect(commFaultTagCache.hasKey(5L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(17L)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(8L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(18L)).andReturn(false).times(2);
+    EasyMock.expect(dataTagCache.hasKey(10L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(19L)).andReturn(false).times(2);
 
-    EasyMock.expect(ruleTagCache.hasKey(11L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(20L)).andReturn(false);
+    EasyMock.expect(ruleTagCache.hasKey(11L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(20L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(ruleTagCache, processCache, equipmentCache, subEquipmentCache, alarmCache, dataTagCache, aliveTagCache, commFaultTagCache, statusTagCache, commandtagCache);
@@ -208,35 +208,35 @@ public class ConfigurationParseAllTogetherTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(0L)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(24L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(21L)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(6L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(13L)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(0L)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(24L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(21L)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(6L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(13L)).andReturn(false).times(2);
 
-    EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(25L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(22L)).andReturn(false);
-    EasyMock.expect(commFaultTagCache.hasKey(4L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(14L)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(7L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(15L)).andReturn(false);
-    EasyMock.expect(dataTagCache.hasKey(9L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(16L)).andReturn(false);
-    EasyMock.expect(commandtagCache.hasKey(27L)).andReturn(false);
+    EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(25L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(22L)).andReturn(false).times(2);
+    EasyMock.expect(commFaultTagCache.hasKey(4L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(14L)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(7L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(15L)).andReturn(false).times(2);
+    EasyMock.expect(dataTagCache.hasKey(9L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(16L)).andReturn(false).times(2);
+    EasyMock.expect(commandtagCache.hasKey(27L)).andReturn(false).times(2);
 
-    EasyMock.expect(subEquipmentCache.hasKey(2L)).andReturn(false);
-    EasyMock.expect(statusTagCache.hasKey(26L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(23L)).andReturn(false);
-    EasyMock.expect(commFaultTagCache.hasKey(5L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(17L)).andReturn(false);
-    EasyMock.expect(aliveTagCache.hasKey(8L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(18L)).andReturn(false);
-    EasyMock.expect(dataTagCache.hasKey(10L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(19L)).andReturn(false);
+    EasyMock.expect(subEquipmentCache.hasKey(2L)).andReturn(false).times(2);
+    EasyMock.expect(statusTagCache.hasKey(26L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(23L)).andReturn(false).times(2);
+    EasyMock.expect(commFaultTagCache.hasKey(5L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(17L)).andReturn(false).times(2);
+    EasyMock.expect(aliveTagCache.hasKey(8L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(18L)).andReturn(false).times(2);
+    EasyMock.expect(dataTagCache.hasKey(10L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(19L)).andReturn(false).times(2);
 
-    EasyMock.expect(ruleTagCache.hasKey(11L)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(20L)).andReturn(false);
+    EasyMock.expect(ruleTagCache.hasKey(11L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(20L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(ruleTagCache, processCache, equipmentCache, subEquipmentCache, alarmCache, dataTagCache, aliveTagCache, commFaultTagCache, statusTagCache, commandtagCache);

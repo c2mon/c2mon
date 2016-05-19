@@ -127,13 +127,11 @@ public class ConfigurationProcessUtil {
   public static Pair<Process, Properties> buildUpdateProcessWtihSomeFields(Long id) {
     Process pro = Process.builder()
         .id(id)
-        .name("Prozess_Update")
         .description("foo_Update")
         .maxMessageSize(100)
         .build();
 
     Properties props = new Properties();
-    props.setProperty("name", "Prozess_Update");
     props.setProperty("description", "foo_Update");
     props.setProperty("maxMessageSize", String.valueOf(100));
 

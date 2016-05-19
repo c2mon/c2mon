@@ -21,7 +21,12 @@ import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.process.Process;
-import cern.c2mon.shared.client.configuration.api.tag.*;
+import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
+import cern.c2mon.shared.client.configuration.api.tag.AliveTag;
+import cern.c2mon.shared.client.configuration.api.tag.CommFaultTag;
+import cern.c2mon.shared.client.configuration.api.tag.DataTag;
+import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
+import cern.c2mon.shared.client.configuration.api.tag.RuleTag;
 import cern.c2mon.shared.common.metadata.Metadata;
 
 import java.util.ArrayList;

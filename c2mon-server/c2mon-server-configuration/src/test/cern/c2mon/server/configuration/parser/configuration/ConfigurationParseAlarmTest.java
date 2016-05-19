@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ * <p/>
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ * <p/>
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ * <p/>
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -113,7 +113,7 @@ public class ConfigurationParseAlarmTest {
   public void alarmUpdate_notExistingInstance() {
     // Setup Exception
     alarmUpdate.expect(ConfigurationParseException.class);
-    alarmUpdate.expectMessage("Creating Alarm (id = 1) failed. Not enough arguments.");
+    alarmUpdate.expectMessage("Creating Alarm (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<Alarm, Properties> pair = buildUpdateAlarmWithSomeFields(1l);
@@ -124,7 +124,7 @@ public class ConfigurationParseAlarmTest {
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(dataTagCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(alarmCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(alarmCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, dataTagCache, alarmCache);
@@ -256,7 +256,7 @@ public class ConfigurationParseAlarmTest {
   public void alarmCreate_withNoFields() {
     // Setup Exception
     alarmCreate.expect(ConfigurationParseException.class);
-    alarmCreate.expectMessage("Creating Alarm (id = 1) failed. Not enough arguments.");
+    alarmCreate.expectMessage("Creating Alarm (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Configuration configuration = getConfBuilderAlarm(buildAlarmWithId(1L)._1);
@@ -266,10 +266,10 @@ public class ConfigurationParseAlarmTest {
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(dataTagCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(alarmCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(alarmCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
-    EasyMock.replay(processCache, equipmentCache, dataTagCache ,alarmCache);
+    EasyMock.replay(processCache, equipmentCache, dataTagCache, alarmCache);
 
     // Run the code to be tested
     configurationParser.parse(configuration);
@@ -289,10 +289,10 @@ public class ConfigurationParseAlarmTest {
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(dataTagCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(alarmCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(alarmCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
-    EasyMock.replay(processCache, equipmentCache, dataTagCache ,alarmCache);
+    EasyMock.replay(processCache, equipmentCache, dataTagCache, alarmCache);
 
     // Run the code to be tested
     List<ConfigurationElement> elements = configurationParser.parse(configuration);
@@ -311,7 +311,7 @@ public class ConfigurationParseAlarmTest {
   @Test
   public void alarmCreate_withNotExistingSupClass() {
     alarmCreate.expect(ConfigurationParseException.class);
-    alarmCreate.expectMessage("Creating Process (id = 1) failed. Not enough arguments.");
+    alarmCreate.expectMessage("Creating Process (id = 1) failed: Not enough arguments.");
 
     // Setup Configuration Instance
     Pair<Alarm, Properties> pair = buildAlarmWithPrimFields(1l);
@@ -319,7 +319,7 @@ public class ConfigurationParseAlarmTest {
 
     // Setup Mock
     // Set expectations
-    EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(processCache.hasKey(1L)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache);
@@ -342,7 +342,7 @@ public class ConfigurationParseAlarmTest {
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(dataTagCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(alarmCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(alarmCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, dataTagCache, alarmCache);
@@ -372,7 +372,7 @@ public class ConfigurationParseAlarmTest {
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(dataTagCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(alarmCache.hasKey(1l)).andReturn(false);
+    EasyMock.expect(alarmCache.hasKey(1l)).andReturn(false).times(2);
 
     // Switch to replay mode
     EasyMock.replay(processCache, equipmentCache, dataTagCache, alarmCache);
@@ -408,14 +408,14 @@ public class ConfigurationParseAlarmTest {
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(dataTagCache.hasKey(1L)).andReturn(true);
 
-    EasyMock.expect(alarmCache.hasKey(1l)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(2l)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(3l)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(4l)).andReturn(false);
-    EasyMock.expect(alarmCache.hasKey(5l)).andReturn(false);
+    EasyMock.expect(alarmCache.hasKey(1l)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(2l)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(3l)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(4l)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(5l)).andReturn(false).times(2);
 
     // Switch to replay mode
-    EasyMock.replay(processCache, equipmentCache, dataTagCache ,alarmCache);
+    EasyMock.replay(processCache, equipmentCache, dataTagCache, alarmCache);
 
     // Run the code to be tested
     List<ConfigurationElement> elements = configurationParser.parse(configuration);
@@ -455,9 +455,8 @@ public class ConfigurationParseAlarmTest {
   @Test
   public void alarmDelete_NotExistingInstance() {
     // Setup Exception
-    // alarmDelete.expect(ConfigurationParseException.class);
-    // alarmDelete.expectMessage("Deleting Alarm 1 failed.
-    // Alarm do not exist in the cache.");
+    alarmDelete.expect(ConfigurationParseException.class);
+    alarmDelete.expectMessage("Deleting of Alarm (id = 1) failed: The object is unknown to the sever.");
 
     // Setup Configuration Instance
     Alarm alarm = buildDeleteAlarm(1l);
@@ -468,11 +467,10 @@ public class ConfigurationParseAlarmTest {
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(dataTagCache.hasKey(1L)).andReturn(true);
-    // EasyMock.expect(alarmCache.hasKey(1L)).andReturn(false);
+    EasyMock.expect(alarmCache.hasKey(1L)).andReturn(false);
 
     // Switch to replay mode
-    EasyMock.replay(processCache, equipmentCache, dataTagCache);
-    // EasyMock.replay(alarmCache);
+    EasyMock.replay(processCache, equipmentCache, dataTagCache, alarmCache);
 
     // Run the code to be tested
     List<ConfigurationElement> elements = configurationParser.parse(configuration);
@@ -484,7 +482,7 @@ public class ConfigurationParseAlarmTest {
     assertTrue(elements.get(0).getAction().equals(Action.REMOVE));
 
     // Verify mock methods were called
-    EasyMock.verify(processCache, equipmentCache, dataTagCache);
+    EasyMock.verify(processCache, equipmentCache, dataTagCache, alarmCache);
   }
 
   /**
@@ -502,10 +500,10 @@ public class ConfigurationParseAlarmTest {
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
     EasyMock.expect(dataTagCache.hasKey(1L)).andReturn(true);
+    EasyMock.expect(alarmCache.hasKey(1L)).andReturn(true);
 
     // Switch to replay mode
-    EasyMock.replay(processCache, equipmentCache, dataTagCache);
-    // EasyMock.replay(alarmCache);
+    EasyMock.replay(processCache, equipmentCache, dataTagCache, alarmCache);
 
     // Run the code to be tested
     List<ConfigurationElement> elements = configurationParser.parse(configuration);
@@ -517,7 +515,7 @@ public class ConfigurationParseAlarmTest {
     assertTrue(elements.get(0).getAction().equals(Action.REMOVE));
 
     // Verify mock methods were called
-    EasyMock.verify(processCache, equipmentCache, dataTagCache);
+    EasyMock.verify(processCache, equipmentCache, dataTagCache, alarmCache);
   }
 
   @Test
@@ -535,10 +533,11 @@ public class ConfigurationParseAlarmTest {
     EasyMock.expect(dataTagCache.hasKey(1L)).andReturn(true);
 
     EasyMock.expect(alarmCache.hasKey(2L)).andReturn(true);
-    EasyMock.expect(alarmCache.hasKey(3L)).andReturn(false);
+    EasyMock.expect(alarmCache.hasKey(3L)).andReturn(false).times(2);
+    EasyMock.expect(alarmCache.hasKey(1L)).andReturn(true);
 
     // Switch to replay mode
-    EasyMock.replay(processCache, equipmentCache, dataTagCache ,alarmCache);
+    EasyMock.replay(processCache, equipmentCache, dataTagCache, alarmCache);
 
     // Run the code to be tested
     List<ConfigurationElement> elements = configurationParser.parse(configuration);

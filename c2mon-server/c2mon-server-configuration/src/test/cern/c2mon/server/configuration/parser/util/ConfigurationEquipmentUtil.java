@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -19,12 +19,9 @@ package cern.c2mon.server.configuration.parser.util;
 import java.util.Properties;
 
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
-import cern.c2mon.shared.client.configuration.api.process.*;
-import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.AliveTag;
 import cern.c2mon.shared.client.configuration.api.tag.CommFaultTag;
 import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
-import cern.c2mon.shared.client.configuration.api.util.DataType;
 
 //@Service
 public class ConfigurationEquipmentUtil {
@@ -134,14 +131,12 @@ public class ConfigurationEquipmentUtil {
   public static Pair<Equipment, Properties> buildUpdateEquipmentWithSomeFields(Long id) {
     Equipment pro = Equipment.builder()
         .id(id)
-        .name("Equipment_Update")
         .description("foo_Update")
         .address("testAddress_Update")
         .handlerClass("handlerClassName")
         .build();
 
     Properties props = new Properties();
-    props.setProperty("name", "Equipment_Update");
     props.setProperty("description", "foo_Update");
     props.setProperty("address", "testAddress_Update");
     props.setProperty("handlerClass", "handlerClassName");

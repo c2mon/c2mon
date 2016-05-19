@@ -1,23 +1,22 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.configuration.parser.util;
 
 import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
-import cern.c2mon.shared.client.configuration.api.util.DataType;
 import cern.c2mon.shared.client.tag.TagMode;
 
 import java.util.Properties;
@@ -41,7 +40,7 @@ public class ConfigurationStatusTagUtil {
     props.setProperty("name", "StatusTag");
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", DataType.STRING.toString());
+    props.setProperty("dataType", String.class.getName());
     props.setProperty("isLogged", String.valueOf(true));
     props.setProperty("processId", String.valueOf(1l));
 
@@ -61,7 +60,7 @@ public class ConfigurationStatusTagUtil {
     props.setProperty("name", "StatusTag");
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", DataType.STRING.toString());
+    props.setProperty("dataType", String.class.getName());
     props.setProperty("isLogged", String.valueOf(false));
     props.setProperty("processId", String.valueOf(1l));
 
@@ -79,7 +78,7 @@ public class ConfigurationStatusTagUtil {
     props.setProperty("name", "StatusTag");
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", DataType.STRING.toString());
+    props.setProperty("dataType", String.class.getName());
     props.setProperty("isLogged", String.valueOf(true));
     props.setProperty("processId", String.valueOf(1l));
 
@@ -128,7 +127,7 @@ public class ConfigurationStatusTagUtil {
     props.setProperty("name", "StatusTag"+parent);
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", DataType.STRING.toString());
+    props.setProperty("dataType", String.class.getName());
     props.setProperty("isLogged", String.valueOf(true));
     switch(parent){
       case "process" : props.setProperty("processId", String.valueOf(parentId)); break;
@@ -151,7 +150,7 @@ public class ConfigurationStatusTagUtil {
     props.setProperty("name", "StatusTag"+parent);
     props.setProperty("description", "foo");
     props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", DataType.STRING.toString());
+    props.setProperty("dataType", String.class.getName());
     props.setProperty("isLogged", String.valueOf(false));
     switch(parent){
       case "process" : props.setProperty("processId", String.valueOf(parentId)); break;

@@ -1,25 +1,24 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration.api.alarm;
 
-import cern.c2mon.shared.common.metadata.Metadata;
-import cern.c2mon.shared.client.configuration.api.util.DataType;
-import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationObject;
+import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
+import cern.c2mon.shared.common.metadata.Metadata;
 import lombok.Builder;
 import lombok.Data;
 
@@ -38,23 +37,31 @@ import lombok.Data;
 public class Alarm implements ConfigurationObject {
 
   @IgnoreProperty
+  private boolean update;
+
+  @IgnoreProperty
+  private boolean create;
+
+  @IgnoreProperty
   private boolean deleted;
+
+  /**
+   * The id of the overlying Tag. This field should never set by the user directly.
+   */
+  @IgnoreProperty
+  private Long parentTagId;
+
+  /**
+   * The name of the overlying Tag. This field should never set by the user directly.
+   */
+  @IgnoreProperty
+  private String parentTagName;
 
   /**
    * Internal identifier of the AlarmCacheObject.
    */
   @IgnoreProperty
   private Long id;
-
-  private DataType valueType;
-
-  /**
-   * Unique identifier of the DataTagCacheObject to which the alarm is attached.
-   * The Alarm is activated or terminated depending on the current value of this
-   * data tag.
-   * TODO set the id depending of the Object which holds the Alarm...
-   */
-  private Long dataTagId;
 
   /**
    * LASER fault family of the alarm.
@@ -76,7 +83,6 @@ public class Alarm implements ConfigurationObject {
    */
   private Metadata metadata;
 
-  // TODO check if alarm condition is mandatory
   private AlarmCondition alarmCondition;
 
   /**
@@ -94,13 +100,11 @@ public class Alarm implements ConfigurationObject {
    * @param metadata       Arbitrary metadata attached to this alarm configuration.
    */
   @Builder
-  public Alarm(boolean deleted, Long id, DataType valueType, Long dataTagId, String faultFamily, String faultMember, Integer faultCode,
+  public Alarm(boolean deleted, Long id, String faultFamily, String faultMember, Integer faultCode,
                AlarmCondition alarmCondition, Metadata metadata) {
     super();
     this.deleted = deleted;
     this.id = id;
-    this.valueType = valueType;
-    this.dataTagId = dataTagId;
     this.faultFamily = faultFamily;
     this.faultMember = faultMember;
     this.faultCode = faultCode;
@@ -113,9 +117,84 @@ public class Alarm implements ConfigurationObject {
 
   @Override
   public boolean requiredFieldsGiven() {
-    boolean result = (getId() != null) && (getFaultMember() != null)
-        && (getFaultFamily() != null) && (getFaultCode() != null) && (getValueType() != null);
+    boolean result = (getId() != null) && (getFaultMember() != null) && (getFaultFamily() != null) && (getFaultCode() != null);
 
     return result;
+  }
+
+  public static CreateBuilder create(String faultFamily, String faultMember, Integer faultCode, AlarmCondition alarmCondition) {
+
+    Alarm iniAlarm = Alarm.builder()
+        .faultFamily(faultFamily)
+        .faultMember(faultMember)
+        .faultCode(faultCode)
+        .alarmCondition(alarmCondition).build();
+
+    return iniAlarm.toCreateBuilder(iniAlarm);
+  }
+
+  public static UpdateBuilder update(Long id) {
+
+    Alarm iniAlarm = Alarm.builder().id(id).build();
+
+    return iniAlarm.toUpdateBuilder(iniAlarm);
+  }
+
+  private CreateBuilder toCreateBuilder(Alarm initializationAlarm) {
+    return new CreateBuilder(initializationAlarm);
+  }
+
+  private UpdateBuilder toUpdateBuilder(Alarm initializationAlarm) {
+    return new Alarm.UpdateBuilder(initializationAlarm);
+  }
+
+  public static class CreateBuilder {
+
+    private Alarm alarmBuild;
+
+    CreateBuilder(Alarm initializationAlarm) {
+      this.alarmBuild = initializationAlarm;
+    }
+
+    public Alarm.CreateBuilder id(Long id) {
+      this.alarmBuild.setId(id);
+      return this;
+    }
+
+    public Alarm.CreateBuilder metadata(Metadata metadata) {
+      this.alarmBuild.setMetadata(metadata);
+      return this;
+    }
+
+    public Alarm build() {
+
+      alarmBuild.setCreate(true);
+      return this.alarmBuild;
+    }
+  }
+
+  public static class UpdateBuilder {
+
+    private Alarm builderAlarm;
+
+    UpdateBuilder(Alarm initializationAlarm) {
+      this.builderAlarm = initializationAlarm;
+    }
+
+    public Alarm.UpdateBuilder alarmCondition(AlarmCondition alarmCondition) {
+      this.builderAlarm.setAlarmCondition(alarmCondition);
+      return this;
+    }
+
+    public Alarm.UpdateBuilder metadata(Metadata metadata) {
+      this.builderAlarm.setMetadata(metadata);
+      return this;
+    }
+
+    public Alarm build() {
+
+      this.builderAlarm.setUpdate(true);
+      return this.builderAlarm;
+    }
   }
 }

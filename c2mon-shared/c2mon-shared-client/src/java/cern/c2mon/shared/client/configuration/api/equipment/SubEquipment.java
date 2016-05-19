@@ -16,20 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration.api.equipment;
 
-import java.util.ArrayList;
+import cern.c2mon.shared.client.configuration.api.tag.*;
+import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
+import lombok.*;
+
 import java.util.List;
 
-import cern.c2mon.shared.client.configuration.api.tag.*;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Singular;
-import lombok.ToString;
 
 /**
- * Configuration object for a SubEquipment.
+ * Configuration object for a Equipment.
  * Holds the information to create a {@link cern.c2mon.shared.client.configuration.ConfigurationElement}
- * related to a SubEquipment.
+ * related to an Equipment.
  * <p/>
  * For further information how to use instances of this for server configurations read <a
  * href="http://c2mon.web.cern.ch/c2mon/docs/#_offline_configuration_via_c2mon_database_test_purpose_only">this</a> documentation.
@@ -40,38 +37,176 @@ import lombok.ToString;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class SubEquipment extends Equipment {
+public class SubEquipment extends AbstractEquipment{
+
+  /**
+   * The id of the overlying Process. This field should never set by the user directly.
+   */
+  @IgnoreProperty
+  private Long parentEquipmentId;
+
+  /**
+   * The name of the overlying Process. This field should never set by the user directly.
+   */
+  @IgnoreProperty
+  private String parentEquipmentName;
 
 
   /**
-   * Constructor for building a SubEquipment with all fields.
-   * To build a SubEquipment with arbitrary fields use the builder pattern.
+   * Constructor for building a Equipment with all fields.
+   * To build a Equipment with arbitrary fields use the builder pattern.
    *
-   * @param id            Unique id of the SubEquipment.
-   * @param name          Unique name the SubEquipment.
-   * @param description   Describes the propose of the SubEquipment.
+   * @param id            Unique id of the Equipment.
+   * @param name          Unique name the Equipment.
+   * @param description   Describes the propose of the Equipment.
    * @param deleted       Determine if this object apply as deletion.
    * @param aliveInterval Defines the configuration of the alive interval of the AliveTag which is attached to this Process.
    * @param equipments    List of SubEquipment configuration objects for this tag. If the argument is null the field will be an empty List as default.
-   * @param statusTag     Mandatory configuration object for an StatusTag which is attached to this process. If the configuration is not a delete this
-   *                      field have to be null.
-   * @param aliveTag      Mandatory configuration object for an AliveTag which is attached to this process. If the configuration is not a delete this field
-   *                      have to be null.
-   * @param handlerClass  Full path-class name of the handler class of the this SubEquipment.
-   * @param address       Address parameter used by the handler class to connect to the SubEquipment.
-   * @param commFaultTag  Mandatory configuration object for an CommFaultTag which is attached to this process. If the configuration is not a delete this
-   *                      field have to be null.
-   * @param dataTags      Optional list of DataTag configurations which are attached to this SubEquipment. If the argument is null the field will be an empty
+   * @param statusTag     Mandatory configuration object for an StatusTag which is attached to this process. If the configuration is not a 'delete' this
+   *                      field has to be null.
+   * @param aliveTag      Mandatory configuration object for an AliveTag which is attached to this process. If the configuration is not a 'delete' this field
+   *                      has to be null.
+   * @param handlerClass  Full path-class name of the handler class of the this equipemnt.
+   * @param address       Address parameter used by the handler class to connect to the equipment.
+   * @param commFaultTag  Mandatory configuration object for an CommFaultTag which is attached to this process. If the configuration is not a 'delete' this
+   *                      field has to be null.
+   * @param dataTags      Optional list of DataTag configurations which are attached to this Equipment. If the argument is null the field will be an empty
    *                      List as default.
-   * @param commandTags   Optional list of CommandTag configurations which are attached to this SubEquipment. If the argument is null the field will be an empty
+   * @param commandTags   Optional list of CommandTag configurations which are attached to this Equipment. If the argument is null the field will be an empty
    *                      List as default.
    */
-  @Builder(builderMethodName = "builderSubEquipment")
+  @Builder
   public SubEquipment(boolean deleted, Long id, String name, Integer aliveInterval, String description,
-                      String handlerClass, StatusTag statusTag, AliveTag aliveTag, CommFaultTag commFaultTag, @Singular List<DataTag> dataTags) {
-    super(deleted, id, name, aliveInterval, description, handlerClass, null, new ArrayList<SubEquipment>(), statusTag, commFaultTag, aliveTag, dataTags, null);
+                      String handlerClass, String address, @Singular List<SubEquipment> subEquipments, StatusTag statusTag, CommFaultTag commFaultTag,
+                      AliveTag aliveTag, @Singular List<DataTag> dataTags, @Singular List<CommandTag> commandTags) {
+    super(deleted, id, name, aliveInterval, description, handlerClass, address,  statusTag, commFaultTag,aliveTag,  dataTags, commandTags);
   }
 
   public SubEquipment() {
+  }
+
+  public static CreateBuilder create(String name, String handlerClass) {
+
+    SubEquipment iniEq = SubEquipment.builder().name(name).handlerClass(handlerClass).build();
+
+    return iniEq.toCreateBuilder(iniEq);
+  }
+
+  public static UpdateBuilder update(String name) {
+
+    SubEquipment iniEq = SubEquipment.builder().name(name).build();
+
+    return iniEq.toUpdateBuilder(iniEq);
+  }
+
+  public static UpdateBuilder update(Long id) {
+
+    SubEquipment iniEq = SubEquipment.builder().id(id).build();
+
+    return iniEq.toUpdateBuilder(iniEq);
+  }
+
+  private CreateBuilder toCreateBuilder(SubEquipment initializationEquipment) {
+    return new CreateBuilder(initializationEquipment);
+  }
+
+  private UpdateBuilder toUpdateBuilder(SubEquipment initializationEquipment) {
+    return new UpdateBuilder(initializationEquipment);
+  }
+
+  public static class CreateBuilder {
+
+    private SubEquipment buildEquipment;
+
+    CreateBuilder(SubEquipment initializationEquipment) {
+
+      initializationEquipment.setCreate(true);
+      this.buildEquipment = initializationEquipment;
+    }
+
+    public SubEquipment.CreateBuilder id(Long id) {
+      this.buildEquipment.setId(id);
+      return this;
+    }
+
+    public SubEquipment.CreateBuilder description(String description) {
+      this.buildEquipment.setDescription(description);
+      return this;
+    }
+
+    public SubEquipment.CreateBuilder address(String address) {
+      this.buildEquipment.setAddress(address);
+      return this;
+    }
+
+    public SubEquipment.CreateBuilder aliveTag(AliveTag aliveTag, Integer aliveInterval) {
+
+      this.buildEquipment.setAliveInterval(aliveInterval);
+      this.buildEquipment.setAliveTag(aliveTag);
+
+      if (!aliveTag.isCreate()) {
+        buildEquipment.setCreate(false);
+      }
+
+      return this;
+    }
+
+    public SubEquipment.CreateBuilder statusTag(StatusTag statusTag) {
+      this.buildEquipment.setStatusTag(statusTag);
+
+      if (!statusTag.isCreate()) {
+        buildEquipment.setCreate(false);
+      }
+
+      return this;
+    }
+
+    public SubEquipment.CreateBuilder commFaultTag(CommFaultTag commFaultTag) {
+      this.buildEquipment.setCommFaultTag(commFaultTag);
+
+      if (!commFaultTag.isCreate()) {
+        buildEquipment.setCreate(false);
+      }
+
+      return this;
+    }
+
+    public SubEquipment build() {
+      return this.buildEquipment;
+    }
+  }
+
+  public static class UpdateBuilder {
+    private SubEquipment buildEquipment;
+
+    UpdateBuilder(SubEquipment initializationEquipment) {
+      buildEquipment = initializationEquipment;
+    }
+
+    public SubEquipment.UpdateBuilder aliveInterval(Integer aliveInterval) {
+      this.buildEquipment.setAliveInterval(aliveInterval);
+      return this;
+    }
+
+    public SubEquipment.UpdateBuilder description(String description) {
+      this.buildEquipment.setDescription(description);
+      return this;
+    }
+
+    public SubEquipment.UpdateBuilder handlerClass(String handlerClass) {
+      this.buildEquipment.setHandlerClass(handlerClass);
+      return this;
+    }
+
+    public SubEquipment.UpdateBuilder address(String address) {
+      this.buildEquipment.setAddress(address);
+      return this;
+    }
+
+    public SubEquipment build() {
+      buildEquipment.setUpdate(true);
+
+      return this.buildEquipment;
+    }
   }
 }
