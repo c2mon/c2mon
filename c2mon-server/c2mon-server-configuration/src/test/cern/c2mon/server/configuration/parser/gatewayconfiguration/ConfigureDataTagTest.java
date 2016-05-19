@@ -107,7 +107,7 @@ public class ConfigureDataTagTest {
     assertEquals(parsed.get(0).getElementProperties().get("isLogged"), "true");
     assertEquals(parsed.get(0).getElementProperties().get("equipmentId"), "10");
     assertEquals(parsed.get(0).getElementProperties().get("name"), "myDataTag");
-    assertEquals(parsed.get(0).getElementProperties().get("description"), "No description specified");
+    assertEquals(parsed.get(0).getElementProperties().get("description"), "<no description provided>");
     assertEquals(parsed.get(0).getElementProperties().get("address"), new DataTagAddress().toConfigXML());
     assertEquals(parsed.get(0).getElementProperties().get("mode"), "1");
 
@@ -141,7 +141,7 @@ public class ConfigureDataTagTest {
     assertEquals(parsed.get(0).getElementProperties().get("isLogged"), "true");
     assertEquals(parsed.get(0).getElementProperties().get("equipmentId"), "10");
     assertEquals(parsed.get(0).getElementProperties().get("name"), "myDataTag");
-    assertEquals(parsed.get(0).getElementProperties().get("description"), "No description specified");
+    assertEquals(parsed.get(0).getElementProperties().get("description"), "<no description provided>");
     assertEquals(parsed.get(0).getElementProperties().get("address"), new DataTagAddress().toConfigXML());
     assertEquals(parsed.get(0).getElementProperties().get("mode"), "1");
 

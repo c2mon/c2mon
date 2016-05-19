@@ -104,7 +104,7 @@ public class ConfigureRuleTagTest {
     assertEquals(parsed.get(0).getElementProperties().get("isLogged"), "true");
     assertEquals(parsed.get(0).getElementProperties().get("name"), "myRuleTag");
     assertEquals(parsed.get(0).getElementProperties().get("ruleText"), "ruleExpression");
-    assertEquals(parsed.get(0).getElementProperties().get("description"), "No description specified");
+    assertEquals(parsed.get(0).getElementProperties().get("description"), "<no description provided>");
     assertEquals(parsed.get(0).getElementProperties().get("mode"), "1");
 
     EasyMock.verify(sequenceDAO, ruleTagCache);
@@ -135,7 +135,7 @@ public class ConfigureRuleTagTest {
     assertEquals(parsed.get(0).getElementProperties().get("isLogged"), "true");
     assertEquals(parsed.get(0).getElementProperties().get("name"), "myRuleTag");
     assertEquals(parsed.get(0).getElementProperties().get("ruleText"), "ruleExpression");
-    assertEquals(parsed.get(0).getElementProperties().get("description"), "No description specified");
+    assertEquals(parsed.get(0).getElementProperties().get("description"), "<no description provided>");
     assertEquals(parsed.get(0).getElementProperties().get("mode"), "1");
 
     EasyMock.verify(sequenceDAO, ruleTagCache);

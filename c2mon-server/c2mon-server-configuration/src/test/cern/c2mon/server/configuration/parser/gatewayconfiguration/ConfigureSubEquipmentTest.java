@@ -114,7 +114,7 @@ public class ConfigureSubEquipmentTest {
     assertEquals(parsed.get(2).getElementProperties().get("aliveInterval"), "60000");
     assertEquals(parsed.get(2).getElementProperties().get("name"), "myEquipment");
     assertEquals(parsed.get(2).getElementProperties().get("handlerClass"), "HandlerClassName");
-    assertEquals(parsed.get(2).getElementProperties().get("description"), "No description specified");
+    assertEquals(parsed.get(2).getElementProperties().get("description"), "<no description provided>");
     assertEquals(parsed.get(2).getElementProperties().get("stateTagId"), "31");
     assertEquals(parsed.get(2).getElementProperties().get("commFaultTagId"), "30");
     assertEquals(parsed.get(2).getElementProperties().get("equipmentId"), "10");
@@ -157,7 +157,7 @@ public class ConfigureSubEquipmentTest {
     assertEquals(parsed.get(2).getElementProperties().get("aliveInterval"), "60000");
     assertEquals(parsed.get(2).getElementProperties().get("name"), "myEquipment");
     assertEquals(parsed.get(2).getElementProperties().get("handlerClass"), "HandlerClassName");
-    assertEquals(parsed.get(2).getElementProperties().get("description"), "No description specified");
+    assertEquals(parsed.get(2).getElementProperties().get("description"), "<no description provided>");
     assertEquals(parsed.get(2).getElementProperties().get("stateTagId"), "31");
     assertEquals(parsed.get(2).getElementProperties().get("commFaultTagId"), "30");
     assertEquals(parsed.get(2).getElementProperties().get("equipmentId"), "10");

@@ -111,7 +111,7 @@ public class ConfigureProcessTest {
     assertEquals(parsed.get(2).getElementProperties().get("aliveInterval"), "10000");
     assertEquals(parsed.get(2).getElementProperties().get("name"), "myProcess");
     assertEquals(parsed.get(2).getElementProperties().get("maxMessageDelay"), "1000");
-    assertEquals(parsed.get(2).getElementProperties().get("description"), "No description specified");
+    assertEquals(parsed.get(2).getElementProperties().get("description"), "<no description provided>");
     assertEquals(parsed.get(2).getElementProperties().get("stateTagId"), "31");
     assertEquals(parsed.get(2).getElementProperties().get("aliveTagId"), "30");
     assertEquals(parsed.get(2).getElementProperties().get("maxMessageSize"), "100");
@@ -152,7 +152,7 @@ public class ConfigureProcessTest {
     assertEquals(parsed.get(2).getElementProperties().get("aliveInterval"), "10000");
     assertEquals(parsed.get(2).getElementProperties().get("name"), "myProcess");
     assertEquals(parsed.get(2).getElementProperties().get("maxMessageDelay"), "1000");
-    assertEquals(parsed.get(2).getElementProperties().get("description"), "No description specified");
+    assertEquals(parsed.get(2).getElementProperties().get("description"), "<no description provided>");
     assertEquals(parsed.get(2).getElementProperties().get("stateTagId"), "31");
     assertEquals(parsed.get(2).getElementProperties().get("aliveTagId"), "30");
     assertEquals(parsed.get(2).getElementProperties().get("maxMessageSize"), "100");
