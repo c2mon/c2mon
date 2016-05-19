@@ -66,10 +66,16 @@
                 </executions>
                 <configuration>
                     <imageName>docker.cern.ch/c2mon-project/${project.artifactId}</imageName>
-                    <baseImage>java:8-jdk</baseImage>
-                    <server-id>cern-docker</server-id>
+                    <baseImage>${base.image}</baseImage>
+                    <!--server-id>cern-docker</server-id-->
+                    <useConfigFile>true</useConfigFile>
+                    <forceTags>true</forceTags>
+                    <imageTags>
+                       <imageTag>${project.version}</imageTag>
+                       <!--imageTag>latest</imageTag-->
+                    </imageTags>
                     <workdir>/opt/c2mon/${project.artifactId}</workdir>
-                    <entryPoint>["bin/daqprocess.sh","start"]</entryPoint>
+                    <!--entryPoint>["bin/daqprocess.sh","start", "${DAQ_PROCESS_NAME}"]</entryPoint-->
                     <exposes>
                       <expose>1099</expose>
                     </exposes>
@@ -99,10 +105,21 @@
       </pluginManagement>
 
     </build>
-
+    
+    <profiles>
+		<profile>
+		  <id>rpi</id>
+		  <properties>
+		    <base.image>hypriot/rpi-java</base.image>
+		    <arch.suffix>-arm</arch.suffix>
+		  </properties>
+		</profile>
+    </profiles>
 
     <properties>
+      <base.image>java:8-jdk</base.image>
       <c2mon.daqname>parent</c2mon.daqname>
+      <arch.suffix></arch.suffix>
     </properties>
 
 </project>
