@@ -16,6 +16,7 @@ package cern.c2mon.daq.rest;
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
+import cern.c2mon.daq.DaqStartup;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.rest.controller.RestController;
@@ -50,7 +51,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  * Created by fritter on 05/02/16.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = WebConfig.class)
+@ContextConfiguration(classes = DaqStartup.class)
 @WebAppConfiguration
 public class RestPostTesting {
 

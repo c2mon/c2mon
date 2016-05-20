@@ -175,7 +175,7 @@ public abstract class RestAddressFactory {
    * The pattern don't have to be specified and the method can return null without throwing an exception.
    *
    * @param properties the map which contains the url information.
-   * @return the rest url.
+   * @return The json expression for the value.
    */
   private static String extractJsonPath(Map<String, String> properties) {
 
@@ -186,6 +186,8 @@ public abstract class RestAddressFactory {
     return value;
 
   }
+
+
 
 
 }

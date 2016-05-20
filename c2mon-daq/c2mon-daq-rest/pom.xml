@@ -21,6 +21,7 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-daq</groupId>
       <artifactId>c2mon-daq-core</artifactId>
+      <version>1.7.1</version>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-shared</groupId>

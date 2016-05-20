@@ -35,7 +35,6 @@ public class PostScheduler extends RestScheduler {
 
   public PostScheduler(IEquipmentMessageSender sender, IEquipmentConfiguration configuration, EquipmentLogger logger) {
     super(sender, configuration, logger);
-
   }
 
   /**
@@ -104,7 +103,6 @@ public class PostScheduler extends RestScheduler {
     if (address.getFrequency() != null) {
       timer.schedule(task, address.getFrequency());
     }
-
   }
 
   @Override
@@ -115,7 +113,6 @@ public class PostScheduler extends RestScheduler {
 
     ISourceDataTag tag = equipmentConfiguration.getSourceDataTag(id);
     equipmentMessageSender.sendTagFiltered(tag, tag.getCurrentValue(), System.currentTimeMillis());
-
 
   }
 
@@ -151,10 +148,7 @@ public class PostScheduler extends RestScheduler {
       // sending the reply to the server
       equipmentMessageSender.sendInvalidTag(sdt, SourceDataQuality.DATA_UNAVAILABLE, "No value received in the given time interval of the DataTag-" + id);
 
-
     }
-
   }
-
 
 }

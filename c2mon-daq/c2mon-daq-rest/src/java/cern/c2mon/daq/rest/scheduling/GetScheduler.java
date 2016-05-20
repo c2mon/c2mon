@@ -24,9 +24,12 @@ import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.process.IEquipmentConfiguration;
+import cern.c2mon.shared.common.type.TypeConverter;
 import com.jayway.jsonpath.JsonPath;
 import org.springframework.web.client.RestClientException;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.TimerTask;
 
 
@@ -58,7 +61,6 @@ public class GetScheduler extends RestScheduler {
 
   }
 
-
   @Override
   public void refreshDataTag(Long id) {
 
@@ -73,29 +75,6 @@ public class GetScheduler extends RestScheduler {
     equipmentMessageSender.sendTagFiltered(dataTag, restMessage, System.currentTimeMillis());
 
   }
-
-  // TODO check for more types;
-  private static String getJavaLangType(String type) {
-    if (type.equals("Long") ||
-        type.equals("String") ||
-        type.equals("Integer") ||
-        type.equals("Byte") ||
-        type.equals("Char") ||
-        type.equals("Boolean") ||
-        type.equals("Float") ||
-        type.equals("Double")) {
-
-      return "java.lang.";
-    } else {
-      return "";
-    }
-
-  }
-
-
-  //===========================================================================
-  // Inner class
-  //===========================================================================
 
   /**
    * A instance of the SendRequestTask holds all information for sending a GET request to a webservice.
@@ -129,7 +108,7 @@ public class GetScheduler extends RestScheduler {
 
         // request to the web service
         String restMessage = RESTConnector.sendAndReceiveRequest(url);
-        Class dataType = Class.forName(getJavaLangType(sdt.getDataType()) + sdt.getDataType());
+        Class dataType = TypeConverter.getType(sdt.getDataType());
 
         // convert Message if jsonPathExpression is given
         if (jsonPathExpression != null) {
@@ -141,7 +120,7 @@ public class GetScheduler extends RestScheduler {
         // sending the reply to the server
         equipmentMessageSender.sendTagFiltered(sdt, serverMessage, System.currentTimeMillis());
 
-      } catch (RestClientException | ClassNotFoundException e) {
+      } catch (RestClientException e) {
         equipmentLogger.warn("Problem occurred at the REST get-operation: " + e.getMessage());
         equipmentMessageSender.sendInvalidTag(sdt, SourceDataQuality.DATA_UNAVAILABLE, "Problem occurred at the REST get-operation: " + e.getMessage());
 

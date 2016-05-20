@@ -146,7 +146,7 @@ public final class SimpleXMLParser implements XmlParser {
     String result = spaces + "<address-parameters class=\""+ map.getClass().getCanonicalName() +"\">" ;
 
     for(Map.Entry<String, String> entry : map.entrySet()){
-      result += "<entry key=\"" + entry.getKey() + "\">" + entry.getValue() + "</entry>";
+      result += "<entry key=\"" + entry.getKey() + "\"><![CDATA[" + entry.getValue() + "]]></entry>";
     }
 
     result += "</address-parameters>\n";

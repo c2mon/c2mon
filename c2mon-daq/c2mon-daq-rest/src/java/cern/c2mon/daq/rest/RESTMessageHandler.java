@@ -51,7 +51,7 @@ public class RESTMessageHandler extends EquipmentMessageHandler {
   @Override
   public void connectToDataSource() throws EqIOException {
     // class initialization
-    this.context = SpringApplication.run(WebConfig.class);
+    this.context = ApplicationContextProvider.getApplicationContext();
     RestController restController = context.getBean(RestController.class);
 
     this.equipmentLogger = getEquipmentLogger(RESTMessageHandler.class);
@@ -94,7 +94,6 @@ public class RESTMessageHandler extends EquipmentMessageHandler {
         equipmentLogger.warn("Problem caused by disconnecting: "+ ex.getMessage());
       }
     }
-    ((ConfigurableApplicationContext)context).close();
 
     equipmentLogger.info("Equipment disconnected.");
     equipmentLogger.trace("Leaving disconnectFromDataSource method.");
