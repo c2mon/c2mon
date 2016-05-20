@@ -69,7 +69,7 @@ public class SimpleXMLParserTest {
     testMap.put("key3", ""+ true);
 
     // expected reult
-    String testXML = "            <address-parameters class=\"java.util.HashMap\"><entry key=\"key1\">1</entry><entry key=\"key2\">text</entry><entry key=\"key3\">true</entry></address-parameters>\n";
+    String testXML = "            <address-parameters class=\"java.util.HashMap\"><entry key=\"key1\"><![CDATA[1]]></entry><entry key=\"key2\"><![CDATA[text]]></entry><entry key=\"key3\"><![CDATA[true]]></entry></address-parameters>\n";
 
     // testing
     String value = SimpleXMLParser.mapToXMLString(testMap);
