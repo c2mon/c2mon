@@ -1,21 +1,22 @@
 package cern.c2mon.daq.rest;
 /******************************************************************************
  * Copyright (C) 2010- CERN. All rights not expressly granted are reserved.
- * <p/>
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * <p/>
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * <p/>
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
+import cern.c2mon.daq.rest.config.WebConfigTest;
 import cern.c2mon.daq.rest.webaccess.RESTConnector;
 import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.UseConf;
@@ -26,9 +27,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 
 import static org.easymock.EasyMock.*;
@@ -42,6 +47,9 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @UseHandler(RESTMessageHandler.class)
 @Slf4j
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = WebConfigTest.class)
+@WebAppConfiguration
 public class RESTMessageHandlerTest extends GenericMessageHandlerTst {
 
   // reference to the instance of the handler to test
@@ -53,6 +61,7 @@ public class RESTMessageHandlerTest extends GenericMessageHandlerTst {
 
     // cast the reference (declared in the parent class) to the expected type
     theHandler = (RESTMessageHandler) msgHandler;
+//    theHandler.setRequestDelegator(new RequestDelegator(theHandler.getEquipmentMessageSender(), theHandler.getEquipmentConfiguration(), theHandler.getEquipmentLogger(RESTMessageHandler.class), restController));
 
     log.info("leaving beforeTest()");
   }
