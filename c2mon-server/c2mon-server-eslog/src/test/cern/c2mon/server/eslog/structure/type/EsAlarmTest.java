@@ -16,27 +16,24 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.type;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.fail;
+import cern.c2mon.server.eslog.structure.types.EsAlarm;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import cern.c2mon.server.eslog.structure.types.EsAlarm;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
 
 /**
  * @author Alban Marguet
  */
 public class EsAlarmTest {
   private Gson gson = new GsonBuilder().create();
-  private EsAlarm EsAlarm;
+  private EsAlarm esAlarm;
   private String expectedJson;
   private long tagId = 1;
   private long alarmId = 2;
@@ -59,43 +56,29 @@ public class EsAlarmTest {
     metadata.put("test1", "value1");
     metadata.put("test2", "value2");
 
-    EsAlarm = new EsAlarm();
-    EsAlarm.setAlarmId(alarmId);
-    EsAlarm.setTagId(tagId);
-    EsAlarm.setFaultFamily(faultFamily);
-    EsAlarm.setFaultMember(faultMember);
-    EsAlarm.setFaultCode(faultCode);
-    EsAlarm.setActive(active);
-    EsAlarm.setActivity(activity);
-    EsAlarm.setActiveNumeric(activeNumeric);
-    EsAlarm.setPriority(priority);
-    EsAlarm.setInfo(info);
-    EsAlarm.setServerTimestamp(serverTimestamp);
-    EsAlarm.setMetadata(metadata);
-    JsonObject element = gson.toJsonTree(new Object()).getAsJsonObject();
-    element.addProperty("tagId", tagId);
-    element.addProperty("alarmId", alarmId);
-    element.addProperty("faultFamily", faultFamily);
-    element.addProperty("faultMember", faultMember);
-    element.addProperty("faultCode", faultCode);
-    element.addProperty("active", active);
-    element.addProperty("activity", activity);
-    element.addProperty("activeNumeric", activeNumeric);
-    element.addProperty("priority", priority);
-    element.addProperty("info", info);
-    element.addProperty("serverTimestamp", serverTimestamp);
-    for (String key : metadata.keySet()) {
-      element.addProperty(key, metadata.get(key));
-    }
-    expectedJson = gson.toJson(element);
+    esAlarm = new EsAlarm();
+    esAlarm.setAlarmId(alarmId);
+    esAlarm.setTagId(tagId);
+    esAlarm.setFaultFamily(faultFamily);
+    esAlarm.setFaultMember(faultMember);
+    esAlarm.setFaultCode(faultCode);
+    esAlarm.setActive(active);
+    esAlarm.setActivity(activity);
+    esAlarm.setActiveNumeric(activeNumeric);
+    esAlarm.setPriority(priority);
+    esAlarm.setInfo(info);
+    esAlarm.setServerTimestamp(serverTimestamp);
+    esAlarm.getMetadata().putAll(metadata);
+
+    expectedJson = gson.toJson(esAlarm);
   }
 
   @Test
   public void testJsonSerialization() {
-    String json = EsAlarm.toString();
+    String json = esAlarm.toString();
     try {
-      assertEquals(expectedJson, EsAlarm.toString());
-      assertEquals(EsAlarm, EsAlarm.getObject(expectedJson));
+      assertEquals(expectedJson, esAlarm.toString());
+      assertEquals(esAlarm, esAlarm.getObject(expectedJson));
     }
     catch (Exception e) {
       fail("Should be able to serialize/deserialize JSON");

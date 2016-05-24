@@ -16,21 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog;
 
+import cern.c2mon.server.eslog.connector.Connector;
+import cern.c2mon.server.eslog.listener.EsAlarmLogListener;
 import lombok.extern.slf4j.Slf4j;
-
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import cern.c2mon.server.eslog.connector.Connector;
-import cern.c2mon.server.eslog.listener.EsAlarmLogListener;
 
 /**
  * Integration test with the core modules.

@@ -16,22 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.indexer;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.sql.Timestamp;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.eslog.connector.TransportConnector;
 import cern.c2mon.server.eslog.structure.converter.EsSupervisionEventConverter;
@@ -41,6 +25,21 @@ import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import java.sql.Timestamp;
+
+import static junit.framework.TestCase.assertTrue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Test the EsSupervisionEventIndexer class.
@@ -80,7 +79,7 @@ public class EsSupervisionEventIndexerTest {
     indexer.setSupervisionPrefix("prevision_");
     indexer.setIndexFormat("M");
     mapping = new EsSupervisionMapping();
-    mapping.setProperties(EsMapping.ValueType.supervisionType);
+    mapping.setProperties(EsMapping.ValueType.SUPERVISION);
   }
 
   @After

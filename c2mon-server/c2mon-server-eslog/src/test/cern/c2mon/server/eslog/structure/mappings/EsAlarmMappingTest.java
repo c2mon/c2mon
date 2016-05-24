@@ -16,11 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.mappings;
 
-import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Verify the output of the EsAlarmMapping.
@@ -28,55 +28,59 @@ import org.junit.Test;
  */
 public class EsAlarmMappingTest {
   private EsAlarmMapping mapping;
-  private String expectedMappings = "{\n" +
-      "  \"mappings\": {\n" +
-      "    \"alarm\": {\n" +
-      "      \"properties\": {\n" +
-      "        \"tagId\": {\n" +
-      "          \"type\": \"long\"\n" +
-      "        },\n" +
-      "        \"alarmId\": {\n" +
-      "          \"type\": \"long\"\n" +
-      "        },\n" +
-      "        \"faultFamily\": {\n" +
-      "          \"type\": \"string\",\n" +
-      "          \"index\": \"not_analyzed\"\n" +
-      "        },\n" +
-      "        \"faultMember\": {\n" +
-      "          \"type\": \"string\",\n" +
-      "          \"index\": \"not_analyzed\"\n" +
-      "        },\n" +
-      "        \"faultCode\": {\n" +
-      "          \"type\": \"integer\"\n" +
-      "        },\n" +
-      "        \"active\": {\n" +
-      "          \"type\": \"boolean\"\n" +
-      "        },\n" +
-      "        \"activity\": {\n" +
-      "          \"type\": \"string\",\n" +
-      "          \"index\": \"not_analyzed\"\n" +
-      "        },\n" +
-      "        \"activeNumeric\": {\n" +
-      "          \"type\": \"double\"\n" +
-      "        },\n" +
-      "        \"priority\": {\n" +
-      "          \"type\": \"integer\"\n" +
-      "        },\n" +
-      "        \"info\": {\n" +
-      "          \"type\": \"string\",\n" +
-      "          \"index\": \"not_analyzed\"\n" +
-      "        },\n" +
-      "        \"serverTimestamp\": {\n" +
-      "          \"type\": \"date\",\n" +
-      "          \"format\": \"epoch_millis\"\n" +
-      "        },\n" +
-      "        \"timeZone\": {\n" +
-      "          \"type\": \"string\"\n" +
-      "        }\n" +
-      "      }\n" +
-      "    }\n" +
-      "  }\n" +
-      "}";
+  private final String expectedMappings = "{\n" +
+          "  \"mappings\": {\n" +
+          "    \"alarm\": {\n" +
+          "      \"properties\": {\n" +
+          "        \"tagId\": {\n" +
+          "          \"type\": \"long\"\n" +
+          "        },\n" +
+          "        \"alarmId\": {\n" +
+          "          \"type\": \"long\"\n" +
+          "        },\n" +
+          "        \"faultFamily\": {\n" +
+          "          \"type\": \"string\",\n" +
+          "          \"index\": \"not_analyzed\"\n" +
+          "        },\n" +
+          "        \"faultMember\": {\n" +
+          "          \"type\": \"string\",\n" +
+          "          \"index\": \"not_analyzed\"\n" +
+          "        },\n" +
+          "        \"faultCode\": {\n" +
+          "          \"type\": \"integer\"\n" +
+          "        },\n" +
+          "        \"active\": {\n" +
+          "          \"type\": \"boolean\"\n" +
+          "        },\n" +
+          "        \"activity\": {\n" +
+          "          \"type\": \"string\",\n" +
+          "          \"index\": \"not_analyzed\"\n" +
+          "        },\n" +
+          "        \"activeNumeric\": {\n" +
+          "          \"type\": \"double\"\n" +
+          "        },\n" +
+          "        \"priority\": {\n" +
+          "          \"type\": \"integer\"\n" +
+          "        },\n" +
+          "        \"info\": {\n" +
+          "          \"type\": \"string\",\n" +
+          "          \"index\": \"not_analyzed\"\n" +
+          "        },\n" +
+          "        \"serverTimestamp\": {\n" +
+          "          \"type\": \"date\",\n" +
+          "          \"format\": \"epoch_millis\"\n" +
+          "        },\n" +
+          "        \"timeZone\": {\n" +
+          "          \"type\": \"string\"\n" +
+          "        },\n" +
+          "        \"metadata\": {\n" +
+          "          \"type\": \"nested\",\n" +
+          "          \"dynamic\": \"true\"\n" +
+          "        }\n" +
+          "      }\n" +
+          "    }\n" +
+          "  }\n" +
+          "}";
 
   @Before
   public void setup() {
@@ -85,7 +89,7 @@ public class EsAlarmMappingTest {
 
   @Test
   public void testSetProperties() {
-    mapping.setProperties(EsMapping.ValueType.alarmType);
+    mapping.setProperties(EsMapping.ValueType.ALARM);
     assertNotNull(mapping.getMappings());
     assertEquals(expectedMappings, mapping.getMapping());
   }

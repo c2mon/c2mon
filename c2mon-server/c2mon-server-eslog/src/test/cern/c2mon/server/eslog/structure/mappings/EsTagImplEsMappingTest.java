@@ -16,13 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.mappings;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import lombok.extern.slf4j.Slf4j;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Verify that we always get a EsMapping. Important for a good indexing in ElasticSearch.

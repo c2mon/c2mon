@@ -16,19 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.listener;
 
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.when;
-
-import java.sql.Timestamp;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.eslog.structure.converter.EsSupervisionEventConverter;
 import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
@@ -36,6 +23,17 @@ import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import java.sql.Timestamp;
+
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.when;
 
 /**
  * Test if the the SupervisionEvent are well translated into EsSupervisionEvent for ElasticSearch.

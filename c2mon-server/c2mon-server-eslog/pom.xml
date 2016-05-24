@@ -26,7 +26,7 @@
       <version>2.1.0</version>
     </dependency>
 
-    <!-- Spring deps -->
+    <!-- Spring dependencies -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>

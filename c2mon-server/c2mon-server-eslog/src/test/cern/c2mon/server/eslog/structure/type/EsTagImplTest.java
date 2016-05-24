@@ -16,28 +16,25 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.type;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.fail;
+import cern.c2mon.server.eslog.structure.types.AbstractEsTag;
+import cern.c2mon.server.eslog.structure.types.EsTagString;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import cern.c2mon.server.eslog.structure.types.EsTagImpl;
-import cern.c2mon.server.eslog.structure.types.EsTagString;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
 
 /**
  * @author Alban Marguet
  */
 public class EsTagImplTest {
   private Gson gson = new GsonBuilder().create();
-  private EsTagImpl esTagImpl;
+  private AbstractEsTag esTag;
   private String expectedJson;
   private long id = 1;
   private String name = "name";
@@ -57,52 +54,35 @@ public class EsTagImplTest {
 
   @Before
   public void setup() {
+    esTag = new EsTagString();
+    esTag.setId(id);
+    esTag.setName(name);
+    esTag.setDataType(dataType);
+    esTag.setSourceTimestamp(sourceTimestamp);
+    esTag.setServerTimestamp(serverTimestamp);
+    esTag.setDaqTimestamp(daqTimestamp);
+    esTag.setStatus(status);
+    esTag.setQuality(quality);
+    esTag.setValid(valid);
+    esTag.setValue(value);
+    esTag.setValueBoolean(valueBoolean);
+    esTag.setValueString(valueString);
+    esTag.setValueNumeric(valueNumeric);
+    esTag.setValueDescription(valueDescription);
+
     metadata.put("test1", "value1");
     metadata.put("test2", "value2");
+    esTag.getMetadata().putAll(metadata);
 
-    esTagImpl = new EsTagString();
-    esTagImpl.setId(id);
-    esTagImpl.setName(name);
-    esTagImpl.setDataType(dataType);
-    esTagImpl.setSourceTimestamp(sourceTimestamp);
-    esTagImpl.setServerTimestamp(serverTimestamp);
-    esTagImpl.setDaqTimestamp(daqTimestamp);
-    esTagImpl.setStatus(status);
-    esTagImpl.setQuality(quality);
-    esTagImpl.setValid(valid);
-    esTagImpl.setValue(value);
-    esTagImpl.setValueBoolean(valueBoolean);
-    esTagImpl.setValueString(valueString);
-    esTagImpl.setValueNumeric(valueNumeric);
-    esTagImpl.setValueDescription(valueDescription);
-    esTagImpl.setMetadata(metadata);
-
-    JsonObject element = gson.toJsonTree(new Object()).getAsJsonObject();
-    element.addProperty("id", id);
-    element.addProperty("name", name);
-    element.addProperty("dataType", dataType);
-    element.addProperty("sourceTimestamp", sourceTimestamp);
-    element.addProperty("serverTimestamp", serverTimestamp);
-    element.addProperty("daqTimestamp", daqTimestamp);
-    element.addProperty("status", status);
-    element.addProperty("quality", quality);
-    element.addProperty("valid", valid);
-    element.addProperty("valueBoolean", valueBoolean);
-    element.addProperty("valueString", valueString);
-    element.addProperty("valueNumeric", valueNumeric);
-    element.addProperty("valueDescription", valueDescription);
-    for (String key : metadata.keySet()) {
-      element.addProperty(key, metadata.get(key));
-    }
-    expectedJson = gson.toJson(element);
+    expectedJson = gson.toJson(esTag);
   }
 
   @Test
   public void testJsonSerialization() {
-    String json = esTagImpl.toString();
+    String json = esTag.toString();
     try {
-      assertEquals(expectedJson, esTagImpl.toString());
-      assertEquals(esTagImpl, esTagImpl.getObject(expectedJson));
+      assertEquals(expectedJson, esTag.toString());
+      assertEquals(esTag, esTag.getObject(expectedJson));
     }
     catch (Exception e) {
       e.printStackTrace();

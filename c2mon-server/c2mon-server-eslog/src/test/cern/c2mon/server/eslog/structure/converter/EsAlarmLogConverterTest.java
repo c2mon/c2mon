@@ -16,24 +16,22 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.converter;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNull;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.runners.MockitoJUnitRunner;
-
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.eslog.structure.types.EsAlarm;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.metadata.Metadata;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNull;
 
 /**
  * Insure that EsAlarmLogConverter converts well Alarm to EsAlarm.

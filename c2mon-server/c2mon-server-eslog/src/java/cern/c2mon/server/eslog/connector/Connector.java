@@ -1,66 +1,68 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ * <p>
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ * <p>
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.eslog.connector;
 
-import java.util.Set;
-
+import cern.c2mon.server.eslog.structure.types.EsAlarm;
+import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
 
-import cern.c2mon.server.eslog.structure.types.EsAlarm;
-import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
+import java.util.Set;
 
 /**
  * Handle the connection/querying data to ElasticSearch cluster.
+ *
  * @author Alban Marguet.
  */
 public interface Connector {
-    
+
   /**
    * Close the communication with an ElasticSearch cluster.
+   *
    * @param client of the ElasticSearch cluster.
    */
   void close(Client client);
 
-  /** 
-   * Wait for the good status to be able to fetch data after ingestion. 
+  /**
+   * Wait for the good status to be able to fetch data after ingestion.
    */
   void refreshClusterStats();
 
-  /** 
-   * The client connected to ElasticSearch. 
+  /**
+   * The client connected to ElasticSearch.
    */
   Client getClient();
 
-  /** 
-   * The name of the ElasticSearch cluster. 
+  /**
+   * The name of the ElasticSearch cluster.
    */
   String getCluster();
 
   /**
-   * 
    * @return the {@link BulkProcessor} instance
    */
   BulkProcessor getBulkProcessor();
 
-  /** Retrieve the lists of indices, types and aliases from ElasticSearch and update them in memory. */
+  /**
+   * Retrieve the lists of indices, types and aliases from ElasticSearch and update them in memory.
+   */
   Set<String> retrieveIndicesFromES();
-  
+
   Set<String> retrieveTypesFromES(String index);
 
   /**
@@ -75,18 +77,25 @@ public interface Connector {
    */
   boolean handleIndexQuery(String indexName, String type, String mapping);
 
-  /** Allows to add a new SupervisionEvent to ElasticSearch. */
+  /**
+   * Allows to add a new SupervisionEvent to ElasticSearch.
+   */
   boolean handleSupervisionQuery(String indexName, String mapping, EsSupervisionEvent esSupervisionEvent);
 
-  /** Allows to add a new EsAlarm to ElasticSearch. */
+  /**
+   * Allows to add a new EsAlarm to ElasticSearch.
+   */
   boolean handleAlarmQuery(String indexName, String mapping, EsAlarm EsAlarm);
 
   /**
    * Allows to add data by batches to the ElasticSearch cluster thanks to a BulkProcessor.
+   *
    * @return response of the BulkProcessor.
    */
   boolean bulkAdd(IndexRequest indexNewTag);
 
-  /** Wait for all operations to be taken into account. */
+  /**
+   * Wait for all operations to be taken into account.
+   */
   boolean waitForYellowStatus();
 }

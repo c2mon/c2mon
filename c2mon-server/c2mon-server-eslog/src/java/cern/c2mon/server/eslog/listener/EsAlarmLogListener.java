@@ -1,29 +1,20 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- *
+ * <p>
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- *
+ * <p>
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.eslog.listener;
-
-import javax.annotation.PostConstruct;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.SmartLifecycle;
-import org.springframework.stereotype.Service;
 
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.server.cache.C2monCacheListener;
@@ -34,33 +25,52 @@ import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.eslog.indexer.EsAlarmIndexer;
 import cern.c2mon.server.eslog.structure.converter.EsAlarmLogConverter;
 import cern.c2mon.server.eslog.structure.types.EsAlarm;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.SmartLifecycle;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
 
 /**
  * Listens to updates in the Alarm cache and send them to ElasticSearch with the {@link EsAlarmIndexer} class.
+ *
  * @author Alban Marguet
  */
 @Slf4j
 @Service
 public class EsAlarmLogListener implements C2monCacheListener<Alarm>, SmartLifecycle {
-  /** Reference to registration service. */
+  /**
+   * Reference to registration service.
+   */
   private CacheRegistrationService cacheRegistrationService;
 
-  /** Bean that logs Tags into ElasticSearch. */
+  /**
+   * Bean that logs Tags into ElasticSearch.
+   */
   private IPersistenceManager persistenceManager;
 
-  /** Allows to get the right information from the Alarm to create an EsAlarm instance. */
+  /**
+   * Allows to get the right information from the Alarm to create an EsAlarm instance.
+   */
   private EsAlarmLogConverter esAlarmLogConverter;
 
-  /** Listener container lifecycle hook. */
+  /**
+   * Listener container lifecycle hook.
+   */
   private Lifecycle listenerContainer;
 
-  /** Lifecycle flag. */
+  /**
+   * Lifecycle flag.
+   */
   private volatile boolean running = false;
 
   /**
    * Autowired constructor.
+   *
    * @param cacheRegistrationService for registering cache listeners.
-   * @param persistenceManager for logging cache objects to ElasticSearch.
+   * @param persistenceManager       for logging cache objects to ElasticSearch.
    */
   @Autowired
   public EsAlarmLogListener(final CacheRegistrationService cacheRegistrationService,
@@ -72,30 +82,32 @@ public class EsAlarmLogListener implements C2monCacheListener<Alarm>, SmartLifec
     this.esAlarmLogConverter = esAlarmLogConverter;
   }
 
-  /** Registers to be notified of all Tag updates (data, rule and control tags). */
+  /**
+   * Registers to be notified of all Tag updates (data, rule and control tags).
+   */
   @PostConstruct
   public void init() {
     listenerContainer = cacheRegistrationService.registerToAlarms(this);
   }
 
-  /** New Alarm incoming. */
+  /**
+   * New Alarm incoming.
+   */
   @Override
   public void notifyElementUpdated(Alarm cacheable) {
     log.debug("notifyElementUpdated() - Received an Alarm event.");
     try {
       EsAlarm EsAlarm = esAlarmLogConverter.convertAlarmToAlarmES(cacheable);
       sendIfAlarmESIsNotNull(EsAlarm);
-    }
-    catch(Exception e) {
+    } catch(Exception e) {
       log.error("notifyElementUpdated() - Could not add Alarm to ElasticSearch: Alarm # " + cacheable.getId() + ".", e);
     }
   }
 
   private void sendIfAlarmESIsNotNull(EsAlarm EsAlarm) {
-    if (EsAlarm != null) {
+    if(EsAlarm != null) {
       persistenceManager.storeData(EsAlarm);
-    }
-    else {
+    } else {
       log.warn("notifyElementUpdated() - Warning: The received alarm was null.");
     }
   }

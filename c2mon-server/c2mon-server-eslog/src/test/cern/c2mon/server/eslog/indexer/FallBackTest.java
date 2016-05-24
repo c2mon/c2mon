@@ -16,10 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.indexer;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.when;
-
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.eslog.connector.Connector;
+import cern.c2mon.server.eslog.structure.types.EsAlarm;
 import org.elasticsearch.ElasticsearchException;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,9 +27,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.eslog.connector.Connector;
-import cern.c2mon.server.eslog.structure.types.EsAlarm;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Alban Marguet

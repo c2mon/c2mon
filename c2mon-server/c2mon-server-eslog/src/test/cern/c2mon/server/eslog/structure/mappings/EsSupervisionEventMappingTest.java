@@ -16,11 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.mappings;
 
-import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Verify the output of the EsSupervisionMapping.
@@ -59,7 +59,7 @@ public class EsSupervisionEventMappingTest {
 
   @Test
   public void testSetProperties() {
-    mapping.setProperties(EsMapping.ValueType.supervisionType);
+    mapping.setProperties(EsMapping.ValueType.SUPERVISION);
     assertNotNull(mapping.getMappings());
     assertEquals(expectedMappings, mapping.getMapping());
   }

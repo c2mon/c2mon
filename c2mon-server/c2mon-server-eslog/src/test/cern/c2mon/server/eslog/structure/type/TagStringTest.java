@@ -16,21 +16,19 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.type;
 
-import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-
+import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.server.eslog.structure.types.EsTagString;
 import lombok.extern.slf4j.Slf4j;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.server.eslog.structure.types.EsTagString;
+import java.io.IOException;
+
+import static junit.framework.TestCase.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the good behaviour of the EsTagString class.
@@ -60,9 +58,9 @@ public class TagStringTest {
 	public void testBuild() throws IOException {
 		tagString.setQuality("ok");
 		String line = "\"quality\":\"ok\"";
-		String text = "{\"id\":0,\"sourceTimestamp\":0,\"serverTimestamp\":0,\"daqTimestamp\":0,\"status\":0," + line + "}";
+		String expectedTagJson = "{\"id\":0,\"sourceTimestamp\":0,\"serverTimestamp\":0,\"daqTimestamp\":0,\"status\":0,\"quality\":\"ok\",\"metadata\":{}}";
 
-		assertEquals(text, tagString.toString());
+		assertEquals(expectedTagJson, tagString.toString());
 	}
 
 	@Test
@@ -73,11 +71,13 @@ public class TagStringTest {
 
 	@Test
 	public void testGetObject() {
-    String line = "{\"id\":192506,\"name\":\"CM.MEY.VGTCTESTCM11:STATUS\",\"dataType\":\"string\",\"sourceTimestamp\":0,\"serverTimestamp\":1451915554970,\"daqTimestamp\":0,\"status\":0," +
-        "\"quality\":\"{}\",\"valueString\":\"DOWN\",\"valueDescription\":\"Communication fault tag indicates that equipment E_OPC_GTCTESTCM11 is down. Reason: Problems connecting to VGTCTESTCM11: Problems wih the DCOM connection occured\",\"process\":\"P_GTCTESTCM11\"," +
-        "\"equipment\":\"E_OPC_GTCTESTCM11\"}";
-		IFallback result = tagString.getObject(line);
+    final String expectedTagJson = "{\"id\":192506,\"name\":\"CM.MEY.VGTCTESTCM11:STATUS\",\"dataType\":\"string\",\"sourceTimestamp\":0," +
+						"\"serverTimestamp\":1451915554970,\"daqTimestamp\":0,\"status\":0,\"quality\":\"{}\",\"valueString\":\"DOWN\"," +
+						"\"valueDescription\":\"Communication fault tag indicates that equipment E_OPC_GTCTESTCM11 is down. " +
+						"Reason: Problems connecting to VGTCTESTCM11: Problems wih the DCOM connection occured\"," +
+						"\"metadata\":{},\"process\":\"P_GTCTESTCM11\",\"equipment\":\"E_OPC_GTCTESTCM11\"}";
+		IFallback result = tagString.getObject(expectedTagJson);
     assertTrue(result instanceof EsTagString);
-    assertEquals(line, result.toString());
+    assertEquals(expectedTagJson, result.toString());
 	}
 }

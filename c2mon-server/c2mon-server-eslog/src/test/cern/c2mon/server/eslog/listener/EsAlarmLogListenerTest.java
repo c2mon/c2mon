@@ -16,10 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.listener;
 
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.eslog.structure.converter.EsAlarmLogConverter;
+import cern.c2mon.server.eslog.structure.types.EsAlarm;
+import cern.c2mon.server.test.CacheObjectCreation;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,11 +28,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.eslog.structure.converter.EsAlarmLogConverter;
-import cern.c2mon.server.eslog.structure.types.EsAlarm;
-import cern.c2mon.server.test.CacheObjectCreation;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Test if the Alarms are sent to ElasticSearch when received.

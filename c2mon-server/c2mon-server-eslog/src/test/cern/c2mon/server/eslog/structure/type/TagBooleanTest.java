@@ -16,19 +16,18 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.type;
 
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-
+import cern.c2mon.server.eslog.structure.types.EsTagBoolean;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import cern.c2mon.server.eslog.structure.types.EsTagBoolean;
+import java.io.IOException;
+
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the good behaviour of the EsTagBoolean class. verify that it builds
@@ -66,10 +65,10 @@ public class TagBooleanTest {
   @Test
   public void testBuild() throws IOException {
     tagBoolean.setDataType("boolean");
-    String line = "\"dataType\":\"boolean\",";
-    String text = "{\"id\":0," + line + "\"sourceTimestamp\":0,\"serverTimestamp\":0,\"daqTimestamp\":0,\"status\":0}";
 
-    assertEquals(text, tagBoolean.toString());
+    final String expectedTagJson = "{\"id\":0,\"dataType\":\"boolean\",\"sourceTimestamp\":0,\"serverTimestamp\":0,\"daqTimestamp\":0,\"status\":0,\"metadata\":{}}";
+
+    assertEquals(expectedTagJson, tagBoolean.toString());
   }
 
   @Test

@@ -16,21 +16,19 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.type;
 
-import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-
+import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.server.eslog.structure.types.EsTagNumeric;
 import lombok.extern.slf4j.Slf4j;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.server.eslog.structure.types.EsTagNumeric;
+import java.io.IOException;
+
+import static junit.framework.TestCase.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the good behaviour of the EsTagNumeric class. verify that it builds
@@ -66,10 +64,11 @@ public class TagNumericTest {
   @Test
   public void testBuild() throws IOException {
     tagNumeric.setDataType("numeric");
-    String line = "\"dataType\":\"numeric\",";
-    String text = "{\"id\":0," + line + "\"sourceTimestamp\":0,\"serverTimestamp\":0,\"daqTimestamp\":0,\"status\":0}";
 
-    assertEquals(text, tagNumeric.toString());
+    final String expectedTagJson = "{\"id\":0,\"dataType\":\"numeric\",\"sourceTimestamp\":0,\"serverTimestamp\":0," +
+            "\"daqTimestamp\":0,\"status\":0,\"metadata\":{}}";
+
+    assertEquals(expectedTagJson, tagNumeric.toString());
   }
 
   @Test
@@ -80,9 +79,12 @@ public class TagNumericTest {
 
   @Test
   public void testGetObject() {
-    String line = "{\"id\":1053976,\"name\":\"CLIC:CFC-CCR-ALLGPSPS:SYS.MEM.FREEPCT\",\"dataType\":\"float\",\"sourceTimestamp\":1454342362957,\"serverTimestamp\":1454342362981,\"daqTimestamp\":1454342362957,\"status\":0,\"quality\":\"{}\",\"valid\":true,\"valueNumeric\":73.9237,\"valueDescription\":\"\",\"process\":\"P_CLIC_SPS\",\"equipment\":\"CLIC:CFC-CCR-ALLGPSPS\"}";
-    IFallback result = tagNumeric.getObject(line);
+    final String expectedTagJson = "{\"id\":1053976,\"name\":\"CLIC:CFC-CCR-ALLGPSPS:SYS.MEM.FREEPCT\"," +
+            "\"dataType\":\"float\",\"sourceTimestamp\":1454342362957,\"serverTimestamp\":1454342362981," +
+            "\"daqTimestamp\":1454342362957,\"status\":0,\"quality\":\"{}\",\"valid\":true,\"valueNumeric\":73.9237," +
+            "\"valueDescription\":\"\",\"metadata\":{},\"process\":\"P_CLIC_SPS\",\"equipment\":\"CLIC:CFC-CCR-ALLGPSPS\"}";
+    IFallback result = tagNumeric.getObject(expectedTagJson);
     assertTrue(result instanceof EsTagNumeric);
-    assertEquals(line, result.toString());
+    assertEquals(expectedTagJson, result.toString());
   }
 }

@@ -16,24 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.indexer;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.sql.Timestamp;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.eslog.connector.TransportConnector;
@@ -42,6 +24,22 @@ import cern.c2mon.server.eslog.structure.mappings.EsAlarmMapping;
 import cern.c2mon.server.eslog.structure.mappings.EsMapping;
 import cern.c2mon.server.eslog.structure.types.EsAlarm;
 import cern.c2mon.server.test.CacheObjectCreation;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import java.sql.Timestamp;
+
+import static junit.framework.TestCase.assertTrue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Test the EsAlarmIndexer methods.
@@ -51,8 +49,8 @@ import cern.c2mon.server.test.CacheObjectCreation;
 @Slf4j
 public class EsAlarmIndexerTest {
   private Alarm alarm;
-  private EsAlarm EsAlarm;
-  private EsAlarmMapping mapping;
+  private EsAlarm esAlarm;
+  private EsAlarmMapping esAlarmMapping;
   private Timestamp timestamp;
   @InjectMocks
   private EsAlarmIndexer indexer;
@@ -63,13 +61,13 @@ public class EsAlarmIndexerTest {
   @Before
   public void setup() throws IDBPersistenceException {
     alarm = CacheObjectCreation.createTestAlarm1();
-    EsAlarm = esAlarmLogConverter.convertAlarmToAlarmES(alarm);
+    esAlarm = esAlarmLogConverter.convertAlarmToAlarmES(alarm);
     timestamp = alarm.getTimestamp();
-    when(connector.handleAlarmQuery(anyString(), anyString(), eq(EsAlarm))).thenReturn(true);
+    when(connector.handleAlarmQuery(anyString(), anyString(), eq(esAlarm))).thenReturn(true);
     indexer.setAlarmPrefix(indexer.alarmPrefix);
     indexer.setIndexFormat("M");
-    mapping = new EsAlarmMapping();
-    mapping.setProperties(EsMapping.ValueType.alarmType);
+    esAlarmMapping = new EsAlarmMapping();
+    esAlarmMapping.setProperties(EsMapping.ValueType.ALARM);
   }
 
   @After
@@ -85,10 +83,11 @@ public class EsAlarmIndexerTest {
   }
 
   @Test
-  public void testLogSupervisionEvent() throws IDBPersistenceException {
-    String expectedMapping = mapping.getMapping();
+  public void testLogAlarm() throws IDBPersistenceException {
+    String expectedMapping = esAlarmMapping.getMapping();
 
-    indexer.logAlarm(EsAlarm);
-    verify(connector).handleAlarmQuery(eq(indexer.getSupervisionPrefix() + indexer.millisecondsToYearMonth(timestamp.getTime())), eq(expectedMapping), eq(EsAlarm));
+    indexer.logAlarm(esAlarm);
+    verify(connector).handleAlarmQuery(eq(indexer.getAlarmPrefix() + indexer.millisecondsToYearMonth(timestamp.getTime())), eq(expectedMapping), eq(esAlarm));
   }
+
 }

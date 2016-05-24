@@ -16,46 +16,32 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.indexer;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.eslog.connector.TransportConnector;
+import cern.c2mon.server.eslog.structure.mappings.EsMapping;
+import cern.c2mon.server.eslog.structure.mappings.EsStringTagMapping;
+import cern.c2mon.server.eslog.structure.types.AbstractEsTag;
+import cern.c2mon.server.eslog.structure.types.EsTagBoolean;
+import cern.c2mon.server.eslog.structure.types.EsTagString;
 import lombok.extern.slf4j.Slf4j;
-
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.eslog.connector.TransportConnector;
-import cern.c2mon.server.eslog.structure.mappings.EsMapping;
-import cern.c2mon.server.eslog.structure.mappings.EsStringTagMapping;
-import cern.c2mon.server.eslog.structure.types.EsTagBoolean;
-import cern.c2mon.server.eslog.structure.types.EsTagImpl;
-import cern.c2mon.server.eslog.structure.types.EsTagString;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+
+import static junit.framework.TestCase.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test the EsIndexer methods for sending the right data to the Connector.
@@ -146,7 +132,7 @@ public class EsIndexerTest {
 
     assertEquals(expectedIndex, indexer.getCacheIndicesTypes().keySet());
 
-    connector.handleIndexQuery("c2mon-tag_2015-01", "tag_string", new EsStringTagMapping(EsMapping.ValueType.stringType).getMapping());
+    connector.handleIndexQuery("c2mon-tag_2015-01", "tag_string", new EsStringTagMapping(EsMapping.ValueType.STRING).getMapping());
     assertEquals(expectedType, indexer.getCacheIndicesTypes().get("c2mon-tag_2015-01"));
   }
 
@@ -223,9 +209,9 @@ public class EsIndexerTest {
 
   @Test
   public void testIndexTags() throws IDBPersistenceException {
-    List<EsTagImpl> list = new ArrayList<>();
-    EsTagImpl tag = new EsTagBoolean();
-    tag.setDataType(EsMapping.ValueType.boolType.toString());
+    List<AbstractEsTag> list = new ArrayList<>();
+    AbstractEsTag tag = new EsTagBoolean();
+    tag.setDataType(EsMapping.ValueType.BOOLEAN.toString());
     tag.setId(1L);
     tag.setServerTimestamp(123456789000L);
     tag.setValue(true);
@@ -253,7 +239,6 @@ public class EsIndexerTest {
     long size = 10;
 
     Set<String> listIndices = new HashSet<>();
-    Set<String> listAliases = new HashSet<>();
     long id = 1L;
     long tagServerTime = 123456789000L;
     Map<String, String> metadata1 = new HashMap<>();
@@ -264,20 +249,20 @@ public class EsIndexerTest {
     //not all tags have the same metadata and last tag has nothing
     for (; id <= size; id++, tagServerTime += 1000) {
       tag = new EsTagString();
-      tag.setDataType(EsMapping.ValueType.stringType.toString());
+      tag.setDataType(EsMapping.ValueType.STRING.toString());
       tag.setId(id);
       tag.setServerTimestamp(tagServerTime);
       list.add(tag);
       listIndices.add(indexer.indexPrefix + indexer.millisecondsToYearMonth(tag.getServerTimestamp()));
-      listAliases.add(indexer.typePrefix + tag.getId());
+
       if (id == size) {
         log.debug("list of tags realized");
       }
       else if (id % 2 == 0) {
-        tag.setMetadata(metadata1);
+        tag.getMetadata().putAll(metadata1);
       }
       else {
-        tag.setMetadata(metadata2);
+        tag.getMetadata().putAll(metadata2);
       }
     }
 

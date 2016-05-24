@@ -16,27 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
@@ -46,17 +25,32 @@ import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.eslog.structure.mappings.EsMapping.ValueType;
+import cern.c2mon.server.eslog.structure.types.AbstractEsTag;
 import cern.c2mon.server.eslog.structure.types.EsTagBoolean;
-import cern.c2mon.server.eslog.structure.types.EsTagImpl;
 import cern.c2mon.server.eslog.structure.types.EsTagNumeric;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.common.metadata.Metadata;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
 /**
- * Checks on the fields of data appened/set to EsTagImpl.
+ * Checks on the fields of data appened/set to AbstractEsTag.
  * 
  * @author Alban Marguet.
  */
@@ -78,7 +72,7 @@ public class DataEsTagImplLogConverterTest {
   @Mock
   private Tag tagC2MON;
   @Mock
-  private EsTagImpl esTagImpl;
+  private AbstractEsTag esTagImpl;
 
   @Test
   public void testGetProcessName() {
@@ -227,7 +221,7 @@ public class DataEsTagImplLogConverterTest {
   public void testConvertToTagES() throws IOException {
     long id = 1L;
     String name = "tag";
-    ValueType type = ValueType.boolType;
+    ValueType type = ValueType.BOOLEAN;
     long timeStamp = 123456L;
     boolean value = true;
     String valueDesc = "ok";
@@ -239,7 +233,7 @@ public class DataEsTagImplLogConverterTest {
     when(tagC2MON.getValue()).thenReturn(value);
     when(tagC2MON.getValueDescription()).thenReturn(valueDesc);
 
-    EsTagImpl esTagImpl = esLogConverter.convertToTagES(tagC2MON);
+    AbstractEsTag esTagImpl = esLogConverter.convertToTagES(tagC2MON);
     assertEquals(id, esTagImpl.getIdAsLong());
     assertEquals(name, esTagImpl.getName());
     assertEquals(type.toString(), esTagImpl.getDataType());
@@ -250,12 +244,12 @@ public class DataEsTagImplLogConverterTest {
     assertNull(esTagImpl.getQuality());
     assertTrue(esTagImpl.getValid());
 
-    when(tagC2MON.getDataType()).thenReturn(ValueType.stringType.toString());
+    when(tagC2MON.getDataType()).thenReturn(ValueType.STRING.toString());
     when(tagC2MON.getValue()).thenReturn(name);
     esTagImpl = esLogConverter.convertToTagES(tagC2MON);
     assertEquals(name, esTagImpl.getValue());
 
-    when(tagC2MON.getDataType()).thenReturn(ValueType.longType.toString());
+    when(tagC2MON.getDataType()).thenReturn(ValueType.LONG.toString());
     when(tagC2MON.getValue()).thenReturn(timeStamp);
     esTagImpl = esLogConverter.convertToTagES(tagC2MON);
     assertEquals(timeStamp, esTagImpl.getValue());
@@ -271,7 +265,7 @@ public class DataEsTagImplLogConverterTest {
     DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
     tag.setDaqTimestamp(null);
     tag.setSourceTimestamp(null);
-    EsTagImpl esTagImpl = esLogConverter.convertToTagES(tag);
+    AbstractEsTag esTagImpl = esLogConverter.convertToTagES(tag);
     assertTrue(esTagImpl instanceof EsTagBoolean);
     assertEquals(0, esTagImpl.getDaqTimestamp());
     assertEquals(0, esTagImpl.getSourceTimestamp());
@@ -280,7 +274,7 @@ public class DataEsTagImplLogConverterTest {
   @Test
   public void ModuleConvertsTagsAsExpected() {
     Tag tag = createTagExample();
-    EsTagImpl esTagImpl = esLogConverter.convertToTagES(tag);
+    AbstractEsTag esTagImpl = esLogConverter.convertToTagES(tag);
 
     assertTrue(esTagImpl instanceof EsTagBoolean);
     assertTrue(esTagImpl.getValueBoolean());
