@@ -47,7 +47,7 @@ public class DataTagAddressTest {
     DataTagAddress testAddress = new DataTagAddress(testData);
 
     String compareString = "      <DataTagAddress>\n" +
-        "            <address-parameters class=\"java.util.HashMap\"><entry key=\"key1\">1</entry><entry key=\"key2\">test</entry><entry key=\"key3\">true</entry></address-parameters>\n" +
+        "            <address-parameters class=\"java.util.HashMap\"><entry key=\"key1\"><![CDATA[1]]></entry><entry key=\"key2\"><![CDATA[test]]></entry><entry key=\"key3\"><![CDATA[true]]></entry></address-parameters>\n" +
         "        <priority>2</priority>\n" +
         "        <guaranteed-delivery>false</guaranteed-delivery>\n" +
         "      </DataTagAddress>\n";
