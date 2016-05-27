@@ -21,6 +21,12 @@
       <groupId>cern.c2mon.c2mon-publisher</groupId>
       <artifactId>c2mon-publisher-core</artifactId>
       <version>[1.5.0, 2.0.0)</version>
+      <exclusions>
+      	<exclusion>
+      		<artifactId>activemq-all</artifactId>
+      		<groupId>org.apache.activemq</groupId>
+      	</exclusion>
+      </exclusions>
     </dependency>
 
     <!-- CERN 3rd party dependencies -->
@@ -53,6 +59,16 @@
       <artifactId>slf4j-log4j12</artifactId>
       <version>1.7.5</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache.activemq</groupId>
+    	<artifactId>activemq-client</artifactId>
+    	<version>5.12.2</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache.activemq</groupId>
+    	<artifactId>activemq-openwire-legacy</artifactId>
+    	<version>5.12.2</version>
     </dependency>
   </dependencies>
 </project>
