@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 public enum GsonSupplier implements Supplier<Gson> {
   INSTANCE(GsonFactory.createGson());
 
-  protected final Gson gson;
+  private final Gson gson;
 
   GsonSupplier(final Gson gson) {
     this.gson = gson;
