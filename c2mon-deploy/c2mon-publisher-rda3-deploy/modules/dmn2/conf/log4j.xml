@@ -5,18 +5,6 @@
                      threshold="debug"
                      xmlns:log4j='http://jakarta.apache.org/log4j/'>
                      
-  <renderer  renderedClass="cern.c2mon.client.common.tag.ClientDataTagValue"
-             renderingClass="cern.c2mon.client.common.tag.ClientDataTagValueRenderer" />
-
-  <!--
-    Create a RollingFileAppender.
-    Log messages are written to the file specified in the ${tim.log.file}
-    system property. The file size is limited to 10MB; once this size is reached
-    the file is truncated and backed up and a new file is started.
-    If the specified file cannot be opened or the ${tim.log.file} property
-    has not been specified on the command line, the FallbackFileAppender is used
-    instead.
-  -->
   <appender name="FileAppender" class="org.apache.log4j.RollingFileAppender">
     <errorHandler class="org.apache.log4j.varia.FallbackErrorHandler">
       <root-ref/>
