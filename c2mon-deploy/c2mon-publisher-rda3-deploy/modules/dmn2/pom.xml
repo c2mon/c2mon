@@ -24,7 +24,24 @@
 		<groupId>org.slf4j</groupId>
 		<artifactId>slf4j-log4j12</artifactId>
 	</dependency>
+	<dependency>
+		<groupId>org.apache.activemq</groupId>
+		<artifactId>activemq-client</artifactId>
+		<version>5.12.2</version>
+	</dependency>
+	<dependency>
+		<groupId>cern.c2mon.c2mon-client</groupId>
+		<artifactId>c2mon-client-all</artifactId>
+		<version>1.6.5</version>
+		<exclusions>
+      	<exclusion>
+      		<artifactId>activemq-all</artifactId>
+      		<groupId>org.apache.activemq</groupId>
+      	</exclusion>
+      </exclusions>
+	</dependency>
 	</dependencies>
+
 
 	<developers />
 	<scm>
