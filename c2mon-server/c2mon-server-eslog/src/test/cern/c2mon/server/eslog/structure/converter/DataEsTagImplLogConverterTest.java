@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -51,7 +51,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Checks on the fields of data appened/set to AbstractEsTag.
- * 
+ *
  * @author Alban Marguet.
  */
 @Slf4j
@@ -155,7 +155,7 @@ public class DataEsTagImplLogConverterTest {
     when(subEquipmentCache.get(subEquipment.getId())).thenReturn(subEquipment);
     when(tag.getSubEquipmentIds()).thenReturn(Collections.singleton(subEquipment.getId()));
 
-    Map<String, String> result = esLogConverter.getTagMetadataProcess(tag);
+    Map<String, String> result = esLogConverter.getTagProcessMetadata(tag);
 
     assertEquals(expected, result);
   }
@@ -178,7 +178,7 @@ public class DataEsTagImplLogConverterTest {
     when(equipmentCache.get(equipment.getId())).thenReturn(equipment);
     when(tag.getEquipmentIds()).thenReturn(Collections.singleton(equipment.getId()));
 
-    Map<String, String> result = esLogConverter.getTagMetadataProcess(tag);
+    Map<String, String> result = esLogConverter.getTagProcessMetadata(tag);
 
     assertEquals(expected, result);
   }
@@ -195,7 +195,7 @@ public class DataEsTagImplLogConverterTest {
     when(processCache.get(process.getId())).thenReturn(process);
     when(tag.getProcessIds()).thenReturn(Collections.singleton(process.getId()));
 
-    Map<String, String> result = esLogConverter.getTagMetadataProcess(tag);
+    Map<String, String> result = esLogConverter.getTagProcessMetadata(tag);
     assertEquals(expected, result);
   }
 
@@ -203,7 +203,7 @@ public class DataEsTagImplLogConverterTest {
   public void testGetMetadataProcessWithNull() {
     HashMap<String, String> expected = new HashMap<>();
 
-    Map<String, String> result = esLogConverter.getTagMetadataProcess(tag);
+    Map<String, String> result = esLogConverter.getTagProcessMetadata(tag);
     assertEquals(expected, result);
   }
 
@@ -214,7 +214,7 @@ public class DataEsTagImplLogConverterTest {
     tag.setEquipmentId(null);
     tag.setSubEquipmentId(null);
     tag.setProcessId(null);
-    assertEquals(expected, esLogConverter.getTagMetadataProcess(tag));
+    assertEquals(expected, esLogConverter.getTagProcessMetadata(tag));
   }
 
   @Test

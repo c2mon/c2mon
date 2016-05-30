@@ -32,10 +32,10 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(MockitoJUnitRunner.class)
 public class EsTagImplEsMappingTest {
   private String expectedMapping = "{\n" +
-      "  \"_routing\": {\n" +
-      "    \"required\": \"true\"\n" +
-      "  }\n" +
-      "}";
+          "  \"_routing\": {\n" +
+          "    \"required\": \"true\"\n" +
+          "  }\n" +
+          "}";
 
   @Test
   public void testGetESMapping() {

@@ -66,8 +66,7 @@ public class EsSupervisionEventTest {
     try {
       assertEquals(expectedJson, esSupervisionEvent.toString());
       assertEquals(esSupervisionEvent, esSupervisionEvent.getObject(expectedJson));
-    }
-    catch (Exception e) {
+    } catch(Exception e) {
       fail("Should be able to serialize/deserialize JSON");
     }
   }

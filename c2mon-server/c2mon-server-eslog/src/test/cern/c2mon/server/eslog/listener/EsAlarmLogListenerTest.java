@@ -47,12 +47,12 @@ public class EsAlarmLogListenerTest {
 
   @Before
   public void setup() {
-    when(esAlarmLogConverter.convertAlarmToAlarmES(eq(alarm))).thenReturn(EsAlarm);
+    when(esAlarmLogConverter.convert(eq(alarm))).thenReturn(EsAlarm);
   }
 
   @Test
   public void testAlarmIsSentToIndexer() throws IDBPersistenceException {
     listener.notifyElementUpdated(alarm);
-    verify(esAlarmLogConverter).convertAlarmToAlarmES(eq(alarm));
+    verify(esAlarmLogConverter).convert(eq(alarm));
   }
 }

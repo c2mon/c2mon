@@ -29,28 +29,28 @@ import static org.junit.Assert.assertEquals;
 public class EsSupervisionEventMappingTest {
   private EsSupervisionMapping mapping;
   private String expectedMappings = "{\n" +
-      "  \"mappings\": {\n" +
-      "    \"supervision\": {\n" +
-      "      \"properties\": {\n" +
-      "        \"id\": {\n" +
-      "          \"type\": \"long\"\n" +
-      "        },\n" +
-      "        \"timestamp\": {\n" +
-      "          \"type\": \"date\",\n" +
-      "          \"format\": \"epoch_millis\"\n" +
-      "        },\n" +
-      "        \"message\": {\n" +
-      "          \"type\": \"string\",\n" +
-      "          \"index\": \"not_analyzed\"\n" +
-      "        },\n" +
-      "        \"status\": {\n" +
-      "          \"type\": \"string\",\n" +
-      "          \"index\": \"not_analyzed\"\n" +
-      "        }\n" +
-      "      }\n" +
-      "    }\n" +
-      "  }\n" +
-      "}";
+          "  \"mappings\": {\n" +
+          "    \"supervision\": {\n" +
+          "      \"properties\": {\n" +
+          "        \"id\": {\n" +
+          "          \"type\": \"long\"\n" +
+          "        },\n" +
+          "        \"timestamp\": {\n" +
+          "          \"type\": \"date\",\n" +
+          "          \"format\": \"epoch_millis\"\n" +
+          "        },\n" +
+          "        \"message\": {\n" +
+          "          \"type\": \"string\",\n" +
+          "          \"index\": \"not_analyzed\"\n" +
+          "        },\n" +
+          "        \"status\": {\n" +
+          "          \"type\": \"string\",\n" +
+          "          \"index\": \"not_analyzed\"\n" +
+          "        }\n" +
+          "      }\n" +
+          "    }\n" +
+          "  }\n" +
+          "}";
 
   @Before
   public void setup() {

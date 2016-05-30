@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * <p>
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * <p>
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * <p>
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -20,8 +20,9 @@ import cern.c2mon.server.eslog.structure.mappings.EsMapping;
 import cern.c2mon.server.eslog.structure.types.AbstractEsTag;
 import cern.c2mon.server.eslog.structure.types.EsAlarm;
 import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
-import com.carrotsearch.hppc.ObjectContainer;
 import com.carrotsearch.hppc.cursors.ObjectCursor;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequestBuilder;
@@ -33,10 +34,8 @@ import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.cluster.metadata.AliasMetaData;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
@@ -54,6 +53,7 @@ import javax.annotation.PostConstruct;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
@@ -115,6 +115,24 @@ public class TransportConnector implements Connector {
   @Value("${c2mon.server.eslog.local}")
   private boolean isLocal;
 
+  @Value("${c2mon.server.eslog.httpEnabled:false}")
+  private boolean httpEnabled;
+
+  /**
+   * BulkSettings
+   */
+  @Value("${c2mon.server.eslog.config.bulk.actions}")
+  private int bulkActions;
+
+  @Value("${c2mon.server.eslog.config.bulk.size}")
+  private int bulkSize;
+
+  @Value("${c2mon.server.eslog.config.bulk.flush}")
+  private int flushInterval;
+
+  @Value("${c2mon.server.eslog.config.bulk.concurrent}")
+  private int concurrent;
+
   /**
    * Connection settings for the node according to the host, port, cluster, node and isLocal.
    */
@@ -143,21 +161,6 @@ public class TransportConnector implements Connector {
    */
   private boolean isConnected;
 
-  /**
-   * BulkSettings
-   */
-  @Value("${c2mon.server.eslog.config.bulk.actions}")
-  private int bulkActions;
-
-  @Value("${c2mon.server.eslog.config.bulk.size}")
-  private int bulkSize;
-
-  @Value("${c2mon.server.eslog.config.bulk.flush}")
-  private int flushInterval;
-
-  @Value("${c2mon.server.eslog.config.bulk.concurrent}")
-  private int concurrent;
-
 
   /**
    * Instantiate the Client to communicate with the ElasticSearch cluster. If it
@@ -165,7 +168,7 @@ public class TransportConnector implements Connector {
    */
   @PostConstruct
   public void init() {
-    if(!host.equalsIgnoreCase("localhost") && !host.equalsIgnoreCase("local")) {
+    if (!host.equalsIgnoreCase("localhost") && !host.equalsIgnoreCase("local")) {
       setLocal(false);
     }
     findClusterAndLaunchBulk();
@@ -178,7 +181,7 @@ public class TransportConnector implements Connector {
    * This creates a transport client that is able to communicate with the nodes.
    */
   private void initializationSteps() {
-    if(isLocal) {
+    if (isLocal) {
       setHost(LOCAL_HOST);
       setPort(LOCAL_PORT);
 
@@ -197,11 +200,14 @@ public class TransportConnector implements Connector {
    * @return the {@link Client} instance.
    */
   private Client createClient() {
-    if(isLocal) {
-      this.settings = Settings.settingsBuilder()
-              .put("node.local", isLocal)
-              .put("node.name", node)
-              .put("cluster.name", cluster)
+    final Settings.Builder settingsBuilder = Settings.settingsBuilder();
+
+    settingsBuilder.put("node.name", node)
+            .put("cluster.name", cluster)
+            .put("http.enabled", httpEnabled);
+
+    if (isLocal) {
+      this.settings = settingsBuilder.put("node.local", true)
               .build();
 
       log.debug("Creating local client on host " + host + " and port " + port + " with name " + node + ", in cluster " + cluster + ".");
@@ -209,23 +215,19 @@ public class TransportConnector implements Connector {
               .settings(settings)
               .build()
               .addTransportAddress(new LocalTransportAddress(String.valueOf(port)));
-    } else {
-      this.settings = Settings.settingsBuilder()
-              .put("cluster.name", cluster)
-              .put("node.name", node)
-              .build();
+    }
 
-      log.debug("Creating  client on host " + host + " and port " + port + " with name " + node + ", in cluster " + cluster + ".");
+    this.settings = settingsBuilder.build();
 
-      try {
-        return TransportClient.builder()
-                .settings(settings)
-                .build()
-                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), port));
-      } catch(UnknownHostException e) {
-        log.error("createTransportClient() - Error whilst connecting to the ElasticSearch cluster (host=" + host + ", port=" + port + ").", e);
-        return null;
-      }
+    log.debug("Creating  client on host " + host + " and port " + port + " with name " + node + ", in cluster " + cluster + ".");
+    try {
+      return TransportClient.builder()
+              .settings(settings)
+              .build()
+              .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), port));
+    } catch(UnknownHostException e) {
+      log.error("createTransportClient() - Error whilst connecting to the ElasticSearch cluster (host=" + host + ", port=" + port + ").", e);
+      return null;
     }
   }
 
@@ -310,14 +312,14 @@ public class TransportConnector implements Connector {
    */
   @Override
   public boolean waitForYellowStatus() {
-    if(client != null) {
-      checkYellowStatus();
-      log.debug("waitForYellowStatus() - Everything is alright.");
-      return true;
-    } else {
+    if (client == null) {
       log.warn("waitForYellowStatus() - client for the ElasticSearch cluster seems to have null value.");
       return false;
     }
+
+    checkYellowStatus();
+    log.debug("waitForYellowStatus() - Everything is alright.");
+    return true;
   }
 
   /**
@@ -325,14 +327,18 @@ public class TransportConnector implements Connector {
    */
   @Override
   public boolean bulkAdd(IndexRequest request) {
-    if(bulkProcessor != null && request != null) {
-      bulkProcessor.add(request);
-      log.trace("bulkAdd() - BulkProcessor will handle indexing of new index.");
-      return true;
-    } else {
+    if (bulkProcessor == null) {
       log.error("bulkProcessor is null. This should not happen!");
+      return false;
     }
-    return false;
+
+    if (request == null) {
+      return false;
+    }
+
+    bulkProcessor.add(request);
+    log.trace("bulkAdd() - BulkProcessor will handle indexing of new index.");
+    return true;
   }
 
   /**
@@ -343,14 +349,12 @@ public class TransportConnector implements Connector {
    */
   @Override
   public boolean handleIndexQuery(String indexName, String type, String mapping) {
-    boolean isAcked = false;
-    if(client == null) {
+    if (client == null) {
       log.error("handleIndexQuery() - Error: the client is " + client + ".");
-      return isAcked;
+      return false;
     }
 
-    isAcked = indexNew(indexName, type, mapping);
-    return isAcked;
+    return indexNew(indexName, type, mapping);
   }
 
   /**
@@ -363,14 +367,12 @@ public class TransportConnector implements Connector {
    */
   @Override
   public boolean handleSupervisionQuery(String indexName, String mapping, EsSupervisionEvent esSupervisionEvent) {
-    boolean isAcked = false;
-    if(client == null) {
+    if (client == null) {
       log.error("handleSupervisionQuery() - Error: the client is " + client + ".");
-      return isAcked;
+      return false;
     }
 
-    isAcked = logSupervisionEvent(indexName, mapping, esSupervisionEvent);
-    return isAcked;
+    return logSupervisionEvent(indexName, mapping, esSupervisionEvent);
   }
 
   /**
@@ -384,15 +386,13 @@ public class TransportConnector implements Connector {
   @Override
   public boolean handleAlarmQuery(String indexName, String mapping, EsAlarm esAlarm) {
     log.debug("handleAlarmQuery() - Handling AlarmESQuery with mapping:" + mapping + " for index: " + indexName + ".");
-    boolean isAcked = false;
 
-    if(client == null) {
+    if (client == null) {
       log.error("handleAlarmQuery() - Error: the client is " + client + ".");
-      return isAcked;
+      return false;
     }
 
-    isAcked = logAlarmES(indexName, mapping, esAlarm);
-    return isAcked;
+    return logAlarmES(indexName, mapping, esAlarm);
   }
 
   /**
@@ -400,12 +400,14 @@ public class TransportConnector implements Connector {
    */
   @Override
   public Set<String> retrieveIndicesFromES() {
-    Set<String> indices = new HashSet<>();
-    if(client != null) {
-      log.trace("updateIndices() - Updating list of indices.");
-      indices.addAll(getListOfIndicesFromES());
+    if (client == null) {
+      return Collections.emptySet();
     }
-    return indices;
+
+    log.trace("updateIndices() - Updating list of indices.");
+    return getListOfIndicesFromES().stream()
+            .distinct()
+            .collect(Collectors.toSet());
   }
 
   /**
@@ -413,12 +415,14 @@ public class TransportConnector implements Connector {
    */
   @Override
   public Set<String> retrieveTypesFromES(String index) {
-    Set<String> types = new HashSet<>();
-    if(client != null) {
-      log.trace("updateTypes() - Updating list of types.");
-      types.addAll(getListOfTypesFromES(index));
+    if (client == null) {
+      return Collections.emptySet();
     }
-    return types;
+
+    log.trace("updateTypes() - Updating list of types.");
+    return getTypesFromES(index).stream()
+            .distinct()
+            .collect(Collectors.toSet());
   }
 
   /**
@@ -478,7 +482,7 @@ public class TransportConnector implements Connector {
    */
   @Override
   public void close(Client transportClient) {
-    if(transportClient != null) {
+    if (transportClient != null) {
       transportClient.close();
       log.info("close() - Closed client: " + transportClient.settings().get("node.name"));
     }
@@ -489,9 +493,9 @@ public class TransportConnector implements Connector {
    */
   private List<Integer> getFailedActions(BulkResponse bulkResponse) {
     List<Integer> failedActions = new ArrayList<>();
-    if(bulkResponse.hasFailures()) {
-      for(BulkItemResponse item : bulkResponse.getItems()) {
-        if(item.isFailed()) {
+    if (bulkResponse.hasFailures()) {
+      for (BulkItemResponse item : bulkResponse.getItems()) {
+        if (item.isFailed()) {
           failedActions.add(item.getItemId());
         }
       }
@@ -517,8 +521,9 @@ public class TransportConnector implements Connector {
   /**
    * Retrieve all the indices in ElasticSearch as a String array.
    */
-  protected String[] getIndicesFromCluster() {
-    return client.admin().indices().prepareGetIndex().get().indices();
+  protected List<String> getIndicesFromCluster() {
+    String[] indices = client.admin().indices().prepareGetIndex().get().indices();
+    return Arrays.asList(indices);
   }
 
   /**
@@ -539,7 +544,7 @@ public class TransportConnector implements Connector {
    * Allows to retrieve all the mappings inside a cluster.
    */
   protected Iterator<ObjectCursor<IndexMetaData>> getIndicesWithMetadata() {
-    return client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().indices().values().iterator();
+    return client.admin().cluster().prepareState().get().getState().getMetaData().indices().values().iterator();
   }
 
   /**
@@ -550,18 +555,15 @@ public class TransportConnector implements Connector {
   }
 
   /**
-   * Retrieve the aliases associated to the specified index.
-   */
-  protected ObjectContainer<AliasMetaData> getAliases(String index) {
-    return client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().index(index).getAliases().values();
-  }
-
-  /**
    * @return true if the specified index exists.
    */
   protected boolean indexExists(String indexName) {
+    if (Strings.isNullOrEmpty(indexName)) {
+      return false;
+    }
+
     log.debug("indexExists() - Look for the existence of the index " + indexName + ".");
-    return client.admin().indices().prepareExists(indexName).execute().actionGet().isExists();
+    return client.admin().indices().prepareExists(indexName).get().isExists();
   }
 
   /**
@@ -577,19 +579,23 @@ public class TransportConnector implements Connector {
     String jsonSource = esAlarm.toString();
     String routing = String.valueOf(esAlarm.getAlarmId());
 
-    if(!indexExists(indexName) && mapping != null) {
-      client.admin().indices().prepareCreate(indexName).setSource(mapping).execute().actionGet();
-      log.debug("logAlarmES() - Source query is: " + jsonSource + ".");
-    }
-
-    if(indexExists(indexName)) {
+    if (indexExists(indexName)) {
       log.debug("logAlarmES() - Add new Alarm event to index " + indexName + ".");
-      IndexResponse response = client.prepareIndex().setIndex(indexName).setType(EsMapping.ValueType.ALARM.toString()).setSource(jsonSource).setRouting(routing).execute().actionGet();
-      return response.isCreated();
-
+      return client.prepareIndex().setIndex(indexName)
+              .setType(EsMapping.ValueType.ALARM.toString())
+              .setSource(jsonSource)
+              .setRouting(routing)
+              .get().isCreated();
     }
 
-    return false;
+    if (Strings.isNullOrEmpty(mapping)) {
+      return false;
+    }
+
+    log.debug("logAlarmES() - Source query is: " + jsonSource + ".");
+    return client.admin().indices().prepareCreate(indexName)
+            .setSource(mapping)
+            .get().isAcknowledged();
   }
 
   /**
@@ -603,17 +609,27 @@ public class TransportConnector implements Connector {
   public boolean logSupervisionEvent(String indexName, String mapping, EsSupervisionEvent esSupervisionEvent) {
     String jsonSource = esSupervisionEvent.toString();
     String routing = esSupervisionEvent.getId();
-    if(!indexExists(indexName) && mapping != null) {
-      client.admin().indices().prepareCreate(indexName).setSource(mapping).execute().actionGet();
-      log.debug("logSupervisionEvent() - Source query is: " + jsonSource + ".");
+
+    if (indexExists(indexName)) {
+      log.debug("logSupervisionEvent() - Add new Supervision event to index " + indexName + ".");
+      return client.prepareIndex().setIndex(indexName)
+              .setType(EsMapping.ValueType.SUPERVISION.toString())
+              .setSource(jsonSource)
+              .setRouting(routing)
+              .get()
+              .isCreated();
     }
 
-    if(indexExists(indexName)) {
-      log.debug("logSupervisionEvent() - Add new Supervision event to index " + indexName + ".");
-      IndexResponse response = client.prepareIndex().setIndex(indexName).setType(EsMapping.ValueType.SUPERVISION.toString()).setSource(jsonSource).setRouting(routing).execute().actionGet();
-      return response.isCreated();
+    if (Strings.isNullOrEmpty(mapping)) {
+      return false;
     }
-    return false;
+
+    log.debug("logSupervisionEvent() - Source query is: " + jsonSource + ".");
+    return client.admin().indices().prepareCreate(indexName)
+            .setSource(mapping)
+            .get()
+            .isAcknowledged();
+
   }
 
   /**
@@ -622,33 +638,28 @@ public class TransportConnector implements Connector {
    * @return List<String>: names of the indices.
    */
   public List<String> getListOfIndicesFromES() {
-    if(client != null) {
-      String[] indicesFromCluster = getIndicesFromCluster();
-      log.debug("getListOfAnswer() - got a list of indices, size=" + indicesFromCluster.length);
-      return Arrays.asList(indicesFromCluster);
-    } else {
+    if (client == null) {
       log.warn("getListOFAnswer() - Warning: client has value " + client + ".");
-      return new ArrayList<>();
+      return Collections.emptyList();
     }
+
+    List<String> indicesFromCluster = getIndicesFromCluster();
+    log.debug("getListOfAnswer() - got a list of indices, size=" + indicesFromCluster.size());
+
+    return indicesFromCluster;
   }
 
   /**
    * Simple query to get all the types of the {@param index}.
    */
-  public List<String> getListOfTypesFromES(String index) {
-    List<String> result = new ArrayList<>();
-    if(index != null) {
-      Iterator<ObjectCursor<String>> typesIt = getIndexWithMetadata(index).keys().iterator();
-      addTypesToResult(typesIt, result);
-      log.info("QueryTypes - Got a list of types, size= " + result.size());
+  public Collection<String> getTypesFromES(String index) {
+    if (index == null) {
+      return Collections.emptySet();
     }
-    return result;
-  }
+    final Collection<String> types = Sets.newHashSet(getIndexWithMetadata(index).keysIt());
 
-  private void addTypesToResult(Iterator<ObjectCursor<String>> typesIt, List<String> result) {
-    while(typesIt.hasNext()) {
-      result.add(typesIt.next().value);
-    }
+    log.info("QueryTypes - Got a list of types, size= " + types.size());
+    return types;
   }
 
   /**
@@ -658,7 +669,7 @@ public class TransportConnector implements Connector {
    * @return true if the cluster has acknowledged the query.
    */
   public boolean indexNew(String index, String type, String mapping) {
-    if(type == null && mapping == null) {
+    if (type == null && mapping == null) {
       return handleAddingIndex(index);
     } else {
       return handleAddingMapping(index, type, mapping);
@@ -667,12 +678,12 @@ public class TransportConnector implements Connector {
 
   private boolean handleAddingIndex(String index) {
     CreateIndexRequestBuilder createIndexRequestBuilder = prepareCreateIndexRequestBuilder(index);
-    CreateIndexResponse response = createIndexRequestBuilder.execute().actionGet();
+    CreateIndexResponse response = createIndexRequestBuilder.get();
     return response.isAcknowledged();
   }
 
   private boolean handleAddingMapping(String index, String type, String mapping) {
-    PutMappingResponse response = client.admin().indices().preparePutMapping(index).setType(type).setSource(mapping).execute().actionGet();
+    PutMappingResponse response = client.admin().indices().preparePutMapping(index).setType(type).setSource(mapping).get();
     return response.isAcknowledged();
   }
 }

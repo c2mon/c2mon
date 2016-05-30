@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * <p>
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * <p>
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * <p>
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -22,7 +22,6 @@ import cern.c2mon.server.eslog.connector.Connector;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -136,30 +135,26 @@ public abstract class EsIndexer implements IDBPersistenceHandler {
    * Milliseconds since Epoch time to YYYY-MM.
    */
   protected String millisecondsToYearMonth(long millis) {
-    String timestamp = getSimpleDateFormatForMilliseconds("yyyy-MM", millis);
-    return timestamp;
+    return getSimpleDateFormatForMilliseconds("yyyy-MM", millis);
   }
 
   /**
    * Milliseconds since Epoch time to YYYY-ww.
    */
   protected String millisecondsToYearWeek(long millis) {
-    String timeStamp = getSimpleDateFormatForMilliseconds("yyyy-'W'ww", millis);
-    return timeStamp;
+    return getSimpleDateFormatForMilliseconds("yyyy-'W'ww", millis);
   }
 
   /**
    * Milliseconds since Epoch time to YYYY-MM-DD.
    */
   protected String millisecondsToYearMonthDay(long millis) {
-    String timestamp = getSimpleDateFormatForMilliseconds("yyyy-MM-dd", millis);
-    return timestamp;
+    return getSimpleDateFormatForMilliseconds("yyyy-MM-dd", millis);
   }
 
   private String getSimpleDateFormatForMilliseconds(String wantedPattern, long millis) {
-    SimpleDateFormat sdf = new SimpleDateFormat(wantedPattern);
     Date date = new Date(millis);
-    return sdf.format(date);
+    return new SimpleDateFormat(wantedPattern).format(date);
   }
 
   /**
@@ -167,8 +162,8 @@ public abstract class EsIndexer implements IDBPersistenceHandler {
    */
   protected MappingMetaData retrieveMappingES(String index, String type) throws IDBPersistenceException {
     try {
-      ClusterState state = connector.getClient().admin().cluster().prepareState().execute().actionGet().getState();
-      return state.getMetaData().index(index).mapping(type);
+      return connector.getClient().admin().cluster().prepareState().get()
+              .getState().getMetaData().index(index).mapping(type);
     } catch(ElasticsearchException e) {
       throw new IDBPersistenceException();
     }

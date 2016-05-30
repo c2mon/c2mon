@@ -51,9 +51,16 @@
       <version>[1.6.4, 2.0.0)</version>
     </dependency>
 
+    <!--Other dependencies -->
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>19.0</version>
     </dependency>
 
     <!-- Test dependency -->

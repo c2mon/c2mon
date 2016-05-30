@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * <p>
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * <p>
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * <p>
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -190,11 +190,11 @@ public interface EsMapping {
       this.valid = new Valid();
       this.valueDescription = new ValueDescription();
 
-      if(ValueType.isNumeric(valueType)) {
+      if (ValueType.isNumeric(valueType)) {
         this.valueNumeric = new ValueNumeric(valueType);
-      } else if(ValueType.isString(valueType)) {
+      } else if (ValueType.isString(valueType)) {
         this.valueString = new ValueString(valueType);
-      } else if(ValueType.isBoolean(valueType)) {
+      } else if (ValueType.isBoolean(valueType)) {
         this.valueBoolean = new ValueBoolean(valueType);
         this.valueNumeric = new ValueNumeric(ValueType.DOUBLE);
       }
@@ -206,9 +206,9 @@ public interface EsMapping {
     }
 
     public String getValueType() {
-      if(valueBoolean != null) {
+      if (valueBoolean != null) {
         return valueBoolean.getType();
-      } else if(valueNumeric != null) {
+      } else if (valueNumeric != null) {
         return valueNumeric.getType();
       } else {
         return valueString.getType();

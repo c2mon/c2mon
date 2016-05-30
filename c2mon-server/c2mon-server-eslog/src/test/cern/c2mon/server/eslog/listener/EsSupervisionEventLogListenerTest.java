@@ -37,6 +37,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Test if the the SupervisionEvent are well translated into EsSupervisionEvent for ElasticSearch.
+ *
  * @author Alban Marguet
  */
 @Slf4j

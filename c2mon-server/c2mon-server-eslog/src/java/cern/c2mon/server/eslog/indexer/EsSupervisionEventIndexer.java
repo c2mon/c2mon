@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * <p>
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * <p>
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * <p>
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -29,6 +29,7 @@ import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
@@ -73,8 +74,11 @@ public class EsSupervisionEventIndexer extends EsIndexer {
 
   @Override
   public void storeData(IFallback object) throws IDBPersistenceException {
+    if(object == null) {
+      return;
+    }
     try {
-      if(object != null && object instanceof EsSupervisionEvent) {
+      if (object instanceof EsSupervisionEvent) {
         logSupervisionEvent((EsSupervisionEvent) object);
       }
     } catch(ElasticsearchException e) {
@@ -84,9 +88,12 @@ public class EsSupervisionEventIndexer extends EsIndexer {
 
   @Override
   public void storeData(List data) throws IDBPersistenceException {
+    if(CollectionUtils.isEmpty(data)) {
+      return;
+    }
     try {
-      for(Object object : data) {
-        if(object instanceof IFallback) {
+      for (Object object : data) {
+        if (object instanceof IFallback) {
           storeData((IFallback) object);
         }
       }
@@ -101,7 +108,7 @@ public class EsSupervisionEventIndexer extends EsIndexer {
    * @param esSupervisionEvent to be written to ElasticSearch.
    */
   public void logSupervisionEvent(EsSupervisionEvent esSupervisionEvent) {
-    if(esSupervisionEvent != null) {
+    if (esSupervisionEvent != null) {
       String indexName = generateSupervisionIndex(esSupervisionEvent.getEventTime());
       String mapping = createMappingIfNewIndex(indexName);
       indexData(indexName, mapping, esSupervisionEvent);
@@ -118,7 +125,7 @@ public class EsSupervisionEventIndexer extends EsIndexer {
   }
 
   private String createMappingIfNewIndex(String indexName) {
-    if(cacheIndices.keySet().contains(indexName)) {
+    if (cacheIndices.keySet().contains(indexName)) {
       return cacheIndices.get(indexName);
     } else {
       EsSupervisionMapping supervisionMapping = new EsSupervisionMapping();
@@ -131,12 +138,12 @@ public class EsSupervisionEventIndexer extends EsIndexer {
    */
   private void retrieveMappingsFromES() throws IDBPersistenceException {
     Set<String> indicesES = retrieveIndicesFromES();
-    for(String index : indicesES) {
+    for (String index : indicesES) {
       Set<String> types = retrieveTypesFromES(index);
-      for(String type : types) {
+      for (String type : types) {
         MappingMetaData mapping = retrieveMappingES(index, type);
 
-        if(mapping != null) {
+        if (mapping != null) {
           String jsonMapping = mapping.source().toString();
           log.debug("retrieveMappingsFromES() - mapping: " + jsonMapping);
           this.cacheIndices.put(index, jsonMapping);
@@ -154,7 +161,7 @@ public class EsSupervisionEventIndexer extends EsIndexer {
    */
   private void indexData(String indexName, String mapping, EsSupervisionEvent esSupervisionEvent) {
     boolean isAcked = connector.handleSupervisionQuery(indexName, mapping, esSupervisionEvent);
-    if(isAcked) {
+    if (isAcked) {
       log.debug("logSupervisionEvent() - isAcked: " + isAcked);
       cacheIndices.put(indexName, mapping);
     }

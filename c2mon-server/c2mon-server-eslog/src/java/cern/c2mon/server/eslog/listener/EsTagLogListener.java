@@ -1,17 +1,17 @@
 package cern.c2mon.server.eslog.listener;
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * <p>
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * <p>
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * <p>
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -126,8 +126,8 @@ public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLif
   }
 
   private void retrieveTagsToLog(Collection<Tag> tagCollection, Collection<Tag> tagsToLog) {
-    for(Tag tag : tagCollection) {
-      if(tag.isLogged()) {
+    for (Tag tag : tagCollection) {
+      if (tag.isLogged()) {
         tagsToLog.add(tag);
       }
     }
@@ -138,14 +138,14 @@ public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLif
                                        List<AbstractEsTag> tagNumericCollection,
                                        List<AbstractEsTag> tagStringCollection,
                                        List<AbstractEsTag> tagBooleanCollection) {
-    for(Tag tag : tagsToLog) {
+    for (Tag tag : tagsToLog) {
       try {
         AbstractEsTag esTagImpl = esTagLogConverter.convertToTagES(tag);
-        if(esTagImpl instanceof EsTagString) {
+        if (esTagImpl instanceof EsTagString) {
           addTagToCollectionIfNotNull(esTagImpl, tagStringCollection);
-        } else if(esTagImpl instanceof EsTagBoolean) {
+        } else if (esTagImpl instanceof EsTagBoolean) {
           addTagToCollectionIfNotNull(esTagImpl, tagBooleanCollection);
-        } else if(esTagImpl instanceof EsTagNumeric) {
+        } else if (esTagImpl instanceof EsTagNumeric) {
           addTagToCollectionIfNotNull(esTagImpl, tagNumericCollection);
         }
       } catch(Exception e) {
@@ -155,7 +155,7 @@ public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLif
   }
 
   private void addTagToCollectionIfNotNull(AbstractEsTag esTagImpl, Collection<AbstractEsTag> esTagImplCollection) {
-    if(esTagImpl != null) {
+    if (esTagImpl != null) {
       esTagImplCollection.add(esTagImpl);
     }
   }

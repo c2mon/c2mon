@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * <p>
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * <p>
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * <p>
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -20,6 +20,7 @@ import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
 import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.equipment.AbstractEquipment;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
@@ -35,8 +36,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -48,25 +51,24 @@ import java.util.stream.Collectors;
 @Component
 public class EsTagLogConverter {
 
-  private final ProcessCache processCache;
-  private final EquipmentCache equipmentCache;
-  private final SubEquipmentCache subEquipmentCache;
-  private final Gson gson;
-
   /**
    * Default ID to return if nothing is found in cache.
    */
-  private final long DEFAULT_ID = -1;
+  private static final long DEFAULT_ID = -1;
 
-  /**
-   * Autowired constructor to access cache for processMetadata.
-   */
+  private final Gson gson = GsonSupplier.INSTANCE.get();
+
+  private final ProcessCache processCache;
+  private final EquipmentCache equipmentCache;
+  private final SubEquipmentCache subEquipmentCache;
+
   @Autowired
-  public EsTagLogConverter(final ProcessCache processCache, final EquipmentCache equipmentCache, final SubEquipmentCache subEquipmentCache) {
+  public EsTagLogConverter(final ProcessCache processCache,
+                           final EquipmentCache equipmentCache,
+                           final SubEquipmentCache subEquipmentCache) {
     this.processCache = processCache;
     this.equipmentCache = equipmentCache;
     this.subEquipmentCache = subEquipmentCache;
-    this.gson = GsonSupplier.INSTANCE.get();
   }
 
   /**
@@ -75,10 +77,9 @@ public class EsTagLogConverter {
    * @param tag Tag object in C2MON.
    * @return {@link AbstractEsTag}, ready to be logged to the ElasticSearch instance.
    */
-  public AbstractEsTag convertToTagES(Tag tag) {
+  public AbstractEsTag convertToTagES(final Tag tag) {
     AbstractEsTag esTagImpl = instantiateTagES(tag.getDataType());
-
-    if(esTagImpl == null) {
+    if (esTagImpl == null) {
       return null;
     }
 
@@ -88,7 +89,8 @@ public class EsTagLogConverter {
     esTagImpl.setName(tag.getName());
     esTagImpl.setDataType(tag.getDataType().toLowerCase());
 
-    setSourceAndDaqTimestamp(tag, esTagImpl);
+    setSourceTimestamp(tag, esTagImpl);
+    setDaqTimestamp(tag, esTagImpl);
 
     setServerTimestamp(tag, esTagImpl);
     setStatus(tag, esTagImpl);
@@ -103,110 +105,6 @@ public class EsTagLogConverter {
   }
 
   /**
-   * Handles Metadata of tag and retrieve process, equipment and subEquipment.
-   */
-  private void setMetadata(Tag tag, AbstractEsTag esTag) {
-    retrieveTagMetadata(tag, esTag);
-    retrieveParentsMetadata(tag, esTag);
-  }
-
-  private void retrieveTagMetadata(Tag tag, AbstractEsTag esTag) {
-    Metadata metadata = tag.getMetadata();
-    if(metadata == null) {
-      return;
-    }
-
-    final Map<String, String> esMetadata = metadata.getMetadata().entrySet().stream()
-            .collect(Collectors.toMap(
-                    Map.Entry::getKey,
-                    entry -> entry.getValue().toString()));
-
-    esTag.getMetadata().putAll(esMetadata);
-  }
-
-  private void retrieveParentsMetadata(Tag tag, AbstractEsTag esTag) {
-    Map<String, String> parentNames = getTagMetadataProcess(tag);
-    String process = retrieveProcessIfExists(parentNames);
-    String equipment = retrieveEquipmentIfExists(parentNames);
-    String subEquipment = retrieveSubEquipmentIfExists(parentNames);
-
-    esTag.setProcess(process);
-    esTag.setEquipment(equipment);
-    esTag.setSubEquipment(subEquipment);
-  }
-
-  private String retrieveProcessIfExists(Map<String, String> parentNames) {
-    if(parentNames.containsKey("process")) {
-      return parentNames.get("process");
-    } else {
-      return null;
-    }
-  }
-
-  private String retrieveEquipmentIfExists(Map<String, String> parentNames) {
-    if(parentNames.containsKey("equipment")) {
-      return parentNames.get("equipment");
-    } else {
-      return null;
-    }
-  }
-
-  private String retrieveSubEquipmentIfExists(Map<String, String> parentNames) {
-    if(parentNames.containsKey("subEquipment")) {
-      return parentNames.get("subEquipment");
-    } else {
-      return null;
-    }
-  }
-
-  private void setSourceAndDaqTimestamp(Tag tag, AbstractEsTag esTag) {
-    if(tag instanceof DataTag) {
-      Timestamp sourceTimeStamp = ((DataTag) tag).getSourceTimestamp();
-      Timestamp daqTimeStamp = ((DataTag) tag).getDaqTimestamp();
-
-      if(sourceTimeStamp != null && daqTimeStamp != null) {
-        esTag.setSourceTimestamp(sourceTimeStamp.getTime());
-        esTag.setDaqTimestamp(daqTimeStamp.getTime());
-      }
-    }
-  }
-
-  private void setServerTimestamp(Tag tag, AbstractEsTag esTag) {
-    Timestamp serverTimeStamp = tag.getCacheTimestamp();
-    if(serverTimeStamp != null) {
-      esTag.setServerTimestamp(serverTimeStamp.getTime());
-    }
-  }
-
-  private void setStatus(Tag tag, AbstractEsTag esTag) {
-    final DataTagQuality dataTagQuality = tag.getDataTagQuality();
-    if(dataTagQuality == null) {
-      return;
-    }
-
-    int statusCode = dataTagQuality.getInvalidQualityStates().keySet().stream()
-            .mapToInt(status -> (int) Math.pow(2, status.getCode()))
-            .sum();
-
-    esTag.setStatus(statusCode);
-  }
-
-  private void setQuality(Tag tag, AbstractEsTag esTagImpl) {
-    DataTagQuality quality = tag.getDataTagQuality();
-    if(quality == null) {
-      return;
-    }
-
-    esTagImpl.setQuality(gson.toJson(quality.getInvalidQualityStates()));
-  }
-
-  private void setValid(Tag tag, AbstractEsTag esTagImpl) {
-    DataTagQuality quality = tag.getDataTagQuality();
-
-    esTagImpl.setValid(quality == null || quality.getInvalidQualityStates().isEmpty());
-  }
-
-  /**
    * Instantiate the right Class of {@link AbstractEsTag according to the dataType: boolean, String or int.
    *
    * @param dataType of the Tag in C2MON.
@@ -215,16 +113,87 @@ public class EsTagLogConverter {
   public AbstractEsTag instantiateTagES(String dataType) {
     dataType = dataType.toLowerCase();
 
-    if(ValueType.isBoolean(dataType)) {
+    if (ValueType.isBoolean(dataType)) {
       return new EsTagBoolean();
-    } else if(ValueType.isString(dataType)) {
+    } else if (ValueType.isString(dataType)) {
       return new EsTagString();
-    } else if(ValueType.isNumeric(dataType)) {
+    } else if (ValueType.isNumeric(dataType)) {
       return new EsTagNumeric();
     } else {
       log.warn("instantiateTagES() - Tag did not correspond to any existing type. (dataType = " + dataType + ").");
       return null;
     }
+  }
+
+  /**
+   * Handles Metadata of tag and retrieve process, equipment and subEquipment.
+   */
+  private void setMetadata(final Tag tag, final AbstractEsTag esTag) {
+    esTag.getMetadata().putAll(retrieveTagMetadata(tag));
+
+    Map<String, String> parentNames = getTagProcessMetadata(tag);
+    esTag.setProcess(parentNames.get("process"));
+    esTag.setEquipment(parentNames.get("equipment"));
+    esTag.setSubEquipment(parentNames.get("subEquipment"));
+  }
+
+  private Map<String, String> retrieveTagMetadata(Tag tag) {
+    Metadata metadata = tag.getMetadata();
+    if (metadata == null) {
+      return Collections.emptyMap();
+    }
+    return metadata.getMetadata().entrySet().stream()
+            .collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    entry -> entry.getValue().toString()));
+  }
+
+  private void setSourceTimestamp(Tag tag, AbstractEsTag esTag) {
+    if (!(tag instanceof DataTag)) {
+      return;
+    }
+
+    Optional.ofNullable(((DataTag) tag).getSourceTimestamp())
+            .map(Timestamp::getTime)
+            .ifPresent(esTag::setSourceTimestamp);
+  }
+
+  private void setDaqTimestamp(Tag tag, AbstractEsTag esTag) {
+    if (!(tag instanceof DataTag)) {
+      return;
+    }
+
+    Optional.ofNullable(((DataTag) tag).getDaqTimestamp())
+            .map(Timestamp::getTime)
+            .ifPresent(esTag::setDaqTimestamp);
+  }
+
+  private void setServerTimestamp(Tag tag, AbstractEsTag esTag) {
+    Optional.ofNullable(tag.getCacheTimestamp())
+            .map(Timestamp::getTime)
+            .ifPresent(esTag::setServerTimestamp);
+  }
+
+  private void setStatus(Tag tag, AbstractEsTag esTag) {
+    Optional.ofNullable(tag.getDataTagQuality())
+            .map(dataTagQuality -> dataTagQuality.getInvalidQualityStates().keySet())
+            .map(tagQualityStatuses -> tagQualityStatuses.stream()
+                    .mapToInt(status -> (int) Math.pow(2, status.getCode()))
+                    .sum())
+            .ifPresent(esTag::setStatus);
+  }
+
+  private void setQuality(Tag tag, AbstractEsTag esTagImpl) {
+    Optional.ofNullable(tag.getDataTagQuality())
+            .map(DataTagQuality::getInvalidQualityStates)
+            .map(gson::toJson)
+            .ifPresent(esTagImpl::setQuality);
+  }
+
+  private void setValid(Tag tag, AbstractEsTag esTagImpl) {
+    DataTagQuality quality = tag.getDataTagQuality();
+
+    esTagImpl.setValid(quality == null || quality.getInvalidQualityStates().isEmpty());
   }
 
   /**
@@ -235,130 +204,84 @@ public class EsTagLogConverter {
    * @return List of names in the order ProcessName [, EquipmentName,
    * SubEquipmentName].
    */
-  public Map<String, String> getTagMetadataProcess(Tag tag) {
-    Map<String, String> result = new HashMap<>();
+  public Map<String, String> getTagProcessMetadata(Tag tag) {
 
-    long processId = DEFAULT_ID;
     long equipmentId = DEFAULT_ID;
     long subEquipmentId = DEFAULT_ID;
+    long processId = DEFAULT_ID;
 
     boolean subEquipmentIsPresent = !CollectionUtils.isEmpty(tag.getSubEquipmentIds());
     boolean EquipmentIsPresent = !CollectionUtils.isEmpty(tag.getEquipmentIds());
     boolean processIsPresent = !CollectionUtils.isEmpty(tag.getProcessIds());
 
-    if(subEquipmentIsPresent) {
+    if (subEquipmentIsPresent) {
       subEquipmentId = tag.getSubEquipmentIds().iterator().next();
       equipmentId = searchEquipmentInSubEquipmentCache(subEquipmentId);
       processId = searchProcessIdInEquipmentCache(equipmentId);
-    } else if(EquipmentIsPresent) {
-      equipmentId = tag.getEquipmentIds().iterator().next();
-      processId = searchProcessIdInEquipmentCache(equipmentId);
-    } else if(processIsPresent) {
-      processId = tag.getProcessIds().iterator().next();
-    } else {
-      log.info("no Process, Equipment or subEquipment");
-      return result;
+
+      return getMetadata(processId, equipmentId, subEquipmentId);
     }
 
-    addMetadataToResult(processId, equipmentId, subEquipmentId, result);
+    if (EquipmentIsPresent) {
+      equipmentId = tag.getEquipmentIds().iterator().next();
+      processId = searchProcessIdInEquipmentCache(equipmentId);
 
-    return result;
+      return getMetadata(processId, equipmentId, subEquipmentId);
+    }
+
+    if (processIsPresent) {
+      processId = tag.getProcessIds().iterator().next();
+
+      return getMetadata(processId, equipmentId, subEquipmentId);
+    }
+
+    log.info("no Process, Equipment or subEquipment");
+    return Collections.emptyMap();
   }
 
   private long searchEquipmentInSubEquipmentCache(long subEquipmentId) {
-    SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);
-    if(subEquipment == null) {
-      return DEFAULT_ID;
-    }
-
-    return subEquipment.getParentId();
+    return Optional.ofNullable(subEquipmentCache.get(subEquipmentId))
+            .map(SubEquipment::getParentId)
+            .orElse(DEFAULT_ID);
   }
 
   private long searchProcessIdInEquipmentCache(long equipmentId) {
-    Equipment equipment = equipmentCache.get(equipmentId);
-    if(equipment == null) {
-      return DEFAULT_ID;
+    return Optional.ofNullable(equipmentCache.get(equipmentId))
+            .map(Equipment::getProcessId)
+            .orElse(DEFAULT_ID);
+  }
+
+  private Map<String, String> getMetadata(long processId, long equipmentId, long subEquipmentId) {
+    final Map<String, String> metadata = new HashMap<>();
+
+    extractProcessName(processId)
+            .ifPresent(processName -> metadata.put("process", processName));
+    extractEquipmentName(equipmentId)
+            .ifPresent(equipmentName -> metadata.put("equipment", equipmentName));
+    extractSubEquipmentName(subEquipmentId)
+            .ifPresent(subEquipmentName -> metadata.put("subEquipment", subEquipmentName));
+
+    return metadata;
+  }
+
+  private Optional<String> extractProcessName(long processId) {
+    return Optional.ofNullable(processCache.get(processId))
+            .map(Process::getName);
+  }
+
+  private Optional<String> extractEquipmentName(long equipmentId) {
+    if (equipmentId == -1) {
+      return Optional.empty();
     }
-
-    return equipment.getProcessId();
+    return Optional.ofNullable(equipmentCache.get(equipmentId))
+            .map(AbstractEquipment::getName);
   }
 
-  private void addMetadataToResult(long processId, long equipmentId, long subEquipmentId, Map<String, String> result) {
-    addProcessNameToResult(processId, result);
-    addEquipmentNameToResult(equipmentId, result);
-    addSubEquipmentNameToResult(subEquipmentId, result);
-  }
-
-  private void addProcessNameToResult(long processId, Map<String, String> result) {
-    String processName = getProcessName(processId);
-    result.put("process", processName);
-  }
-
-  private void addEquipmentNameToResult(long equipmentId, Map<String, String> result) {
-    if(equipmentId != -1) {
-      String equipmentName = getEquipmentName(equipmentId);
-      if(equipmentName != null) {
-        result.put("equipment", equipmentName);
-      }
+  private Optional<String> extractSubEquipmentName(long subEquipmentId) {
+    if (subEquipmentId == -1) {
+      return Optional.empty();
     }
-  }
-
-  private void addSubEquipmentNameToResult(long subEquipmentId, Map<String, String> result) {
-    if(subEquipmentId != -1) {
-      String subEquipmentName = getSubEquipmentName(subEquipmentId);
-      if(subEquipmentName != null) {
-        result.put("subEquipment", subEquipmentName);
-      }
-    }
-  }
-
-  /**
-   * Retrieve the name of a Process according to the id.
-   *
-   * @param processId of the tag.
-   * @return processName
-   */
-  public String getProcessName(long processId) {
-    String processName = null;
-
-    Process process = processCache.get(processId);
-    if(process != null) {
-      processName = process.getName();
-    }
-
-    return processName;
-  }
-
-  /**
-   * Retrieve the name of an Equipment according to the id.
-   *
-   * @param equipmentId of the tag.
-   * @return equipmentName
-   */
-  public String getEquipmentName(long equipmentId) {
-    String equipmentName = null;
-
-    Equipment equipment = equipmentCache.get(equipmentId);
-    if(equipment != null) {
-      equipmentName = equipment.getName();
-    }
-
-    return equipmentName;
-  }
-
-  /**
-   * Retrieve the Name of a SubEquipment according to the id.
-   *
-   * @param subEquipmentId of the tag.
-   * @return subEquipmentName
-   */
-  public String getSubEquipmentName(long subEquipmentId) {
-    SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);
-    String subEquipmentName = null;
-    if(subEquipment != null) {
-      subEquipmentName = subEquipment.getName();
-    }
-
-    return subEquipmentName;
+    return Optional.ofNullable(subEquipmentCache.get(subEquipmentId))
+            .map(AbstractEquipment::getName);
   }
 }

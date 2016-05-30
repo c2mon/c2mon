@@ -79,8 +79,7 @@ public class EsAlarmTest {
     try {
       assertEquals(expectedJson, esAlarm.toString());
       assertEquals(esAlarm, esAlarm.getObject(expectedJson));
-    }
-    catch (Exception e) {
+    } catch(Exception e) {
       fail("Should be able to serialize/deserialize JSON");
     }
   }

@@ -61,7 +61,7 @@ public class EsAlarmIndexerTest {
   @Before
   public void setup() throws IDBPersistenceException {
     alarm = CacheObjectCreation.createTestAlarm1();
-    esAlarm = esAlarmLogConverter.convertAlarmToAlarmES(alarm);
+    esAlarm = esAlarmLogConverter.convert(alarm);
     timestamp = alarm.getTimestamp();
     when(connector.handleAlarmQuery(anyString(), anyString(), eq(esAlarm))).thenReturn(true);
     indexer.setAlarmPrefix(indexer.alarmPrefix);

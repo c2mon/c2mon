@@ -48,14 +48,14 @@ public class EsAlarmLogConverterTest {
 
   @Test
   public void testNullConvertsToNull() {
-    EsAlarm = esAlarmLogConverter.convertAlarmToAlarmES(alarm);
+    EsAlarm = esAlarmLogConverter.convert(alarm);
     assertNull(EsAlarm);
   }
 
   @Test
   public void testDataIsPreserved() {
     alarm = CacheObjectCreation.createTestAlarm1();
-    EsAlarm = esAlarmLogConverter.convertAlarmToAlarmES(alarm);
+    EsAlarm = esAlarmLogConverter.convert(alarm);
 
     callTests(EsAlarm, alarm);
   }
@@ -64,13 +64,13 @@ public class EsAlarmLogConverterTest {
   public void testMetadata() {
     alarm = initAlarmWithMetadata();
 
-    EsAlarm = esAlarmLogConverter.convertAlarmToAlarmES(alarm);
+    EsAlarm = esAlarmLogConverter.convert(alarm);
     callTests(EsAlarm, alarm);
     log.debug(arrayString.toString());
     assertEquals(arrayString.toString(), EsAlarm.getMetadata().get("array"));
   }
 
-  private void callTests(EsAlarm EsAlarm, Alarm  alarm) {
+  private void callTests(EsAlarm EsAlarm, Alarm alarm) {
     log.debug(EsAlarm.toString());
     assertEquals(alarm.getTagId().longValue(), EsAlarm.getTagId());
     assertEquals(alarm.getId().longValue(), EsAlarm.getAlarmId());

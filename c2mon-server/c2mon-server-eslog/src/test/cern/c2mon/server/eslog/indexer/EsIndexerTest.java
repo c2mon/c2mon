@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -48,7 +48,7 @@ import static org.junit.Assert.assertTrue;
  * @author Alban Marguet.
  */
 @Slf4j
-@ContextConfiguration({"classpath:cern/c2mon/server/eslog/config/server-eslog-integration.xml" })
+@ContextConfiguration({"classpath:cern/c2mon/server/eslog/config/server-eslog-integration.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class EsIndexerTest {
   private static String clusterName;
@@ -257,11 +257,9 @@ public class EsIndexerTest {
 
       if (id == size) {
         log.debug("list of tags realized");
-      }
-      else if (id % 2 == 0) {
+      } else if (id % 2 == 0) {
         tag.getMetadata().putAll(metadata1);
-      }
-      else {
+      } else {
         tag.getMetadata().putAll(metadata2);
       }
     }
@@ -275,7 +273,7 @@ public class EsIndexerTest {
     Set<String> resultTypes = indexer.getCacheIndicesTypes().get(indexName);
 
     List<String> liveIndices = connector.getListOfIndicesFromES();
-    List<String> liveTypes = connector.getListOfTypesFromES(indexName);
+    Collection<String> liveTypes = connector.getTypesFromES(indexName);
 
     SearchResponse response = getResponse(connector.getClient(), new String[]{indexName});
 
@@ -320,8 +318,7 @@ public class EsIndexerTest {
   private void sleep() {
     try {
       Thread.sleep(3000L);
-    }
-    catch (InterruptedException e) {
+    } catch(InterruptedException e) {
       e.printStackTrace();
     }
   }

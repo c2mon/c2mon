@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * <p>
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * <p>
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * <p>
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -36,10 +36,10 @@ public class EsAlarmLogConverter {
   /**
    * Converts an Alarm to an {@link EsAlarm} by getting all its data.
    */
-  public EsAlarm convertAlarmToAlarmES(Alarm alarm) {
+  public EsAlarm convert(final Alarm alarm) {
     EsAlarm esAlarm = new EsAlarm();
 
-    if(alarm == null || alarm.getTagId() == null) {
+    if (alarm == null || alarm.getTagId() == null) {
       return null;
     }
 
@@ -49,7 +49,7 @@ public class EsAlarmLogConverter {
     esAlarm.setActive(alarm.isActive());
     esAlarm.setActivity(String.valueOf(alarm.isActive()));
 
-    if(esAlarm.isActive()) {
+    if (esAlarm.isActive()) {
       esAlarm.setActiveNumeric(1);
     } else {
       esAlarm.setActiveNumeric(0);
@@ -60,7 +60,7 @@ public class EsAlarmLogConverter {
     esAlarm.setFaultCode(alarm.getFaultCode());
 
     Timestamp alarmTimestamp = alarm.getTimestamp();
-    if(alarmTimestamp != null) {
+    if (alarmTimestamp != null) {
       esAlarm.setServerTimestamp(alarm.getTimestamp().getTime());
     }
     esAlarm.setInfo(alarm.getInfo());
@@ -69,9 +69,9 @@ public class EsAlarmLogConverter {
     return esAlarm;
   }
 
-  private void retrieveMetadata(EsAlarm esAlarm, Alarm alarm) {
+  private void retrieveMetadata(final EsAlarm esAlarm, final Alarm alarm) {
     final Metadata metadata = alarm.getMetadata();
-    if(metadata == null) {
+    if (metadata == null) {
       return;
     }
 
@@ -82,4 +82,5 @@ public class EsAlarmLogConverter {
 
     esAlarm.getMetadata().putAll(esMetadata);
   }
+
 }

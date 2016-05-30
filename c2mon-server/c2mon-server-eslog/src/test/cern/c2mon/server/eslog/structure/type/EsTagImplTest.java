@@ -83,8 +83,7 @@ public class EsTagImplTest {
     try {
       assertEquals(expectedJson, esTag.toString());
       assertEquals(esTag, esTag.getObject(expectedJson));
-    }
-    catch (Exception e) {
+    } catch(Exception e) {
       e.printStackTrace();
       fail("Should be able to serialize/deserialize JSON");
     }
