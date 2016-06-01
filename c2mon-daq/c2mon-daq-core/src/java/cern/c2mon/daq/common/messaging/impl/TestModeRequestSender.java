@@ -16,14 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
-import cern.c2mon.shared.common.process.ProcessConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
 
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
+import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.process.ProcessConfigurationResponse;
 import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
 
@@ -43,7 +40,7 @@ public class TestModeRequestSender implements ProcessRequestSender {
 
   @Override
   public ProcessConnectionResponse sendProcessConnectionRequest(final String processName) {
-    return new ProcessConnectionResponse(ProcessConnectionResponse.NO_PROCESS, 123456L);
+    return new ProcessConnectionResponse(processName, 123456L);
   }
 
   @Override

@@ -16,11 +16,6 @@
  ******************************************************************************/
 package cern.c2mon.daq.config;
 
-import cern.c2mon.daq.common.conf.core.CommonConfiguration;
-import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.common.messaging.ProcessRequestSender;
-import cern.c2mon.daq.common.messaging.impl.ActiveRequestSender;
-import cern.c2mon.daq.common.messaging.impl.TestModeRequestSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +24,11 @@ import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
+
+import cern.c2mon.daq.common.conf.core.CommonConfiguration;
+import cern.c2mon.daq.common.messaging.ProcessRequestSender;
+import cern.c2mon.daq.common.messaging.impl.ActiveRequestSender;
+import cern.c2mon.daq.common.messaging.impl.TestModeRequestSender;
 
 /**
  * This configuration class is responsible for instantiating the various {@link ProcessRequestSender} beans used within the DAQ core. The {@link
@@ -64,22 +64,22 @@ public class ProcessRequestSenderConfig {
   @Qualifier("secondProcessRequestJmsTemplate")
   JmsTemplate secondProcessRequestJmsTemplate;
 
-  @Bean
-  @Profile({ "single", "double", "test" })
+  @Bean(name = "primaryRequestSender")
+  @Profile({ "single", "double" })
   public ProcessRequestSender primaryRequestSender() {
     return new ActiveRequestSender(commonConfiguration, processRequestJmsTemplate);
+  }
+
+  @Bean(name = "primaryRequestSender")
+  @Profile("test")
+  public ProcessRequestSender testRequestSender() {
+    return new TestModeRequestSender(new ActiveRequestSender(commonConfiguration, processRequestJmsTemplate));
   }
 
   @Bean
   @Profile("double")
   public ProcessRequestSender secondaryRequestSender() {
     return new ActiveRequestSender(commonConfiguration, secondProcessRequestJmsTemplate);
-  }
-
-  @Bean(name = "primaryRequestSender")
-  @Profile("test")
-  public ProcessRequestSender testRequestSender() {
-    return new TestModeRequestSender(primaryRequestSender());
   }
 
 }
