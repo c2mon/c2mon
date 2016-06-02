@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.eslog.structure.types;
+package cern.c2mon.server.eslog.structure.types.tag;
 
 import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.server.eslog.structure.types.GsonSupplier;
 import com.google.gson.Gson;
 import lombok.Data;
 import lombok.NonNull;
@@ -41,26 +42,31 @@ public abstract class AbstractEsTag implements IFallback {
   private long id;
   private String name;
   private String dataType;
-  private long sourceTimestamp;
+
+  private long timestamp;
   private long serverTimestamp;
   private long daqTimestamp;
-  private int status;
-  private String quality; //tagstatusdesc
-  private Boolean valid; //if quality is OK or not
 
-  protected transient Object value;
+  private TagQualityAnalysis quality;
+
+  protected transient Object rawValue;
+
+  protected Number value;
   protected Boolean valueBoolean;
   protected String valueString;
-  protected Number valueNumeric;
+
+  /**
+   * The metric unit of the enclosed tag value.
+   * If no metric unit is available, the default
+   * (not available) one will be used.
+   */
+  private String unit = "n/a";
+
   private String valueDescription;
 
   private final Map<String, String> metadata = new HashMap<>();
 
-  private String process;
-  private String equipment;
-  private String subEquipment;
-
-  abstract public void setValue(Object tagValue);
+  abstract public void setRawValue(Object tagValue);
 
   /**
    * JSON representation of a AbstractEsTag.

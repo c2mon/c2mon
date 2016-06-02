@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -8,13 +10,20 @@
     <version>RELEASE</version>
   </parent>
 
+  <properties>
+    <elasticsearch.version>2.1.0</elasticsearch.version>
+    <google-guava.version>19.0</google-guava.version>
+    <commons-io.version>2.5</commons-io.version>
+    <mockito-all.version>1.10.19</mockito-all.version>
+  </properties>
+
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-eslog</artifactId>
   <version>1.7.3-SNAPSHOT</version>
 
   <description>C2MON server persistence module for ElasticSearch</description>
-  
-   <scm>
+
+  <scm>
     <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-eslog</developerConnection>
   </scm>
 
@@ -23,7 +32,7 @@
     <dependency>
       <groupId>org.elasticsearch</groupId>
       <artifactId>elasticsearch</artifactId>
-      <version>2.1.0</version>
+      <version>${elasticsearch.version}</version>
     </dependency>
 
     <!-- Spring dependencies -->
@@ -60,7 +69,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>19.0</version>
+      <version>${google-guava.version}</version>
     </dependency>
 
     <!-- Test dependency -->
@@ -80,13 +89,13 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
-      <version>1.10.19</version>
+      <version>${mockito-all.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.4</version>
+      <version>${commons-io.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -24,10 +24,10 @@ import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.eslog.indexer.EsTagIndexer;
 import cern.c2mon.server.eslog.structure.converter.EsTagLogConverter;
-import cern.c2mon.server.eslog.structure.types.AbstractEsTag;
-import cern.c2mon.server.eslog.structure.types.EsTagBoolean;
-import cern.c2mon.server.eslog.structure.types.EsTagNumeric;
-import cern.c2mon.server.eslog.structure.types.EsTagString;
+import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
+import cern.c2mon.server.eslog.structure.types.tag.EsTagBoolean;
+import cern.c2mon.server.eslog.structure.types.tag.EsTagNumeric;
+import cern.c2mon.server.eslog.structure.types.tag.EsTagString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -149,7 +149,9 @@ public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLif
           addTagToCollectionIfNotNull(esTagImpl, tagNumericCollection);
         }
       } catch(Exception e) {
-        log.error("convertTagsToLogToTagES() - Error occurred during tag parsing for ElasticSearch. Tag #" + tag.getId() + " is not added to bulk sending (name=" + tag.getName() + ", value=" + tag.getValue() + ", type=" + tag.getDataType() + ")", e);
+        log.error("convertTagsToLogToTagES() - Error occurred during tag parsing for ElasticSearch. Tag #"
+            + tag.getId() + " is not added to bulk sending (name=" + tag.getName()
+            + ", value=" + tag.getValue() + ", type=" + tag.getDataType() + ")", e);
       }
     }
   }
@@ -164,16 +166,19 @@ public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLif
                                                    List<AbstractEsTag> tagStringCollection,
                                                    List<AbstractEsTag> tagBooleanCollection) {
     try {
-      log.debug("sendCollectionTagESToElasticSearch() - send a collection of tagNumeric to indexer of size: " + tagNumericCollection.size());
+      log.debug("sendCollectionTagESToElasticSearch() - send a collection of tagNumeric to indexer of size: "
+          + tagNumericCollection.size());
       persistenceManagerTagNumeric.storeData(tagNumericCollection);
 
-      log.debug("sendCollectionTagESToElasticSearch() - send a collection of tagString to indexer of size: " + tagStringCollection.size());
+      log.debug("sendCollectionTagESToElasticSearch() - send a collection of tagString to indexer of size: "
+          + tagStringCollection.size());
       persistenceManagerTagString.storeData(tagStringCollection);
 
-      log.debug("sendCollectionTagESToElasticSearch() - send a collection of tagBoolean to indexer of size: " + tagBooleanCollection.size());
+      log.debug("sendCollectionTagESToElasticSearch() - send a collection of tagBoolean to indexer of size: "
+          + tagBooleanCollection.size());
       persistenceManagerTagBoolean.storeData(tagBooleanCollection);
     } catch(Exception e) {
-      log.error("sendCollectionTagESToElasticSearch() - Exception occurred while trying to index data to the ElasticSearch cluster.", e);
+      log.error("sendCollectionTagESToElasticSearch() - Exception occurred while trying to index data to the cluster.", e);
     }
   }
 

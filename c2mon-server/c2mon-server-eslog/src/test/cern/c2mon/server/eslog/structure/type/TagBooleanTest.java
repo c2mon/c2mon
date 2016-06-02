@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.type;
 
-import cern.c2mon.server.eslog.structure.types.EsTagBoolean;
+import cern.c2mon.server.eslog.structure.types.tag.EsTagBoolean;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -42,38 +42,39 @@ public class TagBooleanTest {
 
   @Test
   public void testValue() {
-    tagBoolean.setValue(true);
+    tagBoolean.setRawValue(true);
 
-    assertEquals(true, tagBoolean.getValue());
-    assertEquals(1, tagBoolean.getValueNumeric());
+    assertEquals(true, tagBoolean.getRawValue());
+    assertEquals(1, tagBoolean.getValue());
     assertTrue(tagBoolean.getValueBoolean());
-    assertTrue(tagBoolean.getValue() instanceof Boolean);
+    assertTrue(tagBoolean.getRawValue() instanceof Boolean);
 
-    tagBoolean.setValue(false);
+    tagBoolean.setRawValue(false);
 
-    assertEquals(false, tagBoolean.getValue());
-    assertTrue(tagBoolean.getValue() instanceof Boolean);
+    assertEquals(false, tagBoolean.getRawValue());
+    assertTrue(tagBoolean.getRawValue() instanceof Boolean);
     assertFalse(tagBoolean.getValueBoolean());
-    assertEquals(0, tagBoolean.getValueNumeric());
+    assertEquals(0, tagBoolean.getValue());
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testBadValue() {
-    tagBoolean.setValue("NotBoolean");
+    tagBoolean.setRawValue("NotBoolean");
   }
 
   @Test
   public void testBuild() throws IOException {
     tagBoolean.setDataType("boolean");
 
-    final String expectedTagJson = "{\"id\":0,\"dataType\":\"boolean\",\"sourceTimestamp\":0,\"serverTimestamp\":0,\"daqTimestamp\":0,\"status\":0,\"metadata\":{}}";
+    final String expectedTagJson = "{\"id\":0,\"dataType\":\"boolean\",\"timestamp\":0,\"serverTimestamp\":0," +
+        "\"daqTimestamp\":0,\"unit\":\"n/a\",\"metadata\":{}}";
 
     assertEquals(expectedTagJson, tagBoolean.toString());
   }
 
   @Test
   public void testNullValue() {
-    tagBoolean.setValue(null);
-    assertNull(tagBoolean.getValue());
+    tagBoolean.setRawValue(null);
+    assertNull(tagBoolean.getRawValue());
   }
 }

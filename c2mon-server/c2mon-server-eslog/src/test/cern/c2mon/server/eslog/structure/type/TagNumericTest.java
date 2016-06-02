@@ -17,7 +17,8 @@
 package cern.c2mon.server.eslog.structure.type;
 
 import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.server.eslog.structure.types.EsTagNumeric;
+import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
+import cern.c2mon.server.eslog.structure.types.tag.EsTagNumeric;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,20 +45,20 @@ public class TagNumericTest {
 
   @Test
   public void testValue() {
-    tagNumeric.setValue(123);
+    tagNumeric.setRawValue(123);
 
-    assertEquals(123, tagNumeric.getValue());
-    assertTrue(tagNumeric.getValue() instanceof Integer);
+    assertEquals(123, tagNumeric.getRawValue());
+    assertTrue(tagNumeric.getRawValue() instanceof Integer);
 
-    tagNumeric.setValue(1.23);
+    tagNumeric.setRawValue(1.23);
 
-    assertEquals(1.23, tagNumeric.getValue());
-    assertTrue(tagNumeric.getValue() instanceof Double);
+    assertEquals(1.23, tagNumeric.getRawValue());
+    assertTrue(tagNumeric.getRawValue() instanceof Double);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testBadValue() {
-    tagNumeric.setValue("notNumeric");
+    tagNumeric.setRawValue("notNumeric");
   }
 
 
@@ -65,24 +66,27 @@ public class TagNumericTest {
   public void testBuild() throws IOException {
     tagNumeric.setDataType("numeric");
 
-    final String expectedTagJson = "{\"id\":0,\"dataType\":\"numeric\",\"sourceTimestamp\":0,\"serverTimestamp\":0," +
-            "\"daqTimestamp\":0,\"status\":0,\"metadata\":{}}";
+    final String expectedTagJson = "{\"id\":0,\"dataType\":\"numeric\",\"timestamp\":0,\"serverTimestamp\":0," +
+        "\"daqTimestamp\":0,\"unit\":\"n/a\",\"metadata\":{}}";
 
     assertEquals(expectedTagJson, tagNumeric.toString());
   }
 
   @Test
   public void testNullValue() {
-    tagNumeric.setValue(null);
-    assertNull(tagNumeric.getValue());
+    tagNumeric.setRawValue(null);
+    assertNull(tagNumeric.getRawValue());
   }
 
   @Test
   public void testGetObject() {
-    final String expectedTagJson = "{\"id\":1053976,\"name\":\"CLIC:CFC-CCR-ALLGPSPS:SYS.MEM.FREEPCT\"," +
-            "\"dataType\":\"float\",\"sourceTimestamp\":1454342362957,\"serverTimestamp\":1454342362981," +
-            "\"daqTimestamp\":1454342362957,\"status\":0,\"quality\":\"{}\",\"valid\":true,\"valueNumeric\":73.9237," +
-            "\"valueDescription\":\"\",\"metadata\":{},\"process\":\"P_CLIC_SPS\",\"equipment\":\"CLIC:CFC-CCR-ALLGPSPS\"}";
+
+    final String expectedTagJson = "{\"id\":0,\"name\":\"CLIC:CFC-CCR-ALLGPSPS:SYS.MEM.FREEPCT\"," +
+        "\"dataType\":\"float\",\"timestamp\":1454342362957,\"serverTimestamp\":1454342362981,\"daqTimestamp\":1454342362957," +
+        "\"quality\":{\"status\":0,\"valid\":true,\"statusInfo\":[\"OK\"]}," +
+        "\"value\":73.9237,\"unit\":\"n/a\"," +
+        "\"metadata\":{\"process\":\"P_CLIC_SPS\",\"equipment\":\"CLIC:CFC-CCR-ALLGPSPS\"}}";
+
     IFallback result = tagNumeric.getObject(expectedTagJson);
     assertTrue(result instanceof EsTagNumeric);
     assertEquals(expectedTagJson, result.toString());

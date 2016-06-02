@@ -22,6 +22,7 @@ import cern.c2mon.shared.common.metadata.Metadata;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -61,26 +62,26 @@ public class EsAlarmLogConverter {
 
     Timestamp alarmTimestamp = alarm.getTimestamp();
     if (alarmTimestamp != null) {
-      esAlarm.setServerTimestamp(alarm.getTimestamp().getTime());
+      esAlarm.setServerTimestamp(alarmTimestamp.getTime());
     }
+
     esAlarm.setInfo(alarm.getInfo());
 
-    retrieveMetadata(esAlarm, alarm);
+    esAlarm.getMetadata().putAll(retrieveMetadata(alarm));
+
     return esAlarm;
   }
 
-  private void retrieveMetadata(final EsAlarm esAlarm, final Alarm alarm) {
+  private Map<String, String> retrieveMetadata(final Alarm alarm) {
     final Metadata metadata = alarm.getMetadata();
     if (metadata == null) {
-      return;
+      return Collections.emptyMap();
     }
 
-    final Map<String, String> esMetadata = metadata.getMetadata().entrySet().stream()
+    return metadata.getMetadata().entrySet().stream()
             .collect(Collectors.toMap(
                     Map.Entry::getKey,
                     entry -> entry.getValue().toString()));
-
-    esAlarm.getMetadata().putAll(esMetadata);
   }
 
 }

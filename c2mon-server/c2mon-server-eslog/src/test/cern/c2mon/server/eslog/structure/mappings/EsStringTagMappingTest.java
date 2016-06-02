@@ -31,68 +31,80 @@ import static org.junit.Assert.assertEquals;
 @RunWith(MockitoJUnitRunner.class)
 public class EsStringTagMappingTest {
   private final String expectedMapping = "{\n" +
-          "  \"_routing\": {\n" +
-          "    \"required\": \"true\"\n" +
-          "  },\n" +
-          "  \"properties\": {\n" +
-          "    \"id\": {\n" +
-          "      \"type\": \"long\"\n" +
-          "    },\n" +
-          "    \"name\": {\n" +
-          "      \"type\": \"string\",\n" +
-          "      \"index\": \"not_analyzed\"\n" +
-          "    },\n" +
-          "    \"dataType\": {\n" +
-          "      \"type\": \"string\",\n" +
-          "      \"index\": \"not_analyzed\"\n" +
-          "    },\n" +
-          "    \"sourceTimestamp\": {\n" +
-          "      \"type\": \"date\",\n" +
-          "      \"format\": \"epoch_millis\"\n" +
-          "    },\n" +
-          "    \"serverTimestamp\": {\n" +
-          "      \"type\": \"date\",\n" +
-          "      \"format\": \"epoch_millis\"\n" +
-          "    },\n" +
-          "    \"daqTimestamp\": {\n" +
-          "      \"type\": \"date\",\n" +
-          "      \"format\": \"epoch_millis\"\n" +
-          "    },\n" +
-          "    \"status\": {\n" +
-          "      \"type\": \"integer\"\n" +
-          "    },\n" +
-          "    \"quality\": {\n" +
-          "      \"type\": \"string\",\n" +
-          "      \"index\": \"not_analyzed\"\n" +
-          "    },\n" +
-          "    \"valid\": {\n" +
-          "      \"type\": \"boolean\"\n" +
-          "    },\n" +
-          "    \"valueDescription\": {\n" +
-          "      \"type\": \"string\",\n" +
-          "      \"index\": \"not_analyzed\"\n" +
-          "    },\n" +
-          "    \"valueString\": {\n" +
-          "      \"type\": \"string\"\n" +
-          "    },\n" +
-          "    \"process\": {\n" +
-          "      \"type\": \"string\",\n" +
-          "      \"index\": \"not_analyzed\"\n" +
-          "    },\n" +
-          "    \"equipment\": {\n" +
-          "      \"type\": \"string\",\n" +
-          "      \"index\": \"not_analyzed\"\n" +
-          "    },\n" +
-          "    \"subEquipment\": {\n" +
-          "      \"type\": \"string\",\n" +
-          "      \"index\": \"not_analyzed\"\n" +
-          "    },\n" +
-          "    \"metadata\": {\n" +
-          "      \"dynamic\": \"true\",\n" +
-          "      \"type\": \"nested\"\n" +
-          "    }\n" +
-          "  }\n" +
-          "}";
+      "  \"_routing\": {\n" +
+      "    \"required\": \"true\"\n" +
+      "  },\n" +
+      "  \"properties\": {\n" +
+      "    \"id\": {\n" +
+      "      \"type\": \"long\"\n" +
+      "    },\n" +
+      "    \"name\": {\n" +
+      "      \"type\": \"string\",\n" +
+      "      \"index\": \"not_analyzed\"\n" +
+      "    },\n" +
+      "    \"dataType\": {\n" +
+      "      \"type\": \"string\",\n" +
+      "      \"index\": \"not_analyzed\"\n" +
+      "    },\n" +
+      "    \"timestamp\": {\n" +
+      "      \"type\": \"date\",\n" +
+      "      \"format\": \"epoch_millis\"\n" +
+      "    },\n" +
+      "    \"serverTimestamp\": {\n" +
+      "      \"type\": \"date\",\n" +
+      "      \"format\": \"epoch_millis\"\n" +
+      "    },\n" +
+      "    \"daqTimestamp\": {\n" +
+      "      \"type\": \"date\",\n" +
+      "      \"format\": \"epoch_millis\"\n" +
+      "    },\n" +
+      "    \"quality\": {\n" +
+      "      \"dynamic\": \"false\",\n" +
+      "      \"type\": \"object\",\n" +
+      "      \"properties\": {\n" +
+      "        \"valid\": {\n" +
+      "          \"type\": \"boolean\"\n" +
+      "        },\n" +
+      "        \"statusInfo\": {\n" +
+      "          \"type\": \"string\",\n" +
+      "          \"index\": \"not_analyzed\"\n" +
+      "        },\n" +
+      "        \"status\": {\n" +
+      "          \"type\": \"integer\"\n" +
+      "        }\n" +
+      "      }\n" +
+      "    },\n" +
+      "    \"unit\": {\n" +
+      "      \"type\": \"string\",\n" +
+      "      \"index\": \"not_analyzed\"\n" +
+      "    },\n" +
+      "    \"valueDescription\": {\n" +
+      "      \"type\": \"string\",\n" +
+      "      \"index\": \"not_analyzed\"\n" +
+      "    },\n" +
+      "    \"valueString\": {\n" +
+      "      \"type\": \"string\"\n" +
+      "    },\n" +
+      "    \"metadata\": {\n" +
+      "      \"dynamic\": \"true\",\n" +
+      "      \"type\": \"nested\",\n" +
+      "      \"properties\": {\n" +
+      "        \"process\": {\n" +
+      "          \"type\": \"string\",\n" +
+      "          \"index\": \"not_analyzed\"\n" +
+      "        },\n" +
+      "        \"subEquipment\": {\n" +
+      "          \"type\": \"string\",\n" +
+      "          \"index\": \"not_analyzed\"\n" +
+      "        },\n" +
+      "        \"equipment\": {\n" +
+      "          \"type\": \"string\",\n" +
+      "          \"index\": \"not_analyzed\"\n" +
+      "        }\n" +
+      "      }\n" +
+      "    }\n" +
+      "  }\n" +
+      "}";
 
   @Test
   public void testGetStringMapping() {

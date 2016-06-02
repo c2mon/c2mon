@@ -16,10 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.mappings;
 
+import cern.c2mon.server.eslog.structure.types.tag.EsTagBoolean;
+
 /**
- * EsMapping that a {@link cern.c2mon.server.eslog.structure.types.EsTagBoolean} will use in the ElasticSearch cluster.
- * valueBoolean = true --> valueNumeric = 1, valueString = "true".
- * valueBoolean = false --> valueNumeric = 0, valueString = "false".
+ * EsMapping that a {@link EsTagBoolean} will use in the ElasticSearch cluster.
+ * valueBoolean = true --> value = 1, valueString = "true".
+ * valueBoolean = false --> value = 0, valueString = "false".
  *
  * @author Alban Marguet.
  */

@@ -16,8 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.mappings;
 
-import cern.c2mon.server.eslog.structure.types.AbstractEsTag;
+import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
 import lombok.Getter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Defines the ElasticSearch arguments for the types and the indices.
@@ -38,6 +41,7 @@ public interface EsMapping {
     DOUBLE("double"),
     BOOLEAN("boolean"),
     DATE("date"),
+    OBJECT("object"),
     NESTED("nested");
 
     private final String type;
@@ -163,53 +167,44 @@ public interface EsMapping {
     Id id;
     Name name;
     DataType dataType;
-    SourceTimestamp sourceTimestamp;
+    Timestamp timestamp;
     ServerTimestamp serverTimestamp;
     DaqTimestamp daqTimestamp;
-    Status status;
     Quality quality;
-    Valid valid;
+    Unit unit;
     ValueDescription valueDescription;
     ValueBoolean valueBoolean;
     ValueString valueString;
-    ValueNumeric valueNumeric;
-    Process process;
-    Equipment equipment;
-    SubEquipment subEquipment;
+    Value value;
     Metadata metadata;
 
     Properties(ValueType valueType) {
       this.id = new Id();
       this.name = new Name();
       this.dataType = new DataType();
-      this.sourceTimestamp = new SourceTimestamp();
+      this.timestamp = new Timestamp();
       this.serverTimestamp = new ServerTimestamp();
       this.daqTimestamp = new DaqTimestamp();
-      this.status = new Status();
       this.quality = new Quality();
-      this.valid = new Valid();
+      this.unit = new Unit();
       this.valueDescription = new ValueDescription();
 
       if (ValueType.isNumeric(valueType)) {
-        this.valueNumeric = new ValueNumeric(valueType);
+        this.value = new Value(valueType);
       } else if (ValueType.isString(valueType)) {
         this.valueString = new ValueString(valueType);
       } else if (ValueType.isBoolean(valueType)) {
         this.valueBoolean = new ValueBoolean(valueType);
-        this.valueNumeric = new ValueNumeric(ValueType.DOUBLE);
+        this.value = new Value(ValueType.DOUBLE);
       }
-
-      this.process = new Process();
-      this.equipment = new Equipment();
-      this.subEquipment = new SubEquipment();
       this.metadata = new Metadata();
     }
 
     public String getValueType() {
       if (valueBoolean != null) {
         return valueBoolean.getType();
-      } else if (valueNumeric != null) {
-        return valueNumeric.getType();
+      } else if (value != null) {
+        return value.getType();
       } else {
         return valueString.getType();
       }
@@ -229,31 +224,48 @@ public interface EsMapping {
       private final String index = indexNotAnalyzed;
     }
 
-    class SourceTimestamp {
+    class Timestamp {
       private final String type = ValueType.DATE.toString();
       private final String format = epochMillisFormat;
     }
 
-    class ServerTimestamp extends SourceTimestamp {
+    class ServerTimestamp extends Timestamp {
     }
 
-    class DaqTimestamp extends SourceTimestamp {
+    class DaqTimestamp extends Timestamp {
+    }
+
+
+    class Quality {
+      private final String dynamic = "false";
+      private final String type = ValueType.OBJECT.toString();
+
+      private final Map<String, Object> properties = new HashMap<String, Object>(){{
+        put("status", new Status());
+        put("valid", new Valid());
+        put("statusInfo", new StatusInfo());
+      }};
     }
 
     class Status {
       private final String type = ValueType.INT.toString();
     }
 
-    class Quality {
-      private final String type = ValueType.STRING.toString();
-      private final String index = indexNotAnalyzed;
-    }
-
     class Valid {
       private final String type = ValueType.BOOLEAN.toString();
     }
 
+    class Unit {
+      private final String type = ValueType.STRING.toString();
+      private final String index = indexNotAnalyzed;
+    }
+
     class ValueDescription {
+      private final String type = ValueType.STRING.toString();
+      private final String index = indexNotAnalyzed;
+    }
+
+    class StatusInfo {
       private final String type = ValueType.STRING.toString();
       private final String index = indexNotAnalyzed;
     }
@@ -277,12 +289,22 @@ public interface EsMapping {
     }
 
     @Getter
-    class ValueNumeric {
+    class Value {
       private final String type;
 
-      public ValueNumeric(ValueType type) {
+      public Value(ValueType type) {
         this.type = type.toString();
       }
+    }
+
+    class Metadata {
+      private final String dynamic = "true";
+      private final String type = ValueType.NESTED.toString();
+      private final Map<String, Object> properties = new HashMap<String, Object>(){{
+        put("process", new Process());
+        put("equipment", new Equipment());
+        put("subEquipment", new SubEquipment());
+      }};
     }
 
     class Process {
@@ -298,11 +320,6 @@ public interface EsMapping {
     class SubEquipment {
       private final String type = ValueType.STRING.toString();
       private final String index = indexNotAnalyzed;
-    }
-
-    class Metadata {
-      private final String dynamic = "true";
-      private final String type = ValueType.NESTED.toString();
     }
   }
 

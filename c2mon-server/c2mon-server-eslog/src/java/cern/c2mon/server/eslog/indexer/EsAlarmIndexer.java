@@ -105,7 +105,7 @@ public class EsAlarmIndexer extends EsIndexer {
    */
   public void logAlarm(EsAlarm esAlarm) {
     if (esAlarm == null) {
-      log.debug("logAlarm() - Could not instantiate EsAlarm, null value.");
+      log.debug("logAlarm() - Could not instantiate EsAlarm, null rawValue.");
     }
 
     String indexName = generateAlarmIndex(esAlarm.getServerTimestamp());

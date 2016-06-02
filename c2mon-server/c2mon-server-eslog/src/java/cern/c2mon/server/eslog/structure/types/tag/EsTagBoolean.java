@@ -14,38 +14,45 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.eslog.structure.types;
+package cern.c2mon.server.eslog.structure.types.tag;
 
 import cern.c2mon.pmanager.IFallback;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Represents a Tag in ElasticSearch.
- * This type of {@link AbstractEsTag}  contains a String value.
+ * This type of {@link AbstractEsTag} contains a boolean value.
  *
  * @author Alban Marguet.
  */
 @Slf4j
-public class EsTagString extends AbstractEsTag {
+public class EsTagBoolean extends AbstractEsTag {
+
   /**
-   * Set the value as a String for this {@link AbstractEsTag}.
+   * Set the value of this EsTagBoolean to the value of the Tag in C2MON.
    *
-   * @param value Object supposed to be a String.
+   * @param rawValue Object supposed to be a boolean.
    */
   @Override
-  public void setValue(Object value) {
-    if (value == null) {
-      log.trace("setValue() EsTagString - Value is not set (value= " + value + ").");
-    } else if (value instanceof String) {
-      this.value = value;
-      this.valueString = (String) value;
-    } else {
-      throw new IllegalArgumentException("setValue() - Cannot instantiate new EsTagString in ElasticSearch because the value has class=" + value.getClass().getName() + ")");
+  public void setRawValue(final Object rawValue) {
+    if (rawValue == null) {
+      log.trace("setRawValue() EsTagBoolean - Value is not set (rawValue= " + rawValue + ").");
+      return;
     }
+
+    this.rawValue = rawValue;
+
+    if (!(rawValue instanceof Boolean)) {
+      throw new IllegalArgumentException("setRawValue() - Cannot instantiate new EsTagBoolean in ElasticSearch " +
+          "because the rawValue has class=" + rawValue.getClass().getName() + ")");
+    }
+
+    valueBoolean = (Boolean) rawValue;
+    this.value = valueBoolean ? 1 : 0;
   }
 
   @Override
   public IFallback getObject(String line) {
-    return gson.fromJson(line, EsTagString.class);
+    return gson.fromJson(line, EsTagBoolean.class);
   }
 }

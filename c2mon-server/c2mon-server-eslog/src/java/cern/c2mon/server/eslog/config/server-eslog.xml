@@ -30,7 +30,7 @@
     <constructor-arg>
       <bean class="cern.c2mon.server.eslog.alarm.EsAlarmListener"/>
     </constructor-arg>
-    <constructor-arg><bean class="cern.c2mon.server.eslog.structure.types.EsTagNumeric"/></constructor-arg>
+    <constructor-arg><bean class="cern.c2mon.server.eslog.structure.types.tag.EsTagNumeric"/></constructor-arg>
   </bean>
 
   <bean id="esTagStringPersistenceManager" class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
@@ -39,7 +39,7 @@
     <constructor-arg>
       <bean class="cern.c2mon.server.eslog.alarm.DummyEsAlarmListener"/>
     </constructor-arg>
-    <constructor-arg><bean class="cern.c2mon.server.eslog.structure.types.EsTagString"/></constructor-arg>
+    <constructor-arg><bean class="cern.c2mon.server.eslog.structure.types.tag.EsTagString"/></constructor-arg>
   </bean>
 
   <bean id="esTagBooleanPersistenceManager" class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
@@ -48,7 +48,7 @@
     <constructor-arg>
       <bean class="cern.c2mon.server.eslog.alarm.DummyEsAlarmListener"/>
     </constructor-arg>
-    <constructor-arg><bean class="cern.c2mon.server.eslog.structure.types.EsTagBoolean"/></constructor-arg>
+    <constructor-arg><bean class="cern.c2mon.server.eslog.structure.types.tag.EsTagBoolean"/></constructor-arg>
   </bean>
 
 </beans>

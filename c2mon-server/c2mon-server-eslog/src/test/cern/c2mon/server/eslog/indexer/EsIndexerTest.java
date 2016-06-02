@@ -20,9 +20,9 @@ import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.eslog.connector.TransportConnector;
 import cern.c2mon.server.eslog.structure.mappings.EsMapping;
 import cern.c2mon.server.eslog.structure.mappings.EsStringTagMapping;
-import cern.c2mon.server.eslog.structure.types.AbstractEsTag;
-import cern.c2mon.server.eslog.structure.types.EsTagBoolean;
-import cern.c2mon.server.eslog.structure.types.EsTagString;
+import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
+import cern.c2mon.server.eslog.structure.types.tag.EsTagBoolean;
+import cern.c2mon.server.eslog.structure.types.tag.EsTagString;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -214,13 +214,13 @@ public class EsIndexerTest {
     tag.setDataType(EsMapping.ValueType.BOOLEAN.toString());
     tag.setId(1L);
     tag.setServerTimestamp(123456789000L);
-    tag.setValue(true);
+    tag.setRawValue(true);
     String indexName = indexer.indexPrefix + indexer.millisecondsToYearMonth(tag.getServerTimestamp());
     String typeName = indexer.typePrefix + tag.getDataType();
 
     list.add(tag);
 
-    assertEquals(1, tag.getValueNumeric());
+    assertEquals(1, tag.getValue());
     assertTrue(tag.getValueBoolean());
     assertNull(tag.getValueString());
 

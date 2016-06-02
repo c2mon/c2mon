@@ -16,8 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.type;
 
-import cern.c2mon.server.eslog.structure.types.AbstractEsTag;
-import cern.c2mon.server.eslog.structure.types.EsTagString;
+import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
+import cern.c2mon.server.eslog.structure.types.tag.EsTagString;
+import cern.c2mon.server.eslog.structure.types.tag.TagQualityAnalysis;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.Before;
@@ -39,15 +40,14 @@ public class EsTagImplTest {
   private long id = 1;
   private String name = "name";
   private String dataType = "string";
-  private long sourceTimestamp = 123456;
+  private long timestamp = 123456;
   private long serverTimestamp = 123456;
   private long daqTimestamp = 123456;
-  private int status = 0;
-  private String quality = "{}";
-  private Boolean valid = true;
-  private Object value = "value";
+
+  private TagQualityAnalysis quality = new TagQualityAnalysis();
+  private Object value = "rawValue";
   private Boolean valueBoolean;
-  private String valueString = "value";
+  private String valueString = "rawValue";
   private Number valueNumeric;
   private String valueDescription = "OK";
   private Map<String, String> metadata = new HashMap<>();
@@ -58,16 +58,18 @@ public class EsTagImplTest {
     esTag.setId(id);
     esTag.setName(name);
     esTag.setDataType(dataType);
-    esTag.setSourceTimestamp(sourceTimestamp);
+    esTag.setTimestamp(timestamp);
     esTag.setServerTimestamp(serverTimestamp);
     esTag.setDaqTimestamp(daqTimestamp);
-    esTag.setStatus(status);
+
+    quality.setStatus(0);
+    quality.setValid(true);
     esTag.setQuality(quality);
-    esTag.setValid(valid);
-    esTag.setValue(value);
+
+    esTag.setRawValue(value);
     esTag.setValueBoolean(valueBoolean);
     esTag.setValueString(valueString);
-    esTag.setValueNumeric(valueNumeric);
+    esTag.setValue(valueNumeric);
     esTag.setValueDescription(valueDescription);
 
     metadata.put("test1", "value1");

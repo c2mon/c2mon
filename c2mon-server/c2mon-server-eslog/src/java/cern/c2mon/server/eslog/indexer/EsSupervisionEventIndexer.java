@@ -113,7 +113,7 @@ public class EsSupervisionEventIndexer extends EsIndexer {
       String mapping = createMappingIfNewIndex(indexName);
       indexData(indexName, mapping, esSupervisionEvent);
     } else {
-      log.debug("logSupervisionEvent() - Could not instantiate SupervisionEventImpl, null value.");
+      log.debug("logSupervisionEvent() - Could not instantiate SupervisionEventImpl, null rawValue.");
     }
   }
 

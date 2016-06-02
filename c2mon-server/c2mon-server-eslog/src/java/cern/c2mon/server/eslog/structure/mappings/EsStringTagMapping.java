@@ -16,9 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.mappings;
 
+import cern.c2mon.server.eslog.structure.types.tag.EsTagString;
+
 /**
- * EsMapping that a {@link cern.c2mon.server.eslog.structure.types.EsTagString} will use to be indexed in the ElasticSearch cluster.
- * valueString = value; valueBoolean = valueNumeric = null;
+ * EsMapping that a {@link EsTagString} will use to be indexed in the ElasticSearch cluster.
+ * valueString = value; valueBoolean = value = null;
  *
  * @author Alban Marguet.
  */

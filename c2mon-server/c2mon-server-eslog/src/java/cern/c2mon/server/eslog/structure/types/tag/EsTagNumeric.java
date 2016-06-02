@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.eslog.structure.types;
+package cern.c2mon.server.eslog.structure.types.tag;
 
 import cern.c2mon.pmanager.IFallback;
 import lombok.extern.slf4j.Slf4j;
@@ -31,19 +31,23 @@ public class EsTagNumeric extends AbstractEsTag {
   /**
    * Set the value of this EsTagNumeric to the value of the Tag in C2MON.
    *
-   * @param value Object supposed to be numeric.
+   * @param rawValue Object supposed to be numeric.
    */
   @Override
-  public void setValue(Object value) {
-    if (value == null) {
-      log.trace("setValue() EsTagNumeric - Value is not set (value= " + value + ").");
-    } else if (value instanceof Number) {
-      this.value = value;
-      this.valueNumeric = (Number) value;
-    } else {
-      log.trace("setValue() - value has value " + value + ".");
-      throw new IllegalArgumentException("setValue() - Cannot instantiate new EsTagNumeric in ElasticSearch because the value has class=" + value.getClass().getName() + ")");
+  public void setRawValue(final Object rawValue) {
+    if (rawValue == null) {
+      log.trace("setRawValue() EsTagNumeric - Value is not set (rawValue= " + rawValue + ").");
+      return;
     }
+
+    this.rawValue = rawValue;
+
+    if (!(rawValue instanceof Number)) {
+      log.trace("setRawValue() - rawValue has rawValue " + rawValue + ".");
+      throw new IllegalArgumentException("setRawValue() - Cannot instantiate new EsTagNumeric in ElasticSearch " +
+          "because the rawValue is of type=" + rawValue.getClass().getName());
+    }
+    this.value = (Number) rawValue;
   }
 
   @Override

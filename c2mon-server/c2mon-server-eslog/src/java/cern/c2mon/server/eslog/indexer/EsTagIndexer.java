@@ -23,7 +23,7 @@ import cern.c2mon.server.eslog.structure.mappings.EsBooleanTagMapping;
 import cern.c2mon.server.eslog.structure.mappings.EsMapping;
 import cern.c2mon.server.eslog.structure.mappings.EsNumericTagMapping;
 import cern.c2mon.server.eslog.structure.mappings.EsStringTagMapping;
-import cern.c2mon.server.eslog.structure.types.AbstractEsTag;
+import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
@@ -177,7 +177,7 @@ public class EsTagIndexer extends EsIndexer {
    */
   private boolean indexByBatch(String index, String type, AbstractEsTag tag) {
     if (tag == null) {
-      log.warn("indexByBatch() - Error while indexing data. Tag has null value");
+      log.warn("indexByBatch() - Error while indexing data. Tag has null rawValue");
       return false;
     }
 
