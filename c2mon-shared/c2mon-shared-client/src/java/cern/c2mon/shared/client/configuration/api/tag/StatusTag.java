@@ -16,13 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration.api.tag;
 
-import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
+import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.metadata.Metadata;
 import lombok.*;
-
-import java.util.List;
+import org.springframework.util.Assert;
 
 /**
  * Configuration object for a StatusTag.
@@ -40,91 +39,115 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class StatusTag extends ControlTag {
 
+  private Long equipmentId;
+
+  private Long subEquipmentId;
+
+  private Long processId;
+
+  @IgnoreProperty
+  private String processName;
+
+  @IgnoreProperty
+  private String equipmentName;
+
+  @IgnoreProperty
+  private String subEquipmentName;
+
   @DefaultValue("java.lang.String")
-  private String dataType = null;
+  private String dataType;
 
   @DefaultValue("true")
-  private Boolean isLogged = true;
-
-  /**
-   * Constructor for building a StatusTag with all fields.
-   * To build a StatusTag with arbitrary fields use the builder pattern.
-   *
-   * @param id          Unique id of the tag.
-   * @param name        Unique name the tag.
-   * @param description Describes the propose of the tag.
-   * @param mode        define the mode in which the tag is running.
-   * @param alarms      List of configuration PObjects for this tag. If the argument is null the field will be an empty List as default.
-   * @param metadata    Arbitrary metadata attached to his tag configuration.
-   * @param isLogged    Defines if the tag which belongs to this configuration should be logged.
-   * @param metadata    Arbitrary metadata attached to his tag configuration.
-   */
-  @Builder
-  public StatusTag(Long id, String name, String description, TagMode mode, @Singular List<Alarm> alarms,
-                   Boolean isLogged, Metadata metadata) {
-
-    super(id, name, description, mode, alarms, metadata);
-
-    this.isLogged = isLogged;
-  }
-
-  public StatusTag() {
-  }
-
-
-  @Override
-  public boolean requiredFieldsGiven() {
-    return super.requiredFieldsGiven();
-  }
+  private Boolean isLogged;
 
   public static CreateBuilder create(String name) {
+    Assert.hasText(name, "Status tag name required!");
 
-    StatusTag iniTag = StatusTag.builder().name(name).build();
-
-    return iniTag.toCreateBuilder(iniTag);
+    return new CreateBuilder(name);
   }
 
-  private StatusTag.CreateBuilder toCreateBuilder(StatusTag initializationTag) {
-    return new StatusTag.CreateBuilder(initializationTag);
+  public static UpdateBuilder update(Long id) {
+    return new UpdateBuilder(id);
   }
 
-  public static class CreateBuilder {
+  public static UpdateBuilder update(String name) {
+    return new UpdateBuilder(name);
+  }
 
-    private StatusTag builderTag;
+  public static class UpdateBuilder {
 
-    CreateBuilder(StatusTag initializationTag) {
+    private StatusTag tagToBuild = new StatusTag();
 
-      initializationTag.setCreate(true);
-      this.builderTag = initializationTag;
+    private UpdateBuilder(String name) {
+      tagToBuild.setName(name);
     }
 
-    public StatusTag.CreateBuilder id(Long id) {
-      this.builderTag.setId(id);
+    private UpdateBuilder(Long id) {
+      tagToBuild.setId(id);
+    }
+
+    public StatusTag.UpdateBuilder description(String description) {
+      this.tagToBuild.setDescription(description);
       return this;
     }
 
-    public StatusTag.CreateBuilder description(String description) {
-      this.builderTag.setDescription(description);
+    public StatusTag.UpdateBuilder mode(TagMode mode) {
+      this.tagToBuild.setMode(mode);
       return this;
     }
 
-    public StatusTag.CreateBuilder mode(TagMode mode) {
-      this.builderTag.setMode(mode);
+    public StatusTag.UpdateBuilder isLogged(Boolean isLogged) {
+      this.tagToBuild.setIsLogged(isLogged);
       return this;
     }
 
-    public StatusTag.CreateBuilder isLogged(Boolean isLogged) {
-      this.builderTag.setIsLogged(isLogged);
-      return this;
-    }
-
-    public StatusTag.CreateBuilder metadata(Metadata metadata) {
-      this.builderTag.setMetadata(metadata);
+    public StatusTag.UpdateBuilder metadata(Metadata metadata) {
+      this.tagToBuild.setMetadata(metadata);
       return this;
     }
 
     public StatusTag build() {
-      return this.builderTag;
+      this.tagToBuild.setUpdated(true);
+      return this.tagToBuild;
+    }
+  }
+
+  public static class CreateBuilder {
+
+    private StatusTag tagToBuild = new StatusTag();
+
+    private CreateBuilder(String name) {
+      tagToBuild.setName(name);
+    }
+
+    public StatusTag.CreateBuilder id(Long id) {
+      this.tagToBuild.setId(id);
+      return this;
+    }
+
+    public StatusTag.CreateBuilder description(String description) {
+      this.tagToBuild.setDescription(description);
+      return this;
+    }
+
+    public StatusTag.CreateBuilder mode(TagMode mode) {
+      this.tagToBuild.setMode(mode);
+      return this;
+    }
+
+    public StatusTag.CreateBuilder isLogged(Boolean isLogged) {
+      this.tagToBuild.setIsLogged(isLogged);
+      return this;
+    }
+
+    public StatusTag.CreateBuilder metadata(Metadata metadata) {
+      this.tagToBuild.setMetadata(metadata);
+      return this;
+    }
+
+    public StatusTag build() {
+      tagToBuild.setCreated(true);
+      return this.tagToBuild;
     }
   }
 }

@@ -17,16 +17,22 @@
 package cern.c2mon.server.configuration.parser.impl;
 
 import cern.c2mon.server.configuration.parser.ConfigurationParser;
-import cern.c2mon.server.configuration.parser.tasks.SequenceTask;
-import cern.c2mon.server.configuration.parser.util.ConfigurationParserUtil;
+import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
+import cern.c2mon.server.configuration.parser.factory.*;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.Configuration;
+import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
+import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
+import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
+import cern.c2mon.shared.client.configuration.api.process.Process;
+import cern.c2mon.shared.client.configuration.api.tag.*;
+import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
 
 /**
  * This class holds all information about a Configuration object to translate
@@ -37,75 +43,116 @@ import java.util.List;
 @Component
 public class ConfigurationParserImpl implements ConfigurationParser {
 
-  private CRUDConfigurationParser crudConfigurationParser;
-  private HierarchicalConfigurationParser hierarchicalConfigurationParser;
+  private AlarmFactory alarmFactory;
+  private CommandTagFactory commandTagFactory;
+  private ControlTagFactory controlTagFactory;
+  private DataTagFactory dataTagFactory;
+  private EquipmentFactory equipmentFactory;
+  private ProcessFactory processFactory;
+  private RuleTagFactory ruleTagFactory;
+  private SubEquipmentFactory subEquipmentFactory;
 
-  private ConfigurationParserUtil parserUtil;
 
   @Autowired
-  public ConfigurationParserImpl(HierarchicalConfigurationParser hierarchicalConfigurationParser,
-                                 CRUDConfigurationParser crudConfigurationParser,
-                                 ConfigurationParserUtil parserUtil) {
-    this.crudConfigurationParser = crudConfigurationParser;
-    this.hierarchicalConfigurationParser = hierarchicalConfigurationParser;
-    this.parserUtil = parserUtil;
+  public ConfigurationParserImpl(
+      AlarmFactory alarmFactory, CommandTagFactory commandTagFactory, ControlTagFactory controlTagFactory,
+      DataTagFactory dataTagFactory, EquipmentFactory equipmentFactory, ProcessFactory processFactory, RuleTagFactory ruleTagFactory,
+      SubEquipmentFactory subEquipmentFactory) {
+    this.alarmFactory = alarmFactory;
+    this.commandTagFactory = commandTagFactory;
+    this.controlTagFactory = controlTagFactory;
+    this.dataTagFactory = dataTagFactory;
+    this.equipmentFactory = equipmentFactory;
+    this.processFactory = processFactory;
+    this.ruleTagFactory = ruleTagFactory;
+    this.subEquipmentFactory = subEquipmentFactory;
   }
 
-  /**
-   * Parse the given {@link Configuration} into a list of {@link ConfigurationElement}
-   * The information how each {@link ConfigurationElement} is build is provided by the fields of each {@link ConfigurationElement}.
-   * After creating a List of single Tasks the Method sort all tasks to a specific order.
-   * Because of the sorting the returning list will be handeld in the right way.
-   *
-   * @param configuration Object which holds all information for creating the list of {@link ConfigurationElement}
-   * @return List of ConfigurationElement, which are used by the {@link cern.c2mon.server.configuration.ConfigurationLoader}
-   */
   @Override
   public List<ConfigurationElement> parse(Configuration configuration) {
-    List<SequenceTask> taskResultList;
 
-    if (!parserUtil.isEmptyCollection(configuration.getProcesses()) || !parserUtil.isEmptyCollection(configuration.getRules())) {
+    if (configuration.getEntities() != null && !configuration.getEntities().isEmpty()) {
 
-      taskResultList = hierarchicalConfigurationParser.parseHierarchicalConfiguration(configuration);
-
+      return parseConfigurationList(configuration.getEntities());
     } else {
 
-      taskResultList = crudConfigurationParser.parseCRUDConfiguration(configuration);
-
+      throw new ConfigurationParseException("Warning: Empty configuration received");
     }
-    // create and return the actual configuration elements based on the parsed information in the taskResultList
-    return finalizeConfiguration(configuration, taskResultList);
   }
 
   /**
-   * Puts the configuration tasks in the right order.
-   * Also removes all null values from the created {@link SequenceTask} list.
-   * This null object represent shell objects which holds no information about the actual configuration.
+   * Parses a list of entities to be configured and transform them into
+   * {@link SequenceTask} instances.
    *
-   * @param config        The main configuration object from the client.
-   * @param sequenceTasks The created {@link SequenceTask}s created through the parsing of the {@link Configuration}.
-   * @return The concrete {@link ConfigurationElement} for the server configuration.
+   * @param entities Objects which holds the information to create a {@link ConfigurationElement}.
+   * @return A {@link ConfigurationElement} for the server configuration.
    */
-  private List<ConfigurationElement> finalizeConfiguration(Configuration config, List<SequenceTask> sequenceTasks) {
-    List<ConfigurationElement> elements = new ArrayList<>();
+  private List<ConfigurationElement> parseConfigurationList(List<? extends ConfigurationEntity> entities) {
+    List<ConfigurationElement> results = new ArrayList<>();
+    EntityFactory entityFactory;
 
-    // After parsing configure given list and put it in the right order
-    // remove all null taskResultList which are are created from shell-objects
-    sequenceTasks.removeAll(Collections.singleton(null));
-    Collections.sort(sequenceTasks);
+    for (ConfigurationEntity configurationEntity : entities) {
+      entityFactory = getEntityFactory(configurationEntity);
 
-    long confId = config.getConfigurationId() == null ? parserUtil.getNextConfigId() : config.getConfigurationId();
-    long seqId = 0l;
+      // ===================== Delete =====================
 
-    for (SequenceTask task : sequenceTasks) {
-      ConfigurationElement element = task.getConfigurationElement();
-      element.setSequenceId(seqId++);
-      element.setConfigId(confId);
-      elements.add(element);
+      if (configurationEntity.isDeleted()) {
+
+        results.add(entityFactory.deleteInstance(configurationEntity));
+
+        // ===================== Update =====================
+
+      } else if (configurationEntity.isUpdated()) {
+
+        results.add(entityFactory.updateInstance(configurationEntity));
+
+        // ===================== Create =====================
+
+      } else if (configurationEntity.isCreated()) {
+
+        results.addAll(entityFactory.createInstance(configurationEntity));
+
+      } else {
+        throw new ConfigurationParseException("Error while parsing a " + configurationEntity.getClass() + ": No action flag set.");
+      }
     }
-
-    return elements;
+    return results;
   }
+
+  /**
+   * Determine the correct {@link EntityFactory} based on the instance of the {@link ConfigurationEntity}.
+   *
+   * @param entity A entity for creating a {@link ConfigurationElement}.
+   * @return The corresponding factory.
+   */
+  private EntityFactory getEntityFactory(ConfigurationEntity entity) {
+    if (entity instanceof Process) {
+      return processFactory;
+    }
+    if (entity instanceof Equipment) {
+      return equipmentFactory;
+    }
+    if (entity instanceof SubEquipment) {
+      return subEquipmentFactory;
+    }
+    if (entity instanceof AliveTag || entity instanceof StatusTag || entity instanceof CommFaultTag) {
+      return controlTagFactory;
+    }
+    if (entity instanceof DataTag) {
+      return dataTagFactory;
+    }
+    if (entity instanceof RuleTag) {
+      return ruleTagFactory;
+    }
+    if (entity instanceof Alarm) {
+      return alarmFactory;
+    }
+    if (entity instanceof CommandTag) {
+      return commandTagFactory;
+    }
+    throw new IllegalArgumentException("No EntityFactory for the Instances of class " + entity.getClass() + " specified");
+  }
+
 }
 
 

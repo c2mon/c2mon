@@ -24,88 +24,74 @@ import cern.c2mon.shared.common.metadata.Metadata;
 
 import java.util.Properties;
 
-//@Service
 public class ConfigurationDataTagUtil {
 
+  /**
+   * Expected generated id is 100.
+   * Expected parent id is 10.
+   */
+  public static DataTag buildCreateBasicDataTag(Properties properties) {
+    if (properties == null) {
+      properties = new Properties();
+    }
 
-  public static Pair<DataTag, Properties> buildDataTagWithId(Long id) {
-    return new Pair<DataTag, Properties>(DataTag.builder().id(id).build(), new Properties());
+    DataTag dataTag = DataTag.create("DataTag", Integer.class, new DataTagAddress()).build();
+    dataTag.setEquipmentId(10L);
+
+    properties.setProperty("name", "DataTag");
+    properties.setProperty("description", "<no description provided>");
+    properties.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
+    properties.setProperty("dataType", Integer.class.getName());
+    properties.setProperty("isLogged", String.valueOf(true));
+    properties.setProperty("equipmentId", String.valueOf(10l));
+    properties.setProperty("address", new DataTagAddress().toConfigXML());
+
+    return dataTag;
   }
 
-  public static Pair<DataTag, Properties> buildDataTagWithPrimFields(Long id) {
-    DataTag pro = DataTag.builder()
+  /**
+   * Expected parent id is 10.
+   */
+  public static DataTag buildCreateAllFieldsDataTag(Long id, Properties properties) {
+    if (properties == null) {
+      properties = new Properties();
+    }
+
+    DataTag dataTag = DataTag.create("DataTag" + id, Integer.class, new DataTagAddress())
         .id(id)
-        .name("DataTag")
         .description("foo")
         .mode(TagMode.OPERATIONAL)
-        .dataType(Integer.class)
-        .build();
-
-    Properties props = new Properties();
-    props.setProperty("name", "DataTag");
-    props.setProperty("description", "foo");
-    props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("dataType", Integer.class.getName());
-    props.setProperty("isLogged", String.valueOf(true));
-    props.setProperty("equipmentId", String.valueOf(1l));
-
-    return new Pair<>(pro, props);
-  }
-
-  public static Pair<DataTag, Properties> buildDataTagWithAllFields(Long id) {
-    DataTag pro = DataTag.builder()
-        .id(id)
-        .name("DataTag")
-        .description("foo")
-        .mode(TagMode.OPERATIONAL)
-        .dataType(Integer.class)
         .isLogged(false)
         .minValue(0)
         .maxValue(10)
-        .address(new DataTagAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress")))
         .unit("testUnit")
-        .metadata(Metadata.builder().addMetadata("testMetadata",11).build())
+        .metadata(Metadata.builder().addMetadata("testMetadata", 11).build())
         .build();
+    dataTag.setEquipmentId(10L);
 
-    Properties props = new Properties();
-    props.setProperty("name", "DataTag");
-    props.setProperty("description", "foo");
-    props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("dataType", Integer.class.getName());
-    props.setProperty("isLogged", String.valueOf(false));
-    props.setProperty("minValue", String.valueOf(0));
-    props.setProperty("maxValue", String.valueOf(10));
-    props.setProperty("address", new DataTagAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress")).toConfigXML());
-    props.setProperty("equipmentId", String.valueOf(1l));
-    props.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata",11).build()));
-    props.setProperty("unit", "testUnit");
+    properties.setProperty("name", "DataTag" + id);
+    properties.setProperty("description", "foo");
+    properties.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
+    properties.setProperty("dataType", Integer.class.getName());
+    properties.setProperty("isLogged", String.valueOf(false));
+    properties.setProperty("minValue", String.valueOf(0));
+    properties.setProperty("maxValue", String.valueOf(10));
+    properties.setProperty("address", new DataTagAddress().toConfigXML());
+    properties.setProperty("equipmentId", String.valueOf(10l));
+    properties.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata", 11).build()));
+    properties.setProperty("unit", "testUnit");
 
-    return new Pair<DataTag, Properties>(pro, props);
+    return dataTag;
   }
 
-  public static Pair<DataTag, Properties> buildDataTagWithoutDefaultFields(Long id) {
-    DataTag pro = DataTag.builder()
-        .id(id)
-        .name("DataTag")
-        .description("foo")
-        .dataType(Integer.class)
-        .build();
+  public static DataTag buildUpdateDataTagWithAllFields(Long id, Properties properties) {
+    if (properties == null) {
+      properties = new Properties();
+    }
 
-    Properties props = new Properties();
-    props.setProperty("name", "DataTag");
-    props.setProperty("description", "foo");
-    props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", Integer.class.getName());
-    props.setProperty("isLogged", String.valueOf(true));
-    props.setProperty("equipmentId", String.valueOf(1l));
-
-    return new Pair<>(pro, props);
-  }
-
-  public static Pair<DataTag, Properties> buildUpdateDataTagWithAllFields(Long id) {
-    DataTag pro = DataTag.builder()
-        .id(id)
-        .name("DataTag_Update")
+    DataTag dataTag = DataTag.update(id)
+        .unit("updateUnit")
+        .name("updateName")
         .description("foo_Update")
         .mode(TagMode.OPERATIONAL)
         .dataType(Double.class)
@@ -113,134 +99,66 @@ public class ConfigurationDataTagUtil {
         .minValue(1)
         .maxValue(11)
         .address(new DataTagAddress(new PLCHardwareAddressImpl(2, 2, 2, 2, 2, 2.0f, "testAddress_Update")))
-        .unit("testUnit_Update")
-        .metadata(Metadata.builder().addMetadata("testMetadata_Update",true).build())
+        .metadata(Metadata.builder().addMetadata("testMetadata_Update", true).build())
         .build();
 
-    Properties props = new Properties();
-    props.setProperty("name", "DataTag_Update");
-    props.setProperty("description", "foo_Update");
-    props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("dataType", Double.class.getName());
-    props.setProperty("isLogged", String.valueOf(true));
-    props.setProperty("minValue", String.valueOf(1));
-    props.setProperty("maxValue", String.valueOf(11));
-    props.setProperty("address", new DataTagAddress(new PLCHardwareAddressImpl(2, 2, 2, 2, 2, 2.0f, "testAddress_Update")).toConfigXML());
-    props.setProperty("unit", "testUnit_Update");
-    props.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata_Update",true).build()));
+    properties.setProperty("name", "updateName");
+    properties.setProperty("unit", "updateUnit");
+    properties.setProperty("description", "foo_Update");
+    properties.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
+    properties.setProperty("dataType", Double.class.getName());
+    properties.setProperty("isLogged", String.valueOf(true));
+    properties.setProperty("minValue", String.valueOf(1));
+    properties.setProperty("maxValue", String.valueOf(11));
+    properties.setProperty("address", new DataTagAddress(new PLCHardwareAddressImpl(2, 2, 2, 2, 2, 2.0f, "testAddress_Update")).toConfigXML());
+    properties.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata_Update", true).build()));
 
-    return new Pair<>(pro, props);
+    return dataTag;
   }
 
-  public static Pair<DataTag, Properties> buildUpdateDataTagWithSomeFields(Long id) {
-    DataTag pro = DataTag.builder()
-        .id(id)
-        .name("DataTag_Update")
+  public static DataTag buildUpdateDataTagWithSomeFields(Long id, Properties properties) {
+    if (properties == null) {
+      properties = new Properties();
+    }
+
+    DataTag dataTag = DataTag.update(id)
+        .description("foo_Update")
+        .minValue(1)
+        .maxValue(11)
+        .build();
+    int a;
+
+    properties.setProperty("description", "foo_Update");
+    properties.setProperty("minValue", String.valueOf(1));
+    properties.setProperty("maxValue", String.valueOf(11));
+
+    return dataTag;
+  }
+
+  public static DataTag buildUpdateDataTagWithSomeFields(String name, Properties properties) {
+    if (properties == null) {
+      properties = new Properties();
+    }
+    DataTag dataTag = DataTag.update(name)
         .description("foo_Update")
         .minValue(1)
         .maxValue(11)
         .build();
 
-    Properties props = new Properties();
-    props.setProperty("name", "DataTag_Update");
-    props.setProperty("description", "foo_Update");
-    props.setProperty("minValue", String.valueOf(1));
-    props.setProperty("maxValue", String.valueOf(11));
 
-    return new Pair<>(pro, props);
+    properties.setProperty("name", name);
+    properties.setProperty("description", "foo_Update");
+    properties.setProperty("minValue", String.valueOf(1));
+    properties.setProperty("maxValue", String.valueOf(11));
+
+    return dataTag;
   }
 
   public static DataTag buildDeleteDataTag(Long id) {
-    DataTag pro = DataTag.builder()
-        .id(id)
-        .deleted(true)
-        .build();
+    DataTag deleteTag = new DataTag();
+    deleteTag.setId(id);
+    deleteTag.setDeleted(true);
 
-    return pro;
+    return deleteTag;
   }
-
-  // ##################### Builder #####################
-
-
-  public static Pair<DataTag.DataTagBuilder, Properties> builderDataTagWithPrimFields(Long id, String parent, Long parentId) {
-    DataTag.DataTagBuilder pro = DataTag.builder()
-        .id(id)
-        .name("DataTag")
-        .description("foo")
-        .mode(TagMode.OPERATIONAL)
-        .dataType(Integer.class);
-
-    Properties props = new Properties();
-    props.setProperty("name", "DataTag");
-    props.setProperty("description", "foo");
-    props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("dataType", Integer.class.getName());
-    props.setProperty("isLogged", String.valueOf(true));
-    switch(parent){
-      case "equipment" : props.setProperty("equipmentId", String.valueOf(parentId)); break;
-      case "subEquipment" : props.setProperty("subEquipmentId", String.valueOf(parentId)); break;
-      default: throw new RuntimeException("not such super class given");
-    }
-
-    return new Pair<>(pro, props);
-  }
-
-  public static Pair<DataTag.DataTagBuilder, Properties> builderDataTagWithAllFields(Long id, String parent, Long parentId) {
-    DataTag.DataTagBuilder pro = DataTag.<Integer>builder()
-        .id(id)
-        .name("DataTag")
-        .description("foo")
-        .dataType(Integer.class)
-        .isLogged(false)
-        .minValue(0)
-        .maxValue(10)
-        .address(new DataTagAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress")))
-        .unit("testUnit")
-        .dipAddress("testConfigDIPaddress")
-        .japcAddress("testConfigJAPCaddress")
-        .metadata(Metadata.builder().addMetadata("testMetadata",11).build());
-
-
-    Properties props = new Properties();
-    props.setProperty("name", "DataTag");
-    props.setProperty("description", "foo");
-    props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", Integer.class.getName());
-    props.setProperty("isLogged", String.valueOf(false));
-    props.setProperty("minValue", String.valueOf(0));
-    props.setProperty("maxValue", String.valueOf(10));
-    props.setProperty("address", new DataTagAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress")).toConfigXML());
-    props.setProperty("unit", "testUnit");
-    props.setProperty("dipAddress", "testConfigDIPaddress");
-    props.setProperty("japcAddress", "testConfigJAPCaddress");
-    props.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata",11).build()));
-    switch(parent){
-      case "equipment" : props.setProperty("equipmentId", String.valueOf(parentId)); break;
-      case "subEquipment" : props.setProperty("subEquipmentId", String.valueOf(parentId)); break;
-      default: throw new RuntimeException("not such super class given");
-    }
-
-    return new Pair<>(pro, props);
-  }
-
-  public static Pair<DataTag.DataTagBuilder, Properties> builderDataTagUpdate(Long id) {
-    DataTag.DataTagBuilder pro = DataTag.<Integer>builder()
-        .id(id)
-        .description("foo_update")
-        .maxValue(20)
-        .address(new DataTagAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress_update")))
-        .japcAddress("testConfigJAPCaddress_update")
-        .metadata(Metadata.builder().addMetadata("testMetadata_update",true).build());;
-
-
-    Properties props = new Properties();
-    props.setProperty("description", "foo_update");
-    props.setProperty("maxValue", String.valueOf(20));
-    props.setProperty("address", new DataTagAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress_update")).toConfigXML());
-    props.setProperty("japcAddress", "testConfigJAPCaddress_update");
-    props.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata_update",true).build()));
-
-    return new Pair<>(pro, props);
-  }
-
 }

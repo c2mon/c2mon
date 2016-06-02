@@ -19,8 +19,7 @@ package cern.c2mon.shared.client.configuration.api.equipment;
 import cern.c2mon.shared.client.configuration.api.tag.*;
 import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import lombok.*;
-
-import java.util.List;
+import org.springframework.util.Assert;
 
 
 /**
@@ -37,176 +36,124 @@ import java.util.List;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class SubEquipment extends AbstractEquipment{
+public class SubEquipment extends AbstractEquipment {
 
-  /**
-   * The id of the overlying Process. This field should never set by the user directly.
-   */
-  @IgnoreProperty
-  private Long parentEquipmentId;
+  private Long equipmentId;
 
-  /**
-   * The name of the overlying Process. This field should never set by the user directly.
-   */
   @IgnoreProperty
   private String parentEquipmentName;
-
-
-  /**
-   * Constructor for building a Equipment with all fields.
-   * To build a Equipment with arbitrary fields use the builder pattern.
-   *
-   * @param id            Unique id of the Equipment.
-   * @param name          Unique name the Equipment.
-   * @param description   Describes the propose of the Equipment.
-   * @param deleted       Determine if this object apply as deletion.
-   * @param aliveInterval Defines the configuration of the alive interval of the AliveTag which is attached to this Process.
-   * @param equipments    List of SubEquipment configuration objects for this tag. If the argument is null the field will be an empty List as default.
-   * @param statusTag     Mandatory configuration object for an StatusTag which is attached to this process. If the configuration is not a 'delete' this
-   *                      field has to be null.
-   * @param aliveTag      Mandatory configuration object for an AliveTag which is attached to this process. If the configuration is not a 'delete' this field
-   *                      has to be null.
-   * @param handlerClass  Full path-class name of the handler class of the this equipemnt.
-   * @param address       Address parameter used by the handler class to connect to the equipment.
-   * @param commFaultTag  Mandatory configuration object for an CommFaultTag which is attached to this process. If the configuration is not a 'delete' this
-   *                      field has to be null.
-   * @param dataTags      Optional list of DataTag configurations which are attached to this Equipment. If the argument is null the field will be an empty
-   *                      List as default.
-   * @param commandTags   Optional list of CommandTag configurations which are attached to this Equipment. If the argument is null the field will be an empty
-   *                      List as default.
-   */
-  @Builder
-  public SubEquipment(boolean deleted, Long id, String name, Integer aliveInterval, String description,
-                      String handlerClass, String address, @Singular List<SubEquipment> subEquipments, StatusTag statusTag, CommFaultTag commFaultTag,
-                      AliveTag aliveTag, @Singular List<DataTag> dataTags, @Singular List<CommandTag> commandTags) {
-    super(deleted, id, name, aliveInterval, description, handlerClass, address,  statusTag, commFaultTag,aliveTag,  dataTags, commandTags);
-  }
 
   public SubEquipment() {
   }
 
-  public static CreateBuilder create(String name, String handlerClass) {
-
-    SubEquipment iniEq = SubEquipment.builder().name(name).handlerClass(handlerClass).build();
-
-    return iniEq.toCreateBuilder(iniEq);
+  public static CreateBuilder create(String name) {
+    Assert.hasText(name, "SubEquipment name is required!");
+    return new CreateBuilder(name);
   }
 
   public static UpdateBuilder update(String name) {
-
-    SubEquipment iniEq = SubEquipment.builder().name(name).build();
-
-    return iniEq.toUpdateBuilder(iniEq);
+    return new UpdateBuilder(name);
   }
 
   public static UpdateBuilder update(Long id) {
-
-    SubEquipment iniEq = SubEquipment.builder().id(id).build();
-
-    return iniEq.toUpdateBuilder(iniEq);
-  }
-
-  private CreateBuilder toCreateBuilder(SubEquipment initializationEquipment) {
-    return new CreateBuilder(initializationEquipment);
-  }
-
-  private UpdateBuilder toUpdateBuilder(SubEquipment initializationEquipment) {
-    return new UpdateBuilder(initializationEquipment);
+    return new UpdateBuilder(id);
   }
 
   public static class CreateBuilder {
 
-    private SubEquipment buildEquipment;
+    private SubEquipment subEquipmentToBuild = new SubEquipment();
 
-    CreateBuilder(SubEquipment initializationEquipment) {
-
-      initializationEquipment.setCreate(true);
-      this.buildEquipment = initializationEquipment;
+    private CreateBuilder(String name) {
+      subEquipmentToBuild.setName(name);
+      subEquipmentToBuild.setCreated(false);
     }
 
     public SubEquipment.CreateBuilder id(Long id) {
-      this.buildEquipment.setId(id);
+      this.subEquipmentToBuild.setId(id);
       return this;
     }
 
     public SubEquipment.CreateBuilder description(String description) {
-      this.buildEquipment.setDescription(description);
+      this.subEquipmentToBuild.setDescription(description);
       return this;
     }
 
     public SubEquipment.CreateBuilder address(String address) {
-      this.buildEquipment.setAddress(address);
+      this.subEquipmentToBuild.setAddress(address);
       return this;
     }
 
     public SubEquipment.CreateBuilder aliveTag(AliveTag aliveTag, Integer aliveInterval) {
 
-      this.buildEquipment.setAliveInterval(aliveInterval);
-      this.buildEquipment.setAliveTag(aliveTag);
+      this.subEquipmentToBuild.setAliveInterval(aliveInterval);
+      this.subEquipmentToBuild.setAliveTag(aliveTag);
 
-      if (!aliveTag.isCreate()) {
-        buildEquipment.setCreate(false);
+      if (!aliveTag.isCreated()) {
+        subEquipmentToBuild.setCreated(false);
       }
 
       return this;
     }
 
     public SubEquipment.CreateBuilder statusTag(StatusTag statusTag) {
-      this.buildEquipment.setStatusTag(statusTag);
+      this.subEquipmentToBuild.setStatusTag(statusTag);
 
-      if (!statusTag.isCreate()) {
-        buildEquipment.setCreate(false);
+      if (!statusTag.isCreated()) {
+        subEquipmentToBuild.setCreated(false);
       }
 
       return this;
     }
 
     public SubEquipment.CreateBuilder commFaultTag(CommFaultTag commFaultTag) {
-      this.buildEquipment.setCommFaultTag(commFaultTag);
+      this.subEquipmentToBuild.setCommFaultTag(commFaultTag);
 
-      if (!commFaultTag.isCreate()) {
-        buildEquipment.setCreate(false);
+      if (!commFaultTag.isCreated()) {
+        subEquipmentToBuild.setCreated(false);
       }
-
       return this;
     }
 
     public SubEquipment build() {
-      return this.buildEquipment;
+      this.subEquipmentToBuild.setCreated(true);
+      return this.subEquipmentToBuild;
     }
   }
 
   public static class UpdateBuilder {
-    private SubEquipment buildEquipment;
+    private SubEquipment subEquipmentToBuild = new SubEquipment();
 
-    UpdateBuilder(SubEquipment initializationEquipment) {
-      buildEquipment = initializationEquipment;
+    private UpdateBuilder(String name) {
+      subEquipmentToBuild.setName(name);
+    }
+
+    private UpdateBuilder(Long id) {
+      subEquipmentToBuild.setId(id);
+    }
+
+    public SubEquipment.UpdateBuilder name(String name) {
+      this.subEquipmentToBuild.setName(name);
+      return this;
     }
 
     public SubEquipment.UpdateBuilder aliveInterval(Integer aliveInterval) {
-      this.buildEquipment.setAliveInterval(aliveInterval);
+      this.subEquipmentToBuild.setAliveInterval(aliveInterval);
       return this;
     }
 
     public SubEquipment.UpdateBuilder description(String description) {
-      this.buildEquipment.setDescription(description);
-      return this;
-    }
-
-    public SubEquipment.UpdateBuilder handlerClass(String handlerClass) {
-      this.buildEquipment.setHandlerClass(handlerClass);
+      this.subEquipmentToBuild.setDescription(description);
       return this;
     }
 
     public SubEquipment.UpdateBuilder address(String address) {
-      this.buildEquipment.setAddress(address);
+      this.subEquipmentToBuild.setAddress(address);
       return this;
     }
 
     public SubEquipment build() {
-      buildEquipment.setUpdate(true);
-
-      return this.buildEquipment;
+      subEquipmentToBuild.setUpdated(true);
+      return this.subEquipmentToBuild;
     }
   }
 }

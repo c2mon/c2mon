@@ -18,11 +18,14 @@ package cern.c2mon.server.configuration.parser.toJSON;
 
 
 import cern.c2mon.shared.client.configuration.api.Configuration;
+import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
+import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
+import cern.c2mon.shared.client.configuration.api.tag.RuleTag;
 import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
-import cern.c2mon.shared.client.configuration.api.util.ConfigurationObject;
+import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
 import cern.c2mon.shared.client.configuration.serialisation.HardwareAddressDeserializer;
 import cern.c2mon.shared.client.configuration.serialisation.HardwareAddressSerializer;
 import cern.c2mon.shared.common.datatag.address.ENSHardwareAddress;
@@ -36,9 +39,15 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import static cern.c2mon.server.configuration.parser.util.ConfigurationAllTogetherUtil.buildAllWithAllFields;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationAlarmUtil.buildCreateBasicAlarm;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationDataTagUtil.buildCreateBasicDataTag;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationEquipmentUtil.buildCreateBasicEquipment;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationProcessUtil.buildCreateBasicProcess;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationRuleTagUtil.buildCreateBasicRuleTag;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationSubEquipmentUtil.buildCreateBasicSubEquipment;
 import static cern.c2mon.shared.common.datatag.address.JMXHardwareAddress.ReceiveMethod.poll;
 import static org.junit.Assert.assertEquals;
 
@@ -171,12 +180,12 @@ public class ParseToJSON {
     createEquipment.setParentProcessName("P_TEST");
     DataTag updateTag = DataTag.update("The DataTag").maxValue(10).description("dataTagUpdate").build();
 
-    List<ConfigurationObject> configList = new ArrayList<>();
+    List<ConfigurationEntity> configList = new ArrayList<>();
     configList.add(createProcess);
     configList.add(createEquipment);
     configList.add(updateTag);
 
-    insertConfig.setConfigurationItems(configList);
+    insertConfig.setEntities(configList);
 
     Configuration readConfig = serializeDeserializeConfiguration(insertConfig);
 
@@ -186,14 +195,21 @@ public class ParseToJSON {
   @Test
   public void parseComplexConfiguration2() {
 
-    Configuration insert = buildAllWithAllFields()._1;
+    Process process = buildCreateBasicProcess(null);
+    Equipment equipment = buildCreateBasicEquipment(null);
+    SubEquipment subEquipment = buildCreateBasicSubEquipment(null);
+    DataTag dataTag = buildCreateBasicDataTag(null);
+    Alarm alarm = buildCreateBasicAlarm(null);
+    RuleTag ruleTag = buildCreateBasicRuleTag(null);
+
+    List<ConfigurationEntity> entities = Arrays.asList(process, equipment, subEquipment, dataTag, alarm, ruleTag);
+    Configuration insert = new Configuration();
+    insert.setEntities(entities);
+
     Configuration confRead = serializeDeserializeConfiguration(insert);
 
     assertEquals(insert, confRead);
   }
-
-//  @Test
-
 
   private Configuration serializeDeserializeConfiguration(Configuration config){
     try {

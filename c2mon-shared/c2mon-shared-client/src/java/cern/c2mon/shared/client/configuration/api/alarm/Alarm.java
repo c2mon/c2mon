@@ -16,11 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration.api.alarm;
 
-import cern.c2mon.shared.client.configuration.api.util.ConfigurationObject;
+import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
 import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import cern.c2mon.shared.common.metadata.Metadata;
-import lombok.Builder;
 import lombok.Data;
+import org.springframework.util.Assert;
 
 /**
  * Configuration object for a Alarm.
@@ -34,28 +34,21 @@ import lombok.Data;
  * @author Franz Ritter
  */
 @Data
-public class Alarm implements ConfigurationObject {
+public class Alarm implements ConfigurationEntity {
 
   @IgnoreProperty
-  private boolean update;
+  private boolean updated;
 
   @IgnoreProperty
-  private boolean create;
+  private boolean created;
 
   @IgnoreProperty
   private boolean deleted;
 
-  /**
-   * The id of the overlying Tag. This field should never set by the user directly.
-   */
-  @IgnoreProperty
-  private Long parentTagId;
+  private Long dataTagId;
 
-  /**
-   * The name of the overlying Tag. This field should never set by the user directly.
-   */
   @IgnoreProperty
-  private String parentTagName;
+  private String dataTagName;
 
   /**
    * Internal identifier of the AlarmCacheObject.
@@ -85,116 +78,77 @@ public class Alarm implements ConfigurationObject {
 
   private AlarmCondition alarmCondition;
 
-  /**
-   * Constructor for building a Alarm with all fields.
-   * To build a Alarm with arbitrary fields use the builder pattern.
-   *
-   * @param deleted        Determine if this object apply as deletion.
-   * @param id             Unique id of the alarm.
-   * @param valueType      Determine the data type of the alarm which belongs to this configuration.
-   * @param dataTagId      Determine the id of the tag which this alarm is attached to.
-   * @param faultFamily    LASER fault family of the alarm.
-   * @param faultMember    LASER fault member of the alarm.
-   * @param faultCode      LASER fault code of the alarm.
-   * @param alarmCondition Determine the alarm condition of this alarm.
-   * @param metadata       Arbitrary metadata attached to this alarm configuration.
-   */
-  @Builder
-  public Alarm(boolean deleted, Long id, String faultFamily, String faultMember, Integer faultCode,
-               AlarmCondition alarmCondition, Metadata metadata) {
-    super();
-    this.deleted = deleted;
-    this.id = id;
-    this.faultFamily = faultFamily;
-    this.faultMember = faultMember;
-    this.faultCode = faultCode;
-    this.alarmCondition = alarmCondition;
-    this.metadata = metadata;
-  }
 
   public Alarm() {
   }
 
-  @Override
-  public boolean requiredFieldsGiven() {
-    boolean result = (getId() != null) && (getFaultMember() != null) && (getFaultFamily() != null) && (getFaultCode() != null);
-
-    return result;
-  }
-
   public static CreateBuilder create(String faultFamily, String faultMember, Integer faultCode, AlarmCondition alarmCondition) {
-
-    Alarm iniAlarm = Alarm.builder()
-        .faultFamily(faultFamily)
-        .faultMember(faultMember)
-        .faultCode(faultCode)
-        .alarmCondition(alarmCondition).build();
-
-    return iniAlarm.toCreateBuilder(iniAlarm);
+    Assert.hasText(faultMember, "Fault member is required!");
+    Assert.hasText(faultFamily, "Fault family is required!");
+    Assert.notNull(faultCode, "Fault code is required!");
+    Assert.notNull(alarmCondition, "Alarm condition code is required!");
+    return new CreateBuilder(faultFamily, faultMember, faultCode, alarmCondition);
   }
 
   public static UpdateBuilder update(Long id) {
-
-    Alarm iniAlarm = Alarm.builder().id(id).build();
-
-    return iniAlarm.toUpdateBuilder(iniAlarm);
-  }
-
-  private CreateBuilder toCreateBuilder(Alarm initializationAlarm) {
-    return new CreateBuilder(initializationAlarm);
-  }
-
-  private UpdateBuilder toUpdateBuilder(Alarm initializationAlarm) {
-    return new Alarm.UpdateBuilder(initializationAlarm);
+    return new UpdateBuilder(id);
   }
 
   public static class CreateBuilder {
 
-    private Alarm alarmBuild;
+    private Alarm alarmToBuild = new Alarm();
 
-    CreateBuilder(Alarm initializationAlarm) {
-      this.alarmBuild = initializationAlarm;
+    private CreateBuilder(String faultFamily, String faultMember, Integer faultCode, AlarmCondition alarmCondition) {
+      alarmToBuild.setFaultFamily(faultFamily);
+      alarmToBuild.setFaultMember(faultMember);
+      alarmToBuild.setFaultCode(faultCode);
+      alarmToBuild.setAlarmCondition(alarmCondition);
     }
 
     public Alarm.CreateBuilder id(Long id) {
-      this.alarmBuild.setId(id);
+      this.alarmToBuild.setId(id);
+      return this;
+    }
+
+    public Alarm.CreateBuilder dataTagId(Long dataTagId) {
+      this.alarmToBuild.setDataTagId(dataTagId);
       return this;
     }
 
     public Alarm.CreateBuilder metadata(Metadata metadata) {
-      this.alarmBuild.setMetadata(metadata);
+      this.alarmToBuild.setMetadata(metadata);
       return this;
     }
 
     public Alarm build() {
 
-      alarmBuild.setCreate(true);
-      return this.alarmBuild;
+      alarmToBuild.setCreated(true);
+      return this.alarmToBuild;
     }
   }
 
   public static class UpdateBuilder {
 
-    private Alarm builderAlarm;
+    private Alarm alarmToBuild = new Alarm();
 
-    UpdateBuilder(Alarm initializationAlarm) {
-      this.builderAlarm = initializationAlarm;
+    private UpdateBuilder(Long id) {
+      this.alarmToBuild.setId(id);
     }
 
     public Alarm.UpdateBuilder alarmCondition(AlarmCondition alarmCondition) {
-      this.builderAlarm.setAlarmCondition(alarmCondition);
+      this.alarmToBuild.setAlarmCondition(alarmCondition);
       return this;
     }
 
     public Alarm.UpdateBuilder metadata(Metadata metadata) {
-      this.builderAlarm.setMetadata(metadata);
+      this.alarmToBuild.setMetadata(metadata);
       return this;
     }
 
     public Alarm build() {
 
-      this.builderAlarm.setUpdate(true);
-      return this.builderAlarm;
+      this.alarmToBuild.setUpdated(true);
+      return this.alarmToBuild;
     }
   }
 }

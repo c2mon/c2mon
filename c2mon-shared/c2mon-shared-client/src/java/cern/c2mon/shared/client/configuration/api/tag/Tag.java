@@ -16,17 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration.api.tag;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.common.metadata.Metadata;
-import cern.c2mon.shared.client.configuration.api.util.ConfigurationObject;
+import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import cern.c2mon.shared.client.tag.TagMode;
 import lombok.Data;
-import lombok.Singular;
 
 /**
  * Tag class which holds the information to create a {@link cern.c2mon.shared.client.configuration.ConfigurationElement}
@@ -35,25 +30,13 @@ import lombok.Singular;
  * @author Franz Ritter
  */
 @Data
-public abstract class Tag implements ConfigurationObject {
+public abstract class Tag implements ConfigurationEntity {
 
   @IgnoreProperty
-  private boolean update = false;
+  private boolean updated = false;
 
   @IgnoreProperty
-  private boolean create = false;
-
-  /**
-   * The id of the overlying Object. This field should never set by the user directly.
-   */
-  @IgnoreProperty
-  private Long parentId;
-
-  /**
-   * The name of the overlying Object. This field should never set by the user directly.
-   */
-  @IgnoreProperty
-  private String parentName;
+  private boolean created = false;
 
   /**
    * determine if the instance of this class defines a DELETE command
@@ -83,42 +66,14 @@ public abstract class Tag implements ConfigurationObject {
    * Indicates whether a tag is "in operation", "in maintenance" or "in test".
    */
   @DefaultValue("TEST")
-  private TagMode mode = TagMode.TEST;
+  private TagMode mode;
 
   /**
    * Meta data of the tag object. Holds arbitrary data which are related to the given Tag.
    */
   private Metadata metadata;
 
-  @IgnoreProperty
-  private List<Alarm> alarms = new ArrayList<>();
-
-  public void addAlarm(Alarm alarm) {
-    this.alarms.add(alarm);
-  }
-
-  public Tag(boolean deleted, Long id, String name, String description, TagMode mode, @Singular List<Alarm> alarms, Metadata metadata) {
-    super();
-    this.deleted = deleted;
-    this.id = id ;
-    this.name = name;
-    this.description = description;
-    this.mode = mode;
-    this.alarms = alarms == null ? new ArrayList<Alarm>() : alarms;
-    this.metadata = metadata;
-  }
-
   public Tag() {
-  }
-
-  /**
-   * Checks if all mandatory fields are set.
-   * <p/>
-   * mode is also a Primary filed. But Because that mode is also a default Value it is not necessary to set it in the POJO
-   */
-  @Override
-  public boolean requiredFieldsGiven() {
-    return (getId() != null) && (getName() != null);
   }
 
 }

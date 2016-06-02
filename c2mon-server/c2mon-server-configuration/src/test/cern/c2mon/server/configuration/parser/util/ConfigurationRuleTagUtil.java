@@ -18,190 +18,121 @@ package cern.c2mon.server.configuration.parser.util;
 
 import cern.c2mon.shared.client.configuration.api.tag.RuleTag;
 import cern.c2mon.shared.client.tag.TagMode;
+import cern.c2mon.shared.common.metadata.Metadata;
 
 import java.util.Properties;
 
-//@Service
 public class ConfigurationRuleTagUtil {
 
 
-  public static Pair<RuleTag, Properties> buildRuleTagWtihId(Long id) {
-    return new Pair<>(RuleTag.builder().id(id).build(), new Properties());
+  /**
+   * Expected generated id is 100.
+   */
+  public static RuleTag buildCreateBasicRuleTag(Properties properties) {
+    if (properties == null) {
+      properties = new Properties();
+    }
+
+    RuleTag ruleTag = RuleTag.create("RuleTag", Integer.class, "ruleExpression").build();
+
+    properties.setProperty("name", "RuleTag");
+    properties.setProperty("description", "<no description provided>");
+    properties.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
+    properties.setProperty("dataType", Integer.class.getName());
+    properties.setProperty("isLogged", String.valueOf(true));
+    properties.setProperty("ruleText", "ruleExpression");
+
+    return ruleTag;
   }
 
-  public static Pair<RuleTag, Properties> buildRuleTagWtihPrimFields(Long id) {
-    RuleTag pro = RuleTag.builder()
-        .id(id)
-        .name("RuleTag")
+  public static RuleTag buildCreateAllFieldsRuleTag(Long id, Properties properties) {
+    if (properties == null) {
+      properties = new Properties();
+    }
+
+    RuleTag ruleTag = RuleTag.create("RuleTag"+id, Integer.class, "(#1000 < 0)|(#1000 > 200)[1],true[0]")
         .description("foo")
-        .dataType(Integer.class)
-        .build();
-
-    Properties props = new Properties();
-    props.setProperty("name", "RuleTag");
-    props.setProperty("description", "foo");
-    props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", Integer.class.getName());
-    props.setProperty("isLogged", String.valueOf(true));
-
-    return new Pair<>(pro, props);
-  }
-
-  public static Pair<RuleTag, Properties> buildRuleTagWtihAllFields(Long id) {
-    RuleTag pro = RuleTag.builder()
-        .id(id)
-        .name("RuleTag")
-        .description("foo")
-        .mode(TagMode.OPERATIONAL)
-        .dataType(Integer.class)
         .isLogged(false)
-        .ruleText("testRule")
+        .mode(TagMode.OPERATIONAL)
+        .id(id)
+        .metadata(Metadata.builder().addMetadata("testMetadata", 11).build())
         .build();
 
-    Properties props = new Properties();
-    props.setProperty("name", "RuleTag");
-    props.setProperty("description", "foo");
-    props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("dataType", Integer.class.getName());
-    props.setProperty("isLogged", String.valueOf(false));
-    props.setProperty("ruleText", "testRule");
+    properties.setProperty("name", "RuleTag" + id);
+    properties.setProperty("description", "foo");
+    properties.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
+    properties.setProperty("dataType", Integer.class.getName());
+    properties.setProperty("isLogged", String.valueOf(false));
+    properties.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata", 11).build()));
+    properties.setProperty("ruleText", "(#1000 < 0)|(#1000 > 200)[1],true[0]");
 
-    return new Pair<>(pro, props);
+    return ruleTag;
   }
 
-  public static Pair<RuleTag, Properties> buildRuleTagWtihoutDefaultFields(Long id) {
-    RuleTag pro = RuleTag.builder()
-        .id(id)
-        .name("RuleTag")
-        .description("foo")
-        .dataType(Integer.class)
-        .build();
+  public static RuleTag buildUpdateRuleTagWithAllFields(Long id, Properties properties) {
+    if (properties == null) {
+      properties = new Properties();
+    }
 
-    Properties props = new Properties();
-    props.setProperty("name", "RuleTag");
-    props.setProperty("description", "foo");
-    props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", Integer.class.getName());
-    props.setProperty("isLogged", String.valueOf(true));
-
-    return new Pair<>(pro, props);
-  }
-
-  public static Pair<RuleTag, Properties> buildUpdateRuleTagWithAllFields(Long id) {
-    RuleTag pro = RuleTag.builder()
-        .id(id)
-        .name("RuleTag_Update")
+    RuleTag ruleTag = RuleTag.update(id)
+        .name("updateName")
         .description("foo_Update")
         .mode(TagMode.OPERATIONAL)
         .dataType(Double.class)
         .isLogged(true)
-        .ruleText("testRule_Update")
+        .metadata(Metadata.builder().addMetadata("testMetadata_Update", true).build())
+        .ruleText("(#1000 < 20)|(#1000 > 200)[1],true[0]")
         .build();
 
-    Properties props = new Properties();
-    props.setProperty("name", "RuleTag_Update");
-    props.setProperty("description", "foo_Update");
-    props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("dataType", Double.class.getName());
-    props.setProperty("isLogged", String.valueOf(true));
-    props.setProperty("ruleText", "testRule_Update");
+    properties.setProperty("name", "updateName");
+    properties.setProperty("description", "foo_Update");
+    properties.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
+    properties.setProperty("dataType", Double.class.getName());
+    properties.setProperty("isLogged", String.valueOf(true));
+    properties.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata_Update", true).build()));
+    properties.setProperty("ruleText", "(#1000 < 20)|(#1000 > 200)[1],true[0]");
 
-    return new Pair<>(pro, props);
+    return ruleTag;
   }
 
-  public static Pair<RuleTag, Properties> buildUpdateRuleTagWtihSomeFields(Long id) {
-    RuleTag pro = RuleTag.builder()
-        .id(id)
+  public static RuleTag buildUpdateRuleTagWithSomeFields(Long id, Properties properties) {
+    if (properties == null) {
+      properties = new Properties();
+    }
+
+    RuleTag ruleTag = RuleTag.update(id)
         .description("foo_Update")
+        .ruleText("update ruleExpression")
         .build();
 
-    Properties props = new Properties();
-    props.setProperty("description", "foo_Update");
+    properties.setProperty("description", "foo_Update");
+    properties.setProperty("ruleText", "update ruleExpression");
 
-    return new Pair<>(pro, props);
+    return ruleTag;
+  }
+
+  public static RuleTag buildUpdateRuleTagWithSomeFields(String name, Properties properties) {
+    if (properties == null) {
+      properties = new Properties();
+    }
+
+    RuleTag ruleTag = RuleTag.update(name)
+        .description("foo_Update")
+        .ruleText("update ruleExpression")
+        .build();
+
+    properties.setProperty("name", name);
+    properties.setProperty("description", "foo_Update");
+    properties.setProperty("ruleText", "update ruleExpression");;
+
+    return ruleTag;
   }
 
   public static RuleTag buildDeleteRuleTag(Long id) {
-    return RuleTag.builder()
-        .id(id)
-        .deleted(true)
-        .build();
-  }
-  // ##################### Builder #####################
+    RuleTag deleteTag = new RuleTag();
+    deleteTag.setId(id);
+    deleteTag.setDeleted(true);
 
-  public static Pair<RuleTag.RuleTagBuilder, Properties> builderRuleTagWithPrimFields(Long id) {
-    RuleTag.RuleTagBuilder pro = RuleTag.builder()
-        .id(id)
-        .name("RuleTag"+id)
-        .description("foo")
-        .dataType(Integer.class);
-
-    Properties props = new Properties();
-    props.setProperty("name", "RuleTag"+id);
-    props.setProperty("description", "foo");
-    props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", Integer.class.getName());
-    props.setProperty("isLogged", String.valueOf(true));
-
-    return new Pair<>(pro, props);
-  }
-
-  public static Pair<RuleTag.RuleTagBuilder, Properties> builderRuleTagWithAllFields(Long id) {
-    RuleTag.RuleTagBuilder pro = RuleTag.builder()
-        .id(id)
-        .name("RuleTag"+id)
-        .description("foo")
-        .mode(TagMode.OPERATIONAL)
-        .dataType(Integer.class)
-        .isLogged(false)
-        .ruleText("testRule");
-
-    Properties props = new Properties();
-    props.setProperty("name", "RuleTag"+id);
-    props.setProperty("description", "foo");
-    props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("dataType", Integer.class.getName());
-    props.setProperty("isLogged", String.valueOf(false));
-    props.setProperty("ruleText", "testRule");
-
-    return new Pair<>(pro, props);
-  }
-
-  public static Pair<RuleTag.RuleTagBuilder, Properties> builderRuleTagWithAllFields(Long id, String ruleText) {
-    RuleTag.RuleTagBuilder pro = RuleTag.builder()
-        .id(id)
-        .name("RuleTag"+id)
-        .description("foo")
-        .mode(TagMode.OPERATIONAL)
-        .dataType(Integer.class)
-        .isLogged(false)
-        .ruleText(ruleText)
-        .dipAddress("testConfigDIPaddress")
-        .japcAddress("testConfigJAPCaddress");
-
-    Properties props = new Properties();
-    props.setProperty("name", "RuleTag"+id);
-    props.setProperty("description", "foo");
-    props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("dataType", Integer.class.getName());
-    props.setProperty("isLogged", String.valueOf(false));
-    props.setProperty("ruleText", ruleText);
-    props.setProperty("dipAddress", "testConfigDIPaddress");
-    props.setProperty("japcAddress", "testConfigJAPCaddress");
-
-    return new Pair<>(pro, props);
-  }
-
-  public static Pair<RuleTag.RuleTagBuilder, Properties> builderRuleTagUpdate(Long id, String ruleText) {
-    RuleTag.RuleTagBuilder pro = RuleTag.builder()
-        .id(id)
-        .ruleText(ruleText)
-        .japcAddress("testConfigJAPCAddress_Update");
-
-    Properties props = new Properties();
-    props.setProperty("ruleText", ruleText);
-    props.setProperty("japcAddress", "testConfigJAPCAddress_Update");
-
-    return new Pair<>(pro, props);
+    return deleteTag;
   }
 }

@@ -19,126 +19,87 @@ package cern.c2mon.server.configuration.parser.util;
 import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
+import cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl;
+import cern.c2mon.shared.common.metadata.Metadata;
 
 import java.util.Properties;
 
-//@Service
 public class ConfigurationCommandTagUtil {
 
+  /**
+   * Expected generated id is 500.
+   * Expected parent id is 10.
+   */
+  public static CommandTag buildCreateBasicCommandTag(Properties properties) {
+    if (properties == null) {
+      properties = new Properties();
+    }
 
-  public static Pair<CommandTag, Properties> buildCommandTagWithId(Long id) {
-    return new Pair<>(CommandTag.builder().id(id).build(), new Properties());
+    CommandTag commandTag = CommandTag.create("CommandTag", Integer.class, new SimpleHardwareAddressImpl("testAddress"),
+        30000, 6000, 200, 2, "RBAC class", "RBAC device", "RBAC property").equipmentId(10L).build();
+
+    properties.setProperty("name", "CommandTag");
+    properties.setProperty("description", "<no description provided>");
+    properties.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
+    properties.setProperty("dataType", Integer.class.getName());
+    properties.setProperty("hardwareAddress", new SimpleHardwareAddressImpl("testAddress").toConfigXML());
+    properties.setProperty("equipmentId", String.valueOf(10l));
+    properties.setProperty("clientTimeout", String.valueOf(30000));
+    properties.setProperty("execTimeout", String.valueOf(6000));
+    properties.setProperty("sourceTimeout", String.valueOf(200));
+    properties.setProperty("sourceRetries", String.valueOf(2));
+    properties.setProperty("rbacClass", "RBAC class");
+    properties.setProperty("rbacDevice", "RBAC device");
+    properties.setProperty("rbacProperty", "RBAC property");
+
+    return commandTag;
   }
 
-  public static Pair<CommandTag, Properties> buildCommandTagWithPrimFields(Long id) {
-    CommandTag pro = CommandTag.builder()
+  /**
+   * Expected parent id is 10.
+   */
+  public static CommandTag buildCreateAllFieldsCommandTag(Long id, Properties properties) {
+    if (properties == null) {
+      properties = new Properties();
+    }
+
+    CommandTag commandTag = CommandTag.create("CommandTag" + id, Integer.class, new SimpleHardwareAddressImpl("testAddress"),
+        30000 ,6000, 200, 2, "RBAC class", "RBAC device", "RBAC property")
         .id(id)
-        .name("CommandTag")
-        .description("foo")
-        .dataType(String.class)
-        .hardwareAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress"))
-        .clientTimeout(30000)
-        .execTimeout(6000)
-        .sourceTimeout(200)
-        .sourceRetries(2)
-        .rbacClass("RBAC class")
-        .rbacDevice("RBAC device")
-        .rbacProperty("RBAC property")
-        .build();
-
-    Properties props = new Properties();
-    props.setProperty("name", "CommandTag");
-    props.setProperty("description", "foo");
-    props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", String.class.getName());
-    props.setProperty("hardwareAddress", new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress").toConfigXML());
-    props.setProperty("equipmentId", String.valueOf(1l));
-    props.setProperty("clientTimeout", String.valueOf(30000));
-    props.setProperty("execTimeout", String.valueOf(6000));
-    props.setProperty("sourceTimeout", String.valueOf(200));
-    props.setProperty("sourceRetries", String.valueOf(2));
-    props.setProperty("rbacClass", "RBAC class");
-    props.setProperty("rbacDevice", "RBAC device");
-    props.setProperty("rbacProperty", "RBAC property");
-    props.setProperty("equipmentId", String.valueOf(1L));
-
-    return new Pair<>(pro, props);
-  }
-
-  public static Pair<CommandTag, Properties> buildCommandTagWithAllFields(Long id) {
-    CommandTag pro = CommandTag.builder()
-        .id(id)
-        .name("CommandTag")
+        .equipmentId(10L)
         .description("foo")
         .mode(TagMode.OPERATIONAL)
-        .dataType(String.class)
-        .hardwareAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress"))
-        .clientTimeout(30000)
-        .execTimeout(6000)
-        .sourceTimeout(200)
-        .sourceRetries(2)
-        .rbacClass("RBAC class")
-        .rbacDevice("RBAC device")
-        .rbacProperty("RBAC property")
+        .metadata(Metadata.builder().addMetadata("testMetadata", 11).build())
+        .maximum(100)
+        .minimum(0)
         .build();
 
-    Properties props = new Properties();
-    props.setProperty("name", "CommandTag");
-    props.setProperty("description", "foo");
-    props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("dataType", String.class.getName());
-    props.setProperty("hardwareAddress", new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress").toConfigXML());
-    props.setProperty("equipmentId", String.valueOf(1l));
-    props.setProperty("clientTimeout", String.valueOf(30000));
-    props.setProperty("execTimeout", String.valueOf(6000));
-    props.setProperty("sourceTimeout", String.valueOf(200));
-    props.setProperty("sourceRetries", String.valueOf(2));
-    props.setProperty("rbacClass", "RBAC class");
-    props.setProperty("rbacDevice", "RBAC device");
-    props.setProperty("rbacProperty", "RBAC property");
-    props.setProperty("equipmentId", String.valueOf(1L));
+    properties.setProperty("name", "CommandTag" + id);
+    properties.setProperty("description", "foo");
+    properties.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
+    properties.setProperty("dataType", Integer.class.getName());
+    properties.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata", 11).build()));
+    properties.setProperty("hardwareAddress", new SimpleHardwareAddressImpl("testAddress").toConfigXML());
+    properties.setProperty("equipmentId", String.valueOf(10l));
+    properties.setProperty("clientTimeout", String.valueOf(30000));
+    properties.setProperty("execTimeout", String.valueOf(6000));
+    properties.setProperty("sourceTimeout", String.valueOf(200));
+    properties.setProperty("sourceRetries", String.valueOf(2));
+    properties.setProperty("rbacClass", "RBAC class");
+    properties.setProperty("rbacDevice", "RBAC device");
+    properties.setProperty("rbacProperty", "RBAC property");
+    properties.setProperty("maxValue", "100");
+    properties.setProperty("minValue", "0");
 
-    return new Pair<>(pro, props);
+    return commandTag;
   }
 
-  public static Pair<CommandTag, Properties> buildCommandTagWithoutDefaultFields(Long id) {
-    CommandTag pro = CommandTag.builder()
-        .id(id)
-        .name("CommandTag")
-        .description("foo")
-        .dataType(String.class)
-        .hardwareAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress"))
-        .clientTimeout(30000)
-        .execTimeout(6000)
-        .sourceTimeout(200)
-        .sourceRetries(2)
-        .rbacClass("RBAC class")
-        .rbacDevice("RBAC device")
-        .rbacProperty("RBAC property")
-        .build();
+  public static CommandTag buildUpdateCommandTagWithAllFields(Long id, Properties properties) {
+    if (properties == null) {
+      properties = new Properties();
+    }
 
-    Properties props = new Properties();
-    props.setProperty("name", "CommandTag");
-    props.setProperty("description", "foo");
-    props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", String.class.getName());
-    props.setProperty("hardwareAddress", new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress").toConfigXML());
-    props.setProperty("equipmentId", String.valueOf(1l));
-    props.setProperty("clientTimeout", String.valueOf(30000));
-    props.setProperty("execTimeout", String.valueOf(6000));
-    props.setProperty("sourceTimeout", String.valueOf(200));
-    props.setProperty("sourceRetries", String.valueOf(2));
-    props.setProperty("rbacClass", "RBAC class");
-    props.setProperty("rbacDevice", "RBAC device");
-    props.setProperty("rbacProperty", "RBAC property");
-    props.setProperty("equipmentId", String.valueOf(1L));
-
-    return new Pair<>(pro, props);
-  }
-
-  public static Pair<CommandTag, Properties> buildUpdateCommandTagWithAllFields(Long id) {
-    CommandTag pro = CommandTag.builder()
-        .id(id)
+    CommandTag commandTag = CommandTag.update(id)
         .name("CommandTag_update")
         .description("foo_update")
         .mode(TagMode.OPERATIONAL)
@@ -150,27 +111,33 @@ public class ConfigurationCommandTagUtil {
         .rbacClass("RBAC class_update")
         .rbacDevice("RBAC device_update")
         .rbacProperty("RBAC property_update")
+        .maximum(200)
+        .minimum(20)
         .build();
 
-    Properties props = new Properties();
-    props.setProperty("name", "CommandTag_update");
-    props.setProperty("description", "foo_update");
-    props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("hardwareAddress", new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress_update").toConfigXML());
-    props.setProperty("clientTimeout", String.valueOf(40000));
-    props.setProperty("execTimeout", String.valueOf(7000));
-    props.setProperty("sourceTimeout", String.valueOf(300));
-    props.setProperty("sourceRetries", String.valueOf(3));
-    props.setProperty("rbacClass", "RBAC class_update");
-    props.setProperty("rbacDevice", "RBAC device_update");
-    props.setProperty("rbacProperty", "RBAC property_update");
+    properties.setProperty("name", "CommandTag_update");
+    properties.setProperty("description", "foo_update");
+    properties.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
+    properties.setProperty("hardwareAddress", new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress_update").toConfigXML());
+    properties.setProperty("clientTimeout", String.valueOf(40000));
+    properties.setProperty("execTimeout", String.valueOf(7000));
+    properties.setProperty("sourceTimeout", String.valueOf(300));
+    properties.setProperty("sourceRetries", String.valueOf(3));
+    properties.setProperty("rbacClass", "RBAC class_update");
+    properties.setProperty("rbacDevice", "RBAC device_update");
+    properties.setProperty("rbacProperty", "RBAC property_update");
+    properties.setProperty("maxValue", "200");
+    properties.setProperty("minValue", "20");
 
-    return new Pair<>(pro, props);
+    return commandTag;
   }
 
-  public static Pair<CommandTag, Properties> buildUpdateCommandTagWithSomeFields(Long id) {
-    CommandTag pro = CommandTag.builder()
-        .id(id)
+  public static CommandTag buildUpdateCommandTagWithSomeFields(Long id, Properties properties) {
+    if (properties == null) {
+      properties = new Properties();
+    }
+
+    CommandTag commandTag = CommandTag.update(id)
         .description("foo_update")
         .mode(TagMode.OPERATIONAL)
         .hardwareAddress(new PLCHardwareAddressImpl(2, 2, 2, 2, 2, 2.0f, "testAddress_update"))
@@ -179,115 +146,47 @@ public class ConfigurationCommandTagUtil {
         .rbacProperty("RBAC property_update")
         .build();
 
-    Properties props = new Properties();
-    props.setProperty("description", "foo_update");
-    props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("hardwareAddress", new PLCHardwareAddressImpl(2, 2, 2, 2, 2, 2.0f, "testAddress_update").toConfigXML());
-    props.setProperty("clientTimeout", String.valueOf(40000));
-    props.setProperty("sourceRetries", String.valueOf(3));
-    props.setProperty("rbacProperty", "RBAC property_update");
+    properties.setProperty("description", "foo_update");
+    properties.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
+    properties.setProperty("hardwareAddress", new PLCHardwareAddressImpl(2, 2, 2, 2, 2, 2.0f, "testAddress_update").toConfigXML());
+    properties.setProperty("clientTimeout", String.valueOf(40000));
+    properties.setProperty("sourceRetries", String.valueOf(3));
+    properties.setProperty("rbacProperty", "RBAC property_update");
 
-    return new Pair<>(pro, props);
+    return commandTag;
   }
 
-  public static CommandTag buildDeleteCommandTag(Long id) {
-    CommandTag pro = CommandTag.builder()
-        .id(id)
-        .deleted(true)
-        .build();
-
-    return pro;
-  }
-
-  // ##################### Builder #####################
-
-
-  public static Pair<CommandTag.CommandTagBuilder, Properties> builderCommandTagWithPrimFields(Long id, Long parentId) {
-    CommandTag.CommandTagBuilder pro = CommandTag.builder()
-        .id(id)
-        .name("CommandTag")
-        .description("foo")
-        .dataType(String.class)
-        .hardwareAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress"))
-        .clientTimeout(30000)
-        .execTimeout(6000)
-        .sourceTimeout(200)
-        .sourceRetries(2)
-        .rbacClass("RBAC class")
-        .rbacDevice("RBAC device")
-        .rbacProperty("RBAC property");
-
-    Properties props = new Properties();
-    props.setProperty("name", "CommandTag");
-    props.setProperty("description", "foo");
-    props.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
-    props.setProperty("dataType", String.class.getName());
-    props.setProperty("hardwareAddress", new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress").toConfigXML());
-    props.setProperty("equipmentId", String.valueOf(parentId));
-    props.setProperty("clientTimeout", String.valueOf(30000));
-    props.setProperty("execTimeout", String.valueOf(6000));
-    props.setProperty("sourceTimeout", String.valueOf(200));
-    props.setProperty("sourceRetries", String.valueOf(2));
-    props.setProperty("rbacClass", "RBAC class");
-    props.setProperty("rbacDevice", "RBAC device");
-    props.setProperty("rbacProperty", "RBAC property");
-
-    return new Pair<>(pro, props);
-  }
-
-  public static Pair<CommandTag.CommandTagBuilder, Properties> builderCommandTagWithAllFields(Long id, Long parentId) {
-    CommandTag.CommandTagBuilder pro = CommandTag.builder()
-        .id(id)
-        .name("CommandTag")
-        .description("foo")
-        .mode(TagMode.OPERATIONAL)
-        .dataType(String.class)
-        .hardwareAddress(new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress"))
-        .clientTimeout(30000)
-        .execTimeout(6000)
-        .sourceTimeout(200)
-        .sourceRetries(2)
-        .rbacClass("RBAC class")
-        .rbacDevice("RBAC device")
-        .rbacProperty("RBAC property");
-
-    Properties props = new Properties();
-    props.setProperty("name", "CommandTag");
-    props.setProperty("description", "foo");
-    props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("dataType", String.class.getName());
-    props.setProperty("hardwareAddress", new PLCHardwareAddressImpl(1, 1, 1, 1, 1, 1.0f, "testAddress").toConfigXML());
-    props.setProperty("equipmentId", String.valueOf(parentId));
-    props.setProperty("clientTimeout", String.valueOf(30000));
-    props.setProperty("execTimeout", String.valueOf(6000));
-    props.setProperty("sourceTimeout", String.valueOf(200));
-    props.setProperty("sourceRetries", String.valueOf(2));
-    props.setProperty("rbacClass", "RBAC class");
-    props.setProperty("rbacDevice", "RBAC device");
-    props.setProperty("rbacProperty", "RBAC property");
-
-    return new Pair<>(pro, props);
-  }
-
-  public static Pair<CommandTag.CommandTagBuilder, Properties> builderCommandTagUpdate(Long id) {
-    CommandTag.CommandTagBuilder pro = CommandTag.builder()
-        .id(id)
+  public static CommandTag buildUpdateCommandTagWithSomeFields(String name, Properties properties) {
+    if (properties == null) {
+      properties = new Properties();
+    }
+    CommandTag commandTag = CommandTag.update(name)
         .description("foo_update")
         .mode(TagMode.OPERATIONAL)
         .hardwareAddress(new PLCHardwareAddressImpl(2, 2, 2, 2, 2, 2.0f, "testAddress_update"))
         .clientTimeout(40000)
         .sourceRetries(3)
-        .rbacProperty("RBAC property_update");
+        .rbacProperty("RBAC property_update")
+        .minimum(20)
+        .build();
 
-    Properties props = new Properties();
-    props.setProperty("description", "foo_update");
-    props.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
-    props.setProperty("hardwareAddress", new PLCHardwareAddressImpl(2, 2, 2, 2, 2, 2.0f, "testAddress_update").toConfigXML());
-    props.setProperty("clientTimeout", String.valueOf(40000));
-    props.setProperty("sourceRetries", String.valueOf(3));
-    props.setProperty("rbacProperty", "RBAC property_update");
+    properties.setProperty("description", "foo_update");
+    properties.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
+    properties.setProperty("hardwareAddress", new PLCHardwareAddressImpl(2, 2, 2, 2, 2, 2.0f, "testAddress_update").toConfigXML());
+    properties.setProperty("clientTimeout", String.valueOf(40000));
+    properties.setProperty("sourceRetries", String.valueOf(3));
+    properties.setProperty("rbacProperty", "RBAC property_update");
+    properties.setProperty("minValue", "20");
 
-    return new Pair<>(pro, props);
+    return commandTag;
+  }
+
+  public static CommandTag buildDeleteCommandTag(Long id) {
+    CommandTag deleteTag = new CommandTag();
+    deleteTag.setId(id);
+    deleteTag.setDeleted(true);
+
+    return deleteTag;
   }
 
 }

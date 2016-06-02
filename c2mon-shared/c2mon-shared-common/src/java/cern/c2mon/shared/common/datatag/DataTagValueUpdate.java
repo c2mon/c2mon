@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -50,18 +50,18 @@ public final class DataTagValueUpdate {
   public static final String XML_ROOT_ELEMENT= "DataTagValueUpdate";
 
   public static final String XML_ATTRIBUTE_PROCESS_ID= "process-id";
-  
+
   public static final String XML_ATTRIBUTE_PROCESS_PIK= "process-pik";
   // ----------------------------------------------------------------------------
   // PRIVATE STATIC MEMBERS
   // ----------------------------------------------------------------------------
 
-  
+
   /**
    * Log4j Logger for the DataTagValueUpdate class.
    */
   protected static final Logger log = LoggerFactory.getLogger(DataTagValueUpdate.class);
-  
+
   // ----------------------------------------------------------------------------
   // MEMBERS
   // ----------------------------------------------------------------------------
@@ -85,7 +85,7 @@ public final class DataTagValueUpdate {
     this.processId = pProcessId;
     this.tagValues = pTagValues;
   }
-  
+
   public DataTagValueUpdate(final Long pProcessId, final Long pProcessPIK) {
     this.processId = pProcessId;
     this.processPIK = pProcessPIK;
@@ -105,7 +105,7 @@ public final class DataTagValueUpdate {
   public Long getProcessId() {
     return this.processId;
   }
-  
+
   public void setProcessPIK(final Long pProcessPIK) {
     this.processPIK = pProcessPIK;
   }
@@ -127,7 +127,7 @@ public final class DataTagValueUpdate {
   }
 
   // ----------------------------------------------------------------------------
-  // METHODS FOR XML-IFICATION and DE-XML-IFICATION 
+  // METHODS FOR XML-IFICATION and DE-XML-IFICATION
   // ----------------------------------------------------------------------------
 
   public String toXML() {
@@ -175,7 +175,7 @@ public final class DataTagValueUpdate {
     /* Only process if the element name is <DataTagValueUpdate> */
     if (domElement.getNodeName().equals(XML_ROOT_ELEMENT)) {
 
-      /* Try to extract the process-id attribute from the XML message. 
+      /* Try to extract the process-id attribute from the XML message.
        * If this fails, return null. */
       try {
         result.processId = Long.valueOf(domElement.getAttribute(XML_ATTRIBUTE_PROCESS_ID));
@@ -188,16 +188,16 @@ public final class DataTagValueUpdate {
           } catch (NumberFormatException nfe) {
             log.trace("DataTagValueUpdate - fromXML - No PIK attribute received.");
           }
-          
-          Node fieldNode = null; 
+
+          Node fieldNode = null;
           NodeList fields = domElement.getChildNodes();
           int fieldsCount = fields.getLength();
-        
+
           result.tagValues = new ArrayList<SourceDataTagValue>(fieldsCount);
 
           for (int i = 0; i < fieldsCount; i++) {
             fieldNode = fields.item(i);
-            if (fieldNode.getNodeType() == Node.ELEMENT_NODE 
+            if (fieldNode.getNodeType() == Node.ELEMENT_NODE
                 && fieldNode.getNodeName().equals(SourceDataTagValue.XML_ROOT_ELEMENT)
             ) {
               result.tagValues.add(

@@ -1,0 +1,124 @@
+/*******************************************************************************
+ * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ *
+ * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
+ * C2MON is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation, either version 3 of the license.
+ *
+ * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+
+package cern.c2mon.server.configuration.parser.factory;
+
+import cern.c2mon.server.cache.DataTagCache;
+import cern.c2mon.server.cache.EquipmentCache;
+import cern.c2mon.server.cache.SubEquipmentCache;
+import cern.c2mon.server.cache.TagFacadeGateway;
+import cern.c2mon.server.cache.loading.EquipmentDAO;
+import cern.c2mon.server.cache.loading.SequenceDAO;
+import cern.c2mon.server.cache.loading.SubEquipmentDAO;
+import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.api.tag.DataTag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * @author Franz Ritter
+ */
+@Service
+public class DataTagFactory extends EntityFactory<DataTag> {
+
+  private EquipmentDAO equipmentDAO;
+  private EquipmentCache equipmentCache;
+  private SubEquipmentDAO subEquipmentDAO;
+  private SubEquipmentCache subEquipmentCache;
+
+  private DataTagCache dataTagCache;
+  private TagFacadeGateway tagFacadeGateway;
+  private SequenceDAO sequenceDAO;
+
+  @Autowired
+  public DataTagFactory(DataTagCache dataTagCache, TagFacadeGateway tagFacadeGateway, SequenceDAO sequenceDAO, EquipmentDAO equipmentDAO, EquipmentCache equipmentCache,
+                        SubEquipmentDAO subEquipmentDAO, SubEquipmentCache subEquipmentCache) {
+    this.dataTagCache = dataTagCache;
+    this.tagFacadeGateway = tagFacadeGateway;
+    this.sequenceDAO = sequenceDAO;
+    this.equipmentDAO = equipmentDAO;
+    this.equipmentCache = equipmentCache;
+    this.subEquipmentDAO = subEquipmentDAO;
+    this.subEquipmentCache = subEquipmentCache;
+  }
+
+  @Override
+  public List<ConfigurationElement> createInstance(DataTag dataTag) {
+    dataTag = getParentId(dataTag);
+
+    return Collections.singletonList(doCreateInstance(dataTag));
+  }
+
+  private DataTag getParentId(DataTag dataTag) {
+    Long parentId;
+
+    if (dataTag.getEquipmentId() != null || dataTag.getEquipmentName() != null) {
+      if (dataTag.getSubEquipmentId() == null && dataTag.getSubEquipmentName() == null) {
+
+        parentId = dataTag.getEquipmentId() != null ? dataTag.getEquipmentId() : equipmentDAO.getIdByName(dataTag.getEquipmentName());
+        dataTag.setEquipmentId(parentId);
+
+        if (!equipmentCache.hasKey(parentId)) {
+          throw new ConfigurationParseException("Creating of a new DataTag (id = " + dataTag.getId() + ") failed: " +
+              "No Equipment with the id " + parentId + " found");
+        }
+      } else {
+        throw new ConfigurationParseException("Creating of a new DataTag (id = " + dataTag.getId() + ") failed: " +
+            "You cant specify equipment and subEquipment as parent");
+      }
+    } else if (dataTag.getSubEquipmentId() != null || dataTag.getSubEquipmentName() != null) {
+
+      parentId = dataTag.getSubEquipmentId() != null ? dataTag.getSubEquipmentId() : subEquipmentDAO.getIdByName(dataTag.getSubEquipmentName());
+      dataTag.setSubEquipmentId(parentId);
+
+      if (!subEquipmentCache.hasKey(parentId)) {
+        throw new ConfigurationParseException("Creating of a new DataTag (id = " + dataTag.getId() + ") failed: " +
+            "No SubEquipment with the id " + parentId + " found");
+      }
+    } else {
+      throw new ConfigurationParseException("Creating of a new DataTag (id = " + dataTag.getId() + ") failed: " +
+          "No equipment or subEquipment specified");
+    }
+
+    return dataTag;
+  }
+
+  @Override
+  Long createId(DataTag configurationEntity) {
+    return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextTagId();
+  }
+
+  @Override
+  Long getId(DataTag entity) {
+    return entity.getId() != null ? entity.getId() : dataTagCache.get(entity.getName()).getId();
+  }
+
+  @Override
+  boolean cacheHasEntity(Long id) {
+    return tagFacadeGateway.isInTagCache(id);
+  }
+
+  @Override
+  ConfigConstants.Entity getEntity() {
+    return ConfigConstants.Entity.DATATAG;
+  }
+}

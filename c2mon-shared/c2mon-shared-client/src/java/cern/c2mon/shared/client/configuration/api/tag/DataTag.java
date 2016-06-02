@@ -16,14 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration.api.tag;
 
-import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
+import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.metadata.Metadata;
 import lombok.*;
-
-import java.util.List;
+import org.springframework.util.Assert;
 
 /**
  * Configuration object for a DataTag.
@@ -41,19 +40,29 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class DataTag extends Tag {
 
+  private Long equipmentId;
+
+  private Long subEquipmentId;
+
+  @IgnoreProperty
+  private String equipmentName;
+
+  @IgnoreProperty
+  private String subEquipmentName;
+
   /**
    * Minimum value for range checks. If the system receives a tag value that is
    * less than the authorized minimum value, it will flag the new tag value as
    * invalid.
    */
-  private Number minValue = null;
+  private Number minValue;
 
   /**
    * Maximum value for range checks. If the system receives a tag value that is
    * less than the authorized minimum value, it will flag the new tag value as
    * invalid.
    */
-  private Number maxValue = null;
+  private Number maxValue;
 
   /**
    * DIP address for tags published on DIP
@@ -87,188 +96,160 @@ public class DataTag extends Tag {
    * short-term log.
    */
   @DefaultValue("true")
-  private Boolean isLogged = true;
-
-  /**
-   * Constructor for building a DataTag with all fields.
-   * To build a DataTag with arbitrary fields use the builder pattern.
-   *
-   * @param id          Unique id of the tag.
-   * @param name        Unique name the tag.
-   * @param description Describes the propose of the tag.
-   * @param mode        define the mode in which the tag is running.
-   * @param alarms      List of configuration PObjects for this tag. If the argument is null the field will be an empty List as default.
-   * @param metadata    Arbitrary metadata attached to this tag configuration.
-   * @param isLogged    Defines if the tag which belongs to this configuration should be logged.
-   * @param deleted     Determine if this object apply as deletion.
-   * @param dataType    Determine the data type of the DataTag which belongs to this configuration.
-   * @param unit        Unit of the tag's value.
-   * @param minValue    Minimum value of the DataTag which belongs to this configuration.
-   * @param maxValue    Maximum value of the DataTag which belongs to this configuration.
-   * @param address     DataTagAddress which belongs to this tag configuration.
-   * @param dipAddress  Defines the dipAddress of the DataTag which belongs to this configuration.
-   * @param japcAddress Defines the japcAddress of the DataTag which belongs to this configuration.
-   */
-  @Builder
-  public DataTag(boolean deleted, Long id, String name, String description, Class<?> dataType, TagMode mode, @Singular List<Alarm> alarms,
-                 Boolean isLogged, String unit, Number minValue, Number maxValue, DataTagAddress address, String dipAddress, String japcAddress, Metadata metadata) {
-    super(deleted, id, name, description, mode, alarms, metadata);
-    this.dataType = dataType != null ? dataType.getName() : null;
-    this.minValue = minValue;
-    this.maxValue = maxValue;
-    this.address = address;
-    this.unit = unit;
-    this.dipAddress = dipAddress;
-    this.japcAddress = japcAddress;
-    this.isLogged = isLogged;
-  }
+  private Boolean isLogged;
 
   public DataTag() {
   }
 
-  @Override
-  public boolean requiredFieldsGiven() {
-    return super.requiredFieldsGiven() && (dataType != null);
-  }
-
   public static CreateBuilder create(String name, Class dataType, DataTagAddress address) {
+    Assert.hasText(name, "Data tag name is required!");
+    Assert.notNull(dataType, "Data type is required!");
+    Assert.notNull(address, "Data tag address is required!");
 
-    DataTag iniTag = DataTag.builder().name(name).dataType(dataType).address(address).build();
-
-    return iniTag.toCreateBuilder(iniTag);
+    return new CreateBuilder(name, dataType, address);
   }
 
   public static UpdateBuilder update(Long id) {
-
-    DataTag iniTag = DataTag.builder().id(id).build();
-
-    return iniTag.toUpdateBuilder(iniTag);
+    return new UpdateBuilder(id);
   }
 
   public static UpdateBuilder update(String name) {
-
-    DataTag iniTag = DataTag.builder().name(name).build();
-
-    return iniTag.toUpdateBuilder(iniTag);
+    return new UpdateBuilder(name);
   }
-
-  private DataTag.CreateBuilder toCreateBuilder(DataTag initializationTag) {
-    return new CreateBuilder(initializationTag);
-  }
-
-  private UpdateBuilder toUpdateBuilder(DataTag initializationTag) {
-    return new UpdateBuilder(initializationTag);
-  }
-
 
   public static class CreateBuilder {
 
-    private DataTag builderTag;
+    private DataTag tagToBuild = new DataTag();
 
-    CreateBuilder(DataTag initializationTag) {
-      this.builderTag = initializationTag;
+    private CreateBuilder(String name, Class dataType, DataTagAddress address) {
+      tagToBuild.setName(name);
+      tagToBuild.setDataType(dataType.getName());
+      tagToBuild.setAddress(address);
     }
 
     public DataTag.CreateBuilder id(Long id) {
-      this.builderTag.setId(id);
+      this.tagToBuild.setId(id);
+      return this;
+    }
+
+    public DataTag.CreateBuilder equipmentId(Long equipmentId) {
+      this.tagToBuild.setEquipmentId(equipmentId);
+      return this;
+    }
+
+    public DataTag.CreateBuilder subEquipmentId(Long subEquipmentId) {
+      this.tagToBuild.setSubEquipmentId(subEquipmentId);
       return this;
     }
 
     public DataTag.CreateBuilder description(String description) {
-      this.builderTag.setDescription(description);
+      this.tagToBuild.setDescription(description);
       return this;
     }
 
     public DataTag.CreateBuilder unit(String unit) {
-      this.builderTag.setUnit(unit);
+      this.tagToBuild.setUnit(unit);
       return this;
     }
 
     public DataTag.CreateBuilder mode(TagMode mode) {
-      this.builderTag.setMode(mode);
+      this.tagToBuild.setMode(mode);
       return this;
     }
 
     public DataTag.CreateBuilder isLogged(Boolean isLogged) {
-      this.builderTag.setIsLogged(isLogged);
+      this.tagToBuild.setIsLogged(isLogged);
       return this;
     }
 
     public DataTag.CreateBuilder minValue(Number minValue) {
-      this.builderTag.setMinValue(minValue);
+      this.tagToBuild.setMinValue(minValue);
       return this;
     }
 
     public DataTag.CreateBuilder maxValue(Number maxValue) {
-      this.builderTag.setMaxValue(maxValue);
+      this.tagToBuild.setMaxValue(maxValue);
       return this;
     }
 
     public DataTag.CreateBuilder metadata(Metadata metadata) {
-      this.builderTag.setMetadata(metadata);
+      this.tagToBuild.setMetadata(metadata);
       return this;
     }
 
     public DataTag build() {
 
-      builderTag.setCreate(true);
-      return  this.builderTag;
+      tagToBuild.setCreated(true);
+      return this.tagToBuild;
     }
 
   }
 
   public static class UpdateBuilder {
 
-    private DataTag builderTag;
+    private DataTag tagToBuild = new DataTag();
 
-    UpdateBuilder(DataTag initializationTag) {
-      this.builderTag = initializationTag;
+    private UpdateBuilder(String name) {
+      this.tagToBuild.setName(name);
+    }
+
+    private UpdateBuilder(long id) {
+      this.tagToBuild.setId(id);
     }
 
     public DataTag.UpdateBuilder name(String name) {
-      this.builderTag.setName(name);
+      this.tagToBuild.setName(name);
+      return this;
+    }
+
+    public DataTag.UpdateBuilder dataType(Class<?> dataType) {
+      this.tagToBuild.setDataType(dataType.getName());
+      return this;
+    }
+
+    public DataTag.UpdateBuilder unit(String unit) {
+      this.tagToBuild.setUnit(unit);
       return this;
     }
 
     public DataTag.UpdateBuilder mode(TagMode mode) {
-      this.builderTag.setMode(mode);
+      this.tagToBuild.setMode(mode);
       return this;
     }
 
     public DataTag.UpdateBuilder isLogged(Boolean isLogged) {
-      this.builderTag.setIsLogged(isLogged);
+      this.tagToBuild.setIsLogged(isLogged);
       return this;
     }
 
     public DataTag.UpdateBuilder minValue(Number minValue) {
-      this.builderTag.setMinValue(minValue);
+      this.tagToBuild.setMinValue(minValue);
       return this;
     }
 
     public DataTag.UpdateBuilder maxValue(Number maxValue) {
-      this.builderTag.setMaxValue(maxValue);
+      this.tagToBuild.setMaxValue(maxValue);
       return this;
     }
 
     public DataTag.UpdateBuilder address(DataTagAddress address) {
-      this.builderTag.setAddress(address);
+      this.tagToBuild.setAddress(address);
       return this;
     }
 
     public DataTag.UpdateBuilder metadata(Metadata metadata) {
-      this.builderTag.setMetadata(metadata);
+      this.tagToBuild.setMetadata(metadata);
       return this;
     }
 
     public DataTag.UpdateBuilder description(String description) {
-      this.builderTag.setDescription(description);
+      this.tagToBuild.setDescription(description);
       return this;
     }
 
     public DataTag build() {
-
-      builderTag.setUpdate(true);
-      return this.builderTag;
+      tagToBuild.setUpdated(true);
+      return this.tagToBuild;
     }
   }
 }

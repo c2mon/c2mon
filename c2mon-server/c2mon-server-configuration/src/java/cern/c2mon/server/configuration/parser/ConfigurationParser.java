@@ -26,13 +26,13 @@ import java.util.List;
  * this object in List of ConfigurationElement.
  *
  * @author Franz Ritter
- *
  */
 public interface ConfigurationParser {
   /**
-   * parsing the given Configuration object of this class and collects all Data
-   * to Create the list of ConfigurationElement. Since all taks need do handle
-   * in a specific order the list compareable depending to this order.
+   * Parses the {@link Configuration} and returns a List of {@link ConfigurationElement}s.
+   *
+   * @param configuration Object which holds all information for creating the list of {@link ConfigurationElement}
+   * @return List of ConfigurationElement, which are used by the {@link cern.c2mon.server.configuration.ConfigurationLoader}
    */
   List<ConfigurationElement> parse(Configuration configuration);
 }

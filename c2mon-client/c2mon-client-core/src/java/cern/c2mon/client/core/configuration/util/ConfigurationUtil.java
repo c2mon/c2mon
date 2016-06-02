@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.client.core.configuration.util;
 
-import cern.c2mon.shared.client.configuration.api.util.ConfigurationObject;
+import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
 
 import java.util.List;
 
@@ -31,9 +31,9 @@ public class ConfigurationUtil {
    *
    * @param config The update configuration object build by the client.
    */
-  public static <T extends ConfigurationObject> void validateIsUpdate(List<T> configurationObjects) {
+  public static <T extends ConfigurationEntity> void validateIsUpdate(List<T> configurationObjects) {
     for (T config : configurationObjects) {
-      if (!config.isUpdate()) {
+      if (!config.isUpdated()) {
         throw new IllegalArgumentException(config.getClass() + " Created through the wrong builder pattern. " +
             "Please use the 'update' builder provided by the class of the object");
       }
@@ -46,9 +46,9 @@ public class ConfigurationUtil {
    *
    * @param config The create configuration object build by the client.
    */
-  public static <T extends ConfigurationObject> void validateIsCreate(List<T> configurationObjects) {
+  public static <T extends ConfigurationEntity> void validateIsCreate(List<T> configurationObjects) {
     for (T config : configurationObjects) {
-      if (!config.isCreate()) {
+      if (!config.isCreated()) {
         throw new IllegalArgumentException(config.getClass() + " Created through the wrong builder pattern. " +
             "Please use the 'create' builder provided by the class of the object");
       }

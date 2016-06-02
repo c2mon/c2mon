@@ -40,10 +40,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.jms.JMSException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service("configurationService")
 @Slf4j
@@ -56,17 +53,17 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
   private ConfigurationRequestSender configurationRequestSender;
 
-  private ProcessConfiguration processConfiguration;
+  private ProcessConfigurationManager processConfigurationManager;
 
-  private EquipmentConfiguration equipmentConfiguration;
+  private EquipmentConfigurationManager equipmentConfigurationManager;
 
-  private SubEquipmentConfiguration subEquipmentConfiguration;
+  private SubEquipmentConfigurationManager subEquipmentConfigurationManager;
 
-  private DataTagConfiguration dataTagConfiguration;
+  private DataTagConfigurationManager dataTagConfigurationManager;
 
-  private RuleTagConfiguration ruleTagConfiguration;
+  private RuleTagConfigurationManager ruleTagConfigurationManager;
 
-  private AlarmConfiguration alarmConfiguration;
+  private AlarmConfigurationManager alarmConfigurationManager;
 
   /**
    * Default Constructor, used by Spring to instantiate the Singleton service
@@ -75,16 +72,16 @@ public class ConfigurationServiceImpl implements ConfigurationService {
    */
   @Autowired
   protected ConfigurationServiceImpl(final @Qualifier("coreRequestHandler") RequestHandler requestHandler, final ConfigurationRequestSender configurationRequestSender,
-                                     ProcessConfiguration processConfiguration, EquipmentConfiguration equipmentConfiguration, SubEquipmentConfiguration subEquipmentConfiguration,
-                                     DataTagConfiguration dataTagConfiguration, RuleTagConfiguration ruleTagConfiguration, AlarmConfiguration alarmConfiguration) {
+                                     ProcessConfigurationManager processConfigurationManager, EquipmentConfigurationManager equipmentConfigurationManager, SubEquipmentConfigurationManager subEquipmentConfigurationManager,
+                                     DataTagConfigurationManager dataTagConfigurationManager, RuleTagConfigurationManager ruleTagConfigurationManager, AlarmConfigurationManager alarmConfigurationManager) {
     this.clientRequestHandler = requestHandler;
     this.configurationRequestSender = configurationRequestSender;
-    this.processConfiguration = processConfiguration;
-    this.equipmentConfiguration = equipmentConfiguration;
-    this.subEquipmentConfiguration = subEquipmentConfiguration;
-    this.dataTagConfiguration = dataTagConfiguration;
-    this.ruleTagConfiguration = ruleTagConfiguration;
-    this.alarmConfiguration = alarmConfiguration;
+    this.processConfigurationManager = processConfigurationManager;
+    this.equipmentConfigurationManager = equipmentConfigurationManager;
+    this.subEquipmentConfigurationManager = subEquipmentConfigurationManager;
+    this.dataTagConfigurationManager = dataTagConfigurationManager;
+    this.ruleTagConfigurationManager = ruleTagConfigurationManager;
+    this.alarmConfigurationManager = alarmConfigurationManager;
   }
 
   @Override
@@ -157,270 +154,210 @@ public class ConfigurationServiceImpl implements ConfigurationService {
   }
 
   public ConfigurationReport createProcess(String processName) {
-    return processConfiguration.createProcess(processName);
+    return processConfigurationManager.createProcess(processName);
   }
 
   public ConfigurationReport createProcess(Process process) {
-    return processConfiguration.createProcess(process);
+    return processConfigurationManager.createProcess(process);
   }
 
   @Override
   public ConfigurationReport updateProcess(Process process) {
-    return processConfiguration.updateProcess(process);
+    return processConfigurationManager.updateProcess(process);
   }
 
   @Override
-  public ConfigurationReport removeProcess(Long id) {
-    return processConfiguration.removeProcess(id);
+  public ConfigurationReport removeProcessById(Long id) {
+    return processConfigurationManager.removeProcessById(id);
   }
 
   @Override
   public ConfigurationReport removeProcess(String name) {
-    return processConfiguration.removeProcess(name);
-  }
-
-  @Override
-  public ConfigurationReport createEquipment(Long processId, String name, String handlerClass) {
-    return equipmentConfiguration.createEquipment(processId, name, handlerClass);
-  }
-
-  @Override
-  public ConfigurationReport createEquipment(Long processId, Equipment equipment) {
-    return equipmentConfiguration.createEquipment(processId, equipment);
-  }
-
-  @Override
-  public ConfigurationReport createEquipments(Long processId, List<Equipment> equipments) {
-    return equipmentConfiguration.createEquipments(processId, equipments);
+    return processConfigurationManager.removeProcess(name);
   }
 
   @Override
   public ConfigurationReport createEquipment(String processName, String name, String handlerClass) {
-    return equipmentConfiguration.createEquipment(processName, name, handlerClass);
+    return equipmentConfigurationManager.createEquipment(processName, name, handlerClass);
   }
 
   @Override
   public ConfigurationReport createEquipment(String processName, Equipment equipment) {
-    return equipmentConfiguration.createEquipment(processName, equipment);
+    return equipmentConfigurationManager.createEquipment(processName, equipment);
   }
 
   @Override
-  public ConfigurationReport createEquipments(String processName, List<Equipment> equipments) {
-    return equipmentConfiguration.createEquipments(processName, equipments);
+  public ConfigurationReport createEquipment(String processName, List<Equipment> equipments) {
+    return equipmentConfigurationManager.createEquipment(processName, equipments);
   }
 
   @Override
   public ConfigurationReport updateEquipment(Equipment equipment) {
-    return equipmentConfiguration.updateEquipment(equipment);
+    return equipmentConfigurationManager.updateEquipment(equipment);
   }
 
   @Override
-  public ConfigurationReport updateEquipments(List<Equipment> equipments) {
-    return equipmentConfiguration.updateEquipments(equipments);
+  public ConfigurationReport updateEquipment(List<Equipment> equipments) {
+    return equipmentConfigurationManager.updateEquipment(equipments);
   }
 
   @Override
-  public ConfigurationReport removeEquipment(Long id) {
-    return equipmentConfiguration.removeEquipment(id);
+  public ConfigurationReport removeEquipmentById(Long id) {
+    return equipmentConfigurationManager.removeEquipmentById(id);
   }
 
   @Override
-  public ConfigurationReport removeEquipments(List<Long> ids) {
-    return equipmentConfiguration.removeEquipments(ids);
+  public ConfigurationReport removeEquipmentById(Set<Long> ids) {
+    return equipmentConfigurationManager.removeEquipmentById(ids);
   }
 
   @Override
   public ConfigurationReport removeEquipment(String equipmentName) {
-    return equipmentConfiguration.removeEquipment(equipmentName);
+    return equipmentConfigurationManager.removeEquipment(equipmentName);
   }
 
   @Override
-  public ConfigurationReport removeEquipmentsByName(List<String> equipmentNames) {
-    return equipmentConfiguration.removeEquipmentsByName(equipmentNames);
-  }
-
-  @Override
-  public ConfigurationReport createSubEquipment(Long equipmentId, String name, String handlerClass) {
-    return subEquipmentConfiguration.createSubEquipment(equipmentId, name, handlerClass);
-  }
-
-  @Override
-  public ConfigurationReport createSubEquipment(Long equipmentId, SubEquipment subEquipment) {
-    return subEquipmentConfiguration.createSubEquipment(equipmentId, subEquipment);
-  }
-
-  @Override
-  public ConfigurationReport createSubEquipments(Long equipmentId, List<SubEquipment> subEquipments) {
-    return subEquipmentConfiguration.createSubEquipments(equipmentId, subEquipments);
+  public ConfigurationReport removeEquipment(Set<String> equipmentNames) {
+    return equipmentConfigurationManager.removeEquipment(equipmentNames);
   }
 
   @Override
   public ConfigurationReport createSubEquipment(String equipmentName, String name, String handlerClass) {
-    return subEquipmentConfiguration.createSubEquipment(equipmentName, name, handlerClass);
+    return subEquipmentConfigurationManager.createSubEquipment(equipmentName, name, handlerClass);
   }
 
   @Override
   public ConfigurationReport createSubEquipment(String equipmentName, SubEquipment subEquipment) {
-    return subEquipmentConfiguration.createSubEquipment(equipmentName, subEquipment);
+    return subEquipmentConfigurationManager.createSubEquipment(equipmentName, subEquipment);
   }
 
   @Override
-  public ConfigurationReport createSubEquipments(String equipmentName, List<SubEquipment> subEquipments) {
-    return subEquipmentConfiguration.createSubEquipments(equipmentName, subEquipments);
+  public ConfigurationReport createSubEquipment(String equipmentName, List<SubEquipment> subEquipments) {
+    return subEquipmentConfigurationManager.createSubEquipment(equipmentName, subEquipments);
   }
 
   @Override
   public ConfigurationReport updateSubEquipment(SubEquipment subEquipment) {
-    return subEquipmentConfiguration.updateSubEquipment(subEquipment);
+    return subEquipmentConfigurationManager.updateSubEquipment(subEquipment);
   }
 
   @Override
-  public ConfigurationReport updateSubEquipments(List<SubEquipment> subEquipments) {
-    return subEquipmentConfiguration.updateSubEquipments(subEquipments);
+  public ConfigurationReport updateSubEquipment(List<SubEquipment> subEquipments) {
+    return subEquipmentConfigurationManager.updateSubEquipment(subEquipments);
   }
 
   @Override
-  public ConfigurationReport removeSubEquipment(Long id) {
-    return subEquipmentConfiguration.removeSubEquipment(id);
+  public ConfigurationReport removeSubEquipmentById(Long id) {
+    return subEquipmentConfigurationManager.removeSubEquipmentById(id);
   }
 
   @Override
-  public ConfigurationReport removeSubEquipments(List<Long> ids) {
-    return subEquipmentConfiguration.removeSubEquipments(ids);
+  public ConfigurationReport removeSubEquipmentById(Set<Long> ids) {
+    return subEquipmentConfigurationManager.removeSubEquipmentById(ids);
   }
 
   @Override
   public ConfigurationReport removeSubEquipment(String subEquipmentName) {
-    return subEquipmentConfiguration.removeSubEquipment(subEquipmentName);
+    return subEquipmentConfigurationManager.removeSubEquipment(subEquipmentName);
   }
 
   @Override
-  public ConfigurationReport removeSubEquipmentsByName(List<String> subEquipmentNames) {
-    return subEquipmentConfiguration.removeSubEquipmentsByName(subEquipmentNames);
-  }
-
-  @Override
-  public ConfigurationReport createDataTag(Long equipmentId, String name, Class<?> dataType, DataTagAddress address) {
-    return dataTagConfiguration.createDataTag(equipmentId, name, dataType, address);
-  }
-
-  @Override
-  public ConfigurationReport createDataTag(Long equipmentId, DataTag dataTag) {
-    return dataTagConfiguration.createDataTag(equipmentId, dataTag);
-  }
-
-  @Override
-  public ConfigurationReport createDataTags(Long equipmentId, List<DataTag> tags) {
-    return dataTagConfiguration.createDataTags(equipmentId, tags);
+  public ConfigurationReport removeSubEquipment(Set<String> subEquipmentNames) {
+    return subEquipmentConfigurationManager.removeSubEquipment(subEquipmentNames);
   }
 
   @Override
   public ConfigurationReport createDataTag(String equipmentName, String name, Class<?> dataType, DataTagAddress address) {
-    return dataTagConfiguration.createDataTag(equipmentName, name, dataType, address);
+    return dataTagConfigurationManager.createDataTag(equipmentName, name, dataType, address);
   }
 
   @Override
   public ConfigurationReport createDataTag(String equipmentName, DataTag dataTag) {
-    return dataTagConfiguration.createDataTag(equipmentName, dataTag);
+    return dataTagConfigurationManager.createDataTag(equipmentName, dataTag);
   }
 
   @Override
   public ConfigurationReport createDataTags(String equipmentName, List<DataTag> tags) {
-    return dataTagConfiguration.createDataTags(equipmentName, tags);
+    return dataTagConfigurationManager.createDataTags(equipmentName, tags);
   }
 
   @Override
   public ConfigurationReport updateTag(Tag tag) {
-    return dataTagConfiguration.updateTag(tag);
+    return dataTagConfigurationManager.updateTag(tag);
   }
 
   @Override
   public ConfigurationReport updateTags(List<Tag> tags) {
-    return dataTagConfiguration.updateTags(tags);
+    return dataTagConfigurationManager.updateTags(tags);
   }
 
   @Override
-  public ConfigurationReport removeTag(Long id) {
-    return dataTagConfiguration.removeTag(id);
+  public ConfigurationReport removeTagsById(Set<Long> ids) {
+    return dataTagConfigurationManager.removeTagsById(ids);
   }
 
   @Override
-  public ConfigurationReport removeTags(List<Long> ids) {
-    return dataTagConfiguration.removeTags(ids);
+  public ConfigurationReport removeTagById(Long id) {
+    return dataTagConfigurationManager.removeTagById(id);
   }
 
   @Override
   public ConfigurationReport removeTag(String name) {
-    return dataTagConfiguration.removeTag(name);
+    return dataTagConfigurationManager.removeTag(name);
   }
 
   @Override
-  public ConfigurationReport removeTagsByName(List<String> tagNames) {
-    return dataTagConfiguration.removeTagsByName(tagNames);
+  public ConfigurationReport removeTags(Set<String> tagNames) {
+    return dataTagConfigurationManager.removeTags(tagNames);
   }
 
   @Override
   public ConfigurationReport createRule(String ruleExpression, String name, Class<?> dataType) {
-    return ruleTagConfiguration.createRule(ruleExpression, name, dataType);
+    return ruleTagConfigurationManager.createRule(ruleExpression, name, dataType);
   }
 
   @Override
   public ConfigurationReport createRule(RuleTag createRuleTag) {
-    return ruleTagConfiguration.createRule(createRuleTag);
+    return ruleTagConfigurationManager.createRule(createRuleTag);
   }
 
   @Override
   public ConfigurationReport createRules(List<RuleTag> ruleTags) {
-    return ruleTagConfiguration.createRules(ruleTags);
-  }
-
-  @Override
-  public ConfigurationReport createAlarm(Long tagId, AlarmCondition alarmCondition, String faultFamily, String faultMember, Integer faultCode) {
-    return alarmConfiguration.createAlarm(tagId, alarmCondition, faultFamily, faultMember, faultCode);
-  }
-
-  @Override
-  public ConfigurationReport createAlarm(Long tagId, Alarm alarm) {
-    return alarmConfiguration.createAlarm(tagId, alarm);
-  }
-
-  @Override
-  public ConfigurationReport createAlarmsById(Map<Long, Alarm> alarms) {
-    return alarmConfiguration.createAlarmsById(alarms);
+    return ruleTagConfigurationManager.createRules(ruleTags);
   }
 
   @Override
   public ConfigurationReport createAlarm(String tagName, AlarmCondition alarmCondition, String faultFamily, String faultMember, Integer faultCode) {
-    return alarmConfiguration.createAlarm(tagName, alarmCondition, faultFamily, faultMember, faultCode);
+    return alarmConfigurationManager.createAlarm(tagName, alarmCondition, faultFamily, faultMember, faultCode);
   }
 
   @Override
   public ConfigurationReport createAlarm(String tagName, Alarm alarm) {
-    return alarmConfiguration.createAlarm(tagName, alarm);
+    return alarmConfigurationManager.createAlarm(tagName, alarm);
   }
 
   @Override
-  public ConfigurationReport createAlarmsByName(Map<String, Alarm> alarms) {
-    return alarmConfiguration.createAlarmsByName(alarms);
+  public ConfigurationReport createAlarms(Map<String, Alarm> alarms) {
+    return alarmConfigurationManager.createAlarms(alarms);
   }
 
   @Override
   public ConfigurationReport updateAlarm(Alarm updateAlarm) {
-    return alarmConfiguration.updateAlarm(updateAlarm);
+    return alarmConfigurationManager.updateAlarm(updateAlarm);
   }
 
   @Override
   public ConfigurationReport updateAlarms(List<Alarm> alarms) {
-    return alarmConfiguration.updateAlarms(alarms);
+    return alarmConfigurationManager.updateAlarms(alarms);
   }
 
   @Override
   public ConfigurationReport removeAlarm(Long id) {
-    return alarmConfiguration.removeAlarm(id);
+    return alarmConfigurationManager.removeAlarm(id);
   }
 
   @Override
-  public ConfigurationReport removeAlarms(List<Long> ids) {
-    return alarmConfiguration.removeAlarms(ids);
+  public ConfigurationReport removeAlarms(Set<Long> ids) {
+    return alarmConfigurationManager.removeAlarms(ids);
   }
 }

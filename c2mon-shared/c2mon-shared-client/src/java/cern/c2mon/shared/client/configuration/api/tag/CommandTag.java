@@ -16,13 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration.api.tag;
 
-import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
+import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.metadata.Metadata;
 import lombok.*;
-
-import java.util.List;
+import org.springframework.util.Assert;
 
 /**
  * Configuration object for a CommandTag.
@@ -41,6 +40,11 @@ import java.util.List;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class CommandTag extends Tag {
+
+  private Long equipmentId;
+
+  @IgnoreProperty
+  private String equipmentName;
 
   /**
    * Client timeout of the CommandTag
@@ -84,27 +88,20 @@ public class CommandTag extends Tag {
   private String dataType;
 
   /**
+   * Minimum value for the command value.
+   */
+  private Number minValue;
+
+  /**
+   * Maximum value for the command value.
+   */
+  private Number maxValue;
+
+  /**
    * Hardware address of the CommandTag. The Hardware address is required by the data source to actually execute the
    * command.
-   * Saved as String to make the property simpler
    */
   private HardwareAddress hardwareAddress;
-
-  @Builder
-  protected CommandTag(boolean deleted, Long id, String name, String description, Class<?> dataType, TagMode mode, @Singular List<Alarm> alarms
-      , Integer clientTimeout, Integer execTimeout, Integer sourceTimeout, Integer sourceRetries, String rbacClass, String rbacDevice, String rbacProperty,
-                    HardwareAddress hardwareAddress, Metadata metadata) {
-    super(deleted, id, name, description, mode, alarms, metadata);
-    this.dataType = dataType!= null ? dataType.getName() : null;
-    this.clientTimeout = clientTimeout;
-    this.execTimeout = execTimeout;
-    this.sourceTimeout = sourceTimeout;
-    this.sourceRetries = sourceRetries;
-    this.rbacClass = rbacClass;
-    this.rbacDevice = rbacDevice;
-    this.rbacProperty = rbacProperty;
-    this.hardwareAddress = hardwareAddress;
-  }
 
   /**
    * Empty default constructor
@@ -112,10 +109,181 @@ public class CommandTag extends Tag {
   public CommandTag() {
   }
 
-  @Override
-  public boolean requiredFieldsGiven() {
-    return (getId() != null) && (getName() != null) && (getDescription() != null)
-        && (getClientTimeout() != null) && (getExecTimeout() != null) && (getSourceTimeout() != null)
-        && (getSourceRetries() != null) && (getRbacClass() != null) && (getRbacDevice() != null) && (getRbacProperty() != null);
+  public static CreateBuilder create(String name, Class<?> dataType, HardwareAddress hardwareAddress, Integer clientTimeout, Integer execTimeout, Integer sourceTimeout, Integer sourceRetries,
+                                     String rbacClass, String rbacDevice, String rbacProperty) {
+    Assert.hasText(name, "Command tag name is required!");
+    Assert.notNull(hardwareAddress, "Hardware address is required!");
+    Assert.notNull(dataType, "Command tag data type is required!");
+    Assert.notNull(clientTimeout, "Client timeout is required!");
+    Assert.notNull(execTimeout, "Execution timeout is required!");
+    Assert.notNull(sourceTimeout, "Source timeout is required!");
+    Assert.notNull(sourceRetries, "Source retries is required!");
+    Assert.hasText(rbacClass, "RBAC class is required!");
+    Assert.hasText(rbacDevice, "RBAC device is required!");
+    Assert.hasText(rbacProperty, "RBAC property is required!");
+
+    return new CreateBuilder(name, dataType, hardwareAddress, clientTimeout, execTimeout, sourceTimeout, sourceRetries, rbacClass, rbacDevice, rbacProperty);
+  }
+
+  public static UpdateBuilder update(Long id) {
+    return new UpdateBuilder(id);
+  }
+
+  public static UpdateBuilder update(String name) {
+    return new UpdateBuilder(name);
+  }
+
+
+  public static class CreateBuilder {
+    private CommandTag tagToBuild = new CommandTag();
+
+    private CreateBuilder(String name, Class<?> dataType, HardwareAddress hardwareAddress, Integer clientTimeout, Integer execTimeout, Integer sourceTimeout, Integer sourceRetries,
+                          String rbacClass, String rbacDevice, String rbacProperty) {
+      this.tagToBuild.setName(name);
+      this.tagToBuild.setDataType(dataType.getName());
+      this.tagToBuild.setHardwareAddress(hardwareAddress);
+      this.tagToBuild.setClientTimeout(clientTimeout);
+      this.tagToBuild.setExecTimeout(execTimeout);
+      this.tagToBuild.setSourceRetries(sourceRetries);
+      this.tagToBuild.setSourceTimeout(sourceTimeout);
+      this.tagToBuild.setRbacClass(rbacClass);
+      this.tagToBuild.setRbacDevice(rbacDevice);
+      this.tagToBuild.setRbacProperty(rbacProperty);
+
+      this.tagToBuild.setCreated(true);
+    }
+
+    public CommandTag.CreateBuilder id(Long id) {
+      this.tagToBuild.setId(id);
+      return this;
+    }
+
+    public CommandTag.CreateBuilder equipmentId(Long equipmentId) {
+      this.tagToBuild.setEquipmentId(equipmentId);
+      return this;
+    }
+
+    public CommandTag.CreateBuilder description(String description) {
+      this.tagToBuild.setDescription(description);
+      return this;
+    }
+
+    public CommandTag.CreateBuilder mode(TagMode mode) {
+      this.tagToBuild.setMode(mode);
+      return this;
+    }
+
+    public CommandTag.CreateBuilder minimum(Number minimum) {
+      this.tagToBuild.setMinValue(minimum);
+      return this;
+    }
+
+    public CommandTag.CreateBuilder maximum(Number maximum) {
+      this.tagToBuild.setMaxValue(maximum);
+      return this;
+    }
+
+    public CommandTag.CreateBuilder metadata(Metadata metadata) {
+      this.tagToBuild.setMetadata(metadata);
+      return this;
+    }
+
+    public CommandTag build() {
+      tagToBuild.setCreated(true);
+      return this.tagToBuild;
+    }
+
+  }
+
+  public static class UpdateBuilder {
+    private CommandTag tagToBuild = new CommandTag();
+
+    private UpdateBuilder(Long id) {
+      tagToBuild.setId(id);
+    }
+
+    private UpdateBuilder(String name) {
+      tagToBuild.setName(name);
+    }
+
+    public CommandTag.UpdateBuilder name(String name) {
+      this.tagToBuild.setName(name);
+      return this;
+    }
+
+    public CommandTag.UpdateBuilder description(String description) {
+      this.tagToBuild.setDescription(description);
+      return this;
+    }
+
+    public CommandTag.UpdateBuilder dataType(Class<?> dataType) {
+      this.tagToBuild.setDataType(dataType.getName());
+      return this;
+    }
+
+    public CommandTag.UpdateBuilder mode(TagMode mode) {
+      this.tagToBuild.setMode(mode);
+      return this;
+    }
+
+    public CommandTag.UpdateBuilder clientTimeout(Integer clientTimeout) {
+      this.tagToBuild.setClientTimeout(clientTimeout);
+      return this;
+    }
+
+    public CommandTag.UpdateBuilder execTimeout(Integer execTimeout) {
+      this.tagToBuild.setExecTimeout(execTimeout);
+      return this;
+    }
+
+    public CommandTag.UpdateBuilder sourceTimeout(Integer sourceTimeout) {
+      this.tagToBuild.setSourceTimeout(sourceTimeout);
+      return this;
+    }
+
+    public CommandTag.UpdateBuilder sourceRetries(Integer sourceRetries) {
+      this.tagToBuild.setSourceRetries(sourceRetries);
+      return this;
+    }
+
+    public CommandTag.UpdateBuilder rbacClass(String rbacClass) {
+      this.tagToBuild.setRbacClass(rbacClass);
+      return this;
+    }
+
+    public CommandTag.UpdateBuilder rbacDevice(String rbacDevice) {
+      this.tagToBuild.setRbacDevice(rbacDevice);
+      return this;
+    }
+
+    public CommandTag.UpdateBuilder rbacProperty(String rbacProperty) {
+      this.tagToBuild.setRbacProperty(rbacProperty);
+      return this;
+    }
+
+    public CommandTag.UpdateBuilder minimum(Number minimum) {
+      this.tagToBuild.setMinValue(minimum);
+      return this;
+    }
+
+    public CommandTag.UpdateBuilder maximum(Number maximum) {
+      this.tagToBuild.setMaxValue(maximum);
+      return this;
+    }
+
+    public CommandTag.UpdateBuilder hardwareAddress(HardwareAddress hardwareAddress) {
+      this.tagToBuild.setHardwareAddress(hardwareAddress);
+      return this;
+    }
+
+    public CommandTag.UpdateBuilder metadata(Metadata metadata) {
+      this.tagToBuild.setMetadata(metadata);
+      return this;
+    }
+
+    public CommandTag build() {
+      this.tagToBuild.setUpdated(true);
+      return this.tagToBuild;
+    }
   }
 }

@@ -189,7 +189,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   @Override
   public ConfigurationReport applyConfiguration(Configuration configuration) {
-    LOGGER.info(String.format("Applying configuration for %d process(es)", configuration.getProcesses().size()));
+    LOGGER.info(String.format("Applying configuration with %d item(s)", configuration.getEntities().size()));
     Long configId = sequenceDAO.getNextConfigId();
     ConfigurationReport report = null;
 

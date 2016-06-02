@@ -16,13 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration.api.tag;
 
-import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.metadata.Metadata;
-import lombok.*;
-
-import java.util.List;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.springframework.util.Assert;
 
 /**
  * Configuration object for a RuleTag.
@@ -62,39 +62,18 @@ public class RuleTag extends Tag {
   private String dataType;
 
   /**
+   * Unit of the tag's value. This parameter is defined at configuration time
+   * and doesn't change during run-time. It is mainly used for analogue values
+   * that may represent e.g. a flow in "m3", a voltage in "kV" etc.
+   */
+  private String unit;
+
+  /**
    * Indicates whether this tag's value changes shall be logged to the
    * short-term log.
    */
   @DefaultValue("true")
-  private Boolean isLogged = true;
-
-  /**
-   * Constructor for building a RuleTag with all fields.
-   * To build a RuleTag with arbitrary fields use the builder pattern.
-   *
-   * @param id          Unique id of the tag.
-   * @param name        Unique name the tag.
-   * @param description Describes the propose of the tag.
-   * @param mode        define the mode in which the tag is running.
-   * @param alarms      List of configuration PObjects for this tag. If the argument is null the field will be an empty List as default.
-   * @param isLogged    Defines if the tag which belongs to this configuration should be logged.
-   * @param metadata    Arbitrary metadata attached to his tag configuration.
-   * @param deleted     Determine if this object apply as deletion.
-   * @param dataType    Determine the data type of the DataTag which belongs to this configuration.
-   * @param dipAddress  Defines the dipAddress of the DataTag which belongs to this configuration.
-   * @param japcAddress Defines the japcAddress of the DataTag which belongs to this configuration.
-   * @param ruleText    The rule which will be set to the rule through this configuration.
-   */
-  @Builder
-  protected RuleTag(boolean deleted, Long id, String name, String description, Class<?> dataType, TagMode mode, @Singular List<Alarm> alarms, Boolean isLogged,
-                    String ruleText, String dipAddress, String japcAddress, Metadata metadata) {
-    super(deleted, id, name, description, mode, alarms, metadata);
-    this.dataType = dataType!= null ? dataType.getName() : null;
-    this.ruleText = ruleText;
-    this.dipAddress = dipAddress;
-    this.japcAddress = japcAddress;
-    this.isLogged = isLogged;
-  }
+  private Boolean isLogged;
 
   /**
    * empty default constructor
@@ -102,121 +81,120 @@ public class RuleTag extends Tag {
   public RuleTag() {
   }
 
-  @Override
-  public boolean requiredFieldsGiven() {
-    return super.requiredFieldsGiven() && (getDataType() != null);
-  }
-
   public static CreateBuilder create(String name, Class<?> dataType, String ruleText) {
 
-    RuleTag iniTag = RuleTag.builder().name(name).dataType(dataType).ruleText(ruleText).build();
+    Assert.hasText(name, "Rule tag name is required!");
+    Assert.notNull(name, "Data type is required!");
+    Assert.hasText(ruleText, "Rule expression is required!");
 
-    return iniTag.toCreateBuilder(iniTag);
+    return new CreateBuilder(name, dataType, ruleText);
   }
 
   public static UpdateBuilder update(Long id) {
-
-    RuleTag iniTag = RuleTag.builder().id(id).build();
-
-    return iniTag.toUpdateBuilder(iniTag);
+    return new UpdateBuilder(id);
   }
 
   public static UpdateBuilder update(String name) {
-
-    RuleTag iniTag = RuleTag.builder().name(name).build();
-
-    return iniTag.toUpdateBuilder(iniTag);
-  }
-
-  private CreateBuilder toCreateBuilder(RuleTag initializationTag) {
-    return new CreateBuilder(initializationTag);
-  }
-
-  private UpdateBuilder toUpdateBuilder(RuleTag initializationTag) {
-    return new UpdateBuilder(initializationTag);
+    return new UpdateBuilder(name);
   }
 
   public static class CreateBuilder {
 
-    RuleTag ruleTagBuild;
+    private RuleTag tagToBuild = new RuleTag();
 
-    CreateBuilder(RuleTag initializationTag) {
-      this.ruleTagBuild = initializationTag;
+    private CreateBuilder(String name, Class<?> dataType, String ruleText) {
+      this.tagToBuild.setName(name);
+      this.tagToBuild.setDataType(dataType.getName());
+      this.tagToBuild.setRuleText(ruleText);
     }
 
     public RuleTag.CreateBuilder id(Long id) {
-      this.ruleTagBuild.setId(id);
+      this.tagToBuild.setId(id);
       return this;
     }
 
     public RuleTag.CreateBuilder description(String description) {
-      this.ruleTagBuild.setDescription(description);
+      this.tagToBuild.setDescription(description);
       return this;
     }
 
     public RuleTag.CreateBuilder mode(TagMode mode) {
-      this.ruleTagBuild.setMode(mode);
+      this.tagToBuild.setMode(mode);
+      return this;
+    }
+
+    public RuleTag.CreateBuilder unit(String unit) {
+      this.tagToBuild.setUnit(unit);
       return this;
     }
 
     public RuleTag.CreateBuilder isLogged(Boolean isLogged) {
-      this.ruleTagBuild.setIsLogged(true);
+      this.tagToBuild.setIsLogged(isLogged);
       return this;
     }
 
     public RuleTag.CreateBuilder metadata(Metadata metadata) {
-      this.ruleTagBuild.setMetadata(metadata);
+      this.tagToBuild.setMetadata(metadata);
       return this;
     }
 
     public RuleTag build() {
 
-      ruleTagBuild.setCreate(true);
-      return this.ruleTagBuild;
+      tagToBuild.setCreated(true);
+      return this.tagToBuild;
     }
   }
 
   public static class UpdateBuilder {
 
-    private RuleTag builderTag;
+    private RuleTag tagToBuild = new RuleTag();
 
-    UpdateBuilder(RuleTag initializationTag) {
-      this.builderTag = initializationTag;
+    private UpdateBuilder(String name) {
+      tagToBuild.setName(name);
+    }
+
+    private UpdateBuilder(Long id) {
+      tagToBuild.setId(id);
+    }
+
+    public RuleTag.UpdateBuilder name(String name) {
+      this.tagToBuild.setName(name);
+      return this;
     }
 
     public UpdateBuilder description(String description) {
-      this.builderTag.setDescription(description);
+      this.tagToBuild.setDescription(description);
       return this;
     }
 
     public UpdateBuilder dataType(Class<?> dataType) {
-      this.builderTag.setDataType(dataType.getName());
+      this.tagToBuild.setDataType(dataType.getName());
       return this;
     }
 
     public UpdateBuilder mode(TagMode mode) {
-      this.builderTag.setMode(mode);
+      this.tagToBuild.setMode(mode);
       return this;
     }
 
     public UpdateBuilder isLogged(Boolean isLogged) {
-      this.builderTag.setIsLogged(isLogged);
+      this.tagToBuild.setIsLogged(isLogged);
       return this;
     }
 
     public UpdateBuilder ruleText(String ruleText) {
-      this.builderTag.setRuleText(ruleText);
+      this.tagToBuild.setRuleText(ruleText);
       return this;
     }
 
     public UpdateBuilder metadata(Metadata metadata) {
-      this.builderTag.setMetadata(metadata);
+      this.tagToBuild.setMetadata(metadata);
       return this;
     }
 
     public RuleTag build() {
-      this.builderTag.setUpdate(true);
-      return this.builderTag;
+      this.tagToBuild.setUpdated(true);
+      return this.tagToBuild;
     }
   }
 }
