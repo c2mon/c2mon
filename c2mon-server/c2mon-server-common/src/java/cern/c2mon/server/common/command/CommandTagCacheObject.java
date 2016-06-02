@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -20,6 +20,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import cern.c2mon.shared.common.metadata.Metadata;
 import org.simpleframework.xml.Transient;
 
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
@@ -30,7 +31,7 @@ import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 
 /**
  * Note: does not keep the latest value of the command. Commands are logged in the STL account.
- * 
+ *
  * @param <T> the type of the values that can be set for this command
  */
 
@@ -115,6 +116,12 @@ public final class CommandTagCacheObject<T> implements CommandTag<T>, Cacheable,
     private RbacAuthorizationDetails authorizationDetails;
 
     /**
+     * The meta data of the Tag. The meta data can be arbitrary and of of the type String, Number and Boolean.
+     * Not every Tag needs to have a meta data. Also the meta data don't have to be every time the same.
+     */
+    private Metadata metadata;
+
+    /**
      * Details concerning a command execution. This is only set in the copy of the object (outside the cache), once a
      * command execution is taking place (used for instance when logging the command). It is not saved in the cache.
      */
@@ -132,7 +139,7 @@ public final class CommandTagCacheObject<T> implements CommandTag<T>, Cacheable,
      * Constructor with the minimal fields excepted to be non-null in all cache objects circulating in the server.
      * <p>
      * Used when loading the cache from the DB.
-     * 
+     *
      * @param pId
      * @param name
      * @param description
@@ -150,7 +157,7 @@ public final class CommandTagCacheObject<T> implements CommandTag<T>, Cacheable,
 
     /**
      * Constructor should only be used for testing.
-     * 
+     *
      * @param pId id of command
      */
     public CommandTagCacheObject(final Long pId) {
@@ -269,6 +276,14 @@ public final class CommandTagCacheObject<T> implements CommandTag<T>, Cacheable,
 
     public void setMaximum(final Comparable<T> newMaximum) {
         this.maximum = newMaximum;
+    }
+
+    public final Metadata getMetadata() {
+        return this.metadata;
+    }
+
+    public void setMetadata(Metadata data) {
+        this.metadata = data;
     }
 
     @Override
@@ -411,21 +426,21 @@ public final class CommandTagCacheObject<T> implements CommandTag<T>, Cacheable,
     public CommandTagCacheObject<T> clone() throws CloneNotSupportedException {
       @SuppressWarnings("unchecked")
       CommandTagCacheObject<T> clone = (CommandTagCacheObject<T>) super.clone();
-      
+
       clone.aliveLock = new ReentrantReadWriteLock();
       clone.readLock = clone.aliveLock.readLock();
       clone.writeLock = clone.aliveLock.writeLock();
-      
+
       if (authorizationDetails != null) {
         clone.authorizationDetails = this.authorizationDetails.clone();
       }
 
       clone.commandExecutionDetails = null;
-      
+
       if (hwAddress != null) {
         clone.hwAddress = this.hwAddress.clone();
       }
-      
+
       return clone;
     }
 }

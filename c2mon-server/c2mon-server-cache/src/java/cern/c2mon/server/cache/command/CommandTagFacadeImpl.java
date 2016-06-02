@@ -30,6 +30,7 @@ import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
+import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.daq.config.CommandTagUpdate;
 import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
 import org.slf4j.Logger;
@@ -199,51 +200,14 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
 
     // minValue (Comparable)
     if ((tmpStr = properties.getProperty("minValue"))!= null) {
-      try {
-        if (commandTagCacheObject.getDataType().equals("Float")) {
-          commandTagCacheObject.setMinimum(Float.valueOf(tmpStr));
-        }
-        else if (commandTagCacheObject.getDataType().equals("Integer")) {
-          commandTagCacheObject.setMinimum(Integer.valueOf(tmpStr));
-        }
-        else if (commandTagCacheObject.getDataType().equals("Double")) {
-          commandTagCacheObject.setMinimum(Double.valueOf(tmpStr));
-        }
-        else if (commandTagCacheObject.getDataType().equals("Long")) {
-          commandTagCacheObject.setMinimum(Long.valueOf(tmpStr));
-        }
-        else if (commandTagCacheObject.getDataType().equals("Short")) {
-          commandTagCacheObject.setMinimum(Short.valueOf(tmpStr));
-        }
-      }
-      catch (NumberFormatException e) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-            "NumberFormatException: Unable to convert parameter \"minValue\" to " + commandTagCacheObject.getDataType() + ": " + tmpStr);
-      }
+        Comparable comparableMin = (Comparable) TypeConverter.cast(tmpStr, commandTagCacheObject.getDataType());
+        commandTagCacheObject.setMinimum(comparableMin);
     }
+
     // Try to extract maxValue of the appropriate data type
     if ((tmpStr = properties.getProperty("maxValue"))!= null) {
-      try {
-        if (commandTagCacheObject.getDataType().equals("Float")) {
-          commandTagCacheObject.setMaximum(Float.valueOf(tmpStr));
-        }
-        else if (commandTagCacheObject.getDataType().equals("Integer")) {
-          commandTagCacheObject.setMaximum(Integer.valueOf(tmpStr));
-        }
-        else if (commandTagCacheObject.getDataType().equals("Double")) {
-          commandTagCacheObject.setMaximum(Double.valueOf(tmpStr));
-        }
-        else if (commandTagCacheObject.getDataType().equals("Long")) {
-          commandTagCacheObject.setMaximum(Long.valueOf(tmpStr));
-        }
-        else if (commandTagCacheObject.getDataType().equals("Short")) {
-          commandTagCacheObject.setMaximum(Short.valueOf(tmpStr));
-        }
-      }
-      catch (NumberFormatException e) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-            "NumberFormatException: Unable to convert parameter \"maxValue\" to " + commandTagCacheObject.getDataType() + ": " + tmpStr);
-      }
+      Comparable comparableMax = (Comparable) TypeConverter.cast(tmpStr, commandTagCacheObject.getDataType());
+      commandTagCacheObject.setMaximum(comparableMax);
     }
 
     RbacAuthorizationDetails authorizationDetails = new RbacAuthorizationDetails();
@@ -356,7 +320,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
 
     if (commandTag.getMinimum() != null) {
       try {
-        Class minValueClass = Class.forName("java.lang." + commandTag.getDataType());
+        Class minValueClass = TypeConverter.getType(commandTag.getDataType());
         if (!minValueClass.isInstance(commandTag.getMinimum())) {
           throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"mininum\" must be of type " + commandTag.getDataType() + " or null");
         }
@@ -369,7 +333,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
 
     if (commandTag.getMaximum() != null ) {
       try {
-        Class maxValueClass = Class.forName("java.lang." + commandTag.getDataType());
+        Class maxValueClass = TypeConverter.getType(commandTag.getDataType());
         if (!maxValueClass.isInstance(commandTag.getMaximum())) {
           throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"maximum\" must be of type " + commandTag.getDataType() + " or null");
         }
