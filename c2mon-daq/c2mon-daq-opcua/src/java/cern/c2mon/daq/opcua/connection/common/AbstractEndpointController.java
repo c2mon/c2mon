@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -47,7 +47,7 @@ import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 
 /**
  * AbstractEndpointController abstract class (no implementation of this class)
- * 
+ *
  * @author vilches
  */
 public abstract class AbstractEndpointController implements IOPCEndpointListener, ICommandTagChanger, IDataTagChanger {
@@ -55,7 +55,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
      * Private class logger.
      */
     private static final Logger logger = LoggerFactory.getLogger(AbstractEndpointController.class);
-    
+
     /**
      * Properties for the opc endpoint.
      */
@@ -106,9 +106,9 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
      * The equipment configuration for his controller.
      */
     protected IEquipmentConfiguration equipmentConfiguration;
-    
+
     private Timer statusCheckTimer;
-    
+
     /**
      * Reason why the connection cannot be done
      */
@@ -117,26 +117,26 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
     /**
      * Starts this controllers endpoint for the first time. After this method is called the
      * controller will receive updates.
-     * 
+     *
      * @return True if the connection was successful or false in any other case
      */
-    public synchronized boolean startEndpoint() {      
+    public synchronized boolean startEndpoint() {
         try {
             startProcedure();
         } catch (OPCCommunicationException e) {
             logger.error("Endpoint creation failed. Controller will try again. ", e);
             // Restart Endpoint
             triggerEndpointRestart("Problems connecting to " + currentAddress.getUri().getHost() + ": " + e.getMessage());
-            
+
             return false;
         }
-        
+
         return true;
     }
-    
+
     /**
      * Restart the controller endpoint if the first attempt fails
-     * 
+     *
      * @return True if the reconnection was successful or false in any other case
      */
     public synchronized boolean restartEndpoint() {
@@ -146,37 +146,37 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
             logger.error("Endpoint creation failed. Controller will try again. ", e);
             // Reason
             this.noConnectionReason = "Problems connecting to " + currentAddress.getUri().getHost() + ": " + e.getMessage();
-            
+
             return false;
         }
-        
+
         return true;
     }
-    
+
     /**
      * Procedure common to all starts (start and restart)
      */
     protected synchronized void startProcedure() throws OPCCommunicationException {
         // Create Endpoint
         createEndpoint();
-        
+
         // Register Listeners
         this.endpoint.registerEndpointListener(this.logListener);
         this.endpoint.registerEndpointListener(this);
-        
+
         // Add Tags to endpoint
         addTagsToEndpoint();
-        
+
         // Send info message to Comm_fault tag
         this.sender.confirmEquipmentStateOK("Connected to " + currentAddress.getUri().getHost());
-        
+
         startAliveTimer();
         setUpStatusChecker();
-        
+
         // Change endpoint status to operational
         this.endpoint.setStateOperational();
     }
-    
+
     /**
      * Add Data and Command tags to the the endpoint
      */
@@ -196,7 +196,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
         int serverTimeout = getCurrentOPCAddress().getServerTimeout();
         logger.info("Starting OPCStatusChecker for endpoint address: " + getCurrentOPCAddress().getUriString());
         statusCheckTimer.schedule(new StatusChecker(endpoint) {
-            
+
             @Override
             public void onOPCUnknownException(
                     final IOPCEndpoint endpoint, final Exception e) {
@@ -205,7 +205,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
                         + "because of an unexpected exception. Shutting down.", e);
                 stop();
             }
-            
+
             @Override
             public void onOPCCriticalException(
                     final IOPCEndpoint endpoint, final OPCCriticalException e) {
@@ -214,7 +214,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
                         + "because of a critical OPC exception. Shutting down.", e);
                 stop();
             }
-            
+
             @Override
             public void onOPCCommunicationException(
                     final IOPCEndpoint endpoint, final OPCCommunicationException e) {
@@ -225,7 +225,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
     }
 
     /**
-     * 
+     *
      */
     public void stopStatusChecker() {
         if (statusCheckTimer != null) {
@@ -240,7 +240,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
     public synchronized void startAliveTimer() {
         ISourceDataTag targetTag = equipmentConfiguration.getSourceDataTag(
                 equipmentConfiguration.getAliveTagId());
-        boolean aliveWriterEnabled = getCurrentOPCAddress().isAliveWriteEnabled();
+        boolean aliveWriterEnabled = getCurrentOPCAddress().isAliveWriterEnabled();
         if (!aliveWriterEnabled) {
           logger.info("Equipment Alive Timer has been disabled in the configuration ==> Alive Timer has not been started.");
         }
@@ -262,7 +262,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
         }
     }
 
-    
+
     /**
      * Makes sure there is a created and initialized endpoint.
      */
@@ -270,12 +270,12 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
         if (this.endpoint == null || this.endpoint.getState() == STATE.NOT_INITIALIZED) {
             AbstractOPCUAAddress address = getNextOPCAddress();
             logger.info("createEndpoint - Trying to create endpoint '" + address.getUriString() + "'");
-            this.endpoint = this.opcEndpointFactory.createEndpoint(address.getProtocol());
+            this.endpoint = this.opcEndpointFactory.createEndpoint(address);
             if (this.endpoint == null && opcAddresses.size() > 1) {
                 logger.warn("createEndpoint - Endpoint creation for '" + address.getUriString() + "' failed. Trying alternative address.");
                 // try alternative address
                 address = getNextOPCAddress();
-                this.endpoint = this.opcEndpointFactory.createEndpoint(address.getProtocol());
+                this.endpoint = this.opcEndpointFactory.createEndpoint(address);
             }
             if (this.endpoint != null) {
                 this.endpoint.initialize(address);
@@ -302,7 +302,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
     /**
      * Returns the next available OPCAddress. If there is no second address the
      * first one will be returned.
-     * 
+     *
      * @return The next available OPCAddress.
      */
     protected synchronized AbstractOPCUAAddress getNextOPCAddress() {
@@ -317,10 +317,10 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
         }
         return this.currentAddress;
     }
-    
+
     /**
      * Returns the current OPCUA Address
-     * 
+     *
      * @return The OPCUAAddress used at the moment.
      */
     protected synchronized AbstractOPCUAAddress getCurrentOPCAddress() {
@@ -330,7 +330,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
     /**
      * Implementation of the IOPCEndpointListener interface. The endpoint
      * controller will forward updates to the core (EquipmentMessageSender).
-     * 
+     *
      * @param dataTag
      *            The data tag which has a changed value.
      * @param timestamp
@@ -341,9 +341,9 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
     @Override
     public void onNewTagValue(final ISourceDataTag dataTag, final long timestamp, final Object tagValue) {
         logger.debug("onNewTagValue - New Tag value received for Tag #" + dataTag.getId());
-        
+
         this.sender.sendTagFiltered(dataTag, tagValue, timestamp);
-        
+
         logger.debug("onNewTagValue - Tag value " + tagValue + " sent for Tag #" + dataTag.getId());
     }
 
@@ -358,7 +358,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
 
     /**
      * Refreshes the values of the provided source data tag.
-     * 
+     *
      * @param sourceDataTag
      *            The source data tag to refresh the value for.
      */
@@ -372,7 +372,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
 
     /**
      * Invalidates the tag which caused an exception in an endpoint.
-     * 
+     *
      * @param dataTag
      *            The data tag which caused an exception.
      * @param cause
@@ -380,16 +380,16 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
      */
     @Override
     public void onTagInvalidException(final ISourceDataTag dataTag, final Throwable cause) {
-        String decription = "Tag invalid: " + cause.getClass().getSimpleName() + ": " 
+        String decription = "Tag invalid: " + cause.getClass().getSimpleName() + ": "
             + cause.getMessage();
         logger.debug(decription);
-        this.sender.sendInvalidTag(dataTag, (short) SourceDataQuality.DATA_UNAVAILABLE, cause.getMessage());
+        this.sender.sendInvalidTag(dataTag, SourceDataQuality.DATA_UNAVAILABLE, cause.getMessage());
     }
 
     /**
      * When this is called a serious error happened for our subscriptions. A
      * full restart is required.
-     * 
+     *
      * @param cause
      *            The cause of the subscription loss.
      */
@@ -399,14 +399,14 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
         triggerEndpointRestart(cause.getMessage());
     }
 
-    
+
     /**
      * Triggers the restart of this endpoint.
      * @param reason The reason of the restart, if any applicable.
      */
-    protected synchronized void triggerEndpointRestart(final String reason) {      
+    protected synchronized void triggerEndpointRestart(final String reason) {
         this.noConnectionReason = reason;
-        
+
         // Do while the endpoint state changes to OPERATOINAL
         do {
             // Stop endpoint and send message to COMM_FAULT tag
@@ -414,7 +414,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
                 AbstractEndpointController.this.stop();
             }
             catch (Exception ex) {
-                logger.warn("triggerEndpointRestart - Error stopping endpoint subscription for " + 
+                logger.warn("triggerEndpointRestart - Error stopping endpoint subscription for " +
                         getCurrentOPCAddress().getUri().getHost(), ex);
             }
             finally {
@@ -428,13 +428,13 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
 
             // Sleep before retrying
             try {
-                logger.debug("triggerEndpointRestart - Server " + getCurrentOPCAddress().getUri().getHost() 
+                logger.debug("triggerEndpointRestart - Server " + getCurrentOPCAddress().getUri().getHost()
                         + " - Sleeping for " + getCurrentOPCAddress().getServerRetryTimeout() + " ms ...");
                 Thread.sleep(getCurrentOPCAddress().getServerRetryTimeout());
             } catch (InterruptedException e) {
                 logger.error("Subscription restart interrupted for " + getCurrentOPCAddress().getUri().getHost(), e);
             }
-            
+
             // Retry
             try {
                 if (!restartEndpoint()) {
@@ -448,12 +448,12 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
         } while (endpoint.getState() != STATE.OPERATIONAL);
         logger.info("triggerEndpointRestart - Exiting OPC Endpoint restart procedure for " + getCurrentOPCAddress().getUri().getHost());
     }
-            
-  
+
+
 
     /**
      * Runs a command on the current endpoint.
-     * 
+     *
      * @param commandTag
      *            The command to run.
      * @param sourceCommandTagValue
@@ -466,7 +466,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
 
     /**
      * Adds a command tag to the controller.
-     * 
+     *
      * @param sourceCommandTag
      *            The command tag to add.
      * @param changeReport
@@ -484,7 +484,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
 
     /**
      * Removes a command tag from the controller.
-     * 
+     *
      * @param sourceCommandTag
      *            The command tag to remove.
      * @param changeReport
@@ -503,7 +503,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
 
     /**
      * Updates a command tag.
-     * 
+     *
      * @param sourceCommandTag
      *            The command tag to updates.
      * @param oldSourceCommandTag
@@ -528,7 +528,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
 
     /**
      * Adds a data tag.
-     * 
+     *
      * @param sourceDataTag
      *            The data tag to add.
      * @param changeReport
@@ -547,7 +547,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
 
     /**
      * Removes a data tag.
-     * 
+     *
      * @param sourceDataTag
      *            The data tag to remove.
      * @param changeReport
@@ -565,7 +565,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
 
     /**
      * Updates a data tag.
-     * 
+     *
      * @param sourceDataTag
      *            The data tag to update.
      * @param oldSourceDataTag
@@ -596,9 +596,9 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
             throw new OPCCriticalException(
                     "No Endpoint was created or Endpoint was not initialized/started.");
     }
-    
+
     /**
-     * 
+     *
      * @return the writer
      */
     public AliveWriter getWriter() {

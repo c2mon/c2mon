@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -20,12 +20,14 @@ package cern.c2mon.daq.opcua.connection.common;
 import java.net.URI;
 
 import cern.c2mon.daq.opcua.connection.common.impl.AliveWriter;
+import lombok.Getter;
 
 /**
  * AbstractOPCUAAddress abstract class (no implementation of this class)
- * 
+ *
  * @author vilches
  */
+@Getter
 public abstract class AbstractOPCUAAddress {
     /**
      * URI of the OPC server.
@@ -47,7 +49,7 @@ public abstract class AbstractOPCUAAddress {
      * User name to authenticate.
      */
     protected String user;
-    
+
     /**
      * Password to authenticate.
      */
@@ -57,7 +59,7 @@ public abstract class AbstractOPCUAAddress {
      * Domain to authenticate to.
      */
     protected String domain;
-    
+
     /**
      * If, set to false, then the Alive WriterTask is not started.
      * The OPC has then to update itself the equipment alive tag,
@@ -66,20 +68,13 @@ public abstract class AbstractOPCUAAddress {
      * The default value is <code>true</code>.
      * @see AliveWriter
      */
-    protected boolean aliveWriter = true;
-    
+    protected boolean aliveWriterEnabled = true;
+
     /**
      * @return the uri
      */
     public String getUriString() {
         return uri.toString();
-    }
-
-    /**
-     * @return the uri
-     */
-    public URI getUri() {
-        return uri;
     }
 
     /**
@@ -90,60 +85,24 @@ public abstract class AbstractOPCUAAddress {
     }
 
     /**
-     * @return the user
-     */
-    public String getUser() {
-        return user;
-    }
-
-    /**
-     * @return the password
-     */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     * @return the domain
-     */
-    public String getDomain() {
-        return domain;
-    }
-
-    /**
-     * @return the serverTimeout
-     */
-    public int getServerTimeout() {
-        return serverTimeout;
-    }
-
-    /**
-     * @return the serverRetryTimeout
-     */
-    public int getServerRetryTimeout() {
-        return serverRetryTimeout;
-    }
-    
-    /**
      * If this method returns <code>false</code>, then the Alive WriterTask
      * is not started. The OPC has then to update itself the equipment alive tag,
      * otherwise the C2MON server will invalidate all tags from this process
      * because of an alive timer expiration.
-     * 
+     *
      * @return <code>true</code>, if the AliveWriter
      *         task shall be enabled or not.
      * @see AliveWriter
      */
-    public boolean isAliveWriteEnabled() {
-      return aliveWriter;
+    public boolean isAliveWriterEnabled() {
+      return aliveWriterEnabled;
     }
-    
-
 
     /**
      * Builder class.
      *
      */
+    @Getter
     public static abstract class AbstractBuilder {
 
         /**
@@ -175,7 +134,7 @@ public abstract class AbstractOPCUAAddress {
          * Domain to authenticate to.
          */
         protected String domain;
-        
+
         /**
          * If, set to <code>false</code>, then the Alive WriterTask is not started.
          * The OPC has then to update itself the equipment alive tag,
@@ -184,11 +143,11 @@ public abstract class AbstractOPCUAAddress {
          * The default value is <code>true</code>.
          * @see AliveWriter
          */
-        protected boolean aliveWriter = true;
+        protected boolean aliveWriterEnabled = true;
 
         /**
          * Sets the user and domain in the form of user@domain.
-         * 
+         *
          * @param userAtDomain user@domain string.
          * @return The Builder object itself to chain the calls.
          */
@@ -204,7 +163,7 @@ public abstract class AbstractOPCUAAddress {
 
         /**
          * Sets the user name for authentication.
-         * 
+         *
          * @param user The user name.
          * @return The Builder object itself to chain the calls.
          */
@@ -215,7 +174,7 @@ public abstract class AbstractOPCUAAddress {
 
         /**
          * Sets the password for authentication.
-         * 
+         *
          * @param password The password.
          * @return The Builder object itself to chain the calls.
          */
@@ -226,7 +185,7 @@ public abstract class AbstractOPCUAAddress {
 
         /**
          * Sets the domain to authenticate to.
-         * 
+         *
          * @param domain The domain name.
          * @return The Builder object itself to chain the calls.
          */
@@ -234,82 +193,27 @@ public abstract class AbstractOPCUAAddress {
             this.domain = domain;
             return this;
         }
-        
+
         /**
          * If this value is set to <code>false</code>, then the Alive WriterTask
          * is not started. The OPC has then to update itself the equipment alive tag,
          * otherwise the C2MON server will invalidate all tags from this process
          * because of an alive timer expiration.<p>
          * The default value is set to <code>true</code>
-         * @param aliveWriter The startup option of the AliveWriter process.
+         * @param aliveWriterEnabled The startup option of the AliveWriter process.
          * @return The Builder object itself to chain the calls.
-         * 
+         *
          * @see AliveWriter
          */
-        public AbstractBuilder aliveWriter(final boolean aliveWriter) {
-          this.aliveWriter = aliveWriter;
+        public AbstractBuilder aliveWriterEnabled(final boolean aliveWriterEnabled) {
+          this.aliveWriterEnabled = aliveWriterEnabled;
           return this;
         }
-        
-        /**
-         * 
-         * @return
-         */
-        public final URI getUri() {
-            return uri;
-        }
 
-        /**
-         * 
-         * @return
-         */
-        public final int getServerTimeout() {
-            return serverTimeout;
-        }
-
-        /**
-         * 
-         * @return
-         */
-        public final int getServerRetryTimeout() {
-            return serverRetryTimeout;
-        }
-
-        /**
-         * 
-         * @return
-         */
-        public final String getUser() {
-            return user;
-        }
-
-        /**
-         * 
-         * @return
-         */
-        public final String getPassword() {
-            return password;
-        }
-
-        /**
-         * 
-         * @return
-         */
-        public final String getDomain() {
-            return domain;
-        }
-
-        /**
-         * 
-         * @return
-         */
-        public final boolean isAliveWriter() {
-            return aliveWriter;
-        }
 
         /**
          * Builds the OPCUAAddress object based on the provided parameters.
-         * 
+         *
          * @return The new OPCUAAddress object.
          */
         public abstract AbstractOPCUAAddress build();

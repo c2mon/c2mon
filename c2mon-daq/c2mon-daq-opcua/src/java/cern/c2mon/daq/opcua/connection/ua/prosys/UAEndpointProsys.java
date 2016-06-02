@@ -1,20 +1,20 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.daq.opcua.connection.ua;
+package cern.c2mon.daq.opcua.connection.ua.prosys;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,8 +31,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.opcfoundation.ua.builtintypes.DataValue;
 import org.opcfoundation.ua.builtintypes.DateTime;
 import org.opcfoundation.ua.builtintypes.LocalizedText;
@@ -47,6 +45,8 @@ import org.opcfoundation.ua.core.ServerState;
 import org.opcfoundation.ua.core.TimestampsToReturn;
 import org.opcfoundation.ua.transport.security.Cert;
 import org.opcfoundation.ua.transport.security.SecurityMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.prosysopc.ua.ApplicationIdentity;
 import com.prosysopc.ua.CertificateValidationListener;
@@ -71,19 +71,20 @@ import cern.c2mon.daq.opcua.connection.common.impl.OPCCommunicationException;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCriticalException;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCEndpoint;
 import cern.c2mon.daq.opcua.connection.common.impl.SubscriptionGroup;
+import cern.c2mon.daq.opcua.connection.ua.UAItemDefintion;
 
 /**
  * The OPCUA endpoint to connect to OPC UA servers.
- * 
+ *
  * @author Andreas Lang
  *
  */
-public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements CertificateValidationListener {
+public class UAEndpointProsys extends OPCEndpoint<UAItemDefintion> implements CertificateValidationListener {
 
   /**
    * logger of this class.
    */
-  private final static Logger LOG = LoggerFactory.getLogger(UAEndpoint.class);
+  private final static Logger LOG = LoggerFactory.getLogger(UAEndpointProsys.class);
 
   /**
    * Map of UA subscriptions
@@ -129,18 +130,18 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
 
   /**
    * Creates a new OPC UA endpoint.
-   * 
+   *
    * @param itemDefinitionFactory The factory to create item definitions.
    * @param groupProvider The group provider to group definitions into
    *          subscriptions.
    */
-  public UAEndpoint(final IItemDefinitionFactory<UAItemDefintion> itemDefinitionFactory, final IGroupProvider<UAItemDefintion> groupProvider) {
+  public UAEndpointProsys(final IItemDefinitionFactory<UAItemDefintion> itemDefinitionFactory, final IGroupProvider<UAItemDefintion> groupProvider) {
     super(itemDefinitionFactory, groupProvider);
   }
 
   /**
    * Initialization method.
-   * 
+   *
    * @param opcAddress The address for this OPC UA endpoint.
    */
   @Override
@@ -164,7 +165,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
    * Sets up the security settings for the application. The highest available
    * security policy is set. If there are no matching policies a
    * RuntimeException will be thrown.
-   * 
+   *
    * @param password The password of the user.
    * @param userName The username to use.
    * @throws ServiceException Throws a service exception if the server is not
@@ -196,7 +197,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
 
   /**
    * Sets up the application setting to identify to the server.
-   * 
+   *
    * @throws CertificateNotYetValidException Thrown if the certificate is not
    *           yet valid.
    * @throws CertificateExpiredException Thrown if the certificate of the
@@ -221,7 +222,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
 
   /**
    * Subscribes the item definitions in the subscriptions to the OPC UA server.
-   * 
+   *
    * @param subscriptionGroups the subscription groups to subscribe to.
    */
   @Override
@@ -233,7 +234,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
 
   /**
    * Subscribes this group o the OPC server.
-   * 
+   *
    * @param group The group with the items to subscribe.
    */
   private void subscribe(final SubscriptionGroup<UAItemDefintion> group) {
@@ -261,7 +262,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
   /**
    * Processes a item defintion by adding it to a subscription and setting its
    * time and value deadband.
-   * 
+   *
    * @param subscription The subscription to add to.
    * @param valueDeadband The value deadband for this item.
    * @param timeDeadband The time deadband for this item.
@@ -283,7 +284,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
   /**
    * Adds a monitored item to a subscription and stores it in the definition
    * map.
-   * 
+   *
    * @param subscription The subscription to add to.
    * @param definition The item definition.
    * @param item The item to add to the subscription.
@@ -300,7 +301,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
 
   /**
    * Registers for events on this subscription.
-   * 
+   *
    * @param subscription The subscription to register on.
    */
   private void registerForNotifications(final Subscription subscription) {
@@ -323,7 +324,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
 
   /**
    * Notifies endpoints about a changed monitored item.
-   * 
+   *
    * @param item The item which changed.
    * @param value The new value of the item.
    */
@@ -341,7 +342,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
 
   /**
    * Notifies endpoints about a changed monitored item.
-   * 
+   *
    * @param item The item which changed.
    * @param exception The exception which caused the error.
    */
@@ -354,7 +355,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
    * Certificate validation method. Accepts a certificate if it is valid, the
    * signature is correct and it is either not self signed or the selfsigned
    * certificate is explicitly trusted.
-   * 
+   *
    * @param certificate The certificate received.
    * @param description The application description received.
    * @param compliedCertificateChecks Set of all complied certificate checks.
@@ -373,7 +374,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
   /**
    * Checks if he provided checks either don't contain 'SelfSigned' or the
    * checks describe a specifically trusted certificate.
-   * 
+   *
    * @param compliedCertificateChecks The checks a certificate complies to.
    * @return True if the certificate the checks belong to is either not self
    *         signed or is specifically trusted else false.
@@ -384,7 +385,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
 
   /**
    * Refreshes the values of a collection of item definitions.
-   * 
+   *
    * @param itemDefintions The item definitions to refresh.
    */
   @Override
@@ -429,7 +430,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
 
   /**
    * Method call for OPC UA.
-   * 
+   *
    * @param itemDefintion The item definiton object which identifies the method
    *          to call.
    * @param values The values used as parameters of the method.
@@ -454,7 +455,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
 
   /**
    * Writes to a value in the OPC UA server identified by the item definiton.
-   * 
+   *
    * @param itemDefintion The item definition which decribes the value in the
    *          OPCServer to write to.
    * @param value The value to write to.
@@ -486,7 +487,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
   /**
    * Called when an item definition which was in the provided subscription group
    * is removed.
-   * 
+   *
    * @param subscriptionGroup The group which contained the item definition.
    * @param removedDefinition The definition which was removed.
    */
@@ -519,7 +520,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
 
   /**
    * Called when a subscription group should be subscribed at the endpoint.
-   * 
+   *
    * @param subscriptionGroup The group to subscribe at the endpoint.
    */
   @Override
@@ -549,7 +550,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
   /**
    * Returns true if the provided node id is part of the provided item
    * definition.
-   * 
+   *
    * @param definition The item definition to check.
    * @param monitoredId The NodeId which could be inside the definition
    * @return True if the NodeId is part of the definition else false.
@@ -561,7 +562,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>implements Certifica
   /**
    * Checks the status of the enpoint. It will throw an exception if something
    * is wrong.
-   * 
+   *
    * @throws OPCCommunicationException Thrown if the connection is not reachable
    *           but might be back later on.
    * @throws OPCCriticalException Thrown if the connection is not reachable and

@@ -20,11 +20,17 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-daq</groupId>
       <artifactId>c2mon-daq-core</artifactId>
-    </dependency>
+    </dependency> 
     <dependency>
       <groupId>com.prosys</groupId>
       <artifactId>opc-ua-java-sdk</artifactId>
       <version>1.2.2-2918</version>
+      <scope>provided</scope>
+    </dependency>
+   <dependency>
+      <groupId>com.digitalpetri.opcua</groupId>
+      <artifactId>ua-client</artifactId>
+      <version>1.1.0</version>
     </dependency>
     <dependency>
       <groupId>org.opcfoundation</groupId>
@@ -112,6 +118,10 @@
       <groupId>commons-discovery</groupId>
       <artifactId>commons-discovery</artifactId>
       <version>0.4</version>
+    </dependency>
+    <dependency>
+     <groupId>org.projectlombok</groupId>
+     <artifactId>lombok</artifactId>
     </dependency>
   </dependencies>
   <developers />

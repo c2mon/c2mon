@@ -14,25 +14,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.daq.opcua.connection.common;
-
-import cern.c2mon.daq.opcua.EndpointTypesUnknownException;
-
 /**
- * The factory to create OPCEndpoints.
- *
- * @author Andreas Lang
- *
+ * The default implementation of the UA Stack
  */
-public interface IOPCEndpointFactory {
+package cern.c2mon.daq.opcua.connection.ua.digitalpetri;
 
-    /**
-     * Creates a new OPCEndpoitn of the correct type. If the type specified
-     * can not be found an {@link EndpointTypesUnknownException} is thrown.
-     *
-     * @param type The type of the endpoint to create.
-     * @return The new endpoint.
-     */
-    IOPCEndpoint createEndpoint(AbstractOPCUAAddress address);
-
-}

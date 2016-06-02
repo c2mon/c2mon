@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.daq.opcua.connection.ua;
+package cern.c2mon.daq.opcua.connection.ua.prosys;
 
 import java.util.UUID;
 
@@ -22,6 +22,7 @@ import org.opcfoundation.ua.builtintypes.NodeId;
 import org.opcfoundation.ua.builtintypes.UnsignedInteger;
 
 import cern.c2mon.daq.opcua.connection.common.IItemDefinitionFactory;
+import cern.c2mon.daq.opcua.connection.ua.UAItemDefintion;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress;
 import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress.ADDRESS_TYPE;
@@ -32,7 +33,7 @@ import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress.ADDRESS_TYPE;
  * @author Andreas Lang
  *
  */
-public class UaItemDefintionFactory 
+public class UaItemDefintionFactoryProsys 
         implements IItemDefinitionFactory<UAItemDefintion> {
     
     /**

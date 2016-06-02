@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.daq.opcua.connection.ua;
+package cern.c2mon.daq.opcua.connection.ua.digitalpetri;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

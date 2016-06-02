@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -25,19 +25,19 @@ import java.util.List;
 
 import org.junit.Test;
 
+import cern.c2mon.daq.opcua.connection.common.AbstractOPCUAAddressParser.AddressKeys;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCUADefaultAddress;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCUADefaultAddressParser;
-import static cern.c2mon.daq.opcua.connection.common.AbstractOPCUAAddressParser.*;
 
 public class OPCAddressParserTest {
-    
+
     private OPCUADefaultAddressParser parser = new OPCUADefaultAddressParser();
-    
+
     @Test
     public void testParseAddressSingleCorrect() throws URISyntaxException {
-        String addressString = URI_KEY + "=dcom://testhost:1234/testpath;"
-            + USER_KEY + "=user@domain;" + PASSWORD_KEY + "=password;"
-            + SERVER_TIMEOUT_KEY + "=314;" + SERVER_RETRY_TIMEOUT_KEY + "=1337";
+        String addressString = AddressKeys.URI + "=dcom://testhost:1234/testpath;"
+            + AddressKeys.user + "=user@domain;" + AddressKeys.password + "=password;"
+            + AddressKeys.serverTimeout + "=314;" + AddressKeys.serverRetryTimeout + "=1337";
         List<OPCUADefaultAddress> addresses =
             parser.createOPCAddressFromAddressString(addressString);
         assertEquals(1, addresses.size());
@@ -50,16 +50,16 @@ public class OPCAddressParserTest {
         assertEquals(new URI("dcom://testhost:1234/testpath"), address.getUri());
         assertEquals("dcom://testhost:1234/testpath", address.getUriString());
         assertEquals("user", address.getUser());
-        assertEquals(true, address.isAliveWriteEnabled());
+        assertEquals(true, address.isAliveWriterEnabled());
     }
-    
+
     @Test
     public void testParseAddressDoubleCorrect() throws URISyntaxException {
-        String addressString = URI_KEY + "=dcom://testhost:1234/testpath," 
-            + "http://testhost2:1234/testpath2;" + USER_KEY + "=user@domain,user2;"
-            + PASSWORD_KEY + "=password, password2;"
-            + SERVER_TIMEOUT_KEY + "=314;" + SERVER_RETRY_TIMEOUT_KEY + "=1337;"
-            + ALIVE_WRITER_KEY + "=false";
+        String addressString = AddressKeys.URI + "=dcom://testhost:1234/testpath,"
+            + "http://testhost2:1234/testpath2;" + AddressKeys.user + "=user@domain,user2;"
+            + AddressKeys.password + "=password, password2;"
+            + AddressKeys.serverTimeout + "=314;" + AddressKeys.serverRetryTimeout + "=1337;"
+            + AddressKeys.aliveWriter + "=false";
         List<OPCUADefaultAddress> addresses =
             parser.createOPCAddressFromAddressString(addressString);
         assertEquals(2, addresses.size());
@@ -72,8 +72,8 @@ public class OPCAddressParserTest {
         assertEquals(new URI("dcom://testhost:1234/testpath"), address.getUri());
         assertEquals("dcom://testhost:1234/testpath", address.getUriString());
         assertEquals("user", address.getUser());
-        assertEquals(false, address.isAliveWriteEnabled());
-        
+        assertEquals(false, address.isAliveWriterEnabled());
+
         address = addresses.get(1);
         assertEquals("http", address.getProtocol());
         assertNull(address.getDomain());
@@ -83,15 +83,15 @@ public class OPCAddressParserTest {
         assertEquals(new URI("http://testhost2:1234/testpath2"), address.getUri());
         assertEquals("http://testhost2:1234/testpath2", address.getUriString());
         assertEquals("user2", address.getUser());
-        assertEquals(false, address.isAliveWriteEnabled());
+        assertEquals(false, address.isAliveWriterEnabled());
     }
-    
+
     @Test(expected=Exception.class)
     public void testParseAddressWrongURI() {
-        String addressString = URI_KEY + "=://wrongURI?," 
-            + "http://testhost2:1234/testpath2;" + USER_KEY + "=user@domain,user2;"
-            + PASSWORD_KEY + "=password, password2;"
-            + SERVER_TIMEOUT_KEY + "=314;" + SERVER_RETRY_TIMEOUT_KEY + "=1337";
+        String addressString = AddressKeys.URI + "=://wrongURI?,"
+            + "http://testhost2:1234/testpath2;" + AddressKeys.user + "=user@domain,user2;"
+            + AddressKeys.password + "=password, password2;"
+            + AddressKeys.serverTimeout + "=314;" + AddressKeys.serverRetryTimeout + "=1337";
         parser.createOPCAddressFromAddressString(addressString);
     }
 }

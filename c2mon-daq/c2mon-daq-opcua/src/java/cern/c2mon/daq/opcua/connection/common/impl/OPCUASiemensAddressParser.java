@@ -93,7 +93,7 @@ public class OPCUASiemensAddressParser extends AbstractOPCUAAddressParser {
                     this.redundantServerStateName)
                 .userAtDomain(userAtDomain != null ? userAtDomain.trim() : null)
                 .password(password.trim())
-                .aliveWriter(this.aliveWriter)
+                .aliveWriterEnabled(this.aliveWriter)
                 .build();
         } catch (URISyntaxException e) {
             throw new OPCAUAddressException("Syntax of Siemens OPC URI is incorrect: " + uri, e);

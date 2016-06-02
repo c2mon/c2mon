@@ -14,25 +14,41 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.daq.opcua.connection.common;
+package cern.c2mon.daq.opcua.connection.ua.digitalpetri;
 
-import cern.c2mon.daq.opcua.EndpointTypesUnknownException;
+
+import com.digitalpetri.opcua.stack.core.types.builtin.NodeId;
+
+import cern.c2mon.daq.opcua.connection.common.impl.ItemDefinition;
 
 /**
- * The factory to create OPCEndpoints.
+ * The OPC UA item definition.
  *
  * @author Andreas Lang
  *
  */
-public interface IOPCEndpointFactory {
+public class UAItemDefintionDigitalpetri extends ItemDefinition<NodeId> {
 
     /**
-     * Creates a new OPCEndpoitn of the correct type. If the type specified
-     * can not be found an {@link EndpointTypesUnknownException} is thrown.
+     * Creates a new UA item definiton.
      *
-     * @param type The type of the endpoint to create.
-     * @return The new endpoint.
+     * @param id The id of the definiton.
+     * @param address The address of the item.
      */
-    IOPCEndpoint createEndpoint(AbstractOPCUAAddress address);
+    public UAItemDefintionDigitalpetri(final long id, final NodeId address) {
+        super(id, address);
+    }
+
+    /**
+     * Creates a new UA item definiton.
+     *
+     * @param id The id of the definiton.
+     * @param address The address of the item.
+     * @param alternativeAddress The alternative address of the item.
+     */
+    public UAItemDefintionDigitalpetri(final long id, final NodeId address,
+            final NodeId alternativeAddress) {
+        super(id, address, alternativeAddress);
+    }
 
 }
