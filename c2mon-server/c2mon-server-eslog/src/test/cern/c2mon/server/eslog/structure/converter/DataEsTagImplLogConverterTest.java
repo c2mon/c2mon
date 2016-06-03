@@ -234,6 +234,7 @@ public class DataEsTagImplLogConverterTest {
     when(tagC2MON.getTimestamp()).thenReturn(new Timestamp(1234567));
     when(tagC2MON.getDataTagQuality()).thenReturn(new DataTagQualityImpl());
     when(tagC2MON.getValueDescription()).thenReturn(valueDesc);
+    when(tagC2MON.getUnit()).thenReturn("km");
 
     AbstractEsTag esTagImpl = esLogConverter.convertToTagES(tagC2MON);
     assertEquals(id, esTagImpl.getIdAsLong());
@@ -260,6 +261,7 @@ public class DataEsTagImplLogConverterTest {
     esTagImpl = esLogConverter.convertToTagES(tagC2MON);
     assertNotNull(esTagImpl.getQuality());
     assertFalse(esTagImpl.getQuality().isValid());
+    assertEquals("km", esTagImpl.getUnit());
   }
 
   @Test

@@ -27,7 +27,6 @@ import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 
 import static junit.framework.TestCase.assertNull;

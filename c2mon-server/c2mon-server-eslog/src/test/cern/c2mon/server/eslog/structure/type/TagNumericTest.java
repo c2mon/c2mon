@@ -17,7 +17,6 @@
 package cern.c2mon.server.eslog.structure.type;
 
 import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
 import cern.c2mon.server.eslog.structure.types.tag.EsTagNumeric;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;

@@ -17,9 +17,9 @@
 package cern.c2mon.server.eslog.connector;
 
 import cern.c2mon.server.eslog.structure.mappings.EsMapping;
-import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
 import cern.c2mon.server.eslog.structure.types.EsAlarm;
 import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
+import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
 import com.carrotsearch.hppc.cursors.ObjectCursor;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
