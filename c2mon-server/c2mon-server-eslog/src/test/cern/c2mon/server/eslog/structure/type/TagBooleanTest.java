@@ -64,10 +64,11 @@ public class TagBooleanTest {
 
   @Test
   public void testBuild() throws IOException {
-    tagBoolean.setDataType("boolean");
+    tagBoolean.getC2mon().setDataType(Boolean.class.getName());
 
-    final String expectedTagJson = "{\"id\":0,\"dataType\":\"boolean\",\"timestamp\":0,\"serverTimestamp\":0," +
-        "\"daqTimestamp\":0,\"unit\":\"n/a\",\"metadata\":{}}";
+    final String expectedTagJson = "{\"id\":0,\"timestamp\":0," +
+        "\"c2mon\":{\"dataType\":\"java.lang.Boolean\",\"serverTimestamp\":0,\"sourceTimestamp\":0,\"daqTimestamp\":0}," +
+        "\"metadata\":{}}";
 
     assertEquals(expectedTagJson, tagBoolean.toString());
   }

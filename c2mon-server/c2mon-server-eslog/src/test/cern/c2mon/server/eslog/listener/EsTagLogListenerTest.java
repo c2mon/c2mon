@@ -67,7 +67,7 @@ public class EsTagLogListenerTest {
     tag.setLogged(logged);
     cacheListener.notifyElementUpdated(Collections.<Tag>singletonList(tag));
 
-    verify(esLogConverter).convertToTagES(eq(tag));
+    verify(esLogConverter).convert(eq(tag));
   }
 
   @Test
@@ -76,7 +76,7 @@ public class EsTagLogListenerTest {
     tag.setLogged(notLogged);
     cacheListener.notifyElementUpdated(Collections.<Tag>singletonList(tag));
 
-    verify(esLogConverter, never()).convertToTagES(tag);
+    verify(esLogConverter, never()).convert(tag);
   }
 
   @Test
@@ -97,8 +97,8 @@ public class EsTagLogListenerTest {
     list.add(tag3);
 
     cacheListener.notifyElementUpdated(list);
-    verify(esLogConverter).convertToTagES(eq(tag1));
-    verify(esLogConverter).convertToTagES(eq(tag2));
-    verify(esLogConverter, atMost(2)).convertToTagES(eq(tag3));
+    verify(esLogConverter).convert(eq(tag1));
+    verify(esLogConverter).convert(eq(tag2));
+    verify(esLogConverter, atMost(2)).convert(eq(tag3));
   }
 }

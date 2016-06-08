@@ -102,7 +102,7 @@ public class EsSupervisionEventListener implements SupervisionListener, SmartLif
     }
 
     try {
-      EsSupervisionEvent esSupervisionEvent = esSupervisionEventConverter.convertSupervisionEventToSupervisionES(supervisionEvent);
+      EsSupervisionEvent esSupervisionEvent = esSupervisionEventConverter.convert(supervisionEvent);
       persistenceManager.storeData(esSupervisionEvent);
     } catch(Exception e) {
       log.error("notifySupervisionEvent() - Could not add Supervision to ElasticSearch: Event # " + supervisionEvent.getEntityId() + ".", e);

@@ -57,10 +57,11 @@ public class EsTagImplTest {
     esTag = new EsTagString();
     esTag.setId(id);
     esTag.setName(name);
-    esTag.setDataType(dataType);
+
+    esTag.getC2mon().setDataType(dataType);
     esTag.setTimestamp(timestamp);
-    esTag.setServerTimestamp(serverTimestamp);
-    esTag.setDaqTimestamp(daqTimestamp);
+    esTag.getC2mon().setServerTimestamp(serverTimestamp);
+    esTag.getC2mon().setDaqTimestamp(daqTimestamp);
 
     quality.setStatus(0);
     quality.setValid(true);

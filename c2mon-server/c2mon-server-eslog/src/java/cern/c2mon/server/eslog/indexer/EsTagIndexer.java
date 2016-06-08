@@ -148,8 +148,8 @@ public class EsTagIndexer extends EsIndexer {
    * @return true, if tag indexing was successful
    */
   private boolean sendTagToBatch(AbstractEsTag tag) {
-    String indexName = generateTagIndex(tag.getServerTimestamp());
-    String type = generateTagType(tag.getDataType());
+    String indexName = generateTagIndex(tag.getC2mon().getServerTimestamp());
+    String type = generateTagType(tag.getC2mon().getDataType());
 
     if (log.isTraceEnabled()) {
       log.trace("sendTagToBatch() - Index a new tag.");

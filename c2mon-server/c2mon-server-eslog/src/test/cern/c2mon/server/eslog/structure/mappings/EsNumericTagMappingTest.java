@@ -43,21 +43,20 @@ public class EsNumericTagMappingTest {
       "      \"type\": \"string\",\n" +
       "      \"index\": \"not_analyzed\"\n" +
       "    },\n" +
-      "    \"dataType\": {\n" +
+      "    \"value\": {\n" +
+      "      \"type\": \"long\"\n" +
+      "    },\n" +
+      "    \"type\": {\n" +
       "      \"type\": \"string\",\n" +
       "      \"index\": \"not_analyzed\"\n" +
       "    },\n" +
-      "    \"timestamp\": {\n" +
-      "      \"type\": \"date\",\n" +
-      "      \"format\": \"epoch_millis\"\n" +
+      "    \"valueDescription\": {\n" +
+      "      \"type\": \"string\",\n" +
+      "      \"index\": \"not_analyzed\"\n" +
       "    },\n" +
-      "    \"serverTimestamp\": {\n" +
-      "      \"type\": \"date\",\n" +
-      "      \"format\": \"epoch_millis\"\n" +
-      "    },\n" +
-      "    \"daqTimestamp\": {\n" +
-      "      \"type\": \"date\",\n" +
-      "      \"format\": \"epoch_millis\"\n" +
+      "    \"unit\": {\n" +
+      "      \"type\": \"string\",\n" +
+      "      \"index\": \"not_analyzed\"\n" +
       "    },\n" +
       "    \"quality\": {\n" +
       "      \"dynamic\": \"false\",\n" +
@@ -75,21 +74,18 @@ public class EsNumericTagMappingTest {
       "        }\n" +
       "      }\n" +
       "    },\n" +
-      "    \"unit\": {\n" +
-      "      \"type\": \"string\",\n" +
-      "      \"index\": \"not_analyzed\"\n" +
+      "    \"timestamp\": {\n" +
+      "      \"type\": \"date\",\n" +
+      "      \"format\": \"epoch_millis\"\n" +
       "    },\n" +
-      "    \"valueDescription\": {\n" +
-      "      \"type\": \"string\",\n" +
-      "      \"index\": \"not_analyzed\"\n" +
-      "    },\n" +
-      "    \"value\": {\n" +
-      "      \"type\": \"long\"\n" +
-      "    },\n" +
-      "    \"metadata\": {\n" +
-      "      \"dynamic\": \"true\",\n" +
-      "      \"type\": \"nested\",\n" +
+      "    \"c2mon\": {\n" +
+      "      \"dynamic\": \"false\",\n" +
+      "      \"type\": \"object\",\n" +
       "      \"properties\": {\n" +
+      "        \"daqTimestamp\": {\n" +
+      "          \"type\": \"date\",\n" +
+      "          \"format\": \"epoch_millis\"\n" +
+      "        },\n" +
       "        \"process\": {\n" +
       "          \"type\": \"string\",\n" +
       "          \"index\": \"not_analyzed\"\n" +
@@ -98,11 +94,27 @@ public class EsNumericTagMappingTest {
       "          \"type\": \"string\",\n" +
       "          \"index\": \"not_analyzed\"\n" +
       "        },\n" +
+      "        \"serverTimestamp\": {\n" +
+      "          \"type\": \"date\",\n" +
+      "          \"format\": \"epoch_millis\"\n" +
+      "        },\n" +
+      "        \"sourceTimestamp\": {\n" +
+      "          \"type\": \"date\",\n" +
+      "          \"format\": \"epoch_millis\"\n" +
+      "        },\n" +
+      "        \"dataType\": {\n" +
+      "          \"type\": \"string\",\n" +
+      "          \"index\": \"not_analyzed\"\n" +
+      "        },\n" +
       "        \"equipment\": {\n" +
       "          \"type\": \"string\",\n" +
       "          \"index\": \"not_analyzed\"\n" +
       "        }\n" +
       "      }\n" +
+      "    },\n" +
+      "    \"metadata\": {\n" +
+      "      \"dynamic\": \"true\",\n" +
+      "      \"type\": \"nested\"\n" +
       "    }\n" +
       "  }\n" +
       "}";

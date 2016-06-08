@@ -41,13 +41,6 @@ public abstract class AbstractEsTag implements IFallback {
 
   private long id;
   private String name;
-  private String dataType;
-
-  private long timestamp;
-  private long serverTimestamp;
-  private long daqTimestamp;
-
-  private TagQualityAnalysis quality;
 
   protected transient Object rawValue;
 
@@ -55,14 +48,25 @@ public abstract class AbstractEsTag implements IFallback {
   protected Boolean valueBoolean;
   protected String valueString;
 
-  /**
-   * The metric unit of the enclosed tag value.
-   * If no metric unit is available, the default
-   * (not available) one will be used.
-   */
-  private String unit = "n/a";
+  protected String type;
 
   private String valueDescription;
+
+  /**
+   * The nullable metric unit of the enclosed tag value.
+   */
+  private String unit;
+
+  /**
+   * Contains useful information about the validity, status and invalid
+   * qualities for all the monitored instances (process, equipment, sub-equipment),
+   * that are registered under this tag.
+   */
+  private TagQualityAnalysis quality;
+
+  private long timestamp;
+
+  private final EsTagC2monInfo c2mon = new EsTagC2monInfo();
 
   private final Map<String, String> metadata = new HashMap<>();
 

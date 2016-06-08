@@ -65,8 +65,9 @@ public class TagStringTest {
     qualityAnalysis.setValid(true);
     tagString.setQuality(qualityAnalysis);
 
-    String expectedTagJson = "{\"id\":0,\"timestamp\":0,\"serverTimestamp\":0,\"daqTimestamp\":0," +
-        "\"quality\":{\"status\":0,\"valid\":true,\"statusInfo\":[\"OK\"]},\"unit\":\"n/a\",\"metadata\":{}}";
+    String expectedTagJson = "{\"id\":0,\"quality\":{\"status\":0,\"valid\":true," +
+        "\"statusInfo\":[\"OK\"]},\"timestamp\":0," +
+        "\"c2mon\":{\"serverTimestamp\":0,\"sourceTimestamp\":0,\"daqTimestamp\":0},\"metadata\":{}}";
 
     assertEquals(expectedTagJson, tagString.toString());
   }
@@ -83,11 +84,13 @@ public class TagStringTest {
 
     tag.setId(192506);
     tag.setName("CM.MEY.VGTCTESTCM11:STATUS");
-    tag.setDataType("string");
+    tag.getC2mon().setDataType(String.class.getName());
 
     tag.setTimestamp(1454342362957L);
-    tag.setServerTimestamp(1451915554970L);
-    tag.setDaqTimestamp(1454342362957L);
+
+    tag.getC2mon().setServerTimestamp(1451915554970L);
+    tag.getC2mon().setDaqTimestamp(1454342362957L);
+    tag.getC2mon().setSourceTimestamp(1451915554970L);
 
     TagQualityAnalysis qualityAnalysis = new TagQualityAnalysis();
     qualityAnalysis.setValid(true);
@@ -102,7 +105,7 @@ public class TagStringTest {
 
     System.out.println(tag.toString());
 
-    final String expectedTagJson = "{\"id\":192506,\"name\":\"CM.MEY.VGTCTESTCM11:STATUS\",\"dataType\":\"string\",\"timestamp\":1454342362957,\"serverTimestamp\":1451915554970,\"daqTimestamp\":1454342362957,\"quality\":{\"status\":0,\"valid\":true,\"statusInfo\":[\"OK\"]},\"valueString\":\"DOWN\",\"unit\":\"n/a\",\"valueDescription\":\"Communication fault tag indicates that equipment E_OPC_GTCTESTCM11 is down. Reason: Problems connecting to VGTCTESTCM11: Problems wih the DCOM connection occured\",\"metadata\":{\"process\":\"P_GTCTESTCM11\",\"equipment\":\"E_OPC_GTCTESTCM11\"}}";
+    final String expectedTagJson = "{\"id\":192506,\"name\":\"CM.MEY.VGTCTESTCM11:STATUS\",\"valueString\":\"DOWN\",\"valueDescription\":\"Communication fault tag indicates that equipment E_OPC_GTCTESTCM11 is down. Reason: Problems connecting to VGTCTESTCM11: Problems wih the DCOM connection occured\",\"unit\":\"n/a\",\"quality\":{\"status\":0,\"valid\":true,\"statusInfo\":[\"OK\"]},\"timestamp\":1454342362957,\"c2mon\":{\"process\":\"P_GTCTESTCM11\",\"equipment\":\"E_OPC_GTCTESTCM11\",\"dataType\":\"string\",\"serverTimestamp\":1451915554970,\"sourceTimestamp\":1451915554970,\"daqTimestamp\":1454342362957},\"metadata\":{}}";
     IFallback result = tagString.getObject(expectedTagJson);
     assertTrue(result instanceof EsTagString);
     assertEquals(expectedTagJson, result.toString());

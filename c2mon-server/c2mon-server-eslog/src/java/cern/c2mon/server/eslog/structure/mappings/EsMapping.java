@@ -166,28 +166,26 @@ public interface EsMapping {
   class Properties {
     Id id;
     Name name;
-    DataType dataType;
-    Timestamp timestamp;
-    ServerTimestamp serverTimestamp;
-    DaqTimestamp daqTimestamp;
-    Quality quality;
-    Unit unit;
-    ValueDescription valueDescription;
+
+    Value value;
     ValueBoolean valueBoolean;
     ValueString valueString;
-    Value value;
+
+    Type type;
+
+    ValueDescription valueDescription;
+    Unit unit;
+    Quality quality;
+
+    Timestamp timestamp;
+
+    C2Mon c2mon;
     Metadata metadata;
 
     Properties(ValueType valueType) {
       this.id = new Id();
       this.name = new Name();
-      this.dataType = new DataType();
-      this.timestamp = new Timestamp();
-      this.serverTimestamp = new ServerTimestamp();
-      this.daqTimestamp = new DaqTimestamp();
-      this.quality = new Quality();
-      this.unit = new Unit();
-      this.valueDescription = new ValueDescription();
+
 
       if (ValueType.isNumeric(valueType)) {
         this.value = new Value(valueType);
@@ -195,8 +193,17 @@ public interface EsMapping {
         this.valueString = new ValueString(valueType);
       } else if (ValueType.isBoolean(valueType)) {
         this.valueBoolean = new ValueBoolean(valueType);
-        this.value = new Value(ValueType.DOUBLE);
+        this.value = new Value(ValueType.INT);
       }
+
+      this.type = new Type();
+      this.valueDescription = new ValueDescription();
+      this.unit = new Unit();
+      this.quality = new Quality();
+
+      this.timestamp = new Timestamp();
+
+      this.c2mon = new C2Mon();
       this.metadata = new Metadata();
     }
 
@@ -229,6 +236,9 @@ public interface EsMapping {
       private final String format = epochMillisFormat;
     }
 
+    class SourceTimestamp extends Timestamp {
+    }
+
     class ServerTimestamp extends Timestamp {
     }
 
@@ -246,6 +256,12 @@ public interface EsMapping {
         put("statusInfo", new StatusInfo());
       }};
     }
+
+    class Type {
+      private String type = ValueType.STRING.toString();
+      private final String index = indexNotAnalyzed;
+    }
+
 
     class Status {
       private final String type = ValueType.INT.toString();
@@ -297,13 +313,21 @@ public interface EsMapping {
       }
     }
 
-    class Metadata {
-      private final String dynamic = "true";
-      private final String type = ValueType.NESTED.toString();
+    //c2mon goes here
+    class C2Mon {
+      private final String dynamic = "false";
+      private final String type = ValueType.OBJECT.toString();
+
       private final Map<String, Object> properties = new HashMap<String, Object>(){{
         put("process", new Process());
         put("equipment", new Equipment());
         put("subEquipment", new SubEquipment());
+
+        put("dataType", new DataType());
+
+        put("serverTimestamp", new ServerTimestamp());
+        put("sourceTimestamp", new SourceTimestamp());
+        put("daqTimestamp", new DaqTimestamp());
       }};
     }
 
@@ -320,6 +344,11 @@ public interface EsMapping {
     class SubEquipment {
       private final String type = ValueType.STRING.toString();
       private final String index = indexNotAnalyzed;
+    }
+
+    class Metadata {
+      private final String dynamic = "true";
+      private final String type = ValueType.NESTED.toString();
     }
   }
 

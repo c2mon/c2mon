@@ -16,7 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.config;
 
+import cern.c2mon.server.eslog.structure.converter.ConverterConfiguration;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 
 /**
@@ -26,6 +28,10 @@ import org.springframework.context.annotation.ImportResource;
  * @author Alban Marguet.
  */
 @Configuration
+@Import({
+    ConverterConfiguration.class
+})
 @ImportResource({"classpath:cern/c2mon/server/eslog/config/server-eslog.xml"})
 public class ElasticSearchConfig {
+
 }

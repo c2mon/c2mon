@@ -32,11 +32,12 @@ import java.util.stream.Collectors;
  * @author Alban Marguet
  */
 @Component
-public class EsAlarmLogConverter {
+public class EsAlarmLogConverter implements Converter<Alarm, EsAlarm> {
 
   /**
    * Converts an Alarm to an {@link EsAlarm} by getting all its data.
    */
+  @Override
   public EsAlarm convert(final Alarm alarm) {
     EsAlarm esAlarm = new EsAlarm();
 

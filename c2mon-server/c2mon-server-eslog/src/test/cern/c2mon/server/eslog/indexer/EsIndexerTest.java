@@ -23,6 +23,7 @@ import cern.c2mon.server.eslog.structure.mappings.EsStringTagMapping;
 import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
 import cern.c2mon.server.eslog.structure.types.tag.EsTagBoolean;
 import cern.c2mon.server.eslog.structure.types.tag.EsTagString;
+import cern.c2mon.server.eslog.structure.types.tag.TagValueType;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -211,12 +212,14 @@ public class EsIndexerTest {
   public void testIndexTags() throws IDBPersistenceException {
     List<AbstractEsTag> list = new ArrayList<>();
     AbstractEsTag tag = new EsTagBoolean();
-    tag.setDataType(EsMapping.ValueType.BOOLEAN.toString());
+
+    tag.setType(TagValueType.BOOLEAN.getFriendlyName());
+    tag.getC2mon().setDataType("boolean");
     tag.setId(1L);
-    tag.setServerTimestamp(123456789000L);
+    tag.getC2mon().setServerTimestamp(123456789000L);
     tag.setRawValue(true);
-    String indexName = indexer.indexPrefix + indexer.millisecondsToYearMonth(tag.getServerTimestamp());
-    String typeName = indexer.typePrefix + tag.getDataType();
+    String indexName = indexer.indexPrefix + indexer.millisecondsToYearMonth(tag.getC2mon().getServerTimestamp());
+    String typeName = indexer.typePrefix + tag.getC2mon().getDataType();
 
     list.add(tag);
 
@@ -249,11 +252,12 @@ public class EsIndexerTest {
     //not all tags have the same metadata and last tag has nothing
     for (; id <= size; id++, tagServerTime += 1000) {
       tag = new EsTagString();
-      tag.setDataType(EsMapping.ValueType.STRING.toString());
+
+      tag.getC2mon().setDataType(EsMapping.ValueType.STRING.toString());
       tag.setId(id);
-      tag.setServerTimestamp(tagServerTime);
+      tag.getC2mon().setServerTimestamp(tagServerTime);
       list.add(tag);
-      listIndices.add(indexer.indexPrefix + indexer.millisecondsToYearMonth(tag.getServerTimestamp()));
+      listIndices.add(indexer.indexPrefix + indexer.millisecondsToYearMonth(tag.getC2mon().getServerTimestamp()));
 
       if (id == size) {
         log.debug("list of tags realized");

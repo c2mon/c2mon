@@ -59,7 +59,7 @@ public class EsSupervisionEventLogListenerTest {
 
   @Test
   public void testNotifySupervisionEvent() throws IDBPersistenceException {
-    when(esSupervisionEventConverter.convertSupervisionEventToSupervisionES(eq(event))).thenReturn(esSupervisionEvent);
+    when(esSupervisionEventConverter.convert(eq(event))).thenReturn(esSupervisionEvent);
     listener.notifySupervisionEvent(event);
   }
 }

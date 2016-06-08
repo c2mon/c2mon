@@ -63,10 +63,10 @@ public class TagNumericTest {
 
   @Test
   public void testBuild() throws IOException {
-    tagNumeric.setDataType("numeric");
+    tagNumeric.getC2mon().setDataType(Integer.class.getName());
 
-    final String expectedTagJson = "{\"id\":0,\"dataType\":\"numeric\",\"timestamp\":0,\"serverTimestamp\":0," +
-        "\"daqTimestamp\":0,\"unit\":\"n/a\",\"metadata\":{}}";
+    final String expectedTagJson = "{\"id\":0,\"timestamp\":0,\"c2mon\":{\"dataType\":\"java.lang.Integer\"," +
+        "\"serverTimestamp\":0,\"sourceTimestamp\":0,\"daqTimestamp\":0},\"metadata\":{}}";
 
     assertEquals(expectedTagJson, tagNumeric.toString());
   }
@@ -81,10 +81,11 @@ public class TagNumericTest {
   public void testGetObject() {
 
     final String expectedTagJson = "{\"id\":0,\"name\":\"CLIC:CFC-CCR-ALLGPSPS:SYS.MEM.FREEPCT\"," +
-        "\"dataType\":\"float\",\"timestamp\":1454342362957,\"serverTimestamp\":1454342362981,\"daqTimestamp\":1454342362957," +
-        "\"quality\":{\"status\":0,\"valid\":true,\"statusInfo\":[\"OK\"]}," +
-        "\"value\":73.9237,\"unit\":\"n/a\"," +
-        "\"metadata\":{\"process\":\"P_CLIC_SPS\",\"equipment\":\"CLIC:CFC-CCR-ALLGPSPS\"}}";
+        "\"value\":73.9237,\"unit\":\"n/a\",\"quality\":{\"status\":0,\"valid\":true," +
+        "\"statusInfo\":[\"OK\"]},\"timestamp\":1454342362957," +
+        "\"c2mon\":{\"process\":\"P_CLIC_SPS\",\"equipment\":\"CLIC:CFC-CCR-ALLGPSPS\",\"dataType\":\"float\"," +
+        "\"serverTimestamp\":1454342362981,\"sourceTimestamp\":1454342362981,\"daqTimestamp\":1454342362957}," +
+        "\"metadata\":{\"metaFieldName\":\"metaValue\"}}";
 
     IFallback result = tagNumeric.getObject(expectedTagJson);
     assertTrue(result instanceof EsTagNumeric);

@@ -26,12 +26,10 @@ import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.eslog.structure.mappings.EsMapping.ValueType;
-import cern.c2mon.server.eslog.structure.types.GsonSupplier;
 import cern.c2mon.server.eslog.structure.types.tag.*;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.common.metadata.Metadata;
-import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +39,6 @@ import org.springframework.util.CollectionUtils;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Converts the dataTags from the server to the ElasticSearch format {@link AbstractEsTag}.
@@ -50,26 +47,28 @@ import java.util.stream.Stream;
  */
 @Slf4j
 @Component
-public class EsTagLogConverter {
-
+public class EsTagLogConverter implements Converter<Tag, AbstractEsTag> {
   /**
    * Default ID to return if nothing is found in cache.
    */
   private static final long DEFAULT_ID = -1;
 
-  private final Gson gson = GsonSupplier.INSTANCE.get();
-
   private final ProcessCache processCache;
   private final EquipmentCache equipmentCache;
   private final SubEquipmentCache subEquipmentCache;
 
+  private final Converter<String, TagValueType> dataTypeConverter;
+
   @Autowired
   public EsTagLogConverter(final ProcessCache processCache,
                            final EquipmentCache equipmentCache,
-                           final SubEquipmentCache subEquipmentCache) {
+                           final SubEquipmentCache subEquipmentCache,
+                           final Converter<String, TagValueType> dataTypeConverter) {
     this.processCache = processCache;
     this.equipmentCache = equipmentCache;
     this.subEquipmentCache = subEquipmentCache;
+
+    this.dataTypeConverter = dataTypeConverter;
   }
 
   /**
@@ -78,7 +77,8 @@ public class EsTagLogConverter {
    * @param tag Tag object in C2MON.
    * @return {@link AbstractEsTag}, ready to be logged to the ElasticSearch instance.
    */
-  public AbstractEsTag convertToTagES(final Tag tag) {
+  @Override
+  public AbstractEsTag convert(final Tag tag) {
     AbstractEsTag esTag = instantiateTagES(tag.getDataType());
     if (esTag == null) {
       return null;
@@ -86,24 +86,33 @@ public class EsTagLogConverter {
 
     esTag.setId(tag.getId());
     esTag.setName(tag.getName());
-    esTag.setDataType(tag.getDataType().toLowerCase());
 
     esTag.setRawValue(tag.getValue());
+    setType(tag, esTag);
 
-    esTag.setTimestamp(tag.getTimestamp().getTime());
+    esTag.setValueDescription(tag.getValueDescription());
 
-    setDaqTimestamp(tag, esTag);
-    setServerTimestamp(tag, esTag);
 
     setUnit(tag, esTag);
     setQualityAnalysis(tag, esTag);
 
-    esTag.setValueDescription(tag.getValueDescription());
+    esTag.setTimestamp(tag.getTimestamp().getTime());
 
+    extractC2MonInfo(tag, esTag);
     setMetadata(tag, esTag);
 
-    log.trace("convertToTagES() - new esTagImpl: " + esTag.toString());
+    log.trace("convert() - new esTagImpl: " + esTag.toString());
     return esTag;
+  }
+
+  private void setType(final Tag tag, final AbstractEsTag esTag) {
+    if(tag == null) {
+      return;
+    }
+
+    TagValueType valueType = dataTypeConverter.convert(tag.getDataType());
+    esTag.setType(valueType.getFriendlyName());
+
   }
 
   /**
@@ -127,25 +136,56 @@ public class EsTagLogConverter {
     }
   }
 
-  private void setDaqTimestamp(Tag tag, AbstractEsTag esTag) {
+  private void extractC2MonInfo(final Tag tag, final AbstractEsTag esTag) {
+    if(tag == null) {
+      return;
+    }
+
+    final Map<String, String> tagProcessMetadata = retrieveTagProcessMetadata(tag);
+
+    EsTagC2monInfo c2MonInfo = esTag.getC2mon();
+    c2MonInfo.setProcess(tagProcessMetadata.get("process"));
+    c2MonInfo.setEquipment(tagProcessMetadata.get("equipment"));
+    c2MonInfo.setSubEquipment(tagProcessMetadata.get("subEquipment"));
+
+    c2MonInfo.setDataType(tag.getDataType().toLowerCase());
+
+    setServerTimestamp(tag, c2MonInfo);
+    setSourceTimeStamp(tag, c2MonInfo);
+    setDaqTimestamp(tag, c2MonInfo);
+  }
+
+
+  private void setServerTimestamp(Tag tag, EsTagC2monInfo c2MonInfo) {
+    Optional.ofNullable(tag.getCacheTimestamp())
+        .map(Timestamp::getTime)
+        .ifPresent(c2MonInfo::setServerTimestamp);
+  }
+
+  private void setSourceTimeStamp(Tag tag, EsTagC2monInfo c2MonInfo) {
+    if (!(tag instanceof DataTag)) {
+      return;
+    }
+    Optional.ofNullable(((DataTag) tag).getSourceTimestamp())
+        .map(Timestamp::getTime)
+        .ifPresent(c2MonInfo::setSourceTimestamp);
+  }
+
+  private void setDaqTimestamp(Tag tag, EsTagC2monInfo c2MonInfo) {
     if (!(tag instanceof DataTag)) {
       return;
     }
     Optional.ofNullable(((DataTag) tag).getDaqTimestamp())
             .map(Timestamp::getTime)
-            .ifPresent(esTag::setDaqTimestamp);
+            .ifPresent(c2MonInfo::setDaqTimestamp);
   }
 
-  private void setServerTimestamp(Tag tag, AbstractEsTag esTag) {
-    Optional.ofNullable(tag.getCacheTimestamp())
-            .map(Timestamp::getTime)
-            .ifPresent(esTag::setServerTimestamp);
-  }
 
   private void setUnit(Tag tag, AbstractEsTag esTag) {
-    Optional.ofNullable(tag.getUnit())
+    String unit = Optional.ofNullable(tag.getUnit())
         .filter(StringUtils::isNotBlank)
-        .ifPresent(esTag::setUnit);
+        .orElse("");
+    esTag.setUnit(unit);
   }
 
   private void setQualityAnalysis(final Tag tag, final AbstractEsTag esTag) {
@@ -171,11 +211,11 @@ public class EsTagLogConverter {
    * @param tag the {@link Tag} instance that is used to extract the general status
    * @return the result of the accumulated statuses.
    *         If no invalid status was found (good quality) the result will be {@code 0}.
-   *
    */
   private int calculateStatus(final Tag tag) {
     return Optional.ofNullable(tag.getDataTagQuality())
-        .map(dataTagQuality -> dataTagQuality.getInvalidQualityStates().keySet())
+        .map(DataTagQuality::getInvalidQualityStates)
+        .map(Map::keySet)
         .map(tagQualityStatuses -> tagQualityStatuses.stream()
             .mapToInt(TagQualityStatus::getCode)
             .map(statusCode -> (int) Math.pow(2, statusCode))
@@ -194,11 +234,16 @@ public class EsTagLogConverter {
    *
    */
   private Collection<String> collectStatusInfo(final DataTagQuality dataTagQuality) {
-    Collection<String> invalidQualityInfo = Optional.ofNullable(dataTagQuality.getInvalidQualityStates())
-        .map(Map::entrySet)
-        .map(Collection::stream)
-        .orElse(Stream.empty())
-        .map(invalidQualityState -> invalidQualityState.getKey().name() + " : " + invalidQualityState.getValue())
+    final String delimiter = " : ";
+
+    Map<TagQualityStatus, String> invalidQualityStates = dataTagQuality.getInvalidQualityStates();
+    if(invalidQualityStates == null) {
+      return Collections.singleton(TagQualityAnalysis.OK);
+    }
+
+    Collection<String> invalidQualityInfo = invalidQualityStates.entrySet().stream()
+        .map(invalidQualityState -> String.format("%s %s %s",
+            invalidQualityState.getKey().name(), delimiter, invalidQualityState.getValue()))
         .collect(Collectors.toSet());
 
     if(invalidQualityInfo.isEmpty()) {
@@ -212,7 +257,6 @@ public class EsTagLogConverter {
    * Handles Metadata of tag and retrieve process, equipment and subEquipment.
    */
   private void setMetadata(final Tag tag, final AbstractEsTag esTag) {
-    esTag.getMetadata().putAll(retrieveTagProcessMetadata(tag));
     esTag.getMetadata().putAll(retrieveTagMetadata(tag));
   }
 

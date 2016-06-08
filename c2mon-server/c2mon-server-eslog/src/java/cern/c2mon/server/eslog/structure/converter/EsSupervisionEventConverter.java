@@ -26,12 +26,13 @@ import org.springframework.stereotype.Component;
  * @author Alban Marguet
  */
 @Component
-public class EsSupervisionEventConverter {
+public class EsSupervisionEventConverter implements Converter<SupervisionEvent, EsSupervisionEvent> {
 
   /**
    * A supervisionEvent becomes a {@link EsSupervisionEvent}.
    */
-  public EsSupervisionEvent convertSupervisionEventToSupervisionES(final SupervisionEvent supervisionEvent) {
+  @Override
+  public EsSupervisionEvent convert(final SupervisionEvent supervisionEvent) {
     if (supervisionEvent == null) {
       return null;
     }
@@ -42,10 +43,12 @@ public class EsSupervisionEventConverter {
       esSupervisionEvent.setEntityName(supervisionEvent.getEntity().name());
     }
     esSupervisionEvent.setEntityId(supervisionEvent.getEntityId());
+
     if (supervisionEvent.getEventTime() != null) {
       esSupervisionEvent.setEventTime(supervisionEvent.getEventTime().getTime());
     }
     esSupervisionEvent.setMessage(supervisionEvent.getMessage());
+
     if (supervisionEvent.getStatus() != null) {
       esSupervisionEvent.setStatusName(supervisionEvent.getStatus().name());
     }

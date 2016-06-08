@@ -140,7 +140,7 @@ public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLif
                                        List<AbstractEsTag> tagBooleanCollection) {
     for (Tag tag : tagsToLog) {
       try {
-        AbstractEsTag esTagImpl = esTagLogConverter.convertToTagES(tag);
+        AbstractEsTag esTagImpl = esTagLogConverter.convert(tag);
         if (esTagImpl instanceof EsTagString) {
           addTagToCollectionIfNotNull(esTagImpl, tagStringCollection);
         } else if (esTagImpl instanceof EsTagBoolean) {
