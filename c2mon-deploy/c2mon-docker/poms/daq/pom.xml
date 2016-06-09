@@ -21,6 +21,17 @@
         </dependency>
     </dependencies>
     <build>
+      <resources>
+        <resource>
+            <directory>${project.basedir}/../../poms/daq/src/main/resources</directory>
+            <filtering>true</filtering>
+        </resource>
+        <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+        </resource>
+      </resources>
+    
       <pluginManagement>
         <plugins>
         
@@ -67,7 +78,7 @@
                 <configuration>
                     <imageName>docker.cern.ch/c2mon-project/${project.artifactId}</imageName>
                     <baseImage>${base.image}</baseImage>
-                    <!--server-id>cern-docker</server-id-->
+                    
                     <useConfigFile>true</useConfigFile>
                     <forceTags>true</forceTags>
                     <imageTags>
@@ -75,7 +86,7 @@
                        <!--imageTag>latest</imageTag-->
                     </imageTags>
                     <workdir>/opt/c2mon/${project.artifactId}</workdir>
-                    <!--entryPoint>["bin/daqprocess.sh","start", "${DAQ_PROCESS_NAME}"]</entryPoint-->
+                    <entryPoint>["/docker-entrypoint.sh"]</entryPoint>
                     <exposes>
                       <expose>1099</expose>
                     </exposes>
@@ -97,6 +108,11 @@
                        <resource>
                          <directory>${project.build.directory}/classes/conf</directory>
                          <targetPath>/opt/c2mon/${project.artifactId}/conf</targetPath>
+                       </resource>
+                       <resource>
+                         <directory>${project.build.directory}/classes</directory>
+                         <includes><include>docker-entrypoint.sh</include></includes>
+                         <targetPath>/</targetPath>
                        </resource>
                     </resources>
                 </configuration>
