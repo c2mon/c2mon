@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -24,7 +24,7 @@ import cern.c2mon.server.common.tag.Tag;
 
 /**
  * Contains static methods for comparing cache objects in tests.
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -34,7 +34,7 @@ public final class CacheObjectComparison {
    * Hide constructor.
    */
   private CacheObjectComparison() { };
-  
+
   /**
    * Compares CommandTags.
    * @param commandTag1 first tag
@@ -51,14 +51,15 @@ public final class CacheObjectComparison {
     assertEquals(commandTag1.getSourceTimeout(), commandTag2.getSourceTimeout());
     assertEquals(commandTag1.getSourceRetries(), commandTag2.getSourceRetries());
     assertEquals(commandTag1.getExecTimeout(), commandTag2.getExecTimeout());
-    assertEquals(commandTag1.getClientTimeout(), commandTag2.getClientTimeout());    
+    assertEquals(commandTag1.getClientTimeout(), commandTag2.getClientTimeout());
     assertEquals(commandTag1.getAuthorizationDetails(), commandTag2.getAuthorizationDetails());
     assertEquals(commandTag1.getMinimum(), commandTag2.getMinimum());
     assertEquals(commandTag1.getMaximum(), commandTag2.getMaximum());
-    
+    assertEquals(commandTag1.getMetadata(), commandTag2.getMetadata());
+
     assertEquals(commandTag1.getProcessId(), commandTag2.getProcessId());
   }
-  
+
   /**
    * Compares DataTags.
    * @param dataTag1 first tag
@@ -66,15 +67,15 @@ public final class CacheObjectComparison {
    */
   public static void equals(final DataTagCacheObject dataTag1, final DataTagCacheObject dataTag2) {
     equalsTag(dataTag1, dataTag2);
-    assertEquals(dataTag1.getEquipmentId(), dataTag2.getEquipmentId());    
+    assertEquals(dataTag1.getEquipmentId(), dataTag2.getEquipmentId());
     assertEquals(dataTag1.getAddress().toConfigXML(), dataTag2.getAddress().toConfigXML());
     assertEquals(dataTag1.getCacheTimestamp(), dataTag2.getCacheTimestamp());
-    assertEquals(dataTag1.getDaqTimestamp(), dataTag2.getDaqTimestamp());       
-    assertEquals(dataTag1.getStatus(), dataTag2.getStatus());   
+    assertEquals(dataTag1.getDaqTimestamp(), dataTag2.getDaqTimestamp());
+    assertEquals(dataTag1.getStatus(), dataTag2.getStatus());
     assertEquals(dataTag1.getProcessId(), dataTag2.getProcessId());
-    assertEquals(dataTag1.isLogged(), dataTag2.isLogged());        
+    assertEquals(dataTag1.isLogged(), dataTag2.isLogged());
   }
-  
+
   /**
    * Compares two Tags.
    * @param tag1 first tag
@@ -89,16 +90,16 @@ public final class CacheObjectComparison {
     assertEquals(tag1.getAlarmIds(), tag2.getAlarmIds());
     assertEquals(tag1.getRuleIds(), tag2.getRuleIds());
     assertEquals(tag1.getTimestamp(), tag2.getTimestamp());
-    assertEquals(tag1.getDataTagQuality(), tag2.getDataTagQuality());   
+    assertEquals(tag1.getDataTagQuality(), tag2.getDataTagQuality());
     assertEquals(tag1.getDipAddress(), tag2.getDipAddress());
     assertEquals(tag1.getJapcAddress(), tag2.getJapcAddress());
     assertEquals(tag1.getValueDictionary().toXML(), tag2.getValueDictionary().toXML());
     assertEquals(tag1.getValue(), tag2.getValue());
     assertEquals(tag1.getUnit(), tag2.getUnit());
-    assertEquals(tag1.getValueDescription(), tag2.getValueDescription()); 
-    assertEquals(tag1.isExistingTag(), tag2.isExistingTag()); 
+    assertEquals(tag1.getValueDescription(), tag2.getValueDescription());
+    assertEquals(tag1.isExistingTag(), tag2.isExistingTag());
   }
-  
+
   /**
    * Assert all Alarm fields are equal.
    * @param alarm1 first alarm
@@ -119,9 +120,9 @@ public final class CacheObjectComparison {
       assertEquals(alarm1.getLastPublication().getState(), alarm2.getLastPublication().getState());
       assertEquals(alarm1.getLastPublication().getInfo(), alarm2.getLastPublication().getInfo());
       assertEquals(alarm1.getLastPublication().getPublicationTime(), alarm2.getLastPublication().getPublicationTime());
-    }    
+    }
   }
-  
-  
-  
+
+
+
 }
