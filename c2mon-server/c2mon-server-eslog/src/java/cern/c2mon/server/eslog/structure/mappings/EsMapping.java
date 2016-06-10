@@ -179,7 +179,7 @@ public interface EsMapping {
 
     Timestamp timestamp;
 
-    C2Mon c2mon;
+    C2monMetadata c2mon;
     Metadata metadata;
 
     Properties(ValueType valueType) {
@@ -203,7 +203,7 @@ public interface EsMapping {
 
       this.timestamp = new Timestamp();
 
-      this.c2mon = new C2Mon();
+      this.c2mon = new C2monMetadata();
       this.metadata = new Metadata();
     }
 
@@ -314,7 +314,7 @@ public interface EsMapping {
     }
 
     //c2mon goes here
-    class C2Mon {
+    class C2monMetadata {
       private final String dynamic = "false";
       private final String type = ValueType.OBJECT.toString();
 

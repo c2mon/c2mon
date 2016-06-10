@@ -23,7 +23,7 @@ import cern.c2mon.server.eslog.structure.mappings.EsStringTagMapping;
 import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
 import cern.c2mon.server.eslog.structure.types.tag.EsTagBoolean;
 import cern.c2mon.server.eslog.structure.types.tag.EsTagString;
-import cern.c2mon.server.eslog.structure.types.tag.TagValueType;
+import cern.c2mon.server.eslog.structure.types.tag.EsValueType;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -213,7 +213,7 @@ public class EsIndexerTest {
     List<AbstractEsTag> list = new ArrayList<>();
     AbstractEsTag tag = new EsTagBoolean();
 
-    tag.setType(TagValueType.BOOLEAN.getFriendlyName());
+    tag.setType(EsValueType.BOOLEAN.getFriendlyName());
     tag.getC2mon().setDataType("boolean");
     tag.setId(1L);
     tag.getC2mon().setServerTimestamp(123456789000L);

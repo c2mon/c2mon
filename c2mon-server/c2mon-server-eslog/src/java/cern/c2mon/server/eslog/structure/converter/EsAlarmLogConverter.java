@@ -19,6 +19,7 @@ package cern.c2mon.server.eslog.structure.converter;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.eslog.structure.types.EsAlarm;
 import cern.c2mon.shared.common.metadata.Metadata;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;

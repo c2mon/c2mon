@@ -44,17 +44,17 @@ public class EsAlarmLogListener implements C2monCacheListener<Alarm>, SmartLifec
   /**
    * Reference to registration service.
    */
-  private CacheRegistrationService cacheRegistrationService;
+  private final CacheRegistrationService cacheRegistrationService;
 
   /**
    * Bean that logs Tags into ElasticSearch.
    */
-  private IPersistenceManager persistenceManager;
+  private final IPersistenceManager persistenceManager;
 
   /**
    * Allows to get the right information from the Alarm to create an EsAlarm instance.
    */
-  private EsAlarmLogConverter esAlarmLogConverter;
+  private final EsAlarmLogConverter esAlarmLogConverter;
 
   /**
    * Listener container lifecycle hook.
@@ -76,7 +76,6 @@ public class EsAlarmLogListener implements C2monCacheListener<Alarm>, SmartLifec
   public EsAlarmLogListener(final CacheRegistrationService cacheRegistrationService,
                             @Qualifier("esAlarmPersistenceManager") final IPersistenceManager persistenceManager,
                             final EsAlarmLogConverter esAlarmLogConverter) {
-    super();
     this.cacheRegistrationService = cacheRegistrationService;
     this.persistenceManager = persistenceManager;
     this.esAlarmLogConverter = esAlarmLogConverter;
@@ -94,26 +93,23 @@ public class EsAlarmLogListener implements C2monCacheListener<Alarm>, SmartLifec
    * New Alarm incoming.
    */
   @Override
-  public void notifyElementUpdated(Alarm cacheable) {
-    log.debug("notifyElementUpdated() - Received an Alarm event.");
-    try {
-      EsAlarm EsAlarm = esAlarmLogConverter.convert(cacheable);
-      sendIfAlarmESIsNotNull(EsAlarm);
-    } catch(Exception e) {
-      log.error("notifyElementUpdated() - Could not add Alarm to ElasticSearch: Alarm # " + cacheable.getId() + ".", e);
-    }
-  }
-
-  private void sendIfAlarmESIsNotNull(EsAlarm EsAlarm) {
-    if (EsAlarm != null) {
-      persistenceManager.storeData(EsAlarm);
-    } else {
+  public void notifyElementUpdated(final Alarm alarm) {
+    if(alarm == null) {
       log.warn("notifyElementUpdated() - Warning: The received alarm was null.");
+      return;
+    }
+
+    log.debug("notifyElementUpdated() - Received an Alarm event with body: " + alarm.toString());
+    try {
+      EsAlarm esAlarm = esAlarmLogConverter.convert(alarm);
+      persistenceManager.storeData(esAlarm);
+    } catch(Exception e) {
+      log.error("notifyElementUpdated() - Could not add Alarm to ElasticSearch: Alarm # " + alarm.getId() + ".", e);
     }
   }
 
   @Override
-  public void confirmStatus(Alarm cacheable) {
+  public void confirmStatus(Alarm alarm) {
     // no confirmation required
   }
 

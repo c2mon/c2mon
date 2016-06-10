@@ -23,7 +23,7 @@ import lombok.Getter;
  * An enumeration with all the supported data types
  * that a {@link Tag}'s value can be represented.
  */
-public enum TagValueType {
+public enum EsValueType {
   BOOLEAN("boolean"),
   NUMERIC("numeric"),
   STRING("string"),
@@ -36,7 +36,7 @@ public enum TagValueType {
   @Getter
   private final String friendlyName;
 
-  TagValueType(String friendlyType) {
+  EsValueType(String friendlyType) {
     this.friendlyName = friendlyType;
   }
 

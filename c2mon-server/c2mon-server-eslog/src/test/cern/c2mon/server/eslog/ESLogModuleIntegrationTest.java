@@ -34,8 +34,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration({"classpath:cern/c2mon/server/eslog/config/server-eslog-integration.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ESLogModuleIntegrationTest {
+
   @Autowired
   private Connector connector;
+
   @Autowired
   private EsAlarmLogListener esAlarmLogListener;
 

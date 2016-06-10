@@ -1,4 +1,3 @@
-package cern.c2mon.server.eslog.listener;
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
  *
@@ -15,6 +14,7 @@ package cern.c2mon.server.eslog.listener;
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
+package cern.c2mon.server.eslog.listener;
 
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.server.cache.BufferedTimCacheListener;
@@ -61,9 +61,9 @@ public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLif
   /**
    * The {@link EsTagIndexer} allows to use the connection to the ElasticSearch cluster and to write data.
    */
-  private final IPersistenceManager persistenceManagerTagNumeric;
-  private final IPersistenceManager persistenceManagerTagString;
-  private final IPersistenceManager persistenceManagerTagBoolean;
+  private final IPersistenceManager tagNumericPersistenceManager;
+  private final IPersistenceManager tagStringPersistenceManager;
+  private final IPersistenceManager tagBooleanPersistenceManager;
 
   /**
    * Listener container lifecycle hook.
@@ -82,16 +82,15 @@ public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLif
    */
   @Autowired
   public EsTagLogListener(final CacheRegistrationService cacheRegistrationService,
-                          @Qualifier("esTagNumericPersistenceManager") final IPersistenceManager persistenceManagerTagNumeric,
-                          @Qualifier("esTagStringPersistenceManager") final IPersistenceManager persistenceManagerTagString,
-                          @Qualifier("esTagBooleanPersistenceManager") final IPersistenceManager persistenceManagerTagBoolean,
+                          @Qualifier("esTagNumericPersistenceManager") final IPersistenceManager tagNumericPersistenceManager,
+                          @Qualifier("esTagStringPersistenceManager") final IPersistenceManager tagStringPersistenceManager,
+                          @Qualifier("esTagBooleanPersistenceManager") final IPersistenceManager tagBooleanPersistenceManager,
                           final EsTagLogConverter esTagLogConverter) {
-    super();
     this.cacheRegistrationService = cacheRegistrationService;
     this.esTagLogConverter = esTagLogConverter;
-    this.persistenceManagerTagNumeric = persistenceManagerTagNumeric;
-    this.persistenceManagerTagString = persistenceManagerTagString;
-    this.persistenceManagerTagBoolean = persistenceManagerTagBoolean;
+    this.tagNumericPersistenceManager = tagNumericPersistenceManager;
+    this.tagStringPersistenceManager = tagStringPersistenceManager;
+    this.tagBooleanPersistenceManager = tagBooleanPersistenceManager;
   }
 
   /**
@@ -168,15 +167,15 @@ public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLif
     try {
       log.debug("sendCollectionTagESToElasticSearch() - send a collection of tagNumeric to indexer of size: "
           + tagNumericCollection.size());
-      persistenceManagerTagNumeric.storeData(tagNumericCollection);
+      tagNumericPersistenceManager.storeData(tagNumericCollection);
 
       log.debug("sendCollectionTagESToElasticSearch() - send a collection of tagString to indexer of size: "
           + tagStringCollection.size());
-      persistenceManagerTagString.storeData(tagStringCollection);
+      tagStringPersistenceManager.storeData(tagStringCollection);
 
       log.debug("sendCollectionTagESToElasticSearch() - send a collection of tagBoolean to indexer of size: "
           + tagBooleanCollection.size());
-      persistenceManagerTagBoolean.storeData(tagBooleanCollection);
+      tagBooleanPersistenceManager.storeData(tagBooleanCollection);
     } catch(Exception e) {
       log.error("sendCollectionTagESToElasticSearch() - Exception occurred while trying to index data to the cluster.", e);
     }

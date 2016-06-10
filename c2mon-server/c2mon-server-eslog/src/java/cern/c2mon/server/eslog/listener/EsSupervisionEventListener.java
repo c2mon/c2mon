@@ -95,6 +95,11 @@ public class EsSupervisionEventListener implements SupervisionListener, SmartLif
   @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
   @Override
   public void notifySupervisionEvent(final SupervisionEvent supervisionEvent) {
+    if(supervisionEvent == null) {
+      log.warn("notifySupervisionEvent() - Warning: Received a null supervision event.");
+      return;
+    }
+
     if (log.isDebugEnabled()) {
       log.debug("notifySupervisionEvent() - Logging supervision status " + supervisionEvent.getStatus()
               + " for " + supervisionEvent.getEntity()

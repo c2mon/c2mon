@@ -30,9 +30,11 @@ import cern.c2mon.server.eslog.structure.types.tag.*;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.common.metadata.Metadata;
+import cern.c2mon.shared.common.type.TypeConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -57,18 +59,13 @@ public class EsTagLogConverter implements Converter<Tag, AbstractEsTag> {
   private final EquipmentCache equipmentCache;
   private final SubEquipmentCache subEquipmentCache;
 
-  private final Converter<String, TagValueType> dataTypeConverter;
-
   @Autowired
   public EsTagLogConverter(final ProcessCache processCache,
                            final EquipmentCache equipmentCache,
-                           final SubEquipmentCache subEquipmentCache,
-                           final Converter<String, TagValueType> dataTypeConverter) {
+                           final SubEquipmentCache subEquipmentCache) {
     this.processCache = processCache;
     this.equipmentCache = equipmentCache;
     this.subEquipmentCache = subEquipmentCache;
-
-    this.dataTypeConverter = dataTypeConverter;
   }
 
   /**
@@ -110,7 +107,21 @@ public class EsTagLogConverter implements Converter<Tag, AbstractEsTag> {
       return;
     }
 
-    TagValueType valueType = dataTypeConverter.convert(tag.getDataType());
+    final Class type = TypeConverter.getType(tag.getDataType());
+
+    EsValueType valueType;
+    if (type == null) {
+      valueType = EsValueType.OBJECT;
+    } else if (Number.class.isAssignableFrom(type)) {
+      valueType = EsValueType.NUMERIC;
+    } else if (Boolean.class.isAssignableFrom(type)) {
+      valueType = EsValueType.BOOLEAN;
+    } else if (String.class.isAssignableFrom(type)) {
+      valueType = EsValueType.STRING;
+    } else {
+      valueType = EsValueType.OBJECT;
+    }
+
     esTag.setType(valueType.getFriendlyName());
 
   }

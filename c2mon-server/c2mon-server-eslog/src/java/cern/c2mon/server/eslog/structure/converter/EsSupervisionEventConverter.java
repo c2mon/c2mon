@@ -18,6 +18,7 @@ package cern.c2mon.server.eslog.structure.converter;
 
 import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 /**
