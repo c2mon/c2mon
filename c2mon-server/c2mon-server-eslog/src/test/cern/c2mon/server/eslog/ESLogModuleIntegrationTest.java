@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog;
 
+import cern.c2mon.server.eslog.config.EsLogIntegrationConfiguration;
 import cern.c2mon.server.eslog.connector.Connector;
 import cern.c2mon.server.eslog.listener.EsAlarmLogListener;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Alban Marguet.
  */
 @Slf4j
-@ContextConfiguration({"classpath:cern/c2mon/server/eslog/config/server-eslog-integration.xml"})
+@ContextConfiguration(classes = {
+    EsLogIntegrationConfiguration.class
+})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ESLogModuleIntegrationTest {
 
@@ -61,7 +64,6 @@ public class ESLogModuleIntegrationTest {
     }
   }
 
-
   @Test
   public void testModuleStartup() {
     String[] indices = connector.getClient().admin().indices().prepareGetIndex().get().indices();
@@ -70,4 +72,5 @@ public class ESLogModuleIntegrationTest {
       log.info(index);
     }
   }
+
 }

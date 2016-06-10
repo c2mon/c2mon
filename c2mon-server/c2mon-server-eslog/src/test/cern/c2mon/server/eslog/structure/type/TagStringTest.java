@@ -20,7 +20,6 @@ import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
 import cern.c2mon.server.eslog.structure.types.tag.EsTagString;
 import cern.c2mon.server.eslog.structure.types.tag.TagQualityAnalysis;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -38,7 +37,6 @@ import static org.junit.Assert.assertTrue;
  * verify that it builds correctly in JSON and accept/reject good/bad types of value.
  * @author Alban Marguet.
  */
-@Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public class TagStringTest {
   @InjectMocks

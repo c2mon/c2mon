@@ -21,6 +21,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +33,7 @@ import static junit.framework.TestCase.fail;
 /**
  * @author Alban Marguet
  */
+@RunWith(JUnit4.class)
 public class EsAlarmTest {
   private Gson gson = new GsonBuilder().create();
   private EsAlarm esAlarm;

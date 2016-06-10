@@ -29,7 +29,7 @@ import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
@@ -43,8 +43,8 @@ import java.util.Set;
  * @author Alban Marguet
  */
 @Slf4j
-@Service
 @Qualifier("esAlarmIndexer")
+@Component
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class EsAlarmIndexer extends EsIndexer {

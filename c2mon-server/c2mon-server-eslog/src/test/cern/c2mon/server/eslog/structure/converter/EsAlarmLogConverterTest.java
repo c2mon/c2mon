@@ -96,4 +96,5 @@ public class EsAlarmLogConverterTest {
 
     return alarm;
   }
+
 }

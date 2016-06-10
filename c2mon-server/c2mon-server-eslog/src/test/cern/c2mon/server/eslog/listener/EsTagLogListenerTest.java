@@ -23,7 +23,6 @@ import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.eslog.indexer.EsTagIndexer;
 import cern.c2mon.server.eslog.structure.converter.EsTagLogConverter;
 import cern.c2mon.server.test.CacheObjectCreation;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -41,8 +40,6 @@ import static org.mockito.Mockito.*;
  *
  * @author Alban Marguet
  */
-
-@Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public class EsTagLogListenerTest {
   private long id = 2L;

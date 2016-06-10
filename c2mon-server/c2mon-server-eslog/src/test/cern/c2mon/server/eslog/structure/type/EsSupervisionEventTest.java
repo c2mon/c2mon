@@ -21,10 +21,11 @@ import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.fail;
@@ -33,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Alban Marguet
  */
-@Slf4j
+@RunWith(JUnit4.class)
 public class EsSupervisionEventTest {
   private Gson gson = new GsonBuilder().create();
   private EsSupervisionEvent esSupervisionEvent;

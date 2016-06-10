@@ -45,9 +45,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Alban Marguet.
  */
 
-@Component
-@Qualifier("esTagIndexer")
 @Slf4j
+@Qualifier("esTagIndexer")
+@Component
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class EsTagIndexer extends EsIndexer {

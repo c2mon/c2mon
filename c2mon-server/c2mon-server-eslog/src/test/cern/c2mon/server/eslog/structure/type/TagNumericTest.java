@@ -18,7 +18,6 @@ package cern.c2mon.server.eslog.structure.type;
 
 import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.server.eslog.structure.types.tag.EsTagNumeric;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -36,7 +35,6 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Alban Marguet.
  */
-@Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public class TagNumericTest {
   @InjectMocks

@@ -16,7 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.mappings;
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -28,7 +27,6 @@ import static org.junit.Assert.assertNotNull;
  * Verify that we always get a EsMapping. Important for a good indexing in ElasticSearch.
  * @author Alban Marguet.
  */
-@Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public class EsTagImplEsMappingTest {
   private String expectedMapping = "{\n" +

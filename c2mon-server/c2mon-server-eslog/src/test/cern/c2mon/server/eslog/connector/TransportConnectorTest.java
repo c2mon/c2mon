@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.connector;
 
+import cern.c2mon.server.eslog.config.EsLogIntegrationConfiguration;
 import cern.c2mon.server.eslog.structure.mappings.EsStringTagMapping;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -43,7 +44,9 @@ import static org.junit.Assert.assertTrue;
  * @author Alban Marguet.
  */
 @Slf4j
-@ContextConfiguration({"classpath:cern/c2mon/server/eslog/config/server-eslog-integration.xml"})
+@ContextConfiguration(classes = {
+    EsLogIntegrationConfiguration.class
+})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class TransportConnectorTest {
   private int shards = 10;

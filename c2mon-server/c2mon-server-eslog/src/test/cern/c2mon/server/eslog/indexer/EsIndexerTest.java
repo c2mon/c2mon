@@ -17,6 +17,7 @@
 package cern.c2mon.server.eslog.indexer;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.eslog.config.EsLogIntegrationConfiguration;
 import cern.c2mon.server.eslog.connector.TransportConnector;
 import cern.c2mon.server.eslog.structure.mappings.EsMapping;
 import cern.c2mon.server.eslog.structure.mappings.EsStringTagMapping;
@@ -49,7 +50,9 @@ import static org.junit.Assert.assertTrue;
  * @author Alban Marguet.
  */
 @Slf4j
-@ContextConfiguration({"classpath:cern/c2mon/server/eslog/config/server-eslog-integration.xml"})
+@ContextConfiguration(classes = {
+    EsLogIntegrationConfiguration.class
+})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class EsIndexerTest {
   private static String clusterName;
@@ -58,8 +61,10 @@ public class EsIndexerTest {
   private static String home;
   private static Client clusterClient;
   private static Client initClient;
+
   @Autowired
   private EsTagIndexer indexer;
+
   @Autowired
   private TransportConnector connector;
 

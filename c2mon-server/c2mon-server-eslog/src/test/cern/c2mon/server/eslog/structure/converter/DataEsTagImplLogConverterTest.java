@@ -34,7 +34,6 @@ import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.common.metadata.Metadata;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -55,7 +54,6 @@ import static org.mockito.Mockito.when;
  *
  * @author Alban Marguet.
  */
-@Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public class DataEsTagImplLogConverterTest {
   @InjectMocks
@@ -339,4 +337,5 @@ public class DataEsTagImplLogConverterTest {
 
     return tag;
   }
+
 }

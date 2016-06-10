@@ -18,6 +18,8 @@ package cern.c2mon.server.eslog.structure.mappings;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
@@ -26,6 +28,7 @@ import static org.junit.Assert.assertEquals;
  * Verify the output of the EsAlarmMapping.
  * @author Alban Marguet
  */
+@RunWith(JUnit4.class)
 public class EsAlarmMappingTest {
   private EsAlarmMapping mapping;
   private final String expectedMappings = "{\n" +

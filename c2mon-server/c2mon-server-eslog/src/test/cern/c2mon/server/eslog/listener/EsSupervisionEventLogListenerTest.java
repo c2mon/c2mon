@@ -23,7 +23,6 @@ import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -40,7 +39,6 @@ import static org.mockito.Mockito.when;
  *
  * @author Alban Marguet
  */
-@Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public class EsSupervisionEventLogListenerTest {
   private SupervisionConstants.SupervisionEntity entity = SupervisionConstants.SupervisionEntity.PROCESS;
@@ -50,10 +48,13 @@ public class EsSupervisionEventLogListenerTest {
   private String message = "message";
   private SupervisionEvent event = new SupervisionEventImpl(entity, id, status, timestamp, message);
   private EsSupervisionEvent esSupervisionEvent;
+
   @Mock
   private SupervisionNotifier supervisionNotifier;
+
   @InjectMocks
   private EsSupervisionEventListener listener;
+
   @Mock
   private EsSupervisionEventConverter esSupervisionEventConverter;
 
@@ -62,4 +63,5 @@ public class EsSupervisionEventLogListenerTest {
     when(esSupervisionEventConverter.convert(eq(event))).thenReturn(esSupervisionEvent);
     listener.notifySupervisionEvent(event);
   }
+
 }

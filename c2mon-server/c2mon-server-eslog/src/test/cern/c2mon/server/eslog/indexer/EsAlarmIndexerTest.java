@@ -24,7 +24,6 @@ import cern.c2mon.server.eslog.structure.mappings.EsAlarmMapping;
 import cern.c2mon.server.eslog.structure.mappings.EsMapping;
 import cern.c2mon.server.eslog.structure.types.EsAlarm;
 import cern.c2mon.server.test.CacheObjectCreation;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,14 +45,15 @@ import static org.mockito.Mockito.when;
  * @author Alban Marguet
  */
 @RunWith(MockitoJUnitRunner.class)
-@Slf4j
 public class EsAlarmIndexerTest {
   private Alarm alarm;
   private EsAlarm esAlarm;
   private EsAlarmMapping esAlarmMapping;
   private Timestamp timestamp;
+
   @InjectMocks
   private EsAlarmIndexer indexer;
+
   @Mock
   private TransportConnector connector;
   private EsAlarmLogConverter esAlarmLogConverter = new EsAlarmLogConverter();
