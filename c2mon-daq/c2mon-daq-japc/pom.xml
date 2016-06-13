@@ -4,7 +4,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-daq</groupId>
     <artifactId>c2mon-daq-pom</artifactId>
-    <version>1.6.2</version>
+    <version>1.7.1</version>
   </parent>
 
   <groupId>cern.c2mon.c2mon-daq</groupId>
@@ -43,6 +43,8 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-daq</groupId>
       <artifactId>c2mon-daq-test</artifactId>
+      <scope>test</scope>
+      <version>[1.7.0, 2.0.0)</version>
     </dependency>
     <dependency>
       <groupId>org.easymock</groupId>
