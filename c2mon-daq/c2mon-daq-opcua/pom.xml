@@ -4,7 +4,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-daq</groupId>
     <artifactId>c2mon-daq-pom</artifactId>
-    <version>RELEASE</version>
+    <version>1.7.1</version>
   </parent>
   <groupId>cern.c2mon.c2mon-daq</groupId>
   <artifactId>c2mon-daq-opcua</artifactId>
@@ -99,10 +99,12 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
+      <version>3.1</version>
     </dependency>
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymockclassextension</artifactId>
+      <version>3.1</version>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
