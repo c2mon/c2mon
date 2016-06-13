@@ -22,7 +22,7 @@
   
   <!-- the connection below is not currently used: configuration requests are made via the client module -->
   <bean id="configRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
-   <constructor-arg index="0" value="${c2mon.server.configuration.jms.destination}"/>
+   <constructor-arg index="0" value="${c2mon.server.configuration.jms.queue}"/>
   </bean>
     
   <bean id="configRequestJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
