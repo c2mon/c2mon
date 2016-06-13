@@ -18,7 +18,6 @@ package cern.c2mon.daq.common.messaging.impl;
 
 import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.common.conf.core.RunOptions;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
@@ -216,9 +215,6 @@ public class RequestControllerTest {
      * @return configurationController
      */
     private ConfigurationController getBasicConfigurationController() {
-      // We need run options for being use with fir the new PIK (default is we send the PIK)
-      RunOptions runOptions = new RunOptions();
-
       ConfigurationController configurationController = new ConfigurationController();
       ProcessConfiguration processConfiguration = new ProcessConfiguration();
       EquipmentConfiguration equipmentConfiguration = new EquipmentConfiguration();

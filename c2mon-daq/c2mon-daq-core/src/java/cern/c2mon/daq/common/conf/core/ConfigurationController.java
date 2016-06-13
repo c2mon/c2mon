@@ -215,7 +215,6 @@ public class ConfigurationController {
 
     boolean localConfiguration = false;
 
-    //    if (getCommandParamsHandler().hasParam(CONFIGURATION_PARAM)) {
     if (environment.containsProperty(Options.LOCAL_CONFIG_FILE)) {
 
       LOGGER.info("loadProcessConfiguration - Taking Configuration from file");
@@ -887,15 +886,6 @@ public class ConfigurationController {
     return sourceDataTags;
   }
 
-  //  /**
-  //   * gets the run options.
-  //   *
-  //   * @return The run options of this process.
-  //   */
-  //  public RunOptions getRunOptions() {
-  //    return runOptions;
-  //  }
-
   /**
    * Gets the common configuration of this DAQ process.
    *
@@ -931,16 +921,6 @@ public class ConfigurationController {
   public void setProcessConfigurationLoader(final ProcessConfigurationLoader processConfigurationLoader) {
     this.processConfigurationLoader = processConfigurationLoader;
   }
-
-  //  /**
-  //   * Gets the command parameter handler which holds the provided startup
-  //   * arguments.
-  //   *
-  //   * @return The Command parameter handler.
-  //   */
-  //  public CommandParamsHandler getCommandParamsHandler() {
-  //    return commandParamsHandler;
-  //  }
 
   /**
    * Adds a core data tag changer to the configuration controller. This changers
@@ -1167,11 +1147,4 @@ public class ConfigurationController {
   public long getStartUp() {
     return startUp;
   }
-
-  //  /**
-  //   * @param commandParamsHandler the commandParamsHandler to set
-  //   */
-  //  public void setCommandParamsHandler(final CommandParamsHandler commandParamsHandler) {
-  //    this.commandParamsHandler = commandParamsHandler;
-  //  }
 }

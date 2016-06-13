@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.common.conf.core.RunOptions;
 import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;

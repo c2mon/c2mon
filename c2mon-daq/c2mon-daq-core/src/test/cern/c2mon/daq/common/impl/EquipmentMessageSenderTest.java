@@ -38,7 +38,6 @@ import lombok.Data;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.daq.common.conf.core.RunOptions;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.filter.IFilterMessageSender;
@@ -126,8 +125,7 @@ public class EquipmentMessageSenderTest {
         processConf.setProcessID(1L);
         processConf.setProcessName("ad");
         equipmentConfiguration.setHandlerClassName("asd");
-//        equipmentMessageSender.setEquipmentLoggerFactory(EquipmentLoggerFactory.createFactory(equipmentConfiguration,
-//                processConf, new RunOptions()));
+
         EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(equipmentConfiguration,
                 processConf, false, false);
 

@@ -190,8 +190,6 @@ public class ActiveRequestSenderTest {
 
     this.environmentMock = EasyMock.createMock(Environment.class);
 
-    // Mock for configurationController to use getCommandParamsHandler()
-    // The run options of the DAQ process
     this.configurationControllerMock = EasyMock.createMockBuilder(ConfigurationController.class).
         addMockedMethod("getProcessConfiguration").
         createMock();
@@ -274,24 +272,13 @@ public class ActiveRequestSenderTest {
    */
   private void sendProcessConnectionRequest() {
     // Expectations.
-//    EasyMock.expect(this.configurationControllerMock.getCommandParamsHandler()).andReturn(this.commandParamsHandlerMock).times(1);
-    EasyMock.expect(this.environmentMock.getProperty(EasyMock.<String>anyObject())).andReturn(PROCESS_NAME).times(1);
-
-//    EasyMock.expect(this.configurationControllerMock.getRunOptions()).andReturn(this.runOptionsMock).times(1);
-    //EasyMock.expect(this.runOptionsMock.setStartUp(System.currentTimeMillis())).times(1);
+    EasyMock.expect(this.environmentMock.getProperty(EasyMock.<String>anyObject())).andReturn(PROCESS_NAME).times(1);;
 
     // Start mock replay
     EasyMock.replay(this.environmentMock, this.configurationControllerMock);
 
     // Here, the real test starts
     ProcessConnectionResponse processConnectionResponse = this.activeRequestSender.sendProcessConnectionRequest(PROCESS_NAME);
-
-//    try {
-//      Thread.sleep(2000);
-//    }
-//    catch (InterruptedException e) {
-//      LOGGER.error("testSendprocessConnectionRequest() - Sleep error. "+ e);
-//    }
 
     // onMessage call will take over the reply. No need top wait since the call will never come back before without a reply
 
@@ -356,8 +343,6 @@ public class ActiveRequestSenderTest {
    */
   private void sendProcessConfigurationRequest() {
     // Expectations.
-//    EasyMock.expect(this.configurationControllerMock.getCommandParamsHandler()).andReturn(this.commandParamsHandlerMock).times(1);
-//    EasyMock.expect(this.commandParamsHandlerMock.getParamValue("-processName")).andReturn(PROCESS_NAME).times(1);
     EasyMock.expect(this.environmentMock.getProperty(EasyMock.<String>anyObject())).andReturn(PROCESS_NAME).times(1);
     EasyMock.expect(this.commonConfigurationMock.getRequestTimeout()).andReturn(TEST_RESULTS_TIMEOUT).times(2);
 //    EasyMock.expect(this.configurationControllerMock.getProcessConfiguration()).andReturn(this.processConfigurationMock).times(1);
