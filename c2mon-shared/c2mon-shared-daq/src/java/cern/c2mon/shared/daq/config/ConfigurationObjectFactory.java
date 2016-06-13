@@ -41,6 +41,8 @@ import cern.c2mon.shared.common.type.TypeConverter;
  * convention 'CREATE_METHOD_PREFIX + methodName(Element domElement)'.
  *
  * @author alang
+ *
+ * @deprecated
  */
 public class ConfigurationObjectFactory extends ObjectFactory implements ConfigurationXMLConstants {
 

@@ -38,6 +38,8 @@ import cern.c2mon.shared.common.datatag.address.HardwareAddress;
  * Class to create DOM artifacts from configuration objects.
  *
  * @author Andreas Lang
+ *
+ * @deprecated
  */
 public class ConfigurationDOMFactory extends DOMFactory implements ConfigurationXMLConstants, ConfigurationJavaConstants {
 

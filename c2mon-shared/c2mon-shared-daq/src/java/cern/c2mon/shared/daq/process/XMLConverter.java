@@ -39,7 +39,8 @@ import cern.c2mon.shared.util.parser.SimpleXMLParser;
  * Helper class to transform a class using simpleframework annotations into XML
  * 
  * @author vilches
- * 
+ *
+ * @deprecated
  */
 public class XMLConverter {
   /** Log4j instance */

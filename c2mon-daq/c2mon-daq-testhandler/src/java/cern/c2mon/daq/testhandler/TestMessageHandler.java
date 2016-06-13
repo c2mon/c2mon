@@ -21,8 +21,6 @@ import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
-import cern.c2mon.daq.common.jmx.JmxRegistrationMXBean;
-import cern.c2mon.daq.common.jmx.JmxRegistrationMXBean.MBeanType;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.shared.common.command.ISourceCommandTag;
@@ -141,13 +139,7 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
 
   }
 
-  /**
-   * The default constructor.
-   */
-  public TestMessageHandler() {
-    JmxRegistrationMXBean jmxRegistrationMXBean = new JmxRegistrationMXBean(MBeanType.JMS, "testMessageHandler");
-    jmxRegistrationMXBean.registerMBean(this);
-  }
+  public TestMessageHandler() {}
 
   /**
    * Normally this method is responsible for opening subscriptions for all

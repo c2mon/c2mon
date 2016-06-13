@@ -18,6 +18,7 @@ package cern.c2mon.daq.common.conf.core;
 
 import org.w3c.dom.Element;
 
+@Deprecated
 public class XMLTagValueExtractor {
 
     /**
