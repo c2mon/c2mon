@@ -16,18 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
-import java.util.Collection;
-import java.util.Iterator;
-
-import javax.annotation.PostConstruct;
-import javax.jms.JMSException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.common.jmx.JmxRegistrationMXBean;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.common.messaging.JmsSender;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
@@ -39,6 +28,14 @@ import cern.c2mon.shared.util.buffer.PullEvent;
 import cern.c2mon.shared.util.buffer.PullException;
 import cern.c2mon.shared.util.buffer.SynchroBuffer;
 import cern.c2mon.shared.util.buffer.SynchroBufferListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.PostConstruct;
+import javax.jms.JMSException;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * The ProcessMessageSender class is responsible for sending JMS messages from
@@ -253,12 +250,6 @@ public class ProcessMessageSender implements IProcessMessageSender {
    */
   public final void connect() {
     for (JmsSender jmsSender : jmsSenders) {
-//      // Helper class for registering the MXBean to the current server
-//      JmxRegistrationMXBean jmxRegistrationMXBean = new JmxRegistrationMXBean(JmxRegistrationMXBean.MBeanType.JMS, jmsSender.getBeanName());
-//
-//      // Register JmsSender as MXBean
-//      jmxRegistrationMXBean.registerMBean(jmsSender);
-
       // Connection
       jmsSender.connect();
     }

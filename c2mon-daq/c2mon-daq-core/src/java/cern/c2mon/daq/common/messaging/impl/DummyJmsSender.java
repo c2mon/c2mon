@@ -16,27 +16,18 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.jms.JMSException;
-
-import org.springframework.beans.factory.annotation.Required;
-
-import cern.c2mon.daq.common.jmx.JmsSenderMXBean;
 import cern.c2mon.daq.common.messaging.JmsSender;
 import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
+
+import javax.jms.JMSException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * this class is used for testing purposes and for the TestMode
- *
- * @author ${user}
- * @version $Revision$, $Date$, $Author$
+ * This class is used for testing purposes and for the TestMode
  */
-public class DummyJmsSender implements JmsSender, JmsSenderMXBean {
+public class DummyJmsSender implements JmsSender {
 
 
   private List<SourceDataTagValue> messages = new ArrayList<SourceDataTagValue>();
@@ -45,11 +36,6 @@ public class DummyJmsSender implements JmsSender, JmsSenderMXBean {
    * Enabling/disabling the action of sending information to the brokers
    */
   private boolean isEnabled = true;
-
-//  /**
-//   * The Spring name for the ActiveJmsSender
-//   */
-//  private String beanName;
 
   @Override
   public void connect() {
@@ -104,23 +90,4 @@ public class DummyJmsSender implements JmsSender, JmsSenderMXBean {
   public final boolean getEnabled() {
     return this.isEnabled;
   }
-
-//  /**
-//   * Sets the Spring name for the ActiveJmsSender
-//   */
-//  @Required
-//  public final void setBeanName(final String name) {
-//    this.beanName = name;
-//  }
-//
-//  @Override
-//  public final String getBeanName() {
-//    return this.beanName;
-//  }
-
-  @Override
-  public final void jmsBrokerDataConnectionEnable(final boolean value) {
-    this.setEnabled(value);
-  }
-
 }

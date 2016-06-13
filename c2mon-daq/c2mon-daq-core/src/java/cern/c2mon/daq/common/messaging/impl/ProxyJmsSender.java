@@ -16,16 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
-import java.util.Iterator;
-
-import javax.annotation.PostConstruct;
-import javax.jms.JMSException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Required;
-
-import cern.c2mon.daq.common.jmx.JmsSenderMXBean;
 import cern.c2mon.daq.common.messaging.JmsSender;
 import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
@@ -33,8 +23,12 @@ import cern.c2mon.shared.util.buffer.PullEvent;
 import cern.c2mon.shared.util.buffer.PullException;
 import cern.c2mon.shared.util.buffer.SynchroBuffer;
 import cern.c2mon.shared.util.buffer.SynchroBufferListener;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.PostConstruct;
+import javax.jms.JMSException;
+import java.util.Iterator;
 
 /**
  * This class wraps a JMSSender so that all JMS sending occurs on separate threads from
@@ -48,7 +42,7 @@ import org.springframework.stereotype.Component;
  * @author mbrightw
  *
  */
-public class ProxyJmsSender implements JmsSender, JmsSenderMXBean {
+public class ProxyJmsSender implements JmsSender {
 
 
   /**
@@ -72,11 +66,6 @@ public class ProxyJmsSender implements JmsSender, JmsSenderMXBean {
    * (sent with processValues).
    */
   private SynchroBuffer lowPriorityBuffer;
-
-//  /**
-//   * The Spring name for the ProxyJmsSender
-//   */
-//  private String beanName;
 
   /**
    * Init method called on bean initialization.
@@ -252,23 +241,4 @@ public class ProxyJmsSender implements JmsSender, JmsSenderMXBean {
   public final boolean getEnabled() {
     return this.wrappedSender.getEnabled();
   }
-
-//  /**
-//   * Sets the Spring name for the ProxyJmsSender
-//   */
-//  @Required
-//  public final void setBeanName(final String name) {
-//    this.beanName = name;
-//  }
-//
-//  @Override
-//  public final String getBeanName() {
-//    return this.beanName;
-//  }
-
-  @Override
-  public final void jmsBrokerDataConnectionEnable(final boolean value) {
-    setEnabled(value);
-  }
-
 }

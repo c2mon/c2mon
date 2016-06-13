@@ -17,7 +17,6 @@
 package cern.c2mon.daq.common.messaging.impl;
 
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.common.jmx.JmsSenderMXBean;
 import cern.c2mon.daq.common.messaging.JmsSender;
 import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
@@ -26,10 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Required;
-import org.springframework.context.annotation.Profile;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
 
@@ -39,7 +35,7 @@ import javax.jms.JMSException;
  *
  * @author mbrightw
  */
-public class ActiveJmsSender implements JmsSender, JmsSenderMXBean {
+public class ActiveJmsSender implements JmsSender {
 
   /**
    * The class logger.
@@ -225,23 +221,5 @@ public class ActiveJmsSender implements JmsSender, JmsSenderMXBean {
   @Override
   public final boolean getEnabled() {
     return this.isEnabled;
-  }
-
-  //    /**
-  //     * Sets the Spring name for the ActiveJmsSender
-  //     */
-  //    @Required
-  //    public final void setBeanName(final String name) {
-  //      this.beanName = name;
-  //    }
-  //
-  //    @Override
-  //    public final String getBeanName() {
-  //      return this.beanName;
-  //    }
-
-  @Override
-  public final void jmsBrokerDataConnectionEnable(final boolean value) {
-    this.setEnabled(value);
   }
 }
