@@ -4,12 +4,12 @@
   <parent>
     <groupId>cern.c2mon.c2mon-daq</groupId>
     <artifactId>c2mon-daq-pom</artifactId>
-    <version>RELEASE</version>
+    <version>1.7.1</version>
   </parent>
 
   <groupId>cern.c2mon.c2mon-daq</groupId>
 	<artifactId>c2mon-daq-jec</artifactId>
-	<version>1.6.1-SNAPSHOT</version>
+	<version>1.7.0-SNAPSHOT</version>
 	<name>c2mon-daq-jec</name>
 	<packaging>jar</packaging>
 	<description>This is a C2MON JEC DAQ. It allows C2MON to acquire data from Siemens S7 PLCs. The Java Equipment Controller (JEC) was developed by TS-CSE-CO</description>
@@ -39,14 +39,18 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-daq</groupId>
       <artifactId>c2mon-daq-test</artifactId>
+      <scope>test</scope>
+      <version>[1.7.0, 2.0.0)</version>
     </dependency>
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
+      <version>3.1</version>
     </dependency>
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymockclassextension</artifactId>
+      <version>3.1</version>
     </dependency>
   </dependencies>
   <developers />

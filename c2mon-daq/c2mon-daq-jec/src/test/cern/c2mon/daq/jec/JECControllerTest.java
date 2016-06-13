@@ -1,56 +1,55 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.daq.jec;
+
+import static org.easymock.EasyMock.createMock;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-import static org.easymock.classextension.EasyMock.*;
-import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
-import cern.c2mon.daq.common.impl.EquipmentMessageSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.daq.common.conf.core.RunOptions;
-import cern.c2mon.daq.jec.JECController;
-import cern.c2mon.daq.jec.PLCConnectionSampler;
-import cern.c2mon.daq.jec.PLCObjectFactory;
+import cern.c2mon.daq.common.impl.EquipmentMessageSender;
+import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.jec.address.TestPLCHardwareAddress;
+import cern.c2mon.daq.jec.config.PLCConfiguration;
+import cern.c2mon.daq.jec.frames.JECCommandRunner;
+import cern.c2mon.daq.jec.plc.JECPFrames;
+import cern.c2mon.daq.jec.plc.StdConstants;
+import cern.c2mon.daq.jec.plc.TestPLCDriver;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.command.ISourceCommandTag;
 import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.address.PLCHardwareAddress;
-import cern.c2mon.daq.jec.config.PLCConfiguration;
-import cern.c2mon.daq.jec.frames.JECCommandRunner;
-import cern.c2mon.daq.jec.plc.JECPFrames;
-import cern.c2mon.daq.jec.plc.StdConstants;
-import cern.c2mon.daq.jec.plc.TestPLCDriver;
 import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 
 public class JECControllerTest {
-    
+
     private JECController jecController;
     private PLCObjectFactory plcFactory;
-    
+
     @Before
     public void setUp() throws InstantiationException, IllegalAccessException, ClassNotFoundException, SecurityException, NoSuchMethodException {
         PLCConfiguration plcConfiguration = new PLCConfiguration();
@@ -67,17 +66,17 @@ public class JECControllerTest {
         EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(equipmentConfiguration, processConfiguration, true, true);
         jecController = new JECController(plcFactory, connectionSampler, jecCommandRunner, equipmentMessageSender, equipmentLoggerFactory);
     }
-    
+
     @Test
     public void testConfigureAnalogCommandTag() throws ConfigurationException {
         PLCHardwareAddressImpl hwAddress = new PLCHardwareAddressImpl(PLCHardwareAddress.STRUCT_ANALOG_COMMAND, 1, 5, 0, 10, 100, "PWA-asd", 1000);
         ISourceCommandTag commandTag = new SourceCommandTag(1L, "sd", 500, 5, hwAddress);
         jecController.configureCommandTag(commandTag);
         hwAddress.setNativeAddress("asd"); //should now be ignored.
-        hwAddress.setWordId(100); 
+        hwAddress.setWordId(100);
         jecController.configureCommandTag(commandTag);
         hwAddress.setNativeAddress("PWAasd"); //should now be ignored.
-        hwAddress.setWordId(50); 
+        hwAddress.setWordId(50);
         jecController.configureCommandTag(commandTag);
         jecController.initArrays();
         JECPFrames jecFrame = jecController.getSetConfigurationMessage();
@@ -91,19 +90,19 @@ public class JECControllerTest {
         hwAddress.setWordId(75);
         assertFalse(jecController.isInAddressRange(hwAddress));
     }
-    
+
     @Test
     public void testConfigureBooleanCommandTag() throws ConfigurationException {
         PLCHardwareAddressImpl hwAddress = new PLCHardwareAddressImpl(PLCHardwareAddress.STRUCT_BOOLEAN_COMMAND, 1, 5, 0, 10, 100, "PWA-asd", 1000);
         ISourceCommandTag commandTag = new SourceCommandTag(1L, "sd", 500, 5, hwAddress);
         jecController.configureCommandTag(commandTag);
         hwAddress.setNativeAddress("asd"); //should now be ignored.
-        hwAddress.setWordId(100); 
-        hwAddress.setBitId(10); 
+        hwAddress.setWordId(100);
+        hwAddress.setBitId(10);
         jecController.configureCommandTag(commandTag);
         hwAddress.setNativeAddress("PWAasd");
         hwAddress.setWordId(50);
-        hwAddress.setBitId(7); 
+        hwAddress.setBitId(7);
         jecController.configureCommandTag(commandTag);
         jecController.initArrays();
         JECPFrames jecFrame = jecController.getSetConfigurationMessage();
@@ -117,10 +116,10 @@ public class JECControllerTest {
         hwAddress.setWordId(75);
         assertFalse(jecController.isInAddressRange(hwAddress));
         hwAddress.setWordId(50);
-        hwAddress.setBitId(8); 
+        hwAddress.setBitId(8);
         assertFalse(jecController.isInAddressRange(hwAddress));
     }
-    
+
     @Test
     public void testAcknowledgeReceivedMessage() throws IOException {
         JECPFrames recvMsg = plcFactory.getRawRecvFrame();
@@ -132,12 +131,12 @@ public class JECControllerTest {
         assertEquals(12, lastSend.GetDataType());
         assertEquals(lastSend, sendFrame);
     }
-    
+
     @Test
     public void testClearTagConfiguration() {
         jecController.clearTagConfiguration();
     }
-       
+
     @Test
     public void testGetNumberAnalogFrames() {
       assertEquals(0, jecController.getNumberOfAnalogDataJECFrames());
@@ -151,7 +150,7 @@ public class JECControllerTest {
       jecController.configureDataTag(new SourceDataTag(12L, "test tag", false, (short)0, "Float", new DataTagAddress(new TestPLCHardwareAddress("PWA", 1, 222, 0, PLCHardwareAddress.STRUCT_ANALOG))));
       assertEquals(2, jecController.getNumberOfAnalogDataJECFrames());
     }
-    
+
     @Test
     public void testGetNumberBooleanFrames() {
       assertEquals(0, jecController.getNumberOfBooleanDataJECFrames());
