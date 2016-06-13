@@ -38,7 +38,6 @@ import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationFactory;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationHandler;
-import cern.c2mon.daq.common.conf.core.RunOptions;
 import cern.c2mon.daq.common.impl.EquipmentCommandHandler;
 import cern.c2mon.daq.common.impl.EquipmentMessageSender;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
@@ -146,11 +145,8 @@ public abstract class GenericMessageHandlerTst {
             equipmentMessageSender = new EquipmentMessageSender(filterMessageSender, messageSender,
                     medDynamicTimeDeadbandFilterActivator, lowDynamicTimeDeadbandFilterActivator);
 
-            RunOptions roptions = new RunOptions();
             configurationController = new ConfigurationController();
             configurationController.setProcessConfiguration(pconf);
-            roptions.setEqAppendersOnly(false);
-            roptions.setEqLoggers(false);
             pconf.setProcessID(TEST_PROCESS_ID);
             pconf.setProcessName(TEST_PROCESS_NAME);
 
