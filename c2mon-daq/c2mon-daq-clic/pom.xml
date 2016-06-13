@@ -1,61 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>cern.c2mon.c2mon-daq</groupId>
-		<artifactId>c2mon-daq-pom</artifactId>
-		<version>RELEASE</version>
-	</parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.c2mon.c2mon-daq</groupId>
+    <artifactId>c2mon-daq-pom</artifactId>
+    <version>1.7.1</version>
+  </parent>
 
-	<artifactId>c2mon-daq-clic</artifactId>
-	<version>1.0.12-SNAPSHOT</version>
-	<name>c2mon-daq-clic</name>
-	<packaging>jar</packaging>
-	<description>C2MON data acquisition component for communication with the CLIC agents</description>
-	<url />
+  <groupId>cern.c2mon.c2mon-daq</groupId>
+  <artifactId>c2mon-daq-clic</artifactId>
+  <version>1.0.12-SNAPSHOT</version>
+  <name>c2mon-daq-clic</name>
+  <packaging>jar</packaging>
+  <description>C2MON data acquisition component for communication with the CLIC agents</description>
+  <url />
 
-	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-daq-clic</developerConnection>
-	</scm>
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-daq-clic</developerConnection>
+  </scm>
 
-	<dependencies>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-daq</groupId>
-			<artifactId>c2mon-daq-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-shared</groupId>
-			<artifactId>c2mon-shared-common</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-shared</groupId>
-			<artifactId>c2mon-shared-daq</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
+  <dependencies>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-daq</groupId>
+      <artifactId>c2mon-daq-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <artifactId>c2mon-shared-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <artifactId>c2mon-shared-daq</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>cern.c2mon.c2mon-daq</groupId>
-			<artifactId>c2mon-daq-test</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymock</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymockclassextension</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.dmn2</groupId>
-			<artifactId>dmn2-agentlib-java</artifactId>
-			<version>[1.0.0,2.0.0)</version>
-		</dependency>
-	</dependencies>
-	<developers />
-
-	<groupId>cern.c2mon.c2mon-daq</groupId>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-daq</groupId>
+      <artifactId>c2mon-daq-test</artifactId>
+      <scope>test</scope>
+      <version>[1.7.0, 2.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymockclassextension</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.dmn2</groupId>
+      <artifactId>dmn2-agentlib-java</artifactId>
+      <version>[1.0.0,2.0.0)</version>
+    </dependency>
+  </dependencies>
+  <developers />
 </project>
