@@ -21,6 +21,7 @@ package cern.c2mon.shared.daq.config;
  *
  * @author alang
  *
+ * @deprecated
  */
 public interface ConfigurationXMLConstants {
 

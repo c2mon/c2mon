@@ -53,10 +53,8 @@ import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
  * @author Andreas Lang
  *
  */
-public class DirectoryMessageReceiver extends ProcessMessageReceiver 
-        implements ConfigurationXMLConstants {
-//    private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryMessageReceiver.class);
-    
+public class DirectoryMessageReceiver extends ProcessMessageReceiver {
+
     private static final String USER_HOME_ENV = "user.home";
     
     private static final String READ_DIR_NAME = "messages";
@@ -99,7 +97,7 @@ public class DirectoryMessageReceiver extends ProcessMessageReceiver
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(file);
             if (document.getDocumentElement().getTagName()
-                    .equals(CONFIGURATION_CHANGE_EVENT_ELEMENT)) {
+                    .equals(ConfigurationXMLConstants.CONFIGURATION_CHANGE_EVENT_ELEMENT)) {
                 onReconfigureProcess(document, null, null);
             }
             else if (document.getDocumentElement().getTagName()
