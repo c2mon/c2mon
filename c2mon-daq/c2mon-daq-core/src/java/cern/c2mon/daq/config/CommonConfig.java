@@ -21,7 +21,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.io.FileSystemResource;
 
 /**
  * This configuration class is responsible for importing an externalised properties file specified by c2mon.daq.properties.location (if it exists) and using
@@ -31,7 +30,7 @@ import org.springframework.core.io.FileSystemResource;
  */
 @Configuration
 @PropertySources({
-    @PropertySource(value = "classpath:c2mon-daq.properties"),
+    @PropertySource(value = "classpath:c2mon-daq-default.properties"),
     @PropertySource(value = "${c2mon.daq.properties.location}", ignoreResourceNotFound = true)
 })
 public class CommonConfig {
