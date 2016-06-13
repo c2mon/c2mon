@@ -69,7 +69,7 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
    * Property that will by used as trunk. Should
    * always be overriden by server default property.
    */
-  @Value("${c2mon.jms.tag.publication.topic}")
+  @Value("${c2mon.server.client.jms.topic.tag.trunk}")
   private String tagPublicationTrunk = "c2mon.client.tag.default";
 
   /**

@@ -40,7 +40,7 @@ public class RuleTagLoaderDAOImpl extends AbstractBatchLoaderDAO<RuleTag> implem
    */
   private RuleTagMapper ruleTagMapper;
   
-  @Value("${c2mon.jms.tag.publication.topic}") 
+  @Value("${c2mon.server.client.jms.topic.tag.trunk}")
   private String publicationTrunk;
 
   @Autowired

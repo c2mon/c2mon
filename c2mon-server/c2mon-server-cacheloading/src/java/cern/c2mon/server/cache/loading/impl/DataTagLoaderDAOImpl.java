@@ -41,7 +41,7 @@ public class DataTagLoaderDAOImpl extends AbstractBatchLoaderDAO<DataTag> implem
    */
   private DataTagMapper dataTagMapper;
   
-  @Value("${c2mon.jms.tag.publication.topic}") 
+  @Value("${c2mon.server.client.jms.topic.tag.trunk}")
   private String publicationTrunk; 
   
   @Autowired

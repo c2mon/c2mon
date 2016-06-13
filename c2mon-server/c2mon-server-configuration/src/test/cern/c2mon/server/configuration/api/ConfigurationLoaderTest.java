@@ -155,7 +155,7 @@ public class ConfigurationLoaderTest {
   @Value("${c2mon.server.daqcommunication.jms.queue.trunk}")
   private String jmsDaqQueueTrunk;
 
-  @Value("${c2mon.jms.tag.publication.topic}")
+  @Value("${c2mon.server.client.jms.topic.tag.trunk}")
   private String tagPublicationTrunk = "c2mon.client.tag.default";
 
   @Before

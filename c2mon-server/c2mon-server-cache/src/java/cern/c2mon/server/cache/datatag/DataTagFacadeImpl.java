@@ -72,7 +72,7 @@ public class DataTagFacadeImpl extends AbstractDataTagFacade<DataTag> implements
    * Property that will by used as trunk. Should
    * always be overridden by server default property.
    */
-  @Value("${c2mon.jms.tag.publication.topic}")
+  @Value("${c2mon.server.client.jms.topic.tag.trunk}")
   private String tagPublicationTrunk = "c2mon.client.tag.default";
 
   /**

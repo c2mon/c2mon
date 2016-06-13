@@ -16,19 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.api.util;
 
-import cern.c2mon.server.cache.*;
-import cern.c2mon.server.cache.dbaccess.*;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
-import cern.c2mon.server.common.alive.AliveTimerCacheObject;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
-import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
-import cern.c2mon.server.test.TestDataInserter;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
@@ -37,19 +32,11 @@ import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 import cern.c2mon.shared.client.configuration.api.tag.RuleTag;
-import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
-import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
-import cern.c2mon.shared.common.metadata.Metadata;
-import cern.c2mon.shared.common.type.TypeConverter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -61,10 +48,10 @@ public class CacheObjectFactory {
   @Value("${c2mon.server.daqcommunication.jms.queue.trunk}")
   private String jmsDaqQueueTrunk;
 
-  @Value("${c2mon.jms.tag.publication.topic}")
+  @Value("${c2mon.server.client.jms.topic.tag.trunk}")
   private String tagPublicationTrunk = "c2mon.client.tag.default";
 
-  @Value("${c2mon.jms.controltag.publication.topic}")
+  @Value("${c2mon.server.client.jms.topic.controltag}")
   private String controlTagPublicationTopic;
 
   public ProcessCacheObject buildProcessCacheObject(Long id, Process configProcess) {

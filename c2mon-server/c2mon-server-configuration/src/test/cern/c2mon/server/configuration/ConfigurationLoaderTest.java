@@ -241,10 +241,10 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @Autowired
   private TestDataInserter testDataInserter;
 
-  @Value("${c2mon.jms.tag.publication.topic}")
+  @Value("${cc2mon.server.client.jms.topic.tag.trunk}")
   private String tagPublicationTrunk = "c2mon.client.tag.default";
 
-  @Value("${c2mon.jms.controltag.publication.topic}")
+  @Value("${c2mon.server.client.jms.topic.controltag}")
   private String controlTagPublicationTopic;
 
   @Value("${c2mon.server.daqcommunication.jms.queue.trunk}")

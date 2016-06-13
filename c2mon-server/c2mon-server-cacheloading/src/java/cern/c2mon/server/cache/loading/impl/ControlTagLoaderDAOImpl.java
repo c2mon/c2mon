@@ -42,7 +42,7 @@ public class ControlTagLoaderDAOImpl extends AbstractDefaultLoaderDAO<ControlTag
   
   private DataTagMapper dataTagMapper;
   
-  @Value("${c2mon.jms.controltag.publication.topic}") 
+  @Value("${c2mon.server.client.jms.topic.controltag}")
   private String publicationTopic;
   
   @Autowired

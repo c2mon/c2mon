@@ -53,7 +53,7 @@ public class ControlTagFacadeImpl extends AbstractDataTagFacade<ControlTag> impl
    * Property that will by used as trunk. Should
    * always be overriden by server default property.
    */
-  @Value("${c2mon.jms.controltag.publication.topic}")
+  @Value("${c2mon.server.client.jms.topic.controltag}")
   private String controlTagPublicationTopic = "c2mon.client.controltag.default";
   
   private AliveTimerCache aliveTimerCache;

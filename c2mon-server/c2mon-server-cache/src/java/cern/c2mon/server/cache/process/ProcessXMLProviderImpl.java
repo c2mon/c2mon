@@ -110,7 +110,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
       str.append("<ProcessConfiguration ").append(schemaInfo).append(" process-id=\"");
 
       str.append(processCacheObject.getId());
-      str.append("\" type=\"initialise\">\n");
+      str.append("\" type=\"initialise\"").append(" name=\"").append(processCacheObject.getName()).append("\">\n");
 
       str.append("  <alive-tag-id>");
       str.append(processCacheObject.getAliveTagId());
