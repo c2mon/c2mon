@@ -25,7 +25,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
 
-import cern.c2mon.daq.common.conf.core.CommonConfiguration;
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
 import cern.c2mon.daq.common.messaging.impl.ActiveRequestSender;
 import cern.c2mon.daq.common.messaging.impl.TestModeRequestSender;
@@ -54,9 +53,6 @@ public class ProcessRequestSenderConfig {
   Environment environment;
 
   @Autowired
-  CommonConfiguration commonConfiguration;
-
-  @Autowired
   @Qualifier("processRequestJmsTemplate")
   JmsTemplate processRequestJmsTemplate;
 
@@ -67,19 +63,19 @@ public class ProcessRequestSenderConfig {
   @Bean(name = "primaryRequestSender")
   @Profile({ "single", "double" })
   public ProcessRequestSender primaryRequestSender() {
-    return new ActiveRequestSender(commonConfiguration, processRequestJmsTemplate);
+    return new ActiveRequestSender(environment, processRequestJmsTemplate);
   }
 
   @Bean(name = "primaryRequestSender")
   @Profile("test")
   public ProcessRequestSender testRequestSender() {
-    return new TestModeRequestSender(new ActiveRequestSender(commonConfiguration, processRequestJmsTemplate));
+    return new TestModeRequestSender(new ActiveRequestSender(environment, processRequestJmsTemplate));
   }
 
   @Bean
   @Profile("double")
   public ProcessRequestSender secondaryRequestSender() {
-    return new ActiveRequestSender(commonConfiguration, secondProcessRequestJmsTemplate);
+    return new ActiveRequestSender(environment, secondProcessRequestJmsTemplate);
   }
 
 }

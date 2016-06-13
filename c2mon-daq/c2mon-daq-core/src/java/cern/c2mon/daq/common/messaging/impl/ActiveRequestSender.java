@@ -16,14 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
-import cern.c2mon.daq.common.conf.core.CommonConfiguration;
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
+import cern.c2mon.daq.config.Options;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.process.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;
 
@@ -48,11 +49,6 @@ public class ActiveRequestSender implements ProcessRequestSender {
   private static final long PIK_REQUEST_TIMEOUT = 5000;
 
   /**
-   * Reference to the common DAQ configuration.
-   */
-  private final CommonConfiguration commonConfiguration;
-
-  /**
    * Reference to the JmsTemplate used to send messages to the server
    * (instantiated in Spring XML).
    */
@@ -69,15 +65,20 @@ public class ActiveRequestSender implements ProcessRequestSender {
   private ProcessMessageConverter processMessageConverter;
 
   /**
+   * Reference to the Spring environment
+   */
+  private Environment environment;
+
+  /**
    * Unique constructor used by Spring to instantiate the bean.
    *
-   * @param commonConfiguration     the common DAQ configuration object (from properties file)
+   * @param environment             the Spring environment
    * @param jmsTemplate             the JmsTemplate is wired using a Qualifier annotation to
    *                                distinguish it from the others: can be overwritten using the setter
    */
   @Autowired
-  public ActiveRequestSender(final CommonConfiguration commonConfiguration, @Qualifier("processRequestJmsTemplate") final JmsTemplate jmsTemplate) {
-    this.commonConfiguration = commonConfiguration;
+  public ActiveRequestSender(final Environment environment, @Qualifier("processRequestJmsTemplate") final JmsTemplate jmsTemplate) {
+    this.environment = environment;
     this.jmsTemplate = jmsTemplate;
 //    this.configurationController = configurationController;
     this.processMessageConverter = new ProcessMessageConverter();
@@ -103,13 +104,14 @@ public class ActiveRequestSender implements ProcessRequestSender {
         message.setJMSReplyTo(replyQueue);
         MessageProducer messageProducer = session.createProducer(requestDestination);
         try {
-          messageProducer.setTimeToLive(commonConfiguration.getRequestTimeout());
+          Long requestTimeout = environment.getRequiredProperty(Options.SERVER_REQUEST_TIMEOUT, Long.class);
+          messageProducer.setTimeToLive(requestTimeout);
           messageProducer.send(message);
 
           // wait for reply (receive timeout is set in XML)
           MessageConsumer consumer = session.createConsumer(replyQueue);
           try {
-            Message replyMessage = consumer.receive(commonConfiguration.getRequestTimeout());
+            Message replyMessage = consumer.receive(requestTimeout);
             if (replyMessage == null) {
               return null;
             } else {

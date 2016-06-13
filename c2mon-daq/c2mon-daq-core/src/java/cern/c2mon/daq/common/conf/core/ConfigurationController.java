@@ -86,12 +86,6 @@ public class ConfigurationController {
   private long startUp;
 
   /**
-   * The common configuration object shared over all DAQs. This is loaded from a
-   * local configuration file.
-   */
-  @Autowired
-  private CommonConfiguration commonConfiguration;
-  /**
    * The process configuration object.
    */
   private ProcessConfiguration processConfiguration;
@@ -887,15 +881,6 @@ public class ConfigurationController {
   }
 
   /**
-   * Gets the common configuration of this DAQ process.
-   *
-   * @return The common configuration object.
-   */
-  public CommonConfiguration getCommonConfiguration() {
-    return commonConfiguration;
-  }
-
-  /**
    * Sets the process configuration of this DAQ process.
    *
    * @param processConfiguration The process configuration object.
@@ -1054,82 +1039,6 @@ public class ConfigurationController {
     return null;
   }
 
-//  /**
-//   * Flag indicating whether the filtered messages should or should not be
-//   * sent to the filter module.
-//   */
-//  private boolean filterMode = true;
-//
-//  /**
-//   * This flag is used for switching on/off separate equipment logger's
-//   * appenders
-//   */
-//  private boolean useEquipmentLoggers = false;
-//
-//  /**
-//   * This flag is used in pair with eqLoggers flag, to define whether
-//   * equipment loggers should append both process and equipment appenders or
-//   * only equipment
-//   */
-//  private boolean useEquipmentAppendersOnly = false;
-//
-//  /**
-//   * returns the filterMode of the process
-//   *
-//   * @return the filterMode
-//   */
-//  public final boolean isFilterMode() {
-//    return filterMode;
-//  }
-//
-//  /**
-//   * sets the filterMode for the process
-//   *
-//   * @param filterMode to be set
-//   */
-//  public final void setFilterMode(final boolean filterMode) {
-//    this.filterMode = filterMode;
-//  }
-//
-//  /**
-//   * This method sets the useEquipmentLoggers boolean flag
-//   *
-//   * @param useEquipmentLoggers boolean flag stating whether each equipment unit should have
-//   *                            separate file appender or not
-//   */
-//  public final void setUseEquipmentLoggers(final boolean useEquipmentLoggers) {
-//    this.useEquipmentLoggers = useEquipmentLoggers;
-//  }
-//
-//  /**
-//   * This method returns eqLoggers boolean flag
-//   *
-//   * @return boolean
-//   */
-//  public boolean useEquipmentLoggers() {
-//    return useEquipmentLoggers;
-//  }
-//
-//  /**
-//   * This method sets the useEquipmentAppendersOnly boolean flag
-//   *
-//   * @param useEquipmentAppendersOnly boolean flag stating whether each equipment logger should
-//   *                                  append only its related appender or also the process logger's
-//   *                                  appender.
-//   */
-//  public final void setUseEquipmentAppendersOnly(final boolean useEquipmentAppendersOnly) {
-//    this.useEquipmentAppendersOnly = useEquipmentAppendersOnly;
-//  }
-//
-//  /**
-//   * This method returns eqAppendersOnly boolean flag
-//   *
-//   * @return boolean
-//   */
-//  public boolean useEquipmentAppendersOnly() {
-//    return useEquipmentAppendersOnly;
-//  }
-
   /**
    * This method sets the startup time of the process (in milliseconds)
    *
@@ -1146,5 +1055,9 @@ public class ConfigurationController {
    */
   public long getStartUp() {
     return startUp;
+  }
+
+  public Environment getEnvironment() {
+    return environment;
   }
 }

@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
+import static org.easymock.EasyMock.eq;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -47,7 +48,6 @@ import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.daq.common.conf.core.CommonConfiguration;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
@@ -170,13 +170,6 @@ public class ActiveRequestSenderTest {
   private ProcessConfiguration processConfigurationMock;
 
   /**
-   * Mock
-   * The CommonConfiguration object to be used in the Configuration test call
-   */
-  private CommonConfiguration commonConfigurationMock;
-
-
-  /**
    * Before each tests
    */
   @Before
@@ -200,12 +193,8 @@ public class ActiveRequestSenderTest {
         addMockedMethod("getprocessPIK").
         createMock();
 
-    this.commonConfigurationMock  = EasyMock.createMockBuilder(CommonConfiguration.class).
-        addMockedMethod("getRequestTimeout").
-        createMock();
-
     // Class to test ActiveRequestSender
-    this.activeRequestSender = new ActiveRequestSender(this.commonConfigurationMock, this.jmsTemplate);
+    this.activeRequestSender = new ActiveRequestSender(this.environmentMock, this.jmsTemplate);
   }
 
   /**
@@ -329,27 +318,15 @@ public class ActiveRequestSenderTest {
    */
   @Test
   public final void testSendProcessConfigurationRequest() {
+    EasyMock.reset(this.environmentMock);
     ActiveRequestSenderTest.testType = TestType.CONFIG;
     LOGGER.debug("Starting " + ActiveRequestSenderTest.testType.getName());
 
-    // Call the sending process configuration
-    sendProcessConfigurationRequest();
-  }
-
-  /**
-   * This method do all the mocking work before and after calling the sendProcessConfigurationRequest()
-   * function. It is common for all tests cause the differences are in the reply messages
-   *
-   */
-  private void sendProcessConfigurationRequest() {
     // Expectations.
-    EasyMock.expect(this.environmentMock.getProperty(EasyMock.<String>anyObject())).andReturn(PROCESS_NAME).times(1);
-    EasyMock.expect(this.commonConfigurationMock.getRequestTimeout()).andReturn(TEST_RESULTS_TIMEOUT).times(2);
-//    EasyMock.expect(this.configurationControllerMock.getProcessConfiguration()).andReturn(this.processConfigurationMock).times(1);
-//    EasyMock.expect(this.processConfigurationMock.getprocessPIK()).andReturn(PROCESS_PIK).times(1);
+    EasyMock.expect(this.environmentMock.getRequiredProperty(EasyMock.<String>anyObject(), eq(Long.class))).andReturn(TEST_RESULTS_TIMEOUT).times(1);
 
     // Start mock replay
-    EasyMock.replay(this.environmentMock, this.configurationControllerMock, this.commonConfigurationMock, this.processConfigurationMock);
+    EasyMock.replay(this.environmentMock);
 
     // Here, the real test starts
     ProcessConfigurationResponse processConfigurationResponse = this.activeRequestSender.sendProcessConfigurationRequest(PROCESS_NAME);
@@ -358,7 +335,7 @@ public class ActiveRequestSenderTest {
     compareConfiguration(processConfigurationResponse);
 
     // Verify configurationController Mock to check that sendprocessConnectionRequest() called what we expected
-    EasyMock.verify(this.configurationControllerMock, this.commonConfigurationMock);
+    EasyMock.verify(this.environmentMock);
   }
 
 
