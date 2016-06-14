@@ -62,7 +62,6 @@
     <dependency>
       <groupId>net.sf.ehcache</groupId>
       <artifactId>ehcache-core</artifactId>
-      <scope>provided</scope>
     </dependency>
 
     <!-- Test dependencies -->
