@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -25,6 +25,7 @@ import javax.naming.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Isolation;
@@ -55,7 +56,6 @@ import cern.c2mon.shared.daq.config.DataTagUpdate;
  * Implementation of transacted methods.
  *
  * @author Mark Brightwell
- *
  */
 @Service
 public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag> implements DataTagConfigTransacted {
@@ -89,19 +89,24 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
 
   /**
    * Autowired constructor.
-   * @param dataTagFacade reference to facade bean
-   * @param dataTagLoaderDAO reference to DAO
-   * @param dataTagCache reference to cache
-   * @param equipmentFacade reference to equipment facade
+   * @param dataTagFacade      reference to facade bean
+   * @param dataTagLoaderDAO   reference to DAO
+   * @param dataTagCache       reference to cache
+   * @param equipmentFacade    reference to equipment facade
    * @param tagLocationService reference to tag location bean
    */
   @Autowired
   public DataTagConfigTransactedImpl(final DataTagFacade dataTagFacade,
-      final DataTagLoaderDAO dataTagLoaderDAO, final DataTagCache dataTagCache,
-      final EquipmentFacade equipmentFacade, SubEquipmentFacade subEquipmentFacade, final TagLocationService tagLocationService){
+                                     final DataTagLoaderDAO dataTagLoaderDAO, final DataTagCache dataTagCache,
+                                     final EquipmentFacade equipmentFacade, SubEquipmentFacade subEquipmentFacade, final TagLocationService tagLocationService) {
     super(dataTagLoaderDAO, dataTagFacade, dataTagCache, tagLocationService);
     this.equipmentFacade = equipmentFacade;
     this.subEquipmentFacade = subEquipmentFacade;
+  }
+
+  @ManagedOperation(description = "Persists the current cache configurations to the DB (cache persistence). Ensures cache object runtime values & DB are synchronized.")
+  public void persistAllCacheConfigurationToDatabase() {
+    tagCache.getKeys().parallelStream().forEach((key) -> configurableDAO.updateConfig(tagCache.get(key)));
   }
 
   /**
@@ -110,7 +115,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
    * @param element the server configuration element
    * @return the change event to send to the DAQ
    * @throws IllegalAccessException
-   * @throws RuntimeException if any error occurs during reconfiguration; DB transaction is rolled back and cache elements are removed
+   * @throws RuntimeException       if any error occurs during reconfiguration; DB transaction is rolled back and cache elements are removed
    */
   @Override
   @Transactional(value = "cacheTransactionManager")
@@ -118,7 +123,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
 
     // TIMS-1048: Making check before write lock in order to avoid a deadlock situation
     checkId(element.getEntityId());
-    
+
     tagCache.acquireWriteLockOnKey(element.getEntityId());
     try {
       LOGGER.trace("Creating DataTag " + element.getEntityId());
@@ -138,18 +143,18 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
               ((DataTagFacade) commonTagFacade).generateSourceDataTag(dataTag));
           return new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(dataTag.getEquipmentId()), dataTagAdd);
         }
-        
+
         if (dataTag.getSubEquipmentId() != null) {
           // TIMS-951: Allow attachment of DataTags to SubEquipments
           subEquipmentFacade.addTagToSubEquipment(dataTag.getSubEquipmentId(), dataTag.getId());
           DataTagAdd dataTagAdd = new DataTagAdd(element.getSequenceId(), subEquipmentFacade.getEquipmentIdForSubEquipment(dataTag.getSubEquipmentId()),
-            ((DataTagFacade) commonTagFacade).generateSourceDataTag(dataTag));
+              ((DataTagFacade) commonTagFacade).generateSourceDataTag(dataTag));
           return new ProcessChange(subEquipmentFacade.getProcessIdForAbstractEquipment(dataTag.getSubEquipmentId()), dataTagAdd);
         }
 
         throw new IllegalArgumentException("No (sub)equipment id set in datatag (" + dataTag.getId() + ") configuration.");
-        
-        
+
+
       } catch (Exception ex) {
         LOGGER.error("Exception caught when attempting to create a DataTag - rolling back the DB transaction and undoing cache changes.");
         tagCache.remove(dataTag.getId());
@@ -165,7 +170,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
             subEquipmentFacade.removeTagFromSubEquipment(dataTag.getSubEquipmentId(), dataTag.getId());
           }
         }
-        
+
         throw new UnexpectedRollbackException("Unexpected exception while creating a DataTag: rolling back the change", ex);
       }
     } finally {
@@ -184,7 +189,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
    * reason this call requires a NEW TRANSACTION, so the calling
    * method can reload the object from a rolled back DB.
    *
-   * @param id the id of the tag
+   * @param id         the id of the tag
    * @param properties the properties containing the changes
    * @return an change event if action is necessary by the DAQ; otherwise null
    */
@@ -265,14 +270,14 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
           tagCache.releaseWriteLockOnKey(id);
         }
       }
-      
+
       // if successful so far add remove event for DAQ layer
       DataTagRemove removeEvent = new DataTagRemove();
       removeEvent.setDataTagId(id);
 
       if (tagCopy.getEquipmentId() != null) {
         removeEvent.setEquipmentId(tagCopy.getEquipmentId());
-        processChange = new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(tagCopy.getEquipmentId()), removeEvent); 
+        processChange = new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(tagCopy.getEquipmentId()), removeEvent);
       }
       // TIMS-951: Allow attachment of DataTags to SubEquipments
       else if (tagCopy.getSubEquipmentId() != null) {
