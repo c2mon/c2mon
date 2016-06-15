@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -46,6 +46,7 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
 import cern.c2mon.shared.daq.config.IChange;
 
+
 /**
  * See interface documentation.
  *
@@ -67,7 +68,6 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
 
   private EquipmentFacade equipmentFacade;
 
-  @Autowired
   private ProcessConfigHandler processConfigHandler;
 
   private EquipmentCache equipmentCache;
@@ -90,6 +90,11 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
   }
 
   @Override
+  public void setProcessConfigHandler(ProcessConfigHandler processConfigHandler) {
+    this.processConfigHandler = processConfigHandler;
+  }
+
+  @Override
   public ProcessChange removeEquipment(final Long equipmentid, final ConfigurationElementReport equipmentReport) {
     LOGGER.debug("Removing Equipment " + equipmentid);
     try {
@@ -105,19 +110,19 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
       } finally {
         equipmentCache.releaseWriteLockOnKey(equipmentid);
       }
-      
+
       // must be removed last as equipment references them; when this returns are removed from cache and DB permanently
       removeEquipmentControlTags(equipmentCopy, equipmentReport);
-      
+
       // remove alive & commfault after control tags, or could be pulled back in from DB to cache!
       equipmentFacade.removeAliveTimer(equipmentid);
       equipmentFacade.removeCommFault(equipmentid);
       processConfigHandler.removeEquipmentFromProcess(equipmentid, equipmentCopy.getProcessId());
       equipmentCache.remove(equipmentid);
       IChange equipmentUnitRemove = new EquipmentUnitRemove(0L, equipmentid); //id is reset
-      
+
       return new ProcessChange(equipmentCopy.getProcessId(), equipmentUnitRemove);
-      
+
     } catch (CacheElementNotFoundException cacheEx) {
       LOGGER.debug("Equipment not found in cache - unable to remove it.");
       equipmentReport.setWarning("Equipment not found in cache so cannot be removed.");

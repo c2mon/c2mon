@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -42,6 +42,8 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.common.ConfigurationException;
+
+import javax.annotation.PostConstruct;
 
 /**
  * See interface documentation.
@@ -93,6 +95,11 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
     this.processCache = processCache;
     this.processFacade = processFacade;
     this.jmsContainerManager = jmsContainerManager;
+  }
+
+  @PostConstruct
+  public void init(){
+    equipmentConfigHandler.setProcessConfigHandler(this);
   }
 
   /**
@@ -192,22 +199,22 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
   @Override
   public ProcessChange updateProcess(final Long processId,
                                     final Properties elementProperties) throws IllegalAccessException {
-    
+
     if (elementProperties.containsKey("id")) {
       LOGGER.warn("Attempting to change the process id - this is not currently supported!");
       elementProperties.remove("id");
     }
-    
+
     if (elementProperties.containsKey("name")) {
       LOGGER.warn("Attempting to change the process name - this is not currently supported!");
       elementProperties.remove("name");
     }
-    
+
     boolean aliveConfigure = false;
     if (elementProperties.containsKey("aliveInterval") || elementProperties.containsKey("aliveTagId")) {
       aliveConfigure = true;
     }
-    
+
     ProcessChange processChange = new ProcessChange(processId);
     try {
       Long oldAliveId = processCache.getCopy(processId).getAliveTagId();
@@ -220,7 +227,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
         processFacade.loadAndStartAliveTag(processId);
         processChange.requiresReboot();
       }
-      
+
     } catch (CacheElementNotFoundException cacheEx) {
       LOGGER.warn("Unable to locate Process " + processId + " in cache so unable to update it.");
       throw cacheEx;
@@ -228,7 +235,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
       LOGGER.error("Exception caught while updating Process " + processId + " - rolling back DB and cache changes for this Process.");
       throw new UnexpectedRollbackException("Unexpected exception caught while updating Process " + processId, e);
     }
-    
+
     return processChange;
   }
 
