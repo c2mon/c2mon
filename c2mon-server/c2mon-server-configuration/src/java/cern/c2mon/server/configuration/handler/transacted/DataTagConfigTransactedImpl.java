@@ -104,11 +104,6 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
     this.subEquipmentFacade = subEquipmentFacade;
   }
 
-  @ManagedOperation(description = "Persists the current cache configurations to the DB (cache persistence). Ensures cache object runtime values & DB are synchronized.")
-  public void persistAllCacheConfigurationToDatabase() {
-    tagCache.getKeys().parallelStream().forEach((key) -> configurableDAO.updateConfig(tagCache.get(key)));
-  }
-
   /**
    * Create the cache objects, puts it in the DB, loads it into the cache, and returns the
    * change event for sending to the DAQ.
