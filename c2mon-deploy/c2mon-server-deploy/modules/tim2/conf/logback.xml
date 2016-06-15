@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true">
   <include resource="org/springframework/boot/logging/logback/defaults.xml" />
-  <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
 
 
-  <property name="LOG_FILE"                    value="${LOG_PATH:-/tmp}/c2mon.log"/>
-  <property name="ERROR_LOG_FILE"              value="${LOG_PATH:-/tmp}/c2mon.error.log"/>
-  <property name="PERSISTENCE_LOG_FILE"        value="${LOG_PATH:-/tmp}/c2mon.persistence.log"/>
-  <property name="TAG_LOG_FILE"                value="${LOG_PATH:-/tmp}/c2mon.tag.log"/>
-  <property name="RULE_LOG_FILE"               value="${LOG_PATH:-/tmp}/c2mon.rultetag.log"/>
-  <property name="BENCHMARK_TAG_LOG_FILE"      value="${LOG_PATH:-/tmp}/c2mon.benchmark.tag.log"/>
-  <property name="BENCHMARK_PRIORITY_LOG_FILE" value="${LOG_PATH:-/tmp}/c2mon.benchmark.priority.log"/>
-  <property name="LASER_ALARM_LOG_FILE"        value="${LOG_PATH:-/tmp}/c2mon.laser.log"/>
-  <property name="STL_LOG_FILE"                value="${LOG_PATH:-/tmp}/c2mon.shortterm.log"/>
+  <property name="LOG_FILE"             value="${LOG_PATH:-/tmp}/c2mon.log"/>
+  <property name="TAG_LOG_FILE"         value="${LOG_PATH:-/tmp}/c2mon.tag.log"/>
+  <property name="RULE_LOG_FILE"        value="${LOG_PATH:-/tmp}/c2mon.ruletag.log"/>
+  <property name="ERROR_LOG_FILE"       value="${LOG_PATH:-/tmp}/c2mon.error.log"/>
+  <property name="FALLBACK_LOG_FILE"    value="${LOG_PATH:-/tmp}/c2mon.fallback.log"/>
+  <property name="PERSISTENCE_LOG_FILE" value="${LOG_PATH:-/tmp}/c2mon.persistence.log"/>
+  <property name="LASER_LOG_FILE"       value="${LOG_PATH:-/tmp}/c2mon.laser.log"/>
 
 
   <appender name="FileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -22,6 +19,32 @@
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
       <fileNamePattern>${LOG_FILE}.%i</fileNamePattern>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>10MB</MaxFileSize>
+    </triggeringPolicy>
+  </appender>
+
+  <appender name="TagAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${TAG_LOG_FILE}</file>
+    <encoder>
+      <pattern>%msg%n</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${TAG_LOG_FILE}.%i</fileNamePattern>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>10MB</MaxFileSize>
+    </triggeringPolicy>
+  </appender>
+
+  <appender name="RuleTagAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${RULE_LOG_FILE}</file>
+    <encoder>
+      <pattern>%msg%n</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${RULE_LOG_FILE}.%i</fileNamePattern>
     </rollingPolicy>
     <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
       <MaxFileSize>10MB</MaxFileSize>
@@ -44,6 +67,19 @@
     </filter>
   </appender>
 
+  <appender name="FallbackLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${FALLBACK_LOG_FILE}</file>
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${FALLBACK_LOG_FILE}.%i</fileNamePattern>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>10MB</MaxFileSize>
+    </triggeringPolicy>
+  </appender>
+  
   <appender name="PersistenceAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${PERSISTENCE_LOG_FILE}</file>
     <encoder>
@@ -56,87 +92,23 @@
       <MaxFileSize>10MB</MaxFileSize>
     </triggeringPolicy>
   </appender>
-
-  <appender name="TagAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${TAG_LOG_FILE}</file>
-    <encoder>
-      <pattern>${FILE_LOG_PATTERN}</pattern>
-    </encoder>
-    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-      <fileNamePattern>${TAG_LOG_FILE}.%i</fileNamePattern>
-    </rollingPolicy>
-    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-      <MaxFileSize>10MB</MaxFileSize>
-    </triggeringPolicy>
-  </appender>
-
-  <appender name="RuleTagAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${RULE_LOG_FILE}</file>
-    <encoder>
-      <pattern>${FILE_LOG_PATTERN}</pattern>
-    </encoder>
-    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-      <fileNamePattern>${RULE_LOG_FILE}.%i</fileNamePattern>
-    </rollingPolicy>
-    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-      <MaxFileSize>10MB</MaxFileSize>
-    </triggeringPolicy>
-  </appender>
-
-  <appender name="BenchmarkDataTagAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${BENCHMARK_TAG_LOG_FILE}</file>
-    <encoder>
-      <pattern>${FILE_LOG_PATTERN}</pattern>
-    </encoder>
-    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-      <fileNamePattern>${BENCHMARK_TAG_LOG_FILE}.%i</fileNamePattern>
-    </rollingPolicy>
-    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-      <MaxFileSize>10MB</MaxFileSize>
-    </triggeringPolicy>
-  </appender>
-
-  <appender name="BenchmarkPriorityAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${BENCHMARK_PRIORITY_LOG_FILE}</file>
-    <encoder>
-      <pattern>${FILE_LOG_PATTERN}</pattern>
-    </encoder>
-    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-      <fileNamePattern>${BENCHMARK_PRIORITY_LOG_FILE}.%i</fileNamePattern>
-    </rollingPolicy>
-    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-      <MaxFileSize>10MB</MaxFileSize>
-    </triggeringPolicy>
-  </appender>
-
+  
   <appender name="LaserAlarmsAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${LASER_ALARM_LOG_FILE}</file>
+    <file>${LASER_LOG_FILE}</file>
     <encoder>
-      <pattern>${FILE_LOG_PATTERN}</pattern>
+      <pattern>%msg%n</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-      <fileNamePattern>${LASER_ALARM_LOG_FILE}.%i</fileNamePattern>
+      <fileNamePattern>${LASER_LOG_FILE}.%i</fileNamePattern>
     </rollingPolicy>
     <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
       <MaxFileSize>10MB</MaxFileSize>
     </triggeringPolicy>
   </appender>
-
-  <appender name="ShortTermLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${STL_LOG_FILE}</file>
-    <encoder>
-      <pattern>${FILE_LOG_PATTERN}</pattern>
-    </encoder>
-    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-      <fileNamePattern>${STL_LOG_FILE}.%i</fileNamePattern>
-    </rollingPolicy>
-    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-      <MaxFileSize>10MB</MaxFileSize>
-    </triggeringPolicy>
-  </appender>
-
+  
   <appender name="AdminEmailAppender" class="ch.qos.logback.classic.net.SMTPAppender">
     <smtpHost>cernmx.cern.ch</smtpHost>
+    <to>anna.suwalska@cern.ch</to>
     <to>matthias.braeger@cern.ch</to>
     <to>justin.lewis.salmon@cern.ch</to>
     <from>tim.support@cern.ch</from>
@@ -146,55 +118,54 @@
 
   <appender name="AdminSmsAppender" class="ch.qos.logback.classic.net.SMTPAppender">
     <smtpHost>cernmx.cern.ch</smtpHost>
-    <to>0041764876862@mail2sms.cern.ch</to>
-    <to>0041764875788@mail2sms.cern.ch</to>
-    <to>0041764832903@mail2sms.cern.ch</to>
+    <to>0041754115676@mail2sms.cern.ch</to> <!-- Anna -->
+    <to>0041754115788@mail2sms.cern.ch</to> <!-- Matthias -->
+    <to>0041754117434@mail2sms.cern.ch</to> <!-- Justin -->
     <from>tim.support@cern.ch</from>
     <subject>C2MON server warning</subject>
     <layout class="ch.qos.logback.classic.html.HTMLLayout"/>
   </appender>
 
 
-  <!-- TODO: add CMW central logging appender -->
-
-
-  <logger name="BenchmarkDataTagLogger" level="INFO">
-    <appender-ref ref="BenchmarkDataTagAppender"/>
-  </logger>
-  <logger name="BenchmarkPriorityLogger" level="INFO">
-    <appender-ref ref="BenchmarkPriorityAppender"/>
-  </logger>
-  <logger name="SourceDataTagLogger" level="INFO">
+  <logger name="SourceDataTagLogger" level="INFO" additivity="false">
     <appender-ref ref="TagAppender"/>
   </logger>
-  <logger name="RuleTagLogger" level="INFO">
+  
+  <logger name="RuleTagLogger" level="INFO" additivity="false">
     <appender-ref ref="RuleTagAppender"/>
   </logger>
-  <logger name="LaserAlarmsLogger" level="INFO">
-    <appender-ref ref="LaserAlarmsAppender"/>
+  
+  <!-- Used within c2mon-shared-persistence-manager to trace activities of the history fallback mechanism -->
+  <logger name="ShortTermLogFallbackLogger" level="INFO" additivity="false">
+    <appender-ref ref="FallbackLogAppender"/>
   </logger>
-  <logger name="ShortTermLogFallbackLogger" level="INFO">
-    <appender-ref ref="ShortTermLogAppender"/>
-  </logger>
-  <logger name="cern.c2mon" level="DEBUG"/>
-  <logger name="cern.c2mon.server.shorttermlog" level="DEBUG"/>
-  <logger name="cern.c2mon.pmanager" level="DEBUG"/>
+  
   <logger name="cern.c2mon.server.cachepersistence" level="DEBUG">
     <appender-ref ref="PersistenceAppender"/>
   </logger>
+  
+  <!-- c2mon-server-laser module -->
+  <logger name="LaserAlarmsLogger" level="INFO" additivity="false">
+    <appender-ref ref="LaserAlarmsAppender"/>
+  </logger>
+  
   <logger name="AdminSmsLogger" level="INFO">
     <appender-ref ref="AdminSmsAppender"/>
     <appender-ref ref="AdminEmailAppender"/>
-    <appender-ref ref="FileAppender"/>
   </logger>
+  
   <logger name="AdminEmailLogger" level="INFO">
     <appender-ref ref="AdminEmailAppender"/>
   </logger>
+  
+  
+  <logger name="cern.c2mon" level="DEBUG"/>
+  <logger name="cern.c2mon.server.shorttermlog" level="DEBUG"/>
+  <logger name="cern.c2mon.pmanager" level="DEBUG"/>
   <logger name="org.apache.activemq" level="INFO"/>
   <logger name="org.springframework" level="INFO"/>
 
   <root level="INFO">
-    <appender-ref ref="CONSOLE" />
     <appender-ref ref="FileAppender"/>
     <appender-ref ref="ErrorAppender"/>
   </root>

@@ -22,12 +22,24 @@
       <artifactId>c2mon-server-all</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>net.sf.ehcache</groupId>
           <artifactId>ehcache-core</artifactId>
+          <groupId>net.sf.ehcache</groupId>
         </exclusion>
         <exclusion>
-          <groupId>net.sf.ehcache</groupId>
-          <artifactId>ehcache</artifactId>
+          <artifactId>logback-classic</artifactId>
+          <groupId>ch.qos.logback</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>logback-core</artifactId>
+          <groupId>ch.qos.logback</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>hsqldb</artifactId>
+          <groupId>org.hsqldb</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>mysql-connector-java</artifactId>
+          <groupId>mysql</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -35,19 +47,23 @@
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-shorttermlog</artifactId>
       <version>[1.5.0, 2.0.0)</version>
+      <exclusions>
+       <exclusion>
+          <artifactId>hsqldb</artifactId>
+          <groupId>org.hsqldb</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-laser</artifactId>
       <version>[1.5.0, 2.0.0)</version>
     </dependency>
-
-    <!-- TODO: Re-enable elasticsearch once ready -->
-    <!--<dependency>-->
-      <!--<groupId>cern.c2mon.c2mon-server</groupId>-->
-      <!--<artifactId>c2mon-server-eslog</artifactId>-->
-      <!--<version>[1.6.0, 2.0.0)</version>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-eslog</artifactId>
+      <version>[1.7.0,2.0.0]</version>
+    </dependency>
 
     <!-- 3rd party dependencies -->
     <dependency>
@@ -56,9 +72,9 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-    	<groupId>cern.c2mon.c2mon-server</groupId>
-    	<artifactId>c2mon-server-eslog</artifactId>
-    	<version>[1.7.0,2.0.0]</version>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 

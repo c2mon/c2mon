@@ -20,28 +20,67 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-all</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>ehcache-core</artifactId>
+          <groupId>net.sf.ehcache</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>hsqldb</artifactId>
+          <groupId>org.hsqldb</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>log4j-over-slf4j</artifactId>
+          <groupId>org.slf4j</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>mysql-connector-java</artifactId>
+          <groupId>mysql</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
+  
+    <!-- 
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-benchmark</artifactId>
       <version>[1.5.0, 2.0.0)</version>
     </dependency>
+     -->
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-laser</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
+      <version>[1.7.0, 2.0.0)</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>log4j</artifactId>
+          <groupId>log4j</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-shorttermlog</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
+      <version>[1.7.0, 2.0.0)</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>hsqldb</artifactId>
+          <groupId>org.hsqldb</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>mybatis-spring</artifactId>
+          <groupId>org.mybatis</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
+    <!-- 
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-eslog</artifactId>
-      <version>[1.6.0, 2.0.0)</version>
+      <version>[1.7.0, 2.0.0)</version>
     </dependency>
-
+     -->
+     
     <!-- for distributed cache only -->
     <dependency>
       <groupId>org.terracotta.bigmemory</groupId>
@@ -65,14 +104,16 @@
       <artifactId>ojdbc</artifactId>
     </dependency>
 
-    <!-- for logging -->
+    <!-- for central logging -->
+    <!-- 
     <dependency>
       <groupId>cern.cmw</groupId>
       <artifactId>cmw-log-log4j</artifactId>
       <scope>runtime</scope>
       <version>[1.5.8, 2.0.0)</version>
     </dependency>
-
+     -->
+     
     <!--
       Allows exposing the JMX interface to DIAMON
     -->
