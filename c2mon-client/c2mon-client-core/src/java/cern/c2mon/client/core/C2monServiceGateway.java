@@ -23,11 +23,11 @@ import org.springframework.boot.Banner;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import cern.c2mon.client.core.manager.CommandManager;
 import cern.c2mon.client.core.manager.SupervisionManager;
 import cern.c2mon.client.core.manager.TagManager;
+import org.springframework.context.support.AbstractApplicationContext;
 
 /**
  * This class is the main facade for all applications using the
@@ -215,7 +215,7 @@ public class C2monServiceGateway {
       context = new SpringApplicationBuilder().sources(C2monAutoConfiguration.class).bannerMode(Banner.Mode.OFF).run();
       initiateGatewayFields(context);
 
-      ((AnnotationConfigApplicationContext) context).registerShutdownHook();
+      ((AbstractApplicationContext) context).registerShutdownHook();
     }
     else {
       LOG.debug("startC2monClient() - C2MON client core already started.");
