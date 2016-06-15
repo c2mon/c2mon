@@ -1,12 +1,13 @@
 package cern.c2mon.server.common.util;
 
-import lombok.extern.slf4j.Slf4j;
+import javax.annotation.PreDestroy;
+
 import org.hsqldb.Server;
 import org.hsqldb.persist.HsqlProperties;
 import org.hsqldb.server.ServerConstants;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PreDestroy;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Justin Lewis Salmon
@@ -16,7 +17,6 @@ import javax.annotation.PreDestroy;
 public class HsqlServer {
 
   private static Server server;
-  private static HsqlProperties properties = new HsqlProperties();
 
   public static void start(String database, String dbname) {
     if (server != null && server.getState() == ServerConstants.SERVER_STATE_ONLINE) {
@@ -25,6 +25,7 @@ public class HsqlServer {
     }
 
     server = new Server();
+    HsqlProperties properties = new HsqlProperties();
     properties.setProperty("server.database.0", database);
     properties.setProperty("server.dbname.0", dbname);
 
