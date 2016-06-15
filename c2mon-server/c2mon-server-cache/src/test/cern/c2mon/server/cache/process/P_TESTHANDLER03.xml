@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProcessConfiguration xmlns="http://timweb.cern.ch/schemas/c2mon-daq/Configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                       xsi:schemaLocation="http://timweb.cern.ch/schemas/c2mon-daq/Configuration http://timweb/schemas/c2mon-daq/ProcessConfiguration.xsd"
-                      process-id="50" type="initialise">
+                      process-id="50" type="initialise" name="P_TESTHANDLER03">
   <alive-tag-id>1221</alive-tag-id>
   <alive-interval>60000</alive-interval>
   <max-message-size>100</max-message-size>
