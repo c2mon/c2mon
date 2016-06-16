@@ -25,6 +25,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.Attribute;
@@ -70,7 +71,7 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   /** LASER alarm fault member */
   @NotNull
   @Element
-  private String faultMember;
+  private String faultMemeber;
 
   /** Free text for additional information about the alarm */
   @Element(required = false)
@@ -128,7 +129,7 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
                         final boolean isActive) {
     id = pId;
     faultCode = pFaultCode;
-    faultMember = pFaultMember;
+    faultMemeber = pFaultMember;
     faultFamily = pFaultFamily;
     info = pInfo;
     tagId = pTagId;
@@ -159,13 +160,20 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
                         final boolean isActive) {
     id = pId;
     faultCode = pFaultCode;
-    faultMember = pFaultMember;
+    faultMemeber = pFaultMember;
     faultFamily = pFaultFamily;
     info = pInfo;
     tagId = pTagId;
     tagDescription = pTagDescription;
     timestamp = pTimestamp;
     active = isActive;
+  }
+
+
+  @Override
+  @JsonIgnore
+  public String getFaultMember() {
+    return this.faultMemeber;
   }
 
   @Override
