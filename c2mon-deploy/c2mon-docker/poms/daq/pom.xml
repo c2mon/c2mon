@@ -96,6 +96,9 @@
                       <run>apt-get install -y --no-install-recommends xz-utils</run> <!--lsof command-not-found-->
                       <run>rm -rf /var/lib/apt/lists/*</run>
                     </runs>
+                    <env>
+                      <LD_LIBRARY_PATH>/opt/c2mon/${project.artifactId}/lib_so</LD_LIBRARY_PATH>
+                    </env>
                     <volumes>
                       <volume>/opt/c2mon/${project.artifactId}/log</volume>
                       <volume>/opt/c2mon/${project.artifactId}/conf</volume>
