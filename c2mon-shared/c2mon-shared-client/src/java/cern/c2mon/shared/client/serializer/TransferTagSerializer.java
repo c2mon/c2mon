@@ -139,6 +139,7 @@ public class TransferTagSerializer {
     Object newTagValue = tag.getValue();
 
     if (isKnownClass(tag.getValueClassName())
+        && getType(tag.getValueClassName()) != String.class
         && newTagValue != null
         && (newTagValue.getClass() == LinkedHashMap.class)
         || isJsonString(newTagValue)) {
