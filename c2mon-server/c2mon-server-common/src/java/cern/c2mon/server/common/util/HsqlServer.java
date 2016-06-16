@@ -5,14 +5,12 @@ import javax.annotation.PreDestroy;
 import org.hsqldb.Server;
 import org.hsqldb.persist.HsqlProperties;
 import org.hsqldb.server.ServerConstants;
-import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Justin Lewis Salmon
  */
-@Component
 @Slf4j
 public class HsqlServer {
 
