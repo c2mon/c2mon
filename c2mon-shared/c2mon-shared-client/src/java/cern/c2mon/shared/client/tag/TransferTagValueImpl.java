@@ -20,6 +20,8 @@ import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import cern.c2mon.shared.common.type.TypeConverter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.Singular;
 import lombok.extern.slf4j.Slf4j;
@@ -50,10 +52,13 @@ public class TransferTagValueImpl extends ClientRequestReport implements TagValu
 
   /** The unique tag id */
   @NotNull @Min(1)
-  private final Long id;
+  private Long tagId;
 
   /** The class type of the tag value as String representation */
   private String valueClassName;
+
+  /** The value of the tag. Parameter is only used for backward compatibly to the old server */
+  private String tagValue;
 
   /** The value of the tag */
   private Object value;
@@ -70,11 +75,11 @@ public class TransferTagValueImpl extends ClientRequestReport implements TagValu
 
   /** Collection of <code>AlarmValue</code> objects */
   @Singular
-  private final Collection<AlarmValueImpl> alarms = new ArrayList<>();
+  private Collection<AlarmValueImpl> alarmValues = new ArrayList<>();
 
   /** The quality of the tag */
   @NotNull
-  private final DataTagQualityImpl dataTagQuality;
+  private DataTagQualityImpl tagQuality;
 
   /** The tag description */
   private String description;
@@ -131,12 +136,11 @@ public class TransferTagValueImpl extends ClientRequestReport implements TagValu
                               final Timestamp pDaqTimestamp,
                               final Timestamp pServerTimestamp,
                               final String pDescription) {
-    id = pTagId;
-
+    tagId = pTagId;
     value = pTagValue;
-//    valueClassName = getType(valueType).getName();
+    tagValue = value != null ? value.toString() : null;
 
-    dataTagQuality = pTagQuality;
+    tagQuality = pTagQuality;
     this.mode = pMode;
     sourceTimestamp = pSourceTimestamp;
     daqTimestamp = pDaqTimestamp;
@@ -145,6 +149,38 @@ public class TransferTagValueImpl extends ClientRequestReport implements TagValu
     valueDescription = pValueDescription;
   }
 
+  @Override
+  @JsonIgnore
+  public Long getId(){
+    return this.tagId;
+  }
+
+  @Override
+  @JsonIgnore
+  public DataTagQualityImpl getDataTagQuality(){
+    return this.tagQuality;
+  }
+
+  public void setTagValue(String tagValueAsString){
+    try {
+      if (tagValueAsString != null && valueClassName != null) {
+        if (valueClassName.equals(String.class.getName())) {
+          value = tagValueAsString;
+        } else {
+          value = TypeConverter.cast(tagValueAsString, valueClassName);
+        }
+      } else {
+        log.warn("Set tagValue not possible: value class name not given or the value is null");
+      }
+    } catch (Exception e) {
+      log.error("Set tagValue not possible: Error while parsing occurred - "+e);
+    }
+  }
+
+  public void setValue(Object value ){
+    this.value = value;
+    this.tagValue = value != null ? value.toString() : null;
+  }
 
   /**
    * Adds the given alarm value to the transfer tag, except if an alarm with the same ID
@@ -153,13 +189,11 @@ public class TransferTagValueImpl extends ClientRequestReport implements TagValu
    * @return <code>true</code>, if the alarm was successfully added to this tag
    */
   public final boolean addAlarmValue(@Valid final AlarmValueImpl alarmValue) {
-    if (alarmValue.getTagId().equals(id)) {
-      return alarms.add(alarmValue);
+    if (alarmValue.getTagId().equals(tagId)) {
+      return alarmValues.add(alarmValue);
     }
-
     return false;
   }
-
 
   /**
    * Adds the given alarm values to the transfer tag, except if an alarm with the same ID
@@ -176,13 +210,12 @@ public class TransferTagValueImpl extends ClientRequestReport implements TagValu
     }
   }
 
-
   /**
    * @see cern.c2mon.shared.client.tag.TagValueUpdate#getAlarms()
    */
   @Override
+  @JsonIgnore
   public final Collection<AlarmValue> getAlarms() {
-    return new ArrayList<AlarmValue>(alarms);
+    return new ArrayList<AlarmValue>(alarmValues);
   }
-
 }

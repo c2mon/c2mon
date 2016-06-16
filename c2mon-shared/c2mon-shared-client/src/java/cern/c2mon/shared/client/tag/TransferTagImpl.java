@@ -24,6 +24,7 @@ import javax.validation.constraints.Size;
 
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.rule.RuleExpression;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 /**
@@ -72,13 +73,13 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
 
   /** The unique name of the tag */
   @NotNull
-  private final String name;
+  private String tagName;
 
   /** Unit of the tag */
   private String unit = null;
 
   /** In case of a rule tag this field should not be null */
-  private String ruleExpression = null;
+  private String ruleExpressionStr = null;
 
   /** In case of a Control tag update, this field is set to <code>true</code> */
   private boolean controlTag = false;
@@ -128,8 +129,20 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
                          final String pTopicName) {
     super(pTagId, pTagValue, pTagValueDescription, pTagQuality, pMode, pSourceTimestamp, pDaqTimestamp, pServerTimestamp, pDescription);
 
-    name = pTagName;
+    tagName = pTagName;
     topicName = pTopicName;
+  }
+
+  @Override
+  @JsonIgnore
+  public String getName(){
+    return this.tagName;
+  }
+
+  @Override
+  @JsonIgnore
+  public String getRuleExpression(){
+    return this.ruleExpressionStr;
   }
 
   /**
@@ -222,7 +235,7 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
    * @param ruleExpression The rule which was used to compute the tag value
    */
   public void defineRuleExpression(final RuleExpression ruleExpression) {
-    this.ruleExpression = ruleExpression.getExpression();
+    this.ruleExpressionStr = ruleExpression.getExpression();
   }
 
   /**

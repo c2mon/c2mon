@@ -79,14 +79,14 @@ public class TransferTagImplTest {
     		             "\"equipmentIds\":[4234,234]," +
     		             "\"subEquipmentIds\":[14234,1234]," +
     		             "\"topicName\":\"topic:name\"," +
-    		             "\"name\":\"tag:name\"," +
-    		             "\"id\":1234," +
+    		             "\"tagName\":\"tag:name\"," +
+    		             "\"tagId\":1234," +
     		             "\"valueClassName\":\"java.lang.Float\"," +
     		             "\"value\":3.34535," +
     		             "\"mode\":\"TEST\"," +
     		             "\"simulated\":false," +
     		             "\"alarmValues\":[]," +
-    		             "\"dataTagQuality\":{\"invalidQualityStates\":{\"PROCESS_DOWN\":\"Process Down\"},\"isValid\":false}," +
+    		             "\"tagQuality\":{\"invalidQualityStates\":{\"PROCESS_DOWN\":\"Process Down\"},\"isValid\":false}," +
     		             "\"description\":\"Test transfer tag\"," +
     		             "\"valueDescription\":\"Test val desc\"," +
     		             "\"sourceTimestamp\":1343812635352," +

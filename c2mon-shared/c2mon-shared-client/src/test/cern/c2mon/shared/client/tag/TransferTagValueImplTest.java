@@ -196,12 +196,12 @@ public class TransferTagValueImplTest {
   public void testStringBackwardsCompatibility() {
 
     //current publication format of Tag + associated alarm values
-    String jsonString = "{\"id\":100003," +
+    String jsonString = "{\"tagId\":100003," +
     		"\"valueClassName\":\"java.lang.String\"," +
-    		"\"value\":\"DOWN\"," +
+    		"\"tagValue\":\"DOWN\"," +
     		"\"mode\":\"TEST\"," +
     		"\"simulated\":false," +
-    		"\"alarms\":[{\"id\":1," +
+    		"\"alarmValues\":[{\"id\":1," +
     				                "\"faultCode\":0," +
     				                "\"faultFamily\":\"fault family\"," +
     				                "\"faultMember\":\"fault member\"," +
@@ -227,7 +227,7 @@ public class TransferTagValueImplTest {
     				                "\"currentOperation\":0," +
     				                "\"totalParts\":0," +
     				                "\"currentPart\":0}]," +
-    			"\"dataTagQuality\":{\"invalidQualityStates\":{},\"isValid\":false}," +
+    			"\"tagQuality\":{\"invalidQualityStates\":{},\"isValid\":false}," +
     			"\"description\":\"test description\"," +
     			"\"valueDescription\":\"test value description\"," +
     			"\"sourceTimestamp\":1343809448989," +
@@ -264,12 +264,12 @@ public class TransferTagValueImplTest {
   public void testLongBackwardsCompatibility() {
 
     //current publication format of Tag + associated alarm values
-    String jsonString = "{\"id\":100003," +
+    String jsonString = "{\"tagId\":100003," +
         "\"valueClassName\":\"java.lang.Long\"," +
-        "\"value\":1843809447020," +
+        "\"tagValue\":1843809447020," +
         "\"mode\":\"TEST\"," +
         "\"simulated\":false," +
-        "\"alarms\":[{\"id\":1," +
+        "\"alarmValues\":[{\"id\":1," +
                             "\"faultCode\":0," +
                             "\"faultFamily\":\"fault family\"," +
                             "\"faultMember\":\"fault member\"," +
@@ -295,7 +295,7 @@ public class TransferTagValueImplTest {
                             "\"currentOperation\":0," +
                             "\"totalParts\":0," +
                             "\"currentPart\":0}]," +
-          "\"dataTagQuality\":{\"invalidQualityStates\":{},\"isValid\":false}," +
+          "\"tagQuality\":{\"invalidQualityStates\":{},\"isValid\":false}," +
           "\"description\":\"test description\"," +
           "\"valueDescription\":\"test value description\"," +
           "\"sourceTimestamp\":1343809448989," +
