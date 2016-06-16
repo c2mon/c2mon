@@ -143,14 +143,11 @@ public class TransferTagSerializer {
         && newTagValue != null
         && (newTagValue.getClass() == LinkedHashMap.class)
         || isJsonString(newTagValue)) {
-
       // determine which type the value have and try to convert the value to the correct type:
       if(newTagValue.getClass() == LinkedHashMap.class){
-
         newTagValue = hashMapToObject((LinkedHashMap) tag.getValue(), getType(tag.getValueClassName()));
 
       } else {
-
         newTagValue = stringToObject((String) tag.getValue(), getType(tag.getValueClassName()));
       }
 
@@ -169,7 +166,7 @@ public class TransferTagSerializer {
 
   /**
    * takes a HashMap and creates an Object. The HashMap should be created through jackson,
-   * so that jackson can deserialize it an instantiate an object.
+   * so that jackson can deserialize it and instantiate an object.
    *
    * @param map The LinkedHashMap which holds the data for the object.
    * @param type the Type of the created object.
@@ -183,11 +180,20 @@ public class TransferTagSerializer {
 
     } catch (IOException e) {
 
-      log.warn("Could not create a object of "+type+" out of the given map:"+e.getMessage());
+      log.warn("Could not create a object of the class "+type.getName()+" out of the map "+map.toString()+" :"+e.getMessage());
       return null;
     }
   }
 
+  /**
+   * Takes a String and creates an Object. The string should be in json format,
+   * so that jackson can deserialize it and instantiate an object.
+   *
+   * @param map The json string which holds the data for the object.
+   * @param type the Type of the created object.
+   * @param <T> The instantiation of the map.
+   * @return The instantiated object based on the information of the string.
+   */
   private static <T> T stringToObject(String jsonString, Class<T> type){
     try {
 
@@ -195,7 +201,7 @@ public class TransferTagSerializer {
 
     } catch (IOException e) {
 
-      log.warn("Could not create a object of "+type+" out of the given map:"+e.getMessage());
+      log.warn("Could not create a object of the class"+type.getName()+" out of the value "+jsonString+": "+e.getMessage());
       return null;
     }
   }
