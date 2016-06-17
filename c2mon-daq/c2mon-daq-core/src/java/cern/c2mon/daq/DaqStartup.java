@@ -16,8 +16,11 @@
  ******************************************************************************/
 package cern.c2mon.daq;
 
-import cern.c2mon.daq.config.Options;
-import lombok.extern.slf4j.Slf4j;
+import static java.lang.String.format;
+import static java.lang.System.getProperty;
+
+import java.io.IOException;
+
 import org.springframework.boot.Banner;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -25,10 +28,8 @@ import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
 import org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
-import java.io.IOException;
-
-import static java.lang.String.format;
-import static java.lang.System.getProperty;
+import cern.c2mon.daq.config.Options;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class is responsible for bootstrapping a C2MON DAQ process.
@@ -46,7 +47,7 @@ public class DaqStartup {
       throw new RuntimeException(format("Please specify the DAQ process name using '%s'.", Options.C2MON_DAQ_NAME));
     }
 
-    // The JMS mode (single, multi, test) is controlled via Spring profiles
+    // The JMS mode (single, double, test) is controlled via Spring profiles
     String mode = getProperty(Options.JMS_MODE);
     System.setProperty("spring.profiles.active", mode == null ? "single" : mode);
 
