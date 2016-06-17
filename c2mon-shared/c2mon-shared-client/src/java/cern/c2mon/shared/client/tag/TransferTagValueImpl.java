@@ -161,19 +161,23 @@ public class TransferTagValueImpl extends ClientRequestReport implements TagValu
     return this.tagQuality;
   }
 
-  public void setTagValue(String tagValueAsString){
+  /**
+   * Automatically called through the jackson deserialization procedure.
+   * Parses the value representation from the 1.6.7. Server version to the correct type.
+   *
+   * @param tagValueAsString Tag value represented in String format.
+   */
+  public void setTagValue(String tagValueAsString) {
     try {
-      if (tagValueAsString != null && valueClassName != null) {
-        if (valueClassName.equals(String.class.getName())) {
-          value = tagValueAsString;
-        } else {
-          value = TypeConverter.cast(tagValueAsString, valueClassName);
+      if (valueClassName != null) {
+        if (tagValueAsString != null) {
+          value = valueClassName.equals(String.class.getName()) ? tagValueAsString : TypeConverter.cast(tagValueAsString, valueClassName);
         }
       } else {
-        log.warn("Set tagValue not possible: value class name not given or the value is null");
+        log.warn("Set tagValue not possible: value class name not given");
       }
     } catch (Exception e) {
-      log.error("Set tagValue not possible: Error while parsing occurred - "+e);
+      log.error("Set tagValue not possible: Error while parsing occurred - " + e);
     }
   }
 
