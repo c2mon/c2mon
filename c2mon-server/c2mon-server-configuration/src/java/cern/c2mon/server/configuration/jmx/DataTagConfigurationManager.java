@@ -17,9 +17,12 @@
 
 package cern.c2mon.server.configuration.jmx;
 
+import cern.c2mon.patterncache.Cachable;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.loading.DataTagLoaderDAO;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -62,12 +65,14 @@ public class DataTagConfigurationManager {
 
       int counter=0, overall=0;
       for(Long id : tagIdList){
-        dataTagLoaderDAO.updateConfig(dataTagCache.get(id));
+        DataTag tag = dataTagCache.getCopy(id);
+        log.debug("Write Tag [id: "+tag.getId()+" - logged:"+tag.isLogged()+" - minvalue"+tag.getMinValue()+" - maxValue"+tag.getMaxValue()+"] into db");
+        dataTagLoaderDAO.updateConfig(dataTagCache.getCopy(id));
         counter++;
         overall++;
-        if(tagIdList.size()/10 >= counter){
+        if(counter >= tagIdList.size()*0.1){
           counter =0;
-          log.debug("JMX update progress:"+tagIdList.size()/overall);
+          log.debug("JMX update progress:"+(int)(((overall*1.0)/tagIdList.size()) *100));
         }
       }
 
