@@ -59,7 +59,20 @@ public class DataTagConfigurationManager {
       List<Long> tagIdList = dataTagCache.getKeys();
 
       log.trace("Persisting " + tagIdList.size() + " configuration of cache object(s) to the database (DataTag)");
-      tagIdList.parallelStream().forEach((key) -> dataTagLoaderDAO.updateConfig(dataTagCache.get(key)));
+
+      int counter=0, overall=0;
+      for(Long id : tagIdList){
+        dataTagLoaderDAO.updateConfig(dataTagCache.get(id));
+        counter++;
+        overall++;
+        if(tagIdList.size()/10 >= counter){
+          counter =0;
+          log.trace("JMX update progress:"+tagIdList.size()/overall);
+        }
+      }
+
+//      TODO: use the stream
+//      tagIdList.stream().forEach((key) -> dataTagLoaderDAO.updateConfig(dataTagCache.get(key)));
       log.trace("Done with Persisting the DataTag Configuration");
 
     } finally {
