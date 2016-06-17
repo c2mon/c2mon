@@ -128,6 +128,9 @@ public class ObjectTypeHandler implements TypeHandler {
       if (parameter != null) {
       	// Because the value is stored as VARCHAR in the db it have to be transformed to a json string
       	ps.setString(parameterIndex, mapper.writeValueAsString(parameter));
+        if(parameter != null){
+          LOGGER.debug("ObjectTypeHandler: set min value "+parameter+" for");
+        }
       }
       else {
       	ps.setString(parameterIndex, null);

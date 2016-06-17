@@ -58,7 +58,7 @@ public class DataTagConfigurationManager {
     try {
       List<Long> tagIdList = dataTagCache.getKeys();
 
-      log.trace("Persisting " + tagIdList.size() + " configuration of cache object(s) to the database (DataTag)");
+      log.debug("Persisting " + tagIdList.size() + " configuration of cache object(s) to the database (DataTag)");
 
       int counter=0, overall=0;
       for(Long id : tagIdList){
@@ -67,13 +67,13 @@ public class DataTagConfigurationManager {
         overall++;
         if(tagIdList.size()/10 >= counter){
           counter =0;
-          log.trace("JMX update progress:"+tagIdList.size()/overall);
+          log.debug("JMX update progress:"+tagIdList.size()/overall);
         }
       }
 
 //      TODO: use the stream
 //      tagIdList.stream().forEach((key) -> dataTagLoaderDAO.updateConfig(dataTagCache.get(key)));
-      log.trace("Done with Persisting the DataTag Configuration");
+      log.debug("Done with Persisting the DataTag Configuration");
 
     } finally {
       clusterCache.releaseWriteLockOnKey(cachePersistenceLock);
