@@ -40,6 +40,8 @@ import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
+import static cern.c2mon.shared.common.type.TypeConverter.*;
+
 /**
  * Factory class for creating transfer objects for sending to the C2MON client layer
  *
@@ -79,14 +81,16 @@ public abstract class TransferObjectFactory {
               tag.getName(),
               tag.getTopic());
 
+      String dataType = isKnownClass(tag.getDataType()) ? getType(tag.getDataType()).getName() : tag.getDataType();
+      transferTag.setValueClassName(dataType);
+
       addAlarmValues(transferTag, tagWithAlarms.getAlarms());
       transferTag.setSimulated(tag.isSimulated());
       transferTag.setUnit(tag.getUnit());
       transferTag.addEquipmentIds(tag.getEquipmentIds());
       transferTag.addSubEquipmentIds(tag.getSubEquipmentIds());
       transferTag.addProcessIds(tag.getProcessIds());
-      transferTag.setValueClassName(tag.getDataType());
-      if(tag.getMetadata()!= null){
+      if (tag.getMetadata() != null) {
         transferTag.setMetadata(tag.getMetadata().getMetadata());
       }
 
@@ -123,7 +127,8 @@ public abstract class TransferObjectFactory {
               tag.getCacheTimestamp(),
               tag.getDescription());
 
-      tagValue.setValueClassName(tag.getDataType());
+      String dataType = isKnownClass(tag.getDataType()) ? getType(tag.getDataType()).getName() : tag.getDataType();
+      tagValue.setValueClassName(dataType);
       addAlarmValues(tagValue, tagWithAlarms.getAlarms());
       tagValue.setSimulated(tag.isSimulated());
     }
