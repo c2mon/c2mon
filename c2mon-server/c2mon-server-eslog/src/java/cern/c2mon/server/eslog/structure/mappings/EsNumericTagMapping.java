@@ -27,11 +27,11 @@ import cern.c2mon.server.eslog.structure.types.tag.EsTagNumeric;
 public class EsNumericTagMapping extends EsTagMapping implements EsMapping {
 
   /**
-   * Inbstantiate a new EsNumericTagMapping by setting its Properties according to {@param type}
+   * Instantiate a new EsNumericTagMapping by setting its Properties according to {@param valueType}
    */
-  public EsNumericTagMapping(ValueType type) {
+  public EsNumericTagMapping(final ValueType valueType) {
     super();
-    setProperties(type);
+    setProperties(valueType);
   }
 
   /**

@@ -36,7 +36,7 @@ public class EsTagNumeric extends AbstractEsTag {
   @Override
   public void setRawValue(final Object rawValue) {
     if (rawValue == null) {
-      log.trace("setRawValue() EsTagNumeric - Value is not set (rawValue= " + rawValue + ").");
+      log.trace("setRawValue() EsTagNumeric - Value is null");
       return;
     }
 

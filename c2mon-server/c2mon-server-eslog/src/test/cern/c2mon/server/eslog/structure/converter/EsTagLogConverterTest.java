@@ -34,6 +34,7 @@ import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.common.metadata.Metadata;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -47,6 +48,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 /**
@@ -55,23 +57,38 @@ import static org.mockito.Mockito.when;
  * @author Alban Marguet.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class DataEsTagImplLogConverterTest {
+public class EsTagLogConverterTest {
+
   @InjectMocks
   private EsTagLogConverter esLogConverter;
+
   @Mock
   private ProcessCache processCache;
+
   @Mock
   private EquipmentCache equipmentCache;
+
   @Mock
   private SubEquipmentCache subEquipmentCache;
+
   @Mock
   private DataTagQuality dataTagQuality;
+
   @Mock
   private DataTagCacheObject tag;
+
   @Mock
   private Tag tagC2MON;
-  @Mock
-  private AbstractEsTag esTagImpl;
+
+  @Before
+  public void setUp() throws Exception {
+    reset(processCache,
+        equipmentCache,
+        subEquipmentCache,
+        dataTagQuality,
+        tag,
+        tagC2MON);
+  }
 
   @Test
   public void testGetProcessName() {
@@ -224,6 +241,7 @@ public class DataEsTagImplLogConverterTest {
     long timeStamp = 123456L;
     boolean value = true;
     String valueDesc = "ok";
+
     when(tagC2MON.getId()).thenReturn(id);
     when(tagC2MON.getName()).thenReturn(name);
     when(tagC2MON.getDataType()).thenReturn(type.toString());
@@ -279,7 +297,9 @@ public class DataEsTagImplLogConverterTest {
 
   @Test
   public void ModuleConvertsTagsAsExpected() {
-    Tag tag = createTagExample();
+    DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
+    tag.setDataType("boolean");
+    tag.setLogged(true);
 
     AbstractEsTag esTag = esLogConverter.convert(tag);
 
@@ -316,26 +336,28 @@ public class DataEsTagImplLogConverterTest {
     map.put("responsible", "coucou");
     map.put("intShouldGoToStringMetadata", 2);
     Metadata metadata = new Metadata(map);
-    DataTagCacheObject tag = createTagExample();
 
-    tag.setMetadata(metadata);
-
-    esTagImpl = esLogConverter.convert(tag);
-    assertNotNull(esTagImpl.getMetadata());
-    assertEquals("1", esTagImpl.getMetadata().get("building"));
-    assertEquals("2", esTagImpl.getMetadata().get("intShouldGoToStringMetadata"));
-    assertEquals("coucou", esTagImpl.getMetadata().get("responsible"));
-  }
-
-  /**
-   * @return Tag of type boolean with value true.
-   */
-  private DataTagCacheObject createTagExample() {
     DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
     tag.setDataType("boolean");
     tag.setLogged(true);
 
-    return tag;
+    tag.setMetadata(metadata);
+
+    AbstractEsTag esTag = esLogConverter.convert(tag);
+    assertNotNull(esTag.getMetadata());
+    assertEquals("1", esTag.getMetadata().get("building"));
+    assertEquals("2", esTag.getMetadata().get("intShouldGoToStringMetadata"));
+    assertEquals("coucou", esTag.getMetadata().get("responsible"));
+  }
+
+  @Test
+  public void testConvert_WhenValueTypeIsBoolean_ConvertsToEsTagAndAssignsType() {
+    DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
+
+    AbstractEsTag esTag = esLogConverter.convert(tag);
+
+    assertNotNull(esTag);
+    assertEquals(EsValueType.BOOLEAN.toString(), esTag.getType());
   }
 
 }

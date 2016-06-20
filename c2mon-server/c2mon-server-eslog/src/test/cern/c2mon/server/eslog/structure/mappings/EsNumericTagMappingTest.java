@@ -121,7 +121,7 @@ public class EsNumericTagMappingTest {
 
   @Test
   public void testGetNumericMapping() {
-    EsNumericTagMapping mapping = new EsNumericTagMapping(ValueType.INT);
+    EsNumericTagMapping mapping = new EsNumericTagMapping(ValueType.INTEGER);
     String valueType = mapping.properties.getValueType();
     assertTrue(ValueType.isNumeric(valueType));
   }

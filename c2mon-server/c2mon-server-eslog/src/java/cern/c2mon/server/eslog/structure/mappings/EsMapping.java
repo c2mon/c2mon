@@ -35,7 +35,7 @@ public interface EsMapping {
     SUPERVISION("supervision"),
     STRING("string"),
     LONG("long"),
-    INT("integer"),
+    INTEGER("integer"),
     FLOAT("float"),
     SHORT("short"),
     DOUBLE("double"),
@@ -77,7 +77,7 @@ public interface EsMapping {
         case LONG:
         case SHORT:
         case DOUBLE:
-        case INT:
+        case INTEGER:
           return true;
         default:
           return false;
@@ -90,6 +90,20 @@ public interface EsMapping {
               || isShort(typeAsString)
               || isDouble(typeAsString)
               || isInt(typeAsString));
+    }
+
+    public static ValueType getIfNumeric(final String dataType) {
+      if(ValueType.isInt(dataType)) {
+        return ValueType.INTEGER;
+      } else if(ValueType.isDouble(dataType)) {
+        return ValueType.DOUBLE;
+      } else if(ValueType.isFloat(dataType)) {
+        return ValueType.FLOAT;
+      } else if(ValueType.isLong(dataType)) {
+        return ValueType.LONG;
+      } else {
+        return null;
+      }
     }
 
     public static boolean isLong(final String typeAsString) {
@@ -109,7 +123,7 @@ public interface EsMapping {
     }
 
     public static boolean isInt(final String typeAsString) {
-      return INT.toString().equalsIgnoreCase(typeAsString);
+      return INTEGER.toString().equalsIgnoreCase(typeAsString);
     }
 
     public static boolean isBoolean(final ValueType type) {
@@ -186,14 +200,13 @@ public interface EsMapping {
       this.id = new Id();
       this.name = new Name();
 
-
       if (ValueType.isNumeric(valueType)) {
         this.value = new Value(valueType);
       } else if (ValueType.isString(valueType)) {
         this.valueString = new ValueString(valueType);
       } else if (ValueType.isBoolean(valueType)) {
         this.valueBoolean = new ValueBoolean(valueType);
-        this.value = new Value(ValueType.INT);
+        this.value = new Value(ValueType.DOUBLE);
       }
 
       this.type = new Type();
@@ -264,7 +277,7 @@ public interface EsMapping {
 
 
     class Status {
-      private final String type = ValueType.INT.toString();
+      private final String type = ValueType.INTEGER.toString();
     }
 
     class Valid {
@@ -473,7 +486,7 @@ public interface EsMapping {
         }
 
         class FaultCode {
-          private final String type = ValueType.INT.toString();
+          private final String type = ValueType.INTEGER.toString();
         }
 
         class Active {
@@ -490,7 +503,7 @@ public interface EsMapping {
         }
 
         class Priority {
-          private final String type = ValueType.INT.toString();
+          private final String type = ValueType.INTEGER.toString();
         }
 
         class Info {

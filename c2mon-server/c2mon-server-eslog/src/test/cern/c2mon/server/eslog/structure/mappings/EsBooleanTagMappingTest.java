@@ -42,7 +42,7 @@ public class EsBooleanTagMappingTest {
       "      \"index\": \"not_analyzed\"\n" +
       "    },\n" +
       "    \"value\": {\n" +
-      "      \"type\": \"integer\"\n" +
+      "      \"type\": \"double\"\n" +
       "    },\n" +
       "    \"valueBoolean\": {\n" +
       "      \"type\": \"boolean\"\n" +

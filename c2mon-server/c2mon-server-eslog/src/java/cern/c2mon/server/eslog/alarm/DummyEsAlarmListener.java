@@ -1,4 +1,3 @@
-package cern.c2mon.server.eslog.alarm;
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
  *
@@ -15,8 +14,10 @@ package cern.c2mon.server.eslog.alarm;
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
+package cern.c2mon.server.eslog.alarm;
 
 import cern.c2mon.pmanager.IAlarmListener;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 
@@ -25,23 +26,27 @@ import java.io.File;
  *
  * @author Mark Brightwell
  */
+@Slf4j
 public class DummyEsAlarmListener implements IAlarmListener {
 
   @Override
   public void dbUnavailable(boolean alarmUp, String exceptionMsg, String dbInfo) {
-    // TODO Auto-generated method stub
-
+    //log.error(String.format("Database unavailable, reason: %s. Database info: %s", exceptionMsg, dbInfo));
   }
 
   @Override
   public void diskFull(boolean alarmUp, String directoryName) {
-    // TODO Auto-generated method stub
-
+    log.error(String.format("Disk space if full! Directory name: %s", directoryName));
   }
 
   @Override
   public void fileNotReachable(boolean alarmUp, File file) {
-    // TODO Auto-generated method stub
+    log.error("Can not access file in system!");
+
+    if(file != null) {
+      log.error(String.format("Inaccessible file name: %s", file.getName()));
+    }
 
   }
+
 }

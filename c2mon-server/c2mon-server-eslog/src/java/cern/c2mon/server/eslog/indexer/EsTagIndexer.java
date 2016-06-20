@@ -103,9 +103,9 @@ public class EsTagIndexer extends EsIndexer {
         }
       }
       log.debug("storeData() - indexTags() a new Collection of " + tags.size() + " tags.");
-      indexTags(tags);
+      this.indexTags(tags);
     } catch(ElasticsearchException e) {
-      throw new IDBPersistenceException();
+      throw new IDBPersistenceException(e);
     }
   }
 
@@ -115,6 +115,11 @@ public class EsTagIndexer extends EsIndexer {
    * @param tags to index.
    */
   public synchronized void indexTags(Collection<AbstractEsTag> tags) {
+    if(tags == null) {
+      log.warn("indexTags() - Received a null collection of tags will do nothing!");
+      return;
+    }
+
     log.debug("indexTags() - Received a collection of " + tags.size() + " tags to send by batch.");
 
     if (CollectionUtils.isEmpty(tags)) {
@@ -165,7 +170,7 @@ public class EsTagIndexer extends EsIndexer {
   }
 
   private String generateTagType(String dataType) {
-    return typePrefix + dataType.toLowerCase();
+    return typePrefix + dataType;
   }
 
   /**

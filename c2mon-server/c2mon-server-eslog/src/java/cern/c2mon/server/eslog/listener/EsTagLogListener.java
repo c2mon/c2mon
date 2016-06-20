@@ -25,19 +25,20 @@ import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.eslog.indexer.EsTagIndexer;
 import cern.c2mon.server.eslog.structure.converter.EsTagLogConverter;
 import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
-import cern.c2mon.server.eslog.structure.types.tag.EsTagBoolean;
-import cern.c2mon.server.eslog.structure.types.tag.EsTagNumeric;
-import cern.c2mon.server.eslog.structure.types.tag.EsTagString;
+import cern.c2mon.server.eslog.structure.types.tag.EsValueType;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 /**
  * Listens to updates in the Rule and DataTag caches and calls the {@link EsTagIndexer} for logging these to ElasticSearch.
@@ -58,9 +59,6 @@ public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLif
    */
   private final EsTagLogConverter esTagLogConverter;
 
-  /**
-   * The {@link EsTagIndexer} allows to use the connection to the ElasticSearch cluster and to write data.
-   */
   private final IPersistenceManager tagNumericPersistenceManager;
   private final IPersistenceManager tagStringPersistenceManager;
   private final IPersistenceManager tagBooleanPersistenceManager;
@@ -75,19 +73,14 @@ public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLif
    */
   private volatile boolean running = false;
 
-  /**
-   * Autowired constructor.
-   *
-   * @param cacheRegistrationService for registering cache listeners
-   */
   @Autowired
-  public EsTagLogListener(final CacheRegistrationService cacheRegistrationService,
+  public EsTagLogListener(final EsTagLogConverter esTagLogConverter,
+                          final CacheRegistrationService cacheRegistrationService,
                           @Qualifier("esTagNumericPersistenceManager") final IPersistenceManager tagNumericPersistenceManager,
                           @Qualifier("esTagStringPersistenceManager") final IPersistenceManager tagStringPersistenceManager,
-                          @Qualifier("esTagBooleanPersistenceManager") final IPersistenceManager tagBooleanPersistenceManager,
-                          final EsTagLogConverter esTagLogConverter) {
-    this.cacheRegistrationService = cacheRegistrationService;
+                          @Qualifier("esTagBooleanPersistenceManager") final IPersistenceManager tagBooleanPersistenceManager) {
     this.esTagLogConverter = esTagLogConverter;
+    this.cacheRegistrationService = cacheRegistrationService;
     this.tagNumericPersistenceManager = tagNumericPersistenceManager;
     this.tagStringPersistenceManager = tagStringPersistenceManager;
     this.tagBooleanPersistenceManager = tagBooleanPersistenceManager;
@@ -112,73 +105,59 @@ public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLif
    * @param tagCollection batch of tags to be logged to ElasticSearch
    */
   @Override
-  public void notifyElementUpdated(Collection<Tag> tagCollection) {
-    log.debug("notifyElementUpdated() - Received a tagCollection of " + tagCollection.size() + " elements.");
-    List<Tag> tagsToLog = new ArrayList<>(tagCollection.size());
-    List<AbstractEsTag> tagNumericCollection = new ArrayList<>();
-    List<AbstractEsTag> tagStringCollection = new ArrayList<>();
-    List<AbstractEsTag> tagBooleanCollection = new ArrayList<>();
-
-    retrieveTagsToLog(tagCollection, tagsToLog);
-    convertTagsToLogToTagES(tagsToLog, tagNumericCollection, tagStringCollection, tagBooleanCollection);
-    sendCollectionsTagESToElasticSearch(tagNumericCollection, tagStringCollection, tagBooleanCollection);
-  }
-
-  private void retrieveTagsToLog(Collection<Tag> tagCollection, Collection<Tag> tagsToLog) {
-    for (Tag tag : tagCollection) {
-      if (tag.isLogged()) {
-        tagsToLog.add(tag);
-      }
+  public void notifyElementUpdated(final Collection<Tag> tagCollection) {
+    if(tagCollection == null) {
+      log.warn("notifyElementUpdated() - Received a null collection of tags");
+      return;
     }
-    log.debug("retrieveTagsToLog() - With " + tagsToLog.size() + " tags to be logged.");
+    log.info("notifyElementUpdated() - Received a tagCollection of " + tagCollection.size() + " elements.");
+
+    Collection<Tag> loggableTags = filterLoggableTags(tagCollection);
+    log.debug("retrieveLoggableTags() - With " + loggableTags.size() + " tags to be logged.");
+
+    sendEsTagsToElastic(convertTagsToEsTags(loggableTags));
   }
 
-  private void convertTagsToLogToTagES(Collection<Tag> tagsToLog,
-                                       List<AbstractEsTag> tagNumericCollection,
-                                       List<AbstractEsTag> tagStringCollection,
-                                       List<AbstractEsTag> tagBooleanCollection) {
+  private Collection<Tag> filterLoggableTags(final Collection<Tag> tagCollection) {
+    if(tagCollection == null) {
+      return Collections.emptyList();
+    }
+    return tagCollection.stream()
+        .filter(Tag::isLogged)
+        .collect(Collectors.toList());
+  }
+
+  private ListMultimap<String, AbstractEsTag> convertTagsToEsTags(final Collection<Tag> tagsToLog) {
+    final ListMultimap<String, AbstractEsTag> tagMultimap = ArrayListMultimap.create();
+    if (CollectionUtils.isEmpty(tagsToLog)) {
+      return tagMultimap;
+    }
+
     for (Tag tag : tagsToLog) {
-      try {
-        AbstractEsTag esTagImpl = esTagLogConverter.convert(tag);
-        if (esTagImpl instanceof EsTagString) {
-          addTagToCollectionIfNotNull(esTagImpl, tagStringCollection);
-        } else if (esTagImpl instanceof EsTagBoolean) {
-          addTagToCollectionIfNotNull(esTagImpl, tagBooleanCollection);
-        } else if (esTagImpl instanceof EsTagNumeric) {
-          addTagToCollectionIfNotNull(esTagImpl, tagNumericCollection);
-        }
-      } catch(Exception e) {
-        log.error("convertTagsToLogToTagES() - Error occurred during tag parsing for ElasticSearch. Tag #"
-            + tag.getId() + " is not added to bulk sending (name=" + tag.getName()
-            + ", value=" + tag.getValue() + ", type=" + tag.getDataType() + ")", e);
+      AbstractEsTag esTagImpl = esTagLogConverter.convert(tag);
+      if (esTagImpl != null) {
+        tagMultimap.put(esTagImpl.getType(), esTagImpl);
       }
     }
+
+    return tagMultimap;
   }
 
-  private void addTagToCollectionIfNotNull(AbstractEsTag esTagImpl, Collection<AbstractEsTag> esTagImplCollection) {
-    if (esTagImpl != null) {
-      esTagImplCollection.add(esTagImpl);
+  private void sendEsTagsToElastic(final ListMultimap<String, AbstractEsTag> tagMultimap) {
+    if(tagMultimap == null) {
+      log.warn("sendCollectionTagESToElasticSearch() - received an empty map of tags, will do nothing!");
+      return;
     }
-  }
 
-  private void sendCollectionsTagESToElasticSearch(List<AbstractEsTag> tagNumericCollection,
-                                                   List<AbstractEsTag> tagStringCollection,
-                                                   List<AbstractEsTag> tagBooleanCollection) {
-    try {
-      log.debug("sendCollectionTagESToElasticSearch() - send a collection of tagNumeric to indexer of size: "
-          + tagNumericCollection.size());
-      tagNumericPersistenceManager.storeData(tagNumericCollection);
+    log.info("sendCollectionTagESToElasticSearch() - send a collection of tags to indexer of size: "
+        + tagMultimap.size());
 
-      log.debug("sendCollectionTagESToElasticSearch() - send a collection of tagString to indexer of size: "
-          + tagStringCollection.size());
-      tagStringPersistenceManager.storeData(tagStringCollection);
+    tagNumericPersistenceManager.storeData(tagMultimap.get(EsValueType.NUMERIC.getFriendlyName()));
+    tagBooleanPersistenceManager.storeData(tagMultimap.get(EsValueType.BOOLEAN.getFriendlyName()));
+    tagStringPersistenceManager.storeData(tagMultimap.get(EsValueType.STRING.getFriendlyName()));
 
-      log.debug("sendCollectionTagESToElasticSearch() - send a collection of tagBoolean to indexer of size: "
-          + tagBooleanCollection.size());
-      tagBooleanPersistenceManager.storeData(tagBooleanCollection);
-    } catch(Exception e) {
-      log.error("sendCollectionTagESToElasticSearch() - Exception occurred while trying to index data to the cluster.", e);
-    }
+    //objects will be stored with the string persistence manager, as well
+    tagStringPersistenceManager.storeData(tagMultimap.get(EsValueType.OBJECT.getFriendlyName()));
   }
 
   @Override

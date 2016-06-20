@@ -16,18 +16,24 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.listener;
 
+import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.eslog.indexer.EsTagIndexer;
 import cern.c2mon.server.eslog.structure.converter.EsTagLogConverter;
+import cern.c2mon.server.eslog.structure.types.tag.EsTagBoolean;
 import cern.c2mon.server.test.CacheObjectCreation;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,29 +46,99 @@ import static org.mockito.Mockito.*;
  *
  * @author Alban Marguet
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = EsTagLogListenerTest.TagLogListenerTestConfiguration.class)
 public class EsTagLogListenerTest {
+
+  @Configuration
+  public static class TagLogListenerTestConfiguration {
+    @Bean
+    public EsTagLogConverter esTagLogConverter() {
+      return mock(EsTagLogConverter.class);
+    }
+
+    @Bean
+    public CacheRegistrationService cacheRegistrationService() {
+      return mock(CacheRegistrationService.class);
+    }
+
+    @Bean
+    public IPersistenceManager esTagNumericPersistenceManager() {
+      return mock(IPersistenceManager.class);
+    }
+
+    @Bean
+    public IPersistenceManager esTagStringPersistenceManager() {
+      return mock(IPersistenceManager.class);
+    }
+
+    @Bean
+    public IPersistenceManager esTagBooleanPersistenceManager() {
+      return mock(IPersistenceManager.class);
+    }
+
+    @Bean
+    public EsTagLogListener esTagLogListener() {
+      return new EsTagLogListener(
+          esTagLogConverter(),
+          cacheRegistrationService(),
+          esTagNumericPersistenceManager(),
+          esTagStringPersistenceManager(),
+          esTagBooleanPersistenceManager());
+    }
+
+  }
+
+  @Before
+  public void setUp() throws Exception {
+    reset(esLogConverter,
+        cacheRegistrationService,
+        tagNumericPersistenceManager,
+        tagStringPersistenceManager,
+        tagBooleanPersistenceManager);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+//    verifyNoMoreInteractions(esLogConverter,
+//        cacheRegistrationService,
+//        tagNumericPersistenceManager,
+//        tagStringPersistenceManager,
+//        tagBooleanPersistenceManager);
+  }
+
   private long id = 2L;
   private boolean logged = true;
   private boolean notLogged = false;
-  @InjectMocks
-  private EsTagLogListener cacheListener;
 
-  @Mock
+  @Autowired
   private EsTagLogConverter esLogConverter;
 
-  @Mock
+  @Autowired
   private CacheRegistrationService cacheRegistrationService;
 
-  @Mock
-  private EsTagIndexer indexer;
 
+  @Autowired
+  @Qualifier("esTagNumericPersistenceManager")
+  private IPersistenceManager tagNumericPersistenceManager;
+
+  @Autowired
+  @Qualifier("esTagStringPersistenceManager")
+  private IPersistenceManager tagStringPersistenceManager;
+
+  @Autowired
+  @Qualifier("esTagBooleanPersistenceManager")
+  private IPersistenceManager tagBooleanPersistenceManager;
+
+
+  @Autowired
+  private EsTagLogListener tagLogListener;
 
   @Test
   public void testTagIsLoggedToES() throws IDBPersistenceException {
     DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
     tag.setLogged(logged);
-    cacheListener.notifyElementUpdated(Collections.<Tag>singletonList(tag));
+    tagLogListener.notifyElementUpdated(Collections.<Tag>singletonList(tag));
 
     verify(esLogConverter).convert(eq(tag));
   }
@@ -71,7 +147,7 @@ public class EsTagLogListenerTest {
   public void testTagIsNotLoggedToES() throws IDBPersistenceException {
     DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
     tag.setLogged(notLogged);
-    cacheListener.notifyElementUpdated(Collections.<Tag>singletonList(tag));
+    tagLogListener.notifyElementUpdated(Collections.<Tag>singletonList(tag));
 
     verify(esLogConverter, never()).convert(tag);
   }
@@ -93,9 +169,23 @@ public class EsTagLogListenerTest {
     list.add(tag2);
     list.add(tag3);
 
-    cacheListener.notifyElementUpdated(list);
+    EsTagBoolean convertedTag1 = new EsTagBoolean();
+    convertedTag1.setValueBoolean((Boolean) tag1.getValue());
+
+    EsTagBoolean convertedTag2 = new EsTagBoolean();
+    convertedTag2.setValueBoolean((Boolean) tag2.getValue());
+
+    when(esLogConverter.convert(tag1)).thenReturn(convertedTag1);
+    when(esLogConverter.convert(tag2)).thenReturn(convertedTag2);
+
+    tagLogListener.notifyElementUpdated(list);
+
     verify(esLogConverter).convert(eq(tag1));
     verify(esLogConverter).convert(eq(tag2));
     verify(esLogConverter, atMost(2)).convert(eq(tag3));
+
+    verify(tagBooleanPersistenceManager, times(1)).storeData(anyList());
+//    verify(tagNumericPersistenceManager).storeData(anyList());
+//    verify(tagStringPersistenceManager, times(2)).storeData(anyList());
   }
 }

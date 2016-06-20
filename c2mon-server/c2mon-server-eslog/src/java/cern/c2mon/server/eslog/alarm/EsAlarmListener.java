@@ -1,4 +1,3 @@
-package cern.c2mon.server.eslog.alarm;
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
  *
@@ -15,6 +14,7 @@ package cern.c2mon.server.eslog.alarm;
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
+package cern.c2mon.server.eslog.alarm;
 
 import cern.c2mon.pmanager.IAlarmListener;
 import org.slf4j.Logger;
@@ -55,8 +55,8 @@ public class EsAlarmListener implements IAlarmListener {
       SMS_LOGGER.error("Error in ElasticSearch logging: cluster unavailable. See email for details.");
     } else if (!alarmUp && dbAlarm) {
       dbAlarm = false;
-      EMAIL_LOGGER.error("EScluster unavailable error has resolved itself");
-      SMS_LOGGER.error("EScluster unavailable error has resolved itself");
+      EMAIL_LOGGER.error("ES cluster unavailable error has resolved itself");
+      SMS_LOGGER.error("ES cluster unavailable error has resolved itself");
     }
   }
 

@@ -100,11 +100,9 @@ public class EsSupervisionEventListener implements SupervisionListener, SmartLif
       return;
     }
 
-    if (log.isDebugEnabled()) {
-      log.debug("notifySupervisionEvent() - Logging supervision status " + supervisionEvent.getStatus()
-              + " for " + supervisionEvent.getEntity()
-              + " " + supervisionEvent.getEntityId() + " to ElasticSearch");
-    }
+    log.debug("notifySupervisionEvent() - Logging supervision status " + supervisionEvent.getStatus()
+        + " for " + supervisionEvent.getEntity()
+        + " " + supervisionEvent.getEntityId() + " to ElasticSearch");
 
     try {
       EsSupervisionEvent esSupervisionEvent = esSupervisionEventConverter.convert(supervisionEvent);
