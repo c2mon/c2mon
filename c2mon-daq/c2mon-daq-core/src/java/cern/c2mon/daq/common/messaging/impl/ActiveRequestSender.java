@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
+import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
 import cern.c2mon.daq.config.Options;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
@@ -55,11 +56,6 @@ public class ActiveRequestSender implements ProcessRequestSender {
   private JmsTemplate jmsTemplate;
 
   /**
-   * Configuration controller as access point to the configuration.
-   */
-//  private final ConfigurationController configurationController;
-
-  /**
    * ProcessMessageConverter helper class (fromMessage/ToMessage)
    */
   private ProcessMessageConverter processMessageConverter;
@@ -80,7 +76,6 @@ public class ActiveRequestSender implements ProcessRequestSender {
   public ActiveRequestSender(final Environment environment, @Qualifier("processRequestJmsTemplate") final JmsTemplate jmsTemplate) {
     this.environment = environment;
     this.jmsTemplate = jmsTemplate;
-//    this.configurationController = configurationController;
     this.processMessageConverter = new ProcessMessageConverter();
   }
 
@@ -98,7 +93,7 @@ public class ActiveRequestSender implements ProcessRequestSender {
         TemporaryQueue replyQueue = session.createTemporaryQueue();
 
         ProcessConfigurationRequest processConfigurationRequest = new ProcessConfigurationRequest(processName);
-//        processConfigurationRequest.setprocessPIK(configurationController.getProcessConfiguration().getprocessPIK());
+        processConfigurationRequest.setprocessPIK(ProcessConfigurationHolder.getInstance().getprocessPIK());
 
         Message message = processMessageConverter.toMessage(processConfigurationRequest, session);
         message.setJMSReplyTo(replyQueue);

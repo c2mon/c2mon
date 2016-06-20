@@ -86,10 +86,6 @@ public class ConfigurationController {
   private long startUp;
 
   /**
-   * The process configuration object.
-   */
-  private ProcessConfiguration processConfiguration;
-  /**
    * The process configuration loader used at startup.
    */
   @Autowired
@@ -192,11 +188,12 @@ public class ConfigurationController {
     }
 
     // Set process PIK for future communications with the server (if it exists)
-    // in a provisional
-    // ProcessConfiguration
-    this.processConfiguration = new ProcessConfiguration();
-    this.processConfiguration.setProcessName(processConnectionResponse.getProcessName());
-    this.processConfiguration.setprocessPIK(processConnectionResponse.getProcessPIK());
+    // in a provisional ProcessConfiguration
+    ProcessConfiguration processConfiguration = new ProcessConfiguration();
+    processConfiguration.setProcessName(processConnectionResponse.getProcessName());
+    processConfiguration.setprocessPIK(processConnectionResponse.getProcessPIK());
+
+    ProcessConfigurationHolder.setInstance(processConfiguration);
   }
 
   /**
@@ -251,8 +248,10 @@ public class ConfigurationController {
     // try to create process configuration object (with the PIK saved in the
     // provisional ProcessConfiguration)
     try {
-      this.processConfiguration = this.processConfigurationLoader.createProcessConfiguration(this.processConfiguration.getProcessName(), this
-          .processConfiguration.getprocessPIK(), xmlConfiguration, localConfiguration);
+      ProcessConfiguration configuration = ProcessConfigurationHolder.getInstance();
+      configuration = this.processConfigurationLoader.createProcessConfiguration(configuration.getProcessName(),
+          configuration.getprocessPIK(), xmlConfiguration, localConfiguration);
+      ProcessConfigurationHolder.setInstance(configuration);
 
       LOGGER.debug("loadProcessConfiguration - ... properties loaded successfully.");
     } catch (ConfUnknownTypeException ex) {
@@ -290,7 +289,7 @@ public class ConfigurationController {
    */
   private void sendDisconnectionNotification() {
     LOGGER.trace("sendDisconnectionNotification - Primary Request Sender disconnection");
-    primaryRequestSender.sendProcessDisconnectionRequest(processConfiguration, startUp);
+    primaryRequestSender.sendProcessDisconnectionRequest(ProcessConfigurationHolder.getInstance(), startUp);
 
     // send in separate thread as may block if broker problem
     if (secondaryRequestSender != null) {
@@ -298,7 +297,7 @@ public class ConfigurationController {
       Thread disconnectSend = new Thread(new Runnable() {
         @Override
         public void run() {
-          secondaryRequestSender.sendProcessDisconnectionRequest(processConfiguration, startUp);
+          secondaryRequestSender.sendProcessDisconnectionRequest(ProcessConfigurationHolder.getInstance(), startUp);
         }
       });
       disconnectSend.setDaemon(true);
@@ -322,9 +321,11 @@ public class ConfigurationController {
     ChangeReport changeReport = new ChangeReport(dataTagAddChange);
     Long equipmentId = dataTagAddChange.getEquipmentId();
 
+    ProcessConfiguration configuration = ProcessConfigurationHolder.getInstance();
+
     // Check if the equipment id is a SubEquipment id.
-    if (!processConfiguration.getEquipmentConfigurations().containsKey(equipmentId)) {
-      for (EquipmentConfiguration equipmentConfiguration : processConfiguration.getEquipmentConfigurations().values()) {
+    if (!configuration.getEquipmentConfigurations().containsKey(equipmentId)) {
+      for (EquipmentConfiguration equipmentConfiguration : configuration.getEquipmentConfigurations().values()) {
         if (equipmentConfiguration.getSubEquipmentConfigurations().containsKey(equipmentId)) {
           equipmentId = equipmentConfiguration.getId();
         }
@@ -391,9 +392,11 @@ public class ConfigurationController {
     ChangeReport changeReport = new ChangeReport(commandTagAddChange);
     Long equipmentId = commandTagAddChange.getEquipmentId();
 
+    ProcessConfiguration configuration = ProcessConfigurationHolder.getInstance();
+
     // Check if the equipment id is a SubEquipment id.
-    if (!processConfiguration.getEquipmentConfigurations().containsKey(equipmentId)) {
-      for (EquipmentConfiguration equipmentConfiguration : processConfiguration.getEquipmentConfigurations().values()) {
+    if (!configuration.getEquipmentConfigurations().containsKey(equipmentId)) {
+      for (EquipmentConfiguration equipmentConfiguration : configuration.getEquipmentConfigurations().values()) {
         if (equipmentConfiguration.getSubEquipmentConfigurations().containsKey(equipmentId)) {
           equipmentId = equipmentConfiguration.getId();
         }
@@ -514,9 +517,11 @@ public class ConfigurationController {
     ChangeReport changeReport = new ChangeReport(dataTagUpdateChange);
     long equipmentId = dataTagUpdateChange.getEquipmentId();
 
+    ProcessConfiguration configuration = ProcessConfigurationHolder.getInstance();
+
     // Check if the equipment id is a SubEquipment id.
-    if (!processConfiguration.getEquipmentConfigurations().containsKey(equipmentId)) {
-      for (EquipmentConfiguration equipmentConfiguration : processConfiguration.getEquipmentConfigurations().values()) {
+    if (!configuration.getEquipmentConfigurations().containsKey(equipmentId)) {
+      for (EquipmentConfiguration equipmentConfiguration : configuration.getEquipmentConfigurations().values()) {
         if (equipmentConfiguration.getSubEquipmentConfigurations().containsKey(equipmentId)) {
           equipmentId = equipmentConfiguration.getId();
         }
@@ -625,9 +630,11 @@ public class ConfigurationController {
     long equipmentId = commandTagUpdateChange.getEquipmentId();
     long commandTagId = commandTagUpdateChange.getCommandTagId();
 
+    ProcessConfiguration configuration = ProcessConfigurationHolder.getInstance();
+
     // Check if the equipment id is a SubEquipment id.
-    if (!processConfiguration.getEquipmentConfigurations().containsKey(equipmentId)) {
-      for (EquipmentConfiguration equipmentConfiguration : processConfiguration.getEquipmentConfigurations().values()) {
+    if (!configuration.getEquipmentConfigurations().containsKey(equipmentId)) {
+      for (EquipmentConfiguration equipmentConfiguration : configuration.getEquipmentConfigurations().values()) {
         if (equipmentConfiguration.getSubEquipmentConfigurations().containsKey(equipmentId)) {
           equipmentId = equipmentConfiguration.getId();
         }
@@ -688,8 +695,10 @@ public class ConfigurationController {
   public synchronized ChangeReport onEquipmentConfigurationUpdate(final EquipmentConfigurationUpdate equipmentConfigurationUpdate) {
     long equipmentId = equipmentConfigurationUpdate.getEquipmentId();
     ChangeReport changeReport = new ChangeReport(equipmentConfigurationUpdate);
+    ProcessConfiguration configuration = ProcessConfigurationHolder.getInstance();
+
     try {
-      EquipmentConfiguration equipmentConfiguration = processConfiguration.getEquipmentConfiguration(equipmentId);
+      EquipmentConfiguration equipmentConfiguration = configuration.getEquipmentConfiguration(equipmentId);
       if (equipmentConfiguration != null) {
         EquipmentConfiguration clonedEquipmentConfiguration = equipmentConfiguration.clone();
         synchronized (equipmentConfiguration) {
@@ -708,7 +717,7 @@ public class ConfigurationController {
           // error
           changeReport.appendInfo("Change fully applied.");
         } else {
-          processConfiguration.getEquipmentConfigurations().put(equipmentId, clonedEquipmentConfiguration);
+          configuration.getEquipmentConfigurations().put(equipmentId, clonedEquipmentConfiguration);
         }
       } else {
         changeReport.appendError("Equipment configuration with id: " + equipmentId + " not found.");
@@ -737,15 +746,17 @@ public class ConfigurationController {
   public synchronized ChangeReport onProcessConfigurationUpdate(final ProcessConfigurationUpdate processConfigurationUpdate) {
     ChangeReport changeReport = new ChangeReport(processConfigurationUpdate);
     long processId = processConfigurationUpdate.getProcessId();
+    ProcessConfiguration configuration = ProcessConfigurationHolder.getInstance();
+
     try {
-      if (processId == processConfiguration.getProcessID()) {
-        synchronized (processConfiguration) {
-          configurationUpdater.updateProcessConfiguration(processConfigurationUpdate, processConfiguration);
+      if (processId == configuration.getProcessID()) {
+        synchronized (configuration) {
+          configurationUpdater.updateProcessConfiguration(processConfigurationUpdate, configuration);
         }
         changeReport.appendInfo("Process with id " + processId + " successfully updated.");
         changeReport.setState(CHANGE_STATE.SUCCESS);
       } else {
-        changeReport.appendError("The process id of this DAQ is " + processConfiguration.getProcessID() + " not " + processId + ".");
+        changeReport.appendError("The process id of this DAQ is " + configuration.getProcessID() + " not " + processId + ".");
       }
     } catch (Exception e) {
       changeReport.appendError("Error while applying process changes: " + e.getMessage());
@@ -765,9 +776,10 @@ public class ConfigurationController {
 
     ChangeReport changeReport = new ChangeReport(subEquipmentUnitRemove);
     changeReport.setState(CHANGE_STATE.SUCCESS);
+    ProcessConfiguration configuration = ProcessConfigurationHolder.getInstance();
 
     // Check if the parent equipment exists
-    EquipmentConfiguration parentEquipmentConfiguration = processConfiguration.getEquipmentConfiguration(subEquipmentUnitRemove.getParentEquipmentId());
+    EquipmentConfiguration parentEquipmentConfiguration = configuration.getEquipmentConfiguration(subEquipmentUnitRemove.getParentEquipmentId());
     if (parentEquipmentConfiguration == null) {
       changeReport.appendError("Parent Equipment unit id: " + subEquipmentUnitRemove.getParentEquipmentId() + " for SubEquipment unit " +
           subEquipmentUnitRemove.getSubEquipmentId() + " is unknown");
@@ -799,9 +811,10 @@ public class ConfigurationController {
 
     ChangeReport changeReport = new ChangeReport(subEquipmentUnitAdd);
     changeReport.setState(CHANGE_STATE.SUCCESS);
+    ProcessConfiguration configuration = ProcessConfigurationHolder.getInstance();
 
     // Check if the parent equipment exists
-    EquipmentConfiguration parentEquipmentConfiguration = processConfiguration.getEquipmentConfiguration(subEquipmentUnitAdd.getParentEquipmentId());
+    EquipmentConfiguration parentEquipmentConfiguration = configuration.getEquipmentConfiguration(subEquipmentUnitAdd.getParentEquipmentId());
     if (parentEquipmentConfiguration == null) {
       changeReport.appendError("Parent Equipment unit id: " + subEquipmentUnitAdd.getParentEquipmentId() + " for SubEquipment unit " + subEquipmentUnitAdd
           .getSubEquipmentId() + " is unknown");
@@ -842,7 +855,8 @@ public class ConfigurationController {
    * @return The SourceCommandTags or null if the equipment does not exist.
    */
   private Map<Long, SourceCommandTag> getSourceCommandTags(final Long equipmentId) {
-    Map<Long, EquipmentConfiguration> equipmentConfigurations = processConfiguration.getEquipmentConfigurations();
+    ProcessConfiguration configuration = ProcessConfigurationHolder.getInstance();
+    Map<Long, EquipmentConfiguration> equipmentConfigurations = configuration.getEquipmentConfigurations();
     EquipmentConfiguration equipmentConfiguration = equipmentConfigurations.get(equipmentId);
     Map<Long, SourceCommandTag> sourceCommandTags;
     if (equipmentConfiguration == null) {
@@ -861,6 +875,7 @@ public class ConfigurationController {
    * @return The SourceDataTags or null if the equipment does not exist.
    */
   private Map<Long, SourceDataTag> getSourceDataTags(final Long equipmentId) {
+    ProcessConfiguration processConfiguration = ProcessConfigurationHolder.getInstance();
     Map<Long, EquipmentConfiguration> equipmentConfigurations = processConfiguration.getEquipmentConfigurations();
     Map<Long, SourceDataTag> sourceDataTags = null;
 
@@ -886,7 +901,7 @@ public class ConfigurationController {
    * @param processConfiguration The process configuration object.
    */
   public void setProcessConfiguration(final ProcessConfiguration processConfiguration) {
-    this.processConfiguration = processConfiguration;
+    ProcessConfigurationHolder.setInstance(processConfiguration);
   }
 
   /**
@@ -895,7 +910,7 @@ public class ConfigurationController {
    * @return The process configuration object.
    */
   public ProcessConfiguration getProcessConfiguration() {
-    return processConfiguration;
+    return ProcessConfigurationHolder.getInstance();
   }
 
   /**
