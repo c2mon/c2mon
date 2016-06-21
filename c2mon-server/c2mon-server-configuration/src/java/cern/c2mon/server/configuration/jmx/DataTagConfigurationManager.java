@@ -17,12 +17,16 @@
 
 package cern.c2mon.server.configuration.jmx;
 
-import cern.c2mon.patterncache.Cachable;
 import cern.c2mon.server.cache.ClusterCache;
+import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.cache.DataTagCache;
+import cern.c2mon.server.cache.RuleTagCache;
+import cern.c2mon.server.cache.loading.ControlTagLoaderDAO;
 import cern.c2mon.server.cache.loading.DataTagLoaderDAO;
+import cern.c2mon.server.cache.loading.RuleTagLoaderDAO;
+import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.common.rule.RuleTag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -41,49 +45,102 @@ public class DataTagConfigurationManager {
 
   private DataTagLoaderDAO dataTagLoaderDAO;
 
+  private ControlTagLoaderDAO controlTagLoaderDAO;
+
+  private RuleTagLoaderDAO ruleTagLoaderDAO;
+
   private DataTagCache dataTagCache;
 
-  private ClusterCache clusterCache;
+  private ControlTagCache controlTagCache;
 
-  private String cachePersistenceLock = "c2mon.cachepersistence.cachePersistenceLock";
-
+  private RuleTagCache ruleTagCache;
 
   @Autowired
-  public DataTagConfigurationManager(final DataTagLoaderDAO dataTagLoaderDAO, final DataTagCache dataTagCache, ClusterCache clusterCache) {
+  public DataTagConfigurationManager(final DataTagLoaderDAO dataTagLoaderDAO, final DataTagCache dataTagCache,
+                                     ControlTagLoaderDAO controlTagLoaderDAO, ControlTagCache controlTagCache,
+                                     RuleTagLoaderDAO ruleTagLoaderDAO, RuleTagCache ruleTagCache) {
     this.dataTagLoaderDAO = dataTagLoaderDAO;
     this.dataTagCache = dataTagCache;
-    this.clusterCache = clusterCache;
+    this.controlTagLoaderDAO = controlTagLoaderDAO;
+    this.controlTagCache = controlTagCache;
+    this.ruleTagLoaderDAO = ruleTagLoaderDAO;
+    this.ruleTagCache = ruleTagCache;
   }
 
   @ManagedOperation(description = "Persists the current cache configurations to the DB (cache persistence). Ensures cache object runtime values & DB are synchronized.")
   public void persistAllCacheConfigurationToDatabase() {
-    clusterCache.acquireWriteLockOnKey(cachePersistenceLock);
     try {
-      List<Long> tagIdList = dataTagCache.getKeys();
+      List<Long> dataTagIdList = dataTagCache.getKeys();
+      List<Long> controlTagIdList = controlTagCache.getKeys();
+      List<Long> ruleTagIdList = ruleTagCache.getKeys();
 
-      log.debug("Persisting " + tagIdList.size() + " configuration of cache object(s) to the database (DataTag)");
+      int numberOfAllData = dataTagIdList.size() + controlTagIdList.size() + ruleTagIdList.size();
 
-      int counter=0, overall=0;
-      for(Long id : tagIdList){
+      log.debug("Persisting " + numberOfAllData + " configuration of cache object(s) to the database.");
+
+      int counter = 0, overall = 0;
+      for (Long id : dataTagIdList) {
         DataTag tag = dataTagCache.getCopy(id);
-        log.debug("Write Tag [id: "+tag.getId()+" - logged:"+tag.isLogged()+" - minvalue"+tag.getMinValue()+" - maxValue"+tag.getMaxValue()+"] into db");
+        log.trace("Write Tag [id: {} - minvalue: {} - maxvalue: {}]", tag.getId(), tag.getMaxValue(), tag.getMinValue());
         dataTagLoaderDAO.updateConfig(dataTagCache.getCopy(id));
         counter++;
         overall++;
-        if(counter >= tagIdList.size()*0.1){
-          counter =0;
-          log.debug("JMX update progress:"+(int)(((overall*1.0)/tagIdList.size()) *100));
+        if (counter >= numberOfAllData  * 0.1) {
+          counter = 0;
+          log.debug("JMX update progress: " + (int) (((overall * 1.0) / numberOfAllData) * 100) + "%");
         }
       }
 
-//      TODO: use the stream
-//      tagIdList.stream().forEach((key) -> dataTagLoaderDAO.updateConfig(dataTagCache.get(key)));
-      log.debug("Done with Persisting the DataTag Configuration");
+      for (Long id : dataTagIdList) {
+        ControlTag tag = controlTagCache.getCopy(id);
+        log.trace("Write Tag [id: {} - minvalue: {} - maxvalue: {}]", tag.getId(), tag.getMaxValue(), tag.getMinValue());
+        controlTagLoaderDAO.updateConfig(controlTagCache.getCopy(id));
+        counter++;
+        overall++;
+        if (counter >= numberOfAllData  * 0.1) {
+          counter = 0;
+          log.debug("JMX update progress: " + (int) (((overall * 1.0) / numberOfAllData) * 100) + "%");
+        }
+      }
 
-    } finally {
-      clusterCache.releaseWriteLockOnKey(cachePersistenceLock);
+      for (Long id : dataTagIdList) {
+        RuleTag tag = ruleTagCache.getCopy(id);
+        log.trace("Write Tag [id: {} ]", tag.getId());
+        ruleTagLoaderDAO.updateConfig(ruleTagCache.getCopy(id));
+        counter++;
+        overall++;
+        if (counter >= numberOfAllData  * 0.1) {
+          counter = 0;
+          log.debug("JMX update progress: " + (int) (((overall * 1.0) / numberOfAllData) * 100) + "%");
+        }
+      }
+    } catch (Exception e) {
+      log.warn("Error occurred whilst persisting all data tag configurations.", e);
     }
+  }
 
+  @ManagedOperation(description = "Persists the current cache configurations to the DB (cache persistence). Ensures cache object runtime values & DB are synchronized.")
+  public void persistAllCacheConfigurationToDatabaseParallel() {
+    try {
+      List<Long> dataTagIdList = dataTagCache.getKeys();
+      List<Long> controlTagIdList = controlTagCache.getKeys();
+      List<Long> ruleTagIdList = ruleTagCache.getKeys();
+
+      log.debug("Persisting {} dataTag, {} controlTag and {} ruleTag configuration to the database", dataTagIdList.size(), controlTagIdList.size(), ruleTagIdList.size());
+
+      controlTagCache.getKeys().parallelStream().forEach((key) -> controlTagLoaderDAO.updateConfig(controlTagCache.getCopy(key)));
+      log.debug("Persisting controlTags done");
+
+      ruleTagCache.getKeys().parallelStream().forEach((key) -> ruleTagLoaderDAO.updateConfig(ruleTagCache.getCopy(key)));
+      log.debug("Persisting ruleTags done");
+
+      dataTagCache.getKeys().parallelStream().forEach((key) -> dataTagLoaderDAO.updateConfig(dataTagCache.getCopy(key)));
+      log.debug("Persisting dataTags done");
+
+
+    } catch (Exception e) {
+      log.warn("Error occurred whilst persisting all data tag configurations.", e);
+    }
   }
 
 
