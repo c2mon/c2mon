@@ -39,7 +39,7 @@ import java.util.List;
  * @author Franz Ritter
  */
 @Component
-@ManagedResource(objectName = "cern.c2mon:name=dataTagConfigurationManager")
+@ManagedResource(objectName = "cern.c2mon:name=tagConfigurationManager")
 @Slf4j
 public class DataTagConfigurationManager {
 
