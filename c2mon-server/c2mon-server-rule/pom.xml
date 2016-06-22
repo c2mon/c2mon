@@ -10,7 +10,7 @@
 
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-rule</artifactId>
-  <version>1.7.1-SNAPSHOT</version>
+  <version>1.7.1</version>
   <name>c2mon-server-rule</name>
   <packaging>jar</packaging>
   <description>
