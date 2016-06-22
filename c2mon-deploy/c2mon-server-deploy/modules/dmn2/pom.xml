@@ -3,8 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>c2mon-server-deploy</artifactId>
     <groupId>cern.c2mon.c2mon-deploy</groupId>
+    <artifactId>c2mon-server-deploy</artifactId>
     <version>1.7.6-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
@@ -26,16 +26,12 @@
           <groupId>net.sf.ehcache</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>logback-classic</artifactId>
-          <groupId>ch.qos.logback</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>logback-core</artifactId>
-          <groupId>ch.qos.logback</groupId>
-        </exclusion>
-        <exclusion>
           <artifactId>hsqldb</artifactId>
           <groupId>org.hsqldb</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>log4j-over-slf4j</artifactId>
+          <groupId>org.slf4j</groupId>
         </exclusion>
         <exclusion>
           <artifactId>mysql-connector-java</artifactId>
@@ -43,12 +39,31 @@
         </exclusion>
       </exclusions>
     </dependency>
+  
+    <!-- 
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-benchmark</artifactId>
+      <version>[1.5.0, 2.0.0)</version>
+    </dependency>
+     -->
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-laser</artifactId>
+      <version>[1.7.0, 2.0.0)</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>log4j</artifactId>
+          <groupId>log4j</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-shorttermlog</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
+      <version>[1.7.0, 2.0.0)</version>
       <exclusions>
-       <exclusion>
+        <exclusion>
           <artifactId>hsqldb</artifactId>
           <groupId>org.hsqldb</groupId>
         </exclusion>
@@ -56,31 +71,81 @@
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-laser</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-eslog</artifactId>
-      <version>[1.7.0,2.0.0]</version>
+      <version>[1.7.0, 2.0.0)</version>
     </dependency>
-
+     
+     
     <!-- 3rd party dependencies -->
     <dependency>
       <groupId>net.sf.ehcache</groupId>
       <artifactId>ehcache-ee</artifactId>
       <scope>runtime</scope>
     </dependency>
+
+    <!-- use Oracle db -->
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
+      <groupId>oracle</groupId>
+      <artifactId>ojdbc</artifactId>
+    </dependency>
+
+    <!-- for central logging -->
+    <!-- 
+    <dependency>
+      <groupId>cern.cmw</groupId>
+      <artifactId>cmw-log-log4j</artifactId>
       <scope>runtime</scope>
+      <version>[1.5.8, 2.0.0)</version>
+    </dependency>
+     -->
+     
+    <!--
+      Allows exposing the JMX interface to DIAMON
+    -->
+    <dependency>
+        <groupId>cern.accsoft.commons</groupId>
+        <artifactId>accsoft-commons-jmxdirectory-registration</artifactId>
+        <version>[1.1.7, 2.0.0)</version>
     </dependency>
   </dependencies>
 
-  <developers />
   <build>
     <plugins>
+
+      <!-- Prevent Maven from building a jar -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-jar</id>
+            <phase/>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Prevent Maven from trying to install a jar -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-install-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-jar</id>
+            <phase/>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Prevent Maven from creating a source jar -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <configuration>
+          <skipSource>true</skipSource>
+        </configuration>
+      </plugin>
+
+      <!-- Create a tar.gz -->
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>

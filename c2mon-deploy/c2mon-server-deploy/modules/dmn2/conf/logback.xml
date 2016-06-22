@@ -138,6 +138,12 @@
 
   <logger name="cern.c2mon.server.eslog" level="INFO" additivity="false">
     <appender-ref ref="ElasticseachLogAppender"/>
+    <appender-ref ref="ErrorAppender"/>
+  </logger>
+  
+  <logger name="org.elasticsearch" level="INFO" additivity="false">
+    <appender-ref ref="ElasticseachLogAppender"/>
+    <appender-ref ref="ErrorAppender"/>
   </logger>
   
   <!-- TODO: add CMW central logging appender -->
@@ -179,7 +185,6 @@
   <logger name="cern.c2mon.pmanager" level="DEBUG"/>
   <logger name="org.apache.activemq" level="INFO"/>
   <logger name="org.springframework" level="INFO"/>
-  <logger name="org.elasticsearch" level="INFO">
 
   <root level="INFO">
     <appender-ref ref="FileAppender"/>

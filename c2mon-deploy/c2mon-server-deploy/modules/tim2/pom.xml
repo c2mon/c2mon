@@ -67,10 +67,6 @@
           <artifactId>hsqldb</artifactId>
           <groupId>org.hsqldb</groupId>
         </exclusion>
-        <exclusion>
-          <artifactId>mybatis-spring</artifactId>
-          <groupId>org.mybatis</groupId>
-        </exclusion>
       </exclusions>
     </dependency>
     <!-- 
