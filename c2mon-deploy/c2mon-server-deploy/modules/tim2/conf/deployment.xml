@@ -64,7 +64,6 @@ fi
         <property name="c2mon.server.name" value="C2MON-TIM-PRO1" />
         <!-- Configuration for LASER module -->
         <property name="laser.hosts" value="laser-test" />
-        <property name="cmw.mom.brokerlist" value="sljas2:2506,sljas3:2506" />
         <!-- Terracotta configuration -->
         <property name="terracotta.config.location" value="tim-cache-pro1:9510,tim-cache-pro2:9511" />
       </startscript>
@@ -87,7 +86,6 @@ fi
         <property name="c2mon.server.name" value="C2MON-TIM-PRO2" />
         <!-- Configuration for LASER module -->
         <property name="laser.hosts" value="laser-test" />
-        <property name="cmw.mom.brokerlist" value="sljas2:2506,sljas3:2506" />
         <!-- Terracotta configuration -->
         <property name="terracotta.config.location" value="tim-cache-pro1:9510,tim-cache-pro2:9511" />
       </startscript>
@@ -109,7 +107,6 @@ fi
         <property name="c2mon.server.testMode" value="true" />
         <!-- Configuration for LASER module -->
         <property name="laser.hosts" value="laser-test" />
-        <property name="cmw.mom.brokerlist" value="jms-diamon-test:2506" />
         <!-- Terracotta configuration -->
         <property name="terracotta.config.location" value="tim-cache-test1:9510,tim-cache-test2:9511" />
       </startscript>
@@ -126,7 +123,6 @@ fi
         <property name="c2mon.server.testMode" value="true" />
         <!-- Configuration for LASER module -->
         <property name="laser.hosts" value="laser-test" />
-        <property name="cmw.mom.brokerlist" value="jms-diamon-test:2506" />
         <!-- Terracotta configuration -->
         <property name="terracotta.config.location" value="tim-cache-test1:9510,tim-cache-test2:9511" />
       </startscript>
