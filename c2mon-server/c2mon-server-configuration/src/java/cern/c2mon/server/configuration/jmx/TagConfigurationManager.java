@@ -17,7 +17,6 @@
 
 package cern.c2mon.server.configuration.jmx;
 
-import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.RuleTagCache;
@@ -39,9 +38,10 @@ import java.util.List;
  * @author Franz Ritter
  */
 @Component
-@ManagedResource(objectName = "cern.c2mon:name=tagConfigurationManager")
+@ManagedResource(objectName = "cern.c2mon:name=tagConfigurationManager",
+    description = "Persist the configuration of rule-, control- and data-tags into the db.")
 @Slf4j
-public class DataTagConfigurationManager {
+public class TagConfigurationManager {
 
   private DataTagLoaderDAO dataTagLoaderDAO;
 
@@ -56,9 +56,9 @@ public class DataTagConfigurationManager {
   private RuleTagCache ruleTagCache;
 
   @Autowired
-  public DataTagConfigurationManager(final DataTagLoaderDAO dataTagLoaderDAO, final DataTagCache dataTagCache,
-                                     ControlTagLoaderDAO controlTagLoaderDAO, ControlTagCache controlTagCache,
-                                     RuleTagLoaderDAO ruleTagLoaderDAO, RuleTagCache ruleTagCache) {
+  public TagConfigurationManager(final DataTagLoaderDAO dataTagLoaderDAO, final DataTagCache dataTagCache,
+                                 ControlTagLoaderDAO controlTagLoaderDAO, ControlTagCache controlTagCache,
+                                 RuleTagLoaderDAO ruleTagLoaderDAO, RuleTagCache ruleTagCache) {
     this.dataTagLoaderDAO = dataTagLoaderDAO;
     this.dataTagCache = dataTagCache;
     this.controlTagLoaderDAO = controlTagLoaderDAO;
@@ -85,7 +85,7 @@ public class DataTagConfigurationManager {
         dataTagLoaderDAO.updateConfig(dataTagCache.getCopy(id));
         counter++;
         overall++;
-        if (counter >= numberOfAllData  * 0.1) {
+        if (counter >= numberOfAllData * 0.1) {
           counter = 0;
           log.debug("JMX update progress: " + (int) (((overall * 1.0) / numberOfAllData) * 100) + "%");
         }
@@ -97,7 +97,7 @@ public class DataTagConfigurationManager {
         controlTagLoaderDAO.updateConfig(controlTagCache.getCopy(id));
         counter++;
         overall++;
-        if (counter >= numberOfAllData  * 0.1) {
+        if (counter >= numberOfAllData * 0.1) {
           counter = 0;
           log.debug("JMX update progress: " + (int) (((overall * 1.0) / numberOfAllData) * 100) + "%");
         }
@@ -109,7 +109,7 @@ public class DataTagConfigurationManager {
         ruleTagLoaderDAO.updateConfig(ruleTagCache.getCopy(id));
         counter++;
         overall++;
-        if (counter >= numberOfAllData  * 0.1) {
+        if (counter >= numberOfAllData * 0.1) {
           counter = 0;
           log.debug("JMX update progress: " + (int) (((overall * 1.0) / numberOfAllData) * 100) + "%");
         }
@@ -126,16 +126,16 @@ public class DataTagConfigurationManager {
       List<Long> controlTagIdList = controlTagCache.getKeys();
       List<Long> ruleTagIdList = ruleTagCache.getKeys();
 
-      log.debug("Persisting {} dataTag, {} controlTag and {} ruleTag configuration to the database", dataTagIdList.size(), controlTagIdList.size(), ruleTagIdList.size());
+      log.debug("Persisting of {} dataTags, {} controlTags and {} ruleTags configuration to the database", dataTagIdList.size(), controlTagIdList.size(), ruleTagIdList.size());
 
       controlTagCache.getKeys().parallelStream().forEach((key) -> controlTagLoaderDAO.updateConfig(controlTagCache.getCopy(key)));
-      log.debug("Persisting controlTags done");
+      log.debug("Persisting controlTags configuration done");
 
       ruleTagCache.getKeys().parallelStream().forEach((key) -> ruleTagLoaderDAO.updateConfig(ruleTagCache.getCopy(key)));
-      log.debug("Persisting ruleTags done");
+      log.debug("Persisting of {} ruleTags configuration done", ruleTagIdList.size());
 
       dataTagCache.getKeys().parallelStream().forEach((key) -> dataTagLoaderDAO.updateConfig(dataTagCache.getCopy(key)));
-      log.debug("Persisting dataTags done");
+      log.debug("Persisting of {} dataTags configuration done", dataTagIdList.size());
 
 
     } catch (Exception e) {

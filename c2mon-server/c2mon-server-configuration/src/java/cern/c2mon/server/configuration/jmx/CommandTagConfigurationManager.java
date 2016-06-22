@@ -32,7 +32,8 @@ import java.util.List;
  * @author Franz Ritter
  */
 @Component
-@ManagedResource(objectName = "cern.c2mon:name=commandTagConfigurationManager")
+@ManagedResource(objectName = "cern.c2mon:name=commandTagConfigurationManager",
+    description = "Persist the configuration of command tags into the db.")
 @Slf4j
 public class CommandTagConfigurationManager {
 
@@ -40,16 +41,11 @@ public class CommandTagConfigurationManager {
 
   private CommandTagCache commandTagCache;
 
-  private ClusterCache clusterCache;
-
-  private String cachePersistenceLock = "c2mon.cachepersistence.cachePersistenceLock";
-
 
   @Autowired
-  public CommandTagConfigurationManager(final CommandTagDAO commandTagDAO, final CommandTagCache commandTagCache, ClusterCache clusterCache) {
+  public CommandTagConfigurationManager(final CommandTagDAO commandTagDAO, final CommandTagCache commandTagCache) {
     this.commandTagDAO = commandTagDAO;
     this.commandTagCache = commandTagCache;
-    this.clusterCache = clusterCache;
   }
 
   @ManagedOperation(description = "Persists the current cache configurations to the DB (cache persistence). Ensures cache object runtime values & DB are synchronized.")
@@ -78,6 +74,7 @@ public class CommandTagConfigurationManager {
     try {
       log.debug("Persisting " + commandTagCache.getKeys().size() + " configuration of cache object(s) to the database (CommandTag)");
       commandTagCache.getKeys().parallelStream().forEach((key) -> commandTagDAO.updateCommandTag(commandTagCache.getCopy(key)));
+      log.debug("Persisting commandTags configuration done");
 
     }catch (Exception e){
       log.warn("Error occurred whilst persisting all command tag configurations.", e);
