@@ -9,7 +9,7 @@
 
   <groupId>cern.c2mon.c2mon-client</groupId>
   <artifactId>c2mon-client-ext-simulator</artifactId>
-  <version>1.7.4</version>
+  <version>1.7.5-SNAPSHOT</version>
   <name>c2mon-client-ext-simulator</name>
   <packaging>jar</packaging>
   <description>Provides an API to overwrite in the local cache the data received from the C2MON server.</description>
