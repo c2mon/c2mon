@@ -31,6 +31,7 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.easymock.EasyMock;
@@ -321,6 +322,11 @@ public class ActiveRequestSenderTest {
     EasyMock.reset(this.environmentMock);
     ActiveRequestSenderTest.testType = TestType.CONFIG;
     LOGGER.debug("Starting " + ActiveRequestSenderTest.testType.getName());
+
+    ProcessConfiguration processConfiguration = new ProcessConfiguration();
+    processConfiguration.setProcessName(PROCESS_NAME);
+    processConfiguration.setprocessPIK(PROCESS_PIK);
+    ProcessConfigurationHolder.setInstance(processConfiguration);
 
     // Expectations.
     EasyMock.expect(this.environmentMock.getRequiredProperty(EasyMock.<String>anyObject(), eq(Long.class))).andReturn(TEST_RESULTS_TIMEOUT).times(1);
