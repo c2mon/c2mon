@@ -9,7 +9,7 @@
 
   <groupId>cern.c2mon.c2mon-client</groupId>
   <artifactId>c2mon-client-jms</artifactId>
-  <version>1.7.4-SNAPSHOT</version>
+  <version>1.7.4</version>
   <name>c2mon-client-jms</name>
   <packaging>jar</packaging>
   <description>The C2MON Client module handling JMS connections.</description>
