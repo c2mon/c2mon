@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.client.apitest;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -27,6 +28,7 @@ import org.junit.Test;
 public class C2monTestClientTest {
 
   @Test
+  @Ignore
   public void testSubscription() {
     System.setProperty("c2mon.client.test.tagids.location", "classpath:resources/c2mon-test-client-tagids.txt");
     System.setProperty("c2mon.client.test.subscription.number", "5");

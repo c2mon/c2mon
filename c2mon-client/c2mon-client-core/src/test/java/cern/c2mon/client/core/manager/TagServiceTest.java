@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -51,7 +51,7 @@ import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:cern/c2mon/client/core/manager/c2mon-tagservice-test.xml" })
+@ContextConfiguration({ "classpath:test-config/c2mon-tagservice-test.xml" })
 public class TagServiceTest {
 
   /**
@@ -126,7 +126,7 @@ public class TagServiceTest {
     // check test success
     EasyMock.verify(requestHandlerMock, jmsProxyMock);
   }
-  
+
   @Test @DirtiesContext
   public void testSubscribeDataTagUpdates() throws Exception {
     final List<Boolean> check = new ArrayList<>();
@@ -182,19 +182,19 @@ public class TagServiceTest {
     Assert.assertEquals(tagIds1.size(), tagService.getSubscriptionIds(listener1).size());
 
     // second call for second listener
-    tagService.subscribe(tagIds2, listener2); 
-    
+    tagService.subscribe(tagIds2, listener2);
+
     Assert.assertEquals(tagIds2.size(), tagService.getSubscriptionIds(listener2).size());
     Assert.assertEquals(2, check.size());
-    
+
     Thread.sleep(1000);
-    
+
     // check test success
     EasyMock.verify(requestHandlerMock, jmsProxyMock);
   }
 
   @Test @DirtiesContext
-  public void testUnsubscribeDataTags() throws JMSException {
+  public void testUnsubscribeDataTags() throws JMSException, InterruptedException {
     // Test setup
     Set<Long> tagIds1 = new HashSet<Long>();
     for (long i = 1L; i <= 1000; i++) {
@@ -203,7 +203,7 @@ public class TagServiceTest {
     BaseTagListener listener1 = EasyMock.createMock(BaseTagListener.class);
     prepareSubscribeDataTagsMock(tagIds1, listener1);
     EasyMock.replay(requestHandlerMock, jmsProxyMock);
-    
+
     // run test
     tagService.subscribe(tagIds1, listener1);
     Collection<Tag> cdtValues = tagService.getSubscriptions(listener1);
@@ -212,11 +212,13 @@ public class TagServiceTest {
     tagService.unsubscribe(tagIds1, listener1);
     cdtValues = tagService.getSubscriptions(listener1);
     Assert.assertEquals(0, cdtValues.size());
-    
+
+//    Thread.sleep(2000);
+
     // check test success
     EasyMock.verify(requestHandlerMock, jmsProxyMock);
   }
-  
+
   @Test @DirtiesContext
   public void testSubscribeToUnknownDataTag() throws JMSException, Exception{
     final List<Boolean> check = new ArrayList<>();
@@ -241,19 +243,19 @@ public class TagServiceTest {
     ClientDataTagImpl cdt = new ClientDataTagImpl(1L, true);
     EasyMock.expect(jmsProxyMock.isRegisteredListener(cdt)).andReturn(false);
     EasyMock.replay(requestHandlerMock, jmsProxyMock);
-    
+
     // run test
     tagService.subscribe(1L, listener);
     Thread.sleep(200);
     Assert.assertEquals(1, check.size());
     Assert.assertTrue(check.get(0));
     Assert.assertEquals(1, tagService.getSubscriptionIds(listener).size());
-    
-    
+
+
     // check test success
     EasyMock.verify(requestHandlerMock, jmsProxyMock);
   }
-  
+
   @Test @DirtiesContext
   public void testGetUnknownTag() throws JMSException, Exception {
     // Test setup
@@ -261,15 +263,15 @@ public class TagServiceTest {
     tagId.add(1L);
     EasyMock.expect(requestHandlerMock.requestTags(tagId)).andReturn(new ArrayList<TagUpdate>());
     EasyMock.replay(requestHandlerMock);
-    
+
     // run test
     Tag unknownTag = tagService.get(1L);
     Assert.assertFalse(unknownTag.getDataTagQuality().isExistingTag());
-    
+
     // check test success
     EasyMock.verify(requestHandlerMock);
   }
-  
+
   @Test @DirtiesContext
   public void testGetUnknownTags() throws JMSException, Exception {
     // Test setup
@@ -278,14 +280,14 @@ public class TagServiceTest {
     tagIds.add(2L);
     EasyMock.expect(requestHandlerMock.requestTags(tagIds)).andReturn(new ArrayList<TagUpdate>());
     EasyMock.replay(requestHandlerMock);
-    
+
     // run test
     Collection<Tag> unknownTags = tagService.get(tagIds);
     Assert.assertTrue(unknownTags.size() == 2);
     for (Tag unknownTag : unknownTags) {
       Assert.assertFalse(unknownTag.getDataTagQuality().isExistingTag());
     }
-    
+
     // check test success
     EasyMock.verify(requestHandlerMock);
   }
@@ -326,18 +328,18 @@ public class TagServiceTest {
     DataTagQuality tagQuality = new DataTagQualityImpl();
     tagQuality.validate();
     TagUpdate tagUpdate =
-      new TransferTagImpl(
-          tagId,
-          null,
-          "test value desc",
-          (DataTagQualityImpl) tagQuality,
-          TagMode.TEST,
-          new Timestamp(System.currentTimeMillis() - 10000L),
-          new Timestamp(System.currentTimeMillis() - 5000L),
-          new Timestamp(System.currentTimeMillis()),
-          "Test description",
-          "My.data.tag.name",
-          "My.jms.topic");
+        new TransferTagImpl(
+            tagId,
+            null,
+            "test value desc",
+            (DataTagQualityImpl) tagQuality,
+            TagMode.TEST,
+            new Timestamp(System.currentTimeMillis() - 10000L),
+            new Timestamp(System.currentTimeMillis() - 5000L),
+            new Timestamp(System.currentTimeMillis()),
+            "Test description",
+            "My.data.tag.name",
+            "My.jms.topic");
 
     return tagUpdate;
   }

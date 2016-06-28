@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -53,13 +53,11 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.rule.RuleFormatException;
 
 /**
- * Don't forget to add all required environment variables before you start your
- * test! The environment variable are specified in the <code>pom.xml</code>
- *
  * @author Matthias Braeger
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:cern/c2mon/client/core/cache/c2mon-cache-test.xml" })
+@ContextConfiguration({ "classpath:test-config/c2mon-cache-test.xml" })
+@DirtiesContext
 public class ClientDataTagCacheImplTest {
   /**
    * Component to test
@@ -80,9 +78,9 @@ public class ClientDataTagCacheImplTest {
 
   @Before
   public void init() {
-   EasyMock.reset(jmsProxyMock, supervisionManagerMock, requestHandlerMock);
-   cacheController.getLiveCache().clear();
-   cacheController.getHistoryCache().clear();
+    EasyMock.reset(jmsProxyMock, supervisionManagerMock, requestHandlerMock);
+    cacheController.getLiveCache().clear();
+    cacheController.getHistoryCache().clear();
   }
 
   @Test
@@ -96,7 +94,6 @@ public class ClientDataTagCacheImplTest {
    * @throws Exception
    */
   @Test
-  @DirtiesContext
   public void testAddDataTagUpdateListener() throws Exception {
     // Test setup
     Set<Long> tagIds = new HashSet<Long>();
@@ -128,7 +125,6 @@ public class ClientDataTagCacheImplTest {
 
 
   @Test
-  @DirtiesContext
   public void testUnsubscribeAllDataTags() throws Exception {
     // test setup
     Set<Long> tagIds = new HashSet<Long>();
@@ -149,18 +145,22 @@ public class ClientDataTagCacheImplTest {
     // run test
     EasyMock.replay(jmsProxyMock, requestHandlerMock);
     cache.subscribe(tagIds, listener1);
+    Thread.sleep(200);
     Collection<Tag> cachedTags = cache.getAllSubscribedDataTags();
     assertEquals(2, cachedTags.size());
     // NOT Registered listener
     cache.unsubscribeAllDataTags(listener2);
+    Thread.sleep(200);
     cachedTags = cache.getAllSubscribedDataTags();
     assertEquals(2, cachedTags.size());
     // Registered listener
     cache.unsubscribeAllDataTags(listener1);
+    Thread.sleep(200);
     cachedTags = cache.getAllSubscribedDataTags();
     assertEquals(0, cachedTags.size());
 
-    Thread.sleep(2000);
+    Thread.sleep(200);
+    //Thread.sleep(2500);
 
     // check test success
     EasyMock.verify(jmsProxyMock, requestHandlerMock);
@@ -168,7 +168,6 @@ public class ClientDataTagCacheImplTest {
 
 
   @Test
-  @DirtiesContext
   public void testContainsTag() throws Exception {
     // Test setup
     Set<Long> tagIds = new HashSet<Long>();
@@ -198,7 +197,6 @@ public class ClientDataTagCacheImplTest {
   }
 
   @Test
-  @DirtiesContext
   public void testHistoryMode() throws Exception {
     // Test setup
     Set<Long> tagIds = new HashSet<Long>();
@@ -256,18 +254,18 @@ public class ClientDataTagCacheImplTest {
     DataTagQuality tagQuality = new DataTagQualityImpl();
     tagQuality.validate();
     TagUpdate tagUpdate =
-      new TransferTagImpl(
-          tagId,
-          value,
-          "test value desc",
-          (DataTagQualityImpl) tagQuality,
-          TagMode.TEST,
-          new Timestamp(System.currentTimeMillis() - 10000L),
-          new Timestamp(System.currentTimeMillis() - 5000L),
-          new Timestamp(System.currentTimeMillis()),
-          "Test description",
-          "My.data.tag.name",
-          "My.jms.topic");
+        new TransferTagImpl(
+            tagId,
+            value,
+            "test value desc",
+            (DataTagQualityImpl) tagQuality,
+            TagMode.TEST,
+            new Timestamp(System.currentTimeMillis() - 10000L),
+            new Timestamp(System.currentTimeMillis() - 5000L),
+            new Timestamp(System.currentTimeMillis()),
+            "Test description",
+            "My.data.tag.name",
+            "My.jms.topic");
 
     return tagUpdate;
   }

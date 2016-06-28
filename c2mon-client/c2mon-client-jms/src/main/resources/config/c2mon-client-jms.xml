@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+  <!-- Spring XML file for client-jms project -->
+
+  <context:component-scan base-package="cern.c2mon.client.jms"/>
+  <context:annotation-config/>
+
+  <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+    <property name="brokerURL" value="${c2mon.client.jms.url}"/>
+    <property name="userName" value="${c2mon.client.jms.user}"/>
+    <property name="password" value="${c2mon.client.jms.password}"/>
+    <property name="watchTopicAdvisories" value="false"/>
+    <property name="copyMessageOnSend" value="false"/>
+    <property name="clientIDPrefix" value="c2mon-client"  />
+  </bean>
+
+  <bean id="supervisionTopic" class="org.apache.activemq.command.ActiveMQTopic">
+    <constructor-arg value="${c2mon.client.jms.supervision.topic}"/>
+  </bean>
+
+  <bean id="heartbeatTopic" class="org.apache.activemq.command.ActiveMQTopic">
+    <constructor-arg value="${c2mon.client.jms.heartbeat.topic}"/>
+  </bean>
+
+  <bean id="alarmTopic" class="org.apache.activemq.command.ActiveMQTopic">
+    <constructor-arg value="${c2mon.client.jms.alarm.topic}"/>
+  </bean>
+
+  <bean id="jmsSender" class="cern.c2mon.shared.util.jms.ActiveJmsSender">
+    <property name="jmsTemplate" ref="jmsTemplate" />
+  </bean>
+
+  <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+    <property name="connectionFactory" ref="jmsConnectionFactory"/>
+  </bean>
+
+
+</beans>

@@ -76,8 +76,10 @@ import cern.c2mon.shared.util.json.GsonFactory;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:cern/c2mon/client/jms/config/c2mon-client-jms.xml",
-                         "classpath:cern/c2mon/client/jms/config/c2mon-client-jms-properties.xml" })
+@ContextConfiguration({
+    "classpath:config/c2mon-client-jms.xml",
+    "classpath:test-config/c2mon-client-jms-properties.xml"
+})
 @TestPropertySource(
     locations = "classpath:c2mon-client-default.properties",
     properties = {
