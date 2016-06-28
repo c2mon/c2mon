@@ -361,9 +361,9 @@ public class HistoryService {
     final int size = historyValues.size();
     if (size > 0) {
       final HistoryTagValueUpdate h = historyValues.iterator().next();
-      final String type = h.getDataType();
-      final boolean isBooleanData = type.equals("Boolean");
-      return isBooleanData;
+//      final String type = h.getDataType();
+//      final boolean isBooleanData = type.equals("Boolean");
+//      return isBooleanData;
     }
     return false;
   }
