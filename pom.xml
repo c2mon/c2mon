@@ -413,6 +413,17 @@
           </execution>
         </executions>
       </plugin>
+
+      <!-- Maven wrapper -->
+      <plugin>
+        <groupId>com.rimerosolutions.maven.plugins</groupId>
+        <artifactId>wrapper-maven-plugin</artifactId>
+        <version>0.0.4</version>
+        <inherited>false</inherited>
+        <configuration>
+          <mavenVersion>3.3.1</mavenVersion>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>
