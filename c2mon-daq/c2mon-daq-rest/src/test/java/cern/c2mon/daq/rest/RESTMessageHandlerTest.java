@@ -85,7 +85,7 @@ public class RESTMessageHandlerTest extends GenericMessageHandlerTst {
     Capture<Boolean> val = new Capture<>();
     Capture<String> msg = new Capture<>();
 
-    messageSender.sendCommfaultTag(EasyMock.captureLong(id), EasyMock.captureBoolean(val), EasyMock.capture(msg));
+    messageSender.sendCommfaultTag(EasyMock.capture(id), EasyMock.capture(val), EasyMock.capture(msg));
     expectLastCall().once();
 
     // record the mock
@@ -200,7 +200,7 @@ public class RESTMessageHandlerTest extends GenericMessageHandlerTst {
     Capture<Boolean> val = new Capture<>();
     Capture<String> msg = new Capture<>();
 
-    messageSender.sendCommfaultTag(EasyMock.captureLong(id), EasyMock.captureBoolean(val), EasyMock.capture(msg));
+    messageSender.sendCommfaultTag(EasyMock.capture(id), EasyMock.capture(val), EasyMock.capture(msg));
     expectLastCall().once();
 
     // record the mock
