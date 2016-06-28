@@ -36,7 +36,7 @@ import cern.c2mon.shared.common.NoSimpleValueParseException;
 
 import static org.junit.Assert.*;
 
-public class XMLJavaLoopTest extends AbstractXMLTst {
+public class XMLJavaLoopTest extends AbstractXMLTest {
     
     private static final String TEST_UPDATE_XML = "/TestUpdateConfigurationChangeEvent.xml";
     private static final String TEST_REPORT_XML = "/TestConfigurationChangeEventReport.xml";

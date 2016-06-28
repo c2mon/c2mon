@@ -34,13 +34,9 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertFalse;
 
-public class ConfigurationDOMFactoryTest extends AbstractXMLTst {
+public class ConfigurationDOMFactoryTest extends AbstractXMLTest {
 
     private ConfigurationDOMFactory xmlFactory = new ConfigurationDOMFactory();
-
-    private static final String CONFIGURATION_EVENT_XSD = "http://timweb.cern.ch/schemas/c2mon-daq/ConfigurationChangeEvent.xsd";
-
-    private static final String CONFIGURATION_REPORT_XSD = "http://timweb.cern.ch/schemas/c2mon-daq/ConfigurationChangeEventReport.xsd";
 
     private class DataTagUpdateExtended extends DataTagUpdate {
         private int testNumber;
@@ -66,7 +62,6 @@ public class ConfigurationDOMFactoryTest extends AbstractXMLTst {
         document.appendChild(configurationElement);
         Node node = xmlFactory.createDataTagUpdateElement(document, dataTagUpdate);
         configurationElement.appendChild(node);
-        validateDocument(document, CONFIGURATION_EVENT_XSD);
     }
 
     @Test
@@ -77,7 +72,6 @@ public class ConfigurationDOMFactoryTest extends AbstractXMLTst {
         document.appendChild(configurationElement);
         Node node = xmlFactory.createDataTagUpdateElement(document, new DataTagUpdate(dataTagUpdate));
         configurationElement.appendChild(node);
-        validateDocument(document, CONFIGURATION_EVENT_XSD);
         assertFalse(getDocumentString(document).contains("test-number"));
     }
 
@@ -92,8 +86,6 @@ public class ConfigurationDOMFactoryTest extends AbstractXMLTst {
         Element anotherDataTagAddElement = xmlFactory.createDataTagAddElement(document, anotherDataTagAdd);
         configurationElement.appendChild(dataTagAddElement);
         configurationElement.appendChild(anotherDataTagAddElement);
-        validateDocument(document, CONFIGURATION_EVENT_XSD);
-//        printDocument(document);
     }
 
     @Test
@@ -109,9 +101,6 @@ public class ConfigurationDOMFactoryTest extends AbstractXMLTst {
         Element dataTagRemoveElement = xmlFactory.createDataTagRemoveElement(document, dataTagRemove);
         configElement.appendChild(commandTagRemoveElement);
         configElement.appendChild(dataTagRemoveElement);
-
-        validateDocument(document, CONFIGURATION_EVENT_XSD);
-//        printDocument(document);
     }
 
     @Test
@@ -141,9 +130,6 @@ public class ConfigurationDOMFactoryTest extends AbstractXMLTst {
         configElement.appendChild(anotherDataTagAddElement);
         configElement.appendChild(dataTagUpdateElement);
         configElement.appendChild(equipmenUnitUpdateElement);
-
-        validateDocument(document, CONFIGURATION_EVENT_XSD);
-//        printDocument(document);
     }
 
     @Test
@@ -153,10 +139,7 @@ public class ConfigurationDOMFactoryTest extends AbstractXMLTst {
         changeReport.appendError("<asd");
         changeEventReport.appendChangeReport(changeReport);
 
-//        xmlFactory.setDefaultNamespace("http://timweb.cern.ch/schemas/c2mon-daq/ConfigurationReport");
-        Document document = xmlFactory.createConfigurationChangeEventReportDocument(changeEventReport);
-        validateDocument(document, CONFIGURATION_REPORT_XSD);
-//        printDocument(document);
+        xmlFactory.createConfigurationChangeEventReportDocument(changeEventReport);
     }
 
 
@@ -168,20 +151,6 @@ public class ConfigurationDOMFactoryTest extends AbstractXMLTst {
         document.appendChild(configurationElement);
         Node node = xmlFactory.createEquipmentUnitAddElement(document, eqUnitAdd);
         configurationElement.appendChild(node);
-
-//        Transformer transformer = TransformerFactory.newInstance().newTransformer();
-//        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-//
-//        //initialize StreamResult with File object to save to file
-//        StreamResult result = new StreamResult(new StringWriter());
-//        DOMSource source = new DOMSource(document);
-//        transformer.transform(source, result);
-//
-//        String xmlString = result.getWriter().toString();
-//        System.out.println(xmlString);
-
-
-        validateDocument(document, CONFIGURATION_EVENT_XSD);
     }
 
 
