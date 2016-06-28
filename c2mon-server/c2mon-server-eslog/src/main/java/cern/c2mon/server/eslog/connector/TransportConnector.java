@@ -441,7 +441,8 @@ public class TransportConnector implements Connector {
    * @return Node with which we can communicate.
    */
   private Node launchLocalCluster() {
-    String home = System.getProperty("c2mon.server.home") + "/log/elasticsearch-node/";
+    // FIXME: this path should be configurable, but NOT based on c2mon.server.home
+    String home = "/tmp/elasticsearch-node/";
     setLocal(true);
     log.info("launchLocalCLuster() - Launch a new local cluster: home=" + home + ", clusterName=" + cluster + ".");
 

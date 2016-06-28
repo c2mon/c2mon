@@ -61,19 +61,6 @@ public class TransportConnectorTest {
   @Autowired
   private TransportConnector connector;
 
-  @ClassRule
-  public static TemporaryFolder c2monHome = new TemporaryFolder(new File("/tmp"));
-
-  @BeforeClass
-  public static void setEnv() {
-    System.setProperty("c2mon.server.home", c2monHome.toString());
-  }
-
-  @AfterClass
-  public static void cleanEnv() {
-    System.clearProperty("c2mon.server.home");
-  }
-
   @Before
   public void clientSetup() {
     while(!connector.isConnected()) {

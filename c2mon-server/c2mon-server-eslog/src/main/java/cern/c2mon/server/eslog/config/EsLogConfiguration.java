@@ -50,7 +50,7 @@ public class EsLogConfiguration {
   @Bean(name = "esSupervisionEventPersistenceManager")
   public IPersistenceManager esSupervisionEventPersistenceManager(
       @Qualifier("esSupervisionEventIndexer") final IDBPersistenceHandler persistenceHandler,
-      @Value("${c2mon.server.home}/log/supervisionESfallback.txt") final String fallbackFile,
+      @Value("/tmp/supervisionESfallback.txt") final String fallbackFile,
       final IAlarmListener alarmListener) {
 
     return new TimPersistenceManager(persistenceHandler, fallbackFile, alarmListener, new EsSupervisionEvent());
@@ -59,7 +59,7 @@ public class EsLogConfiguration {
   @Bean(name = "esAlarmPersistenceManager")
   public IPersistenceManager esAlarmPersistanceManger(
       @Qualifier("esAlarmIndexer") final IDBPersistenceHandler persistenceHandler,
-      @Value("${c2mon.server.home}/log/alarmESfallback.txt") final String fallbackFile,
+      @Value("/tmp/alarmESfallback.txt") final String fallbackFile,
       final IAlarmListener alarmListener) {
 
     return new TimPersistenceManager(persistenceHandler, fallbackFile, alarmListener, new EsAlarm());
@@ -69,7 +69,7 @@ public class EsLogConfiguration {
   @Bean(name = "esTagNumericPersistenceManager")
   public IPersistenceManager esTagNumericPersistenceManager(
       @Qualifier("esTagIndexer") final IDBPersistenceHandler persistenceHandler,
-      @Value("${c2mon.server.home}/log/tagNumericESfallback.txt") final String fallbackFile,
+      @Value("/tmp/tagNumericESfallback.txt") final String fallbackFile,
       final IAlarmListener alarmListener) {
 
     return new TimPersistenceManager(persistenceHandler, fallbackFile, alarmListener, new EsTagNumeric());
@@ -78,7 +78,7 @@ public class EsLogConfiguration {
   @Bean(name = "esTagStringPersistenceManager")
   public IPersistenceManager esTagStringPersistenceManager(
       @Qualifier("esTagIndexer") final IDBPersistenceHandler persistenceHandler,
-      @Value("${c2mon.server.home}/log/tagStringESfallback.txt") final String fallbackFile,
+      @Value("/tmp/tagStringESfallback.txt") final String fallbackFile,
       final IAlarmListener alarmListener) {
 
     return new TimPersistenceManager(persistenceHandler, fallbackFile, alarmListener, new EsTagString());
@@ -87,7 +87,7 @@ public class EsLogConfiguration {
   @Bean(name = "esTagBooleanPersistenceManager")
   public IPersistenceManager esTagBooleanPersistenceManager(
       @Qualifier("esTagIndexer") final IDBPersistenceHandler persistenceHandler,
-      @Value("${c2mon.server.home}/log/tagBooleanESfallback.txt") final String fallbackFile,
+      @Value("/tmp/tagBooleanESfallback.txt") final String fallbackFile,
       final IAlarmListener alarmListener) {
 
     return new TimPersistenceManager(persistenceHandler, fallbackFile, alarmListener, new EsTagString());
