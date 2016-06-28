@@ -327,6 +327,10 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
     return c2monCacheLoader;
   }
 
+  public LinkedBlockingDeque<C2monCacheListener<? super T>> getCacheListeners() {
+    return cacheListeners;
+  }
+
   /**
    * Tries to load the cache element with the given key from the database and puts it in the cache.
    * In case the cache contains already an entry for that key, the method simply returns

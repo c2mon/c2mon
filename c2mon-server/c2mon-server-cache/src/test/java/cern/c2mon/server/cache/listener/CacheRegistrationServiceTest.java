@@ -16,41 +16,26 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.listener;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.sql.Timestamp;
-
-import javax.annotation.Resource;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import cern.c2mon.server.cache.C2monCacheListener;
-import cern.c2mon.server.cache.CacheRegistrationService;
-import cern.c2mon.server.cache.ControlTagCache;
-import cern.c2mon.server.cache.ControlTagFacade;
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.DataTagFacade;
-import cern.c2mon.server.cache.dbaccess.test.TestDataHelper;
+import cern.c2mon.server.cache.*;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.test.CacheObjectCreation;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.test.annotation.DirtiesContext;
+
+import javax.annotation.Resource;
+import java.io.IOException;
+import java.sql.Timestamp;
+
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
 
 /**
  * Integration test that checks that registered listeners
@@ -66,10 +51,7 @@ import cern.c2mon.server.common.tag.Tag;
  * @author Mark Brightwell
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/cache/config/server-cache-registration-test.xml" })
-@DirtiesContext
-public class CacheRegistrationServiceTest implements ApplicationContextAware {
+public class CacheRegistrationServiceTest extends AbstractCacheIntegrationTest implements ApplicationContextAware {
   
   /**
    * Spring context, that needs starting manually.
@@ -90,23 +72,15 @@ public class CacheRegistrationServiceTest implements ApplicationContextAware {
   
   @Resource
   private DataTagFacade dataTagFacade;
-  
-  /**
-   * For DB insertion of tag used.
-   */
-  @Autowired
-  private TestDataHelper testDataHelper;
-  
+
   private DataTag dataTag;
   
   private ControlTag controlTag;
   
   @Before
-  public void insertTestTag() {
-    testDataHelper.createTestData();
-    testDataHelper.insertTestDataIntoDB();
-    dataTag = testDataHelper.getDataTag();
-    controlTag = testDataHelper.getProcessAliveTag();
+  public void insertTestTag() throws IOException {
+    dataTag = CacheObjectCreation.createTestDataTag();
+    controlTag = CacheObjectCreation.createTestProcessAlive();
     
     //for this test put in cache
     dataTagCache.put(dataTag.getId(), dataTag);
@@ -116,12 +90,6 @@ public class CacheRegistrationServiceTest implements ApplicationContextAware {
   @Before
   public void startContext() {
     ((AbstractApplicationContext) context).start();
-  }
-  
-  @After
-  public void deleteTestTag() {
-    testDataHelper.removeTestData();
-    controlTagCache.remove(testDataHelper.getProcessAliveTag().getId());
   }
   
   /**

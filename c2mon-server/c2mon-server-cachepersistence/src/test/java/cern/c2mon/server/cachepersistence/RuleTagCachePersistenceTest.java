@@ -16,11 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.cachepersistence;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import org.junit.After;
+import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
+import cern.c2mon.server.cache.rule.RuleTagCacheImpl;
+import cern.c2mon.server.cachepersistence.junit.DatabasePopulationRule;
+import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.rule.RuleTagCacheObject;
+import cern.c2mon.server.test.CacheObjectCreation;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
@@ -29,13 +32,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
-import cern.c2mon.server.cache.dbaccess.test.TestDataHelper;
-import cern.c2mon.server.cache.rule.RuleTagCacheImpl;
-import cern.c2mon.server.common.rule.RuleTag;
-import cern.c2mon.server.common.rule.RuleTagCacheObject;
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Integration test of the cache-persistence and cache
@@ -46,10 +49,18 @@ import cern.c2mon.server.common.rule.RuleTagCacheObject;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/cachepersistence/config/server-cachepersistence-rule-test.xml" })
-//@TransactionConfiguration(transactionManager="cacheTransactionManager", defaultRollback=true)
-//@Transactional
+@ContextConfiguration({
+    "classpath:config/server-cache.xml",
+    "classpath:config/server-cachedbaccess.xml",
+    "classpath:config/server-cachepersistence.xml",
+    "classpath:test-config/server-test-properties.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
 public class RuleTagCachePersistenceTest implements ApplicationContextAware {
+
+  @Rule
+  @Autowired
+  public DatabasePopulationRule databasePopulationRule;
   
   /**
    * Need context to explicitly start it (for cache listener lifecycle).
@@ -62,27 +73,17 @@ public class RuleTagCachePersistenceTest implements ApplicationContextAware {
   @Autowired
   private RuleTagCacheImpl ruleTagCache;
   
-  @Autowired
-  private TestDataHelper testDataHelper;
-  
   private RuleTag originalObject;
 
   @Before
-  public void insertTestTag() {
-    testDataHelper.createTestData();
-    testDataHelper.insertTestDataIntoDB();
-    originalObject = testDataHelper.getRuleTag();
+  public void insertTestTag() throws IOException {
+    originalObject = CacheObjectCreation.createTestRuleTag();
+    ruleTagMapper.insertRuleTag((RuleTagCacheObject) originalObject);
     startContext();
   }
   
   public void startContext() {
     ((AbstractApplicationContext) context).start();
-  }
-  
-  @After
-  public void cleanDB() {
-    testDataHelper.removeTestData();
-    //dataTagMapper.deleteDataTag(originalObject.getId()); //from DB
   }
   
   /**
@@ -110,7 +111,7 @@ public class RuleTagCachePersistenceTest implements ApplicationContextAware {
     
     //...and check the DB was updated after the buffer has time to fire
     try {
-      Thread.sleep(20000);
+      Thread.sleep(10000);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }

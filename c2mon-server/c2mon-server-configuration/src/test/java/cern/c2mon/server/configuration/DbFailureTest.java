@@ -23,10 +23,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
+import cern.c2mon.server.configuration.junit.CachePopulationRule;
+import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
@@ -36,6 +39,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.configuration.handler.impl.ProcessConfigHandlerImpl;
@@ -60,7 +64,6 @@ import cern.c2mon.server.cache.dbaccess.ProcessMapper;
 import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
 import cern.c2mon.server.cache.dbaccess.SubEquipmentMapper;
 import cern.c2mon.server.common.process.Process;
-import cern.c2mon.server.test.TestDataInserter;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
@@ -73,8 +76,26 @@ import cern.c2mon.shared.client.configuration.ConfigurationReport;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/configuration/config/server-configuration-loader-test.xml" })
+@ContextConfiguration({
+    "classpath:config/server-configuration.xml",
+    "classpath:config/server-daqcommunication-in.xml",
+    "classpath:config/server-daqcommunication-out.xml",
+    "classpath:config/server-cache.xml",
+    "classpath:config/server-cachedbaccess.xml",
+    "classpath:config/server-rule.xml",
+    "classpath:config/server-supervision.xml",
+    "classpath:test-config/server-test-properties.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
 public class DbFailureTest implements ApplicationContextAware {
+
+  @Rule
+  @Autowired
+  public ConfigurationDatabasePopulationRule populationRule;
+
+  @Rule
+  @Autowired
+  public CachePopulationRule cachePopulationRule;
 
   private IMocksControl mockControl = EasyMock.createNiceControl();
   
@@ -142,20 +163,11 @@ public class DbFailureTest implements ApplicationContextAware {
   
   @Autowired
   private ProcessFacade processFacade;
-  
-  @Autowired
-  private TestDataInserter testDataInserter;
-  
+
   @Before
   public void init() {
     ((AbstractApplicationContext) context).start();
     mockControl.reset();
-  }
-  
-  @After
-  public void after() throws IOException{
-    testDataInserter.removeTestData();
-    testDataInserter.insertTestData();
   }
   
   /**

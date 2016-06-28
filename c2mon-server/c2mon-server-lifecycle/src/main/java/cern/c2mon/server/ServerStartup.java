@@ -39,8 +39,6 @@ import java.io.IOException;
  * logging.path             Location of the root logging directory.
  *
  * @author Justin Lewis Salmon
- * @author Mark Brightwell
- * @author Nacho Vilches
  */
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = {

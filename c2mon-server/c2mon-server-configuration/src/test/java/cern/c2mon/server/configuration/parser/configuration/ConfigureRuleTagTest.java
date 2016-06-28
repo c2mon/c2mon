@@ -51,7 +51,7 @@ import static org.junit.Assert.assertTrue;
  * @author Franz Ritter
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/configuration/config/server-configuration-parser-test.xml"})
+@ContextConfiguration({"classpath:test-config/server-configuration-parser-test.xml"})
 public class ConfigureRuleTagTest {
 
   @Autowired

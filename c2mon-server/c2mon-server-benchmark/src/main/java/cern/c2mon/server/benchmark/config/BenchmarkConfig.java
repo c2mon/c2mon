@@ -7,5 +7,5 @@ import org.springframework.context.annotation.ImportResource;
  * @author Justin Lewis Salmon
  */
 @Configuration
-@ImportResource("classpath:cern/c2mon/server/benchmark/config/server-benchmark.xml")
+@ImportResource("classpath:server-benchmark.xml")
 public class BenchmarkConfig {}

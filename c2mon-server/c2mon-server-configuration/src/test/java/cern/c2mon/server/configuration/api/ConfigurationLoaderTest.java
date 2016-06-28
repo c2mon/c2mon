@@ -30,10 +30,10 @@ import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.api.util.CacheObjectFactory;
 import cern.c2mon.server.configuration.api.util.TestConfigurationProvider;
+import cern.c2mon.server.configuration.junit.CachePopulationRule;
 import cern.c2mon.server.configuration.parser.util.*;
 import cern.c2mon.server.configuraton.helper.ObjectEqualityComparison;
 import cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager;
-import cern.c2mon.server.test.TestDataInserter;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
@@ -53,14 +53,14 @@ import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 import junit.framework.Assert;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -79,9 +79,25 @@ import static org.junit.Assert.*;
  * @author Franz Ritter
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/configuration/config/server-configuration-loader-api-test.xml"})
-@DirtiesContext
+@ContextConfiguration({
+    "classpath:test-config/process-communication-manager-mock.xml",
+    "classpath:config/server-configuration.xml",
+    "classpath:config/server-cache.xml",
+    "classpath:config/server-cachedbaccess.xml",
+    "classpath:config/server-cacheloading.xml",
+    "classpath:config/server-daqcommunication-in.xml",
+    "classpath:config/server-daqcommunication-out.xml",
+    "classpath:config/server-rule.xml",
+    "classpath:config/server-configuration.xml",
+    "classpath:config/server-supervision.xml",
+    "classpath:test-config/server-test-properties.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
 public class ConfigurationLoaderTest {
+
+  @Rule
+  @Autowired
+  public CachePopulationRule cachePopulationRule;
 
   @Autowired
   CacheObjectFactory cacheObjectFactory;
@@ -149,9 +165,6 @@ public class ConfigurationLoaderTest {
   @Autowired
   private ProcessFacade processFacade;
 
-  @Autowired
-  private TestDataInserter testDataInserter;
-
   @Value("${c2mon.server.daqcommunication.jms.queue.trunk}")
   private String jmsDaqQueueTrunk;
 
@@ -164,13 +177,7 @@ public class ConfigurationLoaderTest {
     reset(mockManager);
   }
 
-  @After
-  public void afterTest() throws IOException {
-    testDataInserter.removeTestData();
-  }
-
   @Test
-  @DirtiesContext
   public void createProcess() {
     replay(mockManager);
 
@@ -276,7 +283,6 @@ public class ConfigurationLoaderTest {
   }
 
   @Test
-  @DirtiesContext
   public void createEquipment() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
     // called once when updating the equipment;
     // mock returns a list with the correct number of SUCCESS ChangeReports
@@ -439,7 +445,6 @@ public class ConfigurationLoaderTest {
   }
 
   @Test
-  @DirtiesContext
   public void createSubEquipment() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
     // called once when updating the equipment;
     // mock returns a list with the correct number of SUCCESS ChangeReports

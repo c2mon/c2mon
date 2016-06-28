@@ -40,7 +40,7 @@ import cern.c2mon.server.common.device.DeviceCacheObject;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-@ContextConfiguration({ "classpath:cern/c2mon/server/cache/config/server-cache-device-isolated-test.xml" })
+@ContextConfiguration({ "classpath:server-cache-device-isolated-test.xml" })
 public class DeviceCacheIsolatedTest {
 
   /** Component to test */

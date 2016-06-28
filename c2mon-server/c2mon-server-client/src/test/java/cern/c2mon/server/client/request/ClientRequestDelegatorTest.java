@@ -16,7 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.client.request;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 import javax.jms.Destination;
@@ -66,7 +65,7 @@ import static org.junit.Assert.assertTrue;
  * @author Franz Ritter
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:cern/c2mon/server/client/config/server-client-requestdelegator-test.xml" })
+@ContextConfiguration({"classpath:config/server-client-requestdelegator-test.xml"})
 public class ClientRequestDelegatorTest {
 
   /** Component to test */

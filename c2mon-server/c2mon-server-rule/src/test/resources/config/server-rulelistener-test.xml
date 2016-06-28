@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <!-- test module -->
+  <import resource="classpath:config/server-rule.xml"/>
+
+  <!-- test dependencies -->
+  <import resource="classpath:test-config/core/server-core-test.xml"/>
+  <import resource="classpath:config/server-cachepersistence.xml"/>
+  <import resource="classpath:test-config/server-test-broker.xml"/>
+
+</beans>

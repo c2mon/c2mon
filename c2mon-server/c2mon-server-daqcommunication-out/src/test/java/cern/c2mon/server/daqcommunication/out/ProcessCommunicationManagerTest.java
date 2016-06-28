@@ -29,15 +29,18 @@ import javax.jms.TextMessage;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import cern.c2mon.server.daqcommunication.out.junit.CachePopulationRule;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.cache.ProcessCache;
@@ -53,9 +56,20 @@ import cern.c2mon.shared.daq.config.ConfigurationDOMFactory;
  * 
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration( { "classpath:cern/c2mon/server/daqcommunication/out/config/server-daqcommunication-out-manager-test.xml" })
+@ContextConfiguration({
+    "classpath:config/server-cache.xml",
+    "classpath:config/server-cachedbaccess.xml",
+    "classpath:config/server-cacheloading.xml",
+    "classpath:config/server-daqcommunication-out.xml",
+    "classpath:test-config/server-test-properties.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
 public class ProcessCommunicationManagerTest {
-  
+
+  @Rule
+  @Autowired
+  public CachePopulationRule cachePopulationRule;
+
   /**
    * To test.
    */

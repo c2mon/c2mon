@@ -23,10 +23,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import cern.c2mon.server.cache.dbaccess.junit.DatabasePopulationRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,10 +38,15 @@ import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.shared.common.Cacheable;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-test.xml"})
-@TransactionConfiguration(transactionManager="cacheTransactionManager", defaultRollback=true)
-@Transactional
+@ContextConfiguration({
+    "classpath:config/server-cachedbaccess.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
 public class CommFaultMapperTest {
+
+  @Rule
+  @Autowired
+  public DatabasePopulationRule databasePopulationRule;
 
   @Autowired
   private CommFaultTagMapper commFaultTagMapper;

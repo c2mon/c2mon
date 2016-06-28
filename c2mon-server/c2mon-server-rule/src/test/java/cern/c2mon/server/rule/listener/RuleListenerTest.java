@@ -19,10 +19,15 @@ package cern.c2mon.server.rule.listener;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 
+import cern.c2mon.server.cache.dbaccess.DataTagMapper;
+import cern.c2mon.server.rule.junit.CachePopulationRule;
+import cern.c2mon.server.test.CacheObjectCreation;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
@@ -31,13 +36,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.DataTagFacade;
 import cern.c2mon.server.cache.RuleTagCache;
-import cern.c2mon.server.cache.dbaccess.test.TestDataHelper;
-import cern.c2mon.server.cache.test.TestCacheDataHelper;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
 
@@ -51,8 +55,23 @@ import cern.c2mon.server.common.rule.RuleTag;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:cern/c2mon/server/rule/config/server-rulelistener-test.xml" })
+@ContextConfiguration({
+    "classpath:config/server-cache.xml",
+    "classpath:config/server-cachedbaccess.xml",
+    "classpath:config/server-cacheloading.xml",
+    "classpath:config/server-cachepersistence.xml",
+    "classpath:config/server-daqcommunication-in.xml",
+    "classpath:config/server-daqcommunication-out.xml",
+    "classpath:config/server-supervision.xml",
+    "classpath:config/server-rule.xml",
+    "classpath:test-config/server-test-properties.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
 public class RuleListenerTest implements ApplicationContextAware {
+
+  @Rule
+  @Autowired
+  public CachePopulationRule cachePopulationRule;
 
   /**
    * The time the main thread sleeps to allow listeners to act on
@@ -61,12 +80,6 @@ public class RuleListenerTest implements ApplicationContextAware {
   private static final int SLEEP_TIME = 2000;
   
   private ApplicationContext context;
-  
-  @Autowired
-  private TestDataHelper testDataHelper;
-  
-  @Autowired
-  private TestCacheDataHelper testCacheDataHelper;
   
   @Autowired
   private DataTagFacade dataTagFacade;
@@ -78,15 +91,8 @@ public class RuleListenerTest implements ApplicationContextAware {
   private RuleTagCache ruleTagCache;
   
   @Before
-  public void setUp() {
+  public void setUp() throws IOException {
     ((AbstractApplicationContext) context).start();
-    testDataHelper.createTestData();
-    testCacheDataHelper.insertTestDataIntoCache();
-  }
-  
-  @After
-  public void cleanCache() {
-    testCacheDataHelper.removeTestDataFromCache();
   }
   
   /**
@@ -98,9 +104,13 @@ public class RuleListenerTest implements ApplicationContextAware {
    */
   @Test
   public void testRuleEvaluation() throws InterruptedException {
-    DataTag dataTag1 = testDataHelper.getDataTag();
-    DataTag dataTag2 = testDataHelper.getDataTag2();
-    RuleTag ruleTag = testDataHelper.getRuleTag();
+    DataTag dataTag1 = CacheObjectCreation.createTestDataTag();
+    DataTag dataTag2 = CacheObjectCreation.createTestDataTag2();
+    RuleTag ruleTag = CacheObjectCreation.createTestRuleTag();
+
+    dataTagCache.put(dataTag1.getId(), dataTag1);
+    dataTagCache.put(dataTag2.getId(), dataTag2);
+    ruleTagCache.put(ruleTag.getId(), ruleTag);
     
     //check still set as expected in test class
     assertEquals(dataTag1.getValue(), Boolean.TRUE);

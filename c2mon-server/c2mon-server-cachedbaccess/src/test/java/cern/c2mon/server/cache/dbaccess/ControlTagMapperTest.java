@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +43,11 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-test.xml"})
+@ContextConfiguration({
+    "classpath:config/server-cachedbaccess.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
+//@ContextConfiguration({"classpath:config/server-cachedbaccess-test.xml"})
 @TransactionConfiguration(transactionManager="cacheTransactionManager", defaultRollback=true)
 @Transactional
 public class ControlTagMapperTest {

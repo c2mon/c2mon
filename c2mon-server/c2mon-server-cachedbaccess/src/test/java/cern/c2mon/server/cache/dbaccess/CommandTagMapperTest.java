@@ -16,53 +16,55 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.List;
-
-import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
-import cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl;
-import cern.c2mon.shared.common.metadata.Metadata;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
-
-import cern.c2mon.server.cache.dbaccess.test.TestDataHelper;
+import cern.c2mon.server.cache.dbaccess.junit.DatabasePopulationRule;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.test.CacheObjectComparison;
+import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
+import cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl;
+import cern.c2mon.shared.common.metadata.Metadata;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-test.xml"})
-@TransactionConfiguration(transactionManager="cacheTransactionManager", defaultRollback=true)
-@Transactional
+@ContextConfiguration({
+    "classpath:config/server-cachedbaccess.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
+//@ContextConfiguration({"classpath:config/server-cachedbaccess-test.xml"})
+//@TransactionConfiguration(transactionManager="cacheTransactionManager", defaultRollback=true)
+//@Transactional
 public class CommandTagMapperTest {
+
+  @Rule
+  @Autowired
+  public DatabasePopulationRule databasePopulationRule;
 
   @Autowired
   private CommandTagMapper commandTagMapper;
-
-  @Autowired
-  private TestDataHelper testDataHelper;
 
   private CommandTagCacheObject commandTag;
 
   @Before
   public void setUp() {
-    testDataHelper.removeTestData(); //cleans DB after any previous non-finished tests
-    testDataHelper.createTestData();
-    commandTag = testDataHelper.getCommandTag();
-    testDataHelper.insertTestDataIntoDB();
+//    testDataHelper.removeTestData(); //cleans DB after any previous non-finished tests
+//    testDataHelper.createTestData();
+    commandTag = (CommandTagCacheObject) commandTagMapper.getItem(11000L);
+//    testDataHelper.insertTestDataIntoDB();
   }
 
   @Test
@@ -80,7 +82,7 @@ public class CommandTagMapperTest {
   public void testGetAll() {
     List<CommandTag> commandList = commandTagMapper.getAll();
     assertNotNull(commandList);
-    assertTrue(commandList.size() == 3);
+    assertTrue(commandList.size() == 2);
   }
 
   @Test
@@ -147,11 +149,6 @@ public class CommandTagMapperTest {
     CommandTagCacheObject retrievedCommand = (CommandTagCacheObject) commandTagMapper.getItem(modifiedCommand.getId());
     assertNotNull(retrievedCommand);
     CacheObjectComparison.equals(modifiedCommand, retrievedCommand);
-  }
-
-  @After
-  public void removeTestData() {
-    testDataHelper.removeTestData();
   }
 
   @Test

@@ -22,12 +22,10 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Iterator;
 import java.util.List;
 
+import cern.c2mon.server.cache.AbstractCacheIntegrationTest;
+import cern.c2mon.server.cache.junit.CachePopulationRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.cache.dbaccess.ProcessMapper;
 import cern.c2mon.server.common.process.Process;
@@ -40,10 +38,7 @@ import cern.c2mon.shared.common.Cacheable;
  * @author Mark Brightwell
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@DirtiesContext
-@ContextConfiguration({"classpath:cern/c2mon/server/test/cache/config/server-cache-process-test.xml"})
-public class ProcessCacheTest {
+public class ProcessCacheTest extends AbstractCacheIntegrationTest {
   
   @Autowired  
   private ProcessMapper processMapper;

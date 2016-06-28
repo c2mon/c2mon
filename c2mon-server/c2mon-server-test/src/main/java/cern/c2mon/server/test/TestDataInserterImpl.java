@@ -42,8 +42,8 @@ public class TestDataInserterImpl implements TestDataInserter {
    * Loads the data from file.
    */  
   public void init() {
-    sqlInsert = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/cern/c2mon/server/test/sql/cache-data-insert.sql")));
-    sqlRemove = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/cern/c2mon/server/test/sql/cache-data-remove.sql")));
+    sqlInsert = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/sql/cache-data-insert.sql")));
+    sqlRemove = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/sql/cache-data-remove.sql")));
   }
   
   @Override

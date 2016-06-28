@@ -22,20 +22,31 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
+import cern.c2mon.server.cache.loading.junit.DatabasePopulationRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.common.process.Process;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@DirtiesContext
-@ContextConfiguration({"classpath:cern/c2mon/server/cache/loading/config/server-cacheloading-process-test.xml"})
+@ContextConfiguration({
+    "classpath:config/server-cachedbaccess.xml",
+    "classpath:config/server-cacheloading.xml",
+    "classpath:test-config/server-test-properties.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
 public class ProcessLoaderDAOTest {
+
+  @Rule
+  @Autowired
+  public DatabasePopulationRule databasePopulationRule;
 
   @Autowired
   private ProcessDAO processDAO;

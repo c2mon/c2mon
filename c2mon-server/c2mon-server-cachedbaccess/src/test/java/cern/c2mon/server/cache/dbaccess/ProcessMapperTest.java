@@ -16,32 +16,39 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import java.sql.Timestamp;
-import java.util.List;
-
-import org.junit.After;
+import cern.c2mon.server.cache.dbaccess.junit.DatabasePopulationRule;
+import cern.c2mon.server.common.process.ProcessCacheObject;
+import cern.c2mon.server.common.process.ProcessCacheObject.LocalConfig;
+import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.shared.common.Cacheable;
+import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
-import cern.c2mon.server.cache.dbaccess.test.TestDataHelper;
-import cern.c2mon.server.common.process.ProcessCacheObject;
-import cern.c2mon.server.common.process.ProcessCacheObject.LocalConfig;
-import cern.c2mon.shared.common.Cacheable;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import java.sql.Timestamp;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-test.xml"})
-@TransactionConfiguration(transactionManager="cacheTransactionManager", defaultRollback=true)
-@Transactional
+@ContextConfiguration({
+    "classpath:config/server-cachedbaccess.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
+//@ContextConfiguration({"classpath:config/server-cachedbaccess-test.xml"})
+//@TransactionConfiguration(transactionManager="cacheTransactionManager", defaultRollback=true)
+//@Transactional
 public class ProcessMapperTest {
+
+  @Rule
+  @Autowired
+  public DatabasePopulationRule databasePopulationRule;
 
   /**
    * Class to test
@@ -49,24 +56,11 @@ public class ProcessMapperTest {
   @Autowired
   private ProcessMapper processMapper;
 
-  @Autowired
-  private TestDataHelper testDataHelper;
-
   private ProcessCacheObject originalProcess;
 
-
-  @SuppressWarnings("deprecation")
   @Before
   public void insertTestProcess() {
-    testDataHelper.createTestData();
-    testDataHelper.insertTestDataIntoDB();
-    originalProcess = testDataHelper.getProcess();
-  }
-
-  @After
-  public void deleteTestProcess() {
-    //processMapper.deleteProcess(Long.valueOf(100000));
-    testDataHelper.removeTestData();
+    originalProcess = (ProcessCacheObject) processMapper.getItem(50L);
   }
 
   /**
@@ -104,10 +98,8 @@ public class ProcessMapperTest {
 
   @Test
   public void getByName() {
-    Long retrievedId = processMapper.getIdByName("Test Process");
-
-    assertEquals((long)retrievedId, 90L);
-
+    Long retrievedId = processMapper.getIdByName("P_TESTHANDLER03");
+    assertEquals((long)retrievedId, 50L);
   }
 
   @Test
@@ -166,10 +158,7 @@ public class ProcessMapperTest {
 
   @Test
   public void testGetNumTags() {
-    int n = processMapper.getNumTags(90L);
-    // Note: getNumTags() currently doesn't take into account tags attached to
-    // subequipment. If/when it does, it should return 3 here instead of 2.
-    assertTrue(processMapper.getNumTags(90L).equals(2));
+    assertTrue(processMapper.getNumTags(50L).equals(6));
   }
 
   @Test

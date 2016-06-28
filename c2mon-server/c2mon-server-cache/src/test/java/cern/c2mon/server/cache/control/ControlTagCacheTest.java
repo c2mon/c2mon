@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import cern.c2mon.server.cache.AbstractCacheIntegrationTest;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,10 +46,7 @@ import cern.c2mon.server.common.tag.Tag;
  * @author mbrightw
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/cache/config/server-cache-control-test.xml"})
-@DirtiesContext  
-public class ControlTagCacheTest {
+public class ControlTagCacheTest extends AbstractCacheIntegrationTest {
     
   @Autowired
   @Qualifier("controlTagCache")
@@ -66,7 +64,6 @@ public class ControlTagCacheTest {
    */
   
   @Test
-  @DirtiesContext
   public void testCacheLoading() {
     assertNotNull(controlTagCache);
     
@@ -84,7 +81,6 @@ public class ControlTagCacheTest {
   }
   
   @Test
-  @DirtiesContext
   public void testGetTagByName() {
     Assert.assertNull(controlTagCache.get("does not exist"));
     
@@ -100,7 +96,6 @@ public class ControlTagCacheTest {
   }
   
   @Test
-  @DirtiesContext
   public void testSearchWithNameWildcard() {
     Collection<ControlTag> resultList = controlTagCache.findByNameWildcard("*does_not_exist*");
     Assert.assertNotNull(resultList);

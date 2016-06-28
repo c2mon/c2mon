@@ -22,6 +22,7 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Iterator;
 import java.util.List;
 
+import cern.c2mon.server.cache.AbstractCacheIntegrationTest;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,12 +41,8 @@ import cern.c2mon.server.common.device.DeviceClassCacheObject;
  * loading and cache DB access modules.
  *
  * @author Justin Lewis Salmon
- *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@DirtiesContext
-@ContextConfiguration({ "classpath:cern/c2mon/server/cache/config/server-cache-deviceclass-test.xml" })
-public class DeviceClassCacheTest {
+public class DeviceClassCacheTest extends AbstractCacheIntegrationTest {
 
   @Autowired
   private DeviceClassMapper deviceClassMapper;
@@ -93,6 +90,4 @@ public class DeviceClassCacheTest {
     } catch (CacheElementNotFoundException e) {
     }
   }
-
-
 }

@@ -32,7 +32,7 @@ import cern.c2mon.server.test.broker.TestBrokerService;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/daqcommunication/out/config/server-daqcommunication-out-connection-test.xml"})
+@ContextConfiguration({"classpath:config/server-daqcommunication-out-connection-test.xml"})
 public class ConnectionTest {
  
   private static TestBrokerService testBrokerService = new TestBrokerService();

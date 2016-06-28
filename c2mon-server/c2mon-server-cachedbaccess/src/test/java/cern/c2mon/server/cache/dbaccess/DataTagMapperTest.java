@@ -16,10 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
+import cern.c2mon.server.cache.dbaccess.junit.DatabasePopulationRule;
 import cern.c2mon.server.cache.dbaccess.structure.DBBatch;
-import cern.c2mon.server.cache.dbaccess.test.TestDataHelper;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.datatag.*;
 import cern.c2mon.shared.common.metadata.Metadata;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,15 +28,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
 import lombok.Data;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -47,38 +46,18 @@ import java.util.Map;
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-test.xml"})
-@TransactionConfiguration(transactionManager="cacheTransactionManager", defaultRollback=true)
-@Transactional
+@ContextConfiguration({
+    "classpath:config/server-cachedbaccess.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
 public class DataTagMapperTest {
+
+  @Rule
+  @Autowired
+  public DatabasePopulationRule databasePopulationRule;
 
   @Autowired
   private DataTagMapper dataTagMapper;
-
-  @Autowired
-  private TestDataHelper testDataHelper;
-
-  private DataTagCacheObject dataTag;
-
-
-//  @BeforeClass
-//  public static void setUp() {
-//    //start Spring context
-//    String contextFile = "cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-test.xml";
-//    ApplicationContext applicationContext = new ClassPathXmlApplicationContext(contextFile);
-//    dataTagMapper = (DataTagMapper) applicationContext.getBean("dataTagMapper");
-//    testDataHelper = (TestDataHelper) applicationContext.getBean("testDataHelper");
-//  }
-
-  @Before
-  public void setUp() {
-    testDataHelper.removeTestData();
-  }
-
-  @After
-  public void cleanDb() {
-    testDataHelper.removeTestData();
-  }
 
   @Test
   public void mapDataTagWithIntegerArray() {
@@ -197,16 +176,10 @@ public class DataTagMapperTest {
 
   @Test
   public void testAlarmCollectionCorrect() {
-    testDataHelper.createTestData();
-    testDataHelper.insertTestDataIntoDB();
-    DataTagCacheObject dataTagFromDB = (DataTagCacheObject) dataTagMapper.getItem(testDataHelper.getDataTag().getId());
-    Long alarmId1 = testDataHelper.getAlarm1().getId();
-    Long alarmId2 = testDataHelper.getAlarm2().getId();
-    Long alarmId3 = testDataHelper.getAlarm3().getId();
-    assertEquals(3, dataTagFromDB.getAlarmIds().size());
-    assertTrue(dataTagFromDB.getAlarmIds().contains(alarmId1));
-    assertTrue(dataTagFromDB.getAlarmIds().contains(alarmId2));
-    assertTrue(dataTagFromDB.getAlarmIds().contains(alarmId3));
+    DataTagCacheObject dataTagFromDB = (DataTagCacheObject) dataTagMapper.getItem(200000L);
+    assertEquals(2, dataTagFromDB.getAlarmIds().size());
+    assertTrue(dataTagFromDB.getAlarmIds().contains(350002L));
+    assertTrue(dataTagFromDB.getAlarmIds().contains(350003L));
   }
 
   @Test

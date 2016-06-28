@@ -29,6 +29,7 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static cern.c2mon.server.eslog.structure.mappings.EsMapping.ValueType;
@@ -47,6 +48,7 @@ import static org.junit.Assert.assertTrue;
 @ContextConfiguration(classes = {
     EsLogIntegrationConfiguration.class
 })
+@TestPropertySource("classpath:c2mon-server-default.properties")
 @RunWith(SpringJUnit4ClassRunner.class)
 public class TransportConnectorTest {
   private int shards = 10;

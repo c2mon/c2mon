@@ -16,11 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.server.cachepersistence;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import org.junit.After;
+import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.dbaccess.AlarmMapper;
+import cern.c2mon.server.cachepersistence.junit.DatabasePopulationRule;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.common.alarm.AlarmCondition;
+import cern.c2mon.server.test.CacheObjectCreation;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
@@ -30,14 +34,11 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.cache.AlarmCache;
-import cern.c2mon.server.cache.dbaccess.AlarmMapper;
-import cern.c2mon.server.cache.dbaccess.test.TestDataHelper;
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alarm.AlarmCondition;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests of persistence mechanisms to the Alarm cache.
@@ -46,20 +47,24 @@ import cern.c2mon.server.common.alarm.AlarmCondition;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@DirtiesContext
-@ContextConfiguration({"classpath:cern/c2mon/server/cachepersistence/config/server-cachepersistence-alarm-test.xml" })
-//@TransactionConfiguration(transactionManager="cacheTransactionManager", defaultRollback=true)
-//@Transactional(noRollbackFor = Exception.class)
+@ContextConfiguration({
+    "classpath:config/server-cache.xml",
+    "classpath:config/server-cachedbaccess.xml",
+    "classpath:config/server-cachepersistence.xml",
+    "classpath:test-config/server-test-properties.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
 public class AlarmCachePersistenceTest implements ApplicationContextAware {
+
+  @Rule
+  @Autowired
+  public DatabasePopulationRule databasePopulationRule;
 
   /**
    * Need context to explicitly start it (listeners
    * require an explicit start to the Spring context).
    */
   private ApplicationContext context;
-  
-  @Autowired
-  private TestDataHelper testDataHelper;
   
   @Autowired
   private AlarmCache alarmCache;
@@ -71,19 +76,10 @@ public class AlarmCachePersistenceTest implements ApplicationContextAware {
   
   @Before
   public void before() {
-    //insert test tag
-    testDataHelper.removeTestData();
-    testDataHelper.createTestData();
-    testDataHelper.insertTestDataIntoDB();
-    originalObject = testDataHelper.getAlarm1();
+    originalObject = alarmMapper.getItem(350000L);
     
     //need *explicit* start of listeners
     ((AbstractApplicationContext) context).start();
-  }
-  
-  @After
-  public void cleanDB() {
-    testDataHelper.removeTestData();
   }
   
   /**

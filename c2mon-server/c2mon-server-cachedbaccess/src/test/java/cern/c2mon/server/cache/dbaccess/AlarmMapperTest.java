@@ -1,96 +1,74 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ * <p>
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ * <p>
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.*;
-
-import java.sql.Timestamp;
-
-import javax.annotation.Resource;
-import javax.validation.constraints.AssertTrue;
-
-import org.junit.After;
-import org.junit.Before;
+import cern.c2mon.server.cache.dbaccess.junit.DatabasePopulationRule;
+import cern.c2mon.server.cache.dbaccess.structure.DBBatch;
+import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.common.alarm.AlarmCondition;
+import cern.c2mon.server.test.CacheObjectComparison;
+import cern.c2mon.server.test.CacheObjectCreation;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.BeforeTransaction;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
-import cern.c2mon.server.cache.dbaccess.structure.DBBatch;
-import cern.c2mon.server.cache.dbaccess.test.TestDataHelper;
-import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.test.CacheObjectComparison;
-import cern.c2mon.server.common.alarm.AlarmCondition;
+import javax.annotation.Resource;
+import java.sql.Timestamp;
 
+import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the iBatis AlarmMapper.
- * @author Mark Brightwell
  *
+ * @author Mark Brightwell
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@TransactionConfiguration(transactionManager="cacheTransactionManager", defaultRollback=true)
-@Transactional
-@ContextConfiguration({"classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-test.xml"})
+@ContextConfiguration({
+    "classpath:config/server-cachedbaccess.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
+//@TransactionConfiguration(transactionManager = "cacheTransactionManager", defaultRollback = true)
+//@Transactional
+//@ContextConfiguration({"classpath:config/server-cachedbaccess-test.xml"})
 public class AlarmMapperTest {
-  
+
+  @Rule
+  @Autowired
+  public DatabasePopulationRule databasePopulationRule;
+
   @Resource
   private AlarmMapper alarmMapper;
-  
-  @Resource
-  private TestDataHelper testDataHelper;  
-  
-  
-  /**
-   * Makes sure DB is cleaned if failed to
-   * run in a previous test.
-   */
-  @BeforeTransaction
-  public void cleanAtStartUp() {
-    testDataHelper.removeTestData();
-  }
-  
-  /**
-   * Calls the global create and insert on the
-   * helper, so tests all DB inserts at once.
-   */
-  @Test
-  public void testDataHelper() {
-    testDataHelper.createTestData();
-    testDataHelper.insertTestDataIntoDB();
-  }
-  
-  /**
-   * Tests the alarm is inserted and retrieved correctly.
-   */
-  @Test
-  public void testInsertAndRetrieve() {
-    testDataHelper.createTestData();
-    testDataHelper.insertTestDataIntoDB();
-    AlarmCacheObject alarmOriginal = testDataHelper.getAlarm3();    
-    AlarmCacheObject alarmRetrieved = (AlarmCacheObject) alarmMapper.getItem(alarmOriginal.getId());
-    CacheObjectComparison.equals(alarmOriginal, alarmRetrieved);
-    
-  }
-  
+
+//  /**
+//   * Tests the alarm is inserted and retrieved correctly.
+//   */
+//  @Test
+//  public void testInsertAndRetrieve() {
+//    AlarmCacheObject alarmOriginal = CacheObjectCreation.createTestAlarm3();
+//    AlarmCacheObject alarmRetrieved = (AlarmCacheObject) alarmMapper.getItem(alarmOriginal.getId());
+//    CacheObjectComparison.equals(alarmOriginal, alarmRetrieved);
+//  }
+
   /**
    * Compares size of table with number of records.
    */
@@ -100,7 +78,7 @@ public class AlarmMapperTest {
     int alarmsRetrieved = alarmMapper.getAll().size();
     assertEquals(tableSize, alarmsRetrieved);
   }
-  
+
   /**
    * Checks runs.
    */
@@ -108,15 +86,15 @@ public class AlarmMapperTest {
   public void testGetMinId() {
     alarmMapper.getMinId();
   }
-  
+
   /**
    * Checks runs.
    */
   @Test
   public void testGetMaxId() {
     alarmMapper.getMaxId();
-  }  
-  
+  }
+
   /**
    * Retrieves a batch of 10 and checks the number
    * retrieved is correct (checks > 10 in table).
@@ -131,12 +109,10 @@ public class AlarmMapperTest {
       assertEquals(tableSize, alarmsRetrieved);
     }
   }
-  
+
   @Test
   public void testUpdateAlarm() {
-    testDataHelper.createTestData();
-    testDataHelper.insertTestDataIntoDB();
-    AlarmCacheObject alarmOriginal = testDataHelper.getAlarm1();
+    AlarmCacheObject alarmOriginal = (AlarmCacheObject) alarmMapper.getItem(350000L);
     //check is terminated
     assertEquals(alarmOriginal.getState(), AlarmCondition.TERMINATE);
     //update fields
@@ -153,21 +129,16 @@ public class AlarmMapperTest {
     //compare
     CacheObjectComparison.equals(alarmOriginal, alarmRetrieved);
   }
-  
+
   @Test
   public void testIsInDB() {
     assertTrue(alarmMapper.isInDb(350000L));
   }
-  
+
   @Test
   public void testNotInDB() {
     assertFalse(alarmMapper.isInDb(450000L));
   }
-  
-  @After
-  public void cleanDb() {
-    testDataHelper.removeTestData();
-  }
-  
+
 }
 

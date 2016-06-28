@@ -16,39 +16,43 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import static cern.c2mon.server.test.device.ObjectComparison.assertDeviceCommandEquals;
-import static cern.c2mon.server.test.device.ObjectComparison.assertDevicePropertyListContains;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.After;
+import cern.c2mon.server.cache.dbaccess.junit.DatabasePopulationRule;
+import cern.c2mon.server.common.device.Device;
+import cern.c2mon.server.common.device.DeviceCacheObject;
+import cern.c2mon.shared.client.device.DeviceCommand;
+import cern.c2mon.shared.client.device.DeviceProperty;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
-import cern.c2mon.server.common.device.Device;
-import cern.c2mon.server.common.device.DeviceCacheObject;
-import cern.c2mon.server.test.TestDataInserter;
-import cern.c2mon.shared.client.device.DeviceCommand;
-import cern.c2mon.shared.client.device.DeviceProperty;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static cern.c2mon.server.test.device.ObjectComparison.assertDeviceCommandEquals;
+import static cern.c2mon.server.test.device.ObjectComparison.assertDevicePropertyListContains;
 
 /**
  * @author Justin Lewis Salmon
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-test.xml" })
-@TransactionConfiguration(transactionManager = "cacheTransactionManager", defaultRollback = true)
-@Transactional
+@ContextConfiguration({
+    "classpath:config/server-cachedbaccess.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
+//@ContextConfiguration({ "classpath:config/server-cachedbaccess-test.xml" })
+//@TransactionConfiguration(transactionManager = "cacheTransactionManager", defaultRollback = true)
+//@Transactional
 public class DeviceMapperTest {
+
+  @Rule
+  @Autowired
+  public DatabasePopulationRule databasePopulationRule;
 
   /** Component to test */
   @Autowired
@@ -56,20 +60,6 @@ public class DeviceMapperTest {
 
   @Autowired
   private DeviceClassMapper deviceClassMapper;
-
-  @Autowired
-  TestDataInserter testDataInserter;
-
-  @Before
-  public void insertTestData() throws IOException {
-    testDataInserter.removeTestData();
-    testDataInserter.insertTestData();
-  }
-
-  @After
-  public void removeTestData() throws IOException {
-    testDataInserter.removeTestData();
-  }
 
   @Test
   public void testGetItem() throws ClassNotFoundException {

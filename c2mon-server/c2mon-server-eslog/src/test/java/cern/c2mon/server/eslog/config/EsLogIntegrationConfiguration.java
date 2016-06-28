@@ -22,12 +22,11 @@ import org.springframework.context.annotation.ImportResource;
 
 @Configuration
 @ImportResource(locations = {
-    "classpath:cern/c2mon/server/test/server-test-properties.xml",
-    "classpath:cern/c2mon/server/cache/config/server-cache-nonpersistent-server.xml",
-    "classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-common.xml",
-    "classpath:cern/c2mon/server/test/cache/config/server-test-datasource-hsqldb.xml",
-    "classpath:cern/c2mon/server/cache/loading/config/server-cacheloading.xml",
-    "classpath:cern/c2mon/server/supervision/config/server-supervision.xml"
+    "classpath:config/server-cache.xml",
+    "classpath:config/server-cachedbaccess.xml",
+    "classpath:config/server-cacheloading.xml",
+    "classpath:config/server-supervision.xml",
+    "classpath:test-config/server-test-properties.xml"
 })
 @Import(EsLogConfiguration.class)
 public class EsLogIntegrationConfiguration {

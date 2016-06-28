@@ -24,13 +24,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import cern.c2mon.server.cache.AbstractCacheIntegrationTest;
+import cern.c2mon.server.cache.junit.CachePopulationRule;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
 import cern.c2mon.server.common.rule.RuleTag;
@@ -45,10 +43,7 @@ import cern.c2mon.server.test.CacheObjectComparison;
  * @author Mark Brightwell
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@DirtiesContext
-@ContextConfiguration({"classpath:cern/c2mon/server/cache/config/server-cache-rule-test.xml"})
-public class RuleTagCacheTest {
+public class RuleTagCacheTest extends AbstractCacheIntegrationTest {
 
   @Autowired
   private RuleTagMapper ruleTagMapper;
@@ -57,7 +52,6 @@ public class RuleTagCacheTest {
   private RuleTagCacheImpl ruleTagCache;
 
   @Test
-  @DirtiesContext
   public void testCacheLoading() {
     assertNotNull(ruleTagCache);
 
@@ -78,7 +72,6 @@ public class RuleTagCacheTest {
    * Tests the getCopy method retrieves an existing Rule correctly.
    */
   @Test
-  @DirtiesContext
   public void testGetCopy() {
     RuleTagCacheObject cacheObject = (RuleTagCacheObject) ruleTagCache.getCopy(60002L);
     RuleTagCacheObject objectInDb = (RuleTagCacheObject) ruleTagMapper.getItem(60002L);
@@ -130,7 +123,6 @@ public class RuleTagCacheTest {
   }
   
   @Test
-  @DirtiesContext
   public void testGetTagByName() {
     Assert.assertNull(ruleTagCache.get("does not exist"));
     
@@ -146,7 +138,6 @@ public class RuleTagCacheTest {
   }
   
   @Test
-  @DirtiesContext
   public void testSearchWithNameWildcard() {
     Collection<RuleTag> resultList = ruleTagCache.findByNameWildcard("does not exist");
     Assert.assertNotNull(resultList);

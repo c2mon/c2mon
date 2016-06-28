@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 
+import cern.c2mon.server.cache.AbstractCacheIntegrationTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +35,7 @@ import cern.c2mon.server.cache.rule.RuleTagCacheTest;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.rule.RuleTag;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@DirtiesContext
-@ContextConfiguration({"classpath:cern/c2mon/server/cache/config/server-cache-gateway-test.xml"})
-public class TagFacadeGatewayImplTest {
+public class TagFacadeGatewayImplTest extends AbstractCacheIntegrationTest {
   
   @Autowired
   private TagFacadeGateway tagFacadeGateway;

@@ -16,24 +16,18 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.commfault;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import cern.c2mon.server.cache.AbstractCacheIntegrationTest;
+import cern.c2mon.server.cache.dbaccess.CommFaultTagMapper;
+import cern.c2mon.server.common.commfault.CommFaultTag;
+import cern.c2mon.server.common.commfault.CommFaultTagCacheObject;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Iterator;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import cern.c2mon.server.cache.dbaccess.CommFaultTagMapper;
-import cern.c2mon.server.cache.dbaccess.test.TestDataHelper;
-import cern.c2mon.server.common.commfault.CommFaultTag;
-import cern.c2mon.server.common.commfault.CommFaultTagCacheObject;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Integration test of the CommFaultTagCache with the
@@ -42,24 +36,13 @@ import cern.c2mon.server.common.commfault.CommFaultTagCacheObject;
  * @author Mark Brightwell
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@DirtiesContext
-@ContextConfiguration({"classpath:cern/c2mon/server/cache/config/server-cache-commfault-test.xml"})
-public class CommFaultTagCacheTest {
-
-  @Autowired
-  private TestDataHelper testDataHelper;
+public class CommFaultTagCacheTest extends AbstractCacheIntegrationTest {
   
   @Autowired
   private CommFaultTagCacheImpl commFaultTagCache;
   
   @Autowired
   private CommFaultTagMapper commFaultTagMapper;
-  
-  @Before
-  public void clean() {
-    testDataHelper.removeTestData();
-  }
   
   @Test
   public void testCacheLoading() {

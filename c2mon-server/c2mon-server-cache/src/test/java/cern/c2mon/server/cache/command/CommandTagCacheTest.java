@@ -22,6 +22,7 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Iterator;
 import java.util.List;
 
+import cern.c2mon.server.cache.AbstractCacheIntegrationTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +42,7 @@ import cern.c2mon.shared.common.command.CommandTag;
  * @author Mark Brightwell
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@DirtiesContext
-@ContextConfiguration({"classpath:cern/c2mon/server/cache/config/server-cache-command-test.xml" })
-public class CommandTagCacheTest {
+public class CommandTagCacheTest extends AbstractCacheIntegrationTest {
 
   @Autowired  
   private CommandTagMapper commandTagMapper;

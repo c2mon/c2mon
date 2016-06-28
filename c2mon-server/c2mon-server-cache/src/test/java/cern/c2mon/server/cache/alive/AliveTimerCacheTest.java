@@ -22,6 +22,7 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Iterator;
 import java.util.List;
 
+import cern.c2mon.server.cache.AbstractCacheIntegrationTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,10 +40,7 @@ import cern.c2mon.server.common.alive.AliveTimerCacheObject;
  * @author mbrightw
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/cache/config/server-cache-alive-test.xml"})
-@DirtiesContext
-public class AliveTimerCacheTest {
+public class AliveTimerCacheTest extends AbstractCacheIntegrationTest {
 
   @Autowired
   AliveTimerMapper aliveTimerMapper;
@@ -51,7 +49,6 @@ public class AliveTimerCacheTest {
   AliveTimerCacheImpl aliveTimerCache;
   
   @Test
-  @DirtiesContext
   public void testCacheLoading() throws InterruptedException {
     assertNotNull(aliveTimerCache);
     

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+  <!-- for inserting test data -->
+  <import resource="classpath:test-config/server-test-data.xml"/>
+
+  <!-- requires all DB and cache modules for component testing of the configuration module -->
+  <import resource="classpath:config/server-cache-nonpersistent-server.xml"/>
+  <import resource="classpath:config/server-cachedbaccess-common.xml"/>
+  <import resource="classpath:config/server-cacheloading.xml"/>
+  <import resource="classpath:config/server-rule.xml"/>
+
+  <!-- mock the communication bean; needs to be before the configloader class -->
+  <bean id="processCommunicationManager" class="org.easymock.EasyMock" factory-method="createStrictMock">
+    <constructor-arg value="cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager"/>
+  </bean>
+
+  <!-- mock daq-in module dependency -->
+  <bean id="jmsContainerManager" class="org.easymock.EasyMock" factory-method="createStrictMock">
+    <constructor-arg value="cern.c2mon.server.daqcommunication.in.JmsContainerManager"/>
+  </bean>
+
+  <bean id="configurationLoader" class="cern.c2mon.server.configuration.impl.ConfigurationLoaderImpl" autowire="constructor">
+    <property name="daqConfigEnabled" value="true"/>
+    <property name="reportDirectory" value="/tmp/reports"/>
+  </bean>
+  <bean id="configurationDAO" class="cern.c2mon.server.configuration.mybatis.ConfigurationDAOImpl"/>
+
+  <bean id="configurationUpdate" class="cern.c2mon.server.configuration.impl.ConfigurationUpdateImpl"/>
+
+  <bean id="controlTagLoaderDAO" class="cern.c2mon.server.cache.loading.impl.ControlTagLoaderDAOImpl" autowire="constructor"/>
+
+  <bean id="dataTagConfigHandler" class="cern.c2mon.server.configuration.handler.impl.DataTagConfigHandlerImpl" autowire="constructor"/>
+  <bean id="controlTagConfigHandler" class="cern.c2mon.server.configuration.handler.impl.ControlTagConfigHandlerImpl" autowire="constructor"/>
+  <bean id="commandTagConfigHandler" class="cern.c2mon.server.configuration.handler.impl.CommandTagConfigHandler"/>
+  <bean id="processConfigHandler" class="cern.c2mon.server.configuration.handler.impl.ProcessConfigHandlerImpl" autowire="constructor"/>
+  <bean id="alarmConfigHandler" class="cern.c2mon.server.configuration.handler.impl.AlarmConfigHandlerImpl" autowire="constructor"/>
+  <bean id="subEquipmentConfigHandler" class="cern.c2mon.server.configuration.handler.impl.SubEquipmentConfigHandlerImpl" autowire="constructor"/>
+  <bean id="equipmentConfigHandler" class="cern.c2mon.server.configuration.handler.impl.EquipmentConfigHandlerImpl" autowire="constructor"/>
+  <bean id="ruleTagConfigHandler" class="cern.c2mon.server.configuration.handler.impl.RuleTagConfigHandlerImpl" autowire="constructor"/>
+  <bean id="deviceClassConfigHandler" class="cern.c2mon.server.configuration.handler.impl.DeviceClassConfigHandlerImpl" autowire="constructor"/>
+  <bean id="deviceConfigHandler" class="cern.c2mon.server.configuration.handler.impl.DeviceConfigHandlerImpl" autowire="constructor"/>
+
+  <bean id="tagConfigGateway" class="cern.c2mon.server.configuration.handler.impl.TagConfigGateway" autowire="constructor"/>
+
+  <context:annotation-config/>
+  <context:component-scan base-package="cern.c2mon.server.configuration.handler.transacted"/>
+  <context:component-scan base-package="cern.c2mon.server.configuration.parser"/>
+
+
+</beans>

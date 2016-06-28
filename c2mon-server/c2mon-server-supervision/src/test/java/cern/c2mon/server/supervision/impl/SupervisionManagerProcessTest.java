@@ -22,6 +22,8 @@ import static org.junit.Assert.assertNotNull;
 
 import java.sql.Timestamp;
 
+import cern.c2mon.server.supervision.junit.CachePopulationRule;
+import org.junit.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.junit.After;
@@ -30,6 +32,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.supervision.SupervisionManager;
@@ -47,8 +50,18 @@ import cern.c2mon.shared.daq.process.XMLConverter;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/supervision/config/server-supervision-integration.xml" })
+@ContextConfiguration({
+    "classpath:config/server-cache.xml",
+    "classpath:config/server-cachedbaccess.xml",
+    "classpath:config/server-supervision.xml",
+    "classpath:test-config/server-test-properties.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
 public class SupervisionManagerProcessTest {
+
+  @Rule
+  @Autowired
+  public CachePopulationRule cachePopulationRule;
 
   /**
    * The system's logger

@@ -40,7 +40,7 @@ import cern.c2mon.shared.client.lifecycle.ServerLifecycleMapper;
  * 
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration( { "classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-mapper-test.xml" })
+@ContextConfiguration( {"classpath:config/server-shorttermlog-mapper-test.xml"})
 public class ServerLifecycleLogMapperTest {
 
   private ServerLifecycleEvent testEvent = new ServerLifecycleEvent(new Timestamp(System.currentTimeMillis()), "testServer", LifecycleEventType.START);

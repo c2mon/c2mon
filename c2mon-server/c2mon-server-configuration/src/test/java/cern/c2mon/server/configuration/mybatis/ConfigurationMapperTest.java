@@ -20,10 +20,14 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
+import cern.c2mon.server.configuration.junit.CachePopulationRule;
+import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.configuration.mybatis.ConfigurationMapper;
@@ -41,8 +45,22 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/configuration/config/server-configuration-db-test.xml" })
+@ContextConfiguration({
+    "classpath:config/server-configuration.xml",
+    "classpath:config/server-daqcommunication-in.xml",
+    "classpath:config/server-daqcommunication-out.xml",
+    "classpath:config/server-cache.xml",
+    "classpath:config/server-cachedbaccess.xml",
+    "classpath:config/server-rule.xml",
+    "classpath:config/server-supervision.xml",
+    "classpath:test-config/server-test-properties.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
 public class ConfigurationMapperTest {
+
+  @Rule
+  @Autowired
+  public ConfigurationDatabasePopulationRule populationRule;
 
   @Autowired
   private ConfigurationMapper configurationMapper;

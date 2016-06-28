@@ -1,48 +1,51 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ * <p>
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ * <p>
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.List;
-
-import org.junit.After;
-import org.junit.Before;
+import cern.c2mon.server.cache.dbaccess.junit.DatabasePopulationRule;
+import cern.c2mon.server.common.alive.AliveTimer;
+import cern.c2mon.server.common.alive.AliveTimerCacheObject;
+import cern.c2mon.server.common.control.ControlTag;
+import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.shared.common.Cacheable;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
-import cern.c2mon.server.cache.dbaccess.test.TestDataHelper;
-import cern.c2mon.server.common.alive.AliveTimer;
-import cern.c2mon.server.common.alive.AliveTimerCacheObject;
-import cern.c2mon.shared.common.Cacheable;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-test.xml"})
-@TransactionConfiguration(transactionManager="cacheTransactionManager", defaultRollback=true)
-@Transactional
+@ContextConfiguration({
+    "classpath:config/server-cachedbaccess.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
 public class AliveTimerMapperTest {
+
+  @Rule
+  @Autowired
+  public DatabasePopulationRule databasePopulationRule;
 
   private static final Long TEST_ALIVE_ID = new Long(500000);
 
@@ -52,36 +55,22 @@ public class AliveTimerMapperTest {
   @Autowired
   private AliveTimerMapper aliveTimerMapper;
 
-  /**
-   * For creating test data.
-   */
-  @Autowired
-  private TestDataHelper testDataHelper;
-
-  @Before
-  public void insertTestData() {
-    testDataHelper.createTestData();
-    testDataHelper.insertTestDataIntoDB();
-  }
-
-  @After
-  public void cleanDataBase() {
-    testDataHelper.removeTestData();
-  }
-
   //need tests inserting process, equipment and check appear in retrieved view
   @Test
   public void testRetrieveProcessAlive() {
-  //id in control tag cache is the same as in alivetimer cache
-    AliveTimerCacheObject retrievedCacheObject = (AliveTimerCacheObject) aliveTimerMapper.getItem(testDataHelper.getProcessAliveTag().getId());
-    assertEquals(testDataHelper.getProcessAliveTag().getId(), retrievedCacheObject.getId());
-    assertEquals(testDataHelper.getProcess().getAliveInterval(), retrievedCacheObject.getAliveInterval());
+//    Process process = CacheObjectCreation.createTestProcess1();
+//    ControlTag aliveTag = CacheObjectCreation.createTestProcessAlive();
+//    Equipment equipment = CacheObjectCreation.createTestEquipment();
+    //id in control tag cache is the same as in alivetimer cache
+    AliveTimerCacheObject retrievedCacheObject = (AliveTimerCacheObject) aliveTimerMapper.getItem(1221L);
+//    assertEquals(aliveTag.getId(), retrievedCacheObject.getId());
+    assertTrue(60000L == retrievedCacheObject.getAliveInterval());
     assertEquals("PROC", retrievedCacheObject.getAliveType());
-    assertEquals(testDataHelper.getProcess().getId(), retrievedCacheObject.getRelatedId());
-    assertEquals(testDataHelper.getProcess().getName(), retrievedCacheObject.getRelatedName());
-    assertEquals(testDataHelper.getProcess().getStateTagId(), retrievedCacheObject.getRelatedStateTagId());
+    assertTrue(50L == retrievedCacheObject.getRelatedId());
+    assertEquals("P_TESTHANDLER03", retrievedCacheObject.getRelatedName());
+    assertTrue(1220L == retrievedCacheObject.getRelatedStateTagId());
     assertTrue(retrievedCacheObject.getDependentAliveTimerIds().size() == 1); //2 dependent alive timers (eq and subeq)
-    assertTrue(retrievedCacheObject.getDependentAliveTimerIds().contains(testDataHelper.getEquipment().getAliveTagId()));
+    assertTrue(retrievedCacheObject.getDependentAliveTimerIds().contains(1224L));
     //assertTrue(retrievedCacheObject.getDependentAliveTimerIds().contains(testDataHelper.getSubEquipment().getAliveTagId())); only contains equipment alives!
   }
 

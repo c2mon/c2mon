@@ -16,34 +16,40 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.sql.Timestamp;
-import java.util.List;
-
-import org.junit.After;
+import cern.c2mon.server.cache.dbaccess.junit.DatabasePopulationRule;
+import cern.c2mon.server.common.subequipment.SubEquipment;
+import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
+import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
-import cern.c2mon.server.cache.dbaccess.test.TestDataHelper;
-import cern.c2mon.server.common.subequipment.SubEquipment;
-import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import java.sql.Timestamp;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-test.xml"})
-@TransactionConfiguration(transactionManager="cacheTransactionManager", defaultRollback=true)
-@Transactional
+@ContextConfiguration({
+    "classpath:config/server-cachedbaccess.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
+//@ContextConfiguration({"classpath:config/server-cachedbaccess-test.xml"})
+//@TransactionConfiguration(transactionManager="cacheTransactionManager", defaultRollback=true)
+//@Transactional
 public class SubEquipmentMapperTest {
+
+  @Rule
+  @Autowired
+  public DatabasePopulationRule databasePopulationRule;
+
   /**
    * Class to test
    */
@@ -53,16 +59,11 @@ public class SubEquipmentMapperTest {
   @Autowired
   private EquipmentMapper equipmentMapper;
 
-  @Autowired
-  private TestDataHelper testDataHelper;
-
   private SubEquipmentCacheObject subEquipmentCacheObject;
 
   @Before
   public void loadTestData() {
-    testDataHelper.createTestData();
-    testDataHelper.insertTestDataIntoDB();
-    subEquipmentCacheObject = testDataHelper.getSubEquipment();
+    subEquipmentCacheObject = (SubEquipmentCacheObject) subEquipmentMapper.getItem(250L);
   }
 
   /**
@@ -100,12 +101,12 @@ public class SubEquipmentMapperTest {
   @Test
   public void testSelectSubEquipmentsByEquipment() {
     List<SubEquipment> subEquipmentList = subEquipmentMapper.selectSubEquipmentsByEquipment(subEquipmentCacheObject.getParentId());
-    assertEquals(2, subEquipmentList.size());
+    assertEquals(1, subEquipmentList.size());
   }
 
   @Test
   public void testUpdateConfig() {
-    assertEquals(new Long(5000300), subEquipmentCacheObject.getAliveTagId());
+    assertEquals(new Long(1231), subEquipmentCacheObject.getAliveTagId());
     subEquipmentCacheObject.setAliveTagId(1251L);
     subEquipmentCacheObject.setCommFaultTagId(1252L);
     subEquipmentCacheObject.setStateTagId(1250L);
@@ -144,10 +145,4 @@ public class SubEquipmentMapperTest {
   public void testNotInDB() {
     assertFalse(subEquipmentMapper.isInDb(150L));
   }
-
-  @After
-  public void cleanDatabase() {
-    testDataHelper.removeTestData();
-  }
-
 }

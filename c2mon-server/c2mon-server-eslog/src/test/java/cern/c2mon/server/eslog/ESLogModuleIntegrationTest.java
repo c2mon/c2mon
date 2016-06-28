@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog;
 
+import cern.c2mon.server.eslog.config.EsLogConfiguration;
 import cern.c2mon.server.eslog.config.EsLogIntegrationConfiguration;
 import cern.c2mon.server.eslog.connector.Connector;
 import cern.c2mon.server.eslog.listener.EsAlarmLogListener;
@@ -24,7 +25,9 @@ import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
@@ -35,6 +38,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = {
     EsLogIntegrationConfiguration.class
 })
+@TestPropertySource("classpath:c2mon-server-default.properties")
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ESLogModuleIntegrationTest {
 

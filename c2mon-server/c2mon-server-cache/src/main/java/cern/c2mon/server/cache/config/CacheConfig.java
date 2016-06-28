@@ -30,11 +30,11 @@ public class CacheConfig {
 
     switch (cacheMode) {
       case "single-nonpersistent":
-        return getEhCacheManagerFactoryBean("resources/ehcache-notTCmode-nonpersistent.xml");
+        return getEhCacheManagerFactoryBean("ehcache/ehcache-notTCmode-nonpersistent.xml");
       case "single":
-        return getEhCacheManagerFactoryBean("resources/ehcache-notTCmode.xml");
+        return getEhCacheManagerFactoryBean("ehcache/ehcache-notTCmode.xml");
       case "multi":
-        return getEhCacheManagerFactoryBean("resources/ehcache-TCmode.xml");
+        return getEhCacheManagerFactoryBean("ehcache/ehcache-TCmode.xml");
     }
 
     throw new RuntimeException(format("Unsupported cache mode specified: '%s'", cacheMode));
@@ -43,6 +43,7 @@ public class CacheConfig {
   private EhCacheManagerFactoryBean getEhCacheManagerFactoryBean(String configLocation) throws IOException {
     EhCacheManagerFactoryBean bean = new EhCacheManagerFactoryBean();
     bean.setConfigLocation(new ClassPathResource(configLocation));
+    bean.setShared(true);
     return bean;
   }
 }

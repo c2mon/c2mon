@@ -41,7 +41,7 @@ import cern.c2mon.shared.client.command.CommandTagLog;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-mapper-test.xml"})
+@ContextConfiguration({"classpath:config/server-shorttermlog-mapper-test.xml"})
 public class CommandTagMapperTest {
 
   private static final Long COMMAND_ID = 1111L;

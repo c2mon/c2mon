@@ -16,51 +16,40 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.sql.Timestamp;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.junit.After;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
-
+import cern.c2mon.server.cache.dbaccess.junit.DatabasePopulationRule;
 import cern.c2mon.server.cache.dbaccess.structure.DBBatch;
-import cern.c2mon.server.cache.dbaccess.test.TestDataHelper;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.annotation.Resource;
+import java.sql.Timestamp;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-test.xml"})
-@TransactionConfiguration(transactionManager="cacheTransactionManager", defaultRollback=true)
-@Transactional
+@ContextConfiguration({
+    "classpath:config/server-cachedbaccess.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
 public class RuleTagMapperTest {
+
+  @Rule
+  @Autowired
+  public DatabasePopulationRule databasePopulationRule;
 
   @Resource
   private RuleTagMapper ruleTagMapper;
-  
-  @Resource
-  private TestDataHelper testDataHelper;
-  
-  //private RuleTag ruleTag;
-  
-//  @Before
-//  public void insertTestTag() {
-//    testDataHelper.insertTestData();
-//    ruleTag = testDataHelper.getProcess();
-//  }
   
   @Test
   public void testInsertCompletes() {
@@ -100,11 +89,10 @@ public class RuleTagMapperTest {
   
   @Test
   public void testInsertAndRetrieve() {
-    testDataHelper.createTestData();
-    testDataHelper.insertTestDataIntoDB();
-    RuleTagCacheObject ruleTag = testDataHelper.getRuleTag();
+    RuleTagCacheObject ruleTag = CacheObjectCreation.createTestRuleTag();
     //topic is set when process ids are set so is set to default here
     ruleTag.setTopic("c2mon.tag.default.publication");
+    ruleTagMapper.insertRuleTag(ruleTag);
     RuleTagCacheObject retrievedObject = (RuleTagCacheObject) ruleTagMapper.getItem(ruleTag.getId());
     
     assertNotNull(retrievedObject);
@@ -133,10 +121,9 @@ public class RuleTagMapperTest {
   }
   
   @Test
-  public void testUpdateRuleTag() { 
-    testDataHelper.createTestData();
-    testDataHelper.insertTestDataIntoDB();
-    RuleTagCacheObject ruleTag = testDataHelper.getRuleTag();
+  public void testUpdateRuleTag() {
+    RuleTagCacheObject ruleTag = CacheObjectCreation.createTestRuleTag();
+    ruleTagMapper.insertRuleTag(ruleTag);
     
     ruleTag.setValue(new Integer(2000));    
     ruleTag.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
@@ -164,10 +151,4 @@ public class RuleTagMapperTest {
   public void testNotInDB() {
     assertFalse(ruleTagMapper.isInDb(200000L));
   }
-  
-  @After
-  public void cleanDB() {
-    testDataHelper.removeTestData();
-  }
-  
 }

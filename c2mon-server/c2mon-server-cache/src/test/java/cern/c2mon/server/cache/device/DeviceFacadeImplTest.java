@@ -56,7 +56,7 @@ import cern.c2mon.shared.common.ConfigurationException;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-@ContextConfiguration({ "classpath:cern/c2mon/server/cache/config/server-cache-device-facade-test.xml" })
+@ContextConfiguration({ "classpath:server-cache-device-facade-test.xml" })
 public class DeviceFacadeImplTest {
 
   /** Component to test */

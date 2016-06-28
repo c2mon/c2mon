@@ -48,7 +48,7 @@ import cern.c2mon.shared.common.command.CommandTag;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-module-test.xml"})
+@ContextConfiguration({"classpath:config/server-shorttermlog-module-test.xml"})
 public class ShortTermLogModuleTest {
 
   @Autowired

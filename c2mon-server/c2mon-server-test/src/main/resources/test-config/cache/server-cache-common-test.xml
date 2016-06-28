@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <!-- import datasource used for tests -->
+  <import resource="classpath:config/server-cache-cluster.xml"/>
+  <import resource="classpath:test-config/cache/server-test-datasource-hsqldb.xml"/>
+  <import resource="classpath:test-config/server-test-properties.xml"/>
+
+  <!-- test specific settings (cache not in TC mode) -->
+  <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+    <property name="shared" value="true"/>
+    <property name="configLocation" value="classpath:ehcache/ehcache-notTCmode-nonpersistent.xml"/>
+  </bean>
+
+  <bean id="clusterCache" class="cern.c2mon.server.cache.cluster.ClusterCacheImpl"/>
+
+</beans>

@@ -7,5 +7,5 @@ import org.springframework.context.annotation.ImportResource;
  * @author Justin Lewis Salmon
  */
 @Configuration
-@ImportResource("classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog.xml")
+@ImportResource("classpath:config/server-shorttermlog.xml")
 public class ShortTermLogConfig {}

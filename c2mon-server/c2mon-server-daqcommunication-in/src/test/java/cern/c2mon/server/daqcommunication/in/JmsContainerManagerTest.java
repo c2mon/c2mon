@@ -54,8 +54,8 @@ import cern.c2mon.shared.util.jms.ActiveJmsSender;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-@ContextConfiguration({ "classpath:cern/c2mon/server/daqcommunication/in/config/server-daqcommunication-in-connection.xml",
-                        "classpath:cern/c2mon/server/test/server-test-properties.xml"})
+@ContextConfiguration({"classpath:config/server-daqcommunication-in-connection.xml",
+                        "classpath:test-config/server-test-properties.xml"})
 public class JmsContainerManagerTest {
 
   /**

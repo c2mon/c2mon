@@ -35,11 +35,13 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import cern.c2mon.server.cache.junit.CachePopulationRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -53,20 +55,24 @@ import cern.c2mon.server.cache.ProcessXMLProvider;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@DirtiesContext
-@ContextConfiguration({"classpath:cern/c2mon/server/cache/config/server-cache-nonpersistent-server.xml",
-                       "classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-common.xml",
-                       "classpath:cern/c2mon/server/test/cache/config/server-test-datasource-hsqldb.xml",
-                       "classpath:cern/c2mon/server/cache/loading/config/server-cacheloading.xml",
-                       "classpath:cern/c2mon/server/test/server-test-properties.xml"
-                      })
+@ContextConfiguration({
+    "classpath:config/server-cache.xml",
+    "classpath:config/server-cachedbaccess.xml",
+    "classpath:config/server-cacheloading.xml",
+    "classpath:test-config/server-test-properties.xml"
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
 public class ProcessXMLProviderTest {
 
   @Autowired
   private ProcessXMLProvider processXMLProvider;
 
+  @Rule
+  @Autowired
+  public CachePopulationRule cachePopulationRule;
+
   @Test
-  public void testGetProcessConfigXMl() throws ParserConfigurationException, SAXException, IOException, TransformerException {
+  public void testGetProcessConfigXML() throws ParserConfigurationException, SAXException, IOException, TransformerException {
     //validator
     Schema schema = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema").newSchema(new URL("http://timweb.cern.ch/schemas/c2mon-daq/ProcessConfiguration.xsd"));
     Validator validator = schema.newValidator();
@@ -78,7 +84,7 @@ public class ProcessXMLProviderTest {
     documentBuilderFactory.setIgnoringComments(true);
     documentBuilderFactory.setIgnoringElementContentWhitespace(true);
     DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
-    Document expectedDoc = builder.parse(this.getClass().getClassLoader().getResourceAsStream("cern/c2mon/server/cache/process/P_TESTHANDLER03.xml"));
+    Document expectedDoc = builder.parse(this.getClass().getClassLoader().getResourceAsStream("P_TESTHANDLER03.xml"));
     expectedDoc.normalize();
     validator.validate(new DOMSource(expectedDoc));
     DOMSource source = new DOMSource(expectedDoc);
