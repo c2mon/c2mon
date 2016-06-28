@@ -1,50 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <groupId>cern.c2mon.c2mon-daq</groupId>
-    <artifactId>c2mon-daq-pom</artifactId>
-    <version>1.7.1</version>
+    <groupId>cern.c2mon.daq</groupId>
+    <artifactId>c2mon-daq</artifactId>
+    <version>1.8.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>cern.c2mon.c2mon-daq</groupId>
   <artifactId>c2mon-daq-testhandler</artifactId>
-  <version>1.7.2-SNAPSHOT</version>
-  <name>c2mon-daq-testhandler</name>
   <packaging>jar</packaging>
-  <description>This is a C2MON Testing DAQ.  This DAQ simulates the behavior of a DAQ connected to some equipment. It reads a DAQ configuration XML file to determine the tags that the equipment should produce, and sends simulated values of these to the C2MON server.
 
-    </description>
-  <url />
-
-  <scm>
-    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-daq-testhandler</developerConnection>
-  </scm>
+  <description>
+    This is a testing DAQ, used for publishing simulated values of the tags in its configuration.
+  </description>
 
   <dependencies>
     <dependency>
-      <groupId>cern.c2mon.c2mon-daq</groupId>
+      <groupId>cern.c2mon.daq</groupId>
       <artifactId>c2mon-daq-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <groupId>cern.c2mon.shared</groupId>
       <artifactId>c2mon-shared-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <groupId>cern.c2mon.shared</groupId>
       <artifactId>c2mon-shared-daq</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
     </dependency>
 
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
-
     <dependency>
-      <groupId>cern.c2mon.c2mon-daq</groupId>
+      <groupId>cern.c2mon.daq</groupId>
       <artifactId>c2mon-daq-test</artifactId>
       <scope>test</scope>
-      <version>[1.7.0, 2.0.0)</version>
     </dependency>
     <dependency>
       <groupId>org.easymock</groupId>
@@ -54,16 +52,10 @@
       <groupId>org.easymock</groupId>
       <artifactId>easymockclassextension</artifactId>
     </dependency>
-    <dependency>
-     <groupId>org.projectlombok</groupId>
-     <artifactId>lombok</artifactId>
-    </dependency>
-
-	</dependencies>
+  </dependencies>
 
   <build>
     <plugins>
-      <!-- Generates general distribution tarball -->
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
@@ -84,6 +76,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <developers />
 </project>
