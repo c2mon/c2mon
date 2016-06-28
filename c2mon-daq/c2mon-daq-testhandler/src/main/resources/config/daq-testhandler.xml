@@ -28,5 +28,5 @@
     <property name="attributeSource" ref="attributeSource"/>
   </bean>
   
-  <import resource="classpath:resources/daq-core-service.xml"/>
+  <import resource="classpath:test-config/daq-core-service.xml"/>
 </beans>

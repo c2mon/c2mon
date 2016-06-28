@@ -68,14 +68,14 @@
     </fileSet>
   </fileSets>
 
-  <files>
-    <!-- copy the version file -->
-    <file>
-      <source>${project.build.outputDirectory}/version.txt</source>
-      <outputDirectory>/</outputDirectory>
-      <lineEnding>unix</lineEnding>
-      <fileMode>0444</fileMode>
-    </file>
-  </files>
+  <!--<files>-->
+    <!--&lt;!&ndash; copy the version file &ndash;&gt;-->
+    <!--<file>-->
+      <!--<source>${project.build.outputDirectory}/version.txt</source>-->
+      <!--<outputDirectory>/</outputDirectory>-->
+      <!--<lineEnding>unix</lineEnding>-->
+      <!--<fileMode>0444</fileMode>-->
+    <!--</file>-->
+  <!--</files>-->
 
 </assembly>
