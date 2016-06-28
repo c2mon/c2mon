@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>cern.c2mon</groupId>
+    <artifactId>c2mon</artifactId>
+    <version>1.8.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>cern.c2mon.web</groupId>
+  <artifactId>c2mon-web</artifactId>
+  <packaging>pom</packaging>
+
+  <modules>
+    <!--<module>c2mon-web-manager</module>-->
+    <module>c2mon-web-restapi</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- Internal C2MON dependencies -->
+      <dependency>
+        <groupId>cern.c2mon.shared</groupId>
+        <artifactId>c2mon-shared-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.shared</groupId>
+        <artifactId>c2mon-shared-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+
+</project>
+
