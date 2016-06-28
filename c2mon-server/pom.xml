@@ -103,6 +103,11 @@
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-server-shorttermlog</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-supervision</artifactId>
         <version>${project.version}</version>
       </dependency>
