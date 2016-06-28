@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>cern.c2mon</groupId>
+    <artifactId>c2mon</artifactId>
+    <version>1.8.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>cern.c2mon.server</groupId>
+  <artifactId>c2mon-server</artifactId>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>c2mon-server-alarm</module>
+    <module>c2mon-server-cache</module>
+    <module>c2mon-server-cachedbaccess</module>
+    <module>c2mon-server-cacheloading</module>
+    <module>c2mon-server-cachepersistence</module>
+    <module>c2mon-server-client</module>
+    <module>c2mon-server-command</module>
+    <module>c2mon-server-common</module>
+    <module>c2mon-server-configuration</module>
+    <module>c2mon-server-daqcommunication-in</module>
+    <module>c2mon-server-daqcommunication-out</module>
+    <module>c2mon-server-lifecycle</module>
+    <module>c2mon-server-rule</module>
+    <module>c2mon-server-shorttermlog</module>
+    <module>c2mon-server-supervision</module>
+    <module>c2mon-server-test</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- Internal C2MON dependencies -->
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-server-alarm</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-server-cache</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-server-cachedbaccess</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-server-cacheloading</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-server-cachepersistence</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-server-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-server-command</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-server-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-server-configuration</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-server-daqcommunication-in</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-server-daqcommunication-out</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-server-lifecycle</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-server-rule</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-server-supervision</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-server-test</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <!-- C2MON shared libraries -->
+      <dependency>
+        <groupId>cern.c2mon.shared</groupId>
+        <artifactId>c2mon-shared-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.shared</groupId>
+        <artifactId>c2mon-shared-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.shared</groupId>
+        <artifactId>c2mon-shared-daq</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.shared</groupId>
+        <artifactId>c2mon-shared-rule</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.shared</groupId>
+        <artifactId>c2mon-shared-persistence-manager</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.shared</groupId>
+        <artifactId>c2mon-shared-util</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+</project>
+
