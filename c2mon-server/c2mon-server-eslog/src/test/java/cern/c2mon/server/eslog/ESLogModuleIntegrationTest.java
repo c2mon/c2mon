@@ -30,6 +30,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
+
 /**
  * Integration test with the core modules.
  * @author Alban Marguet.
@@ -49,7 +51,7 @@ public class ESLogModuleIntegrationTest {
   private EsAlarmLogListener esAlarmLogListener;
 
   @ClassRule
-  public static TemporaryFolder c2monHome = new TemporaryFolder();
+  public static TemporaryFolder c2monHome = new TemporaryFolder(new File("/tmp"));
 
   @BeforeClass
   public static void setEnv() {

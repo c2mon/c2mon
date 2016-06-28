@@ -36,6 +36,7 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
@@ -53,6 +54,7 @@ import static org.junit.Assert.assertTrue;
 @ContextConfiguration(classes = {
     EsLogIntegrationConfiguration.class
 })
+@TestPropertySource("classpath:c2mon-server-default.properties")
 @RunWith(SpringJUnit4ClassRunner.class)
 public class EsIndexerTest {
   private static String clusterName;
@@ -69,7 +71,7 @@ public class EsIndexerTest {
   private TransportConnector connector;
 
   @ClassRule
-  public static TemporaryFolder c2monHome = new TemporaryFolder();
+  public static TemporaryFolder c2monHome = new TemporaryFolder(new File("/tmp"));
 
   @BeforeClass
   public static void setEnv() {
