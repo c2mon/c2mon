@@ -175,7 +175,7 @@ public class JmsContainerManagerTest {
     jmsSender.sendToQueue("test message from process 2", testTrunkName + ".Process-2-" + millis);
     
     //check after pause
-    Thread.sleep(2000);
+//    Thread.sleep(2000);
     EasyMock.verify(mockProcessCache);
     EasyMock.verify(mockProcess1);
     EasyMock.verify(mockProcess2);
@@ -207,7 +207,7 @@ public class JmsContainerManagerTest {
     jmsSender.sendToQueue("test subscribe to process 3", testTrunkName + ".Process-3-" + millis);    
     
     //check after pause
-    Thread.sleep(2000);    
+//    Thread.sleep(2000);
     EasyMock.verify(mockProcess);   
     EasyMock.verify(mockListener);
     
@@ -225,7 +225,6 @@ public class JmsContainerManagerTest {
    * @throws JMSException 
    */
   @Test
-  @Ignore("This test is flaky!")
   public void testUnsubscribe() throws InterruptedException, JMSException {
     testSubscribe();
     EasyMock.reset(mockListener);
@@ -240,7 +239,7 @@ public class JmsContainerManagerTest {
     jmsSender.sendToQueue("test unsubscribe from process 3", tmpQueueName);    
     
     //check after pause that listener was NOT called
-    Thread.sleep(2000);       
+//    Thread.sleep(2000);
     EasyMock.verify(mockListener);
     EasyMock.verify(mockProcess);
   }
