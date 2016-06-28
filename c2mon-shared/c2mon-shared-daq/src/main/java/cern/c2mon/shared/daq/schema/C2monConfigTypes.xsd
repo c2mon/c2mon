@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+    targetNamespace="http://timweb.cern.ch/schemas/c2mon-daq/Configuration"
+    xmlns="http://timweb.cern.ch/schemas/c2mon-daq/C2monConfigTypes"
+    xmlns:conf="http://timweb.cern.ch/schemas/c2mon-daq/Configuration"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	elementFormDefault="qualified">
+	
+	<!-- The equipment unit type -->
+	<xs:complexType name="equipmentUnit">
+	  <xs:all minOccurs="1" >
+	  	<xs:element minOccurs="1" name="handler-class-name" type="xs:string" />
+        <xs:element minOccurs="1" name="commfault-tag-id" type="xs:long" />
+        <xs:element minOccurs="1" name="commfault-tag-value" type="xs:boolean" />
+        <xs:element minOccurs="0" name="alive-tag-id" type="xs:long" />
+        <xs:element minOccurs="0" name="alive-interval" type="xs:long" />
+        <xs:element minOccurs="1" name="address" type="xs:string" />
+        <xs:element minOccurs="0" name="SubEquipmentUnits" >
+        	<xs:complexType>
+        		<xs:sequence minOccurs="0">
+        			<xs:element minOccurs="1" maxOccurs="unbounded" name="SubEquipmentUnit" type="conf:subEquipmentUnit"></xs:element>
+        		</xs:sequence>
+        	</xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="DataTags" >
+        	<xs:complexType>
+        		<xs:sequence>
+        			<xs:element minOccurs="0" maxOccurs="unbounded" name="DataTag" type="conf:dataTag"></xs:element>
+        		</xs:sequence>
+        	</xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="1" name="CommandTags" >
+        	<xs:complexType>
+        		<xs:sequence>
+        			<xs:element minOccurs="0" maxOccurs="unbounded" name="CommandTag" type="conf:commandTag" />
+        		</xs:sequence>
+        	</xs:complexType>
+        </xs:element>
+      </xs:all>
+      <xs:attribute name="id" use="required" type="xs:long"/>
+      <xs:attribute name="name" use="required" type="xs:string"/>
+    </xs:complexType>
+    
+    <!-- A SubequipmentUnit type -->
+    <xs:complexType name="subEquipmentUnit">
+    	<xs:all>
+    		<xs:element minOccurs="1" name="commfault-tag-id" type="xs:long" />
+        <xs:element minOccurs="1" name="commfault-tag-value" type="xs:boolean" />
+        <xs:element name="alive-tag-id" type="xs:long" />
+        <xs:element name="alive-interval" type="xs:long" />          
+    	</xs:all>
+      <xs:attribute name="id" use="required" type="xs:long"/>
+      <xs:attribute name="name" use="required" type="xs:string"/>
+    </xs:complexType>
+	
+	<!-- The data tag type -->
+	<xs:complexType name="dataTag">
+	  <xs:all>
+	    <xs:element name="mode" minOccurs="0" type="xs:short" default="0" />
+	    <xs:element name="data-type" minOccurs="1" type="xs:string" />
+	    <xs:element name="min-value" minOccurs="0" type="conf:typeableString" />
+	    <xs:element name="max-value" minOccurs="0" type="conf:typeableString" />
+	    <xs:element name="DataTagAddress" minOccurs="1" type="conf:dataTagAddress"/>
+	  </xs:all>
+	  <xs:attribute name="id" use="required" type="xs:long"/>
+	  <xs:attribute name="name" use="required" type="xs:string"/>
+	  <xs:attribute name="control" use="required" type="xs:boolean"/>
+	</xs:complexType>
+	
+	<!-- String which represents data of type data-type -->
+    <xs:complexType name="typeableString">
+       <xs:simpleContent>
+           <xs:extension base="xs:string">
+               <xs:attribute name="data-type" use="required" type="xs:string" />
+           </xs:extension>
+       </xs:simpleContent>
+    </xs:complexType>
+	
+	<!-- The command tag type -->
+	<xs:complexType name="commandTag">
+	  <xs:all>
+	    <xs:element minOccurs="1" name="source-timeout" type="xs:int"/>
+	    <xs:element minOccurs="1" name="source-retries" type="xs:int"/>
+	    <xs:element minOccurs="1" name="HardwareAddress" type="conf:hardwareAddress"/>
+	  </xs:all>
+	  <xs:attribute name="id" use="required" type="xs:long"/>
+	  <xs:attribute name="name" use="required" type="xs:string"/>
+	</xs:complexType>
+	
+	<!-- The hardware address type -->
+	<xs:complexType name="hardwareAddress">
+	  <xs:sequence>
+	    <xs:any minOccurs="1" maxOccurs="unbounded" processContents="lax"/>
+	  </xs:sequence>
+	  <xs:attribute name="class" use="required" type="xs:NCName"/>
+	</xs:complexType>
+	
+	<!-- The data tag address type -->
+	<xs:complexType name="dataTagAddress">
+	  <xs:all>
+		<xs:element minOccurs="0" name="time-to-live" type="xs:int"/>
+        <xs:element minOccurs="0" name="value-deadband-type" type="xs:short"/>
+		<xs:element minOccurs="0" name="value-deadband" type="xs:float"/>
+		<xs:element minOccurs="0" name="priority" type="xs:int"/>
+		<xs:element minOccurs="0" name="time-deadband" type="xs:int"/>
+	    <xs:element minOccurs="0" name="guaranteed-delivery" type="xs:boolean" />
+	    <xs:element minOccurs="0" name="HardwareAddress" type="conf:hardwareAddress"/>
+	  </xs:all>
+	</xs:complexType>
+	
+</xs:schema>

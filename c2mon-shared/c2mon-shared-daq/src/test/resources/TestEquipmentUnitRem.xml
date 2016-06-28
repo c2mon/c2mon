@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ConfigurationChangeEvent
+  xmlns="http://timweb.cern.ch/schemas/c2mon-daq/Configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://timweb.cern.ch/schemas/c2mon-daq/Configuration http://timweb.cern.ch/schemas/c2mon-daq/ConfigurationChangeEvent.xsd">
+  
+  <EquipmentUnitRemove change-id="1" equipment-id="2"/>
+  
+</ConfigurationChangeEvent>

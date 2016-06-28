@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ConfigurationChangeEvent
+  xmlns="http://timweb.cern.ch/schemas/c2mon-daq/Configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://timweb.cern.ch/schemas/c2mon-daq/Configuration http://timweb.cern.ch/schemas/c2mon-daq/ConfigurationChangeEvent.xsd">
+  
+  <EquipmentUnitAdd change-id="1" equipment-id="2408">    
+    <equipment-unit-xml><![CDATA[<EquipmentUnit id="2408" name="RDA:CFV-CCR-CSGSPS">
+            <handler-class-name>cern.c2mon.daq.japc.GenericJapcMessageHandler</handler-class-name>
+            <commfault-tag-id>2136996</commfault-tag-id>
+            <commfault-tag-value>false</commfault-tag-value>
+            <address></address>
+            <SubEquipmentUnits>
+            </SubEquipmentUnits>
+            <DataTags>
+              <DataTag id="2136998" name="CFV-CCR-CSGSPS:RDA:SMP.CISRA.CHANNEL.1" control="false">
+                <data-type>Integer</data-type>
+                <DataTagAddress>
+                  <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">
+                    <protocol>rda</protocol>
+                    <service>rda</service>
+                    <device-name>CISX.CCR.SPS.RA</device-name>
+                    <property-name>RegisterValue</property-name>
+                    <data-field-name>value</data-field-name>
+                    <column-index>-1</column-index>
+                    <row-index>-1</row-index>
+                    <filter>name=SERIAL_IN_STATUS</filter>
+                  </HardwareAddress>
+                  <time-to-live>7200000</time-to-live>
+                  <priority>2</priority>
+                  <guaranteed-delivery>false</guaranteed-delivery>
+                </DataTagAddress>
+              </DataTag>  
+            </DataTags>
+            <CommandTags>
+            </CommandTags>
+          </EquipmentUnit>]]></equipment-unit-xml>
+  </EquipmentUnitAdd>
+
+</ConfigurationChangeEvent>

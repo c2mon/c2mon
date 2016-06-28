@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ConfigurationChangeEventReport
+	xmlns="http://timweb.cern.ch/schemas/c2mon-daq/ConfigurationReport">
+	<ChangeReport change-id="1" state="SUCCESS">
+		<info-message>&lt;info</info-message>
+	</ChangeReport>
+	<ChangeReport change-id="2" state="SUCCESS" />
+	<ChangeReport change-id="3" state="SUCCESS">
+		<warn-message>warn</warn-message>
+	</ChangeReport>
+	<ChangeReport change-id="4" state="FAIL">
+		<error-message>error</error-message>
+	</ChangeReport>
+	<ChangeReport change-id="5" state="REBOOT">
+		<error-message>error</error-message>
+	</ChangeReport>
+</ConfigurationChangeEventReport>
