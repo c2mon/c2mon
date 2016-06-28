@@ -78,7 +78,7 @@ public class ProcessDAOImpl extends AbstractDefaultLoaderDAO<Process> implements
     if (process.getProcessPIK() != null) {
       LOGGER.debug("doPostDbLoading - jmsDaqCommandQueue: " + process.getJmsDaqCommandQueue());
     } else {
-      LOGGER.warn("doPostDbLoading - Null PIK registered. Probably empty Data Base info. Waiting to fill it up through the cache persistence");
+      LOGGER.info("doPostDbLoading - Null PIK registered. Probably empty database info. Waiting to fill it up through the cache persistence");
     }
 
     return process;
