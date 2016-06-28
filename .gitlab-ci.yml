@@ -1,7 +1,7 @@
 #image: maven:3.3-jdk-8
 
 before_script:
-  - yum install maven
+  - sudo yum install maven
 
 build:
   script: mvn -q -B -T4 clean package
