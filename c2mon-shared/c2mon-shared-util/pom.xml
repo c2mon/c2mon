@@ -3,31 +3,24 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>cern.c2mon.c2mon-shared</groupId>
-    <artifactId>c2mon-shared-pom</artifactId>
-    <version>1.6.4</version>
+    <groupId>cern.c2mon.shared</groupId>
+    <artifactId>c2mon-shared</artifactId>
+    <version>1.8.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>cern.c2mon.c2mon-shared</groupId>
   <artifactId>c2mon-shared-util</artifactId>
-  <version>1.7.3-SNAPSHOT</version>
-  <name>c2mon-shared-util</name>
   <packaging>jar</packaging>
-  <description>
-    Utility classes used in the C2MON project.
-  </description>
-  <url>http://cern.ch/c2mon</url>
 
-  <scm>
-    <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-shared/c2mon-shared-util</developerConnection>
-  </scm>
+  <description>
+    Shared utility classes used throughout C2MON
+  </description>
 
   <dependencies>
+    <!-- 3rd-party dependencies -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    <!-- Gson: Java to Json conversion -->
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
@@ -54,11 +47,6 @@
     </dependency>
     
     <!-- Test dependencies -->
-    <dependency>
-     <groupId>org.slf4j</groupId>
-     <artifactId>slf4j-log4j12</artifactId>
-     <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

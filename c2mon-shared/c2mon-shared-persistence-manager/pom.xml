@@ -2,16 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <groupId>cern.c2mon.c2mon-shared</groupId>
-    <artifactId>c2mon-shared-pom</artifactId>
-    <version>RELEASE</version>
+    <groupId>cern.c2mon.shared</groupId>
+    <artifactId>c2mon-shared</artifactId>
+    <version>1.8.0-SNAPSHOT</version>
   </parent>
-  <groupId>cern.c2mon.c2mon-shared</groupId>
+
   <artifactId>c2mon-shared-persistence-manager</artifactId>
-  <version>1.7.1-SNAPSHOT</version>
-  <name>c2mon-shared-persistence-manager</name>
   <packaging>jar</packaging>
+
   <description>
     This JAR is part of C2MON's persistence layer. It manages
     all the incoming requests to commit data to C2MON's DB by providing a fallback mechanism that guarantees that not
@@ -20,42 +20,24 @@
     files instead and it will be automatically recovered once the DB is back. The code is generic enough
     to allow its use by any other C2MON project that has to deal with the persistence layer.
   </description>
-  <url>http://timweb.cern.ch</url>
-
-  <scm>
-    <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-shared/c2mon-shared-persistence-manager</developerConnection>
-  </scm>
 
   <dependencies>
+    <!-- Internal C2MON dependencies-->
+    <dependency>
+      <groupId>cern.c2mon.shared</groupId>
+      <artifactId>c2mon-shared-util</artifactId>
+    </dependency>
+
+    <!-- 3rd-party dependencies-->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.5</version>
     </dependency>
+
+    <!-- Test dependencies-->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-shared</groupId>
-      <artifactId>c2mon-shared-util</artifactId>
-    </dependency>
   </dependencies>
-
-  <developers/>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.8</version>
-        <configuration>
-          <argLine>
-            -Dtim.log.fallback.file=FallBackFileControllerTest.log
-          </argLine>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
 </project>

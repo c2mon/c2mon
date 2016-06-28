@@ -1,32 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <groupId>cern.c2mon.c2mon-shared</groupId>
-    <artifactId>c2mon-shared-pom</artifactId>
-    <version>1.6.4</version>
+    <groupId>cern.c2mon.shared</groupId>
+    <artifactId>c2mon-shared</artifactId>
+    <version>1.8.0-SNAPSHOT</version>
   </parent>
-  <groupId>cern.c2mon.c2mon-shared</groupId>
+
   <artifactId>c2mon-shared-daq</artifactId>
-  <version>1.7.2-SNAPSHOT</version>
-  <name>c2mon-shared-daq</name>
   <packaging>jar</packaging>
+
   <description>
     Classes shared between the server and DAQ layer.
   </description>
-  <url>http://cern.ch/c2mon</url>
-
-  <scm>
-    <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-shared/c2mon-shared-daq</developerConnection>
-  </scm>
 
   <dependencies>
+    <!-- Internal C2MON dependencies-->
     <dependency>
-      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <groupId>cern.c2mon.shared</groupId>
       <artifactId>c2mon-shared-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <groupId>cern.c2mon.shared</groupId>
       <artifactId>c2mon-shared-util</artifactId>
       <exclusions>
         <exclusion>
@@ -35,12 +31,12 @@
         </exclusion>
       </exclusions>
     </dependency>
+
+    <!-- 3rd-party dependencies-->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
     </dependency>
-
-    <!--3rd party dependencies-->
     <dependency>
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>
@@ -50,18 +46,18 @@
       <artifactId>jms</artifactId>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
     </dependency>
     <dependency>
-     <groupId>org.slf4j</groupId>
-     <artifactId>slf4j-api</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <!-- Test dependencies-->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
     </dependency>
   </dependencies>
-  <developers />
 </project>

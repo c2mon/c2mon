@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <groupId>cern.c2mon.c2mon-shared</groupId>
-    <artifactId>c2mon-shared-pom</artifactId>
-    <version>RELEASE</version>
+    <groupId>cern.c2mon.shared</groupId>
+    <artifactId>c2mon-shared</artifactId>
+    <version>1.8.0-SNAPSHOT</version>
   </parent>
-  <groupId>cern.c2mon.c2mon-shared</groupId>
+
   <artifactId>c2mon-shared-rule</artifactId>
-  <version>1.2.12-SNAPSHOT</version>
-  <name>c2mon-shared-rule</name>
   <packaging>jar</packaging>
+
   <description>
-      Contains the core rule classes used to evaluate and parse rule expressions.
-    </description>
-  <url>http://timweb.cern.ch</url>
-  
-  <scm>
-    <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-shared/c2mon-shared-rule</developerConnection>
-  </scm>
-  
+    Rule expression parsing and evaluation module
+  </description>
+
   <dependencies>
+    <!-- Internal C2MON dependencies -->
     <dependency>
-      <groupId>cern.c2mon.c2mon-shared</groupId>
-      <artifactId>c2mon-shared-common</artifactId>      
+      <groupId>cern.c2mon.shared</groupId>
+      <artifactId>c2mon-shared-common</artifactId>
     </dependency>
+
+    <!-- 3rd-party dependencies -->
+
+    <!-- Test dependencies -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -35,5 +35,5 @@
       <artifactId>easymock</artifactId>
     </dependency>
   </dependencies>
-  <developers />
+  <developers/>
 </project>
