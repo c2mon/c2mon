@@ -1,8 +1,0 @@
-<config>
-  <view>
-    <property name="url" type="java.lang.String" value="http://timweb.cern.ch/Views/Production/Process_State/ProcessState.idbd" />
-    <property name="external" type="java.lang.Boolean" value="false" />
-  </view>
-
-  <property name="views-navigation-tree-root-path" type="java.lang.String" value="Production" />
-</config>

@@ -1,6 +1,0 @@
-<config>
-	<view>
-		<property name="url" type="java.lang.String" value="http://timweb.cern.ch/Views/Production/CCC/CCC_Wall_Screen.cmb"/>
-		<property name="external" type="java.lang.Boolean" value="true"/>
-	</view>
-</config>
