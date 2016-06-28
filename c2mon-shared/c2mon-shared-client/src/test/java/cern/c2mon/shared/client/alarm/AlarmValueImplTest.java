@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package java.client.alarm;
+package cern.c2mon.shared.client.alarm;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;

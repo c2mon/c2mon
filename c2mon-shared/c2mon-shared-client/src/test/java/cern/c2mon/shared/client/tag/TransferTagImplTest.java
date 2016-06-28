@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package java.client.tag;
+package cern.c2mon.shared.client.tag;
 
 import static cern.c2mon.shared.client.serializer.TransferTagSerializer.*;
 import static junit.framework.Assert.assertEquals;

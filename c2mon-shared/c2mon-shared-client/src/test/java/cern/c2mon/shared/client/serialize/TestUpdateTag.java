@@ -15,7 +15,7 @@
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package java.client.serialize;
+package cern.c2mon.shared.client.serialize;
 
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.shared.client.request.ClientRequestResult;

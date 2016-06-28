@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -30,7 +30,7 @@ import org.junit.Test;
 
 /**
  * J-unit test of the <code>PatternCacheFileWatchdog</class> class
- * 
+ *
  * @author wbuczak
  */
 public class PatternCacheFileWatchdogTest {
@@ -41,7 +41,7 @@ public class PatternCacheFileWatchdogTest {
     public void testPatternCacheFileWatchdog() throws Exception {
 
         String filePath = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()
-                + System.getProperty("file.separator") + TEST_CREDENTIALS_FILE;
+            + System.getProperty("file.separator") + TEST_CREDENTIALS_FILE;
         System.out.println(filePath);
 
         try {
@@ -55,18 +55,18 @@ public class PatternCacheFileWatchdogTest {
 
         PatternCache<UserCredentials> pcache = new PatternCache<UserCredentials>(UserCredentials.class);
         PatternCacheFileWatchdog<UserCredentials> fwatchdog = new PatternCacheFileWatchdog<UserCredentials>(pcache,
-                filePath, 500);
+            filePath, 500);
 
         // this should match immediately 
         assertNotNull(pcache.findMatch("abc"));
-        
+
         assertNull(pcache.findMatch("JMX:TEST01"));
         assertEquals(1, pcache.getSize());
 
         // start file watcher
         fwatchdog.start();
 
-        Thread.sleep(600);
+        Thread.sleep(1000);
 
         // append file
         try {

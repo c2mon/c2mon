@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
 
 /**
  * J-unit test of the <code>PatternCache</code> class
@@ -47,8 +48,7 @@ public class PatternCacheTest {
 
         pcache = new PatternCache<UserCredentials>(UserCredentials.class);
 
-        URL url = this.getClass().getResource(TEST_CREDENTIALS_FILE1);
-        pcache.load(new File(url.getFile()));
+        pcache.load(new ClassPathResource(TEST_CREDENTIALS_FILE1).getFile());
 
         commonTest();
     }
@@ -59,7 +59,7 @@ public class PatternCacheTest {
         pcache = new PatternCache<UserCredentials>(UserCredentials.class);
 
         StringBuilder strbld = new StringBuilder();
-        URL url = this.getClass().getResource(TEST_CREDENTIALS_FILE1);
+        URL url = new ClassPathResource(TEST_CREDENTIALS_FILE1).getURL();
 
         Path path = Paths.get(url.getPath());
         for (String line : Files.readAllLines(path, StandardCharsets.UTF_8)) {
@@ -124,8 +124,7 @@ public class PatternCacheTest {
 
         pcache = new PatternCache<UserCredentials>(UserCredentials.class);
 
-        URL url = this.getClass().getResource(TEST_CREDENTIALS_FILE1);
-        pcache.load(new File(url.getFile()));
+        pcache.load(new ClassPathResource(TEST_CREDENTIALS_FILE1).getFile());
 
         CacheReloader<UserCredentials> creloader = new CacheReloader<UserCredentials>(pcache);
         Thread cacheReloader = new Thread(creloader);

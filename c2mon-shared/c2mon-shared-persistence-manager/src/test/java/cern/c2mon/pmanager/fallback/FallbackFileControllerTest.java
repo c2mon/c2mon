@@ -40,7 +40,7 @@ public class FallbackFileControllerTest extends TestCase {
     private static final int NUMBER_OF_LINES = 5;
     
     /** The fallback file path */
-    private static final String PATH = System.getProperty("tim.log.fallback.file");
+    private static final String PATH = "/tmp/falback-test.txt";
 
     /** It sets up the class for the test */
     protected void setUp() {

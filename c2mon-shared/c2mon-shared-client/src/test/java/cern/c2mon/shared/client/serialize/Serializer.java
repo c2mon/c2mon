@@ -15,7 +15,7 @@
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package java.client.serialize;
+package cern.c2mon.shared.client.serialize;
 
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
@@ -33,7 +33,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static cern.c2mon.shared.client.serializer.TransferTagSerializer.*;
-import static java.client.tag.TransferTagValueImplTest.createTagForValue;
+import static cern.c2mon.shared.client.tag.TransferTagValueImplTest.createTagForValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

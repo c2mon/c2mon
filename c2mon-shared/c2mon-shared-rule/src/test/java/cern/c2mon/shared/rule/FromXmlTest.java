@@ -21,6 +21,7 @@ import static org.junit.Assert.*;
 import java.util.Collection;
 
 import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
 
 /**
  * Lets make sure we can read the RULES from a given XML file.
@@ -29,7 +30,7 @@ import org.junit.Test;
 public class FromXmlTest {
 
   /** XML with rules, extracted from the database */
-  private static final String XML_PATH = "src/test/cern/c2mon/shared/rule/rules.xml";
+  private static final String XML_PATH = "rules.xml";
   
   /** Rules contained in the XML FILE */
   private static final int RULE_COUNT = 1339;
@@ -43,7 +44,7 @@ public class FromXmlTest {
 
     try {
       Collection<RuleExpression> rules = RuleExpression
-          .createExpressionFromDatabaseXML(XML_PATH);
+          .createExpressionFromDatabaseXML(new ClassPathResource(XML_PATH).getFile().getAbsolutePath());
       
       assertTrue(rules.size() == RULE_COUNT);
       

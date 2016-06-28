@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package java.client.request;
+package cern.c2mon.shared.client.request;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
