@@ -3,24 +3,43 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>cern.c2mon.c2mon-server</groupId>
-    <artifactId>c2mon-server-pom</artifactId>
-    <version>RELEASE</version>
+    <groupId>cern.c2mon.server</groupId>
+    <artifactId>c2mon-server</artifactId>
+    <version>1.8.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-daqcommunication-out</artifactId>
-  <version>1.7.1-SNAPSHOT</version>
-  <name>c2mon-server-daqcommunication-out</name>
   <packaging>jar</packaging>
-  <description>C2MON module managing outgoing communication to the DAQ layer</description>
-  <url>http://timweb.cern.ch</url>
 
-  <scm>
-    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-daqcommunication-out</developerConnection>
-  </scm>
+  <description>C2MON module managing outgoing communication to the DAQ layer</description>
 
   <dependencies>
+    <!-- Internal C2MON dependencies -->
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-cache</artifactId>
+    </dependency>
+
+    <!-- 3rd-party dependencies -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jms</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-all</artifactId>
+    </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-test</artifactId>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -37,47 +56,5 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-jms</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-all</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-cache</artifactId>
-      <version>[1.5.5, 2.0.0)</version>
-    </dependency>
-
-    <!-- C2MON test dependencies -->
-    <dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-test</artifactId>
-    </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.8.1</version>
-        <configuration>
-          <argLine>
-            -Dc2mon.log.dir=${basedir}/build/log
-          </argLine>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
-  <developers />
 </project>

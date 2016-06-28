@@ -2,25 +2,24 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <groupId>cern.c2mon.c2mon-server</groupId>
-    <artifactId>c2mon-server-pom</artifactId>
-    <version>RELEASE</version>
+    <groupId>cern.c2mon.server</groupId>
+    <artifactId>c2mon-server</artifactId>
+    <version>1.8.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-cachepersistence</artifactId>
-  <version>1.7.1-SNAPSHOT</version>
-  <name>c2mon-server-cachepersistence</name>
   <packaging>jar</packaging>
-  <description>The C2MON server module managing the persistence of cache updates to the database.</description>
-  <url>http://timweb.cern.ch</url>
 
-  <scm>
-	 <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-cachepersistence</developerConnection>
-  </scm>
+  <description>The C2MON server module managing the persistence of cache updates to the database.</description>
 
   <dependencies>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-cache</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -38,55 +37,14 @@
       <artifactId>spring-test</artifactId>
     </dependency>
     <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-cache</artifactId>
-      <version>[1.5.1, 2.0.0)</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>net.sf.ehcache</groupId>
       <artifactId>ehcache-core</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
+      <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-test</artifactId>
     </dependency>
   </dependencies>
-
-  <developers />
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.8.1</version>
-        <configuration>
-          <argLine>
-            <!-- -Dc2mon.properties.location=${c2mon.properties.location}-->
-            <!-- -Dc2mon.log.dir=${basedir}/build/log-->
-            <!--&lt;!&ndash;-->
-              <!--for this module only-->
-            <!--&ndash;&gt;-->
-            <!-- -Dc2mon.persistence.buffer.min=2000-->
-            <!-- -Dc2mon.persistence.buffer.max=3000-->
-            <!-- -Dc2mon.persistence.buffer.growth=100-->
-            <!-- -Dc2mon.persistence.timeout=5000-->
-            <!--&lt;!&ndash;-->
-              <!--for cache module and cache loading-->
-            <!--&ndash;&gt;-->
-            <!-- -Ddatasource.persistence.connections.initial=2-->
-            <!-- -Ddatasource.persistence.connections.max=2-->
-            <!-- -Dc2mon.jms.controltag.publication.topic=c2mon.controltag.publication.test-->
-            <!-- -Dc2mon.jms.tag.publication.topic=c2mon.tag.publication.test-->
-            <!-- -Dcache.loader.batch.size=10000-->
-            <!-- -Dcache.loader.threads.max=2-->
-            <!-- -Dcache.loader.queue.size=1000-->
-
-          </argLine>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>

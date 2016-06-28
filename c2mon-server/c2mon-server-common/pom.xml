@@ -4,25 +4,36 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>cern.c2mon.c2mon-server</groupId>
-    <artifactId>c2mon-server-pom</artifactId>
-    <version>RELEASE</version>
+    <groupId>cern.c2mon.server</groupId>
+    <artifactId>c2mon-server</artifactId>
+    <version>1.8.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-common</artifactId>
-  <version>1.7.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <description>
-    Classes that are shared across the server modules (but not outside the server).
-  </description>
-
-  <scm>
-    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-common</developerConnection>
-  </scm>
+  <description>Classes that are shared across the server modules (but not outside the server).</description>
 
   <dependencies>
+    <!-- Internal C2MON dependencies -->
+    <dependency>
+      <groupId>cern.c2mon.shared</groupId>
+      <artifactId>c2mon-shared-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.shared</groupId>
+      <artifactId>c2mon-shared-daq</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.shared</groupId>
+      <artifactId>c2mon-shared-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.shared</groupId>
+      <artifactId>c2mon-shared-rule</artifactId>
+    </dependency>
+
+    <!-- 3rd party dependencies -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-tx</artifactId>
@@ -63,29 +74,7 @@
       <artifactId>lombok</artifactId>
     </dependency>
 
-    <!-- C2MON dependencies -->
-    <dependency>
-      <groupId>cern.c2mon.c2mon-shared</groupId>
-      <artifactId>c2mon-shared-common</artifactId>
-      <version>[1.5.7, 2.0.0)</version>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-shared</groupId>
-      <artifactId>c2mon-shared-daq</artifactId>
-      <version>[1.5.3, 2.0.0)</version>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-shared</groupId>
-      <artifactId>c2mon-shared-client</artifactId>
-      <version>[1.6.0, 2.0.0)</version>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-shared</groupId>
-      <artifactId>c2mon-shared-rule</artifactId>
-      <version>[1.2.10, 2.0.0)</version>
-    </dependency>
-
-    <!-- test deps -->
+    <!-- Test dependencies -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

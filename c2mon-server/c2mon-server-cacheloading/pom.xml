@@ -1,40 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>cern.c2mon.c2mon-server</groupId>
-		<artifactId>c2mon-server-pom</artifactId>
-		<version>RELEASE</version>
-	</parent>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-  <groupId>cern.c2mon.c2mon-server</groupId>
-	<artifactId>c2mon-server-cacheloading</artifactId>
-	<version>1.7.2-SNAPSHOT</version>
-	<name>c2mon-server-cacheloading</name>
-	<packaging>jar</packaging>
-	<description>
-    	The C2MON server core module loading the caches from the database.
-    </description>
-	<url>http://timweb.cern.ch</url>
+  <parent>
+    <groupId>cern.c2mon.server</groupId>
+    <artifactId>c2mon-server</artifactId>
+    <version>1.8.0-SNAPSHOT</version>
+  </parent>
 
-	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-cacheloading</developerConnection>
-	</scm>
+  <artifactId>c2mon-server-cacheloading</artifactId>
+  <packaging>jar</packaging>
 
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymock</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-tx</artifactId>
-		</dependency>
+  <description>The C2MON server core module loading the caches from the database.</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-cachedbaccess</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.shared</groupId>
+      <artifactId>c2mon-shared-common</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
@@ -43,22 +44,11 @@
       <groupId>org.mybatis</groupId>
       <artifactId>mybatis</artifactId>
     </dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-shared</groupId>
-			<artifactId>c2mon-shared-common</artifactId>
-      <version>LATEST</version>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-cachedbaccess</artifactId>
-      <version>LATEST</version>
-		</dependency>
 
-    <!-- Test dependency -->
+    <!-- Test dependencies -->
     <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
+      <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-test</artifactId>
     </dependency>
-	</dependencies>
-	<developers />
+  </dependencies>
 </project>

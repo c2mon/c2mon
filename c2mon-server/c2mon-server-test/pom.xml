@@ -4,56 +4,31 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>cern.c2mon.c2mon-server</groupId>
-    <artifactId>c2mon-server-pom</artifactId>
-    <version>RELEASE</version>
+    <groupId>cern.c2mon.server</groupId>
+    <artifactId>c2mon-server</artifactId>
+    <version>1.8.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-test</artifactId>
-  <version>1.7.3-SNAPSHOT</version>
-  <name>c2mon-server-test</name>
   <packaging>jar</packaging>
-  <description>
-    The C2MON test module with helper classes for use across all server module tests.
-  </description>
 
-  <scm>
-    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-test</developerConnection>
-  </scm>
+  <description>The C2MON test module with helper classes for use across all server module tests.</description>
 
   <dependencies>
+    <!-- Internal C2MON dependencies -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
+      <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-common</artifactId>
-      <version>[1.5.3, 2.0.0)</version>
-      <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache-core</artifactId>
-      <scope>test</scope>
-    </dependency>
+
+    <!-- 3rd-party dependencies -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
       <artifactId>spring-tx</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
     </dependency>
     <dependency>
       <groupId>oracle</groupId>
@@ -70,7 +45,6 @@
     <dependency>
       <groupId>org.hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
-      <version>2.3.2</version>
     </dependency>
     <dependency>
       <groupId>org.apache.activemq</groupId>
@@ -79,6 +53,26 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
     </dependency>
   </dependencies>
 </project>

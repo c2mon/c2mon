@@ -3,24 +3,44 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>cern.c2mon.c2mon-server</groupId>
-    <artifactId>c2mon-server-pom</artifactId>
-    <version>RELEASE</version>
+    <groupId>cern.c2mon.server</groupId>
+    <artifactId>c2mon-server</artifactId>
+    <version>1.8.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-shorttermlog</artifactId>
-  <version>1.7.2-SNAPSHOT</version>
-  <name>c2mon-server-shorttermlog</name>
   <packaging>jar</packaging>
-  <description>C2MON server module for short-term logging to the DB (of Tag updates, Commands and Supervision events)</description>
-  <url>http://timweb.cern.ch</url>
 
-  <scm>
-    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-shorttermlog</developerConnection>
-  </scm>
+  <description>C2MON server module for short-term logging to the DB (of Tag updates, Commands and Supervision events)</description>
 
   <dependencies>
+    <!-- Internal C2MON dependencies -->
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-cache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-supervision</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-command</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.shared</groupId>
+      <artifactId>c2mon-shared-rule</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.shared</groupId>
+      <artifactId>c2mon-shared-persistence-manager</artifactId>
+    </dependency>
+
+    <!-- 3rd party dependencies -->
     <dependency>
       <groupId>oracle</groupId>
       <artifactId>ojdbc</artifactId>
@@ -41,18 +61,6 @@
       <groupId>commons-dbcp</groupId>
       <artifactId>commons-dbcp</artifactId>
     </dependency>
-
-    <!-- test dependencies -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-    </dependency>
-
-    <!-- Spring deps -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
@@ -72,43 +80,26 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
-      <version>1.3.0.RELEASE</version>
+      <version>${org.springframework.boot.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
     </dependency>
 
-    <!-- C2MON dependencies -->
+    <!-- Test dependencies -->
     <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-all</artifactId>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
     </dependency>
-
     <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-test</artifactId>
       <scope>provided</scope>
     </dependency>
-
-    <dependency>
-    	<groupId>org.projectlombok</groupId>
-    	<artifactId>lombok</artifactId>
-    </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <argLine>
-            <!-- -Dc2mon.properties.location=${c2mon.properties.location}-->
-            <!-- -Ddatasource.stl.connections.initial=1-->
-            <!-- -Ddatasource.stl.connections.max=5-->
-            <!-- -Dc2mon.command.log.fallback.file=commandfallback.txt-->
-            <!-- -Dc2mon.tag.log.fallback.file=tagfallback.txt-->
-          </argLine>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  <developers />
 </project>
