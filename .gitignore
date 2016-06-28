@@ -5,6 +5,7 @@ target/
 
 # IDE files
 *.iml
+.idea/
 
 # Package Files
 *.jar
