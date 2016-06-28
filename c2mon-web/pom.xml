@@ -14,7 +14,7 @@
   <packaging>pom</packaging>
 
   <modules>
-    <!--<module>c2mon-web-manager</module>-->
+    <module>c2mon-web-configviewer</module>
     <module>c2mon-web-restapi</module>
   </modules>
 

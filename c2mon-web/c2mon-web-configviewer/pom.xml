@@ -1,41 +1,29 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <groupId>cern.c2mon.c2mon-client</groupId>
-    <artifactId>c2mon-client-pom</artifactId>
-    <version>RELEASE</version>
+    <groupId>cern.c2mon.web</groupId>
+    <artifactId>c2mon-web</artifactId>
+    <version>1.8.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>cern.c2mon.c2mon-client</groupId>
   <artifactId>c2mon-web-configviewer</artifactId>
-  <version>1.7.3-SNAPSHOT</version>
-
   <packaging>war</packaging>
 
   <properties>
-    <org.springframework.version>4.2.3.RELEASE</org.springframework.version>
-    <org.springframework.boot.version>1.3.0.RELEASE</org.springframework.boot.version>
     <org.springframework.security.version>4.0.3.RELEASE</org.springframework.security.version>
   </properties>
 
   <dependencies>
-
-    <!-- C2MON dependency -->
+    <!-- C2MON dependencies -->
     <dependency>
-      <groupId>cern.c2mon.c2mon-client</groupId>
+      <groupId>cern.c2mon.client</groupId>
       <artifactId>c2mon-client-core</artifactId>
-      <version>1.7.2</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
       <artifactId>c2mon-client-ext-rbac</artifactId>
-       <version>1.7.2</version>
+      <version>1.7.3-SNAPSHOT</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
@@ -46,7 +34,7 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
       <artifactId>c2mon-client-ext-history</artifactId>
-      <version>1.7.2</version>
+      <version>1.7.6-SNAPSHOT</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
@@ -55,7 +43,7 @@
       </exclusions>
     </dependency>
 
-    <!-- SPRING library dependencies -->
+    <!-- 3rd-party dependencies -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
@@ -72,7 +60,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-messaging</artifactId>
-      <version>4.2.3.RELEASE</version>
+      <version>${org.springframework.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -137,22 +125,18 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-validator</artifactId>
-      <version>5.2.3.Final</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
-      <version>2.6.5</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.6.5</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.6.5</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -162,17 +146,14 @@
     <dependency>
       <groupId>commons-cli</groupId>
       <artifactId>commons-cli</artifactId>
-      <version>1.2</version>
     </dependency>
     <dependency>
       <groupId>org.mybatis</groupId>
       <artifactId>mybatis</artifactId>
-      <version>3.2.7</version>
     </dependency>
     <dependency>
       <groupId>org.hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
-      <version>2.3.2</version>
     </dependency>
     <dependency>
       <groupId>jfree</groupId>
@@ -187,7 +168,6 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.16.8</version>
     </dependency>
 
     <!-- Test dependencies -->
@@ -197,20 +177,9 @@
     </dependency>
   </dependencies>
 
-  <scm>
-    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-client/c2mon-web-configviewer</developerConnection>
-  </scm>
 
   <build>
     <finalName>${project.name}-${project.version}</finalName>
-
-    <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
-    <testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-      </resource>
-    </resources>
 
     <plugins>
       <plugin>
