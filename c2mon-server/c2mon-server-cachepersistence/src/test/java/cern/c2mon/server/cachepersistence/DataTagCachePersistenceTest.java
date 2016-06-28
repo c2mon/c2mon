@@ -16,9 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.cachepersistence;
 
+import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.datatag.DataTagCacheImpl;
 import cern.c2mon.server.cache.dbaccess.DataTagMapper;
+import cern.c2mon.server.cachepersistence.common.BatchPersistenceManager;
+import cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl;
 import cern.c2mon.server.cachepersistence.junit.DatabasePopulationRule;
+import cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.test.CacheObjectCreation;
@@ -40,6 +44,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.concurrent.CountDownLatch;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -57,17 +62,11 @@ import static org.junit.Assert.assertNotNull;
     "classpath:test-config/server-test-properties.xml"
 })
 @TestPropertySource("classpath:c2mon-server-default.properties")
-public class DataTagCachePersistenceTest implements ApplicationContextAware {
+public class DataTagCachePersistenceTest {
 
   @Rule
   @Autowired
   public DatabasePopulationRule databasePopulationRule;
-
-  /**
-   * Need context to explicitly start it (cache listeners
-   * need explicit starting).
-   */
-  private ApplicationContext context;
 
   @Autowired
   private DataTagCacheImpl dataTagCache;
@@ -75,24 +74,25 @@ public class DataTagCachePersistenceTest implements ApplicationContextAware {
   @Autowired
   private DataTagMapper dataTagMapper;
 
+  @Autowired
+  private BatchPersistenceManagerImpl dataTagPersistenceManager;
+
+  @Autowired
+  private PersistenceSynchroListener datatagPersistenceSynchroListener;
+
   private DataTagCacheObject originalObject;
 
   @Before
   public void setUpData() throws IOException {
     originalObject = (DataTagCacheObject) dataTagMapper.getItem(200000L);
-  }
-
-  @Before
-  public void startContext() {
-    ((AbstractApplicationContext) context).start();
+    datatagPersistenceSynchroListener.start();
   }
 
   /**
    * Tests the functionality: put value in cache -> persist to DB.
    */
   @Test
-  @Ignore("This test is flaky!")
-  public void testTagPersistence() {
+  public void testTagPersistence() throws InterruptedException {
 
     //create a test cache object, put in the cache
     dataTagCache.put(originalObject.getId(), originalObject);
@@ -106,19 +106,15 @@ public class DataTagCachePersistenceTest implements ApplicationContextAware {
     assertNotNull(objectInDB);
     assertEquals(objectInDB.getValue(), originalObject.getValue());
 
-
     //now update the cache object
     cacheObject.setValue(0);
 
     //notify the listeners
     dataTagCache.notifyListenersOfUpdate(cacheObject);
 
-    //...and check the DB was updated after the buffer has time to fire
-    try {
-      Thread.sleep(10000);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
+    // trigger the batch persist
+    dataTagPersistenceManager.persistAllCacheToDatabase();
+
     objectInDB = (DataTagCacheObject) dataTagMapper.getItem(originalObject.getId());
     assertNotNull(objectInDB);
     assertEquals(0, objectInDB.getValue());
@@ -182,14 +178,4 @@ public class DataTagCachePersistenceTest implements ApplicationContextAware {
     //remove from DB (in After)
 
   }
-
-  /**
-   * Set the application context. Used for explicit start.
-   */
-  @Override
-  public void setApplicationContext(ApplicationContext arg0) throws BeansException {
-    context = arg0;
-  }
-
-
 }

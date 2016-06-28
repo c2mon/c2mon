@@ -18,7 +18,9 @@ package cern.c2mon.server.cachepersistence;
 
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.dbaccess.AlarmMapper;
+import cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl;
 import cern.c2mon.server.cachepersistence.junit.DatabasePopulationRule;
+import cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
@@ -54,17 +56,11 @@ import static org.junit.Assert.assertNotNull;
     "classpath:test-config/server-test-properties.xml"
 })
 @TestPropertySource("classpath:c2mon-server-default.properties")
-public class AlarmCachePersistenceTest implements ApplicationContextAware {
+public class AlarmCachePersistenceTest {
 
   @Rule
   @Autowired
   public DatabasePopulationRule databasePopulationRule;
-
-  /**
-   * Need context to explicitly start it (listeners
-   * require an explicit start to the Spring context).
-   */
-  private ApplicationContext context;
   
   @Autowired
   private AlarmCache alarmCache;
@@ -72,14 +68,18 @@ public class AlarmCachePersistenceTest implements ApplicationContextAware {
   @Autowired
   private AlarmMapper alarmMapper;
 
+  @Autowired
+  private BatchPersistenceManagerImpl alarmPersistenceManager;
+
+  @Autowired
+  private PersistenceSynchroListener alarmPersistenceSynchroListener;
+
   private Alarm originalObject;
   
   @Before
   public void before() {
     originalObject = alarmMapper.getItem(350000L);
-    
-    //need *explicit* start of listeners
-    ((AbstractApplicationContext) context).start();
+    alarmPersistenceSynchroListener.start();
   }
   
   /**
@@ -106,13 +106,10 @@ public class AlarmCachePersistenceTest implements ApplicationContextAware {
     cacheObject.setState(AlarmCondition.ACTIVE);
     //notify the listeners
     alarmCache.notifyListenersOfUpdate(cacheObject);
-    
-    //...and check the DB was updated after the buffer has time to fire
-    try {
-      Thread.sleep(20000);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
+
+    // trigger the persist
+    alarmPersistenceManager.persistAllCacheToDatabase();
+
     objectInDB = (AlarmCacheObject) alarmMapper.getItem(originalObject.getId());
     assertNotNull(objectInDB);    
     assertEquals(AlarmCondition.ACTIVE, objectInDB.getState());
@@ -121,13 +118,4 @@ public class AlarmCachePersistenceTest implements ApplicationContextAware {
     //remove from cache
     alarmCache.remove(originalObject.getId());  
   }
-
-  /**
-   * Set the application context. Used for explicit start.
-   */
-  @Override
-  public void setApplicationContext(ApplicationContext arg0) throws BeansException {
-    context = arg0;
-  }
-  
 }
