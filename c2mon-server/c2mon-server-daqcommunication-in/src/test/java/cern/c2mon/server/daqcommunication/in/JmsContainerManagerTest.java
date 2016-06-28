@@ -18,6 +18,7 @@ package cern.c2mon.server.daqcommunication.in;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.CountDownLatch;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
@@ -25,6 +26,7 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.easymock.EasyMock;
+import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -157,9 +159,21 @@ public class JmsContainerManagerTest {
     EasyMock.expect(mockProcess2.getName()).andReturn("Process-2-" + millis).times(2);
     EasyMock.expect(mockProcess1.getId()).andReturn(1L);
     EasyMock.expect(mockProcess2.getId()).andReturn(2L);
+
+    final CountDownLatch latch = new CountDownLatch(2);
+
     //expect one message from each
     mockListener.onMessage(EasyMock.isA(TextMessage.class), EasyMock.isA(Session.class));
+    EasyMock.expectLastCall().andAnswer(() -> {
+      latch.countDown();
+      return null;
+    });
+
     mockListener.onMessage(EasyMock.isA(TextMessage.class), EasyMock.isA(Session.class));
+    EasyMock.expectLastCall().andAnswer(() -> {
+      latch.countDown();
+      return null;
+    });
     
     //run test
     EasyMock.replay(mockProcessCache);
@@ -174,8 +188,9 @@ public class JmsContainerManagerTest {
     jmsSender.sendToQueue("test message from process 1", testTrunkName + ".Process-1-" + millis);
     jmsSender.sendToQueue("test message from process 2", testTrunkName + ".Process-2-" + millis);
     
-    //check after pause
-//    Thread.sleep(2000);
+    // wait for the listeners to fire
+    latch.await();
+
     EasyMock.verify(mockProcessCache);
     EasyMock.verify(mockProcess1);
     EasyMock.verify(mockProcess2);
@@ -194,8 +209,15 @@ public class JmsContainerManagerTest {
     long millis = System.currentTimeMillis();
     EasyMock.expect(mockProcess.getId()).andReturn(10L).times(3);
     EasyMock.expect(mockProcess.getName()).andReturn("Process-3-" + millis).times(2);
+
+    final CountDownLatch latch = new CountDownLatch(1);
+
     //expect one message from each
     mockListener.onMessage(EasyMock.isA(TextMessage.class), EasyMock.isA(Session.class));
+    EasyMock.expectLastCall().andAnswer(() -> {
+      latch.countDown();
+      return null;
+    });
     
     //run test   
     EasyMock.replay(mockProcess);    
@@ -204,10 +226,11 @@ public class JmsContainerManagerTest {
     //init subscriptions
     jmsContainerManager.subscribe(mockProcess);
     //check messages are picked up    
-    jmsSender.sendToQueue("test subscribe to process 3", testTrunkName + ".Process-3-" + millis);    
-    
-    //check after pause
-//    Thread.sleep(2000);
+    jmsSender.sendToQueue("test subscribe to process 3", testTrunkName + ".Process-3-" + millis);
+
+    // wait for the listeners to fire
+    latch.await();
+
     EasyMock.verify(mockProcess);   
     EasyMock.verify(mockListener);
     
@@ -238,10 +261,8 @@ public class JmsContainerManagerTest {
     //check messages are picked up    
     jmsSender.sendToQueue("test unsubscribe from process 3", tmpQueueName);    
     
-    //check after pause that listener was NOT called
-//    Thread.sleep(2000);
+    //check that listener was NOT called
     EasyMock.verify(mockListener);
     EasyMock.verify(mockProcess);
   }
-  
 }
