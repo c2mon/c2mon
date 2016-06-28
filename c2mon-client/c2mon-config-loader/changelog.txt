@@ -1,8 +1,0 @@
-c2mon-config-loader history log
-=========================
-
-
- 24/03/2014 - release version 1.0.0-SNAPSHOT
- -----------------------------------
- Wojtek Buczak:
- * first implementation
