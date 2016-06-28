@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+  <context:annotation-config/>
+  <context:component-scan base-package="cern.c2mon.server.configuration"/>
+  
+  <!-- datasource itself is included in the c2mon-datasource.xml file in the deployment configuration directory -->
+  <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-mybatis.xml"/>
+  
+  <bean id="configurationLoader" class="cern.c2mon.server.configuration.impl.ConfigurationLoaderImpl" autowire="constructor">
+    <property name="daqConfigEnabled" value="${c2mon.server.configuration.daqConfigEnabled}"/>
+    <property name="reportDirectory" value="${c2mon.server.home}/reports"/>
+  </bean>
+    
+  <bean id="configurationRequestConverter" class="cern.c2mon.shared.client.configuration.ConfigurationRequestConverter" init-method="init"/>
+  
+  <!-- the connection below is not currently used: configuration requests are made via the client module -->
+  <bean id="configRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
+   <constructor-arg index="0" value="${c2mon.server.configuration.jms.queue}"/>
+  </bean>
+    
+  <bean id="configRequestJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+      <!-- include exception listener here? -->    
+      <property name="connectionFactory" ref="clientSingleConnectionFactory"/>
+      <property name="destination" ref="configRequestDestination"/>
+      <property name="messageListener" ref="configurationRequestHandler" />
+      <property name="concurrentConsumers" value="1"/>
+      <property name="maxConcurrentConsumers" value="1"/>      
+      <property name="sessionTransacted" value="false"/>
+      <property name="taskExecutor" ref="clientExecutor"/>
+      <property name="phase">
+      	 <util:constant static-field="cern.c2mon.server.common.config.ServerConstants.PHASE_START_LAST"/>
+      </property>     
+<!--      <property name="errorHandler" ref="processRequestHandler"/>         -->
+  </bean>
+  
+  <!--<bean class="cern.c2mon.server.configuration.handler.impl.ProcessConfigHandlerImpl">-->
+  	<!--<property name="allowRunningProcessRemoval" value="${c2mon.server.configuration.allowRunningProcessRemoval}"/>-->
+  <!--</bean>-->
+
+</beans>

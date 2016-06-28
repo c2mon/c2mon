@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <import resource="classpath:cern/c2mon/server/test/cache/config/server-cache-alarm-test.xml"/>
+  
+  <bean id="testDataHelper" class="cern.c2mon.server.cache.dbaccess.test.TestDataHelper"/>
+
+  <bean id="alarmPersistenceDAO" class="cern.c2mon.server.cachepersistence.impl.CachePersistenceDAOImpl">
+    <constructor-arg ref="alarmMapper"/>
+    <constructor-arg ref="alarmCache"/>
+  </bean>
+  
+  <bean name="alarmPersistenceManager" class="cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl">
+    <constructor-arg ref="alarmPersistenceDAO"/>
+    <constructor-arg ref="alarmCache" />
+  </bean>
+
+  <bean id="alarmPersistenceSynchroListener" class="cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener">
+    <constructor-arg ref="alarmCache"/>
+    <constructor-arg ref="alarmPersistenceManager"/>    
+  </bean>
+
+</beans>

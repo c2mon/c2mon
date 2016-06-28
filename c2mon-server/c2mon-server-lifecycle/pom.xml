@@ -64,22 +64,9 @@
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-alarm</artifactId>
     </dependency>
-
-    <!-- TODO: remove this -->
     <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
+      <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-eslog</artifactId>
-      <version>1.7.3-SNAPSHOT</version>
-      <exclusions>
-        <exclusion>
-          <groupId>cern.c2mon.c2mon-server</groupId>
-          <artifactId>c2mon-server-all</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>cern.c2mon.c2mon-server</groupId>
-          <artifactId>c2mon-server-shorttermlog</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <!-- 3rd-party dependencies -->

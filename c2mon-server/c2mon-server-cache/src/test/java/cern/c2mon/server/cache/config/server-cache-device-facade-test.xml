@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+<!--   <bean id="clusterCache" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.server.cache.ClusterCache" />
+  </bean>
+
+  <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager"> 
+    <property name="cacheManager"> <bean class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"> 
+    <property name="configLocation" value="resources/ehcache-notTCmode-nonpersistent.xml" /> 
+    </bean> </property> </bean>
+
+  <bean id="deviceEhcacheManager"
+    class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+    <property name="configLocation" value="resources/ehcache-notTCmode-nonpersistent.xml"></property>
+  </bean>
+
+  <bean id="deviceEhcache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+    <property name="cacheName" value="deviceCache" />
+  </bean>
+
+  <bean id="deviceClassEhcache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+    <property name="cacheName" value="deviceClassEhcache" />
+  </bean>
+
+  <bean id="deviceEhcacheLoader" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.server.cache.common.EhcacheLoaderImpl" />
+  </bean>
+
+  <bean id="deviceClassEhcacheLoader" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.server.cache.common.EhcacheLoaderImpl" />
+  </bean>
+
+  <bean id="deviceCacheLoader" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.server.cache.common.C2monCacheLoader" />
+  </bean>
+
+  <bean id="deviceClassCacheLoader" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.server.cache.common.C2monCacheLoader" />
+  </bean>
+
+  <bean id="deviceDAO" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg
+      value="cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO" />
+  </bean>
+
+  <bean id="deviceClassDAO" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg
+      value="cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO" />
+  </bean>
+
+  <bean
+    class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="properties">
+      <props>
+        <prop key="c2mon.server.cache.skippreloading">true</prop>
+        <prop key="c2mon.cache.mode">single-nonpersistent</prop>
+      </props>
+    </property>
+  </bean> -->
+
+  <bean id="deviceCache" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.server.cache.DeviceCache" />
+  </bean>
+
+  <bean id="deviceClassCache" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.server.cache.DeviceClassCache" />
+  </bean>
+
+  <bean id="deviceFacade" class="cern.c2mon.server.cache.device.DeviceFacadeImpl">
+  </bean>
+  
+  <bean id="deviceClassFacade" class="cern.c2mon.server.cache.device.DeviceClassFacadeImpl">
+  </bean>
+
+</beans>

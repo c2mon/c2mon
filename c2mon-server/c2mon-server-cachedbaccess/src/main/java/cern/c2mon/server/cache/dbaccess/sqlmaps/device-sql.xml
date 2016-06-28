@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="cern.c2mon.server.cache.dbaccess.DeviceMapper">
+
+  <resultMap id="deviceResultMap" type="cern.c2mon.server.common.device.DeviceCacheObject">
+    <id property="id" column="device_id"/>
+    <result property="name" column="device_name"/>
+    <result property="deviceClassId" column="device_class_id"/>
+
+    <collection property="deviceProperties" ofType="cern.c2mon.shared.client.device.DeviceProperty">
+      <id property="id" column="property_id"/>
+      <result property="name" column="property_name"/>
+      <result property="value" column="property_value"/>
+      <result property="category" column="property_category"/>
+      <result property="resultType" column="property_result_type"/>
+
+      <collection property="fields" ofType="cern.c2mon.shared.client.device.DeviceProperty">
+        <id property="id" column="field_id"/>
+        <result property="name" column="field_name"/>
+        <result property="value" column="field_value"/>
+        <result property="category" column="field_category"/>
+        <result property="resultType" column="field_result_type"/>
+      </collection>
+    </collection>
+
+    <collection property="deviceCommands" ofType="cern.c2mon.shared.client.device.DeviceCommand">
+      <id property="id" column="command_id"/>
+      <result property="name" column="command_name"/>
+      <result property="value" column="command_value"/>
+      <result property="category" column="command_category"/>
+      <result property="resultType" column="command_result_type"/>
+    </collection>
+  </resultMap>
+
+  <!-- getAll needed for persistent caches -->
+  <select id="getAll" resultMap="deviceResultMap">
+    SELECT DEVICE.DEVID as device_id,
+           DEVICE.DEVNAME as device_name,
+           DEVICE.DEVCLASSID as device_class_id,
+           DEVICEPROPERTY.DVPPROPID as property_id,
+           DEVICEPROPERTY.DVPNAME as property_name,
+           DEVICEPROPERTY.DVPVALUE as property_value,
+           DEVICEPROPERTY.DVPCATEGORY as property_category,
+           DEVICEPROPERTY.DVPRESULTTYPE as property_result_type,
+           PROPERTYFIELD.PRFFIELDID as field_id,
+           PROPERTYFIELD.PRFFIELDNAME as field_name,
+           PROPERTYFIELD.PRFVALUE as field_value,
+           PROPERTYFIELD.PRFCATEGORY as field_category,
+           PROPERTYFIELD.PRFRESULTTYPE as field_result_type,
+           DEVICECOMMAND.DVCCMDID as command_id,
+           DEVICECOMMAND.DVCNAME as command_name,
+           DEVICECOMMAND.DVCVALUE as command_value,
+           DEVICECOMMAND.DVCCATEGORY as command_category,
+           DEVICECOMMAND.DVCRESULTTYPE as command_result_type
+      FROM DEVICE
+           LEFT OUTER JOIN DEVICEPROPERTY
+        ON DEVICE.DEVID = DEVICEPROPERTY.DVPDEVID
+           LEFT OUTER JOIN PROPERTYFIELD
+        ON DEVICE.DEVID = PROPERTYFIELD.PRFDEVID
+           LEFT OUTER JOIN DEVICECOMMAND
+        ON DEVICE.DEVID = DEVICECOMMAND.DVCDEVID
+  </select>
+
+  <!-- getItem needed for persistence caches -->
+  <select id="getItem" resultMap="deviceResultMap" parameterType="Long">
+    SELECT DEVICE.DEVID as device_id,
+           DEVICE.DEVNAME as device_name,
+           DEVICE.DEVCLASSID as device_class_id,
+           DEVICEPROPERTY.DVPPROPID as property_id,
+           DEVICEPROPERTY.DVPNAME as property_name,
+           DEVICEPROPERTY.DVPVALUE as property_value,
+           DEVICEPROPERTY.DVPCATEGORY as property_category,
+           DEVICEPROPERTY.DVPRESULTTYPE as property_result_type,
+           PROPERTYFIELD.PRFFIELDID as field_id,
+           PROPERTYFIELD.PRFFIELDNAME as field_name,
+           PROPERTYFIELD.PRFVALUE as field_value,
+           PROPERTYFIELD.PRFCATEGORY as field_category,
+           PROPERTYFIELD.PRFRESULTTYPE as field_result_type,
+           DEVICECOMMAND.DVCCMDID as command_id,
+           DEVICECOMMAND.DVCNAME as command_name,
+           DEVICECOMMAND.DVCVALUE as command_value,
+           DEVICECOMMAND.DVCCATEGORY as command_category,
+           DEVICECOMMAND.DVCRESULTTYPE as command_result_type
+      FROM DEVICE
+           LEFT OUTER JOIN DEVICEPROPERTY
+        ON DEVICE.DEVID = DEVICEPROPERTY.DVPDEVID
+           LEFT OUTER JOIN PROPERTYFIELD
+        ON DEVICE.DEVID = PROPERTYFIELD.PRFDEVID
+           LEFT OUTER JOIN DEVICECOMMAND
+        ON DEVICE.DEVID = DEVICECOMMAND.DVCDEVID
+     WHERE DEVICE.DEVID = #{id}
+  </select>
+
+  <insert id="insertDevice"
+    parameterType="cern.c2mon.server.common.device.DeviceCacheObject">
+    INSERT INTO DEVICE
+    (DEVID, DEVNAME, DEVCLASSID)
+    VALUES (#{id}, #{name}, #{deviceClassId})
+  </insert>
+
+  <insert id="insertDeviceProperty">
+    INSERT INTO DEVICEPROPERTY (DVPPROPID, DVPNAME, DVPVALUE, DVPCATEGORY, DVPRESULTTYPE, DVPDEVID)
+    VALUES (#{property.id}, #{property.name}, #{property.value,javaType=String ,jdbcType=VARCHAR}, #{property.category,javaType=String, jdbcType=VARCHAR},
+            #{property.resultType}, #{id})
+  </insert>
+
+  <insert id="insertPropertyField">
+    INSERT INTO PROPERTYFIELD (PRFFIELDID, PRFFIELDNAME, PRFVALUE, PRFCATEGORY, PRFRESULTTYPE, PRFPROPID, PRFDEVID)
+    VALUES (#{field.id}, #{field.name}, #{field.value,javaType=String, jdbcType=VARCHAR}, #{field.category},
+            #{field.resultType}, #{propertyId}, #{deviceId})
+  </insert>
+
+  <insert id="insertDeviceCommand">
+    INSERT INTO DEVICECOMMAND (DVCCMDID, DVCNAME, DVCVALUE, DVCCATEGORY, DVCRESULTTYPE, DVCDEVID)
+    VALUES (#{command.id}, #{command.name}, #{command.value}, #{command.category}, #{command.resultType},
+            #{id})
+  </insert>
+
+  <update id="updateDeviceConfig" parameterType="cern.c2mon.server.common.device.Device">
+    UPDATE DEVICE
+       SET DEVNAME = #{name},
+           DEVCLASSID = #{deviceClassId}
+     WHERE DEVID = #{id}
+  </update>
+
+  <select id="getMaxId" resultType="Long">
+    SELECT MAX(DEVID)
+    FROM DEVICE
+  </select>
+
+  <select id="getMinId" resultType="Long">
+    SELECT MIN(DEVID)
+    FROM DEVICE
+  </select>
+
+  <select id="isInDb" resultType="boolean" parameterType="Long">
+    SELECT
+    count(*)
+    FROM DEVICE
+    WHERE DEVID = #{id}
+  </select>
+
+  <select id="getNumberItems" resultType="Integer">
+    SELECT COUNT(DISTINCT DEVID)
+      FROM DEVICE
+  </select>
+
+  <delete id="deleteDevice" parameterType="Long">
+    DELETE FROM DEVICE WHERE DEVID = #{id}
+  </delete>
+
+  <delete id="deleteDeviceProperties" parameterType="Long">
+    DELETE FROM DEVICEPROPERTY WHERE DVPDEVID = #{id}
+  </delete>
+
+  <delete id="deletePropertyFields" parameterType="Long">
+    DELETE FROM PROPERTYFIELD WHERE PRFDEVID = #{id}
+  </delete>
+
+  <delete id="deleteDeviceCommands" parameterType="Long">
+    DELETE FROM DEVICECOMMAND WHERE DVCDEVID = #{id}
+  </delete>
+
+</mapper>

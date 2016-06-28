@@ -5,10 +5,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>cern.c2mon.c2mon-server</groupId>
-    <artifactId>c2mon-server-pom</artifactId>
-    <version>RELEASE</version>
+    <groupId>cern.c2mon.server</groupId>
+    <artifactId>c2mon-server</artifactId>
+    <version>1.8.0-SNAPSHOT</version>
   </parent>
+
+  <artifactId>c2mon-server-eslog</artifactId>
+  <packaging>jar</packaging>
+
+  <description>C2MON server persistence module for ElasticSearch</description>
 
   <properties>
     <elasticsearch.version>2.1.0</elasticsearch.version>
@@ -17,25 +22,23 @@
     <mockito-all.version>1.10.19</mockito-all.version>
   </properties>
 
-  <groupId>cern.c2mon.c2mon-server</groupId>
-  <artifactId>c2mon-server-eslog</artifactId>
-  <version>1.7.4-SNAPSHOT</version>
-
-  <description>C2MON server persistence module for ElasticSearch</description>
-
-  <scm>
-    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-eslog</developerConnection>
-  </scm>
-
   <dependencies>
-    <!-- ElasticSearch dependency -->
+    <!-- C2MON dependencies -->
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-cache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-shorttermlog</artifactId>
+    </dependency>
+
+    <!-- 3rd-party dependencies -->
     <dependency>
       <groupId>org.elasticsearch</groupId>
       <artifactId>elasticsearch</artifactId>
       <version>${elasticsearch.version}</version>
     </dependency>
-
-    <!-- Spring dependencies -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
@@ -48,33 +51,19 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
     </dependency>
-
-    <!-- C2MON dependencies -->
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-all</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-shorttermlog</artifactId>
-      <version>[1.6.4, 2.0.0)</version>
-    </dependency>
-
-    <!--Other dependencies -->
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
     </dependency>
-
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>${google-guava.version}</version>
     </dependency>
 
-    <!-- Test dependency -->
+    <!-- Test dependencies -->
     <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
+      <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-test</artifactId>
     </dependency>
     <dependency>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <!-- contains beans for requests to DAQ layer; JMS container lifecycle is managed directly by Spring -->
+
+  <bean id="requestDestination" class="org.apache.activemq.command.ActiveMQQueue">
+    <constructor-arg index="0" value="${c2mon.server.daqcommunication.jms.queue.trunk}.request"/>
+  </bean>
+
+  <bean id="requestJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+    <!-- include exception listener here? -->
+    <property name="connectionFactory" ref="daqInConnectionFactory"/>
+    <property name="destination" ref="requestDestination"/>
+    <property name="messageListener" ref="processRequestHandler"/>
+    <property name="concurrentConsumers"    value="${c2mon.server.daqcommunication.jms.request.consumers.initial}"/>
+    <property name="maxConcurrentConsumers" value="${c2mon.server.daqcommunication.jms.request.consumers.max}"/>
+    <property name="sessionTransacted"      value="${c2mon.server.daqcommunication.jms.request.transacted}"/>
+    <property name="autoStartup"            value="false"/>
+    <property name="phase">
+      <bean class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+        <property name="targetClass" value="cern.c2mon.server.common.config.ServerConstants"/>
+        <property name="targetField" value="PHASE_START_LAST"/>
+      </bean>
+    </property>
+    <property name="beanName" value="Process request JMS container"/>
+  </bean>
+
+
+</beans>
