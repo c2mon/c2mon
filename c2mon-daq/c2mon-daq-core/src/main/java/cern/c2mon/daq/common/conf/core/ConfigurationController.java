@@ -773,10 +773,10 @@ public class ConfigurationController {
    */
   public ChangeReport onSubEquipmentUnitRemove(SubEquipmentUnitRemove subEquipmentUnitRemove) {
     LOGGER.debug("onSubEquipmentUnitRemove - entering onSubEquipmentUnitRemove()..");
+    ProcessConfiguration configuration = ProcessConfigurationHolder.getInstance();
 
     ChangeReport changeReport = new ChangeReport(subEquipmentUnitRemove);
     changeReport.setState(CHANGE_STATE.SUCCESS);
-    ProcessConfiguration configuration = ProcessConfigurationHolder.getInstance();
 
     // Check if the parent equipment exists
     EquipmentConfiguration parentEquipmentConfiguration = configuration.getEquipmentConfiguration(subEquipmentUnitRemove.getParentEquipmentId());
@@ -808,10 +808,10 @@ public class ConfigurationController {
 
   public ChangeReport onSubEquipmentUnitAdd(final SubEquipmentUnitAdd subEquipmentUnitAdd) {
     LOGGER.debug("onSubEquipmentUnitAdd - entering onSubEquipmentUnitAdd()..");
+    ProcessConfiguration configuration = ProcessConfigurationHolder.getInstance();
 
     ChangeReport changeReport = new ChangeReport(subEquipmentUnitAdd);
     changeReport.setState(CHANGE_STATE.SUCCESS);
-    ProcessConfiguration configuration = ProcessConfigurationHolder.getInstance();
 
     // Check if the parent equipment exists
     EquipmentConfiguration parentEquipmentConfiguration = configuration.getEquipmentConfiguration(subEquipmentUnitAdd.getParentEquipmentId());

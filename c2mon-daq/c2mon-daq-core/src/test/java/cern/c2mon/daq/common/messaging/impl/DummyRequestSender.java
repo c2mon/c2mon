@@ -23,6 +23,7 @@ import java.io.IOException;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import org.apache.xerces.parsers.DOMParser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.w3c.dom.Document;
 
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
@@ -56,7 +57,12 @@ public class DummyRequestSender implements ProcessRequestSender {
       //processConfigurationResponse.setProcessName(processConfigurationRequest.getProcessName());
       
       // We get the configuration XML file (empty by default)
-      processConfigurationResponse.setConfigurationXML(readFile(processConfigurationFilePath)); 
+      try {
+        String path = new ClassPathResource(processConfigurationFilePath).getFile().getAbsolutePath();
+        processConfigurationResponse.setConfigurationXML(readFile(path));
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
       
       return processConfigurationResponse;
     }

@@ -42,6 +42,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.listener.SessionAwareMessageListener;
@@ -445,8 +446,8 @@ public class ActiveRequestSenderTest {
 //          String processConfiguration = supervisionManager.onProcessConfiguration(processConfigurationRequest);
 
           // We get the configuration XML file (empty by default)
-          URL url = Test.class.getClassLoader().getResource("resources/P_JECTEST01-testhandler.xml");
-          processConfigurationResponse.setConfigurationXML(readFile(url.getPath()));
+          String path = new ClassPathResource("P_JECTEST01-testhandler.xml").getFile().getAbsolutePath();
+          processConfigurationResponse.setConfigurationXML(readFile(path));
 
 
           String processConfiguration = this.xmlConverter.toXml(processConfigurationResponse);
@@ -466,6 +467,8 @@ public class ActiveRequestSenderTest {
         }
       } catch (MessageConversionException e) {
         LOGGER.error("onMessage - Exception caught while converting incoming DAQ request - unable to process request", e);
+      } catch (IOException e) {
+        e.printStackTrace();
       }
     }
 
