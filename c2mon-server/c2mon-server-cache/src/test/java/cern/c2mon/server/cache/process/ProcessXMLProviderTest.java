@@ -73,9 +73,6 @@ public class ProcessXMLProviderTest {
 
   @Test
   public void testGetProcessConfigXML() throws ParserConfigurationException, SAXException, IOException, TransformerException {
-    //validator
-    Schema schema = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema").newSchema(new URL("http://timweb.cern.ch/schemas/c2mon-daq/ProcessConfiguration.xsd"));
-    Validator validator = schema.newValidator();
 
     //read in expected XML from file
     DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -86,7 +83,7 @@ public class ProcessXMLProviderTest {
     DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
     Document expectedDoc = builder.parse(this.getClass().getClassLoader().getResourceAsStream("P_TESTHANDLER03.xml"));
     expectedDoc.normalize();
-    validator.validate(new DOMSource(expectedDoc));
+
     DOMSource source = new DOMSource(expectedDoc);
     StringWriter writer = new StringWriter();
     StreamResult streamResult = new StreamResult(writer);
@@ -105,7 +102,6 @@ public class ProcessXMLProviderTest {
     streamResult = new StreamResult(writer);
     transformer.transform(source, streamResult);
     String receivedString = writer.toString();
-    validator.validate(new DOMSource(receivedDoc));
 
     //compare the 2 XMLs
     assertEquals(expectedString, receivedString);
