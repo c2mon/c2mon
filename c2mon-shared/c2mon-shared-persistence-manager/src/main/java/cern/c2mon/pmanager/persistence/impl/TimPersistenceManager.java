@@ -250,7 +250,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
 
         try {
             dbHandler.storeData(data);
-            LOG.info("log([Collection]) : " + size + " tags have been successfuly logged into the DB");
+            LOG.info("log([Collection]) : " + size + " tags have been successfully logged into the DB");
             alarmSender.dbUnavailable(DOWN, null, dbHandler.getDBInfo());
         } catch (IDBPersistenceException e) {
             connectionDown = true;
