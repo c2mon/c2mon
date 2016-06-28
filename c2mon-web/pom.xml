@@ -22,6 +22,11 @@
     <dependencies>
       <!-- Internal C2MON dependencies -->
       <dependency>
+        <groupId>cern.c2mon.client</groupId>
+        <artifactId>c2mon-client-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
         <groupId>cern.c2mon.shared</groupId>
         <artifactId>c2mon-shared-client</artifactId>
         <version>${project.version}</version>
