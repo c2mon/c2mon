@@ -1,0 +1,4 @@
+image: java:8
+
+build:
+  script: mvn clean package
