@@ -1,41 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <groupId>cern.c2mon.c2mon-client</groupId>
-    <artifactId>c2mon-client-pom</artifactId>
-    <version>1.6.0</version>
+    <groupId>cern.c2mon.client</groupId>
+    <artifactId>c2mon-client</artifactId>
+    <version>1.8.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>cern.c2mon.c2mon-client</groupId>
   <artifactId>c2mon-client-core</artifactId>
-  <version>1.7.7-SNAPSHOT</version>
-  <name>c2mon-client-core</name>
   <packaging>jar</packaging>
+
   <description>The C2MON Client API which handles the communication to the C2MON server.</description>
-  <url>http://timweb.cern.ch</url>
 
   <dependencies>
-    <!-- C2MON dependencies -->
+    <!-- Internal C2MON dependencies -->
     <dependency>
-      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <groupId>cern.c2mon.shared</groupId>
       <artifactId>c2mon-shared-client</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
     </dependency>
     <dependency>
-      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <groupId>cern.c2mon.shared</groupId>
       <artifactId>c2mon-shared-util</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
     </dependency>
     <dependency>
-      <groupId>cern.c2mon.c2mon-client</groupId>
+      <groupId>cern.c2mon.client</groupId>
       <artifactId>c2mon-client-common</artifactId>
-      <version>[1.5.0, 2.0.0)</version>
     </dependency>
     <dependency>
-      <groupId>cern.c2mon.c2mon-client</groupId>
+      <groupId>cern.c2mon.client</groupId>
       <artifactId>c2mon-client-jms</artifactId>
-      <version>[1.1.12, 2.0.0)</version>
     </dependency>
 
     <!-- 3rd party dependencies -->
@@ -43,25 +38,21 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-autoconfigure</artifactId>
-      <version>1.3.0.RELEASE</version>
-    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-configuration-processor</artifactId>
-      <version>1.3.0.RELEASE</version>
       <optional>true</optional>
     </dependency>
-
     <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-autoconfigure</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
     </dependency>
 
-    <!-- test dependencies -->
+    <!-- Test dependencies -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -75,41 +66,4 @@
       <artifactId>spring-test</artifactId>
     </dependency>
   </dependencies>
-
-  <developers />
-  
-  <build>
-    <resources>
-      <resource>
-        <directory>src/resources</directory>
-      </resource>
-    </resources>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.8</version>
-        <!--<configuration>-->
-          <!--<argLine>-->
-            <!--&lt;!&ndash; needed for the client JMS module &ndash;&gt;-->
-            <!--<!-&#45;&#45;Dc2mon.client.jms.url=tcp://jms-tim-test1:61616&ndash;&gt;-->
-            <!--<!-&#45;&#45;Dc2mon.client.jms.user=not-used&ndash;&gt;-->
-            <!--<!-&#45;&#45;Dc2mon.client.jms.password=not-used&ndash;&gt;-->
-            <!--<!-&#45;&#45;Dc2mon.client.jms.supervision.topic=c2mon.JmsProxy.test.supervision.topic&ndash;&gt;-->
-            <!--<!-&#45;&#45;Dc2mon.client.jms.heartbeat.topic=c2mon.JmsProxy.test.heartbeat.topic&ndash;&gt;-->
-            <!--<!-&#45;&#45;Dc2mon.client.jms.alarm.topic=c2mon.JmsProxy.test.alarm.topic&ndash;&gt;-->
-            <!--<!-&#45;&#45;Dc2mon.client.jms.request.queue=c2mon.JmsProxy.test.request.queue&ndash;&gt;-->
-            <!--<!-&#45;&#45;Dc2mon.client.jms.adminmessage.topic=c2mon.JmsProxy.test.adminmessage&ndash;&gt;-->
-            <!--<!-&#45;&#45;Dc2mon.client.request.size=100&ndash;&gt;-->
-            <!--<!-&#45;&#45;Dc2mon.client.request.threads.max=3&ndash;&gt;-->
-          <!--</argLine>-->
-        <!--</configuration>-->
-      </plugin>
-    </plugins>
-  </build>
-
-  <scm>
-    <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-core</developerConnection>
-  </scm>
-
 </project>
