@@ -21,6 +21,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.w3c.dom.Document;
 
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationFactory;
@@ -77,7 +79,7 @@ public class ProcessConfigurationLoaderTest {
   }
 
   @Test
-  public void testCreateProcessConfiguration() throws ConfUnknownTypeException, ConfRejectedTypeException {
+  public void testCreateProcessConfiguration() throws ConfUnknownTypeException, ConfRejectedTypeException, IOException {
     ProcessConfiguration processConfiguration = getProcessConfiguration(PROCESS_CONFIGURATION_XML);
 
     assertEquals(4092L, processConfiguration.getProcessID().longValue());
@@ -129,7 +131,7 @@ public class ProcessConfigurationLoaderTest {
   }
 
   @Test
-  public void testConfigUnknownException() throws ConfRejectedTypeException {
+  public void testConfigUnknownException() throws ConfRejectedTypeException, IOException {
     try {
       getProcessConfiguration(PROCESS_CONFIGURATION_UNKNOWN_TYPE_XML);
       fail("No ConfUnknownException thrown.");
@@ -140,7 +142,7 @@ public class ProcessConfigurationLoaderTest {
   }
 
   @Test
-  public void testConfigRejectedException() throws ConfUnknownTypeException {
+  public void testConfigRejectedException() throws ConfUnknownTypeException, IOException {
     try {
       getProcessConfiguration(PROCESS_CONFIGURATION_REJECTED_XML);
       fail("No ConfRejectedTypeException thrown.");
@@ -149,8 +151,8 @@ public class ProcessConfigurationLoaderTest {
     }
   }
 
-  private ProcessConfiguration getProcessConfiguration(String name) throws ConfUnknownTypeException, ConfRejectedTypeException {
-    String path = ProcessConfigurationLoaderTest.class.getResource(name).getPath();
+  private ProcessConfiguration getProcessConfiguration(String name) throws ConfUnknownTypeException, ConfRejectedTypeException, IOException {
+    String path = new ClassPathResource(name).getFile().getAbsolutePath();
     Document pconfDocument = processConfigurationLoader.fromFiletoDOC(path);
     ProcessConfiguration processConfiguration = processConfigurationLoader.createProcessConfiguration(PROCESS_NAME, PROCESS_PIK, pconfDocument, true);
     return processConfiguration;

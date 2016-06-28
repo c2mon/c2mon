@@ -1494,7 +1494,7 @@ public class EquipmentMessageSenderTest {
       mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       mapper.enable(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY);
 
-      File tempOut = new File("temp.json");
+      File tempOut = new File("/tmp/temp.json");
 
       // Test Integer:
       SourceDataTagValue valueToWrite = sdt3.update(1, "test", new Timestamp(System.currentTimeMillis()));

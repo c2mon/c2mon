@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- *
+ * <p>
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- *
+ * <p>
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -68,8 +68,11 @@ import cern.c2mon.shared.daq.process.XMLConverter;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:resources/daq-test-properties.xml" , "classpath:daq-activemq.xml",
-"classpath:resources/daq-test-activerequestsender.xml"})
+@ContextConfiguration({
+    "classpath:daq-activemq.xml",
+    "classpath:test-config/daq-test-properties.xml",
+    "classpath:test-config/daq-test-activerequestsender.xml"
+})
 public class ActiveRequestSenderTest {
 
   /**
@@ -262,7 +265,8 @@ public class ActiveRequestSenderTest {
    */
   private void sendProcessConnectionRequest() {
     // Expectations.
-    EasyMock.expect(this.environmentMock.getProperty(EasyMock.<String>anyObject())).andReturn(PROCESS_NAME).times(1);;
+    EasyMock.expect(this.environmentMock.getProperty(EasyMock.<String>anyObject())).andReturn(PROCESS_NAME).times(1);
+    ;
 
     // Start mock replay
     EasyMock.replay(this.environmentMock, this.configurationControllerMock);
@@ -345,7 +349,6 @@ public class ActiveRequestSenderTest {
   }
 
 
-
   /**
    * Listener declared
    *  in daq-test-activerequestsender.xml and used for
@@ -381,7 +384,7 @@ public class ActiveRequestSenderTest {
         }
         // ProcessConnectionRequest
         else if (processRequest instanceof ProcessConnectionRequest) {
-          ProcessConnectionRequest processConnectionRequest = (ProcessConnectionRequest)processRequest;
+          ProcessConnectionRequest processConnectionRequest = (ProcessConnectionRequest) processRequest;
           LOGGER.info("onMessage - DAQ Connection request received from DAQ " + processConnectionRequest.getProcessName());
 
           // Replace the server original call
@@ -399,25 +402,21 @@ public class ActiveRequestSenderTest {
               processConnectionResponse.setprocessPIK(PROCESS_PIK);
               stringProcessConnectionResponse = this.xmlConverter.toXml(processConnectionResponse);
               LOGGER.debug("Good reply sent to PIK Request");
-            }
-            else if (ActiveRequestSenderTest.testType == TestType.CONNECT_REJECT) {
+            } else if (ActiveRequestSenderTest.testType == TestType.CONNECT_REJECT) {
               // With the emulated Rejected server reply
               processConnectionResponse.setprocessPIK(PIK_REJECTED);
               stringProcessConnectionResponse = this.xmlConverter.toXml(processConnectionResponse);
               LOGGER.debug("Rejected reply sent to PIK Request");
-            }
-            else if (ActiveRequestSenderTest.testType == TestType.CONNECT_BAD_XML) {
+            } else if (ActiveRequestSenderTest.testType == TestType.CONNECT_BAD_XML) {
               // Modify the XML
               stringProcessConnectionResponse = this.xmlConverter.toXml("Nacho testing XML");
               LOGGER.debug("Bad XML reply sent to PIK Request");
             }
-          }
-          else {
+          } else {
             // Time Out (normally it is 12000 for the timeout)
             try {
               Thread.sleep(TEST_RESULTS_TIMEOUT);
-            }
-            catch (InterruptedException e) {
+            } catch (InterruptedException e) {
               LOGGER.debug("Time Out Thread error: " + e);
             }
             LOGGER.debug("No reply sent to PIK Request");
@@ -450,7 +449,6 @@ public class ActiveRequestSenderTest {
           processConfigurationResponse.setConfigurationXML(readFile(url.getPath()));
 
 
-
           String processConfiguration = this.xmlConverter.toXml(processConfigurationResponse);
 
           LOGGER.debug("onMessage - Sending Configuration Response to DAQ " + processConfigurationResponse.getProcessName());
@@ -471,8 +469,7 @@ public class ActiveRequestSenderTest {
       }
     }
 
-    public String readFile(String filename)
-    {
+    public String readFile(String filename) {
       String content = null;
       File file = new File(filename); //for ex foo.txt
       try {
@@ -500,16 +497,13 @@ public class ActiveRequestSenderTest {
       assertNotNull(processConnectionResponse);
       assertEquals(PROCESS_NAME, processConnectionResponse.getProcessName());
       assertEquals(PROCESS_PIK, processConnectionResponse.getProcessPIK());
-    }
-    else if (ActiveRequestSenderTest.testType == TestType.CONNECT_REJECT) {
+    } else if (ActiveRequestSenderTest.testType == TestType.CONNECT_REJECT) {
       assertNotNull(processConnectionResponse);
       assertEquals(PROCESS_NAME, processConnectionResponse.getProcessName());
       assertEquals(PIK_REJECTED, processConnectionResponse.getProcessPIK());
-    }
-    else if (ActiveRequestSenderTest.testType == TestType.CONNECT_TIME_OUT) {
+    } else if (ActiveRequestSenderTest.testType == TestType.CONNECT_TIME_OUT) {
       assertEquals(null, processConnectionResponse);
-    }
-    else {
+    } else {
       assertNotNull(null, "ERROR - No test for PIK was found.");
     }
   }
