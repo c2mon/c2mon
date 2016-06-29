@@ -132,7 +132,7 @@ fork-and-edit cases); _globally_ on your machine with
 or _locally_ for the `c2mon` repository only by omitting the
 '--global' flag:
 
-    cd spring-framework
+    cd c2mon
     git config user.name "First Last"
     git config user.email user@mail.com
 
