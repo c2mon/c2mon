@@ -17,6 +17,27 @@
 package cern.c2mon.server.configuration.parser.toJSON;
 
 
+import static cern.c2mon.server.configuration.parser.util.ConfigurationAlarmUtil.buildCreateBasicAlarm;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationDataTagUtil.buildCreateBasicDataTag;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationEquipmentUtil.buildCreateBasicEquipment;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationProcessUtil.buildCreateBasicProcess;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationRuleTagUtil.buildCreateBasicRuleTag;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationSubEquipmentUtil.buildCreateBasicSubEquipment;
+import static cern.c2mon.shared.common.datatag.address.JMXHardwareAddress.ReceiveMethod.poll;
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
@@ -28,28 +49,15 @@ import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
 import cern.c2mon.shared.client.configuration.serialisation.HardwareAddressDeserializer;
 import cern.c2mon.shared.client.configuration.serialisation.HardwareAddressSerializer;
-import cern.c2mon.shared.common.datatag.address.ENSHardwareAddress;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import cern.c2mon.shared.common.datatag.address.impl.*;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static cern.c2mon.server.configuration.parser.util.ConfigurationAlarmUtil.buildCreateBasicAlarm;
-import static cern.c2mon.server.configuration.parser.util.ConfigurationDataTagUtil.buildCreateBasicDataTag;
-import static cern.c2mon.server.configuration.parser.util.ConfigurationEquipmentUtil.buildCreateBasicEquipment;
-import static cern.c2mon.server.configuration.parser.util.ConfigurationProcessUtil.buildCreateBasicProcess;
-import static cern.c2mon.server.configuration.parser.util.ConfigurationRuleTagUtil.buildCreateBasicRuleTag;
-import static cern.c2mon.server.configuration.parser.util.ConfigurationSubEquipmentUtil.buildCreateBasicSubEquipment;
-import static cern.c2mon.shared.common.datatag.address.JMXHardwareAddress.ReceiveMethod.poll;
-import static org.junit.Assert.assertEquals;
+import cern.c2mon.shared.common.datatag.address.impl.DBHardwareAddressImpl;
+import cern.c2mon.shared.common.datatag.address.impl.DIPHardwareAddressImpl;
+import cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl;
+import cern.c2mon.shared.common.datatag.address.impl.JMXHardwareAddressImpl;
+import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
+import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
+import cern.c2mon.shared.common.datatag.address.impl.SSHHardwareAddressImpl;
+import cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl;
 
 /**
  * @author Franz Ritter
@@ -81,16 +89,6 @@ public class ParseToJSON {
   public void parseTagWithDIPHardwareAddress(){
 
     HardwareAddress address = new DIPHardwareAddressImpl("itemName", "fieldName", 1);
-    HardwareAddress readAddress = serializeDeserializeAddress(address);
-
-    assertEquals(address, readAddress);
-
-  }
-
-  @Test
-  public void parseTagWithENSHardwareAddress(){
-
-    HardwareAddress address = new ENSHardwareAddressImpl("pAddress", ENSHardwareAddress.TYPE_ANALOG);
     HardwareAddress readAddress = serializeDeserializeAddress(address);
 
     assertEquals(address, readAddress);
