@@ -16,7 +16,6 @@
   <modules>
     <module>c2mon-daq-core</module>
     <module>c2mon-daq-test</module>
-    <module>c2mon-daq-testhandler</module>
   </modules>
 
   <dependencies>
