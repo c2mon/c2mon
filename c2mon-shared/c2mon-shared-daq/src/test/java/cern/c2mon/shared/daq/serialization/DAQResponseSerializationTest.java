@@ -37,7 +37,7 @@ public class DAQResponseSerializationTest {
 
   @Test
   public void
-  serializeSourceDataTagValueResponse(){
+  serializeSourceDataTagValueResponse() {
     SourceDataTagValueResponse response = createDataTAgResponse();
     String jsonResponse = MessageConverter.responseToJson(response);
     SourceDataTagValueResponse responseFromJson = MessageConverter.responseFromJson(jsonResponse, SourceDataTagValueResponse.class);
@@ -47,7 +47,7 @@ public class DAQResponseSerializationTest {
 
   @Test
   public void
-  serializeSourceCommandTagReport(){
+  serializeSourceCommandTagReport() {
     SourceCommandTagReport response = createSourceCommandTagReport();
     String jsonResponse = MessageConverter.responseToJson(response);
     SourceCommandTagReport responseFromJson = MessageConverter.responseFromJson(jsonResponse, SourceCommandTagReport.class);
@@ -57,7 +57,7 @@ public class DAQResponseSerializationTest {
 
   @Test
   public void
-  serializeConfigurationChangeEventReport(){
+  serializeConfigurationChangeEventReport() {
     ConfigurationChangeEventReport response = createConfigurationChangeEventReport();
     String jsonResponse = MessageConverter.responseToJson(response);
     ConfigurationChangeEventReport responseFromJson = MessageConverter.responseFromJson(jsonResponse, ConfigurationChangeEventReport.class);
@@ -65,7 +65,7 @@ public class DAQResponseSerializationTest {
     assertEquals(response, responseFromJson);
   }
 
-  private SourceDataTagValueResponse createDataTAgResponse(){
+  private SourceDataTagValueResponse createDataTAgResponse() {
     SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(
         10L,
         "DataTag name",
@@ -83,7 +83,7 @@ public class DAQResponseSerializationTest {
     return new SourceDataTagValueResponse(update);
   }
 
-  private SourceCommandTagReport createSourceCommandTagReport(){
+  private SourceCommandTagReport createSourceCommandTagReport() {
 
     return new SourceCommandTagReport(
         1L,
@@ -95,7 +95,7 @@ public class DAQResponseSerializationTest {
   }
 
 
-  private ConfigurationChangeEventReport createConfigurationChangeEventReport(){
+  private ConfigurationChangeEventReport createConfigurationChangeEventReport() {
     ChangeReport report = new ChangeReport();
     report.setChangeId(1l);
     report.setErrorMessage("errorMessage");

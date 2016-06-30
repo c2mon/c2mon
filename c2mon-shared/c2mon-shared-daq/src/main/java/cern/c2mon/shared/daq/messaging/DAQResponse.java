@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 /**
  * @author Franz Ritter
  */
-@JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
     @JsonSubTypes.Type(value = ConfigurationChangeEventReport.class, name = "changeResponse"),
     @JsonSubTypes.Type(value = SourceCommandTagReport.class, name = "commandResponse"),

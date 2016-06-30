@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -231,8 +231,7 @@ public class DataTagValueUpdateTest {
       factory.setIgnoringComments(true);
       factory.setValidating(false);
       this.builder = factory.newDocumentBuilder();
-    }
-    catch (ParserConfigurationException e) {
+    } catch (ParserConfigurationException e) {
       e.printStackTrace();
     }
 
@@ -258,11 +257,11 @@ public class DataTagValueUpdateTest {
     }
 
     // Create SourceDataTagValue values to fill the DataTagValueUpdate
-    for (int j=0; j< 5; j++) {
+    for (int j = 0; j < 5; j++) {
       SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(
           new Long(j), ("tag.name.of.tag." + j), false, new Boolean(false),
-          new SourceDataQuality((short)j, "everything rather OK" + j), System.currentTimeMillis(), 2, false, null,1000
-          );
+          new SourceDataQuality((short) j, "everything rather OK" + j), System.currentTimeMillis(), 2, false, null, 1000
+      );
       sourceDataTagValue.setDaqTimestamp(new Timestamp(System.currentTimeMillis()));
       this.dataTagValueUpdateTO.addValue(sourceDataTagValue);
     }
@@ -283,12 +282,12 @@ public class DataTagValueUpdateTest {
       InputSource inputSource2 = new InputSource(in);
       inputSource2.setEncoding("US-ASCII");
       inputSource2.setByteStream(in);
-      doc= this.builder.parse(inputSource2);
-      inputSource2= null;
+      doc = this.builder.parse(inputSource2);
+      inputSource2 = null;
       in.close();
-      in=null;
+      in = null;
+    } catch (Exception e) {
     }
-    catch (Exception e) {}
 
     // Read DataTagValueUpdate  back from XML
     this.dataTagValueUpdateFROM = DataTagValueUpdate.fromXML(doc.getDocumentElement());

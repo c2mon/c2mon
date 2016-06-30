@@ -28,11 +28,11 @@ public class ServerErrorResponse implements DAQResponse {
 
   String errorMessage;
 
-  public ServerErrorResponse(String errorMessage){
+  public ServerErrorResponse(String errorMessage) {
     this.errorMessage = errorMessage;
   }
 
-  public ServerErrorResponse(){
+  public ServerErrorResponse() {
   }
 
 }

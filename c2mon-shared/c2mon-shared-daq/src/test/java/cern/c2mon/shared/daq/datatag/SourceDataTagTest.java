@@ -30,7 +30,6 @@ import java.sql.Timestamp;
  * Unit test of SourceDataTag class.
  *
  * @author Mark Brightwell
- *
  */
 public class SourceDataTagTest {
 

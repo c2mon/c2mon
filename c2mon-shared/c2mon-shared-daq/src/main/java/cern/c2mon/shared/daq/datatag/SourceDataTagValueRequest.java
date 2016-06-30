@@ -26,6 +26,7 @@ import javax.jms.Topic;
 
 
 //imported as in into TIM2
+
 /**
  * This class represents a request to a DAQ process to send the
  * last know values of a number of DataTags.
@@ -44,7 +45,6 @@ import javax.jms.Topic;
  * sent to the server on the topic contained in the request.
  *
  * @author stowisek
- *
  */
 @Data
 public class SourceDataTagValueRequest implements ServerRequest {
@@ -75,8 +75,9 @@ public class SourceDataTagValueRequest implements ServerRequest {
 
   /**
    * Constructor
+   *
    * @param pType request type
-   * @param pId identifier of the equipment/process/datatag for which the values are requested
+   * @param pId   identifier of the equipment/process/datatag for which the values are requested
    */
   public SourceDataTagValueRequest(final DataTagRequestType pType, final Long pId) {
     this.id = pId;

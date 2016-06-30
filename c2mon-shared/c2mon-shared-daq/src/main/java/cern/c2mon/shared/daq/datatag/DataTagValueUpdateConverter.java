@@ -42,7 +42,6 @@ import java.io.IOException;
  * <p>Is used for conversion in the DAQ and server code.
  *
  * @author Mark Brightwell
- *
  */
 public class DataTagValueUpdateConverter implements MessageConverter {
 
@@ -86,7 +85,7 @@ public class DataTagValueUpdateConverter implements MessageConverter {
    * <p>Never returns null.
    *
    * @param message the incoming JMS message
-   * @throws JMSException if the content of the message cannot be extracted due to some JMS problem
+   * @throws JMSException               if the content of the message cannot be extracted due to some JMS problem
    * @throws MessageConversionException if error occurs during parsing of message content (including non-text message reception)
    */
   //TODO make the fromMessage backwards compatible in order to also receive the old xml format!
@@ -104,7 +103,7 @@ public class DataTagValueUpdateConverter implements MessageConverter {
         LOGGER.trace("Update received from DAQ:\n" + incomingJSON);
       }
 
-      if(isJsonString(incomingJSON)){
+      if (isJsonString(incomingJSON)) {
 
         return readJsonString(incomingJSON);
 
@@ -127,7 +126,7 @@ public class DataTagValueUpdateConverter implements MessageConverter {
    * (to be used in DAQ code once TIM2 operational).
    *
    * @param dataTagValueUpdate the update object to convert
-   * @param session the JMS session in which the message must be created
+   * @param session            the JMS session in which the message must be created
    * @return the resulting JMS message
    * @throws JMSException if an error occurs in creating the JMS message
    */
@@ -160,6 +159,7 @@ public class DataTagValueUpdateConverter implements MessageConverter {
 
   /**
    * Determine if the string is a valid json String
+   *
    * @param json String value which needs to be checked if its a json String.
    * @return True if the string is in the json format
    */

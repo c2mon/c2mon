@@ -67,45 +67,44 @@ public class SourceDataTagValueResponse implements DAQResponse {
 
 
   public SourceDataTagValueResponse(final String pExecutionErrorMessage) {
-    this.status= STATUS_EXECUTION_FAILED;
+    this.status = STATUS_EXECUTION_FAILED;
     this.errorMessage = pExecutionErrorMessage;
   }
 
   @JsonIgnore
   @Deprecated
-  public void addDataTagValueUpdate(final DataTagValueUpdate pDataTagValueUpdate)
-  {
+  public void addDataTagValueUpdate(final DataTagValueUpdate pDataTagValueUpdate) {
 
   }
 
   @JsonIgnore
-  public boolean isStatusOK()
-  {
+  public boolean isStatusOK() {
     if (this.status.equals(STATUS_OK))
-     return true;
+      return true;
     else
-     return false;
+      return false;
   }
 
 
   public String getErrorMessage() {
     return this.errorMessage;
   }
+
   @JsonIgnore
   @Deprecated
   public DataTagValueUpdate getDataTagValueUpdate(int index) {
     DataTagValueUpdate dtvUpdate = null;
-    try
-    {
+    try {
       dtvUpdate = this.dataTagValueUpdates.get(index);
+    } catch (Exception ex) {
     }
-    catch (Exception ex) {}
 
     return dtvUpdate;
   }
 
   /**
    * returns a collection of DataTagValueUpdate objects
+   *
    * @return
    */
   @JsonIgnore
@@ -117,6 +116,7 @@ public class SourceDataTagValueResponse implements DAQResponse {
 
   /**
    * returns the number of DataTagValueUpdate objects iside the wrapper
+   *
    * @return
    */
   @JsonIgnore
@@ -128,16 +128,16 @@ public class SourceDataTagValueResponse implements DAQResponse {
 
   /**
    * returns the overal number of DataTagValue objects in the wrapper
+   *
    * @return
    */
   @JsonIgnore
   @Deprecated
-  public int getDataTagValueUpdateTagsCount()
-  {
+  public int getDataTagValueUpdateTagsCount() {
     int counter = 0;
 
-    for (int i=0; i<this.dataTagValueUpdates.size();i++)
-      counter+=((DataTagValueUpdate)dataTagValueUpdates.get(i)).getValues().size();
+    for (int i = 0; i < this.dataTagValueUpdates.size(); i++)
+      counter += ((DataTagValueUpdate) dataTagValueUpdates.get(i)).getValues().size();
 
     return counter;
   }
@@ -145,15 +145,15 @@ public class SourceDataTagValueResponse implements DAQResponse {
 
   /**
    * returns a collection of DataTagValue objects
+   *
    * @return
    */
   @JsonIgnore
-  public Collection getAllDataTagValueObjects()
-  {
+  public Collection getAllDataTagValueObjects() {
     Collection result = new ArrayList();
 
-    for (int i=0; i<this.dataTagValueUpdates.size();i++) {
-      result.addAll(((DataTagValueUpdate)dataTagValueUpdates.get(i)).getValues());
+    for (int i = 0; i < this.dataTagValueUpdates.size(); i++) {
+      result.addAll(((DataTagValueUpdate) dataTagValueUpdates.get(i)).getValues());
     }
 
     return result;

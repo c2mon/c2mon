@@ -272,7 +272,7 @@ public class DataTagValueUpdateConverterTest {
     ArbitraryObject testObject1 = ArbitraryObject.builder().field1("TestFiled").field2(1.4f).build();
     ArbitraryObject testObject2 = ArbitraryObject.builder().field1("TestFiled").field2(1.4f).fields(new Integer[]{1, 2, 3}).build();
     ArbitraryObject testObject3 = ArbitraryObject.builder().field1("TestFiled").field2(1.4f).objectField(testObject1).build();
-    ArbitraryObject testObject4 = ArbitraryObject.builder().field1("TestFiled").field2(1.4f).addEntry("testValue1",1.0).addEntry("testValue2", 2.0).build();
+    ArbitraryObject testObject4 = ArbitraryObject.builder().field1("TestFiled").field2(1.4f).addEntry("testValue1", 1.0).addEntry("testValue2", 2.0).build();
 
     String serializedValue;
     Object deserializedObject;
@@ -361,9 +361,9 @@ public class DataTagValueUpdateConverterTest {
 
 
     } catch (JsonProcessingException e) {
-      if(e.getMessage().contains("Direct self-reference leading to cycle")){
+      if (e.getMessage().contains("Direct self-reference leading to cycle")) {
         assertTrue(true);
-      } else{
+      } else {
         assertTrue(false);
       }
 

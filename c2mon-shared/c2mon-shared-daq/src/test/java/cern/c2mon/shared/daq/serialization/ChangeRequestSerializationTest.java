@@ -116,7 +116,7 @@ public class ChangeRequestSerializationTest {
     SourceDataTag sdt = createSourceDataTag();
     sdt.setDataType(Long.class.getName());
 
-    String sdtString  = MessageConverter.mapper.writeValueAsString(sdt);
+    String sdtString = MessageConverter.mapper.writeValueAsString(sdt);
     SourceDataTag sdtFromJseon = MessageConverter.mapper.readValue(sdtString, SourceDataTag.class);
 
 
