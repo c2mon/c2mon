@@ -27,13 +27,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
-import cern.c2mon.shared.daq.exception.ProcessRequestException;
-import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 
 /**
@@ -56,6 +51,8 @@ public class SourceDataTagValueResponse implements DAQResponse {
   public static final String STATUS_OK = "OK";
   public static final String STATUS_EXECUTION_FAILED = "FAILED";
 
+  public SourceDataTagValueResponse() {
+  }
 
   public SourceDataTagValueResponse(final DataTagValueUpdate pDataTagVAlueUpdate) {
     this.dataTagValueUpdates.add(pDataTagVAlueUpdate);
@@ -94,7 +91,6 @@ public class SourceDataTagValueResponse implements DAQResponse {
   public String getErrorMessage() {
     return this.errorMessage;
   }
-
   @JsonIgnore
   @Deprecated
   public DataTagValueUpdate getDataTagValueUpdate(int index) {

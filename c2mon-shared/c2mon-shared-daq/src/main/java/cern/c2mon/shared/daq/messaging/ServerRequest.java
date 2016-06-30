@@ -18,6 +18,7 @@
 package cern.c2mon.shared.daq.messaging;
 
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
+import cern.c2mon.shared.daq.config.ChangeRequest;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -29,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  */
 @JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="type")
 @JsonSubTypes({
-//    @JsonSubTypes.Type(value = ChangeRequest.class, name = "changeRequest"),
+    @JsonSubTypes.Type(value = ChangeRequest.class, name = "changeRequest"),
     @JsonSubTypes.Type(value = SourceCommandTagValue.class, name = "commandRequest"),
     @JsonSubTypes.Type(value = SourceDataTagValueRequest.class, name = "dataTagRequest")})
 public interface ServerRequest {
