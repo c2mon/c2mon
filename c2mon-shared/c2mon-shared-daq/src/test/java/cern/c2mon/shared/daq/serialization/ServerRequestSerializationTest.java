@@ -19,8 +19,10 @@ package cern.c2mon.shared.daq.serialization;
 
 import cern.c2mon.shared.common.datatag.*;
 import cern.c2mon.shared.daq.command.SourceCommandTagReport;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
 import org.junit.Test;
 
@@ -37,77 +39,30 @@ public class ServerRequestSerializationTest {
 
   @Test
   public void
-  serializeSourceDataTagValueResponse(){
-    SourceDataTagValueResponse response = createDataTAgResponse();
-    String jsonResponse = MessageConverter.responseToJson(response);
-    SourceDataTagValueResponse responseFromJson = MessageConverter.responseFromJson(jsonResponse, SourceDataTagValueResponse.class);
+  serializeSourceCommandTagValue(){
+    SourceCommandTagValue request = createSourceCommandTagValue();
+    String jsonResponse = MessageConverter.requestToJson(request);
+    SourceCommandTagValue responseFromJson = (SourceCommandTagValue) MessageConverter.requestFromJson(jsonResponse);
 
-    assertEquals(response, responseFromJson);
+    assertEquals(request, responseFromJson);
   }
 
   @Test
   public void
-  serializeSourceCommandTagReport(){
-    SourceCommandTagReport response = createSourceCommandTagReport();
-    String jsonResponse = MessageConverter.responseToJson(response);
-    SourceCommandTagReport responseFromJson = MessageConverter.responseFromJson(jsonResponse, SourceCommandTagReport.class);
+  serializeSourceDataTagValueRequest(){
+    SourceDataTagValueRequest request = createSourceDataTagValueRequest();
+    String jsonResponse = MessageConverter.requestToJson(request);
+    SourceDataTagValueRequest responseFromJson = (SourceDataTagValueRequest) MessageConverter.requestFromJson(jsonResponse);
 
-    assertEquals(response, responseFromJson);
-  }
-
-  @Test
-  public void
-  serializeConfigurationChangeEventReport(){
-    ConfigurationChangeEventReport response = createConfigurationChangeEventReport();
-    String jsonResponse = MessageConverter.responseToJson(response);
-    ConfigurationChangeEventReport responseFromJson = MessageConverter.responseFromJson(jsonResponse, ConfigurationChangeEventReport.class);
-
-    assertEquals(response, responseFromJson);
-  }
-
-  private SourceDataTagValueResponse createDataTAgResponse(){
-    SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(
-        10L,
-        "DataTag name",
-        false,
-        null,
-        new SourceDataQuality(Short.valueOf("4")), //invalid
-        new Timestamp(System.currentTimeMillis()),
-        DataTagConstants.PRIORITY_LOW,
-        false,
-        "test description",
-        DataTagAddress.TTL_FOREVER);
-    ArrayList<SourceDataTagValue> values = new ArrayList<>(Collections.singletonList(sourceDataTagValue));
-
-    DataTagValueUpdate update = new DataTagValueUpdate(1L, 2L, values);
-    return new SourceDataTagValueResponse(update);
-  }
-
-  private SourceCommandTagReport createSourceCommandTagReport(){
-
-    return new SourceCommandTagReport(
-        1L,
-        "name",
-        SourceCommandTagReport.Status.STATUS_OK,
-        "cmd execute description",
-        "returnValue",
-        System.currentTimeMillis());
+    assertEquals(request, responseFromJson);
   }
 
 
-  private ConfigurationChangeEventReport createConfigurationChangeEventReport(){
-    ChangeReport report = new ChangeReport();
-    report.setChangeId(1l);
-    report.setErrorMessage("errorMessage");
-    report.setInfoMessage("infoMessage");
-    report.setState(ChangeReport.CHANGE_STATE.FAIL);
-    report.setWarnMessage("WarnMessage");
-
-    ConfigurationChangeEventReport result = new ConfigurationChangeEventReport();
-    result.appendChangeReport(report);
-
-    return result;
+  private SourceCommandTagValue createSourceCommandTagValue(){
+    return new SourceCommandTagValue(1L, "name", 2L, (short)0, 1234, Integer.class.getName());
   }
 
-
+  private SourceDataTagValueRequest createSourceDataTagValueRequest(){
+    return new SourceDataTagValueRequest(SourceDataTagValueRequest.DataTagRequestType.DATATAG, 1L);
+  }
 }
