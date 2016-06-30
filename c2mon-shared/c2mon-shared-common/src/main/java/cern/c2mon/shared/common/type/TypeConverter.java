@@ -16,13 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.shared.common.type;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.awt.Color;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This helper class provides methods to cast a given raw type object into
@@ -88,6 +88,7 @@ public final class TypeConverter  {
    * @throws ClassCastException In case of a cast exception
    * @deprecated Please use method {@link #castToType(Object, Class)} instead
    */
+  @Deprecated
   public static final Object cast(final Object pValue, final Class< ? > pTargetType) throws ClassCastException {
     if (pValue == null || pTargetType == null) {
       return null;
@@ -509,7 +510,7 @@ public final class TypeConverter  {
       // Checks if the color string is a field in the Color class
       try {
           Field field = Color.class.getField(str);
-          return (Color)field.get(null);
+          return (Color) field.get(null);
       } catch (Exception e) {
       }
 
@@ -568,7 +569,7 @@ public final class TypeConverter  {
   //===========================================================================
 
   /**
-   * checks if the given data type is a Number.
+   * Checks if the given data type is a Number.
    * Because of the old representation of data type without the full class name java.lang
    * the check have to be done separate for all subclasses of {@link Number}.
    * @param dataType the String name of the data type
@@ -576,7 +577,7 @@ public final class TypeConverter  {
    */
   public static boolean isNumber(String dataType) {
 
-    Class type = getType(dataType);
+    Class<?> type = getType(dataType);
 
     return type != null && Number.class.isAssignableFrom(type);
 
@@ -591,11 +592,15 @@ public final class TypeConverter  {
 
   }
 
-  public static Class<?> getType(String typeName){
+  /**
+   * @param typeName A simple class name within the java.lang.* package or the full classpath
+   * @return The class for the given name or <code>null</code>, if the class is unknown to the server
+   */
+  public static Class<?> getType(String typeName) {
 
-    String fullPath = !typeName.contains(".") ? "java.lang."+typeName : typeName;
+    String fullPath = !typeName.contains(".") ? "java.lang." + typeName : typeName;
 
-    try{
+    try {
 
       return Class.forName(fullPath);
 
