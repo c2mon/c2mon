@@ -1,35 +1,35 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.shared.common.command;
 
+import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
+import lombok.Data;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import cern.c2mon.shared.common.ConfigurationException;
-import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
-
 /**
  * @author Jan Stowisek
  * @version $Revision: 1.8 $ ($Date: 2005/02/01 17:04:58 $ - $State: Exp $)
  */
-
+@Data
 public class SourceCommandTag implements Cloneable, ISourceCommandTag {
 
     /**
@@ -49,7 +49,7 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
      * actually send the command value to the piece of equipment concerned.
      */
     @Element(name = "HardwareAddress")
-    private HardwareAddress hwAddress;
+    private HardwareAddress hardwareAddress;
 
     /**
      * Timeout in milliseconds. Depending on the way the equipment responds to
@@ -103,108 +103,13 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
         this.name = name;
         this.sourceTimeout = sourceTimeout;
         this.sourceRetries = sourceRetries;
-        this.hwAddress = hwAddress;
+        this.hardwareAddress = hwAddress;
     }
 
     /**
-     * No-arg constructor (required for XML deserialisation).
+     * No-arg constructor (required for JSON deserialisation).
      */
     public SourceCommandTag() {
-    }
-
-    /**
-     * Get the unique numeric identifier of the command tag.
-     *
-     * @return the unique numeric identifier of the command tag.
-     */
-    @Override
-    public Long getId() {
-        return this.id;
-    }
-
-    /**
-     * Set the unique numeric identifier of the command tag.
-     *
-     * @param pId
-     *            the new unique numeric identifier for the command tag.
-     */
-    public void setId(final Long pId) {
-        this.id = pId;
-    }
-
-    /**
-     * Get the unique name of the command tag.
-     *
-     * @return the unique name of the command tag.
-     */
-    @Override
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * Set the unique name of the command tag.
-     *
-     * @param pName
-     *            the new name for the command tag.
-     */
-    public void setName(final String pName) {
-        this.name = pName;
-    }
-
-    /**
-     * Gets the source timeout of this tag.
-     *
-     * @return The source timeout.
-     */
-    @Override
-    public int getSourceTimeout() {
-        return this.sourceTimeout;
-    }
-
-    /**
-     * Sets the source timeout of this tag.
-     *
-     * @param newSourceTimeout The new source timeout.
-     */
-    public void setSourceTimeout(final int newSourceTimeout) {
-        this.sourceTimeout = newSourceTimeout;
-    }
-
-    /**
-     * Gets the maximum number of retries sending this command.
-     *
-     * @return The maximum number of command execution retries.
-     */
-    public int getSourceRetries() {
-        return this.sourceRetries;
-    }
-
-    /**
-     * Sets the maximum number of command execution retries.
-     *
-     * @param newSourceRetries The new maximum number of retries.
-     */
-    public void setSourceRetries(final int newSourceRetries) {
-        this.sourceRetries = newSourceRetries;
-    }
-
-    /**
-     * Returns the hardware address of this tag.
-     *
-     * @return The hardware address of this tag.
-     */
-    @Override
-    public HardwareAddress getHardwareAddress() {
-        return this.hwAddress;
-    }
-
-    /**
-     * Sets the HardwareAddress of this command tag.
-     * @param pHwAddress The hardware address of this command tag.
-     */
-    public void setHardwareAddress(final HardwareAddress pHwAddress) {
-        this.hwAddress = pHwAddress;
     }
 
     /**
@@ -275,7 +180,7 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
                 }
 
                 if (fieldName.equals("HardwareAddress")) {
-                    result.hwAddress = HardwareAddressFactory.getInstance().fromConfigXML((org.w3c.dom.Element) fieldNode);
+                    result.hardwareAddress = HardwareAddressFactory.getInstance().fromConfigXML((org.w3c.dom.Element) fieldNode);
                 }
             }
         }
@@ -306,12 +211,12 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
      * @throws ConfigurationException Thrown if the command tag is not valid.
      */
     public void validate() throws ConfigurationException {
-        if (hwAddress == null) {
+        if (hardwareAddress == null) {
             throw new ConfigurationException(
                     ConfigurationException.INVALID_PARAMETER_VALUE,
                     "Hardware address null. Command Tag not valid."
                     );
         }
-        hwAddress.validate();
+        hardwareAddress.validate();
     }
 }

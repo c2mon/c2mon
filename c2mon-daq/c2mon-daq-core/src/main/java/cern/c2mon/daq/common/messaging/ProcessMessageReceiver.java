@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import cern.c2mon.daq.common.DriverKernel;
 import cern.c2mon.daq.common.messaging.impl.RequestController;
@@ -43,7 +42,6 @@ import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
-import cern.c2mon.shared.daq.config.ConfigurationObjectFactory;
 import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
 import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;

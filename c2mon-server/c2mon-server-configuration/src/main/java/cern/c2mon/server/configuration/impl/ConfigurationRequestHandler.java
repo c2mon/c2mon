@@ -27,7 +27,7 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import cern.c2mon.shared.client.configuration.ConfigConstants;
-import cern.c2mon.shared.client.configuration.serialisation.HardwareAddressDeserializer;
+import cern.c2mon.shared.common.serialisation.HardwareAddressDeserializer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

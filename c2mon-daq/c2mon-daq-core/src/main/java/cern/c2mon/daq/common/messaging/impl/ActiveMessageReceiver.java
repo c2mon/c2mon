@@ -43,7 +43,6 @@ import cern.c2mon.daq.common.messaging.ProcessMessageReceiver;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.command.SourceCommandTagReport;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
-import cern.c2mon.shared.daq.config.ConfigurationDOMFactory;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
 import cern.c2mon.shared.util.parser.ParserException;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;

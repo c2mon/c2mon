@@ -15,12 +15,13 @@
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package cern.c2mon.shared.client.configuration.serialisation;
+package cern.c2mon.shared.common.serialisation;
 
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import com.fasterxml.jackson.core.JsonGenerator;
+import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -32,46 +33,55 @@ import java.util.HashMap;
 
 /**
  *
- * Defines to Serialize a HardwareAddress for the Jackson parser
+ * Defines to Deserialize a HardwareAddress for the Jackson parser
  *
  * @author Franz Ritter
  */
-public class HardwareAddressSerializer extends com.fasterxml.jackson.databind.JsonSerializer<HardwareAddress> {
+public class HardwareAddressDeserializer extends com.fasterxml.jackson.databind.JsonDeserializer<HardwareAddress> {
 
   @Override
-  public void serialize(HardwareAddress hardwareAddress, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-    jsonGenerator.writeStartObject();
-    jsonGenerator.writeStringField("xmlData", hardwareAddress.toConfigXML());
-    jsonGenerator.writeEndObject();
+  public HardwareAddress deserialize(com.fasterxml.jackson.core.JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+    JsonNode node = jsonParser.getCodec().readTree(jsonParser);
+    String xmlData = node.get("xmlData").asText();
+
+    return HardwareAddressFactory.getInstance().fromConfigXML(xmlData);
   }
 
-  // TODO: use for not using HardwareAddress toXML
-  private <T extends HardwareAddress> HashMap<String, Object> dataToHashMap(T address, Class<T> typeName) {
+  // TODO: use for not using HardwareAddress fromXML
+  private <T extends HardwareAddress> T hashMapToData(HashMap<String, Object> data, String typeName) {
+
     HashMap<String, Object> result = new HashMap<>();
 
     try {
-      T obj = typeName.cast(address);
+      Class<T> type = (Class<T>) Class.forName(typeName);
 
-      BeanInfo info = Introspector.getBeanInfo(typeName);
+      T obj = type.getConstructor().newInstance();
+
+      BeanInfo info = Introspector.getBeanInfo(type);
       PropertyDescriptor[] props = info.getPropertyDescriptors();
 
       for (PropertyDescriptor pd : props) {
         if (!pd.getName().equals("class")
             && pd.getReadMethod().invoke(obj) != null
             && pd.getWriteMethod().invoke(obj) != null) {
-          Object value = pd.getReadMethod().invoke(obj);
-          result.put(pd.getName(), value);
+
+          Object fieldValue = data.get(pd.getName());
+
+          pd.getWriteMethod().invoke(obj, fieldValue);
         }
       }
 
-    } catch (IntrospectionException e) {
-      e.printStackTrace();
-    } catch (InvocationTargetException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
-    }
-    return result;
-  }
+      return obj;
 
+    } catch (IntrospectionException
+        | InvocationTargetException
+        | IllegalAccessException
+        | ClassNotFoundException
+        | InstantiationException
+        | NoSuchMethodException e) {
+      e.printStackTrace();
+
+      return null;
+    }
+  }
 }

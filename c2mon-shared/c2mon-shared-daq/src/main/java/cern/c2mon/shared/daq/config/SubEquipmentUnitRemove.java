@@ -1,26 +1,29 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.shared.daq.config;
+
+import lombok.Data;
 
 /**
  * A SubEquipment unit remove event.
  *
  * @author Justin Lewis Salmon
  */
+@Data
 public class SubEquipmentUnitRemove extends Change {
 
   /**
@@ -54,37 +57,11 @@ public class SubEquipmentUnitRemove extends Change {
    *
    * @param changeId the change id of the new change.
    * @param subEquipmentId the id longof the equipment to add the data tag to.
-   * @param parentEquipmentId the parent Equipment unique identifier
+   * @param parentId the parent Equipment unique identifier
    */
   public SubEquipmentUnitRemove(final Long changeId, final Long subEquipmentId, final Long parentId) {
     setChangeId(changeId);
     setSubEquipmentId(subEquipmentId);
     setParentEquipmentId(parentId);
-  }
-
-  /**
-   * Set the SubEquipment ID.
-   *
-   * @param subEquipmentId the ID to set
-   */
-  public void setSubEquipmentId(Long subEquipmentId) {
-    this.subEquipmentId = subEquipmentId;
-  }
-
-  /**
-   * Retrieve the SubEquipment ID.
-   *
-   * @return the ID of the SubEquipment
-   */
-  public Long getSubEquipmentId() {
-    return subEquipmentId;
-  }
-
-  public Long getParentEquipmentId() {
-    return parentEquipmentId;
-  }
-
-  public void setParentEquipmentId(Long parentEquipmentId) {
-    this.parentEquipmentId = parentEquipmentId;
   }
 }

@@ -19,6 +19,9 @@ package cern.c2mon.shared.daq.command;
 
 import java.io.Serializable;
 
+import cern.c2mon.shared.daq.messaging.ServerRequest;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -36,8 +39,9 @@ import org.w3c.dom.NodeList;
  * @author Jan Stowisek
  * @version $Revision: 1.13 $ ($Date: 2006/04/21 13:06:30 $ - $State: Exp $)
  */
-
-public class SourceCommandTagValue implements Serializable, Cloneable {
+@Data
+@Slf4j
+public class SourceCommandTagValue implements ServerRequest, Serializable, Cloneable {
   /**
    * Unique numeric identifier of the command tag.
    */
@@ -70,11 +74,6 @@ public class SourceCommandTagValue implements Serializable, Cloneable {
   protected short mode;
 
   /**
-   * Log4j Logger for this class.
-   */
-  protected static final Logger log = LoggerFactory.getLogger(SourceCommandTagValue.class);
-
-  /**
    * Log4j Logger for logging DataTag values.
    */
   protected static final Logger cmdlog = LoggerFactory.getLogger("SourceCommandTagLogger");
@@ -104,154 +103,6 @@ public class SourceCommandTagValue implements Serializable, Cloneable {
     this.value = pValue;
     this.dataType = pDataType;
   }
-
-  /**
-   * Get the unique numeric identifier of the command tag.
-   * @return the unique numeric identifier of the command tag
-   */
-  public Long getId() {
-    return this.id;
-  }
-
-  /**
-   * Get the unique name of the command tag.
-   * @return the unique name of the command tag
-   */
-  public String getName() {
-    return this.name;
-  }
-
-  /**
-   * Get the id of the equipment unit to which the command is attached.
-   */
-  public Long getEquipmentId() {
-    return this.equipmentId;
-  }
-
-  /**
-   * Get the command's current mode.
-   * @return the mode of the command tag
-   * @see cern.c2mon.shared.common.TagMode
-   */
-  public short getMode() {
-    return this.mode;
-  }
-
-
-  /**
-   * Get the command's value.
-   * @return the value of the command (i.e. the value to be sent to the equipment)
-   */
-  public Object getValue() {
-    return this.value;
-  }
-
-  /**
-   * Get the data type of the command's value.
-   * @return the data type of the command's value. Null if no value is set.
-   */
-  public String getDataType() {
-      return dataType;
-//    if (value != null) {
-//      return value.getClass().getSimpleName();
-//    } else {
-//      return null;
-//    }
-  }
-
-  public String toXML() {
-    // <CommandTag id="..." name="..." equipment-id="...">
-    StringBuffer str = new StringBuffer("<CommandTag id=\"");
-
-    str.append(this.id);
-    str.append("\" name=\"");
-    str.append(this.name);
-    str.append("\" equipment-id=\"");
-    str.append(this.equipmentId);
-    str.append("\">\n");
-
-    // <value dataType="..."> ... </value>
-    if (value != null) {
-      str.append("  <value type=\"");
-      str.append(this.dataType);
-      str.append("\">");
-      str.append(this.value);
-      str.append("</value>\n");
-    }
-
-    // <mode> ... </mode>
-    str.append("  <mode>");
-    str.append(this.mode);
-    str.append("</mode>\n");
-
-    str.append("</CommandTag>\n");
-    return str.toString();
-  }
-
-  /**
-   * Create a SourceCommandTagValue object from a DOM element.
-   * @param domElement DOM element
-   * SourceDataTagValue object
-   * @return a SourceDataTagValue object.
-   */
-  public synchronized static SourceCommandTagValue fromXML(Element domElement) {
-    SourceCommandTagValue cmd = new SourceCommandTagValue();
-    // extract attributes
-    try {
-      cmd.id = Long.valueOf(domElement.getAttribute("id"));
-      cmd.name = domElement.getAttribute("name");
-      cmd.equipmentId = Long.valueOf(domElement.getAttribute("equipment-id"));
-    } catch (NumberFormatException nfe) {
-      log.error(nfe.toString());
-      return null;
-    } catch (Exception ex) {
-      log.error(ex.toString());
-      return null;
-    }
-
-    NodeList fields = domElement.getChildNodes();
-    String fieldName;
-    String fieldValueString;
-    Node fieldNode;
-    int fieldsCount = fields.getLength();
-
-    for (int i = 0; i < fieldsCount; i++) {
-      fieldNode = fields.item(i);
-      if (fieldNode.getNodeType() == 1) {
-        fieldName = fieldNode.getNodeName();
-        fieldValueString = fieldNode.getFirstChild().getNodeValue();
-
-        if (fieldName.equals("value")) {
-          cmd.dataType = fieldNode.getAttributes().item(0).getNodeValue();
-
-          if (cmd.dataType.equals("Integer")) {
-            cmd.value = Integer.valueOf(fieldValueString);
-          } else if (cmd.dataType.equals("Float")) {
-            cmd.value = Float.valueOf(fieldValueString);
-          } else if (cmd.dataType.equals("Double")) {
-            cmd.value = Double.valueOf(fieldValueString);
-          } else if (cmd.dataType.equals("Long")) {
-            cmd.value = Long.valueOf(fieldValueString);
-          } else if (cmd.dataType.equals("Boolean")) {
-            cmd.value = Boolean.valueOf(fieldValueString);
-          } else if (cmd.dataType.equals("String")) {
-            cmd.value = fieldValueString;
-          }
-        }
-
-        else if (fieldName.equals("mode")) {
-          try {
-            cmd.mode = Short.parseShort(fieldValueString);
-          } catch (NumberFormatException nfe) {
-            log.error("Cannot extract valid mode value from <mode> element.");
-            return null;
-          }
-        }
-      }// if
-    }// for
-    return cmd;
-  }
-
 
   public void log() {
     cmdlog.info(this.toString());

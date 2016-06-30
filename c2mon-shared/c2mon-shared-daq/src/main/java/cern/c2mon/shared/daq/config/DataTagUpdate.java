@@ -1,20 +1,23 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.shared.daq.config;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
 
 /**
  * A datatag update POJO.
@@ -25,13 +28,14 @@ package cern.c2mon.shared.daq.config;
  * @author alang
  *
  */
-@SuppressWarnings("unchecked")
+@Data
 public class DataTagUpdate extends Change implements ITagChange {
 
     /**
      * Records if this update contains a field to update or not.
      */
-    private transient boolean isEmpty = true;
+    @JsonIgnore
+    private transient boolean empty = true;
     /**
      * The data tag id.
      */
@@ -59,11 +63,11 @@ public class DataTagUpdate extends Change implements ITagChange {
     /**
      * The new min-value of the datatag or null if unchanged.
      */
-    private Comparable minValue;
+    private Number minValue;
     /**
      * The new max-value of the data tag or null if unchanged.
      */
-    private Comparable maxValue;
+    private Number maxValue;
 
     /**
      * Creates a new data tag update change.
@@ -107,62 +111,11 @@ public class DataTagUpdate extends Change implements ITagChange {
     }
 
     /**
-     * @return the dataTagId
-     */
-    public Long getDataTagId() {
-        return dataTagId;
-    }
-    /**
-     * @param dataTagId the dataTagId to set
-     */
-    public void setDataTagId(final Long dataTagId) {
-        this.dataTagId = dataTagId;
-    }
-    /**
-     * @return the dataTagAddressUpdate or null if unchanged.
-     */
-    public DataTagAddressUpdate getDataTagAddressUpdate() {
-        return dataTagAddressUpdate;
-    }
-    /**
      * @param dataTagAddressUpdate the dataTagAddressUpdate to set
      */
-    public void setDataTagAddressUpdate(
-            final DataTagAddressUpdate dataTagAddressUpdate) {
+    public void setDataTagAddressUpdate(final DataTagAddressUpdate dataTagAddressUpdate) {
         setEmpty(false);
         this.dataTagAddressUpdate = dataTagAddressUpdate;
-    }
-    /**
-     * @return the name or null if unchanged.
-     */
-    public String getName() {
-        return name;
-    }
-    /**
-     * @param name the name to set
-     */
-    public void setName(final String name) {
-        this.name = name;
-        //setEmpty(false);
-    }
-    /**
-     * @return the mode or null if unchanged.
-     */
-    public Short getMode() {
-        return mode;
-    }
-    /**
-     * @param mode the mode to set
-     */
-    public void setMode(final Short mode) {
-        this.mode = mode;
-        //setEmpty(false);
-    }
-    /**
-     * @return the dataType or null if unchanged.
-     */
-    public String getDataType() {
-        return dataType;
     }
     /**
      * @param dataType the dataType to set
@@ -172,69 +125,17 @@ public class DataTagUpdate extends Change implements ITagChange {
         setEmpty(false);
     }
     /**
-     * @return the minValue or null if unchanged.
-     */
-    public Comparable getMinValue() {
-        return minValue;
-    }
-    /**
      * @param minValue the minValue to set
      */
-    public void setMinValue(final Comparable minValue) {
+    public void setMinValue(final Number minValue) {
         this.minValue = minValue;
         setEmpty(false);
     }
     /**
-     * @return the maxValue or null if unchanged.
-     */
-    public Comparable getMaxValue() {
-        return maxValue;
-    }
-    /**
      * @param maxValue the maxValue to set
      */
-    public void setMaxValue(final Comparable maxValue) {
+    public void setMaxValue(final Number maxValue) {
         this.maxValue = maxValue;
         setEmpty(false);
     }
-
-    /**
-     * Sets the equipment id of the data tag.
-     * @param equipmentId The equipment id of the data tag.
-     */
-    @Override
-    public void setEquipmentId(final long equipmentId) {
-        this.equipmentId = equipmentId;
-    }
-
-    /**
-     * Returns the equipment id of the data tag.
-     * @return The equipment id of the data tag.
-     */
-    @Override
-    public long getEquipmentId() {
-        return equipmentId;
-    }
-
-    /**
-     * Sets the isEmpty field
-     * @param isEmpty empty flag to set
-     */
-    private void setEmpty(final boolean isEmpty) {
-      this.isEmpty = isEmpty;
-    }
-
-    /**
-     * Returns true if no fields were set in this update object,
-     * in which case the server does not need to send it down to
-     * the DAQ.
-     *
-     * <p>For use on server side.
-     *
-     * @return true if no fields are set
-     */
-    public boolean isEmpty() {
-      return isEmpty;
-    }
-
 }

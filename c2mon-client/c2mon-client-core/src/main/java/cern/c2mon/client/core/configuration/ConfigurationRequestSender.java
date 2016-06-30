@@ -20,7 +20,7 @@ import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
-import cern.c2mon.shared.client.configuration.serialisation.HardwareAddressSerializer;
+import cern.c2mon.shared.common.serialisation.HardwareAddressSerializer;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.util.jms.JmsSender;
 import com.fasterxml.jackson.databind.DeserializationFeature;

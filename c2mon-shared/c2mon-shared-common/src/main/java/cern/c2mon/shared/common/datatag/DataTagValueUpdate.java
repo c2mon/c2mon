@@ -16,35 +16,25 @@
  *****************************************************************************/
 package cern.c2mon.shared.common.datatag;
 
-import java.io.ByteArrayInputStream;
-import java.sql.Timestamp;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.apache.xerces.jaxp.DocumentBuilderFactoryImpl;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
 
 /**
+ * TODO: change description
  * The DataTagValueUpdate class is used for encoding/decoding DataTag value
  * update XML messages sent to the server application by TIM drivers.
  */
-
+@Data
+@Slf4j
 public final class DataTagValueUpdate {
-  // ----------------------------------------------------------------------------
-  // CONSTANT DEFINITIONS
-  // ----------------------------------------------------------------------------
   public static final String XSD_URL = "http://ts-project-tim.web.cern.ch/ts-project-tim/xml/DataTagValueUpdate.xsd";
 
   public static final String XML_ROOT_ELEMENT= "DataTagValueUpdate";
@@ -52,33 +42,17 @@ public final class DataTagValueUpdate {
   public static final String XML_ATTRIBUTE_PROCESS_ID= "process-id";
 
   public static final String XML_ATTRIBUTE_PROCESS_PIK= "process-pik";
-  // ----------------------------------------------------------------------------
-  // PRIVATE STATIC MEMBERS
-  // ----------------------------------------------------------------------------
-
-
-  /**
-   * Log4j Logger for the DataTagValueUpdate class.
-   */
-  protected static final Logger log = LoggerFactory.getLogger(DataTagValueUpdate.class);
-
-  // ----------------------------------------------------------------------------
-  // MEMBERS
-  // ----------------------------------------------------------------------------
 
   protected Long processId = null;
   protected Long processPIK = null;
   protected ArrayList<SourceDataTagValue> tagValues = null;
 
-  // ----------------------------------------------------------------------------
-  // CONSTRUCTORS
-  // ----------------------------------------------------------------------------
   protected DataTagValueUpdate() {
   }
 
   public DataTagValueUpdate(final Long pProcessId) {
     this.processId = pProcessId;
-    this.tagValues = new ArrayList<SourceDataTagValue>(10);
+    this.tagValues = new ArrayList<>(10);
   }
 
   public DataTagValueUpdate(final Long pProcessId, final ArrayList<SourceDataTagValue> pTagValues) {
@@ -89,29 +63,13 @@ public final class DataTagValueUpdate {
   public DataTagValueUpdate(final Long pProcessId, final Long pProcessPIK) {
     this.processId = pProcessId;
     this.processPIK = pProcessPIK;
-    this.tagValues = new ArrayList<SourceDataTagValue>(10);
+    this.tagValues = new ArrayList<>(10);
   }
 
   public DataTagValueUpdate(final Long pProcessId, final Long pProcessPIK, final ArrayList<SourceDataTagValue> pTagValues) {
     this.processId = pProcessId;
     this.processPIK = pProcessPIK;
     this.tagValues = pTagValues;
-  }
-
-  public void setProcessId(final Long pProcessId) {
-    this.processId = pProcessId;
-  }
-
-  public Long getProcessId() {
-    return this.processId;
-  }
-
-  public void setProcessPIK(final Long pProcessPIK) {
-    this.processPIK = pProcessPIK;
-  }
-
-  public Long getProcessPIK() {
-    return this.processPIK;
   }
 
   public void addValue(final SourceDataTagValue pValue) {
@@ -126,10 +84,7 @@ public final class DataTagValueUpdate {
     return this.tagValues;
   }
 
-  // ----------------------------------------------------------------------------
-  // METHODS FOR XML-IFICATION and DE-XML-IFICATION
-  // ----------------------------------------------------------------------------
-
+  @Deprecated
   public String toXML() {
 
     StringBuffer str = new StringBuffer();
@@ -169,6 +124,7 @@ public final class DataTagValueUpdate {
   }
 
   //Jira: [TIMS-811] Adding PIK to deserialization process
+  @Deprecated
   public static DataTagValueUpdate fromXML(Element domElement) {
     DataTagValueUpdate result = new DataTagValueUpdate();
 
@@ -222,7 +178,7 @@ public final class DataTagValueUpdate {
     if (this.tagValues != null) {
       int size = tagValues.size();
       for (int i = 0; i != size; i++) {
-        ((SourceDataTagValue) tagValues.get(i)).log();
+        tagValues.get(i).log();
       }
     }
   }

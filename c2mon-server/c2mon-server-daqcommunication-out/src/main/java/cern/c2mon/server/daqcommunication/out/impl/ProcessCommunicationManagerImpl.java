@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -49,8 +49,6 @@ import cern.c2mon.shared.daq.command.SourceCommandTagReport;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
-import cern.c2mon.shared.daq.config.ConfigurationDOMFactory;
-import cern.c2mon.shared.daq.config.ConfigurationObjectFactory;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
 import cern.c2mon.shared.daq.exception.ProcessRequestException;
@@ -66,51 +64,51 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessCommunicationManagerImpl.class); 
-  
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessCommunicationManagerImpl.class);
+
   /**
    * Time spent waiting for a DAQ to send a response when reconfiguration.
-   */  
+   */
   @Value("${c2mon.server.daqcommunication.jms.configurationTimeout}")
   private int configurationTimeout = 180000;
-  
+
   /**
    * Lifecycle flag.
    */
   private volatile boolean running = false;
-  
+
   /**
    * Reference to the equipment cache.
    */
   private EquipmentCache equipmentCache;
-  
+
   /**
    * Reference to process cache.
    */
   private ProcessCache processCache;
-  
+
   /**
    * Reference to process facade.
    */
   private ProcessFacade processFacade;
-  
+
   /**
    * Reference to the bean managing the JMS
    * sending.
    */
-  private JmsProcessOut jmsProcessOut; 
-  
+  private JmsProcessOut jmsProcessOut;
+
   /**
    * Simple XML parser.
    */
   private XmlParser xmlParser;
-  
+
   /**
-   * Pooled JMS connection factory. 
+   * Pooled JMS connection factory.
    */
   private ConnectionFactory processOutConnectionFactory;
-  
-  
+
+
   /**
    * Autowired constructor.
    * @param equipmentCache
@@ -123,28 +121,28 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
   @Autowired
   public ProcessCommunicationManagerImpl(EquipmentCache equipmentCache,
                                             ProcessCache processCache, ProcessFacade processFacade,
-                                            JmsProcessOut jmsProcessOut, 
+                                            JmsProcessOut jmsProcessOut,
                                             @Qualifier("processCommunicationXMLParser") XmlParser parser,
                                             @Qualifier("processOutConnectionFactory") ConnectionFactory connectionFactory) {
     super();
     this.equipmentCache = equipmentCache;
     this.processCache = processCache;
-    this.processFacade = processFacade;    
-    this.jmsProcessOut = jmsProcessOut;    
+    this.processFacade = processFacade;
+    this.jmsProcessOut = jmsProcessOut;
     this.xmlParser = parser;
     this.processOutConnectionFactory = connectionFactory;
   }
-  
+
   @Override
   public SourceDataTagValueResponse requestDataTagValues(final SourceDataTagValueRequest pRequest) throws ProcessRequestException {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Requesting datatag values for " + pRequest.getType());
     }
-    
+
     SourceDataTagValueResponse result = null;
-    
+
     if (pRequest == null) {
-      String errorMessage = "requestDataTagValues() : called with null parameter.";      
+      String errorMessage = "requestDataTagValues() : called with null parameter.";
       throw new ProcessRequestException(errorMessage);
     } else {
       try {
@@ -161,29 +159,29 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
           if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("requestDataTagValues() for EQUIPMENT " + equipmentId);
           }
-        
+
           try {
             Equipment equipment = equipmentCache.get(equipmentId);
             processId = equipment.getProcessId();
-          } catch (CacheElementNotFoundException cacheEx) {            
-            String errorMessage = "Unable to treat data tag request.";             
+          } catch (CacheElementNotFoundException cacheEx) {
+            String errorMessage = "Unable to treat data tag request.";
             throw new ProcessRequestException(errorMessage, cacheEx);
           }
-                              
+
         } else if (pRequest.getType().equals(SourceDataTagValueRequest.TYPE_DATATAG)) {
           if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("requestDataTagValues() for DATATAG " + pRequest.getId());
           }
-          String errorMessage = "requestDataTagValues() : request for individual tags currently not supported.";          
+          String errorMessage = "requestDataTagValues() : request for individual tags currently not supported.";
           throw new ProcessRequestException(errorMessage);
         } else {
           String errorMessage = "SourceDataTagValueRequest type not recognized - unable to process it.";
           LOGGER.error(errorMessage);
           throw new ProcessRequestException(errorMessage);
         }
-        
+
         //if managed to set the processId
-        
+
         try {
           Process process = processCache.get(processId);
           if (processFacade.isRunning(process)) {
@@ -191,39 +189,39 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
               LOGGER.debug("requestDataTagValues() : associated process is running.");
             }
             //treat request
-            String reply = jmsProcessOut.sendTextMessage(pRequest.toXML(), process.getJmsDaqCommandQueue(), 10000);            
+            String reply = jmsProcessOut.sendTextMessage(pRequest.toXML(), process.getJmsDaqCommandQueue(), 10000);
             if (reply != null) {
               if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("requestDataTagValues() : reply received: " + reply);
               }
               Document doc = xmlParser.parse(reply);  //can throw ParserException
               if (doc != null) {
-                result = SourceDataTagValueResponse.fromXML(doc.getDocumentElement());  //can throw ProcessRequestException        
-              } 
+                result = SourceDataTagValueResponse.fromXML(doc.getDocumentElement());  //can throw ProcessRequestException
+              }
             } else {
-              String errorMessage = "No response received for a SourceDataTagValueRequest (request timeout?)";              
+              String errorMessage = "No response received for a SourceDataTagValueRequest (request timeout?)";
               throw new ProcessRequestException(errorMessage);
             }
-          } else {            
+          } else {
             String errorMessage = "requestDataTagValues() : Process " + processId + " is not running.";
-            throw new ProcessRequestException(errorMessage);            
+            throw new ProcessRequestException(errorMessage);
           }
         } catch (CacheElementNotFoundException cacheEx) {
           String errorMessage = "Unable to process data tag request.";
           throw new ProcessRequestException(errorMessage, cacheEx);
         }
-                             
+
       } catch (Exception e) {
         String errorMessage = "requestDataTagValues() : Exception caught";
         LOGGER.error(errorMessage, e);
-        throw new RuntimeException(errorMessage, e);       
-      }    
-    }        
+        throw new RuntimeException(errorMessage, e);
+      }
+    }
     return result;
   }
 
   @Override
-  public <T> CommandReport executeCommand(final CommandTag<T> commandTag, final T value) {      
+  public <T> CommandReport executeCommand(final CommandTag<T> commandTag, final T value) {
     // Before attempting anything else, make sure none of the parameters is null
     if (commandTag == null) {
       LOGGER.warn("executeCommand() : called with null CommandTagHandler parameter.");
@@ -236,7 +234,7 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("executeCommand() : called for command id " + commandTag.getId());
     }
-    
+
     CommandReport result = null;
 
     try {
@@ -246,10 +244,10 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
           LOGGER.debug("executeCommand() : associated process is running.");
         }
         // treat command
-        SourceCommandTagValue val = 
-          new SourceCommandTagValue(commandTag.getId(), commandTag.getName(), commandTag.getEquipmentId(), commandTag.getMode(), 
+        SourceCommandTagValue val =
+          new SourceCommandTagValue(commandTag.getId(), commandTag.getName(), commandTag.getEquipmentId(), commandTag.getMode(),
                                     value, commandTag.getDataType());
-        String reply = jmsProcessOut.sendTextMessage(val.toXML(), process.getJmsDaqCommandQueue(), commandTag.getExecTimeout());         
+        String reply = jmsProcessOut.sendTextMessage(val.toXML(), process.getJmsDaqCommandQueue(), commandTag.getExecTimeout());
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("executeCommand() : reply received: " + reply);
         }
@@ -264,11 +262,11 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
             } else if (report.getStatus() == SourceCommandTagReport.STATUS_TEST_OK) {
               return new CommandReportImpl(commandTag.getId(), CommandExecutionStatus.STATUS_NOT_EXECUTED, report.getFullDescription());
             } else {
-              return new CommandReportImpl(commandTag.getId(), CommandExecutionStatus.STATUS_EXECUTION_FAILED, 
+              return new CommandReportImpl(commandTag.getId(), CommandExecutionStatus.STATUS_EXECUTION_FAILED,
                                        report.getFullDescription());
             }
           } else {
-            return new CommandReportImpl(commandTag.getId(), CommandExecutionStatus.STATUS_SERVER_ERROR, 
+            return new CommandReportImpl(commandTag.getId(), CommandExecutionStatus.STATUS_SERVER_ERROR,
                                      "Reply received from DAQ could not be unmarshalled");
           }
         } else {
@@ -276,26 +274,26 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
         }
       } else {
         LOGGER.warn("executeCommand() : Process is not running.");
-        result = 
+        result =
             new CommandReportImpl(commandTag.getId(), CommandExecutionStatus.STATUS_PROCESS_DOWN, "The associated DAQ process is not running.");
       }
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.error("executeCommand() : Process (id=" + commandTag.getProcessId() + ") related to command tag (id=" 
+      LOGGER.error("executeCommand() : Process (id=" + commandTag.getProcessId() + ") related to command tag (id="
           + commandTag.getId() + ") not found in cache.", cacheEx);
-      result = 
+      result =
           new CommandReportImpl(commandTag.getId(), CommandExecutionStatus.STATUS_SERVER_ERROR, "Process related to command not found in cache.");
     } catch (Exception e) {
       LOGGER.error("executeCommand() : Exception", e);
     }
     return result;
   }
-  
+
   @Override
-  public ConfigurationChangeEventReport sendConfiguration(final Long processId, final List<Change> changeList) 
-          throws ParserConfigurationException, IllegalAccessException, InstantiationException, 
+  public ConfigurationChangeEventReport sendConfiguration(final Long processId, final List<Change> changeList)
+          throws ParserConfigurationException, IllegalAccessException, InstantiationException,
                   TransformerException, NoSuchFieldException, NoSimpleValueParseException {
     ConfigurationDOMFactory domFactory = new ConfigurationDOMFactory();
-  
+
     String xmlConfigString = domFactory.createConfigurationXMLString(changeList);
     String reply = jmsProcessOut.sendTextMessage(xmlConfigString, processCache.get(processId).getJmsDaqCommandQueue(), configurationTimeout);
     if (reply != null) {
@@ -307,11 +305,11 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
       LOGGER.warn("Null reconfiguration reply received from DAQ - probably due to timeout, current set at " + configurationTimeout);
       //TODO create new default failure report for all changes in changeList... and return (changes only applied on server then)
       throw new RuntimeException("Null reconfiguration reply received from DAQ - probably due to timeout, current set at " + configurationTimeout);
-    }    
+    }
   }
 
   @Override
-  public boolean isAutoStartup() {    
+  public boolean isAutoStartup() {
     return false;
   }
 
@@ -327,7 +325,7 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
   }
 
   @Override
-  public void start() {    
+  public void start() {
     running = true;
   }
 
@@ -335,20 +333,20 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
   public void stop() {
     if (running) {
       running = false;
-      try {     
+      try {
         LOGGER.debug("Shutting down ProcessCommunicationManager bean and associated JMS connections.");
         if (processOutConnectionFactory instanceof SingleConnectionFactory) {
           ((SingleConnectionFactory) processOutConnectionFactory).destroy();
-        }      
+        }
       } catch (Exception e) {
         LOGGER.error("Exception caught when trying to shutdown the server->DAQ JMS connections:", e);
-        e.printStackTrace(System.err);          
+        e.printStackTrace(System.err);
       }
-    }    
+    }
   }
 
   @Override
-  public int getPhase() {    
+  public int getPhase() {
     return ServerConstants.PHASE_INTERMEDIATE;
   }
 

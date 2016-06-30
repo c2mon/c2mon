@@ -20,7 +20,9 @@ import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue;
 import cern.c2mon.shared.common.type.TypeConverter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 import org.apache.commons.lang.ArrayUtils;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
@@ -42,11 +44,8 @@ import java.util.Map;
  * @author Jan Stowisek
  * @version $Revision: 1.22 $ ($Date: 2009/05/12 13:05:39 $ - $State: Exp $)
  */
+@Data
 public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
-
-    // ----------------------------------------------------------------------------
-    // PRIVATE STATIC MEMBERS
-    // ----------------------------------------------------------------------------
     /**
      * Version number of the class used during serialization/deserialization. This is to ensure that minor changes to
      * the class do not prevent us from reading back DataTagAddress objects we have serialized earlier. If fields are
@@ -84,7 +83,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      */
     @Element(name = "min-value", required = false, type = String.class)
     @SuppressWarnings("unchecked")
-    private Comparable minValue;
+    private Number minValue;
 
     /**
      * The max value as comparable without specified type to avoid splitting up the source data tag in different
@@ -92,7 +91,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      */
     @Element(name = "max-value", required = false, type = String.class)
     @SuppressWarnings("unchecked")
-    private Comparable maxValue;
+    private Number maxValue;
 
     /**
      * Address information, including parameters for deadband filtering, transformations etc.
@@ -102,10 +101,6 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /** Current value of the SourceDataTag */
     private SourceDataTagValue currentValue;
-
-    // ----------------------------------------------------------------------------
-    // CONSTRUCTORS
-    // ----------------------------------------------------------------------------
 
     /**
      * Creates a new SourceDataTag
@@ -145,76 +140,11 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
     }
 
     /**
-     * Gets the id of the data tag.
-     *
-     * @return The id of the data tag.
-     */
-    @Override
-    public Long getId() {
-        return this.id;
-    }
-
-    /**
-     * Gets the name of the data tag.
-     *
-     * @return The name of the data tag.
-     */
-    @Override
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * Sets the name of this data tag.
-     *
-     * @param newName The new name of this data tag.
-     */
-    public void setName(final String newName) {
-        this.name = newName;
-    }
-
-    /**
-     * Gets the data tag data type.
-     *
-     * @return The data tag data type.
-     */
-    @Override
-    public String getDataType() {
-        return this.dataType;
-    }
-
-    /**
-     * Sets the data tag type of this data tag and updates also the numeric type.
-     *
-     * @param newDataType The new data tag type.
-     */
-    public void setDataType(final String newDataType) {
-        this.dataType = newDataType;
-    }
-
-    /**
-     * Returns true if this is a control tag.
-     *
-     * @return True if it is a control tag else false.
-     */
-    public boolean isControlTag() {
-        return this.control;
-    }
-
-    /**
-     * Returns the mode of this data tag. See {@link DataTagConstants} for details.
-     *
-     * @return The mode of this data tag.
-     */
-    public short getMode() {
-        return this.mode;
-    }
-
-    /**
      * Checks if the data tag is in operation mode.
      *
      * @return True if it is in operation modee else false.
      */
+    @JsonIgnore
     public boolean isInOperation() {
         return (this.mode == DataTagConstants.MODE_OPERATIONAL);
     }
@@ -224,6 +154,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      *
      * @return True if the data tag is in test mode else false.
      */
+    @JsonIgnore
     public boolean isInTest() {
         return (this.mode == DataTagConstants.MODE_TEST);
     }
@@ -233,71 +164,9 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      *
      * @return True if the data tag is in maintenance mode else false.
      */
+    @JsonIgnore
     public boolean isInMaintenance() {
         return (this.mode == DataTagConstants.MODE_MAINTENANCE);
-    }
-
-    /**
-     * Sets if this tag is a control tag.
-     *
-     * @param isControlTag If true the tag will be set as control tag else it will be no control tag.
-     */
-    public void setControlTag(final boolean isControlTag) {
-        this.control = isControlTag;
-    }
-
-    /**
-     * Gets the data tag address.
-     *
-     * @return The data tag address.
-     */
-    public DataTagAddress getAddress() {
-        return this.address;
-    }
-
-    /**
-     * Sets the data tag address.
-     *
-     * @param newAddress The new data tag address.
-     */
-    public void setAddress(final DataTagAddress newAddress) {
-        this.address = newAddress;
-    }
-
-    /**
-     * Returns the min value of the data tag value as comparable object.
-     *
-     * @return The min value.
-     */
-    public Comparable getMinValue() {
-        return this.minValue;
-    }
-
-    /**
-     * Sets the min value of this tag.
-     *
-     * @param pMinValue The new min value of this tag.
-     */
-    public void setMinValue(final Comparable pMinValue) {
-        this.minValue = pMinValue;
-    }
-
-    /**
-     * Returns the max value of the data tag value as comparable object.
-     *
-     * @return The max value.
-     */
-    public Comparable getMaxValue() {
-        return this.maxValue;
-    }
-
-    /**
-     * Sets the max value of this tag.
-     *
-     * @param pMaxValue The new max value.
-     */
-    public void setMaxValue(final Comparable pMaxValue) {
-        this.maxValue = pMaxValue;
     }
 
     /**
@@ -339,10 +208,11 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      */
     @Override
     public synchronized SourceDataTagValue getCurrentValue() {
-        if (currentValue != null)
-            return this.currentValue.clone();
-        else
-            return null;
+      if (currentValue != null) {
+        return this.currentValue.clone();
+      } else {
+        return null;
+      }
     }
 
     /**
@@ -371,7 +241,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      *
      * @param value The new value. (Should match the right data type)
      * @param valueDescription The description of the new value.
-     * @param timestamp The src timestamp of the value (the DAQ timestamp is set to the system time at this point)
+     * @param srcTimestamp The src timestamp of the value (the DAQ timestamp is set to the system time at this point)
      * @return A SourceDataTag value object to send to the server.
      */
     public synchronized SourceDataTagValue update(final Object value, final String valueDescription, final Timestamp srcTimestamp) {
@@ -384,7 +254,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      * @param value The new value. (Should match the right data type)
      * @param sourceDataQuality The quality of the new new SDValue
      * @param valueDescription The description of the new value.
-     * @param timestamp The src timestamp of the value (the DAQ timestamp is set to the system time at this point)
+     * @param srcTimestamp The src timestamp of the value (the DAQ timestamp is set to the system time at this point)
      * @param daqTimestamp
      *
      * @return A SourceDataTag value object to send to the server.
@@ -405,14 +275,6 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
       }
 
       return this.currentValue.clone();
-    }
-
-
-    /**
-     * @param mode the mode to set
-     */
-    public void setMode(final short mode) {
-        this.mode = mode;
     }
 
     /**
@@ -585,7 +447,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
                     result.address = DataTagAddress.fromConfigXML((org.w3c.dom.Element) fieldNode);
                 } else if (fieldName.equals("min-value") || fieldName.equals("max-value")) {
                     String dataType = fieldNode.getAttributes().item(0).getNodeValue();
-                    Comparable value = (Comparable) TypeConverter.cast(fieldValueString, dataType);
+                    Number value = (Number) TypeConverter.cast(fieldValueString, dataType);
                     if (fieldName.equals("min-value")) {
                         result.minValue = value;
                     } else {
@@ -610,7 +472,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
         str.append(id);
         str.append("\" name=\"");
         str.append(name);
-        if (isControlTag()) {
+        if (isControl()) {
             str.append("\" control=\"true\">\n");
         } else {
             str.append("\" control=\"false\">\n");

@@ -1,27 +1,28 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.shared.daq.datatag;
 
 
-import javax.jms.Topic;
-import org.w3c.dom.Element;
-
+import cern.c2mon.shared.daq.messaging.ServerRequest;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.jms.Topic;
 
 
 //imported as in into TIM2
@@ -45,8 +46,8 @@ import org.slf4j.LoggerFactory;
  * @author stowisek
  *
  */
-
-public class SourceDataTagValueRequest implements java.io.Serializable {
+@Data
+public class SourceDataTagValueRequest implements ServerRequest {
 
   private static final Logger LOG = LoggerFactory.getLogger(SourceDataTagValueRequest.class);
 
@@ -58,7 +59,7 @@ public class SourceDataTagValueRequest implements java.io.Serializable {
   /**
    * Request type: TYPE_PROCESS, TYPE_EQUIPMENT or TYPE_DATATAG
    */
-  private String type;
+  private DataTagRequestType type;
 
   /**
    * Topic on which the DAQ is expected to publish the response to this
@@ -66,125 +67,22 @@ public class SourceDataTagValueRequest implements java.io.Serializable {
    */
   protected Topic replyTopic;
 
-  // TODO use enum instead
-  public static final String TYPE_PROCESS = "PROCESS";
-
-  public static final String TYPE_EQUIPMENT = "EQUIPMENT";
-
-  public static final String TYPE_DATATAG = "DATATAG";
+  public enum DataTagRequestType {
+    PROCESS,
+    EQUIPMENT,
+    DATATAG;
+  }
 
   /**
    * Constructor
    * @param pType request type
    * @param pId identifier of the equipment/process/datatag for which the values are requested
    */
-  public SourceDataTagValueRequest(final String pType, final Long pId) {
+  public SourceDataTagValueRequest(final DataTagRequestType pType, final Long pId) {
     this.id = pId;
     this.type = pType;
   }
 
-  /**
-   * Get the request type
-   * @return the type of request
-   */
-  public String getType() {
-    return this.type;
+  public SourceDataTagValueRequest() {
   }
-
-  /**
-   * Get the identifier of the Equipment/Process/DataTag for which the
-   * values are requested, depending on the request type.
-   * @return
-   */
-  public Long getId() {
-    return this.id;
-  }
-
-  public void setType(final String pType) {
-    this.type = pType;
-  }
-
-  public void setId(final Long pId) {
-    this.id = pId;
-  }
-
-  public void setReplyTopic(final Topic pReplyTopic) {
-    this.replyTopic = pReplyTopic;
-  }
-
-  /**
-   * Get the name of the JMS topic on which the DAQ is expected to
-   * send its reply.
-   */
-  public Topic getReplyTopic() {
-    return this.replyTopic;
-  }
-
-
-  public String toXML() {
-    StringBuffer str = new StringBuffer(150);
-    str.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-    str.append("<DataTagValueUpdateRequest ");
-    if (this.type != null) {
-      str.append("type=\"");
-      str.append(this.type);
-      str.append("\" ");
-    }
-    if (this.id != null) {
-      str.append("id=\"");
-      str.append(this.id);
-      str.append("\" ");
-    }
-    str.append("/>");
-    return str.toString();
-  }
-
-  public synchronized static SourceDataTagValueRequest fromXML(Element domElement) {
-    Long id = null;
-    String type = null;
-    String idStr = null;
-    // extract attributes
-    try {
-      idStr = domElement.getAttribute("id");
-      if (idStr != null && (!idStr.equals(""))) {
-        id = Long.valueOf(idStr);
-      }
-      type = domElement.getAttribute("type");
-    } catch (NumberFormatException nfe) {
-      LOG.error(nfe.toString());
-      return null;
-    } catch (Exception ex) {
-      LOG.error(ex.toString());
-      return null;
-    }
-
-    return new SourceDataTagValueRequest(type, id);
-  }
-
-  /**
-   * Return an XML representation of the SourceDataTagValueRequest
-   */
-  public String toString() {
-    return toXML();
-  }
-
-  /**
-   * Checks whether two request objects are equal by comparing their
-   * members. Please note that a SourceDataTagValueRequest object created
-   * using fromXML() may NOT be equals to the object creating the XML as
-   * the replyTopic is also taken into account in the comparison.
-   */
-  public boolean equals(final Object pObj) {
-	  boolean result = pObj != null && pObj instanceof SourceDataTagValueRequest;
-	  if (result) {
-		SourceDataTagValueRequest copy = (SourceDataTagValueRequest) pObj;
-		result =
-			((this.type == null) ? (copy.type == null) : (this.type.equals(copy.type)))
-			&& ((this.id == null) ? (copy.id == null) : (this.id.equals(copy.id)))
-			&& (this.replyTopic == null ? copy.replyTopic == null : this.replyTopic.equals(copy.replyTopic));
-
-	  }
-	  return result;
-  }
-
 }
