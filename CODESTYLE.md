@@ -68,11 +68,12 @@ Then be sure to update it to 2016 accordingly:
 The import statements are structured as follow:
 
 * import `java.*`
+* blank line
 * import `javax.*`
 * blank line
 * import all other imports
 * blank line
-* import `org.springframework.*`
+* import `cern.c2mon.*`
 * blank line
 * import static all other imports
 
