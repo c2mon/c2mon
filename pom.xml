@@ -55,12 +55,13 @@
         <enabled>true</enabled>
       </snapshots>
     </repository>
-
   </repositories>
 
 
   <scm>
-    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/new/c2mon</developerConnection>
+    <url>https://gitlab.cern.ch/c2mon/c2mon</url>
+    <connection>scm:git:git://gitlab.cern.ch/c2mon/c2mon.git</connection>
+    <developerConnection>scm:git:git@gitlab.cern.ch:7999/c2mon/c2mon.git</developerConnection>
   </scm>
 
 
