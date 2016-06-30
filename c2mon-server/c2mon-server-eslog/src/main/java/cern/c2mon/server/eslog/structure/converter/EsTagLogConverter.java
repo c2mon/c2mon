@@ -16,6 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.converter;
 
+import java.sql.Timestamp;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
@@ -25,22 +36,11 @@ import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.eslog.structure.mappings.EsMapping.ValueType;
 import cern.c2mon.server.eslog.structure.types.tag.*;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.common.metadata.Metadata;
 import cern.c2mon.shared.common.type.TypeConverter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-
-import java.sql.Timestamp;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Converts the dataTags from the server to the ElasticSearch format {@link AbstractEsTag}.
@@ -107,7 +107,7 @@ public class EsTagLogConverter implements Converter<Tag, AbstractEsTag> {
       return;
     }
 
-    final Class type = TypeConverter.getType(tag.getDataType());
+    final Class<?> type = TypeConverter.getType(tag.getDataType());
 
     EsValueType valueType;
     if (type == null) {
@@ -132,18 +132,19 @@ public class EsTagLogConverter implements Converter<Tag, AbstractEsTag> {
    * @param dataType of the Tag in C2MON.
    * @return {@link AbstractEsTag}: {@link EsTagString }, {@link EsTagNumeric } or {@link EsTagBoolean } for ElasticSearch.
    */
-  public AbstractEsTag instantiateTagES(String dataType) {
-    dataType = dataType.toLowerCase();
+  public AbstractEsTag instantiateTagES(final String dataType) {
 
-    if (ValueType.isBoolean(dataType)) {
-      return new EsTagBoolean();
-    } else if (ValueType.isString(dataType)) {
-      return new EsTagString();
-    } else if (ValueType.isNumeric(dataType)) {
+    if (TypeConverter.isNumber(dataType)) {
       return new EsTagNumeric();
-    } else {
-      log.warn("instantiateTagES() - Tag did not correspond to any existing type. (dataType = " + dataType + ").");
-      return null;
+    }
+
+    Class<?> clazz = TypeConverter.getType(dataType);
+
+    if (clazz != null && Boolean.class.isAssignableFrom(clazz)) {
+      return new EsTagBoolean();
+    }
+    else {
+      return new EsTagString();
     }
   }
 
@@ -159,7 +160,7 @@ public class EsTagLogConverter implements Converter<Tag, AbstractEsTag> {
     c2MonInfo.setEquipment(tagProcessMetadata.get("equipment"));
     c2MonInfo.setSubEquipment(tagProcessMetadata.get("subEquipment"));
 
-    c2MonInfo.setDataType(tag.getDataType().toLowerCase());
+    c2MonInfo.setDataType(tag.getDataType());
 
     setServerTimestamp(tag, c2MonInfo);
     setSourceTimeStamp(tag, c2MonInfo);
