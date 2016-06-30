@@ -16,16 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.daqcommunication.out;
 
+
+
+
 import cern.c2mon.server.cache.ProcessCache;
+import cern.c2mon.server.daqcommunication.out.junit.CachePopulationRule;
 import cern.c2mon.server.test.broker.TestBrokerService;
 import cern.c2mon.shared.common.NoSimpleValueParseException;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 import cern.c2mon.shared.daq.serialization.MessageConverter;
 import org.apache.activemq.command.ActiveMQQueue;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
@@ -57,6 +58,10 @@ import static org.junit.Assert.assertNotNull;
 })
 @TestPropertySource("classpath:c2mon-server-default.properties")
 public class ProcessCommunicationManagerTest {
+
+  @Rule
+  @Autowired
+  public CachePopulationRule cachePopulationRule;
 
   /**
    * To test.
