@@ -17,18 +17,9 @@
 
 package cern.c2mon.shared.daq.serialization;
 
-import cern.c2mon.shared.common.datatag.*;
-import cern.c2mon.shared.daq.command.SourceCommandTagReport;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
-import cern.c2mon.shared.daq.config.ChangeReport;
-import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
 import org.junit.Test;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 
@@ -39,7 +30,7 @@ public class ServerRequestSerializationTest {
 
   @Test
   public void
-  serializeSourceCommandTagValue(){
+  serializeSourceCommandTagValue() {
     SourceCommandTagValue request = createSourceCommandTagValue();
     String jsonResponse = MessageConverter.requestToJson(request);
     SourceCommandTagValue responseFromJson = (SourceCommandTagValue) MessageConverter.requestFromJson(jsonResponse);
@@ -49,7 +40,7 @@ public class ServerRequestSerializationTest {
 
   @Test
   public void
-  serializeSourceDataTagValueRequest(){
+  serializeSourceDataTagValueRequest() {
     SourceDataTagValueRequest request = createSourceDataTagValueRequest();
     String jsonResponse = MessageConverter.requestToJson(request);
     SourceDataTagValueRequest responseFromJson = (SourceDataTagValueRequest) MessageConverter.requestFromJson(jsonResponse);
@@ -58,11 +49,11 @@ public class ServerRequestSerializationTest {
   }
 
 
-  private SourceCommandTagValue createSourceCommandTagValue(){
-    return new SourceCommandTagValue(1L, "name", 2L, (short)0, 1234, Integer.class.getName());
+  private SourceCommandTagValue createSourceCommandTagValue() {
+    return new SourceCommandTagValue(1L, "name", 2L, (short) 0, 1234, Integer.class.getName());
   }
 
-  private SourceDataTagValueRequest createSourceDataTagValueRequest(){
+  private SourceDataTagValueRequest createSourceDataTagValueRequest() {
     return new SourceDataTagValueRequest(SourceDataTagValueRequest.DataTagRequestType.DATATAG, 1L);
   }
 }
