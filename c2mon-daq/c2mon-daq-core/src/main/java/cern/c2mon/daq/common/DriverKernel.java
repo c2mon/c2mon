@@ -16,7 +16,6 @@
  ******************************************************************************/
 package cern.c2mon.daq.common;
 
-import cern.c2mon.daq.config.Options;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationFactory;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationHandler;
@@ -28,6 +27,7 @@ import cern.c2mon.daq.common.messaging.ProcessMessageReceiver;
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
 import cern.c2mon.daq.common.messaging.impl.ProcessMessageSender;
 import cern.c2mon.daq.common.messaging.impl.RequestController;
+import cern.c2mon.daq.config.Options;
 import cern.c2mon.daq.filter.FilterConnectorThread;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.tools.StackTraceHelper;

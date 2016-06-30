@@ -17,6 +17,9 @@
 package cern.c2mon.daq.filter.impl;
 
 
+import cern.c2mon.daq.common.conf.core.ConfigurationController;
+import cern.c2mon.daq.filter.FilterMessageSender;
+import cern.c2mon.shared.daq.filter.FilteredDataTagValueUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +28,8 @@ import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+
+import javax.jms.JMSException;
 
 /**
  * Dummy implementation of the FilterMessageSender which can be plugged into the
@@ -36,7 +41,7 @@ import org.springframework.stereotype.Component;
  *
  * @author mbrightw
  */
-public class DummyFilterSender implements IFilterMessageSender, JmsLifecycle {
+public class DummyFilterSender implements IFilterMessageSender{
 
   /*
    * The system logger.

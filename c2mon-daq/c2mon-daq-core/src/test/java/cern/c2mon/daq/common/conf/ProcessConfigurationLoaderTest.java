@@ -112,7 +112,7 @@ public class ProcessConfigurationLoaderTest {
     assertEquals(2, sourceDataTagMap1.size());
     SourceDataTag sourceDataTag1 = sourceDataTagMap1.get(1L);
     assertEquals("CP.PRE.AIRH4STP887:DEFAUT_PROCESSEUR", sourceDataTag1.getName());
-    assertFalse(sourceDataTag1.isControlTag());
+    assertFalse(sourceDataTag1.isControl());
     assertEquals("Boolean", sourceDataTag1.getDataType());
     assertEquals(9999999, sourceDataTag1.getAddress().getTimeToLive());
     assertEquals(7, sourceDataTag1.getAddress().getPriority());

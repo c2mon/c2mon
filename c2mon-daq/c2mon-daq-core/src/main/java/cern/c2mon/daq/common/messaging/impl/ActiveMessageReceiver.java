@@ -16,17 +16,16 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
-import javax.annotation.PostConstruct;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-import javax.jms.Topic;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
+import cern.c2mon.daq.common.conf.core.ConfigurationController;
+import cern.c2mon.daq.common.messaging.ProcessMessageReceiver;
+import cern.c2mon.shared.common.process.ProcessConfiguration;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
+import cern.c2mon.shared.daq.config.ChangeRequest;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
+import cern.c2mon.shared.daq.messaging.DAQResponse;
+import cern.c2mon.shared.daq.messaging.ServerRequest;
+import cern.c2mon.shared.daq.messaging.response.ServerErrorResponse;
+import cern.c2mon.shared.daq.serialization.MessageConverter;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,16 +35,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
 
-import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.common.messaging.ProcessMessageReceiver;
-import cern.c2mon.shared.common.process.ProcessConfiguration;
-import cern.c2mon.shared.daq.command.SourceCommandTagReport;
-import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
-import cern.c2mon.shared.util.parser.ParserException;
-import cern.c2mon.shared.util.parser.SimpleXMLParser;
+import javax.annotation.PostConstruct;
+import javax.jms.*;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Implementation of the ProcessMessageReceiver interface for ActiveMQ JMS
@@ -70,11 +63,6 @@ public class ActiveMessageReceiver extends ProcessMessageReceiver implements Ses
   private static final Logger LOGGER = LoggerFactory.getLogger(ActiveMessageReceiver.class);
 
   /**
-   * Reference to the unique XML parser (singleton).
-   */
-  private SimpleXMLParser simpleXMLparser;
-
-  /**
    * Wire field to resolve circular reference.
    */
   private DefaultMessageListenerContainer listenerContainer;
@@ -84,12 +72,6 @@ public class ActiveMessageReceiver extends ProcessMessageReceiver implements Ses
    * the configuration to know on which topic he has to listen.
    */
   private ConfigurationController configurationController;
-
-  /**
-   * The DOM Factory to create the DOM tree and String representations
-   * of reconfiguration objects.
-   */
-  private ConfigurationDOMFactory domFactory = new ConfigurationDOMFactory();
 
   /**
    * Unique constructor (uses Qualifier annotation for wiring the listener
@@ -104,7 +86,6 @@ public class ActiveMessageReceiver extends ProcessMessageReceiver implements Ses
   public ActiveMessageReceiver(final ConfigurationController configurationController, @Qualifier
       ("serverRequestListenerContainer") final DefaultMessageListenerContainer serverRequestJmsContainer) throws ParserConfigurationException {
     super();
-    this.simpleXMLparser = new SimpleXMLParser();
     this.configurationController = configurationController;
     this.listenerContainer = serverRequestJmsContainer;
   }
@@ -148,56 +129,17 @@ public class ActiveMessageReceiver extends ProcessMessageReceiver implements Ses
   }
 
   /**
-   * Sends a command report to the server.
-   *
-   * @param commandReport The command report to send to the server.
-   * @param destination The destination to send to.
-   * @param session The JMS session to use to send the message.
-   * @throws JMSException Throws a JMSException if the sending of
-   * the message failed.
-   */
-  @Override
-  public void sendCommandReport(final SourceCommandTagReport commandReport, final Destination destination, final Session session) throws JMSException {
-    sendTextMessage(commandReport.toXML(), destination, session);
-  }
-
-  /**
-   * Sends a configuration report to the server.
-   *
-   * @param configurationChangeEventReport The configuration change event
-   * report to send.
-   * @param destination The destination (Queue/Topic) to send to.
-   * @param session The JMS session to use.
-   * @throws JMSException Throws a JMSException if the sending of
-   * the message failed.
-   * @throws IllegalAccessException Throws an exception if an method constructor
-   * or field used in a reflective call was not accessible.
-   * @throws InstantiationException Called if no default constructor could
-   * be called from the newInstance method via reflection.
-   * @throws ParserConfigurationException Indicates a serious configuration
-   * error with the XML parser.
-   * @throws TransformerException An error occurred while transforming the XML.
-   */
-  @Override
-  public void sendConfigurationReport(final ConfigurationChangeEventReport configurationChangeEventReport, final Destination destination, final Session
-      session) throws TransformerException, ParserConfigurationException, IllegalAccessException, InstantiationException, JMSException {
-    String reportString = domFactory.createConfigurationChangeEventReportXMLString(configurationChangeEventReport);
-    sendTextMessage(reportString, destination, session);
-  }
-
-  /**
    * Sends a data tag value response to the server.
-   * @param sourceDataTagValueResponse The response to a source data
-   * tag value request.
-   * @param replyTopic The topic to reply to.
+   * @param response the response which is send to the server
+   * @param destination The destination
    * @param session The JMSSession which should be used.
    * @throws JMSException Throws a JMSException if the sending of
    * the message failed.
    */
   @Override
-  public void sendDataTagValueResponse(final SourceDataTagValueResponse sourceDataTagValueResponse, final Topic replyTopic, final Session session) throws
+  public void sendDAQResponse(final DAQResponse response, final Destination destination, final Session session) throws
       JMSException {
-    sendTextMessage(sourceDataTagValueResponse.toXML(), replyTopic, session);
+    sendTextMessage(MessageConverter.responseToJson(response), destination, session);
   }
 
   /**
@@ -234,55 +176,42 @@ public class ActiveMessageReceiver extends ProcessMessageReceiver implements Ses
   // TODO change commands & requests to Queue (need change in DAQ tim-shared,
   // so postponed until prototype is working)
   public void onMessage(final Message message, final Session session) throws JMSException {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Request/Command received from the server.");
+    LOGGER.debug("Request/Command received from the server.");
+    if (message.getJMSReplyTo() == null) {
+      LOGGER.warn("\tthe \"replyTo\" property was not set in the JMS message. Ignoring request.");
+      return;
     }
+    DAQResponse response;
+
 
     if (message instanceof TextMessage) {
       TextMessage textMessage = (TextMessage) message;
       String messageContent = textMessage.getText();
-      Document xmlContent;
 
-      if (LOGGER.isTraceEnabled()) LOGGER.trace("message received from server: " + textMessage.getText());
-
+      LOGGER.trace("message received from server: " + textMessage.getText());
       try {
-        xmlContent = simpleXMLparser.parse(messageContent);
-        switch (checkMessageType(xmlContent.getDocumentElement().getTagName())) {
-          case MSG_CHANGE_LOGGING_LEVEL:
-            this.onChangeLoggingLevel(xmlContent);
-            break;
+        ServerRequest request = MessageConverter.requestFromJson(messageContent);
 
-          case MSG_EXECUTE_COMMAND:
-            onExecuteCommand(xmlContent, message.getJMSReplyTo(), session); // already
-            break;
+        if (request instanceof SourceDataTagValueRequest) {
+          LOGGER.debug("Processing server request for current data tag values.");
+          response = onSourceDataTagValueUpdateRequest((SourceDataTagValueRequest) request);
 
-          case MSG_RECONFIGURE_PROCESS:
-            onReconfigureProcess(xmlContent, message.getJMSReplyTo(), session);
-            break;
+        } else if (request instanceof SourceCommandTagValue) {
+          response = onExecuteCommand((SourceCommandTagValue) request);
 
-          case MSG_SRC_DATATAG_VALUE_UPDATE_REQUEST:
-            if (LOGGER.isDebugEnabled()) {
-              LOGGER.debug("Processing server request for current data tag values.");
-            }
-            onSourceDatatagValueUpdateRequest(xmlContent, (Topic) message.getJMSReplyTo(), session);
-            break;
+        } else if (request instanceof ChangeRequest) {
+          response = onReconfigureProcess((ChangeRequest) request);
 
-          default:
-            LOGGER.warn("Request received from server not recognized");
-            break;
+        } else {
+          LOGGER.warn("Request received from server not recognized");
+          response = new ServerErrorResponse("Request received from server not recognized: " + request.getClass() + " not supported from the DAQ.");
+        }
+        sendDAQResponse(response, message.getJMSReplyTo(), session);
 
-        } // switch
-      } catch (ParserException e) {
-        LOGGER.error("ParserException caught on processing incoming DAQ message: ", e);
-        LOGGER.error("   message being ignored.");
-        // throw new
-        // JMSException("ParserException caught on processing incoming DAQ message (see logs for details).");
       } catch (Exception e) {
         LOGGER.error("Unexpected exception caught while processing server request.", e);
       }
-
-    } // if
-    else {
+    } else {
       LOGGER.warn("Received non-text message - unable to process.");
     }
   }

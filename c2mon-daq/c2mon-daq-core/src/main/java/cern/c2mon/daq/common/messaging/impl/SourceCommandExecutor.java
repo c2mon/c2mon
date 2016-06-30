@@ -1,21 +1,22 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
+import cern.c2mon.shared.daq.command.SourceCommandTagReport.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,10 +25,12 @@ import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.shared.daq.command.SourceCommandTagReport;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 
+import static cern.c2mon.shared.daq.command.SourceCommandTagReport.Status.*;
+
 /**
  * This class models the threads responsible for command execution
  */
-class SourceCommandExecutor extends Thread {
+public class SourceCommandExecutor extends Thread {
 
     /**
      * Log4j Logger for this class
@@ -52,7 +55,7 @@ class SourceCommandExecutor extends Thread {
     /**
      * Execution status
      */
-    private int cmdExecutionStatus = SourceCommandTagReport.STATUS_NOK_TIMEOUT;
+    private Status cmdExecutionStatus = STATUS_NOK_TIMEOUT;
 
     /**
      * Report description
@@ -66,7 +69,7 @@ class SourceCommandExecutor extends Thread {
 
     /**
      * The SourceCommandExecutor constructor
-     * 
+     *
      * @param commandRunner
      *            The command runner to actually run the command.
      * @param sourceCommandTagValue
@@ -96,21 +99,21 @@ class SourceCommandExecutor extends Thread {
             // if no exception occured, assume that everything went ok..
             synchronized (commandExecLock) {
                 this.returnValue = retValue;
-                cmdExecutionStatus = SourceCommandTagReport.STATUS_OK;
+                cmdExecutionStatus = STATUS_OK;
                 commandExecLock.notifyAll();
             }
         } catch (EqCommandTagException ex1) {
             logger.error("a problem with executing command encountered. problem description: " + ex1.getErrorDescription());
 
             synchronized (commandExecLock) {
-                cmdExecutionStatus = SourceCommandTagReport.STATUS_NOK_FROM_EQUIPMENTD;
+                cmdExecutionStatus = STATUS_NOK_FROM_EQUIPMENTD;
                 cmdExecutionDescription = ex1.getErrorDescription();
             }
         }
         catch (Exception ex2) {
             logger.error("run(): Unexpected error executing the command : " + ex2.getMessage(), ex2);
             synchronized (commandExecLock) {
-                cmdExecutionStatus = SourceCommandTagReport.STATUS_NOK_FROM_EQUIPMENTD;
+                cmdExecutionStatus = STATUS_NOK_FROM_EQUIPMENTD;
                 cmdExecutionDescription = ex2.getMessage();
             }
         }
@@ -118,7 +121,7 @@ class SourceCommandExecutor extends Thread {
 
     /**
      * Returns the report to the current command.
-     * 
+     *
      * @return The report to the current running/finished command.
      */
     public SourceCommandTagReport getSourceCommandTagReport() {

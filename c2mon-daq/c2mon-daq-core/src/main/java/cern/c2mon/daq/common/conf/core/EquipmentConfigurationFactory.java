@@ -191,7 +191,7 @@ public class EquipmentConfigurationFactory extends XMLTagValueExtractor implemen
           LOGGER.warn("\tPriority on equipment alive tag " + sourceDataTag.getId() + " is wrongly configured! Adjusting priority to HIGH (7)");
           sourceDataTag.getAddress().setPriority(DataTagAddress.PRIORITY_HIGH);
         }
-        if (!sourceDataTag.isControlTag()) {
+        if (!sourceDataTag.isControl()) {
           LOGGER.warn("\tEquipment alive tag " + sourceDataTag.getId() + " is not configured as control tag! Please correct this in the configuration.");
         }
       }

@@ -34,6 +34,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest.DataTagRequestType.*;
 import static org.easymock.classextension.EasyMock.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -127,7 +128,7 @@ public class RequestControllerTest {
 
         RequestController handler = new RequestController(configurationController);
         SourceDataTagValueRequest valueRequest =
-            new SourceDataTagValueRequest(SourceDataTagValueRequest.TYPE_PROCESS, 1L);
+            new SourceDataTagValueRequest(PROCESS, 1L);
 
         SourceDataTagValueResponse response =
             handler.onSourceDataTagValueUpdateRequest(valueRequest);
@@ -141,7 +142,7 @@ public class RequestControllerTest {
 
         RequestController handler = new RequestController(configurationController);
         SourceDataTagValueRequest valueRequest =
-            new SourceDataTagValueRequest(SourceDataTagValueRequest.TYPE_PROCESS, 2L);
+            new SourceDataTagValueRequest(PROCESS, 2L);
 
         SourceDataTagValueResponse response =
             handler.onSourceDataTagValueUpdateRequest(valueRequest);
@@ -157,7 +158,7 @@ public class RequestControllerTest {
 
         RequestController handler = new RequestController(configurationController);
         SourceDataTagValueRequest valueRequest =
-            new SourceDataTagValueRequest(SourceDataTagValueRequest.TYPE_EQUIPMENT, 2L);
+            new SourceDataTagValueRequest(EQUIPMENT, 2L);
 
         SourceDataTagValueResponse response =
             handler.onSourceDataTagValueUpdateRequest(valueRequest);
@@ -171,7 +172,7 @@ public class RequestControllerTest {
 
         RequestController handler = new RequestController(configurationController);
         SourceDataTagValueRequest valueRequest =
-            new SourceDataTagValueRequest(SourceDataTagValueRequest.TYPE_EQUIPMENT, 20L);
+            new SourceDataTagValueRequest(EQUIPMENT, 20L);
 
         SourceDataTagValueResponse response =
             handler.onSourceDataTagValueUpdateRequest(valueRequest);
@@ -187,7 +188,7 @@ public class RequestControllerTest {
 
         RequestController handler = new RequestController(configurationController);
         SourceDataTagValueRequest valueRequest =
-            new SourceDataTagValueRequest(SourceDataTagValueRequest.TYPE_DATATAG, 1L);
+            new SourceDataTagValueRequest(DATATAG, 1L);
 
         SourceDataTagValueResponse response =
             handler.onSourceDataTagValueUpdateRequest(valueRequest);
@@ -201,7 +202,7 @@ public class RequestControllerTest {
 
         RequestController handler = new RequestController(configurationController);
         SourceDataTagValueRequest valueRequest =
-            new SourceDataTagValueRequest(SourceDataTagValueRequest.TYPE_DATATAG, 20L);
+            new SourceDataTagValueRequest(DATATAG, 20L);
 
         SourceDataTagValueResponse response =
             handler.onSourceDataTagValueUpdateRequest(valueRequest);
@@ -215,27 +216,27 @@ public class RequestControllerTest {
      * @return configurationController
      */
     private ConfigurationController getBasicConfigurationController() {
-      ConfigurationController configurationController = new ConfigurationController();
-      ProcessConfiguration processConfiguration = new ProcessConfiguration();
-      EquipmentConfiguration equipmentConfiguration = new EquipmentConfiguration();
-      EquipmentConfiguration equipmentConfiguration2 = new EquipmentConfiguration();
-      SourceCommandTag commandTag = new SourceCommandTag(1L, "hello");
-      DataTagAddress address = new DataTagAddress();
-      SourceDataTag sourceDataTag = new SourceDataTag(1L, "asd", false, (short)0, "Integer", address);
-      SourceDataTag sourceDataTag2 = new SourceDataTag(2L, "asd", false, (short)0, "Integer", address);
-      SourceDataTag sourceDataTag3 = new SourceDataTag(3L, "asd", false, (short)0, "Integer", address);
-      processConfiguration.setProcessID(1L);
-      equipmentConfiguration.setId(1L);
-      sourceDataTag.update(25);
-      sourceDataTag2.update(25);
-      sourceDataTag3.update(25);
-      configurationController.setProcessConfiguration(processConfiguration);
-      processConfiguration.getEquipmentConfigurations().put(1L, equipmentConfiguration);
-      processConfiguration.getEquipmentConfigurations().put(2L, equipmentConfiguration2);
-      equipmentConfiguration.getCommandTags().put(1L, commandTag);
-      equipmentConfiguration.getDataTags().put(1L, sourceDataTag);
-      equipmentConfiguration2.getDataTags().put(2L, sourceDataTag2);
-      equipmentConfiguration2.getDataTags().put(3L, sourceDataTag3);
-      return configurationController;
+        ConfigurationController configurationController = new ConfigurationController();
+        ProcessConfiguration processConfiguration = new ProcessConfiguration();
+        EquipmentConfiguration equipmentConfiguration = new EquipmentConfiguration();
+        EquipmentConfiguration equipmentConfiguration2 = new EquipmentConfiguration();
+        SourceCommandTag commandTag = new SourceCommandTag(1L, "hello");
+        DataTagAddress address = new DataTagAddress();
+        SourceDataTag sourceDataTag = new SourceDataTag(1L, "asd", false, (short)0, "Integer", address);
+        SourceDataTag sourceDataTag2 = new SourceDataTag(2L, "asd", false, (short)0, "Integer", address);
+        SourceDataTag sourceDataTag3 = new SourceDataTag(3L, "asd", false, (short)0, "Integer", address);
+        processConfiguration.setProcessID(1L);
+        equipmentConfiguration.setId(1L);
+        sourceDataTag.update(25);
+        sourceDataTag2.update(25);
+        sourceDataTag3.update(25);
+        configurationController.setProcessConfiguration(processConfiguration);
+        processConfiguration.getEquipmentConfigurations().put(1L, equipmentConfiguration);
+        processConfiguration.getEquipmentConfigurations().put(2L, equipmentConfiguration2);
+        equipmentConfiguration.getCommandTags().put(1L, commandTag);
+        equipmentConfiguration.getDataTags().put(1L, sourceDataTag);
+        equipmentConfiguration2.getDataTags().put(2L, sourceDataTag2);
+        equipmentConfiguration2.getDataTags().put(3L, sourceDataTag3);
+        return configurationController;
     }
 }

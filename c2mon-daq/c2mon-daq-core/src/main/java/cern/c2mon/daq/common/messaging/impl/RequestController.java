@@ -1,4 +1,4 @@
-/******************************************************************************
+/*******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
- *****************************************************************************/
+ ******************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
 import java.util.ArrayList;
@@ -49,6 +49,9 @@ import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+
+import static cern.c2mon.shared.daq.command.SourceCommandTagReport.Status.*;
+import static cern.c2mon.shared.daq.command.SourceCommandTagReport.Status.STATUS_TEST_OK;
 
 /**
  * The RequestController is to direct request to the core to the right place in the core.
@@ -123,26 +126,25 @@ public class RequestController {
         } else if (change instanceof ProcessConfigurationUpdate) {
             report = configurationController.onProcessConfigurationUpdate((ProcessConfigurationUpdate) change);
 
-        // NOTE: adding and removing EquipmentUnit(s) at runtime is handled directly by DriverKernel
-        // see: ProcessMessageReceiver.onReconfigureProcess()
+            // NOTE: adding and removing EquipmentUnit(s) at runtime is handled directly by DriverKernel
+            // see: ProcessMessageReceiver.onReconfigureProcess()
 
-        //} else if (change instanceof EquipmentUnitAdd) {
-        //    report = configurationController.onEquipmentUnitAdd((EquipmentUnitAdd) change);
-        //} else if (change instanceof EquipmentUnitRemove) {
-        //    report = configurationController.onEquipmentUnitRemove((EquipmentUnitRemove) change);
+            //} else if (change instanceof EquipmentUnitAdd) {
+            //    report = configurationController.onEquipmentUnitAdd((EquipmentUnitAdd) change);
+            //} else if (change instanceof EquipmentUnitRemove) {
+            //    report = configurationController.onEquipmentUnitRemove((EquipmentUnitRemove) change);
 
         } else if (change instanceof SubEquipmentUnitAdd) {
-          report = configurationController.onSubEquipmentUnitAdd((SubEquipmentUnitAdd) change);
+            report = configurationController.onSubEquipmentUnitAdd((SubEquipmentUnitAdd) change);
         } else if (change instanceof SubEquipmentUnitRemove) {
-          report = configurationController.onSubEquipmentUnitRemove((SubEquipmentUnitRemove) change);
+            report = configurationController.onSubEquipmentUnitRemove((SubEquipmentUnitRemove) change);
         } else {
             report = new ChangeReport(change);
             report.appendError("Change failed in DAQ core. " + change.getClass().getName()
-                    + " is not supported by this version of the DAQ.");
+                + " is not supported by this version of the DAQ.");
         }
 
         LOGGER.debug("Leaving applyChange: ");
-
         return report;
     }
 
@@ -155,8 +157,7 @@ public class RequestController {
     public SourceCommandTagReport executeCommand(final SourceCommandTagValue sourceCommandTagValue) {
         long equipmentId = sourceCommandTagValue.getEquipmentId();
         long commandTagId = sourceCommandTagValue.getId();
-        EquipmentConfiguration equipmentConfiguration = configurationController.getProcessConfiguration()
-                .getEquipmentConfiguration(equipmentId);
+        EquipmentConfiguration equipmentConfiguration = configurationController.getProcessConfiguration().getEquipmentConfiguration(equipmentId);
         SourceCommandTagReport report;
         if (equipmentConfiguration != null) {
             SourceCommandTag sourceCommandTag = equipmentConfiguration.getCommandTags().get(commandTagId);
@@ -165,19 +166,19 @@ public class RequestController {
                 int sourceTimeout = sourceCommandTag.getSourceTimeout();
                 ICommandRunner commandRunner = commandRunners.get(equipmentId);
                 if (commandRunner != null) {
-                    report = executeCommandOnImplementation(sourceCommandTagValue, commandRunner, sourceRetries,
-                            sourceTimeout);
+                    report = executeCommandOnImplementation(sourceCommandTagValue, commandRunner, sourceRetries, sourceTimeout);
+
                 } else {
-                    report = new SourceCommandTagReport(SourceCommandTagReport.STATUS_NOK_FROM_EQUIPMENTD, "Equipment "
-                            + equipmentId + " has no command runner. " + "Does it support command execution?");
+                    report = new SourceCommandTagReport(STATUS_NOK_FROM_EQUIPMENTD, "Equipment "
+                        + equipmentId + " has no command runner. " + "Does it support command execution?");
                 }
             } else {
-                report = new SourceCommandTagReport(SourceCommandTagReport.STATUS_NOK_INVALID_COMMAND, "Command tag "
-                        + commandTagId + " not found.");
+                report = new SourceCommandTagReport(STATUS_NOK_INVALID_COMMAND, "Command tag "
+                    + commandTagId + " not found.");
             }
         } else {
-            report = new SourceCommandTagReport(SourceCommandTagReport.STATUS_NOK_INVALID_EQUIPMENT, "Equipment "
-                    + equipmentId + " not found.");
+            report = new SourceCommandTagReport(STATUS_NOK_INVALID_EQUIPMENT, "Equipment "
+                + equipmentId + " not found.");
         }
         return report;
     }
@@ -193,7 +194,7 @@ public class RequestController {
      * @return The command report about the success of the command.
      */
     private SourceCommandTagReport executeCommandOnImplementation(final SourceCommandTagValue sourceCommandTagValue,
-            final ICommandRunner commandRunner, final int sourceRetries, final int sourceTimeout) {
+                                                                  final ICommandRunner commandRunner, final int sourceRetries, final int sourceTimeout) {
         SourceCommandTagReport report = null;
         for (int i = 0; i < sourceRetries + 1; i++) {
             SourceCommandExecutor commandExecutor = new SourceCommandExecutor(commandRunner, sourceCommandTagValue);
@@ -202,11 +203,11 @@ public class RequestController {
                 commandExecutor.join(sourceTimeout);
             } catch (InterruptedException e) {
                 LOGGER.error("Thread interrupted while waiting for command execution." + "of command: "
-                        + sourceCommandTagValue.getId());
+                    + sourceCommandTagValue.getId());
             }
             report = commandExecutor.getSourceCommandTagReport();
-            int status = report.getStatus();
-            if (status == SourceCommandTagReport.STATUS_OK || status == SourceCommandTagReport.STATUS_TEST_OK) {
+            SourceCommandTagReport.Status status = report.getStatus();
+            if (status.equals(STATUS_OK)|| status.equals(STATUS_TEST_OK) ) {
                 break;
             } else {
                 commandExecutor.interrupt();
@@ -214,11 +215,10 @@ public class RequestController {
         }
 
         if (report == null) {
-            report = new SourceCommandTagReport(SourceCommandTagReport.STATUS_NOK_FROM_EQUIPMENTD,
-                    "Command could not be executed. Most likely the thread controling "
-                            + "the execution was interrupted. See error logs for details.");
+            report = new SourceCommandTagReport(STATUS_NOK_FROM_EQUIPMENTD,
+                "Command could not be executed. Most likely the thread controling "
+                    + "the execution was interrupted. See error logs for details.");
         }
-
         return report;
     }
 
@@ -228,57 +228,63 @@ public class RequestController {
      * @param sourceDataTagValueRequest The request to handle.
      * @return A SourceDataTagValueResponse which contains the result of the request. The return value is never null.
      */
-    public SourceDataTagValueResponse onSourceDataTagValueUpdateRequest(
-            final SourceDataTagValueRequest sourceDataTagValueRequest) {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("entering handleSdtValueUpdateRequest()..");
+    public SourceDataTagValueResponse onSourceDataTagValueUpdateRequest(final SourceDataTagValueRequest sourceDataTagValueRequest) {
+        LOGGER.debug("entering handleSdtValueUpdateRequest()..");
         final SourceDataTagValueResponse dataTagValueResponse;
-        String type = sourceDataTagValueRequest.getType();
+        SourceDataTagValueRequest.DataTagRequestType type = sourceDataTagValueRequest.getType();
+
         Long processId = configurationController.getProcessConfiguration().getProcessID();
         String processName = configurationController.getProcessConfiguration().getProcessName();
-        List<DataTagValueUpdate> updates = new ArrayList<DataTagValueUpdate>();
-        Map<Long, EquipmentConfiguration> equipmentMap = configurationController.getProcessConfiguration()
-                .getEquipmentConfigurations();
-        if (type.equals(SourceDataTagValueRequest.TYPE_PROCESS)) {
-            LOGGER.debug("request type: PROCESS");
-            if (processId.equals(sourceDataTagValueRequest.getId())) {
-                for (EquipmentConfiguration equipmentConfiguration : equipmentMap.values()) {
-                    updates.addAll(getDataTagUpdates(equipmentConfiguration));
+        List<DataTagValueUpdate> updates = new ArrayList<>();
+        Map<Long, EquipmentConfiguration> equipmentMap = configurationController.getProcessConfiguration().getEquipmentConfigurations();
+
+        switch (type) {
+            case PROCESS:
+                LOGGER.debug("request type: PROCESS");
+                if (processId.equals(sourceDataTagValueRequest.getId())) {
+                    for (EquipmentConfiguration equipmentConfiguration : equipmentMap.values()) {
+                        updates.addAll(getDataTagUpdates(equipmentConfiguration));
+                    }
+                    dataTagValueResponse = new SourceDataTagValueResponse(updates);
+                } else {
+                    String error = "process " + processName + " does not have id: " + sourceDataTagValueRequest.getId();
+                    LOGGER.error(error);
+                    dataTagValueResponse = new SourceDataTagValueResponse(error);
                 }
-                dataTagValueResponse = new SourceDataTagValueResponse(updates);
-            } else {
-                String error = "process " + processName + " does not have id: " + sourceDataTagValueRequest.getId();
+                break;
+
+            case EQUIPMENT:
+                LOGGER.debug("request type: EQUIPMENT");
+                Long equipmentId = sourceDataTagValueRequest.getId();
+                EquipmentConfiguration configuration = equipmentMap.get(equipmentId);
+                if (configuration != null) {
+                    updates.addAll(getDataTagUpdates(configuration));
+                    dataTagValueResponse = new SourceDataTagValueResponse(updates);
+                } else {
+                    String error = "process " + processName + " does not have equipment with id: " + equipmentId;
+                    LOGGER.error(error);
+                    dataTagValueResponse = new SourceDataTagValueResponse(error);
+                }
+                break;
+
+            case DATATAG:
+                LOGGER.debug("request type: DATATAG");
+                Long dataTagId = sourceDataTagValueRequest.getId();
+                ISourceDataTag sourceDataTag = configurationController.findDataTag(dataTagId);
+                if (sourceDataTag != null) {
+                    updates.add(getDataTagUpdate(sourceDataTag));
+                    dataTagValueResponse = new SourceDataTagValueResponse(updates);
+                } else {
+                    String error = "process " + processName + " does not have a data tag with id: " + dataTagId;
+                    LOGGER.error(error);
+                    dataTagValueResponse = new SourceDataTagValueResponse(error);
+                }
+                break;
+
+            default:
+                String error = "Unknown SourceDataTagValueRequest type: " + type;
                 LOGGER.error(error);
                 dataTagValueResponse = new SourceDataTagValueResponse(error);
-            }
-        } else if (type.equals(SourceDataTagValueRequest.TYPE_EQUIPMENT)) {
-            LOGGER.debug("request type: EQUIPMENT");
-            Long equipmentId = sourceDataTagValueRequest.getId();
-            EquipmentConfiguration configuration = equipmentMap.get(equipmentId);
-            if (configuration != null) {
-                updates.addAll(getDataTagUpdates(configuration));
-                dataTagValueResponse = new SourceDataTagValueResponse(updates);
-            } else {
-                String error = "process " + processName + " does not have equipment with id: " + equipmentId;
-                LOGGER.error(error);
-                dataTagValueResponse = new SourceDataTagValueResponse(error);
-            }
-        } else if (type.equals(SourceDataTagValueRequest.TYPE_DATATAG)) {
-            LOGGER.debug("request type: DATATAG");
-            Long dataTagId = sourceDataTagValueRequest.getId();
-            ISourceDataTag sourceDataTag = configurationController.findDataTag(dataTagId);
-            if (sourceDataTag != null) {
-                updates.add(getDataTagUpdate(sourceDataTag));
-                dataTagValueResponse = new SourceDataTagValueResponse(updates);
-            } else {
-                String error = "process " + processName + " does not have a data tag with id: " + dataTagId;
-                LOGGER.error(error);
-                dataTagValueResponse = new SourceDataTagValueResponse(error);
-            }
-        } else {
-            String error = "Unknown SourceDataTagValueRequest type: " + type;
-            LOGGER.error(error);
-            dataTagValueResponse = new SourceDataTagValueResponse(error);
         }
         return dataTagValueResponse;
     }

@@ -45,7 +45,7 @@ import cern.c2mon.shared.util.buffer.SynchroBufferListener;
  *
  * @author Mark Brightwell
  */
-public abstract class FilterMessageSender implements IFilterMessageSender, JmsLifecycle {
+public abstract class FilterMessageSender implements IFilterMessageSender{
 
   /**
    * Class logger.
@@ -126,7 +126,7 @@ public abstract class FilterMessageSender implements IFilterMessageSender, JmsLi
    * @param dataTagValue a datatag value to be sent
    */
   @Override
-  public final void addValue(final FilteredDataTagValue dataTagValue) {
+  public void addValue(final FilteredDataTagValue dataTagValue) {
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace("entering addValue()...");
       LOGGER.trace("\tadding value to buffer");
