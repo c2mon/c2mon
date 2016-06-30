@@ -186,7 +186,7 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
       } else {
         Comparable comparableMin = (Comparable) TypeConverter.cast(tmpStr, dataTagCacheObject.getDataType());
         dataTagCacheObject.setMinValue(comparableMin);
-        dataTagUpdate.setMinValue(comparableMin);
+        dataTagUpdate.setMinValue((Number) comparableMin);
       }
     }
 
@@ -197,7 +197,7 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
       } else {
         Comparable comparableMax = (Comparable) TypeConverter.cast(tmpStr, dataTagCacheObject.getDataType());
         dataTagCacheObject.setMaxValue(comparableMax);
-        dataTagUpdate.setMaxValue(comparableMax);
+        dataTagUpdate.setMaxValue((Number) comparableMax);
       }
     }
 
@@ -220,7 +220,6 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
    * attempted. Call within synchronized block.
    * @param dataTag
    * @param sourceDataTagValue
-   * @param timestamp
    * @return true if the update should be filtered out, false if it should be kept
    */
   private boolean filterout(DataTag dataTag, SourceDataTagValue sourceDataTagValue) {
@@ -491,8 +490,8 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
     SourceDataTag sourceDataTag = new SourceDataTag(dataTag.getId(), dataTag.getName(), (dataTag instanceof ControlTag) ? true : false);
     sourceDataTag.setDataType(dataTag.getDataType());
     sourceDataTag.setMode(dataTag.getMode());
-    sourceDataTag.setMinValue(dataTag.getMinValue());
-    sourceDataTag.setMaxValue(dataTag.getMaxValue());
+    sourceDataTag.setMinValue((Number) dataTag.getMinValue());
+    sourceDataTag.setMaxValue((Number) dataTag.getMaxValue());
     if (dataTag.getAddress() != null) {
       sourceDataTag.setAddress(dataTag.getAddress());
     }
