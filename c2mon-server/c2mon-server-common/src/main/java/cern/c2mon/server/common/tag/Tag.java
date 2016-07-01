@@ -58,8 +58,6 @@ public interface Tag extends RuleInputValue, Cacheable {
 
   /**
    * Get the data type of the tag's current value.
-   * The data type is the name of the Java class without "java.lang.", e.g.
-   * "Integer", "Boolean", "String" etc.
    */
   String getDataType();
   
