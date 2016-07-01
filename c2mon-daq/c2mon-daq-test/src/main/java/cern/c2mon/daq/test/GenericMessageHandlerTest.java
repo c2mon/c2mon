@@ -54,7 +54,7 @@ import cern.c2mon.shared.common.process.ProcessConfiguration;
  * @author wbuczak
  */
 
-public abstract class GenericMessageHandlerTst {
+public abstract class GenericMessageHandlerTest {
 
     protected static final String TEST_PROCESS_NAME = "P_TEST_01";
 
@@ -78,7 +78,7 @@ public abstract class GenericMessageHandlerTst {
 
     protected ConfigurationController configurationController;
 
-    static Logger log = LoggerFactory.getLogger(GenericMessageHandlerTst.class);
+    static Logger log = LoggerFactory.getLogger(GenericMessageHandlerTest.class);
 
     @Rule
     public TestName testName = new TestName();
@@ -88,14 +88,14 @@ public abstract class GenericMessageHandlerTst {
         Method testMethod = this.getClass().getMethod(testName, (Class<?>[]) null);
 
         if (testMethod.isAnnotationPresent(UseConf.class)) {
-            return format("conf/%s", testMethod.getAnnotation(UseConf.class).value());
+            return format("/conf/%s", testMethod.getAnnotation(UseConf.class).value());
         }
 
         return null;
     }
 
     protected final String getHandlerClass() throws Exception {
-        Class<? extends GenericMessageHandlerTst> clazz = this.getClass();
+        Class<? extends GenericMessageHandlerTest> clazz = this.getClass();
 
         if (clazz.isAnnotationPresent(UseHandler.class)) {
             return clazz.getAnnotation(UseHandler.class).value().getName();
