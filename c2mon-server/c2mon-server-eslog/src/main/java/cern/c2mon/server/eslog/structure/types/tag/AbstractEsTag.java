@@ -48,7 +48,7 @@ public abstract class AbstractEsTag implements IFallback {
   protected Boolean valueBoolean;
   protected String valueString;
 
-  protected String type;
+  protected EsValueType type;
 
   private String valueDescription;
 

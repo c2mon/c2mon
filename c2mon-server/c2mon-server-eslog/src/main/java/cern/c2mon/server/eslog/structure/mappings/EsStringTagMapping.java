@@ -17,6 +17,7 @@
 package cern.c2mon.server.eslog.structure.mappings;
 
 import cern.c2mon.server.eslog.structure.types.tag.EsTagString;
+import cern.c2mon.server.eslog.structure.types.tag.EsValueType;
 
 /**
  * EsMapping that a {@link EsTagString} will use to be indexed in the ElasticSearch cluster.
@@ -28,20 +29,7 @@ public class EsStringTagMapping extends EsTagMapping implements EsMapping {
   /**
    * Instantiate a new EsStringTagMapping by setting its Properties according to {@param the type}.
    */
-  public EsStringTagMapping(ValueType type) {
-    super();
-    setProperties(type);
-  }
-
-  /**
-   * Initialize the mapping according that the valueType is String type.
-   */
-  @Override
-  public void setProperties(ValueType tagValueType) {
-    if (tagValueType.equals(ValueType.STRING)) {
-      this.properties = new Properties(tagValueType);
-    } else {
-      throw new IllegalArgumentException("Type for EsTagString must be string.");
-    }
+  public EsStringTagMapping() {
+    super(EsValueType.STRING);
   }
 }

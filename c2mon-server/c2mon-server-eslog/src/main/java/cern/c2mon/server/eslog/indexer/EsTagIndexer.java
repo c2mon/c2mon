@@ -16,14 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.indexer;
 
-import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.eslog.connector.Connector;
-import cern.c2mon.server.eslog.structure.mappings.EsBooleanTagMapping;
-import cern.c2mon.server.eslog.structure.mappings.EsMapping;
-import cern.c2mon.server.eslog.structure.mappings.EsNumericTagMapping;
-import cern.c2mon.server.eslog.structure.mappings.EsStringTagMapping;
-import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.PostConstruct;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
@@ -34,9 +31,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.PostConstruct;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.eslog.connector.Connector;
+import cern.c2mon.server.eslog.structure.mappings.EsBooleanTagMapping;
+import cern.c2mon.server.eslog.structure.mappings.EsMapping;
+import cern.c2mon.server.eslog.structure.mappings.EsNumericTagMapping;
+import cern.c2mon.server.eslog.structure.mappings.EsStringTagMapping;
+import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
+import cern.c2mon.server.eslog.structure.types.tag.EsValueType;
 
 /**
  * Used to write (a.k.a. index) the data to elasticSearch.
@@ -67,6 +70,7 @@ public class EsTagIndexer extends EsIndexer {
   /**
    * make sure the connection is alive.
    */
+  @Override
   @PostConstruct
   public void init() throws IDBPersistenceException {
     super.init();
@@ -148,29 +152,50 @@ public class EsTagIndexer extends EsIndexer {
 
   /**
    * Initialize the JSON, indexName and type for the {@link AbstractEsTag} and send it to the BulkProcessor.
-   *
+   * Scope is protected for testing
    * @param tag to index.
    * @return true, if tag indexing was successful
    */
-  private boolean sendTagToBatch(AbstractEsTag tag) {
-    String indexName = generateTagIndex(tag.getC2mon().getServerTimestamp());
-    String type = generateTagType(tag.getC2mon().getDataType());
+  protected boolean sendTagToBatch(AbstractEsTag tag) {
+    if (tag == null) {
+      log.warn("indexByBatch() - Error while indexing data. Tag has null rawValue");
+      return false;
+    }
+    
+    String index = generateTagIndex(tag.getC2mon().getServerTimestamp());
+    String type = generateTagType(tag.getType());
 
     if (log.isTraceEnabled()) {
-      log.trace("sendTagToBatch() - Index a new tag.");
-      log.trace("sendTagToBatch() - Index = " + indexName);
-      log.trace("sendTagToBatch() - Type = " + type);
+      log.trace("Indexing a new tag (#{})", tag.getId());
+      log.trace("Index = " + index);
+      log.trace("Type = " + type);
+    }
+    
+
+    if (index == null || type == null || !checkIndex(index)) {
+      log.warn("indexByBatch() - Error while indexing tag #{}. Bad index {}  -> Tag will not be sent to elasticsearch!", tag.getId(), index);
+      return false;
     }
 
-    return indexByBatch(indexName, type, tag);
+    boolean indexIsPresent = createNotExistingIndex(index);
+    boolean typeIsPresent = createNotExistingMapping(index, type, tag.getType());
+
+    String tagJson = tag.toString();
+    log.debug("indexByBatch() - New IndexRequest for index" + index + " and source " + tagJson);
+    if (indexIsPresent && typeIsPresent) {
+      IndexRequest indexNewTag = new IndexRequest(index, type).source(tagJson).routing(String.valueOf(tag.getId()));
+      return connector.bulkAdd(indexNewTag);
+    }
+
+    return false;
   }
 
   private String generateTagIndex(long serverTime) {
     return retrieveIndexFormat(indexPrefix, serverTime);
   }
 
-  private String generateTagType(String dataType) {
-    return typePrefix + dataType;
+  private String generateTagType(EsValueType dataType) {
+    return typePrefix + dataType.getFriendlyName();
   }
 
   /**
@@ -180,19 +205,29 @@ public class EsTagIndexer extends EsIndexer {
    *
    * @return if the cluster has acked the writing.
    */
-  private boolean indexByBatch(String index, String type, AbstractEsTag tag) {
+  private boolean indexByBatch(AbstractEsTag tag) {
     if (tag == null) {
       log.warn("indexByBatch() - Error while indexing data. Tag has null rawValue");
       return false;
     }
+    
+    String index = generateTagIndex(tag.getC2mon().getServerTimestamp());
+    String type = generateTagType(tag.getType());
 
-    if (index == null || type == null || !checkIndex(index) || !checkType(type)) {
-      log.warn("indexByBatch() - Error while indexing data. Bad index or type values: " + index + ", " + type + ". Tag #" + tag.getId() + " will not be sent to elasticsearch!");
+    if (log.isTraceEnabled()) {
+      log.trace("Indexing a new tag (#{})", tag.getId());
+      log.trace("Index = " + index);
+      log.trace("Type = " + type);
+    }
+    
+
+    if (index == null || type == null || !checkIndex(index)) {
+      log.warn("indexByBatch() - Error while indexing tag #{}. Bad index {}  -> Tag will not be sent to elasticsearch!", tag.getId(), index);
       return false;
     }
 
     boolean indexIsPresent = createNotExistingIndex(index);
-    boolean typeIsPresent = createNotExistingMapping(index, type);
+    boolean typeIsPresent = createNotExistingMapping(index, type, tag.getType());
 
     String tagJson = tag.toString();
     log.debug("indexByBatch() - New IndexRequest for index" + index + " and source " + tagJson);
@@ -206,12 +241,6 @@ public class EsTagIndexer extends EsIndexer {
 
   private boolean checkIndex(String index) {
     return index.matches("^" + indexPrefix + "\\d\\d\\d\\d-\\d\\d-?\\d?\\d?$");
-  }
-
-  private boolean checkType(String type) {
-    String dataType = type.substring(typePrefix.length());
-
-    return type.matches("^" + typePrefix + ".+$") && (EsMapping.ValueType.matches(dataType));
   }
 
   private boolean createNotExistingIndex(String index) {
@@ -239,12 +268,12 @@ public class EsTagIndexer extends EsIndexer {
     return false;
   }
 
-  private boolean createNotExistingMapping(String index, String type) {
+  private boolean createNotExistingMapping(String index, String type, EsValueType valueType) {
     if (mappingExists(index, type)) {
       return true;
     }
 
-    boolean isInstantiated = instantiateType(index, type);
+    boolean isInstantiated = instantiateType(index, type, valueType);
     if (isInstantiated) {
       addType(index, type);
     }
@@ -271,14 +300,14 @@ public class EsTagIndexer extends EsIndexer {
   /**
    * Try to add a new type to ElasticSearch to the specified index with the specified mapping.
    */
-  private boolean instantiateType(String index, String type) {
-    if ((cacheIndicesTypes.containsKey(index) && cacheIndicesTypes.get(index).contains(type)) || !checkIndex(index) || !checkType(type)) {
+  private boolean instantiateType(String index, String type, EsValueType valueType) {
+    if ((cacheIndicesTypes.containsKey(index) && cacheIndicesTypes.get(index).contains(type)) || !checkIndex(index)) {
       log.warn("instantiateType() - Bad type adding to index " + index + ", type: " + type);
     }
 
     String mapping = null;
     if (!typeIsPresent(index, type)) {
-      mapping = chooseMapping(type.substring(typePrefix.length()));
+      mapping = chooseMapping(valueType);
       log.debug("instantiateIndex() - Adding a new mapping to index " + index + " for type " + type + ": " + mapping);
     }
     return connector.handleIndexQuery(index, type, mapping);
@@ -287,16 +316,16 @@ public class EsTagIndexer extends EsIndexer {
   /**
    * Choose a {@link EsMapping} (to index the data in the right way in ElasticSearch) according to the {@param dataType}.
    */
-  private String chooseMapping(String dataType) {
+  private String chooseMapping(EsValueType dataType) {
     log.trace("chooseMapping() - Choose mapping for type " + dataType);
-    if (EsMapping.ValueType.isBoolean(dataType)) {
-      return new EsBooleanTagMapping(EsMapping.ValueType.BOOLEAN).getMapping();
-    } else if (EsMapping.ValueType.isString(dataType)) {
-      return new EsStringTagMapping(EsMapping.ValueType.STRING).getMapping();
-    } else if (EsMapping.ValueType.isNumeric(dataType)) {
-      return new EsNumericTagMapping(EsMapping.ValueType.DOUBLE).getMapping();
-    } else {
-      return null;
+
+    switch (dataType) {
+    case BOOLEAN:
+      return new EsBooleanTagMapping().getMapping();
+    case NUMERIC:
+      return new EsNumericTagMapping().getMapping();
+    default:
+      return new EsStringTagMapping().getMapping();
     }
   }
 
@@ -320,8 +349,8 @@ public class EsTagIndexer extends EsIndexer {
    *
    * @param typeName type defined for the new document.
    */
-  public synchronized void addType(String index, String typeName) {
-    if (checkType(typeName) && cacheIndicesTypes.containsKey(index)) {
+  protected synchronized void addType(String index, String typeName) {
+    if (cacheIndicesTypes.containsKey(index)) {
       cacheIndicesTypes.get(index).add(typeName);
       log.debug("addType() - Added type " + typeName + " in memory list.");
     } else {

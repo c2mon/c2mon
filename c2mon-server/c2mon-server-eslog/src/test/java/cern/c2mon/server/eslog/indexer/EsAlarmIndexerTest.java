@@ -16,14 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.indexer;
 
-import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.eslog.connector.TransportConnector;
-import cern.c2mon.server.eslog.structure.converter.EsAlarmLogConverter;
-import cern.c2mon.server.eslog.structure.mappings.EsAlarmMapping;
-import cern.c2mon.server.eslog.structure.mappings.EsMapping;
-import cern.c2mon.server.eslog.structure.types.EsAlarm;
-import cern.c2mon.server.test.CacheObjectCreation;
+import java.sql.Timestamp;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +26,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.sql.Timestamp;
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.eslog.connector.TransportConnector;
+import cern.c2mon.server.eslog.structure.converter.EsAlarmLogConverter;
+import cern.c2mon.server.eslog.structure.mappings.EsAlarmMapping;
+import cern.c2mon.server.eslog.structure.types.EsAlarm;
+import cern.c2mon.server.test.CacheObjectCreation;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.anyString;
@@ -67,7 +67,6 @@ public class EsAlarmIndexerTest {
     indexer.setAlarmPrefix(indexer.alarmPrefix);
     indexer.setIndexFormat("M");
     esAlarmMapping = new EsAlarmMapping();
-    esAlarmMapping.setProperties(EsMapping.ValueType.ALARM);
   }
 
   @After

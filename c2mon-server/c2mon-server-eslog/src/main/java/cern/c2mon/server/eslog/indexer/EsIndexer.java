@@ -52,7 +52,7 @@ public abstract class EsIndexer implements IDBPersistenceHandler {
   protected String indexFormat;
 
   /**
-   * Every tag or alias must begin with the same prefix, e.g., tag_string is a good type and tag_207807 is a good alias.
+   * Every tag must begin with the same prefix, e.g., tag_string is a good type.
    */
   @Value("${c2mon.server.eslog.prefix.type}")
   protected String typePrefix;
@@ -60,7 +60,7 @@ public abstract class EsIndexer implements IDBPersistenceHandler {
   /**
    * The first index in the cluster is c2mon_1970-01 which corresponds to the Epoch time (ES stocks timestamps in milliseconds since Epoch).
    */
-  protected String FIRST_INDEX = indexPrefix + "1970-01";
+  protected final String FIRST_INDEX = indexPrefix + "1970-01";
 
   @Value("${c2mon.server.eslog.prefix.supervision}")
   protected String supervisionPrefix;

@@ -122,7 +122,7 @@ public class EsTagLogConverter implements Converter<Tag, AbstractEsTag> {
       valueType = EsValueType.OBJECT;
     }
 
-    esTag.setType(valueType.getFriendlyName());
+    esTag.setType(valueType);
 
   }
 

@@ -62,7 +62,6 @@ public class EsSupervisionEventMappingTest {
 
   @Test
   public void testSetProperties() {
-    mapping.setProperties(EsMapping.ValueType.SUPERVISION);
     assertNotNull(mapping.getMappings());
     assertEquals(expectedMappings, mapping.getMapping());
   }

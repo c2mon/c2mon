@@ -92,7 +92,6 @@ public class EsAlarmMappingTest {
 
   @Test
   public void testSetProperties() {
-    mapping.setProperties(EsMapping.ValueType.ALARM);
     assertNotNull(mapping.getMappings());
     assertEquals(expectedMappings, mapping.getMapping());
   }

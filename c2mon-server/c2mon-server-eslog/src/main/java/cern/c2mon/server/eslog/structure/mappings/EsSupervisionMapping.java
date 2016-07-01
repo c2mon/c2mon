@@ -30,33 +30,21 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 public class EsSupervisionMapping implements EsMapping {
   private SupervisionProperties mappings;
+  private static transient Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
   /**
    * Instantiate a new EsSupervisionMapping by setting it Properties to supervision type.
    */
   public EsSupervisionMapping() {
-    setProperties(ValueType.SUPERVISION);
+    mappings = new SupervisionProperties();
   }
 
   /**
    * @return the mapping as JSON String for ElasticSearch.
    */
   public String getMapping() {
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
     String json = gson.toJson(this);
     log.trace("getMapping() - Created the supervision mapping: " + json);
     return json;
-  }
-
-  /**
-   * Initialize the mapping according that the dataType is supervision type.
-   */
-  @Override
-  public void setProperties(ValueType valueType) {
-    if (ValueType.isSupervision(valueType)) {
-      mappings = new SupervisionProperties();
-    } else {
-      log.debug("setProperties() - Could not instantiate properties, type is null");
-    }
   }
 }

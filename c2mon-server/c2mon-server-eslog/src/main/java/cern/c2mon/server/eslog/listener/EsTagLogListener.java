@@ -127,8 +127,8 @@ public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLif
         .collect(Collectors.toList());
   }
 
-  private ListMultimap<String, AbstractEsTag> convertTagsToEsTags(final Collection<Tag> tagsToLog) {
-    final ListMultimap<String, AbstractEsTag> tagMultimap = ArrayListMultimap.create();
+  private ListMultimap<EsValueType, AbstractEsTag> convertTagsToEsTags(final Collection<Tag> tagsToLog) {
+    final ListMultimap<EsValueType, AbstractEsTag> tagMultimap = ArrayListMultimap.create();
     if (CollectionUtils.isEmpty(tagsToLog)) {
       return tagMultimap;
     }
@@ -143,7 +143,7 @@ public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLif
     return tagMultimap;
   }
 
-  private void sendEsTagsToElastic(final ListMultimap<String, AbstractEsTag> tagMultimap) {
+  private void sendEsTagsToElastic(final ListMultimap<EsValueType, AbstractEsTag> tagMultimap) {
     if(tagMultimap == null) {
       log.warn("sendCollectionTagESToElasticSearch() - received an empty map of tags, will do nothing!");
       return;
@@ -152,12 +152,12 @@ public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLif
     log.info("sendCollectionTagESToElasticSearch() - send a collection of tags to indexer of size: "
         + tagMultimap.size());
 
-    tagNumericPersistenceManager.storeData(tagMultimap.get(EsValueType.NUMERIC.getFriendlyName()));
-    tagBooleanPersistenceManager.storeData(tagMultimap.get(EsValueType.BOOLEAN.getFriendlyName()));
-    tagStringPersistenceManager.storeData(tagMultimap.get(EsValueType.STRING.getFriendlyName()));
+    tagNumericPersistenceManager.storeData(tagMultimap.get(EsValueType.NUMERIC));
+    tagBooleanPersistenceManager.storeData(tagMultimap.get(EsValueType.BOOLEAN));
+    tagStringPersistenceManager.storeData(tagMultimap.get(EsValueType.STRING));
 
     //objects will be stored with the string persistence manager, as well
-    tagStringPersistenceManager.storeData(tagMultimap.get(EsValueType.OBJECT.getFriendlyName()));
+    tagStringPersistenceManager.storeData(tagMultimap.get(EsValueType.OBJECT));
   }
 
   @Override

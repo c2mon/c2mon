@@ -20,7 +20,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.junit.Assert.assertEquals;
+import cern.c2mon.server.eslog.structure.types.tag.EsValueType;
+
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -28,22 +29,17 @@ import static org.junit.Assert.assertNotNull;
  * @author Alban Marguet.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class EsTagImplEsMappingTest {
-  private String expectedMapping = "{\n" +
-          "  \"_routing\": {\n" +
-          "    \"required\": \"true\"\n" +
-          "  }\n" +
-          "}";
-
+public class EsTagMappingTest {
+  
   @Test
   public void testGetESMapping() {
-    EsTagMapping mapping = new EsTagMapping();
+    EsTagMapping mapping = new EsTestTagMapping();
     assertNotNull(mapping.getMapping());
   }
-
-  @Test
-  public void testExpectedOutput() {
-    EsTagMapping mapping = new EsTagMapping();
-    assertEquals(expectedMapping, mapping.getMapping());
+  
+  private class EsTestTagMapping extends EsTagMapping {
+    public EsTestTagMapping() {
+      super(EsValueType.OBJECT);
+    }
   }
 }

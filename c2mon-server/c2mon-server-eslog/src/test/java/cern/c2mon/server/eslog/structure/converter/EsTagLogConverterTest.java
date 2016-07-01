@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gson.GsonBuilder;
+import lombok.Data;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,7 +39,6 @@ import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.eslog.structure.mappings.EsMapping.ValueType;
 import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
 import cern.c2mon.server.eslog.structure.types.tag.EsTagBoolean;
 import cern.c2mon.server.eslog.structure.types.tag.EsTagNumeric;
@@ -55,7 +56,7 @@ import static org.mockito.Mockito.when;
 /**
  * Checks on the fields of data appened/set to AbstractEsTag.
  *
- * @author Alban Marguet.
+ * @author Alban Marguet, Matthias Braeger
  */
 @RunWith(MockitoJUnitRunner.class)
 public class EsTagLogConverterTest {
@@ -236,12 +237,36 @@ public class EsTagLogConverterTest {
 
   @Test
   public void testConvertToTagES() throws IOException {
+    convertToTagES(Boolean.FALSE, EsValueType.BOOLEAN);
+
+    convertToTagES(Integer.MAX_VALUE, EsValueType.NUMERIC);
+    convertToTagES(0, EsValueType.NUMERIC);
+    convertToTagES(null, "Integer", EsValueType.NUMERIC);
+
+    convertToTagES(Long.MIN_VALUE, EsValueType.NUMERIC);
+    convertToTagES(Double.MIN_VALUE, EsValueType.NUMERIC);
+    convertToTagES(Float.MIN_VALUE, EsValueType.NUMERIC);
+    convertToTagES(Short.MAX_VALUE, EsValueType.NUMERIC);
+
+    convertToTagES("John Lennon", EsValueType.STRING);
+
+    ComplexType test = new ComplexType();
+    test.setBool(true);
+    test.setInteger(5);
+    test.setString("Paul McCartney");
+    convertToTagES(new GsonBuilder().create().toJson(test), test.getClass().getName(), EsValueType.OBJECT);
+
+  }
+
+  private void convertToTagES(final Object value, final EsValueType type) throws IOException {
+    convertToTagES(value, value.getClass().getName(), type);
+    convertToTagES(value, value.getClass().getName().substring("java.lang.".length()), type);
+  }
+
+  private void convertToTagES(final Object value, final String dataType, final EsValueType type) throws IOException {
     long id = 1L;
     String name = "tag";
-    ValueType type = ValueType.BOOLEAN;
-    String dataType = "Boolean";
     long timeStamp = 123456L;
-    Boolean value = Boolean.TRUE;
     String valueDesc = "ok";
 
     when(tagC2MON.getId()).thenReturn(id);
@@ -258,7 +283,7 @@ public class EsTagLogConverterTest {
     AbstractEsTag esTag = esLogConverter.convert(tagC2MON);
     assertEquals(id, esTag.getIdAsLong());
     assertEquals(name, esTag.getName());
-    assertEquals(type.toString(), esTag.getType());
+    assertEquals(type, esTag.getType());
     assertNotNull(esTag.getC2mon());
     assertEquals(dataType, esTag.getC2mon().getDataType());
     assertEquals(timeStamp, esTag.getC2mon().getServerTimestamp());
@@ -267,22 +292,12 @@ public class EsTagLogConverterTest {
     assertEquals(valueDesc, esTag.getValueDescription());
     assertNotNull(esTag.getQuality());
     assertFalse(esTag.getQuality().isValid());
-
-    when(tagC2MON.getDataType()).thenReturn("String");
-    when(tagC2MON.getValue()).thenReturn(name);
-    esTag = esLogConverter.convert(tagC2MON);
-    assertEquals(name, esTag.getRawValue());
-
-    when(tagC2MON.getDataType()).thenReturn("Long");
-    when(tagC2MON.getValue()).thenReturn(timeStamp);
-    esTag = esLogConverter.convert(tagC2MON);
-    assertEquals(timeStamp, esTag.getRawValue());
+    assertEquals("km", esTag.getUnit());
 
     when(tagC2MON.getDataTagQuality()).thenReturn(new DataTagQualityImpl(TagQualityStatus.EQUIPMENT_DOWN));
     esTag = esLogConverter.convert(tagC2MON);
     assertNotNull(esTag.getQuality());
     assertFalse(esTag.getQuality().isValid());
-    assertEquals("km", esTag.getUnit());
   }
 
   @Test
@@ -313,7 +328,7 @@ public class EsTagLogConverterTest {
     assertTrue((Boolean) esTag.getRawValue());
     assertNotNull(esTag.getC2mon());
     assertEquals("Boolean", esTag.getC2mon().getDataType());
-    assertEquals(EsValueType.BOOLEAN.getFriendlyName(), esTag.getType());
+    assertEquals(EsValueType.BOOLEAN, esTag.getType());
 
     DataTagCacheObject tagNumeric = new DataTagCacheObject();
     tagNumeric.setId(1L);
@@ -329,7 +344,7 @@ public class EsTagLogConverterTest {
     assertNull(esTag.getValueString());
     assertNotNull(esTag.getC2mon());
     assertEquals("Integer", esTag.getC2mon().getDataType());
-    assertEquals(EsValueType.NUMERIC.getFriendlyName(), esTag.getType());
+    assertEquals(EsValueType.NUMERIC, esTag.getType());
   }
 
   @Test
@@ -360,7 +375,15 @@ public class EsTagLogConverterTest {
     AbstractEsTag esTag = esLogConverter.convert(tag);
 
     assertNotNull(esTag);
-    assertEquals(EsValueType.BOOLEAN.toString(), esTag.getType());
+    assertEquals(EsValueType.BOOLEAN, esTag.getType());
+  }
+
+
+  @Data
+  private class ComplexType {
+    String string;
+    Integer integer;
+    Boolean bool;
   }
 
 }

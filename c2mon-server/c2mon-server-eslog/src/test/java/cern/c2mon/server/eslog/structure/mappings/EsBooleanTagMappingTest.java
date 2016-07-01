@@ -16,10 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.mappings;
 
-import cern.c2mon.server.eslog.structure.mappings.EsMapping.ValueType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import cern.c2mon.server.eslog.structure.mappings.EsMapping.ValueType;
 
 import static org.junit.Assert.assertEquals;
 
@@ -122,20 +123,14 @@ public class EsBooleanTagMappingTest {
 
   @Test
   public void testGetBooleanMapping() {
-    EsBooleanTagMapping mapping = new EsBooleanTagMapping(ValueType.BOOLEAN);
+    EsBooleanTagMapping mapping = new EsBooleanTagMapping();
     String valueType = mapping.properties.getValueType();
     assertEquals(ValueType.BOOLEAN.toString(), valueType);
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void wrongGetBooleanMapping() {
-    EsBooleanTagMapping mapping = new EsBooleanTagMapping(ValueType.STRING);
-    mapping.properties.getValueType();
-  }
-
   @Test
   public void testOutput() {
-    EsBooleanTagMapping mapping = new EsBooleanTagMapping(ValueType.BOOLEAN);
+    EsBooleanTagMapping mapping = new EsBooleanTagMapping();
     assertEquals(expectedMapping, mapping.getMapping());
   }
 }

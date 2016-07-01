@@ -118,7 +118,7 @@ public class TransportConnectorTest {
     Client initClient = connector.getClient();
 
     String type = "tag_string";
-    String mapping = new EsStringTagMapping(ValueType.STRING).getMapping();
+    String mapping = new EsStringTagMapping().getMapping();
 
     connector.setClient(null); // should be caught
     boolean result = connector.handleIndexQuery("c2mon_2015-01", type, mapping);

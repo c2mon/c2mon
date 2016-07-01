@@ -17,6 +17,7 @@
 package cern.c2mon.server.eslog.structure.mappings;
 
 import cern.c2mon.server.eslog.structure.types.tag.EsTagBoolean;
+import cern.c2mon.server.eslog.structure.types.tag.EsValueType;
 
 /**
  * EsMapping that a {@link EsTagBoolean} will use in the ElasticSearch cluster.
@@ -30,20 +31,7 @@ public class EsBooleanTagMapping extends EsTagMapping implements EsMapping {
   /**
    * Instantiate a {@link EsBooleanTagMapping} by setting its properties with {@param type}
    */
-  public EsBooleanTagMapping(ValueType type) {
-    super();
-    setProperties(type);
-  }
-
-  /**
-   * Initialize the mapping according that the valueType is boolean type.
-   */
-  @Override
-  public void setProperties(ValueType valueType) {
-    if (valueType.equals(ValueType.BOOLEAN)) {
-      properties = new Properties(valueType);
-    } else {
-      throw new IllegalArgumentException("Type for EsTagBoolean must be boolean.");
-    }
+  public EsBooleanTagMapping() {
+    super(EsValueType.BOOLEAN);
   }
 }

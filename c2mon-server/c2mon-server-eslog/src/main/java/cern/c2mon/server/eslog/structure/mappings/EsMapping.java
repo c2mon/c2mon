@@ -16,11 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.mappings;
 
-import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
-import lombok.Getter;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import lombok.Getter;
+
+import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
+import cern.c2mon.server.eslog.structure.types.tag.EsValueType;
 
 /**
  * Defines the ElasticSearch arguments for the types and the indices.
@@ -36,8 +38,6 @@ public interface EsMapping {
     STRING("string"),
     LONG("long"),
     INTEGER("integer"),
-    FLOAT("float"),
-    SHORT("short"),
     DOUBLE("double"),
     BOOLEAN("boolean"),
     DATE("date"),
@@ -54,104 +54,6 @@ public interface EsMapping {
     public String toString() {
       return this.type;
     }
-
-    public static boolean isAlarm(ValueType type) {
-      return ALARM.equals(type);
-    }
-
-    public static boolean isAlarm(String typeAsString) {
-      return ALARM.toString().equalsIgnoreCase(typeAsString);
-    }
-
-    public static boolean isSupervision(ValueType type) {
-      return SUPERVISION.equals(type);
-    }
-
-    public static boolean isSupervision(String typeAsString) {
-      return SUPERVISION.toString().equalsIgnoreCase(typeAsString);
-    }
-
-    public static boolean isNumeric(ValueType type) {
-      switch(type) {
-        case FLOAT:
-        case LONG:
-        case SHORT:
-        case DOUBLE:
-        case INTEGER:
-          return true;
-        default:
-          return false;
-      }
-    }
-
-    public static boolean isNumeric(final String typeAsString) {
-      return (isLong(typeAsString)
-              || isFloat(typeAsString)
-              || isShort(typeAsString)
-              || isDouble(typeAsString)
-              || isInt(typeAsString));
-    }
-
-    public static ValueType getIfNumeric(final String dataType) {
-      if(ValueType.isInt(dataType)) {
-        return ValueType.INTEGER;
-      } else if(ValueType.isDouble(dataType)) {
-        return ValueType.DOUBLE;
-      } else if(ValueType.isFloat(dataType)) {
-        return ValueType.FLOAT;
-      } else if(ValueType.isLong(dataType)) {
-        return ValueType.LONG;
-      } else {
-        return null;
-      }
-    }
-
-    public static boolean isLong(final String typeAsString) {
-      return LONG.toString().equalsIgnoreCase(typeAsString);
-    }
-
-    public static boolean isFloat(final String typeAsString) {
-      return FLOAT.toString().equalsIgnoreCase(typeAsString);
-    }
-
-    public static boolean isShort(final String typeAsString) {
-      return SHORT.toString().equalsIgnoreCase(typeAsString);
-    }
-
-    public static boolean isDouble(final String typeAsString) {
-      return DOUBLE.toString().equalsIgnoreCase(typeAsString);
-    }
-
-    public static boolean isInt(final String typeAsString) {
-      return INTEGER.toString().equalsIgnoreCase(typeAsString);
-    }
-
-    public static boolean isBoolean(final ValueType type) {
-      return BOOLEAN.equals(type);
-    }
-
-    public static boolean isBoolean(final String typeAsString) {
-      return BOOLEAN.toString().equalsIgnoreCase(typeAsString);
-    }
-
-    public static boolean isString(final ValueType type) {
-      return STRING.equals(type);
-    }
-
-    public static boolean isString(final String typeAsString) {
-      return STRING.toString().equalsIgnoreCase(typeAsString);
-    }
-
-    public static boolean isDate(final String typeAsString) {
-      return DATE.toString().equalsIgnoreCase(typeAsString);
-    }
-
-    public static boolean matches(final String typeAsString) {
-      return (isNumeric(typeAsString)
-              || isBoolean(typeAsString)
-              || isDate(typeAsString)
-              || isString(typeAsString));
-    }
   }
 
   String indexNotAnalyzed = "not_analyzed";
@@ -160,17 +62,12 @@ public interface EsMapping {
 
   String getMapping();
 
-  void setProperties(ValueType tagValueType);
-
+  @Getter
   class Routing {
     String required;
 
     Routing() {
       this.required = routing;
-    }
-
-    public String getRequired() {
-      return required;
     }
   }
 
@@ -196,17 +93,25 @@ public interface EsMapping {
     C2monMetadata c2mon;
     Metadata metadata;
 
-    Properties(ValueType valueType) {
+    Properties(EsValueType valueType) {
       this.id = new Id();
       this.name = new Name();
 
-      if (ValueType.isNumeric(valueType)) {
-        this.value = new Value(valueType);
-      } else if (ValueType.isString(valueType)) {
-        this.valueString = new ValueString(valueType);
-      } else if (ValueType.isBoolean(valueType)) {
-        this.valueBoolean = new ValueBoolean(valueType);
+      switch (valueType) {
+      case NUMERIC:
         this.value = new Value(ValueType.DOUBLE);
+        break;
+      case BOOLEAN:
+        this.valueBoolean = new ValueBoolean();
+        this.value = new Value(ValueType.DOUBLE);
+        break;
+      case OBJECT:
+        this.valueString = new ValueString(ValueType.NESTED);
+        break;
+      case STRING:
+      default:
+        this.valueString = new ValueString(ValueType.STRING);
+        break;
       }
 
       this.type = new Type();
@@ -263,7 +168,8 @@ public interface EsMapping {
       private final String dynamic = "false";
       private final String type = ValueType.OBJECT.toString();
 
-      private final Map<String, Object> properties = new HashMap<String, Object>(){{
+      @SuppressWarnings("serial")
+      private final Map<String, Object> properties = new HashMap<String, Object>() {{
         put("status", new Status());
         put("valid", new Valid());
         put("statusInfo", new StatusInfo());
@@ -301,11 +207,7 @@ public interface EsMapping {
 
     @Getter
     class ValueBoolean {
-      private final String type;
-
-      public ValueBoolean(ValueType type) {
-        this.type = type.toString();
-      }
+      private final String type = ValueType.BOOLEAN.toString();
     }
 
     @Getter

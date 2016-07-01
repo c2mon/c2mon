@@ -20,6 +20,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 
+import cern.c2mon.server.eslog.structure.types.tag.EsValueType;
+
 /**
  * Allows to create dynamic mappings for the different types that exist in ElasticSearch.
  * Take care of the basic structure requiring the routing for faster retrieval and the body of the properties.
@@ -27,16 +29,18 @@ import lombok.extern.slf4j.Slf4j;
  * @author Alban Marguet.
  */
 @Slf4j
-public class EsTagMapping implements EsMapping {
+public abstract class EsTagMapping implements EsMapping {
   protected Routing _routing;
   protected Properties properties;
+  private static transient Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
   /**
    * Instantiate a new EsTagMapping by putting a routing required.
    */
-  public EsTagMapping() {
+  public  EsTagMapping(EsValueType valueType) {
     _routing = new Routing();
     log.trace("EsTagMapping() - Initialized a mapping with routing.");
+    setProperties(valueType);
   }
 
   /**
@@ -44,7 +48,6 @@ public class EsTagMapping implements EsMapping {
    */
   @Override
   public String getMapping() {
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
     String json = gson.toJson(this);
     log.trace("getMapping() - Created the mapping : " + json);
     return json;
@@ -53,8 +56,7 @@ public class EsTagMapping implements EsMapping {
   /**
    * Set the Properties object according to the {@param valueType}
    */
-  @Override
-  public void setProperties(ValueType valueType) {
+  private void setProperties(EsValueType valueType) {
     properties = new Properties(valueType);
   }
 }

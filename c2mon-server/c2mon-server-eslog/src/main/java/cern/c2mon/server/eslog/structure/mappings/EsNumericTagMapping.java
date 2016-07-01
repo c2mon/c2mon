@@ -17,6 +17,7 @@
 package cern.c2mon.server.eslog.structure.mappings;
 
 import cern.c2mon.server.eslog.structure.types.tag.EsTagNumeric;
+import cern.c2mon.server.eslog.structure.types.tag.EsValueType;
 
 /**
  * EsMapping that a {@link EsTagNumeric} will use to be indexed in the ElasticSearch cluster.
@@ -29,20 +30,7 @@ public class EsNumericTagMapping extends EsTagMapping implements EsMapping {
   /**
    * Instantiate a new EsNumericTagMapping by setting its Properties according to {@param valueType}
    */
-  public EsNumericTagMapping(final ValueType valueType) {
-    super();
-    setProperties(valueType);
-  }
-
-  /**
-   * Initialize the mapping according to the valueType.
-   */
-  @Override
-  public void setProperties(ValueType tagValueType) {
-    if (ValueType.isNumeric(tagValueType)) {
-      this.properties = new Properties(tagValueType);
-    } else {
-      throw new IllegalArgumentException("Type for EsTagNumeric must be integer or double.");
-    }
+  public EsNumericTagMapping() {
+    super(EsValueType.NUMERIC);
   }
 }

@@ -17,6 +17,8 @@
 package cern.c2mon.server.eslog.structure.mappings;
 
 import cern.c2mon.server.eslog.structure.mappings.EsMapping.ValueType;
+import cern.c2mon.server.eslog.structure.types.tag.EsValueType;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -44,7 +46,7 @@ public class EsNumericTagMappingTest {
       "      \"index\": \"not_analyzed\"\n" +
       "    },\n" +
       "    \"value\": {\n" +
-      "      \"type\": \"long\"\n" +
+      "      \"type\": \"double\"\n" +
       "    },\n" +
       "    \"type\": {\n" +
       "      \"type\": \"string\",\n" +
@@ -121,20 +123,14 @@ public class EsNumericTagMappingTest {
 
   @Test
   public void testGetNumericMapping() {
-    EsNumericTagMapping mapping = new EsNumericTagMapping(ValueType.INTEGER);
+    EsNumericTagMapping mapping = new EsNumericTagMapping();
     String valueType = mapping.properties.getValueType();
-    assertTrue(ValueType.isNumeric(valueType));
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void wrongGetNumericMapping() {
-    EsNumericTagMapping mapping = new EsNumericTagMapping(ValueType.BOOLEAN);
-    mapping.properties.getValueType();
+    assertEquals(ValueType.DOUBLE.toString(), valueType);
   }
 
   @Test
   public void testOutput() {
-    EsNumericTagMapping mapping = new EsNumericTagMapping(ValueType.LONG);
+    EsNumericTagMapping mapping = new EsNumericTagMapping();
     assertEquals(expectedLongMapping, mapping.getMapping());
   }
 }

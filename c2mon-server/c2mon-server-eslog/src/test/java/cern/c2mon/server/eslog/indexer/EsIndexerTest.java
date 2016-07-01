@@ -16,6 +16,25 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.indexer;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+
+import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.eslog.config.EsLogIntegrationConfiguration;
 import cern.c2mon.server.eslog.connector.TransportConnector;
@@ -25,25 +44,10 @@ import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
 import cern.c2mon.server.eslog.structure.types.tag.EsTagBoolean;
 import cern.c2mon.server.eslog.structure.types.tag.EsTagString;
 import cern.c2mon.server.eslog.structure.types.tag.EsValueType;
-import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.junit.*;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
-import static junit.framework.TestCase.*;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -73,18 +77,8 @@ public class EsIndexerTest {
   @Before
   public void clientSetup() throws IOException {
     log.info("@Before");
-    log.info("begin delete directory");
-
-    File dataDir = new File(home + "/data");
-    File[] data = dataDir.listFiles();
-
-    if (data != null) {
-      for (File file : data) {
-        file.delete();
-      }
-    }
-
-    log.info("end. Cleaned ./data directory");
+    
+    delete();
 
     if (connector.getClient() != null) {
       initClient = connector.getClient();
@@ -107,6 +101,21 @@ public class EsIndexerTest {
     indexer.getCacheIndicesTypes().clear();
 //    connector.closeBulk();
   }
+  
+  private void delete() {
+    log.info("begin delete directory");
+
+    File dataDir = new File(home + "/data");
+    File[] data = dataDir.listFiles();
+
+    if (data != null) {
+      for (File file : data) {
+        file.delete();
+      }
+    }
+
+    log.info("end. Cleaned ./data directory");
+  }
 
   @Test
   public void testInit() {
@@ -127,7 +136,7 @@ public class EsIndexerTest {
 
     assertEquals(expectedIndex, indexer.getCacheIndicesTypes().keySet());
 
-    connector.handleIndexQuery("c2mon-tag_2015-01", "tag_string", new EsStringTagMapping(EsMapping.ValueType.STRING).getMapping());
+    connector.handleIndexQuery("c2mon-tag_2015-01", "tag_string", new EsStringTagMapping().getMapping());
     assertEquals(expectedType, indexer.getCacheIndicesTypes().get("c2mon-tag_2015-01"));
   }
 
@@ -207,7 +216,7 @@ public class EsIndexerTest {
     List<AbstractEsTag> list = new ArrayList<>();
     AbstractEsTag tag = new EsTagBoolean();
 
-    tag.setType(EsValueType.BOOLEAN.getFriendlyName());
+    tag.setType(EsValueType.BOOLEAN);
     tag.getC2mon().setDataType("boolean");
     tag.setId(1L);
     tag.getC2mon().setServerTimestamp(123456789000L);
@@ -247,8 +256,9 @@ public class EsIndexerTest {
     for (; id <= size; id++, tagServerTime += 1000) {
       tag = new EsTagString();
 
-      tag.getC2mon().setDataType(EsMapping.ValueType.STRING.toString());
+      tag.getC2mon().setDataType(String.class.getName());
       tag.setId(id);
+      tag.setType(EsValueType.STRING);
       tag.getC2mon().setServerTimestamp(tagServerTime);
       list.add(tag);
       listIndices.add(indexer.indexPrefix + indexer.millisecondsToYearMonth(tag.getC2mon().getServerTimestamp()));
@@ -283,7 +293,7 @@ public class EsIndexerTest {
     assertTrue(resultIndices.size() == liveIndices.size());
 
     assertTrue(resultTypes.contains("tag_string") && resultTypes.size() == 1);
-    assertTrue(resultIndices.containsAll(listIndices) && resultIndices.size() == listIndices.size());
+    assertTrue(resultIndices.containsAll(listIndices));
 
     assertTrue(liveIndices.containsAll(resultIndices));
     assertTrue(liveTypes.containsAll(resultTypes));

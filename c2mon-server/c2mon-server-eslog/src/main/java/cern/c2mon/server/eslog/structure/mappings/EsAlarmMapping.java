@@ -32,31 +32,19 @@ public class EsAlarmMapping implements EsMapping {
 
   private AlarmProperties mappings;
   private transient long tagId;
+  private static transient Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
   /**
    * Instantiate am EsAlarmMapping by setting its properties with the ALARM.
    */
   public EsAlarmMapping() {
-    setProperties(ValueType.ALARM);
-  }
-
-  /**
-   * Initialize the mapping according that the valueType is alarm type.
-   */
-  @Override
-  public void setProperties(ValueType valueType) {
-    if (ValueType.isAlarm(valueType)) {
-      mappings = new AlarmProperties();
-    } else {
-      log.debug("setProperties() - Could not instantiate properties, type is null");
-    }
+    mappings = new AlarmProperties();
   }
 
   /**
    * @return the mapping as JSON String for ElasticSearch.
    */
   public String getMapping() {
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
     String json = gson.toJson(this);
     log.trace("getMapping() - Created the alarm mapping: " + json);
     return json;

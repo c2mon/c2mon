@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.listener;
 
+import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.eslog.structure.converter.EsSupervisionEventConverter;
 import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
@@ -51,6 +52,9 @@ public class EsSupervisionEventLogListenerTest {
 
   @Mock
   private SupervisionNotifier supervisionNotifier;
+  
+  @Mock
+  private IPersistenceManager persistenceManager;
 
   @InjectMocks
   private EsSupervisionEventListener listener;
