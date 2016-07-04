@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -20,6 +20,7 @@ import java.util.Map;
 
 import cern.c2mon.shared.common.command.ISourceCommandTag;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 
 /**
  * The equipment configuration interface covers all for the implementation
@@ -110,13 +111,22 @@ public interface IEquipmentConfiguration {
      * @return SourceCommandTag map (commandTagId -> SourceCommandTag)
      */
     Map<Long, ISourceCommandTag> getSourceCommandTags();
-    
+
     /**
      * @param dataTagId The id of the data tag to look for.
      * @return <code>true</code>, if a configuration exists for the given tag id.
      * @see #getSourceDataTag(Long)
      */
     boolean isSourceDataTagConfigured(final Long dataTagId);
+
+    /**
+     * Checks all {@link SourceDataTag} which are attached to the equipment for the given name and returns the id of the tag.
+     * Retruns the id of the found datatag otherwise
+     *
+     * @param name The name of the tag to look for.
+     * @return Retruns the id of the found tag otherwise throws an {@link IllegalArgumentException}.
+     */
+    Long getSourceDataTagIdByName(String name);
 
     /**
      * Gets the SourceDataTag with the specified id.

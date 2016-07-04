@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -309,10 +309,10 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
   /**
    * This method sets the Equipment unit's address
    *
-   * @deprecated this method is kept for backward compatibility reasons. For new
-   *             development please use method
-   *             {@link #setEquipmentAddress(String)}
    * @param addr equipment's address
+   * @deprecated this method is kept for backward compatibility reasons. For new
+   * development please use method
+   * {@link #setEquipmentAddress(String)}
    */
   @Deprecated
   public void setAddress(final String addr) {
@@ -326,9 +326,9 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
   /**
    * This method sets the Equipment unit's address
    *
-   * @deprecated this method is kept for backward compatibility reasons. For new
-   *             development please use method {@link #getEquipmentAddress()}
    * @return The address of this equipment. (key value pairs separated with ';')
+   * @deprecated this method is kept for backward compatibility reasons. For new
+   * development please use method {@link #getEquipmentAddress()}
    */
   @Override
   @Deprecated
@@ -346,7 +346,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
    *
    * @param tagID The tag id to check.
    * @return True if the source data tag is part of this equipment unit else
-   *         false.
+   * false.
    */
   @Override
   public boolean hasSourceDataTag(final Long tagID) {
@@ -442,7 +442,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
   public ISourceDataTag getSourceDataTag(final Long dataTagId) {
     return sourceDataTags.get(dataTagId);
   }
-  
+
   @Override
   public boolean isSourceDataTagConfigured(final Long dataTagId) {
     return sourceDataTags.containsKey(dataTagId);
@@ -453,11 +453,21 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
    *
    * @param commandTagId The id of the command tag to look for.
    * @return The searched data tag or null if there is no command tag for the
-   *         id.
+   * id.
    */
   @Override
   public ISourceCommandTag getSourceCommandTag(final Long commandTagId) {
     return getSourceCommandTags().get(commandTagId);
+  }
+
+  @Override
+  public Long getSourceDataTagIdByName(String name) {
+   SourceDataTag tag = sourceDataTagList.stream()
+        .filter(t -> t.getName().equals(name))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("No SourceDataTag with the name " + name + " attached to the equipment."));
+
+    return tag.getId();
   }
 
   /**
