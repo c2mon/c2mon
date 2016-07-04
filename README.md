@@ -42,5 +42,5 @@ C2MON is released under the [GPLv3 License][].
 [Git]: http://help.github.com/set-up-git-redirect
 [JDK8 build]: http://www.oracle.com/technetwork/java/javase/downloads
 [Pull requests]: http://help.github.com/send-pull-requests
-[contributor guidelines]: https://gitlab.cern.ch/c2mon/c2mon/blob/master/CONTRIBUTING.md
+[contributor guidelines]: /CONTRIBUTING.md
 [GPLv3 License]: https://www.gnu.org/licenses/gpl-3.0.en.html
