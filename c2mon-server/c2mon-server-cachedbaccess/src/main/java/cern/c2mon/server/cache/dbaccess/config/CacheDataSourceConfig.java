@@ -32,7 +32,13 @@ public class CacheDataSourceConfig {
     String url = environment.getProperty("c2mon.server.cachedbaccess.jdbc.url");
 
     if (url.contains("hsql")) {
-      return new HsqlDatabaseBuilder().setUrl(url).addScript(new ClassPathResource("sql/cache-schema-hsqldb.sql")).build();
+      HsqlDatabaseBuilder builder = new HsqlDatabaseBuilder().setUrl(url).addScript(new ClassPathResource("sql/cache-schema-hsqldb.sql"));
+
+      if (environment.getProperty("c2mon.server.cachedbaccess.insertTestData", Boolean.class)) {
+        builder.addScript(new ClassPathResource("sql/demo/cache-data-demo.sql"));
+      }
+
+      return builder.build();
     } else {
       return DataSourceBuilder.create().build();
     }
