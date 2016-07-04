@@ -16,6 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.impl;
 
+import java.io.IOException;
+import java.sql.Timestamp;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
@@ -27,13 +33,11 @@ import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue.FilterType;
 import cern.c2mon.shared.common.type.TypeConverter;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
-import java.sql.Timestamp;
-
-import static cern.c2mon.shared.common.type.TypeConverter.*;
+import static cern.c2mon.shared.common.type.TypeConverter.cast;
+import static cern.c2mon.shared.common.type.TypeConverter.getType;
+import static cern.c2mon.shared.common.type.TypeConverter.isKnownClass;
+import static cern.c2mon.shared.common.type.TypeConverter.isNumber;
 import static java.lang.String.format;
 
 /**
@@ -233,6 +237,11 @@ class EquipmentSenderValid {
 
     // check if the timestamp is valid.
     if (!isTimestampValid(currentSourceDataTag, newTagValue, sourceTimestamp, pValueDescr)) {
+      return false;
+    }
+
+    if (newTagValue == null) {
+      equipmentSenderInvalid.sendInvalidTag(currentSourceDataTag, SourceDataQuality.DATA_UNAVAILABLE, pValueDescr, new Timestamp(sourceTimestamp));
       return false;
     }
 
@@ -440,8 +449,9 @@ class EquipmentSenderValid {
     if ((isKnownClass(currentSourceDataTag.getDataType())
         && !(this.dataTagValueValidator.isConvertible(currentSourceDataTag, newTagValue)
         || isInstantiable(newTagValue, getType(currentSourceDataTag.getDataType()))))) {
+
       String description = format(
-          "\tconvertible : The value (%s) received for tag[%d] and the tag's type (" + currentSourceDataTag.getDataType() + ") are not compatible.",
+          "\tconvertible : The value (%s) received for tag[%d] and the defined data type (" + currentSourceDataTag.getDataType() + ") are not compatible.",
           newTagValue, currentSourceDataTag.getId());
 
       this.equipmentLogger.warn(description);
