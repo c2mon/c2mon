@@ -462,7 +462,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
   @Override
   public Long getSourceDataTagIdByName(String name) {
-   SourceDataTag tag = sourceDataTagList.stream()
+   SourceDataTag tag = sourceDataTags.values().stream()
         .filter(t -> t.getName().equals(name))
         .findFirst()
         .orElseThrow(() -> new IllegalArgumentException("No SourceDataTag with the name " + name + " attached to the equipment."));
