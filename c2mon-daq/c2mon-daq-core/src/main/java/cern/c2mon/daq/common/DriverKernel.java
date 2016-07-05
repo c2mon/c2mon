@@ -29,6 +29,7 @@ import cern.c2mon.daq.common.messaging.ProcessRequestSender;
 import cern.c2mon.daq.common.messaging.impl.ProcessMessageSender;
 import cern.c2mon.daq.common.messaging.impl.RequestController;
 import cern.c2mon.daq.filter.FilterConnectorThread;
+import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.tools.StackTraceHelper;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.daq.tools.processexceptions.ConfRejectedTypeException;
@@ -91,7 +92,7 @@ public class DriverKernel implements ApplicationContextAware {
    * Reference to the static FilterMessageSender object
    */
   @Autowired
-  private JmsLifecycle filterMessageSender;
+  private IFilterMessageSender filterMessageSender;
 
   /**
    * The reference to the primary ProcessRequestSender: the primary sender also
