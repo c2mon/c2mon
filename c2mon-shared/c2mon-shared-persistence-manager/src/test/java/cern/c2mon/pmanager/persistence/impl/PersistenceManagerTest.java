@@ -33,7 +33,7 @@ import junit.framework.TestCase;
  *
  */
  
-public class TimPersistenceManagerTest extends TestCase {
+public class PersistenceManagerTest extends TestCase {
 
     /** Instance of the class we want to test */
     private PersistenceManager persistenceManager;
