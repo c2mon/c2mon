@@ -352,12 +352,16 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
    * current value is null.
    */
   public String getDataType() {
-    if (this.value != null) {
-
-      return this.value.getClass().getName().substring(10);
-    } else {
+    if (this.value == null) {
       return null;
     }
+
+    String dataType = value.getClass().getName();
+    if (dataType.contains(".")) {
+      return dataType.substring(dataType.lastIndexOf('.') + 1);
+    }
+
+    return dataType;
   }
 
   /**

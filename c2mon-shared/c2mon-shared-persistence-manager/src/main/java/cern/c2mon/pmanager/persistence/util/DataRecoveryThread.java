@@ -25,7 +25,7 @@ import cern.c2mon.pmanager.alarm.FallbackAlarmsInterface;
 import cern.c2mon.pmanager.fallback.FallbackProperties;
 import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.pmanager.persistence.impl.TimPersistenceManager;
+import cern.c2mon.pmanager.persistence.impl.PersistenceManager;
 
 /**
  * This class implements the Runnable interface. It runs as a separate thread
@@ -60,13 +60,13 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
      * This way the thread will be able to access its fields knowing from which
      * file it has to read back, etc.
      */
-    private TimPersistenceManager persistenceManager = null;
+    private PersistenceManager persistenceManager = null;
 
     /**
      * @param persistenceManager
      *            the persistenceManager to set
      */
-    public final void setPersistenceManager(final TimPersistenceManager persistenceManager) {
+    public final void setPersistenceManager(final PersistenceManager persistenceManager) {
          this.persistenceManager = persistenceManager;
          
     }
@@ -78,7 +78,7 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
      * @param persistence
      *            Indicates the number of miliseconds the thread has to sleep
      */
-    public DataRecoveryThread(final TimPersistenceManager persistence) {
+    public DataRecoveryThread(final PersistenceManager persistence) {
         if (persistence.getSleepTime() == -1) { // The sleeptime has not been
                                                 // provided by the client
             persistence.setSleepTime(DEFAULT_SLEEP_TIME);

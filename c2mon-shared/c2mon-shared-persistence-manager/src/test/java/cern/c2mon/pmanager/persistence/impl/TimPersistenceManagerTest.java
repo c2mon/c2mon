@@ -22,7 +22,7 @@ import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.pmanager.mock.AlarmListenerImpl;
 import cern.c2mon.pmanager.mock.DBHandlerImpl;
 import cern.c2mon.pmanager.mock.FallbackImpl;
-import cern.c2mon.pmanager.persistence.impl.TimPersistenceManager;
+import cern.c2mon.pmanager.persistence.impl.PersistenceManager;
 import junit.framework.TestCase;
 
 /**
@@ -36,11 +36,11 @@ import junit.framework.TestCase;
 public class TimPersistenceManagerTest extends TestCase {
 
     /** Instance of the class we want to test */
-    private TimPersistenceManager persistenceManager;
+    private PersistenceManager persistenceManager;
     
     /** It sets all the objects needed for running the test */
     public final void setUp() {
-        persistenceManager = new TimPersistenceManager(new DBHandlerImpl(), "./ShortTermLogFallback", new AlarmListenerImpl(), new FallbackImpl());
+        persistenceManager = new PersistenceManager(new DBHandlerImpl(), "./ShortTermLogFallback", new AlarmListenerImpl(), new FallbackImpl());
         
     }
     

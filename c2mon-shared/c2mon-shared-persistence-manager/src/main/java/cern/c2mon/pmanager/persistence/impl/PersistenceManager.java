@@ -1,22 +1,21 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.pmanager.persistence.impl;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,13 +48,13 @@ import cern.c2mon.pmanager.persistence.util.DataRecoveryThread;
  * @author mruizgar
  *
  */
-public class TimPersistenceManager implements IPersistenceManager, FallbackAlarmsInterface {
+public class PersistenceManager<T extends IFallback> implements IPersistenceManager<T>, FallbackAlarmsInterface {
 
     /**
      * Implementation of the IDBPersistenceHandler interface that will be used
      * to commit the data into the DB
      */
-    private final IDBPersistenceHandler dbHandler;
+    private final IDBPersistenceHandler<T> dbHandler;
 
     /**
      * Indicates the time that the DataRecoveryThread will sleep between each
@@ -86,7 +85,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
     private DataRecoveryThread dataRecovery = new DataRecoveryThread(this);
 
     /** Log4j Logger for this class */
-    private static final Logger LOG = LoggerFactory.getLogger(TimPersistenceManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PersistenceManager.class);
 
     /**
      * The minimal amount of space in MB that always shall be left free on the
@@ -101,7 +100,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
     /**
      * @return the dbHandler
      */
-    public final IDBPersistenceHandler getDbHandler() {
+    public final IDBPersistenceHandler<T> getDbHandler() {
         return dbHandler;
     }
 
@@ -160,7 +159,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
      *            logged into the DB and, if it is the case, in the fallback
      *            mechanism
      */
-    public TimPersistenceManager(final IDBPersistenceHandler dbHandler,
+    public PersistenceManager(final IDBPersistenceHandler<T> dbHandler,
             final String falbackFile, final IAlarmListener aSender, final IFallback fallbackObj) {
         this.dbHandler = dbHandler;
         this.alarmSender = aSender;
@@ -179,7 +178,8 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
      *            the caller to ensure that all objects in the list are of type
      *            IFallback. No online type checking.
      */
-    public final void storeData(final List data) {
+    @Override
+    public final void storeData(final List<T> data) {
         if (log(data) && !fallbackManager.isFallbackFileEmpty()) {
             if (!this.dataRecovery.isRunning()) {
                 dataRecovery.setPersistenceManager(this);
@@ -198,7 +198,8 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
      * @param object
      *            IFallback object to be stored
      */
-    public final void storeData(final IFallback object) {
+    @Override
+    public final void storeData(final T object) {
         if (log(object) && !fallbackManager.isFallbackFileEmpty()) {
             if (!this.dataRecovery.isRunning()) {
               dataRecovery.setPersistenceManager(this);
@@ -219,7 +220,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
      * @return A boolean showing whether the database is up (true) or down
      *         (false)
      */
-    private boolean log(final List data) {
+    private boolean log(final List<T> data) {
 
         // size of the collection
         int size;
@@ -256,11 +257,11 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
             connectionDown = true;
             commitedTags = e.getCommited();
             if (size > commitedTags) {
-                List temp = data.subList(commitedTags, size);
+                List<T> temp = data.subList(commitedTags, size);
                 synchronized (fallbackManager.getFallbackFileController()) {
                     if (!writeToFallback(temp)) {
                         for (int i = 0; i < temp.size(); i++) {
-                            fallbackObj = (IFallback) temp.get(i);
+                            fallbackObj = temp.get(i);
                             FALLBACK_LOG.info(fallbackObj.toString());
                         }
                     }
@@ -285,7 +286,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
      * @return A boolean value indicating whether the DB is available (true) or
      *         unavailable (false)
      */
-    private boolean log(final IFallback object) {
+    private boolean log(final T object) {
         boolean dbConnectionUp = true;
 
         // Check whether the CommandTagHandle is not null.
@@ -300,7 +301,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
         } catch (IDBPersistenceException e) {
             dbConnectionUp = false;
             synchronized (fallbackManager.getFallbackFileController()) {
-                ArrayList temp = new ArrayList();
+                List<T> temp = new ArrayList<>();
                 temp.add(object);
                 if (!writeToFallback(temp)) {
                     FALLBACK_LOG.debug(temp.get(0).toString());
@@ -326,7 +327,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
      * @return A boolean indicating whether data should be logged to log4j
      *         instead (false) or not (true)
      */
-    private boolean writeToFallback(final List temp) {
+    private boolean writeToFallback(final List<T> temp) {
         boolean notLog4j = true;
 
         try {
@@ -386,6 +387,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
      * the reference from the thread to this current object, so the garbage
      * collector identifies it as isolated.
      */
+    @Override
     public final void finalize() {
 
         if (LOG.isDebugEnabled()) {
