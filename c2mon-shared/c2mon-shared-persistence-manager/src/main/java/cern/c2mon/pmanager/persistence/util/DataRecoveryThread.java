@@ -25,7 +25,7 @@ import cern.c2mon.pmanager.alarm.FallbackAlarmsInterface;
 import cern.c2mon.pmanager.fallback.FallbackProperties;
 import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.pmanager.persistence.impl.PersistenceManager;
+import cern.c2mon.pmanager.persistence.impl.TimPersistenceManager;
 
 /**
  * This class implements the Runnable interface. It runs as a separate thread
@@ -60,14 +60,14 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
      * This way the thread will be able to access its fields knowing from which
      * file it has to read back, etc.
      */
-    private PersistenceManager persistenceManager = null;
+    private TimPersistenceManager timPersistenceManager = null;
 
     /**
-     * @param persistenceManager
+     * @param timPersistenceManager
      *            the persistenceManager to set
      */
-    public final void setPersistenceManager(final PersistenceManager persistenceManager) {
-         this.persistenceManager = persistenceManager;
+    public final void setPersistenceManager(final TimPersistenceManager timPersistenceManager) {
+         this.timPersistenceManager = timPersistenceManager;
          
     }
 
@@ -78,12 +78,12 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
      * @param persistence
      *            Indicates the number of miliseconds the thread has to sleep
      */
-    public DataRecoveryThread(final PersistenceManager persistence) {
+    public DataRecoveryThread(final TimPersistenceManager persistence) {
         if (persistence.getSleepTime() == -1) { // The sleeptime has not been
                                                 // provided by the client
             persistence.setSleepTime(DEFAULT_SLEEP_TIME);
         }
-        this.persistenceManager = persistence;
+        this.timPersistenceManager = persistence;
     }
 
     /**
@@ -109,7 +109,7 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
      * Removes the reference to the TimPersistenceManager object
      */
     private void resetPersistenceManager() {
-        persistenceManager = null;
+        timPersistenceManager = null;
     }
 
     /**
@@ -123,8 +123,8 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
         stopped = false;
         if (FALLBACK_LOG.isDebugEnabled())
             FALLBACK_LOG.debug("Thread of instance " + this.hashCode() + " beginning");
-        synchronized (persistenceManager.getFallbackManager().getFallbackFileController()) {
-            while (!persistenceManager.getFallbackManager().isFallbackFileEmpty() && committed
+        synchronized (timPersistenceManager.getFallbackManager().getFallbackFileController()) {
+            while (!timPersistenceManager.getFallbackManager().isFallbackFileEmpty() && committed
                     && isRunning()) {
                 int numberOfTags;
                 // The data from the log file will be read from the file and
@@ -139,7 +139,7 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
                     committed = false;
                 }
                 try {
-                    Thread.sleep(persistenceManager.getSleepTime());
+                    Thread.sleep(timPersistenceManager.getSleepTime());
                 } catch (InterruptedException e) {
                     FALLBACK_LOG.error("An error occurred while trying to make the thread to sleep");
                 }
@@ -152,7 +152,7 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
          * work persistenceManager = null;
          */
         stopped = true;
-        persistenceManager = null;
+        timPersistenceManager = null;
         if (FALLBACK_LOG.isDebugEnabled()) {
             FALLBACK_LOG.debug("Removing the reference to the persistenceManager");
         }
@@ -179,7 +179,7 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
                     .debug("commitFallbackData() : Commiting the tags stored in the logfile back into the database");
         try {
             // Get all the datatags stored in the log file
-            data = persistenceManager.getFallbackManager().readDataBack(
+            data = timPersistenceManager.getFallbackManager().readDataBack(
                     FallbackProperties.getInstance().getNumberLinesToReadFromFile());
             // Insert the datatags into the database           
             if (LOG.isDebugEnabled()) {
@@ -187,7 +187,7 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
                         + " tags from the fallback file into the database");
             }
             
-            persistenceManager.getDbHandler().storeData(data);
+            timPersistenceManager.getDbHandler().storeData(data);
             committed = data.size();
         } catch (IDBPersistenceException e) {
             FALLBACK_LOG.error(
@@ -197,7 +197,7 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
                 // ignoring those last ones
                 // that have been already read, but not committed
                 committed = e.getCommited();
-                persistenceManager.getFallbackManager().goToLastProcessedLine(e.getCommited());
+                timPersistenceManager.getFallbackManager().goToLastProcessedLine(e.getCommited());
             } catch (DataFallbackException fe) {
                 FALLBACK_LOG
                         .error("CommitFallBackData : The file desciptor could not be placed in the right place,"
@@ -209,7 +209,7 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
             try {
                 // Place the cursor in the last processed line, as if this
                 // called had never been made
-                persistenceManager.getFallbackManager().goToLastProcessedLine(committed);
+                timPersistenceManager.getFallbackManager().goToLastProcessedLine(committed);
             } catch (DataFallbackException fe) {
                 FALLBACK_LOG
                         .error("CommitFallBackLogs : The file desciptor could not be placed in the right place,"
@@ -228,17 +228,17 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
      */
     private void removeReadData(final int size) {
 
-        if (!persistenceManager.getFallbackManager().removeReadData(size)) {
-            persistenceManager.getAlarmSender().fileNotReachable(
+        if (!timPersistenceManager.getFallbackManager().removeReadData(size)) {
+            timPersistenceManager.getAlarmSender().fileNotReachable(
                     ACTIVATED,
-                    persistenceManager.getFallbackManager().getFallbackFileController()
+                    timPersistenceManager.getFallbackManager().getFallbackFileController()
                             .getDataFile());
             FALLBACK_LOG
                     .error("commitFallbackCommandLogs() - CommandTags cannot be removed from the fallback log file");
         } else {
-            persistenceManager.getAlarmSender().fileNotReachable(
+            timPersistenceManager.getAlarmSender().fileNotReachable(
                     DOWN,
-                    persistenceManager.getFallbackManager().getFallbackFileController()
+                    timPersistenceManager.getFallbackManager().getFallbackFileController()
                             .getDataFile());
         }
 
@@ -252,6 +252,6 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
         if (LOG.isDebugEnabled()) {
             LOG.debug("finalize() - Removing the reference to the TimPersistenManager");
         }
-        persistenceManager = null;
+        timPersistenceManager = null;
     }
 }

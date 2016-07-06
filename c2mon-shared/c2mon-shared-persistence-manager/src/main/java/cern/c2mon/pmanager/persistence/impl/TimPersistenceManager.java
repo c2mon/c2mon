@@ -48,7 +48,7 @@ import cern.c2mon.pmanager.persistence.util.DataRecoveryThread;
  * @author mruizgar
  *
  */
-public class PersistenceManager<T extends IFallback> implements IPersistenceManager<T>, FallbackAlarmsInterface {
+public class TimPersistenceManager<T extends IFallback> implements IPersistenceManager<T>, FallbackAlarmsInterface {
 
     /**
      * Implementation of the IDBPersistenceHandler interface that will be used
@@ -85,7 +85,7 @@ public class PersistenceManager<T extends IFallback> implements IPersistenceMana
     private DataRecoveryThread dataRecovery = new DataRecoveryThread(this);
 
     /** Log4j Logger for this class */
-    private static final Logger LOG = LoggerFactory.getLogger(PersistenceManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TimPersistenceManager.class);
 
     /**
      * The minimal amount of space in MB that always shall be left free on the
@@ -159,7 +159,7 @@ public class PersistenceManager<T extends IFallback> implements IPersistenceMana
      *            logged into the DB and, if it is the case, in the fallback
      *            mechanism
      */
-    public PersistenceManager(final IDBPersistenceHandler<T> dbHandler,
+    public TimPersistenceManager(final IDBPersistenceHandler<T> dbHandler,
             final String falbackFile, final IAlarmListener aSender, final IFallback fallbackObj) {
         this.dbHandler = dbHandler;
         this.alarmSender = aSender;
