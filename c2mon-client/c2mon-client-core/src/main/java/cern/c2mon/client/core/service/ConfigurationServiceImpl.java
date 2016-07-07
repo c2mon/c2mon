@@ -282,33 +282,33 @@ public class ConfigurationServiceImpl implements ConfigurationService {
   }
 
   @Override
-  public ConfigurationReport updateTag(Tag tag) {
-    return dataTagConfigurationManager.updateTag(tag);
+  public ConfigurationReport updateDataTag(DataTag tag) {
+    return dataTagConfigurationManager.updateDataTag(tag);
   }
 
   @Override
-  public ConfigurationReport updateTags(List<Tag> tags) {
-    return dataTagConfigurationManager.updateTags(tags);
+  public ConfigurationReport updateDataTags(List<DataTag> tags) {
+    return dataTagConfigurationManager.updateDataTags(tags);
   }
 
   @Override
-  public ConfigurationReport removeTagsById(Set<Long> ids) {
-    return dataTagConfigurationManager.removeTagsById(ids);
+  public ConfigurationReport removeDataTagsById(Set<Long> ids) {
+    return dataTagConfigurationManager.removeDataTagsById(ids);
   }
 
   @Override
-  public ConfigurationReport removeTagById(Long id) {
-    return dataTagConfigurationManager.removeTagById(id);
+  public ConfigurationReport removeDataTagById(Long id) {
+    return dataTagConfigurationManager.removeDataTagById(id);
   }
 
   @Override
-  public ConfigurationReport removeTag(String name) {
-    return dataTagConfigurationManager.removeTag(name);
+  public ConfigurationReport removeDataTag(String name) {
+    return dataTagConfigurationManager.removeDataTag(name);
   }
 
   @Override
-  public ConfigurationReport removeTags(Set<String> tagNames) {
-    return dataTagConfigurationManager.removeTags(tagNames);
+  public ConfigurationReport removeDataTags(Set<String> tagNames) {
+    return dataTagConfigurationManager.removeDataTags(tagNames);
   }
 
   @Override
@@ -324,6 +324,36 @@ public class ConfigurationServiceImpl implements ConfigurationService {
   @Override
   public ConfigurationReport createRules(List<RuleTag> ruleTags) {
     return ruleTagConfigurationManager.createRules(ruleTags);
+  }
+
+  @Override
+  public ConfigurationReport updateRuleTag(RuleTag tag) {
+    return ruleTagConfigurationManager.updateRuleTag(tag);
+  }
+
+  @Override
+  public ConfigurationReport updateRuleTags(List<RuleTag> tags) {
+    return ruleTagConfigurationManager.updateRuleTags(tags);
+  }
+
+  @Override
+  public ConfigurationReport removeRuleTagsById(Set<Long> ids) {
+    return ruleTagConfigurationManager.removeRuleTagsById(ids);
+  }
+
+  @Override
+  public ConfigurationReport removeRuleTagById(Long id) {
+    return ruleTagConfigurationManager.removeRuleTagById(id);
+  }
+
+  @Override
+  public ConfigurationReport removeRuleTag(String name) {
+    return ruleTagConfigurationManager.removeRuleTag(name);
+  }
+
+  @Override
+  public ConfigurationReport removeRuleTags(Set<String> tagNames) {
+    return ruleTagConfigurationManager.removeRuleTags(tagNames);
   }
 
   @Override
