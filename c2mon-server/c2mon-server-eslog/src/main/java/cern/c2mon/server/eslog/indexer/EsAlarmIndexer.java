@@ -16,26 +16,26 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.indexer;
 
-import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.eslog.connector.Connector;
-import cern.c2mon.server.eslog.structure.mappings.EsAlarmMapping;
-import cern.c2mon.server.eslog.structure.types.EsAlarm;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.PostConstruct;
+
 import com.google.common.base.Strings;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.eslog.connector.Connector;
+import cern.c2mon.server.eslog.structure.mappings.EsAlarmMapping;
+import cern.c2mon.server.eslog.structure.types.EsAlarm;
 
 /**
  * Allows to send the data to ElasticSearch through {@link Connector}.
@@ -47,7 +47,7 @@ import java.util.Set;
 @Component
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class EsAlarmIndexer extends EsIndexer {
+public class EsAlarmIndexer<T extends EsAlarm> extends EsIndexer<T> {
   /**
    * Holds the ElasticSearch mapping given to an index.
    */
@@ -56,7 +56,8 @@ public class EsAlarmIndexer extends EsIndexer {
   /**
    * Autowired constructor.
    *
-   * @param connector handling the connection with ElasticSearch.
+   * @param connector
+   *          handling the connection with ElasticSearch.
    */
   @Autowired
   public EsAlarmIndexer(final Connector connector) {
@@ -66,6 +67,7 @@ public class EsAlarmIndexer extends EsIndexer {
   /**
    * Make sure the connection is alive.
    */
+  @Override
   @PostConstruct
   public void init() throws IDBPersistenceException {
     super.init();
@@ -73,35 +75,34 @@ public class EsAlarmIndexer extends EsIndexer {
   }
 
   @Override
-  public void storeData(IFallback object) throws IDBPersistenceException {
+  public void storeData(T esAlarm) throws IDBPersistenceException {
     try {
-      if (object != null && object instanceof EsAlarm) {
-        logAlarm((EsAlarm) object);
+      if (esAlarm != null) {
+        logAlarm(esAlarm);
       }
-    } catch(ElasticsearchException e) {
+    } catch (Exception e) {
       log.debug("EsAlarmIndexer storeData() - Cluster is not reachable");
-      throw new IDBPersistenceException();
+      throw new IDBPersistenceException(e);
     }
   }
 
   @Override
-  public void storeData(List data) throws IDBPersistenceException {
+  public void storeData(List<T> data) throws IDBPersistenceException {
     try {
-      for (Object object : data) {
-        if (object instanceof IFallback) {
-          storeData((IFallback) object);
-        }
+      for (T esAlarm : data) {
+        storeData(esAlarm);
       }
-    } catch(ElasticsearchException e) {
+    } catch (Exception e) {
       log.debug("EsAlarmIndexer storeData() - Cluster is not reachable");
-      throw new IDBPersistenceException();
+      throw new IDBPersistenceException(e);
     }
   }
 
   /**
    * Ask the {@link Connector} to write the data to ElasticSearch.
    *
-   * @param esAlarm to write to the cluster.
+   * @param esAlarm
+   *          to write to the cluster.
    */
   public void logAlarm(EsAlarm esAlarm) {
     if (esAlarm == null) {
@@ -130,7 +131,8 @@ public class EsAlarmIndexer extends EsIndexer {
   }
 
   /**
-   * Ask the ElasticSearch cluster to retrieve the mappings that it holds for every index/type.
+   * Ask the ElasticSearch cluster to retrieve the mappings that it holds for
+   * every index/type.
    */
   private void retrieveMappingsFromES() throws IDBPersistenceException {
     Set<String> indicesES = retrieveIndicesFromES();
@@ -149,11 +151,15 @@ public class EsAlarmIndexer extends EsIndexer {
   }
 
   /**
-   * Send the data to the {@link Connector}: try to index an new entry to ElasticSearch.
+   * Send the data to the {@link Connector}: try to index an new entry to
+   * ElasticSearch.
    *
-   * @param indexName to which add the data.
-   * @param mapping   as JSON.
-   * @param esAlarm   the data.
+   * @param indexName
+   *          to which add the data.
+   * @param mapping
+   *          as JSON.
+   * @param esAlarm
+   *          the data.
    */
   private void indexData(String indexName, String mapping, EsAlarm esAlarm) {
     boolean isAcked = connector.handleAlarmQuery(indexName, mapping, esAlarm);

@@ -16,25 +16,25 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.connector;
 
-import cern.c2mon.server.eslog.config.EsLogIntegrationConfiguration;
-import cern.c2mon.server.eslog.structure.mappings.EsStringTagMapping;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
-import org.junit.*;
-import org.junit.rules.TemporaryFolder;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.File;
+import cern.c2mon.server.eslog.config.EsLogIntegrationConfiguration;
+import cern.c2mon.server.eslog.structure.mappings.EsTagMapping;
+import cern.c2mon.server.eslog.structure.types.tag.EsTag;
 
-import static cern.c2mon.server.eslog.structure.mappings.EsMapping.ValueType;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertFalse;
@@ -117,8 +117,8 @@ public class TransportConnectorTest {
   public void testHandleIndexQuery() {
     Client initClient = connector.getClient();
 
-    String type = "tag_string";
-    String mapping = new EsStringTagMapping().getMapping();
+    String type = "type_string";
+    String mapping = new EsTagMapping(EsTag.TYPE_STRING, String.class.getName()).getMapping();
 
     connector.setClient(null); // should be caught
     boolean result = connector.handleIndexQuery("c2mon_2015-01", type, mapping);

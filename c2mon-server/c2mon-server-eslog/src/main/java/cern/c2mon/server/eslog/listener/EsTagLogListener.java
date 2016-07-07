@@ -16,6 +16,21 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.listener;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.SmartLifecycle;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.server.cache.BufferedTimCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
@@ -24,21 +39,7 @@ import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.eslog.indexer.EsTagIndexer;
 import cern.c2mon.server.eslog.structure.converter.EsTagLogConverter;
-import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
-import cern.c2mon.server.eslog.structure.types.tag.EsValueType;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.SmartLifecycle;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
-import javax.annotation.PostConstruct;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.stream.Collectors;
+import cern.c2mon.server.eslog.structure.types.tag.EsTag;
 
 /**
  * Listens to updates in the Rule and DataTag caches and calls the {@link EsTagIndexer} for logging these to ElasticSearch.
@@ -55,13 +56,11 @@ public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLif
   private final CacheRegistrationService cacheRegistrationService;
 
   /**
-   * Allows to convert from Tag to {@link AbstractEsTag}.
+   * Allows to convert from Tag to {@link EsTag}.
    */
   private final EsTagLogConverter esTagLogConverter;
 
-  private final IPersistenceManager tagNumericPersistenceManager;
-  private final IPersistenceManager tagStringPersistenceManager;
-  private final IPersistenceManager tagBooleanPersistenceManager;
+  private final IPersistenceManager<EsTag> esTagPersistenceManager;
 
   /**
    * Listener container lifecycle hook.
@@ -76,14 +75,10 @@ public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLif
   @Autowired
   public EsTagLogListener(final EsTagLogConverter esTagLogConverter,
                           final CacheRegistrationService cacheRegistrationService,
-                          @Qualifier("esTagNumericPersistenceManager") final IPersistenceManager tagNumericPersistenceManager,
-                          @Qualifier("esTagStringPersistenceManager") final IPersistenceManager tagStringPersistenceManager,
-                          @Qualifier("esTagBooleanPersistenceManager") final IPersistenceManager tagBooleanPersistenceManager) {
+                          @Qualifier("esTagPersistenceManager") final IPersistenceManager<EsTag> esTagPersistenceManager) {
     this.esTagLogConverter = esTagLogConverter;
     this.cacheRegistrationService = cacheRegistrationService;
-    this.tagNumericPersistenceManager = tagNumericPersistenceManager;
-    this.tagStringPersistenceManager = tagStringPersistenceManager;
-    this.tagBooleanPersistenceManager = tagBooleanPersistenceManager;
+    this.esTagPersistenceManager = esTagPersistenceManager;
   }
 
   /**
@@ -115,7 +110,7 @@ public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLif
     Collection<Tag> loggableTags = filterLoggableTags(tagCollection);
     log.debug("retrieveLoggableTags() - With " + loggableTags.size() + " tags to be logged.");
 
-    sendEsTagsToElastic(convertTagsToEsTags(loggableTags));
+    esTagPersistenceManager.storeData(convertTagsToEsTags(loggableTags));
   }
 
   private Collection<Tag> filterLoggableTags(final Collection<Tag> tagCollection) {
@@ -127,37 +122,15 @@ public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLif
         .collect(Collectors.toList());
   }
 
-  private ListMultimap<EsValueType, AbstractEsTag> convertTagsToEsTags(final Collection<Tag> tagsToLog) {
-    final ListMultimap<EsValueType, AbstractEsTag> tagMultimap = ArrayListMultimap.create();
+  private List<EsTag> convertTagsToEsTags(final Collection<Tag> tagsToLog) {
+    final List<EsTag> esTagList = new ArrayList<>();
     if (CollectionUtils.isEmpty(tagsToLog)) {
-      return tagMultimap;
+      return esTagList;
     }
 
-    for (Tag tag : tagsToLog) {
-      AbstractEsTag esTagImpl = esTagLogConverter.convert(tag);
-      if (esTagImpl != null) {
-        tagMultimap.put(esTagImpl.getType(), esTagImpl);
-      }
-    }
+    tagsToLog.forEach(tag -> esTagList.add(esTagLogConverter.convert(tag)));
 
-    return tagMultimap;
-  }
-
-  private void sendEsTagsToElastic(final ListMultimap<EsValueType, AbstractEsTag> tagMultimap) {
-    if(tagMultimap == null) {
-      log.warn("sendCollectionTagESToElasticSearch() - received an empty map of tags, will do nothing!");
-      return;
-    }
-
-    log.info("sendCollectionTagESToElasticSearch() - send a collection of tags to indexer of size: "
-        + tagMultimap.size());
-
-    tagNumericPersistenceManager.storeData(tagMultimap.get(EsValueType.NUMERIC));
-    tagBooleanPersistenceManager.storeData(tagMultimap.get(EsValueType.BOOLEAN));
-    tagStringPersistenceManager.storeData(tagMultimap.get(EsValueType.STRING));
-
-    //objects will be stored with the string persistence manager, as well
-    tagStringPersistenceManager.storeData(tagMultimap.get(EsValueType.OBJECT));
+    return esTagList;
   }
 
   @Override

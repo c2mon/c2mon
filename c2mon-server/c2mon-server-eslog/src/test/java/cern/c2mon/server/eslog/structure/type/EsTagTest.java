@@ -16,9 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.type;
 
-import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
-import cern.c2mon.server.eslog.structure.types.tag.EsTagString;
-import cern.c2mon.server.eslog.structure.types.tag.TagQualityAnalysis;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.Before;
@@ -26,8 +26,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.util.HashMap;
-import java.util.Map;
+import cern.c2mon.server.eslog.structure.types.tag.EsTag;
+import cern.c2mon.server.eslog.structure.types.tag.TagQualityAnalysis;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.fail;
@@ -36,13 +36,13 @@ import static junit.framework.TestCase.fail;
  * @author Alban Marguet
  */
 @RunWith(JUnit4.class)
-public class EsTagImplTest {
+public class EsTagTest {
   private Gson gson = new GsonBuilder().create();
-  private AbstractEsTag esTag;
+  private EsTag esTag;
   private String expectedJson;
   private long id = 1;
   private String name = "name";
-  private String dataType = "string";
+  private String dataType = "String";
   private long timestamp = 123456;
   private long serverTimestamp = 123456;
   private long daqTimestamp = 123456;
@@ -57,11 +57,9 @@ public class EsTagImplTest {
 
   @Before
   public void setup() {
-    esTag = new EsTagString();
-    esTag.setId(id);
+    esTag = new EsTag(id, dataType);
     esTag.setName(name);
 
-    esTag.getC2mon().setDataType(dataType);
     esTag.setTimestamp(timestamp);
     esTag.getC2mon().setServerTimestamp(serverTimestamp);
     esTag.getC2mon().setDaqTimestamp(daqTimestamp);
@@ -85,7 +83,6 @@ public class EsTagImplTest {
 
   @Test
   public void testJsonSerialization() {
-    String json = esTag.toString();
     try {
       assertEquals(expectedJson, esTag.toString());
       assertEquals(esTag, esTag.getObject(expectedJson));

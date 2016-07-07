@@ -16,14 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.listener;
 
-import cern.c2mon.pmanager.persistence.IPersistenceManager;
-import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.cache.CacheRegistrationService;
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.eslog.structure.converter.EsTagLogConverter;
-import cern.c2mon.server.eslog.structure.types.tag.EsTagBoolean;
-import cern.c2mon.server.test.CacheObjectCreation;
+import java.util.ArrayList;
+import java.util.Collections;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,9 +30,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import cern.c2mon.pmanager.persistence.IPersistenceManager;
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.cache.CacheRegistrationService;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.eslog.structure.converter.EsTagLogConverter;
+import cern.c2mon.server.eslog.structure.types.tag.EsTag;
+import cern.c2mon.server.test.CacheObjectCreation;
 
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -63,17 +65,7 @@ public class EsTagLogListenerTest {
     }
 
     @Bean
-    public IPersistenceManager esTagNumericPersistenceManager() {
-      return mock(IPersistenceManager.class);
-    }
-
-    @Bean
-    public IPersistenceManager esTagStringPersistenceManager() {
-      return mock(IPersistenceManager.class);
-    }
-
-    @Bean
-    public IPersistenceManager esTagBooleanPersistenceManager() {
+    public IPersistenceManager<EsTag> esTagPersistenceManager() {
       return mock(IPersistenceManager.class);
     }
 
@@ -82,9 +74,7 @@ public class EsTagLogListenerTest {
       return new EsTagLogListener(
           esTagLogConverter(),
           cacheRegistrationService(),
-          esTagNumericPersistenceManager(),
-          esTagStringPersistenceManager(),
-          esTagBooleanPersistenceManager());
+          esTagPersistenceManager());
     }
 
   }
@@ -93,9 +83,7 @@ public class EsTagLogListenerTest {
   public void setUp() throws Exception {
     reset(esLogConverter,
         cacheRegistrationService,
-        tagNumericPersistenceManager,
-        tagStringPersistenceManager,
-        tagBooleanPersistenceManager);
+        tagPersistenceManager);
   }
 
   @After
@@ -119,16 +107,8 @@ public class EsTagLogListenerTest {
 
 
   @Autowired
-  @Qualifier("esTagNumericPersistenceManager")
-  private IPersistenceManager tagNumericPersistenceManager;
-
-  @Autowired
-  @Qualifier("esTagStringPersistenceManager")
-  private IPersistenceManager tagStringPersistenceManager;
-
-  @Autowired
-  @Qualifier("esTagBooleanPersistenceManager")
-  private IPersistenceManager tagBooleanPersistenceManager;
+  @Qualifier("esTagPersistenceManager")
+  private IPersistenceManager<EsTag> tagPersistenceManager;
 
 
   @Autowired
@@ -169,10 +149,10 @@ public class EsTagLogListenerTest {
     list.add(tag2);
     list.add(tag3);
 
-    EsTagBoolean convertedTag1 = new EsTagBoolean();
+    EsTag convertedTag1 = new EsTag(1L, "Boolean");
     convertedTag1.setValueBoolean((Boolean) tag1.getValue());
 
-    EsTagBoolean convertedTag2 = new EsTagBoolean();
+    EsTag convertedTag2 = new EsTag(2L, Boolean.class.getName());
     convertedTag2.setValueBoolean((Boolean) tag2.getValue());
 
     when(esLogConverter.convert(tag1)).thenReturn(convertedTag1);
@@ -184,8 +164,6 @@ public class EsTagLogListenerTest {
     verify(esLogConverter).convert(eq(tag2));
     verify(esLogConverter, atMost(2)).convert(eq(tag3));
 
-    verify(tagBooleanPersistenceManager, times(1)).storeData(anyList());
-//    verify(tagNumericPersistenceManager).storeData(anyList());
-//    verify(tagStringPersistenceManager, times(2)).storeData(anyList());
+    verify(tagPersistenceManager, times(1)).storeData(anyList());
   }
 }

@@ -16,8 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.types.tag;
 
-import cern.c2mon.server.common.tag.Tag;
 import lombok.Data;
+
+import cern.c2mon.server.common.tag.Tag;
 
 /**
  * Represents a detailed and very specific information
@@ -47,7 +48,7 @@ public class EsTagC2monInfo {
    * The fully qualified value (classname) of a tag's
    * enclosed metric value
    */
-  private String dataType;
+  private final String dataType;
 
   /**
    * The time when the server received the {@link Tag}

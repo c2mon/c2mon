@@ -30,7 +30,7 @@ import static junit.framework.TestCase.assertEquals;
  * @author Alban Marguet.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class EsNumericTagMappingTest {
+public class EsLongTagMappingTest {
   private final String expectedMapping = "{\n" +
       "  \"_routing\": {\n" +
       "    \"required\": \"true\"\n" +
@@ -45,6 +45,9 @@ public class EsNumericTagMappingTest {
       "    },\n" +
       "    \"value\": {\n" +
       "      \"type\": \"double\"\n" +
+      "    },\n" +
+      "    \"valueLong\": {\n" +
+      "      \"type\": \"long\"\n" +
       "    },\n" +
       "    \"type\": {\n" +
       "      \"type\": \"string\",\n" +
@@ -120,38 +123,11 @@ public class EsNumericTagMappingTest {
       "}";
 
   @Test
-  public void testShortOutput() {
-    EsTagMapping mapping1 = new EsTagMapping(EsTag.TYPE_NUMBER, Short.class.getName());
+  public void testLongOutput() {
+    EsTagMapping mapping1 = new EsTagMapping(EsTag.TYPE_NUMBER, Long.class.getName());
     assertEquals(expectedMapping, mapping1.getMapping());
 
-    EsTagMapping mapping2 = new EsTagMapping(EsTag.TYPE_NUMBER, "Short");
-    assertEquals(expectedMapping, mapping2.getMapping());
-  }
-
-  @Test
-  public void testIntegerOutput() {
-    EsTagMapping mapping1 = new EsTagMapping(EsTag.TYPE_NUMBER, Integer.class.getName());
-    assertEquals(expectedMapping, mapping1.getMapping());
-
-    EsTagMapping mapping2 = new EsTagMapping(EsTag.TYPE_NUMBER, "Integer");
-    assertEquals(expectedMapping, mapping2.getMapping());
-  }
-
-  @Test
-  public void testFloatOutput() {
-    EsTagMapping mapping = new EsTagMapping(EsTag.TYPE_NUMBER, Float.class.getName());
-    assertEquals(expectedMapping, mapping.getMapping());
-
-    EsTagMapping mapping2 = new EsTagMapping(EsTag.TYPE_NUMBER, "Float");
-    assertEquals(expectedMapping, mapping2.getMapping());
-  }
-
-  @Test
-  public void testDoubleOutput() {
-    EsTagMapping mapping = new EsTagMapping(EsTag.TYPE_NUMBER, Double.class.getName());
-    assertEquals(expectedMapping, mapping.getMapping());
-
-    EsTagMapping mapping2 = new EsTagMapping(EsTag.TYPE_NUMBER, "Double");
+    EsTagMapping mapping2 = new EsTagMapping(EsTag.TYPE_NUMBER, "Long");
     assertEquals(expectedMapping, mapping2.getMapping());
   }
 }

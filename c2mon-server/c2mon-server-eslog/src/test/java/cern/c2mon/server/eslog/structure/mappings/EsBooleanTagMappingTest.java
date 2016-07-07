@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import cern.c2mon.server.eslog.structure.mappings.EsMapping.ValueType;
+import cern.c2mon.server.eslog.structure.types.tag.EsTag;
 
 import static org.junit.Assert.assertEquals;
 
@@ -122,15 +122,8 @@ public class EsBooleanTagMappingTest {
       "}";
 
   @Test
-  public void testGetBooleanMapping() {
-    EsBooleanTagMapping mapping = new EsBooleanTagMapping();
-    String valueType = mapping.properties.getValueType();
-    assertEquals(ValueType.BOOLEAN.toString(), valueType);
-  }
-
-  @Test
   public void testOutput() {
-    EsBooleanTagMapping mapping = new EsBooleanTagMapping();
+    EsTagMapping mapping = new EsTagMapping(EsTag.TYPE_BOOLEAN, Boolean.class.getName());
     assertEquals(expectedMapping, mapping.getMapping());
   }
 }

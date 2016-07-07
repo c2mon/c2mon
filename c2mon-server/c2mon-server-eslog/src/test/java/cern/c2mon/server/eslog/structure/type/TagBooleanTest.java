@@ -16,13 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.type;
 
-import cern.c2mon.server.eslog.structure.types.tag.EsTagBoolean;
+import java.io.IOException;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.io.IOException;
+import cern.c2mon.server.eslog.structure.types.tag.EsTag;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNull;
@@ -37,36 +37,31 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class TagBooleanTest {
-  @InjectMocks
-  private EsTagBoolean tagBoolean;
 
   @Test
   public void testValue() {
+    EsTag tagBoolean = new EsTag(1L, Boolean.class.getName());
     tagBoolean.setRawValue(true);
 
-    assertEquals(true, tagBoolean.getRawValue());
     assertEquals(1, tagBoolean.getValue());
     assertTrue(tagBoolean.getValueBoolean());
-    assertTrue(tagBoolean.getRawValue() instanceof Boolean);
 
     tagBoolean.setRawValue(false);
 
-    assertEquals(false, tagBoolean.getRawValue());
-    assertTrue(tagBoolean.getRawValue() instanceof Boolean);
     assertFalse(tagBoolean.getValueBoolean());
     assertEquals(0, tagBoolean.getValue());
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testBadValue() {
+    EsTag tagBoolean = new EsTag(1L, Boolean.class.getName());
     tagBoolean.setRawValue("NotBoolean");
   }
 
   @Test
   public void testBuild() throws IOException {
-    tagBoolean.getC2mon().setDataType(Boolean.class.getName());
-
-    final String expectedTagJson = "{\"id\":0,\"timestamp\":0," +
+    EsTag tagBoolean = new EsTag(1L, Boolean.class.getName());
+    final String expectedTagJson = "{\"id\":1,\"type\":\"boolean\",\"timestamp\":0," +
         "\"c2mon\":{\"dataType\":\"java.lang.Boolean\",\"serverTimestamp\":0,\"sourceTimestamp\":0,\"daqTimestamp\":0}," +
         "\"metadata\":{}}";
 
@@ -75,7 +70,8 @@ public class TagBooleanTest {
 
   @Test
   public void testNullValue() {
+    EsTag tagBoolean = new EsTag(1L, Boolean.class.getName());
     tagBoolean.setRawValue(null);
-    assertNull(tagBoolean.getRawValue());
+    assertNull(tagBoolean.getValueBoolean());
   }
 }

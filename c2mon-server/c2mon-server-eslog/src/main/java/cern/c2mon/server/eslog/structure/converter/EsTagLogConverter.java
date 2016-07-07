@@ -36,20 +36,21 @@ import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.eslog.structure.types.tag.*;
+import cern.c2mon.server.eslog.structure.types.tag.EsTag;
+import cern.c2mon.server.eslog.structure.types.tag.EsTagC2monInfo;
+import cern.c2mon.server.eslog.structure.types.tag.TagQualityAnalysis;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.common.metadata.Metadata;
-import cern.c2mon.shared.common.type.TypeConverter;
 
 /**
- * Converts the dataTags from the server to the ElasticSearch format {@link AbstractEsTag}.
+ * Converts the dataTags from the server to the ElasticSearch format {@link EsTag}.
  *
  * @author Alban Marguet.
  */
 @Slf4j
 @Component
-public class EsTagLogConverter implements Converter<Tag, AbstractEsTag> {
+public class EsTagLogConverter implements Converter<Tag, EsTag> {
   /**
    * Default ID to return if nothing is found in cache.
    */
@@ -69,26 +70,18 @@ public class EsTagLogConverter implements Converter<Tag, AbstractEsTag> {
   }
 
   /**
-   * Converts all the properties of a Tag to create a {@link AbstractEsTag} according to the dataType.
+   * Converts all the properties of a Tag to create a {@link EsTag} according to the dataType.
    *
    * @param tag Tag object in C2MON.
-   * @return {@link AbstractEsTag}, ready to be logged to the ElasticSearch instance.
+   * @return {@link EsTag}, ready to be logged to the ElasticSearch instance.
    */
   @Override
-  public AbstractEsTag convert(final Tag tag) {
-    AbstractEsTag esTag = instantiateTagES(tag.getDataType());
-    if (esTag == null) {
-      return null;
-    }
+  public EsTag convert(final Tag tag) {
+    EsTag esTag = new EsTag(tag.getId(), tag.getDataType());
 
-    esTag.setId(tag.getId());
     esTag.setName(tag.getName());
-
     esTag.setRawValue(tag.getValue());
-    setType(tag, esTag);
-
     esTag.setValueDescription(tag.getValueDescription());
-
 
     setUnit(tag, esTag);
     setQualityAnalysis(tag, esTag);
@@ -102,65 +95,13 @@ public class EsTagLogConverter implements Converter<Tag, AbstractEsTag> {
     return esTag;
   }
 
-  private void setType(final Tag tag, final AbstractEsTag esTag) {
-    if(tag == null) {
-      return;
-    }
-
-    final Class<?> type = TypeConverter.getType(tag.getDataType());
-
-    EsValueType valueType;
-    if (type == null) {
-      valueType = EsValueType.OBJECT;
-    } else if (Number.class.isAssignableFrom(type)) {
-      valueType = EsValueType.NUMERIC;
-    } else if (Boolean.class.isAssignableFrom(type)) {
-      valueType = EsValueType.BOOLEAN;
-    } else if (String.class.isAssignableFrom(type)) {
-      valueType = EsValueType.STRING;
-    } else {
-      valueType = EsValueType.OBJECT;
-    }
-
-    esTag.setType(valueType);
-
-  }
-
-  /**
-   * Instantiate the right Class of {@link AbstractEsTag according to the dataType: boolean, String or int.
-   *
-   * @param dataType of the Tag in C2MON.
-   * @return {@link AbstractEsTag}: {@link EsTagString }, {@link EsTagNumeric } or {@link EsTagBoolean } for ElasticSearch.
-   */
-  public AbstractEsTag instantiateTagES(final String dataType) {
-
-    if (TypeConverter.isNumber(dataType)) {
-      return new EsTagNumeric();
-    }
-
-    Class<?> clazz = TypeConverter.getType(dataType);
-
-    if (clazz != null && Boolean.class.isAssignableFrom(clazz)) {
-      return new EsTagBoolean();
-    }
-    else {
-      return new EsTagString();
-    }
-  }
-
-  private void extractC2MonInfo(final Tag tag, final AbstractEsTag esTag) {
-    if(tag == null) {
-      return;
-    }
-
+  private void extractC2MonInfo(final Tag tag, final EsTag esTag) {
     final Map<String, String> tagProcessMetadata = retrieveTagProcessMetadata(tag);
 
     EsTagC2monInfo c2MonInfo = esTag.getC2mon();
     c2MonInfo.setProcess(tagProcessMetadata.get("process"));
     c2MonInfo.setEquipment(tagProcessMetadata.get("equipment"));
     c2MonInfo.setSubEquipment(tagProcessMetadata.get("subEquipment"));
-
-    c2MonInfo.setDataType(tag.getDataType());
 
     setServerTimestamp(tag, c2MonInfo);
     setSourceTimeStamp(tag, c2MonInfo);
@@ -193,14 +134,14 @@ public class EsTagLogConverter implements Converter<Tag, AbstractEsTag> {
   }
 
 
-  private void setUnit(Tag tag, AbstractEsTag esTag) {
+  private void setUnit(Tag tag, EsTag esTag) {
     String unit = Optional.ofNullable(tag.getUnit())
         .filter(StringUtils::isNotBlank)
         .orElse("");
     esTag.setUnit(unit);
   }
 
-  private void setQualityAnalysis(final Tag tag, final AbstractEsTag esTag) {
+  private void setQualityAnalysis(final Tag tag, final EsTag esTag) {
     final DataTagQuality dataTagQuality = tag.getDataTagQuality();
     if(dataTagQuality == null) {
       return;
@@ -268,7 +209,7 @@ public class EsTagLogConverter implements Converter<Tag, AbstractEsTag> {
   /**
    * Handles Metadata of tag and retrieve process, equipment and subEquipment.
    */
-  private void setMetadata(final Tag tag, final AbstractEsTag esTag) {
+  private void setMetadata(final Tag tag, final EsTag esTag) {
     esTag.getMetadata().putAll(retrieveTagMetadata(tag));
   }
 

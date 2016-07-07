@@ -22,11 +22,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-<<<<<<< HEAD
 import com.google.gson.GsonBuilder;
 import lombok.Data;
-=======
->>>>>>> de9d5bd... Fixed EsTag type conversion in ES module
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,10 +39,7 @@ import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
-import cern.c2mon.server.eslog.structure.types.tag.EsTagBoolean;
-import cern.c2mon.server.eslog.structure.types.tag.EsTagNumeric;
-import cern.c2mon.server.eslog.structure.types.tag.EsValueType;
+import cern.c2mon.server.eslog.structure.types.tag.EsTag;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
@@ -240,43 +234,36 @@ public class EsTagLogConverterTest {
 
   @Test
   public void testConvertToTagES() throws IOException {
-    convertToTagES(Boolean.FALSE, EsValueType.BOOLEAN);
+    convertToTagES(Boolean.FALSE, EsTag.TYPE_BOOLEAN);
 
-    convertToTagES(Integer.MAX_VALUE, EsValueType.NUMERIC);
-    convertToTagES(0, EsValueType.NUMERIC);
-    convertToTagES(null, "Integer", EsValueType.NUMERIC);
+    convertToTagES(Integer.MAX_VALUE, EsTag.TYPE_NUMBER);
+    convertToTagES(0, EsTag.TYPE_NUMBER);
+    convertToTagES(null, "Integer", EsTag.TYPE_NUMBER);
 
-    convertToTagES(Long.MIN_VALUE, EsValueType.NUMERIC);
-    convertToTagES(Double.MIN_VALUE, EsValueType.NUMERIC);
-    convertToTagES(Float.MIN_VALUE, EsValueType.NUMERIC);
-    convertToTagES(Short.MAX_VALUE, EsValueType.NUMERIC);
+    convertToTagES(Long.MIN_VALUE, EsTag.TYPE_NUMBER);
+    convertToTagES(Double.MIN_VALUE, EsTag.TYPE_NUMBER);
+    convertToTagES(Float.MIN_VALUE, EsTag.TYPE_NUMBER);
+    convertToTagES(Short.MAX_VALUE, EsTag.TYPE_NUMBER);
 
-    convertToTagES("John Lennon", EsValueType.STRING);
+    convertToTagES("John Lennon", EsTag.TYPE_STRING);
 
     ComplexType test = new ComplexType();
     test.setBool(true);
     test.setInteger(5);
     test.setString("Paul McCartney");
-    convertToTagES(new GsonBuilder().create().toJson(test), test.getClass().getName(), EsValueType.OBJECT);
+    convertToTagES(new GsonBuilder().create().toJson(test), test.getClass().getName(), EsTag.TYPE_OBJECT);
 
   }
 
-  private void convertToTagES(final Object value, final EsValueType type) throws IOException {
+  private void convertToTagES(final Object value, final String type) throws IOException {
     convertToTagES(value, value.getClass().getName(), type);
     convertToTagES(value, value.getClass().getName().substring("java.lang.".length()), type);
   }
 
-  private void convertToTagES(final Object value, final String dataType, final EsValueType type) throws IOException {
+  private void convertToTagES(final Object value, final String dataType, final String type) throws IOException {
     long id = 1L;
     String name = "tag";
-<<<<<<< HEAD
     long timeStamp = 123456L;
-=======
-    ValueType type = ValueType.BOOLEAN;
-    String dataType = "Boolean";
-    long timeStamp = 123456L;
-    Boolean value = Boolean.TRUE;
->>>>>>> de9d5bd... Fixed EsTag type conversion in ES module
     String valueDesc = "ok";
 
     when(tagC2MON.getId()).thenReturn(id);
@@ -290,36 +277,18 @@ public class EsTagLogConverterTest {
     when(tagC2MON.getValueDescription()).thenReturn(valueDesc);
     when(tagC2MON.getUnit()).thenReturn("km");
 
-    AbstractEsTag esTag = esLogConverter.convert(tagC2MON);
+    EsTag esTag = esLogConverter.convert(tagC2MON);
     assertEquals(id, esTag.getIdAsLong());
     assertEquals(name, esTag.getName());
-<<<<<<< HEAD
     assertEquals(type, esTag.getType());
-=======
-    assertEquals(type.toString(), esTag.getType());
->>>>>>> de9d5bd... Fixed EsTag type conversion in ES module
     assertNotNull(esTag.getC2mon());
     assertEquals(dataType, esTag.getC2mon().getDataType());
     assertEquals(timeStamp, esTag.getC2mon().getServerTimestamp());
     assertEquals(1, esTag.getQuality().getStatus());
-    assertEquals(value, esTag.getRawValue());
     assertEquals(valueDesc, esTag.getValueDescription());
     assertNotNull(esTag.getQuality());
     assertFalse(esTag.getQuality().isValid());
-<<<<<<< HEAD
     assertEquals("km", esTag.getUnit());
-=======
-
-    when(tagC2MON.getDataType()).thenReturn("String");
-    when(tagC2MON.getValue()).thenReturn(name);
-    esTag = esLogConverter.convert(tagC2MON);
-    assertEquals(name, esTag.getRawValue());
-
-    when(tagC2MON.getDataType()).thenReturn("Long");
-    when(tagC2MON.getValue()).thenReturn(timeStamp);
-    esTag = esLogConverter.convert(tagC2MON);
-    assertEquals(timeStamp, esTag.getRawValue());
->>>>>>> de9d5bd... Fixed EsTag type conversion in ES module
 
     when(tagC2MON.getDataTagQuality()).thenReturn(new DataTagQualityImpl(TagQualityStatus.EQUIPMENT_DOWN));
     esTag = esLogConverter.convert(tagC2MON);
@@ -333,8 +302,8 @@ public class EsTagLogConverterTest {
     tag.setDaqTimestamp(null);
     tag.setSourceTimestamp(null);
 
-    AbstractEsTag esTag = esLogConverter.convert(tag);
-    assertTrue(esTag instanceof EsTagBoolean);
+    EsTag esTag = esLogConverter.convert(tag);
+    assertEquals(esTag.getType(), EsTag.TYPE_BOOLEAN);
     assertNotNull(esTag.getTimestamp());
     assertNotNull(esTag.getC2mon());
     assertNotNull(esTag.getC2mon().getDaqTimestamp());
@@ -346,20 +315,16 @@ public class EsTagLogConverterTest {
     tag.setDataType("Boolean");
     tag.setLogged(true);
 
-    AbstractEsTag esTag = esLogConverter.convert(tag);
+    EsTag esTag = esLogConverter.convert(tag);
 
-    assertTrue(esTag instanceof EsTagBoolean);
+    assertEquals(EsTag.TYPE_BOOLEAN, esTag.getType());
     assertTrue(esTag.getValueBoolean());
     assertEquals(1, esTag.getValue());
     assertNull(esTag.getValueString());
-    assertTrue((Boolean) esTag.getRawValue());
     assertNotNull(esTag.getC2mon());
     assertEquals("Boolean", esTag.getC2mon().getDataType());
-<<<<<<< HEAD
-    assertEquals(EsValueType.BOOLEAN, esTag.getType());
-=======
-    assertEquals(EsValueType.BOOLEAN.getFriendlyName(), esTag.getType());
->>>>>>> de9d5bd... Fixed EsTag type conversion in ES module
+
+    assertEquals(EsTag.TYPE_BOOLEAN, esTag.getType());
 
     DataTagCacheObject tagNumeric = new DataTagCacheObject();
     tagNumeric.setId(1L);
@@ -368,18 +333,13 @@ public class EsTagLogConverterTest {
 
     esTag = esLogConverter.convert(tagNumeric);
 
-    assertTrue(esTag instanceof EsTagNumeric);
+    assertEquals(esTag.getType(), EsTag.TYPE_NUMBER);
     assertNull(esTag.getValueBoolean());
     assertEquals(126387213, esTag.getValue());
-    assertEquals(126387213, esTag.getRawValue());
     assertNull(esTag.getValueString());
     assertNotNull(esTag.getC2mon());
     assertEquals("Integer", esTag.getC2mon().getDataType());
-<<<<<<< HEAD
-    assertEquals(EsValueType.NUMERIC, esTag.getType());
-=======
-    assertEquals(EsValueType.NUMERIC.getFriendlyName(), esTag.getType());
->>>>>>> de9d5bd... Fixed EsTag type conversion in ES module
+    assertEquals(EsTag.TYPE_NUMBER, esTag.getType());
   }
 
   @Test
@@ -396,7 +356,7 @@ public class EsTagLogConverterTest {
 
     tag.setMetadata(metadata);
 
-    AbstractEsTag esTag = esLogConverter.convert(tag);
+    EsTag esTag = esLogConverter.convert(tag);
     assertNotNull(esTag.getMetadata());
     assertEquals("1", esTag.getMetadata().get("building"));
     assertEquals("2", esTag.getMetadata().get("intShouldGoToStringMetadata"));
@@ -407,10 +367,10 @@ public class EsTagLogConverterTest {
   public void testConvert_WhenValueTypeIsBoolean_ConvertsToEsTagAndAssignsType() {
     DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
 
-    AbstractEsTag esTag = esLogConverter.convert(tag);
+    EsTag esTag = esLogConverter.convert(tag);
 
     assertNotNull(esTag);
-    assertEquals(EsValueType.BOOLEAN, esTag.getType());
+    assertEquals(EsTag.TYPE_BOOLEAN, esTag.getType());
   }
 
 

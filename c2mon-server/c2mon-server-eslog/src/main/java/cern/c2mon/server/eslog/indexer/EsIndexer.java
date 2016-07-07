@@ -16,9 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.indexer;
 
-import cern.c2mon.pmanager.IDBPersistenceHandler;
-import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.eslog.connector.Connector;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Set;
+
+import javax.annotation.PostConstruct;
+
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
@@ -27,10 +30,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Set;
+import cern.c2mon.pmanager.IDBPersistenceHandler;
+import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.eslog.connector.Connector;
 
 /**
  * Used to write (a.k.a. to index) the data to ElasticSearch.
@@ -41,7 +44,7 @@ import java.util.Set;
 @Slf4j
 @Component
 @Data
-public abstract class EsIndexer implements IDBPersistenceHandler {
+public abstract class EsIndexer<T extends IFallback> implements IDBPersistenceHandler<T> {
   /**
    * Prefix used for every index in the ElasticSearch cluster, e.g., c2mon_2015-11 is a valid index.
    */

@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Represents a detailed quality information provider for an {@link AbstractEsTag}.
+ * Represents a detailed quality information provider for an {@link EsTag}.
  */
 @Slf4j
 @Data

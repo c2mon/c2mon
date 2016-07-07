@@ -16,10 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.connector;
 
-import cern.c2mon.server.eslog.structure.mappings.EsMapping;
-import cern.c2mon.server.eslog.structure.types.EsAlarm;
-import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
-import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+
 import com.carrotsearch.hppc.cursors.ObjectCursor;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -49,17 +52,15 @@ import org.elasticsearch.node.Node;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.*;
-import java.util.stream.Collectors;
+import cern.c2mon.server.eslog.structure.types.EsAlarm;
+import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
+import cern.c2mon.server.eslog.structure.types.tag.EsTag;
 
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 /**
  * Allows to connect to the cluster via a transport client. Handles all the
- * queries and writes data thanks to a bulkProcessor for {@link AbstractEsTag}
+ * queries and writes data thanks to a bulkProcessor for {@link EsTag}
  * or 1 by 1 for  {@link EsAlarm} and {@link EsSupervisionEvent} to the ElasticSearch cluster.
  * This is very light for the cluster to be connected this way.
  *
@@ -72,8 +73,11 @@ public class TransportConnector implements Connector {
   /**
    * Only used, if elasticSearch is started inside this JVM
    */
-  private final int LOCAL_PORT = 1;
-  private final String LOCAL_HOST = "local";
+  private final static int LOCAL_PORT = 1;
+  private final static String LOCAL_HOST = "local";
+
+  private final static String TYPE_ALARM = "alarm";
+  private final static String TYPE_SUPERVISION = "supervision";
 
   /**
    * Default port for elastic search transport node
@@ -583,7 +587,7 @@ public class TransportConnector implements Connector {
     if (indexExists(indexName)) {
       log.debug("logAlarmES() - Add new Alarm event to index " + indexName + ".");
       return client.prepareIndex().setIndex(indexName)
-              .setType(EsMapping.ValueType.ALARM.toString())
+              .setType(TYPE_ALARM)
               .setSource(jsonSource)
               .setRouting(routing)
               .get().isCreated();
@@ -614,7 +618,7 @@ public class TransportConnector implements Connector {
     if (indexExists(indexName)) {
       log.debug("logSupervisionEvent() - Add new Supervision event to index " + indexName + ".");
       return client.prepareIndex().setIndex(indexName)
-              .setType(EsMapping.ValueType.SUPERVISION.toString())
+              .setType(TYPE_SUPERVISION)
               .setSource(jsonSource)
               .setRouting(routing)
               .get()
@@ -684,7 +688,14 @@ public class TransportConnector implements Connector {
   }
 
   private boolean handleAddingMapping(String index, String type, String mapping) {
-    PutMappingResponse response = client.admin().indices().preparePutMapping(index).setType(type).setSource(mapping).get();
-    return response.isAcknowledged();
+
+    PutMappingResponse response = null;
+    try {
+      response = client.admin().indices().preparePutMapping(index).setType(type).setSource(mapping).get();
+    } catch (Exception e) {
+      log.error("Error occured whilst preparing the mapping for index={}, type={}, mapping={}", index, type, mapping, e);
+    }
+
+    return response == null ? false : response.isAcknowledged();
   }
 }

@@ -47,4 +47,56 @@ public class EsSupervisionMapping implements EsMapping {
     log.trace("getMapping() - Created the supervision mapping: " + json);
     return json;
   }
+  
+  /**
+   * Properties for a {@link cern.c2mon.server.eslog.structure.types.EsSupervisionEvent}.
+   */
+  private class SupervisionProperties {
+    private Supervision supervision;
+
+    SupervisionProperties() {
+      this.supervision = new Supervision();
+    }
+
+    class Supervision {
+      private Properties properties;
+
+      Supervision() {
+        properties = new Properties();
+      }
+
+      class Properties {
+        private Id id;
+        private Timestamp timestamp;
+        private Message message;
+        private Status status;
+
+        Properties() {
+          this.id = new Id();
+          this.timestamp = new Timestamp();
+          this.message = new Message();
+          this.status = new Status();
+        }
+
+        class Id {
+          private final String type = ValueType.LONG.toString();
+        }
+
+        class Timestamp {
+          private final String type = ValueType.DATE.toString();
+          private final String format = epochMillisFormat;
+        }
+
+        class Message {
+          private final String type = ValueType.STRING.toString();
+          private final String index = indexNotAnalyzed;
+        }
+
+        class Status {
+          private final String type = ValueType.STRING.toString();
+          private final String index = indexNotAnalyzed;
+        }
+      }
+    }
+  }
 }

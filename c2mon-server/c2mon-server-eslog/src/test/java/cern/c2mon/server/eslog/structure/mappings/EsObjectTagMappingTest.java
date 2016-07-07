@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.mappings;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -23,14 +24,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 import cern.c2mon.server.eslog.structure.types.tag.EsTag;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
- * Test the good behaviour of the EsNumericTagMapping class.
- * We need a good mapping to index correctly the data in ElasticSearch.
+ * Tests the good behaviour of the class EsStringTagMapping.
+ * Needed to do a good indexing in ElasticSearch.
  * @author Alban Marguet.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class EsNumericTagMappingTest {
+@Slf4j
+public class EsObjectTagMappingTest {
   private final String expectedMapping = "{\n" +
       "  \"_routing\": {\n" +
       "    \"required\": \"true\"\n" +
@@ -43,8 +46,9 @@ public class EsNumericTagMappingTest {
       "      \"type\": \"string\",\n" +
       "      \"index\": \"not_analyzed\"\n" +
       "    },\n" +
-      "    \"value\": {\n" +
-      "      \"type\": \"double\"\n" +
+      "    \"valueObject\": {\n" +
+      "      \"type\": \"nested\",\n" +
+      "      \"index\": \"analyzed\"\n" +
       "    },\n" +
       "    \"type\": {\n" +
       "      \"type\": \"string\",\n" +
@@ -120,38 +124,9 @@ public class EsNumericTagMappingTest {
       "}";
 
   @Test
-  public void testShortOutput() {
-    EsTagMapping mapping1 = new EsTagMapping(EsTag.TYPE_NUMBER, Short.class.getName());
-    assertEquals(expectedMapping, mapping1.getMapping());
-
-    EsTagMapping mapping2 = new EsTagMapping(EsTag.TYPE_NUMBER, "Short");
-    assertEquals(expectedMapping, mapping2.getMapping());
-  }
-
-  @Test
-  public void testIntegerOutput() {
-    EsTagMapping mapping1 = new EsTagMapping(EsTag.TYPE_NUMBER, Integer.class.getName());
-    assertEquals(expectedMapping, mapping1.getMapping());
-
-    EsTagMapping mapping2 = new EsTagMapping(EsTag.TYPE_NUMBER, "Integer");
-    assertEquals(expectedMapping, mapping2.getMapping());
-  }
-
-  @Test
-  public void testFloatOutput() {
-    EsTagMapping mapping = new EsTagMapping(EsTag.TYPE_NUMBER, Float.class.getName());
+  public void testStringOutput() {
+    EsTagMapping mapping = new EsTagMapping(EsTag.TYPE_OBJECT, EsTag.class.getName());
+    assertNotNull(mapping.getMapping());
     assertEquals(expectedMapping, mapping.getMapping());
-
-    EsTagMapping mapping2 = new EsTagMapping(EsTag.TYPE_NUMBER, "Float");
-    assertEquals(expectedMapping, mapping2.getMapping());
-  }
-
-  @Test
-  public void testDoubleOutput() {
-    EsTagMapping mapping = new EsTagMapping(EsTag.TYPE_NUMBER, Double.class.getName());
-    assertEquals(expectedMapping, mapping.getMapping());
-
-    EsTagMapping mapping2 = new EsTagMapping(EsTag.TYPE_NUMBER, "Double");
-    assertEquals(expectedMapping, mapping2.getMapping());
   }
 }

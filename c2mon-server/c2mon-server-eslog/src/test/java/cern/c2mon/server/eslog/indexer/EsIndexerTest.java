@@ -38,12 +38,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.eslog.config.EsLogIntegrationConfiguration;
 import cern.c2mon.server.eslog.connector.TransportConnector;
-import cern.c2mon.server.eslog.structure.mappings.EsMapping;
-import cern.c2mon.server.eslog.structure.mappings.EsStringTagMapping;
-import cern.c2mon.server.eslog.structure.types.tag.AbstractEsTag;
-import cern.c2mon.server.eslog.structure.types.tag.EsTagBoolean;
-import cern.c2mon.server.eslog.structure.types.tag.EsTagString;
-import cern.c2mon.server.eslog.structure.types.tag.EsValueType;
+import cern.c2mon.server.eslog.structure.mappings.EsTagMapping;
+import cern.c2mon.server.eslog.structure.types.tag.EsTag;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
@@ -69,7 +65,7 @@ public class EsIndexerTest {
   private static Client initClient;
 
   @Autowired
-  private EsTagIndexer indexer;
+  private EsTagIndexer<EsTag> indexer;
 
   @Autowired
   private TransportConnector connector;
@@ -77,7 +73,7 @@ public class EsIndexerTest {
   @Before
   public void clientSetup() throws IOException {
     log.info("@Before");
-    
+
     delete();
 
     if (connector.getClient() != null) {
@@ -101,7 +97,7 @@ public class EsIndexerTest {
     indexer.getCacheIndicesTypes().clear();
 //    connector.closeBulk();
   }
-  
+
   private void delete() {
     log.info("begin delete directory");
 
@@ -136,7 +132,7 @@ public class EsIndexerTest {
 
     assertEquals(expectedIndex, indexer.getCacheIndicesTypes().keySet());
 
-    connector.handleIndexQuery("c2mon-tag_2015-01", "tag_string", new EsStringTagMapping().getMapping());
+    connector.handleIndexQuery("c2mon-tag_2015-01", "tag_string", new EsTagMapping(EsTag.TYPE_STRING, String.class.getName()).getMapping());
     assertEquals(expectedType, indexer.getCacheIndicesTypes().get("c2mon-tag_2015-01"));
   }
 
@@ -213,16 +209,13 @@ public class EsIndexerTest {
 
   @Test
   public void testIndexTags() throws IDBPersistenceException {
-    List<AbstractEsTag> list = new ArrayList<>();
-    AbstractEsTag tag = new EsTagBoolean();
+    List<EsTag> list = new ArrayList<>();
+    EsTag tag = new EsTag(1L, Boolean.class.getName());
 
-    tag.setType(EsValueType.BOOLEAN);
-    tag.getC2mon().setDataType("boolean");
-    tag.setId(1L);
     tag.getC2mon().setServerTimestamp(123456789000L);
     tag.setRawValue(true);
     String indexName = indexer.indexPrefix + indexer.millisecondsToYearMonth(tag.getC2mon().getServerTimestamp());
-    String typeName = indexer.typePrefix + tag.getC2mon().getDataType();
+    String typeName = indexer.typePrefix + EsTagIndexer.getSimpleTypeName(tag.getC2mon().getDataType());
 
     list.add(tag);
 
@@ -254,11 +247,8 @@ public class EsIndexerTest {
 
     //not all tags have the same metadata and last tag has nothing
     for (; id <= size; id++, tagServerTime += 1000) {
-      tag = new EsTagString();
+      tag = new EsTag(id, String.class.getName());
 
-      tag.getC2mon().setDataType(String.class.getName());
-      tag.setId(id);
-      tag.setType(EsValueType.STRING);
       tag.getC2mon().setServerTimestamp(tagServerTime);
       list.add(tag);
       listIndices.add(indexer.indexPrefix + indexer.millisecondsToYearMonth(tag.getC2mon().getServerTimestamp()));
@@ -290,9 +280,14 @@ public class EsIndexerTest {
     log.debug("response: " + response.getHits().getTotalHits());
 
     assertEquals(size, response.getHits().getTotalHits());
-    assertTrue(resultIndices.size() == liveIndices.size());
+    if (liveIndices.contains(".kibana")) {
+      assertEquals(resultIndices.size() + 1, liveIndices.size());
+    }
+    else {
+      assertEquals(resultIndices.size(), liveIndices.size());
+    }
 
-    assertTrue(resultTypes.contains("tag_string") && resultTypes.size() == 1);
+    assertTrue(resultTypes.contains("type_String"));
     assertTrue(resultIndices.containsAll(listIndices));
 
     assertTrue(liveIndices.containsAll(resultIndices));

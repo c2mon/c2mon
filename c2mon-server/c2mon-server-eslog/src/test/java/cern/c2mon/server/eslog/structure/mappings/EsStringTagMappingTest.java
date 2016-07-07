@@ -16,13 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.mappings;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import cern.c2mon.server.eslog.structure.mappings.EsMapping.ValueType;
+import cern.c2mon.server.eslog.structure.types.tag.EsTag;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.TestCase.assertEquals;
 
 /**
  * Tests the good behaviour of the class EsStringTagMapping.
@@ -30,6 +31,7 @@ import static org.junit.Assert.assertEquals;
  * @author Alban Marguet.
  */
 @RunWith(MockitoJUnitRunner.class)
+@Slf4j
 public class EsStringTagMappingTest {
   private final String expectedMapping = "{\n" +
       "  \"_routing\": {\n" +
@@ -44,7 +46,8 @@ public class EsStringTagMappingTest {
       "      \"index\": \"not_analyzed\"\n" +
       "    },\n" +
       "    \"valueString\": {\n" +
-      "      \"type\": \"string\"\n" +
+      "      \"type\": \"string\",\n" +
+      "      \"index\": \"not_analyzed\"\n" +
       "    },\n" +
       "    \"type\": {\n" +
       "      \"type\": \"string\",\n" +
@@ -120,15 +123,11 @@ public class EsStringTagMappingTest {
       "}";
 
   @Test
-  public void testGetStringMapping() {
-    EsStringTagMapping mapping = new EsStringTagMapping();
-    String valueType = mapping.properties.getValueType();
-    assertEquals(ValueType.STRING.toString(), valueType);
-  }
-
-  @Test
-  public void testOutput() {
-    EsStringTagMapping mapping = new EsStringTagMapping();
+  public void testStringOutput() {
+    EsTagMapping mapping = new EsTagMapping(EsTag.TYPE_STRING, String.class.getName());
     assertEquals(expectedMapping, mapping.getMapping());
+
+    EsTagMapping mapping2 = new EsTagMapping(EsTag.TYPE_STRING, "String");
+    assertEquals(expectedMapping, mapping2.getMapping());
   }
 }

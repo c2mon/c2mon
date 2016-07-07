@@ -16,26 +16,26 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.indexer;
 
-import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.eslog.connector.Connector;
-import cern.c2mon.server.eslog.structure.mappings.EsSupervisionMapping;
-import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.PostConstruct;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.eslog.connector.Connector;
+import cern.c2mon.server.eslog.structure.mappings.EsSupervisionMapping;
+import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
 
 /**
  * Allows to write a {@link EsSupervisionEvent} to ElasticSearch through the {@link Connector}.
@@ -47,7 +47,7 @@ import java.util.Set;
 @Component
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class EsSupervisionEventIndexer extends EsIndexer {
+public class EsSupervisionEventIndexer<T extends EsSupervisionEvent> extends EsIndexer<T> {
   /**
    * Holds the ElasticSearch mapping given to an index.
    */
@@ -66,6 +66,7 @@ public class EsSupervisionEventIndexer extends EsIndexer {
   /**
    * Wait for the connection with ElasticSearch to be alive.
    */
+  @Override
   @PostConstruct
   public void init() throws IDBPersistenceException {
     super.init();
@@ -73,32 +74,28 @@ public class EsSupervisionEventIndexer extends EsIndexer {
   }
 
   @Override
-  public void storeData(IFallback object) throws IDBPersistenceException {
+  public void storeData(T object) throws IDBPersistenceException {
     if(object == null) {
       return;
     }
     try {
-      if (object instanceof EsSupervisionEvent) {
-        logSupervisionEvent((EsSupervisionEvent) object);
-      }
-    } catch(ElasticsearchException e) {
-      throw new IDBPersistenceException();
+      logSupervisionEvent(object);
+    } catch(Exception e) {
+      throw new IDBPersistenceException(e);
     }
   }
 
   @Override
-  public void storeData(List data) throws IDBPersistenceException {
+  public void storeData(List<T> data) throws IDBPersistenceException {
     if(CollectionUtils.isEmpty(data)) {
       return;
     }
     try {
-      for (Object object : data) {
-        if (object instanceof IFallback) {
-          storeData((IFallback) object);
-        }
+      for (T object : data) {
+          storeData(object);
       }
-    } catch(ElasticsearchException e) {
-      throw new IDBPersistenceException();
+    } catch(Exception e) {
+      throw new IDBPersistenceException(e);
     }
   }
 

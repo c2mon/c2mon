@@ -16,6 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.config;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
 import cern.c2mon.pmanager.IAlarmListener;
 import cern.c2mon.pmanager.IDBPersistenceHandler;
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
@@ -23,13 +29,7 @@ import cern.c2mon.pmanager.persistence.impl.TimPersistenceManager;
 import cern.c2mon.server.eslog.alarm.DummyEsAlarmListener;
 import cern.c2mon.server.eslog.structure.types.EsAlarm;
 import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
-import cern.c2mon.server.eslog.structure.types.tag.EsTagNumeric;
-import cern.c2mon.server.eslog.structure.types.tag.EsTagString;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import cern.c2mon.server.eslog.structure.types.tag.EsTag;
 
 /**
  * This class is responsible for configuring the Spring context for the eslog
@@ -48,49 +48,30 @@ public class EsLogConfiguration {
 
 
   @Bean(name = "esSupervisionEventPersistenceManager")
-  public IPersistenceManager esSupervisionEventPersistenceManager(
-      @Qualifier("esSupervisionEventIndexer") final IDBPersistenceHandler persistenceHandler,
+  public IPersistenceManager<EsSupervisionEvent> esSupervisionEventPersistenceManager(
+      @Qualifier("esSupervisionEventIndexer") final IDBPersistenceHandler<EsSupervisionEvent> persistenceHandler,
       @Value("/tmp/supervisionESfallback.txt") final String fallbackFile,
       final IAlarmListener alarmListener) {
 
-    return new TimPersistenceManager(persistenceHandler, fallbackFile, alarmListener, new EsSupervisionEvent());
+    return new TimPersistenceManager<EsSupervisionEvent>(persistenceHandler, fallbackFile, alarmListener, new EsSupervisionEvent());
   }
 
   @Bean(name = "esAlarmPersistenceManager")
-  public IPersistenceManager esAlarmPersistanceManger(
-      @Qualifier("esAlarmIndexer") final IDBPersistenceHandler persistenceHandler,
+  public IPersistenceManager<EsAlarm> esAlarmPersistanceManger(
+      @Qualifier("esAlarmIndexer") final IDBPersistenceHandler<EsAlarm> persistenceHandler,
       @Value("/tmp/alarmESfallback.txt") final String fallbackFile,
       final IAlarmListener alarmListener) {
 
-    return new TimPersistenceManager(persistenceHandler, fallbackFile, alarmListener, new EsAlarm());
+    return new TimPersistenceManager<EsAlarm>(persistenceHandler, fallbackFile, alarmListener, new EsAlarm());
   }
 
 
-  @Bean(name = "esTagNumericPersistenceManager")
-  public IPersistenceManager esTagNumericPersistenceManager(
-      @Qualifier("esTagIndexer") final IDBPersistenceHandler persistenceHandler,
-      @Value("/tmp/tagNumericESfallback.txt") final String fallbackFile,
+  @Bean(name = "esTagPersistenceManager")
+  public IPersistenceManager<EsTag> esTagPersistenceManager(
+      @Qualifier("esTagIndexer") final IDBPersistenceHandler<EsTag> persistenceHandler,
+      @Value("/tmp/tagESfallback.txt") final String fallbackFile,
       final IAlarmListener alarmListener) {
 
-    return new TimPersistenceManager(persistenceHandler, fallbackFile, alarmListener, new EsTagNumeric());
+    return new TimPersistenceManager<EsTag>(persistenceHandler, fallbackFile, alarmListener, new EsTag());
   }
-
-  @Bean(name = "esTagStringPersistenceManager")
-  public IPersistenceManager esTagStringPersistenceManager(
-      @Qualifier("esTagIndexer") final IDBPersistenceHandler persistenceHandler,
-      @Value("/tmp/tagStringESfallback.txt") final String fallbackFile,
-      final IAlarmListener alarmListener) {
-
-    return new TimPersistenceManager(persistenceHandler, fallbackFile, alarmListener, new EsTagString());
-  }
-
-  @Bean(name = "esTagBooleanPersistenceManager")
-  public IPersistenceManager esTagBooleanPersistenceManager(
-      @Qualifier("esTagIndexer") final IDBPersistenceHandler persistenceHandler,
-      @Value("/tmp/tagBooleanESfallback.txt") final String fallbackFile,
-      final IAlarmListener alarmListener) {
-
-    return new TimPersistenceManager(persistenceHandler, fallbackFile, alarmListener, new EsTagString());
-  }
-
 }
