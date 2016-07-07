@@ -26,98 +26,98 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * The DataTagConfigurationManager allows to apply create, update and delete configurations for DataTags.
+ * The DataTagConfigurationManager allows to apply create, update and delete
+ * configurations for DataTags.
  *
  * @author Franz Ritter
  */
 public interface DataTagConfigurationManager {
 
   /**
-   * Creates a new 'DataTag' on the server with the given name, data type and {@link DataTagAddress}.
-   * After a successful creation a DAQ which links to the DataTagAddress can be started.
-   * <br/>
+   * Creates a new 'DataTag' on the server with the given name, data type and
+   * {@link DataTagAddress}. After a successful creation a DAQ which links to
+   * the DataTagAddress can be started.
+   * <p>
    * The DataTag is created with default parameters.
    *
    * @param equipmentName The name of the overlying Equipment.
    * @param name          The name of the DataTag to be created.
    * @param dataType      The data type of the DataTag.
    * @param address       The DataTag address of the dataTag.
-   * @return A {@link ConfigurationReport} containing all details of the Tag configuration,
-   * including if it was successful or not.
-   * @see DataTagConfigurationManager#createDataTag(String, String, Class, DataTagAddress)
+   * @return A {@link ConfigurationReport} containing all details of the Tag
+   * configuration, including if it was successful or not.
+   * @see DataTagConfigurationManager#createDataTag(String, String, Class,
+   * DataTagAddress)
    * @see DataTagConfigurationManager#createDataTag(String, DataTag)
    */
   ConfigurationReport createDataTag(String equipmentName, String name, Class<?> dataType, DataTagAddress address);
 
   /**
-   * Creates a new 'DataTag' on the server with the given name, data type and {@link DataTagAddress} set in the {@link DataTag} object.
-   * After a successful creation a DAQ which links to the DataTagAddress can be started.
-   * <br/>
-   * Next to the specified parameters the DataTag is created with default parameters.
+   * Creates a new 'DataTag' on the server with the given name, data type and
+   * {@link DataTagAddress} set in the {@link DataTag} object.
+   * After a successful creation a DAQ which links to the DataTagAddress can be
+   * started.
    * <p>
-   * Note: You have to use {@link DataTag#create(String, Class, DataTagAddress)} to instantiate the 'dataTag' parameter of this method.
-   * </p>
+   * Next to the specified parameters the DataTag is created with default
+   * parameters.
+   * <p>
+   * Note: You have to use {@link DataTag#create(String, Class, DataTagAddress)}
+   * to instantiate the 'dataTag' parameter of this method.
    *
    * @param equipmentName The name of the overlying Equipment.
    * @param dataTag       The {@link DataTag} configuration for the 'create'.
-   * @return A {@link ConfigurationReport} containing all details of the Tag configuration,
-   * including if it was successful or not.
-   * @see DataTagConfigurationManager#createDataTag(String, String, Class, DataTagAddress)
+   * @return A {@link ConfigurationReport} containing all details of the Tag
+   * configuration, including if it was successful or not.
+   * @see DataTagConfigurationManager#createDataTag(String, String, Class,
+   * DataTagAddress)
    * @see DataTagConfigurationManager#createDataTag(String, DataTag)
    */
   ConfigurationReport createDataTag(String equipmentName, DataTag dataTag);
 
   /**
-   * Creates multiple new 'DataTags' on the server with the given names, data types and {@link DataTagAddress}es set in the {@link DataTag} objects.
-   * After a successful creation a DAQ which links to the DataTagAddresses can be started.
-   * <br/>
-   * Next to the specified parameters the DataTags are created with default parameters.
+   * Creates multiple new 'DataTags' on the server with the given names, data
+   * types and {@link DataTagAddress}es set in the {@link DataTag} objects.
+   * After a successful creation a DAQ which links to the DataTagAddresses can
+   * be started.
    * <p>
-   * Note: You have to use {@link DataTag#create(String, Class, DataTagAddress)} to instantiate the 'dataTags' parameter of this method.
-   * </p>
+   * Next to the specified parameters the DataTags are created with default
+   * parameters.
+   * <p>
+   * Note: You have to use {@link DataTag#create(String, Class, DataTagAddress)}
+   * to instantiate the 'dataTags' parameter of this method.
    *
    * @param equipmentName The name of the overlying Equipment.
-   * @param dataTags       The list of {@link DataTag} configurations for the 'create'.
-   * @return A {@link ConfigurationReport} containing all details of the Tag configuration,
-   * including if it was successful or not.
+   * @param dataTags      The list of {@link DataTag} configurations for the
+   *                      'create'.
+   * @return A {@link ConfigurationReport} containing all details of the Tag
+   * configuration, including if it was successful or not.
    */
   ConfigurationReport createDataTags(String equipmentName, List<DataTag> dataTags);
 
   /**
-   * Updates a existing 'Tag' with the given parameters set in the {@link Tag} object.
-   * <br/>
+   * Updates a existing 'Tag' with the given parameters set in the {@link Tag}
+   * object.
    * <p>
-   * Note: You have to use one of the following methods to instantiate the 'tag' parameter of this method.
-   * <br/>
-   * {@link DataTag#update(Long)}
-   * <br/>
-   * {@link DataTag#update(String)}
-   * <br/>
-   * {@link RuleTag#update(Long)}
-   * <br/>
-   * {@link RuleTag#update(String)}
-   * </p>
+   * Note: You have to use one of the following methods to instantiate the
+   * 'tag' parameter of this method.
+   * <p>
+   * {@link DataTag#update(Long)}, {@link DataTag#update(String)},
+   * {@link RuleTag#update(Long)}, {@link RuleTag#update(String)}
    *
    * @param tag The {@link Tag} configuration for the 'update'.
-   * @return A {@link ConfigurationReport} containing all details of the Process configuration,
-   * including if it was successful or not.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * Process configuration, including if it was successful or not.
    */
   ConfigurationReport updateTag(Tag tag);
 
   /**
-   * Updates multiple existing 'Tags' with the given parameters set in the {@link Tag} objects.
-   * <br/>
+   * Updates multiple existing 'Tags' with the given parameters set in the
+   * {@link Tag} objects.
    * <p>
    * Note: You have to use one of the following methods to instantiate the 'tag' parameter of this method.
-   * <br/>
-   * {@link DataTag#update(Long)}
-   * <br/>
-   * {@link DataTag#update(String)}
-   * <br/>
-   * {@link RuleTag#update(Long)}
-   * <br/>
-   * {@link RuleTag#update(String)}
-   * </p>
+   * <p>
+   * {@link DataTag#update(Long)}, {@link DataTag#update(String)},
+   * {@link RuleTag#update(Long)}, {@link RuleTag#update(String)}
    *
    * @param tags The list of {@link Tag} configurations for the 'updates'.
    * @return A {@link ConfigurationReport} containing all details of the Tag configuration,
@@ -129,8 +129,8 @@ public interface DataTagConfigurationManager {
    * Removes a existing 'Tag' with the given id.
    *
    * @param id The id of the Tag which needs to be removed.
-   * @return A {@link ConfigurationReport} containing all details of the Tag configuration,
-   * including if it was successful or not.
+   * @return A {@link ConfigurationReport} containing all details of the Tag
+   * configuration, including if it was successful or not.
    */
   ConfigurationReport removeTagById(Long id);
 
@@ -138,8 +138,8 @@ public interface DataTagConfigurationManager {
    * Removes multiple existing 'Tags' with the given ids.
    *
    * @param ids The list of ids of the Tags which needs to be removed.
-   * @return A {@link ConfigurationReport} containing all details of the Process configuration,
-   * including if it was successful or not.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * Process configuration, including if it was successful or not.
    */
   ConfigurationReport removeTagsById(Set<Long> ids);
 
@@ -147,8 +147,8 @@ public interface DataTagConfigurationManager {
    * Removes a existing 'Tag' with the given name.
    *
    * @param name The name of the Tag which needs to be removed.
-   * @return A {@link ConfigurationReport} containing all details of the Process configuration,
-   * including if it was successful or not.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * Process configuration, including if it was successful or not.
    */
   ConfigurationReport removeTag(String name);
 

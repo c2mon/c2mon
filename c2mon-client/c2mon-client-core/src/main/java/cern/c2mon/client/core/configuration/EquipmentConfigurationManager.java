@@ -24,83 +24,97 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * The EquipmentConfigurationManager allows to apply create, update and delete configurations for Equipment.
+ * The EquipmentConfigurationManager allows to apply create, update and delete
+ * configurations for Equipment.
  *
  * @author Franz Ritter
  */
 public interface EquipmentConfigurationManager {
 
   /**
-   * Creates a new 'Equipment' on the server with the given name and handler class.
-   * After a successful creation a DAQ which corresponds to the Equipment can be started.
-   * <br/>
-   * The Equipment is created with default parameters including the standard ControlTags.
+   * Creates a new 'Equipment' on the server with the given name and handler
+   * class. After a successful creation a DAQ which corresponds to the
+   * Equipment can be started.
+   * <p>
+   * The Equipment is created with default parameters including the
+   * standard ControlTags.
    *
    * @param processName  The name of the overlying Process.
    * @param name         The name of the Equipment to be created.
-   * @param handlerClass The full class path of the Equipment which needs to be created.
-   * @return A {@link ConfigurationReport} containing all details of the Equipment configuration,
+   * @param handlerClass The full class path of the Equipment which needs
+   *                     to be created.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * Equipment configuration,
    * including if it was successful or not.
    * @see EquipmentConfigurationManager#createEquipment(String, Equipment)
    */
   ConfigurationReport createEquipment(String processName, String name, String handlerClass);
 
   /**
-   * Creates a new 'Equipment' on the server with the given name and handler class specified in the {@link Equipment} object.
-   * After a successful creation a DAQ which corresponds to the Equipment can be started.
-   * <br/>
-   * Next to the specified parameters the Equipment is created with default parameters including the standard ControlTags.
+   * Creates a new 'Equipment' on the server with the given name and handler
+   * class specified in the {@link Equipment} object. After a successful
+   * creation a DAQ which corresponds to the Equipment can be started.
    * <p>
-   * Note: You have to use {@link Equipment#create(String, String)} to instantiate the 'equipment' parameter of this method.
-   * </p>
+   * Next to the specified parameters the Equipment is created with default
+   * parameters including the standard ControlTags.
+   * <p>
+   * Note: You have to use {@link Equipment#create(String, String)} to
+   * instantiate the 'equipment' parameter of this method.
    *
    * @param processName The name of the overlying Process.
    * @param equipment   The {@link Equipment} configuration for the 'create'.
-   * @return A {@link ConfigurationReport} containing all details of the Equipment configuration,
-   * including if it was successful or not.
+   * @return A {@link ConfigurationReport} containing all details of
+   * the Equipment configuration, including if it was successful or not.
    * @see EquipmentConfigurationManager#createEquipment(String, String, String)
    */
   ConfigurationReport createEquipment(String processName, Equipment equipment);
 
   /**
-   * Creates multiple 'Equipment' on the server with the given name and handler class specified in the {@link Equipment} objects.
-   * After a successful creation a DAQ which corresponds to the SubEquipments can be started.
-   * <br/>
-   * Next to the specified parameters the Equipment are created with default parameters including the standard ControlTags.
+   * Creates multiple 'Equipment' on the server with the given name and handler
+   * class specified in the {@link Equipment} objects. After a successful
+   * creation a DAQ which corresponds to the SubEquipments can be started.
    * <p>
-   * Note: You have to use {@link Equipment#create(String, String)} to instantiate the 'subEquipment' parameter of this method.
-   * </p>
+   * Next to the specified parameters the Equipment are created with default
+   * parameters including the standard ControlTags.
+   * <p>
+   * Note: You have to use {@link Equipment#create(String, String)} to
+   * instantiate the 'subEquipment' parameter of this method.
    *
    * @param processName  The name of the overlying Process.
-   * @param subEquipment The list of {@link Equipment} configurations for the 'create'.
-   * @return A {@link ConfigurationReport} containing all details of the Equipment configuration,
-   * including if it was successful or not.
+   * @param equipments The list of {@link Equipment} configurations for the
+   *                   'create'.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * Equipment configuration, including if it was successful or not.
    */
   ConfigurationReport createEquipment(String processName, List<Equipment> equipments);
 
   /**
-   * Updates a existing 'Equipment' with the given parameters in the {@link Equipment} object.
-   * <br/>
+   * Updates a existing 'Equipment' with the given parameters in the
+   * {@link Equipment} object.
    * <p>
-   * Note: You have to use {@link Equipment#update(Long)} or {@link Process#update(String)} to instantiate the 'equipment' parameter of this method.
+   * Note: You have to use {@link Equipment#update(Long)} or
+   * {@link Process#update(String)} to instantiate the 'equipment'
+   * parameter of this method.
    * </p>
    *
    * @param equipment The {@link Equipment} configuration for the 'update'.
-   * @return A {@link ConfigurationReport} containing all details of the Equipment configuration,
-   * including if it was successful or not.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * Equipment configuration, including if it was successful or not.
    */
   ConfigurationReport updateEquipment(Equipment equipment);
 
   /**
-   * Updates a list of existing 'Equipments' with the given parameters in the {@link Equipment} objects.
-   * <br/>
+   * Updates a list of existing 'Equipments' with the given parameters in the
+   * {@link Equipment} objects.
    * <p>
-   * Note: You have to use {@link Equipment#update(Long)} or {@link Process#update(String)} to instantiate the 'equipment' parameter of this method.
-   * </p>
+   * Note: You have to use {@link Equipment#update(Long)} or
+   * {@link Process#update(String)} to instantiate the 'equipment' parameter of
+   * this method.
    *
-   * @param equipments The list of {@link Equipment} configurations for the 'update'.
-   * @return A {@link ConfigurationReport} containing all details of the Equipment configuration,
-   * including if it was successful or not.
+   * @param equipments The list of {@link Equipment} configurations for the
+   *                   'update'.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * Equipment configuration, including if it was successful or not.
    */
   ConfigurationReport updateEquipment(List<Equipment> equipments);
 
@@ -108,8 +122,8 @@ public interface EquipmentConfigurationManager {
    * Removes a existing 'Equipment' with the given id.
    *
    * @param id The id of the Equipment which needs to be removed.
-   * @return A {@link ConfigurationReport} containing all details of the Equipment configuration,
-   * including if it was successful or not.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * Equipment configuration, including if it was successful or not.
    */
   ConfigurationReport removeEquipmentById(Long id);
 
@@ -117,26 +131,26 @@ public interface EquipmentConfigurationManager {
    * Removes a list of existing 'Equipments' with the given ids.
    *
    * @param ids The set of ids of the Equipments which needs to be removed.
-   * @return A {@link ConfigurationReport} containing all details of the Equipment configuration,
-   * including if it was successful or not.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * Equipment configuration, including if it was successful or not.
    */
   ConfigurationReport removeEquipmentById(Set<Long> ids);
 
   /**
    * Removes a existing 'Equipment' with the given name.
    *
-   * @param id The name of the Equipment which needs to be removed.
-   * @return A {@link ConfigurationReport} containing all details of the Equipment configuration,
-   * including if it was successful or not.
+   * @param name The name of the Equipment which needs to be removed.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * Equipment configuration, including if it was successful or not.
    */
   ConfigurationReport removeEquipment(String name);
 
   /**
    * Removes a list of existing 'Equipments' with the given names.
    *
-   * @param ids The setof names of the Equipments which needs to be removed.
-   * @return A {@link ConfigurationReport} containing all details of the Equipment configuration,
-   * including if it was successful or not.
+   * @param names The setof names of the Equipments which needs to be removed.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * Equipment configuration, including if it was successful or not.
    */
   ConfigurationReport removeEquipment(Set<String> names);
 

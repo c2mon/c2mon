@@ -27,53 +27,62 @@ import java.util.List;
 public interface RuleTagConfigurationManager {
 
   /**
-   * Creates a new 'RuleTag' on the server with the given name, data type and <a href="http://c2mon.web.cern.ch/c2mon/docs/#_rule_engine">rule expression</a>.
-   * After a successful creation the server starts to evaluate the rule based on the already applied DataTags.
-   * <br/>
+   * Creates a new 'RuleTag' on the server with the given name, data type and
+   * <a href="http://c2mon.web.cern.ch/c2mon/docs/#_rule_engine">rule
+   * expression</a>.
+   * After a successful creation the server starts to evaluate the rule based
+   * on the already applied DataTags.
+   * <p>
    * The RuleTag is created with default parameters.
    *
-   * @param ruleExpression The <a href="http://c2mon.web.cern.ch/c2mon/docs/#_rule_engine">rule expression</a>.
+   * @param ruleExpression The
+   *                       <a href="http://c2mon.web.cern.ch/c2mon/docs/#_rule_engine">
+   *                       rule expression</a>.
    * @param name           The name of the RuleTag.
    * @param dataType       The data type of the RuleTag.
-   * @return A {@link ConfigurationReport} containing all details of the RuleTag configuration,
-   * including if it was successful or not.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * RuleTag configuration, including if it was successful or not.
    * @see RuleTagConfigurationManager#createRule(RuleTag)
    */
   ConfigurationReport createRule(String ruleExpression, String name, Class<?> dataType);
 
   /**
-   * Creates a new 'RuleTag' on the server with the given name, data type and <a href="http://c2mon.web.cern.ch/c2mon/docs/#_rule_engine">rule expression</a>
-   * set in the {@link RuleTag} object.
-   * After a successful creation the server starts to evaluate the rule based on the already applied DataTags.
-   * <br/>
-   * Next to the specified parameters the RuleTag is created with default parameters.
+   * Creates a new 'RuleTag' on the server with the given name, data type and
+   * <a href="http://c2mon.web.cern.ch/c2mon/docs/#_rule_engine">rule
+   * expression</a> set in the {@link RuleTag} object. After a successful
+   * creation the server starts to evaluate the rule based on the already
+   * applied DataTags.
    * <p>
-   * Note: You have to use {@link RuleTag#create(String, Class, String)} to instantiate the 'ruleTag' parameter of this method.
-   * </p>
+   * Next to the specified parameters the RuleTag is created with default
+   * parameters.
+   * <p>
+   * Note: You have to use {@link RuleTag#create(String, Class, String)} to
+   * instantiate the 'ruleTag' parameter of this method.
    *
    * @param ruleTag The {@link RuleTag} configuration for the 'create'.
-   * @return A {@link ConfigurationReport} containing all details of the RuleTag configuration,
-   * including if it was successful or not.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * RuleTag configuration, including if it was successful or not.
    * @see RuleTagConfigurationManager#createRule(RuleTag)
    */
   ConfigurationReport createRule(RuleTag ruleTag);
 
   /**
-   * Creates multiple new 'RuleTags' on the server with the given names, data types and <a href="http://c2mon.web.cern.ch/c2mon/docs/#_rule_engine">rule expressions</a>
-   * set in the {@link RuleTag} objects.
-   * After a successful creation the server starts to evaluate the rules based on the already applied DataTags.
-   * <br/>
-   * Next to the specified parameters the RuleTags are created with default parameters.
+   * Creates multiple new 'RuleTags' on the server with the given names, data
+   * types and <a href="http://c2mon.web.cern.ch/c2mon/docs/#_rule_engine">
+   * rule expressions</a> set in the {@link RuleTag} objects. After a
+   * successful creation the server starts to evaluate the rules based on the
+   * already applied DataTags.
    * <p>
-   * Note: You have to use {@link RuleTag#create(String, Class, String)} to instantiate the 'ruleTags' parameter of this method.
-   * </p>
+   * Next to the specified parameters the RuleTags are created with default
+   * parameters.
+   * <p>
+   * Note: You have to use {@link RuleTag#create(String, Class, String)} to
+   * instantiate the 'ruleTags' parameter of this method.
    *
-   * @param ruleTag The {@link RuleTag} configurations for the 'create'.
-   * @return A {@link ConfigurationReport} containing all details of the RuleTag configuration,
-   * including if it was successful or not.
+   * @param ruleTags The {@link RuleTag} configurations for the 'create'.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * RuleTag configuration, including if it was successful or not.
    * @see RuleTagConfigurationManager#createRule(RuleTag)
    */
   ConfigurationReport createRules(List<RuleTag> ruleTags);
-
-
 }

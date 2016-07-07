@@ -20,50 +20,56 @@ import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.process.Process;
 
 /**
- * The ProcessConfigurationManager allows to apply create, update and delete configurations for Processes.
+ * The ProcessConfigurationManager allows to apply create, update and delete
+ * configurations for Processes.
  *
  * @author Franz Ritter
  */
 public interface ProcessConfigurationManager {
 
   /**
-   * Creates a new 'Process' on the server for the given name, which allows to start a new DAQ process.
-   * <br/>
-   * The Process is created with default parameters including the standard ControlTags.
+   * Creates a new 'Process' on the server for the given name, which allows to
+   * start a new DAQ process.
+   * <p>
+   * The Process is created with default parameters including the standard
+   * ControlTags.
    *
    * @param processName The name of the process to be created.
-   * @return A {@link ConfigurationReport} containing all details of the Process configuration,
-   * including if it was successful or not.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * Process configuration, including if it was successful or not.
    * @see ProcessConfigurationManager#createProcess(Process)
    */
   ConfigurationReport createProcess(String processName);
 
   /**
-   * Creates a new 'Process' with the given parameters in the {@link Process} object.
-   * The created Process allows than to start a new DAQ process.
-   * <br/>
-   * Next to the specified parameters the Process is created with default parameters including the standard ControlTags.
+   * Creates a new 'Process' with the given parameters in the
+   * {@link Process} object. The created Process allows than to start a new DAQ
+   * process.
    * <p>
-   * Note: You have to use {@link Process#create(String)} to instantiate the parameter of this method.
-   * </p>
+   * Next to the specified parameters the Process is created with default
+   * parameters including the standard ControlTags.
+   * <p>
+   * Note: You have to use {@link Process#create(String)} to instantiate the
+   * parameter of this method.
    *
    * @param process The {@linkk Process} configuration for the 'create'.
-   * @return A {@link ConfigurationReport} containing all details of the Process configuration,
-   * including if it was successful or not.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * Process configuration, including if it was successful or not.
    * @see ProcessConfigurationManager#createProcess(String)
    */
   ConfigurationReport createProcess(Process process);
 
   /**
-   * Updates a existing 'Process' with the given parameters in the {@link Process} object.
-   * <br/>
+   * Updates a existing 'Process' with the given parameters in the
+   * {@link Process} object.
    * <p>
-   * Note: You have to use {@link Process#update(Long)} or {@link Process#update(String)} to instantiate the parameter of this method.
-   * </p>
+   * Note: You have to use {@link Process#update(Long)} or
+   * {@link Process#update(String)} to instantiate the parameter of this
+   * method.
    *
    * @param process The {@link Process} configuration for the 'update'.
-   * @return A {@link ConfigurationReport} containing all details of the Process configuration,
-   * including if it was successful or not.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * Process configuration, including if it was successful or not.
    */
   ConfigurationReport updateProcess(Process process);
 
@@ -71,8 +77,8 @@ public interface ProcessConfigurationManager {
    * Removes a existing 'Process' with the given id.
    *
    * @param id The id of the Process which needs to be removed.
-   * @return A {@link ConfigurationReport} containing all details of the Process configuration,
-   * including if it was successful or not.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * Process configuration, including if it was successful or not.
    */
   ConfigurationReport removeProcessById(Long id);
 
@@ -80,10 +86,8 @@ public interface ProcessConfigurationManager {
    * Removes a existing 'Process' with the given name.
    *
    * @param name The name of the Process which needs to be removed.
-   * @return A {@link ConfigurationReport} containing all details of the Process configuration,
-   * including if it was successful or not.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * Process configuration, including if it was successful or not.
    */
   ConfigurationReport removeProcess(String name);
-
 }
-
