@@ -82,16 +82,16 @@ public class DataTagConfigurationManagerImpl implements DataTagConfigurationMana
   }
 
   @Override
-  public ConfigurationReport updateTag(Tag tag) {
+  public ConfigurationReport updateDataTag(DataTag tag) {
 
-    List<Tag> dummyTagList = new ArrayList<>();
+    List<DataTag> dummyTagList = new ArrayList<>();
     dummyTagList.add(tag);
 
-    return updateTags(dummyTagList);
+    return updateDataTags(dummyTagList);
   }
 
   @Override
-  public ConfigurationReport updateTags(List<Tag> tags) {
+  public ConfigurationReport updateDataTags(List<DataTag> tags) {
 
     // validate the Configuration object
     validateIsUpdate(tags);
@@ -103,16 +103,16 @@ public class DataTagConfigurationManagerImpl implements DataTagConfigurationMana
   }
 
   @Override
-  public ConfigurationReport removeTagById(Long id) {
+  public ConfigurationReport removeDataTagById(Long id) {
 
     Set<Long> dummyTagIdList = new HashSet<>();
     dummyTagIdList.add(id);
 
-    return removeTagsById(dummyTagIdList);
+    return removeDataTagsById(dummyTagIdList);
   }
 
   @Override
-  public ConfigurationReport removeTagsById(Set<Long> ids) {
+  public ConfigurationReport removeDataTagsById(Set<Long> ids) {
 
     List<Tag> tagsToDelete = new ArrayList<>();
 
@@ -131,16 +131,16 @@ public class DataTagConfigurationManagerImpl implements DataTagConfigurationMana
   }
 
   @Override
-  public ConfigurationReport removeTag(String name) {
+  public ConfigurationReport removeDataTag(String name) {
 
     Set<String> dummyTagNameList = new HashSet<>();
     dummyTagNameList.add(name);
 
-    return removeTags(dummyTagNameList);
+    return removeDataTags(dummyTagNameList);
   }
 
   @Override
-  public ConfigurationReport removeTags(Set<String> tagNames) {
+  public ConfigurationReport removeDataTags(Set<String> tagNames) {
 
     List<Tag> tagsToDelete = new ArrayList<>();
 

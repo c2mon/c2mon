@@ -95,71 +95,70 @@ public interface DataTagConfigurationManager {
   ConfigurationReport createDataTags(String equipmentName, List<DataTag> dataTags);
 
   /**
-   * Updates a existing 'Tag' with the given parameters set in the {@link Tag}
-   * object.
+   * Updates a existing {@link DataTag} with the given parameters set in the
+   * {@link DataTag} object.
    * <p>
    * Note: You have to use one of the following methods to instantiate the
    * 'tag' parameter of this method.
    * <p>
-   * {@link DataTag#update(Long)}, {@link DataTag#update(String)},
-   * {@link RuleTag#update(Long)}, {@link RuleTag#update(String)}
+   * {@link DataTag#update(Long)}, {@link DataTag#update(String)}
    *
-   * @param tag The {@link Tag} configuration for the 'update'.
+   * @param tag The {@link DataTag} configuration for the 'update'.
    * @return A {@link ConfigurationReport} containing all details of the
    * Process configuration, including if it was successful or not.
    */
-  ConfigurationReport updateTag(Tag tag);
+  ConfigurationReport updateDataTag(DataTag tag);
 
   /**
-   * Updates multiple existing 'Tags' with the given parameters set in the
-   * {@link Tag} objects.
+   * Updates multiple existing {@link DataTag} with the given parameters set in
+   * the {@link DataTag} objects.
    * <p>
-   * Note: You have to use one of the following methods to instantiate the 'tag' parameter of this method.
+   * Note: You have to use one of the following methods to instantiate the
+   * 'tag' parameter of this method.
    * <p>
-   * {@link DataTag#update(Long)}, {@link DataTag#update(String)},
-   * {@link RuleTag#update(Long)}, {@link RuleTag#update(String)}
+   * {@link DataTag#update(Long)}, {@link DataTag#update(String)}
    *
-   * @param tags The list of {@link Tag} configurations for the 'updates'.
-   * @return A {@link ConfigurationReport} containing all details of the Tag configuration,
-   * including if it was successful or not.
+   * @param tags The list of {@link DataTag} configurations for the 'updates'.
+   * @return A {@link ConfigurationReport} containing all details of the Tag
+   * configuration, including if it was successful or not.
    */
-  ConfigurationReport updateTags(List<Tag> tags);
+  ConfigurationReport updateDataTags(List<DataTag> tags);
 
   /**
-   * Removes a existing 'Tag' with the given id.
+   * Removes a existing {@link DataTag} with the given id.
    *
    * @param id The id of the Tag which needs to be removed.
    * @return A {@link ConfigurationReport} containing all details of the Tag
    * configuration, including if it was successful or not.
    */
-  ConfigurationReport removeTagById(Long id);
+  ConfigurationReport removeDataTagById(Long id);
 
   /**
-   * Removes multiple existing 'Tags' with the given ids.
+   * Removes multiple existing {@link DataTag} with the given ids.
    *
    * @param ids The list of ids of the Tags which needs to be removed.
    * @return A {@link ConfigurationReport} containing all details of the
    * Process configuration, including if it was successful or not.
    */
-  ConfigurationReport removeTagsById(Set<Long> ids);
+  ConfigurationReport removeDataTagsById(Set<Long> ids);
 
   /**
-   * Removes a existing 'Tag' with the given name.
+   * Removes a existing {@link DataTag} with the given name.
    *
    * @param name The name of the Tag which needs to be removed.
    * @return A {@link ConfigurationReport} containing all details of the
    * Process configuration, including if it was successful or not.
    */
-  ConfigurationReport removeTag(String name);
+  ConfigurationReport removeDataTag(String name);
 
   /**
-   * Removes multiple existing 'Tags' with the given names.
+   * Removes multiple existing {@link DataTag} with the given names.
    *
    * @param names The list of names of the Tags which needs to be removed.
-   * @return A {@link ConfigurationReport} containing all details of the Process configuration,
-   * including if it was successful or not.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * Process configuration, including if it was successful or not.
    */
-  ConfigurationReport removeTags(Set<String> names);
+  ConfigurationReport removeDataTags(Set<String> names);
 
 
 }
