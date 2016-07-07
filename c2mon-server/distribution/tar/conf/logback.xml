@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+  <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+
+
+  <property name="LOG_FILE"          value="${LOG_PATH:-/tmp}/c2mon.log"/>
+  <property name="TAG_LOG_FILE"      value="${LOG_PATH:-/tmp}/c2mon.tag.log"/>
+  <property name="RULE_LOG_FILE"     value="${LOG_PATH:-/tmp}/c2mon.ruletag.log"/>
+  <property name="ERROR_LOG_FILE"    value="${LOG_PATH:-/tmp}/c2mon.error.log"/>
+  <property name="FALLBACK_LOG_FILE" value="${LOG_PATH:-/tmp}/c2mon.fallback.log"/>
+
+
+  <appender name="FileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_FILE}</file>
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${LOG_FILE}.%i</fileNamePattern>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>10MB</MaxFileSize>
+    </triggeringPolicy>
+  </appender>
+
+  <appender name="TagAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${TAG_LOG_FILE}</file>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %msg%n</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${TAG_LOG_FILE}.%i</fileNamePattern>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>10MB</MaxFileSize>
+    </triggeringPolicy>
+  </appender>
+
+  <appender name="RuleTagAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${RULE_LOG_FILE}</file>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %msg%n</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${RULE_LOG_FILE}.%i</fileNamePattern>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>10MB</MaxFileSize>
+    </triggeringPolicy>
+  </appender>
+
+  <appender name="ErrorAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${ERROR_LOG_FILE}</file>
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${ERROR_LOG_FILE}.%i</fileNamePattern>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>10MB</MaxFileSize>
+    </triggeringPolicy>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>WARN</level>
+    </filter>
+  </appender>
+
+  <appender name="FallbackLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${FALLBACK_LOG_FILE}</file>
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${FALLBACK_LOG_FILE}.%i</fileNamePattern>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>10MB</MaxFileSize>
+    </triggeringPolicy>
+  </appender>
+
+
+  <logger name="SourceDataTagLogger" level="INFO" additivity="false">
+    <appender-ref ref="TagAppender"/>
+  </logger>
+  
+  <logger name="RuleTagLogger" level="INFO" additivity="false">
+    <appender-ref ref="RuleTagAppender"/>
+  </logger>
+  
+  <!-- Used within c2mon-shared-persistence-manager to trace activities of the history fallback mechanism -->
+  <logger name="ShortTermLogFallbackLogger" level="INFO" additivity="false">
+    <appender-ref ref="FallbackLogAppender"/>
+  </logger>
+  
+  <logger name="cern.c2mon" level="DEBUG"/>
+  <logger name="cern.c2mon.server.shorttermlog" level="DEBUG"/>
+  <logger name="cern.c2mon.pmanager" level="DEBUG"/>
+  <logger name="org.apache.activemq" level="INFO"/>
+  <logger name="org.springframework" level="INFO"/>
+
+  <root level="INFO">
+    <appender-ref ref="FileAppender"/>
+    <appender-ref ref="ErrorAppender"/>
+  </root>
+</configuration>

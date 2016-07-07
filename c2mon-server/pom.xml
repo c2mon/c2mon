@@ -32,6 +32,7 @@
     <module>c2mon-server-shorttermlog</module>
     <module>c2mon-server-supervision</module>
     <module>c2mon-server-test</module>
+    <module>distribution</module>
   </modules>
 
   <dependencies>
