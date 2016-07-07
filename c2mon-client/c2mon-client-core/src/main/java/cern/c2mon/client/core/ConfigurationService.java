@@ -29,19 +29,19 @@ import cern.c2mon.shared.client.tag.TagConfig;
 import java.util.Collection;
 
 /**
- * The Configuration Service allows applying new configurations to the server and to
- * fetch the configuration for the configured DAQ Processes.
+ * The Configuration Service allows applying new configurations to the server
+ * and to fetch the configuration for the configured DAQ Processes.
  *
  * @author Matthias Braeger
  */
 public interface ConfigurationService extends ProcessConfigurationManager,
-    EquipmentConfigurationManager, SubEquipmentConfigurationManager, DataTagConfigurationManager, RuleTagConfigurationManager, AlarmConfigurationManager {
+    EquipmentConfigurationManager, SubEquipmentConfigurationManager, DataTagConfigurationManager,
+    RuleTagConfigurationManager, AlarmConfigurationManager {
 
   /**
-   * Returns a TagConfiguration object for every valid id on the list.
-   * The values are fetched from the server.
-   * However, in case of a connection error or an unknown tag id the corresponding
-   * tag might be missing.
+   * Returns a TagConfiguration object for every valid id on the list. The
+   * values are fetched from the server. However, in case of a connection
+   * error or an unknown tag id the corresponding tag might be missing.
    *
    * @param tagIds A collection of data tag id's
    * @return A collection of all <code>TagConfiguration</code> objects
@@ -49,30 +49,31 @@ public interface ConfigurationService extends ProcessConfigurationManager,
   Collection<TagConfig> getTagConfigurations(final Collection<Long> tagIds);
 
   /**
-   * Applies the configuration and returns a Configuration Report.
-   * The values are fetched from the server.
-   * However, in case of a connection error or an unknown configuration Id the corresponding
-   * tag might be missing.
+   * Applies the configuration and returns a Configuration Report. The values
+   * are fetched from the server. However, in case of a connection error or an
+   * unknown configuration Id the corresponding tag might be missing.
    *
-   * @param configurationId The configuration id used to fetch the Configuration Report object
-   * @return A Configuration Report object
-   * @see TagService#applyConfiguration(Long, ClientRequestReportListener) that also sends
-   * reports for the progress of the operation
+   * @param configurationId The configuration id used to fetch the
+   *                        Configuration Report object
+   * @return A Configuration Report object that also sends reports for the
+   * progress of the operation
    */
   ConfigurationReport applyConfiguration(final Long configurationId);
 
   /**
-   * Applies the configuration and returns a Configuration Report.
-   * The values are fetched from the server.
-   * <p/>
-   * Has an extra parameter that allows the caller
-   * to be informed for the progress of the operation.
-   * <p/>
-   * However, in case of a connection error or an unknown configuration Id the corresponding
-   * tag might be missing.
+   * Applies the configuration and returns a Configuration Report. The values
+   * are fetched from the server.
+   * <p>
+   * Has an extra parameter that allows the caller to be informed for the
+   * progress of the operation.
+   * <p>
+   * However, in case of a connection error or an unknown configuration Id the
+   * corresponding tag might be missing.
    *
-   * @param configurationId The configuration id used to fetch the Configuration Report object
-   * @param reportListener  Is informed about the progress of the operation on the server side.
+   * @param configurationId The configuration id used to fetch the
+   *                        Configuration Report object
+   * @param reportListener  Is informed about the progress of the operation on
+   *                        the server side.
    * @return A {@link ConfigurationReport} object
    * @see ClientRequestProgressReport
    * @see ClientRequestErrorReport
@@ -80,12 +81,15 @@ public interface ConfigurationService extends ProcessConfigurationManager,
   ConfigurationReport applyConfiguration(final Long configurationId, final ClientRequestReportListener reportListener);
 
   /**
-   * Applies a configuration based on a {@link Configuration} object.
-   * The object holds all information what should be configured and how it should be configured.
-   * This includes the common operations CREATE, DELETE  and UPDATE.
-   * <p/>
-   * For more information of the configuration object read the documentation of {@link Configuration}
-   * or follow the instruction in the <a href="http://c2mon.web.cern.ch/c2mon/docs/#_offline_configuration_via_c2mon_database_test_purpose_only">c2mon documentation</a>.
+   * Applies a configuration based on a {@link Configuration} object. The
+   * object holds all information what should be configured and how it should
+   * be configured. This includes the common operations CREATE, DELETE and
+   * UPDATE.
+   * <p>
+   * For more information of the configuration object read the documentation of
+   * {@link Configuration} or follow the instruction in the
+   * <a href="http://c2mon.web.cern.ch/c2mon/docs/#_offline_configuration_via_c2mon_database_test_purpose_only">
+   *   c2mon documentation</a>.
    *
    * @param configuration
    * @param listener
@@ -97,9 +101,9 @@ public interface ConfigurationService extends ProcessConfigurationManager,
   /**
    * Retrieve a list of all previously applied configuration reports from the
    * server. Note that this method will only return partial information about
-   * each report. This is done to reduce the size of the message returned by the
-   * server.
-   * <p/>
+   * each report. This is done to reduce the size of the message returned by
+   * the server.
+   * <p>
    * To get the full report(s) for a particular configuration, use
    * {@link TagService#getConfigurationReports(Long)}.
    *
