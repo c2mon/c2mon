@@ -4,9 +4,11 @@
   <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
 
   <logger name="cern.c2mon" level="INFO"/>
-  <logger name="org.springframework" level="INFO"/>
   <logger name="org.apache.activemq" level="INFO"/>
-
+  <logger name="org.mybatis" level="INFO"/>
+  <logger name="org.springframework" level="INFO"/>
+  <logger name="net.sf.ehcache" level="INFO"/>
+  
   <root level="INFO">
     <appender-ref ref="CONSOLE" />
   </root>
