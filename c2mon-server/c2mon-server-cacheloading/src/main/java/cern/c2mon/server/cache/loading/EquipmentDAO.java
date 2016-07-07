@@ -23,7 +23,7 @@ import cern.c2mon.server.common.equipment.Equipment;
  * @author mbrightw
  *
  */
-public interface EquipmentDAO extends BatchCacheLoaderDAO<Equipment>, ConfigurableDAO<Equipment> {
+public interface EquipmentDAO extends SimpleCacheLoaderDAO<Equipment>, ConfigurableDAO<Equipment> {
 
   Long getIdByName(String name);
 

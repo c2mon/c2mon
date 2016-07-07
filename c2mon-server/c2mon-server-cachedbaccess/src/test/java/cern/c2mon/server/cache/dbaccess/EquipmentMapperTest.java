@@ -140,21 +140,6 @@ public class EquipmentMapperTest {
     assertTrue(returnList.size() > 0);
   }
 
-  /**
-   * Tests the batch loading method.
-   */
-  @Test
-  public void testGetBatch() {
-    DBBatch dbBatch = new DBBatch(150L, 160L);
-    List<Equipment> equipments = equipmentMapper.getRowBatch(dbBatch);
-    assertNotNull(equipments);
-    assertTrue(equipments.size() == 2);
-
-    DBBatch dbBatch2 = new DBBatch(150L, 159L);
-    List<Equipment> equipments2 = equipmentMapper.getRowBatch(dbBatch2);
-    assertNotNull(equipments2);
-    assertTrue(equipments2.size() == 1);
-  }
 
   @Test
   public void testInsertAndRetrieve() {
@@ -226,19 +211,6 @@ public class EquipmentMapperTest {
     assertEquals(new Long(1251), updatedEquipment.getAliveTagId());
     assertEquals(new Long(1252), updatedEquipment.getCommFaultTagId());
     assertEquals(new Long(1250), updatedEquipment.getStateTagId());
-  }
-
-  @Test
-  public void testGetMaxId() {
-    //only based on data already in DB
-    Long max = equipmentMapper.getMaxId();
-    assertEquals(max, Long.valueOf(170));
-  }
-
-  @Test
-  public void testGetMinId() {
-    Long max = equipmentMapper.getMinId();
-    assertEquals(max, Long.valueOf(150));
   }
 
   @Test
