@@ -28,9 +28,7 @@ import cern.c2mon.shared.client.configuration.api.alarm.AlarmCondition;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.process.Process;
-import cern.c2mon.shared.client.configuration.api.tag.DataTag;
-import cern.c2mon.shared.client.configuration.api.tag.RuleTag;
-import cern.c2mon.shared.client.configuration.api.tag.Tag;
+import cern.c2mon.shared.client.configuration.api.tag.*;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
@@ -65,15 +63,23 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
   private AlarmConfigurationManager alarmConfigurationManager;
 
+  private ControlTagConfigurationManager controlTagConfigurationManager;
+
   /**
    * Default Constructor, used by Spring to instantiate the Singleton service
    *
    * @param requestHandler Provides methods for requesting tag information from the C2MON server
    */
   @Autowired
-  protected ConfigurationServiceImpl(final @Qualifier("coreRequestHandler") RequestHandler requestHandler, final ConfigurationRequestSender configurationRequestSender,
-                                     ProcessConfigurationManager processConfigurationManager, EquipmentConfigurationManager equipmentConfigurationManager, SubEquipmentConfigurationManager subEquipmentConfigurationManager,
-                                     DataTagConfigurationManager dataTagConfigurationManager, RuleTagConfigurationManager ruleTagConfigurationManager, AlarmConfigurationManager alarmConfigurationManager) {
+  protected ConfigurationServiceImpl(final @Qualifier("coreRequestHandler") RequestHandler requestHandler, final
+  ConfigurationRequestSender configurationRequestSender,
+                                     ProcessConfigurationManager processConfigurationManager,
+                                     EquipmentConfigurationManager equipmentConfigurationManager,
+                                     SubEquipmentConfigurationManager subEquipmentConfigurationManager,
+                                     DataTagConfigurationManager dataTagConfigurationManager,
+                                     RuleTagConfigurationManager ruleTagConfigurationManager,
+                                     AlarmConfigurationManager alarmConfigurationManager,
+                                     ControlTagConfigurationManager controlTagConfigurationManager) {
     this.clientRequestHandler = requestHandler;
     this.configurationRequestSender = configurationRequestSender;
     this.processConfigurationManager = processConfigurationManager;
@@ -82,6 +88,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     this.dataTagConfigurationManager = dataTagConfigurationManager;
     this.ruleTagConfigurationManager = ruleTagConfigurationManager;
     this.alarmConfigurationManager = alarmConfigurationManager;
+    this.controlTagConfigurationManager = controlTagConfigurationManager;
   }
 
   @Override
@@ -104,7 +111,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     try {
       return clientRequestHandler.getConfigurationReports();
     } catch (JMSException e) {
-      log.error("getConfigurationReports() - JMS connection lost -> Could not retrieve configuration reports from the C2MON server.", e);
+      log.error("getConfigurationReports() - JMS connection lost -> Could not retrieve configuration reports from the" +
+          " C2MON server.", e);
     }
     return new ArrayList<>();
   }
@@ -114,7 +122,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     try {
       return clientRequestHandler.getConfigurationReports(id);
     } catch (JMSException e) {
-      log.error("getConfigurationReports() - JMS connection lost -> Could not retrieve configuration reports from the C2MON server.", e);
+      log.error("getConfigurationReports() - JMS connection lost -> Could not retrieve configuration reports from the" +
+          " C2MON server.", e);
     }
     return new ArrayList<>();
   }
@@ -125,7 +134,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     try {
       return clientRequestHandler.getProcessNames();
     } catch (JMSException e) {
-      log.error("getProcessNames() - JMS connection lost -> Could not retrieve process names from the C2MON server.", e);
+      log.error("getProcessNames() - JMS connection lost -> Could not retrieve process names from the C2MON server.",
+          e);
     }
     return new ArrayList<>();
   }
@@ -137,7 +147,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
       // no cache for Tag Configurations => fetch them from the server
       return clientRequestHandler.requestTagConfigurations(tagIds);
     } catch (JMSException e) {
-      log.error("getTagConfigurations() - JMS connection lost -> Could not retrieve missing tags from the C2MON server.", e);
+      log.error("getTagConfigurations() - JMS connection lost -> Could not retrieve missing tags from the C2MON " +
+          "server.", e);
     }
     return new ArrayList<>();
   }
@@ -267,7 +278,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
   }
 
   @Override
-  public ConfigurationReport createDataTag(String equipmentName, String name, Class<?> dataType, DataTagAddress address) {
+  public ConfigurationReport createDataTag(String equipmentName, String name, Class<?> dataType, DataTagAddress
+      address) {
     return dataTagConfigurationManager.createDataTag(equipmentName, name, dataType, address);
   }
 
@@ -309,6 +321,36 @@ public class ConfigurationServiceImpl implements ConfigurationService {
   @Override
   public ConfigurationReport removeDataTags(Set<String> tagNames) {
     return dataTagConfigurationManager.removeDataTags(tagNames);
+  }
+
+  @Override
+  public ConfigurationReport updateAliveTag(AliveTag tag) {
+    return controlTagConfigurationManager.updateAliveTag(tag);
+  }
+
+  @Override
+  public ConfigurationReport updateAliveTags(List<AliveTag> tags) {
+    return controlTagConfigurationManager.updateAliveTags(tags);
+  }
+
+  @Override
+  public ConfigurationReport updateCommFaultTag(CommFaultTag tag) {
+    return controlTagConfigurationManager.updateCommFaultTag(tag);
+  }
+
+  @Override
+  public ConfigurationReport updateCommFaultTags(List<CommFaultTag> tags) {
+    return controlTagConfigurationManager.updateCommFaultTags(tags);
+  }
+
+  @Override
+  public ConfigurationReport updateStatusTag(StatusTag tag) {
+    return controlTagConfigurationManager.updateStatusTag(tag);
+  }
+
+  @Override
+  public ConfigurationReport updateStatusTags(List<StatusTag> tags) {
+    return controlTagConfigurationManager.updateStatusTags(tags);
   }
 
   @Override
@@ -357,7 +399,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
   }
 
   @Override
-  public ConfigurationReport createAlarm(String tagName, AlarmCondition alarmCondition, String faultFamily, String faultMember, Integer faultCode) {
+  public ConfigurationReport createAlarm(String tagName, AlarmCondition alarmCondition, String faultFamily, String
+      faultMember, Integer faultCode) {
     return alarmConfigurationManager.createAlarm(tagName, alarmCondition, faultFamily, faultMember, faultCode);
   }
 

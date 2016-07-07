@@ -36,7 +36,7 @@ import java.util.Collection;
  */
 public interface ConfigurationService extends ProcessConfigurationManager,
     EquipmentConfigurationManager, SubEquipmentConfigurationManager, DataTagConfigurationManager,
-    RuleTagConfigurationManager, AlarmConfigurationManager {
+    RuleTagConfigurationManager, AlarmConfigurationManager, ControlTagConfigurationManager {
 
   /**
    * Returns a TagConfiguration object for every valid id on the list. The
@@ -89,7 +89,7 @@ public interface ConfigurationService extends ProcessConfigurationManager,
    * For more information of the configuration object read the documentation of
    * {@link Configuration} or follow the instruction in the
    * <a href="http://c2mon.web.cern.ch/c2mon/docs/#_offline_configuration_via_c2mon_database_test_purpose_only">
-   *   c2mon documentation</a>.
+   * c2mon documentation</a>.
    *
    * @param configuration
    * @param listener
