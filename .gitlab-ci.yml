@@ -1,4 +1,4 @@
-image: maven:3.3-jdk-8
+image: docker:latest
 
 services:
 - docker:dind # https://cdn.meme.am/instances/500x/49519932.jpg
@@ -8,4 +8,4 @@ before_script:
 
 build:
   script:
-   - mvn -q -B -T4 -U clean deploy --settings settings.xml
+   - ./mvnw -q -B -T4 -U clean deploy --settings settings.xml
