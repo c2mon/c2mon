@@ -1,6 +1,11 @@
 image: maven:3.3-jdk-8
 
+services:
+- docker:dind # https://cdn.meme.am/instances/500x/49519932.jpg
+
+before_script:
+  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD docker.cern.ch
+
 build:
   script:
-   - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD docker.cern.ch 
    - mvn -q -B -T4 -U clean deploy --settings settings.xml
