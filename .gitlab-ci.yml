@@ -4,4 +4,4 @@ before_script:
 
 build:
   script:
-   - ./mvnw -q -B -T4 -U clean deploy --settings settings.xml
+   - mvn -q -B -T4 -U clean deploy --settings settings.xml
