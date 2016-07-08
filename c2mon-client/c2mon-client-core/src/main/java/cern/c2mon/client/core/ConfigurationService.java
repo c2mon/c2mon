@@ -25,6 +25,7 @@ import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.request.ClientRequestErrorReport;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
 import cern.c2mon.shared.client.tag.TagConfig;
+import org.apache.activemq.command.Command;
 
 import java.util.Collection;
 
@@ -36,7 +37,8 @@ import java.util.Collection;
  */
 public interface ConfigurationService extends ProcessConfigurationManager,
     EquipmentConfigurationManager, SubEquipmentConfigurationManager, DataTagConfigurationManager,
-    RuleTagConfigurationManager, AlarmConfigurationManager, ControlTagConfigurationManager {
+    RuleTagConfigurationManager, AlarmConfigurationManager, ControlTagConfigurationManager,
+    CommandTagConfigurationManager {
 
   /**
    * Returns a TagConfiguration object for every valid id on the list. The

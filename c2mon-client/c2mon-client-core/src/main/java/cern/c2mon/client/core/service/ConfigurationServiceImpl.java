@@ -19,6 +19,7 @@ package cern.c2mon.client.core.service;
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.core.ConfigurationService;
 import cern.c2mon.client.core.configuration.*;
+import cern.c2mon.client.core.configuration.impl.CommandTagConfigurationManagerImpl;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
@@ -32,6 +33,7 @@ import cern.c2mon.shared.client.configuration.api.tag.*;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -65,6 +67,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
   private ControlTagConfigurationManager controlTagConfigurationManager;
 
+  private CommandTagConfigurationManager commandTagConfigurationManager;
+
   /**
    * Default Constructor, used by Spring to instantiate the Singleton service
    *
@@ -79,7 +83,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                                      DataTagConfigurationManager dataTagConfigurationManager,
                                      RuleTagConfigurationManager ruleTagConfigurationManager,
                                      AlarmConfigurationManager alarmConfigurationManager,
-                                     ControlTagConfigurationManager controlTagConfigurationManager) {
+                                     ControlTagConfigurationManager controlTagConfigurationManager,
+                                     CommandTagConfigurationManager commandTagConfigurationManager) {
     this.clientRequestHandler = requestHandler;
     this.configurationRequestSender = configurationRequestSender;
     this.processConfigurationManager = processConfigurationManager;
@@ -89,6 +94,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     this.ruleTagConfigurationManager = ruleTagConfigurationManager;
     this.alarmConfigurationManager = alarmConfigurationManager;
     this.controlTagConfigurationManager = controlTagConfigurationManager;
+    this.commandTagConfigurationManager = commandTagConfigurationManager;
   }
 
   @Override
@@ -321,6 +327,55 @@ public class ConfigurationServiceImpl implements ConfigurationService {
   @Override
   public ConfigurationReport removeDataTags(Set<String> tagNames) {
     return dataTagConfigurationManager.removeDataTags(tagNames);
+  }
+
+  @Override
+  public ConfigurationReport createCommandTag(String equipmentName, String name, Class<?> dataType, HardwareAddress
+      hardwareAddress, Integer clientTimeout, Integer execTimeout, Integer sourceTimeout, Integer sourceRetries,
+                                              String rbacClass, String rbacDevice, String rbacProperty) {
+
+    return commandTagConfigurationManager.createCommandTag(equipmentName, name, dataType, hardwareAddress,
+        clientTimeout, execTimeout, sourceTimeout, sourceRetries, rbacClass, rbacDevice, rbacProperty);
+  }
+
+  @Override
+  public ConfigurationReport createCommandTag(String equipmentName, CommandTag commandTag) {
+    return commandTagConfigurationManager.createCommandTag(equipmentName, commandTag);
+  }
+
+  @Override
+  public ConfigurationReport createCommandTags(String equipmentName, List<CommandTag> tags) {
+    return commandTagConfigurationManager.createCommandTags(equipmentName, tags);
+  }
+
+  @Override
+  public ConfigurationReport updateCommandTag(CommandTag tag) {
+    return commandTagConfigurationManager.updateCommandTag(tag);
+  }
+
+  @Override
+  public ConfigurationReport updateCommandTags(List<CommandTag> tags) {
+    return commandTagConfigurationManager.updateCommandTags(tags);
+  }
+
+  @Override
+  public ConfigurationReport removeCommandTagsById(Set<Long> ids) {
+    return commandTagConfigurationManager.removeCommandTagsById(ids);
+  }
+
+  @Override
+  public ConfigurationReport removeCommandTagById(Long id) {
+    return commandTagConfigurationManager.removeCommandTagById(id);
+  }
+
+  @Override
+  public ConfigurationReport removeCommandTag(String name) {
+    return commandTagConfigurationManager.removeCommandTag(name);
+  }
+
+  @Override
+  public ConfigurationReport removeCommandTags(Set<String> tagNames) {
+    return commandTagConfigurationManager.removeCommandTags(tagNames);
   }
 
   @Override
