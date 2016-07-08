@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -28,6 +28,7 @@ import java.util.Map;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import lombok.Data;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
@@ -43,6 +44,7 @@ import cern.c2mon.shared.common.datatag.DataTagDeadband;
 import cern.c2mon.shared.util.json.GsonFactory;
 
 @Root(name = "TagConfig")
+@Data
 public class TagConfigImpl extends ClientRequestReport implements TagConfig {
 
   /** The unique tag id */
@@ -92,6 +94,13 @@ public class TagConfigImpl extends ClientRequestReport implements TagConfig {
    */
   @Element(required = false, data = true)
   private String hardwareAddress;
+
+  /**
+   * All address information of the given DataTag
+   * This is an central element for this class which provides the information for the daq to create an DataTag.
+   */
+  @ElementMap(name = "address-parameters", key="key", attribute=true, required = false)
+  private Map<String, String> addressParameters = new HashMap<>();
 
   /**
    * List of rule ids which are using this tag.
@@ -161,48 +170,6 @@ public class TagConfigImpl extends ClientRequestReport implements TagConfig {
   }
 
   /**
-   * @param valueDeadbandType the valueDeadbandType to set
-   */
-  public void setValueDeadbandType(final short valueDeadbandType) {
-    this.valueDeadbandType = valueDeadbandType;
-  }
-
-  /**
-   * @param valueDeadband the valueDeadband to set
-   */
-  public void setValueDeadband(final float valueDeadband) {
-    this.valueDeadband = valueDeadband;
-  }
-
-  /**
-   * @param timeDeadband the timeDeadband to set
-   */
-  public void setTimeDeadband(final int timeDeadband) {
-    this.timeDeadband = timeDeadband;
-  }
-
-  /**
-   * @param priority the priority to set
-   */
-  public void setPriority(final int priority) {
-    this.priority = priority;
-  }
-
-  /**
-   * @param guaranteedDelivery the guaranteedDelivery to set
-   */
-  public void setGuaranteedDelivery(final boolean guaranteedDelivery) {
-    this.guaranteedDelivery = guaranteedDelivery;
-  }
-
-  /**
-   * @param hardwareAddress the hardwareAddress to set
-   */
-  public void setHardwareAddress(final String hardwareAddress) {
-    this.hardwareAddress = hardwareAddress;
-  }
-
-  /**
    * @param alarmIds the alarmIds to set
    */
   public void setAlarmIds(List<Long> alarmIds) {
@@ -222,68 +189,6 @@ public class TagConfigImpl extends ClientRequestReport implements TagConfig {
     else {
       this.ruleIds = new ArrayList<Long>();
     }
-  }
-
-  /**
-   * @param ruleExpressionStr the ruleExpressionStr to set
-   */
-  public void setRuleExpressionStr(final String ruleExpressionStr) {
-    this.ruleExpressionStr = ruleExpressionStr;
-  }
-
-  /**
-   * @param topicName the topicName to set
-   */
-  public void setTopicName(final String topicName) {
-    this.topicName = topicName;
-  }
-
-  /**
-   * @return the valueDeadbandType
-   */
-  @Override
-  public short getValueDeadbandType() {
-    return valueDeadbandType;
-  }
-
-  /**
-   * @return the valueDeadband
-   */
-  @Override
-  public float getValueDeadband() {
-    return valueDeadband;
-  }
-
-  /**
-   * @return the timeDeadband
-   */
-  @Override
-  public int getTimeDeadband() {
-    return timeDeadband;
-  }
-
-  /**
-   * @return the priority
-   */
-  @Override
-  public int getPriority() {
-    return priority;
-  }
-
-  /**
-   * @return the guaranteedDelivery
-   */
-  @Override
-  public boolean isGuaranteedDelivery() {
-    return guaranteedDelivery;
-  }
-
-  /**
-   * @return the hardwareAddress
-   */
-  @Override
-  public String getHardwareAddress() {
-    return hardwareAddress;
   }
 
   @Override
@@ -324,30 +229,6 @@ public class TagConfigImpl extends ClientRequestReport implements TagConfig {
   }
 
   @Override
-  public String getMaxValue() {
-    return maxValue;
-  }
-
-  @Override
-  public String getMinValue() {
-    return minValue;
-  }
-
-  /**
-   * @param minValue the minValue to set
-   */
-  public void setMinValue(String minValue) {
-    this.minValue = minValue;
-  }
-
-  /**
-   * @param maxValue the maxValue to set
-   */
-  public void setMaxValue(String maxValue) {
-    this.maxValue = maxValue;
-  }
-
-  @Override
   public Collection<Long> getAlarmIds() {
     return alarmIds;
   }
@@ -358,11 +239,6 @@ public class TagConfigImpl extends ClientRequestReport implements TagConfig {
   }
 
   @Override
-  public Long getId() {
-    return id;
-  }
-
-  @Override
   public String getJapcPublication() {
     return publications.get(Publisher.JAPC);
   }
@@ -370,11 +246,6 @@ public class TagConfigImpl extends ClientRequestReport implements TagConfig {
   @Override
   public String getRuleExpression() {
     return ruleExpressionStr;
-  }
-
-  @Override
-  public String getTopicName() {
-    return topicName;
   }
 
   public String getXml() {
@@ -425,12 +296,10 @@ public class TagConfigImpl extends ClientRequestReport implements TagConfig {
     return conf;
   }
 
-
   @Override
   public String toString() {
     return this.getXml();
   }
-
 
   /**
    * Deserialized the JSON string into a <code>TagConfig</code> object instance
@@ -449,15 +318,5 @@ public class TagConfigImpl extends ClientRequestReport implements TagConfig {
   @Override
   public void setLogged(Boolean logged) {
     this.logged = logged;
-  }
-
-  @Override
-  public List<String> getProcessNames() {
-    return processNames;
-  }
-
-  @Override
-  public void setProcessNames(List<String> processNames) {
-    this.processNames = processNames;
   }
 }

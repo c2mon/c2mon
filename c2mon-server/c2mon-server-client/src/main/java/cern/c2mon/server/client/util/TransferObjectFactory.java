@@ -228,8 +228,11 @@ public abstract class TransferObjectFactory {
           tagConfig.setValueDeadband(dataTag.getAddress().getValueDeadband());
           tagConfig.setTimeDeadband(dataTag.getAddress().getTimeDeadband());
           tagConfig.setGuaranteedDelivery(dataTag.getAddress().isGuaranteedDelivery());
-          tagConfig.setHardwareAddress(dataTag.getAddress().getHardwareAddress().toConfigXML());
           tagConfig.setPriority(dataTag.getAddress().getPriority());
+          tagConfig.setAddressParameters(dataTag.getAddress().getAddressParameters());
+          if(dataTag.getAddress().getHardwareAddress() != null){
+            tagConfig.setHardwareAddress(dataTag.getAddress().getHardwareAddress().toConfigXML());
+          }
         }
       }
 
