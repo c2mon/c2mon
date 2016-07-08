@@ -82,7 +82,7 @@
         <configuration>
           <imageName>docker.cern.ch/c2mon-project/server${arch.suffix}</imageName>
           <baseImage>${base.image}</baseImage>
-          <server-id>cern-docker</server-id>
+          <serverId>cern-docker</serverId>
           <registryUrl>https://docker.cern.ch</registryUrl>
           <!--<useConfigFile>true</useConfigFile>-->
           <forceTags>true</forceTags>
