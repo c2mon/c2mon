@@ -346,6 +346,18 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.8.1</version>
         </plugin>
+        <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.6</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.8.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.5.2</version>
+        </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -391,14 +403,6 @@
           <configuration>
             <tagBase>svn+ssh://svn.cern.ch/reps/tim2/tags/c2mon/c2mon-server</tagBase>
             <autoVersionSubmodules>true</autoVersionSubmodules>
-
-
-            <!-- TODO: remove this -->
-            <checkModificationExcludes>
-              <checkModificationExclude>**/**</checkModificationExclude>
-            </checkModificationExcludes>
-
-
           </configuration>
         </plugin>
       </plugins>
