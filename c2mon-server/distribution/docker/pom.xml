@@ -13,15 +13,6 @@
   <name>c2mon-server :: docker image</name>
   <packaging>pom</packaging>
 
-  <dependencies>
-    <!--<dependency>-->
-      <!--<groupId>cern.c2mon.server</groupId>-->
-      <!--<artifactId>c2mon-server</artifactId>-->
-      <!--<version>${project.version}</version>-->
-      <!--<type>pom</type>-->
-    <!--</dependency>-->
-  </dependencies>
-
   <properties>
     <base.image>java:8-jdk</base.image>
     <arch.prefix></arch.prefix>
@@ -90,7 +81,7 @@
             <imageTag>${project.version}</imageTag>
             <!--imageTag>latest</imageTag-->
           </imageTags>
-          <workdir>/server</workdir>
+          <workdir>/c2mon-server</workdir>
           <cmd>["bin/c2mon.sh","run"]</cmd>
           <exposes>
             <expose>61616</expose>
@@ -102,13 +93,13 @@
             <run>chmod 755 /server/bin/*</run>
           </runs>
           <volumes>
-            <volume>/server/log</volume>
-            <volume>/server/conf</volume>
+            <volume>/c2mon-server/log</volume>
+            <volume>/c2mon-server/conf</volume>
           </volumes>
           <resources>
             <resource>
               <directory>${project.build.directory}/dependency/c2mon-server-${project.version}</directory>
-              <targetPath>/server</targetPath>
+              <targetPath>/c2mon-server</targetPath>
             </resource>
           </resources>
         </configuration>
