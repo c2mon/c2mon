@@ -457,6 +457,7 @@ public class TransportConnector implements Connector {
             .put("node.name", "ClusterNode")
             .put("node.data", true)
             .put("node.master", true)
+            .put("network.host", "0.0.0.0")
             .put("http.enabled", true)
             .put("http.cors.enabled", true)
             .put("http.cors.allow-origin", "/.*/")
