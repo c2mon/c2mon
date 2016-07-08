@@ -90,7 +90,7 @@
             <expose>1099</expose>
           </exposes>
           <runs>
-            <run>chmod 755 /server/bin/*</run>
+            <run>chmod 755 /c2mon-server/bin/*</run>
           </runs>
           <volumes>
             <volume>/c2mon-server/log</volume>
