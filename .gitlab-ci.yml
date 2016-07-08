@@ -1,3 +1,4 @@
+image: java:8
 
 before_script:
   - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD -e test@example.com docker.cern.ch
