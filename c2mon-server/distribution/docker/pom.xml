@@ -95,6 +95,7 @@
           <volumes>
             <volume>/c2mon-server/log</volume>
             <volume>/c2mon-server/conf</volume>
+            <volume>/tmp/elasticsearch-node</volume>
           </volumes>
           <resources>
             <resource>
