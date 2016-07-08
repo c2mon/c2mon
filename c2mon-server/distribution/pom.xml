@@ -5,23 +5,26 @@
 
   <parent>
     <groupId>cern.c2mon.server</groupId>
-    <artifactId>c2mon-server</artifactId>
+    <artifactId>c2mon-server-parent</artifactId>
     <version>1.8.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>distribution</artifactId>
   <packaging>pom</packaging>
 
-  <description>The C2MON server distribution package</description>
-
-  <dependencies>
-    <dependency>
-      <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-lifecycle</artifactId>
-    </dependency>
-  </dependencies>
-  
   <modules>
     <module>tar</module>
+    <module>docker</module>
   </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>tar</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
 </project>
