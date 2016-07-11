@@ -49,7 +49,9 @@ import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.node.Node;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.eslog.structure.types.EsAlarm;
@@ -136,6 +138,9 @@ public class TransportConnector implements Connector {
 
   @Value("${c2mon.server.eslog.config.bulk.concurrent}")
   private int concurrent;
+
+  @Autowired
+  private Environment environment;
 
   /**
    * Connection settings for the node according to the host, port, cluster, node and isLocal.
@@ -445,10 +450,9 @@ public class TransportConnector implements Connector {
    * @return Node with which we can communicate.
    */
   private Node launchLocalCluster() {
-    // FIXME: this path should be configurable, but NOT based on c2mon.server.home
-    String home = "/tmp/elasticsearch-node/";
+    String home = environment.getRequiredProperty("c2mon.server.eslog.home");
     setLocal(true);
-    log.info("launchLocalCLuster() - Launch a new local cluster: home=" + home + ", clusterName=" + cluster + ".");
+    log.info("Launching an embedded elasticsearch cluster: home=" + home + ", clusterName=" + cluster);
 
     return nodeBuilder().settings(Settings.settingsBuilder()
             .put("path.home", home)

@@ -10,6 +10,7 @@
   </parent>
 
   <artifactId>c2mon-server</artifactId>
+  <name>c2mon-server :: tarball</name>
   <packaging>pom</packaging>
 
   <dependencies>
