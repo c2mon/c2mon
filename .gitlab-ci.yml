@@ -1,6 +1,6 @@
 
 before_script:
-  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD -e test@example.com docker.cern.ch
+  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD -e $DOCKER_EMAIL docker.cern.ch
 
 build:
   script:

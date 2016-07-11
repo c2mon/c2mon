@@ -8,6 +8,14 @@
       <username>${env.ARTIFACTORY_USERNAME}</username>
       <password>${env.ARTIFACTORY_PASSWORD}</password>
     </server>
+    <server>
+      <id>docker.cern.ch</id>
+      <username>${env.DOCKER_USERNAME}</username>
+      <password>${env.DOCKER_PASSWORD}</password>
+      <configuration>
+        <email>${env.DOCKER_EMAIL}</email>
+      </configuration>
+    </server>
   </servers>
 
   <profiles>
