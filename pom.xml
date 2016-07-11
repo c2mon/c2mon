@@ -358,6 +358,10 @@
           <artifactId>maven-install-plugin</artifactId>
           <version>2.5.2</version>
         </plugin>
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.7</version>
+        </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -400,8 +404,7 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
           <version>2.5.3</version>
-          <configuration>
-            <tagBase>svn+ssh://svn.cern.ch/reps/tim2/tags/c2mon/c2mon-server</tagBase>
+          <configuration> 
             <autoVersionSubmodules>true</autoVersionSubmodules>
           </configuration>
         </plugin>

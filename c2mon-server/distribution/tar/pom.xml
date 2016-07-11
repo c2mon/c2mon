@@ -88,7 +88,7 @@
           <finalName>c2mon-server-${project.version}</finalName>
           <appendAssemblyId>false</appendAssemblyId>
           <descriptors>
-            <descriptor>distribution/tar/assembly.xml</descriptor>
+            <descriptor>./assembly.xml</descriptor>
           </descriptors>
         </configuration>
         <executions>
