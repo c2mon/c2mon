@@ -1,7 +1,3 @@
-
-before_script:
-  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD -e $DOCKER_EMAIL docker.cern.ch
-
 build:
   script:
    - mvn -q -B clean deploy --settings settings.xml

@@ -36,7 +36,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>cern.c2mon.server</groupId>
-                  <artifactId>tar</artifactId>
+                  <artifactId>c2mon-server</artifactId>
                   <type>tar.gz</type>
                 </artifactItem>
               </artifactItems>
@@ -75,11 +75,10 @@
           <baseImage>${docker.image.base}</baseImage>
           <serverId>docker.cern.ch</serverId>
           <registryUrl>https://docker.cern.ch</registryUrl>
-          <!--<useConfigFile>true</useConfigFile>-->
           <forceTags>true</forceTags>
           <imageTags>
             <imageTag>${project.version}</imageTag>
-            <!--imageTag>latest</imageTag-->
+            <imageTag>latest</imageTag>
           </imageTags>
           <workdir>/c2mon-server</workdir>
           <cmd>["bin/c2mon.sh","run"]</cmd>

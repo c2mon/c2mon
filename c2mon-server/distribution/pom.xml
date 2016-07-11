@@ -21,7 +21,7 @@
     <dependencies>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
-        <artifactId>tar</artifactId>
+        <artifactId>c2mon-server</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>
