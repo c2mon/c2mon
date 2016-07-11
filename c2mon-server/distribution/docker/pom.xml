@@ -14,7 +14,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <base.image>java:8-jdk</base.image>
+    <docker.image.base>java:8-jdk</docker.image.base>
     <arch.prefix></arch.prefix>
     <arch.suffix></arch.suffix>
   </properties>
@@ -72,7 +72,7 @@
         </executions>
         <configuration>
           <imageName>docker.cern.ch/c2mon-project/server${arch.suffix}</imageName>
-          <baseImage>${base.image}</baseImage>
+          <baseImage>${docker.image.base}</baseImage>
           <serverId>docker.cern.ch</serverId>
           <registryUrl>https://docker.cern.ch</registryUrl>
           <!--<useConfigFile>true</useConfigFile>-->
