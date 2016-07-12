@@ -25,8 +25,8 @@ package cern.c2mon.shared.client.tag;
 public enum TagMode {
   /** Tag is operational */
   OPERATIONAL,
-  /** Tag is currently in test phase */
-  TEST,
   /** The source is currently in maintenance */
-  MAINTENANCE;
+  MAINTENANCE,
+  /** Tag is currently in test phase */
+  TEST
 }
