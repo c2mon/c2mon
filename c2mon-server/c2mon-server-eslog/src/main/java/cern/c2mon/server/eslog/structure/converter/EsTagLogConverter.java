@@ -214,14 +214,13 @@ public class EsTagLogConverter implements Converter<Tag, EsTag> {
   }
 
   private Map<String, String> retrieveTagMetadata(Tag tag) {
-    Metadata metadata = tag.getMetadata();
-    if (metadata == null) {
+    if (tag.getMetadata() == null) {
       return Collections.emptyMap();
     }
-    return metadata.getMetadata().entrySet().stream()
-        .collect(Collectors.toMap(
-            Map.Entry::getKey,
-            entry -> entry.getValue().toString()));
+
+    Map<String, String> metadata = new HashMap<>();
+    tag.getMetadata().getMetadata().forEach((k, v) -> metadata.put(k, v == null ? null : v.toString()));
+    return metadata;
   }
 
   /**
