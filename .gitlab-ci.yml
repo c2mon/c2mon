@@ -1,3 +1,14 @@
+
+# Upload snapshots for master branch only
+build_and_deploy:
+  script:
+    - mvn -q -B clean deploy --settings settings.xml
+  only:
+    - master
+
+# Just build feature branches, don't deploy them
 build:
   script:
-   - mvn -q -B clean deploy --settings settings.xml
+    - mvn -q -B clean package --settings settings.xml
+  except:
+    - master
