@@ -35,7 +35,8 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 
 /**
- * JMS sender class for sending the Configuration request to the server and waiting for the response.
+ * JMS sender class for sending the Configuration request to the server and
+ * waiting for the response.
  *
  * @author Justin Lewis Salmon
  */
@@ -61,10 +62,11 @@ public class ConfigurationRequestSender {
   }
 
   /**
-   * @param configuration
-   * @param listener
    *
-   * @return
+   *
+   * @param configuration The configuration created from the client
+   * @param listener The listener for the configuration
+   * @return The report of the configuration
    */
   public ConfigurationReport applyConfiguration(Configuration configuration, ClientRequestReportListener listener) {
     try {
@@ -72,7 +74,14 @@ public class ConfigurationRequestSender {
       String destination = environment.getRequiredProperty("c2mon.client.jms.config.queue");
       String reply = jmsSender.sendRequestToQueue(message, destination, DEFAULT_TIMEOUT);
 
-      return mapper.readValue(reply, ConfigurationReport.class);
+      if (reply != null) {
+        return mapper.readValue(reply, ConfigurationReport.class);
+      } else {
+        ConfigurationReport failureReport = new ConfigurationReport();
+        failureReport.setStatus(ConfigConstants.Status.FAILURE);
+        failureReport.setStatusDescription("Server timed out after " + DEFAULT_TIMEOUT + " seconds.");
+        return failureReport;
+      }
 
     } catch (IOException e) {
 
@@ -101,7 +110,8 @@ public class ConfigurationRequestSender {
     }
 
     @Override
-    public T deserialize(JsonElement elem, Type interfaceType, JsonDeserializationContext context) throws JsonParseException {
+    public T deserialize(JsonElement elem, Type interfaceType, JsonDeserializationContext context) throws
+        JsonParseException {
       final JsonObject wrapper = (JsonObject) elem;
       final JsonElement typeName = get(wrapper, "class");
       final JsonElement data = get(wrapper, "data");
@@ -119,7 +129,9 @@ public class ConfigurationRequestSender {
 
     private JsonElement get(final JsonObject wrapper, String memberName) {
       final JsonElement elem = wrapper.get(memberName);
-      if (elem == null) throw new JsonParseException("no '" + memberName + "' member found in what was expected to be an interface wrapper");
+      if (elem == null)
+        throw new JsonParseException("no '" + memberName + "' member found in what was expected to be an interface " +
+            "wrapper");
       return elem;
     }
   }
