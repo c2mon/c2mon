@@ -356,7 +356,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         } catch (Exception ex) {
           String errMessage = configId + " Exception caught while applying the configuration change (Action, Entity, Entity id) = ("
             + element.getAction() + "; " + element.getEntity() + "; " + element.getEntityId() + ")";
-          LOGGER.error(errMessage, ex);
+          LOGGER.error(errMessage, ex.getMessage());
           elementReport.setFailure("Exception caught while applying the configuration change.", ex);
           element.setStatus(Status.FAILURE);
           report.addStatus(Status.FAILURE);

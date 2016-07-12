@@ -244,7 +244,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   public void testCreateUpdateRemoveControlTag() {
     // create
     ConfigurationReport report = configurationLoader.applyConfiguration(2);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty()); // empty because no
@@ -271,7 +271,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     ObjectEqualityComparison.assertDataTagConfigEquals(expectedObject, cacheObject);
     // test update of control tag
     report = configurationLoader.applyConfiguration(6);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
@@ -296,7 +296,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     ConfigurationReport report = configurationLoader.applyConfiguration(8);
 
     // check outcome
-    System.out.println(report.toXML());
+    
     assertEquals(Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty()); // empty because no
                                                          // process/equipment
@@ -317,7 +317,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(3);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     CommandTagCacheObject cacheObject = (CommandTagCacheObject) commandTagCache.get(10000L);
 
@@ -342,7 +342,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     // test update
     report = configurationLoader.applyConfiguration(5);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     CommandTagCacheObject cacheObjectUpdated = (CommandTagCacheObject) commandTagCache.get(10000L);
@@ -388,7 +388,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(1);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
@@ -436,7 +436,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     // test update of this datatag
     report = configurationLoader.applyConfiguration(4);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
@@ -451,8 +451,6 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     equipment = equipmentCache.get(cacheObject.getEquipmentId());
 
     equipmentCache.acquireWriteLockOnKey(cacheObject.getEquipmentId());
-    System.out.println(equipment.getDataTagIds().toString());
-    System.out.println(equipmentCache.get(cacheObject.getEquipmentId()).getDataTagIds().toString());
     equipmentCache.releaseWriteLockOnKey(cacheObject.getEquipmentId());
   }
 
@@ -472,7 +470,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     ConfigurationReport report = configurationLoader.applyConfiguration(7);
 
     // check successful
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
@@ -506,7 +504,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     // insert datatag to base rule on
     configurationLoader.applyConfiguration(1);
     ConfigurationReport report = configurationLoader.applyConfiguration(10);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     RuleTagCacheObject cacheObject = (RuleTagCacheObject) ruleTagCache.get(50100L);
 
@@ -540,7 +538,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     report = configurationLoader.applyConfiguration(11);
     Thread.sleep(1000); // sleep 1s to allow for rule evaluation on separate
                         // thread
-    System.out.println(report.toXML());
+    
     RuleTagCacheObject updatedCacheObject = (RuleTagCacheObject) ruleTagCache.get(50100L);
     ObjectEqualityComparison.assertRuleTagConfigEquals(expectedObject, updatedCacheObject);
 
@@ -555,7 +553,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     // remove ruletag
     ConfigurationReport report = configurationLoader.applyConfiguration(12);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertFalse(ruleTagCache.hasKey(60007L));
     assertNull(ruleTagMapper.getItem(60007L));
@@ -659,7 +657,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(13);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus()); // ok as DAQ handles Equipment
                                                  // creation
@@ -691,7 +689,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     // update (creates controltag and updates equipment) - should succeed
     report = configurationLoader.applyConfiguration(25);
-    System.out.println(report.toXML());
+    
     // expect 2 top elements (control and equipment, with control first)
     // equipment report should have 1 sub-reports from DAQ (control tag has no
     // address)
@@ -767,7 +765,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     // remove equipment
     // remove completes successfully; both Equipment and ControlTags are removed
     ConfigurationReport report = configurationLoader.applyConfiguration(15);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus()); // DAQ deals with Equipment
                                                  // removal
@@ -788,7 +786,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(16);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     ProcessCacheObject cacheObject = (ProcessCacheObject) processCache.get(2L);
@@ -808,7 +806,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     // update
     report = configurationLoader.applyConfiguration(17);
-    System.out.println(report.toXML());
+    
 
     cacheObject = (ProcessCacheObject) processCache.getCopy(2L);
     expectedObject.setDescription("updated description");
@@ -833,7 +831,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(28);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     verify(mockManager);
     // check process, tag, rules and alarms are gone
@@ -952,7 +950,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(19);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     SubEquipmentCacheObject cacheObject = (SubEquipmentCacheObject) subEquipmentCache.get(200L);
@@ -982,7 +980,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getEquipmentId());
 
     report = configurationLoader.applyConfiguration(20);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     verify(mockManager);
@@ -998,7 +996,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     // Create another DataTag attached to the SubEquipment (two already exist in
     // permanent test data)
     ConfigurationReport report = configurationLoader.applyConfiguration(99);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     SubEquipment subEquipment = subEquipmentCache.get(250L);
@@ -1020,7 +1018,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     // Create another DataTag attached to the SubEquipment (two already exist in
     // permanent test data)
     ConfigurationReport report = configurationLoader.applyConfiguration(99);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     SubEquipment subEquipment = subEquipmentCache.get(250L);
@@ -1036,7 +1034,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     }
 
     report = configurationLoader.applyConfiguration(21);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertFalse(subEquipmentCache.hasKey(250L));
     assertNull(equipmentMapper.getItem(250L));
@@ -1066,7 +1064,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     // Create the subequipment
     ConfigurationReport report = configurationLoader.applyConfiguration(19);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     SubEquipment subEquipment = subEquipmentCache.get(200L);
@@ -1082,7 +1080,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     report = configurationLoader.applyConfiguration(98);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertFalse(subEquipmentCache.hasKey(200L));
     assertNull(equipmentMapper.getItem(200L));
@@ -1148,7 +1146,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     alarmCache.registerSynchronousListener(checker);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(22);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     AlarmCacheObject cacheObject = (AlarmCacheObject) alarmCache.get(300000L);
@@ -1169,7 +1167,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     // update should succeed
     report = configurationLoader.applyConfiguration(23);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     cacheObject = (AlarmCacheObject) alarmCache.get(300000L);
     expectedObject.setFaultFamily("updated fault family");
@@ -1197,7 +1195,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     alarmCache.registerSynchronousListener(checker);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(24);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertFalse(alarmCache.hasKey(350000L));
     assertNull(alarmMapper.getItem(350000L));
@@ -1218,7 +1216,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(30);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     DeviceClassCacheObject expectedObject = (DeviceClassCacheObject) deviceClassMapper.getItem(10L);
@@ -1254,7 +1252,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     // Update should succeed
     report = configurationLoader.applyConfiguration(31);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     cacheObject = (DeviceClassCacheObject) deviceClassCache.get(10L);
 
@@ -1276,7 +1274,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(33);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     deviceClass = deviceClassCache.get(400L);
@@ -1286,7 +1284,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertNotNull(device);
 
     report = configurationLoader.applyConfiguration(32);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertFalse(deviceClassCache.hasKey(400L));
     DeviceClass cacheObject = deviceClassMapper.getItem(400L);
@@ -1301,7 +1299,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(33);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     DeviceCacheObject cacheObject = (DeviceCacheObject) deviceCache.get(20L);
@@ -1328,7 +1326,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     // Update should succeed
     report = configurationLoader.applyConfiguration(34);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     cacheObject = (DeviceCacheObject) deviceCache.get(20L);
 
@@ -1349,7 +1347,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(35);
-    System.out.println(report.toXML());
+    
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertFalse(deviceCache.hasKey(300L));
     assertNull(deviceMapper.getItem(300L));
@@ -1371,7 +1369,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
       t.join();
 
       report = ccr.report;
-      System.out.println(report.toXML());
+      
       assertTrue(report.toXML().contains(Status.FAILURE.toString()));
       assertTrue(report.toXML().contains("rejected since another configuration is still running"));
 

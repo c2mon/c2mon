@@ -181,7 +181,6 @@ public class ClientModuleIntegrationTest implements ApplicationContextAware {
         assertNotNull(replyMessage);
         assertTrue(replyMessage instanceof TextMessage);
         String replyText = ((TextMessage) replyMessage).getText();
-        System.out.println("reply: " + replyText);
 
         List<DeviceClassNameResponse> deviceClassNames = (List<DeviceClassNameResponse>) request.fromJsonResponse(replyText);
         assertNotNull(deviceClassNames);
@@ -225,7 +224,6 @@ public class ClientModuleIntegrationTest implements ApplicationContextAware {
         assertNotNull(replyMessage);
         assertTrue(replyMessage instanceof TextMessage);
         String replyText = ((TextMessage) replyMessage).getText();
-        System.out.println("reply: " + replyText);
 
         List<TransferDevice> devices = (List<TransferDevice>) request.fromJsonResponse(replyText);
         assertNotNull(devices);

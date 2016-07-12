@@ -151,7 +151,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
          }
         return processChange;
       } catch (RuntimeException ex) {
-        LOGGER.error("Exception caught when attempting to remove a process - rolling back DB changes.", ex);
+        LOGGER.error("Exception caught when attempting to remove a process - rolling back DB changes: {}", ex.getMessage());
         throw new UnexpectedRollbackException("Unexpected exception caught while removing Process.", ex);
       } finally {
         if (processCache.isWriteLockedByCurrentThread(processId)) {
