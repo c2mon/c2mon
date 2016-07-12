@@ -60,18 +60,20 @@ public interface C2monCacheWithListeners<K, T extends Cacheable> extends C2monCa
   /**
    * Register to be notified with collections of cache objects, rather than single objects.
    * @param bufferedTimCacheListener the listener that should be notified
+   * @param frequency the frequency (in ms) at which the buffer should be emptied
    * @return a Lifecycle object to start and stop the listener thread; the start should be called once the
    *        registered C2monCacheListener is ready; the stop should be called at the start of the listener shutdown
    */
-  Lifecycle registerBufferedListener(BufferedTimCacheListener<? super T> bufferedTimCacheListener);
+  Lifecycle registerBufferedListener(BufferedTimCacheListener<? super T> bufferedTimCacheListener, int frequency);
   
   /**
    * Register to receive the Ids of cache objects that have been updated.
    * @param bufferedTimCacheListener the listener that should be notified
+   * @param frequency the frequency (in ms) at which the buffer should be emptied
    * @return a Lifecycle object to start and stop the listener thread; the start should be called once the
    *  registered C2monCacheListener is ready; the stop should be called at the start of the listener shutdown 
    */
-  Lifecycle registerKeyBufferedListener(BufferedTimCacheListener<Long> bufferedTimCacheListener);
+  Lifecycle registerKeyBufferedListener(BufferedTimCacheListener<Long> bufferedTimCacheListener, int frequency);
   
   /**
    * Registers a listener to be notified of updates on multiple threads.

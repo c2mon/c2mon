@@ -1,127 +1,132 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
-	                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
-	                    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
-  
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
   <!-- instantiates a DAO bean, persistence manager and cache listener for each cache requiring DB persistence -->
-  
+
   <context:annotation-config/>
-  <context:component-scan base-package="cern.c2mon.server.cachepersistence"/>  
-  
+  <context:component-scan base-package="cern.c2mon.server.cachepersistence"/>
+
   <!--  <aop:config proxy-target-class="true"/> //needed if using CGLIB proxies-->
-  
+
   <bean id="controlTagPersistenceDAO" class="cern.c2mon.server.cachepersistence.impl.CachePersistenceDAOImpl">
     <constructor-arg ref="controlTagMapper"/>
     <constructor-arg ref="controlTagCache"/>
   </bean>
-  
+
   <bean name="controlTagPersistenceManager" class="cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl">
     <constructor-arg ref="controlTagPersistenceDAO"/>
-    <constructor-arg ref="controlTagCache" />
+    <constructor-arg ref="controlTagCache"/>
   </bean>
 
   <bean id="controlTagPersistenceSynchroListener" class="cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener">
     <constructor-arg ref="controlTagCache"/>
     <constructor-arg ref="controlTagPersistenceManager"/>
+    <constructor-arg value="${c2mon.server.cache.bufferedListenerPullFrequency}"/>
   </bean>
-  
+
   <bean id="dataTagPersistenceDAO" class="cern.c2mon.server.cachepersistence.impl.CachePersistenceDAOImpl">
     <constructor-arg ref="dataTagMapper"/>
     <constructor-arg ref="dataTagCache"/>
   </bean>
-  
+
   <bean name="dataTagPersistenceManager" class="cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl">
     <constructor-arg ref="dataTagPersistenceDAO"/>
-    <constructor-arg ref="dataTagCache" />
+    <constructor-arg ref="dataTagCache"/>
     <property name="timeoutPerBatch" value="${c2mon.server.cachepersistence.timeoutPerBatch}"/>
   </bean>
 
   <bean id="datatagPersistenceSynchroListener" class="cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener">
     <constructor-arg ref="dataTagCache"/>
     <constructor-arg ref="dataTagPersistenceManager"/>
+    <constructor-arg value="${c2mon.server.cache.bufferedListenerPullFrequency}"/>
   </bean>
-  
-   <bean id="ruleTagPersistenceDAO" class="cern.c2mon.server.cachepersistence.impl.CachePersistenceDAOImpl">
+
+  <bean id="ruleTagPersistenceDAO" class="cern.c2mon.server.cachepersistence.impl.CachePersistenceDAOImpl">
     <constructor-arg ref="ruleTagMapper"/>
     <constructor-arg ref="ruleTagCache"/>
   </bean>
-  
+
   <bean name="ruleTagPersistenceManager" class="cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl">
     <constructor-arg ref="ruleTagPersistenceDAO"/>
-    <constructor-arg ref="ruleTagCache" />
+    <constructor-arg ref="ruleTagCache"/>
   </bean>
-  
+
   <bean id="ruleTagPersistenceSynchroListener" class="cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener">
     <constructor-arg ref="ruleTagCache"/>
     <constructor-arg ref="ruleTagPersistenceManager"/>
+    <constructor-arg value="${c2mon.server.cache.bufferedListenerPullFrequency}"/>
   </bean>
-  
+
   <bean id="alarmPersistenceDAO" class="cern.c2mon.server.cachepersistence.impl.CachePersistenceDAOImpl">
     <constructor-arg ref="alarmMapper"/>
     <constructor-arg ref="alarmCache"/>
   </bean>
-  
+
   <bean name="alarmPersistenceManager" class="cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl">
     <constructor-arg ref="alarmPersistenceDAO"/>
-    <constructor-arg ref="alarmCache" />
+    <constructor-arg ref="alarmCache"/>
     <property name="timeoutPerBatch" value="${c2mon.server.cachepersistence.timeoutPerBatch}"/>
   </bean>
 
   <bean id="alarmPersistenceSynchroListener" class="cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener">
     <constructor-arg ref="alarmCache"/>
     <constructor-arg ref="alarmPersistenceManager"/>
+    <constructor-arg value="${c2mon.server.cache.bufferedListenerPullFrequency}"/>
   </bean>
-	
+
   <bean id="processPersistenceDAO" class="cern.c2mon.server.cachepersistence.impl.CachePersistenceDAOImpl">
     <constructor-arg ref="processMapper"/>
     <constructor-arg ref="processCache"/>
   </bean>
-  
+
   <bean name="processPersistenceManager" class="cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl">
     <constructor-arg ref="processPersistenceDAO"/>
-    <constructor-arg ref="processCache" />
+    <constructor-arg ref="processCache"/>
     <property name="timeoutPerBatch" value="${c2mon.server.cachepersistence.timeoutPerBatch}"/>
   </bean>
 
   <bean id="processPersistenceSynchroListener" class="cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener">
     <constructor-arg ref="processCache"/>
     <constructor-arg ref="processPersistenceManager"/>
+    <constructor-arg value="${c2mon.server.cache.bufferedListenerPullFrequency}"/>
   </bean>
-  
+
   <bean id="equipmentPersistenceDAO" class="cern.c2mon.server.cachepersistence.impl.CachePersistenceDAOImpl">
     <constructor-arg ref="equipmentMapper"/>
     <constructor-arg ref="equipmentCache"/>
   </bean>
-  
+
   <bean name="equipmentPersistenceManager" class="cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl">
     <constructor-arg ref="equipmentPersistenceDAO"/>
-    <constructor-arg ref="equipmentCache" />
+    <constructor-arg ref="equipmentCache"/>
     <property name="timeoutPerBatch" value="${c2mon.server.cachepersistence.timeoutPerBatch}"/>
   </bean>
 
   <bean id="equipmentPersistenceSynchroListener" class="cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener">
     <constructor-arg ref="equipmentCache"/>
     <constructor-arg ref="equipmentPersistenceManager"/>
+    <constructor-arg value="${c2mon.server.cache.bufferedListenerPullFrequency}"/>
   </bean>
-  
+
   <bean id="subEquipmentPersistenceDAO" class="cern.c2mon.server.cachepersistence.impl.CachePersistenceDAOImpl">
     <constructor-arg ref="subEquipmentMapper"/>
     <constructor-arg ref="subEquipmentCache"/>
   </bean>
-  
+
   <bean name="subEquipmentPersistenceManager" class="cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl">
     <constructor-arg ref="subEquipmentPersistenceDAO"/>
-    <constructor-arg ref="subEquipmentCache" />
+    <constructor-arg ref="subEquipmentCache"/>
     <property name="timeoutPerBatch" value="${c2mon.server.cachepersistence.timeoutPerBatch}"/>
   </bean>
 
   <bean id="subEquipmentPersistenceSynchroListener" class="cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener">
     <constructor-arg ref="subEquipmentCache"/>
     <constructor-arg ref="subEquipmentPersistenceManager"/>
+    <constructor-arg value="${c2mon.server.cache.bufferedListenerPullFrequency}"/>
   </bean>
-  
+
 </beans>

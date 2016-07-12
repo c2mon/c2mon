@@ -17,6 +17,7 @@
 package cern.c2mon.server.cache.listener;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.AlarmCache;
@@ -61,16 +62,6 @@ public class CacheRegistrationServiceImpl implements CacheRegistrationService {
   public static final int QUEUE_SIZE_DEFAULT = Integer.MAX_VALUE;
   
   /**
-   * Default SynchroBuffer parameters.
-   */
-  public static final int BUFFER_MIN_TIME = 100;
-  
-  public static final int BUFFER_MAX_TIME = 1000;
-  
-  public static final int BUFFER_WINDOW_GROWTH = 100;
-  
-  
-  /**
    * Reference to the DataTag cache.
    */
   private DataTagCache dataTagCache;
@@ -89,6 +80,8 @@ public class CacheRegistrationServiceImpl implements CacheRegistrationService {
    * Reference to the Alarm cache.
    */
   private AlarmCache alarmCache;
+
+  private Environment environment;
       
   /**
    * Autowired constructor.
@@ -98,15 +91,17 @@ public class CacheRegistrationServiceImpl implements CacheRegistrationService {
    * @param alarmCache the alarm cache
    */
   @Autowired
-  public CacheRegistrationServiceImpl(final DataTagCache dataTagCache, 
-                                        final ControlTagCache controlTagCache,
-                                          final RuleTagCache ruleTagCache,
-                                           final AlarmCache alarmCache) {
+  public CacheRegistrationServiceImpl(final DataTagCache dataTagCache,
+                                      final ControlTagCache controlTagCache,
+                                      final RuleTagCache ruleTagCache,
+                                      final AlarmCache alarmCache,
+                                      final Environment environment) {
     super();
     this.dataTagCache = dataTagCache;
     this.controlTagCache = controlTagCache;
     this.ruleTagCache = ruleTagCache;
     this.alarmCache = alarmCache;
+    this.environment = environment;
   }
 
   @Override
@@ -172,7 +167,8 @@ public class CacheRegistrationServiceImpl implements CacheRegistrationService {
   
   @Override
   public Lifecycle registerBufferedListenerToTags(final BufferedTimCacheListener<Tag> bufferListener) {
-    BufferedCacheListener<Tag> bufferedCacheListener = new BufferedCacheListener<Tag>(bufferListener);
+    int frequency = environment.getRequiredProperty("c2mon.server.cache.bufferedListenerPullFrequency", Integer.class);
+    BufferedCacheListener<Tag> bufferedCacheListener = new BufferedCacheListener<>(bufferListener, frequency);
     registerListenerToTags(bufferedCacheListener);
     return bufferedCacheListener;
   }

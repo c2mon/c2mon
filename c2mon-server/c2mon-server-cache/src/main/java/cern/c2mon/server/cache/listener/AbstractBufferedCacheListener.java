@@ -26,6 +26,7 @@ import cern.c2mon.server.cache.BufferedTimCacheListener;
 import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.shared.common.Cacheable;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Abstract listener implementation that batches the notifications before
@@ -51,7 +52,7 @@ public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> impl
   /**
    * Max sleep time between pulls (could be longer if previous task is longer)
    */
-  private static final int SLEEP_BETWEEN_PULLS = 10000;
+  private int frequency;
   
   /**
    * Queues keeping the keys for supported methods.
@@ -62,7 +63,7 @@ public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> impl
   /**
    * Wrapped listener.
    */
-  private BufferedTimCacheListener<S> bufferedKeyTimCacheListener;
+  private BufferedTimCacheListener<S> bufferedCacheListener;
   
   /**
    * Indicates if the listener is enabled (if not, notifications are ignored and exception is thrown).
@@ -71,15 +72,13 @@ public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> impl
   
   /**
    * Notice that duplicate policy is ignored if finite capacity is set (duplicate.OK is set) - TODO rewrite/adapt SynchroBuffer for this...
-   * @param minWindowSize
-   * @param maxWindowSize
-   * @param windowGrowthFactor
-   * @param duplicatePolicy
-   * @param capacity
-   * @param bufferedKeyTimCacheListener
+
+   * @param bufferedCacheListener listener expecting collections of cache objects
+   * @param frequency the frequency (in ms) at which the buffer should be emptied
    */
-  public AbstractBufferedCacheListener(BufferedTimCacheListener<S> bufferedKeyTimCacheListener) {    
-    this.bufferedKeyTimCacheListener = bufferedKeyTimCacheListener; 
+  public AbstractBufferedCacheListener(BufferedTimCacheListener<S> bufferedCacheListener, int frequency) {
+    this.bufferedCacheListener = bufferedCacheListener;
+    this.frequency = frequency;
     enabled = false;
   }  
 
@@ -140,7 +139,7 @@ public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> impl
               LinkedList<S> updateKeys = new LinkedList<S>();
               onUpdateQueue.drainTo(updateKeys, MAX_TO_LISTENER);
               if (!updateKeys.isEmpty()) {
-                bufferedKeyTimCacheListener.notifyElementUpdated(updateKeys);
+                bufferedCacheListener.notifyElementUpdated(updateKeys);
               }
             }
             
@@ -148,11 +147,11 @@ public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> impl
               LinkedList<S> confirmationKeys = new LinkedList<S>();
               statusConfirmationQueue.drainTo(confirmationKeys, MAX_TO_LISTENER);
               if (!confirmationKeys.isEmpty()) {
-                bufferedKeyTimCacheListener.confirmStatus(confirmationKeys);
+                bufferedCacheListener.confirmStatus(confirmationKeys);
               }
             }
             
-            while (System.currentTimeMillis() - millisStart < SLEEP_BETWEEN_PULLS) {
+            while (System.currentTimeMillis() - millisStart < frequency) {
               try {
                 Thread.sleep(1000);
               } catch (InterruptedException e) {

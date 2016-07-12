@@ -299,14 +299,14 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
     return threadedCacheListener;
   }
 
-  public Lifecycle registerBufferedListener(final BufferedTimCacheListener bufferedTimCacheListener) {
-    BufferedCacheListener bufferedCacheListener = new BufferedCacheListener(bufferedTimCacheListener);
+  public Lifecycle registerBufferedListener(final BufferedTimCacheListener bufferedTimCacheListener, int frequency) {
+    BufferedCacheListener bufferedCacheListener = new BufferedCacheListener(bufferedTimCacheListener, frequency);
     cacheListeners.add(bufferedCacheListener);
     return bufferedCacheListener;
   }
 
-  public Lifecycle registerKeyBufferedListener(final BufferedTimCacheListener<Long> bufferedTimCacheListener) {
-    BufferedKeyCacheListener<T> bufferedKeyCacheListener = new BufferedKeyCacheListener<T>(bufferedTimCacheListener);
+  public Lifecycle registerKeyBufferedListener(final BufferedTimCacheListener<Long> bufferedCacheListener, int frequency) {
+    BufferedKeyCacheListener<T> bufferedKeyCacheListener = new BufferedKeyCacheListener<T>(bufferedCacheListener, frequency);
     cacheListeners.add(bufferedKeyCacheListener);
     return bufferedKeyCacheListener;
   }

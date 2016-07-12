@@ -48,22 +48,7 @@ public class PersistenceSynchroListener implements BufferedTimCacheListener<Long
    * Class logger.
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(PersistenceSynchroListener.class);
-  
-  /**
-   * SynchroBuffer max time.
-   */
-  private int bufferMaxTime;
-  
-  /**
-   * SynchroBuffer min time.
-   */
-  private int bufferMinTime;
-  
-  /**
-   * SynchroBuffer window growth.
-   */
-  private int bufferWindowGrowth;
-  
+
   /**
    * The cache which will be persisted.
    */
@@ -84,6 +69,8 @@ public class PersistenceSynchroListener implements BufferedTimCacheListener<Long
    * Lifecycle flag.
    */
   private volatile boolean running = false;
+
+  private int bufferedListenerPullFrequency;
   
   /**
    * The constructor that should be used to instantiate a new
@@ -94,9 +81,12 @@ public class PersistenceSynchroListener implements BufferedTimCacheListener<Long
    * @param batchPersistenceManager the DAO object that contains the logic
    *                  for persisting the cache elements
    */
-  public PersistenceSynchroListener(final C2monCacheWithListeners<Long, ? extends Cacheable> timCache, final BatchPersistenceManager batchPersistenceManager) {    
+  public PersistenceSynchroListener(final C2monCacheWithListeners<Long, ? extends Cacheable> timCache,
+                                    final BatchPersistenceManager batchPersistenceManager,
+                                    final int bufferedListenerPullFrequency) {
     this.timCache = timCache;
     this.persistenceManager = batchPersistenceManager;
+    this.bufferedListenerPullFrequency = bufferedListenerPullFrequency;
   }
   
   /**
@@ -105,7 +95,7 @@ public class PersistenceSynchroListener implements BufferedTimCacheListener<Long
    */
   @PostConstruct
   public void init() {   
-    listenerContainer = timCache.registerKeyBufferedListener(this); 
+    listenerContainer = timCache.registerKeyBufferedListener(this, bufferedListenerPullFrequency);
   }
 
   @Override
