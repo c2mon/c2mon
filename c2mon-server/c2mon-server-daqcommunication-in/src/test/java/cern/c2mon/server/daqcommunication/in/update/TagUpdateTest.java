@@ -16,13 +16,16 @@
  *****************************************************************************/
 package cern.c2mon.server.daqcommunication.in.update;
 
-import static org.junit.Assert.*;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-
+import cern.c2mon.server.cache.ControlTagCache;
+import cern.c2mon.server.cache.DataTagCache;
+import cern.c2mon.server.cache.dbaccess.ControlTagMapper;
+import cern.c2mon.server.cache.dbaccess.DataTagMapper;
+import cern.c2mon.server.cache.loading.ControlTagLoaderDAO;
+import cern.c2mon.server.cache.loading.DataTagLoaderDAO;
+import cern.c2mon.server.common.control.ControlTag;
+import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.daqcommunication.in.junit.CachePopulationRule;
-import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.shared.common.datatag.*;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,26 +35,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.cache.ControlTagCache;
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.dbaccess.ControlTagMapper;
-import cern.c2mon.server.cache.dbaccess.DataTagMapper;
-import cern.c2mon.server.cache.loading.ControlTagLoaderDAO;
-import cern.c2mon.server.cache.loading.DataTagLoaderDAO;
-import cern.c2mon.server.common.control.ControlTag;
-import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.test.broker.TestBrokerService;
-import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
-import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
-import cern.c2mon.shared.common.datatag.SourceDataQuality;
-import cern.c2mon.shared.common.datatag.SourceDataTagValue;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+
+import static org.junit.Assert.*;
 
 /**
  * Integration testing of the server-daqcommunication-in module.
@@ -69,7 +60,12 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
     "classpath:config/server-supervision.xml",
     "classpath:test-config/server-test-properties.xml"
 })
-@TestPropertySource("classpath:c2mon-server-default.properties")
+@TestPropertySource(
+    locations = "classpath:c2mon-server-default.properties",
+    properties = {
+        "c2mon.server.cache.bufferedListenerPullFrequency=1"
+    }
+)
 public class TagUpdateTest implements ApplicationContextAware {
 
   @Rule
@@ -87,14 +83,6 @@ public class TagUpdateTest implements ApplicationContextAware {
    */
   @Autowired
   private SourceUpdateManager sourceUpdateManager;
-  
-  /**
-   * Used to create a test datatag in the database.
-   */
-  @Autowired
-  private DataTagLoaderDAO dataTagCacheDAO;
-  @Autowired
-  private ControlTagLoaderDAO controlTagCacheDAO;
   
   /**
    * Used to load the test datatag into the cache.
@@ -117,8 +105,6 @@ public class TagUpdateTest implements ApplicationContextAware {
   
   private ControlTag controlTag;
   
-  private TestBrokerService testBrokerService;
-  
   @Before
   public void startContext() {
     ((AbstractApplicationContext) context).start();
@@ -134,7 +120,7 @@ public class TagUpdateTest implements ApplicationContextAware {
    * Tests that an incoming update is correctly saved in the cache and database.
    */
   @Test
-  public void testIncomingDataTag() {
+  public void testIncomingDataTag() throws InterruptedException {
 //    originalTag = DataTagMapperTest.createTestDataTag();//with id 1'000'000
 //    //insert into the database
 //    dataTagCacheDAO.insertDataTag(originalTag);
@@ -170,14 +156,10 @@ public class TagUpdateTest implements ApplicationContextAware {
     assertEquals(dataTag.getTimestamp(), cacheObject.getTimestamp());
     assertEquals(dataTag.getDaqTimestamp(), cacheObject.getDaqTimestamp());
     assertEquals(dataTag.getSourceTimestamp(), cacheObject.getSourceTimestamp());
-    
-    
-    //include a break for buffer to empty
-    try {
-      Thread.sleep(15000);
-    } catch (InterruptedException e) {      
-      e.printStackTrace();
-    }
+
+    // include a break for buffer to empty
+    Thread.sleep(500);
+
     DataTag dbObject = (DataTag) dataTagMapper.getItem(cacheObject.getId());
     assertNotNull(dbObject);
     assertEquals(sourceDataTagValue.getValue(), dbObject.getValue());
@@ -186,7 +168,7 @@ public class TagUpdateTest implements ApplicationContextAware {
   }
   
   @Test
-  public void testIncomingDataInvalidTagWithNullValue() {
+  public void testIncomingDataInvalidTagWithNullValue() throws InterruptedException {
 //    originalTag = DataTagMapperTest.createTestDataTag();//with id 1'000'000
 //    //insert into the database
 //    dataTagCacheDAO.insertDataTag(originalTag);
@@ -222,14 +204,10 @@ public class TagUpdateTest implements ApplicationContextAware {
     assertEquals(dataTag.getTimestamp(), cacheObject.getTimestamp());
     assertEquals(dataTag.getDaqTimestamp(), cacheObject.getDaqTimestamp());
     assertEquals(dataTag.getSourceTimestamp(), cacheObject.getSourceTimestamp());
-    
-    
-    //include a break for buffer to empty
-    try {
-      Thread.sleep(15000);
-    } catch (InterruptedException e) {      
-      e.printStackTrace();
-    }
+
+    // include a break for buffer to empty
+    Thread.sleep(500);
+
     DataTag dbObject = (DataTag) dataTagMapper.getItem(cacheObject.getId());
     assertNotNull(dbObject);
     //original value
@@ -245,7 +223,7 @@ public class TagUpdateTest implements ApplicationContextAware {
    * Tests that an incoming control tag is correctly saved in the cache and database.
    */
   @Test
-  public void testIncomingControlTag() {
+  public void testIncomingControlTag() throws InterruptedException {
     controlTagCache.put(controlTag.getId(), controlTag);
     
     //check controltag value is not set to 2000
@@ -254,7 +232,7 @@ public class TagUpdateTest implements ApplicationContextAware {
     //create a source update for this tag
     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
     Timestamp daqTimestamp = new Timestamp(System.currentTimeMillis() + 1);
-    SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(controlTag.getId(), 
+    SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(controlTag.getId(),
                                                                    controlTag.getName(),
                                                                    true, new Long(2000),   //CONTROL TAG WITH VALUE 2000
                                                                    new SourceDataQuality(),
@@ -275,13 +253,10 @@ public class TagUpdateTest implements ApplicationContextAware {
     assertEquals(controlTag.getTimestamp(), cacheObject.getTimestamp());
     assertEquals(controlTag.getDaqTimestamp(), cacheObject.getDaqTimestamp());
     assertEquals(controlTag.getSourceTimestamp(), cacheObject.getSourceTimestamp());
-    
-    //include a break for buffer to empty, before DB check
-    try {
-      Thread.sleep(15000);
-    } catch (InterruptedException e) {      
-      e.printStackTrace();
-    }
+
+    // include a break for buffer to empty
+    Thread.sleep(500);
+
     ControlTag dbObject = (ControlTag) controlTagMapper.getItem(cacheObject.getId());
     assertEquals(sourceDataTagValue.getValue(), dbObject.getValue());
     assertEquals(sourceDataTagValue.getTimestamp(), dbObject.getTimestamp());
