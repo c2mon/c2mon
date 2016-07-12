@@ -192,11 +192,11 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
     return typePrefix + getSimpleTypeName(dataType);
   }
 
-  public final static String getSimpleTypeName(String dataType) {
+  public static String getSimpleTypeName(String dataType) {
     String type = dataType.toLowerCase();
 
     if (dataType.contains(".")) {
-      type = dataType.substring(type.lastIndexOf('.') + 1);
+      type = type.substring(type.lastIndexOf('.') + 1);
     }
 
     return type;

@@ -287,7 +287,7 @@ public class EsIndexerTest {
       assertEquals(resultIndices.size(), liveIndices.size());
     }
 
-    assertTrue(resultTypes.contains("type_String"));
+    assertTrue(resultTypes.contains("type_string"));
     assertTrue(resultIndices.containsAll(listIndices));
 
     assertTrue(liveIndices.containsAll(resultIndices));
