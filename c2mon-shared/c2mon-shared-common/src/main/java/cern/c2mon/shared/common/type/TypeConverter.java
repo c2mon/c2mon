@@ -551,11 +551,11 @@ public final class TypeConverter  {
         }
 
         if (result == null) {
-          LOG.error("cast() : Conversion error. Could not cast input value [" + value + "] of type "
+          LOG.error("Conversion error: Could not cast input value [" + value + "] of type "
               + value.getClass().getName() + " to resulting type " + className);
         }
       } catch (ClassCastException cce) {
-        LOG.error("cast() : Conversion error", cce);
+        LOG.error("Conversion error: {}", cce.getMessage());
         result = null;
       }
     }

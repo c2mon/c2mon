@@ -150,9 +150,7 @@ public class EquipmentLoggerFactory {
           rollingFileAppender.setMaxFileSize("10MB");
         }
         rollingFileAppender.setMaxBackupIndex(1);
-      } catch (Exception ex) {
-        ex.printStackTrace();
-      }
+      } catch (Exception ignored) {}
     }
   }
 

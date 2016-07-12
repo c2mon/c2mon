@@ -111,7 +111,7 @@ public class SourceCommandExecutor extends Thread {
             }
         }
         catch (Exception ex2) {
-            logger.error("run(): Unexpected error executing the command : " + ex2.getMessage(), ex2);
+            logger.error("run(): Unexpected error executing the command : " + ex2.getMessage());
             synchronized (commandExecLock) {
                 cmdExecutionStatus = STATUS_NOK_FROM_EQUIPMENTD;
                 cmdExecutionDescription = ex2.getMessage();

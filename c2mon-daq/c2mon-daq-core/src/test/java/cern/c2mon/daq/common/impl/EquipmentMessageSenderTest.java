@@ -1522,8 +1522,6 @@ public class EquipmentMessageSenderTest {
       readValue = mapper.readValue(tempOut, SourceDataTagValue.class);
       String blub = mapper.writeValueAsString(123456L);
       Object reBlub = mapper.readValue(blub, Object.class);
-      System.out.println("Hallo");
-
 
     } catch (IOException e) {
       e.printStackTrace();

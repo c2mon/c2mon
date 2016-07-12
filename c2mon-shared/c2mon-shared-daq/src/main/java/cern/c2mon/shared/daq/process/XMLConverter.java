@@ -93,12 +93,12 @@ public class XMLConverter {
           LOGGER.trace("toXml() : converting from ProcessDisconnectionRequest to XML.");
           serializer.write(((ProcessDisconnectionRequest) obj), fw);
         } else {
-          LOGGER.error("toXml() : Object type no found: " + obj.getClass());    
+          LOGGER.error("Object type not found: " + obj.getClass());
           throw new MessageConversionException("toXml() : unsupported type");
         }
         result = fw.toString();
       } catch (Exception e) {
-        LOGGER.error("toXml(): Error coverting object " + obj + " to XML: " + e);
+        LOGGER.error("Error converting object " + obj + " to XML: " + e);
       } finally {
         if (fw != null) {
           try {
