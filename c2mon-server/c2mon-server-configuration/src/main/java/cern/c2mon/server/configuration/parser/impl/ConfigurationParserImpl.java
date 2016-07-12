@@ -81,7 +81,7 @@ public class ConfigurationParserImpl implements ConfigurationParser {
 
   /**
    * Parses a list of entities to be configured and transform them into
-   * {@link SequenceTask} instances.
+   * {@link ConfigurationElement} instances.
    *
    * @param entities Objects which holds the information to create a {@link ConfigurationElement}.
    * @return A {@link ConfigurationElement} for the server configuration.
@@ -93,24 +93,12 @@ public class ConfigurationParserImpl implements ConfigurationParser {
     for (ConfigurationEntity configurationEntity : entities) {
       entityFactory = getEntityFactory(configurationEntity);
 
-      // ===================== Delete =====================
-
       if (configurationEntity.isDeleted()) {
-
         results.add(entityFactory.deleteInstance(configurationEntity));
-
-        // ===================== Update =====================
-
       } else if (configurationEntity.isUpdated()) {
-
         results.add(entityFactory.updateInstance(configurationEntity));
-
-        // ===================== Create =====================
-
       } else if (configurationEntity.isCreated()) {
-
         results.addAll(entityFactory.createInstance(configurationEntity));
-
       } else {
         throw new ConfigurationParseException("Error while parsing a " + configurationEntity.getClass() + ": No action flag set.");
       }

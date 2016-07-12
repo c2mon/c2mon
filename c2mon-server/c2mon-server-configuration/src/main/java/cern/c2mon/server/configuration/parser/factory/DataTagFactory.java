@@ -50,8 +50,9 @@ public class DataTagFactory extends EntityFactory<DataTag> {
   private SequenceDAO sequenceDAO;
 
   @Autowired
-  public DataTagFactory(DataTagCache dataTagCache, TagFacadeGateway tagFacadeGateway, SequenceDAO sequenceDAO, EquipmentDAO equipmentDAO, EquipmentCache equipmentCache,
-                        SubEquipmentDAO subEquipmentDAO, SubEquipmentCache subEquipmentCache) {
+  public DataTagFactory(DataTagCache dataTagCache, TagFacadeGateway tagFacadeGateway, SequenceDAO sequenceDAO,
+                        EquipmentDAO equipmentDAO, EquipmentCache equipmentCache, SubEquipmentDAO subEquipmentDAO,
+                        SubEquipmentCache subEquipmentCache) {
     this.dataTagCache = dataTagCache;
     this.tagFacadeGateway = tagFacadeGateway;
     this.sequenceDAO = sequenceDAO;
