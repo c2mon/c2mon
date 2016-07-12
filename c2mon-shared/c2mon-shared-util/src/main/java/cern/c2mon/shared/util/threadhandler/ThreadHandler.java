@@ -155,13 +155,13 @@ public class ThreadHandler extends Thread {
           try {
             methodToCall.invoke(objectToCall, copyList.pollFirst());
           } catch (IllegalArgumentException e) {
-            LOGGER.error("ThreadHandler passed incorrect parameters - unable to process them: ", e);
+            LOGGER.error("ThreadHandler passed incorrect parameters - unable to process them: {}", e.getMessage());
           } catch (IllegalAccessException e) {
-            LOGGER.error("IllegalAccessException caught while invoking method on ThreadHandler: ", e);
+            LOGGER.error("IllegalAccessException caught while invoking method on ThreadHandler: {}", e.getMessage());
           } catch (InvocationTargetException e) {
-            LOGGER.error("InvocationTargetException caught while invoking method on ThreadHandler: ", e);
+            LOGGER.error("InvocationTargetException caught while invoking method on ThreadHandler: {}", e.getMessage());
           } catch (Exception e) {
-            LOGGER.error("Unidentified exception caught in the ThreadHandler thread: ", e);
+            LOGGER.error("Unidentified exception caught in the ThreadHandler thread: {}", e.getMessage());
           }
         } 
       }
