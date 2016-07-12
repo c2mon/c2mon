@@ -188,22 +188,22 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
     return clone;
   }
 
-  private <T> T deepClone(T o) {
+  private <T> T deepClone(T object) {
+    if (object == null) {
+      return null;
+    }
+
     try {
       ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
       ObjectOutputStream out = null;
       out = new ObjectOutputStream(byteOut);
-      out.writeObject(o);
+      out.writeObject(object);
       out.flush();
       ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(byteOut.toByteArray()));
-      return (T) o.getClass().cast(in.readObject());
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
+      return (T) object.getClass().cast(in.readObject());
+    } catch (IOException | ClassNotFoundException e) {
+      throw new RuntimeException("Error cloning metadata: the object is not serializable");
     }
-    log.error("Cloning of in metadata failed. the Object ist not serializable");
-    throw  new RuntimeException("Cloning of in metadata failed. the Object ist not serializable");
   }
 
   public String getXml() {
