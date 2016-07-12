@@ -35,7 +35,7 @@ import static cern.c2mon.server.configuration.parser.util.ReflectionService.extr
  *
  * @author Franz Ritter
  */
-abstract public class EntityFactory<T extends ConfigurationEntity> {
+public abstract class EntityFactory<T extends ConfigurationEntity> {
 
   /**
    * Internal method to get all {@link ConfigurationEntity} information for a create.
@@ -82,7 +82,8 @@ abstract public class EntityFactory<T extends ConfigurationEntity> {
       return element;
 
     } else {
-      throw new ConfigurationParseException("Updating of " + configurationEntity.getClass().getSimpleName() + " (id = " + configurationEntity.getId() + ") failed: The object is unknown to the sever.");
+      throw new ConfigurationParseException("Updating of " + configurationEntity.getClass().getSimpleName() +
+          " (id = " + configurationEntity.getId() + ") failed: The object is unknown to the sever.");
     }
   }
 
@@ -98,13 +99,14 @@ abstract public class EntityFactory<T extends ConfigurationEntity> {
 
     if (cacheHasEntity(entityId)) {
 
-      element.setEntityId(configurationEntity.getId());
+      element.setEntityId(entityId);
       element.setAction(ConfigConstants.Action.REMOVE);
 
       return element;
 
     } else {
-      throw new ConfigurationParseException("Deleting of " + configurationEntity.getClass().getSimpleName() + " (id = " + entityId + ") failed: The object is unknown to the sever.");
+      throw new ConfigurationParseException("Deleting of " + configurationEntity.getClass().getSimpleName() +
+          " (id = " + entityId + ") failed: The object is unknown to the sever.");
     }
   }
 

@@ -52,7 +52,6 @@ public class ConfigurationParserImpl implements ConfigurationParser {
   private RuleTagFactory ruleTagFactory;
   private SubEquipmentFactory subEquipmentFactory;
 
-
   @Autowired
   public ConfigurationParserImpl(
       AlarmFactory alarmFactory, CommandTagFactory commandTagFactory, ControlTagFactory controlTagFactory,
