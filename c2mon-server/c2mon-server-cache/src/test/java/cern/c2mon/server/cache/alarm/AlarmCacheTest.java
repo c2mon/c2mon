@@ -119,6 +119,5 @@ public class AlarmCacheTest extends AbstractCacheIntegrationTest {
     Collection<Long> result = alarmCache.findAlarm(query);
     assertNotNull(result);
     assertEquals("Search result != 4", 4, result.size());
-    System.out.println(result.size());
   }
 }

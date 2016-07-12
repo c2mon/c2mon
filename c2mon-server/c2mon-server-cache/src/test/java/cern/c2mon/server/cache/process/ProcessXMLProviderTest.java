@@ -76,7 +76,7 @@ public class ProcessXMLProviderTest {
 
     //read in expected XML from file
     DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-    documentBuilderFactory.setValidating(true);
+    documentBuilderFactory.setValidating(false);
     documentBuilderFactory.setNamespaceAware(true);
     documentBuilderFactory.setIgnoringComments(true);
     documentBuilderFactory.setIgnoringElementContentWhitespace(true);
@@ -94,7 +94,6 @@ public class ProcessXMLProviderTest {
 
     //get XML from server
     String processXML = processXMLProvider.getProcessConfigXML("P_TESTHANDLER03");
-    System.out.println(processXML);
     Document receivedDoc = builder.parse(new ByteArrayInputStream(processXML.getBytes()));
     receivedDoc.normalize();
     source = new DOMSource(receivedDoc);

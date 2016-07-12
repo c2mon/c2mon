@@ -81,7 +81,6 @@ public class SupervisionAppenderTest {
     assertTrue(tag.getDataTagQuality().isInvalidStatusSet(TagQualityStatus.PROCESS_DOWN));
     assertTrue(!tag.getDataTagQuality().isInvalidStatusSet(TagQualityStatus.EQUIPMENT_DOWN));
     assertTrue(tag.getDataTagQuality().getDescription().equals("test message"));
-    System.out.println(tag.getDataTagQuality().getDescription());
   }
   
   
