@@ -65,7 +65,7 @@ public abstract class Tag implements ConfigurationEntity {
   /**
    * Indicates whether a tag is "in operation", "in maintenance" or "in test".
    */
-  @DefaultValue("TEST")
+  @DefaultValue("OPERATIONAL")
   private TagMode mode;
 
   /**
