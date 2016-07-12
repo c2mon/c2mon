@@ -75,7 +75,7 @@ public class ServerLifecycleLogger implements SmartLifecycle {
   /**
    * Time between re-log attempts of server start event.
    */
-  private long timebetweenRelogs = 120000;
+  private long timeBetweenRelogs = 120000;
   
   /**
    * Constructor.
@@ -99,7 +99,7 @@ public class ServerLifecycleLogger implements SmartLifecycle {
         relogTimer.cancel();
       }
     } catch (PersistenceException e) {
-      LOGGER.error("Exception caught when logging start event: will try again in 2 minutes time", e);
+      LOGGER.error("Exception caught when logging start event, will try again in 2 minutes time: {}", e.getMessage());
       if (relogTimer == null){
         relogTimer = new Timer("Lifecycle-start-log-timer");
       }
@@ -109,7 +109,7 @@ public class ServerLifecycleLogger implements SmartLifecycle {
           public void run() {
             logStartEvent(event);
           }
-       }, timebetweenRelogs);
+       }, timeBetweenRelogs);
       }
     }
   }
@@ -118,7 +118,7 @@ public class ServerLifecycleLogger implements SmartLifecycle {
     try {
       serverLifecycleMapper.logEvent(new ServerLifecycleEvent(new Timestamp(System.currentTimeMillis()), serverName, LifecycleEventType.STOP));
     } catch (PersistenceException e) {
-      LOGGER.error("Exception caught when logging server stop event", e);
+      LOGGER.error("Exception caught when logging server stop event: {}", e.getMessage());
     }    
   }
   
@@ -174,10 +174,10 @@ public class ServerLifecycleLogger implements SmartLifecycle {
   }
 
   /**
-   * @param timeBetweenRelogs the timebetweenRelogs to set
+   * @param timeBetweenRelogs the timeBetweenRelogs to set
    */
-  public void setTimebetweenRelogs(long timeBetweenRelogs) {
-    this.timebetweenRelogs = timeBetweenRelogs;
+  public void setTimeBetweenRelogs(long timeBetweenRelogs) {
+    this.timeBetweenRelogs = timeBetweenRelogs;
   }
 
 }

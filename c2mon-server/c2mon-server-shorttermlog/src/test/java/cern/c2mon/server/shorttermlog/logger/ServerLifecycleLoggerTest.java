@@ -25,6 +25,8 @@ import org.junit.Test;
 import cern.c2mon.shared.client.lifecycle.ServerLifecycleEvent;
 import cern.c2mon.shared.client.lifecycle.ServerLifecycleMapper;
 
+import java.util.concurrent.CountDownLatch;
+
 /**
  * Unit test of ServerLifecycleLogger.
  * 
@@ -45,7 +47,7 @@ public class ServerLifecycleLoggerTest {
     lifecycleMapper = control.createMock(ServerLifecycleMapper.class);
     serverLifecycleLogger = new ServerLifecycleLogger(lifecycleMapper);
     serverLifecycleLogger.setServerName("test-server");
-    serverLifecycleLogger.setTimebetweenRelogs(1000);
+    serverLifecycleLogger.setTimeBetweenRelogs(1000);
   }
   
   /**
@@ -70,11 +72,12 @@ public class ServerLifecycleLoggerTest {
   @Test
   public void testRepeatStartLog() throws InterruptedException {
     lifecycleMapper.logEvent(EasyMock.isA(ServerLifecycleEvent.class));
-    EasyMock.expectLastCall().andThrow(new PersistenceException()).times(3,10);
+    CountDownLatch latch = new CountDownLatch(3);
+    EasyMock.expectLastCall().andAnswer(() -> { latch.countDown(); throw new PersistenceException(""); }).times(3,10);
     control.replay();
     serverLifecycleLogger.start();
-    Thread.sleep(5000);
+    latch.await();
     serverLifecycleLogger.stop();
-    control.verify();    
+    control.verify();
   }
 }
