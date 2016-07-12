@@ -22,6 +22,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.Timestamp;
+import java.util.concurrent.CountDownLatch;
 
 import cern.c2mon.server.cache.*;
 import cern.c2mon.server.supervision.junit.CachePopulationRule;
@@ -130,9 +131,10 @@ public class SupervisionManagerTest {
    */
   @Test
   public void testProcessAliveTag() throws InterruptedException {
+    CountDownLatch latch = new CountDownLatch(6);
     supervisionListener.notifySupervisionEvent(EasyMock.isA(SupervisionEvent.class));
     cacheSupervisionListener.onSupervisionChange(EasyMock.isA(Tag.class));
-    EasyMock.expectLastCall().times(6);
+    EasyMock.expectLastCall().andAnswer(() -> { latch.countDown(); return null; }).times(6);
 
     controller.replay();
 
@@ -169,7 +171,7 @@ public class SupervisionManagerTest {
     assertEquals(SupervisionStatus.RUNNING.toString(), stateTag.getValue());
     assertEquals(processTime, stateTag.getCacheTimestamp());
 
-    Thread.sleep(2000); //wait for notification on listener thread
+    latch.await(); //wait for notification on listener thread
     controller.verify();
   }
 
@@ -242,7 +244,7 @@ public class SupervisionManagerTest {
     assertEquals(SupervisionStatus.RUNNING.toString(), stateTag.getValue());
 //    assertEquals(originalProcessTime, stateTag.getCacheTimestamp());
 
-    Thread.sleep(2000); //wait for notification on listener thread
+//    Thread.sleep(2000); //wait for notification on listener thread
     controller.verify(); //expect one call on the supervision listener
   }
 
@@ -258,10 +260,11 @@ public class SupervisionManagerTest {
   @Test
   @DirtiesContext
   public void testCommFaultTag() throws InterruptedException {
+    CountDownLatch latch1 = new CountDownLatch(6);
     //(1) Send CommFaultTag TRUE
     supervisionListener.notifySupervisionEvent(EasyMock.isA(SupervisionEvent.class));
     cacheSupervisionListener.onSupervisionChange(EasyMock.isA(Tag.class));
-    EasyMock.expectLastCall().times(6);
+    EasyMock.expectLastCall().andAnswer(() -> { latch1.countDown(); return null; }).times(6);
 
     Equipment equipment = equipmentCache.getCopy(150L);
     assertEquals(equipment.getSupervisionStatus(), SupervisionStatus.DOWN);
@@ -277,7 +280,7 @@ public class SupervisionManagerTest {
     supervisionManager.processControlTag(new SourceDataTagValue(1223L,
         "test commfault", true, Boolean.TRUE, new SourceDataQuality(), new Timestamp(updateTime), 4, false, "description", 10000));
     //wait for Tag callback thread
-    Thread.sleep(2000);
+    latch1.await();
 
     controller.verify();
 
@@ -292,16 +295,18 @@ public class SupervisionManagerTest {
 
     //(2) Send CommFaultTag FALSE
     controller.reset();
+    CountDownLatch latch2 = new CountDownLatch(6);
+
     supervisionListener.notifySupervisionEvent(EasyMock.isA(SupervisionEvent.class));
     cacheSupervisionListener.onSupervisionChange(EasyMock.isA(Tag.class));
-    EasyMock.expectLastCall().times(6);
+    EasyMock.expectLastCall().andAnswer(() -> { latch2.countDown(); return null; }).times(6);
 
     controller.replay();
 
     long updateTime2 = System.currentTimeMillis();
     supervisionManager.processControlTag(new SourceDataTagValue(1223L,
         "test commfault", true, Boolean.FALSE, new SourceDataQuality(), new Timestamp(updateTime2), 4, false, "description", 10000));
-    Thread.sleep(2000);
+    latch2.await();
 
     controller.verify();
     equipment = equipmentCache.getCopy(150L);
@@ -324,10 +329,12 @@ public class SupervisionManagerTest {
   @Test
   @DirtiesContext
   public void testSubEquipmentCommFaultTag() throws InterruptedException {
+    CountDownLatch latch1 = new CountDownLatch(2);
     // (1) Send CommFaultTag TRUE
     supervisionListener.notifySupervisionEvent(EasyMock.isA(SupervisionEvent.class));
     cacheSupervisionListener.onSupervisionChange(EasyMock.isA(Tag.class));
-    EasyMock.expectLastCall().times(2);
+
+    EasyMock.expectLastCall().andAnswer(() -> { latch1.countDown(); return null; }).times(2);
 
     SubEquipment subEquipment = subEquipmentCache.getCopy(250L);
     assertEquals(subEquipment.getSupervisionStatus(), SupervisionStatus.DOWN);
@@ -343,7 +350,7 @@ public class SupervisionManagerTest {
     supervisionManager.processControlTag(new SourceDataTagValue(1232L, "test commfault", true, Boolean.TRUE, new SourceDataQuality(),
         new Timestamp(updateTime), 4, false, "description", 10000));
     // wait for Tag callback thread
-    Thread.sleep(2000);
+    latch1.await();
 
     controller.verify();
 
@@ -358,16 +365,18 @@ public class SupervisionManagerTest {
 
     //(2) Send CommFaultTag FALSE
     controller.reset();
+    CountDownLatch latch2 = new CountDownLatch(2);
+
     supervisionListener.notifySupervisionEvent(EasyMock.isA(SupervisionEvent.class));
     cacheSupervisionListener.onSupervisionChange(EasyMock.isA(Tag.class));
-    EasyMock.expectLastCall().times(2);
+    EasyMock.expectLastCall().andAnswer(() -> { latch2.countDown(); return null; }).times(2);
 
     controller.replay();
 
     long updateTime2 = System.currentTimeMillis();
     supervisionManager.processControlTag(new SourceDataTagValue(1232L,
         "test commfault", true, Boolean.FALSE, new SourceDataQuality(), new Timestamp(updateTime2), 4, false, "description", 10000));
-    Thread.sleep(2000);
+    latch2.await();
 
     controller.verify();
     subEquipment = subEquipmentCache.getCopy(250L);

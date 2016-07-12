@@ -26,6 +26,8 @@ import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 
+import java.util.concurrent.CountDownLatch;
+
 /**
  * Unit test of the SupervisionNotifier implementation.
  * 
@@ -61,12 +63,16 @@ public class SupervisionNotifierTest {
   public void testNotifications() throws InterruptedException {
     SupervisionListener supervisionListener = EasyMock.createMock(SupervisionListener.class);
     SupervisionEvent event = new SupervisionEventImpl(ENTITY, ID, STATUS, DATE, MESSAGE);
+    CountDownLatch latch = new CountDownLatch(1);
+
     supervisionListener.notifySupervisionEvent(event);
+    EasyMock.expectLastCall().andAnswer(() -> { latch.countDown(); return null; });
+
     EasyMock.replay(supervisionListener);
     supervisionNotifier.registerAsListener(supervisionListener);
     supervisionNotifier.notifySupervisionEvent(event);
     //wait for notification to occur
-    Thread.sleep(1000);
+    latch.await();
     EasyMock.verify(supervisionListener);
   }
   

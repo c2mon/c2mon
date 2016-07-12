@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+@Ignore
 public class TestBrokerServiceTest {
 
   private TestBrokerService testBrokerService;
@@ -54,7 +55,6 @@ public class TestBrokerServiceTest {
   }
   
   @Test
-  @Ignore
   public void testBrokerStartFromXml() throws Exception {
     ApplicationContext context = new ClassPathXmlApplicationContext("server-test-broker.xml");
     testBrokerService = context.getBean(TestBrokerService.class);
