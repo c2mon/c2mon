@@ -718,4 +718,8 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
   public static <T> T getAddressParameter(Map<String,String> parameters, String key, Class<T> type) {
     return objectMapper.convertValue(parameters.get(key), type);
   }
+
+  public boolean isControlTag() {
+    return this.control;
+  }
 }
