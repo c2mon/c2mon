@@ -63,6 +63,15 @@ public interface ControlTagConfigurationManager {
   ConfigurationReport updateAliveTags(List<AliveTag> tags);
 
   /**
+   * Removes a existing {@link AliveTag} with the given name.
+   *
+   * @param name The name of the Tag which needs to be removed.
+   * @return A {@link ConfigurationReport} containing all details of the
+   * Process configuration, including if it was successful or not.
+   */
+  ConfigurationReport removeAliveTag(String name);
+
+  /**
    * Updates a existing {@link CommFaultTag} with the given parameters set in the
    * {@link CommFaultTag} object.
    * <p>

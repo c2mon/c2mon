@@ -380,6 +380,11 @@ public class ConfigurationServiceImpl implements ConfigurationService {
   }
 
   @Override
+  public ConfigurationReport removeAliveTag(String name) {
+    return controlTagConfigurationManager.removeAliveTag(name);
+  }
+
+  @Override
   public ConfigurationReport updateCommFaultTag(CommFaultTag tag) {
     return controlTagConfigurationManager.updateCommFaultTag(tag);
   }

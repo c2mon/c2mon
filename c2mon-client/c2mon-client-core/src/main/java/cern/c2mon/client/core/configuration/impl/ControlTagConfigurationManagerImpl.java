@@ -23,10 +23,7 @@ import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.tag.*;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static cern.c2mon.client.core.configuration.util.ConfigurationUtil.validateIsUpdate;
 
@@ -55,6 +52,21 @@ public class ControlTagConfigurationManagerImpl implements ControlTagConfigurati
 
     Configuration config = new Configuration();
     config.setEntities(tags);
+
+    return configurationRequestSender.applyConfiguration(config, null);
+  }
+
+  @Override
+  public ConfigurationReport removeAliveTag(String name) {
+
+    DataTag deleteTag = new DataTag();
+    deleteTag.setName(name);
+    deleteTag.setDeleted(true);
+
+    List<DataTag> list = Collections.singletonList(deleteTag);
+
+    Configuration config = new Configuration();
+    config.setEntities(list);
 
     return configurationRequestSender.applyConfiguration(config, null);
   }
