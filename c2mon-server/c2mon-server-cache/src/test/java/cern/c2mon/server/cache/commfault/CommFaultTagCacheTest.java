@@ -48,13 +48,8 @@ public class CommFaultTagCacheTest extends AbstractCacheIntegrationTest {
   public void testCacheLoading() {
     assertNotNull(commFaultTagCache);
     
-    List<CommFaultTag> commFaultList = commFaultTagMapper.getAll(); //IN FACT: GIVES TIME FOR CACHE TO FINISH LOADING ASYNCH BEFORE COMPARISON BELOW...
-    try {
-      Thread.sleep(10000);
-    } catch (InterruptedException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+    List<CommFaultTag> commFaultList = commFaultTagMapper.getAll();
+
     //test the cache is the same size as in DB
     assertEquals(commFaultList.size(), commFaultTagCache.getCache().getKeys().size());
     //compare all the objects from the cache and buffer
