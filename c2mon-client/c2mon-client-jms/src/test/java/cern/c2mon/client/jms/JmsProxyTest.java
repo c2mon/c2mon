@@ -32,7 +32,9 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import cern.c2mon.client.jms.impl.JmsProxyImpl;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
+import cern.c2mon.shared.client.tag.TagValueUpdate;
 import junit.framework.Assert;
 
 import org.apache.activemq.command.ActiveMQQueue;
@@ -106,6 +108,18 @@ public class JmsProxyTest {
 
   private static ConnectionFactory connectionFactory;
 
+  TopicRegistrationDetails details = new TopicRegistrationDetails() {
+    @Override
+    public String getTopicName() {
+      return "c2mon.JmsProxy.test.topic.registration";
+    }
+
+    @Override
+    public Long getId() {
+      return 1L;
+    }
+  };
+
 
   @BeforeClass
   public static void startBroker() throws Exception {
@@ -122,8 +136,15 @@ public class JmsProxyTest {
     jmsSender = new ActiveJmsSender();
     jmsSender.setJmsTemplate(new JmsTemplate(connectionFactory));
     serverTemplate = new JmsTemplate(connectionFactory);
+
     //JMS connection is started in separate thread, so leave time to connect
-    Thread.sleep(2000);
+    try {
+      TagUpdateListener listener = tagValueUpdate -> false;
+      jmsProxy.registerUpdateListener(listener, details);
+      jmsProxy.unregisterUpdateListener(listener);
+    } catch (Exception ignored) {
+      Thread.sleep(2000);
+    }
   }
 
   @AfterClass
@@ -217,18 +238,6 @@ public class JmsProxyTest {
   @DirtiesContext
   public void testUpdateNotification() throws JMSException, InterruptedException {
     TagUpdateListener listener = EasyMock.createMock(TagUpdateListener.class);
-    TopicRegistrationDetails details = new TopicRegistrationDetails() {
-
-      @Override
-      public String getTopicName() {
-        return "c2mon.JmsProxy.test.topic.registration";
-      }
-
-      @Override
-      public Long getId() {
-        return 1L;
-      }
-    };
 
     //expect
     EasyMock.expect(listener.onUpdate(EasyMock.isA(TransferTagValueImpl.class))).andReturn(true);
@@ -266,18 +275,6 @@ public class JmsProxyTest {
   @DirtiesContext
   public void testUnregisterUpdateListener() throws JMSException {
     TagUpdateListener listener = EasyMock.createMock(TagUpdateListener.class);
-    TopicRegistrationDetails details = new TopicRegistrationDetails() {
-
-      @Override
-      public String getTopicName() {
-        return "c2mon.JmsProxy.test.topic.registration";
-      }
-
-      @Override
-      public Long getId() {
-        return 1L;
-      }
-    };
 
     //register first
     jmsProxy.registerUpdateListener(listener, details);
@@ -297,18 +294,6 @@ public class JmsProxyTest {
   @DirtiesContext
   public void testReplaceUpdateListener() throws JMSException {
     TagUpdateListener listener = EasyMock.createMock(TagUpdateListener.class);
-    TopicRegistrationDetails details = new TopicRegistrationDetails() {
-
-      @Override
-      public String getTopicName() {
-        return "c2mon.JmsProxy.test.topic.registration";
-      }
-
-      @Override
-      public Long getId() {
-        return 1L;
-      }
-    };
 
     //new listener to replace old
     TagUpdateListener newListener = EasyMock.createMock(TagUpdateListener.class);
