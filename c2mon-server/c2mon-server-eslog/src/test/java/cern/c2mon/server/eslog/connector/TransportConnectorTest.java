@@ -120,12 +120,8 @@ public class TransportConnectorTest {
     String type = "type_string";
     String mapping = new EsTagMapping(EsTag.TYPE_STRING, String.class.getName()).getMapping();
 
-    connector.setClient(null); // should be caught
-    boolean result = connector.handleIndexQuery("c2mon_2015-01", type, mapping);
-    assertFalse(result);
-
     connector.setClient(initClient);
-    result = connector.handleIndexQuery("c2mon_2015-01", null, null);
+    boolean result = connector.handleIndexQuery("c2mon_2015-01", null, null);
     assertTrue(result);
   }
 
@@ -135,7 +131,6 @@ public class TransportConnectorTest {
     boolean result = connector.bulkAdd(null);
     assertFalse(result);
 
-    connector.setBulkProcessor(null);
     result = connector.bulkAdd(null);
     assertFalse(result);
 
