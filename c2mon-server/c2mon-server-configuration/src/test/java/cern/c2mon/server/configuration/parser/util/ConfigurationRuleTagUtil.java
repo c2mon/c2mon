@@ -37,7 +37,7 @@ public class ConfigurationRuleTagUtil {
 
     properties.setProperty("name", "RuleTag");
     properties.setProperty("description", "<no description provided>");
-    properties.setProperty("mode", String.valueOf(TagMode.TEST.ordinal()));
+    properties.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
     properties.setProperty("dataType", Integer.class.getName());
     properties.setProperty("isLogged", String.valueOf(true));
     properties.setProperty("ruleText", "ruleExpression");
