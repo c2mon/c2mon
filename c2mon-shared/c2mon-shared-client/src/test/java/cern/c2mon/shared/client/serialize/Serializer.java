@@ -130,8 +130,8 @@ public class Serializer {
 
   @Test
   public void jacksonJsonDeserializationOfResponseCollection() {
-    try {
 
+    try {
       Collection<TransferTagValueImpl> response = new ArrayList<>();
       response.add(tag1);
       response.add(tag2);

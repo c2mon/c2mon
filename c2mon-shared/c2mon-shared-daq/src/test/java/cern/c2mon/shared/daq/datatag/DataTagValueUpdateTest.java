@@ -239,15 +239,12 @@ public class DataTagValueUpdateTest {
     Long number = Long.valueOf(new Random().nextInt(10));
     switch (this.testType) {
       case NO_PIK:
-        System.out.println("createXML - No PIK test with id=" + number);
         this.dataTagValueUpdateTO = new DataTagValueUpdate(number);
         break;
       case PIK:
-        System.out.println("createXML - PIK test with id=" + number + " and PIK=" + TestType.PIK.getPik());
         this.dataTagValueUpdateTO = new DataTagValueUpdate(number, TestType.PIK.getPik());
         break;
       case WRONG_PIK:
-        System.out.println("createXML - WRONG_PIK test with id=" + number + " and PIK=" + TestType.WRONG_PIK.getPik());
         this.dataTagValueUpdateTO = new DataTagValueUpdate(number, TestType.WRONG_PIK.getPik());
         break;
       default:
@@ -268,7 +265,6 @@ public class DataTagValueUpdateTest {
 
     // Create XML from object
     this.xml = dataTagValueUpdateTO.toXML();
-    System.out.println("createXML - xml\n:" + this.xml);
   }
 
   /*
@@ -291,6 +287,5 @@ public class DataTagValueUpdateTest {
 
     // Read DataTagValueUpdate  back from XML
     this.dataTagValueUpdateFROM = DataTagValueUpdate.fromXML(doc.getDocumentElement());
-    System.out.println(this.dataTagValueUpdateFROM.toXML());
   }
 }

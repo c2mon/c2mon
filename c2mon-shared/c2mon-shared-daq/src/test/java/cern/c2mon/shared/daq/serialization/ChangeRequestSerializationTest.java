@@ -118,10 +118,6 @@ public class ChangeRequestSerializationTest {
 
     String sdtString = MessageConverter.mapper.writeValueAsString(sdt);
     SourceDataTag sdtFromJseon = MessageConverter.mapper.readValue(sdtString, SourceDataTag.class);
-
-
-    System.out.println("Tach breakpoint");
-
   }
 
 

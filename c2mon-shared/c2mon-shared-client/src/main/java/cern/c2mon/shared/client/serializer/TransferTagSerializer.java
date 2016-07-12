@@ -44,6 +44,7 @@ import static cern.c2mon.shared.common.type.TypeConverter.isKnownClass;
 public class TransferTagSerializer {
 
   private static ObjectMapper mapper = new ObjectMapper();
+
   static {
     mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     mapper.enable(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY);
@@ -52,7 +53,6 @@ public class TransferTagSerializer {
   public static ObjectMapper getJacksonParser(){
     return mapper;
   }
-
 
   /**
    * Converts the TagValue with into a json String. Jackson is used to do this.
@@ -64,11 +64,8 @@ public class TransferTagSerializer {
     String result = null;
 
     try {
-
       result = mapper.writeValueAsString(tagUpdate);
-
     } catch (JsonProcessingException e) {
-
       log.error("Serializing of tagUpdate failed: " + e.getMessage());
     }
 
@@ -84,17 +81,15 @@ public class TransferTagSerializer {
    * @return The instance of the TagValueUpdate with a converted TagValue.
    */
   public static <T extends TagValueUpdate> T fromJson(String tagUpdateJson, Class<T> dataType) {
-
     T tag = null;
-    try {
 
+    try {
       tag = mapper.readValue(tagUpdateJson, dataType);
       tag.setValue(convertTagValue(tag));
-
     } catch (IOException e) {
-
       log.warn("Error occurred while converting the json string back to an object: "+e.getMessage());
     }
+
     return tag;
   }
 
@@ -108,20 +103,14 @@ public class TransferTagSerializer {
    * @return An instantiated collection of the TagValueUpdates which implements also the ClientRequestResult interface.
    */
   public static <T extends TagValueUpdate, U extends ClientRequestResult> Collection<U> fromCollectionJson(String tagUpdateJson, TypeReference dataType){
-
     Collection<T> result = null;
 
     try {
-
       result = mapper.readValue(tagUpdateJson, dataType);
-
-      for(T resultElement : result){
-
-          resultElement.setValue(convertTagValue(resultElement));
-
+      for (T resultElement : result) {
+        resultElement.setValue(convertTagValue(resultElement));
       }
     } catch (IOException e) {
-
       log.error("Deserialization of tagUpdate failed: " + e.getMessage());
     }
 
@@ -155,9 +144,7 @@ public class TransferTagSerializer {
       newTagValue = newTagValue == null ? cast(tag.getValue(), tag.getValueClassName()) : newTagValue;
 
     } else if (isKnownClass(tag.getValueClassName())) {
-
       newTagValue = cast(newTagValue, tag.getValueClassName());
-
     }
 
     return newTagValue;
@@ -174,12 +161,9 @@ public class TransferTagSerializer {
    * @return The instantiated object based on the information of the map.
    */
   private static <T> T hashMapToObject(LinkedHashMap map, Class<T> type){
-
     try {
       return stringToObject(mapper.writeValueAsString(map), type);
-
     } catch (IOException e) {
-
       log.warn("Could not create a object of the class "+type.getName()+" out of the map "+map.toString()+" :"+e.getMessage());
       return null;
     }
@@ -196,11 +180,8 @@ public class TransferTagSerializer {
    */
   private static <T> T stringToObject(String jsonString, Class<T> type){
     try {
-
       return mapper.readValue(jsonString, type);
-
     } catch (IOException e) {
-
       log.warn("Could not create a object of the class"+type.getName()+" out of the value "+jsonString+": "+e.getMessage());
       return null;
     }
@@ -217,13 +198,10 @@ public class TransferTagSerializer {
     try {
       if (json instanceof String) {
         final JsonParser parser = mapper.getFactory().createParser((String) json);
-        while (parser.nextToken() != null) {
-        }
+        while (parser.nextToken() != null) {}
         valid = true;
       }
-    } catch (IOException ioe) {
-
-    }
+    } catch (IOException ignored) {}
     return valid;
   }
 }

@@ -308,7 +308,7 @@ public class TimPersistenceManager<T extends IFallback> implements IPersistenceM
                 }
             }
             LOG
-            .error("log([IFallback]) - The IFallback object with id " + object.getId() + " could not be committed into the database due to "
+            .error("Fallback object with id " + object.getId() + " could not be committed into the database: "
                     + e.getMessage());
             alarmSender.dbUnavailable(ACTIVATED, e.getMessage(), dbHandler.getDBInfo());
         }
