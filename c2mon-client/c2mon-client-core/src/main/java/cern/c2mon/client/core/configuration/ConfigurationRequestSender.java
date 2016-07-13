@@ -43,7 +43,7 @@ import java.lang.reflect.Type;
 @Service
 public class ConfigurationRequestSender {
 
-  private final long DEFAULT_TIMEOUT = 60_000l; // 1 minute
+  private static final long DEFAULT_TIMEOUT = 60_000L; // 1 minute
 
   @Autowired
   private JmsSender jmsSender;
@@ -62,10 +62,9 @@ public class ConfigurationRequestSender {
   }
 
   /**
-   *
-   *
    * @param configuration The configuration created from the client
    * @param listener The listener for the configuration
+   *
    * @return The report of the configuration
    */
   public ConfigurationReport applyConfiguration(Configuration configuration, ClientRequestReportListener listener) {
@@ -84,55 +83,12 @@ public class ConfigurationRequestSender {
       }
 
     } catch (IOException e) {
-
       ConfigurationReport failureReport = new ConfigurationReport();
       failureReport.setExceptionTrace(e);
       failureReport.setStatus(ConfigConstants.Status.FAILURE);
       failureReport.setStatusDescription("Serialization or Deserialization of Configuration on Client side failed");
 
       return failureReport;
-
-    }
-  }
-
-  /**
-   * Wraps the JSON serialisation/deserialisation of an interface type, adding concrete class information
-   *
-   * @param <T>
-   */
-  final class InterfaceAdapter<T> implements JsonSerializer<T>, JsonDeserializer<T> {
-    @Override
-    public JsonElement serialize(T object, Type interfaceType, JsonSerializationContext context) {
-      final JsonObject wrapper = new JsonObject();
-      wrapper.addProperty("class", object.getClass().getName());
-      wrapper.add("data", context.serialize(object));
-      return wrapper;
-    }
-
-    @Override
-    public T deserialize(JsonElement elem, Type interfaceType, JsonDeserializationContext context) throws
-        JsonParseException {
-      final JsonObject wrapper = (JsonObject) elem;
-      final JsonElement typeName = get(wrapper, "class");
-      final JsonElement data = get(wrapper, "data");
-      final Type actualType = typeForName(typeName);
-      return context.deserialize(data, actualType);
-    }
-
-    private Type typeForName(final JsonElement typeElem) {
-      try {
-        return Class.forName(typeElem.getAsString());
-      } catch (ClassNotFoundException e) {
-        throw new JsonParseException(e);
-      }
-    }
-
-    private JsonElement get(final JsonObject wrapper, String memberName) {
-      final JsonElement elem = wrapper.get(memberName);
-      if (elem == null)
-        throw new JsonParseException("no '" + memberName + "' member found in what was expected to be an interface " +
-            "wrapper");
-      return elem;
     }
   }
 }
