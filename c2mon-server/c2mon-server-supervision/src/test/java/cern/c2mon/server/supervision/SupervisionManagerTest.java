@@ -201,7 +201,6 @@ public class SupervisionManagerTest {
    * @throws InterruptedException
    */
   @Test
-  @DirtiesContext
   public void testProcessAliveNoAffect() throws InterruptedException {
     controller.reset();
     controller.replay(); //no listener call this time
@@ -258,7 +257,6 @@ public class SupervisionManagerTest {
    * @throws InterruptedException
    */
   @Test
-  @DirtiesContext
   public void testCommFaultTag() throws InterruptedException {
     CountDownLatch latch1 = new CountDownLatch(6);
     //(1) Send CommFaultTag TRUE
@@ -327,7 +325,6 @@ public class SupervisionManagerTest {
    * @throws InterruptedException
    */
   @Test
-  @DirtiesContext
   public void testSubEquipmentCommFaultTag() throws InterruptedException {
     CountDownLatch latch1 = new CountDownLatch(2);
     // (1) Send CommFaultTag TRUE
