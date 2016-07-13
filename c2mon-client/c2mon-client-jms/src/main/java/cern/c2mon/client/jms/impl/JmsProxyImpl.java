@@ -17,6 +17,9 @@
 package cern.c2mon.client.jms.impl;
 
 import java.io.Serializable;
+import java.lang.management.ManagementFactory;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,6 +47,7 @@ import javax.jms.TemporaryQueue;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -97,6 +101,7 @@ import com.google.gson.JsonSyntaxException;
  * @author Mark Brightwell
  */
 @Service
+@Slf4j
 @ManagedResource(objectName = "cern.c2mon:type=JMS,name=JmsProxy")
 public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
 
@@ -326,8 +331,16 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    * connection factory is ActiveMQ.
    */
   private void setActiveMQConnectionPrefix() {
-    ProcessInfo procInfo = ProcUtils.get().getProcessInfo();
-    String clientIdPrefix = "C2MON-CLIENT-" + procInfo.getUserId() + "@" + procInfo.getHostName() + "[" + procInfo.getPid() + "]";
+    String pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
+
+    String hostname = null;
+    try {
+      hostname = InetAddress.getLocalHost().getHostName();
+    } catch (UnknownHostException e) {
+      log.info("Couldn't get hostname", e);
+    }
+
+    String clientIdPrefix = "C2MON-CLIENT-" + System.getProperty("user.name") + "@" + hostname + "[" + pid + "]";
     ((ActiveMQConnectionFactory) jmsConnectionFactory).setClientIDPrefix(clientIdPrefix);
   }
 
