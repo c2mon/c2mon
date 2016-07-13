@@ -59,8 +59,6 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
-import cern.accsoft.commons.util.proc.ProcUtils;
-import cern.accsoft.commons.util.proc.ProcessInfo;
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.jms.BroadcastMessageListener;
