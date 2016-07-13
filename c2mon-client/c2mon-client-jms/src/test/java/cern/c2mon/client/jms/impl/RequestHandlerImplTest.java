@@ -23,6 +23,9 @@ import java.util.Collections;
 
 import javax.jms.JMSException;
 
+import cern.c2mon.shared.client.request.ClientRequestResult;
+import cern.c2mon.shared.client.tag.TagConfigImpl;
+import cern.c2mon.shared.client.tag.TransferTagImpl;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.math.LongRange;
 import org.easymock.EasyMock;
@@ -65,8 +68,7 @@ public class RequestHandlerImplTest {
   @Before
   public void setUp() {
     jmsProxy = EasyMock.createMock(JmsProxy.class);    
-    requestHandlerImpl = new RequestHandlerImpl(jmsProxy);
-    requestHandlerImpl.setRequestQueue("request queue");
+    requestHandlerImpl = new RequestHandlerImpl(jmsProxy, "request queue", "admin queue");
   }
 
   /**
@@ -91,7 +93,7 @@ public class RequestHandlerImplTest {
    */
   @Test
   public void getTagValues() throws JMSException, InterruptedException {
-    Collection<Object> returnCollection = Arrays.asList(new Object());
+    Collection<ClientRequestResult> returnCollection = Arrays.asList(new TagConfigImpl(1));
     EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), 
         EasyMock.eq("request queue"), EasyMock.eq(10000),
           (ClientRequestReportListener) EasyMock.isNull()
@@ -125,11 +127,11 @@ public class RequestHandlerImplTest {
    */
   @Test
   public void getTags() throws JMSException, InterruptedException {
-    Collection<Object> returnCollection = Arrays.asList(new Object());
+    Collection<ClientRequestResult> returnCollection = Arrays.asList(new TagConfigImpl(1));
     EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class),
         EasyMock.eq("request queue"), EasyMock.eq(10000),
-          (ClientRequestReportListener) EasyMock.isNull()
-        )).andReturn(returnCollection);
+        EasyMock.isNull()
+    )).andReturn(returnCollection);
 
     EasyMock.replay(jmsProxy);
 
@@ -144,7 +146,7 @@ public class RequestHandlerImplTest {
    */
   @Test
   public void getManyTags() throws JMSException {
-    Collection<Object> returnCollection = Arrays.asList(new Object(), new Object());
+    Collection<ClientRequestResult> returnCollection = Arrays.asList(new TagConfigImpl(1), new TagConfigImpl(1));
     EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), 
         EasyMock.eq("request queue"), EasyMock.eq(10000), //10000 is timeout
         (ClientRequestReportListener) EasyMock.isNull()
@@ -185,7 +187,7 @@ public class RequestHandlerImplTest {
   @Test
   public void testGetProcessXml() throws JMSException {
     String processName = "name";
-    Collection<ProcessXmlResponse> response = new ArrayList<ProcessXmlResponse>();
+    Collection<ClientRequestResult> response = new ArrayList<>();
     response.add(new ProcessXmlResponse() {
 
       @Override
@@ -215,7 +217,7 @@ public class RequestHandlerImplTest {
   @Test
   public void testGetProcessNames() throws JMSException {
     
-    Collection<ProcessNameResponse> response = new ArrayList<ProcessNameResponse>();
+    Collection<ClientRequestResult> response = new ArrayList<>();
     response.add(new ProcessNameResponse() {
 
       @Override
@@ -252,7 +254,7 @@ public class RequestHandlerImplTest {
     CommandExecuteRequest<Boolean> executeRequest = new CommandExecuteRequestImpl<Boolean>(id, Boolean.TRUE, 1000, "FRED", "CIA");
     executeCommandRequest.setObjectParameter(executeRequest);
     
-    Collection<CommandReport> response = new ArrayList<CommandReport>();
+    Collection<ClientRequestResult> response = new ArrayList<>();
     response.add(createCommandReport(executeCommandRequest));
     
     EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(1000))
@@ -296,7 +298,7 @@ public class RequestHandlerImplTest {
   @Test(expected=RuntimeException.class)
   public void testGetProcessXmlError() throws JMSException {
     String processName = "name";
-    Collection<ProcessXmlResponse> response = new ArrayList<ProcessXmlResponse>();
+    Collection<ClientRequestResult> response = new ArrayList<>();
     response.add(new ProcessXmlResponse() {
 
       @Override
