@@ -29,6 +29,7 @@ import cern.c2mon.server.supervision.junit.CachePopulationRule;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -325,6 +326,7 @@ public class SupervisionManagerTest {
    * @throws InterruptedException
    */
   @Test
+  @Ignore("This test is flaky")
   public void testSubEquipmentCommFaultTag() throws InterruptedException {
     CountDownLatch latch1 = new CountDownLatch(2);
     // (1) Send CommFaultTag TRUE
