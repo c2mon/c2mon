@@ -28,10 +28,10 @@ import java.util.concurrent.TimeUnit;
 
 import javax.jms.JMSException;
 
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
@@ -75,13 +75,13 @@ public class RequestHandlerImpl implements RequestHandler {
    * The maximum number of tags in a single request. Each request runs in its
    * own thread on the server and is sent in a single JMS message.
    */
-  @Value("${c2mon.client.request.size}")
+  @Setter
   private int maxRequestSize = 500;
 
   /**
    * Core/max number of threads in executor.
    */
-  @Value("${c2mon.client.request.threads.max}")
+  @Setter
   private int corePoolSize = 5;
 
   /**
@@ -97,10 +97,8 @@ public class RequestHandlerImpl implements RequestHandler {
   /**
    * Name of main client request queue.
    */
-  @Value("${c2mon.client.jms.request.queue}")
   protected String defaultRequestQueue;
 
-  @Value("${c2mon.client.jms.admin.queue}")
   private String adminRequestQueue;
 
   /**
@@ -116,9 +114,10 @@ public class RequestHandlerImpl implements RequestHandler {
    *          the proxy bean
    */
   @Autowired
-  public RequestHandlerImpl(final JmsProxy jmsProxy) {
-    super();
+  public RequestHandlerImpl(final JmsProxy jmsProxy, final String defaultRequestQueue, String adminRequestQueue) {
     this.jmsProxy = jmsProxy;
+    this.defaultRequestQueue = defaultRequestQueue;
+    this.adminRequestQueue = adminRequestQueue;
     executor.allowCoreThreadTimeOut(true);
   }
 

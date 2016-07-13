@@ -280,9 +280,9 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    *          topic on which heartbeat messages arrive from server
    */
   @Autowired
-  public JmsProxyImpl(final ConnectionFactory connectionFactory, @Qualifier("supervisionTopic") final Destination supervisionTopic,
-      @Qualifier("alarmTopic") final Destination alarmTopic, @Qualifier("heartbeatTopic") final Destination heartbeatTopic,
-      final SlowConsumerListener slowConsumerListener) {
+  public JmsProxyImpl(final ConnectionFactory connectionFactory, final Destination supervisionTopic,
+                      final Destination alarmTopic, final Destination heartbeatTopic,
+                      final SlowConsumerListener slowConsumerListener) {
     this.jmsConnectionFactory = connectionFactory;
     this.supervisionTopic = supervisionTopic;
     this.heartbeatTopic = heartbeatTopic;

@@ -123,12 +123,12 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
   private final ClientHealthMonitor jmsHealthMonitor;
 
   @Autowired
-  protected SupervisionManager(final JmsProxy pJmsProxy, final @Qualifier("coreRequestHandler") RequestHandler pRequestHandler, final HeartbeatListenerManager pHeartbeatManager,
-      final ClientHealthMonitor pJmsHealthMonitor) {
-    jmsProxy = pJmsProxy;
-    clientRequestHandler = pRequestHandler;
-    heartbeatManager = pHeartbeatManager;
-    jmsHealthMonitor = pJmsHealthMonitor;
+  protected SupervisionManager(final JmsProxy jmsProxy, final RequestHandler coreRequestHandler, final HeartbeatListenerManager heartbeatManager,
+                               final ClientHealthMonitor clientHealthMonitor) {
+    this.jmsProxy = jmsProxy;
+    this.clientRequestHandler = coreRequestHandler;
+    this.heartbeatManager = heartbeatManager;
+    this.jmsHealthMonitor = clientHealthMonitor;
   }
 
   /**
