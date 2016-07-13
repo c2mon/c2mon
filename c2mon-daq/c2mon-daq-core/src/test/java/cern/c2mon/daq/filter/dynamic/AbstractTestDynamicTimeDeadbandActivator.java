@@ -99,12 +99,11 @@ public abstract class AbstractTestDynamicTimeDeadbandActivator {
                 }
             }, 0, 1);
         }
-        Thread.sleep(5000L);
+
         for (Timer timer : timers) {
             timer.cancel();
         }
         activator.clearDataTags();
-        Thread.sleep(1000L);
     }
 
     public static void setSourceDataTags(HashMap<Long, SourceDataTag> sourceDataTags) {
