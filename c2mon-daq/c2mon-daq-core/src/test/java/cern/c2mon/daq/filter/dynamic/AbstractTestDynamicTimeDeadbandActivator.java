@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static junit.framework.Assert.*;
 
-public abstract class AbstractTestDyanmicTimeDeadbandActivator {
+public abstract class AbstractTestDynamicTimeDeadbandActivator {
 
     private static final int NUMBER_OF_TEST_TAGS = 1000;
     private static final Long TEST_KEY = 1L;
@@ -108,7 +108,7 @@ public abstract class AbstractTestDyanmicTimeDeadbandActivator {
     }
 
     public static void setSourceDataTags(HashMap<Long, SourceDataTag> sourceDataTags) {
-        AbstractTestDyanmicTimeDeadbandActivator.sourceDataTags = sourceDataTags;
+        AbstractTestDynamicTimeDeadbandActivator.sourceDataTags = sourceDataTags;
     }
 
     public static HashMap<Long, SourceDataTag> getSourceDataTags() {
@@ -116,7 +116,7 @@ public abstract class AbstractTestDyanmicTimeDeadbandActivator {
     }
 
     public static void setActivator(IDynamicTimeDeadbandFilterActivator activator) {
-        AbstractTestDyanmicTimeDeadbandActivator.activator = activator;
+        AbstractTestDynamicTimeDeadbandActivator.activator = activator;
     }
 
     public static IDynamicTimeDeadbandFilterActivator getActivator() {
@@ -124,7 +124,7 @@ public abstract class AbstractTestDyanmicTimeDeadbandActivator {
     }
 
     public static void setTestTag(SourceDataTag testTag) {
-        AbstractTestDyanmicTimeDeadbandActivator.testTag = testTag;
+        AbstractTestDynamicTimeDeadbandActivator.testTag = testTag;
     }
 
     public static SourceDataTag getTestTag() {

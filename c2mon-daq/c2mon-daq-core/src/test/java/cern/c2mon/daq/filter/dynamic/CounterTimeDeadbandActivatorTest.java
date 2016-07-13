@@ -21,10 +21,9 @@ import static junit.framework.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.daq.filter.dynamic.CounterTimeDeadbandActivator;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
 
-public class CounterTimeDeadbandActivatorTest extends AbstractTestDyanmicTimeDeadbandActivator {
+public class CounterTimeDeadbandActivatorTest extends AbstractTestDynamicTimeDeadbandActivator {
     
     private static final long CHECK_INTERVAL = 100;
     private static final int NUMBER_OF_COUNTERS = 3;
