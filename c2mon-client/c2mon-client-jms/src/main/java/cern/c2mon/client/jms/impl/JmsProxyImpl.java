@@ -973,14 +973,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
 
   @PostConstruct
   public void init() {
-    // thread starting connection; is stopped when calling shutdown method
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        setActiveMQConnectionPrefix();
-        connect();
-      }
-    }).start();
+    setActiveMQConnectionPrefix();
+    connect();
     running = true;
   }
 
