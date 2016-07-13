@@ -20,7 +20,7 @@ import java.util.Collection;
 
 import javax.jms.JMSException;
 
-import cern.c2mon.client.jms.AlarmListener;
+import cern.c2mon.client.core.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 
 public interface AlarmService {

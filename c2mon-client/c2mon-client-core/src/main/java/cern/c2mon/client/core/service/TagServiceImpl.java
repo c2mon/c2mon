@@ -40,9 +40,8 @@ import cern.c2mon.client.core.cache.ClientDataTagCache;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.manager.CoreSupervisionManager;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
-import cern.c2mon.client.jms.RequestHandler;
+import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.shared.client.tag.TagUpdate;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.rule.RuleFormatException;
 import lombok.extern.slf4j.Slf4j;
 

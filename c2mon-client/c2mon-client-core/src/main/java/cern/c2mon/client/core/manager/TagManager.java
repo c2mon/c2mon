@@ -36,7 +36,7 @@ import cern.c2mon.client.core.StatisticsService;
 import cern.c2mon.client.core.cache.CacheSynchronizationException;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.service.TagServiceImpl;
-import cern.c2mon.client.jms.AlarmListener;
+import cern.c2mon.client.core.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;

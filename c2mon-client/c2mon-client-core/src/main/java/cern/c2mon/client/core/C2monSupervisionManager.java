@@ -17,8 +17,8 @@
 package cern.c2mon.client.core;
 
 import cern.c2mon.client.core.listener.HeartbeatListener;
-import cern.c2mon.client.jms.ClientHealthListener;
-import cern.c2mon.client.jms.ConnectionListener;
+import cern.c2mon.client.core.jms.ClientHealthListener;
+import cern.c2mon.client.core.jms.ConnectionListener;
 
 /**
  * This interface describes the methods which are provided by

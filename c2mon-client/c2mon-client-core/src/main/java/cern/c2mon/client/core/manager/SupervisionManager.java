@@ -28,16 +28,15 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.core.listener.HeartbeatListener;
-import cern.c2mon.client.jms.ClientHealthListener;
-import cern.c2mon.client.jms.ClientHealthMonitor;
-import cern.c2mon.client.jms.ConnectionListener;
-import cern.c2mon.client.jms.JmsProxy;
-import cern.c2mon.client.jms.RequestHandler;
-import cern.c2mon.client.jms.SupervisionListener;
+import cern.c2mon.client.core.jms.ClientHealthListener;
+import cern.c2mon.client.core.jms.ClientHealthMonitor;
+import cern.c2mon.client.core.jms.ConnectionListener;
+import cern.c2mon.client.core.jms.JmsProxy;
+import cern.c2mon.client.core.jms.RequestHandler;
+import cern.c2mon.client.core.jms.SupervisionListener;
 import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 

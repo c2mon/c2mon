@@ -20,7 +20,7 @@ import java.util.Collection;
 
 import cern.c2mon.client.core.C2monSupervisionManager;
 import cern.c2mon.client.core.SupervisionService;
-import cern.c2mon.client.jms.SupervisionListener;
+import cern.c2mon.client.core.jms.SupervisionListener;
 
 /**
  * This interface extends the <code>C2monSupervisionManager</code>

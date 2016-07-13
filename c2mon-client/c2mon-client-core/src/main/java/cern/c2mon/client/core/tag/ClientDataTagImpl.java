@@ -26,7 +26,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.simpleframework.xml.Attribute;
@@ -45,8 +44,8 @@ import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TypeNumeric;
 import cern.c2mon.client.common.util.ConcurrentIdentitySet;
-import cern.c2mon.client.jms.SupervisionListener;
-import cern.c2mon.client.jms.TopicRegistrationDetails;
+import cern.c2mon.client.core.jms.SupervisionListener;
+import cern.c2mon.client.core.jms.TopicRegistrationDetails;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagMode;

@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.core.StatisticsService;
-import cern.c2mon.client.jms.RequestHandler;
+import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.shared.client.statistics.TagStatisticsResponse;
 import lombok.extern.slf4j.Slf4j;
 

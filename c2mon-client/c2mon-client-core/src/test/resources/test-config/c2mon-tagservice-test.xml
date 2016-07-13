@@ -8,11 +8,11 @@
   <!-- the main Spring XML configuration file for starting up the C2MON client core context -->
 
   <bean id="jmsProxy" class="org.easymock.EasyMock" factory-method="createNiceMock">
-    <constructor-arg value="cern.c2mon.client.jms.JmsProxy"/>
+    <constructor-arg value="cern.c2mon.client.core.jms.JmsProxy"/>
   </bean>
   
   <bean id="coreRequestHandler" class="org.easymock.EasyMock" factory-method="createMock">
-    <constructor-arg value="cern.c2mon.client.jms.RequestHandler"/>
+    <constructor-arg value="cern.c2mon.client.core.jms.RequestHandler"/>
   </bean>
   
   <bean id="supervisionManager" class="org.easymock.EasyMock" factory-method="createNiceMock">

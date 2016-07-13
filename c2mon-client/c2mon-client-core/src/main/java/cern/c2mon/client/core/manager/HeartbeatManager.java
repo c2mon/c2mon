@@ -32,7 +32,7 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.core.C2monSupervisionManager;
 import cern.c2mon.client.core.listener.HeartbeatListener;
-import cern.c2mon.client.jms.JmsProxy;
+import cern.c2mon.client.core.jms.JmsProxy;
 import cern.c2mon.shared.client.supervision.Heartbeat;
 
 /**
@@ -45,7 +45,7 @@ import cern.c2mon.shared.client.supervision.Heartbeat;
  * @see SupervisionManager
  */
 @Service
-class HeartbeatManager extends TimerTask implements cern.c2mon.client.jms.HeartbeatListener, HeartbeatListenerManager {
+class HeartbeatManager extends TimerTask implements cern.c2mon.client.core.jms.HeartbeatListener, HeartbeatListenerManager {
 
   /** Logger instance of this class */
   private static final Logger LOG = LoggerFactory.getLogger(HeartbeatManager.class);

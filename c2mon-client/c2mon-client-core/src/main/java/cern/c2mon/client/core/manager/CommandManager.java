@@ -35,7 +35,7 @@ import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.CommandService;
 import cern.c2mon.client.core.tag.ClientCommandTagImpl;
-import cern.c2mon.client.jms.RequestHandler;
+import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.shared.client.command.CommandExecuteRequest;
 import cern.c2mon.shared.client.command.CommandExecuteRequestImpl;
 import cern.c2mon.shared.client.command.CommandExecutionStatus;

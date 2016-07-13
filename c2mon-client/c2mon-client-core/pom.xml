@@ -28,10 +28,6 @@
       <groupId>cern.c2mon.client</groupId>
       <artifactId>c2mon-client-common</artifactId>
     </dependency>
-    <dependency>
-      <groupId>cern.c2mon.client</groupId>
-      <artifactId>c2mon-client-jms</artifactId>
-    </dependency>
 
     <!-- 3rd party dependencies -->
     <dependency>
