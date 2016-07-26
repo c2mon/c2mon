@@ -10,7 +10,7 @@
 		<constructor-arg value="${c2mon.server.shorttermlog.jdbc.url}"/>
 	</bean>
 
-	<bean id="commandPersistenceManager" class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
+	<bean id="commandPersistenceManager" class="cern.c2mon.pmanager.persistence.impl.PersistenceManager">
 		<constructor-arg ref="commandLoggerDAO" />
 		<constructor-arg value="${c2mon.server.shorttermlog.fallback.command}" />
 		<constructor-arg>

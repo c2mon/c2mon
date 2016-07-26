@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import cern.c2mon.pmanager.IAlarmListener;
 import cern.c2mon.pmanager.IDBPersistenceHandler;
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
-import cern.c2mon.pmanager.persistence.impl.TimPersistenceManager;
+import cern.c2mon.pmanager.persistence.impl.PersistenceManager;
 import cern.c2mon.server.eslog.alarm.DummyEsAlarmListener;
 import cern.c2mon.server.eslog.structure.types.EsAlarm;
 import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
@@ -53,7 +53,7 @@ public class EsLogConfiguration {
       @Value("/tmp/supervisionESfallback.txt") final String fallbackFile,
       final IAlarmListener alarmListener) {
 
-    return new TimPersistenceManager<EsSupervisionEvent>(persistenceHandler, fallbackFile, alarmListener, new EsSupervisionEvent());
+    return new PersistenceManager<EsSupervisionEvent>(persistenceHandler, fallbackFile, alarmListener, new EsSupervisionEvent());
   }
 
   @Bean(name = "esAlarmPersistenceManager")
@@ -62,7 +62,7 @@ public class EsLogConfiguration {
       @Value("/tmp/alarmESfallback.txt") final String fallbackFile,
       final IAlarmListener alarmListener) {
 
-    return new TimPersistenceManager<EsAlarm>(persistenceHandler, fallbackFile, alarmListener, new EsAlarm());
+    return new PersistenceManager<EsAlarm>(persistenceHandler, fallbackFile, alarmListener, new EsAlarm());
   }
 
 
@@ -72,6 +72,6 @@ public class EsLogConfiguration {
       @Value("/tmp/tagESfallback.txt") final String fallbackFile,
       final IAlarmListener alarmListener) {
 
-    return new TimPersistenceManager<EsTag>(persistenceHandler, fallbackFile, alarmListener, new EsTag());
+    return new PersistenceManager<EsTag>(persistenceHandler, fallbackFile, alarmListener, new EsTag());
   }
 }

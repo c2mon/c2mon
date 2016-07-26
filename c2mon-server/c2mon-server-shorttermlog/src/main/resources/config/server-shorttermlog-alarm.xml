@@ -15,7 +15,7 @@
       <bean class="cern.c2mon.server.shorttermlog.structure.AlarmLogConverter"/>
     </constructor-arg>
     <constructor-arg>
-      <bean class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
+      <bean class="cern.c2mon.pmanager.persistence.impl.PersistenceManager">
         <constructor-arg ref="alarmLoggerDAO"/>
         <constructor-arg value="${c2mon.server.shorttermlog.fallback.alarm}"/>
         <constructor-arg>

@@ -48,7 +48,7 @@ import cern.c2mon.pmanager.persistence.util.DataRecoveryThread;
  * @author mruizgar
  *
  */
-public class TimPersistenceManager<T extends IFallback> implements IPersistenceManager<T>, FallbackAlarmsInterface {
+public class PersistenceManager<T extends IFallback> implements IPersistenceManager<T>, FallbackAlarmsInterface {
 
     /**
      * Implementation of the IDBPersistenceHandler interface that will be used
@@ -77,7 +77,7 @@ public class TimPersistenceManager<T extends IFallback> implements IPersistenceM
     /**
      * Instance of the class that will deal with the process of reading and
      * committing back the data from the fallback mechanism to the DB Each
-     * instance of TimPersistenceManager will stored a unique instance of that
+     * instance of PersistenceManager will stored a unique instance of that
      * class, that will be executed as an independent thread. This way we will
      * avoid that the same fallback file tries to be treated by different
      * threads at the same time
@@ -85,7 +85,7 @@ public class TimPersistenceManager<T extends IFallback> implements IPersistenceM
     private DataRecoveryThread dataRecovery = new DataRecoveryThread(this);
 
     /** Log4j Logger for this class */
-    private static final Logger LOG = LoggerFactory.getLogger(TimPersistenceManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PersistenceManager.class);
 
     /**
      * The minimal amount of space in MB that always shall be left free on the
@@ -142,7 +142,7 @@ public class TimPersistenceManager<T extends IFallback> implements IPersistenceM
     }
 
     /**
-     * Creates a new TimPersistenceManager object.
+     * Creates a new PersistenceManager object.
      *
      * @param dbHandler
      *            IDBPersistenceHandler instance indicating which implementation
@@ -159,7 +159,7 @@ public class TimPersistenceManager<T extends IFallback> implements IPersistenceM
      *            logged into the DB and, if it is the case, in the fallback
      *            mechanism
      */
-    public TimPersistenceManager(final IDBPersistenceHandler<T> dbHandler,
+    public PersistenceManager(final IDBPersistenceHandler<T> dbHandler,
             final String falbackFile, final IAlarmListener aSender, final IFallback fallbackObj) {
         this.dbHandler = dbHandler;
         this.alarmSender = aSender;

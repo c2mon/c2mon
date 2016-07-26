@@ -16,11 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.pmanager.persistence.impl;
 
-import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.pmanager.mock.AlarmListenerImpl;
-import cern.c2mon.pmanager.mock.DBHandlerImpl;
-import cern.c2mon.pmanager.mock.FallbackImpl;
-import org.junit.Assert;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,32 +28,33 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
+import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.pmanager.mock.AlarmListenerImpl;
+import cern.c2mon.pmanager.mock.DBHandlerImpl;
+import cern.c2mon.pmanager.mock.FallbackImpl;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * JUnit test for the TimPersistenceManager class
+ * JUnit test for the PersistenceManager class
  *
  * @author mruizgar
  *
  */
 @RunWith(JUnit4.class)
-public class TimPersistenceManagerTest {
+public class PersistenceManagerTest {
 
   @Rule
   public TemporaryFolder folder = new TemporaryFolder(new File("/tmp"));
 
   /** Instance of the class we want to test */
-  private TimPersistenceManager timPersistenceManager;
+  private PersistenceManager<IFallback> persistenceManager;
 
   /** It sets all the objects needed for running the test */
   @Before
   public final void setUp() throws IOException {
     File fallbackFile = folder.newFile();
-    timPersistenceManager = new TimPersistenceManager(new DBHandlerImpl(), fallbackFile.getAbsolutePath(), new AlarmListenerImpl(), new FallbackImpl());
+    persistenceManager = new PersistenceManager<>(new DBHandlerImpl(), fallbackFile.getAbsolutePath(), new AlarmListenerImpl(), new FallbackImpl());
   }
 
   /**
@@ -61,11 +62,11 @@ public class TimPersistenceManagerTest {
    */
   @Test
   public final void testStoreObjectData() {
-    int lines = timPersistenceManager.getFallbackManager().getFallbackFileController().getNumberOfLines();
+    int lines = persistenceManager.getFallbackManager().getFallbackFileController().getNumberOfLines();
 
     IFallback fallback = new FallbackImpl();
-    timPersistenceManager.storeData(fallback);
-    assertEquals(lines, timPersistenceManager.getFallbackManager().getFallbackFileController().getNumberOfLines());
+    persistenceManager.storeData(fallback);
+    assertEquals(lines, persistenceManager.getFallbackManager().getFallbackFileController().getNumberOfLines());
   }
 
   /**
@@ -73,13 +74,13 @@ public class TimPersistenceManagerTest {
    */
   @Test
   public final void testStoreListData() {
-    int lines = timPersistenceManager.getFallbackManager().getFallbackFileController().getNumberOfLines();
-    ArrayList data = new ArrayList();
+    int lines = persistenceManager.getFallbackManager().getFallbackFileController().getNumberOfLines();
+    List<IFallback> data = new ArrayList<>();
     for (int i = 0; i < 4; i++) {
       data.add(new FallbackImpl());
     }
-    timPersistenceManager.storeData(data);
-    assertEquals(lines, timPersistenceManager.getFallbackManager().getFallbackFileController().getNumberOfLines());
+    persistenceManager.storeData(data);
+    assertEquals(lines, persistenceManager.getFallbackManager().getFallbackFileController().getNumberOfLines());
   }
 
   /**
@@ -88,11 +89,11 @@ public class TimPersistenceManagerTest {
   @Test
   public final void testStoreObjectConnectionFails() {
     FallbackImpl fallback = new FallbackImpl();
-    int lines = timPersistenceManager.getFallbackManager().getFallbackFileController().getNumberOfLines();
+    int lines = persistenceManager.getFallbackManager().getFallbackFileController().getNumberOfLines();
 
     fallback.setObjectData(FallbackImpl.ERROR);
-    timPersistenceManager.storeData(fallback);
-    assertEquals(1, timPersistenceManager.getFallbackManager().getFallbackFileController().getNumberOfLines() - lines);
+    persistenceManager.storeData(fallback);
+    assertEquals(1, persistenceManager.getFallbackManager().getFallbackFileController().getNumberOfLines() - lines);
   }
 
   /**
@@ -100,16 +101,16 @@ public class TimPersistenceManagerTest {
    */
   @Test
   public final void testStoreListDataConnectionFails() {
-    ArrayList data = new ArrayList();
-    int lines = timPersistenceManager.getFallbackManager().getFallbackFileController().getNumberOfLines();
+    List<IFallback> data = new ArrayList<>();
+    int lines = persistenceManager.getFallbackManager().getFallbackFileController().getNumberOfLines();
     for (int i = 0; i < 4; i++) {
       data.add(new FallbackImpl());
     }
     FallbackImpl fallback = new FallbackImpl();
     fallback.setObjectData(FallbackImpl.ERROR);
     data.add(fallback);
-    timPersistenceManager.storeData(data);
-    assertEquals(5, timPersistenceManager.getFallbackManager().getFallbackFileController().getNumberOfLines() - lines);
+    persistenceManager.storeData(data);
+    assertEquals(5, persistenceManager.getFallbackManager().getFallbackFileController().getNumberOfLines() - lines);
   }
 
 
