@@ -48,7 +48,7 @@ public abstract class EsIndexer<T extends IFallback> implements IDBPersistenceHa
   /**
    * Prefix used for every index in the ElasticSearch cluster, e.g., c2mon_2015-11 is a valid index.
    */
-  @Value("${c2mon.server.eslog.prefix.index}")
+  @Value("${c2mon.server.eslog.index.prefix}")
   protected String indexPrefix;
 
   @Value("${c2mon.server.eslog.config.index.format}")
@@ -57,19 +57,8 @@ public abstract class EsIndexer<T extends IFallback> implements IDBPersistenceHa
   /**
    * Every tag must begin with the same prefix, e.g., tag_string is a good type.
    */
-  @Value("${c2mon.server.eslog.prefix.type}")
+  @Value("${c2mon.server.eslog.type.prefix}")
   protected String typePrefix;
-
-  /**
-   * The first index in the cluster is c2mon_1970-01 which corresponds to the Epoch time (ES stocks timestamps in milliseconds since Epoch).
-   */
-  protected final String FIRST_INDEX = indexPrefix + "1970-01";
-
-  @Value("${c2mon.server.eslog.prefix.supervision}")
-  protected String supervisionPrefix;
-
-  @Value("${c2mon.server.eslog.prefix.alarm}")
-  protected String alarmPrefix;
 
   /**
    * Handles the connection with the ElasticSearch cluster.

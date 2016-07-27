@@ -76,7 +76,6 @@ public class EsSupervisionEventIndexerTest {
     esSupervisionEvent.setStatusName(status.name());
     when(esSupervisionEventConverter.convert(eq(event))).thenReturn(esSupervisionEvent);
     when(connector.handleSupervisionQuery(anyString(), anyString(), eq(esSupervisionEvent))).thenReturn(true);
-    indexer.setSupervisionPrefix("prevision_");
     indexer.setIndexFormat("M");
     mapping = new EsSupervisionMapping();
   }
@@ -98,6 +97,6 @@ public class EsSupervisionEventIndexerTest {
     String expectedMapping = mapping.getMapping();
 
     indexer.logSupervisionEvent(esSupervisionEvent);
-    verify(connector).handleSupervisionQuery(eq(indexer.getSupervisionPrefix() + indexer.millisecondsToYearMonth(timestamp.getTime())), eq(expectedMapping), eq(esSupervisionEvent));
+    verify(connector).handleSupervisionQuery(eq(indexer.getIndexPrefix() + "-supervision_" + indexer.millisecondsToYearMonth(timestamp.getTime())), eq(expectedMapping), eq(esSupervisionEvent));
   }
 }

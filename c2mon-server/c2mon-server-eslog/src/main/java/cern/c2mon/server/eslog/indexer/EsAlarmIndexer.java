@@ -118,7 +118,7 @@ public class EsAlarmIndexer<T extends EsAlarm> extends EsIndexer<T> {
    * Format: "alarmPrefix_indexSettings".
    */
   private String generateAlarmIndex(long time) {
-    return retrieveIndexFormat(alarmPrefix, time);
+    return retrieveIndexFormat(indexPrefix + "-alarm_", time);
   }
 
   private String createOrRetrieveMapping(String indexName) {

@@ -185,11 +185,11 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
   }
 
   private String generateTagIndex(long serverTime) {
-    return retrieveIndexFormat(indexPrefix, serverTime);
+    return retrieveIndexFormat(indexPrefix + "-tag_", serverTime);
   }
 
   private String generateTagType(String dataType) {
-    return typePrefix + getSimpleTypeName(dataType);
+    return typePrefix + "_" + getSimpleTypeName(dataType);
   }
 
   public static String getSimpleTypeName(String dataType) {
@@ -244,7 +244,7 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
   }
 
   private boolean checkIndex(String index) {
-    return index.matches("^" + indexPrefix + "\\d\\d\\d\\d-\\d\\d-?\\d?\\d?$");
+    return index.matches("^" + indexPrefix + "-(alarm|supervision|tag)_\\d\\d\\d\\d-\\d\\d-?\\d?\\d?$");
   }
 
   private boolean createNotExistingIndex(String index) {

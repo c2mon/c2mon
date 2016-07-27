@@ -64,7 +64,6 @@ public class EsAlarmIndexerTest {
     esAlarm = esAlarmLogConverter.convert(alarm);
     timestamp = alarm.getTimestamp();
     when(connector.handleAlarmQuery(anyString(), anyString(), eq(esAlarm))).thenReturn(true);
-    indexer.setAlarmPrefix(indexer.alarmPrefix);
     indexer.setIndexFormat("M");
     esAlarmMapping = new EsAlarmMapping();
   }
@@ -86,7 +85,7 @@ public class EsAlarmIndexerTest {
     String expectedMapping = esAlarmMapping.getMapping();
 
     indexer.logAlarm(esAlarm);
-    verify(connector).handleAlarmQuery(eq(indexer.getAlarmPrefix() + indexer.millisecondsToYearMonth(timestamp.getTime())), eq(expectedMapping), eq(esAlarm));
+    verify(connector).handleAlarmQuery(eq(indexer.getIndexPrefix() + "-alarm_" + indexer.millisecondsToYearMonth(timestamp.getTime())), eq(expectedMapping), eq(esAlarm));
   }
 
 }

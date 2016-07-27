@@ -118,7 +118,7 @@ public class EsSupervisionEventIndexer<T extends EsSupervisionEvent> extends EsI
    * Format: "supervisionPrefix_index-format".
    */
   private String generateSupervisionIndex(long time) {
-    return retrieveIndexFormat(supervisionPrefix, time);
+    return retrieveIndexFormat(indexPrefix + "-supervision_", time);
   }
 
   private String createMappingIfNewIndex(String indexName) {

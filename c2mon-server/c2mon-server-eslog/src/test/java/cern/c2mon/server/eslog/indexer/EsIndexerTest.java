@@ -64,6 +64,8 @@ public class EsIndexerTest {
   private static Client clusterClient;
   private static Client initClient;
 
+  private static final String TAG_INDEX_SUFFIX = "-tag_";
+
   @Autowired
   private EsTagIndexer<EsTag> indexer;
 
@@ -214,8 +216,8 @@ public class EsIndexerTest {
 
     tag.getC2mon().setServerTimestamp(123456789000L);
     tag.setRawValue(true);
-    String indexName = indexer.indexPrefix + indexer.millisecondsToYearMonth(tag.getC2mon().getServerTimestamp());
-    String typeName = indexer.typePrefix + EsTagIndexer.getSimpleTypeName(tag.getC2mon().getDataType());
+    String indexName = indexer.indexPrefix + TAG_INDEX_SUFFIX +indexer.millisecondsToYearMonth(tag.getC2mon().getServerTimestamp());
+    String typeName = indexer.typePrefix + "_" + EsTagIndexer.getSimpleTypeName(tag.getC2mon().getDataType());
 
     list.add(tag);
 
@@ -251,7 +253,7 @@ public class EsIndexerTest {
 
       tag.getC2mon().setServerTimestamp(tagServerTime);
       list.add(tag);
-      listIndices.add(indexer.indexPrefix + indexer.millisecondsToYearMonth(tag.getC2mon().getServerTimestamp()));
+      listIndices.add(indexer.indexPrefix + TAG_INDEX_SUFFIX + indexer.millisecondsToYearMonth(tag.getC2mon().getServerTimestamp()));
 
       if (id == size) {
         log.debug("list of tags realized");
@@ -262,7 +264,7 @@ public class EsIndexerTest {
       }
     }
 
-    indexName = indexer.indexPrefix + indexer.millisecondsToYearMonth(tagServerTime);
+    indexName = indexer.indexPrefix + TAG_INDEX_SUFFIX + indexer.millisecondsToYearMonth(tagServerTime);
     indexer.indexTags(list);
     sleep();
     assertTrue(connector.waitForYellowStatus());
