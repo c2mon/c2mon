@@ -110,7 +110,7 @@ if [ "$2" == "-d" ] || [ "$2" == "--debug" ] || [ "$3" == "-d" ] || [ "$3" == "-
 fi
 
 # Checking for start script
-C2MON_START_CMD=`$C2MON_HOME/bin/*.jvm | head -1`
+C2MON_START_CMD=`ls $C2MON_HOME/bin/*.jvm | head -1`
 if [ ! -f $C2MON_START_CMD ] ; then
   printf "[ERROR] No jvm start script found in $C2MON_HOME/bin/\n"
   exit 1
