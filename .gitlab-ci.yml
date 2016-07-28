@@ -1,5 +1,10 @@
+stages:
+  - build
+  - deploy
+
 # Fully build and deploy master branch
 build_and_deploy:
+  type: build
   script:
     - mvn -q -B clean deploy --settings settings.xml
   only:
@@ -7,10 +12,15 @@ build_and_deploy:
 
 # Just run tests on feature branches
 build:
+  type: build
   script:
     - mvn -q -B test -DskipDockerBuild -DskipDockerTag
   except:
     - master
+
+##
+# CERN specific part. Should be removed one day
+##
 
 # Triggers the build of tim-server
 trigger:
