@@ -26,6 +26,6 @@ build:
 trigger:
   type: deploy
   script:
-    - "curl -X POST -F token=TIM_SERVER_TOKEN -F ref=REF_NAME https://gitlab.cern.ch/api/v3/projects/9859/trigger/builds"
+    - "curl -X POST -F token=TIM_SERVER_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9859/trigger/builds"
   only:
     - master
