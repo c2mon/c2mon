@@ -140,7 +140,7 @@ public interface CacheRegistrationService {
    *          in general, the start() method should be called at the end of its own lifecycle start method,
    *          and the stop() at the beginning of its own stop method
    */
-  Lifecycle registerBufferedListenerToTags(BufferedTimCacheListener<Tag> bufferedTimCacheListener);
+  Lifecycle registerBufferedListenerToTags(C2monBufferedCacheListener<Tag> bufferedTimCacheListener);
 
   /**
    * Registers for all updates to C2MON alarms. Notice this includes all invalidations

@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;
 
-import cern.c2mon.server.cache.BufferedTimCacheListener;
+import cern.c2mon.server.cache.C2monBufferedCacheListener;
 import cern.c2mon.server.cache.C2monCacheWithListeners;
 import cern.c2mon.server.cachepersistence.common.BatchPersistenceManager;
 import cern.c2mon.server.common.component.Lifecycle;
@@ -42,7 +42,7 @@ import cern.c2mon.shared.common.Cacheable;
  * @author Mark Brightwell
  *
  */
-public class PersistenceSynchroListener implements BufferedTimCacheListener<Long>, SmartLifecycle {
+public class PersistenceSynchroListener implements C2monBufferedCacheListener<Long>, SmartLifecycle {
 
   /**
    * Class logger.
@@ -91,7 +91,7 @@ public class PersistenceSynchroListener implements BufferedTimCacheListener<Long
   
   /**
    * Should be run on instantiation of this listener: it registers
-   * to the provided C2monCache as a {@link BufferedTimCacheListener}.
+   * to the provided C2monCache as a {@link C2monBufferedCacheListener}.
    */
   @PostConstruct
   public void init() {   

@@ -35,7 +35,7 @@ public interface C2monCacheWithListeners<K, T extends Cacheable> extends C2monCa
   void notifyListenerStatusConfirmation(T cacheable, long timestamp);
   
   /**
-   * Not used so far. For calling the listener on the same thread as the cache update.
+   * For calling the listener on the same thread as the cache update.
    * TODO switch to this listener for rule listener and client/alarm listener for guaranteed no data loss!
    * (if performance permits... may need to increase the number of JMS listeners)
    * @param timCacheListener
@@ -64,7 +64,7 @@ public interface C2monCacheWithListeners<K, T extends Cacheable> extends C2monCa
    * @return a Lifecycle object to start and stop the listener thread; the start should be called once the
    *        registered C2monCacheListener is ready; the stop should be called at the start of the listener shutdown
    */
-  Lifecycle registerBufferedListener(BufferedTimCacheListener<? super T> bufferedTimCacheListener, int frequency);
+  Lifecycle registerBufferedListener(C2monBufferedCacheListener<? super T> bufferedTimCacheListener, int frequency);
   
   /**
    * Register to receive the Ids of cache objects that have been updated.
@@ -73,7 +73,7 @@ public interface C2monCacheWithListeners<K, T extends Cacheable> extends C2monCa
    * @return a Lifecycle object to start and stop the listener thread; the start should be called once the
    *  registered C2monCacheListener is ready; the stop should be called at the start of the listener shutdown 
    */
-  Lifecycle registerKeyBufferedListener(BufferedTimCacheListener<Long> bufferedTimCacheListener, int frequency);
+  Lifecycle registerKeyBufferedListener(C2monBufferedCacheListener<Long> bufferedTimCacheListener, int frequency);
   
   /**
    * Registers a listener to be notified of updates on multiple threads.

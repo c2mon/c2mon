@@ -21,7 +21,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.AlarmCache;
-import cern.c2mon.server.cache.BufferedTimCacheListener;
+import cern.c2mon.server.cache.C2monBufferedCacheListener;
 import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.cache.CacheSupervisionListener;
@@ -166,22 +166,22 @@ public class CacheRegistrationServiceImpl implements CacheRegistrationService {
   }
   
   @Override
-  public Lifecycle registerBufferedListenerToTags(final BufferedTimCacheListener<Tag> bufferListener) {
+  public Lifecycle registerBufferedListenerToTags(final C2monBufferedCacheListener<Tag> bufferListener) {
     int frequency = environment.getRequiredProperty("c2mon.server.cache.bufferedListenerPullFrequency", Integer.class);
-    BufferedCacheListener<Tag> bufferedCacheListener = new BufferedCacheListener<>(bufferListener, frequency);
+    DefaultBufferedCacheListener<Tag> bufferedCacheListener = new DefaultBufferedCacheListener<>(bufferListener, frequency);
     registerListenerToTags(bufferedCacheListener);
     return bufferedCacheListener;
   }
 
   @Override
-  public Lifecycle registerToAlarms(final C2monCacheListener<Alarm> timCacheListener) {
-    return alarmCache.registerListener(timCacheListener);
+  public Lifecycle registerToAlarms(final C2monCacheListener<Alarm> cacheListener) {
+    return alarmCache.registerListener(cacheListener);
   }
   
-  private void registerListenerToTags(C2monCacheListener<Tag> timCacheListener) {
-    dataTagCache.registerSynchronousListener(timCacheListener);
-    controlTagCache.registerSynchronousListener(timCacheListener);
-    ruleTagCache.registerSynchronousListener(timCacheListener); 
+  private void registerListenerToTags(C2monCacheListener<Tag> cacheListener) {
+    dataTagCache.registerSynchronousListener(cacheListener);
+    controlTagCache.registerSynchronousListener(cacheListener);
+    ruleTagCache.registerSynchronousListener(cacheListener); 
   }
 
 }

@@ -32,7 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
-import cern.c2mon.server.cache.BufferedTimCacheListener;
+import cern.c2mon.server.cache.C2monBufferedCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
@@ -48,7 +48,7 @@ import cern.c2mon.server.eslog.structure.types.tag.EsTag;
  */
 @Service
 @Slf4j
-public class EsTagLogListener implements BufferedTimCacheListener<Tag>, SmartLifecycle {
+public class EsTagLogListener implements C2monBufferedCacheListener<Tag>, SmartLifecycle {
 
   /**
    * Reference to registration service.

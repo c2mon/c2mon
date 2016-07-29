@@ -29,7 +29,7 @@ import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.shorttermlog.logger.BatchLogger;
-import cern.c2mon.server.cache.BufferedTimCacheListener;
+import cern.c2mon.server.cache.C2monBufferedCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
@@ -43,7 +43,7 @@ import cern.c2mon.server.common.tag.Tag;
  *
  */
 @Service
-public class TagLogCacheListener implements BufferedTimCacheListener<Tag>, SmartLifecycle {
+public class TagLogCacheListener implements C2monBufferedCacheListener<Tag>, SmartLifecycle {
 
   /**
    * Class logger.

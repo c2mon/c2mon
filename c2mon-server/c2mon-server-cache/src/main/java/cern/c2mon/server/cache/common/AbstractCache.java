@@ -28,18 +28,17 @@ import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.event.RegisteredEventListeners;
 import net.sf.ehcache.loader.CacheLoader;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 
-import cern.c2mon.server.cache.BufferedTimCacheListener;
+import cern.c2mon.server.cache.C2monBufferedCacheListener;
 import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.cache.listener.BufferedCacheListener;
 import cern.c2mon.server.cache.listener.BufferedKeyCacheListener;
 import cern.c2mon.server.cache.listener.CacheListener;
+import cern.c2mon.server.cache.listener.DefaultBufferedCacheListener;
 import cern.c2mon.server.cache.listener.MultiThreadedCacheListener;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.common.component.Lifecycle;
@@ -57,8 +56,8 @@ import cern.c2mon.shared.common.Cacheable;
  * logic needs performing, this should be done in the corresponding Facade init()
  * method, or if necessary in a separate bean that accesses the facade.
  *
- * @param <T> the cache object type
  * @param <K> the cache key type
+ * @param <T> the cache object type
  *
  * @author Mark Brightwell
  *
@@ -288,24 +287,24 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
   }
 
   public Lifecycle registerListener(C2monCacheListener<? super T> timCacheListener) {
-    CacheListener wrappedCacheListener = new CacheListener(timCacheListener);
+    CacheListener<? super T> wrappedCacheListener = new CacheListener<>(timCacheListener);
     cacheListeners.add(wrappedCacheListener);
     return wrappedCacheListener;
   }
 
   public Lifecycle registerThreadedListener(C2monCacheListener<? super T> timCacheListener, int queueCapacity, int threadPoolSize) {
-    MultiThreadedCacheListener threadedCacheListener = new MultiThreadedCacheListener(timCacheListener, queueCapacity, threadPoolSize);
+    MultiThreadedCacheListener<? super T> threadedCacheListener = new MultiThreadedCacheListener<>(timCacheListener, queueCapacity, threadPoolSize);
     cacheListeners.add(threadedCacheListener);
     return threadedCacheListener;
   }
 
-  public Lifecycle registerBufferedListener(final BufferedTimCacheListener bufferedTimCacheListener, int frequency) {
-    BufferedCacheListener bufferedCacheListener = new BufferedCacheListener(bufferedTimCacheListener, frequency);
+  public Lifecycle registerBufferedListener(final C2monBufferedCacheListener c2monBufferedCacheListener, int frequency) {
+    DefaultBufferedCacheListener bufferedCacheListener = new DefaultBufferedCacheListener(c2monBufferedCacheListener, frequency);
     cacheListeners.add(bufferedCacheListener);
     return bufferedCacheListener;
   }
 
-  public Lifecycle registerKeyBufferedListener(final BufferedTimCacheListener<Long> bufferedCacheListener, int frequency) {
+  public Lifecycle registerKeyBufferedListener(final C2monBufferedCacheListener<Long> bufferedCacheListener, int frequency) {
     BufferedKeyCacheListener<T> bufferedKeyCacheListener = new BufferedKeyCacheListener<T>(bufferedCacheListener, frequency);
     cacheListeners.add(bufferedKeyCacheListener);
     return bufferedKeyCacheListener;

@@ -22,7 +22,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cern.c2mon.server.cache.BufferedTimCacheListener;
+import cern.c2mon.server.cache.C2monBufferedCacheListener;
 import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.shared.common.Cacheable;
@@ -63,7 +63,7 @@ public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> impl
   /**
    * Wrapped listener.
    */
-  private BufferedTimCacheListener<S> bufferedCacheListener;
+  private C2monBufferedCacheListener<S> bufferedCacheListener;
   
   /**
    * Indicates if the listener is enabled (if not, notifications are ignored and exception is thrown).
@@ -76,7 +76,7 @@ public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> impl
    * @param bufferedCacheListener listener expecting collections of cache objects
    * @param frequency the frequency (in ms) at which the buffer should be emptied
    */
-  public AbstractBufferedCacheListener(BufferedTimCacheListener<S> bufferedCacheListener, int frequency) {
+  public AbstractBufferedCacheListener(C2monBufferedCacheListener<S> bufferedCacheListener, int frequency) {
     this.bufferedCacheListener = bufferedCacheListener;
     this.frequency = frequency;
     enabled = false;
