@@ -16,9 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.listener;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +29,6 @@ import cern.c2mon.server.cache.C2monBufferedCacheListener;
 import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.shared.common.Cacheable;
-import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Abstract listener implementation that batches the notifications before
@@ -37,12 +39,8 @@ import org.springframework.beans.factory.annotation.Value;
  * @param <S> the type of object passed to the listener
  *
  */
+@Slf4j
 public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> implements C2monCacheListener<T>, Lifecycle {
-
-  /**
-   * Private class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBufferedCacheListener.class);
 
   /**
    * Max number of objects passed to the listener.
@@ -57,8 +55,8 @@ public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> impl
   /**
    * Queues keeping the keys for supported methods.
    */
-  private LinkedBlockingQueue<S> onUpdateQueue = new LinkedBlockingQueue<S>();  
-  private LinkedBlockingQueue<S> statusConfirmationQueue = new LinkedBlockingQueue<S>();
+  private final LinkedBlockingQueue<S> onUpdateQueue = new LinkedBlockingQueue<S>();  
+  private final LinkedBlockingQueue<S> statusConfirmationQueue = new LinkedBlockingQueue<S>();
   
   /**
    * Wrapped listener.
@@ -68,6 +66,7 @@ public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> impl
   /**
    * Indicates if the listener is enabled (if not, notifications are ignored and exception is thrown).
    */
+  @Getter
   private volatile boolean enabled;
   
   /**
@@ -90,16 +89,14 @@ public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> impl
       try {
         statusConfirmationQueue.put(getDerivedObject(cacheable));
       } catch (InterruptedException e) {
-        LOGGER.error("Interrupted while waiting to insert into queue.", e);
+        log.error("Interrupted while waiting to insert into queue.", e);
       }       
     } else {
       String errorMessage = "Updated notification received with listener disabled."; 
-      LOGGER.warn(errorMessage);
+      log.warn(errorMessage);
       throw new IllegalStateException(errorMessage);
     }
   }
-
-
 
   @Override
   public void notifyElementUpdated(T cacheable) {
@@ -107,12 +104,22 @@ public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> impl
       try {
         onUpdateQueue.put(getDerivedObject(cacheable));
       } catch (InterruptedException e) {
-        LOGGER.error("Interrupted while waiting to insert key into queue.", e);
+        log.error("Interrupted while waiting to insert key into queue.", e);
       }      
     } else {
       String errorMessage = "Updated notification received with listener disabled."; 
-      LOGGER.warn(errorMessage);
+      log.warn(errorMessage);
       throw new IllegalStateException(errorMessage);
+    }
+  }
+  
+  /**
+   * A simple wrapper method around {@link AbstractBufferedCacheListener#notifyElementUpdated(Cacheable)}
+   * @param cacheableList A list of {@link Cacheable} objects
+   */
+  public void notifyElementsUpdated(Collection<T> cacheableList) {
+    for (T cacheable : cacheableList) {
+      notifyElementUpdated(cacheable);
     }
   }
 
@@ -127,7 +134,7 @@ public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> impl
   @Override
   public synchronized void start() {
     if (!enabled) {
-      LOGGER.debug("Starting BufferedCacheListener");
+      log.debug("Starting BufferedCacheListener");
       new Thread(new Runnable() {
         
         @Override
@@ -155,7 +162,7 @@ public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> impl
               try {
                 Thread.sleep(1000);
               } catch (InterruptedException e) {
-                LOGGER.error("Sleep interrupted in BufferedCacheListener thread.");
+                log.error("Sleep interrupted in BufferedCacheListener thread.");
               }
             }
           }
@@ -170,13 +177,13 @@ public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> impl
   @Override
   public synchronized void stop() {
     if (enabled) {
-      LOGGER.debug("Shutting down BufferedKeyCacheListener");
+      log.debug("Shutting down BufferedKeyCacheListener");
       enabled = false;
       while (!onUpdateQueue.isEmpty() || !statusConfirmationQueue.isEmpty()) {
         try {
           Thread.sleep(1000);
         } catch (InterruptedException e) {
-          LOGGER.error("Interrupted while shutting down BufferedKeyCacheListener", e);
+          log.error("Interrupted while shutting down BufferedKeyCacheListener", e);
         }
       }
     }     
