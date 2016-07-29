@@ -16,7 +16,13 @@
   <modules>
     <module>c2mon-daq-core</module>
     <module>c2mon-daq-test</module>
+    <module>distribution</module>
   </modules>
+
+  <properties>
+    <c2mon.daq.name>parent</c2mon.daq.name>
+    <docker.image.base>java:8-jdk</docker.image.base>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -53,8 +59,143 @@
         <artifactId>c2mon-shared-util</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>cern.c2mon.daq</groupId>
+        <artifactId>c2mon-daq-distribution-parent</artifactId>
+        <version>${project.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
+  <build>
+    <pluginManagement>
+      <plugins>
+
+        <!--
+          Configuration to unpack c2mon-daq-distribution-parent so that DAQ
+          implementations can use the resources inside it
+        -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.6</version>
+          <executions>
+            <execution>
+              <id>unpack</id>
+              <phase>prepare-package</phase>
+              <goals>
+                <goal>unpack</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <artifactItems>
+              <artifactItem>
+                <groupId>cern.c2mon.daq</groupId>
+                <artifactId>c2mon-daq-distribution-parent</artifactId>
+                <overWrite>true</overWrite>
+                <outputDirectory>${project.build.directory}/distribution</outputDirectory>
+              </artifactItem>
+            </artifactItems>
+          </configuration>
+        </plugin>
+
+        <!-- Generic tarball configuration -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.6</version>
+          <executions>
+            <execution>
+              <id>make-assembly</id>
+              <phase>package</phase>
+              <goals>
+                <goal>single</goal>
+              </goals>
+              <configuration>
+                <descriptors>
+                  <descriptor>${project.build.directory}/distribution/tar/assembly.xml</descriptor>
+                </descriptors>
+                <appendAssemblyId>false</appendAssemblyId>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- Generic docker image configuration -->
+        <plugin>
+          <groupId>com.spotify</groupId>
+          <artifactId>docker-maven-plugin</artifactId>
+          <version>0.4.10</version>
+          <executions>
+            <execution>
+              <id>build-image</id>
+              <phase>package</phase>
+              <goals>
+                <goal>build</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>push-image</id>
+              <phase>deploy</phase>
+              <goals>
+                <goal>push</goal>
+              </goals>
+              <configuration>
+                <imageName>docker.cern.ch/c2mon-project/daq-${c2mon.daq.name}</imageName>
+              </configuration>
+            </execution>
+          </executions>
+          <configuration>
+            <imageName>docker.cern.ch/c2mon-project/daq-${c2mon.daq.name}</imageName>
+            <baseImage>${docker.image.base}</baseImage>
+            <serverId>docker.cern.ch</serverId>
+            <registryUrl>https://docker.cern.ch</registryUrl>
+            <forceTags>true</forceTags>
+            <imageTags>
+              <imageTag>${project.version}</imageTag>
+            </imageTags>
+            <workdir>/${project.artifactId}</workdir>
+            <entryPoint>["/docker-entrypoint.sh"]</entryPoint>
+            <exposes>
+              <expose>1099</expose>
+            </exposes>
+            <runs>
+              <run>chmod 755 /docker-entrypoint.sh</run>
+              <run>chmod 755 /${project.artifactId}/bin/*</run>
+              <run>apt-get install -y --no-install-recommends xz-utils</run> <!--lsof command-not-found-->
+              <run>rm -rf /var/lib/apt/lists/*</run>
+            </runs>
+            <env>
+              <basedir>${project.artifactId}</basedir>
+              <LD_LIBRARY_PATH>/${project.artifactId}/lib_so</LD_LIBRARY_PATH>
+            </env>
+            <volumes>
+              <volume>/${project.artifactId}/log</volume>
+              <volume>/${project.artifactId}/conf</volume>
+            </volumes>
+            <resources>
+              <resource>
+                <directory>${project.build.directory}</directory>
+                <include>${project.artifactId}-${project.version}.tar.gz</include>
+                <targetPath>/${project.artifactId}</targetPath>
+              </resource>
+              <resource>
+                <directory>${project.build.directory}/distribution/docker/conf</directory>
+                <targetPath>/${project.artifactId}/conf</targetPath>
+              </resource>
+              <resource>
+                <directory>${project.build.directory}/distribution/docker</directory>
+                <includes>
+                  <include>docker-entrypoint.sh</include>
+                </includes>
+                <targetPath>/</targetPath>
+              </resource>
+            </resources>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>
 
