@@ -28,6 +28,7 @@ import java.util.Set;
 
 import javax.jms.JMSException;
 
+import cern.c2mon.client.core.config.C2monClientProperties;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,6 +76,8 @@ public class ClientDataTagCacheImplTest {
   private CacheSynchronizer cacheSynchronizer;
   @Autowired
   private CacheController cacheController;
+  @Autowired
+  private C2monClientProperties properties;
 
   @Before
   public void init() {

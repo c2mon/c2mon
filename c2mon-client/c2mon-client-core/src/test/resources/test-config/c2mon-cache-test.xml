@@ -51,5 +51,6 @@
 
   <bean id="jmsSender" class="cern.c2mon.shared.util.jms.ActiveJmsSender" />
   <bean class="cern.c2mon.client.core.configuration.ConfigurationRequestSender"/>
+  <bean class="cern.c2mon.client.core.config.C2monClientProperties" />
 
 </beans>
