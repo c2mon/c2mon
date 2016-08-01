@@ -17,6 +17,7 @@
 package cern.c2mon.client.core.configuration;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
+import cern.c2mon.client.core.config.C2monClientProperties;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
@@ -49,7 +50,7 @@ public class ConfigurationRequestSender {
   private JmsSender jmsSender;
 
   @Autowired
-  private Environment environment;
+  private C2monClientProperties properties;
 
   private ObjectMapper mapper;
 
@@ -70,7 +71,7 @@ public class ConfigurationRequestSender {
   public ConfigurationReport applyConfiguration(Configuration configuration, ClientRequestReportListener listener) {
     try {
       String message = mapper.writeValueAsString(configuration);
-      String destination = environment.getRequiredProperty("c2mon.client.jms.config.queue");
+      String destination = properties.getJms().getConfigQueue();
       String reply = jmsSender.sendRequestToQueue(message, destination, DEFAULT_TIMEOUT);
 
       if (reply != null) {
