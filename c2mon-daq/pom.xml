@@ -37,32 +37,32 @@
       <dependency>
         <groupId>cern.c2mon.daq</groupId>
         <artifactId>c2mon-daq-core</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.daq</groupId>
         <artifactId>c2mon-daq-test</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.shared</groupId>
         <artifactId>c2mon-shared-common</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.shared</groupId>
         <artifactId>c2mon-shared-daq</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.shared</groupId>
         <artifactId>c2mon-shared-util</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.daq</groupId>
         <artifactId>c2mon-daq-distribution-parent</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -93,6 +93,7 @@
               <artifactItem>
                 <groupId>cern.c2mon.daq</groupId>
                 <artifactId>c2mon-daq-distribution-parent</artifactId>
+                <version>${project.parent.version}</version>
                 <overWrite>true</overWrite>
                 <outputDirectory>${project.build.directory}/distribution</outputDirectory>
               </artifactItem>
