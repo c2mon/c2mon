@@ -56,7 +56,12 @@ LOGGING_CONFIG="-Dlogging.config=$DAQ_HOME/conf/logback.xml -Dlogging.path=$DAQ_
 DAQ_PROPERTIES_FILE="-Dc2mon.daq.properties.location=file://$DAQ_HOME/conf/c2mon-daq.properties"
 ADDITIONAL_PROPERTIES="";
 JVM_MEM="-Xms256m -Xmx256m"
-JVM_OTHER_OPTS=()
+#JVM_OTHER_OPTS=()
+
+# Read options from env.sh
+if [[ -z env.sh ]]; then
+ source $DAQ_HOME/conf/env.sh
+fi
 
 #
 # Read extra options
@@ -98,4 +103,5 @@ shift $(( OPTIND - 1 ));
 [[ -z $1 ]] && usage && exit 1
 PROCESS_NAME=$1
 
-exec -a `basename $0` $JAVA -cp "$CLASSPATH" -Djava.library.path="$DAQ_HOME/lib_so" -Dc2mon.daq.name="${PROCESS_NAME}" $DAQ_PROPERTIES_FILE $ADDITIONAL_PROPERTIES $LOGGING_CONFIG $JVM_MEM "${JVM_OTHER_OPTS[@]}" cern.c2mon.daq.DaqStartup
+exec -a `basename $0` $JAVA -cp "$CLASSPATH" -Dc2mon.daq.name="${PROCESS_NAME}" \
+  $DAQ_PROPERTIES_FILE $ADDITIONAL_PROPERTIES $LOGGING_CONFIG $JVM_MEM "${JVM_OTHER_OPTS[@]}" cern.c2mon.daq.DaqStartup
