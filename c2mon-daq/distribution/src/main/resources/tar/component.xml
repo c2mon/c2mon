@@ -48,7 +48,7 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
 
-    <!-- Copy all configuration files -->
+    <!-- Copy generic configuration files -->
     <fileSet>
       <directory>${project.build.directory}/distribution/tar/conf/</directory>
       <outputDirectory>/conf</outputDirectory>
@@ -58,6 +58,24 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
+
+    <!-- Copy specific configuration files (if any exist) -->
+    <fileSet>
+      <directory>src/dist/tar/</directory>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>deployment.xml</include>
+        <include>conf/*/**</include>
+      </includes>
+    </fileSet>
   </fileSets>
+
+  <files>
+    <file>
+      <source>${project.build.directory}/distribution/tar/version.txt</source>
+      <outputDirectory>/</outputDirectory>
+      <filtered>true</filtered>
+    </file>
+  </files>
 
 </component>
