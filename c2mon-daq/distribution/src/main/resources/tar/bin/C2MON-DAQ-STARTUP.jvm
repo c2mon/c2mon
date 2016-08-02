@@ -59,7 +59,7 @@ JVM_MEM="-Xms256m -Xmx256m"
 #JVM_OTHER_OPTS=()
 
 # Read options from env.sh
-if [[ -z env.sh ]]; then
+if [[ -z $DAQ_HOME/conf/env.sh ]]; then
  source $DAQ_HOME/conf/env.sh
 fi
 
