@@ -178,7 +178,7 @@
               <resource>
                 <directory>${project.build.directory}</directory>
                 <include>${project.artifactId}-${project.version}-dist.tar.gz</include>
-                <targetPath>/</targetPath>
+                <targetPath>/${project.artifactId}</targetPath>
               </resource>
               <resource>
                 <directory>${project.build.directory}/distribution/docker/conf</directory>
