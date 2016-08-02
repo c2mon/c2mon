@@ -44,7 +44,7 @@ import java.lang.reflect.Type;
 @Service
 public class ConfigurationRequestSender {
 
-  private static final long DEFAULT_TIMEOUT = 60_000L; // 1 minute
+  private static final long DEFAULT_TIMEOUT = 3_600_000L;
 
   @Autowired
   private JmsSender jmsSender;
@@ -79,7 +79,7 @@ public class ConfigurationRequestSender {
       } else {
         ConfigurationReport failureReport = new ConfigurationReport();
         failureReport.setStatus(ConfigConstants.Status.FAILURE);
-        failureReport.setStatusDescription("Server timed out after " + DEFAULT_TIMEOUT + " seconds.");
+        failureReport.setStatusDescription("Server timed out after " + DEFAULT_TIMEOUT + "ms");
         return failureReport;
       }
 
@@ -87,7 +87,7 @@ public class ConfigurationRequestSender {
       ConfigurationReport failureReport = new ConfigurationReport();
       failureReport.setExceptionTrace(e);
       failureReport.setStatus(ConfigConstants.Status.FAILURE);
-      failureReport.setStatusDescription("Serialization or Deserialization of Configuration on Client side failed");
+      failureReport.setStatusDescription("Failed to deserialize response");
 
       return failureReport;
     }
