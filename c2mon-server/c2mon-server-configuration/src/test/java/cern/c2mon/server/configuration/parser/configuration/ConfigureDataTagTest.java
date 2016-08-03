@@ -269,7 +269,7 @@ public class ConfigureDataTagTest {
     config.setEntities(tagUpdateList);
 
     // setUp Mocks:
-    EasyMock.expect(dataTagCache.get("myDataTag")).andReturn(new DataTagCacheObject(20L));
+    EasyMock.expect(dataTagCache.get("myDataTag")).andReturn(new DataTagCacheObject(20L)).times(2);
     EasyMock.expect(tagFacadeGateway.isInTagCache(20L)).andReturn(true);
 
     EasyMock.replay(dataTagCache, tagFacadeGateway);
