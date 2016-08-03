@@ -75,7 +75,8 @@ public class DataTagFactory extends EntityFactory<DataTag> {
     if (dataTag.getEquipmentId() != null || dataTag.getEquipmentName() != null) {
       if (dataTag.getSubEquipmentId() == null && dataTag.getSubEquipmentName() == null) {
 
-        parentId = dataTag.getEquipmentId() != null ? dataTag.getEquipmentId() : equipmentDAO.getIdByName(dataTag.getEquipmentName());
+        parentId = dataTag.getEquipmentId() != null ? dataTag.getEquipmentId() : equipmentDAO.getIdByName(dataTag
+            .getEquipmentName());
         dataTag.setEquipmentId(parentId);
 
         if (!equipmentCache.hasKey(parentId)) {
@@ -88,7 +89,8 @@ public class DataTagFactory extends EntityFactory<DataTag> {
       }
     } else if (dataTag.getSubEquipmentId() != null || dataTag.getSubEquipmentName() != null) {
 
-      parentId = dataTag.getSubEquipmentId() != null ? dataTag.getSubEquipmentId() : subEquipmentDAO.getIdByName(dataTag.getSubEquipmentName());
+      parentId = dataTag.getSubEquipmentId() != null ? dataTag.getSubEquipmentId() : subEquipmentDAO.getIdByName
+          (dataTag.getSubEquipmentName());
       dataTag.setSubEquipmentId(parentId);
 
       if (!subEquipmentCache.hasKey(parentId)) {
@@ -110,7 +112,18 @@ public class DataTagFactory extends EntityFactory<DataTag> {
 
   @Override
   Long getId(DataTag entity) {
-    return entity.getId() != null ? entity.getId() : dataTagCache.get(entity.getName()).getId();
+    Long id;
+
+    if (entity.getId() != null) {
+      id = entity.getId();
+    } else {
+      if (dataTagCache.get(entity.getName()) != null) {
+        id = dataTagCache.get(entity.getName()).getId();
+      } else {
+        throw new ConfigurationParseException("DataTag with the name " + entity.getName() + " not known to the server");
+      }
+    }
+    return id;
   }
 
   @Override
