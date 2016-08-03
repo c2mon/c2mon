@@ -25,9 +25,11 @@ build:
 trigger:
   type: deploy
   script:
-    # Trigger the build of tim-server
+    # Trigger build of tim-server
     - "curl -X POST -F token=$TIM_SERVER_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9859/trigger/builds"
-    # Trigger the build of c2mon-daq-opcua
+    # Trigger build of c2mon-daq-alarmsource
+    - "curl -X POST -F token=$C2MON_DAQ_ALARMSOURCE_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9143/trigger/builds"
+    # Trigger build of c2mon-daq-opcua
     - "curl -X POST -F token=$C2MON_DAQ_OPCUA_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9153/trigger/builds"
   only:
     - master
