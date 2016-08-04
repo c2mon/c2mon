@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -280,7 +280,12 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     // (may change in future is alarm state depends on quality f.eg.)
     if (tag.getValue() == null) {
       LOGGER.debug("Alarm update called with null Tag value - leaving Alarm status unchanged at " + alarm.getState());
-      return alarm;
+
+      // change the alarm timestamp if the alarm has never been initialised
+      if (alarmCacheObject.getTimestamp().equals(new Timestamp(0)) ){
+        alarmCacheObject.setTimestamp(alarmTime);
+      }
+      return alarmCacheObject;
     }
 
     if (!tag.getDataTagQuality().isInitialised()) {
@@ -342,7 +347,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     // Default case: change the alarm's state
     // (1) if the alarm has never been initialised
     // (2) if tag is VALID and the alarm changes from ACTIVE->TERMINATE or TERMIATE->ACTIVE
-    if (alarmCacheObject.getState() == null
+    if (alarmCacheObject.getTimestamp().equals(new Timestamp(0))
         || (tag.isValid() && !alarmCacheObject.getState().equals(newState))) {
       if (LOGGER.isTraceEnabled()) {
         LOGGER.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId())
