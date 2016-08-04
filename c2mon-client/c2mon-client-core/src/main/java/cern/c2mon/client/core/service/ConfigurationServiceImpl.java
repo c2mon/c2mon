@@ -45,9 +45,6 @@ import java.util.*;
 @Slf4j
 public class ConfigurationServiceImpl implements ConfigurationService {
 
-  /**
-   * Provides methods for requesting tag information from the C2MON server
-   */
   private RequestHandler clientRequestHandler;
 
   private ConfigurationRequestSender configurationRequestSender;
@@ -68,14 +65,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
   private CommandTagConfigurationManager commandTagConfigurationManager;
 
-  /**
-   * Default Constructor, used by Spring to instantiate the Singleton service
-   *
-   * @param requestHandler Provides methods for requesting tag information from the C2MON server
-   */
   @Autowired
-  protected ConfigurationServiceImpl(final @Qualifier("coreRequestHandler") RequestHandler requestHandler, final
-  ConfigurationRequestSender configurationRequestSender,
+  protected ConfigurationServiceImpl(final @Qualifier("coreRequestHandler") RequestHandler requestHandler,
+                                     final ConfigurationRequestSender configurationRequestSender,
                                      ProcessConfigurationManager processConfigurationManager,
                                      EquipmentConfigurationManager equipmentConfigurationManager,
                                      SubEquipmentConfigurationManager subEquipmentConfigurationManager,

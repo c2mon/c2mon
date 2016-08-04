@@ -201,10 +201,9 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         report = applyConfiguration(configId.intValue(), configuration.getName(), configurationElements, null);
 
       } catch (Exception ex) {
-        LOGGER.error("Exception caught while applying configuration " + configuration.getName(), ex);
-          report = new ConfigurationReport(configId, configuration.getName(), "", Status.FAILURE,
-              "Exception caught when applying configuration with name <" + configuration.getName() + ">.");
-          report.setExceptionTrace(ex);
+        LOGGER.error("Exception caught while applying configuration", ex);
+        report = new ConfigurationReport(configId, configuration.getName(), "", Status.FAILURE, "Exception caught when applying configuration");
+        report.setExceptionTrace(ex);
         throw new ConfigurationException(report, ex);
       } finally {
         clusterCache.releaseWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY);
