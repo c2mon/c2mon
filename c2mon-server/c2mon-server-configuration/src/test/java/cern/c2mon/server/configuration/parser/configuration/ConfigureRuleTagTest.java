@@ -185,7 +185,6 @@ public class ConfigureRuleTagTest {
   public void createExistingRuleTag() {
     // Setup Exception
     tagException.expect(ConfigurationParseException.class);
-    tagException.expectMessage("Error while parsing a 'create' Configuration: Id 21 of the class RuleTag already known to the server");
 
     RuleTag tag = RuleTag.create("myRuleTag", Integer.class, "ruleExpression").id(21L).build();
 
@@ -284,10 +283,9 @@ public class ConfigureRuleTagTest {
   }
 
   @Test
-  public void updateNonExistingRuleTag() {
+  public void updateNonExistentRuleTag() {
     // Setup Exception
     tagException.expect(ConfigurationParseException.class);
-    tagException.expectMessage("Updating of RuleTag (id = 20) failed: The object is unknown to the sever.");
 
     // setup Configuration:
     RuleTag ruleTag = RuleTag.update(20L).description("The description").build();
@@ -332,10 +330,9 @@ public class ConfigureRuleTagTest {
   }
 
   @Test
-  public void deleteNotExistingRuleTag() {
+  public void deleteNonExistentRuleTag() {
     // Setup Exception
     tagException.expect(ConfigurationParseException.class);
-    tagException.expectMessage("Deleting of RuleTag (id = 20) failed: The object is unknown to the sever.");
 
     // setup Configuration:
     RuleTag ruleTag = new RuleTag();

@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -47,7 +48,7 @@ public class ControlTagFactory extends EntityFactory<ControlTag> {
 
   @Override
   public List<ConfigurationElement> createInstance(ControlTag configurationEntity) {
-    return Arrays.asList(doCreateInstance(configurationEntity));
+    return Collections.singletonList(doCreateInstance(configurationEntity));
   }
 
   @Override

@@ -51,18 +51,19 @@ public class AlarmFactory extends EntityFactory<Alarm> {
   }
 
   @Override
-  public List<ConfigurationElement> createInstance(Alarm configurationEntity) {
-    Long tagId = configurationEntity.getDataTagId() != null
-        ? configurationEntity.getDataTagId() : dataTagCache.get(configurationEntity.getDataTagName()).getId();
+  public List<ConfigurationElement> createInstance(Alarm alarm) {
+    Long tagId = alarm.getDataTagId() != null
+        ? alarm.getDataTagId() : dataTagCache.get(alarm.getDataTagName()).getId();
 
     // Check if the parent id exists
     if (tagFacadeGateway.isInTagCache(tagId)) {
 
-      configurationEntity.setDataTagId(tagId);
-      return Collections.singletonList(doCreateInstance(configurationEntity));
+      alarm.setDataTagId(tagId);
+      return Collections.singletonList(doCreateInstance(alarm));
 
     } else {
-      throw new ConfigurationParseException("Creating of a new Alarm (id = " + configurationEntity.getId() + ") failed: No Tag with the id " + tagId + " found");
+      throw new ConfigurationParseException("Error creating alarm #" + alarm.getId() + ": " +
+          "Specified parent datatag #" + tagId + " does not exist!");
     }
   }
 

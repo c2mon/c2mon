@@ -289,7 +289,6 @@ public class ConfigureProcessTest {
   public void createExistingProcess() {
     // Setup Exception
     tagException.expect(ConfigurationParseException.class);
-    tagException.expectMessage("Error while parsing a 'create' Configuration: Id 1 of the class Process already known to the server");
 
     Process process = Process.create("P_TEST").id(1L).build();
 
@@ -387,10 +386,9 @@ public class ConfigureProcessTest {
   }
 
   @Test
-  public void updateNonExistingProcess() {
+  public void updateNonExistentProcess() {
     // Setup Exception
     tagException.expect(ConfigurationParseException.class);
-    tagException.expectMessage("Updating of Process (id = 1) failed: The object is unknown to the sever.");
 
     // setup Configuration:
     Process process = Process.update(1L).description("The description").build();
@@ -437,10 +435,9 @@ public class ConfigureProcessTest {
   }
 
   @Test
-  public void deleteNotExistingProcess() {
+  public void deleteNonExistentProcess() {
     // Setup Exception
     tagException.expect(ConfigurationParseException.class);
-    tagException.expectMessage("Deleting of Process (id = 1) failed: The object is unknown to the sever.");
 
     // setup Configuration:
     Process process = buildDeleteProcess(1L);

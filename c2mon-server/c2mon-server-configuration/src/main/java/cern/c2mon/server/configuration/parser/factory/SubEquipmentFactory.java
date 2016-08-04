@@ -25,7 +25,6 @@ import cern.c2mon.server.cache.loading.SubEquipmentDAO;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
-import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.tag.CommFaultTag;
 import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
@@ -36,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by fritter on 01/06/16.
+ * @author Franz Ritter
  */
 @Service
 public class SubEquipmentFactory extends EntityFactory<SubEquipment> {
@@ -60,32 +59,33 @@ public class SubEquipmentFactory extends EntityFactory<SubEquipment> {
   }
 
   @Override
-  public List<ConfigurationElement> createInstance(SubEquipment configurationEntity) {
+  public List<ConfigurationElement> createInstance(SubEquipment subEquipment) {
     List<ConfigurationElement> configurationElements = new ArrayList<>();
 
-    Long equipmentId = configurationEntity.getEquipmentId() != null
-        ? configurationEntity.getEquipmentId() : equipmentDAO.getIdByName(configurationEntity.getParentEquipmentName());
-    configurationEntity.setEquipmentId(equipmentId);
+    Long equipmentId = subEquipment.getEquipmentId() != null
+        ? subEquipment.getEquipmentId() : equipmentDAO.getIdByName(subEquipment.getParentEquipmentName());
+    subEquipment.setEquipmentId(equipmentId);
 
     // check information about the parent id
     if (equipmentCache.hasKey(equipmentId)) {
 
-      ConfigurationElement createSubEquipment = doCreateInstance(configurationEntity);
-      configurationEntity = setDefaultControlTags(configurationEntity);
+      ConfigurationElement createSubEquipment = doCreateInstance(subEquipment);
+      subEquipment = setDefaultControlTags(subEquipment);
 
-      configurationElements.addAll(controlTagFactory.createInstance(configurationEntity.getCommFaultTag()));
-      configurationElements.addAll(controlTagFactory.createInstance(configurationEntity.getStatusTag()));
-      configurationElements.addAll(controlTagFactory.createInstance(configurationEntity.getAliveTag()));
+      configurationElements.addAll(controlTagFactory.createInstance(subEquipment.getCommFaultTag()));
+      configurationElements.addAll(controlTagFactory.createInstance(subEquipment.getStatusTag()));
+      configurationElements.addAll(controlTagFactory.createInstance(subEquipment.getAliveTag()));
 
-      createSubEquipment.getElementProperties().setProperty("statusTagId", configurationEntity.getStatusTag().getId().toString());
-      createSubEquipment.getElementProperties().setProperty("commFaultTagId", configurationEntity.getCommFaultTag().getId().toString());
-      createSubEquipment.getElementProperties().setProperty("aliveTagId", configurationEntity.getAliveTag().getId().toString());
+      createSubEquipment.getElementProperties().setProperty("statusTagId", subEquipment.getStatusTag().getId().toString());
+      createSubEquipment.getElementProperties().setProperty("commFaultTagId", subEquipment.getCommFaultTag().getId().toString());
+      createSubEquipment.getElementProperties().setProperty("aliveTagId", subEquipment.getAliveTag().getId().toString());
 
       configurationElements.add(createSubEquipment);
 
       return configurationElements;
     } else {
-      throw new ConfigurationParseException("Creating of a new SubEquipment (id = " + configurationEntity.getId() + ") failed: No Equipment with the id " + equipmentId + " found");
+      throw new ConfigurationParseException("Error creating subequipment #" + subEquipment.getId() + ": " +
+          "Specified parent equipment does not exist!");
     }
   }
 
@@ -93,7 +93,7 @@ public class SubEquipmentFactory extends EntityFactory<SubEquipment> {
    * Checks if the Equipment has a defined {@link CommFaultTag} or {@link StatusTag}.
    * If not a automatic Status tag will be created and attached to the equipment configuration.
    *
-   * @param process The Equipment which contains the information of an create.
+   * @param subEquipment The Equipment which contains the information of an create.
    * @return The same equipment from the parameters attached with the status tag information.
    */
   protected static SubEquipment setDefaultControlTags(SubEquipment subEquipment) {
@@ -120,7 +120,8 @@ public class SubEquipmentFactory extends EntityFactory<SubEquipment> {
     if (subEquipment.getAliveTag() != null && subEquipment.getAliveTag().getAddress() != null) {
       subEquipment.getAliveTag().setProcessId(subEquipment.getId());
     } else {
-      throw new ConfigurationParseException("Creating of a new SubEquipment (id = " + subEquipment.getId() + ") failed: You have to specify a AliveTag with DataTagAddress");
+      throw new ConfigurationParseException("Error creating subequipment #" + subEquipment.getId() + ": " +
+          "No alive tag address was specified!");
     }
 
     return subEquipment;

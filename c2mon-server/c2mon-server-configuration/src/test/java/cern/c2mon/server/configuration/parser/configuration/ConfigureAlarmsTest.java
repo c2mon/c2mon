@@ -181,10 +181,9 @@ public class ConfigureAlarmsTest {
   }
 
   @Test
-  public void createAlarmWithNotExistingTag() {
+  public void createAlarmWithNonExistentTag() {
     // Setup Exception
     alarmException.expect(ConfigurationParseException.class);
-    alarmException.expectMessage("Creating of a new Alarm (id = 200) failed: No Tag with the id 100 found");
 
     Alarm alarm = buildCreateBasicAlarm(null);
     alarm.setId(200L);
@@ -207,7 +206,6 @@ public class ConfigureAlarmsTest {
   public void createExistingAlarm() {
     // Setup Exception
     alarmException.expect(ConfigurationParseException.class);
-    alarmException.expectMessage("Error while parsing a 'create' Configuration: Id 200 of the class Alarm already known to the server");
 
     Alarm alarm = buildCreateBasicAlarm(null);
     alarm.setId(200L);
@@ -254,10 +252,9 @@ public class ConfigureAlarmsTest {
   }
 
   @Test
-  public void updateNonExistingAlarm() {
+  public void updateNonExistentAlarm() {
     // Setup Exception
     alarmException.expect(ConfigurationParseException.class);
-    alarmException.expectMessage("Updating of Alarm (id = 200) failed: The object is unknown to the sever.");
 
     // setup Configuration:
     Alarm alarm = Alarm.update(200L).metadata(null).build();
@@ -303,10 +300,9 @@ public class ConfigureAlarmsTest {
   }
 
   @Test
-  public void deleteNotExistingAlarm() {
+  public void deleteNonExistentAlarm() {
     // Setup Exception
     alarmException.expect(ConfigurationParseException.class);
-    alarmException.expectMessage("Deleting of Alarm (id = 200) failed: The object is unknown to the sever.");
 
     // setup Configuration:
     Alarm alarm = buildDeleteAlarm(200L);

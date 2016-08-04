@@ -104,7 +104,7 @@ public class ReflectionService {
         }
       }
     } catch (Exception e) {
-      throw new ConfigurationParseException("Error: Problem occurred while extracting values from the configuration " + object + ": ", e);
+      throw new ConfigurationParseException("Error extracting values from the configuration " + object + ": ", e);
     }
     return properties;
   }
@@ -163,7 +163,7 @@ public class ReflectionService {
         }
       }
     } catch (Exception e) {
-      throw new ConfigurationParseException("Error: Problem occurred while setting default values from the configuration " + object + ": ", e);
+      throw new ConfigurationParseException("Error setting default values from the configuration " + object + ": ", e);
     }
     return properties;
   }

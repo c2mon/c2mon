@@ -59,36 +59,37 @@ public class EquipmentFactory extends EntityFactory<Equipment> {
   }
 
   @Override
-  public List<ConfigurationElement> createInstance(Equipment configurationEntity) {
+  public List<ConfigurationElement> createInstance(Equipment equipment) {
     List<ConfigurationElement> configurationElements = new ArrayList<>();
 
-    Long processId = configurationEntity.getProcessId() != null
-        ? configurationEntity.getProcessId() : processDAO.getIdByName(configurationEntity.getParentProcessName());
-    configurationEntity.setProcessId(processId);
+    Long processId = equipment.getProcessId() != null
+        ? equipment.getProcessId() : processDAO.getIdByName(equipment.getParentProcessName());
+    equipment.setProcessId(processId);
 
     // check information about the parent id
     if (processCache.hasKey(processId)) {
 
-      ConfigurationElement createEquipment = doCreateInstance(configurationEntity);
-      configurationEntity = setDefaultControlTags(configurationEntity);
+      ConfigurationElement createEquipment = doCreateInstance(equipment);
+      equipment = setDefaultControlTags(equipment);
 
-      configurationElements.addAll(controlTagFactory.createInstance(configurationEntity.getCommFaultTag()));
-      configurationElements.addAll(controlTagFactory.createInstance(configurationEntity.getStatusTag()));
+      configurationElements.addAll(controlTagFactory.createInstance(equipment.getCommFaultTag()));
+      configurationElements.addAll(controlTagFactory.createInstance(equipment.getStatusTag()));
 
-      if (configurationEntity.getAliveTag() != null) {
-        configurationElements.addAll(controlTagFactory.createInstance(configurationEntity.getAliveTag()));
-        createEquipment.getElementProperties().setProperty("aliveTagId", configurationEntity.getAliveTag().getId().toString());
+      if (equipment.getAliveTag() != null) {
+        configurationElements.addAll(controlTagFactory.createInstance(equipment.getAliveTag()));
+        createEquipment.getElementProperties().setProperty("aliveTagId", equipment.getAliveTag().getId().toString());
       }
 
-      createEquipment.getElementProperties().setProperty("statusTagId", configurationEntity.getStatusTag().getId().toString());
-      createEquipment.getElementProperties().setProperty("commFaultTagId", configurationEntity.getCommFaultTag().getId().toString());
+      createEquipment.getElementProperties().setProperty("statusTagId", equipment.getStatusTag().getId().toString());
+      createEquipment.getElementProperties().setProperty("commFaultTagId", equipment.getCommFaultTag().getId().toString());
 
 
       configurationElements.add(createEquipment);
 
       return configurationElements;
     } else {
-      throw new ConfigurationParseException("Creating of a new Equipment (id = " + configurationEntity.getId() + ") failed: No Process with the id " + processId + " found");
+      throw new ConfigurationParseException("Error creating equipment #" + equipment.getId() + ": " +
+          "Specified parent process does not exist!");
     }
   }
 

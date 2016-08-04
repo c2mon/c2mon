@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -55,19 +56,20 @@ public class CommandTagFactory extends EntityFactory<CommandTag> {
   }
 
   @Override
-  public List<ConfigurationElement> createInstance(CommandTag configurationEntity) {
+  public List<ConfigurationElement> createInstance(CommandTag commandTag) {
 
-    Long equipmentId = configurationEntity.getEquipmentId() != null
-        ? configurationEntity.getEquipmentId() : equipmentDAO.getIdByName(configurationEntity.getEquipmentName());
+    Long equipmentId = commandTag.getEquipmentId() != null
+        ? commandTag.getEquipmentId() : equipmentDAO.getIdByName(commandTag.getEquipmentName());
 
     // Check if the parent id exists
     if (equipmentCache.hasKey(equipmentId)) {
 
-      configurationEntity.setEquipmentId(equipmentId);
+      commandTag.setEquipmentId(equipmentId);
+      return Collections.singletonList(doCreateInstance(commandTag));
 
-      return Arrays.asList(doCreateInstance(configurationEntity));
     } else {
-      throw new ConfigurationParseException("Creating of a new CommandTag (id = " + configurationEntity.getId() + ") failed: No Equipment with the id " + equipmentId + " found");
+      throw new ConfigurationParseException("Error creating commandtag #" + commandTag.getId() + ": " +
+          "Specified parent equipment does not exist!");
     }
   }
 

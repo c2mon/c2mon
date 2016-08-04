@@ -74,7 +74,7 @@ public class ConfigurationParserImpl implements ConfigurationParser {
       return parseConfigurationList(configuration.getEntities());
     } else {
 
-      throw new ConfigurationParseException("Warning: Empty configuration received");
+      throw new ConfigurationParseException("Empty configuration received!");
     }
   }
 
@@ -99,14 +99,15 @@ public class ConfigurationParserImpl implements ConfigurationParser {
       } else if (configurationEntity.isCreated()) {
         results.addAll(entityFactory.createInstance(configurationEntity));
       } else {
-        throw new ConfigurationParseException("Error while parsing a " + configurationEntity.getClass() + ": No action flag set.");
+        throw new ConfigurationParseException("Error while parsing a " + configurationEntity.getClass() + ": No action flag set!");
       }
     }
     return results;
   }
 
   /**
-   * Determine the correct {@link EntityFactory} based on the instance of the {@link ConfigurationEntity}.
+   * Determine the correct {@link EntityFactory} based on the instance of the
+   * {@link ConfigurationEntity}.
    *
    * @param entity A entity for creating a {@link ConfigurationElement}.
    * @return The corresponding factory.
@@ -136,7 +137,7 @@ public class ConfigurationParserImpl implements ConfigurationParser {
     if (entity instanceof CommandTag) {
       return commandTagFactory;
     }
-    throw new IllegalArgumentException("No EntityFactory for the Instances of class " + entity.getClass() + " specified");
+    throw new IllegalArgumentException("No EntityFactory for class " + entity.getClass() + " could be determined!");
   }
 
 }

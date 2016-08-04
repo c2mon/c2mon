@@ -211,10 +211,9 @@ public class ConfigureDataTagTest {
   }
 
   @Test
-  public void createDataTagWithNotExistingEquipment() {
+  public void createDataTagWithNonExistentEquipment() {
     // Setup Exception
     tagException.expect(ConfigurationParseException.class);
-    tagException.expectMessage("Creating of a new DataTag (id = 21) failed: No Equipment with the id 10 found");
 
     DataTag tag = DataTag.create("myDataTag", Integer.class, new DataTagAddress()).id(21L).build();
     tag.setEquipmentId(10L);
@@ -237,7 +236,6 @@ public class ConfigureDataTagTest {
   public void createExistingDataTag() {
     // Setup Exception
     tagException.expect(ConfigurationParseException.class);
-    tagException.expectMessage("Error while parsing a 'create' Configuration: Id 21 of the class DataTag already known to the server");
 
     DataTag tag = DataTag.create("myDataTag", Integer.class, new DataTagAddress()).id(21L).build();
     tag.setEquipmentId(10L);
@@ -337,10 +335,9 @@ public class ConfigureDataTagTest {
   }
 
   @Test
-  public void updateNonExistingDataTag() {
+  public void updateNonExistentDataTag() {
     // Setup Exception
     tagException.expect(ConfigurationParseException.class);
-    tagException.expectMessage("Updating of DataTag (id = 20) failed: The object is unknown to the sever.");
 
     // setup Configuration:
     DataTag dataTag = DataTag.update(20L).description("The description").build();
@@ -389,7 +386,6 @@ public class ConfigureDataTagTest {
   public void deleteNonExistentDataTag() {
     // Setup Exception
     tagException.expect(ConfigurationParseException.class);
-    tagException.expectMessage("Deleting of DataTag (id = 20) failed: The object is unknown to the sever.");
 
     // setup Configuration:
     DataTag dataTag = new DataTag();

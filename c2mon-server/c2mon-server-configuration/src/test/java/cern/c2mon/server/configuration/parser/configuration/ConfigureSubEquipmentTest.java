@@ -304,10 +304,9 @@ public class ConfigureSubEquipmentTest {
   }
 
   @Test
-  public void createSubEquipmentWithNotExistingProcess() {
+  public void createSubEquipmentWithNonExistentProcess() {
     // Setup Exception
     tagException.expect(ConfigurationParseException.class);
-    tagException.expectMessage("Creating of a new SubEquipment (id = 10) failed: No Equipment with the id 1 found");
 
     SubEquipment subEquipment = SubEquipment.create("myEquipment").id(10L).build();
     subEquipment.setEquipmentId(1L);
@@ -331,7 +330,6 @@ public class ConfigureSubEquipmentTest {
   public void createExistingSubEquipment() {
     // Setup Exception
     tagException.expect(ConfigurationParseException.class);
-    tagException.expectMessage("Error while parsing a 'create' Configuration: Id 10 of the class SubEquipment already known to the server");
 
     SubEquipment equipment = SubEquipment.create("E_TEST").id(10L).build();
     equipment.setEquipmentId(1L);
@@ -431,10 +429,9 @@ public class ConfigureSubEquipmentTest {
   }
 
   @Test
-  public void updateNonExistingSubEquipment() {
+  public void updateNonExistentSubEquipment() {
     // Setup Exception
     tagException.expect(ConfigurationParseException.class);
-    tagException.expectMessage("Updating of SubEquipment (id = 10) failed: The object is unknown to the sever.");
 
     // setup Configuration:
     SubEquipment subEquipment = SubEquipment.update(10L).description("The description").build();
@@ -480,10 +477,9 @@ public class ConfigureSubEquipmentTest {
   }
 
   @Test
-  public void deleteNotExistingSubEquipment() {
+  public void deleteNonExistentSubEquipment() {
     // Setup Exception
     tagException.expect(ConfigurationParseException.class);
-    tagException.expectMessage("Deleting of SubEquipment (id = 10) failed: The object is unknown to the sever.");
 
     // setup Configuration:
     SubEquipment subEquipment = buildDeleteSubEquipment(10L);
