@@ -49,8 +49,8 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
     Long entityId = createId(configurationEntity);
 
     if (cacheHasEntity(entityId)) {
-      throw new ConfigurationParseException("Error while parsing a 'create' Configuration:" +
-          " Id " + entityId + " of the class " + configurationEntity.getClass().getSimpleName() + " already known to the server");
+      throw new ConfigurationParseException("Error creating entity: "
+          + configurationEntity.getClass().getSimpleName() + " with id " + entityId + " already exists!");
     }
 
     configurationEntity.setId(entityId);
@@ -82,8 +82,8 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
       return element;
 
     } else {
-      throw new ConfigurationParseException("Updating of " + configurationEntity.getClass().getSimpleName() +
-          " (id = " + configurationEntity.getId() + ") failed: The object is unknown to the sever.");
+      throw new ConfigurationParseException("Error updating entity: "
+          + configurationEntity.getClass().getSimpleName() + " with id " + entityId + " does not exist!");
     }
   }
 
@@ -105,8 +105,8 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
       return element;
 
     } else {
-      throw new ConfigurationParseException("Deleting of " + configurationEntity.getClass().getSimpleName() +
-          " (id = " + entityId + ") failed: The object is unknown to the sever.");
+      throw new ConfigurationParseException("Error updating entity: "
+          + configurationEntity.getClass().getSimpleName() + " with id " + entityId + " does not exist!");
     }
   }
 

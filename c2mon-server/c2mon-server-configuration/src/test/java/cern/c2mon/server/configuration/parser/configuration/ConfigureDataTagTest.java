@@ -386,7 +386,7 @@ public class ConfigureDataTagTest {
   }
 
   @Test
-  public void deleteNotExistingDataTag() {
+  public void deleteNonExistentDataTag() {
     // Setup Exception
     tagException.expect(ConfigurationParseException.class);
     tagException.expectMessage("Deleting of DataTag (id = 20) failed: The object is unknown to the sever.");

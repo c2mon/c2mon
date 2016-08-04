@@ -69,7 +69,6 @@ public class ConfigurationParserImpl implements ConfigurationParser {
 
   @Override
   public List<ConfigurationElement> parse(Configuration configuration) {
-
     if (configuration.getEntities() != null && !configuration.getEntities().isEmpty()) {
 
       return parseConfigurationList(configuration.getEntities());
