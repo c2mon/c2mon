@@ -26,10 +26,7 @@ import cern.c2mon.shared.common.datatag.DataTagAddress;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static cern.c2mon.client.core.configuration.util.ConfigurationUtil.*;
 
@@ -46,31 +43,20 @@ public class DataTagConfigurationManagerImpl implements DataTagConfigurationMana
     this.configurationRequestSender = configurationRequestSender;
   }
 
-
   @Override
   public ConfigurationReport createDataTag(String equipmentName, String name, Class<?> dataType, DataTagAddress address) {
-
     return createDataTag(equipmentName, DataTag.create(name, dataType, address).build());
-
   }
 
   @Override
   public ConfigurationReport createDataTag(String equipmentName, DataTag dataTag) {
-
-
-    List<DataTag> dummyDataTagList = new ArrayList<>();
-    dummyDataTagList.add(dataTag);
-
-    return createDataTags(equipmentName, dummyDataTagList);
+    return createDataTags(equipmentName, Collections.singletonList(dataTag));
   }
 
   @Override
   public ConfigurationReport createDataTags(String equipmentName, List<DataTag> tags) {
-
-    // validate the Configuration object
     validateIsCreate(tags);
 
-    // Set parent Ids to the configuration
     for (DataTag tag : tags) {
       tag.setEquipmentName(equipmentName);
     }
@@ -83,17 +69,11 @@ public class DataTagConfigurationManagerImpl implements DataTagConfigurationMana
 
   @Override
   public ConfigurationReport updateDataTag(DataTag tag) {
-
-    List<DataTag> dummyTagList = new ArrayList<>();
-    dummyTagList.add(tag);
-
-    return updateDataTags(dummyTagList);
+    return updateDataTags(Collections.singletonList(tag));
   }
 
   @Override
   public ConfigurationReport updateDataTags(List<DataTag> tags) {
-
-    // validate the Configuration object
     validateIsUpdate(tags);
 
     Configuration config = new Configuration();
@@ -104,24 +84,18 @@ public class DataTagConfigurationManagerImpl implements DataTagConfigurationMana
 
   @Override
   public ConfigurationReport removeDataTagById(Long id) {
-
-    Set<Long> dummyTagIdList = new HashSet<>();
-    dummyTagIdList.add(id);
-
-    return removeDataTagsById(dummyTagIdList);
+    return removeDataTagsById(Collections.singleton(id));
   }
 
   @Override
   public ConfigurationReport removeDataTagsById(Set<Long> ids) {
-
     List<Tag> tagsToDelete = new ArrayList<>();
 
     for (Long id : ids) {
-      DataTag deleteTag = new DataTag();
-      deleteTag.setId(id);
-      deleteTag.setDeleted(true);
-
-      tagsToDelete.add(deleteTag);
+      DataTag tagToDelete = new DataTag();
+      tagToDelete.setId(id);
+      tagToDelete.setDeleted(true);
+      tagsToDelete.add(tagToDelete);
     }
 
     Configuration config = new Configuration();
@@ -132,23 +106,18 @@ public class DataTagConfigurationManagerImpl implements DataTagConfigurationMana
 
   @Override
   public ConfigurationReport removeDataTag(String name) {
-
-    Set<String> dummyTagNameList = new HashSet<>();
-    dummyTagNameList.add(name);
-
-    return removeDataTags(dummyTagNameList);
+    return removeDataTags(Collections.singleton(name));
   }
 
   @Override
   public ConfigurationReport removeDataTags(Set<String> tagNames) {
-
     List<Tag> tagsToDelete = new ArrayList<>();
 
     for (String tagName : tagNames) {
-      DataTag deleteTag = new DataTag();
-      deleteTag.setName(tagName);
-      deleteTag.setDeleted(true);
-      tagsToDelete.add(deleteTag);
+      DataTag tagToDelete = new DataTag();
+      tagToDelete.setName(tagName);
+      tagToDelete.setDeleted(true);
+      tagsToDelete.add(tagToDelete);
     }
 
     Configuration config = new Configuration();
