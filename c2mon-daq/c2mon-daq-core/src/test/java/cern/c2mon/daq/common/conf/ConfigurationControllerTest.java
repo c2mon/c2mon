@@ -225,7 +225,7 @@ public class ConfigurationControllerTest {
     }
 
     @Test
-    public void testRemoveNonExistingSourceDataTag() {
+    public void testRemoveNonExistentSourceDataTag() {
         DataTagRemove dataTagRemove = new DataTagRemove(3434L, TEST_NOT_EXIST_ID, TEST_EQUIPMENT_ID);
         IEquipmentConfiguration equipmentConfiguration = processConfiguration.getEquipmentConfigurations().get(
                 TEST_EQUIPMENT_ID);
@@ -273,7 +273,7 @@ public class ConfigurationControllerTest {
     }
 
     @Test
-    public void testRemoveExistingCommandDataTag() {
+    public void testRemoveExistentCommandDataTag() {
         CommandTagRemove commandTagRemove = new CommandTagRemove(3434L, TEST_COMMAND_TAG_ID, TEST_EQUIPMENT_ID);
         IEquipmentConfiguration equipmentConfiguration = processConfiguration.getEquipmentConfigurations().get(
                 TEST_EQUIPMENT_ID);
@@ -284,7 +284,7 @@ public class ConfigurationControllerTest {
     }
 
     @Test
-    public void testRemoveNonExistingCommandDataTag() {
+    public void testRemoveNonExistentCommandDataTag() {
         CommandTagRemove commandTagRemove = new CommandTagRemove(3434L, TEST_NOT_EXIST_ID, TEST_EQUIPMENT_ID);
         IEquipmentConfiguration equipmentConfiguration = processConfiguration.getEquipmentConfigurations().get(
                 TEST_EQUIPMENT_ID);

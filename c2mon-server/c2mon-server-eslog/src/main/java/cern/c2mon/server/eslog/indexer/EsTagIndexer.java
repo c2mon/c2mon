@@ -171,8 +171,8 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
       return false;
     }
 
-    boolean indexIsPresent = createNotExistingIndex(index);
-    boolean typeIsPresent = createNotExistingMapping(index, type, tag);
+    boolean indexIsPresent = createNonExistentIndex(index);
+    boolean typeIsPresent = createNonExistentMapping(index, type, tag);
 
     String tagJson = tag.toString();
     log.debug("indexByBatch() - New IndexRequest for index" + index + " and source " + tagJson);
@@ -230,8 +230,8 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
       return false;
     }
 
-    boolean indexIsPresent = createNotExistingIndex(index);
-    boolean typeIsPresent = createNotExistingMapping(index, type, tag);
+    boolean indexIsPresent = createNonExistentIndex(index);
+    boolean typeIsPresent = createNonExistentMapping(index, type, tag);
 
     String tagJson = tag.toString();
     log.debug("indexByBatch() - New IndexRequest for index" + index + " and source " + tagJson);
@@ -247,7 +247,7 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
     return index.matches("^" + indexPrefix + "-(alarm|supervision|tag)_\\d\\d\\d\\d-\\d\\d-?\\d?\\d?$");
   }
 
-  private boolean createNotExistingIndex(String index) {
+  private boolean createNonExistentIndex(String index) {
     if (cacheIndicesTypes.containsKey(index)) {
       return true;
     }
@@ -272,7 +272,7 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
     return false;
   }
 
-  private boolean createNotExistingMapping(String index, String type, EsTag tag) {
+  private boolean createNonExistentMapping(String index, String type, EsTag tag) {
     if (mappingExists(index, type)) {
       return true;
     }
