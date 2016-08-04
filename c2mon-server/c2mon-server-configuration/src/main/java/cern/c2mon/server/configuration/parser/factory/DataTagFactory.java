@@ -92,12 +92,13 @@ public class DataTagFactory extends EntityFactory<DataTag> {
 
       parentId = dataTag.getSubEquipmentId() != null ? dataTag.getSubEquipmentId() : subEquipmentDAO.getIdByName
           (dataTag.getSubEquipmentName());
-      dataTag.setSubEquipmentId(parentId);
 
-      if (!subEquipmentCache.hasKey(parentId)) {
+      if (parentId == null || !subEquipmentCache.hasKey(parentId)) {
         throw new ConfigurationParseException("Error creating datatag #" + dataTag.getId() + ": " +
             "Specified parent subequipment does not exist!");
       }
+
+      dataTag.setSubEquipmentId(parentId);
     } else {
       throw new ConfigurationParseException("Error creating datatag #" + dataTag.getId() + ": " +
           "No parent equipment or subequipment specified!");
