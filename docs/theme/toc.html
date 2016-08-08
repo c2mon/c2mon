@@ -1,0 +1,60 @@
+<div class="bs-sidebar hidden-print affix well" role="complementary">
+  {% for nav_item in nav %}
+  {% if nav_item.active %}
+
+  {% if nav_item.children %}
+  {% set top_url = nav_item.children[0].url %}
+  {% else %}
+  {% set top_url = nav_item.url %}
+  {% endif %}
+  <h4>
+    <a href="{{ top_url }}">{{ nav_item.title }}</a>
+  </h4>
+
+
+  {% if not nav_item.children %}
+  <ul class="nav bs-sidenav first-level">
+    {% for toc_item in toc %}
+    {% for toc_item in toc_item.children %}
+    {% include "toc-sub.html" %}
+    {% endfor %}
+    {% endfor %}
+  </ul>
+
+  {% else %}
+
+
+  <ul class="nav bs-sidenav first-level">
+    {% for toc_item in nav_item.children %}
+
+    {% if not toc_item.title == 'Home' %}
+    <li class="{% if toc_item.active %}active{% endif %}">
+
+      {% if toc_item.children %}
+      {% set url = toc_item.children[0].url %}
+      {% else %}
+      {% set url = toc_item.url %}
+      {% endif %}
+
+      {% if toc_item.children and toc_item.active %}
+      <a href="{{ url }}">{{ toc_item.title }}</a>
+      <ul class="nav bs-sidenav second-level">
+        {% for toc_item in toc_item.children %}
+
+        {% include "toc-sub.html" %}
+
+        {% endfor %}
+      </ul>
+      {% else %}
+      <a href="{{ url }}">{{ toc_item.title }}</a>
+      {% endif %}
+    </li>
+    {% endif %}
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% endif %}
+  {% endfor %}
+
+  <div id="version-switcher" style="position: absolute; margin-top: 10px; width: 100%"></div>
+</div>

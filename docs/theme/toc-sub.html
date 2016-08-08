@@ -1,0 +1,19 @@
+{% if not toc_item.title == 'Home' %}
+<li>
+  <a href="{{ toc_item.url }}">{{ toc_item.title }}</a>
+
+  {% if toc_item.active %}
+  <ul class="nav bs-sidenav third-level">
+    {% for toc_item in toc %}
+    {% for toc_item in toc_item.children %}
+    {% if not toc_item.title == 'Home' %}
+    <li>
+      <a href="{{ toc_item.url }}">{{ toc_item.title }}</a>
+    </li>
+    {% endif %}
+    {% endfor %}
+    {% endfor %}
+  </ul>
+  {% endif %}
+</li>
+{% endif %}

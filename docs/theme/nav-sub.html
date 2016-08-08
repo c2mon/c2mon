@@ -1,0 +1,18 @@
+{% if not nav_item.children %}
+<li {% if nav_item.active %}class="active"{% endif %}>
+    <a href="{{ nav_item.url }}">{{ nav_item.title }}</a>
+</li>
+{% else %}
+  <li class="dropdown-submenu">
+    {% set first_item = nav_item.children[0] %}
+
+    <a tabindex="-1" href="{{ first_item.url }}">{{ nav_item.title }}</a>
+    <ul class="dropdown-menu">
+        {% for nav_item in nav_item.children %}
+          {% if nav_item.title != 'Home' %}
+            {% include "nav-sub.html" %}
+          {% endif %}
+        {% endfor %}
+    </ul>
+  </li>
+{% endif %}

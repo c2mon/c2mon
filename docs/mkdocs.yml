@@ -1,0 +1,39 @@
+site_name: C2MON
+site_url: http://cern.ch/c2mon
+docs_dir: ./src
+site_dir: ./target
+site_favicon: favicon.ico
+
+theme_dir: ./theme
+#theme: readthedocs
+
+pages:
+  - Home: 'index.md'
+  - Overview:
+    - 'overview.md'
+    - Core Concepts:
+      - 'core-concepts/index.md'
+      - 'Process/Equipment': 'core-concepts/process-equipment.md'
+      - 'core-concepts/tags.md'
+      - 'core-concepts/supervision.md'
+      - 'core-concepts/alarms.md'
+      - 'Class/Device/Property': 'core-concepts/class-device-property.md'
+  - Installation: 'installation.md'
+  - User Guide:
+    - 'user-guide/index.md'
+    - Client API:
+      - 'user-guide/client-api/index.md'
+      - 'user-guide/client-api/subscribing.md'
+      - 'user-guide/client-api/configuration.md'
+      - 'user-guide/client-api/history.md'
+    - DAQ API:
+      - 'user-guide/daq-api/DAQ_module_developer_guide.md'
+      - 'user-guide/daq-api/DAQ_module_testing_guide.md'
+    - Rule Engine: 'user-guide/rule-engine.md'
+  - Appendices:
+    - 'appendices/database_structure.md'
+
+markdown_extensions:
+  - toc:
+      permalink: True
+  - admonition

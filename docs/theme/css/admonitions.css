@@ -1,0 +1,52 @@
+/* Common styles for all types */
+.admonition {
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #eee;
+    border-left-width: 5px;
+    border-radius: 3px;
+    background-color: #fCfCfc;
+}
+.admonition .admonition-title {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+.admonition p:last-child, .admonition ul:last-child, .admonition ol:last-child {
+    margin-bottom: 0;
+}
+.admonition code {
+    border-radius: 3px;
+}
+
+/* Tighten up space between multiple admonitions */
+.admonition + .admonition {
+    margin-top: -5px;
+}
+
+/* Variations */
+.admonition.danger {
+    border-left-color: #d9534f;
+}
+.admonition.danger .admonition-title {
+    color: #d9534f;
+}
+.admonition.warning {
+    border-left-color: #f0ad4e;
+}
+.admonition.warning .admonition-title {
+    color: #f0ad4e;
+}
+.admonition.info {
+    border-left-color: #5bc0de;
+}
+.admonition.info .admonition-title {
+    color: #5bc0de;
+}
+
+/* Title */
+.admonition-title {
+    font-size: 18px;
+    font-family: inherit;
+    font-weight: 500;
+    line-height: 1.1;
+}

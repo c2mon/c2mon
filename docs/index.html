@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+<title>C2MON Homepage</title>
+<!-- Meta -->
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="C2MON homepage">
+<meta name="author" content="Matthias Braeger">
+
+
+<!--
+<script src="assets/plugins/jquery-1.11.1.min.js"></script>
+<script>
+  $(function() {
+    $("#header").load("header.html");
+  });
+</script>
+-->
+
+<link rel="shortcut icon" href="favicon.ico">
+<link href='https://fonts.googleapis.com/css?family=Lato:300,400,300italic,400italic' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+<!--
+<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400,700,300italic,400italic' rel='stylesheet' type='text/css'>
+ -->
+<!-- Global CSS -->
+<link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
+<!-- Plugins CSS -->
+<link rel="stylesheet" href="assets/plugins/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" href="assets/plugins/prism/prism.css">
+<!-- Theme CSS -->
+<link id="theme-style" rel="stylesheet" href="assets/css/styles-c2mon.css">
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body data-spy="scroll">
+
+  <!-- ******HEADER****** -->
+  <header id="header" class="header">
+    <div class="container">
+      <h1 class="logo pull-left">
+        <a class="scrollto" href="#promo">
+          <span class="logo-title">C2MON</span>
+        </a>
+      </h1>
+      <!-- //logo -->
+      <nav id="main-nav" class="main-nav navbar-right" role="navigation">
+        <div class="navbar-header">
+          <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-collapse">
+            <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+          </button>
+          <!-- //nav-toggle -->
+        </div>
+        <!-- //navbar-header -->
+        <div class="navbar-collapse collapse" id="navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active nav-item sr-only"><a class="scrollto" href="#promo">Home</a></li>
+            <li class="nav-item"><a class="scrollto" href="#about">About</a></li>
+            <li class="nav-item"><a class="scrollto" href="#features">Features</a></li>
+            <li class="nav-item"><a class="scrollto" href="#examples">Examples</a></li>
+            <li class="nav-item"><a href="docs/build/index.html">Docs</a></li>
+            <li class="nav-item"><a href="download.html">Download</a></li>
+            <li class="nav-item last"><a class="scrollto" href="#contact">Contact</a></li>
+          </ul>
+          <!-- //nav -->
+        </div>
+        <!-- //navabr-collapse -->
+      </nav>
+      <!-- //main-nav -->
+    </div>
+  </header>
+  <!--//header-->
+
+  <!-- <div id="header"></div> -->
+
+  <!-- ******PROMO****** -->
+  <section id="promo" class="promo section offset-header">
+    <div class="container text-center">
+      <h2 class="title">C2MON</h2>
+      <p class="intro">A highly scalable control and monitoring platform.</p>
+      <div class="btns">
+        <a class="btn btn-cta-primary scrollto" href="#about" target="_blank">About</a>
+        <a class="btn btn-cta-primary" href="docs/build/index.html" target="_blank">Documentation</a>
+      </div>
+      <ul class="meta list-inline">
+        <!--
+        <li><a href="https://gitlab.cern.ch/c2mon" target="_blank">View on CERN GitLab</a></li>
+         -->
+        <li>Created by: <a href="http://cern.ch" target="_blank">CERN</a>
+        </li>
+      </ul>
+      <!--//meta-->
+    </div>
+    <!--//container-->
+  </section>
+  <!--//promo-->
+
+  <!-- ******ABOUT****** -->
+  <section id="about" class="about section">
+    <div class="container">
+      <h2 class="title text-center">What is C2MON?</h2>
+      <p class="intro text-center">
+        C2MON is a modular Java framework for quickly realising highly available, large industrial monitoring and control solutions.
+        It has been developed for CERN’s demanding infrastructure monitoring needs and is based on more than 10 years of experience with the
+        Technical Infrastructure Monitoring (TIM) systems at CERN.
+        <br><br>
+        It comes with a simple and intuitive <a href="docs/build/user-guide/client-api/" target="_blank">data subscription API</a> with
+        integrated history browsing capabilities that can be used to form the basis for industrial dashboards and other graphical monitoring applications.
+        Powerful data filtering and <a href="docs/build/user-guide/client-api/configuration/" target="_blank">configuration mechanisms</a>
+        help fine tune data flow and prevent data burst situations.
+      </p>
+      <div class="row">
+        <div class="item col-md-4 col-sm-6 col-xs-12">
+          <div class="icon-holder">
+            <i class="fa fa-heartbeat"></i>
+          </div>
+          <div class="content">
+            <h3 class="sub-title">Designed for high-availability</h3>
+
+            <ul class="list">
+              <li>Multi server configuration allows for rolling updates and provides a failover mechanism</li>
+              <li>Internal communication over <a href="http://activemq.apache.org/" target="_blank">ActiveMQ</a> JMS ensures that none of your messages get
+                lost
+              </li>
+              <li>Operational database independence through <a href="https://jcp.org/en/jsr/detail?id=107" target="_blank">JCACHE (JSR 107)</a> In-Memory
+                storage solution
+              </li>
+            </ul>
+
+          </div>
+          <!--//content-->
+        </div>
+        <!--//item-->
+        <div class="item col-md-4 col-sm-6 col-xs-12">
+          <div class="icon-holder">
+            <i class="fa fa-arrows-h"></i>
+          </div>
+          <div class="content">
+            <h3 class="sub-title">Scalable at all layers</h3>
+
+            <ul class="list">
+              <li>Add as many load-balanced servers as you need</li>
+              <li>Unlimited Data Acquisition processes</li>
+              <li>Scale-out your <a href="http://activemq.apache.org/" target="_blank">ActiveMQ</a> JMS middleware
+              </li>
+              <li>Possibility to increase In-Memory storage e.g. through <a href="http://www.terracotta.org/downloads/open-source/catalog" target="_blank">Terracotta
+                  Server Open Source Kit</a>
+              </li>
+            </ul>
+
+          </div>
+          <!--//content-->
+        </div>
+        <!--//item-->
+        <div class="item col-md-4 col-sm-6 col-xs-12">
+          <div class="icon-holder">
+            <i class="fa fa-code"></i>
+          </div>
+          <div class="content">
+            <h3 class="sub-title">Easy to customise</h3>
+
+            <ul class="list">
+              <li>Designed to fit <a class="scrollto" href="#examples">multiple monitoring scenarios</a></li>
+              <li>Customisable server based on Java and <a href="http://projects.spring.io/spring-framework/" target="_blank">Spring</a></li>
+              <li>Write your own <a href="docs/build/user-guide/daq-api/DAQ_module_developer_guide/" target="_blank">Data Acquisition modules</a></li>
+              <li>Extendible Java and REST client API available</li>
+            </ul>
+          </div>
+          <!--//content-->
+
+        </div>
+        <!--//item-->
+      </div>
+      <!--//row-->
+
+      <div class="text-center">
+        <iframe width="480" height="360" src="https://www.youtube.com/embed/hxo8K0lbqos?rel=0" frameborder="0" allowfullscreen></iframe>
+      </div>
+
+    </div>
+    <!--//container-->
+  </section>
+  <!--//about-->
+
+  <!-- ******FEATURES****** -->
+  <section id="features" class="features section">
+    <div class="container text-center">
+      <h2 class="title">Features</h2>
+      <ul class="feature-list list-unstyled">
+        <li><i class="fa fa-check"></i> Horizontally scalable at all layers</li>
+        <li><i class="fa fa-check"></i> Load-balanced server clustering capability</li>
+        <li><i class="fa fa-check"></i> Central configuration management</li>
+        <li><i class="fa fa-check"></i> Modern HTML5 web interface with built-in statistics</li>
+        <li><i class="fa fa-check"></i> Modular design, allowing custom extensions</li>
+        <li><i class="fa fa-check"></i> Ability to handle high throughput and millions of different sensors</li>
+        <li><i class="fa fa-check"></i> Supports arbitrary sensor value objects through JSON serialization</li>
+        <li><i class="fa fa-check"></i> Powerful filtering resulting to meaningful alerts</li>
+        <li><i class="fa fa-check"></i> <a href="docs/build/user-guide/rule-engine/" target="_blank">Rule based</a> alerts</li>
+        <li><i class="fa fa-check"></i> History browsing capabilities</li>
+      </ul>
+    </div>
+    <!--//container-->
+  </section>
+  <!--//features-->
+
+
+
+
+  <!-- ******Examples****** -->
+  <section id="examples" class="docs section">
+
+    <div class="container">
+      <h2 class="title text-center">One platform for multiple monitoring scenarios</h2>
+      <p class="intro text-center">
+        Two major systems at CERN are based on C2MON and contributing features to the platform. Come and join our community and see how C2MON will meet also
+        your monitoring requirements. <br> <br>
+
+        <iframe width="480" height="360" src="https://www.youtube.com/embed/OKisSUCCWLQ?rel=0" frameborder="0" allowfullscreen></iframe>
+      </p>
+    </div>
+
+    <br /> <br />
+
+    <div class="container">
+      <div class="docs-inner">
+        <h2 class="title text-center">TIM</h2>
+        <div class="block">
+          <h3 class="sub-title text-center">Technical Infrastructure Monitoring</h3>
+          <p>TIM is a 24/7 service at CERN to supervise and control a variety of infrastructure spread across the CERN sites.</p>
+          <p>TIM provides different types of Java and Web applications allowing operators for instance reacting to alarms, supervising maintenance
+            operations, or monitoring access to the accelerator complex.</p>
+          <p>The main application is called "TIM Viewer", a generic Dashboard viewer for animating data coming from C2MON. Currently, the TIM Viewer hosts
+            +200 Dashboards used by different user groups at CERN.</p>
+
+          <div class="row">
+            <div class="col-md-6">
+              <a href="assets/images/tim_viewer_1.png" title="Tim Viewer: a client application build on top of C2MON" data-gallery="gallery">
+                <img class="img-small thumbnail" src="assets/images/tim_viewer_1.png" alt="">
+              </a>
+            </div>
+            <div class="col-md-6">
+              <a href="assets/images/tim_viewer_2.png" title="Water monitoring station screen as shown on the Tim Viewer" data-gallery="gallery">
+                <img class="img-small thumbnail" src="assets/images/tim_viewer_2.png" alt="">
+              </a>
+            </div>
+          </div>
+
+          <blockquote>
+            <p>
+              Views showing the access status to the
+              <a href="http://home.web.cern.ch/topics/large-hadron-collider" target="_blank">LHC tunnel</a>
+              and a CERN water Monitoring station (
+              <a href="http://home.web.cern.ch/about/accelerators/super-proton-synchrotron" target="_blank">SPS Accelerator</a>
+              ).
+            </p>
+          </blockquote>
+
+          <h5>TIM in numbers:</h5>
+          <ul>
+            <li>~93'000 data tags, ~40'000 alarms, ~ 1'000 rules</li>
+            <li>up to 400 million raw data values per day</li>
+            <li>after filtering ~ 2.2 million values are treated and stored by the C2MON server</li>
+          </ul>
+
+          <p>Please watch also the video to see TIM in action!</p>
+        </div>
+        <!--//container-->
+      </div>
+      <!--//docs-inner-->
+    </div>
+    <!--//container-->
+
+    <br /> <br /> <br />
+
+    <!-- ***** DIAMON ******* -->
+    <div class="container">
+      <div class="docs-inner">
+        <h2 class="title text-center">DIAMON</h2>
+        <div class="block">
+          <h3 class="sub-title text-center">DIAgnostic and MONitoring</h3>
+          <p>The purpose of the DIAMON project is to propose to the CERN operators and equipment groups tools to monitor the BE Controls infrastructure with
+            easy to use, first line diagnostics and tools to solve problems, or help to decide about responsibilities for first line of intervention.</p>
+          <p>The BE Controls Infrastructure spans over huge distances around CERN and covers a multitude of different equipment (more than 3'000 items are
+            eligible to be monitored)!</p>
+          <h5>Main Objectives:</h5>
+          <ul>
+            <li>Provide the <a href="https://www.facebook.com/pages/CERN-Control-Centre-CCC/172354182781843" target="_blank">CERN Control Centre (CCC)</a>
+              operators with precise and easy to use tools to monitor the behaviour of the BE Controls Infrastructure.
+            </li>
+            <li>Allow for an easy access to diagnostic tools providing more details and help to solve an eventual problem.</li>
+          </ul>
+        </div>
+        <!--//container-->
+      </div>
+      <!--//docs-inner-->
+    </div>
+    <!--//container-->
+
+    <br /> <br /> <br />
+
+    <!-- ***** Use Cases ******* -->
+    <div class="container">
+      <div class="docs-inner">
+        <h2 class="title text-center">Your use case?</h2>
+        <p>Since C2MON is essentially a heterogeneous data acquisition framework with configuration, persistence, historical browsing, control and alarm functionalities, it can be suitable for building many different types of system.</p>
+        <p>For example, it is used internally at CERN as an industrial SCADA system; as a network monitoring system; as a central alarm aggregation service; and as a general-purpose data proxy.</p>
+        <p>Hope that makes C2MON also interesting for your business, since you could reuse it as open SCADA middleware whilst focusing on client application development.</p>
+        <div class="block">
+          <h4 class="sub-title">C2MON could be used by you:</h4>
+          <ul>
+            <li>To acquire and store data from different type of systems,</li>
+            <li>To build up a simple or highly distributed or cloud based SCADA solution,</li>
+            <li>To realise high-availability solutions with on-line reconfiguration,</li>
+            <li>To share data from hundreds of thousands or even millions of data sensors with multiple types of applications,</li>
+            <li>To cluster data acquisition with event notifications and to execute background tasks (e.g. rule or alarm evaluations),</li>
+            <li>To centrally manage the subscription configuration from different type of systems,</li>
+            <li>To define structured objects (Devices) on top of your data acquisition that can be re-used on the client tier,</li>
+            <li>To create a data analysis framework,</li>
+            <li>As simple data proxy,</li>
+            <li>As filtering system to reduce for instance the noise of analogue sensors,</li>
+            <li>As data recorder,</li>
+            <li>As data history player for client applications to replay for instance highly complex synoptic dashboards.</li>
+          </ul>
+        </div>
+        <!--//container-->
+      </div>
+      <!--//docs-inner-->
+    </div>
+    <!--//container-->
+
+  </section>
+  <!--//examples-->
+
+
+
+
+  <!-- ******CONTACT****** -->
+  <section id="contact" class="contact section has-pattern">
+    <div class="container">
+      <div class="contact-inner text-center">
+        <h2 class="title">Contact</h2>
+        <p class="intro">
+          We hope you find C2MON interesting. <br />Feel free to get in touch, if you have any questions or suggestions.
+        </p>
+
+        <div class="btns">
+          <a type="button" class="btn btn-cta-primary padded-button" href="mailto:c2mon-support@cern.ch?subject=I am interested in C2MON..."> Email us! </a>
+          <a type="button" class="btn btn-cta-primary padded-button" target="_blank"
+            href="https://simba3.web.cern.ch/simba3/SelfSubscription.aspx?groupName=c2mon-info"> Add/Remove me from Newsletter </a>
+        </div>
+
+      </div>
+      <!--//contact-inner-->
+    </div>
+    <!--//container-->
+  </section>
+  <!--//contact-->
+
+  <!-- ******FOOTER****** -->
+  <footer class="footer">
+    <div class="container text-center">
+      <small class="copyright">Designed with <a href="http://www.bootstrapzero.com/bootstrap-template/devaid" target="_blank">DevAid Bootstrap
+          Template</a>
+      </small>
+    </div>
+    <!--//container-->
+  </footer>
+  <!--//footer-->
+
+  <!-- Javascript -->
+  <script type="text/javascript" src="assets/plugins/jquery-1.11.1.min.js"></script>
+  <script type="text/javascript" src="assets/plugins/jquery-migrate-1.2.1.min.js"></script>
+  <script type="text/javascript" src="assets/plugins/jquery.easing.1.3.js"></script>
+  <script type="text/javascript" src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="assets/plugins/jquery-scrollTo/jquery.scrollTo.min.js"></script>
+  <script type="text/javascript" src="assets/plugins/prism/prism.js"></script>
+  <script type="text/javascript" src="assets/js/main.js"></script>
+</body>
+</html>
