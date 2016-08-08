@@ -103,5 +103,5 @@ if [ -f $DAQ_HOME/conf/env.sh ]; then
  source $DAQ_HOME/conf/env.sh
 fi
 
-exec -a `basename $0` $JAVA -cp "$CLASSPATH" -Dc2mon.daq.name="${PROCESS_NAME}" \
+exec -a ${PROCESS_NAME} $JAVA -cp "$CLASSPATH" -Dc2mon.daq.name="${PROCESS_NAME}" \
   $DAQ_PROPERTIES_FILE $ADDITIONAL_PROPERTIES $LOGGING_CONFIG $JVM_MEM $JVM_OTHER_OPTS cern.c2mon.daq.DaqStartup
