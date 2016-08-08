@@ -213,7 +213,7 @@ public interface RequestHandler {
    * server.
    *
    * To get the full report(s) for a particular configuration, use
-   * {@link C2monTagManager#getConfigurationReport(Long)}.
+   * {@link RequestHandler#getConfigurationReports(Long)}.
    *
    * @return the list of reports
    * @throws JMSException if JMS problem occurs or not connected at the moment

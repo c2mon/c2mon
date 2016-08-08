@@ -99,7 +99,7 @@ public class RequestHandlerImpl implements RequestHandler {
    */
   protected String defaultRequestQueue;
 
-  private String adminRequestQueue;
+  protected String adminRequestQueue;
 
   /**
    * Executor for submitting requests to the server.
