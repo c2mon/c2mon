@@ -18,6 +18,13 @@ build:
   except:
     - master
 
+deploy_docs:
+  type: deploy
+  script:
+    - cp -r docs/target/ ${DOCS_DEPLOY_DIR}
+#  only:
+#    - master
+
 ##
 # CERN specific part. Should be removed one day
 ##
