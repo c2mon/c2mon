@@ -24,7 +24,7 @@ deploy_docs:
     - echo "${KRB_PASSWORD}" | kinit ${KRB_USERNAME}@CERN.CH
     - klist
     - mvn -q -B clean package -pl :docs
-    - scp docs/target ${KRB_USERNAME}@lxplus:/afs/cern.ch/user/j/jusalmon/www/test-c2mon-docs
+    - scp -r docs/target ${KRB_USERNAME}@lxplus:/afs/cern.ch/user/j/jusalmon/www/test-c2mon-docs
 #  only:
 #    - master
 
