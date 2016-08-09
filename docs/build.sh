@@ -7,7 +7,7 @@ function usage {
 [[ -z $1 ]] && usage && exit 1
 VERSION=$1
 
-LATEST_RELEASE=`git describe --tags`
+LATEST_RELEASE=`git tag -l | tail -n 1`
 
 if [[ ${VERSION} =~ "SNAPSHOT" ]]; then
   LATEST_SNAPSHOT=${VERSION}
