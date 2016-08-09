@@ -23,6 +23,9 @@ import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
@@ -33,15 +36,10 @@ import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
 import cern.c2mon.daq.tools.EquipmentSenderHelper;
-import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
-import cern.c2mon.shared.common.datatag.ISourceDataTag;
-import cern.c2mon.shared.common.datatag.SourceDataQuality;
-import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.*;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.common.process.SubEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ChangeReport;
-import org.springframework.stereotype.Component;
 
 /**
  * EquipmentMessageSender to control all filtering and sending.
@@ -49,6 +47,7 @@ import org.springframework.stereotype.Component;
  * @author vilches
  */
 @Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMessageSender, IDynamicTimeDeadbandFilterer {
 
   /**
@@ -554,7 +553,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
     SourceDataTag sdt = (SourceDataTag) this.equipmentConfiguration.getSourceDataTag(tagID);
 
     if (sdt == null) {
-      throw new RuntimeException("Could not get the SourceDataTag for tag " + tagID + ". The tag is not registered in the equipment configurations cache. No update is sent!");
+      throw new RuntimeException("Cannot find SourceDataTag #" + tagID + " in the equipment configuration cache of " + equipmentConfiguration.getName() + ". No update is sent!");
     }
 
     return sdt;
