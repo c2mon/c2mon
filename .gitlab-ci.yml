@@ -22,7 +22,7 @@ deploy_docs:
   type: deploy
   script:
     - mvn -q -B clean package -pl :docs
-    - cp -r docs/target/ ${DOCS_DEPLOY_DIR}
+    - $DEPLOY_DOCS_COMMAND
 #  only:
 #    - master
 
