@@ -21,15 +21,14 @@ build:
 deploy_docs:
   type: deploy
   script:
+    - echo "${KRB_PASSWORD}" | kinit ${KRB_USERNAME}@CERN.CH
+    - klist
     - mvn -q -B clean package -pl :docs
-    - $DEPLOY_DOCS_COMMAND
+    - scp docs/target ${KRB_USERNAME}@lxplus:/afs/cern.ch/user/j/jusalmon/www/test-c2mon-docs
 #  only:
 #    - master
 
-##
-# CERN specific part. Should be removed one day
-##
-
+# CERN-specific triggers. Should be removed one day.
 trigger:
   type: deploy
   script:
