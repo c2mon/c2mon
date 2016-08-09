@@ -27,7 +27,7 @@
           </execution>
         </executions>
         <configuration>
-          <executable>build.sh</executable>
+          <executable>./build.sh</executable>
           <workingDirectory>${project.basedir}</workingDirectory>
           <arguments>
             <argument>${project.version}</argument>
