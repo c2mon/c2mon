@@ -51,14 +51,30 @@ $("li.disabled a").click(function() {
 
 
 /* Version switcher */
-$.getJSON( base_url + "/../versions.json", function(versions) {
+$.getJSON( base_url + "/../versions.json", function(versionDescriptor) {
     var items = [];
 
-    versions.forEach(function (version) {
-        if (window.location.href.indexOf('/' + version + '/') != -1) {
-            items.push( "<option selected>" + version + "</option>" );
+    var selected = window.location.pathname.split('/')[3];
+
+    if (selected === 'latest') {
+        selected = versionDescriptor.release;
+    } else if (selected === 'snapshot') {
+        selected = versionDescriptor.snapshot;
+    }
+
+    versionDescriptor.versions.forEach(function (version) {
+        var extra = '';
+
+        if (version === versionDescriptor.release) {
+            extra = ' [latest]';
+        } else if (version === versionDescriptor.snapshot) {
+            extra = ' [snapshot]';
+        }
+
+        if (version === selected) {
+            items.push( "<option selected>" + version + extra + "</option>" );
         } else {
-            items.push( "<option value='" + base_url + "/../" + version + "'>" + version + "</option>" );
+            items.push( "<option value='" + base_url + "/../" + version + "'>" + version + extra + "</option>" );
         }
     });
 

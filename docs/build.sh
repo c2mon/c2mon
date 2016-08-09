@@ -7,7 +7,7 @@ function usage {
 [[ -z $1 ]] && usage && exit 1
 VERSION=$1
 
-LATEST_RELEASE=`git tag -l | head -n 1`
+LATEST_RELEASE=`git describe --tags`
 
 if [[ ${VERSION} =~ "SNAPSHOT" ]]; then
   LATEST_SNAPSHOT=${VERSION}
@@ -20,8 +20,8 @@ mkdocs build --clean --site-dir=target/${VERSION}
 VERSIONS_FILE=target/versions.json
 
 echo "{" > ${VERSIONS_FILE}
-echo "  \"release\":  \"$LATEST_RELEASE\""  >> ${VERSIONS_FILE}
-echo "  \"snapshot\": \"$LATEST_SNAPSHOT\""  >> ${VERSIONS_FILE}
+echo "  \"release\":  \"$LATEST_RELEASE\","  >> ${VERSIONS_FILE}
+echo "  \"snapshot\": \"$LATEST_SNAPSHOT\","  >> ${VERSIONS_FILE}
 echo "  \"versions\": [" >> ${VERSIONS_FILE}
 
 # Include all released versions
