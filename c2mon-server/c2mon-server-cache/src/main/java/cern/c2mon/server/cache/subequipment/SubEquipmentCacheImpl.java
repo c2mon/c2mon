@@ -113,7 +113,7 @@ public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> imp
     }
 
     // set the dataTag ids to the equipment:
-    List<Long> dataTagIds = dataTagCache.getDataTagIdsByEquipmentId(subEquipment.getId());
+    List<Long> dataTagIds = dataTagCache.getDataTagIdsBySubEquipmentId(subEquipment.getId());
     Collection<Long> oldIdList = subEquipment.getDataTagIds();
     oldIdList.clear();
     oldIdList.addAll(dataTagIds);
