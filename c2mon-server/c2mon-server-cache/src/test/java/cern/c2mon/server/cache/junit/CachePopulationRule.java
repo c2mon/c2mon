@@ -79,17 +79,17 @@ public class CachePopulationRule extends ExternalResource {
     DatabasePopulatorUtils.execute(populator, cacheDataSource);
 
     CacheManager.getInstance().clearAll();
-    processCache.getC2monCacheLoader().preload();
-    equipmentCache.getC2monCacheLoader().preload();
-    subEquipmentCache.getC2monCacheLoader().preload();
-    dataTagCache.getC2monCacheLoader().preload();
-    alarmCache.getC2monCacheLoader().preload();
-    ruleTagCache.getC2monCacheLoader().preload();
-    commandTagCache.getC2monCacheLoader().preload();
-    aliveTimerCache.getC2monCacheLoader().preload();
-    commFaultTagCache.getC2monCacheLoader().preload();
-    controlTagCache.getC2monCacheLoader().preload();
-    deviceClassCache.getC2monCacheLoader().preload();
-    deviceCache.getC2monCacheLoader().preload();
+    controlTagCache.init();
+    processCache.init();
+    dataTagCache.init();
+    equipmentCache.init();
+    aliveTimerCache.init();
+    commFaultTagCache.init();
+    subEquipmentCache.init();
+    alarmCache.init();
+    ruleTagCache.init();
+    commandTagCache.init();
+    deviceClassCache.init();
+    deviceCache.init();
   }
 }
