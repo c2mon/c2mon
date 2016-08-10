@@ -2,54 +2,35 @@
 <!-- the xsd schema is never used by ehcache and can be omitted -->
 <!-- updateCheck=false means ehcache will not seek to update via internet -->
 <ehcache xsi:noNamespaceSchemaLocation="classpath:resources/ehcache.xsd" updateCheck="false" name="tim-cachemanager">
-    <diskStore path="${c2mon.log.dir}/ehcache-diskstore"/>       
-    <defaultCache 
-      eternal="true" 
-      maxElementsInMemory="500" 
+    <diskStore path="${c2mon.log.dir}/ehcache-diskstore"/>
+    <defaultCache
+      eternal="true"
+      maxElementsInMemory="500"
       memoryStoreEvictionPolicy="LRU"
             transactionalMode="off">
       <!-- <persistence strategy="localRestartable"/> -->
     </defaultCache>
-      
+
 <!-- notice maxElementsInMemory below must be large enough for all data tags, since all are in memory -->
-    <cache 
-      name="tagCache" 
-      eternal="true" 
+    <cache
+      name="tagCache"
+      eternal="true"
       maxElementsInMemory="500000"
       statistics="true"
-      transactionalMode="off"       
+      transactionalMode="off"
       memoryStoreEvictionPolicy="FIFO">
       <searchable keys="false" values="false">
         <searchAttribute name="tagName" expression="value.getName()"/>
+        <searchAttribute name="equipmentId" expression="value.getEquipmentId()"/>
+        <searchAttribute name="subEquipmentId" expression="value.getSubEquipmentId()"/>
       </searchable>
     </cache>
-        
-    <cache 
-      name="controlCache" 
-      eternal="true" 
+
+    <cache
+      name="controlCache"
+      eternal="true"
       maxElementsInMemory="100000"
       statistics="true"
-      transactionalMode="off"        
-      memoryStoreEvictionPolicy="LFU">
-      <searchable keys="false" values="false">
-        <searchAttribute name="tagName" expression="value.getName()"/>
-      </searchable>
-    </cache>
-      
-    <cache 
-      name="commandCache" 
-      eternal="true" 
-      maxElementsInMemory="500000"
-      statistics="true"
-      transactionalMode="off"       
-      memoryStoreEvictionPolicy="LFU">
-    </cache>
-          
-    <cache 
-      name="ruleCache" 
-      eternal="true" 
-      maxElementsInMemory="500000"
-      statistics="true"        
       transactionalMode="off"
       memoryStoreEvictionPolicy="LFU">
       <searchable keys="false" values="false">
@@ -57,59 +38,80 @@
       </searchable>
     </cache>
 
-    <cache 
-      name="processCache" 
-      eternal="true" 
+    <cache
+      name="commandCache"
+      eternal="true"
+      maxElementsInMemory="500000"
+      statistics="true"
+      transactionalMode="off"
+      memoryStoreEvictionPolicy="LFU">
+    </cache>
+
+    <cache
+      name="ruleCache"
+      eternal="true"
+      maxElementsInMemory="500000"
+      statistics="true"
+      transactionalMode="off"
+      memoryStoreEvictionPolicy="LFU">
+      <searchable keys="false" values="false">
+        <searchAttribute name="tagName" expression="value.getName()"/>
+      </searchable>
+    </cache>
+
+    <cache
+      name="processCache"
+      eternal="true"
       maxElementsInMemory="50000"
-      statistics="true"        
-      transactionalMode="off"      
+      statistics="true"
+      transactionalMode="off"
       memoryStoreEvictionPolicy="LFU">
       <searchable keys="false" values="false">
         <searchAttribute name="processName" expression="value.getName()"/>
       </searchable>
     </cache>
-      
-    <cache 
-      name="equipmentCache" 
-      eternal="true" 
-      maxElementsInMemory="50000" 
-      statistics="true"       
-      transactionalMode="off"      
+
+    <cache
+      name="equipmentCache"
+      eternal="true"
+      maxElementsInMemory="50000"
+      statistics="true"
+      transactionalMode="off"
       memoryStoreEvictionPolicy="LFU">
     </cache>
-      
-    <cache 
-      name="subEquipmentCache" 
-      eternal="true" 
-      maxElementsInMemory="50000" 
-      statistics="true"  
-      transactionalMode="off"           
+
+    <cache
+      name="subEquipmentCache"
+      eternal="true"
+      maxElementsInMemory="50000"
+      statistics="true"
+      transactionalMode="off"
       memoryStoreEvictionPolicy="LFU">
     </cache>
-      
-    <cache 
-      name="aliveTimerCache" 
-      eternal="true" 
-      maxElementsInMemory="50000" 
-      statistics="true"      
-      transactionalMode="off"       
+
+    <cache
+      name="aliveTimerCache"
+      eternal="true"
+      maxElementsInMemory="50000"
+      statistics="true"
+      transactionalMode="off"
       memoryStoreEvictionPolicy="LFU">
     </cache>
-      
-    <cache 
-      name="commFaultTagCache" 
-      eternal="true" 
-      maxElementsInMemory="50000"   
-      transactionalMode="off"          
+
+    <cache
+      name="commFaultTagCache"
+      eternal="true"
+      maxElementsInMemory="50000"
+      transactionalMode="off"
       memoryStoreEvictionPolicy="LFU">
     </cache>
-      
-    <cache 
-      name="alarmCache" 
-      eternal="true" 
+
+    <cache
+      name="alarmCache"
+      eternal="true"
       maxElementsInMemory="500000"
-      statistics="true"        
-      transactionalMode="off"      
+      statistics="true"
+      transactionalMode="off"
       memoryStoreEvictionPolicy="FIFO">
       <searchable keys="false" values="false">
         <searchAttribute name="isActive" expression="value.isActive()"/>
@@ -118,13 +120,13 @@
         <searchAttribute name="faultCode" expression="value.getFaultCode()"/>
       </searchable>
     </cache>
-      
-    <cache 
-      name="clusterCache" 
-      eternal="true" 
+
+    <cache
+      name="clusterCache"
+      eternal="true"
       maxElementsInMemory="500000"
-      statistics="true"     
-      transactionalMode="off"         
+      statistics="true"
+      transactionalMode="off"
       memoryStoreEvictionPolicy="FIFO">
     </cache>
 
@@ -150,34 +152,34 @@
     </cache>
 
 <!-- Caches used by core repository c2mon-server-supervision -->
-    <cache 
-      name="processEventCache" 
-      eternal="true" 
+    <cache
+      name="processEventCache"
+      eternal="true"
       maxElementsInMemory="50000"
-      statistics="true"    
-      transactionalMode="off"          
+      statistics="true"
+      transactionalMode="off"
       memoryStoreEvictionPolicy="LFU"
     />
-    
-    <cache 
-      name="equipmentEventCache" 
-      eternal="true" 
+
+    <cache
+      name="equipmentEventCache"
+      eternal="true"
       maxElementsInMemory="50000"
-      statistics="true"  
-      transactionalMode="off"           
+      statistics="true"
+      transactionalMode="off"
       memoryStoreEvictionPolicy="LFU"
     />
-    
-    <cache 
-      name="subEquipmentEventCache" 
-      eternal="true" 
+
+    <cache
+      name="subEquipmentEventCache"
+      eternal="true"
       maxElementsInMemory="50000"
-      statistics="true"  
-      transactionalMode="off"           
+      statistics="true"
+      transactionalMode="off"
       memoryStoreEvictionPolicy="LFU"
     />
 <!-- ************************************* -->
-        
+
 <!--    overflowToDisk="false"  -->
 <!--    <terracottaConfig url="localhost:9510"></terracottaConfig>-->
 </ehcache>
