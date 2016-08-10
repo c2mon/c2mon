@@ -46,12 +46,10 @@
              E1.EQALIVEINTERVAL AS equipment_aliveinterval, E1.EQCOMMFAULT_TAGID AS equipment_commfaulttagid,
              E1.EQADDRESS AS equipment_address, E1.EQ_PROCID AS equipment_procid,
              E1.EQSTATUSTIME AS equipment_status_time, E1.EQSTATUSDESC AS equipment_status_desc,
-             E2.EQID AS subequipment_id, D.TAGID as datatag_id,
+             E2.EQID AS subequipment_id, NULL as datatag_id,
              C.CMDID AS commandtag_id, E1.EQSTATE as equipment_state
         FROM EQUIPMENT E1 LEFT OUTER JOIN EQUIPMENT E2
                          ON E1.EQID = E2.EQ_PARENT_ID
-              LEFT OUTER JOIN DATATAG D
-                         ON (E1.EQID = D.TAG_EQID AND D.TAGRULE IS NULL AND D.TAGCONTROLTAG = 0)
               LEFT OUTER JOIN COMMANDTAG C
                          ON E1.EQID = C.CMD_EQID
        WHERE E1.EQ_PROCID IS NOT NULL   <!-- i.e. not SubEquipments -->

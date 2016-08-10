@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -18,6 +18,8 @@ package cern.c2mon.server.cache.equipment;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.cache.DataTagCache;
+import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,12 +41,15 @@ import cern.c2mon.shared.common.ConfigurationException;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * Implementation of the Equipment cache.
- * 
+ *
  * <p>
  * Contains initialization logic.
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -60,16 +65,20 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment>implements
   /** Used to post configure the associated control tags */
   private final ControlTagCache controlCache;
 
+  private final DataTagCache dataTagCache;
+
   @Autowired
-  public EquipmentCacheImpl(final ClusterCache clusterCache, 
+  public EquipmentCacheImpl(final ClusterCache clusterCache,
                             @Qualifier("equipmentEhcache") final Ehcache ehcache,
-                            @Qualifier("equipmentEhcacheLoader") final CacheLoader cacheLoader, 
+                            @Qualifier("equipmentEhcacheLoader") final CacheLoader cacheLoader,
                             @Qualifier("equipmentCacheLoader") final C2monCacheLoader c2monCacheLoader,
-                            @Qualifier("equipmentDAO") final SimpleCacheLoaderDAO<Equipment> cacheLoaderDAO, 
-                            final ControlTagCache controlCache) {
+                            @Qualifier("equipmentDAO") final SimpleCacheLoaderDAO<Equipment> cacheLoaderDAO,
+                            final ControlTagCache controlCache,
+                            final DataTagCache dataTagCache) {
 
     super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
     this.controlCache = controlCache;
+    this.dataTagCache = dataTagCache;
   }
 
   /**
@@ -102,6 +111,12 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment>implements
   protected void doPostDbLoading(Equipment equipment) {
     Long processId = equipment.getProcessId();
     Long equipmentId = equipment.getId();
+
+    // set the dataTag ids to the equipment:
+    List<Long> dataTagIds = dataTagCache.getDataTagIdsByEquipmentId(equipmentId);
+    Collection<Long> oldIdList = equipment.getDataTagIds();
+    oldIdList.clear();
+    oldIdList.addAll(dataTagIds);
 
     Long aliveTagId = equipment.getAliveTagId();
     if (aliveTagId != null) {
