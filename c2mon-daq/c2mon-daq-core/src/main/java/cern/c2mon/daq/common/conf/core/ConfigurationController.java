@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.conf.core;
 
-import java.io.FileWriter;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,24 +25,19 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 
-import cern.c2mon.daq.config.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSSerializer;
 
-import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
-import cern.c2mon.daq.common.conf.equipment.ICoreCommandTagChanger;
-import cern.c2mon.daq.common.conf.equipment.ICoreDataTagChanger;
-import cern.c2mon.daq.common.conf.equipment.ICoreEquipmentConfigurationChanger;
-import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
+import cern.c2mon.daq.common.conf.equipment.*;
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
+import cern.c2mon.daq.config.Options;
 import cern.c2mon.daq.tools.StackTraceHelper;
 import cern.c2mon.daq.tools.processexceptions.ConfUnknownTypeException;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -53,18 +48,8 @@ import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.common.process.SubEquipmentConfiguration;
-import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.*;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.c2mon.shared.daq.config.CommandTagAdd;
-import cern.c2mon.shared.daq.config.CommandTagRemove;
-import cern.c2mon.shared.daq.config.CommandTagUpdate;
-import cern.c2mon.shared.daq.config.DataTagAdd;
-import cern.c2mon.shared.daq.config.DataTagRemove;
-import cern.c2mon.shared.daq.config.DataTagUpdate;
-import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
-import cern.c2mon.shared.daq.config.ProcessConfigurationUpdate;
-import cern.c2mon.shared.daq.config.SubEquipmentUnitAdd;
-import cern.c2mon.shared.daq.config.SubEquipmentUnitRemove;
 import cern.c2mon.shared.daq.process.ProcessConfigurationResponse;
 import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
 
@@ -271,13 +256,16 @@ public class ConfigurationController {
     String fileToSaveConf = environment.getProperty(Options.REMOTE_CONFIG_FILE);
     if (fileToSaveConf.length() > 0 && docXMLConfig != null) {
       LOGGER.info("saveConfiguration - saving the process configuration XML in a file " + fileToSaveConf + " due to user request");
-      FileWriter fwr = null;
+
+      File file = new File(fileToSaveConf);
+      if (file.isDirectory() || !fileToSaveConf.endsWith(".xml")) {
+        throw new RuntimeException("File name provided by '" + Options.REMOTE_CONFIG_FILE +"' option must end with '.xml'");
+      }
+      
       try {
-        fwr = new FileWriter(fileToSaveConf);
-        // TODO default output format - check this works ok
-        XMLSerializer serializer = new XMLSerializer(fwr, new OutputFormat());
-        serializer.serialize(docXMLConfig);
-        fwr.close();
+        DOMImplementationLS domImplementation = (DOMImplementationLS) docXMLConfig.getImplementation();
+        LSSerializer lsSerializer = domImplementation.createLSSerializer();
+        lsSerializer.writeToURI(docXMLConfig, file.toURI().toURL().toString());
       } catch (java.io.IOException ex) {
         LOGGER.error("saveConfiguration - Could not save the configuration to the file " + fileToSaveConf, ex);
       }
