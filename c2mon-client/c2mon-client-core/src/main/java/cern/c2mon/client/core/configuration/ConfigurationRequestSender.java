@@ -44,7 +44,7 @@ import java.lang.reflect.Type;
 @Service
 public class ConfigurationRequestSender {
 
-  private static final long DEFAULT_TIMEOUT = 3_600_000L;
+  private static final long DEFAULT_TIMEOUT = 300000; // 300000ms = 5min
 
   @Autowired
   private JmsSender jmsSender;
