@@ -41,7 +41,7 @@ import static cern.c2mon.server.configuration.parser.util.ReflectionService.extr
  */
 @RequiredArgsConstructor
 public abstract class EntityFactory<T extends ConfigurationEntity> {
-  
+
   private final C2monCache<Long, ? extends Cacheable> cache;
 
   /**
@@ -80,6 +80,12 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
     ConfigurationElement element = createSetupConfigurationElement();
     Long entityId = getId(configurationEntity);
 
+
+    if (entityId == null) {
+      throw new ConfigurationParseException("Error updating entity: Not possible to determine id with the " +
+          "configuration:" + configurationEntity);
+    }
+
     if (hasEntity(entityId)) {
 
       element.setEntityId(entityId);
@@ -104,7 +110,12 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
     ConfigurationElement element = createSetupConfigurationElement();
     Long entityId = getId(configurationEntity);
 
-    if (hasEntity(entityId)) {
+    if (entityId == null) {
+      throw new ConfigurationParseException("Error deleting entity: Not possible to determine id with the " +
+          "configuration:" + configurationEntity);
+    }
+
+      if (hasEntity(entityId)) {
 
       element.setEntityId(entityId);
       element.setAction(ConfigConstants.Action.REMOVE);
