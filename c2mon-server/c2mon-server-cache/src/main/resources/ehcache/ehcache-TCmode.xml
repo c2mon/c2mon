@@ -18,6 +18,8 @@
     <terracotta clustered="true" consistency="strong" />
     <searchable keys="false" values="false">
         <searchAttribute name="tagName" expression="value.getName()"/>
+        <searchAttribute name="equipmentId" expression="value.getEquipmentId()"/>
+        <searchAttribute name="subEquipmentId" expression="value.getSubEquipmentId()"/>
     </searchable>
   </cache>
   
