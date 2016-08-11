@@ -67,34 +67,30 @@ public class ActiveJmsSender implements JmsSender {
     if (text == null) {
       throw new NullPointerException("Attempting to send a null text message.");
     }
-    String reply = (String) jmsTemplate.execute(new SessionCallback() {
-      public Object doInJms(Session session) throws JMSException {
-        String returnString = null;
-        //TemporaryQueue replyQueue = session.createTemporaryQueue();
-        TemporaryTopic replyTopic = session.createTemporaryTopic();
-        TextMessage textMessage = session.createTextMessage();
-        textMessage.setText(text);
-        textMessage.setJMSReplyTo(replyTopic);
-        
-        Destination requestDestination = new ActiveMQQueue(jmsListenerQueue);
-        MessageProducer messageProducer = session.createProducer(requestDestination);
-        messageProducer.send(textMessage);
-                                        
-        //wait for reply (receive timeout is set in XML)                          
-        MessageConsumer consumer = session.createConsumer(replyTopic);           
-        
-        Message replyMessage = consumer.receive(timeout);
-        if (replyMessage != null) {
-          if (replyMessage instanceof TextMessage) {
-            returnString = ((TextMessage) replyMessage).getText();
-          } else {
-            LOGGER.warn("Non-text message received as JMS reply from ActiveMQ - unable to process");
-          }          
+    return jmsTemplate.execute(session -> {
+      String returnString = null;
+      TemporaryTopic replyTopic = session.createTemporaryTopic();
+      TextMessage textMessage = session.createTextMessage();
+      textMessage.setText(text);
+      textMessage.setJMSReplyTo(replyTopic);
+
+      MessageConsumer consumer = session.createConsumer(replyTopic);
+
+      Destination requestDestination = new ActiveMQQueue(jmsListenerQueue);
+      MessageProducer messageProducer = session.createProducer(requestDestination);
+      messageProducer.send(textMessage);
+
+      // Wait for reply
+      Message replyMessage = consumer.receive(timeout);
+      if (replyMessage != null) {
+        if (replyMessage instanceof TextMessage) {
+          returnString = ((TextMessage) replyMessage).getText();
+        } else {
+          LOGGER.warn("Non-text message received as JMS reply from ActiveMQ - unable to process");
         }
-        return returnString;
-      }      
+      }
+      return returnString;
     }, true);
-    return reply;
   }
 
   /**
