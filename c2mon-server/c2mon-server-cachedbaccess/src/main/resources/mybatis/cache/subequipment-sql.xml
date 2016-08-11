@@ -19,10 +19,8 @@
              E.EQHANDLERCLASS as equipment_handlerclass, E.EQSTATE_TAGID as equipment_statetagid,
              E.EQALIVE_TAGID as equipment_alivetagid, E.EQALIVEINTERVAL as equipment_aliveinterval,
              E.EQCOMMFAULT_TAGID as equipment_commfaulttagid, E.EQ_PARENT_ID as equipment_parentid, E.EQSTATE as equipment_state,
-             E.EQSTATUSTIME AS equipment_status_time, E.EQSTATUSDESC AS equipment_status_desc, D.TAGID as datatag_id
+             E.EQSTATUSTIME AS equipment_status_time, E.EQSTATUSDESC AS equipment_status_desc, NULL as datatag_id
         FROM EQUIPMENT E
-        LEFT OUTER JOIN DATATAG D
-          ON (E.EQID = D.TAG_EQID AND D.TAGRULE IS NULL AND D.TAGCONTROLTAG = 0)
        WHERE E.EQ_PROCID IS NULL
     </select>
 
