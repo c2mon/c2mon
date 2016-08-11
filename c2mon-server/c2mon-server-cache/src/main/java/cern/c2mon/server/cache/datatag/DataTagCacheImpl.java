@@ -16,18 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.datatag;
 
-import cern.c2mon.server.cache.ClusterCache;
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.common.C2monCacheLoader;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
-import cern.c2mon.server.cache.tag.AbstractTagCache;
-import cern.c2mon.server.common.config.C2monCacheName;
-import cern.c2mon.server.common.datatag.DataTag;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 import net.sf.ehcache.search.Attribute;
-import net.sf.ehcache.search.Query;
 import net.sf.ehcache.search.Results;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +32,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.util.LinkedList;
-import java.util.List;
+import cern.c2mon.server.cache.ClusterCache;
+import cern.c2mon.server.cache.DataTagCache;
+import cern.c2mon.server.cache.common.C2monCacheLoader;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
+import cern.c2mon.server.cache.tag.AbstractTagCache;
+import cern.c2mon.server.common.config.C2monCacheName;
+import cern.c2mon.server.common.datatag.DataTag;
 
 /**
  * Implementation of the DataTag cache.
@@ -96,52 +97,38 @@ public class DataTagCacheImpl extends AbstractTagCache<DataTag> implements DataT
 
   @Override
   public List<Long> getDataTagIdsByEquipmentId(Long equipmentId) {
-    List<Long> tagIds = new LinkedList<>();
-    Results results = null;
-
-    if (equipmentId == null) {
-      throw new IllegalArgumentException("Attempting to retrieve a List od DataTag ids from the cache with a NULL " +
-          "parameter.");
-    }
-
-    try {
-      Attribute<Long> cacheEquipmentId = getCache().getSearchAttribute("equipmentId");
-      Query query = getCache().createQuery();
-      results = query.includeKeys().addCriteria(cacheEquipmentId.eq(equipmentId)).execute();
-
-      if (results == null) {
-        throw new CacheElementNotFoundException("Failed to execute query with equipmentId " + equipmentId + " : " +
-            "Result is null.");
-      }
-      results.all().forEach(r -> tagIds.add((Long) r.getKey()));
-
-    } finally {
-      if (results != null) {
-        // Discard the results when done to free up cache resources.
-        results.discard();
-      }
-    }
-    return tagIds;
+    return getDataTagIds(equipmentId, "equipmentId");
   }
 
   @Override
   public List<Long> getDataTagIdsBySubEquipmentId(Long subEquipmentId) {
+    return getDataTagIds(subEquipmentId, "subEquipmentId");
+  }
+
+  /**
+   * Receives a list of all DataTag ids which are attached to the given equipment or sub-equipment.
+   * @param id The id of the (sub-)equipment
+   * @param searchAttribute The ehcache search attribute, which is specified in the wrapper method
+   * @return A list of all DataTag ids belonging to the given (sub-)equipment
+   */
+  private List<Long> getDataTagIds(Long id, String searchAttribute) {
     List<Long> tagIds = new LinkedList<>();
     Results results = null;
 
-    if (subEquipmentId == null) {
-      throw new IllegalArgumentException("Attempting to retrieve a List od DataTag ids from the cache with a NULL " +
+    if (id == null) {
+      throw new IllegalArgumentException("Attempting to retrieve a List of DataTag ids from the cache with a NULL " +
           "parameter.");
     }
 
     try {
-      Attribute<Long> cacheEquipmentId = getCache().getSearchAttribute("subEquipmentId");
-      results = getCache().createQuery().includeKeys().addCriteria(cacheEquipmentId.eq(subEquipmentId)).execute();
+      Attribute<Long> cacheEquipmentId = getCache().getSearchAttribute(searchAttribute);
+      results = getCache().createQuery().includeKeys().addCriteria(cacheEquipmentId.eq(id)).execute();
 
       if (results == null) {
-        throw new CacheElementNotFoundException("Failed to execute query with subEquipmentId " + subEquipmentId + " : " +
+        throw new CacheElementNotFoundException("Failed to execute query with (sub)EquipmentId " + id + " : " +
             "Result is null.");
       }
+
       results.all().forEach(r -> tagIds.add((Long) r.getKey()));
 
     } finally {
