@@ -250,14 +250,14 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
   private void processControl(final SourceDataTagValue sourceDataTagValue) {
     try {
       if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace("processControl - Processing incoming update for ControlTag " + sourceDataTagValue.getId());
+        LOGGER.trace("Processing incoming update for control tag #" + sourceDataTagValue.getId());
       }
       Event<Boolean> updatedInCache = controlTagFacade.updateFromSource(sourceDataTagValue.getId(), sourceDataTagValue);
       if (updatedInCache.getReturnValue()) {
         supervisionManager.processControlTag(sourceDataTagValue); //filter out events that were updated later in the cache
       }
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.warn("processControl - Received unrecognized control tag " + sourceDataTagValue.getId() + " - ignoring the update.", cacheEx);
+      LOGGER.warn("Received unrecognized control tag #" + sourceDataTagValue.getId() + ": ignoring the update");
     }
   }
 
@@ -269,13 +269,13 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
   private void processDataTag(final SourceDataTagValue sourceDataTagValue) {
     try {
       if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace("processDataTag - Processing incoming update for DataTag " + sourceDataTagValue.getId());
+        LOGGER.trace("Processing incoming update for datatag #" + sourceDataTagValue.getId());
       }
 
       dataTagFacade.updateFromSource(sourceDataTagValue.getId(), sourceDataTagValue);
 
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.warn("processDataTag - Received unrecognized data tag " + sourceDataTagValue.getId() + " - ignoring the update.", cacheEx);
+      LOGGER.warn("Received unrecognized data tag #" + sourceDataTagValue.getId() + ": ignoring the update");
     }
   }
 
