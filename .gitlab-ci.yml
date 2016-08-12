@@ -35,6 +35,8 @@ trigger:
     - "curl -X POST -F token=$TIM_SERVER_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9859/trigger/builds"
     # Trigger build of c2mon-daq-alarmsource
     - "curl -X POST -F token=$C2MON_DAQ_ALARMSOURCE_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9143/trigger/builds"
+    # Trigger build of c2mon-daq-db
+    - "curl -X POST -F token=$C2MON_DAQ_DB_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9147/trigger/builds"
     # Trigger build of c2mon-daq-japc
     - "curl -X POST -F token=$C2MON_DAQ_JAPC_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9149/trigger/builds"
     # Trigger build of c2mon-daq-opcua
