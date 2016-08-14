@@ -4,9 +4,10 @@
 
 The C2MON server is a standalone application that communicates either locally or remotely with DAQ processes and client applications.
 
-Tarball distribution: **coming soon!**
+* [GitHub](http://github.com/c2mon/c2mon)
+* [CERN Docker registry](https://docker.cern.ch/registrytags?c2mon-project)
+* Tarball distribution: **coming soon!**
 
-Docker image: **coming soon!**
 
 ## Client API
 
