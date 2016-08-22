@@ -22,8 +22,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.cache.C2monBufferedCacheListener;
 import cern.c2mon.server.cache.C2monCacheListener;
@@ -146,7 +144,11 @@ public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> impl
               LinkedList<S> updateKeys = new LinkedList<S>();
               onUpdateQueue.drainTo(updateKeys, MAX_TO_LISTENER);
               if (!updateKeys.isEmpty()) {
-                bufferedCacheListener.notifyElementUpdated(updateKeys);
+                try {
+                  bufferedCacheListener.notifyElementUpdated(updateKeys);
+                } catch (Exception e) {
+                  log.error("Uncaught exception occured in C2monBufferedCacheListener implementation whilst notifying for update of {} elements!", updateKeys.size(), e);
+                }
               }
             }
             
@@ -154,7 +156,11 @@ public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> impl
               LinkedList<S> confirmationKeys = new LinkedList<S>();
               statusConfirmationQueue.drainTo(confirmationKeys, MAX_TO_LISTENER);
               if (!confirmationKeys.isEmpty()) {
-                bufferedCacheListener.confirmStatus(confirmationKeys);
+                try {
+                  bufferedCacheListener.confirmStatus(confirmationKeys);
+                } catch (Exception e) {
+                  log.error("Uncaught exception occured in C2monBufferedCacheListener implementation whilst confirming status of {} cache objects!", confirmationKeys.size(), e);
+                }
               }
             }
             
