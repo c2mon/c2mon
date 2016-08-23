@@ -68,7 +68,7 @@ public abstract class EsIndexer<T extends IFallback> implements IDBPersistenceHa
   /**
    * Is available if the Connector has found a connection.
    */
-  protected boolean isAvailable;
+  protected boolean isAvailable = false;
 
   /**
    * Autowired constructor.
@@ -91,8 +91,14 @@ public abstract class EsIndexer<T extends IFallback> implements IDBPersistenceHa
 
   private void waitForConnection() {
     while(!connector.isConnected()) {
-      isAvailable = false;
+      try {
+        log.trace("waitForConnection() is sleepging for 200ms before checking again for valid ES connection");
+        Thread.sleep(200L);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
     }
+
     isAvailable = true;
   }
 
