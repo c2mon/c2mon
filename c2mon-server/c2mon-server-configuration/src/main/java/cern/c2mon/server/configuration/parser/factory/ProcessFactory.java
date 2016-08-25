@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.loading.SequenceDAO;
+import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.process.Process;
@@ -110,7 +111,12 @@ public class ProcessFactory extends EntityFactory<Process> {
 
   @Override
   Long createId(Process entity) {
-    return entity.getId() != null ? entity.getId() : sequenceDAO.getNextProcessId();
+    if (entity.getName() != null && processCache.getProcessId(entity.getName()) != null) {
+      throw new ConfigurationParseException("Error creating process #" + entity.getName() + ": " +
+          "Name already exists");
+    } else {
+      return entity.getId() != null ? entity.getId() : sequenceDAO.getNextProcessId();
+    }
   }
 
   @Override
