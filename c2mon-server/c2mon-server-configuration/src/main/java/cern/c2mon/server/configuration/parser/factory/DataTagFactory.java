@@ -53,6 +53,7 @@ public class DataTagFactory extends EntityFactory<DataTag> {
   public DataTagFactory(DataTagCache dataTagCache, TagFacadeGateway tagFacadeGateway, SequenceDAO sequenceDAO,
                         EquipmentDAO equipmentDAO, EquipmentCache equipmentCache, SubEquipmentDAO subEquipmentDAO,
                         SubEquipmentCache subEquipmentCache) {
+    super(dataTagCache);
     this.dataTagCache = dataTagCache;
     this.tagFacadeGateway = tagFacadeGateway;
     this.sequenceDAO = sequenceDAO;
@@ -129,7 +130,7 @@ public class DataTagFactory extends EntityFactory<DataTag> {
   }
 
   @Override
-  boolean cacheHasEntity(Long id) {
+  boolean hasEntity(Long id) {
     return tagFacadeGateway.isInTagCache(id);
   }
 

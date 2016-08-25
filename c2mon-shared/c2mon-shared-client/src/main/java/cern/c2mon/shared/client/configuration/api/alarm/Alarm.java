@@ -151,4 +151,9 @@ public class Alarm implements ConfigurationEntity {
       return this.alarmToBuild;
     }
   }
+  
+  @Override
+  public String getName() {
+    return faultFamily + " : " + faultMember + " : " + faultCode;
+  }
 }

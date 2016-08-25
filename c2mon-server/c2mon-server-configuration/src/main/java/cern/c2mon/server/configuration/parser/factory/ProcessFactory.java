@@ -17,19 +17,19 @@
 
 package cern.c2mon.server.configuration.parser.factory;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.loading.ProcessDAO;
 import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.AliveTag;
 import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Franz Ritter
@@ -37,15 +37,14 @@ import java.util.List;
 @Service
 public class ProcessFactory extends EntityFactory<Process> {
 
-  private ProcessCache processCache;
-  private ProcessDAO processDAO;
+  ProcessCache processCache;
   private SequenceDAO sequenceDAO;
   private ControlTagFactory controlTagFactory;
 
   @Autowired
-  public ProcessFactory(ProcessCache processCache, ProcessDAO processDAO, SequenceDAO sequenceDAO, ControlTagFactory controlTagFactory) {
+  public ProcessFactory(ProcessCache processCache, SequenceDAO sequenceDAO, ControlTagFactory controlTagFactory) {
+    super(processCache);
     this.processCache = processCache;
-    this.processDAO = processDAO;
     this.sequenceDAO = sequenceDAO;
     this.controlTagFactory = controlTagFactory;
   }
@@ -106,17 +105,12 @@ public class ProcessFactory extends EntityFactory<Process> {
 
   @Override
   Long getId(Process entity) {
-    return entity.getId() != null ? entity.getId() : processDAO.getIdByName(entity.getName());
+    return entity.getId() != null ? entity.getId() : processCache.getProcessId(entity.getName());
   }
 
   @Override
   Long createId(Process entity) {
     return entity.getId() != null ? entity.getId() : sequenceDAO.getNextProcessId();
-  }
-
-  @Override
-  boolean cacheHasEntity(Long id) {
-    return processCache.hasKey(id);
   }
 
   @Override

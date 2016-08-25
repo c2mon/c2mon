@@ -40,7 +40,6 @@ import java.util.List;
 @Service
 public class EquipmentFactory extends EntityFactory<Equipment> {
 
-  private EquipmentCache equipmentCache;
   private EquipmentDAO equipmentDAO;
   private SequenceDAO sequenceDAO;
   private ProcessCache processCache;
@@ -50,7 +49,7 @@ public class EquipmentFactory extends EntityFactory<Equipment> {
   @Autowired
   public EquipmentFactory(EquipmentCache equipmentCache, EquipmentDAO equipmentDAO, SequenceDAO sequenceDAO, ControlTagFactory controlTagFactory,
                           ProcessCache processCache, ProcessDAO processDAO) {
-    this.equipmentCache = equipmentCache;
+    super(equipmentCache);
     this.equipmentDAO = equipmentDAO;
     this.sequenceDAO = sequenceDAO;
     this.controlTagFactory = controlTagFactory;
@@ -136,11 +135,6 @@ public class EquipmentFactory extends EntityFactory<Equipment> {
   @Override
   Long getId(Equipment configurationEntity) {
     return configurationEntity.getId() != null ? configurationEntity.getId() : equipmentDAO.getIdByName(configurationEntity.getName());
-  }
-
-  @Override
-  boolean cacheHasEntity(Long id) {
-    return equipmentCache.hasKey(id);
   }
 
   @Override

@@ -17,31 +17,32 @@
 
 package cern.c2mon.server.configuration.parser.factory;
 
-import cern.c2mon.server.cache.DataTagCache;
+import java.util.Collections;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.tag.ControlTag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Franz Ritter
  */
 @Service
 public class ControlTagFactory extends EntityFactory<ControlTag> {
-  private DataTagCache dataTagCache;
+  private ControlTagCache controlTagCache;
   private TagFacadeGateway tagFacadeGateway;
   private SequenceDAO sequenceDAO;
 
   @Autowired
-  public ControlTagFactory(DataTagCache dataTagCache, TagFacadeGateway tagFacadeGateway, SequenceDAO sequenceDAO) {
-    this.dataTagCache = dataTagCache;
+  public ControlTagFactory(ControlTagCache controlTagCache, TagFacadeGateway tagFacadeGateway, SequenceDAO sequenceDAO) {
+    super(controlTagCache);
+    this.controlTagCache = controlTagCache;
     this.tagFacadeGateway = tagFacadeGateway;
     this.sequenceDAO = sequenceDAO;
   }
@@ -58,11 +59,11 @@ public class ControlTagFactory extends EntityFactory<ControlTag> {
 
   @Override
   Long getId(ControlTag configurationEntity) {
-    return configurationEntity.getId() != null ? configurationEntity.getId() : dataTagCache.get(configurationEntity.getName()).getId();
+    return configurationEntity.getId() != null ? configurationEntity.getId() : controlTagCache.get(configurationEntity.getName()).getId();
   }
 
   @Override
-  boolean cacheHasEntity(Long id) {
+  boolean hasEntity(Long id) {
     return tagFacadeGateway.isInTagCache(id);
   }
 

@@ -38,14 +38,13 @@ import java.util.List;
 public class AlarmFactory extends EntityFactory<Alarm> {
 
   private SequenceDAO sequenceDAO;
-  private AlarmCache alarmCache;
   private TagFacadeGateway tagFacadeGateway;
   private DataTagCache dataTagCache;
 
   @Autowired
   public AlarmFactory(SequenceDAO sequenceDAO, AlarmCache alarmCache, DataTagCache dataTagCache, TagFacadeGateway tagFacadeGateway) {
+    super(alarmCache);
     this.sequenceDAO = sequenceDAO;
-    this.alarmCache = alarmCache;
     this.dataTagCache = dataTagCache;
     this.tagFacadeGateway = tagFacadeGateway;
   }
@@ -70,16 +69,6 @@ public class AlarmFactory extends EntityFactory<Alarm> {
   @Override
   Long createId(Alarm configurationEntity) {
     return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextAlarmId();
-  }
-
-  @Override
-  Long getId(Alarm configurationEntity) {
-    return configurationEntity.getId();
-  }
-
-  @Override
-  boolean cacheHasEntity(Long id) {
-    return alarmCache.hasKey(id);
   }
 
   @Override

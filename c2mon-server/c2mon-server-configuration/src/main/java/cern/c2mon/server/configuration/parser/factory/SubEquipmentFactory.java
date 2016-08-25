@@ -17,6 +17,12 @@
 
 package cern.c2mon.server.configuration.parser.factory;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
 import cern.c2mon.server.cache.loading.EquipmentDAO;
@@ -28,11 +34,6 @@ import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.tag.CommFaultTag;
 import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Franz Ritter
@@ -40,7 +41,6 @@ import java.util.List;
 @Service
 public class SubEquipmentFactory extends EntityFactory<SubEquipment> {
 
-  private SubEquipmentCache subEquipmentCache;
   private SubEquipmentDAO subEquipmentDAO;
   private EquipmentCache equipmentCache;
   private EquipmentDAO equipmentDAO;
@@ -50,7 +50,7 @@ public class SubEquipmentFactory extends EntityFactory<SubEquipment> {
   @Autowired
   public SubEquipmentFactory(SubEquipmentCache subEquipmentCache, SubEquipmentDAO subEquipmentDAO, SequenceDAO sequenceDAO, ControlTagFactory controlTagFactory,
                              EquipmentFactory equipmentFactory, EquipmentCache equipmentCache, EquipmentDAO equipmentDAO) {
-    this.subEquipmentCache = subEquipmentCache;
+    super(subEquipmentCache);
     this.subEquipmentDAO = subEquipmentDAO;
     this.sequenceDAO = sequenceDAO;
     this.controlTagFactory = controlTagFactory;
@@ -135,11 +135,6 @@ public class SubEquipmentFactory extends EntityFactory<SubEquipment> {
   @Override
   Long getId(SubEquipment configurationEntity) {
     return configurationEntity.getId() != null ? configurationEntity.getId() : subEquipmentDAO.getIdByName(configurationEntity.getName());
-  }
-
-  @Override
-  boolean cacheHasEntity(Long id) {
-    return subEquipmentCache.hasKey(id);
   }
 
   @Override

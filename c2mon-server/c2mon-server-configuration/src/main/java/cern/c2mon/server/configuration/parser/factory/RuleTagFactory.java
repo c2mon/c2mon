@@ -17,32 +17,33 @@
 
 package cern.c2mon.server.configuration.parser.factory;
 
-import cern.c2mon.server.cache.DataTagCache;
+import java.util.Collections;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import cern.c2mon.server.cache.RuleTagCache;
+import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.tag.RuleTag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Franz Ritter
  */
 @Service
 public class RuleTagFactory extends EntityFactory<RuleTag> {
-  private DataTagCache dataTagCache;
-  private RuleTagCache ruleTagCache;
-  private SequenceDAO sequenceDAO;
+  private final RuleTagCache ruleTagCache;
+  private final TagFacadeGateway tagFacadeGateway;
+  private final SequenceDAO sequenceDAO;
 
   @Autowired
-  public RuleTagFactory(DataTagCache dataTagCache, RuleTagCache ruleTagCache, SequenceDAO sequenceDAO) {
-    this.dataTagCache = dataTagCache;
+  public RuleTagFactory(RuleTagCache ruleTagCache, TagFacadeGateway tagFacadeGateway, SequenceDAO sequenceDAO) {
+    super(ruleTagCache);
     this.ruleTagCache = ruleTagCache;
+    this.tagFacadeGateway = tagFacadeGateway;
     this.sequenceDAO = sequenceDAO;
   }
 
@@ -58,12 +59,12 @@ public class RuleTagFactory extends EntityFactory<RuleTag> {
 
   @Override
   Long getId(RuleTag configurationEntity) {
-    return configurationEntity.getId() != null ? configurationEntity.getId() : dataTagCache.get(configurationEntity.getName()).getId();
+    return configurationEntity.getId() != null ? configurationEntity.getId() : ruleTagCache.get(configurationEntity.getName()).getId();
   }
 
   @Override
-  boolean cacheHasEntity(Long id) {
-    return ruleTagCache.hasKey(id);
+  boolean hasEntity(Long id) {
+    return tagFacadeGateway.isInTagCache(id);
   }
 
   @Override

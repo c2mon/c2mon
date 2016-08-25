@@ -17,14 +17,18 @@
 
 package cern.c2mon.server.configuration.parser.factory;
 
+import java.util.List;
+import java.util.Properties;
+
+import lombok.RequiredArgsConstructor;
+
+import cern.c2mon.server.cache.C2monCache;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.server.configuration.parser.util.ReflectionService;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
-
-import java.util.List;
-import java.util.Properties;
+import cern.c2mon.shared.common.Cacheable;
 
 import static cern.c2mon.server.configuration.parser.util.ReflectionService.extractPropertiesFromField;
 
@@ -35,7 +39,10 @@ import static cern.c2mon.server.configuration.parser.util.ReflectionService.extr
  *
  * @author Franz Ritter
  */
+@RequiredArgsConstructor
 public abstract class EntityFactory<T extends ConfigurationEntity> {
+  
+  private final C2monCache<Long, ? extends Cacheable> cache;
 
   /**
    * Internal method to get all {@link ConfigurationEntity} information for a create.
@@ -48,9 +55,9 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
     ConfigurationElement element = createSetupConfigurationElement();
     Long entityId = createId(configurationEntity);
 
-    if (cacheHasEntity(entityId)) {
+    if (hasEntity(entityId)) {
       throw new ConfigurationParseException("Error creating entity: "
-          + configurationEntity.getClass().getSimpleName() + " with id " + entityId + " already exists!");
+          + configurationEntity.getClass().getSimpleName() + " (name = " +  configurationEntity.getName() + ", id = " + entityId + ") already exists!");
     }
 
     configurationEntity.setId(entityId);
@@ -73,7 +80,7 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
     ConfigurationElement element = createSetupConfigurationElement();
     Long entityId = getId(configurationEntity);
 
-    if (cacheHasEntity(entityId)) {
+    if (hasEntity(entityId)) {
 
       element.setEntityId(entityId);
       element.setAction(ConfigConstants.Action.UPDATE);
@@ -83,7 +90,7 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
 
     } else {
       throw new ConfigurationParseException("Error updating entity: "
-          + configurationEntity.getClass().getSimpleName() + " with id " + entityId + " does not exist!");
+          + configurationEntity.getClass().getSimpleName() + " (name = " +  configurationEntity.getName() + ", id = " + entityId + ") does not exist!");
     }
   }
 
@@ -97,7 +104,7 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
     ConfigurationElement element = createSetupConfigurationElement();
     Long entityId = getId(configurationEntity);
 
-    if (cacheHasEntity(entityId)) {
+    if (hasEntity(entityId)) {
 
       element.setEntityId(entityId);
       element.setAction(ConfigConstants.Action.REMOVE);
@@ -105,8 +112,8 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
       return element;
 
     } else {
-      throw new ConfigurationParseException("Error updating entity: "
-          + configurationEntity.getClass().getSimpleName() + " with id " + entityId + " does not exist!");
+      throw new ConfigurationParseException("Error deleting entity: "
+          + configurationEntity.getClass().getSimpleName() + " (name = " +  configurationEntity.getName() + ", id = " + entityId + ") does not exist!");
     }
   }
 
@@ -132,7 +139,9 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
    * @param configurationEntity The entity where the id belongs to.
    * @return The id of the entity.
    */
-  abstract Long getId(T configurationEntity);
+  Long getId(T configurationEntity) {
+    return configurationEntity.getId();
+  }
 
   /**
    * Checks the cache which belongs to a {@link ConfigurationEntity} if the id is already known to the cache.
@@ -140,7 +149,9 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
    * @param id The id which needs to be checked.
    * @return True if the id is known to the cache.
    */
-  abstract boolean cacheHasEntity(Long id);
+  boolean hasEntity(Long id) {
+      return id != null ? cache.hasKey(id) : false;
+  }
 
   /**
    * Determine the corresponding {@link ConfigConstants.Entity} to the {@link ConfigurationEntity}.

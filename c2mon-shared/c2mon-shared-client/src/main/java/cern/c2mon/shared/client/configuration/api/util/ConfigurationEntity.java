@@ -48,6 +48,11 @@ public interface ConfigurationEntity {
    * @return id value
    */
   Long getId();
+  
+  /**
+   * @return The name of the Configuration object
+   */
+  String getName();
 
   /**
    * Set the id to the configuration object

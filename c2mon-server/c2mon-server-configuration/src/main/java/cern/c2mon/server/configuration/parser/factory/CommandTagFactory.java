@@ -17,8 +17,13 @@
 
 package cern.c2mon.server.configuration.parser.factory;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import cern.c2mon.server.cache.CommandTagCache;
-import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.loading.EquipmentDAO;
 import cern.c2mon.server.cache.loading.SequenceDAO;
@@ -26,12 +31,6 @@ import cern.c2mon.server.configuration.parser.exception.ConfigurationParseExcept
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Franz Ritter
@@ -39,17 +38,14 @@ import java.util.List;
 @Service
 public class CommandTagFactory extends EntityFactory<CommandTag> {
 
-  private SequenceDAO sequenceDAO;
-  private CommandTagCache commandTagCache;
-  private DataTagCache dataTagCache;
-  private EquipmentDAO equipmentDAO;
-  private EquipmentCache equipmentCache;
+  private final SequenceDAO sequenceDAO;
+  private final EquipmentDAO equipmentDAO;
+  private final EquipmentCache equipmentCache;
 
   @Autowired
-  public CommandTagFactory(SequenceDAO sequenceDAO, CommandTagCache commandTagCache, DataTagCache dataTagCache, EquipmentCache equipmentCache, EquipmentDAO equipmentDAO) {
+  public CommandTagFactory(CommandTagCache commandTagCache, EquipmentCache equipmentCache, SequenceDAO sequenceDAO, EquipmentDAO equipmentDAO) {
+    super(commandTagCache);
     this.sequenceDAO = sequenceDAO;
-    this.commandTagCache = commandTagCache;
-    this.dataTagCache = dataTagCache;
     this.equipmentCache = equipmentCache;
     this.equipmentDAO = equipmentDAO;
 
@@ -76,16 +72,6 @@ public class CommandTagFactory extends EntityFactory<CommandTag> {
   @Override
   Long createId(CommandTag configurationEntity) {
     return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextTagId();
-  }
-
-  @Override
-  Long getId(CommandTag configurationEntity) {
-    return configurationEntity.getId() != null ? configurationEntity.getId() : dataTagCache.get(configurationEntity.getName()).getId();
-  }
-
-  @Override
-  boolean cacheHasEntity(Long id) {
-    return commandTagCache.hasKey(id);
   }
 
   @Override
