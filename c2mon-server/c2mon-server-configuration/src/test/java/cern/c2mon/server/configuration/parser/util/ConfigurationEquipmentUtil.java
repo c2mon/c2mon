@@ -64,9 +64,9 @@ public class ConfigurationEquipmentUtil {
     Equipment equipment = Equipment.create("E_TEST"+id, "cern.c2mon.daq.testhandler.TestMessageHandler")
         .id(id)
         .description("foo")
-        .commFaultTag(CommFaultTag.create("commFaultTag").build())
-        .aliveTag(AliveTag.create("aliveTag").build(), 70000)
-        .statusTag(StatusTag.create("statusTag").build())
+        .commFaultTag(CommFaultTag.create("E_TEST" + id + ":COMM_FAULT").build())
+        .aliveTag(AliveTag.create("E_TEST" + id + ":ALIVE").build(), 70000)
+        .statusTag(StatusTag.create("E_TEST" + id + ":STATUS").build())
         .address("testAddress")
         .build();
     equipment.setProcessId(1L);

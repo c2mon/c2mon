@@ -66,8 +66,8 @@ public class ConfigurationProcessUtil {
     Process process = Process.create("P_TEST" + id)
         .id(id)
         .description("foo")
-        .aliveTag(AliveTag.create("aliveTag").build(), 70000)
-        .statusTag(StatusTag.create("statusTag").build())
+        .aliveTag(AliveTag.create("P_TEST" + id + ":ALIVE").build(), 70000)
+        .statusTag(StatusTag.create("P_TEST" + id + ":STATUS").build())
         .maxMessageDelay(2000)
         .maxMessageSize(200)
         .build();

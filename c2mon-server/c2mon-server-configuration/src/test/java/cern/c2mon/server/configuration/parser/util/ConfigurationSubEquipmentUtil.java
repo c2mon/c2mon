@@ -38,7 +38,7 @@ public class ConfigurationSubEquipmentUtil {
     }
 
     SubEquipment subEquipment = SubEquipment.create("E_TEST")
-        .aliveTag(AliveTag.create("aliveTag").address(new DataTagAddress()).build(), 60000).build();
+        .aliveTag(AliveTag.create("E_TEST:ALIVE").address(new DataTagAddress()).build(), 60000).build();
     subEquipment.setEquipmentId(1L);
 
     properties.setProperty("name", "E_TEST");
@@ -67,9 +67,9 @@ public class ConfigurationSubEquipmentUtil {
     SubEquipment equipment = SubEquipment.create("E_TEST"+id)
         .id(id)
         .description("foo")
-        .commFaultTag(CommFaultTag.create("commFaultTag").build())
-        .aliveTag(AliveTag.create("aliveTag").address(new DataTagAddress()).build(), 70000)
-        .statusTag(StatusTag.create("statusTag").build())
+        .commFaultTag(CommFaultTag.create("E_TEST" + id + ":COMM_FAULT").build())
+        .aliveTag(AliveTag.create("E_TEST" + id + ":ALIVE").address(new DataTagAddress()).build(), 70000)
+        .statusTag(StatusTag.create("E_TEST" + id + ":STATUS").build())
         .address("testAddress")
         .build();
     equipment.setEquipmentId(1L);
