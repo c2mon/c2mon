@@ -98,6 +98,7 @@ public class ConfigureProcessTest {
 
     // setUp Mocks:
     EasyMock.expect(sequenceDAO.getNextProcessId()).andReturn(1L);
+    EasyMock.expect(processCache.getProcessId("P_TEST")).andReturn(null);
     EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
     EasyMock.expect(tagFacadeGateway.isInTagCache(101L)).andReturn(false);
     EasyMock.expect(sequenceDAO.getNextTagId()).andReturn(101L);
@@ -139,6 +140,7 @@ public class ConfigureProcessTest {
     config.setEntities(processList);
 
     // setUp Mocks:
+    EasyMock.expect(processCache.getProcessId("P_TEST1")).andReturn(null);
     EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
     EasyMock.expect(tagFacadeGateway.isInTagCache(101L)).andReturn(false);
     EasyMock.expect(sequenceDAO.getNextTagId()).andReturn(101L);
@@ -185,18 +187,21 @@ public class ConfigureProcessTest {
     config.setEntities(processList);
 
     // setUp Mocks:
+    EasyMock.expect(processCache.getProcessId("P_TEST1")).andReturn(null);
     EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
     EasyMock.expect(tagFacadeGateway.isInTagCache(101L)).andReturn(false);
     EasyMock.expect(sequenceDAO.getNextTagId()).andReturn(101L);
     EasyMock.expect(tagFacadeGateway.isInTagCache(100L)).andReturn(false);
     EasyMock.expect(sequenceDAO.getNextTagId()).andReturn(100L);
 
+    EasyMock.expect(processCache.getProcessId("P_TEST2")).andReturn(null);
     EasyMock.expect(processCache.hasKey(2L)).andReturn(false);
     EasyMock.expect(tagFacadeGateway.isInTagCache(101L)).andReturn(false);
     EasyMock.expect(sequenceDAO.getNextTagId()).andReturn(101L);
     EasyMock.expect(tagFacadeGateway.isInTagCache(100L)).andReturn(false);
     EasyMock.expect(sequenceDAO.getNextTagId()).andReturn(100L);
 
+    EasyMock.expect(processCache.getProcessId("P_TEST3")).andReturn(null);
     EasyMock.expect(processCache.hasKey(3L)).andReturn(false);
     EasyMock.expect(tagFacadeGateway.isInTagCache(101L)).andReturn(false);
     EasyMock.expect(sequenceDAO.getNextTagId()).andReturn(101L);
@@ -298,7 +303,7 @@ public class ConfigureProcessTest {
     config.setEntities(processList);
 
     // setUp Mocks:
-    EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
+    EasyMock.expect(processCache.getProcessId("P_TEST")).andReturn(1l);
 
     // run test
     EasyMock.replay(processCache);

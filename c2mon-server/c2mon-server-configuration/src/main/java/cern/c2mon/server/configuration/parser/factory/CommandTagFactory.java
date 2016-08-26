@@ -64,7 +64,7 @@ public class CommandTagFactory extends EntityFactory<CommandTag> {
       return Collections.singletonList(doCreateInstance(commandTag));
 
     } else {
-      throw new ConfigurationParseException("Error creating commandtag #" + commandTag.getId() + ": " +
+      throw new ConfigurationParseException("Error creating commandtag " + commandTag.getId() + ": " +
           "Specified parent equipment does not exist!");
     }
   }

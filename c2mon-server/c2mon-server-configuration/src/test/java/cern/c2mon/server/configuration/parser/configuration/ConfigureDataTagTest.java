@@ -161,20 +161,25 @@ public class ConfigureDataTagTest {
     // setUp Mocks:
     EasyMock.expect(tagFacadeGateway.isInTagCache(101L)).andReturn(false);
     EasyMock.expect(equipmentCache.hasKey(10L)).andReturn(true);
+    EasyMock.expect(dataTagCache.get("DataTag101")).andReturn(null);
 
     EasyMock.expect(tagFacadeGateway.isInTagCache(102L)).andReturn(false);
     EasyMock.expect(equipmentCache.hasKey(10L)).andReturn(true);
+    EasyMock.expect(dataTagCache.get("DataTag102")).andReturn(null);
 
     EasyMock.expect(tagFacadeGateway.isInTagCache(103L)).andReturn(false);
     EasyMock.expect(equipmentCache.hasKey(10L)).andReturn(true);
+    EasyMock.expect(dataTagCache.get("DataTag103")).andReturn(null);
 
     EasyMock.expect(tagFacadeGateway.isInTagCache(104L)).andReturn(false);
     EasyMock.expect(equipmentCache.hasKey(10L)).andReturn(true);
+    EasyMock.expect(dataTagCache.get("DataTag104")).andReturn(null);
 
     EasyMock.expect(tagFacadeGateway.isInTagCache(105L)).andReturn(false);
     EasyMock.expect(equipmentCache.hasKey(10L)).andReturn(true);
+    EasyMock.expect(dataTagCache.get("DataTag105")).andReturn(null);
 
-    EasyMock.replay(equipmentCache, sequenceDAO, tagFacadeGateway);
+    EasyMock.replay(equipmentCache, sequenceDAO, tagFacadeGateway, dataTagCache);
 
     // run the parsing
     List<ConfigurationElement> elements = parser.parse(config);

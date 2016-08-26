@@ -111,7 +111,7 @@ public class DataTagFactory extends EntityFactory<DataTag> {
   @Override
   Long createId(DataTag configurationEntity) {
     if (configurationEntity.getName() != null && dataTagCache.get(configurationEntity.getName()) != null) {
-      throw new ConfigurationParseException("Error creating dataTag #" + configurationEntity.getName() + ": " +
+      throw new ConfigurationParseException("Error creating datatag " + configurationEntity.getName() + ": " +
           "Name already exists");
     } else {
       return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextTagId();

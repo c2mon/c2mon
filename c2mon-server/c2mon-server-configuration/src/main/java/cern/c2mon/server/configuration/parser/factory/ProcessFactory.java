@@ -112,7 +112,7 @@ public class ProcessFactory extends EntityFactory<Process> {
   @Override
   Long createId(Process entity) {
     if (entity.getName() != null && processCache.getProcessId(entity.getName()) != null) {
-      throw new ConfigurationParseException("Error creating process #" + entity.getName() + ": " +
+      throw new ConfigurationParseException("Error creating process " + entity.getName() + ": " +
           "Name already exists");
     } else {
       return entity.getId() != null ? entity.getId() : sequenceDAO.getNextProcessId();

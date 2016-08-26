@@ -18,6 +18,7 @@
 package cern.c2mon.server.configuration.parser.configuration;
 
 import cern.c2mon.server.cache.*;
+import cern.c2mon.server.cache.loading.EquipmentDAO;
 import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.server.cache.loading.SubEquipmentDAO;
 import cern.c2mon.server.configuration.parser.ConfigurationParser;
@@ -62,6 +63,9 @@ public class ConfigureSubEquipmentTest {
   EquipmentCache equipmentCache;
 
   @Autowired
+  EquipmentDAO equipmentDAO;
+
+  @Autowired
   SubEquipmentCache subEquipmentCache;
 
   @Autowired
@@ -85,7 +89,7 @@ public class ConfigureSubEquipmentTest {
 
   @Before
   public void resetMocks() {
-    EasyMock.reset(subEquipmentDAO, sequenceDAO, equipmentCache, subEquipmentCache, equipmentCache, tagFacadeGateway);
+    EasyMock.reset(subEquipmentDAO, sequenceDAO, equipmentCache, subEquipmentCache, equipmentCache, tagFacadeGateway,equipmentDAO);
   }
 
 
@@ -103,6 +107,7 @@ public class ConfigureSubEquipmentTest {
 
     // setUp Mocks:
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
+    EasyMock.expect(equipmentDAO.getIdByName("E_TEST")).andReturn(null);
     EasyMock.expect(subEquipmentCache.hasKey(10L)).andReturn(false);
     EasyMock.expect(sequenceDAO.getNextEquipmentId()).andReturn(10L);
     EasyMock.expect(tagFacadeGateway.isInTagCache(102L)).andReturn(false);
@@ -112,7 +117,7 @@ public class ConfigureSubEquipmentTest {
     EasyMock.expect(tagFacadeGateway.isInTagCache(100L)).andReturn(false);
     EasyMock.expect(sequenceDAO.getNextTagId()).andReturn(100L);
 
-    EasyMock.replay(equipmentCache, sequenceDAO, tagFacadeGateway, subEquipmentCache);
+    EasyMock.replay(equipmentCache, sequenceDAO, tagFacadeGateway, subEquipmentCache, equipmentDAO);
 
     List<ConfigurationElement> parsed = parser.parse(config);
 
@@ -138,7 +143,7 @@ public class ConfigureSubEquipmentTest {
     assertTrue(parsed.get(3).getAction().equals(ConfigConstants.Action.CREATE));
     assertEquals(parsed.get(3).getElementProperties(), expectedProps);
 
-    EasyMock.verify(equipmentCache, sequenceDAO, tagFacadeGateway, subEquipmentCache);
+    EasyMock.verify(equipmentCache, sequenceDAO, tagFacadeGateway, subEquipmentCache, equipmentDAO);
   }
 
   @Test
@@ -154,6 +159,7 @@ public class ConfigureSubEquipmentTest {
 
     // setUp Mocks:
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
+    EasyMock.expect(equipmentDAO.getIdByName("E_TEST10")).andReturn(null);
     EasyMock.expect(subEquipmentCache.hasKey(10L)).andReturn(false);
     EasyMock.expect(tagFacadeGateway.isInTagCache(102L)).andReturn(false);
     EasyMock.expect(sequenceDAO.getNextTagId()).andReturn(102L);
@@ -162,7 +168,7 @@ public class ConfigureSubEquipmentTest {
     EasyMock.expect(tagFacadeGateway.isInTagCache(100L)).andReturn(false);
     EasyMock.expect(sequenceDAO.getNextTagId()).andReturn(100L);
 
-    EasyMock.replay(equipmentCache, sequenceDAO, tagFacadeGateway, subEquipmentCache);
+    EasyMock.replay(equipmentCache, sequenceDAO, tagFacadeGateway, subEquipmentCache, equipmentDAO);
 
     List<ConfigurationElement> parsed = parser.parse(config);
 
@@ -188,7 +194,7 @@ public class ConfigureSubEquipmentTest {
     assertTrue(parsed.get(3).getAction().equals(ConfigConstants.Action.CREATE));
     assertEquals(parsed.get(3).getElementProperties(), expectedProps);
 
-    EasyMock.verify(equipmentCache, sequenceDAO, tagFacadeGateway, subEquipmentCache);
+    EasyMock.verify(equipmentCache, sequenceDAO, tagFacadeGateway, subEquipmentCache, equipmentDAO);
   }
 
   @Test
@@ -208,6 +214,7 @@ public class ConfigureSubEquipmentTest {
 
     // setUp Mocks:
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
+    EasyMock.expect(equipmentDAO.getIdByName("E_TEST10")).andReturn(null);
     EasyMock.expect(subEquipmentCache.hasKey(10L)).andReturn(false);
     EasyMock.expect(tagFacadeGateway.isInTagCache(102L)).andReturn(false);
     EasyMock.expect(sequenceDAO.getNextTagId()).andReturn(102L);
@@ -217,6 +224,7 @@ public class ConfigureSubEquipmentTest {
     EasyMock.expect(sequenceDAO.getNextTagId()).andReturn(100L);
 
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
+    EasyMock.expect(equipmentDAO.getIdByName("E_TEST11")).andReturn(null);
     EasyMock.expect(subEquipmentCache.hasKey(11L)).andReturn(false);
     EasyMock.expect(tagFacadeGateway.isInTagCache(102L)).andReturn(false);
     EasyMock.expect(sequenceDAO.getNextTagId()).andReturn(102L);
@@ -226,6 +234,7 @@ public class ConfigureSubEquipmentTest {
     EasyMock.expect(sequenceDAO.getNextTagId()).andReturn(100L);
 
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
+    EasyMock.expect(equipmentDAO.getIdByName("E_TEST12")).andReturn(null);
     EasyMock.expect(subEquipmentCache.hasKey(12L)).andReturn(false);
     EasyMock.expect(tagFacadeGateway.isInTagCache(102L)).andReturn(false);
     EasyMock.expect(sequenceDAO.getNextTagId()).andReturn(102L);
@@ -234,7 +243,7 @@ public class ConfigureSubEquipmentTest {
     EasyMock.expect(tagFacadeGateway.isInTagCache(100L)).andReturn(false);
     EasyMock.expect(sequenceDAO.getNextTagId()).andReturn(100L);
 
-    EasyMock.replay(equipmentCache, sequenceDAO, tagFacadeGateway, subEquipmentCache);
+    EasyMock.replay(equipmentCache, sequenceDAO, tagFacadeGateway, subEquipmentCache, equipmentDAO);
 
     List<ConfigurationElement> parsed = parser.parse(config);
 
@@ -300,7 +309,7 @@ public class ConfigureSubEquipmentTest {
     assertTrue(parsed.get(11).getAction().equals(ConfigConstants.Action.CREATE));
     assertEquals(parsed.get(11).getElementProperties(), expectedProps3);
 
-    EasyMock.verify(equipmentCache, sequenceDAO, tagFacadeGateway, subEquipmentCache);
+    EasyMock.verify(equipmentCache, sequenceDAO, tagFacadeGateway, subEquipmentCache, equipmentDAO);
   }
 
   @Test
@@ -341,12 +350,12 @@ public class ConfigureSubEquipmentTest {
 
     // setUp Mocks:
     EasyMock.expect(equipmentCache.hasKey(1L)).andReturn(true);
-    EasyMock.expect(subEquipmentCache.hasKey(10L)).andReturn(true);
+    EasyMock.expect(equipmentDAO.getIdByName("E_TEST")).andReturn(10L);
 
     // run test
-    EasyMock.replay(subEquipmentCache, equipmentCache);
+    EasyMock.replay(subEquipmentCache, equipmentCache, equipmentDAO);
     parser.parse(config);
-    EasyMock.verify(subEquipmentCache, equipmentCache);
+    EasyMock.verify(subEquipmentCache, equipmentCache, equipmentDAO);
   }
 
   @Test

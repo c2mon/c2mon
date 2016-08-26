@@ -130,7 +130,7 @@ public class EquipmentFactory extends EntityFactory<Equipment> {
   @Override
   Long createId(Equipment configurationEntity) {
     if (configurationEntity.getName() != null && equipmentDAO.getIdByName(configurationEntity.getName()) != null) {
-      throw new ConfigurationParseException("Error creating equipment #" + configurationEntity.getName() + ": " +
+      throw new ConfigurationParseException("Error creating equipment " + configurationEntity.getName() + ": " +
           "Name already exists");
     } else {
       return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextEquipmentId();
