@@ -206,47 +206,6 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
     return type;
   }
 
-//  /**
-//   * Check in-memory if index and types are already present.
-//   * If yes, add to the batch directly,
-//   * otherwise, instantiate a new index with a new mapping.
-//   *
-//   * @return if the cluster has acked the writing.
-//   */
-//  private boolean indexByBatch(EsTag tag) {
-//    if (tag == null) {
-//      log.warn("indexByBatch() - Error while indexing data. Tag has null rawValue");
-//      return false;
-//    }
-//
-//    String index = generateTagIndex(tag.getC2mon().getServerTimestamp());
-//    String type = generateTagType(tag.getC2mon().getDataType());
-//
-//    if (log.isTraceEnabled()) {
-//      log.trace("Indexing a new tag (#{})", tag.getId());
-//      log.trace("Index = " + index);
-//      log.trace("Type = " + type);
-//    }
-//
-//
-//    if (index == null || type == null || !checkIndex(index)) {
-//      log.warn("indexByBatch() - Error while indexing tag #{}. Bad index {}  -> Tag will not be sent to elasticsearch!", tag.getId(), index);
-//      return false;
-//    }
-//
-//    boolean indexIsPresent = createNonExistentIndex(index);
-//    boolean typeIsPresent = createNonExistentMapping(index, type, tag);
-//
-//    String tagJson = tag.toString();
-//    log.debug("indexByBatch() - New IndexRequest for index" + index + " and source " + tagJson);
-//    if (indexIsPresent && typeIsPresent) {
-//      IndexRequest indexNewTag = new IndexRequest(index, type).source(tagJson).routing(String.valueOf(tag.getId()));
-//      return connector.bulkAdd(indexNewTag);
-//    }
-//
-//    return false;
-//  }
-
   private boolean checkIndex(String index) {
     return index.matches("^" + indexPrefix + "-(alarm|supervision|tag)_\\d\\d\\d\\d-\\d\\d-?\\d?\\d?$");
   }
@@ -359,47 +318,7 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
     }
   }
 
-//  /**
-//   * Query the ElasticSearch cluster to retrieve all the indices and types,
-//   * that are present already at startup. Store them in-memory caches.
-//   */
-//  public void updateCache() {
-//    clearCache();
-//    updateCacheIndices();
-//    updateCacheTypes();
-//  }
-
-//  private synchronized void updateCacheIndices() {
-//    for (String index : connector.retrieveIndicesFromES()) {
-//      cacheIndicesTypes.put(index, new HashSet<>());
-//    }
-//  }
-//
-//  private synchronized void updateCacheTypes() {
-//    for (String index : cacheIndicesTypes.keySet()) {
-//      cacheIndicesTypes.get(index).addAll(connector.retrieveTypesFromES(index));
-//    }
-//  }
-
-
   protected synchronized void clearCache() {
     cacheIndicesTypes.clear();
-  }
-
-  protected void displayCache() {
-    if (log.isTraceEnabled()) {
-      log.trace("displayLists():");
-
-      for (String index : cacheIndicesTypes.keySet()) {
-        log.trace("Index:");
-        log.trace(index);
-
-        log.trace("Has types:");
-        Set<String> types = cacheIndicesTypes.get(index);
-        for (String type : types) {
-          log.trace(type);
-        }
-      }
-    }
   }
 }

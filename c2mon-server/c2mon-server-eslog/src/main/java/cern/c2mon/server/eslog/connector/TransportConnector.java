@@ -165,9 +165,6 @@ public class TransportConnector implements Connector {
    */
   private Node localNode;
 
-//  /** Used to look for an ElasticSearch cluster when not connected to any. */
-//  private Thread clusterFinder;
-
   /**
    * True if connected to ElasticSearch
    */
@@ -435,22 +432,6 @@ public class TransportConnector implements Connector {
   }
 
   /**
-   * Close the bulk after it sent enough: reached bulkActions, bulkSize or flushInterval.
-   * And create a new one for further requests.
-   */
-//  public void closeBulk() {
-//    try {
-//      bulkProcessor.awaitClose(10, TimeUnit.MILLISECONDS);
-//      refreshClusterStats();
-//      log.debug("closeBulk() - closing bulkProcessor");
-//    }
-//    catch (InterruptedException e) {
-//      log.warn("closeBulk() - Error whilst awaitClose() the bulkProcessor.", e);
-//    }
-//    initBulkSettings();
-//  }
-
-  /**
    * Method called to close the newly opened client.
    *
    * @param transportClient {@link Client} for the cluster.
@@ -462,22 +443,6 @@ public class TransportConnector implements Connector {
       log.info("close() - Closed client: " + transportClient.settings().get("node.name"));
     }
   }
-
-  /**
-   * Retrieve the failed actions of the BulkProcessor.
-   */
-  private List<Integer> getFailedActions(BulkResponse bulkResponse) {
-    List<Integer> failedActions = new ArrayList<>();
-    if (bulkResponse.hasFailures()) {
-      for (BulkItemResponse item : bulkResponse.getItems()) {
-        if (item.isFailed()) {
-          failedActions.add(item.getItemId());
-        }
-      }
-    }
-    return failedActions;
-  }
-
 
   /***************************************
    *

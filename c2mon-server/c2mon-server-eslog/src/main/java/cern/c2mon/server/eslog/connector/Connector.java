@@ -58,13 +58,6 @@ public interface Connector {
   BulkProcessor getBulkProcessor();
 
   /**
-   * Retrieve the lists of indices, types and aliases from ElasticSearch and update them in memory.
-   */
-//  Set<String> retrieveIndicesFromES();
-
-//  Set<String> retrieveTypesFromES(String index);
-
-  /**
    * @return true if C2MON is connected to an ElasticSearch cluster. (client can communicate with it)
    * It means that initTestPass() return true.
    */

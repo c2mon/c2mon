@@ -64,7 +64,6 @@ public class EsAlarmIndexer<T extends EsAlarm> extends EsIndexer<T> {
   @PostConstruct
   public void init() throws IDBPersistenceException {
     super.init();
-//    retrieveMappingsFromES();
   }
 
   @Override

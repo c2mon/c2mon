@@ -68,7 +68,6 @@ public class EsSupervisionEventIndexer<T extends EsSupervisionEvent> extends EsI
   @PostConstruct
   public void init() throws IDBPersistenceException {
     super.init();
-//    retrieveMappingsFromES();
   }
 
   @Override
@@ -127,25 +126,6 @@ public class EsSupervisionEventIndexer<T extends EsSupervisionEvent> extends EsI
       return supervisionMapping.getMapping();
     }
   }
-
-//  /**
-//   * Ask the ElasticSearch cluster to retrieve the mappings that it holds for every index/type.
-//   */
-//  private void retrieveMappingsFromES() throws IDBPersistenceException {
-//    Set<String> indicesES = retrieveIndicesFromES();
-//    for (String index : indicesES) {
-//      Set<String> types = retrieveTypesFromES(index);
-//      for (String type : types) {
-//        MappingMetaData mapping = retrieveMappingES(index, type);
-//
-//        if (mapping != null) {
-//          String jsonMapping = mapping.source().toString();
-//          log.debug("retrieveMappingsFromES() - mapping: " + jsonMapping);
-//          this.cacheIndices.put(index, jsonMapping);
-//        }
-//      }
-//    }
-//  }
 
   /**
    * Send the data to the Connector: try to index an new entry to ElasticSearch.
