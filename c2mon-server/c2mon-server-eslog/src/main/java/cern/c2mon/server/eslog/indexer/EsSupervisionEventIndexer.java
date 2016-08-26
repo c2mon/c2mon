@@ -19,14 +19,12 @@ package cern.c2mon.server.eslog.indexer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -70,7 +68,7 @@ public class EsSupervisionEventIndexer<T extends EsSupervisionEvent> extends EsI
   @PostConstruct
   public void init() throws IDBPersistenceException {
     super.init();
-    retrieveMappingsFromES();
+//    retrieveMappingsFromES();
   }
 
   @Override
@@ -130,24 +128,24 @@ public class EsSupervisionEventIndexer<T extends EsSupervisionEvent> extends EsI
     }
   }
 
-  /**
-   * Ask the ElasticSearch cluster to retrieve the mappings that it holds for every index/type.
-   */
-  private void retrieveMappingsFromES() throws IDBPersistenceException {
-    Set<String> indicesES = retrieveIndicesFromES();
-    for (String index : indicesES) {
-      Set<String> types = retrieveTypesFromES(index);
-      for (String type : types) {
-        MappingMetaData mapping = retrieveMappingES(index, type);
-
-        if (mapping != null) {
-          String jsonMapping = mapping.source().toString();
-          log.debug("retrieveMappingsFromES() - mapping: " + jsonMapping);
-          this.cacheIndices.put(index, jsonMapping);
-        }
-      }
-    }
-  }
+//  /**
+//   * Ask the ElasticSearch cluster to retrieve the mappings that it holds for every index/type.
+//   */
+//  private void retrieveMappingsFromES() throws IDBPersistenceException {
+//    Set<String> indicesES = retrieveIndicesFromES();
+//    for (String index : indicesES) {
+//      Set<String> types = retrieveTypesFromES(index);
+//      for (String type : types) {
+//        MappingMetaData mapping = retrieveMappingES(index, type);
+//
+//        if (mapping != null) {
+//          String jsonMapping = mapping.source().toString();
+//          log.debug("retrieveMappingsFromES() - mapping: " + jsonMapping);
+//          this.cacheIndices.put(index, jsonMapping);
+//        }
+//      }
+//    }
+//  }
 
   /**
    * Send the data to the Connector: try to index an new entry to ElasticSearch.
@@ -157,7 +155,7 @@ public class EsSupervisionEventIndexer<T extends EsSupervisionEvent> extends EsI
    * @param esSupervisionEvent the data.
    */
   private void indexData(String indexName, String mapping, EsSupervisionEvent esSupervisionEvent) {
-    boolean isAcked = connector.handleSupervisionQuery(indexName, mapping, esSupervisionEvent);
+    boolean isAcked = connector.logSupervisionEvent(indexName, mapping, esSupervisionEvent);
     if (isAcked) {
       log.debug("logSupervisionEvent() - isAcked: " + isAcked);
       cacheIndices.put(indexName, mapping);

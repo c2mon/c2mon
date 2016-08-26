@@ -16,18 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.indexer;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
-import com.google.common.base.Strings;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -48,10 +43,8 @@ import cern.c2mon.server.eslog.structure.types.EsAlarm;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class EsAlarmIndexer<T extends EsAlarm> extends EsIndexer<T> {
-  /**
-   * Holds the ElasticSearch mapping given to an index.
-   */
-  private final Map<String, String> cacheIndices = new HashMap<>();
+
+  private final String alarmMapping = new EsAlarmMapping().getMapping();
 
   /**
    * Autowired constructor.
@@ -71,18 +64,26 @@ public class EsAlarmIndexer<T extends EsAlarm> extends EsIndexer<T> {
   @PostConstruct
   public void init() throws IDBPersistenceException {
     super.init();
-    retrieveMappingsFromES();
+//    retrieveMappingsFromES();
   }
 
   @Override
   public void storeData(T esAlarm) throws IDBPersistenceException {
+    if (esAlarm == null) {
+      return;
+    }
+
+    boolean logged = false;
     try {
-      if (esAlarm != null) {
-        logAlarm(esAlarm);
-      }
+        String indexName = generateAlarmIndex(esAlarm.getServerTimestamp());
+        logged = connector.logAlarmEvent(indexName, alarmMapping, esAlarm);
     } catch (Exception e) {
-      log.debug("EsAlarmIndexer storeData() - Cluster is not reachable");
+      log.debug("storeData() - Cluster is not reachable");
       throw new IDBPersistenceException(e);
+    }
+
+    if (!logged) {
+      throw new IDBPersistenceException("Alarm could not be stored in Elasticsearch");
     }
   }
 
@@ -99,73 +100,9 @@ public class EsAlarmIndexer<T extends EsAlarm> extends EsIndexer<T> {
   }
 
   /**
-   * Ask the {@link Connector} to write the data to ElasticSearch.
-   *
-   * @param esAlarm
-   *          to write to the cluster.
-   */
-  public void logAlarm(EsAlarm esAlarm) {
-    if (esAlarm == null) {
-      log.debug("logAlarm() - Could not instantiate EsAlarm, null rawValue.");
-    }
-
-    String indexName = generateAlarmIndex(esAlarm.getServerTimestamp());
-    String mapping = createOrRetrieveMapping(indexName);
-    indexData(indexName, mapping, esAlarm);
-  }
-
-  /**
    * Format: "alarmPrefix_indexSettings".
    */
   private String generateAlarmIndex(long time) {
     return retrieveIndexFormat(indexPrefix + "-alarm_", time);
-  }
-
-  private String createOrRetrieveMapping(String indexName) {
-    final String cachedMappings = cacheIndices.get(indexName);
-
-    if (Strings.isNullOrEmpty(cachedMappings)) {
-      return new EsAlarmMapping().getMapping();
-    }
-    return cachedMappings;
-  }
-
-  /**
-   * Ask the ElasticSearch cluster to retrieve the mappings that it holds for
-   * every index/type.
-   */
-  private void retrieveMappingsFromES() throws IDBPersistenceException {
-    Set<String> indicesES = retrieveIndicesFromES();
-    for (String index : indicesES) {
-      Set<String> types = retrieveTypesFromES(index);
-      for (String type : types) {
-        MappingMetaData mapping = retrieveMappingES(index, type);
-
-        if (mapping != null) {
-          String jsonMapping = mapping.source().toString();
-          log.debug("retrieveMappingsFromES() - mapping: " + jsonMapping);
-          this.cacheIndices.put(index, jsonMapping);
-        }
-      }
-    }
-  }
-
-  /**
-   * Send the data to the {@link Connector}: try to index an new entry to
-   * ElasticSearch.
-   *
-   * @param indexName
-   *          to which add the data.
-   * @param mapping
-   *          as JSON.
-   * @param esAlarm
-   *          the data.
-   */
-  private void indexData(String indexName, String mapping, EsAlarm esAlarm) {
-    boolean isAcked = connector.handleAlarmQuery(indexName, mapping, esAlarm);
-    if (isAcked) {
-      log.debug("logAlarm() - isAcked: " + isAcked);
-      cacheIndices.put(indexName, mapping);
-    }
   }
 }

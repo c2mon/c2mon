@@ -16,17 +16,20 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.alarm;
 
-import cern.c2mon.pmanager.IAlarmListener;
+import java.io.File;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
-import java.io.File;
+import cern.c2mon.pmanager.IAlarmListener;
 
 /**
  * Fallback alarm listener that send emails/SMS Slf4j.
  *
  * @author Alban Marguet
  */
+@Component("esAlarmListener")
 public class EsAlarmListener implements IAlarmListener {
 
   /**

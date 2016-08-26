@@ -18,7 +18,6 @@ package cern.c2mon.server.eslog.indexer;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -165,19 +164,5 @@ public abstract class EsIndexer<T extends IFallback> implements IDBPersistenceHa
     } catch(ElasticsearchException e) {
       throw new IDBPersistenceException();
     }
-  }
-
-  /**
-   * @return list of indices names in ElasticSearch.
-   */
-  protected Set<String> retrieveIndicesFromES() {
-    return connector.retrieveIndicesFromES();
-  }
-
-  /**
-   * @return the types present in the {@param index} in ElasticSearch.
-   */
-  protected Set<String> retrieveTypesFromES(String index) {
-    return connector.retrieveTypesFromES(index);
   }
 }

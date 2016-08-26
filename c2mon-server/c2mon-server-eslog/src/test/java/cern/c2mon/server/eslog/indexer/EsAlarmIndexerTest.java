@@ -18,7 +18,6 @@ package cern.c2mon.server.eslog.indexer;
 
 import java.sql.Timestamp;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,7 +51,7 @@ public class EsAlarmIndexerTest {
   private Timestamp timestamp;
 
   @InjectMocks
-  private EsAlarmIndexer indexer;
+  private EsAlarmIndexer<EsAlarm> indexer;
 
   @Mock
   private TransportConnector connector;
@@ -63,14 +62,9 @@ public class EsAlarmIndexerTest {
     alarm = CacheObjectCreation.createTestAlarm1();
     esAlarm = esAlarmLogConverter.convert(alarm);
     timestamp = alarm.getTimestamp();
-    when(connector.handleAlarmQuery(anyString(), anyString(), eq(esAlarm))).thenReturn(true);
+    when(connector.logAlarmEvent(anyString(), anyString(), eq(esAlarm))).thenReturn(true);
     indexer.setIndexFormat("M");
     esAlarmMapping = new EsAlarmMapping();
-  }
-
-  @After
-  public void cleanUp() {
-    indexer.getCacheIndices().clear();
   }
 
   @Test
@@ -84,8 +78,8 @@ public class EsAlarmIndexerTest {
   public void testLogAlarm() throws IDBPersistenceException {
     String expectedMapping = esAlarmMapping.getMapping();
 
-    indexer.logAlarm(esAlarm);
-    verify(connector).handleAlarmQuery(eq(indexer.getIndexPrefix() + "-alarm_" + indexer.millisecondsToYearMonth(timestamp.getTime())), eq(expectedMapping), eq(esAlarm));
+    indexer.storeData(esAlarm);
+    verify(connector).logAlarmEvent(eq(indexer.getIndexPrefix() + "-alarm_" + indexer.millisecondsToYearMonth(timestamp.getTime())), eq(expectedMapping), eq(esAlarm));
   }
 
 }

@@ -49,7 +49,7 @@ public class EsTagIndexerTest {
   private EsTagLogConverter esLogConverter;
 
   @InjectMocks
-  private EsTagIndexer tagIndexer;
+  private EsTagIndexer<EsTag> tagIndexer;
 
   @Before
   public void before() {

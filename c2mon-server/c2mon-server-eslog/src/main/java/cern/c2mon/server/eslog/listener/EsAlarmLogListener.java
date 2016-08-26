@@ -49,7 +49,7 @@ public class EsAlarmLogListener implements C2monCacheListener<Alarm>, SmartLifec
   /**
    * Bean that logs Tags into ElasticSearch.
    */
-  private final IPersistenceManager persistenceManager;
+  private final IPersistenceManager<EsAlarm> persistenceManager;
 
   /**
    * Allows to get the right information from the Alarm to create an EsAlarm instance.
@@ -74,7 +74,7 @@ public class EsAlarmLogListener implements C2monCacheListener<Alarm>, SmartLifec
    */
   @Autowired
   public EsAlarmLogListener(final CacheRegistrationService cacheRegistrationService,
-                            @Qualifier("esAlarmPersistenceManager") final IPersistenceManager persistenceManager,
+                            @Qualifier("esAlarmPersistenceManager") final IPersistenceManager<EsAlarm> persistenceManager,
                             final EsAlarmLogConverter esAlarmLogConverter) {
     this.cacheRegistrationService = cacheRegistrationService;
     this.persistenceManager = persistenceManager;

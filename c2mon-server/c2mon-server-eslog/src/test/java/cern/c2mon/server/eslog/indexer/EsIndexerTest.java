@@ -129,12 +129,11 @@ public class EsIndexerTest {
     assertNull(indexer.getCacheIndicesTypes().get("c2mon-tag_2015-01"));
     expectedIndex.add("c2mon-tag_2015-01");
 
-    connector.handleIndexQuery("c2mon-tag_2015-01", null, null);
-    indexer.updateCache();
+    assertTrue(indexer.createNonExistentIndex("c2mon-tag_2015-01"));
 
     assertEquals(expectedIndex, indexer.getCacheIndicesTypes().keySet());
 
-    connector.handleIndexQuery("c2mon-tag_2015-01", "tag_string", new EsTagMapping(EsTag.TYPE_STRING, String.class.getName()).getMapping());
+    connector.createIndexTypeMapping("c2mon-tag_2015-01", "tag_string", new EsTagMapping(EsTag.TYPE_STRING, String.class.getName()).getMapping());
     assertEquals(expectedType, indexer.getCacheIndicesTypes().get("c2mon-tag_2015-01"));
   }
 
@@ -235,7 +234,7 @@ public class EsIndexerTest {
 
     list.clear();
     connector.getClient().admin().indices().delete(new DeleteIndexRequest("*")).actionGet();
-    indexer.updateCache();
+    indexer.clearCache();
 
     long size = 10;
 
@@ -286,7 +285,7 @@ public class EsIndexerTest {
       assertEquals(resultIndices.size() + 1, liveIndices.size());
     }
     else {
-      assertEquals(resultIndices.size(), liveIndices.size());
+      assertEquals(Arrays.toString(liveIndices.toArray()), resultIndices.size(), liveIndices.size());
     }
 
     assertTrue(resultTypes.contains("type_string"));

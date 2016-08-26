@@ -16,13 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.connector;
 
-import cern.c2mon.server.eslog.structure.types.EsAlarm;
-import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
 
-import java.util.Set;
+import cern.c2mon.server.eslog.structure.types.EsAlarm;
+import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
 
 /**
  * Handle the connection/querying data to ElasticSearch cluster.
@@ -61,9 +60,9 @@ public interface Connector {
   /**
    * Retrieve the lists of indices, types and aliases from ElasticSearch and update them in memory.
    */
-  Set<String> retrieveIndicesFromES();
+//  Set<String> retrieveIndicesFromES();
 
-  Set<String> retrieveTypesFromES(String index);
+//  Set<String> retrieveTypesFromES(String index);
 
   /**
    * @return true if C2MON is connected to an ElasticSearch cluster. (client can communicate with it)
@@ -72,20 +71,42 @@ public interface Connector {
   boolean isConnected();
 
   /**
-   * Launch an indexing query against the ElasticSearch cluster.
-   * Used to insert a new index or to add a new mapping(type, mapping) to an existing index.
+   * Used to insert a new index
+   *
+   * @param indexName the Elasticsearch index name that shall be created
+   * @return true, if index creation was successful or index already exists
    */
-  boolean handleIndexQuery(String indexName, String type, String mapping);
+  boolean createIndex(String indexName);
+
+  /**
+   * Create a new QueryIndexBuilder and execute it to create a new index with name {@param indexName} and
+   *
+   * @param index the Elasticsearch index under which the mapping shall be created.
+   * @param type the mapping type
+   * @param mapping JSON string
+   * @return true, if acknowledged by the cluster.
+   */
+  boolean createIndexTypeMapping(String index, String type, String mapping);
 
   /**
    * Allows to add a new SupervisionEvent to ElasticSearch.
+   *
+   * @param indexName          to which add the data.
+   * @param mapping            as JSON.
+   * @param esSupervisionEvent the data.
+   * @return true if acknowledged by the cluster.
    */
-  boolean handleSupervisionQuery(String indexName, String mapping, EsSupervisionEvent esSupervisionEvent);
+  boolean logSupervisionEvent(String indexName, String mapping, EsSupervisionEvent esSupervisionEvent);
 
   /**
    * Allows to add a new EsAlarm to ElasticSearch.
+   *
+   * @param indexName to which add the data.
+   * @param mapping   as JSON.
+   * @param esAlarm   the data.
+   * @return true if acknowledged by the cluster.
    */
-  boolean handleAlarmQuery(String indexName, String mapping, EsAlarm EsAlarm);
+  boolean logAlarmEvent(String indexName, String mapping, EsAlarm esAlarm);
 
   /**
    * Allows to add data by batches to the ElasticSearch cluster thanks to a BulkProcessor.

@@ -28,9 +28,11 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequestBuilder;
+import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkProcessor;
@@ -48,6 +50,7 @@ import org.elasticsearch.common.transport.LocalTransportAddress;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.elasticsearch.node.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -308,7 +311,6 @@ public class TransportConnector implements Connector {
       @Override
       public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
         log.warn("afterBulk() - Error executing bulk", failure);
-        //closeBulk();
         waitForYellowStatus();
       }
     };
@@ -350,64 +352,27 @@ public class TransportConnector implements Connector {
     return true;
   }
 
-  /**
-   * Create a new QueryIndexBuilder and execute it to create a new index with name {@param indexName} and
-   *
-   * @param type and {@param mapping} as JSON.
-   * @return true if acknowledged by the cluster.
-   */
   @Override
-  public boolean handleIndexQuery(String indexName, String type, String mapping) {
+  public boolean createIndexTypeMapping(String index, String type, String mapping) {
     if (client == null) {
-      log.error("handleIndexQuery() - Error: the client is " + client + ".");
+      log.error("Elasticsearch connection not (yet) initialized.");
       return false;
     }
 
-    return indexNew(indexName, type, mapping);
-  }
-
-  /**
-   * Add a new {@link EsSupervisionEvent} to the ElasticSearch cluster.
-   *
-   * @param indexName          to which add the data.
-   * @param mapping            as JSON.
-   * @param esSupervisionEvent the data.
-   * @return true if acknowledged by the cluster.
-   */
-  @Override
-  public boolean handleSupervisionQuery(String indexName, String mapping, EsSupervisionEvent esSupervisionEvent) {
-    if (client == null) {
-      log.error("handleSupervisionQuery() - Error: the client is " + client + ".");
-      return false;
+    PutMappingResponse response = null;
+    try {
+      response = client.admin().indices().preparePutMapping(index).setType(type).setSource(mapping).get();
+    } catch (Exception e) {
+      log.error("Error occured whilst preparing the mapping for index={}, type={}, mapping={}", index, type, mapping, e);
     }
 
-    return logSupervisionEvent(indexName, mapping, esSupervisionEvent);
-  }
-
-  /**
-   * Add a new {@link EsAlarm} to the ElasticSearch cluster.
-   *
-   * @param indexName to which add the data.
-   * @param mapping   as JSON.
-   * @param esAlarm   the data.
-   * @return true if acknowledged by the cluster.
-   */
-  @Override
-  public boolean handleAlarmQuery(String indexName, String mapping, EsAlarm esAlarm) {
-    log.debug("handleAlarmQuery() - Handling AlarmESQuery with mapping:" + mapping + " for index: " + indexName + ".");
-
-    if (client == null) {
-      log.error("handleAlarmQuery() - Error: the client is " + client + ".");
-      return false;
-    }
-
-    return logAlarmES(indexName, mapping, esAlarm);
+    return response == null ? false : response.isAcknowledged();
   }
 
   /**
    * @return the set of indices present in ElasticSearch.
    */
-  @Override
+//  @Override
   public Set<String> retrieveIndicesFromES() {
     if (client == null) {
       return Collections.emptySet();
@@ -422,7 +387,7 @@ public class TransportConnector implements Connector {
   /**
    * @return the set of types associated to the index {@param index} in ElasticSearch.
    */
-  @Override
+//  @Override
   public Set<String> retrieveTypesFromES(String index) {
     if (client == null) {
       return Collections.emptySet();
@@ -441,7 +406,7 @@ public class TransportConnector implements Connector {
   public void refreshClusterStats() {
     log.debug("refreshClusterStats()");
     client.admin().indices().prepareRefresh().execute().actionGet();
-    client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
+    checkYellowStatus();
   }
 
   /**
@@ -544,10 +509,12 @@ public class TransportConnector implements Connector {
   }
 
   /**
-   * Query the cluster in order to do an Alias operation.
+   * Query the cluster in order to check, whether the given index is  existing
    */
-  protected IndicesAliasesRequestBuilder prepareAliases() {
-    return client.admin().indices().prepareAliases();
+  private boolean isIndexExisting(String index) {
+    ActionFuture<IndicesExistsResponse> response = client.admin().indices().exists(new IndicesExistsRequest(index));
+
+    return response.actionGet(1000L).isExists();
   }
 
   /**
@@ -584,8 +551,15 @@ public class TransportConnector implements Connector {
    * @param esAlarm   to be written.
    * @return true if the cluster has acknowledged the query.
    */
-  public boolean logAlarmES(String indexName, String mapping, EsAlarm esAlarm) {
-    log.debug("logAlarmES() - Try to create a writing query for Alarm.");
+  @Override
+  public boolean logAlarmEvent(String indexName, String mapping, EsAlarm esAlarm) {
+    if (client == null) {
+      log.error("Elasticsearch connection not (yet) initialized.");
+      return false;
+    }
+
+    log.debug("logAlarmES() - Try to write new alarm event to in index = {}, mapping = {}.", indexName, mapping);
+
     String jsonSource = esAlarm.toString();
     String routing = String.valueOf(esAlarm.getAlarmId());
 
@@ -603,9 +577,7 @@ public class TransportConnector implements Connector {
     }
 
     log.debug("logAlarmES() - Source query is: " + jsonSource + ".");
-    return client.admin().indices().prepareCreate(indexName)
-            .setSource(mapping)
-            .get().isAcknowledged();
+    return prepareCreateIndexRequestBuilder(indexName).setSource(mapping).get().isAcknowledged();
   }
 
   /**
@@ -616,7 +588,13 @@ public class TransportConnector implements Connector {
    * @param esSupervisionEvent to be written.
    * @return true if the cluster has acknowledged the query.
    */
+  @Override
   public boolean logSupervisionEvent(String indexName, String mapping, EsSupervisionEvent esSupervisionEvent) {
+    if (client == null) {
+      log.error("Elasticsearch connection not (yet) initialized.");
+      return false;
+    }
+
     String jsonSource = esSupervisionEvent.toString();
     String routing = esSupervisionEvent.getId();
 
@@ -635,10 +613,7 @@ public class TransportConnector implements Connector {
     }
 
     log.debug("logSupervisionEvent() - Source query is: " + jsonSource + ".");
-    return client.admin().indices().prepareCreate(indexName)
-            .setSource(mapping)
-            .get()
-            .isAcknowledged();
+    return prepareCreateIndexRequestBuilder(indexName).setSource(mapping).get().isAcknowledged();
 
   }
 
@@ -649,12 +624,12 @@ public class TransportConnector implements Connector {
    */
   public List<String> getListOfIndicesFromES() {
     if (client == null) {
-      log.warn("getListOFAnswer() - Warning: client has value " + client + ".");
+      log.warn("getListOfIndicesFromES() - Warning: client has value " + client + ".");
       return Collections.emptyList();
     }
 
     List<String> indicesFromCluster = getIndicesFromCluster();
-    log.debug("getListOfAnswer() - got a list of indices, size=" + indicesFromCluster.size());
+    log.debug("getListOfIndicesFromES() - got a list of indices, size=" + indicesFromCluster.size());
 
     return indicesFromCluster;
   }
@@ -672,35 +647,23 @@ public class TransportConnector implements Connector {
     return types;
   }
 
-  /**
-   * Write a new index to ElasticSearch if {@param type} and {@param mapping} are null.
-   * Write a new mapping to the index {@param index} otherwise.
-   *
-   * @return true if the cluster has acknowledged the query.
-   */
-  public boolean indexNew(String index, String type, String mapping) {
-    if (type == null && mapping == null) {
-      return handleAddingIndex(index);
-    } else {
-      return handleAddingMapping(index, type, mapping);
+  @Override
+  public boolean createIndex(String indexName) {
+    if (client == null) {
+      log.error("Elasticsearch connection not (yet) initialized.");
+      return false;
     }
-  }
 
-  private boolean handleAddingIndex(String index) {
-    CreateIndexRequestBuilder createIndexRequestBuilder = prepareCreateIndexRequestBuilder(index);
-    CreateIndexResponse response = createIndexRequestBuilder.get();
-    return response.isAcknowledged();
-  }
+    if (isIndexExisting(indexName)) {
+      return true;
+    }
 
-  private boolean handleAddingMapping(String index, String type, String mapping) {
-
-    PutMappingResponse response = null;
+    CreateIndexRequestBuilder createIndexRequestBuilder = prepareCreateIndexRequestBuilder(indexName);
     try {
-      response = client.admin().indices().preparePutMapping(index).setType(type).setSource(mapping).get();
-    } catch (Exception e) {
-      log.error("Error occured whilst preparing the mapping for index={}, type={}, mapping={}", index, type, mapping, e);
+      CreateIndexResponse response = createIndexRequestBuilder.get();
+      return response.isAcknowledged();
+    } catch (IndexAlreadyExistsException ex) {
+      return true;
     }
-
-    return response == null ? false : response.isAcknowledged();
   }
 }

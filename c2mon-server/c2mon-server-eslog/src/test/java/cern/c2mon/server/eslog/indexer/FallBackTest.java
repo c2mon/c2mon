@@ -44,7 +44,7 @@ public class FallBackTest {
   @Before
   public void setup() {
     esAlarmIndexer.setIndexFormat("M");
-    when(connector.handleAlarmQuery(anyString(), anyString(), any(EsAlarm.class))).thenThrow(new ElasticsearchException("testException"));
+    when(connector.logAlarmEvent(anyString(), anyString(), any(EsAlarm.class))).thenThrow(new ElasticsearchException("testException"));
   }
 
 

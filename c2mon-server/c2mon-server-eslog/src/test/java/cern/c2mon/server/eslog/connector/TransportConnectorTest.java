@@ -114,15 +114,32 @@ public class TransportConnectorTest {
   }
 
   @Test
-  public void testHandleIndexQuery() {
+  public void testCreateIndex() {
     Client initClient = connector.getClient();
 
+    connector.setClient(initClient);
+    // creating multiple times the same index should always return true
+    for (int i=0; i <10; i++) {
+      assertTrue(connector.createIndex("c2mon_2015-01"));
+    }
+  }
+
+  @Test
+  public void testCreateIndexTypeMapping() {
+    Client initClient = connector.getClient();
+
+    String index = "c2mon_2015-01";
     String type = "type_string";
     String mapping = new EsTagMapping(EsTag.TYPE_STRING, String.class.getName()).getMapping();
 
     connector.setClient(initClient);
-    boolean result = connector.handleIndexQuery("c2mon_2015-01", null, null);
-    assertTrue(result);
+
+    assertTrue(connector.createIndex(index));
+
+    // creating multiple times the same mapping should always return true
+    for (int i=0; i < 10; i++) {
+      assertTrue(connector.createIndexTypeMapping(index, type, mapping));
+    }
   }
 
   @Test

@@ -16,7 +16,7 @@
   <description>C2MON server persistence module for ElasticSearch</description>
 
   <properties>
-    <elasticsearch.version>2.3.0</elasticsearch.version>
+    <elasticsearch.version>2.3.5</elasticsearch.version>
     <google-guava.version>19.0</google-guava.version>
     <commons-io.version>2.5</commons-io.version>
     <mockito-all.version>1.10.19</mockito-all.version>
