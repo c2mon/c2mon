@@ -17,18 +17,10 @@
 
 package cern.c2mon.server.configuration.parser.configuration;
 
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.RuleTagCache;
-import cern.c2mon.server.cache.SubEquipmentCache;
-import cern.c2mon.server.cache.loading.SequenceDAO;
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.configuration.parser.ConfigurationParser;
-import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
-import cern.c2mon.shared.client.configuration.ConfigConstants;
-import cern.c2mon.shared.client.configuration.ConfigurationElement;
-import cern.c2mon.shared.client.configuration.api.Configuration;
-import cern.c2mon.shared.client.configuration.api.tag.RuleTag;
-import cern.c2mon.shared.client.configuration.api.tag.Tag;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Rule;
@@ -39,9 +31,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import cern.c2mon.server.cache.DataTagCache;
+import cern.c2mon.server.cache.RuleTagCache;
+import cern.c2mon.server.cache.SubEquipmentCache;
+import cern.c2mon.server.cache.TagFacadeGateway;
+import cern.c2mon.server.cache.loading.SequenceDAO;
+import cern.c2mon.server.common.rule.RuleTagCacheObject;
+import cern.c2mon.server.configuration.parser.ConfigurationParser;
+import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.api.Configuration;
+import cern.c2mon.shared.client.configuration.api.tag.RuleTag;
+import cern.c2mon.shared.client.configuration.api.tag.Tag;
 
 import static cern.c2mon.server.configuration.parser.util.ConfigurationRuleTagUtil.*;
 import static org.junit.Assert.assertEquals;
@@ -68,6 +70,9 @@ public class ConfigureRuleTagTest {
 
   @Autowired
   RuleTagCache ruleTagCache;
+  
+  @Autowired
+  TagFacadeGateway tagFacade;
 
   @Rule
   public ExpectedException tagException = ExpectedException.none();
@@ -75,7 +80,7 @@ public class ConfigureRuleTagTest {
 
   @Before
   public void resetMocks() {
-    EasyMock.reset(sequenceDAO, dataTagCache, ruleTagCache);
+    EasyMock.reset(sequenceDAO, dataTagCache, ruleTagCache, tagFacade);
   }
 
 
@@ -93,9 +98,9 @@ public class ConfigureRuleTagTest {
 
     // setUp Mocks:
     EasyMock.expect(sequenceDAO.getNextTagId()).andReturn(100L);
-    EasyMock.expect(ruleTagCache.hasKey(100L)).andReturn(false);
+    EasyMock.expect(tagFacade.isInTagCache(100L)).andReturn(false);
 
-    EasyMock.replay(sequenceDAO, ruleTagCache);
+    EasyMock.replay(sequenceDAO, tagFacade);
 
     List<ConfigurationElement> parsed = parser.parse(config);
 
@@ -105,7 +110,7 @@ public class ConfigureRuleTagTest {
     assertTrue(parsed.get(0).getAction().equals(ConfigConstants.Action.CREATE));
     assertEquals(parsed.get(0).getElementProperties(), expectedProps);
 
-    EasyMock.verify(sequenceDAO, ruleTagCache);
+    EasyMock.verify(sequenceDAO, tagFacade);
   }
 
   @Test
@@ -119,9 +124,9 @@ public class ConfigureRuleTagTest {
     config.setEntities(ruleTagList);
 
     // setUp Mocks:
-    EasyMock.expect(ruleTagCache.hasKey(101L)).andReturn(false);
+    EasyMock.expect(tagFacade.isInTagCache(101L)).andReturn(false);
 
-    EasyMock.replay(ruleTagCache);
+    EasyMock.replay(tagFacade);
 
     List<ConfigurationElement> parsed = parser.parse(config);
 
@@ -131,7 +136,7 @@ public class ConfigureRuleTagTest {
     assertTrue(parsed.get(0).getEntity().equals(ConfigConstants.Entity.RULETAG));
     assertTrue(parsed.get(0).getAction().equals(ConfigConstants.Action.CREATE));
 
-    EasyMock.verify(ruleTagCache);
+    EasyMock.verify(tagFacade);
   }
 
   @Test
@@ -150,11 +155,11 @@ public class ConfigureRuleTagTest {
     config.setEntities(ruleTagList);
 
     // setUp Mocks:
-    EasyMock.expect(ruleTagCache.hasKey(101L)).andReturn(false);
-    EasyMock.expect(ruleTagCache.hasKey(102L)).andReturn(false);
-    EasyMock.expect(ruleTagCache.hasKey(103L)).andReturn(false);
+    EasyMock.expect(tagFacade.isInTagCache(101L)).andReturn(false);
+    EasyMock.expect(tagFacade.isInTagCache(102L)).andReturn(false);
+    EasyMock.expect(tagFacade.isInTagCache(103L)).andReturn(false);
 
-    EasyMock.replay(ruleTagCache);
+    EasyMock.replay(tagFacade);
 
     // run the parsing
     List<ConfigurationElement> elements = parser.parse(config);
@@ -178,7 +183,7 @@ public class ConfigureRuleTagTest {
     assertTrue(elements.get(2).getAction().equals(ConfigConstants.Action.CREATE));
 
 
-    EasyMock.verify(ruleTagCache);
+    EasyMock.verify(tagFacade);
   }
 
   @Test
@@ -194,12 +199,12 @@ public class ConfigureRuleTagTest {
     config.setEntities(ruleTagList);
 
     // setUp Mocks:
-    EasyMock.expect(ruleTagCache.hasKey(21L)).andReturn(true);
+    EasyMock.expect(tagFacade.isInTagCache(21L)).andReturn(true);
 
     // run test
-    EasyMock.replay(ruleTagCache);
+    EasyMock.replay(tagFacade);
     parser.parse(config);
-    EasyMock.verify(ruleTagCache);
+    EasyMock.verify(tagFacade);
   }
 
   @Test
@@ -214,10 +219,10 @@ public class ConfigureRuleTagTest {
     config.setEntities(tagUpdateList);
 
     // setUp Mocks:
-    EasyMock.expect(dataTagCache.get("myRuleTag")).andReturn(new DataTagCacheObject(20L));
-    EasyMock.expect(ruleTagCache.hasKey(20L)).andReturn(true);
+    EasyMock.expect(ruleTagCache.get("myRuleTag")).andReturn(new RuleTagCacheObject(20L));
+    EasyMock.expect(tagFacade.isInTagCache(20L)).andReturn(true);
 
-    EasyMock.replay(dataTagCache, ruleTagCache);
+    EasyMock.replay(ruleTagCache, tagFacade);
 
     List<ConfigurationElement> parsed = parser.parse(config);
 
@@ -226,7 +231,7 @@ public class ConfigureRuleTagTest {
     assertEquals(parsed.get(0).getAction(), ConfigConstants.Action.UPDATE);
     assertEquals(parsed.get(0).getElementProperties(), expectedProps);
 
-    EasyMock.verify(dataTagCache, ruleTagCache);
+    EasyMock.verify(ruleTagCache, tagFacade);
   }
 
   @Test
@@ -242,9 +247,9 @@ public class ConfigureRuleTagTest {
     config.setEntities(tagUpdateList);
 
     // setUp Mocks:
-    EasyMock.expect(ruleTagCache.hasKey(100L)).andReturn(true);
+    EasyMock.expect(tagFacade.isInTagCache(100L)).andReturn(true);
 
-    EasyMock.replay(ruleTagCache);
+    EasyMock.replay(tagFacade);
 
     List<ConfigurationElement> parsed = parser.parse(config);
 
@@ -253,7 +258,7 @@ public class ConfigureRuleTagTest {
     assertEquals(parsed.get(0).getAction(), ConfigConstants.Action.UPDATE);
     assertEquals(parsed.get(0).getElementProperties(), expectedProps);
 
-    EasyMock.verify(ruleTagCache);
+    EasyMock.verify(tagFacade);
   }
 
   @Test
@@ -268,9 +273,9 @@ public class ConfigureRuleTagTest {
     config.setEntities(tagUpdateList);
 
     // setUp Mocks:
-    EasyMock.expect(ruleTagCache.hasKey(100L)).andReturn(true);
+    EasyMock.expect(tagFacade.isInTagCache(100L)).andReturn(true);
 
-    EasyMock.replay(ruleTagCache);
+    EasyMock.replay(tagFacade);
 
     List<ConfigurationElement> parsed = parser.parse(config);
 
@@ -279,7 +284,7 @@ public class ConfigureRuleTagTest {
     assertEquals(parsed.get(0).getAction(), ConfigConstants.Action.UPDATE);
     assertEquals(parsed.get(0).getElementProperties(), expectedProps);
 
-    EasyMock.verify(ruleTagCache);
+    EasyMock.verify(tagFacade);
   }
 
   @Test
@@ -296,12 +301,12 @@ public class ConfigureRuleTagTest {
     config.setEntities(tagUpdateList);
 
     // setUp Mocks:
-    EasyMock.expect(ruleTagCache.hasKey(20L)).andReturn(false);
+    EasyMock.expect(tagFacade.isInTagCache(20L)).andReturn(false);
 
     // run test
-    EasyMock.replay(ruleTagCache);
+    EasyMock.replay(tagFacade);
     parser.parse(config);
-    EasyMock.verify(ruleTagCache);
+    EasyMock.verify(tagFacade);
   }
 
   @Test
@@ -315,9 +320,9 @@ public class ConfigureRuleTagTest {
     config.setEntities(tagUpdateList);
 
     // setUp Mocks:
-    EasyMock.expect(ruleTagCache.hasKey(20L)).andReturn(true);
+    EasyMock.expect(tagFacade.isInTagCache(20L)).andReturn(true);
 
-    EasyMock.replay(ruleTagCache);
+    EasyMock.replay(tagFacade);
 
     List<ConfigurationElement> parsed = parser.parse(config);
 
@@ -326,7 +331,7 @@ public class ConfigureRuleTagTest {
     assertEquals(parsed.get(0).getEntity(), ConfigConstants.Entity.RULETAG);
     assertTrue(parsed.get(0).getElementProperties().isEmpty());
 
-    EasyMock.verify(ruleTagCache);
+    EasyMock.verify(tagFacade);
   }
 
   @Test

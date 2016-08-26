@@ -318,10 +318,10 @@ public class ConfigureProcessTest {
     config.setEntities(processUpdateList);
 
     // setUp Mocks:
-    EasyMock.expect(processDAO.getIdByName("myProcess")).andReturn(1L);
+    EasyMock.expect(processCache.getProcessId("myProcess")).andReturn(1L);
     EasyMock.expect(processCache.hasKey(1L)).andReturn(true);
 
-    EasyMock.replay(processDAO, processCache);
+    EasyMock.replay(processCache);
 
     List<ConfigurationElement> parsed = parser.parse(config);
 
@@ -330,7 +330,7 @@ public class ConfigureProcessTest {
     assertEquals(parsed.get(0).getAction(), ConfigConstants.Action.UPDATE);
     assertEquals(parsed.get(0).getElementProperties(), expectedProps);
 
-    EasyMock.verify(processDAO, processCache);
+    EasyMock.verify(processCache);
   }
 
   @Test

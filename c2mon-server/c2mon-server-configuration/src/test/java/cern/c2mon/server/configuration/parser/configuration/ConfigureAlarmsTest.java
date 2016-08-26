@@ -17,15 +17,10 @@
 
 package cern.c2mon.server.configuration.parser.configuration;
 
-import cern.c2mon.server.cache.AlarmCache;
-import cern.c2mon.server.cache.TagFacadeGateway;
-import cern.c2mon.server.cache.loading.SequenceDAO;
-import cern.c2mon.server.configuration.parser.ConfigurationParser;
-import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
-import cern.c2mon.shared.client.configuration.ConfigConstants;
-import cern.c2mon.shared.client.configuration.ConfigurationElement;
-import cern.c2mon.shared.client.configuration.api.Configuration;
-import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,11 +31,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.TagFacadeGateway;
+import cern.c2mon.server.cache.loading.SequenceDAO;
+import cern.c2mon.server.configuration.parser.ConfigurationParser;
+import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.api.Configuration;
+import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 
-import static cern.c2mon.server.configuration.parser.util.ConfigurationAlarmUtil.*;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationAlarmUtil.buildCreateAllFieldsAlarm;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationAlarmUtil.buildCreateBasicAlarm;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationAlarmUtil.buildDeleteAlarm;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationAlarmUtil.buildUpdateAlarmWithAllFields;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -97,6 +101,7 @@ public class ConfigureAlarmsTest {
     assertEquals((long) parsed.get(0).getEntityId(), 200L);
     assertTrue(parsed.get(0).getEntity().equals(ConfigConstants.Entity.ALARM));
     assertTrue(parsed.get(0).getAction().equals(ConfigConstants.Action.CREATE));
+    parsed.get(0).getElementProperties().remove("name"); // Can be ignored
     assertEquals(parsed.get(0).getElementProperties(), expectedProps);
 
     EasyMock.verify(alarmCache, sequenceDAO, tagFacadeGateway);
@@ -121,6 +126,7 @@ public class ConfigureAlarmsTest {
     List<ConfigurationElement> parsed = parser.parse(config);
 
     assertEquals((long) parsed.get(0).getEntityId(), 201L);
+    parsed.get(0).getElementProperties().remove("name"); // Can be ignored
     assertEquals(parsed.get(0).getElementProperties(), expectedProps);
     assertTrue(parsed.get(0).getEntity().equals(ConfigConstants.Entity.ALARM));
     assertTrue(parsed.get(0).getAction().equals(ConfigConstants.Action.CREATE));
@@ -162,16 +168,19 @@ public class ConfigureAlarmsTest {
     // Assert stuff
     assertTrue(elements.size() == 3);
 
+    elements.get(0).getElementProperties().remove("name"); // Can be ignored, as only a method and not a field
     assertEquals(elements.get(0).getElementProperties(), expectedProps1);
     assertTrue(elements.get(0).getEntityId().equals(201L));
     assertTrue(elements.get(0).getEntity().equals(ConfigConstants.Entity.ALARM));
     assertTrue(elements.get(0).getAction().equals(ConfigConstants.Action.CREATE));
 
+    elements.get(1).getElementProperties().remove("name"); // Can be ignored, as only a method and not a field
     assertEquals(elements.get(1).getElementProperties(), expectedProps2);
     assertTrue(elements.get(1).getEntityId().equals(202L));
     assertTrue(elements.get(1).getEntity().equals(ConfigConstants.Entity.ALARM));
     assertTrue(elements.get(1).getAction().equals(ConfigConstants.Action.CREATE));
 
+    elements.get(2).getElementProperties().remove("name"); // Can be ignored, as only a method and not a field
     assertEquals(elements.get(2).getElementProperties(), expectedProps3);
     assertTrue(elements.get(2).getEntityId().equals(203L));
     assertTrue(elements.get(2).getEntity().equals(ConfigConstants.Entity.ALARM));

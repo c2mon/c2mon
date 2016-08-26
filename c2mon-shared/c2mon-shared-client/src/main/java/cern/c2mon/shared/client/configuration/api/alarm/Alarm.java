@@ -154,6 +154,10 @@ public class Alarm implements ConfigurationEntity {
   
   @Override
   public String getName() {
+    if (faultFamily == null && faultMember == null) {
+      return null;
+    }
+     
     return faultFamily + " : " + faultMember + " : " + faultCode;
   }
 }
