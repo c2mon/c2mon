@@ -70,7 +70,7 @@ public class ConfigureRuleTagTest {
 
   @Autowired
   RuleTagCache ruleTagCache;
-  
+
   @Autowired
   TagFacadeGateway tagFacade;
 
@@ -155,11 +155,14 @@ public class ConfigureRuleTagTest {
     config.setEntities(ruleTagList);
 
     // setUp Mocks:
+    EasyMock.expect(ruleTagCache.get("RuleTag101")).andReturn(null);
     EasyMock.expect(tagFacade.isInTagCache(101L)).andReturn(false);
+    EasyMock.expect(ruleTagCache.get("RuleTag102")).andReturn(null);
     EasyMock.expect(tagFacade.isInTagCache(102L)).andReturn(false);
+    EasyMock.expect(ruleTagCache.get("RuleTag103")).andReturn(null);
     EasyMock.expect(tagFacade.isInTagCache(103L)).andReturn(false);
 
-    EasyMock.replay(tagFacade);
+    EasyMock.replay(tagFacade, ruleTagCache);
 
     // run the parsing
     List<ConfigurationElement> elements = parser.parse(config);
@@ -183,7 +186,7 @@ public class ConfigureRuleTagTest {
     assertTrue(elements.get(2).getAction().equals(ConfigConstants.Action.CREATE));
 
 
-    EasyMock.verify(tagFacade);
+    EasyMock.verify(tagFacade, ruleTagCache);
   }
 
   @Test

@@ -20,6 +20,7 @@ package cern.c2mon.server.configuration.parser.factory;
 import java.util.Collections;
 import java.util.List;
 
+import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,7 +55,12 @@ public class RuleTagFactory extends EntityFactory<RuleTag> {
 
   @Override
   Long createId(RuleTag configurationEntity) {
-    return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextTagId();
+    if (configurationEntity.getName() != null && ruleTagCache.get(configurationEntity.getName()) != null) {
+      throw new ConfigurationParseException("Error creating ruletag " + configurationEntity.getName() + ": " +
+          "Name already exists");
+    } else {
+      return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextTagId();
+    }
   }
 
   @Override
