@@ -138,9 +138,7 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
    * @param configurationEntity The entity where the id belongs to.
    * @return The id of the entity.
    */
-  Long getId(T configurationEntity) {
-    return configurationEntity.getId();
-  }
+  abstract Long getId(T configurationEntity);
 
   /**
    * Checks the cache which belongs to a {@link ConfigurationEntity} if the id is already known to the cache.

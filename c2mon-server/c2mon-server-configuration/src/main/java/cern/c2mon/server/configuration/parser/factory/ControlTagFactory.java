@@ -60,7 +60,6 @@ public class ControlTagFactory extends EntityFactory<ControlTag> {
     } else {
       return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextTagId();
     }
-
   }
 
   @Override

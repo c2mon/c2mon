@@ -72,6 +72,11 @@ public class AlarmFactory extends EntityFactory<Alarm> {
   }
 
   @Override
+  Long getId(Alarm configurationEntity) {
+    return configurationEntity.getId();
+  }
+
+  @Override
   ConfigConstants.Entity getEntity() {
     return ConfigConstants.Entity.ALARM;
   }

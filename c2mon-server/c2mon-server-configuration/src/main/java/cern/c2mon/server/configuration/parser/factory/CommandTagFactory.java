@@ -20,6 +20,7 @@ package cern.c2mon.server.configuration.parser.factory;
 import java.util.Collections;
 import java.util.List;
 
+import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +42,7 @@ public class CommandTagFactory extends EntityFactory<CommandTag> {
   private final SequenceDAO sequenceDAO;
   private final EquipmentDAO equipmentDAO;
   private final EquipmentCache equipmentCache;
+  private final CommandTagCache commandTagCache;
 
   @Autowired
   public CommandTagFactory(CommandTagCache commandTagCache, EquipmentCache equipmentCache, SequenceDAO sequenceDAO, EquipmentDAO equipmentDAO) {
@@ -48,7 +50,7 @@ public class CommandTagFactory extends EntityFactory<CommandTag> {
     this.sequenceDAO = sequenceDAO;
     this.equipmentCache = equipmentCache;
     this.equipmentDAO = equipmentDAO;
-
+    this.commandTagCache = commandTagCache;
   }
 
   @Override
@@ -71,7 +73,28 @@ public class CommandTagFactory extends EntityFactory<CommandTag> {
 
   @Override
   Long createId(CommandTag configurationEntity) {
-    return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextTagId();
+    if (configurationEntity.getName() != null && commandTagCache.getCommandTagId(configurationEntity.getName()) != null) {
+      throw new ConfigurationParseException("Error creating commandtag " + configurationEntity.getName() + ": " +
+          "Name already exists");
+    } else {
+      return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextTagId();
+    }
+  }
+
+  @Override
+  Long getId(CommandTag entity) {
+    Long id;
+
+    if (entity.getId() != null) {
+      id = entity.getId();
+    } else {
+      if (commandTagCache.getCommandTagId(entity.getName()) != null) {
+        id = commandTagCache.getCommandTagId(entity.getName());
+      } else {
+        throw new ConfigurationParseException("CommandTag " + entity.getName() + " does not exist!");
+      }
+    }
+    return id;
   }
 
   @Override
