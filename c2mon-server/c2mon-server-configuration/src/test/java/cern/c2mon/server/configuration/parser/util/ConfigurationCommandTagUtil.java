@@ -36,7 +36,7 @@ public class ConfigurationCommandTagUtil {
     }
 
     CommandTag commandTag = CommandTag.create("CommandTag", Integer.class, new SimpleHardwareAddressImpl("testAddress"),
-        30000, 6000, 200, 2, "RBAC class", "RBAC device", "RBAC property").equipmentId(10L).build();
+        30000, 6000, 200, 2, "RBAC class", "RBAC device", "RBAC property").equipmentId(10L).mode(TagMode.TEST).build();
 
     properties.setProperty("name", "CommandTag");
     properties.setProperty("description", "<no description provided>");
@@ -170,6 +170,7 @@ public class ConfigurationCommandTagUtil {
         .minimum(20)
         .build();
 
+    properties.setProperty("name", name);
     properties.setProperty("description", "foo_update");
     properties.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
     properties.setProperty("hardwareAddress", new PLCHardwareAddressImpl(2, 2, 2, 2, 2, 2.0f, "testAddress_update").toConfigXML());
