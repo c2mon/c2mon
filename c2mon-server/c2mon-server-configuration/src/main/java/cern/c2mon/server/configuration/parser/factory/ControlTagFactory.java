@@ -20,16 +20,15 @@ package cern.c2mon.server.configuration.parser.factory;
 import java.util.Collections;
 import java.util.List;
 
-import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.loading.SequenceDAO;
+import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.tag.ControlTag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Franz Ritter
@@ -78,5 +77,4 @@ public class ControlTagFactory extends EntityFactory<ControlTag> {
   ConfigConstants.Entity getEntity() {
     return ConfigConstants.Entity.CONTROLTAG;
   }
-
 }

@@ -20,10 +20,8 @@ package cern.c2mon.server.configuration.parser.factory;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.ProcessCache;
+import cern.c2mon.server.cache.loading.ProcessDAO;
 import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
@@ -31,6 +29,8 @@ import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.AliveTag;
 import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Franz Ritter
@@ -38,16 +38,17 @@ import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
 @Service
 public class ProcessFactory extends EntityFactory<Process> {
 
-  ProcessCache processCache;
+  private ProcessDAO processDAO;
   private SequenceDAO sequenceDAO;
   private ControlTagFactory controlTagFactory;
 
   @Autowired
-  public ProcessFactory(ProcessCache processCache, SequenceDAO sequenceDAO, ControlTagFactory controlTagFactory) {
+  public ProcessFactory(ProcessCache processCache, SequenceDAO sequenceDAO, ControlTagFactory controlTagFactory,
+                        ProcessDAO processDAO) {
     super(processCache);
-    this.processCache = processCache;
     this.sequenceDAO = sequenceDAO;
     this.controlTagFactory = controlTagFactory;
+    this.processDAO = processDAO;
   }
 
 
@@ -106,12 +107,12 @@ public class ProcessFactory extends EntityFactory<Process> {
 
   @Override
   Long getId(Process entity) {
-    return entity.getId() != null ? entity.getId() : processCache.getProcessId(entity.getName());
+    return entity.getId() != null ? entity.getId() : processDAO.getIdByName(entity.getName());
   }
 
   @Override
   Long createId(Process entity) {
-    if (entity.getName() != null && processCache.getProcessId(entity.getName()) != null) {
+    if (entity.getName() != null && processDAO.getIdByName(entity.getName()) != null) {
       throw new ConfigurationParseException("Error creating process " + entity.getName() + ": " +
           "Name already exists");
     } else {

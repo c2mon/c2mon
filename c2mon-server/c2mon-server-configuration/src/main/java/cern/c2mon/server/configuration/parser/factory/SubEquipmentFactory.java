@@ -20,9 +20,6 @@ package cern.c2mon.server.configuration.parser.factory;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
 import cern.c2mon.server.cache.loading.EquipmentDAO;
@@ -34,6 +31,8 @@ import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.tag.CommFaultTag;
 import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Franz Ritter
@@ -48,8 +47,9 @@ public class SubEquipmentFactory extends EntityFactory<SubEquipment> {
   private ControlTagFactory controlTagFactory;
 
   @Autowired
-  public SubEquipmentFactory(SubEquipmentCache subEquipmentCache, SubEquipmentDAO subEquipmentDAO, SequenceDAO sequenceDAO, ControlTagFactory controlTagFactory,
-                             EquipmentFactory equipmentFactory, EquipmentCache equipmentCache, EquipmentDAO equipmentDAO) {
+  public SubEquipmentFactory(SubEquipmentCache subEquipmentCache, SubEquipmentDAO subEquipmentDAO,
+                             SequenceDAO sequenceDAO, ControlTagFactory controlTagFactory,
+                             EquipmentCache equipmentCache, EquipmentDAO equipmentDAO) {
     super(subEquipmentCache);
     this.subEquipmentDAO = subEquipmentDAO;
     this.sequenceDAO = sequenceDAO;

@@ -17,6 +17,9 @@
 
 package cern.c2mon.server.configuration.parser.factory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.loading.EquipmentDAO;
@@ -31,9 +34,6 @@ import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author Franz Ritter
  */
@@ -47,7 +47,8 @@ public class EquipmentFactory extends EntityFactory<Equipment> {
   private ControlTagFactory controlTagFactory;
 
   @Autowired
-  public EquipmentFactory(EquipmentCache equipmentCache, EquipmentDAO equipmentDAO, SequenceDAO sequenceDAO, ControlTagFactory controlTagFactory,
+  public EquipmentFactory(EquipmentCache equipmentCache, EquipmentDAO equipmentDAO, SequenceDAO sequenceDAO,
+                          ControlTagFactory controlTagFactory,
                           ProcessCache processCache, ProcessDAO processDAO) {
     super(equipmentCache);
     this.equipmentDAO = equipmentDAO;
