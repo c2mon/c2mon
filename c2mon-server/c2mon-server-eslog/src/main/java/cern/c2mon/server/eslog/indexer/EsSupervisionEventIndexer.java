@@ -16,9 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.indexer;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
@@ -26,9 +24,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.eslog.connector.Connector;
@@ -41,15 +37,12 @@ import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
  * @author Alban Marguet
  */
 @Slf4j
-@Qualifier("esSupervisionEventIndexer")
-@Component
 @Data
 @EqualsAndHashCode(callSuper = false)
+@Component("esSupervisionEventIndexer")
 public class EsSupervisionEventIndexer<T extends EsSupervisionEvent> extends EsIndexer<T> {
-  /**
-   * Holds the ElasticSearch mapping given to an index.
-   */
-  Map<String, String> cacheIndices = new HashMap<>();
+
+  private final String supervisionMapping = new EsSupervisionMapping().getMapping();
 
   /**
    * Autowired constructor.
@@ -71,43 +64,34 @@ public class EsSupervisionEventIndexer<T extends EsSupervisionEvent> extends EsI
   }
 
   @Override
-  public void storeData(T object) throws IDBPersistenceException {
-    if(object == null) {
+  public void storeData(T esSupervisionEvent) throws IDBPersistenceException {
+    if(esSupervisionEvent == null) {
       return;
     }
+
+    boolean logged = false;
     try {
-      logSupervisionEvent(object);
-    } catch(Exception e) {
+      String indexName = generateSupervisionIndex(esSupervisionEvent.getEventTime());
+      logged = connector.logSupervisionEvent(indexName, supervisionMapping, esSupervisionEvent);
+    } catch (Exception e) {
+      log.debug("storeData() - Cluster is not reachable");
       throw new IDBPersistenceException(e);
+    }
+
+    if (!logged) {
+      throw new IDBPersistenceException("Supervision could not be stored in Elasticsearch");
     }
   }
 
   @Override
   public void storeData(List<T> data) throws IDBPersistenceException {
-    if(CollectionUtils.isEmpty(data)) {
-      return;
-    }
     try {
-      for (T object : data) {
-          storeData(object);
+      for (T esSupervisionEvent : data) {
+          storeData(esSupervisionEvent);
       }
     } catch(Exception e) {
+      log.debug("storeData() - Cluster is not reachable");
       throw new IDBPersistenceException(e);
-    }
-  }
-
-  /**
-   * Write the {@link EsSupervisionEvent} to ElasticSearch.
-   *
-   * @param esSupervisionEvent to be written to ElasticSearch.
-   */
-  public void logSupervisionEvent(EsSupervisionEvent esSupervisionEvent) {
-    if (esSupervisionEvent != null) {
-      String indexName = generateSupervisionIndex(esSupervisionEvent.getEventTime());
-      String mapping = createMappingIfNewIndex(indexName);
-      indexData(indexName, mapping, esSupervisionEvent);
-    } else {
-      log.debug("logSupervisionEvent() - Could not instantiate SupervisionEventImpl, null rawValue.");
     }
   }
 
@@ -116,29 +100,5 @@ public class EsSupervisionEventIndexer<T extends EsSupervisionEvent> extends EsI
    */
   private String generateSupervisionIndex(long time) {
     return retrieveIndexFormat(indexPrefix + "-supervision_", time);
-  }
-
-  private String createMappingIfNewIndex(String indexName) {
-    if (cacheIndices.keySet().contains(indexName)) {
-      return cacheIndices.get(indexName);
-    } else {
-      EsSupervisionMapping supervisionMapping = new EsSupervisionMapping();
-      return supervisionMapping.getMapping();
-    }
-  }
-
-  /**
-   * Send the data to the Connector: try to index an new entry to ElasticSearch.
-   *
-   * @param indexName          to which add the data.
-   * @param mapping            as JSON.
-   * @param esSupervisionEvent the data.
-   */
-  private void indexData(String indexName, String mapping, EsSupervisionEvent esSupervisionEvent) {
-    boolean isAcked = connector.logSupervisionEvent(indexName, mapping, esSupervisionEvent);
-    if (isAcked) {
-      log.debug("logSupervisionEvent() - isAcked: " + isAcked);
-      cacheIndices.put(indexName, mapping);
-    }
   }
 }

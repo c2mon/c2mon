@@ -16,10 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.connector;
 
+import java.sql.Timestamp;
+
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.junit.After;
@@ -32,8 +35,17 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.eslog.config.EsLogIntegrationConfiguration;
+import cern.c2mon.server.eslog.structure.converter.EsAlarmLogConverter;
+import cern.c2mon.server.eslog.structure.converter.EsSupervisionEventConverter;
+import cern.c2mon.server.eslog.structure.mappings.EsAlarmMapping;
 import cern.c2mon.server.eslog.structure.mappings.EsTagMapping;
+import cern.c2mon.server.eslog.structure.types.EsAlarm;
+import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
 import cern.c2mon.server.eslog.structure.types.tag.EsTag;
+import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
+import cern.c2mon.shared.common.supervision.SupervisionConstants;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
@@ -164,9 +176,55 @@ public class TransportConnectorTest {
     assertEquals(expected.get("number_of_replicas"), getIndexSettings(shards, replica).get("number_of_replicas"));
   }
 
+  @Test
+  public void testLogAlarmEvent() {
+    final String indexName = "index-test_alarm";
+    EsAlarmLogConverter esAlarmLogConverter = new EsAlarmLogConverter();
+
+    for (long i = 1; i <= 3; i++) {
+      EsAlarm esAlarm = esAlarmLogConverter.convert(CacheObjectCreation.createTestAlarm1());
+      esAlarm.setAlarmId(i);
+
+      String mapping = new EsAlarmMapping().getMapping();
+      assertTrue(connector.logAlarmEvent(indexName, mapping, esAlarm));
+      connector.indexExists(indexName);
+
+      sleep(2000);
+      SearchResponse response = connector.getClient().prepareSearch(indexName).setTypes(TransportConnector.TYPE_ALARM).setSize(0).execute().actionGet();
+      assertEquals(response.toString(), i, response.getHits().getTotalHits());
+    }
+  }
+
+  @Test
+  public void testLogSupervisionEvent() {
+    final String indexName = "index-test_supervision";
+    EsSupervisionEventConverter esSupervisionEventConverter = new EsSupervisionEventConverter();
+
+    for (long i = 1; i <= 3; i++) {
+      SupervisionEvent event = new SupervisionEventImpl(SupervisionConstants.SupervisionEntity.PROCESS,
+          i,
+          SupervisionConstants.SupervisionStatus.RUNNING,
+          new Timestamp(123456789),
+          "test message");
+      EsSupervisionEvent esSupervisionEvent = esSupervisionEventConverter.convert(event);
+      String mapping = new EsAlarmMapping().getMapping();
+
+      assertTrue(connector.logSupervisionEvent(indexName, mapping, esSupervisionEvent));
+      connector.indexExists(indexName);
+
+      sleep(2000);
+      SearchResponse response = connector.getClient().prepareSearch(indexName).setTypes(TransportConnector.TYPE_SUPERVISION).setSize(0).execute().actionGet();
+      assertEquals(response.toString(), i, response.getHits().getTotalHits());
+    }
+  }
+
   private void sleep() {
+    sleep(500);
+  }
+
+  private void sleep(long millis) {
     try {
-      Thread.sleep(2000);
+      Thread.sleep(millis);
     } catch(InterruptedException e) {
       e.printStackTrace();
     }

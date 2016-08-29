@@ -18,7 +18,6 @@ package cern.c2mon.server.eslog.indexer;
 
 import java.sql.Timestamp;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,7 +56,7 @@ public class EsSupervisionEventIndexerTest {
   private EsSupervisionEvent esSupervisionEvent;
 
   @InjectMocks
-  private EsSupervisionEventIndexer indexer;
+  private EsSupervisionEventIndexer<EsSupervisionEvent> indexer;
 
   @Mock
   private TransportConnector connector;
@@ -80,11 +79,6 @@ public class EsSupervisionEventIndexerTest {
     mapping = new EsSupervisionMapping();
   }
 
-  @After
-  public void cleanUp() {
-    indexer.getCacheIndices().clear();
-  }
-
   @Test
   public void testInitWell() throws IDBPersistenceException {
     when(connector.isConnected()).thenReturn(true);
@@ -96,7 +90,7 @@ public class EsSupervisionEventIndexerTest {
   public void testLogSupervisionEvent() throws IDBPersistenceException {
     String expectedMapping = mapping.getMapping();
 
-    indexer.logSupervisionEvent(esSupervisionEvent);
+    indexer.storeData(esSupervisionEvent);
     verify(connector).logSupervisionEvent(eq(indexer.getIndexPrefix() + "-supervision_" + indexer.millisecondsToYearMonth(timestamp.getTime())), eq(expectedMapping), eq(esSupervisionEvent));
   }
 }

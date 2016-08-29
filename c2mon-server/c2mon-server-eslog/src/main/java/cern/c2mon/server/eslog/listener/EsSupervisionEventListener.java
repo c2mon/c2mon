@@ -52,7 +52,7 @@ public class EsSupervisionEventListener implements SupervisionListener, SmartLif
   /**
    * Supervision Mapper
    */
-  private IPersistenceManager persistenceManager;
+  private IPersistenceManager<EsSupervisionEvent> persistenceManager;
 
   /**
    * Convert SupervisionEvent to EsSupervisionEvent for ElasticSearch.
@@ -77,7 +77,7 @@ public class EsSupervisionEventListener implements SupervisionListener, SmartLif
    */
   @Autowired
   public EsSupervisionEventListener(final SupervisionNotifier supervisionNotifier,
-                                    @Qualifier("esSupervisionEventPersistenceManager") final IPersistenceManager persistenceManager,
+                                    @Qualifier("esSupervisionEventPersistenceManager") final IPersistenceManager<EsSupervisionEvent> persistenceManager,
                                     final EsSupervisionEventConverter esSupervisionEventConverter) {
     this.supervisionNotifier = supervisionNotifier;
     this.persistenceManager = persistenceManager;
@@ -89,7 +89,6 @@ public class EsSupervisionEventListener implements SupervisionListener, SmartLif
    */
   @PostConstruct
   public void init() {
-    log.debug("Registering ElasticSearch module for supervision updates");
     listenerContainer = supervisionNotifier.registerAsListener(this);
   }
 

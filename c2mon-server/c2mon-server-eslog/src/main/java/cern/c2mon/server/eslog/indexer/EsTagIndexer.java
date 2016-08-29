@@ -27,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.index.IndexRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -43,12 +42,10 @@ import cern.c2mon.server.eslog.structure.types.tag.EsTag;
  *
  * @author Alban Marguet.
  */
-
 @Slf4j
-@Qualifier("esTagIndexer")
-@Component
 @Data
 @EqualsAndHashCode(callSuper = false)
+@Component("esTagIndexer")
 public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
   /**
    * Contains in-memory the content of the Indices and types present in the cluster.
@@ -87,7 +84,7 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
     finally {
       clearCache();
     }
-    
+
     if (!successful) {
       throw new IDBPersistenceException("Tag could not be stored in Elasticsearch");
     }
@@ -100,7 +97,7 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
     }
     try {
       log.debug("storeData() - Try to send data by batch of size " + data.size());
-      
+
       this.indexTags(data);
     } catch(ElasticsearchException e) {
       throw new IDBPersistenceException(e);
@@ -133,7 +130,7 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
         counter++;
       }
     }
-    
+
     if (counter == 0) {
       throw new IDBPersistenceException("Batch of " + tags.size() + " tags could not be saved");
     }
@@ -143,7 +140,7 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
     // FLUSH
     log.debug("indexTags() - closing bulk.");
     connector.getBulkProcessor().flush();
-    
+
     // TODO: Should be removed, but then test needs fixing
     connector.refreshClusterStats();
   }

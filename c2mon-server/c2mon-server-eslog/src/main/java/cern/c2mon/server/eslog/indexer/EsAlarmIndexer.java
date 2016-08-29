@@ -24,7 +24,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
@@ -38,10 +37,9 @@ import cern.c2mon.server.eslog.structure.types.EsAlarm;
  * @author Alban Marguet
  */
 @Slf4j
-@Qualifier("esAlarmIndexer")
-@Component
 @Data
 @EqualsAndHashCode(callSuper = false)
+@Component("esAlarmIndexer")
 public class EsAlarmIndexer<T extends EsAlarm> extends EsIndexer<T> {
 
   private final String alarmMapping = new EsAlarmMapping().getMapping();
@@ -93,7 +91,7 @@ public class EsAlarmIndexer<T extends EsAlarm> extends EsIndexer<T> {
         storeData(esAlarm);
       }
     } catch (Exception e) {
-      log.debug("EsAlarmIndexer storeData() - Cluster is not reachable");
+      log.debug("storeData() - Cluster is not reachable");
       throw new IDBPersistenceException(e);
     }
   }

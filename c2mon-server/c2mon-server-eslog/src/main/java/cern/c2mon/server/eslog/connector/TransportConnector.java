@@ -34,7 +34,6 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
-import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -81,8 +80,8 @@ public class TransportConnector implements Connector {
   private final static int LOCAL_PORT = 1;
   private final static String LOCAL_HOST = "local";
 
-  private final static String TYPE_ALARM = "alarm";
-  private final static String TYPE_SUPERVISION = "supervision";
+  public final static String TYPE_ALARM = "alarm";
+  public final static String TYPE_SUPERVISION = "supervision";
 
   /**
    * Default port for elastic search transport node
@@ -523,26 +522,27 @@ public class TransportConnector implements Connector {
       return false;
     }
 
-    log.debug("logAlarmES() - Try to write new alarm event to in index = {}, mapping = {}.", indexName, mapping);
+    log.debug("logAlarmEvent() - Try to write new alarm event to in index = {}", indexName);
 
     String jsonSource = esAlarm.toString();
     String routing = String.valueOf(esAlarm.getAlarmId());
 
-    if (indexExists(indexName)) {
-      log.debug("logAlarmES() - Add new Alarm event to index " + indexName + ".");
+    boolean indexExist = true;
+    if (!indexExists(indexName)) {
+      log.debug("logAlarmEvent() - Create new alarm index : {}", indexName);
+      indexExist = prepareCreateIndexRequestBuilder(indexName).setSource(mapping).get().isAcknowledged();
+    }
+
+    if (indexExist) {
+      log.debug("logAlarmEvent() - Add new Alarm event to index {}", indexName);
       return client.prepareIndex().setIndex(indexName)
-              .setType(TYPE_ALARM)
-              .setSource(jsonSource)
-              .setRouting(routing)
-              .get().isCreated();
+                   .setType(TYPE_ALARM)
+                   .setSource(jsonSource)
+                   .setRouting(routing)
+                   .get().isCreated();
     }
 
-    if (Strings.isNullOrEmpty(mapping)) {
-      return false;
-    }
-
-    log.debug("logAlarmES() - Source query is: " + jsonSource + ".");
-    return prepareCreateIndexRequestBuilder(indexName).setSource(mapping).get().isAcknowledged();
+    return false;
   }
 
   /**
@@ -560,26 +560,28 @@ public class TransportConnector implements Connector {
       return false;
     }
 
+    log.debug("logSupervisionEvent() - Try to write new supervision event to in index = {}", indexName);
+
     String jsonSource = esSupervisionEvent.toString();
     String routing = esSupervisionEvent.getId();
 
-    if (indexExists(indexName)) {
-      log.debug("logSupervisionEvent() - Add new Supervision event to index " + indexName + ".");
+    boolean indexExist = true;
+    if (!indexExists(indexName)) {
+      log.debug("logSupervisionEvent() - Create new supervision index : {}", indexName);
+      indexExist = prepareCreateIndexRequestBuilder(indexName).setSource(mapping).get().isAcknowledged();
+    }
+
+
+    if (indexExist) {
+      log.debug("logSupervisionEvent() - Add new Supervision event to index {}", indexName);
       return client.prepareIndex().setIndex(indexName)
-              .setType(TYPE_SUPERVISION)
-              .setSource(jsonSource)
-              .setRouting(routing)
-              .get()
-              .isCreated();
+                   .setType(TYPE_SUPERVISION)
+                   .setSource(jsonSource)
+                   .setRouting(routing)
+                   .get().isCreated();
     }
 
-    if (Strings.isNullOrEmpty(mapping)) {
-      return false;
-    }
-
-    log.debug("logSupervisionEvent() - Source query is: " + jsonSource + ".");
-    return prepareCreateIndexRequestBuilder(indexName).setSource(mapping).get().isAcknowledged();
-
+    return false;
   }
 
   /**
