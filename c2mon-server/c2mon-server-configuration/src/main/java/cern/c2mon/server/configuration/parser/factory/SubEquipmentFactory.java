@@ -101,7 +101,7 @@ public class SubEquipmentFactory extends EntityFactory<SubEquipment> {
     if (subEquipment.getCommFaultTag() == null) {
 
       CommFaultTag commfaultTag = CommFaultTag.create(subEquipment.getName() + ":COMM_FAULT")
-          .description("Communication fault tag for subEquipment " + subEquipment.getName())
+          .description("Communication fault tag for sub equipment " + subEquipment.getName())
           .build();
       subEquipment.setCommFaultTag(commfaultTag);
     }
@@ -109,7 +109,7 @@ public class SubEquipmentFactory extends EntityFactory<SubEquipment> {
     if (subEquipment.getStatusTag() == null) {
 
       StatusTag statusTag = StatusTag.create(subEquipment.getName() + ":STATUS")
-          .description("Status tag for subEquipment " + subEquipment.getName())
+          .description("Status tag for sub equipment " + subEquipment.getName())
           .build();
       subEquipment.setStatusTag(statusTag);
     }
@@ -120,7 +120,7 @@ public class SubEquipmentFactory extends EntityFactory<SubEquipment> {
     if (subEquipment.getAliveTag() != null && subEquipment.getAliveTag().getAddress() != null) {
       subEquipment.getAliveTag().setProcessId(subEquipment.getId());
     } else {
-      throw new ConfigurationParseException("Error creating subequipment #" + subEquipment.getId() + ": " +
+      throw new ConfigurationParseException("Error creating sub equipment #" + subEquipment.getId() + ": " +
           "No alive tag address was specified!");
     }
 
@@ -130,8 +130,8 @@ public class SubEquipmentFactory extends EntityFactory<SubEquipment> {
   @Override
   Long createId(SubEquipment configurationEntity) {
     if (configurationEntity.getName() != null && equipmentDAO.getIdByName(configurationEntity.getName()) != null) {
-      throw new ConfigurationParseException("Error creating subequipment " + configurationEntity.getName() + ": " +
-          "Name already exists");
+      throw new ConfigurationParseException("Error creating sub equipment " + configurationEntity.getName() + ": " +
+          "Name already exists!");
     } else {
       return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextEquipmentId();
     }

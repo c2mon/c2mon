@@ -55,7 +55,7 @@ public class ControlTagFactory extends EntityFactory<ControlTag> {
   @Override
   Long createId(ControlTag configurationEntity) {
     if (configurationEntity.getName() != null && controlTagCache.get(configurationEntity.getName()) != null) {
-      throw new ConfigurationParseException("Error creating controltag " + configurationEntity.getName() + ": " +
+      throw new ConfigurationParseException("Error creating control tag " + configurationEntity.getName() + ": " +
           "Name already exists");
     } else {
       return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextTagId();

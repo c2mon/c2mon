@@ -66,7 +66,7 @@ public class CommandTagFactory extends EntityFactory<CommandTag> {
       return Collections.singletonList(doCreateInstance(commandTag));
 
     } else {
-      throw new ConfigurationParseException("Error creating commandtag #" + commandTag.getId() + ": " +
+      throw new ConfigurationParseException("Error creating command tag #" + commandTag.getId() + ": " +
           "Specified parent equipment does not exist!");
     }
   }
@@ -74,8 +74,8 @@ public class CommandTagFactory extends EntityFactory<CommandTag> {
   @Override
   Long createId(CommandTag configurationEntity) {
     if (configurationEntity.getName() != null && commandTagCache.getCommandTagId(configurationEntity.getName()) != null) {
-      throw new ConfigurationParseException("Error creating commandtag " + configurationEntity.getName() + ": " +
-          "Name already exists");
+      throw new ConfigurationParseException("Error creating command tag " + configurationEntity.getName() + ": " +
+          "Name already exists!");
     } else {
       return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextTagId();
     }
@@ -91,7 +91,7 @@ public class CommandTagFactory extends EntityFactory<CommandTag> {
       if (commandTagCache.getCommandTagId(entity.getName()) != null) {
         id = commandTagCache.getCommandTagId(entity.getName());
       } else {
-        throw new ConfigurationParseException("CommandTag " + entity.getName() + " does not exist!");
+        throw new ConfigurationParseException("Command tag " + entity.getName() + " does not exist!");
       }
     }
     return id;

@@ -80,14 +80,14 @@ public class DataTagFactory extends EntityFactory<DataTag> {
             .getEquipmentName());
 
         if (parentId == null || !equipmentCache.hasKey(parentId)) {
-          throw new ConfigurationParseException("Error creating datatag #" + dataTag.getId() + ": " +
+          throw new ConfigurationParseException("Error creating data tag #" + dataTag.getId() + ": " +
               "Specified parent equipment does not exist!");
         }
 
         dataTag.setEquipmentId(parentId);
       } else {
-        throw new ConfigurationParseException("Error creating datatag #" + dataTag.getId() + ": " +
-            "Cannot specify both equipment and subequipment as parent!");
+        throw new ConfigurationParseException("Error creating data tag #" + dataTag.getId() + ": " +
+            "Cannot specify both equipment and sub equipment as parent!");
       }
     } else if (dataTag.getSubEquipmentId() != null || dataTag.getSubEquipmentName() != null) {
 
@@ -95,14 +95,14 @@ public class DataTagFactory extends EntityFactory<DataTag> {
           (dataTag.getSubEquipmentName());
 
       if (parentId == null || !subEquipmentCache.hasKey(parentId)) {
-        throw new ConfigurationParseException("Error creating datatag #" + dataTag.getId() + ": " +
-            "Specified parent subequipment does not exist!");
+        throw new ConfigurationParseException("Error creating data tag #" + dataTag.getId() + ": " +
+            "Specified parent sub equipment does not exist!");
       }
 
       dataTag.setSubEquipmentId(parentId);
     } else {
-      throw new ConfigurationParseException("Error creating datatag #" + dataTag.getId() + ": " +
-          "No parent equipment or subequipment specified!");
+      throw new ConfigurationParseException("Error creating data tag #" + dataTag.getId() + ": " +
+          "No parent equipment or sub equipment specified!");
     }
 
     return dataTag;
@@ -111,8 +111,8 @@ public class DataTagFactory extends EntityFactory<DataTag> {
   @Override
   Long createId(DataTag configurationEntity) {
     if (configurationEntity.getName() != null && dataTagCache.get(configurationEntity.getName()) != null) {
-      throw new ConfigurationParseException("Error creating datatag " + configurationEntity.getName() + ": " +
-          "Name already exists");
+      throw new ConfigurationParseException("Error creating data tag " + configurationEntity.getName() + ": " +
+          "Name already exists!");
     } else {
       return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextTagId();
     }
@@ -128,7 +128,7 @@ public class DataTagFactory extends EntityFactory<DataTag> {
       if (dataTagCache.get(entity.getName()) != null) {
         id = dataTagCache.get(entity.getName()).getId();
       } else {
-        throw new ConfigurationParseException("Datatag " + entity.getName() + " does not exist!");
+        throw new ConfigurationParseException("Data tag " + entity.getName() + " does not exist!");
       }
     }
     return id;

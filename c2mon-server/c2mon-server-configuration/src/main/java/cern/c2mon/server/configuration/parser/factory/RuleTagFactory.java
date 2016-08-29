@@ -56,8 +56,8 @@ public class RuleTagFactory extends EntityFactory<RuleTag> {
   @Override
   Long createId(RuleTag configurationEntity) {
     if (configurationEntity.getName() != null && ruleTagCache.get(configurationEntity.getName()) != null) {
-      throw new ConfigurationParseException("Error creating ruletag " + configurationEntity.getName() + ": " +
-          "Name already exists");
+      throw new ConfigurationParseException("Error creating rule tag " + configurationEntity.getName() + ": " +
+          "Name already exists!");
     } else {
       return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextTagId();
     }
