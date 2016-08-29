@@ -8,7 +8,7 @@
     maxElementsInMemory="500"
     maxEntriesInCache="1000"
     memoryStoreEvictionPolicy="LRU" />
-    
+
   <cache
     name="tagCache"
     eternal="true"
@@ -22,7 +22,7 @@
         <searchAttribute name="subEquipmentId" expression="value.getSubEquipmentId()"/>
     </searchable>
   </cache>
-  
+
   <cache
     name="controlCache"
     eternal="true"
@@ -34,7 +34,7 @@
         <searchAttribute name="tagName" expression="value.getName()"/>
     </searchable>
   </cache>
-  
+
   <cache
     name="ruleCache"
     eternal="true"
@@ -46,7 +46,7 @@
         <searchAttribute name="tagName" expression="value.getName()"/>
     </searchable>
   </cache>
-  
+
   <cache
     name="commandCache"
     eternal="true"
@@ -54,8 +54,11 @@
     maxEntriesInCache="10000">
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
+    <searchable keys="false" values="false">
+      <searchAttribute name="commandTagName" expression="value.getName()"/>
+    </searchable>
   </cache>
-  
+
   <cache
     name="processCache"
     eternal="true"
@@ -67,7 +70,7 @@
     </searchable>
     <terracotta clustered="true" consistency="strong" />
   </cache>
-  
+
   <cache
     name="equipmentCache"
     eternal="true"
@@ -76,7 +79,7 @@
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
   </cache>
-  
+
   <cache
     name="subEquipmentCache"
     eternal="true"
@@ -85,7 +88,7 @@
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
   </cache>
-  
+
   <cache
     name="aliveTimerCache"
     eternal="true"
@@ -94,7 +97,7 @@
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
   </cache>
-  
+
   <cache
     name="commFaultTagCache"
     eternal="true"
@@ -103,7 +106,7 @@
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
   </cache>
-  
+
   <cache
     name="alarmCache"
     eternal="true"
@@ -118,7 +121,7 @@
         <searchAttribute name="faultCode" expression="value.getFaultCode()"/>
     </searchable>
   </cache>
-  
+
   <cache
     name="clusterCache"
     eternal="true"
@@ -158,7 +161,7 @@
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
   </cache>
-  
+
   <cache
     name="equipmentEventCache"
     eternal="true"
@@ -167,7 +170,7 @@
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
   </cache>
-  
+
   <cache
     name="subEquipmentEventCache"
     eternal="true"

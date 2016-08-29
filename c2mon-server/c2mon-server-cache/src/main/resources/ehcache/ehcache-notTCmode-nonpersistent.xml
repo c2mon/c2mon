@@ -45,6 +45,9 @@
       statistics="true"
       transactionalMode="off"
       memoryStoreEvictionPolicy="LFU">
+      <searchable keys="false" values="false">
+        <searchAttribute name="commandTagName" expression="value.getName()"/>
+      </searchable>
     </cache>
 
     <cache
