@@ -64,7 +64,7 @@ public class RuleTagFactory extends EntityFactory<RuleTag> {
 
   @Override
   boolean hasEntity(Long id) {
-    return tagFacadeGateway.isInTagCache(id);
+    return id != null && tagFacadeGateway.isInTagCache(id);
   }
 
   @Override

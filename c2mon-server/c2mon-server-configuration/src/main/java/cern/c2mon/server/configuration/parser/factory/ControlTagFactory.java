@@ -64,7 +64,7 @@ public class ControlTagFactory extends EntityFactory<ControlTag> {
 
   @Override
   boolean hasEntity(Long id) {
-    return tagFacadeGateway.isInTagCache(id);
+    return id != null && tagFacadeGateway.isInTagCache(id);
   }
 
   @Override

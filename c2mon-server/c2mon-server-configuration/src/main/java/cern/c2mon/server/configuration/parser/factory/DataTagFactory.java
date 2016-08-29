@@ -131,7 +131,7 @@ public class DataTagFactory extends EntityFactory<DataTag> {
 
   @Override
   boolean hasEntity(Long id) {
-    return tagFacadeGateway.isInTagCache(id);
+    return id != null && tagFacadeGateway.isInTagCache(id);
   }
 
   @Override

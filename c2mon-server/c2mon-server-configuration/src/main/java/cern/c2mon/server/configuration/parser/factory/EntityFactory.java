@@ -57,7 +57,8 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
 
     if (hasEntity(entityId)) {
       throw new ConfigurationParseException("Error creating entity: "
-          + configurationEntity.getClass().getSimpleName() + " (name = " +  configurationEntity.getName() + ", id = " + entityId + ") already exists!");
+          + configurationEntity.getClass().getSimpleName() + " (name = " + configurationEntity.getName() + ", id = "
+          + entityId + ") already exists!");
     }
 
     configurationEntity.setId(entityId);
@@ -80,23 +81,16 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
     ConfigurationElement element = createSetupConfigurationElement();
     Long entityId = getId(configurationEntity);
 
-
-    if (entityId == null) {
-      throw new ConfigurationParseException("Error updating entity: Not possible to determine id with the " +
-          "configuration:" + configurationEntity);
-    }
-
     if (hasEntity(entityId)) {
-
       element.setEntityId(entityId);
       element.setAction(ConfigConstants.Action.UPDATE);
       element.setElementProperties(getUpdateProperties(configurationEntity));
-
       return element;
 
     } else {
       throw new ConfigurationParseException("Error updating entity: "
-          + configurationEntity.getClass().getSimpleName() + " (name = " +  configurationEntity.getName() + ", id = " + entityId + ") does not exist!");
+          + configurationEntity.getClass().getSimpleName() + " (name = " + configurationEntity.getName() + ", id = "
+          + entityId + ") does not exist!");
     }
   }
 
@@ -110,21 +104,15 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
     ConfigurationElement element = createSetupConfigurationElement();
     Long entityId = getId(configurationEntity);
 
-    if (entityId == null) {
-      throw new ConfigurationParseException("Error deleting entity: Not possible to determine id with the " +
-          "configuration:" + configurationEntity);
-    }
-
-      if (hasEntity(entityId)) {
-
+    if (hasEntity(entityId)) {
       element.setEntityId(entityId);
       element.setAction(ConfigConstants.Action.REMOVE);
-
       return element;
 
     } else {
       throw new ConfigurationParseException("Error deleting entity: "
-          + configurationEntity.getClass().getSimpleName() + " (name = " +  configurationEntity.getName() + ", id = " + entityId + ") does not exist!");
+          + configurationEntity.getClass().getSimpleName() + " (name = " + configurationEntity.getName() + ", id = "
+          + entityId + ") does not exist!");
     }
   }
 
