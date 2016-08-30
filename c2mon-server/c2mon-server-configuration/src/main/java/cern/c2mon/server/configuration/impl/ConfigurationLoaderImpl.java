@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import cern.c2mon.server.cache.loading.SequenceDAO;
+import cern.c2mon.shared.client.configuration.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.simpleframework.xml.Serializer;
@@ -59,17 +60,16 @@ import cern.c2mon.server.configuration.parser.ConfigurationParser;
 import cern.c2mon.server.daqcommunication.in.JmsContainerManager;
 import cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
-import cern.c2mon.shared.client.configuration.ConfigurationElement;
-import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
-import cern.c2mon.shared.client.configuration.ConfigurationException;
-import cern.c2mon.shared.client.configuration.ConfigurationReport;
-import cern.c2mon.shared.client.configuration.ConfigurationReportFileFilter;
-import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.converter.DateFormatConverter;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
+
+import static cern.c2mon.shared.client.configuration.ConfigConstants.Entity.EQUIPMENT;
+import static cern.c2mon.shared.client.configuration.ConfigConstants.Entity.PROCESS;
+import static cern.c2mon.shared.client.configuration.ConfigConstants.Entity.SUBEQUIPMENT;
+
 /**
  * Implementation of the server ConfigurationLoader bean.
  *
@@ -301,72 +301,25 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     //map of lists, where each list needs sending to a particular DAQ (processId -> List of events)
     Map<Long, List<Change>> processLists = new HashMap<Long, List<Change>>();
 
-    AtomicInteger progressCounter = new AtomicInteger(1);
     if (configProgressMonitor != null){
       configProgressMonitor.serverTotalParts(configElements.size());
     }
-    for (ConfigurationElement element : configElements) {
-      if (!cancelRequested) {
-        //initialize success report
-        ConfigurationElementReport elementReport = new ConfigurationElementReport(element.getAction(),
-            element.getEntity(),
-            element.getEntityId());
-        report.addElementReport(elementReport);
-        List<ProcessChange> processChanges = null;
-        try {
-          processChanges = applyConfigElement(element, elementReport);  //never returns null
 
-          if (processChanges == null) {
-            continue;
-          }
+    // Write lock needed to avoid parallel Batch persistence transactions
+    try {
+      clusterCache.acquireWriteLockOnKey(this.cachePersistenceLock);
+      if (runInParallel(configElements)) {
+        LOGGER.info("Enter parallel configuration");
+        configElements.parallelStream().forEach(element ->
+            applyConfigurationElement(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, configProgressMonitor));
 
-          for (ProcessChange processChange : processChanges) {
-
-            Long processId = processChange.getProcessId();
-            if (processChange.processActionRequired()) {
-
-              if (!processLists.containsKey(processId)) {
-                processLists.put(processId, new ArrayList<Change>());
-              }
-
-              processLists.get(processId).add((Change) processChange.getChangeEvent());   //cast to implementation needed as DomFactory uses this - TODO change to interface
-
-              if (processChange.hasNestedSubReport()) {
-                elementReport.addSubReport(processChange.getNestedSubReport());
-                daqReportPlaceholder.put(processChange.getChangeEvent().getChangeId(), processChange.getNestedSubReport());
-              }
-              else {
-                daqReportPlaceholder.put(processChange.getChangeEvent().getChangeId(), elementReport);
-              }
-
-              elementPlaceholder.put(processChange.getChangeEvent().getChangeId(), element);
-              element.setDaqStatus(Status.RESTART); //default to restart; if successful on DAQ layer switch to OK
-            } else if (processChange.requiresReboot()) {
-              if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(configId + " RESTART for " + processChange.getProcessId() + " required");
-              }
-              element.setDaqStatus(Status.RESTART);
-              report.addStatus(Status.RESTART);
-              report.addProcessToReboot(processCache.get(processId).getName());
-              element.setStatus(Status.RESTART);
-              processFacade.requiresReboot(processId, Boolean.TRUE);
-            }
-          }
-        } catch (Exception ex) {
-          String errMessage = configId + " Exception caught while applying the configuration change (Action, Entity, Entity id) = ("
-            + element.getAction() + "; " + element.getEntity() + "; " + element.getEntityId() + ")";
-          LOGGER.error(errMessage, ex.getMessage());
-          elementReport.setFailure("Exception caught while applying the configuration change.", ex);
-          element.setStatus(Status.FAILURE);
-          report.addStatus(Status.FAILURE);
-          report.setStatusDescription("Failure: see details below.");
-        }
-        if (configProgressMonitor != null){
-          configProgressMonitor.onServerProgress(progressCounter.getAndIncrement());
-        }
       } else {
-        LOGGER.info(configId + " Interrupting configuration due to cancel request.");
+        LOGGER.info("Enter serialized configuration");
+        configElements.stream().forEach(element ->
+            applyConfigurationElement(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, configProgressMonitor));
       }
+    } finally {
+      clusterCache.releaseWriteLockOnKey(this.cachePersistenceLock);
     }
 
     //send events to Process if enabled, convert the responses and introduce them into the existing report; else set all DAQs to restart
@@ -456,6 +409,101 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     return report;
   }
 
+  /**
+   * Determine if the configuration can be applied in parallel.
+   *
+   * @param elements List of entities which needs to be configured.
+   * @return True if the configuration can be applied in parallel.
+   */
+  private boolean runInParallel(List<ConfigurationElement> elements) {
+    return !elements.stream().anyMatch(element ->
+        element.getEntity().equals(SUBEQUIPMENT) ||
+            element.getEntity().equals(EQUIPMENT) ||
+            element.getEntity().equals(PROCESS));
+  }
+
+  /**
+   * Apply the list of ConfigurationElement to the server and creates a list of
+   * change elements for the daq configuration.
+   *
+   * @param element The configuration which needs to be applied to the server.
+   * @param processLists A map which will be filled with the changes based on the process the change belongs to.
+   * @param elementPlaceholder A Map which contains the configuration element based on the id.
+   * @param daqReportPlaceholder  A Map which contains the report of the configuration based on the id.
+   * @param report The overall configuration report.
+   * @param configId The id of the current configuration.
+   * @param configProgressMonitor The monitor which observes the progress of the configuration.
+   */
+  private void applyConfigurationElement(ConfigurationElement element, Map<Long, List<Change>> processLists,
+                                         Map<Long, ConfigurationElement> elementPlaceholder,
+                                         Map<Long, ConfigurationElementReport> daqReportPlaceholder,
+                                         ConfigurationReport report, Integer configId,
+                                         final ConfigProgressMonitor configProgressMonitor){
+    AtomicInteger progressCounter = new AtomicInteger(1);
+    if (!cancelRequested) {
+      //initialize success report
+      ConfigurationElementReport elementReport = new ConfigurationElementReport(element.getAction(),
+          element.getEntity(),
+          element.getEntityId());
+      report.addElementReport(elementReport);
+      List<ProcessChange> processChanges;
+      try {
+        processChanges = applyConfigElement(element, elementReport);  //never returns null
+
+        if (processChanges != null) {
+
+
+          for (ProcessChange processChange : processChanges) {
+
+            Long processId = processChange.getProcessId();
+            if (processChange.processActionRequired()) {
+
+              if (!processLists.containsKey(processId)) {
+                processLists.put(processId, new ArrayList<>());
+              }
+
+              //cast to implementation needed as DomFactory uses this - TODO change to interface
+              processLists.get(processId).add((Change) processChange.getChangeEvent());
+
+              if (processChange.hasNestedSubReport()) {
+                elementReport.addSubReport(processChange.getNestedSubReport());
+                daqReportPlaceholder.put(processChange.getChangeEvent().getChangeId(), processChange.getNestedSubReport());
+              }
+              else {
+                daqReportPlaceholder.put(processChange.getChangeEvent().getChangeId(), elementReport);
+              }
+
+              elementPlaceholder.put(processChange.getChangeEvent().getChangeId(), element);
+              element.setDaqStatus(Status.RESTART); //default to restart; if successful on DAQ layer switch to OK
+            } else if (processChange.requiresReboot()) {
+              if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(configId + " RESTART for " + processChange.getProcessId() + " required");
+              }
+              element.setDaqStatus(Status.RESTART);
+              report.addStatus(Status.RESTART);
+              report.addProcessToReboot(processCache.get(processId).getName());
+              element.setStatus(Status.RESTART);
+              processFacade.requiresReboot(processId, Boolean.TRUE);
+            }
+          }
+        }
+      } catch (Exception ex) {
+        String errMessage = configId + " Exception caught while applying the configuration change (Action, Entity, " +
+            "Entity id) = (" + element.getAction() + "; " + element.getEntity() + "; " + element.getEntityId() + ")";
+        LOGGER.error(errMessage, ex.getMessage());
+        elementReport.setFailure("Exception caught while applying the configuration change.", ex);
+        element.setStatus(Status.FAILURE);
+        report.addStatus(Status.FAILURE);
+        report.setStatusDescription("Failure: see details below.");
+      }
+      if (configProgressMonitor != null){
+        configProgressMonitor.onServerProgress(progressCounter.getAndIncrement());
+      }
+    } else {
+      LOGGER.info(configId + " Interrupting configuration due to cancel request.");
+    }
+  }
+
 
   /**
    * Applies a single configuration element. On the DB level, this action should
@@ -471,11 +519,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    **/
   private List<ProcessChange> applyConfigElement(final ConfigurationElement element,
                                                  final ConfigurationElementReport elementReport) throws IllegalAccessException {
-    // Write lock needed to avoid parallel Batch persistence transactions
-    clusterCache.acquireWriteLockOnKey(this.cachePersistenceLock);
     //initialize the DAQ config event
     List<ProcessChange> daqConfigEvents = new ArrayList<ProcessChange>();
-    try {
       if (LOGGER.isTraceEnabled()){
         LOGGER.trace(element.getConfigId() + " Applying configuration element with sequence id " + element.getSequenceId());
       }
@@ -566,9 +611,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
           }
         }
       }
-    } finally {
-      clusterCache.releaseWriteLockOnKey(this.cachePersistenceLock);
-    }
 
     return daqConfigEvents;
   }
