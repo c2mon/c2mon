@@ -99,7 +99,7 @@ public class CommandTagCacheImpl extends AbstractCache<Long, CommandTag> impleme
         LOGGER.info("Failed to find a command tag with name " + name + " in the cache.");
       }
 
-      commandTagKey = (Long) results.all().get(0).getKey();
+      commandTagKey = results.all().size() > 0 ? (Long) results.all().get(0).getKey() : null;
     }
     finally {
       if (results != null) {
