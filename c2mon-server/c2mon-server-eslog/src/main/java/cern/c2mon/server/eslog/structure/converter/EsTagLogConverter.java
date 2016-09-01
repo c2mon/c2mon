@@ -41,7 +41,6 @@ import cern.c2mon.server.eslog.structure.types.tag.EsTagC2monInfo;
 import cern.c2mon.server.eslog.structure.types.tag.TagQualityAnalysis;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
-import cern.c2mon.shared.common.metadata.Metadata;
 
 /**
  * Converts the dataTags from the server to the ElasticSearch format {@link EsTag}.
@@ -262,7 +261,7 @@ public class EsTagLogConverter implements Converter<Tag, EsTag> {
       return extractMetadata(processId, equipmentId, subEquipmentId);
     }
 
-    log.info("no Process, Equipment or subEquipment");
+    log.debug("no Process, Equipment or SubEquipment found for tag #{}", tag.getId());
     return Collections.emptyMap();
   }
 
