@@ -31,6 +31,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import cern.c2mon.shared.client.expression.Expression;
+import cern.c2mon.shared.common.datatag.DataTagValueDictionary;
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Abstract tag used as basis for all tag objects in the server:
  * DataTag, ControlTag and RuleTag.
@@ -102,6 +107,10 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
    * Not every Tag needs to have a meta data. Also the meta data don't have to be every time the same.
    */
   private Metadata metadata;
+
+  @Getter
+  @Setter
+  private Collection<Expression> expressions;
 
   /**
    * DIP address for tags published on DIP
@@ -203,6 +212,7 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
     alarmIds = new ArrayList<>();
     ruleIds = new ArrayList<>();
     cacheTimestamp = new Timestamp(System.currentTimeMillis());
+    expressions = new ArrayList<>();
   }
 
   /**

@@ -20,6 +20,7 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Set;
 
+import cern.c2mon.shared.client.expression.Expression;
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.server.common.metadata.Metadata;
@@ -218,4 +219,9 @@ public interface Tag extends RuleInputValue, Cacheable {
    * @return true if needs logging
    */
   boolean isLogged();
+
+  /**
+   * @return all expressions which are attached to this tag
+   */
+  Collection<Expression> getExpressions();
 }
