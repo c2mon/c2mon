@@ -38,9 +38,13 @@ public class EsSupervisionEventMappingTest {
           "        \"id\": {\n" +
           "          \"type\": \"long\"\n" +
           "        },\n" +
-          "        \"timestamp\": {\n" +
-          "          \"type\": \"date\",\n" +
-          "          \"format\": \"epoch_millis\"\n" +
+          "        \"name\": {\n" +
+          "          \"type\": \"string\",\n" +
+          "          \"index\": \"not_analyzed\"\n" +
+          "        },\n" +
+          "        \"entity\": {\n" +
+          "          \"type\": \"string\",\n" +
+          "          \"index\": \"not_analyzed\"\n" +
           "        },\n" +
           "        \"message\": {\n" +
           "          \"type\": \"string\",\n" +
@@ -49,6 +53,10 @@ public class EsSupervisionEventMappingTest {
           "        \"status\": {\n" +
           "          \"type\": \"string\",\n" +
           "          \"index\": \"not_analyzed\"\n" +
+          "        },\n" +
+          "        \"timestamp\": {\n" +
+          "          \"type\": \"date\",\n" +
+          "          \"format\": \"epoch_millis\"\n" +
           "        }\n" +
           "      }\n" +
           "    }\n" +

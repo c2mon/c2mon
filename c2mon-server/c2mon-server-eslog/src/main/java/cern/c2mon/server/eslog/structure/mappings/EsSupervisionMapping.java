@@ -42,12 +42,13 @@ public class EsSupervisionMapping implements EsMapping {
   /**
    * @return the mapping as JSON String for ElasticSearch.
    */
+  @Override
   public String getMapping() {
     String json = gson.toJson(this);
     log.trace("getMapping() - Created the supervision mapping: " + json);
     return json;
   }
-  
+
   /**
    * Properties for a {@link cern.c2mon.server.eslog.structure.types.EsSupervisionEvent}.
    */
@@ -66,20 +67,25 @@ public class EsSupervisionMapping implements EsMapping {
       }
 
       class Properties {
-        private Id id;
-        private Timestamp timestamp;
-        private Message message;
-        private Status status;
-
-        Properties() {
-          this.id = new Id();
-          this.timestamp = new Timestamp();
-          this.message = new Message();
-          this.status = new Status();
-        }
+        private final Id id = new Id();
+        private final Name name = new Name();
+        private final Entity entity = new Entity();
+        private final Message message = new Message();
+        private final Status status = new Status();
+        private final Timestamp timestamp = new Timestamp();
 
         class Id {
           private final String type = ValueType.LONG.toString();
+        }
+
+        class Name {
+          private final String type = ValueType.STRING.toString();
+          private final String index = indexNotAnalyzed;
+        }
+
+        class Entity {
+          private final String type = ValueType.STRING.toString();
+          private final String index = indexNotAnalyzed;
         }
 
         class Timestamp {

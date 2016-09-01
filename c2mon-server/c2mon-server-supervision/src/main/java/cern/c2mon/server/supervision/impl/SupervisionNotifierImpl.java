@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -35,36 +35,36 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
+import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
-import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.common.component.ExecutorLifecycleHandle;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.server.supervision.SupervisionListener;
 import cern.c2mon.server.supervision.SupervisionNotifier;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 
 /**
- * Notifies the all the listeners of changes in the 
+ * Notifies the all the listeners of changes in the
  * supervision status of the DAQs/Equipment/Subequipment.
- * 
+ *
  * <p>Listeners can register on multiple threads and should
  * ensure they can keep pace with the supervision notifications
  * or else they may slow down the server operation (since
  * the notification thread may be frozen). This should
  * be tuned using the queue size and thread number. In particular,
  * the listener does not need to start multiple threads itself.
- * 
+ *
  * <p>Each listener can specify on how many threads it
  * wishes to be notified, using the following property.
  * <ul>
  *  <li>supervision.notification.threads.max NOT IMPLEMENTED YET
  * </ul>
- * 
- * 
+ *
+ *
  * @author Mark Brightwell
  *
  */
@@ -75,8 +75,8 @@ public class SupervisionNotifierImpl implements SupervisionNotifier, C2monCacheL
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = LoggerFactory.getLogger(SupervisionNotifierImpl.class); 
-  
+  private static final Logger LOGGER = LoggerFactory.getLogger(SupervisionNotifierImpl.class);
+
   /**
    * Default size of task queue for a listener executor.
    */
@@ -99,20 +99,20 @@ public class SupervisionNotifierImpl implements SupervisionNotifier, C2monCacheL
   private ProcessCache processCache;
   private EquipmentCache equipmentCache;
   private SubEquipmentCache subEquipmentCache;
-  
-  
+
+
   /**
    * List of listeners + lock for access.
    */
   private List<SupervisionListener> supervisionListeners = new ArrayList<SupervisionListener>();
   private ReentrantReadWriteLock listenerLock = new ReentrantReadWriteLock();
-  
+
   /**
    * Map of executors. one for each listener.
    */
-  private Map<SupervisionListener, ThreadPoolExecutor> executors = new HashMap<SupervisionListener, ThreadPoolExecutor>();    
-    
-  
+  private Map<SupervisionListener, ThreadPoolExecutor> executors = new HashMap<SupervisionListener, ThreadPoolExecutor>();
+
+
   /**
    * Constructor.
    * @param processCache process cache
@@ -120,15 +120,15 @@ public class SupervisionNotifierImpl implements SupervisionNotifier, C2monCacheL
    * @param subEquipmentCache subequipment cache
    */
   @Autowired
-  public SupervisionNotifierImpl(final ProcessCache processCache, 
-                                final EquipmentCache equipmentCache, 
+  public SupervisionNotifierImpl(final ProcessCache processCache,
+                                final EquipmentCache equipmentCache,
                                 final SubEquipmentCache subEquipmentCache) {
     super();
     this.processCache = processCache;
     this.equipmentCache = equipmentCache;
     this.subEquipmentCache = subEquipmentCache;
   }
-  
+
   @PostConstruct
   public void init() {
     processCache.registerSynchronousListener(this);
@@ -141,33 +141,33 @@ public class SupervisionNotifierImpl implements SupervisionNotifier, C2monCacheL
   public Lifecycle registerAsListener(final SupervisionListener supervisionListener) {
     return registerAsListener(supervisionListener, DEFAULT_NUMBER_THREADS);
   }
-  
-  
+
+
   @Override
   public Lifecycle registerAsListener(final SupervisionListener supervisionListener, final int numberThreads) {
    return registerAsListener(supervisionListener, numberThreads, DEFAULT_QUEUE_SIZE);
   }
-  
+
   /**
    * No synchronisation necessary as all added at start up.
    * @param supervisionListener the listener that should be notified of supervision changes
    * @param numberThreads the number of threads <b>this</b> listener should be notified on (max = core); core threads also time out
    * @param queueSize the size of the queue to use for queuing supervision events (should be set according to
-   *  number of DAQs/Equipments and the length of the expected tasks; runtime exception thrown if queue fills up!) 
+   *  number of DAQs/Equipments and the length of the expected tasks; runtime exception thrown if queue fills up!)
    */
   @Override
   public Lifecycle registerAsListener(final SupervisionListener supervisionListener, final int numberThreads, final int queueSize) {
     listenerLock.writeLock().lock();
     try {
       ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(numberThreads, numberThreads, DEFAULT_THREAD_TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(queueSize), new ThreadPoolExecutor.AbortPolicy());
-      threadPoolExecutor.allowCoreThreadTimeOut(true);      
+      threadPoolExecutor.allowCoreThreadTimeOut(true);
       executors.put(supervisionListener, threadPoolExecutor);
       supervisionListeners.add(supervisionListener);
       return new ExecutorLifecycleHandle(threadPoolExecutor);
     } finally {
       listenerLock.writeLock().unlock();
-    }   
-  }  
+    }
+  }
 
   @Override
   public void notifySupervisionEvent(final SupervisionEvent supervisionEvent) {
@@ -179,9 +179,9 @@ public class SupervisionNotifierImpl implements SupervisionNotifier, C2monCacheL
       }
     } finally {
       listenerLock.writeLock().unlock();
-    }    
+    }
   }
-  
+
   @Override
   public void notifyElementUpdated(Supervised supervised) {
     Timestamp supervisionTime;
@@ -196,17 +196,17 @@ public class SupervisionNotifierImpl implements SupervisionNotifier, C2monCacheL
     } else {
       supervisionMessage = supervised.getSupervisionEntity() + " " + supervised.getName() + " is " + supervised.getSupervisionStatus();
     }
-    notifySupervisionEvent(new SupervisionEventImpl(supervised.getSupervisionEntity(), 
-                                                    supervised.getId(), supervised.getSupervisionStatus(), 
-                                                    supervisionTime, 
-                                                    supervisionMessage));    
+    notifySupervisionEvent(new SupervisionEventImpl(supervised.getSupervisionEntity(),
+                                                    supervised.getId(), supervised.getName(), supervised.getSupervisionStatus(),
+                                                    supervisionTime,
+                                                    supervisionMessage));
   }
-  
+
   @Override
   public void confirmStatus(Supervised supervised) {
     notifyElementUpdated(supervised);
   }
-  
+
   /**
    * For management purposes.
    * @return the size of the queues of the various supervison listeners.
@@ -224,7 +224,7 @@ public class SupervisionNotifierImpl implements SupervisionNotifier, C2monCacheL
     }
     return queueSizes;
   }
-  
+
   /**
    * For management purposes.
    * @return the number of active threads for each listener
@@ -242,10 +242,10 @@ public class SupervisionNotifierImpl implements SupervisionNotifier, C2monCacheL
     }
     return activeThreads;
   }
-  
+
   /**
    * Notifies a listener of a given event.
-   * 
+   *
    * @author Mark Brightwell
    *
    */
@@ -255,12 +255,12 @@ public class SupervisionNotifierImpl implements SupervisionNotifier, C2monCacheL
      * The event to pass to the listener
      */
     private SupervisionEvent event;
-    
+
     /**
      * The listener to call.
      */
     private SupervisionListener listener;
-       
+
     /**
      * Constructor.
      * @param event the event
@@ -281,9 +281,9 @@ public class SupervisionNotifierImpl implements SupervisionNotifier, C2monCacheL
         listener.notifySupervisionEvent(event);
       } catch (RuntimeException e) {
         LOGGER.error("Exception caught while notifying supervision event: the supervision status will no longer be correct and needs refreshing!", e);
-      }      
+      }
     }
-    
+
   }
-  
+
 }

@@ -203,6 +203,7 @@ public class TransportConnectorTest {
     for (long i = 1; i <= 3; i++) {
       SupervisionEvent event = new SupervisionEventImpl(SupervisionConstants.SupervisionEntity.PROCESS,
           i,
+          "P_PROCESS" + i,
           SupervisionConstants.SupervisionStatus.RUNNING,
           new Timestamp(123456789),
           "test message");

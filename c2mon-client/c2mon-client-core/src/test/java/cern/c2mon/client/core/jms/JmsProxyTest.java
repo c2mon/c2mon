@@ -16,34 +16,18 @@
  *****************************************************************************/
 package cern.c2mon.client.core.jms;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertTrue;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 
-import javax.jms.ConnectionFactory;
-import javax.jms.ExceptionListener;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-
-import cern.c2mon.client.core.config.C2monAutoConfiguration;
-import cern.c2mon.client.core.config.C2monClientProperties;
-import cern.c2mon.shared.client.serializer.TransferTagSerializer;
+import javax.jms.*;
 
 import org.apache.activemq.command.ActiveMQQueue;
 import org.easymock.EasyMock;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
-import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;
 import org.springframework.test.annotation.DirtiesContext;
@@ -53,21 +37,23 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.common.listener.TagUpdateListener;
-import cern.c2mon.shared.client.request.ClientRequestErrorReport;
-import cern.c2mon.shared.client.request.ClientRequestImpl;
-import cern.c2mon.shared.client.request.ClientRequestProgressReport;
-import cern.c2mon.shared.client.request.ClientRequestResult;
-import cern.c2mon.shared.client.request.JsonRequest;
+import cern.c2mon.client.core.config.C2monAutoConfiguration;
+import cern.c2mon.client.core.config.C2monClientProperties;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.request.*;
+import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
-import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 import cern.c2mon.shared.util.jms.ActiveJmsSender;
 import cern.c2mon.shared.util.json.GsonFactory;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Integration testing of JmsProxy implementation with ActiveMQ broker.
@@ -187,7 +173,7 @@ public class JmsProxyTest {
             Assert.assertTrue(message instanceof TextMessage);
             //send some response (empty collection)
             Collection<SupervisionEvent> supervisionEvents = new ArrayList<SupervisionEvent>();
-            supervisionEvents.add(new SupervisionEventImpl(SupervisionEntity.PROCESS, 1L, SupervisionStatus.RUNNING, new Timestamp(System.currentTimeMillis()), "test response"));
+            supervisionEvents.add(new SupervisionEventImpl(SupervisionEntity.PROCESS, 1L, "P_TEST", SupervisionStatus.RUNNING, new Timestamp(System.currentTimeMillis()), "test response"));
             Message replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(supervisionEvents));
             MessageProducer producer = session.createProducer(message.getJMSReplyTo());
             producer.send(replyMessage);
@@ -313,7 +299,7 @@ public class JmsProxyTest {
   public void testSupervisionNotification() throws InterruptedException {
     SupervisionListener supervisionListener1 = EasyMock.createMock(SupervisionListener.class);
     SupervisionListener supervisionListener2 = EasyMock.createMock(SupervisionListener.class);
-    SupervisionEvent event = new SupervisionEventImpl(SupervisionEntity.EQUIPMENT, 10L,
+    SupervisionEvent event = new SupervisionEventImpl(SupervisionEntity.EQUIPMENT, 10L, "P_TEST",
                                       SupervisionStatus.DOWN, new Timestamp(System.currentTimeMillis()), "test event");
 
     //expect

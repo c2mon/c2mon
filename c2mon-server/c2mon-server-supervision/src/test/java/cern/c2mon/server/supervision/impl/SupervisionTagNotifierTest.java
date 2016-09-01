@@ -1,27 +1,23 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.supervision.impl;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -35,18 +31,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.cache.C2monCache;
-import cern.c2mon.server.cache.CacheProvider;
-import cern.c2mon.server.cache.ClusterCache;
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.EquipmentFacade;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.ProcessFacade;
-import cern.c2mon.server.cache.RuleTagCache;
-import cern.c2mon.server.cache.SubEquipmentCache;
-import cern.c2mon.server.cache.SubEquipmentFacade;
-import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.supervision.SupervisionAppender;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
@@ -225,7 +210,7 @@ public class SupervisionTagNotifierTest {
   @Test
   @DirtiesContext
   public void testNotifyProcessEvent() {
-    SupervisionEvent event = new SupervisionEventImpl(SupervisionEntity.PROCESS, 10L, SupervisionStatus.DOWN, new Timestamp(System.currentTimeMillis()), "test message");
+    SupervisionEvent event = new SupervisionEventImpl(SupervisionEntity.PROCESS, 10L, "P_TEST", SupervisionStatus.DOWN, new Timestamp(System.currentTimeMillis()), "test message");
 
     EasyMock.expect(processCache.getCopy(10L)).andReturn(process);
     //EasyMock.expect(equipmentFacade.getProcessForAbstractEquipment(30L)).andReturn(process);
@@ -259,7 +244,7 @@ public class SupervisionTagNotifierTest {
   @Test
   @DirtiesContext
   public void testNotifyEquipmentEvent() {
-    SupervisionEvent event = new SupervisionEventImpl(SupervisionEntity.EQUIPMENT, 30L, SupervisionStatus.RUNNING, new Timestamp(System.currentTimeMillis()), "test message");
+    SupervisionEvent event = new SupervisionEventImpl(SupervisionEntity.EQUIPMENT, 30L, "E_TEST", SupervisionStatus.RUNNING, new Timestamp(System.currentTimeMillis()), "test message");
     mockControl.reset();
     //EasyMock.expect(equipmentFacade.getProcessForAbstractEquipment(30L)).andReturn(process);
     EasyMock.expect(equipmentCache.getCopy(30L)).andReturn(equipment);
@@ -289,7 +274,7 @@ public class SupervisionTagNotifierTest {
   @Test
   @DirtiesContext
   public void testNotifySubEquipmentEvent() {
-    SupervisionEvent event = new SupervisionEventImpl(SupervisionEntity.SUBEQUIPMENT, 50L, SupervisionStatus.DOWN, new Timestamp(System.currentTimeMillis()),
+    SupervisionEvent event = new SupervisionEventImpl(SupervisionEntity.SUBEQUIPMENT, 50L, "E_SUBTEST", SupervisionStatus.DOWN, new Timestamp(System.currentTimeMillis()),
         "test message");
     mockControl.reset();
     EasyMock.expect(subEquipmentCache.getCopy(50L)).andReturn(subEquipment);

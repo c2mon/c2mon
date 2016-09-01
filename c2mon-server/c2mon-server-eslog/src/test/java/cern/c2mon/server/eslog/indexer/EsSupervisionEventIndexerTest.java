@@ -50,6 +50,7 @@ public class EsSupervisionEventIndexerTest {
   private SupervisionConstants.SupervisionStatus status = SupervisionConstants.SupervisionStatus.RUNNING;
   private Timestamp timestamp = new Timestamp(123456789);
   private long id = 1L;
+  private String name = "P_TEST";
   private String message = "message";
   private EsSupervisionMapping mapping;
   private SupervisionEvent event;
@@ -66,13 +67,13 @@ public class EsSupervisionEventIndexerTest {
 
   @Before
   public void setup() throws IDBPersistenceException {
-    event = new SupervisionEventImpl(entity, id, status, timestamp, message);
+    event = new SupervisionEventImpl(entity, id, name, status, timestamp, message);
     esSupervisionEvent = new EsSupervisionEvent();
-    esSupervisionEvent.setEntityId(id);
-    esSupervisionEvent.setEntityName(entity.name());
-    esSupervisionEvent.setEventTime(timestamp.getTime());
+    esSupervisionEvent.setId(id);
+    esSupervisionEvent.setName(entity.name());
+    esSupervisionEvent.setTimestamp(timestamp.getTime());
     esSupervisionEvent.setMessage(message);
-    esSupervisionEvent.setStatusName(status.name());
+    esSupervisionEvent.setName(status.name());
     when(esSupervisionEventConverter.convert(eq(event))).thenReturn(esSupervisionEvent);
     when(connector.logSupervisionEvent(anyString(), anyString(), eq(esSupervisionEvent))).thenReturn(true);
     indexer.setIndexFormat("M");

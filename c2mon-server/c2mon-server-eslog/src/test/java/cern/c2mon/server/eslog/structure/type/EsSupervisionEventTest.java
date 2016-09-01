@@ -16,8 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.type;
 
-import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -26,6 +24,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.fail;
@@ -40,30 +41,32 @@ public class EsSupervisionEventTest {
   private EsSupervisionEvent esSupervisionEvent;
   private String expectedJson;
   private long id = 1;
-  private String entityName = "entity";
+  private String name = "P_TEST";
+  private String entity = "entity";
   private String message = "message";
-  private String statusName = "status";
-  private long eventTime = 0;
+  private String status = "status";
+  private long timestamp = 0;
 
   @Before
   public void setup() {
     esSupervisionEvent = new EsSupervisionEvent();
-    esSupervisionEvent.setEntityId(id);
-    esSupervisionEvent.setEntityName(entityName);
+    esSupervisionEvent.setId(id);
+    esSupervisionEvent.setName(name);
+    esSupervisionEvent.setEntity(entity);
     esSupervisionEvent.setMessage(message);
-    esSupervisionEvent.setStatusName(statusName);
+    esSupervisionEvent.setStatus(status);
     JsonObject element = gson.toJsonTree(new Object()).getAsJsonObject();
-    element.addProperty("entityId", id);
+    element.addProperty("id", id);
+    element.addProperty("name", name);
+    element.addProperty("entity", entity);
     element.addProperty("message", message);
-    element.addProperty("entityName", entityName);
-    element.addProperty("statusName", statusName);
-    element.addProperty("eventTime", eventTime);
+    element.addProperty("status", status);
+    element.addProperty("timestamp", timestamp);
     expectedJson = gson.toJson(element);
   }
 
   @Test
   public void testJsonSerialization() {
-    String json = esSupervisionEvent.toString();
     try {
       assertEquals(expectedJson, esSupervisionEvent.toString());
       assertEquals(esSupervisionEvent, esSupervisionEvent.getObject(expectedJson));
@@ -74,7 +77,7 @@ public class EsSupervisionEventTest {
 
   @Test
   public void testGetObject() {
-    String line = "{\"entityId\":1,\"message\":\"message\",\"entityName\":\"entity\",\"statusName\":\"status\",\"eventTime\":0}";
+    String line = "{\"id\":1,\"name\":\"P_TEST\",\"entity\":\"entity\",\"message\":\"message\",\"status\":\"status\",\"timestamp\":0}";
     IFallback result = esSupervisionEvent.getObject(line);
     assertTrue(result instanceof EsSupervisionEvent);
     Assert.assertEquals(line, result.toString());

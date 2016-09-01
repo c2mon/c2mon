@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -22,56 +22,61 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 
-import cern.c2mon.shared.client.request.ClientRequestReport;
+import com.google.gson.Gson;
+import lombok.Data;
+
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 import cern.c2mon.shared.util.json.GsonFactory;
 
-import com.google.gson.Gson;
-
 /**
- * <p>Implementation of the SupervisionEvent. Corresponds to the 
+ * <p>Implementation of the SupervisionEvent. Corresponds to the
  * objects stored in the Supervision log table. The sqlmap subpackage
  * contains an iBatis file for querying the DB.
- * 
+ *
  * <p>Supervision event corresponding to a row in the supervision
  * log table. Can mark a change in the status or a confirmation
  * of the current status.
- * 
+ *
  * @author Mark Brightwell
  *
  */
+@Data
 public class SupervisionEventImpl implements SupervisionEvent {
-  
+
+  private static transient final long serialVersionUID = 1L;
+
   /** Gson parser singleton for that class */
   private static transient Gson gson = null;
-  
+
   /**
    * The entity concerned (Process, Equipment, SubEquipment)
    */
   @NotNull
   private SupervisionEntity entity;
-  
+
   /**
    * The id of the entity (unique for the entity).
    */
   @NotNull
   @Min(1)
   private Long entityId;
-  
+
+  private String name;
+
   /**
    * The new status of the entity.
    */
   @NotNull
   private SupervisionStatus status;
-  
+
   /**
    * The time of this change/confirmation of status.
    */
   @NotNull
   @Past
   private Timestamp eventTime;
-  
+
   /**
    * Additional info (should only be used for informing the user, not
    * for specifying event; if necessary introduce a new status!).
@@ -85,104 +90,29 @@ public class SupervisionEventImpl implements SupervisionEvent {
   private SupervisionEventImpl() {
     // Do nothing
   };
-  
+
   /**
    * Constructor.
    * @param entity The entity for which this supervision event is created
-   * @param entityId The id of the entity
+   * @param id The id of the entity
    * @param status one state from the <code>SupervisionStatus</code> enumeration
-   * @param eventTime time of the event 
+   * @param eventTime time of the event
    * @param  message Free text for describing this event
    */
   public SupervisionEventImpl(final SupervisionEntity entity,
-                              final Long entityId,
+                              final Long id,
+                              final String name,
                               final SupervisionStatus status,
                               final Timestamp eventTime,
                               final String message) {
     this.entity = entity;
-    this.entityId = entityId;
+    this.entityId = id;
+    this.name = name;
     this.status = status;
     this.eventTime = eventTime;
     this.message = message;
   }
 
-  /**
-   * @return the entity
-   */
-  @Override
-  public SupervisionEntity getEntity() {
-    return entity;
-  }
-
-  /**
-   * @return the entityId
-   */
-  @Override
-  public Long getEntityId() {
-    return entityId;
-  }
-
-  /**
-   * @return the status
-   */
-  @Override
-  public SupervisionStatus getStatus() {
-    return status;
-  }
-
-  /**
-   * @return the eventTime
-   */
-  @Override
-  public Timestamp getEventTime() {
-    return eventTime;
-  }
-
-  /**
-   * Getter method.
-   * @return the user-friendly description
-   */
-  @Override
-  public String getMessage() {
-    return message;
-  }
-
-  /**
-   * @param entity the entity to set
-   */
-  public void setEntity(final SupervisionEntity entity) {
-    this.entity = entity;
-  }
-
-  /**
-   * @param entityId the entityId to set
-   */
-  public void setEntityId(final Long entityId) {
-    this.entityId = entityId;
-  }
-
-  /**
-   * @param status the status to set
-   */
-  public void setStatus(final SupervisionStatus status) {
-    this.status = status;
-  }
-
-  /**
-   * @param eventTime the eventTime to set
-   */
-  public void setEventTime(final Timestamp eventTime) {
-    this.eventTime = eventTime;
-  }
-
-  /**
-   * @param message the message to set
-   */
-  public void setMessage(final String message) {
-    this.message = message;
-  }
-  
-  
   /**
    * @return The Gson parser singleton instance to serialize/deserialize Json
    * messages of that class
@@ -191,11 +121,11 @@ public class SupervisionEventImpl implements SupervisionEvent {
     if (gson == null) {
       gson = GsonFactory.createGson();
     }
-    
+
     return gson;
   }
-  
-  
+
+
   /**
    * Generates out of this class instance a JSON message
    * @return The serialized JSON representation of this class instance
@@ -203,8 +133,8 @@ public class SupervisionEventImpl implements SupervisionEvent {
   public final String toJson() {
     return getGson().toJson(this);
   }
-  
-  
+
+
   /**
    * Deserialized the JSON string into a <code>SupervisionEvent</code> object instance
    * @param json A JSON string representation of a <code>SupervisionEventImpl</code> class
@@ -259,8 +189,8 @@ public class SupervisionEventImpl implements SupervisionEvent {
       return false;
     return true;
   }
-  
-  
+
+
   @Override
   public SupervisionEvent clone() throws CloneNotSupportedException {
     SupervisionEventImpl clone = (SupervisionEventImpl) super.clone();

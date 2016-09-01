@@ -16,10 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.converter;
 
-import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
+
+import cern.c2mon.server.eslog.structure.types.EsSupervisionEvent;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
 /**
  * Converts a SupervisionEvent to a {@link EsSupervisionEvent} used in ElasticSearch.
@@ -40,18 +41,21 @@ public class EsSupervisionEventConverter implements Converter<SupervisionEvent, 
 
     EsSupervisionEvent esSupervisionEvent = new EsSupervisionEvent();
 
+    esSupervisionEvent.setId(supervisionEvent.getEntityId());
+
+    esSupervisionEvent.setName(supervisionEvent.getName());
+
     if (supervisionEvent.getEntity() != null) {
-      esSupervisionEvent.setEntityName(supervisionEvent.getEntity().name());
+      esSupervisionEvent.setEntity(supervisionEvent.getEntity().name());
     }
-    esSupervisionEvent.setEntityId(supervisionEvent.getEntityId());
 
     if (supervisionEvent.getEventTime() != null) {
-      esSupervisionEvent.setEventTime(supervisionEvent.getEventTime().getTime());
+      esSupervisionEvent.setTimestamp(supervisionEvent.getEventTime().getTime());
     }
     esSupervisionEvent.setMessage(supervisionEvent.getMessage());
 
     if (supervisionEvent.getStatus() != null) {
-      esSupervisionEvent.setStatusName(supervisionEvent.getStatus().name());
+      esSupervisionEvent.setStatus(supervisionEvent.getStatus().name());
     }
 
     return esSupervisionEvent;

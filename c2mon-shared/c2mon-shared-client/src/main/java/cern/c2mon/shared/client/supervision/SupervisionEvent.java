@@ -51,6 +51,11 @@ public interface SupervisionEvent extends ClientRequestResult, Cloneable, Serial
    * @return the unique id; never returns null
    */
   Long getEntityId();
+  
+  /**
+   * @return The name of the entity 
+   */
+  String getName();
 
   /**
    * Returns the status of the entity concerned (the new or

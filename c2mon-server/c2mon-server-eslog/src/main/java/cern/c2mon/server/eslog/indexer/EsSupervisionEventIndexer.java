@@ -71,7 +71,7 @@ public class EsSupervisionEventIndexer<T extends EsSupervisionEvent> extends EsI
 
     boolean logged = false;
     try {
-      String indexName = generateSupervisionIndex(esSupervisionEvent.getEventTime());
+      String indexName = generateSupervisionIndex(esSupervisionEvent.getTimestamp());
       logged = connector.logSupervisionEvent(indexName, supervisionMapping, esSupervisionEvent);
     } catch (Exception e) {
       log.debug("storeData() - Cluster is not reachable");

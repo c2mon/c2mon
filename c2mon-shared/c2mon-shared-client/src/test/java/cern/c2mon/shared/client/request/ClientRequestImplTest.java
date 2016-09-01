@@ -16,29 +16,18 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.request;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import cern.c2mon.shared.client.request.ClientRequest;
-import cern.c2mon.shared.client.request.ClientRequestImpl;
-import cern.c2mon.shared.client.request.ClientRequestReport;
-import cern.c2mon.shared.client.request.ClientRequestResult;
+import com.google.gson.Gson;
 import org.junit.Test;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
-import cern.c2mon.shared.client.command.CommandExecutionStatus;
-import cern.c2mon.shared.client.command.CommandReport;
-import cern.c2mon.shared.client.command.CommandReportImpl;
-import cern.c2mon.shared.client.command.CommandTagHandleImpl;
-import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
+import cern.c2mon.shared.client.command.*;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
 import cern.c2mon.shared.client.device.DeviceClassNameResponseImpl;
@@ -50,21 +39,16 @@ import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.process.ProcessXmlResponseImpl;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
-import cern.c2mon.shared.client.tag.Publisher;
-import cern.c2mon.shared.client.tag.TagConfig;
-import cern.c2mon.shared.client.tag.TagConfigImpl;
-import cern.c2mon.shared.client.tag.TagMode;
-import cern.c2mon.shared.client.tag.TagUpdate;
-import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.c2mon.shared.client.tag.TransferTagImpl;
-import cern.c2mon.shared.client.tag.TransferTagValueImpl;
+import cern.c2mon.shared.client.tag.*;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 import cern.c2mon.shared.util.json.GsonFactory;
 
-import com.google.gson.Gson;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 
 public class ClientRequestImplTest {
 
@@ -487,7 +471,7 @@ public class ClientRequestImplTest {
       responseList = new ArrayList<SupervisionEvent>();
       for (int i = 0; i < size; i++) {
         responseList.add(
-            new SupervisionEventImpl(SupervisionEntity.PROCESS, Long.valueOf(i), SupervisionStatus.RUNNING, new Timestamp(System.currentTimeMillis()), "supervision event " + i));
+            new SupervisionEventImpl(SupervisionEntity.PROCESS, Long.valueOf(i), "P_TEST", SupervisionStatus.RUNNING, new Timestamp(System.currentTimeMillis()), "supervision event " + i));
       }
     }
     else {

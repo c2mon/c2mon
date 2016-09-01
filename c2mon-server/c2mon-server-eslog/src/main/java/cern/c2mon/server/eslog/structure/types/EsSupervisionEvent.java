@@ -16,28 +16,28 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.types;
 
-import cern.c2mon.pmanager.IFallback;
 import com.google.gson.Gson;
 import lombok.Data;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+
+import cern.c2mon.pmanager.IFallback;
 
 /**
  * Represents a SupervisionEvent for ElasticSearch.
  *
  * @author Alban Marguet
  */
-@Slf4j
 @Data
 public class EsSupervisionEvent implements IFallback {
   @NonNull
   private final transient Gson gson = GsonSupplier.INSTANCE.get();
 
-  private long entityId;
+  private long id;
+  private String name;
+  private String entity;
   private String message;
-  private String entityName;
-  private String statusName;
-  private long eventTime;
+  private String status;
+  private long timestamp;
 
   /**
    * JSON representation of the EsSupervisionEvent
@@ -54,6 +54,6 @@ public class EsSupervisionEvent implements IFallback {
 
   @Override
   public String getId() {
-    return String.valueOf(entityId);
+    return String.valueOf(id);
   }
 }

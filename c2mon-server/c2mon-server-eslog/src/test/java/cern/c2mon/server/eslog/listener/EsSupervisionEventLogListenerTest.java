@@ -16,6 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.listener;
 
+import java.sql.Timestamp;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.eslog.structure.converter.EsSupervisionEventConverter;
@@ -24,13 +32,6 @@ import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
-import java.sql.Timestamp;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
@@ -46,13 +47,14 @@ public class EsSupervisionEventLogListenerTest {
   private SupervisionConstants.SupervisionStatus status = SupervisionConstants.SupervisionStatus.RUNNING;
   private Timestamp timestamp = new Timestamp(123456789);
   private long id = 1L;
+  private String name = "P_TEST";
   private String message = "message";
-  private SupervisionEvent event = new SupervisionEventImpl(entity, id, status, timestamp, message);
+  private SupervisionEvent event = new SupervisionEventImpl(entity, id, name, status, timestamp, message);
   private EsSupervisionEvent esSupervisionEvent;
 
   @Mock
   private SupervisionNotifier supervisionNotifier;
-  
+
   @Mock
   private IPersistenceManager persistenceManager;
 
