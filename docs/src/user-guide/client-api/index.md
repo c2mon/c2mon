@@ -10,21 +10,22 @@ search for and subscribe to tags.
 * `SupervisionService`: Provides methods for registering heartbeat listeners, to monitor server connection state.
 * `SessionService`: Optional service to secure the command execution (requires implementing an `AuthenticationManager`).
 
-## Using Maven
+## Including the API dependency
 
-Add the following lines to your POM file to include the C2MON client API dependency:
+To use the API, you need to add a dependency on `c2mon-daq-core`. Include it in your project using Maven:
+
 ```xml
 <dependency>
-    <groupId>cern.c2mon.client</groupId>
-    <artifactId>c2mon-client-core</artifactId>
+    <groupId>cern.c2mon.daq</groupId>
+    <artifactId>c2mon-daq-core</artifactId>
     <version>__insert_version_here__</version>
 </dependency>
 ```
 
-## Using Gradle
+Or using Gradle:
 
 ```
-compile "cern.c2mon.c2mon-client:c2mon-client-core:__insert_version_here__"
+compile "cern.c2mon.daq:c2mon-daq-core:__insert_version_here__"
 ```
 
 Remember to replace "__insert_version_here__" with a real version number, such as "1.8.0".

@@ -17,7 +17,7 @@ To enable the module, simply add it to your classpath. Using Maven:
 Or using Gradle:
 
 ```
-compile "cern.c2mon.c2mon-client:c2mon-client-all:__insert_version_here__"
+compile "cern.c2mon.client:c2mon-client-ext-history:__insert_version_here__"
 ```
 
 ## Configuring the module
