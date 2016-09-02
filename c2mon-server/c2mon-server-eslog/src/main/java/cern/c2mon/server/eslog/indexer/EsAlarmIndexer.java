@@ -72,7 +72,7 @@ public class EsAlarmIndexer<T extends EsAlarm> extends EsIndexer<T> {
 
     boolean logged = false;
     try {
-        String indexName = generateAlarmIndex(esAlarm.getServerTimestamp());
+        String indexName = generateAlarmIndex(esAlarm.getTimestamp());
         logged = connector.logAlarmEvent(indexName, alarmMapping, esAlarm);
     } catch (Exception e) {
       log.debug("storeData() - Cluster is not reachable");

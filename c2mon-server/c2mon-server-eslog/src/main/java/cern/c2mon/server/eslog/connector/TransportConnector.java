@@ -525,7 +525,7 @@ public class TransportConnector implements Connector {
     log.debug("logAlarmEvent() - Try to write new alarm event to in index = {}", indexName);
 
     String jsonSource = esAlarm.toString();
-    String routing = String.valueOf(esAlarm.getAlarmId());
+    String routing = String.valueOf(esAlarm.getId());
 
     boolean indexExist = true;
     if (!indexExists(indexName)) {

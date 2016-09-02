@@ -16,19 +16,21 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.converter;
 
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.eslog.structure.types.EsAlarm;
-import cern.c2mon.server.test.CacheObjectCreation;
-import cern.c2mon.shared.common.metadata.Metadata;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.HashMap;
-import java.util.Map;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.eslog.structure.types.EsAlarm;
+import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.shared.common.metadata.Metadata;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNull;
@@ -43,43 +45,43 @@ public class EsAlarmLogConverterTest {
   @InjectMocks
   private EsAlarmLogConverter esAlarmLogConverter;
   private Alarm alarm;
-  private EsAlarm EsAlarm;
+  private EsAlarm esAlarm;
   private String[] arrayString = new String[]{};
 
   @Test
   public void testNullConvertsToNull() {
-    EsAlarm = esAlarmLogConverter.convert(alarm);
-    assertNull(EsAlarm);
+    esAlarm = esAlarmLogConverter.convert(alarm);
+    assertNull(esAlarm);
   }
 
   @Test
   public void testDataIsPreserved() {
     alarm = CacheObjectCreation.createTestAlarm1();
-    EsAlarm = esAlarmLogConverter.convert(alarm);
+    esAlarm = esAlarmLogConverter.convert(alarm);
 
-    callTests(EsAlarm, alarm);
+    callTests(esAlarm, alarm);
   }
 
   @Test
   public void testMetadata() {
     alarm = initAlarmWithMetadata();
 
-    EsAlarm = esAlarmLogConverter.convert(alarm);
-    callTests(EsAlarm, alarm);
+    esAlarm = esAlarmLogConverter.convert(alarm);
+    callTests(esAlarm, alarm);
     log.debug(arrayString.toString());
-    assertEquals(arrayString.toString(), EsAlarm.getMetadata().get("array"));
+    assertEquals(arrayString.toString(), esAlarm.getMetadata().get("array"));
   }
 
-  private void callTests(EsAlarm EsAlarm, Alarm alarm) {
-    log.debug(EsAlarm.toString());
-    assertEquals(alarm.getTagId().longValue(), EsAlarm.getTagId());
-    assertEquals(alarm.getId().longValue(), EsAlarm.getAlarmId());
-    assertEquals(alarm.getFaultFamily(), EsAlarm.getFaultFamily());
-    assertEquals(alarm.getFaultMember(), EsAlarm.getFaultMember());
-    assertEquals(alarm.getFaultCode(), EsAlarm.getFaultCode());
-    assertEquals(alarm.isActive(), EsAlarm.isActive());
-    assertEquals(alarm.getInfo(), EsAlarm.getInfo());
-    assertEquals(alarm.getTimestamp().getTime(), EsAlarm.getServerTimestamp());
+  private void callTests(EsAlarm esAlarm, Alarm alarm) {
+    log.debug(esAlarm.toString());
+    assertEquals(alarm.getTagId().longValue(), esAlarm.getTagId());
+    assertEquals(alarm.getId().longValue(), esAlarm.getIdAsLong());
+    assertEquals(alarm.getFaultFamily(), esAlarm.getFaultFamily());
+    assertEquals(alarm.getFaultMember(), esAlarm.getFaultMember());
+    assertEquals(alarm.getFaultCode(), esAlarm.getFaultCode());
+    assertEquals(alarm.isActive(), esAlarm.isActive());
+    assertEquals(alarm.getInfo(), esAlarm.getInfo());
+    assertEquals(alarm.getTimestamp().getTime(), esAlarm.getTimestamp());
   }
 
   private Alarm initAlarmWithMetadata() {
@@ -93,6 +95,7 @@ public class EsAlarmLogConverterTest {
     alarm.setId(1L);
     alarm.setDataTagId(2L);
     alarm.setMetadata(metadata);
+    alarm.setTimestamp(new Timestamp(System.currentTimeMillis()));
 
     return alarm;
   }

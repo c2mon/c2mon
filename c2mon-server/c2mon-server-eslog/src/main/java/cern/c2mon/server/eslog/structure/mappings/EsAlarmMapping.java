@@ -69,43 +69,23 @@ public class EsAlarmMapping implements EsMapping {
       }
 
       class Properties {
-        private final TagId tagId;
-        private final AlarmId alarmId;
-        private final FaultFamily faultFamily;
-        private final FaultMember faultMember;
-        private final FaultCode faultCode;
-        private final Active active;
-        private final Activity activity;
-        private final ActiveNumeric activeNumeric;
-        private final Priority priority;
-        private final Info info;
-        private final ServerTimestamp serverTimestamp;
-        private final TimeZone timeZone;
+        private final Id id = new Id();
+        private final TagId tagId = new TagId();
+        private final FaultFamily faultFamily = new FaultFamily();
+        private final FaultMember faultMember = new FaultMember();
+        private final FaultCode faultCode = new FaultCode();
+        private final Active active = new Active();
+        private final ActiveNumeric activeNumeric = new ActiveNumeric();
+        private final Info info = new Info();
+        private final Timestamp timestamp = new Timestamp();
+        private final Metadata metadata = new Metadata();
 
-        private final Metadata metadata;
-
-
-        Properties() {
-          this.tagId = new TagId();
-          this.alarmId = new AlarmId();
-          this.faultFamily = new FaultFamily();
-          this.faultMember = new FaultMember();
-          this.faultCode = new FaultCode();
-          this.active = new Active();
-          this.activity = new Activity();
-          this.activeNumeric = new ActiveNumeric();
-          this.priority = new Priority();
-          this.info = new Info();
-          this.serverTimestamp = new ServerTimestamp();
-          this.timeZone = new TimeZone();
-          this.metadata = new Metadata();
-        }
 
         class TagId {
           private final String type = ValueType.LONG.toString();
         }
 
-        class AlarmId {
+        class Id {
           private final String type = ValueType.LONG.toString();
         }
 
@@ -127,17 +107,8 @@ public class EsAlarmMapping implements EsMapping {
           private final String type = ValueType.BOOLEAN.toString();
         }
 
-        class Activity {
-          private final String type = ValueType.STRING.toString();
-          private final String index = indexNotAnalyzed;
-        }
-
         class ActiveNumeric {
           private final String type = ValueType.DOUBLE.toString();
-        }
-
-        class Priority {
-          private final String type = ValueType.INTEGER.toString();
         }
 
         class Info {
@@ -145,13 +116,9 @@ public class EsAlarmMapping implements EsMapping {
           private final String index = indexNotAnalyzed;
         }
 
-        class ServerTimestamp {
+        class Timestamp {
           private final String type = ValueType.DATE.toString();
           private final String format = epochMillisFormat;
-        }
-
-        class TimeZone {
-          private final String type = ValueType.STRING.toString();
         }
 
         class Metadata {

@@ -16,16 +16,16 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.converter;
 
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.eslog.structure.types.EsAlarm;
-import cern.c2mon.shared.common.metadata.Metadata;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.stereotype.Component;
-
-import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
+
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.eslog.structure.types.EsAlarm;
+import cern.c2mon.shared.common.metadata.Metadata;
 
 /**
  * Convert an Alarm to an {@link EsAlarm} for ElasticSearch writing.
@@ -47,25 +47,16 @@ public class EsAlarmLogConverter implements Converter<Alarm, EsAlarm> {
     }
 
     esAlarm.setTagId(alarm.getTagId());
-    esAlarm.setAlarmId(alarm.getId());
+    esAlarm.setId(alarm.getId());
 
     esAlarm.setActive(alarm.isActive());
-    esAlarm.setActivity(String.valueOf(alarm.isActive()));
-
-    if (esAlarm.isActive()) {
-      esAlarm.setActiveNumeric(1);
-    } else {
-      esAlarm.setActiveNumeric(0);
-    }
-
+    esAlarm.setActiveNumeric(alarm.isActive() ? 1 : 0);
+    
     esAlarm.setFaultFamily(alarm.getFaultFamily());
     esAlarm.setFaultMember(alarm.getFaultMember());
     esAlarm.setFaultCode(alarm.getFaultCode());
 
-    Timestamp alarmTimestamp = alarm.getTimestamp();
-    if (alarmTimestamp != null) {
-      esAlarm.setServerTimestamp(alarmTimestamp.getTime());
-    }
+    esAlarm.setTimestamp(alarm.getTimestamp().getTime());
 
     esAlarm.setInfo(alarm.getInfo());
 

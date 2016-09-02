@@ -16,7 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.type;
 
-import cern.c2mon.server.eslog.structure.types.EsAlarm;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.Before;
@@ -24,8 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.util.HashMap;
-import java.util.Map;
+import cern.c2mon.server.eslog.structure.types.EsAlarm;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.fail;
@@ -46,9 +47,7 @@ public class EsAlarmTest {
   private int faultCode = 0;
 
   private boolean active = true;
-  private String activity = "active";
   private double activeNumeric = 1;
-  private int priority = 1;
   private String info = "info";
 
   private long serverTimestamp = 0;
@@ -60,17 +59,15 @@ public class EsAlarmTest {
     metadata.put("test2", "value2");
 
     esAlarm = new EsAlarm();
-    esAlarm.setAlarmId(alarmId);
+    esAlarm.setId(alarmId);
     esAlarm.setTagId(tagId);
     esAlarm.setFaultFamily(faultFamily);
     esAlarm.setFaultMember(faultMember);
     esAlarm.setFaultCode(faultCode);
     esAlarm.setActive(active);
-    esAlarm.setActivity(activity);
     esAlarm.setActiveNumeric(activeNumeric);
-    esAlarm.setPriority(priority);
     esAlarm.setInfo(info);
-    esAlarm.setServerTimestamp(serverTimestamp);
+    esAlarm.setTimestamp(serverTimestamp);
     esAlarm.getMetadata().putAll(metadata);
 
     expectedJson = gson.toJson(esAlarm);
@@ -78,7 +75,6 @@ public class EsAlarmTest {
 
   @Test
   public void testJsonSerialization() {
-    String json = esAlarm.toString();
     try {
       assertEquals(expectedJson, esAlarm.toString());
       assertEquals(esAlarm, esAlarm.getObject(expectedJson));

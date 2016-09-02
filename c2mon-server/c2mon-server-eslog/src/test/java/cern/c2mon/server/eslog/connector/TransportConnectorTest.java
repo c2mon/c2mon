@@ -183,7 +183,7 @@ public class TransportConnectorTest {
 
     for (long i = 1; i <= 3; i++) {
       EsAlarm esAlarm = esAlarmLogConverter.convert(CacheObjectCreation.createTestAlarm1());
-      esAlarm.setAlarmId(i);
+      esAlarm.setId(i);
 
       String mapping = new EsAlarmMapping().getMapping();
       assertTrue(connector.logAlarmEvent(indexName, mapping, esAlarm));

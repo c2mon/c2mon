@@ -35,10 +35,10 @@ public class EsAlarmMappingTest {
           "  \"mappings\": {\n" +
           "    \"alarm\": {\n" +
           "      \"properties\": {\n" +
-          "        \"tagId\": {\n" +
+          "        \"id\": {\n" +
           "          \"type\": \"long\"\n" +
           "        },\n" +
-          "        \"alarmId\": {\n" +
+          "        \"tagId\": {\n" +
           "          \"type\": \"long\"\n" +
           "        },\n" +
           "        \"faultFamily\": {\n" +
@@ -55,26 +55,16 @@ public class EsAlarmMappingTest {
           "        \"active\": {\n" +
           "          \"type\": \"boolean\"\n" +
           "        },\n" +
-          "        \"activity\": {\n" +
-          "          \"type\": \"string\",\n" +
-          "          \"index\": \"not_analyzed\"\n" +
-          "        },\n" +
           "        \"activeNumeric\": {\n" +
           "          \"type\": \"double\"\n" +
-          "        },\n" +
-          "        \"priority\": {\n" +
-          "          \"type\": \"integer\"\n" +
           "        },\n" +
           "        \"info\": {\n" +
           "          \"type\": \"string\",\n" +
           "          \"index\": \"not_analyzed\"\n" +
           "        },\n" +
-          "        \"serverTimestamp\": {\n" +
+          "        \"timestamp\": {\n" +
           "          \"type\": \"date\",\n" +
           "          \"format\": \"epoch_millis\"\n" +
-          "        },\n" +
-          "        \"timeZone\": {\n" +
-          "          \"type\": \"string\"\n" +
           "        },\n" +
           "        \"metadata\": {\n" +
           "          \"type\": \"nested\",\n" +

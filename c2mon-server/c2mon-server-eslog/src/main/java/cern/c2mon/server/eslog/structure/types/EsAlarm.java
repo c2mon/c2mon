@@ -16,15 +16,16 @@
  *****************************************************************************/
 package cern.c2mon.server.eslog.structure.types;
 
-import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.gson.Gson;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
-import java.util.Map;
+import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
 
 /**
  * Represents an Alarm Event for ElasticSearch.
@@ -37,20 +38,28 @@ public class EsAlarm implements IFallback {
   @NonNull
   private final transient Gson gson = GsonSupplier.INSTANCE.get();
 
+  /** The alarm id */
+  private long id;
+
+  /** The id of the tag to which the alarm belongs to */
   private long tagId;
-  private long alarmId;
 
   private String faultFamily;
   private String faultMember;
   private int faultCode;
 
+  /** true, if the alarm is active */
   private boolean active;
-  private String activity;
+  /** 1, if the alarm is active otherwise 0 */
   private double activeNumeric;
-  private int priority;
-  private String info;
-  private long serverTimestamp;
 
+  /** optional alarm information sent by the source or added by the server */
+  private String info;
+
+  /** Corresponds to the server timestamp */
+  private long timestamp;
+
+  /** Configured metadata */
   private final Map<String, String> metadata = new HashMap<>();
 
   /**
@@ -70,7 +79,10 @@ public class EsAlarm implements IFallback {
 
   @Override
   public String getId() {
-    return String.valueOf(alarmId);
+    return String.valueOf(id);
   }
 
+  public long getIdAsLong() {
+    return id;
+  }
 }
