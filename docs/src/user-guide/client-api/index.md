@@ -1,67 +1,55 @@
 # Client API
 
-The C2MON Client API is written in Java and provides various service classes to interact with the server.
-All services are accessed via the `C2monServiceGateway` which provides:
+The C2MON client API is written in Java and provides various service classes to interact with the server:
 
-* `TagService`: This is the most important service class and most probably the only one you will need in the beginning.
-it contains all methods to search and subscribe to tag values.
-* `AlarmService`: Allows subscribing to active alarm or retrieve alarm information
-* `CommandService`: To execute pre-configured commands.
-* `ConfigurationService`: Allows applying new server configurations and to fetch the entire configuration for the configured DAQ Processes.
-* `SupervisionService`: Allows registering listeners to get informed about the connection state to the JMS brokers and the heartbeat of the C2MON server.
-* `SessionService`: Optional service to secure the command execution.
-(Please note that this service requires implementing in addition an `AuthenticationManager`)
+* `TagService`: The most important service class and most probably the only one you will need in the beginning. Provides methods to
+search for and subscribe to tags.
+* `AlarmService`: Provides methods for subscribing to active alarms or retrieving alarm information.
+* `CommandService`: Provides methods for executing commands on source equipment.
+* `ConfigurationService`: Provides methods for creating/reading/updating/removing pre-configured entities (such as tags or commands).
+* `SupervisionService`: Provides methods for registering heartbeat listeners, to monitor server connection state.
+* `SessionService`: Optional service to secure the command execution (requires implementing an `AuthenticationManager`).
 
-## Setup
+## Connecting to a C2MON server
 
-Add the following lines to your Maven POM file to include the C2MON client API dependency:
-```xml
-<dependency>
-    <groupId>cern.c2mon.c2mon-client</groupId>
-    <artifactId>c2mon-client-all</artifactId>
-    <version>__insert_version_here__</version>
-</dependency>
-```
+By default, the client tries to connect to a server running at `localhost:61616`.
 
-In addition it requires specifying the Java System property below in your application context:
+To override this, the client looks for the `c2mon.client.conf.url` property at startup. You can set it using a JVM
+argument (`-Dc2mon.client.conf.url=...`) or as a system property (`System.setProperty("c2mon.client.conf.url", "...")`). It takes both `file://`
+and `http://` protocol formats.
+
+
+The file must contain at least the `c2mon.client.jms.url` property, which is the [URL of the JMS broker](http://activemq.apache.org/uri-protocols.html)
+to which the C2MON server is listening for client connections. For example:
 
 ```bash
-# URL to C2MON Client properties file
--Dc2mon.client.conf.url=http://example/c2mon-client.properties
+c2mon.client.jms.url=tcp://jms-broker-host:61616
 ```
 
-Alternatively you can also set a link to a file on your local system.
+## Using the API
 
-```bash
-# URL to C2MON Client properties file
--Dc2mon.client.conf.url=file:///c2mon-client.properties
-```
+### Spring Boot applications
 
-To set the property inside your code, you can use the following command.
+Applications that use Spring Boot can benefit from integration with the C2MON client. Access to the client service classes can simply be acquired by
+`@Autowiring` them, e.g.:
 
 ```java
-System.setProperty("c2mon.client.conf.url", "file:///c2mon-client.properties");
+@Autowired
+private TagService tagService;
 ```
 
-The properties file must at least contain the http://activemq.apache.org/uri-protocols.html[JMS broker communication URL] to reach the C2MON server instance.
+### Non-Spring applications
 
-```bash
-# ActiveMQ URL
-c2mon.client.jms.url=tcp://activemq-broker-host:61620?wireFormat.tcpNoDelayEnabled=true
-```
-
-
-## Startup
-
-At application startup you have to make once the following call in order to initialise the `C2MONServiceGateway`.
-Only then you have access to the different Service instances.
+Regular Java applications must use the `C2monServiceGateway` to acquire access to the service classes. At application startup, initialise the client:
 
 ```java
 C2monServiceGateway.startC2monClientSynchronous();
 ```
 
-The startup can take several seconds, so if you want to to load in meantime other parts of your system use the asynchronous call instead.
+The startup can take several seconds, so to initialise the client asynchronously (letting you load other parts of your system in the meantime):
 
 ```java
 C2monServiceGateway.startC2monClient();
 ```
+
+Then the service classes can be acquired via the gateway, e.g. `TagService tagService = C2monServiceGateway.getTagService();`.
