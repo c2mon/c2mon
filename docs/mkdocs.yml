@@ -9,6 +9,7 @@ theme_dir: ./theme
 
 pages:
   - Home: 'index.md'
+  - Getting Started: 'getting-started.md'
   - Overview:
     - 'overview.md'
     - Core Concepts:
@@ -18,7 +19,6 @@ pages:
       - 'core-concepts/supervision.md'
       - 'core-concepts/alarms.md'
       - 'Class/Device/Property': 'core-concepts/class-device-property.md'
-  - Installation: 'installation.md'
   - User Guide:
     - 'user-guide/index.md'
     - Client API:
