@@ -10,6 +10,25 @@ search for and subscribe to tags.
 * `SupervisionService`: Provides methods for registering heartbeat listeners, to monitor server connection state.
 * `SessionService`: Optional service to secure the command execution (requires implementing an `AuthenticationManager`).
 
+## Using Maven
+
+Add the following lines to your POM file to include the C2MON client API dependency:
+```xml
+<dependency>
+    <groupId>cern.c2mon.c2mon-client</groupId>
+    <artifactId>c2mon-client-all</artifactId>
+    <version>__insert_version_here__</version>
+</dependency>
+```
+
+## Using Gradle
+
+```
+compile "cern.c2mon.c2mon-client:c2mon-client-all:__insert_version_here__"
+```
+
+Remember to replace "__insert_version_here__" with a real version number, such as "1.7.5".
+
 ## Connecting to a C2MON server
 
 By default, the client tries to connect to a server running at `localhost:61616`.

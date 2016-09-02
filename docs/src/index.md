@@ -5,7 +5,7 @@ control functionalities that can be used for building many different types of sy
 
 This manual includes concepts, instructions and samples to guide you on how to use the C2MON platform.
 
-!!! info "Please Note!"
+!!! info "Note"
     This documentation is currently under construction, since we are migrating it from an internal Wiki page.
     If you are still missing some information, please let us know!
 
