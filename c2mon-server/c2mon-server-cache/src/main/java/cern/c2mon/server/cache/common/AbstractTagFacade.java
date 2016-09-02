@@ -16,6 +16,19 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.common;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import lombok.extern.slf4j.Slf4j;
+
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.cache.C2monCacheWithListeners;
@@ -26,6 +39,9 @@ import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.shared.client.expression.Expression;
+import cern.c2mon.shared.client.metadata.Metadata;
+import cern.c2mon.shared.client.serializer.JacksonSerializer;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.SimpleTypeReflectionHandler;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
@@ -35,11 +51,7 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.daq.config.DataTagAddressUpdate;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
 import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
-import lombok.extern.slf4j.Slf4j;
 
-import java.lang.reflect.Field;
-import java.sql.Timestamp;
-import java.util.*;
 
 /**
  * Common implementation of the Tag facade logic.
@@ -185,6 +197,20 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
       // TAG metadata
       cern.c2mon.server.common.metadata.Metadata newMetadata = MetadataUtils.parseMetadataConfiguration(properties, tag.getMetadata());
       tag.setMetadata(newMetadata);
+
+      // TAG expression
+      tmpStr = properties.getProperty("expressions");
+      if (tmpStr != null) {
+
+        TypeReference typeReference = new TypeReference<List<Expression>>() {};
+        ArrayList<Expression> expressions = null;
+        try {
+          expressions = JacksonSerializer.mapper.readValue(tmpStr, typeReference);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+        tag.setExpressions(expressions);
+      }
     }
     catch (Exception e) {
       throw new RuntimeException("Something went wrong while setting the common properties", e);
@@ -270,7 +296,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
    *
    * <p>Note also adjust text field of cache object.
    *
-   * @param tagId
+   * @param tag
    * @param ruleTagId
    */
   @Override
