@@ -22,6 +22,7 @@ import cern.c2mon.shared.client.configuration.api.alarm.AlarmCondition;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
 import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
+import cern.c2mon.shared.client.serializer.JacksonSerializer;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
@@ -96,7 +97,10 @@ public class ReflectionService {
             } else if (pd.getPropertyType().equals(Metadata.class)) {
               tempProp = String.valueOf(Metadata.toJSON((Metadata) pd.getReadMethod().invoke(obj)));
 
-            } else {
+            } else if (pd.getName().equals("expressions")) {
+              tempProp = JacksonSerializer.mapper.writeValueAsString(pd.getReadMethod().invoke(obj));
+
+            } else{
               // default call of all properties. Returns the standard toStringValue of the given Type
               tempProp = pd.getReadMethod().invoke(obj).toString();
             }

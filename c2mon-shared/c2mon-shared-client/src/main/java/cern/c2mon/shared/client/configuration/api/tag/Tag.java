@@ -16,12 +16,18 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration.api.tag;
 
-import cern.c2mon.shared.client.metadata.Metadata;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import lombok.Data;
+
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
+import cern.c2mon.shared.client.expression.Expression;
+import cern.c2mon.shared.client.metadata.Metadata;
 import cern.c2mon.shared.client.tag.TagMode;
-import lombok.Data;
 
 /**
  * Tag class which holds the information to create a {@link cern.c2mon.shared.client.configuration.ConfigurationElement}
@@ -73,7 +79,17 @@ public abstract class Tag implements ConfigurationEntity {
    */
   private Metadata metadata;
 
+  /**
+   * All expressions which are attached to the tag.
+   */
+  private List<Expression> expressions;
+
   public Tag() {
+    expressions = new ArrayList<>();
+  }
+
+  public void addExpression(Expression expression){
+    this.expressions.add(expression);
   }
 
 }
