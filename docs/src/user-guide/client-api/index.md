@@ -15,8 +15,8 @@ search for and subscribe to tags.
 Add the following lines to your POM file to include the C2MON client API dependency:
 ```xml
 <dependency>
-    <groupId>cern.c2mon.c2mon-client</groupId>
-    <artifactId>c2mon-client-all</artifactId>
+    <groupId>cern.c2mon.client</groupId>
+    <artifactId>c2mon-client-core</artifactId>
     <version>__insert_version_here__</version>
 </dependency>
 ```
@@ -24,10 +24,10 @@ Add the following lines to your POM file to include the C2MON client API depende
 ## Using Gradle
 
 ```
-compile "cern.c2mon.c2mon-client:c2mon-client-all:__insert_version_here__"
+compile "cern.c2mon.c2mon-client:c2mon-client-core:__insert_version_here__"
 ```
 
-Remember to replace "__insert_version_here__" with a real version number, such as "1.7.5".
+Remember to replace "__insert_version_here__" with a real version number, such as "1.8.0".
 
 ## Connecting to a C2MON server
 
