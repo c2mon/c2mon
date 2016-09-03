@@ -30,6 +30,6 @@ c2mon.client.history.jdbc.username=sa
 c2mon.client.history.jdbc.password=
 ```
 
-!!! info "Please note!"
+!!! info "Note"
     C2MON currently only supports Oracle, HSQL and MySQL as backing stores.
     In the near future we are planning to migrate to time series databases to provide better performance.

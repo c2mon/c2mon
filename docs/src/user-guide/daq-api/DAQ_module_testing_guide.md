@@ -43,7 +43,7 @@ import cern.c2mon.daq.test.UseHandler;
 
 // Specify the Handler class that is to be tested using @UseHandler annotation
 @UseHandler(DemoMessageHandler.class)
-public class DemoMessageHandlerTest extends GenericMessageHandlerTst {
+public class DemoMessageHandlerTest extends GenericMessageHandlerTest {
 
     static Logger log = Logger.getLogger(DemoMessageHandlerTest.class);
 
@@ -81,7 +81,8 @@ public class DemoMessageHandlerTest extends GenericMessageHandlerTst {
 
 ### How does the annotation work?
 
-Once you annotate your test class with `@UseHandler` annotation, pointing to the handler class you wish to test, an instance of a handler will be created for you automatically for every test declared in your test class.
+Once you annotate your test class with `@UseHandler` annotation, pointing to the handler class you wish to test, an instance of a handler will be created for
+you automatically for every test declared in your test class.
 Every test has of course to be annotated with the standard java JUnit `@Test` annotation.
 
 In addition you need to instruct the framework which configuration should it use to initialize the handler at start-up.
@@ -107,7 +108,8 @@ import org.junit.Test;
 
 The configuration files are XML files with the format compatible with the one that your handler would normally receive from the C2MON server.
 Here the framework injects the configuration for your handler, so that you can run your tests in isolation from any C2MON infrastructure.
-Note that the configuration file only needs the `<EquipmentUnit>` section and you don't have to set the handler-class-name inside, since you already declared the class of your handler using `@UseHandler` annotation.
+Note that the configuration file only needs the `<EquipmentUnit>` section and you don't have to set the handler-class-name inside, since you already declared
+ the class of your handler using `@UseHandler` annotation.
 
 The configuration files for testing your handler should be put into /conf subfolder of your MessageHandler's folder.
 
@@ -128,12 +130,14 @@ src/test/cern/c2mon/daq/demo/conf/e_demohandler_test2.xml
 
 ### Testing Use-Cases
 
-Below we present the most frequently used testing scenarios, which should give you an overall idea on how the testing framework can be used, and how you can build you own tests.
+Below we present the most frequently used testing scenarios, which should give you an overall idea on how the testing framework can be used, and how you can
+build you own tests.
 
 
 #### Assuring the handler sends CommfaultTag at start-up as expected
 
-Unless there are configuration problems, at start-up, your DAQ is expected to deliver a `CommfaultTag` value to the server, indicating if you are correctly connected to the monitored device.
+Unless there are configuration problems, at start-up, your DAQ is expected to deliver a `CommfaultTag` value to the server, indicating if you are correctly
+connected to the monitored device.
 The example code presented below, shows how this scenario can be tested:
 
 **Test class Example:**
