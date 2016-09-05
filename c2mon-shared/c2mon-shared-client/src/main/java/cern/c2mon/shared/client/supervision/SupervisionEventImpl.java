@@ -44,8 +44,6 @@ import cern.c2mon.shared.util.json.GsonFactory;
 @Data
 public class SupervisionEventImpl implements SupervisionEvent {
 
-  private static transient final long serialVersionUID = 1L;
-
   /** Gson parser singleton for that class */
   private static transient Gson gson = null;
 
@@ -62,6 +60,7 @@ public class SupervisionEventImpl implements SupervisionEvent {
   @Min(1)
   private Long entityId;
 
+  /** The name of the entity */
   private String name;
 
   /**
@@ -94,19 +93,19 @@ public class SupervisionEventImpl implements SupervisionEvent {
   /**
    * Constructor.
    * @param entity The entity for which this supervision event is created
-   * @param id The id of the entity
+   * @param entityId The id of the entity
    * @param status one state from the <code>SupervisionStatus</code> enumeration
    * @param eventTime time of the event
    * @param  message Free text for describing this event
    */
   public SupervisionEventImpl(final SupervisionEntity entity,
-                              final Long id,
+                              final Long entityId,
                               final String name,
                               final SupervisionStatus status,
                               final Timestamp eventTime,
                               final String message) {
     this.entity = entity;
-    this.entityId = id;
+    this.entityId = entityId;
     this.name = name;
     this.status = status;
     this.eventTime = eventTime;
