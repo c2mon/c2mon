@@ -81,7 +81,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      * The min value as comparable without specified type to avoid splitting up the source data tag in different
      * generics.
      */
-    @Element(name = "min-value", required = false, type = String.class)
+    @Element(name = "min-value", required = false, type = Double.class) // Double is defined to make the serialization to Number work
     @SuppressWarnings("unchecked")
     private Number minValue;
 
@@ -89,7 +89,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      * The max value as comparable without specified type to avoid splitting up the source data tag in different
      * generics.
      */
-    @Element(name = "max-value", required = false, type = String.class)
+    @Element(name = "max-value", required = false, type = Double.class) // Double is defined to make the serialization to Number work
     @SuppressWarnings("unchecked")
     private Number maxValue;
 
