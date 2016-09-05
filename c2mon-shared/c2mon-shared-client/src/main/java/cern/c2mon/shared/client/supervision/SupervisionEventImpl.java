@@ -44,6 +44,9 @@ import cern.c2mon.shared.util.json.GsonFactory;
 @Data
 public class SupervisionEventImpl implements SupervisionEvent {
 
+  /** Serial version UID */
+  private static final long serialVersionUID = 4404796977086131652L;
+
   /** Gson parser singleton for that class */
   private static transient Gson gson = null;
 
