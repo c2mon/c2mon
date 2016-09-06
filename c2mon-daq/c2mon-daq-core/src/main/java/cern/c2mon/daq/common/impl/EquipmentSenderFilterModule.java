@@ -45,7 +45,6 @@ class EquipmentSenderFilterModule {
      * Creates a new EquipmentSenderFilterModule.
      *
      * @param filterMessageSender The filter message sender to send filtered tag values.
-     * @param equipmentLoggerFactory Equipment Logger factory to create the class logger
      */
     public EquipmentSenderFilterModule (final IFilterMessageSender filterMessageSender) {
         this.filterMessageSender = filterMessageSender;
