@@ -19,9 +19,9 @@ package cern.c2mon.daq.common.impl;
 import java.util.Hashtable;
 import java.util.Timer;
 
+import lombok.extern.slf4j.Slf4j;
+
 import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
-import cern.c2mon.daq.common.logger.EquipmentLogger;
-import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.tools.DataTagValueFilter;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
@@ -35,13 +35,9 @@ import static java.lang.String.format;
  * This class has all methods related with the Equipment Time Deadband (filter, scheduled, ...)
  *
  * @author vilches
- *
  */
+@Slf4j
 class EquipmentTimeDeadband {
-  /**
-   * The logger for this class.
-   */
-  private EquipmentLogger equipmentLogger;
 
   /**
    * The timedeadband schedulers hold tags which have time deadband scheduling activated.
@@ -79,18 +75,15 @@ class EquipmentTimeDeadband {
    * @param dynamicTimeDeadbandFilterer The dynamic time dead band filterer for recording
    * the current source data tag
    * @param equipmentSenderFilterModule The class with the message sender to send filtered tag values
-   * @param equipmentLoggerFactory  Equipment Logger factory to create the class logger
    */
-  public EquipmentTimeDeadband (final IDynamicTimeDeadbandFilterer dynamicTimeDeadbandFilterer,
-                                final IProcessMessageSender processMessageSender,
-                                final  EquipmentSenderFilterModule equipmentSenderFilterModule,
-                                final EquipmentLoggerFactory equipmentLoggerFactory) {
+  public EquipmentTimeDeadband(final IDynamicTimeDeadbandFilterer dynamicTimeDeadbandFilterer,
+                               final IProcessMessageSender processMessageSender,
+                               final EquipmentSenderFilterModule equipmentSenderFilterModule) {
     this.dynamicTimeDeadbandFilterer = dynamicTimeDeadbandFilterer;
     this.processMessageSender = processMessageSender;
     this.equipmentSenderFilterModule = equipmentSenderFilterModule;
-    this.equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());
 
-    this.dataTagValueFilter = new DataTagValueFilter(equipmentLoggerFactory);
+    this.dataTagValueFilter = new DataTagValueFilter();
   }
 
   /**
@@ -101,9 +94,9 @@ class EquipmentTimeDeadband {
   private void createSDTtimeDeadbandScheduler(final SourceDataTag currentTag) {
     if (currentTag.getAddress().isTimeDeadbandEnabled()) {
       if (currentTag.getAddress().getTimeDeadband() > 0) {
-        this.equipmentLogger.debug("createSDTtimeDeadbandScheduler - creating time-deadband scheduler for tag " + currentTag.getId());
+        log.debug("createSDTtimeDeadbandScheduler - creating time-deadband scheduler for tag " + currentTag.getId());
         this.sdtTimeDeadbandSchedulers.put(currentTag.getId(), new SDTTimeDeadbandScheduler(currentTag, this.processMessageSender,
-            this.equipmentSenderFilterModule, timeDeadbandTimer, this.dataTagValueFilter, this.dynamicTimeDeadbandFilterer));
+                this.equipmentSenderFilterModule, timeDeadbandTimer, this.dataTagValueFilter, this.dynamicTimeDeadbandFilterer));
       }
     }
   }
@@ -114,7 +107,7 @@ class EquipmentTimeDeadband {
    * @param currentTag The tag of which the tag scheduler should be used.
    * @param tagValue The value of the tag.
    * @param milisecTimestamp A timestamp in ms.
-   * @param pValueDescr An optional value description.
+   * @param pValueDescr      An optional value description.
    */
   public void addToTimeDeadband(final SourceDataTag currentTag, final ValueUpdate update) {
     addToTimeDeadband(currentTag, update, new SourceDataTagQuality());
@@ -126,12 +119,12 @@ class EquipmentTimeDeadband {
    * @param currentTag The tag of which the tag scheduler should be used.
    * @param tagValue The value of the tag.
    * @param milisecTimestamp A timestamp in ms.
-   * @param pValueDescr An optional value description.
-   * @param newSDQuality the new tag quality
+   * @param pValueDescr      An optional value description.
+   * @param newSDQuality     the new tag quality
    */
   public void addToTimeDeadband(final SourceDataTag currentTag, final ValueUpdate update, final SourceDataTagQuality newSDQuality) {
-    if (this.equipmentLogger.isDebugEnabled()) {
-      this.equipmentLogger.debug(format("addToTimeDeadband - entering addToTimeDeadband(%d)..", currentTag.getId()));
+    if (log.isDebugEnabled()) {
+      log.debug(format("addToTimeDeadband - entering addToTimeDeadband(%d)..", currentTag.getId()));
     }
 
     synchronized (currentTag) { // Synchronizing here, since the scheduler runs on a different thread
@@ -145,7 +138,7 @@ class EquipmentTimeDeadband {
       }
       else {
         // If quality has changed we reset the scheduler
-        if(tagScheduler.isNewQualityStatus(newSDQuality)) {
+        if (tagScheduler.isNewQualityStatus(newSDQuality)) {
           // Flush the current scheduler for the Static TimeDeadband
           tagScheduler.flushAndCancel();
           tagScheduler = createTagScheduler(currentTag);
@@ -160,7 +153,7 @@ class EquipmentTimeDeadband {
       // then we need to send it
       // to the statistics module before updating the tag:
       if (tagScheduler.isScheduledForSending()) {
-        this.equipmentLogger.debug("addToTimeDeadband - Sending time deadband filtered value to statistics module " + tagID);
+        log.debug("addToTimeDeadband - Sending time deadband filtered value to statistics module " + tagID);
 
         ValueUpdate currentValue = new ValueUpdate(
             currentTag.getCurrentValue().getValue(),
@@ -169,12 +162,12 @@ class EquipmentTimeDeadband {
 
         // Send to filter module (Dynamic or Static information added)
         if(this.dynamicTimeDeadbandFilterer.isDynamicTimeDeadband(currentTag)) {
-          this.equipmentLogger.debug("Tag filtered through Dynamic time deadband filtering: '" + tagID + "'");
+          log.debug("Tag filtered through Dynamic time deadband filtering: '" + tagID + "'");
 
 
           this.equipmentSenderFilterModule.sendToFilterModuleByDynamicTimedeadbandFilterer(currentTag, currentValue, FilterType.TIME_DEADBAND.getNumber());
         } else {
-          this.equipmentLogger.debug("Tag filtered through Static time deadband filtering: '" + tagID + "'");
+          log.debug("Tag filtered through Static time deadband filtering: '" + tagID + "'");
 
           this.equipmentSenderFilterModule.sendToFilterModule(currentTag, currentValue, FilterType.TIME_DEADBAND.getNumber());
         }
@@ -183,19 +176,19 @@ class EquipmentTimeDeadband {
       // update the tag value
       currentTag.update(update, newSDQuality);
 
-      this.equipmentLogger.debug("addToTimeDeadband - scheduling value update due to time-deadband filtering rule");
+      log.debug("addToTimeDeadband - scheduling value update due to time-deadband filtering rule");
       // notify the scheduler that it contains a value that needs sending
       tagScheduler.scheduleValueForSending();
     }
 
-    if (this.equipmentLogger.isDebugEnabled()) {
-      this.equipmentLogger.debug(format("addToTimeDeadband - leaving addToTimeDeadband(%d)", currentTag.getId()));
+    if (log.isDebugEnabled()) {
+      log.debug(format("addToTimeDeadband - leaving addToTimeDeadband(%d)", currentTag.getId()));
     }
   }
 
   /**
-   *
    * @param currentTag The tag of which the tag scheduler should be used
+   *
    * @return the new Tag Scheduler
    */
   protected SDTTimeDeadbandScheduler createTagScheduler(final SourceDataTag currentTag) {
@@ -219,25 +212,24 @@ class EquipmentTimeDeadband {
    * @param currentTag The tag to remove.
    */
   public void removeFromTimeDeadband(final SourceDataTag currentTag) {
-    if (this.equipmentLogger.isDebugEnabled()) {
-      this.equipmentLogger.debug(format("removeFromTimeDeadband - entering removeFromTimeDeadband(%d)..", currentTag.getId()));
+    if (log.isDebugEnabled()) {
+      log.debug(format("removeFromTimeDeadband - entering removeFromTimeDeadband(%d)..", currentTag.getId()));
     }
 
     SDTTimeDeadbandScheduler tagScheduler = this.sdtTimeDeadbandSchedulers.remove(currentTag.getId());
     if (tagScheduler != null) {
-      this.equipmentLogger.debug("\tcancelling scheduler");
+      log.debug("\tcancelling scheduler");
       tagScheduler.cancel();
 
       if (tagScheduler.isScheduledForSending()) {
-        this.equipmentLogger
-        .debug("\tforcing scheduler to run its run() in order to send the flush buffered message (if any)");
+        log.debug("\tforcing scheduler to run its run() in order to send the flush buffered message (if any)");
 
         tagScheduler.run();
       }
     }
 
-    if (this.equipmentLogger.isDebugEnabled()) {
-      this.equipmentLogger.debug(format("removeFromTimeDeadband - leaving removeFromTimeDeadband(%d)", currentTag.getId()));
+    if (log.isDebugEnabled()) {
+      log.debug(format("removeFromTimeDeadband - leaving removeFromTimeDeadband(%d)", currentTag.getId()));
     }
   }
 
@@ -245,7 +237,7 @@ class EquipmentTimeDeadband {
    * Sends all through timedeadband delayed values immediately
    */
   public void sendDelayedTimeDeadbandValues() {
-    this.equipmentLogger.trace("sendDelayedTimeDeadbandValues - Sending all time deadband delayed values to the server");
+    log.trace("sendDelayedTimeDeadbandValues - Sending all time deadband delayed values to the server");
 
     for (SDTTimeDeadbandScheduler tagScheduler : this.sdtTimeDeadbandSchedulers.values()) {
       if (tagScheduler.isScheduledForSending()) {
