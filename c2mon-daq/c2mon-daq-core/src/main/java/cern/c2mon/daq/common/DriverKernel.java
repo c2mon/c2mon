@@ -36,7 +36,6 @@ import cern.c2mon.daq.common.conf.core.EquipmentConfigurationFactory;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationHandler;
 import cern.c2mon.daq.common.impl.EquipmentCommandHandler;
 import cern.c2mon.daq.common.impl.EquipmentMessageSender;
-import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.messaging.ProcessMessageReceiver;
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
 import cern.c2mon.daq.common.messaging.impl.ProcessMessageSender;
@@ -60,6 +59,19 @@ import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
 import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * This Kernel is the main class of the daq. It aggregates other classes
@@ -313,14 +325,11 @@ public class DriverKernel implements ApplicationContextAware {
       long equipmentId = conf.getId();
       log.info("configure - Dynamic timedeadband enabled for equipment id: " + equipmentId + " enabled: " + dynamicTimeDeadbandEnabled);
       conf.setDynamicTimeDeadbandEnabled(dynamicTimeDeadbandEnabled);
-      EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(conf, processConfiguration,
-          environment.getProperty("c2mon.daq.logging.useEquipmentLoggers", Boolean.class, false),
-          environment.getProperty("c2mon.daq.logging.useEquipmentAppendersOnly", Boolean.class, false));
 
       EquipmentMessageSender equipmentMessageSender = (EquipmentMessageSender) applicationContext.getBean(EQUIPMENT_MESSAGE_SENDER);
       // equipmentMessageSender.setEquipmentConfiguration(conf);
-      // equipmentMessageSender.setEquipmentLoggerFactory(equipmentLoggerFactory);
-      equipmentMessageSender.init(conf, equipmentLoggerFactory);
+      // equipmentMessageSender.setEquipmentlogFactory(equipmentlogFactory);
+      equipmentMessageSender.init(conf);
 
       configurationController.addCoreDataTagChanger(equipmentId, equipmentMessageSender);
       try {
@@ -328,7 +337,6 @@ public class DriverKernel implements ApplicationContextAware {
         validateCommandTags(conf, equipmentMessageSender);
         equnit = EquipmentMessageHandler.createEquipmentMessageHandler(conf.getHandlerClassName(), new EquipmentCommandHandler(equipmentId,
             requestController), new EquipmentConfigurationHandler(equipmentId, configurationController), equipmentMessageSender, applicationContext);
-        equnit.setEquipmentLoggerFactory(equipmentLoggerFactory);
       } catch (InstantiationException e) {
         String msg = "Error while instantiating " + conf.getHandlerClassName();
         equipmentMessageSender.confirmEquipmentStateIncorrect(msg + ": " + e.getMessage());
@@ -352,7 +360,7 @@ public class DriverKernel implements ApplicationContextAware {
     // try to establish ProcessMessageReceiver's JMS topic connection
     processMessageReceiver.connect();
 
-    // LOGGER.info("Number of supervised equipment units : " +
+    // log.info("Number of supervised equipment units : " +
     // eqLookupTable.size());
     log.info("configure - Number of equipment units configured properly : " + eqUnitsConnectedProperly);
     log.info("configure - DAQ initialized and running.");
@@ -480,35 +488,35 @@ public class DriverKernel implements ApplicationContextAware {
   }
 
   //  /**
-  //   * This method is responsible for changing the log4j's root logger treshold
+  //   * This method is responsible for changing the log4j's root log treshold
   //   *
   //   * @param level - the level to set
   //   */
-  //  public void setRootLoggerLevel(final String level) {
-  //    LOGGER.info("setRootLoggerLevel - changing current process logger's treshold to " + level);
+  //  public void setRootlogLevel(final String level) {
+  //    log.info("setRootlogLevel - changing current process log's treshold to " + level);
   //    Level newLevel = stringToLog4jLevel(level);
   //    if (newLevel != null) {
-  //      Logger.getRootLogger().setLevel(newLevel);
+  //      log.getRootlog().setLevel(newLevel);
   //    } else {
-  //      LOGGER.error("setRootLoggerLevel - could not change logging level to : " + level);
+  //      log.error("setRootlogLevel - could not change logging level to : " + level);
   //    }
   //  }
   //
   //  /**
-  //   * This method is responsible for changing the log4j's root logger treshold
+  //   * This method is responsible for changing the log4j's root log treshold
   //   *
   //   * @param eqID equipment unit unique identifier
   //   * @param eqName equipment unit name
   //   * @param level the level to set
   //   */
-  //  public void setEqLoggerLevel(final Long eqID, final String eqName, final String level) {
-  //    LOGGER.info("changing eqUnit\'s [" + eqID + "," + eqName + "] logger treshold to " + level);
+  //  public void setEqlogLevel(final Long eqID, final String eqName, final String level) {
+  //    log.info("changing eqUnit\'s [" + eqID + "," + eqName + "] log treshold to " + level);
   //    Level newLevel = stringToLog4jLevel(level);
   //    if (newLevel != null) {
-  //      // TODO not perfect will override all loggers of this equipment
-  //      EquipmentLoggerFactory.setLevel(eqName, newLevel);
+  //      // TODO not perfect will override all logs of this equipment
+  //      EquipmentlogFactory.setLevel(eqName, newLevel);
   //    } else {
-  //      LOGGER.error("setEqLoggerLevel - could not change logging level of logger [" + eqID + "," + eqName + "] to level : " + level);
+  //      log.error("setEqlogLevel - could not change logging level of log [" + eqID + "," + eqName + "] to level : " + level);
   //    }
   //  }
   //
@@ -608,14 +616,10 @@ public class DriverKernel implements ApplicationContextAware {
 
     log.info("onEquipmentUnitAdd - Dynamic timedeadband enabled for equipment id: " + conf.getId() + " enabled: " + dynamicTimeDeadbandEnabled);
 
-    EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(conf, processConfiguration,
-        environment.getProperty("c2mon.daq.logging.useEquipmentLoggers", Boolean.class, false),
-        environment.getProperty("c2mon.daq.logging.useEquipmentAppendersOnly", Boolean.class, false));
-
     EquipmentMessageSender equipmentMessageSender = (EquipmentMessageSender) applicationContext.getBean(EQUIPMENT_MESSAGE_SENDER);
     // equipmentMessageSender.setEquipmentConfiguration(conf);
-    // equipmentMessageSender.setEquipmentLoggerFactory(equipmentLoggerFactory);
-    equipmentMessageSender.init(conf, equipmentLoggerFactory);
+    // equipmentMessageSender.setEquipmentlogFactory(equipmentlogFactory);
+    equipmentMessageSender.init(conf);
 
     configurationController.addCoreDataTagChanger(conf.getId(), equipmentMessageSender);
 
@@ -624,7 +628,6 @@ public class DriverKernel implements ApplicationContextAware {
       validateCommandTags(conf, equipmentMessageSender);
       equnit = EquipmentMessageHandler.createEquipmentMessageHandler(conf.getHandlerClassName(), new EquipmentCommandHandler(conf.getId(), requestController)
           , new EquipmentConfigurationHandler(conf.getId(), configurationController), equipmentMessageSender, applicationContext);
-      equnit.setEquipmentLoggerFactory(equipmentLoggerFactory);
 
       // put the equipment configuration into the process configuration's map
       processConfiguration.addEquipmentConfiguration(conf);
