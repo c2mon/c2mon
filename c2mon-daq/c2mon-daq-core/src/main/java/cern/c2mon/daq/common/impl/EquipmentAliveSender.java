@@ -16,11 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.impl;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
-import cern.c2mon.daq.common.logger.EquipmentLogger;
-import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
@@ -35,19 +36,14 @@ import static java.lang.String.format;
  * to the Process Message Sender
  *
  * @author vilches
- *
  */
+@Slf4j
 class EquipmentAliveSender {
 
   /**
    * Constant to prevent from frequent equipment alives
    */
   private static final boolean PREVENT_TOO_FREQUENT_EQUIPMENT_ALIVES = Boolean.getBoolean("c2mon.daq.equipment.alive.filtering");
-
-  /**
-   * The logger for this class.
-   */
-  private EquipmentLogger equipmentLogger;
 
   /**
    * The process message sender takes the messages actually send to the server.
@@ -74,28 +70,27 @@ class EquipmentAliveSender {
    */
   private String confName;
 
-  /** The equipment supervision alive tag id */
+  /**
+   * The equipment supervision alive tag id
+   */
   private final Long aliveTagId;
 
   /**
    * Creates a new EquipmentAliveSender.
    *
    * @param processMessageSender Process Message Sender
-   * @param equipmentLoggerFactory Equipment Logger factory to create the class
-   *          logger
-   * @param aliveTagId The equipment supervision alive tag id
+   * @param aliveTagId           The equipment supervision alive tag id
    */
-  public EquipmentAliveSender(final IProcessMessageSender processMessageSender, final Long aliveTagId, final EquipmentLoggerFactory equipmentLoggerFactory) {
+  public EquipmentAliveSender(final IProcessMessageSender processMessageSender, final Long aliveTagId) {
     this.processMessageSender = processMessageSender;
     this.aliveTagId = aliveTagId;
-    this.equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());
   }
 
   /**
    * Init function
    *
    * @param aliveTagInterval Equipment configuration Tag interval
-   * @param confName Equipment configuration name
+   * @param confName         Equipment configuration name
    */
   public void init(final Long aliveTagInterval, final String confName) {
     this.aliveTagInterval = aliveTagInterval;
@@ -106,6 +101,7 @@ class EquipmentAliveSender {
    * Sends an equipment alive tag with the value set as the current timestamp.
    *
    * @param aliveTag the alive tag to send
+   *
    * @return
    */
   public boolean sendEquipmentAlive(final SourceDataTag aliveTag) {
@@ -118,13 +114,14 @@ class EquipmentAliveSender {
 
       if (aliveTag.getDataType().equalsIgnoreCase("Integer")) {
         value = TypeConverter.cast(Long.valueOf(currentTimestamp % Integer.MAX_VALUE).toString(), aliveTag.getDataType());
-      } else {
+      }
+      else {
         value = TypeConverter.cast(currentTimestamp, aliveTag.getDataType());
       }
 
       if (value == null) {
-        this.equipmentLogger.warn("sendEquipmentAlive() - Could not cast current timestamp to value type "
-            + aliveTag.getDataType() + " of alive tag #" + aliveTag.getId() + " => value set to null!");
+        log.warn("sendEquipmentAlive() - Could not cast current timestamp to value type "
+                + aliveTag.getDataType() + " of alive tag #" + aliveTag.getId() + " => value set to null!");
       }
 
       ValueUpdate update = new ValueUpdate(value, "Auto-generated alive value of Equipment " + confName, currentTimestamp);
@@ -140,7 +137,7 @@ class EquipmentAliveSender {
           "Alive tag for Equipment " + confName, ttl);
     }
 
-    this.equipmentLogger.debug("sendEquipmentAlive() - Sending equipment alive message with timestamp " + currentTimestamp);
+    log.debug("sendEquipmentAlive() - Sending equipment alive message with timestamp " + currentTimestamp);
     return sendEquipmentAliveFiltered(aliveTagValue, currentTimestamp);
   }
 
@@ -148,9 +145,9 @@ class EquipmentAliveSender {
    * Sends an equipment alive tag with the given value, timestamp and
    * description.
    *
-   * @param aliveTag the alive tag to send
-   * @param tagValue the tag value
-   * @param sourceTimestamp the source timestamp (in milliseconds)
+   * @param aliveTag         the alive tag to send
+   * @param tagValue         the tag value
+   * @param sourceTimestamp  the source timestamp (in milliseconds)
    * @param valueDescription the description of the value
    *
    * @return true if the alive was sent, false otherwise
@@ -161,11 +158,11 @@ class EquipmentAliveSender {
       update.setValue(convertedTagValue);
 
       SourceDataTagValue aliveTagValue = aliveTag.update(update);
-      this.equipmentLogger.debug("sendEquipmentAlive() - Sending equipment alive message with source timestamp " + update.getSourceTimestamp());
+      log.debug("sendEquipmentAlive() - Sending equipment alive message with source timestamp " + update.getSourceTimestamp());
       return sendEquipmentAliveFiltered(aliveTagValue, update.getSourceTimestamp());
     }
     else {
-      this.equipmentLogger.warn("sendEquipmentAlive() - Value ["
+      log.warn("sendEquipmentAlive() - Value ["
         + update.getValue() + "] received for alive tag #" + aliveTag.getId()
         + " is not convertible to data type "
         + aliveTag.getDataType() + ". Trying to send the current timestamp as number instead.");
@@ -194,9 +191,9 @@ class EquipmentAliveSender {
         long halfTime = Math.round(this.aliveTagInterval / 2.0);
 
         if (diff < halfTime) {
-          if (this.equipmentLogger.isDebugEnabled()) {
-            this.equipmentLogger.debug(format("this EquipmentAlive of equipment %s will be skipped "
-                + "and will not be sent the server due to enabled equipment alive filtering policy", this.confName));
+          if (log.isDebugEnabled()) {
+            log.debug(format("this EquipmentAlive of equipment %s will be skipped "
+                    + "and will not be sent the server due to enabled equipment alive filtering policy", this.confName));
           }
 
           isSendEquipmentAlive = false;
@@ -207,11 +204,10 @@ class EquipmentAliveSender {
         doSendEquipmentAlive(aliveTagValue);
         this.lastEquipmentAlives.put(aliveTagValue.getId(), timestamp);
         return true;
-
-      } else {
+      }
+      else {
         return false;
       }
-
     }
 
     // If PREVENT_TOO_FREQUENT_EQUIPMENT_ALIVES is disabled (by default it is)
