@@ -20,11 +20,10 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.daq.common.logger.EquipmentLogger;
-import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.tools.DataTagValueFilter;
 import cern.c2mon.daq.tools.DataTagValueValidator;
@@ -32,10 +31,7 @@ import cern.c2mon.shared.common.datatag.*;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue.FilterType;
 import cern.c2mon.shared.common.type.TypeConverter;
 
-import static cern.c2mon.shared.common.type.TypeConverter.cast;
-import static cern.c2mon.shared.common.type.TypeConverter.getType;
-import static cern.c2mon.shared.common.type.TypeConverter.isKnownClass;
-import static cern.c2mon.shared.common.type.TypeConverter.isNumber;
+import static cern.c2mon.shared.common.type.TypeConverter.*;
 import static java.lang.String.format;
 
 /**
@@ -43,8 +39,8 @@ import static java.lang.String.format;
  *
  * @author vilches
  * @author Franz Ritter
- *
  */
+@Slf4j
 class EquipmentSenderValid {
 
   private static ObjectMapper mapper = new ObjectMapper();
@@ -52,11 +48,6 @@ class EquipmentSenderValid {
   static {
     mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
   }
-
-  /**
-   * The logger for this class.
-   */
-  private final EquipmentLogger equipmentLogger;
 
   /**
    * The process message sender takes the messages actually send to the server.
@@ -97,34 +88,31 @@ class EquipmentSenderValid {
   /**
    * Creates a new EquipmentValidSender.
    *
-   * @param filterMessageSender The filter message sender to send filtered tag values.
-   * @param processMessageSender The process message sender to send tags to the server.
+   * @param filterMessageSender         The filter message sender to send filtered tag values.
+   * @param processMessageSender        The process message sender to send tags to the server.
    * @param dynamicTimeDeadbandFilterer
-   * @param equipmentLoggerFactory
    */
   public EquipmentSenderValid(final EquipmentSenderFilterModule equipmentSenderFilterModule,
                               final IProcessMessageSender processMessageSender,
                               final IEquipmentMessageSender equipmentSender,
                               final EquipmentTimeDeadband equipmentTimeDeadband,
-                              final IDynamicTimeDeadbandFilterer dynamicTimeDeadbandFilterer,
-                              final EquipmentLoggerFactory equipmentLoggerFactory) {
+                              final IDynamicTimeDeadbandFilterer dynamicTimeDeadbandFilterer) {
 
     this.equipmentSenderFilterModule = equipmentSenderFilterModule;
     this.processMessageSender = processMessageSender;
     this.equipmentSender = equipmentSender;
     this.equipmentTimeDeadband = equipmentTimeDeadband;
     this.dynamicTimeDeadbandFilterer = dynamicTimeDeadbandFilterer;
-    this.equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());
 
-    this.dataTagValueFilter = new DataTagValueFilter(equipmentLoggerFactory);
-    this.dataTagValueValidator = new DataTagValueValidator(equipmentLoggerFactory);
+    this.dataTagValueFilter = new DataTagValueFilter();
+    this.dataTagValueValidator = new DataTagValueValidator();
   }
 
   /**
    * This method decides how the tag should be sent to the server.
    * If the value is an array or an arbitrary object the sending changes as it is not a primitive type.
    *
-   * @param currentTag The tag to which the value belongs.
+   * @param currentTag      The tag to which the value belongs.
    * @param sourceTimestamp The timestamp of the tag.
    * @param newTagValue The tag value to send.
    * @param valueDescription A description belonging to the value.
@@ -133,20 +121,20 @@ class EquipmentSenderValid {
    */
   public boolean update(final SourceDataTag currentSourceDataTag, final ValueUpdate update) {
     boolean successfullySent = false;
-    this.equipmentLogger.trace("update - entering update()");
+    log.trace("update - entering update()");
 
     try {
 
       successfullySent = doUpdate(currentSourceDataTag, update);
 
     } catch (Exception ex) {
-      this.equipmentLogger.error("update - Unexpected exception caught for tag " + currentSourceDataTag.getId() + ", " + ex.getStackTrace(), ex);
+      log.error("update - Unexpected exception caught for tag " + currentSourceDataTag.getId() + ", " + ex.getStackTrace(), ex);
 
       SourceDataTagQuality quality = new SourceDataTagQuality(SourceDataTagQualityCode.UNKNOWN, "Could not send incoming valid source update to server: " + ex.getMessage());
       this.equipmentSender.update(currentSourceDataTag.getId(), quality, update.getSourceTimestamp());
     }
 
-    this.equipmentLogger.trace("update - leaving update()");
+    log.trace("update - leaving update()");
     return successfullySent;
   }
 
@@ -230,7 +218,7 @@ class EquipmentSenderValid {
     // is Candidate for filtering?
     FilterType filterType = this.dataTagValueFilter.isCandidateForFiltering(currentSourceDataTag, castedUpdate, newSDQuality);
 
-    this.equipmentLogger.debug("checkFiltering - tag #" + currentSourceDataTag.getId() + " with Filter Type " + filterType);
+    log.debug("checkFiltering - tag #" + currentSourceDataTag.getId() + " with Filter Type " + filterType);
 
     // Check filters on (OLD_UPDATE, VALUE_DEADBAND, REPEATED_VALUE or none)
     if (!isFilterOk(filterType, currentSourceDataTag.getId())) {
@@ -240,7 +228,8 @@ class EquipmentSenderValid {
 
       // filtering performed --> dataValue is not okay, return false.
       return false;
-    } else {
+    }
+    else {
 
       // no filtering performed --> dataValue is okay, return true.
       return true;
@@ -251,16 +240,17 @@ class EquipmentSenderValid {
    * Helper method which checks if there is a time deadband according to the new value.
    *
    * @param currentSourceDataTag The tag to which the value belongs.
-   * @param newValueCasted The casted new value of the tag.
-   * @param sourceTimestamp The timestamp of the new value.
-   * @param pValueDescr A description belonging to the value.
+   * @param newValueCasted       The casted new value of the tag.
+   * @param sourceTimestamp      The timestamp of the new value.
+   * @param pValueDescr          A description belonging to the value.
+   *
    * @return If there is an deadBand according to the value the method returns false.
    */
   private boolean checkTimeDeadband(final SourceDataTag currentSourceDataTag, final ValueUpdate castedUpdate) {
 
     if (currentSourceDataTag.getAddress().isTimeDeadbandEnabled()) {
 
-      this.equipmentLogger.debug("checkTimeDeadband - passing update to time-deadband scheduler for tag " + currentSourceDataTag.getId());
+      log.debug("checkTimeDeadband - passing update to time-deadband scheduler for tag " + currentSourceDataTag.getId());
       this.equipmentTimeDeadband.addToTimeDeadband(currentSourceDataTag, castedUpdate);
 
       // Deadband detected --> DataValue is not okay, return false.
@@ -268,7 +258,7 @@ class EquipmentSenderValid {
 
     } else {
       if (this.equipmentTimeDeadband.getSdtTimeDeadbandSchedulers().containsKey(currentSourceDataTag.getId())) {
-        this.equipmentLogger.debug("checkTimeDeadband - remove time-deadband scheduler for tag " + currentSourceDataTag.getId());
+        log.debug("checkTimeDeadband - remove time-deadband scheduler for tag " + currentSourceDataTag.getId());
         this.equipmentTimeDeadband.removeFromTimeDeadband(currentSourceDataTag);
       }
 
@@ -279,10 +269,11 @@ class EquipmentSenderValid {
   }
 
   /**
-   *
    * Helper method which evaluate the filter status.
+   *
    * @param filterType The type of the filter.
-   * @param tagId the id of the tag which belongs to the filter status.
+   * @param tagId      the id of the tag which belongs to the filter status.
+   *
    * @return If the Filter is not ok the method returns false.
    */
   private boolean isFilterOk(final FilterType filterType, final Long tagId) {
@@ -290,34 +281,38 @@ class EquipmentSenderValid {
     if (filterType != FilterType.NO_FILTERING) {
       // OLD_UPDATE filter on
       if ((filterType == FilterType.OLD_UPDATE)) {
-        this.equipmentLogger.debug(format(
-            "\told update filtering : [%d] update was filtered out because the new value timestamp is equal or older than the current value timestamp "
-                + " and the current value has Good Quality or both new and current value has Bad Quality.",
-            tagId));
+        log.debug(format(
+                "\told update filtering : [%d] update was filtered out because the new value timestamp is equal or older than the current value timestamp "
+                        + " and the current value has Good Quality or both new and current value has Bad Quality.",
+                tagId));
 
-        this.equipmentLogger.debug("isFilterOk - sending value to statistics module: old update Filter");
+        log.debug("isFilterOk - sending value to statistics module: old update Filter");
 
         // VALUE_DEADBAND filter on
-      } else if ((filterType == FilterType.VALUE_DEADBAND)) {
-        this.equipmentLogger.debug(format(
-            "\tvalue-deadband filtering : the value of tag [%d] was filtered out due to value-deadband filtering rules and will not be sent to the server",
-            tagId));
+      }
+      else if ((filterType == FilterType.VALUE_DEADBAND)) {
+        log.debug(format(
+                "\tvalue-deadband filtering : the value of tag [%d] was filtered out due to value-deadband filtering rules and will not be sent to the server",
+                tagId));
 
-        this.equipmentLogger.debug("isFilterOk - sending value to statistics module: Value Deadband Filter");
+        log.debug("isFilterOk - sending value to statistics module: Value Deadband Filter");
 
         // REPEATED_VALUE filter on
-      } else if ((filterType == FilterType.REPEATED_VALUE)) {
-        this.equipmentLogger.debug(format(
-            "\ttrying to send twice the same tag [%d] update (with exactly the same value and value description).",
-            tagId));
+      }
+      else if ((filterType == FilterType.REPEATED_VALUE)) {
+        log.debug(format(
+                "\ttrying to send twice the same tag [%d] update (with exactly the same value and value description).",
+                tagId));
 
-        this.equipmentLogger.debug("isFilterOk - sending value to statistics module: Same Value Filter");
+        log.debug("sendTagFiltered - sending value to statistics module: Same Value Filter");
+        log.debug("isFilterOk - sending value to statistics module: Same Value Filter");
       }
 
       // return false because the filter is not ok
       return false;
 
-    } else {
+    }
+    else {
 
       // return false because the filter is ok
       return true;
@@ -329,7 +324,7 @@ class EquipmentSenderValid {
    * Sends all through timedeadband delayed values immediately
    */
   public void sendDelayedTimeDeadbandValues() {
-    equipmentLogger.debug("Sending all time deadband delayed values to the server");
+    log.debug("Sending all time deadband delayed values to the server");
 
     this.equipmentTimeDeadband.sendDelayedTimeDeadbandValues();
   }
@@ -339,18 +334,19 @@ class EquipmentSenderValid {
     boolean result = false;
 
     if (!this.dataTagValueValidator.isTimestampValid(update.getSourceTimestamp())) {
-      equipmentLogger.warn(
+      log.warn(
           format("\tvalid timestamp : the timestamp of tag[%d] is out of range (in the future)",
               currentSourceDataTag.getId()));
 
-      equipmentLogger.debug(format("\tinvalidating tag [%d] with quality FUTURE_SOURCE_TIMESTAMP", currentSourceDataTag.getId()));
+      log.debug(format("\tinvalidating tag [%d] with quality FUTURE_SOURCE_TIMESTAMP", currentSourceDataTag.getId()));
 
       SourceDataTagQuality quality = new SourceDataTagQuality(SourceDataTagQualityCode.FUTURE_SOURCE_TIMESTAMP, "Value received with source timestamp in the future!");
       // Send Invalid Tag
       this.equipmentSender.update(currentSourceDataTag.getId(), update, quality);
 
       // Remove tags which have not convertible values
-    } else {
+    }
+    else {
       result = true;
     }
     return result;
@@ -360,11 +356,13 @@ class EquipmentSenderValid {
    * Checks if the new value is convertible. That is the case if the defined class of the value is known by the daq
    * and the {@link TypeConverter} can cast the value.
    * If the {@link TypeConverter} cannot cast the value check also if the value can be instantiated through jackson.
-   *
+   * <p>
    * If both fail, the value is invalid and the method returns false.
+   *
    * @param currentSourceDataTag The current {@link SourceDataTag} known by the daq.
-   * @param newTagValue the new tag value.
-   * @param sourceTimestamp actual sourceTimeStamp.
+   * @param newTagValue          the new tag value.
+   * @param sourceTimestamp      actual sourceTimeStamp.
+   *
    * @return True if the new value is Convertible.
    */
   private boolean isConvertible(final SourceDataTag currentSourceDataTag, final ValueUpdate update) {
@@ -377,14 +375,15 @@ class EquipmentSenderValid {
           "\tconvertible : The value (%s) received for tag[%d] and the tag's type (" + currentSourceDataTag.getDataType() + ") are not compatible.",
           update.getValue(), currentSourceDataTag.getId());
 
-      this.equipmentLogger.warn(description);
-      this.equipmentLogger.debug(format("\tinvalidating tag[%d] with quality CONVERSION_ERROR", currentSourceDataTag.getId()));
+      log.warn(description);
+      log.debug(format("\tinvalidating tag[%d] with quality CONVERSION_ERROR", currentSourceDataTag.getId()));
 
       SourceDataTagQuality quality = new SourceDataTagQuality(SourceDataTagQualityCode.CONVERSION_ERROR, description);
       this.equipmentSender.update(currentSourceDataTag.getId(), quality, update.getSourceTimestamp());
 
       // Remove tags which are out of their range
-    } else {
+    }
+    else {
       result = true;
     }
     return result;
@@ -399,10 +398,10 @@ class EquipmentSenderValid {
     boolean result = false;
 
     if (!this.dataTagValueValidator.isInRange(currentSourceDataTag, update.getValue())) {
-      this.equipmentLogger.warn(format(
+      log.warn(format(
           "\tin range : the value of tag[%d] was out of range and will only be propagated the first time to the server",
           currentSourceDataTag.getId()));
-      this.equipmentLogger.debug(format("\tinvalidating tag[%d] with quality OUT_OF_BOUNDS", currentSourceDataTag.getId()));
+      log.debug(format("\tinvalidating tag[%d] with quality OUT_OF_BOUNDS", currentSourceDataTag.getId()));
 
       StringBuffer qDesc = new StringBuffer("source value is out of bounds (");
       if (currentSourceDataTag.getMinValue() != null)
@@ -417,7 +416,8 @@ class EquipmentSenderValid {
       this.equipmentSender.update(currentSourceDataTag.getId(), update, quality);
 
       // Checks for Value_Deadband and Same_Value filtering => isCandidateForFiltering
-    } else {
+    }
+    else {
       result = true;
     }
     return result;
@@ -431,7 +431,8 @@ class EquipmentSenderValid {
   private static Object instantiate(Object tagValue, final Class<?> dataType) {
     try {
       return mapper.readValue(mapper.writeValueAsString(tagValue), dataType);
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       return null;
     }
   }
