@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -30,8 +31,6 @@ import org.springframework.stereotype.Component;
 import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.conf.equipment.ICoreDataTagChanger;
-import cern.c2mon.daq.common.logger.EquipmentLogger;
-import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
@@ -47,12 +46,8 @@ import cern.c2mon.shared.daq.config.ChangeReport;
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Slf4j
 public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMessageSender, IDynamicTimeDeadbandFilterer {
-
-  /**
-   * The logger for this class.
-   */
-  private EquipmentLogger equipmentLogger;
 
   /**
    * The filter message sender. All tags a filter rule matched are added to
@@ -110,14 +105,14 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
   /**
    * Creates a new EquipmentMessageSender.
    *
-   * @param filterMessageSender The filter message sender to send filtered tag
-   *          values.
-   * @param processMessageSender The process message sender to send tags to the
-   *          server.
+   * @param filterMessageSender                   The filter message sender to send filtered tag
+   *                                              values.
+   * @param processMessageSender                  The process message sender to send tags to the
+   *                                              server.
    * @param medDynamicTimeDeadbandFilterActivator The dynamic time deadband
-   *          activator for medium priorities.
+   *                                              activator for medium priorities.
    * @param lowDynamicTimeDeadbandFilterActivator The dynamic time deadband
-   *          activator for low priorities. checks around the data tag.
+   *                                              activator for low priorities. checks around the data tag.
    */
   @Autowired
   public EquipmentMessageSender(final IFilterMessageSender filterMessageSender,
@@ -135,29 +130,26 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
    * Init
    *
    * @param equipmentConfiguration
-   * @param equipmentLoggerFactory
    */
-  public void init(final EquipmentConfiguration equipmentConfiguration, final EquipmentLoggerFactory equipmentLoggerFactory) {
+  public void init(final EquipmentConfiguration equipmentConfiguration) {
     // Configuration
     setEquipmentConfiguration(equipmentConfiguration);
-    // Logger
-    setEquipmentLoggerFactory(equipmentLoggerFactory);
 
     // Filter module
-    this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSender, equipmentLoggerFactory);
+    this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSender);
 
     // Time Deadband
-    this.equipmentTimeDeadband = new EquipmentTimeDeadband(this, this.processMessageSender, this.equipmentSenderFilterModule, equipmentLoggerFactory);
+    this.equipmentTimeDeadband = new EquipmentTimeDeadband(this, this.processMessageSender, this.equipmentSenderFilterModule);
 
     // Invalid Sender
-    this.equipmentSenderInvalid = new EquipmentSenderInvalid(this.equipmentSenderFilterModule, this.processMessageSender, this.equipmentTimeDeadband, this,
-        equipmentLoggerFactory);
+    this.equipmentSenderInvalid = new EquipmentSenderInvalid(this.equipmentSenderFilterModule, this.processMessageSender, this.equipmentTimeDeadband, this);
 
     // Valid Sender
-    this.equipmentSenderValid = new EquipmentSenderValid(this.equipmentSenderFilterModule, this.processMessageSender, this, this.equipmentTimeDeadband, this, equipmentLoggerFactory);
+    this.equipmentSenderValid = new EquipmentSenderValid(this.equipmentSenderFilterModule, this.processMessageSender,
+            this.equipmentTimeDeadband, this);
 
     // Alive Sender
-    this.equipmentAliveSender = new EquipmentAliveSender(this.processMessageSender, this.equipmentConfiguration.getAliveTagId(), equipmentLoggerFactory);
+    this.equipmentAliveSender = new EquipmentAliveSender(this.processMessageSender, this.equipmentConfiguration.getAliveTagId());
     this.equipmentAliveSender.init(this.equipmentConfiguration.getAliveTagInterval(), this.equipmentConfiguration.getName());
   }
 
@@ -166,6 +158,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
    * equipment, or any sub equipments.
    *
    * @param tagId the id of the tag to check
+   *
    * @return true if the tag id corresponds to an alive tag, false otherwise
    */
   boolean isAliveTag(Long tagId) {
@@ -191,7 +184,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
     Long supAliveTagId = Long.valueOf(this.equipmentConfiguration.getAliveTagId());
 
     if (supAliveTagId == null) {
-      equipmentLogger.debug("sendSupervisionAlive() - No alive tag specified. Ignoring request.");
+      log.debug("sendSupervisionAlive() - No alive tag specified. Ignoring request.");
       return;
     }
 
@@ -309,15 +302,15 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
     DataTagAddress address = tag.getAddress();
     if (isDynamicTimeDeadband(tag)) {
       switch (address.getPriority()) {
-      case DataTagConstants.PRIORITY_LOW:
-        this.lowDynamicTimeDeadbandFilterActivator.newTagValueSent(tag.getId());
-        break;
-      case DataTagConstants.PRIORITY_MEDIUM:
-        this.medDynamicTimeDeadbandFilterActivator.newTagValueSent(tag.getId());
-        break;
-      default:
-        // other priorities are ignored
-        break;
+        case DataTagConstants.PRIORITY_LOW:
+          this.lowDynamicTimeDeadbandFilterActivator.newTagValueSent(tag.getId());
+          break;
+        case DataTagConstants.PRIORITY_MEDIUM:
+          this.medDynamicTimeDeadbandFilterActivator.newTagValueSent(tag.getId());
+          break;
+        default:
+          // other priorities are ignored
+          break;
       }
     }
   }
@@ -326,6 +319,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
    * Checks if Dynamic Timedeadband can be appliyed or not
    *
    * @param tag The tag to be recorded.
+   *
    * @return True if the Dynamic Timedeadband can be apply or false if not
    */
   @Override
@@ -364,8 +358,8 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
   /**
    * Sends the CommfaultTag message.
    *
-   * @param tagID The CommfaultTag id.
-   * @param value The CommFaultTag value to send.
+   * @param tagID       The CommfaultTag id.
+   * @param value       The CommFaultTag value to send.
    * @param description The description of the CommfaultTag
    */
   private void sendCommfaultTag(final long tagID, final String equipmentName, final boolean value, final String description) {
@@ -413,31 +407,24 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
       DataTagAddress address = entry.getValue().getAddress();
       if (!address.isStaticTimedeadband() && equipmentConfiguration.isDynamicTimeDeadbandEnabled()) {
         switch (address.getPriority()) {
-        case DataTagConstants.PRIORITY_LOW:
-          this.lowDynamicTimeDeadbandFilterActivator.addDataTag(entry.getValue());
-          break;
-        case DataTagConstants.PRIORITY_MEDIUM:
-          this.medDynamicTimeDeadbandFilterActivator.addDataTag(entry.getValue());
-          break;
-        default:
-          // other priorities are ignored
+          case DataTagConstants.PRIORITY_LOW:
+            this.lowDynamicTimeDeadbandFilterActivator.addDataTag(entry.getValue());
+            break;
+          case DataTagConstants.PRIORITY_MEDIUM:
+            this.medDynamicTimeDeadbandFilterActivator.addDataTag(entry.getValue());
+            break;
+          default:
+            // other priorities are ignored
         }
       }
     }
   }
 
   /**
-   * @param equipmentLoggerFactory the equipmentLoggerFactory to set
-   */
-  private void setEquipmentLoggerFactory(final EquipmentLoggerFactory equipmentLoggerFactory) {
-    this.equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());
-  }
-
-  /**
    * Sends all through timedeadband delayed values immediately
    */
   public void sendDelayedTimeDeadbandValues() {
-    this.equipmentLogger.debug("sendDelayedTimeDeadbandValues - Sending all time deadband delayed values to the server");
+    log.debug("sendDelayedTimeDeadbandValues - Sending all time deadband delayed values to the server");
 
     this.equipmentSenderValid.sendDelayedTimeDeadbandValues();
   }
@@ -463,7 +450,6 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
   }
 
   /**
-   *
    * @return equipmentSenderValid
    */
   protected EquipmentSenderValid getEquipmentSenderValid() {
@@ -478,24 +464,24 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
    * Adds a data tag to this sender.
    *
    * @param sourceDataTag The data tag to add.
-   * @param changeReport The change report to fill with the results of the
-   *          change.
+   * @param changeReport  The change report to fill with the results of the
+   *                      change.
    */
   @Override
   public void onAddDataTag(final SourceDataTag sourceDataTag, final ChangeReport changeReport) {
     DataTagAddress address = sourceDataTag.getAddress();
     if (!address.isStaticTimedeadband() && this.equipmentConfiguration.isDynamicTimeDeadbandEnabled()) {
       switch (address.getPriority()) {
-      case DataTagConstants.PRIORITY_LOW:
-        this.lowDynamicTimeDeadbandFilterActivator.addDataTag(sourceDataTag);
-        changeReport.appendInfo("Data tag " + sourceDataTag.getId() + " added to low priority filter.");
-        break;
-      case DataTagConstants.PRIORITY_MEDIUM:
-        this.medDynamicTimeDeadbandFilterActivator.addDataTag(sourceDataTag);
-        changeReport.appendInfo("Data tag " + sourceDataTag.getId() + " added to medium priority filter.");
-        break;
-      default:
-        changeReport.appendInfo("Data tag " + sourceDataTag.getId() + " not added to any filter.");
+        case DataTagConstants.PRIORITY_LOW:
+          this.lowDynamicTimeDeadbandFilterActivator.addDataTag(sourceDataTag);
+          changeReport.appendInfo("Data tag " + sourceDataTag.getId() + " added to low priority filter.");
+          break;
+        case DataTagConstants.PRIORITY_MEDIUM:
+          this.medDynamicTimeDeadbandFilterActivator.addDataTag(sourceDataTag);
+          changeReport.appendInfo("Data tag " + sourceDataTag.getId() + " added to medium priority filter.");
+          break;
+        default:
+          changeReport.appendInfo("Data tag " + sourceDataTag.getId() + " not added to any filter.");
       }
     }
   }
@@ -504,8 +490,8 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
    * Removes a data tag from this sender.
    *
    * @param sourceDataTag The data tag to remove.
-   * @param changeReport The change report to fill with the results of the
-   *          change.
+   * @param changeReport  The change report to fill with the results of the
+   *                      change.
    */
   @Override
   public void onRemoveDataTag(final SourceDataTag sourceDataTag, final ChangeReport changeReport) {
@@ -517,10 +503,10 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
   /**
    * Updates a data tag of this sender.
    *
-   * @param sourceDataTag The data tag to update.
+   * @param sourceDataTag    The data tag to update.
    * @param oldSourceDataTag The old source data tag to identify if necessary
-   *          for changes.
-   * @param changeReport The change report to fill with the results.
+   *                         for changes.
+   * @param changeReport     The change report to fill with the results.
    */
   @Override
   public void onUpdateDataTag(final SourceDataTag sourceDataTag, final SourceDataTag oldSourceDataTag, final ChangeReport changeReport) {
