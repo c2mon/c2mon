@@ -17,11 +17,11 @@
 
 package cern.c2mon.daq.common.tools;
 
-import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
-import cern.c2mon.daq.tools.DataTagValueValidator;
-import cern.c2mon.shared.common.datatag.SourceDataTag;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import cern.c2mon.daq.tools.DataTagValueValidator;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -34,13 +34,12 @@ public class DataTagValueValidatorTest {
   private static DataTagValueValidator valueValidator;
 
   @BeforeClass
-  public static void ini(){
-    EquipmentLoggerFactory factory = new EquipmentLoggerFactory("handlerClassName",1L, "name", "pName", true, false);
-    valueValidator = new DataTagValueValidator(factory);
+  public static void ini() {
+    valueValidator = new DataTagValueValidator();
   }
 
   @Test
-  public void isInRangeLong(){
+  public void isInRangeLong() {
     SourceDataTag sourceDataTag = new SourceDataTag(100L, "testTag", false);
     sourceDataTag.setMaxValue(Long.MAX_VALUE - 1L);
     sourceDataTag.setMinValue(0L);
@@ -53,7 +52,7 @@ public class DataTagValueValidatorTest {
   }
 
   @Test
-  public void isInRangeInteger(){
+  public void isInRangeInteger() {
     SourceDataTag sourceDataTag = new SourceDataTag(100L, "testTag", false);
     sourceDataTag.setMaxValue(Integer.MAX_VALUE - 1);
     sourceDataTag.setMinValue(0);
@@ -66,7 +65,7 @@ public class DataTagValueValidatorTest {
   }
 
   @Test
-  public void isInRangeDouble(){
+  public void isInRangeDouble() {
     SourceDataTag sourceDataTag = new SourceDataTag(100L, "testTag", false);
     sourceDataTag.setMaxValue(100.0);
     sourceDataTag.setMinValue(0.0);
@@ -79,7 +78,7 @@ public class DataTagValueValidatorTest {
   }
 
   @Test
-  public void isInRangeFloat(){
+  public void isInRangeFloat() {
     SourceDataTag sourceDataTag = new SourceDataTag(100L, "testTag", false);
     sourceDataTag.setMaxValue(100.0f);
     sourceDataTag.setMinValue(0.0f);
