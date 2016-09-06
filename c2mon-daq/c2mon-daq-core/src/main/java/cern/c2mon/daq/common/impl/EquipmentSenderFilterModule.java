@@ -18,8 +18,8 @@ package cern.c2mon.daq.common.impl;
 
 import java.sql.Timestamp;
 
-import cern.c2mon.daq.common.logger.EquipmentLogger;
-import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
@@ -28,38 +28,28 @@ import cern.c2mon.shared.common.datatag.ValueUpdate;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue;
 
 /**
- * This class is a helper to deal with all sender methods that use the Filter
- * Message Sender
+ * This class is a helper to deal with all sender methods that use the Filter Message Sender
  *
  * @author vilches
  *
  */
+@Slf4j
 class EquipmentSenderFilterModule {
 
-  /**
-   * The filter message sender. All tags a filter rule matched are added to
-   * this.
-   */
-  private IFilterMessageSender filterMessageSender;
+	/**
+	 * The filter message sender. All tags a filter rule matched are added to this.
+	 */
+	private IFilterMessageSender filterMessageSender;
 
-  /**
-   * The logger for this class.
-   */
-  private EquipmentLogger equipmentLogger;
-
-  /**
-   * Creates a new EquipmentSenderFilterModule.
-   *
-   * @param filterMessageSender The filter message sender to send filtered tag
-   *          values.
-   * @param equipmentLoggerFactory Equipment Logger factory to create the class
-   *          logger
-   */
-  public EquipmentSenderFilterModule(final IFilterMessageSender filterMessageSender, final EquipmentLoggerFactory equipmentLoggerFactory) {
-
-    this.filterMessageSender = filterMessageSender;
-    this.equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());
-  }
+    /**
+     * Creates a new EquipmentSenderFilterModule.
+     *
+     * @param filterMessageSender The filter message sender to send filtered tag values.
+     * @param equipmentLoggerFactory Equipment Logger factory to create the class logger
+     */
+    public EquipmentSenderFilterModule (final IFilterMessageSender filterMessageSender) {
+        this.filterMessageSender = filterMessageSender;
+    }
 
   /**
    * Sends a message to the statistics module. Should only be used in the core.
@@ -109,11 +99,11 @@ class EquipmentSenderFilterModule {
                                     final SourceDataTagQuality quality,
                                     final boolean dynamicFiltered,
                                     final int filterType) {
-    this.equipmentLogger.trace("sendToFilterModule - entering sendToFilterModule() for tag #" + currentSourceDataTag.getId());
+    log.trace("sendToFilterModule - entering sendToFilterModule() for tag #" + currentSourceDataTag.getId());
 
     this.filterMessageSender.addValue(makeFilterValue(currentSourceDataTag, update, quality, dynamicFiltered, filterType));
 
-    this.equipmentLogger.trace("sendToFilterModule - leaving sendToFilterModule() for tag #" + currentSourceDataTag.getId());
+    log.trace("sendToFilterModule - leaving sendToFilterModule() for tag #" + currentSourceDataTag.getId());
   }
 
   /**
@@ -148,12 +138,12 @@ class EquipmentSenderFilterModule {
    * @return the filtered value object
    */
   private FilteredDataTagValue makeFilterValue(SourceDataTag sdt, final ValueUpdate update, final SourceDataTagQuality sourceQuality, final boolean dynamicFiltered, final int filterApplied) {
-      SourceDataTagValue currentVal = sdt.getCurrentValue();
+    SourceDataTagValue currentVal = sdt.getCurrentValue();
 
-      FilteredDataTagValue returnValue = new FilteredDataTagValue(currentVal.getId(), currentVal.getName(),
-              update.getValue().toString(), update.getValueDescription(), sourceQuality.getQualityCode().getQualityCode(), sourceQuality.getDescription(), new Timestamp(update.getSourceTimestamp()),
-              sdt.getDataType(), dynamicFiltered, filterApplied);
+    FilteredDataTagValue returnValue = new FilteredDataTagValue(currentVal.getId(), currentVal.getName(),
+            update.getValue().toString(), update.getValueDescription(), sourceQuality.getQualityCode().getQualityCode(), sourceQuality.getDescription(), new Timestamp(update.getSourceTimestamp()),
+            sdt.getDataType(), dynamicFiltered, filterApplied);
 
-      return returnValue;
+    return returnValue;
   }
 }
