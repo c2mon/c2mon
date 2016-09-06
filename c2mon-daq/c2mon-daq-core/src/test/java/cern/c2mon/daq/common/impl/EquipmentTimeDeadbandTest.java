@@ -21,7 +21,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
-import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.shared.common.datatag.*;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue.FilterType;
@@ -79,12 +78,8 @@ public class EquipmentTimeDeadbandTest {
     processConf.setProcessName("Test");
     equipmentConfiguration.setHandlerClassName("testClass");
 
-
-    EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(equipmentConfiguration,
-        processConf, false, false);
-
     this.equipmentTimeDeadbandTester = new EquipmentTimeDeadbandTester(this.dynamicTimeDeadbandFiltererMock, this.processMessageSenderMock,
-        this.equipmentSenderFilterModuleMock, equipmentLoggerFactory);
+        this.equipmentSenderFilterModuleMock);
   }
 
   /**
