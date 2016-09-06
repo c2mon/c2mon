@@ -25,7 +25,6 @@ import org.junit.Test;
 
 import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
@@ -123,15 +122,12 @@ public class SDTTimeDeadbandSchedulerTest {
 
     replay(this.processMessageSenderMock, this.configurationControllerMock, this.processConfigurationMock, this.dynamicTimeDeadbandFiltererMock);
 
-    EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(this.conf, this.configurationControllerMock.getProcessConfiguration
-        (), false, false);
+    this.equipmentMessageSender.init(this.conf);
 
-    this.equipmentMessageSender.init(this.conf, equipmentLoggerFactory);
-
-    this.dataTagValueFilter = new DataTagValueFilter(equipmentLoggerFactory);
+    this.dataTagValueFilter = new DataTagValueFilter();
 
     // Filter module
-    this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSenderMock, equipmentLoggerFactory);
+    this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSenderMock);
 
     //        EquipmentLogger equipmentLogger = new EquipmentLogger("asd", "asd", "asd");
     this.scheduler = new SDTTimeDeadbandScheduler(tag, this.processMessageSenderMock, this.equipmentSenderFilterModule, new Timer(true), this
@@ -168,15 +164,12 @@ public class SDTTimeDeadbandSchedulerTest {
     replay(this.processMessageSenderMock, this.configurationControllerMock, this.processConfigurationMock, this
         .dynamicTimeDeadbandFiltererMock);
 
-    EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(this.conf, this.configurationControllerMock.getProcessConfiguration
-        (), false, false);
+    this.equipmentMessageSender.init(this.conf);
 
-    this.equipmentMessageSender.init(this.conf, equipmentLoggerFactory);
-
-    this.dataTagValueFilter = new DataTagValueFilter(equipmentLoggerFactory);
+    this.dataTagValueFilter = new DataTagValueFilter();
 
     // Filter module
-    this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSenderMock, equipmentLoggerFactory);
+    this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSenderMock);
 
     //        EquipmentLogger equipmentLogger = new EquipmentLogger("asd", "asd", "asd");
     this.scheduler = new SDTTimeDeadbandScheduler(tag, this.processMessageSenderMock, this.equipmentSenderFilterModule, new Timer(true), this
@@ -220,15 +213,12 @@ public class SDTTimeDeadbandSchedulerTest {
     replay(this.processMessageSenderMock, this.filterMessageSenderMock, this.configurationControllerMock, this.processConfigurationMock,
         this.dynamicTimeDeadbandFiltererMock);
 
-    EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(this.conf, this.configurationControllerMock.getProcessConfiguration
-        (), false, false);
+    this.equipmentMessageSender.init(this.conf);
 
-    this.equipmentMessageSender.init(this.conf, equipmentLoggerFactory);
-
-    this.dataTagValueFilter = new DataTagValueFilter(equipmentLoggerFactory);
+    this.dataTagValueFilter = new DataTagValueFilter();
 
     // Filter module
-    this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSenderMock, equipmentLoggerFactory);
+    this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSenderMock);
 
 //     EquipmentLogger equipmentLogger = new EquipmentLogger("asd", "asd", "asd");
     this.scheduler = new SDTTimeDeadbandScheduler(tag, this.processMessageSenderMock, this.equipmentSenderFilterModule, new Timer(true), this
@@ -270,15 +260,12 @@ public class SDTTimeDeadbandSchedulerTest {
     replay(this.processMessageSenderMock, this.filterMessageSenderMock, this.configurationControllerMock, this.processConfigurationMock,
         this.dynamicTimeDeadbandFiltererMock);
 
-    EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(this.conf, this.configurationControllerMock.getProcessConfiguration
-        (), false, false);
+    this.equipmentMessageSender.init(this.conf);
 
-    this.equipmentMessageSender.init(this.conf, equipmentLoggerFactory);
-
-    this.dataTagValueFilter = new DataTagValueFilter(equipmentLoggerFactory);
+    this.dataTagValueFilter = new DataTagValueFilter();
 
     // Filter module
-    this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSenderMock, equipmentLoggerFactory);
+    this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSenderMock);
 
 //     EquipmentLogger equipmentLogger = new EquipmentLogger("asd", "asd", "asd");
     this.scheduler = new SDTTimeDeadbandScheduler(tag, this.processMessageSenderMock, this.equipmentSenderFilterModule, new Timer(true), this
