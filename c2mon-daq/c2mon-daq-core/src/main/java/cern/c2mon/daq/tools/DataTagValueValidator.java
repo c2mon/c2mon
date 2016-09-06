@@ -16,8 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.daq.tools;
 
-import cern.c2mon.daq.common.logger.EquipmentLogger;
-import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.type.TypeConverter;
 
@@ -28,11 +28,8 @@ import static cern.c2mon.shared.common.type.TypeConverter.getType;
  *
  * @author vilches
  */
+@Slf4j
 public class DataTagValueValidator {
-  /**
-   * The logger of this class
-   */
-  protected EquipmentLogger equipmentLogger;
 
   /**
    * The maximum allowed difference between the system's timestamp and the
@@ -43,12 +40,8 @@ public class DataTagValueValidator {
   /**
    * Creates a new Data Tag Value Validator which uses the provided equipment
    * logger to log its results.
-   *
-   * @param equipmentLoggerFactory
-   *          The equipment logger to use
    */
-  public DataTagValueValidator(final EquipmentLoggerFactory equipmentLoggerFactory) {
-    this.equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());
+  public DataTagValueValidator() {
   }
 
   /**
@@ -63,7 +56,7 @@ public class DataTagValueValidator {
    */
   @SuppressWarnings("unchecked")
   public boolean isInRange(final SourceDataTag sdt, final Object value) {
-    this.equipmentLogger.trace("isInRange - entering isInRange()..");
+    log.trace("isInRange - entering isInRange()..");
 
     boolean isInRange = true;
     Comparable convertedValue;
@@ -74,7 +67,7 @@ public class DataTagValueValidator {
       // convertible)
       convertedValue = (Comparable) TypeConverter.cast(value, sdt.getDataType());
       if (compare(sdt.getMinValue(), convertedValue) > 0) {
-        this.equipmentLogger.trace("\tisInRange - out of range : " + convertedValue
+        log.trace("\tisInRange - out of range : " + convertedValue
             + " is less than the authorized minimum value " + sdt.getMinValue());
         isInRange = false;
       }
@@ -86,14 +79,14 @@ public class DataTagValueValidator {
         // convertible)
         convertedValue = (Comparable) TypeConverter.cast(value, sdt.getDataType());
         if (compare(sdt.getMaxValue(), convertedValue) < 0) {
-          this.equipmentLogger.trace("\tisInRange - out of range : " + convertedValue
+          log.trace("\tisInRange - out of range : " + convertedValue
               + " is greater than the authorized maximum value " + sdt.getMaxValue());
           isInRange = false;
         }
       }
     }
 
-    this.equipmentLogger.trace("isInRange - leaving isInRange(). Is value in range?: " + isInRange);
+    log.trace("isInRange - leaving isInRange(). Is value in range?: " + isInRange);
     return isInRange;
   }
 
@@ -124,13 +117,13 @@ public class DataTagValueValidator {
    *         range or not
    */
   public boolean isTimestampValid(final long timestamp) {
-    this.equipmentLogger.trace("entering isTimestampValid()..");
+    log.trace("entering isTimestampValid()..");
     boolean isValid = true;
     long diff = (timestamp - System.currentTimeMillis());
     if (diff > MAX_MSECONDS_DIFF) {
       isValid = false;
     }
-    this.equipmentLogger.trace("leaving isTimestampValid().. Result: " + isValid);
+    log.trace("leaving isTimestampValid().. Result: " + isValid);
     return isValid;
   }
 
@@ -145,8 +138,7 @@ public class DataTagValueValidator {
    *         <code>false</code>.
    */
   public boolean isConvertible(final SourceDataTag tag, final Object tagValue) {
-    this.equipmentLogger
-        .trace("isConvertible - Tag #" + tag.getId() + " casting " + tagValue + " to " + tag.getDataType());
+    log.trace("isConvertible - Tag #" + tag.getId() + " casting " + tagValue + " to " + tag.getDataType());
     return TypeConverter.isConvertible(tagValue, tag.getDataType());
   }
 }
