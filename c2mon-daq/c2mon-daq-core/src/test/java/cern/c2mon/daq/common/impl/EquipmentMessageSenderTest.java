@@ -26,7 +26,6 @@ import lombok.Data;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
@@ -38,9 +37,7 @@ import cern.c2mon.shared.common.process.SubEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ChangeReport;
 
 import static org.easymock.EasyMock.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class EquipmentMessageSenderTest {
 
@@ -108,9 +105,8 @@ public class EquipmentMessageSenderTest {
     equipmentConfiguration.setHandlerClassName("asd");
     // equipmentMessageSender.setEquipmentLoggerFactory(EquipmentLoggerFactory.createFactory(equipmentConfiguration,
     // processConf, new RunOptions()));
-    EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(equipmentConfiguration, processConf, false, false);
 
-    this.equipmentMessageSender.init(equipmentConfiguration, equipmentLoggerFactory);
+    this.equipmentMessageSender.init(equipmentConfiguration);
 
     // Setup calls should not affect later tests
     reset(lowDynamicTimeDeadbandFilterActivatorMock, medDynamicTimeDeadbandFilterActivatorMock, filterMessageSenderMock, processMessageSenderMock);
@@ -727,7 +723,7 @@ public class EquipmentMessageSenderTest {
     processConf.setProcessName("ad");
     equipmentConfiguration.setHandlerClassName("asd");
 
-    equipmentMessageSender.init(equipmentConfiguration, EquipmentLoggerFactory.createFactory(equipmentConfiguration, processConf, false, false));
+    equipmentMessageSender.init(equipmentConfiguration);
 
     // setup calls should not affect later tests
     reset(filterMessageSenderMock, processMessageSenderMock);
