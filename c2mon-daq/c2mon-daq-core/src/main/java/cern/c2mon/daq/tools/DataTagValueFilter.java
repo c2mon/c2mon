@@ -18,8 +18,8 @@ package cern.c2mon.daq.tools;
 
 import java.util.Arrays;
 
-import cern.c2mon.daq.common.logger.EquipmentLogger;
-import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import cern.c2mon.shared.common.datatag.*;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue.FilterType;
 import cern.c2mon.shared.common.type.TypeConverter;
@@ -31,11 +31,8 @@ import static java.lang.String.format;
  *
  * @author vilches
  */
+@Slf4j
 public class DataTagValueFilter {
-  /**
-   * The logger of this class
-   */
-  protected EquipmentLogger equipmentLogger;
 
   /**
    * Factor to calculate from a percentage value to a simple factor.
@@ -43,15 +40,9 @@ public class DataTagValueFilter {
   private static final double PERCENTAGE_FACTOR = 0.01;
 
   /**
-   * Creates a new Data Tag Value Filter which uses the provided equipment
-   * logger to log its results.
-   *
-   * @param equipmentLogger The equipment logger to use
+   * Creates a new Data Tag Value Filter
    */
-  public DataTagValueFilter(final EquipmentLoggerFactory equipmentLoggerFactory) {
-    this.equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());
-    ;
-  }
+  public DataTagValueFilter() {}
 
   /**
    * This method is responsible for checking if the new value of the particular
@@ -76,8 +67,8 @@ public class DataTagValueFilter {
    * @return True if the value is filtered else false.
    */
   private boolean isValueDeadbandFiltered(final SourceDataTag currentTag, final ValueUpdate update, final SourceDataTagQuality newSDQuality) {
-    if (this.equipmentLogger.isTraceEnabled()) {
-      this.equipmentLogger.trace(format("entering valueDeadbandFilterOut(%d)..", currentTag.getId()));
+    if (log.isTraceEnabled()) {
+      log.trace(format("entering valueDeadbandFilterOut(%d)..", currentTag.getId()));
     }
 
     boolean filterTag = false;
@@ -156,8 +147,8 @@ public class DataTagValueFilter {
 
     } // if
 
-    if (this.equipmentLogger.isTraceEnabled()) {
-      this.equipmentLogger.trace(format("leaving valueDeadbandFilterOut(%d); filter out = %b", currentTag.getId(), filterTag));
+    if (log.isTraceEnabled()) {
+      log.trace(format("leaving valueDeadbandFilterOut(%d); filter out = %b", currentTag.getId(), filterTag));
     }
 
     return filterTag;
@@ -176,7 +167,7 @@ public class DataTagValueFilter {
    *         <code>FilterType.NO_FILTERING</code>
    */
   public FilterType isCandidateForFiltering(final SourceDataTag currentTag, final ValueUpdate castedUpdate, final SourceDataTagQuality newSDQuality) {
-    this.equipmentLogger.debug("isCandidateForFiltering - entering isCandidateForFiltering() for tag #" + currentTag.getId());
+    log.debug("isCandidateForFiltering - entering isCandidateForFiltering() for tag #" + currentTag.getId());
 
     SourceDataTagValue currentSDValue = currentTag.getCurrentValue();
 
@@ -193,7 +184,7 @@ public class DataTagValueFilter {
         }
         else {
           // The value will be filtered out by OLD_UPDATE
-          this.equipmentLogger.trace(
+          log.trace(
               "isCandidateForFiltering - Tag " + currentSDValue.getId() + " - New timestamp is older than the current timestamp. Candidate for filtering");
           return FilterType.OLD_UPDATE;
         }
@@ -205,7 +196,7 @@ public class DataTagValueFilter {
     // in case the SourceDataTag value has never been initialized we don't want
     // to filter
     else {
-      this.equipmentLogger.trace(
+      log.trace(
           "isCandidateForFiltering - Tag " + currentTag.getId() + " - Current Source Data Tag Value null but we have a New value. Not candidate for filtering");
     }
 
@@ -271,7 +262,7 @@ public class DataTagValueFilter {
     if (currentSDValue.getValue() == null && update.getValue() != null) {
       // Got a new value which is initializing our SourceDataTag. Hence we do
       // not want to filter it out!
-      this.equipmentLogger
+      log
           .trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + " - Current Value null but we have a New value. Not candidate for filtering");
 
       return FilterType.NO_FILTERING;
@@ -280,7 +271,7 @@ public class DataTagValueFilter {
       // The two value are different, hence we do not want to filter it out ...
       // unless the Value dead band filter said the opposite
       if (isValueDeadbandFiltered(currentTag, update, newSDQuality)) {
-        this.equipmentLogger
+        log
             .trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + " - New value update but within value deadband filter. Candidate for filtering");
 
         return FilterType.VALUE_DEADBAND;
@@ -288,7 +279,7 @@ public class DataTagValueFilter {
 
       // The two values are different, so it is clear we do not want to filter
       // it out!
-      this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + " - Both Values are different (Current vs New) = ("
+      log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + " - Both Values are different (Current vs New) = ("
           + currentSDValue.getValue() + " vs " + update.getValue() + "). Not candidate for filtering");
 
       return FilterType.NO_FILTERING;
@@ -306,6 +297,7 @@ public class DataTagValueFilter {
    * @param newValue
    * @param newTagValueDesc
    * @param newSDQuality
+   *
    * @return
    */
   private FilterType isDifferentArrayValue(final SourceDataTag currentTag, final Object newValue) {
@@ -315,7 +307,7 @@ public class DataTagValueFilter {
     if (currentSDValue.getValue() == null && newValue != null) {
       // Got a new value which is initializing our SourceDataTag. Hence we do
       // not want to filter it out!
-      this.equipmentLogger
+      log
           .trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + " - Current Value null but we have a New value. Not candidate for filtering");
 
       return FilterType.NO_FILTERING;
@@ -325,7 +317,7 @@ public class DataTagValueFilter {
 
       if (!Arrays.equals((Object[]) currentSDValue.getValue(), (Object[]) newValue)) {
 
-        this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + " - Both Values are different (Current vs New) = ("
+        log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + " - Both Values are different (Current vs New) = ("
             + currentSDValue.getValue() + " vs " + newValue + "). Not candidate for filtering");
 
         return FilterType.NO_FILTERING;
@@ -337,7 +329,7 @@ public class DataTagValueFilter {
 
       if (!currentSDValue.getValue().equals(newValue)) {
 
-        this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + " - Both Values are different (Current vs New) = ("
+        log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + " - Both Values are different (Current vs New) = ("
             + currentSDValue.getValue() + " vs " + newValue + "). Not candidate for filtering");
 
         return FilterType.NO_FILTERING;
@@ -363,7 +355,7 @@ public class DataTagValueFilter {
        */
 
       // The two value Descriptions are different
-      this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
+      log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
           + " - Both Values are equal but Value Descriptions are different. Not candidate for filtering");
 
       return FilterType.NO_FILTERING;
@@ -380,7 +372,7 @@ public class DataTagValueFilter {
       if ((currentSDValue.getQuality().getQualityCode() == newSDQuality.getQualityCode())) {
         // Only checks description is Quality is invalid
         if (!newSDQuality.isValid()) {
-          this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
+          log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
               + " - Both Value, Value Description and Quality codes are equal. Check Quality Descriptions to take a decision");
 
           // Check if quality description did not change. If it is not null we
@@ -390,13 +382,13 @@ public class DataTagValueFilter {
             // both are null or not
             if (newSDQuality.getDescription() == null) {
               // We filter out since both are the same and null
-              this.equipmentLogger
+              log
                   .trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + " - Both Quality Descriptions are null. Candidate for filtering");
 
               return FilterType.REPEATED_INVALID;
             }
             else {
-              this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
+              log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
                   + " - Current Quality Description null but we have a New Quality Description. Not candidate for filtering");
 
               // Goes directly to the final return
@@ -406,20 +398,20 @@ public class DataTagValueFilter {
           else if (currentSDValue.getQuality().getDescription().equals(newSDQuality.getDescription())) {
             // If we are here, it means we have received a redundant quality
             // code and description ==> should be filtered out.
-            this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
+            log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
                 + " - Both Value, Value Description, Quality and Quality Descriptions are equal. Candidate for filtering");
 
             return FilterType.REPEATED_INVALID;
           }
           else {
-            this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
+            log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
                 + " - Current Quality Description and New Quality Description are different. Not candidate for filtering");
 
             // Goes directly to the final return
           }
         }
         else {
-          this.equipmentLogger
+          log
               .trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + " - Both Value, Value Description and Quality codes (OK) are equal");
 
           return FilterType.REPEATED_VALUE;
@@ -427,7 +419,7 @@ public class DataTagValueFilter {
       }
       // Different Quality Codes
       else {
-        this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
+        log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
             + " - Both Value and Value Description are equal but Quality Codes are different. Not candidate for filtering");
       }
     }
@@ -444,9 +436,9 @@ public class DataTagValueFilter {
    * @return True if the absolute value deadband fits else false.
    */
   public boolean isAbsoluteValueDeadband(final Number currentValue, final Number newValue, final float valueDeadband) {
-    this.equipmentLogger.trace("entering isAbsoluteValueDeadband()..");
+    log.trace("entering isAbsoluteValueDeadband()..");
     boolean isAbsoluteValueDeadband = currentValue != null && newValue != null && Math.abs(currentValue.doubleValue() - newValue.doubleValue()) < valueDeadband;
-    this.equipmentLogger.trace("leaving isAbsoluteValueDeadband().. Result: " + isAbsoluteValueDeadband);
+    log.trace("leaving isAbsoluteValueDeadband().. Result: " + isAbsoluteValueDeadband);
     return isAbsoluteValueDeadband;
   }
 
@@ -460,7 +452,7 @@ public class DataTagValueFilter {
    * @return True if the relative value deadband fits else false.
    */
   public boolean isRelativeValueDeadband(final Number currentValue, final Number newValue, final float valueDeadband) {
-    this.equipmentLogger.trace("entering isRelativeValueDeadband()..");
+    log.trace("entering isRelativeValueDeadband()..");
     boolean isRelativeValueDeadband = false;
     if (currentValue == null || newValue == null) {
       isRelativeValueDeadband = false;
@@ -477,7 +469,7 @@ public class DataTagValueFilter {
         isRelativeValueDeadband = realDiff < maxDiff;
       }
     }
-    this.equipmentLogger.trace("leaving isRelativeValueDeadband().. Result: " + isRelativeValueDeadband);
+    log.trace("leaving isRelativeValueDeadband().. Result: " + isRelativeValueDeadband);
     return isRelativeValueDeadband;
   }
 
@@ -490,8 +482,8 @@ public class DataTagValueFilter {
   private boolean isCurrentValueAvailable(final SourceDataTag tag) {
     boolean isAvailable = (tag.getCurrentValue() != null) && (tag.getCurrentValue().getValue() != null);
 
-    if (this.equipmentLogger.isTraceEnabled())
-      this.equipmentLogger.trace(format("isCurrentValueAvailable - Tag %d : %b", tag.getId(), isAvailable));
+    if (log.isTraceEnabled())
+      log.trace(format("isCurrentValueAvailable - Tag %d : %b", tag.getId(), isAvailable));
 
     return isAvailable;
   }
@@ -517,11 +509,11 @@ public class DataTagValueFilter {
    */
   protected boolean isOlderUpdate(final SourceDataTagQuality newSDQuality, final SourceDataTagQuality currentSDQuality, final long newTimestamp,
       final long currentTimestamp) {
-    this.equipmentLogger.debug("isOlderUpdate - entering isOlderUpdate()");
+    log.debug("isOlderUpdate - entering isOlderUpdate()");
 
     // if New TS is older to the current TS we may have a filtering use case
     if (newTimestamp < currentTimestamp) {
-      this.equipmentLogger.trace("isOlderUpdate - New timestamp is older or equal than current TS (" + newTimestamp + ", " + currentTimestamp + ")");
+      log.trace("isOlderUpdate - New timestamp is older or equal than current TS (" + newTimestamp + ", " + currentTimestamp + ")");
       // New timestamp is older or equal than current TS. Check the Quality
       if (currentSDQuality.getQualityCode() == SourceDataTagQualityCode.DATA_UNAVAILABLE) {
         // Exceptional case for not applying this filter:
@@ -530,24 +522,24 @@ public class DataTagValueFilter {
         if (newSDQuality.isValid()) {
           // New value has Good Quality. Swapping to valid to invalid case. No
           // filter
-          this.equipmentLogger.trace("isOlderUpdate - The current value has DATA_UNAVAILABLE Quality but new value has Good Quality. Not filter");
+          log.trace("isOlderUpdate - The current value has DATA_UNAVAILABLE Quality but new value has Good Quality. Not filter");
           return false;
         }
         else {
           // New value has Bad Quality. Filter
-          this.equipmentLogger.trace("isOlderUpdate - The current value has DATA_UNAVAILABLE Quality and new value has Bad Quality. Filter out ");
+          log.trace("isOlderUpdate - The current value has DATA_UNAVAILABLE Quality and new value has Bad Quality. Filter out ");
           return true;
         }
       }
       else {
         // The current value has any Quality but DATA_UNAVAILABLE. Filter
-        this.equipmentLogger.trace("isOlderUpdate - The current value quality is different to DATA_UNAVAILABLE. Filter out ");
+        log.trace("isOlderUpdate - The current value quality is different to DATA_UNAVAILABLE. Filter out ");
         return true;
       }
     }
 
     // New TS is newer than current TS
-    this.equipmentLogger.trace("isOlderUpdate - New timestamp is newer or equal than current TS. Not filter");
+    log.trace("isOlderUpdate - New timestamp is newer or equal than current TS. Not filter");
     return false;
   }
 }
