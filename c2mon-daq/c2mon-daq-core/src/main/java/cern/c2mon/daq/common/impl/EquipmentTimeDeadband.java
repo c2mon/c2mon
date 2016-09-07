@@ -94,7 +94,9 @@ class EquipmentTimeDeadband {
   private void createSDTtimeDeadbandScheduler(final SourceDataTag currentTag) {
     if (currentTag.getAddress().isTimeDeadbandEnabled()) {
       if (currentTag.getAddress().getTimeDeadband() > 0) {
-        log.debug("createSDTtimeDeadbandScheduler - creating time-deadband scheduler for tag " + currentTag.getId());
+        if (log.isDebugEnabled()) {
+          log.debug("createSDTtimeDeadbandScheduler - creating time-deadband scheduler for tag " + currentTag.getId());
+        }
         this.sdtTimeDeadbandSchedulers.put(currentTag.getId(), new SDTTimeDeadbandScheduler(currentTag, this.processMessageSender,
                 this.equipmentSenderFilterModule, timeDeadbandTimer, this.dataTagValueFilter, this.dynamicTimeDeadbandFilterer));
       }
@@ -153,7 +155,9 @@ class EquipmentTimeDeadband {
       // then we need to send it
       // to the statistics module before updating the tag:
       if (tagScheduler.isScheduledForSending()) {
-        log.debug("addToTimeDeadband - Sending time deadband filtered value to statistics module " + tagID);
+        if (log.isDebugEnabled()) {
+          log.debug("addToTimeDeadband - Sending time deadband filtered value to statistics module " + tagID);
+        }
 
         ValueUpdate currentValue = new ValueUpdate(
             currentTag.getCurrentValue().getValue(),
@@ -161,13 +165,17 @@ class EquipmentTimeDeadband {
             currentTag.getCurrentValue().getTimestamp().getTime());
 
         // Send to filter module (Dynamic or Static information added)
-        if(this.dynamicTimeDeadbandFilterer.isDynamicTimeDeadband(currentTag)) {
-          log.debug("Tag filtered through Dynamic time deadband filtering: '" + tagID + "'");
-
+        if (this.dynamicTimeDeadbandFilterer.isDynamicTimeDeadband(currentTag)) {
+          if (log.isDebugEnabled()) {
+            log.debug("Tag filtered through Dynamic time deadband filtering: '" + tagID + "'");
+          }
 
           this.equipmentSenderFilterModule.sendToFilterModuleByDynamicTimedeadbandFilterer(currentTag, currentValue, FilterType.TIME_DEADBAND.getNumber());
-        } else {
-          log.debug("Tag filtered through Static time deadband filtering: '" + tagID + "'");
+        }
+        else {
+          if (log.isDebugEnabled()) {
+            log.debug("Tag filtered through Static time deadband filtering: '" + tagID + "'");
+          }
 
           this.equipmentSenderFilterModule.sendToFilterModule(currentTag, currentValue, FilterType.TIME_DEADBAND.getNumber());
         }

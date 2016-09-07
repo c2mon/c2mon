@@ -383,7 +383,9 @@ public class DriverKernel implements ApplicationContextAware {
   private void validateDataTags(final EquipmentConfiguration conf, final EquipmentMessageSender equipmentMessageSender) {
     for (SourceDataTag sourceDataTag: conf.getDataTags().values()) {
       try {
-        log.debug("validateDataTags - validate DataTag " + sourceDataTag.getId());
+        if (log.isDebugEnabled()) {
+          log.debug("validateDataTags - validate DataTag " + sourceDataTag.getId());
+        }
         sourceDataTag.validate();
       }
       catch (ConfigurationException e) {
@@ -407,7 +409,9 @@ public class DriverKernel implements ApplicationContextAware {
     while (commandTagIterator.hasNext()) {
       SourceCommandTag sourceDataTag = commandTagIterator.next();
       try {
-        log.debug("validateCommandTags - validate DataTag " + sourceDataTag.getId());
+        if (log.isDebugEnabled()) {
+          log.debug("validateCommandTags - validate DataTag " + sourceDataTag.getId());
+        }
         sourceDataTag.validate();
       }
       catch (ConfigurationException e) {
@@ -483,67 +487,6 @@ public class DriverKernel implements ApplicationContextAware {
     return eqLookupTable;
   }
 
-  //  /**
-  //   * This method is responsible for changing the log4j's root log treshold
-  //   *
-  //   * @param level - the level to set
-  //   */
-  //  public void setRootlogLevel(final String level) {
-  //    log.info("setRootlogLevel - changing current process log's treshold to " + level);
-  //    Level newLevel = stringToLog4jLevel(level);
-  //    if (newLevel != null) {
-  //      log.getRootlog().setLevel(newLevel);
-  //    } else {
-  //      log.error("setRootlogLevel - could not change logging level to : " + level);
-  //    }
-  //  }
-  //
-  //  /**
-  //   * This method is responsible for changing the log4j's root log treshold
-  //   *
-  //   * @param eqID equipment unit unique identifier
-  //   * @param eqName equipment unit name
-  //   * @param level the level to set
-  //   */
-  //  public void setEqlogLevel(final Long eqID, final String eqName, final String level) {
-  //    log.info("changing eqUnit\'s [" + eqID + "," + eqName + "] log treshold to " + level);
-  //    Level newLevel = stringToLog4jLevel(level);
-  //    if (newLevel != null) {
-  //      // TODO not perfect will override all logs of this equipment
-  //      EquipmentlogFactory.setLevel(eqName, newLevel);
-  //    } else {
-  //      log.error("setEqlogLevel - could not change logging level of log [" + eqID + "," + eqName + "] to level : " + level);
-  //    }
-  //  }
-  //
-  //  /**
-  //   * This method converts string representation of the logging level to log4j's
-  //   * Level object
-  //   *
-  //   * @param level the string representation of the logging level
-  //   * @return The Level object or null if the String did not match a log4j level.
-  //   */
-  //  private Level stringToLog4jLevel(final String level) {
-  //    Level result = null;
-  //
-  //    if (level.equalsIgnoreCase("OFF"))
-  //      result = Level.OFF;
-  //    else if (level.equalsIgnoreCase("INFO"))
-  //      result = Level.INFO;
-  //    else if (level.equalsIgnoreCase("WARN"))
-  //      result = Level.WARN;
-  //    else if (level.equalsIgnoreCase("ERROR"))
-  //      result = Level.ERROR;
-  //    else if (level.equalsIgnoreCase("FATAL"))
-  //      result = Level.FATAL;
-  //    else if (level.equalsIgnoreCase("DEBUG"))
-  //      result = Level.DEBUG;
-  //    else if (level.equalsIgnoreCase("ALL"))
-  //      result = Level.ALL;
-  //
-  //    return result;
-  //  }
-
   /**
    * Implementation of a spring interface to get the application context.
    *
@@ -614,8 +557,7 @@ public class DriverKernel implements ApplicationContextAware {
     log.info("onEquipmentUnitAdd - Dynamic timedeadband enabled for equipment id: " + conf.getId() + " enabled: " + dynamicTimeDeadbandEnabled);
 
     EquipmentMessageSender equipmentMessageSender = (EquipmentMessageSender) applicationContext.getBean(EQUIPMENT_MESSAGE_SENDER);
-    // equipmentMessageSender.setEquipmentConfiguration(conf);
-    // equipmentMessageSender.setEquipmentlogFactory(equipmentlogFactory);
+
     equipmentMessageSender.init(conf);
 
     configurationController.addCoreDataTagChanger(conf.getId(), equipmentMessageSender);

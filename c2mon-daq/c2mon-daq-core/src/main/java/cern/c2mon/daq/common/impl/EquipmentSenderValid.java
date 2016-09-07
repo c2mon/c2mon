@@ -218,8 +218,9 @@ class EquipmentSenderValid {
     // is Candidate for filtering?
     FilterType filterType = this.dataTagValueFilter.isCandidateForFiltering(currentSourceDataTag, castedUpdate, newSDQuality);
 
-    log.debug("checkFiltering - tag #" + currentSourceDataTag.getId() + " with Filter Type " + filterType);
-
+    if(log.isDebugEnabled()) {
+      log.debug("checkFiltering - tag #" + currentSourceDataTag.getId() + " with Filter Type " + filterType);
+    }
     // Check filters on (OLD_UPDATE, VALUE_DEADBAND, REPEATED_VALUE or none)
     if (!isFilterOk(filterType, currentSourceDataTag.getId())) {
 
@@ -249,8 +250,9 @@ class EquipmentSenderValid {
   private boolean checkTimeDeadband(final SourceDataTag currentSourceDataTag, final ValueUpdate castedUpdate) {
 
     if (currentSourceDataTag.getAddress().isTimeDeadbandEnabled()) {
-
-      log.debug("checkTimeDeadband - passing update to time-deadband scheduler for tag " + currentSourceDataTag.getId());
+      if(log.isDebugEnabled()) {
+        log.debug("checkTimeDeadband - passing update to time-deadband scheduler for tag " + currentSourceDataTag.getId());
+      }
       this.equipmentTimeDeadband.addToTimeDeadband(currentSourceDataTag, castedUpdate);
 
       // Deadband detected --> DataValue is not okay, return false.
@@ -258,7 +260,9 @@ class EquipmentSenderValid {
 
     } else {
       if (this.equipmentTimeDeadband.getSdtTimeDeadbandSchedulers().containsKey(currentSourceDataTag.getId())) {
-        log.debug("checkTimeDeadband - remove time-deadband scheduler for tag " + currentSourceDataTag.getId());
+        if(log.isDebugEnabled()) {
+          log.debug("checkTimeDeadband - remove time-deadband scheduler for tag " + currentSourceDataTag.getId());
+        }
         this.equipmentTimeDeadband.removeFromTimeDeadband(currentSourceDataTag);
       }
 
@@ -277,47 +281,46 @@ class EquipmentSenderValid {
    * @return If the Filter is not ok the method returns false.
    */
   private boolean isFilterOk(final FilterType filterType, final Long tagId) {
-
     if (filterType != FilterType.NO_FILTERING) {
       // OLD_UPDATE filter on
       if ((filterType == FilterType.OLD_UPDATE)) {
-        log.debug(format(
-                "\told update filtering : [%d] update was filtered out because the new value timestamp is equal or older than the current value timestamp "
-                        + " and the current value has Good Quality or both new and current value has Bad Quality.",
-                tagId));
+        if(log.isDebugEnabled()) {
+          log.debug(format(
+                  "\told update filtering : [%d] update was filtered out because the new value timestamp is equal or older than the current value timestamp "
+                          + " and the current value has Good Quality or both new and current value has Bad Quality.",
+                  tagId));
 
-        log.debug("isFilterOk - sending value to statistics module: old update Filter");
-
+          log.debug("isFilterOk - sending value to statistics module: old update Filter");
+        }
         // VALUE_DEADBAND filter on
       }
       else if ((filterType == FilterType.VALUE_DEADBAND)) {
-        log.debug(format(
-                "\tvalue-deadband filtering : the value of tag [%d] was filtered out due to value-deadband filtering rules and will not be sent to the server",
-                tagId));
+        if(log.isDebugEnabled()) {
+          log.debug(format(
+                  "\tvalue-deadband filtering : the value of tag [%d] was filtered out due to value-deadband filtering rules and will not be sent to the server",
+                  tagId));
 
-        log.debug("isFilterOk - sending value to statistics module: Value Deadband Filter");
-
+          log.debug("isFilterOk - sending value to statistics module: Value Deadband Filter");
+        }
         // REPEATED_VALUE filter on
       }
       else if ((filterType == FilterType.REPEATED_VALUE)) {
-        log.debug(format(
-                "\ttrying to send twice the same tag [%d] update (with exactly the same value and value description).",
-                tagId));
+        if (log.isDebugEnabled()) {
+          log.debug(format(
+                  "\ttrying to send twice the same tag [%d] update (with exactly the same value and value description).",
+                  tagId));
 
-        log.debug("sendTagFiltered - sending value to statistics module: Same Value Filter");
-        log.debug("isFilterOk - sending value to statistics module: Same Value Filter");
+          log.debug("sendTagFiltered - sending value to statistics module: Same Value Filter");
+          log.debug("isFilterOk - sending value to statistics module: Same Value Filter");
+        }
       }
-
       // return false because the filter is not ok
       return false;
-
     }
     else {
-
       // return false because the filter is ok
       return true;
     }
-
   }
 
   /**
@@ -338,7 +341,9 @@ class EquipmentSenderValid {
           format("\tvalid timestamp : the timestamp of tag[%d] is out of range (in the future)",
               currentSourceDataTag.getId()));
 
-      log.debug(format("\tinvalidating tag [%d] with quality FUTURE_SOURCE_TIMESTAMP", currentSourceDataTag.getId()));
+      if (log.isDebugEnabled()) {
+        log.debug(format("\tinvalidating tag [%d] with quality FUTURE_SOURCE_TIMESTAMP", currentSourceDataTag.getId()));
+      }
 
       SourceDataTagQuality quality = new SourceDataTagQuality(SourceDataTagQualityCode.FUTURE_SOURCE_TIMESTAMP, "Value received with source timestamp in the future!");
       // Send Invalid Tag
@@ -376,7 +381,9 @@ class EquipmentSenderValid {
           update.getValue(), currentSourceDataTag.getId());
 
       log.warn(description);
-      log.debug(format("\tinvalidating tag[%d] with quality CONVERSION_ERROR", currentSourceDataTag.getId()));
+      if (log.isDebugEnabled()) {
+        log.debug(format("\tinvalidating tag[%d] with quality CONVERSION_ERROR", currentSourceDataTag.getId()));
+      }
 
       SourceDataTagQuality quality = new SourceDataTagQuality(SourceDataTagQualityCode.CONVERSION_ERROR, description);
       this.equipmentSender.update(currentSourceDataTag.getId(), quality, update.getSourceTimestamp());
@@ -401,8 +408,9 @@ class EquipmentSenderValid {
       log.warn(format(
           "\tin range : the value of tag[%d] was out of range and will only be propagated the first time to the server",
           currentSourceDataTag.getId()));
-      log.debug(format("\tinvalidating tag[%d] with quality OUT_OF_BOUNDS", currentSourceDataTag.getId()));
-
+      if(log.isDebugEnabled()) {
+        log.debug(format("\tinvalidating tag[%d] with quality OUT_OF_BOUNDS", currentSourceDataTag.getId()));
+      }
       StringBuffer qDesc = new StringBuffer("source value is out of bounds (");
       if (currentSourceDataTag.getMinValue() != null)
         qDesc.append("min: ").append(currentSourceDataTag.getMinValue()).append(" ");

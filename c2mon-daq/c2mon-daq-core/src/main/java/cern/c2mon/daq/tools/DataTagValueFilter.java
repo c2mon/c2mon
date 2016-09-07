@@ -42,7 +42,8 @@ public class DataTagValueFilter {
   /**
    * Creates a new Data Tag Value Filter
    */
-  public DataTagValueFilter() {}
+  public DataTagValueFilter() {
+  }
 
   /**
    * This method is responsible for checking if the new value of the particular
@@ -167,7 +168,9 @@ public class DataTagValueFilter {
    *         <code>FilterType.NO_FILTERING</code>
    */
   public FilterType isCandidateForFiltering(final SourceDataTag currentTag, final ValueUpdate castedUpdate, final SourceDataTagQuality newSDQuality) {
-    log.debug("isCandidateForFiltering - entering isCandidateForFiltering() for tag #" + currentTag.getId());
+    if(log.isDebugEnabled()) {
+      log.debug("isCandidateForFiltering - entering isCandidateForFiltering() for tag #" + currentTag.getId());
+    }
 
     SourceDataTagValue currentSDValue = currentTag.getCurrentValue();
 

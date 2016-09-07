@@ -137,7 +137,9 @@ class EquipmentAliveSender {
           "Alive tag for Equipment " + confName, ttl);
     }
 
-    log.debug("sendEquipmentAlive() - Sending equipment alive message with timestamp " + currentTimestamp);
+    if (log.isDebugEnabled()) {
+      log.debug("sendEquipmentAlive() - Sending equipment alive message with timestamp " + currentTimestamp);
+    }
     return sendEquipmentAliveFiltered(aliveTagValue, currentTimestamp);
   }
 
@@ -158,7 +160,9 @@ class EquipmentAliveSender {
       update.setValue(convertedTagValue);
 
       SourceDataTagValue aliveTagValue = aliveTag.update(update);
-      log.debug("sendEquipmentAlive() - Sending equipment alive message with source timestamp " + update.getSourceTimestamp());
+      if(log.isDebugEnabled()) {
+        log.debug("sendEquipmentAlive() - Sending equipment alive message with source timestamp " + update.getSourceTimestamp());
+      }
       return sendEquipmentAliveFiltered(aliveTagValue, update.getSourceTimestamp());
     }
     else {

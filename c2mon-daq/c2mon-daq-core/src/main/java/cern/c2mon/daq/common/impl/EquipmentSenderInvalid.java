@@ -111,7 +111,9 @@ class EquipmentSenderInvalid {
       // We check first is the new value has to be filtered out or not
       filterType = this.dataTagValueFilter.isCandidateForFiltering(sourceDataTag, update, newSDQuality);
 
-      log.debug("sendInvalidTag - Filter Type: " + filterType);
+      if (log.isDebugEnabled()) {
+        log.debug("sendInvalidTag - Filter Type: " + filterType);
+      }
 
       // The new value will not be filtered out
       if (filterType == FilterType.NO_FILTERING) {
@@ -138,7 +140,9 @@ class EquipmentSenderInvalid {
          */
         if (newValueCasted != null) {
           // send a corresponding INVALID tag to the statistics module
-          log.debug("sendInvalidTag - sending an invalid tag [" + sourceDataTag.getId() + "] to the statistics module");
+          if (log.isDebugEnabled()) {
+            log.debug("sendInvalidTag - sending an invalid tag [" + sourceDataTag.getId() + "] to the statistics module");
+          }
 
           // send filtered message to statistics module
           this.equipmentSenderFilterModule.sendToFilterModule(sourceDataTag, update, newSDQuality, filterType.getNumber());
@@ -167,17 +171,23 @@ class EquipmentSenderInvalid {
     // variable can be enabled at runtime when the Dynamic
     // filter gets enabled)
     if (sourceDataTag.getAddress().isTimeDeadbandEnabled()) {
-      log.debug("sendInvalidTag - passing update to time-deadband scheduler for tag " + sourceDataTag.getId());
+      if(log.isDebugEnabled()) {
+        log.debug("sendInvalidTag - passing update to time-deadband scheduler for tag " + sourceDataTag.getId());
+      }
       this.equipmentTimeDeadband.addToTimeDeadband(sourceDataTag, castedUpdate, newSDQuality);
     }
     else {
       if (this.equipmentTimeDeadband.getSdtTimeDeadbandSchedulers().containsKey(sourceDataTag.getId())) {
-        log.debug("sendInvalidTag - remove time-deadband scheduler for tag " + sourceDataTag.getId());
+        if (log.isDebugEnabled()) {
+          log.debug("sendInvalidTag - remove time-deadband scheduler for tag " + sourceDataTag.getId());
+        }
         this.equipmentTimeDeadband.removeFromTimeDeadband(sourceDataTag);
       }
 
       // All checks and filters are done
-      log.debug(format("sendInvalidTag - invalidating and sending invalid tag (%d) update to the server", sourceDataTag.getId()));
+      if (log.isDebugEnabled()) {
+        log.debug(format("sendInvalidTag - invalidating and sending invalid tag (%d) update to the server", sourceDataTag.getId()));
+      }
 
       SourceDataTagValue newSDValue = sourceDataTag.update(castedUpdate, newSDQuality);
       // Special case Quality OK
