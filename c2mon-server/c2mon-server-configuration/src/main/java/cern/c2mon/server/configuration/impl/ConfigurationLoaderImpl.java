@@ -66,10 +66,6 @@ import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 
-import static cern.c2mon.shared.client.configuration.ConfigConstants.Entity.EQUIPMENT;
-import static cern.c2mon.shared.client.configuration.ConfigConstants.Entity.PROCESS;
-import static cern.c2mon.shared.client.configuration.ConfigConstants.Entity.SUBEQUIPMENT;
-
 /**
  * Implementation of the server ConfigurationLoader bean.
  *
@@ -417,9 +413,9 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    */
   private boolean runInParallel(List<ConfigurationElement> elements) {
     return !elements.stream().anyMatch(element ->
-        element.getEntity().equals(SUBEQUIPMENT) ||
-            element.getEntity().equals(EQUIPMENT) ||
-            element.getEntity().equals(PROCESS));
+        element.getEntity().equals(ConfigConstants.Entity.SUBEQUIPMENT) ||
+            element.getEntity().equals(ConfigConstants.Entity.EQUIPMENT) ||
+            element.getEntity().equals(ConfigConstants.Entity.PROCESS));
   }
 
   /**
