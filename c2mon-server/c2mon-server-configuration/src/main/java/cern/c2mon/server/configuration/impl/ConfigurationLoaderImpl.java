@@ -22,17 +22,10 @@ import java.io.FileWriter;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import cern.c2mon.server.cache.loading.SequenceDAO;
-import cern.c2mon.shared.client.configuration.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
@@ -43,22 +36,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.ProcessFacade;
+import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.server.configuration.ConfigProgressMonitor;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.dao.ConfigurationDAO;
-import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
-import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
-import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
-import cern.c2mon.server.configuration.handler.DeviceClassConfigHandler;
-import cern.c2mon.server.configuration.handler.DeviceConfigHandler;
-import cern.c2mon.server.configuration.handler.EquipmentConfigHandler;
-import cern.c2mon.server.configuration.handler.ProcessConfigHandler;
-import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
-import cern.c2mon.server.configuration.handler.SubEquipmentConfigHandler;
+import cern.c2mon.server.configuration.handler.*;
 import cern.c2mon.server.configuration.handler.impl.CommandTagConfigHandler;
 import cern.c2mon.server.configuration.parser.ConfigurationParser;
 import cern.c2mon.server.daqcommunication.in.JmsContainerManager;
 import cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager;
+import cern.c2mon.shared.client.configuration.*;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.converter.DateFormatConverter;
@@ -82,14 +69,10 @@ import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   //TODO element & element report status always both need updating - redesign this part
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationLoaderImpl.class);
 
   /**
    * Avoids interfering with running cache persistence jobs.
@@ -102,35 +85,35 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   int changeId = 0; //unique id for all generated changes (including those recursive ones during removal)
 
-  private ProcessCommunicationManager processCommunicationManager;
+  private final ProcessCommunicationManager processCommunicationManager;
 
-  private ConfigurationDAO configurationDAO;
+  private final ConfigurationDAO configurationDAO;
 
-  private SequenceDAO sequenceDAO;
+  private final SequenceDAO sequenceDAO;
 
-  private DataTagConfigHandler dataTagConfigHandler;
+  private final DataTagConfigHandler dataTagConfigHandler;
 
-  private ControlTagConfigHandler controlTagConfigHandler;
+  private final ControlTagConfigHandler controlTagConfigHandler;
 
-  private CommandTagConfigHandler commandTagConfigHandler;
+  private final CommandTagConfigHandler commandTagConfigHandler;
 
-  private AlarmConfigHandler alarmConfigHandler;
+  private final AlarmConfigHandler alarmConfigHandler;
 
-  private RuleTagConfigHandler ruleTagConfigHandler;
+  private final RuleTagConfigHandler ruleTagConfigHandler;
 
-  private EquipmentConfigHandler equipmentConfigHandler;
+  private final EquipmentConfigHandler equipmentConfigHandler;
 
-  private SubEquipmentConfigHandler subEquipmentConfigHandler;
+  private final SubEquipmentConfigHandler subEquipmentConfigHandler;
 
-  private ProcessConfigHandler processConfigHandler;
+  private final ProcessConfigHandler processConfigHandler;
 
-  private ProcessFacade processFacade;
+  private final ProcessFacade processFacade;
 
-  private ProcessCache processCache;
+  private final ProcessCache processCache;
 
-  private DeviceClassConfigHandler deviceClassConfigHandler;
+  private final DeviceClassConfigHandler deviceClassConfigHandler;
 
-  private DeviceConfigHandler deviceConfigHandler;
+  private final DeviceConfigHandler deviceConfigHandler;
 
   /**
    * Flag recording if configuration events should be sent to the DAQ layer (set in XML).
@@ -158,7 +141,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   public ConfigurationLoaderImpl(ProcessCommunicationManager processCommunicationManager,
       ConfigurationDAO configurationDAO, DataTagConfigHandler dataTagConfigHandler,
       ControlTagConfigHandler controlTagConfigHandler, CommandTagConfigHandler commandTagConfigHandler,
-      final AlarmConfigHandler alarmConfigHandler, RuleTagConfigHandler ruleTagConfigHandler,
+      AlarmConfigHandler alarmConfigHandler, RuleTagConfigHandler ruleTagConfigHandler,
       EquipmentConfigHandler equipmentConfigHandler, SubEquipmentConfigHandler subEquipmentConfigHandler,
       ProcessConfigHandler processConfigHandler, ProcessFacade processFacade, ClusterCache clusterCache,
       ProcessCache processCache, DeviceClassConfigHandler deviceClassConfigHandler,
@@ -185,7 +168,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   @Override
   public ConfigurationReport applyConfiguration(Configuration configuration) {
-    LOGGER.info(String.format("Applying configuration with %d item(s)", configuration.getEntities().size()));
+    log.info("Applying configuration with {} item(s)", configuration.getEntities().size());
     Long configId = sequenceDAO.getNextConfigId();
     ConfigurationReport report = null;
 
@@ -197,7 +180,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         report = applyConfiguration(configId.intValue(), configuration.getName(), configurationElements, null);
 
       } catch (Exception ex) {
-        LOGGER.error("Exception caught while applying configuration", ex);
+        log.error("Exception caught while applying configuration", ex);
         report = new ConfigurationReport(configId, configuration.getName(), "", Status.FAILURE, "Exception caught when applying configuration");
         report.setExceptionTrace(ex);
         throw new ConfigurationException(report, ex);
@@ -211,7 +194,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
     else {
       // If we couldn't acquire the configuration lock, reject the request.
-      LOGGER.warn("Unable to apply configuration - another configuration is already running.");
+      log.warn("Unable to apply configuration - another configuration is already running.");
       return new ConfigurationReport(configId, configuration.getName(), configuration.getUser(), Status.FAILURE,
           "Your configuration request has been rejected since another configuration is still running. Please try again later.");
     }
@@ -221,7 +204,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   @Override
   public ConfigurationReport applyConfiguration(final int configId, final ConfigProgressMonitor configProgressMonitor) {
-    LOGGER.info(configId + " Applying configuration ");
+    log.info(configId + " Applying configuration");
     ConfigurationReport report = null;
 
     // Try to acquire the configuration lock.
@@ -230,7 +213,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
         String configName = configurationDAO.getConfigName(configId);
         if (configName == null) {
-          LOGGER.warn(configId + " Unable to locate configuration - cannot be applied.");
+          log.warn(configId + " Unable to locate configuration - cannot be applied.");
           return new ConfigurationReport(
               configId,
               "UNKNOWN",
@@ -242,19 +225,19 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
         List<ConfigurationElement> configElements;
         try {
-          LOGGER.debug(configId + " Fetching configuration items from DB...");
+          log.debug(configId + " Fetching configuration items from DB...");
           configElements = configurationDAO.getConfigElements(configId);
-          LOGGER.debug(configId + " Got " + configElements.size() + " elements from DB");
+          log.debug(configId + " Got " + configElements.size() + " elements from DB");
         } catch (Exception e) {
           String message = "Exception caught while loading the configuration for " + configId + " from the DB: " + e.getMessage();
-          LOGGER.error(message, e);
+          log.error(message, e);
           throw new RuntimeException(message, e);
         }
 
         report = applyConfiguration(configId, configName, configElements, configProgressMonitor);
 
       } catch (Exception ex) {
-        LOGGER.error("Exception caught while applying configuration " + configId, ex);
+        log.error("Exception caught while applying configuration " + configId, ex);
           report = new ConfigurationReport(configId, "UNKNOWN", "", Status.FAILURE,
               "Exception caught when applying configuration with id <" + configId + ">.");
           report.setExceptionTrace(ex);
@@ -269,7 +252,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
     // If we couldn't acquire the configuration lock, reject the request.
     else {
-      LOGGER.warn(configId + " Unable to apply configuration - another configuration is already running.");
+      log.warn(configId + " Unable to apply configuration - another configuration is already running.");
       return new ConfigurationReport(configId, null, null, Status.FAILURE,
           "Your configuration request has been rejected since another configuration is still running. Please try again later.");
     }
@@ -305,12 +288,12 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     try {
       clusterCache.acquireWriteLockOnKey(this.cachePersistenceLock);
       if (runInParallel(configElements)) {
-        LOGGER.info("Enter parallel configuration");
+        log.info("Enter parallel configuration");
         configElements.parallelStream().forEach(element ->
             applyConfigurationElement(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, configProgressMonitor));
 
       } else {
-        LOGGER.info("Enter serialized configuration");
+        log.info("Enter serialized configuration");
         configElements.stream().forEach(element ->
             applyConfigurationElement(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, configProgressMonitor));
       }
@@ -324,7 +307,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         configProgressMonitor.daqTotalParts(processLists.size());
       }
 
-      LOGGER.info(configId + " Reconfiguring " + processLists.keySet().size()+ " processes ...");
+      log.info(configId + " Reconfiguring " + processLists.keySet().size()+ " processes ...");
 
       AtomicInteger daqProgressCounter = new AtomicInteger(1);
       for (Long processId : processLists.keySet()) {
@@ -332,13 +315,13 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
           List<Change> processChangeEvents = processLists.get(processId);
           if (processFacade.isRunning(processId) && !processFacade.isRebootRequired(processId)) {
             try {
-              LOGGER.trace(configId + " Sending " + processChangeEvents.size() + " change events to process " + processId + "...");
+              log.trace(configId + " Sending " + processChangeEvents.size() + " change events to process " + processId + "...");
               ConfigurationChangeEventReport processReport = processCommunicationManager.sendConfiguration(processId, processChangeEvents);
               if (!processReport.getChangeReports().isEmpty()) {
 
-                LOGGER.trace(configId + " Received " + processReport.getChangeReports().size() + " back from process.");
+                log.trace(configId + " Received " + processReport.getChangeReports().size() + " back from process.");
               } else {
-                LOGGER.trace(configId + " Received 0 reports back from process");
+                log.trace(configId + " Received 0 reports back from process");
               }
               for (ChangeReport changeReport : processReport.getChangeReports()) {
                 ConfigurationElementReport convertedReport =
@@ -350,7 +333,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                   elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.RESTART);
                   //TODO set flag & tag to indicate that process restart is needed
                 } else if (changeReport.isFail()) {
-                  LOGGER.debug(configId + " changeRequest failed at process " + processCache.get(processId).getName());
+                  log.debug(configId + " changeRequest failed at process " + processCache.get(processId).getName());
                   report.addStatus(Status.FAILURE);
                   report.setStatusDescription("Failed to apply the configuration successfully. See details in the report below.");
                   elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.FAILURE);
@@ -362,7 +345,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
               }
             } catch (Exception e) {
               String errorMessage = "Error during DAQ reconfiguration: unsuccessful application of configuration (possible timeout) to Process " + processCache.get(processId).getName();
-              LOGGER.error(errorMessage, e);
+              log.error(errorMessage, e);
               processFacade.requiresReboot(processId, true);
               report.addProcessToReboot(processCache.get(processId).getName());
               report.addStatus(Status.FAILURE);
@@ -377,11 +360,11 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
             configProgressMonitor.onDaqProgress(daqProgressCounter.getAndIncrement());
           }
         } else {
-          LOGGER.info("Interrupting configuration " + configId + " due to cancel request.");
+          log.info("Interrupting configuration " + configId + " due to cancel request.");
         }
       }
     } else {
-      LOGGER.debug("DAQ runtime reconfiguration not enabled - setting required restart flags");
+      log.debug("DAQ runtime reconfiguration not enabled - setting required restart flags");
       if (!processLists.isEmpty()){
         report.addStatus(Status.RESTART);
         for (Long processId : processLists.keySet()) {
@@ -398,7 +381,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     }
     //mark the Configuration as applied in the DB table, with timestamp set
     configurationDAO.markAsApplied(configId);
-    LOGGER.info("Finished applying configuraton " + configId);
+    log.info("Finished applying configuraton " + configId);
 
     report.normalize();
 
@@ -472,8 +455,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
               elementPlaceholder.put(processChange.getChangeEvent().getChangeId(), element);
               element.setDaqStatus(Status.RESTART); //default to restart; if successful on DAQ layer switch to OK
             } else if (processChange.requiresReboot()) {
-              if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(configId + " RESTART for " + processChange.getProcessId() + " required");
+              if (log.isDebugEnabled()) {
+                log.debug(configId + " RESTART for " + processChange.getProcessId() + " required");
               }
               element.setDaqStatus(Status.RESTART);
               report.addStatus(Status.RESTART);
@@ -486,7 +469,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       } catch (Exception ex) {
         String errMessage = configId + " Exception caught while applying the configuration change (Action, Entity, " +
             "Entity id) = (" + element.getAction() + "; " + element.getEntity() + "; " + element.getEntityId() + ")";
-        LOGGER.error(errMessage, ex.getMessage());
+        log.error(errMessage, ex.getMessage());
         elementReport.setFailure("Exception caught while applying the configuration change.", ex);
         element.setStatus(Status.FAILURE);
         report.addStatus(Status.FAILURE);
@@ -496,7 +479,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         configProgressMonitor.onServerProgress(progressCounter.getAndIncrement());
       }
     } else {
-      LOGGER.info(configId + " Interrupting configuration due to cancel request.");
+      log.info(configId + " Interrupting configuration due to cancel request.");
     }
   }
 
@@ -517,8 +500,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                                                  final ConfigurationElementReport elementReport) throws IllegalAccessException {
     //initialize the DAQ config event
     List<ProcessChange> daqConfigEvents = new ArrayList<ProcessChange>();
-      if (LOGGER.isTraceEnabled()){
-        LOGGER.trace(element.getConfigId() + " Applying configuration element with sequence id " + element.getSequenceId());
+      if (log.isTraceEnabled()) {
+        log.trace(element.getConfigId() + " Applying configuration element with sequence id " + element.getSequenceId());
       }
 
       if (element.getAction() == null || element.getEntity() == null || element.getEntityId() == null) {
@@ -545,8 +528,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         case DEVICECLASS : daqConfigEvents.add(deviceClassConfigHandler.createDeviceClass(element)); break;
         case DEVICE : daqConfigEvents.add(deviceConfigHandler.createDevice(element)); break;
         default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
-          LOGGER.warn("Unrecognized reconfiguration entity: " + element.getEntity()
-              + " - see reconfiguration report for details.");
+          log.warn("Unrecognized reconfiguration entity: {} - see reconfiguration report for details.", element.getEntity());
         }
         break;
       case UPDATE :
@@ -572,8 +554,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         case DEVICE :
           daqConfigEvents.add(deviceConfigHandler.updateDevice(element.getEntityId(), element.getElementProperties())); break;
         default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
-          LOGGER.warn("Unrecognized reconfiguration entity: " + element.getEntity()
-              + " - see reconfiguration report for details.");
+          log.warn("Unrecognized reconfiguration entity: {}  - see reconfiguration report for details.",  element.getEntity());
         }
         break;
       case REMOVE :
@@ -589,13 +570,11 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         case DEVICECLASS : deviceClassConfigHandler.removeDeviceClass(element.getEntityId(), elementReport); break;
         case DEVICE : deviceConfigHandler.removeDevice(element.getEntityId(), elementReport); break;
         default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
-        LOGGER.warn("Unrecognized reconfiguration entity: " + element.getEntity()
-            + " - see reconfiguration report for details.");
+        log.warn("Unrecognized reconfiguration entity: {} - see reconfiguration report for details.", element.getEntity());
         }
         break;
       default : elementReport.setFailure("Unrecognized reconfiguration action: " + element.getAction());
-      LOGGER.warn("Unrecognized reconfiguration action: " + element.getAction()
-          + " - see reconfiguration report for details.");
+      log.warn("Unrecognized reconfiguration action: {} - see reconfiguration report for details.", element.getAction());
       }
 
       //set *unique* change id (single element may trigger many changes e.g. rule removal)
@@ -628,8 +607,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       bufferedWriter.write(xmlReport);
       bufferedWriter.close();
     } catch (Exception e) {
-      LOGGER.error("Exception caught while writing configuration report to directory: "
-          + reportDirectory, e);
+      log.error("Exception caught while writing configuration report to directory: {}", reportDirectory, e);
     }
   }
 
@@ -669,12 +647,12 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
       for (File file : files) {
         ConfigurationReportHeader report = serializer.read(ConfigurationReportHeader.class, file);
-        LOGGER.debug("Deserialised configuration report " + report.getId());
+        log.debug("Deserialised configuration report {}", report.getId());
         reports.add(report);
       }
 
     } catch (Exception e) {
-      LOGGER.error("Error deserialising configuration report", e);
+      log.error("Error deserialising configuration report", e);
     }
 
     return reports;
@@ -690,12 +668,12 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
       for (File file : files) {
         ConfigurationReport report = serializer.read(ConfigurationReport.class, file);
-        LOGGER.debug("Deserialised configuration report " + report.getId());
+        log.debug("Deserialised configuration report {}", report.getId());
         reports.add(report);
       }
 
     } catch (Exception e) {
-      LOGGER.error("Error deserialising configuration report", e);
+      log.error("Error deserialising configuration report", e);
     }
 
     return reports;
