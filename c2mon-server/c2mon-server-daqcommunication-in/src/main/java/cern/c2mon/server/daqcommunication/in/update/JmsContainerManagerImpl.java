@@ -178,8 +178,11 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
 
   @PostConstruct
   public void init() {
-    threadPool = new ThreadPoolExecutor(nbExecutorThreads, nbExecutorThreads, 
-        THREAD_IDLE_LIMIT, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+    threadPool = new ThreadPoolExecutor(nbExecutorThreads, nbExecutorThreads,
+            THREAD_IDLE_LIMIT, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), r -> {
+      String threadName = "InitDaqUpdate";
+      return new Thread(r, threadName);
+    });
     for (Long id : processCache.getKeys()) {
       subscribe(processCache.get(id), consumersInitial);
     }    
@@ -351,7 +354,10 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
     try {      
       LOGGER.info("Stopping JMS update containers listening for tag updates from the DAQ layer.");
       subscriptionChecker.cancel();
-      ThreadPoolExecutor shutdownExecutor = new ThreadPoolExecutor(10, 10, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+      ThreadPoolExecutor shutdownExecutor = new ThreadPoolExecutor(10, 10, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), r -> {
+        String threadName = "StopDaqUpdate";
+        return new Thread(r, threadName);
+      });
       Collection<ContainerShutdownTask> containerTasks = new ArrayList<ContainerShutdownTask>();      
       for (Map.Entry<Long, DefaultMessageListenerContainer> entry : jmsContainers.entrySet()) {
         ContainerShutdownTask containerShutdownTask = new ContainerShutdownTask(entry.getValue());
