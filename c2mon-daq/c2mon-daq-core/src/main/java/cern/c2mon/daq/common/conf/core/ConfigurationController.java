@@ -59,8 +59,8 @@ import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
  * @author Andreas Lang
  * @author vilches (refactoring updates)
  */
-@Component
 @Slf4j
+@Component("configurationController")
 public class ConfigurationController {
 
   @Autowired

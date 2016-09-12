@@ -62,6 +62,7 @@ public class ProcessMessageSenderConfig {
   private EnvironmentConfig config;
 
   @Autowired
+  @Qualifier("configurationController")
   private ConfigurationController configurationController;
 
   @Autowired
