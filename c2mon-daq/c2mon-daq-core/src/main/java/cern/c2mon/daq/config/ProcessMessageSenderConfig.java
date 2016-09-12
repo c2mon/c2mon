@@ -55,6 +55,7 @@ import cern.c2mon.daq.filter.impl.DummyFilterSender;
     "classpath:daq-activemq.xml",
     "classpath:daq-activemq-second.xml"
 })
+@ComponentScan("cern.c2mon.daq.common.conf.core")
 public class ProcessMessageSenderConfig {
 
   // Ensures that all configured properties are set before initialising the beans
