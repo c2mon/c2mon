@@ -26,6 +26,7 @@ import javax.jms.Message;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.annotation.Bean;
@@ -80,6 +81,8 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
   /**
    * Threads shared by all containers.
    */
+  @Autowired
+  @Qualifier("threadPoolTaskExecutor")
   private ThreadPoolTaskExecutor threadPoolTaskExecutor;
   
   /**
@@ -172,22 +175,10 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
 
   @PostConstruct
   public void init() {
-    threadPoolTaskExecutor = taskExecutor();
     threadPoolTaskExecutor.initialize();
     for (Long id : processCache.getKeys()) {
       subscribe(processCache.get(id), consumersInitial);
     }
-  }
-
-  public ThreadPoolTaskExecutor taskExecutor() {
-    ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
-    threadPoolTaskExecutor.setCorePoolSize(nbExecutorThreads);
-    threadPoolTaskExecutor.setMaxPoolSize(nbExecutorThreads);
-    threadPoolTaskExecutor.setKeepAliveSeconds((int)(THREAD_IDLE_LIMIT / 1000));
-    threadPoolTaskExecutor.setThreadNamePrefix("TagUpdate-");
-    threadPoolTaskExecutor.setAllowCoreThreadTimeOut(true);
-
-    return threadPoolTaskExecutor;
   }
   
   @Override
