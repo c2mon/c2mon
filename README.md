@@ -6,7 +6,7 @@ such as historical metric persistence and browsing, command execution and alerti
 of monitoring and control system.
 
 ## Documentation
-See the current [Javadoc][] and [reference docs][].
+See the current [reference docs][].
 
 ## Issue Tracking
 Please report issues on GitLab via the [issue tracker][].
@@ -36,7 +36,7 @@ extracted from the JDK download.
 C2MON is released under the [GPLv3 License][].
 
 [Javadoc]: https://c2mon.web.cern.ch/c2mon/javadoc/
-[reference docs]: https://c2mon.web.cern.ch/c2mon/docs/build/
+[reference docs]: http://c2mon.web.cern.ch/c2mon/docs/latest/
 [issue tracker]: https://gitlab.cern.ch/c2mon/c2mon/issues
 [Maven]: http://maven.apache.org
 [Git]: http://help.github.com/set-up-git-redirect
