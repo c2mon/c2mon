@@ -23,10 +23,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
+ * This class is responsible for configuring the Spring Context and beans used by DAQ Communication
+ * for daqcommunication-in module. It is automatically detected.
+ *
  * @author Szymon Halastra
  */
 @Configuration
@@ -42,6 +44,11 @@ public class DaqCommunicationInConfiguration {
   private static final int THREAD_IDLE_LIMIT = 60;
   private static final String THREAD_NAME_PREFIX = "TagUpdate-";
 
+  /**
+   * Bean responsible for creating custom ThreadPool with custom thread name prefix
+   *
+   * @return Spring ThreadPoolTaskExecutor with custom thread name prefix
+   */
   @Bean(name = "threadPoolTaskExecutor")
   public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
