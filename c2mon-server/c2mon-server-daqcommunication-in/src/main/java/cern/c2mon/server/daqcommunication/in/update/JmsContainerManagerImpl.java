@@ -16,16 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.daqcommunication.in.update;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 
 import javax.annotation.PostConstruct;
 import javax.jms.ConnectionFactory;
@@ -36,10 +28,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.context.annotation.Bean;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.ProcessCache;
@@ -86,7 +80,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
   /**
    * Threads shared by all containers.
    */
-  private ThreadPoolExecutor threadPool;
+  private ThreadPoolTaskExecutor threadPoolTaskExecutor;
   
   /**
    * The JMS connection factory used (instantiated in XML).
@@ -174,19 +168,26 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
     this.listener = listener;
     this.clusterCache = clusterCache;
   }
- 
+
 
   @PostConstruct
   public void init() {
-    threadPool = new ThreadPoolExecutor(nbExecutorThreads, nbExecutorThreads,
-            THREAD_IDLE_LIMIT, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), r -> {
-      String threadName = "InitDaqUpdate";
-      return new Thread(r, threadName);
-    });
+    threadPoolTaskExecutor = taskExecutor();
+    threadPoolTaskExecutor.initialize();
     for (Long id : processCache.getKeys()) {
       subscribe(processCache.get(id), consumersInitial);
-    }    
-    threadPool.allowCoreThreadTimeOut(true);
+    }
+  }
+
+  public ThreadPoolTaskExecutor taskExecutor() {
+    ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+    threadPoolTaskExecutor.setCorePoolSize(nbExecutorThreads);
+    threadPoolTaskExecutor.setMaxPoolSize(nbExecutorThreads);
+    threadPoolTaskExecutor.setKeepAliveSeconds((int)(THREAD_IDLE_LIMIT / 1000));
+    threadPoolTaskExecutor.setThreadNamePrefix("TagUpdate-");
+    threadPoolTaskExecutor.setAllowCoreThreadTimeOut(true);
+
+    return threadPoolTaskExecutor;
   }
   
   @Override
@@ -222,7 +223,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
     container.setReceiveTimeout(receiveTimeout);
     container.setIdleTaskExecutionLimit(idleTaskExecutionLimit);
     container.setBeanName(process.getName() + " update JMS container");
-    container.setTaskExecutor(threadPool); 
+    container.setTaskExecutor(threadPoolTaskExecutor);
     container.setAcceptMessagesWhileStopping(false);
     jmsContainers.put(process.getId(), container);
     container.initialize();
@@ -277,7 +278,8 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
    */
   @ManagedOperation(description="Get executor queue size.")
   public int getTaskQueueSize() {
-    return threadPool.getQueue().size();
+//    return threadPoolTaskExecutor.getQueue().size();
+    return threadPoolTaskExecutor.getThreadPoolExecutor().getQueue().size();
   }
   
   /**
@@ -287,7 +289,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
    */
   @ManagedOperation(description="Get the number of active threads listening for JMS updates.")
   public int getNumActiveThreads() {
-    return threadPool.getActiveCount();
+    return threadPoolTaskExecutor.getActiveCount();
   }
 
 
@@ -366,7 +368,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
       shutdownExecutor.invokeAll(containerTasks, 60, TimeUnit.SECONDS);
       shutdownExecutor.shutdown();
       jmsContainers.clear();
-      threadPool.shutdown();      
+      threadPoolTaskExecutor.shutdown();
 //      LOGGER.info("Stopping JMS connections to DAQs");
 //      updateConnectionFactory.stop(); //closes all JMS connections in the pool      
     } catch (Exception e) {
