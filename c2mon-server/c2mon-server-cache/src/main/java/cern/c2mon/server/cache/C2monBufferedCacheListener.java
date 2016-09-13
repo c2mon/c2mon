@@ -46,4 +46,9 @@ public interface C2monBufferedCacheListener<S> {
    * @param eventCollection keys of the cache objects
    */
   void confirmStatus(Collection<S> eventCollection);
+
+  /**
+   * Callback used for providing easy access to getting and setting thread name
+   */
+  String getThreadName();
 }

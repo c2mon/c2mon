@@ -18,6 +18,7 @@ package cern.c2mon.server.shorttermlog.listener;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
 
@@ -94,6 +95,12 @@ public class TagLogCacheListener implements C2monBufferedCacheListener<Tag>, Sma
   @Override
   public void confirmStatus(Collection<Tag> tagCollection) {
     //do not log confirm callbacks (STL data not essential)
+  }
+
+  @Override
+  public String getThreadName() {
+    AtomicInteger counter = new AtomicInteger();
+    return "TagCache-" + counter.incrementAndGet();
   }
 
   @Override

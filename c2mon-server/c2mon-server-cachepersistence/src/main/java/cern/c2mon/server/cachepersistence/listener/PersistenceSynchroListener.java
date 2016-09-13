@@ -17,6 +17,7 @@
 package cern.c2mon.server.cachepersistence.listener;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
 
@@ -101,6 +102,12 @@ public class PersistenceSynchroListener implements C2monBufferedCacheListener<Lo
   @Override
   public void confirmStatus(Collection<Long> keyCollection) {    
     notifyElementUpdated(keyCollection); //also persist cache status on confirmation
+  }
+
+  @Override
+  public String getThreadName() {
+    AtomicInteger counter = new AtomicInteger();
+    return "PersistenceCache-" + counter.incrementAndGet();
   }
 
   @Override

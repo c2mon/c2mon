@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -92,6 +93,12 @@ public class EsTagLogListener implements C2monBufferedCacheListener<Tag>, SmartL
   @Override
   public void confirmStatus(Collection<Tag> tagCollection) {
     //do not log confirm callbacks (STL data not essential)
+  }
+
+  @Override
+  public String getThreadName() {
+    AtomicInteger counter = new AtomicInteger();
+    return "ElasticSearch-" + counter.incrementAndGet();
   }
 
   /**

@@ -175,7 +175,7 @@ public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> impl
           
         }
         
-      }).start();
+      }, bufferedCacheListener.getThreadName()).start();
       enabled = true;      
     }        
   }
