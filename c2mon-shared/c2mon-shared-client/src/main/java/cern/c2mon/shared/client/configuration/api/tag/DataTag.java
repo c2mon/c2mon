@@ -31,7 +31,8 @@ import org.springframework.util.Assert;
  * related to a DataTag.
  * <p/>
  * For further information how to use instances of this for server configurations read <a
- * href="http://c2mon.web.cern.ch/c2mon/docs/#_offline_configuration_via_c2mon_database_test_purpose_only">this</a> documentation.
+ * href="http://c2mon.web.cern.ch/c2mon/docs/#_offline_configuration_via_c2mon_database_test_purpose_only">this</a>
+ * documentation.
  * <p/>
  *
  * @author Franz Ritter
@@ -182,7 +183,7 @@ public class DataTag extends Tag {
       return this;
     }
 
-    public DataTag.CreateBuilder expression(String expression){
+    public DataTag.CreateBuilder expression(String expression) {
       Assert.isTrue(expression.contains("$value"));
       this.tagToBuild.addExpression(new Expression(expression));
       return this;

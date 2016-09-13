@@ -20,7 +20,7 @@ public class Evaluator {
         Boolean newEvaluation = Interpreter.evaluateExpression(expression.getExpression(), updateTag.getValue());
         expression.setResult(newEvaluation);
       } else {
-        log.warn("Tried to evaluate a expression with a null value: Tag id:{}, Tag name:{}",
+        log.warn("Tried to evaluate a expression with a null value: tag id:{}, tag name:{}",
             updateTag.getId(), updateTag.getName());
       }
     }

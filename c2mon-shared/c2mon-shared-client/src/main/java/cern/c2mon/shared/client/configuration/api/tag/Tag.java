@@ -87,7 +87,7 @@ public abstract class Tag implements ConfigurationEntity {
   public Tag() {
   }
 
-  public void addExpression(Expression expression){
+  public void addExpression(Expression expression) {
     this.expressions = expressions == null ? new ArrayList<>() : this.expressions;
     this.expressions.add(expression);
   }
