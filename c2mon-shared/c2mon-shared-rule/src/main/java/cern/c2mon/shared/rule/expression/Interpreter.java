@@ -4,7 +4,7 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 
 /**
- * Provides the functionality to run a groovy script on runtime.
+ * Provides the functionality to run a groovy script at runtime.
  *
  * @author Franz Ritter
  */
