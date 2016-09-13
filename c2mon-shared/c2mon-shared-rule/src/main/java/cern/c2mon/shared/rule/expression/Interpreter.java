@@ -4,10 +4,11 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 
 /**
- * Parodies the functionality to run a groovy script dynamic in run time and return a result.
+ * Provides the functionality to run a groovy script dynamic in run time and return a result.
  *
  * @author Franz Ritter
  */
+// TODO use the 'Script' class to avoid repeated groovy compilation
 public class Interpreter {
 
   /**
@@ -18,12 +19,19 @@ public class Interpreter {
    * @param value The parameter which will be injected into the expression.
    * @return The result of the evaluated expression.
    */
-  public static Object evaluateExpression(String expression, Object value) {
+  public static Boolean evaluateExpression(String expression, Object value) {
 
-    Binding binding = new Binding();
-    binding.setVariable("$value", value);
+      Binding binding = new Binding();
+      binding.setVariable("$value", value);
 
-    GroovyShell shell = new GroovyShell(binding);
-    return shell.evaluate(expression);
+      GroovyShell shell = new GroovyShell(binding);
+      Object result = shell.evaluate(expression);
+      if(result instanceof Boolean){
+        return (Boolean) result;
+      } else {
+        Object type = result != null ? result.getClass(): null;
+        throw new IllegalArgumentException("Expression does not evaluate to a boolean. The result is "+ type);
+      }
+
   }
 }
