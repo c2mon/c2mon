@@ -118,20 +118,20 @@ Example:
 
 ```java
 return new MyClass() {
-	@Override
-	public void method() {
-		if (condition()) {
-			something();
-		}
-		else {
-			try {
-				alternative();
-			}
-			catch (ProblemException ex) {
-				recover();
-			}
-		}
-	}
+  @Override
+  public void method() {
+    if (condition()) {
+      something();
+    }
+    else {
+      try {
+        alternative();
+      }
+      catch (ProblemException ex) {
+        recover();
+      }
+    }
+  }
 };
 ```
 
@@ -158,7 +158,7 @@ line rather on the next line (comma separated arguments, etc). For instance:
 if (thisLengthyMethodCall(param1, param2) && anotherCheck() &&
         yetAnotherCheck()) {
 
-    // ....
+  // ....
 }
 ```
 
@@ -178,7 +178,7 @@ Add one blank line after a method signature that is multiline, i.e.
 protected Object invoke(FooBarOperationContext context,
         AnotherSuperLongName name) {
 
-    // code here
+  // code here
 }
 ```
 
@@ -241,8 +241,8 @@ Format the exception message so that the name of the parameter comes first with 
 
 ```java
 public void handle(Event event) {
-    Assert.notNull(event, "Event must not be null");
-    //...
+  Assert.notNull(event, "Event must not be null");
+  //...
 }
 ```
 
@@ -260,14 +260,14 @@ Always add `@Override` on methods overriding or implementing a method declared i
 A class that is only a collection of static utility methods must be named with a `Utils` suffix, must have a private default constructor,
 and must be abstract. Making the class abstract and providing a `private` _default_ constructor prevent anyone from instantiating it. For example:
 
-```
+```java
 public abstract MyUtils {
 
-    private MyUtils() {
-        /* prevent instantiation */
-    }
+  private MyUtils() {
+    /* prevent instantiation */
+  }
 
-    // static utility methods
+  // static utility methods
 }
 ```
 
@@ -281,7 +281,7 @@ A field of a class should *always* be referenced using `this`. A method of class
 
 The following template summarizes a typical use for the Javadoc of a method.
 
-```
+```java
 /**
  * Parse the specified {@link Element} and register the resulting
  * {@link BeanDefinition BeanDefinition(s)}.
@@ -308,7 +308,7 @@ In particular, please note:
 
 The Javadoc of a class has some extra rules that are illustrated by the sample below:
 
-```
+```java
 /*
  * Interface used by the {@link DefaultBeanDefinitionDocumentReader} to handle custom,
  * top-level (directly under {@code <beans/>}) tags.
