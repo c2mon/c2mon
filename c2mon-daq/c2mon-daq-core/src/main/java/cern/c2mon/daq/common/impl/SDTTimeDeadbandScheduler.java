@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -25,10 +25,10 @@ import org.slf4j.LoggerFactory;
 import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.tools.DataTagValueFilter;
-import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
-import cern.c2mon.shared.common.filter.FilteredDataTagValue;
+import cern.c2mon.shared.common.datatag.ValueUpdate;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue.FilterType;
 import cern.c2mon.shared.common.type.TypeConverter;
 
@@ -56,7 +56,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
    * True if the current value should be send in the next run cycle.
    */
   private volatile boolean sendValue = false;
-  
+
   /**
    * Last source Data Tag Value sent to the server
    */
@@ -76,7 +76,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
    * The timer to schedule this task on
    */
   private Timer timeDeadbandTimer;
-  
+
   /**
    * The dynamic time dead band filterer for recording the current source data tag
    */
@@ -84,7 +84,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
 
   /**
    * Indicates if there is a new value to send to the server.
-   * 
+   *
    * @return True if in the next cycle a value should be send to the server else
    *         false.
    */
@@ -94,7 +94,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
 
   /**
    * Creates a new SDTTimeDeadbandscheduler
-   * 
+   *
    * @param sourceDataTag
    *          The source data tag controlled by this object.
    * @param processMessageSender
@@ -105,14 +105,14 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
    *          The timer to schedule this task on.
    * @param valueChecker
    *          Value checker object to avoid repeated values.
-   * @param dynamicTimeDeadbandFilterer 
+   * @param dynamicTimeDeadbandFilterer
    *          The dynamic time dead band filterer for recording the current source data tag
    */
-  public SDTTimeDeadbandScheduler(final SourceDataTag sourceDataTag, 
+  public SDTTimeDeadbandScheduler(final SourceDataTag sourceDataTag,
                                   final IProcessMessageSender processMessageSender,
-                                  final EquipmentSenderFilterModule equipmentSenderFilterModule, 
-                                  final Timer timeDeadbandTimer, 
-                                  final DataTagValueFilter dataTagValueFilter, 
+                                  final EquipmentSenderFilterModule equipmentSenderFilterModule,
+                                  final Timer timeDeadbandTimer,
+                                  final DataTagValueFilter dataTagValueFilter,
                                   final IDynamicTimeDeadbandFilterer dynamicTimeDeadbandFilterer) {
     this.dataTagValueFilter = dataTagValueFilter;
     this.processMessageSender = processMessageSender;
@@ -127,7 +127,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
 
     this.sourceDataTag = sourceDataTag;
   }
-  
+
   /**
    * Starts the timer task with the scheduled fixed rate defined for the given {@link SourceDataTag}
    */
@@ -140,15 +140,15 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
               + this.sourceDataTag.getAddress().getTimeDeadband() + " miliseconds");
         }
       }
-      
+
       this.timeDeadbandTimer.scheduleAtFixedRate(this, 0, this.sourceDataTag.getAddress().getTimeDeadband());
-      
+
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : setting scheduled");
       }
     }
   }
-  
+
   /**
    * flushes and resets the scheduler
    */
@@ -157,7 +157,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : flush and reset");
       }
-      
+
       // Execute the run method to empty the scheduler
       this.cancel();
       this.run();
@@ -181,13 +181,13 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("scheduler[" + this.sourceDataTag.getId() + "] : entering run()..");
     }
-    
+
     try {
       synchronized (this.sourceDataTag) {
         if (isScheduledForSending()) {
-          
+
           SourceDataTagValue currentSDValue = this.sourceDataTag.getCurrentValue();
-          
+
           FilterType filterType;
           // The first time the lastSentSDTagValue is empty
           if (this.lastSourceDataTag == null) {
@@ -198,21 +198,14 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
           }
           else {
             // Check the current Source Data tag against the last one sent since
-            // they have never been compared 
+            // they have never been compared
 
-            // Cast the value to the proper type before sending it 
-            if(currentSDValue.getValue() != null) {
-              Object newValueCasted = TypeConverter.cast(currentSDValue.getValue(), this.lastSourceDataTag.getDataType());
+            // Cast the value to the proper type before sending it
+            Object newValueCasted = TypeConverter.cast(currentSDValue.getValue(), this.lastSourceDataTag.getDataType());
 
-              filterType = this.dataTagValueFilter.isCandidateForFiltering(this.lastSourceDataTag, newValueCasted,
-                  currentSDValue.getValueDescription(), currentSDValue.getQuality(), 
-                  currentSDValue.getTimestamp().getTime());
-            } else {
-              filterType = this.dataTagValueFilter.isCandidateForFiltering(this.lastSourceDataTag, currentSDValue.getValue(),
-                  currentSDValue.getValueDescription(), currentSDValue.getQuality(), 
-                  currentSDValue.getTimestamp().getTime());
-            }
-            
+            ValueUpdate update = new ValueUpdate(newValueCasted, currentSDValue.getValueDescription(), currentSDValue.getTimestamp().getTime());
+            filterType = this.dataTagValueFilter.isCandidateForFiltering(this.lastSourceDataTag, update, currentSDValue.getQuality());
+
             if (LOGGER.isDebugEnabled()) {
               LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : Filter type: " + filterType);
             }
@@ -222,34 +215,34 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
           if (filterType == FilterType.NO_FILTERING) {
             // Clone the last value sent to the server
             this.lastSourceDataTag = this.sourceDataTag.clone();
-            
+
             currentSDValue.setValueDescription("Time-deadband filtering enabled. " + currentSDValue.getValueDescription());
             // Add the value sent
             this.processMessageSender.addValue(currentSDValue);
-            
+
             if (LOGGER.isDebugEnabled()) {
               LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : sending value: " + currentSDValue.getValue());
             }
           }
           // The new value is filtered out
           else {
+            ValueUpdate update = new ValueUpdate(currentSDValue.getValue(), currentSDValue.getValueDescription(), currentSDValue.getTimestamp().getTime());
+
             // Send to filter module (Dynamic or Static information added)
             if(this.dynamicTimeDeadbandFilterer.isDynamicTimeDeadband(this.sourceDataTag)) {
               if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : value filtered with Dynamic TimeDeadband : " 
+                LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : value filtered with Dynamic TimeDeadband : "
                     + currentSDValue.getValue());
               }
-              
-              this.equipmentSenderFilterModule.sendToFilterModuleByDynamicTimedeadbandFilterer(this.sourceDataTag, currentSDValue.getValue(), 
-                  currentSDValue.getTimestamp().getTime(), currentSDValue.getValueDescription(), filterType.getNumber());
+
+              this.equipmentSenderFilterModule.sendToFilterModuleByDynamicTimedeadbandFilterer(this.sourceDataTag, update, filterType.getNumber());
             } else {
               if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : value filtered with Static TimeDeadband: " 
+                LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : value filtered with Static TimeDeadband: "
                     + currentSDValue.getValue());
               }
-              
-              this.equipmentSenderFilterModule.sendToFilterModule(this.sourceDataTag, currentSDValue.getValue(), 
-                  currentSDValue.getTimestamp().getTime(), currentSDValue.getValueDescription(), filterType.getNumber());
+
+              this.equipmentSenderFilterModule.sendToFilterModule(this.sourceDataTag, update, filterType.getNumber());
             }
           }
 
@@ -274,38 +267,38 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
   /**
    * If the quality has changed it means the data tag is swapping from valid to
    * invalid or the other way round
-   * 
+   *
    * @param newSDQuality
    *          The new tag quality
    * @return <code>true</code> if the quality of the last sent Data Tag Value is
    *         not the same as the new one and <code>false</code> in any other
    *         case
    */
-  public boolean isNewQualityStatus(final SourceDataQuality newSDQuality) {    
+  public boolean isNewQualityStatus(final SourceDataTagQuality newSDQuality) {
     // if the scheduler has sent a value before we compare against it
     if (this.lastSourceDataTag != null) {
       SourceDataTagValue lastSentSDTagValue = this.lastSourceDataTag.getCurrentValue();
       if ((lastSentSDTagValue.getValue() != null)
           && (lastSentSDTagValue.getQuality().getQualityCode() != newSDQuality.getQualityCode())) {
         if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : New Quality status. Last Sent Quality [ " 
+          LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : New Quality status. Last Sent Quality [ "
               + lastSentSDTagValue.getQuality() + "] vs New Quality [" + newSDQuality + "]");
         }
-        
+
         return true;
       }
     }
     // If there is something scheduled for sending but was not sent yet we compare against the value scheduled
     else if (isScheduledForSending()) {
       SourceDataTagValue scheduledValue = sourceDataTag.getCurrentValue();
- 
-      if ((scheduledValue != null) 
+
+      if ((scheduledValue != null)
           && (scheduledValue.getQuality().getQualityCode() != newSDQuality.getQualityCode())) {
         if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : New Quality status. Scheduled Quality [" 
+          LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : New Quality status. Scheduled Quality ["
               + scheduledValue.getQuality() + "] vs New Quality [" + newSDQuality + "]");
         }
-        
+
         return true;
       }
     }
@@ -313,7 +306,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : No new Quality status " );
     }
-    
+
     return false;
   }
 

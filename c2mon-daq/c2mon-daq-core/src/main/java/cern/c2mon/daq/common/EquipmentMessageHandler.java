@@ -16,10 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.daq.common;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationHandler;
+import cern.c2mon.daq.common.impl.EquipmentMessageSender;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
@@ -36,19 +39,23 @@ public abstract class EquipmentMessageHandler {
 	 * The equipment-specific logger. It is created for each equipment message
 	 * handler instance.
 	 */
+  @Setter @Getter
 	private EquipmentLoggerFactory equipmentLoggerFactory;
 	/**
 	 * The equipment message sender to send and filter data tags which should be
 	 * send to the server.
 	 */
-	private IEquipmentMessageSender equipmentMessageSender;
+	@Setter
+	private EquipmentMessageSender equipmentMessageSender;
 	/**
 	 * The Equipment configuration object.
 	 */
+	@Getter
 	private IEquipmentConfigurationHandler equipmentConfigurationHandler;
 	/**
 	 * The command handler to register the command runner.
 	 */
+	@Setter @Getter
 	private IEquipmentCommandHandler equipmentCommandHandler;
 	
 	/**
@@ -75,7 +82,7 @@ public abstract class EquipmentMessageHandler {
 			final String handlerClassName,
 			final IEquipmentCommandHandler equipmentCommandHandler,
 			final IEquipmentConfigurationHandler equipmentConfigurationHandler,
-			final IEquipmentMessageSender equipmentMessageSender)
+			final EquipmentMessageSender equipmentMessageSender)
 					throws InstantiationException, IllegalAccessException,
 					ClassNotFoundException {
 		COMMON_LOGGER.debug("entering createFromConfiguration()..");
@@ -141,25 +148,6 @@ public abstract class EquipmentMessageHandler {
 	}
 
 	/**
-	 * Sets the equipment logger factory.
-	 *
-	 * @return  The equipment logger factory.
-	 */
-	public EquipmentLoggerFactory getEquipmentLoggerFactory() {
-		return equipmentLoggerFactory;
-	}
-
-	/**
-	 * Sets the equipment logger factory.
-	 *
-	 * @param equipmentLoggerFactory
-	 *            The new equipment logger factory.
-	 */
-	public void setEquipmentLoggerFactory(final EquipmentLoggerFactory equipmentLoggerFactory) {
-		this.equipmentLoggerFactory = equipmentLoggerFactory;
-	}
-
-	/**
 	 * This abstract method needs to be implemented by the specialized
 	 * EquipmentMessageHandler class. When this method is called, the
 	 * EquipmentMessageHandler is expected to connect to its data source. If the
@@ -197,51 +185,12 @@ public abstract class EquipmentMessageHandler {
 	public abstract void refreshDataTag(final long dataTagId);
 
 	/**
-	 * Sets the current equipment message sender.
-	 *
-	 * @param equipmentMessageSender
-	 *            The equipment message sender to set.
-	 */
-	public void setEquipmentMessageSender(final IEquipmentMessageSender equipmentMessageSender) {
-		this.equipmentMessageSender = equipmentMessageSender;
-	}
-
-	/**
 	 * Returns the equipment message sender.
 	 *
 	 * @return The current equipment message sender.
 	 */
 	public IEquipmentMessageSender getEquipmentMessageSender() {
 		return equipmentMessageSender;
-	}
-
-	/**
-	 * Returns the equipment configuration handler which has all necessary
-	 * configuration for the equipment as well as ways to listen to configuration
-	 * changes.
-	 *
-	 * @return The equipment configuration handler of this equipment message handler.
-	 */
-	public IEquipmentConfigurationHandler getEquipmentConfigurationHandler() {
-		return equipmentConfigurationHandler;
-	}
-
-	/**
-	 * Sets the command handler of this equipment message handler.
-	 * @param equipmentCommandHandler The command handler to register the equipments
-	 * command runner.
-	 */
-	public void setEquipmentCommandHandler(final IEquipmentCommandHandler equipmentCommandHandler) {
-		this.equipmentCommandHandler = equipmentCommandHandler;
-	}
-
-	/**
-	 * Returns the command handler which may be used to register the equipments
-	 * command runner.
-	 * @return The command handler of this equipment.
-	 */
-	public IEquipmentCommandHandler getEquipmentCommandHandler() {
-		return equipmentCommandHandler;
 	}
 
 	/**

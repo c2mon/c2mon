@@ -18,8 +18,8 @@ package cern.c2mon.shared.common.datatag;
 
 import java.sql.Timestamp;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +51,8 @@ import org.w3c.dom.NodeList;
  * @author Jan Stowisek
  */
 @Slf4j
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
 public final class SourceDataTagValue implements Cloneable {
   // ----------------------------------------------------------------------------
   // PRIVATE STATIC MEMBERS
@@ -84,7 +84,7 @@ public final class SourceDataTagValue implements Cloneable {
   protected String valueDescription = "";
 
   /** Current data quality of the tag (may be null if value is valid) */
-  protected SourceDataQuality quality;
+  protected SourceDataTagQuality quality;
 
   /** Source timestamp of the current value */
   protected Timestamp timestamp;
@@ -138,7 +138,7 @@ public final class SourceDataTagValue implements Cloneable {
    * Constructor. The DAQ timestamp is set at object creation.
    */
   public SourceDataTagValue(final Long pId, final String pName, final boolean pControlTag, final Object pValue,
-      final SourceDataQuality pQuality, final long pTimestamp, final int pPriority, final boolean pGuaranteedDelivery,
+      final SourceDataTagQuality pQuality, final long pTimestamp, final int pPriority, final boolean pGuaranteedDelivery,
       final String pDescription, final int pTimeToLive) {
     this(pId, pName, pControlTag, pValue, pQuality, new Timestamp(pTimestamp), pPriority, pGuaranteedDelivery,
         pDescription, pTimeToLive);
@@ -151,7 +151,7 @@ public final class SourceDataTagValue implements Cloneable {
    *          the value description
    */
   public SourceDataTagValue(final Long pId, final String pName, final boolean pControlTag, final Object pValue,
-      final SourceDataQuality pQuality, final Timestamp pTimestamp, final int pPriority,
+      final SourceDataTagQuality pQuality, final Timestamp pTimestamp, final int pPriority,
       final boolean pGuaranteedDelivery, final String pDescription, final int pTimeToLive) {
     this.id = pId;
     this.name = pName;
@@ -176,16 +176,12 @@ public final class SourceDataTagValue implements Cloneable {
    *          original to be copied.
    */
   public SourceDataTagValue(final SourceDataTagValue pOld) {
-    this(pOld.id, pOld.name, pOld.controlTag, pOld.value,
-        pOld.quality == null ? null : new SourceDataQuality(pOld.quality), pOld.timestamp, pOld.priority,
+    this(pOld.id, pOld.name, pOld.controlTag, pOld.value, pOld.quality, pOld.timestamp, pOld.priority,
         pOld.guaranteedDelivery, pOld.valueDescription, pOld.timeToLive);
     // also set simulated flag, which is not part of any constructor
     this.simulated = pOld.simulated;
     // override new DAQ timestamp set by constructor
     this.daqTimestamp = pOld.daqTimestamp;
-  }
-
-  public SourceDataTagValue() {
   }
 
   // ----------------------------------------------------------------------------
@@ -223,101 +219,19 @@ public final class SourceDataTagValue implements Cloneable {
   /**
    * Get the quality of the DataTag's current value. If no quality has been set
    * for this object, we assume that the value is of GOOD quality. Therefore, a
-   * new SourceDataQuality object will be returned.
+   * new SourceDataTagQuality object will be returned.
    */
-  public SourceDataQuality getQuality() {
-    return this.quality != null ? this.quality : new SourceDataQuality(SourceDataQuality.OK);
+  public SourceDataTagQuality getQuality() {
+    return this.quality != null ? this.quality : new SourceDataTagQuality();
   }
 
   /**
    * Check whether the DataTag's current value is valid. A value is considered
-   * valid if the associated SourceDataQuality object is valid OR if no
-   * SourceDataQuality object is associated with the value.
+   * valid if the associated SourceDataTagQuality object is valid OR if no
+   * SourceDataTagQuality object is associated with the value.
    */
   public boolean isValid() {
     return (quality == null || quality.isValid());
-  }
-
-  // ----------------------------------------------------------------------------
-  // METHODS FOR XML-IFICATION and DE-XML-IFICATION
-  // ----------------------------------------------------------------------------
-
-  /**
-   * Create an XML string from the data contained in this object. As this method
-   * is only used by the driver to send DataTagValueUpdate messages to the
-   * application server, the generated XML will never contain any information
-   * about priority, guaranteedDelivery and timeToLive
-   *
-   * @return an XML representation of the SourceDataTagValue object.
-   */
-  public String toXML() {
-
-    /* Open <DataTag> tag with all its attributes */
-    StringBuffer str = new StringBuffer();
-
-    str.append('<');
-    str.append(XML_ROOT_ELEMENT);
-    str.append(' ');
-    str.append(XML_ATTRIBUTE_ID);
-    str.append("=\"");
-    str.append(id);
-    str.append("\" ");
-    str.append(XML_ATTRIBUTE_NAME);
-    str.append("=\"");
-    str.append(name);
-    str.append("\" ");
-    str.append(XML_ATTRIBUTE_CONTROLTAG);
-    str.append("=\"");
-    str.append(Boolean.toString(this.controlTag));
-    str.append("\">\n");
-
-    /* If the value isn't null, add <value></value> tag */
-    if (value != null) {
-      str.append("<value data-type=\"");
-
-      /*
-       * extract data-type information from the value itself (cutting off the
-       * java.lang part of the class name)
-       */
-      str.append(getDataType());
-      str.append("\">");
-      str.append(value.toString());
-      str.append("</value>\n");
-    }
-
-    if (valueDescription != null && !valueDescription.equals("")) {
-      str.append("<value-description><![CDATA[");
-      str.append(valueDescription);
-      str.append("]]></value-description>\n");
-    }
-
-    /* If the value is invalid, add a <quality></quality> tag */
-    if (quality != null && !quality.isValid()) {
-      str.append(quality.toXML());
-    }
-
-    /* Add <timestamp></timestamp> tag */
-    str.append("<timestamp>");
-    str.append(timestamp.getTime());
-    str.append("</timestamp>\n");
-
-    if (daqTimestamp != null) {
-      str.append("<daq-timestamp>");
-      str.append(daqTimestamp.getTime());
-      str.append("</daq-timestamp>\n");
-    }
-
-    if (simulated) {
-      str.append("<simulated>true</simulated>\n");
-    }
-
-    /* Close <DataTag> tag */
-    str.append("</");
-    str.append(XML_ROOT_ELEMENT);
-    str.append(">\n");
-    String result = str.toString();
-    log.trace(result);
-    return result;
   }
 
   /**
@@ -410,7 +324,7 @@ public final class SourceDataTagValue implements Cloneable {
             } else if (fieldName.equals("value-description")) {
               result.valueDescription = fieldNode.getFirstChild().getNodeValue();
             } else if (fieldName.equals("quality")) {
-              result.quality = SourceDataQuality.fromXML((Element) fieldNode);
+              result.quality = SourceDataTagQuality.fromXML((Element) fieldNode);
             } else if (fieldName.equals("timestamp")) {
               try {
                 result.timestamp = new Timestamp(Long.parseLong(fieldValueString));
@@ -435,7 +349,7 @@ public final class SourceDataTagValue implements Cloneable {
       // If no quality was specified in the XML, we assume that the value is
       // valid
       if (result.quality == null) {
-        result.quality = new SourceDataQuality();
+        result.quality = new SourceDataTagQuality();
       }
     }
     return result;
@@ -528,18 +442,15 @@ public final class SourceDataTagValue implements Cloneable {
     str.append(getValue());
     str.append('\t');
     str.append(getDataType());
-    if (getQuality() != null && !getQuality().isValid()) {
-      str.append('\t');
-      str.append(getQuality().getQualityCode());
+    str.append('\t');
+    str.append(getQuality().getQualityCode());
+    if (getQuality().getDescription() != null) {
       str.append('\t');
       str.append(getQuality().getDescription());
-    } else {
-      str.append("\t0\tOK");
     }
     if (getValueDescription() != null) {
       str.append('\t');
-      // remove all \n and replace all \t characters of the value description
-      // string
+      // remove all \n and replace all \t characters of the value description string
       str.append(getValueDescription().replace("\n", "").replace("\t", "  "));
     }
 

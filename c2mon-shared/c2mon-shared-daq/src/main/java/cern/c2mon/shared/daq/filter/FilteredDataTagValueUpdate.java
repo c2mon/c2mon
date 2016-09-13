@@ -1,23 +1,22 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
 package cern.c2mon.shared.daq.filter;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -32,14 +31,14 @@ import cern.c2mon.shared.common.filter.FilteredDataTagValue;
 
 /**
  * Contains a collection of FilteredDataTagValue's.
- * 
+ *
  * This class is identical to the DataTagValueUpdate class, but collects
  * FilteredDataTagValue's instead of SourceDataTagValue's.
- * 
+ *
  * Also provides methods for encoding and decoding in XML.
- * 
+ *
  * @author mbrightw
- * 
+ *
  */
 public class FilteredDataTagValueUpdate {
 
@@ -56,7 +55,7 @@ public class FilteredDataTagValueUpdate {
      * The process-id attribute name of the XML document.
      */
     private static final String XML_ATTRIBUTE_PROCESS_ID = "process-id";
-    
+
     // ----------------------------------------------------------------------------
     // PRIVATE STATIC MEMBERS
     // ----------------------------------------------------------------------------
@@ -74,7 +73,7 @@ public class FilteredDataTagValueUpdate {
      * The unique DAQ process identification number.
      */
     private Long processId = null;
-    
+
     /**
      * The collection of tag values.
      */
@@ -83,7 +82,7 @@ public class FilteredDataTagValueUpdate {
     // ----------------------------------------------------------------------------
     // CONSTRUCTORS
     // ----------------------------------------------------------------------------
-    
+
     /**
      * Constructor.
      */
@@ -196,7 +195,7 @@ public class FilteredDataTagValueUpdate {
 
     /**
      * Gets the object from it's XML encoded form.
-     * @return the object containing the filtered values 
+     * @return the object containing the filtered values
      * @param domElement the document element of the XML document
      */
     public static FilteredDataTagValueUpdate fromXML(final Element domElement) {
@@ -255,22 +254,4 @@ public class FilteredDataTagValueUpdate {
             }
         }
     }
-
-    /**
-     * For testing only.
-     * @param args no parameters
-     */
-    public static void main(final String[] args) {
-        FilteredDataTagValue ft1 = new FilteredDataTagValue(new Long(0), "name1", "value1", new Short((short)1), "qdesc1", new Timestamp(System.currentTimeMillis()), "vdesc1", "datatype1", false, (short) 0);
-
-        FilteredDataTagValue ft2 = new FilteredDataTagValue(new Long(2), "name2", "value2", new Short((short)2), "qdesc2", new Timestamp(System.currentTimeMillis()), "vdesc2", "datatype2", false, (short) 0);
-
-        FilteredDataTagValueUpdate fUpdate = new FilteredDataTagValueUpdate(new Long((long)34));
-        fUpdate.addValue(ft1);
-        fUpdate.addValue(ft2);
-        String xmlVersion = fUpdate.toXML();
-        System.out.println(xmlVersion);
-
-    }
-
 }

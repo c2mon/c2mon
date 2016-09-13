@@ -1,24 +1,21 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.daq.common.impl;
 
-import static java.lang.String.format;
-
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +25,10 @@ import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.datatag.ValueUpdate;
 import cern.c2mon.shared.common.type.TypeConverter;
+
+import static java.lang.String.format;
 
 /**
  * This class has all methods for sending the Equipment Supervision Alive Tags
@@ -58,7 +58,7 @@ class EquipmentAliveSender {
    * Map to store the last sent Equipment or Sub-Equipment Alive timestamps for filtering purposes. <p>
    * Key = alive tag id <br>
    * value = timestamp in milliseconds
-   * 
+   *
    * @see #sendEquipmentAliveFiltered(SourceDataTagValue, long)
    */
   private final Map<Long, Long> lastEquipmentAlives = new HashMap<>();
@@ -115,19 +115,20 @@ class EquipmentAliveSender {
 
     if (aliveTag != null) {
       Object value = null;
-      
+
       if (aliveTag.getDataType().equalsIgnoreCase("Integer")) {
         value = TypeConverter.cast(Long.valueOf(currentTimestamp % Integer.MAX_VALUE).toString(), aliveTag.getDataType());
       } else {
         value = TypeConverter.cast(currentTimestamp, aliveTag.getDataType());
       }
-      
+
       if (value == null) {
-        this.equipmentLogger.warn("sendEquipmentAlive() - Could not cast current timestamp to value type " 
+        this.equipmentLogger.warn("sendEquipmentAlive() - Could not cast current timestamp to value type "
             + aliveTag.getDataType() + " of alive tag #" + aliveTag.getId() + " => value set to null!");
       }
 
-      aliveTagValue = aliveTag.update(value, "Alive tag for Equipment set as current timestamp", new Timestamp(currentTimestamp));
+      ValueUpdate update = new ValueUpdate(value, "Auto-generated alive value of Equipment " + confName, currentTimestamp);
+      aliveTagValue = aliveTag.update(update);
     } else {
 
       int ttl = DataTagConstants.TTL_FOREVER;
@@ -135,8 +136,8 @@ class EquipmentAliveSender {
         ttl = aliveTagInterval.intValue();
       }
 
-      aliveTagValue = new SourceDataTagValue(this.aliveTagId, "eqalive", true, currentTimestamp, null, currentTimestamp, DataTagConstants.PRIORITY_HIGH, false,
-          "Alive tag for Equipment set as current timestamp", ttl);
+      aliveTagValue = new SourceDataTagValue(this.aliveTagId, "EQUIPMENT_ALIVE_" + confName, true, currentTimestamp, null, currentTimestamp, DataTagConstants.PRIORITY_HIGH, false,
+          "Alive tag for Equipment " + confName, ttl);
     }
 
     this.equipmentLogger.debug("sendEquipmentAlive() - Sending equipment alive message with timestamp " + currentTimestamp);
@@ -154,16 +155,18 @@ class EquipmentAliveSender {
    *
    * @return true if the alive was sent, false otherwise
    */
-  public boolean sendEquipmentAlive(final SourceDataTag aliveTag, final Object tagValue, final long sourceTimestamp, final String valueDescription) {
-    if (TypeConverter.isConvertible(tagValue, aliveTag.getDataType())) {
-      Object convertedTagValue = TypeConverter.cast(tagValue, aliveTag.getDataType());
-      SourceDataTagValue aliveTagValue = aliveTag.update(convertedTagValue, valueDescription, new Timestamp(sourceTimestamp));
-      this.equipmentLogger.debug("sendEquipmentAlive() - Sending equipment alive message with source timestamp " + sourceTimestamp);
-      return sendEquipmentAliveFiltered(aliveTagValue, sourceTimestamp);
+  public boolean sendEquipmentAlive(final SourceDataTag aliveTag, ValueUpdate update) {
+    if (TypeConverter.isConvertible(update.getValue(), aliveTag.getDataType())) {
+      Object convertedTagValue = TypeConverter.cast(update.getValue(), aliveTag.getDataType());
+      update.setValue(convertedTagValue);
+
+      SourceDataTagValue aliveTagValue = aliveTag.update(update);
+      this.equipmentLogger.debug("sendEquipmentAlive() - Sending equipment alive message with source timestamp " + update.getSourceTimestamp());
+      return sendEquipmentAliveFiltered(aliveTagValue, update.getSourceTimestamp());
     }
     else {
-      this.equipmentLogger.warn("sendEquipmentAlive() - Value [" 
-        + tagValue + "] received for alive tag #" + aliveTag.getId() 
+      this.equipmentLogger.warn("sendEquipmentAlive() - Value ["
+        + update.getValue() + "] received for alive tag #" + aliveTag.getId()
         + " is not convertible to data type "
         + aliveTag.getDataType() + ". Trying to send the current timestamp as number instead.");
       return sendEquipmentAlive(aliveTag);

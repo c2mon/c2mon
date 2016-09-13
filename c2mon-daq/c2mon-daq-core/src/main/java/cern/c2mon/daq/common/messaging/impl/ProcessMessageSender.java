@@ -16,26 +16,28 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
+import java.util.Collection;
+import java.util.Iterator;
+
+import javax.annotation.PostConstruct;
+import javax.jms.JMSException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.common.messaging.JmsSender;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
-import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.util.buffer.PullEvent;
 import cern.c2mon.shared.util.buffer.PullException;
 import cern.c2mon.shared.util.buffer.SynchroBuffer;
 import cern.c2mon.shared.util.buffer.SynchroBufferListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.annotation.PostConstruct;
-import javax.jms.JMSException;
-import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * The ProcessMessageSender class is responsible for sending JMS messages from
@@ -147,7 +149,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
     // String name,
     // boolean controlTag,
     // Object value,
-    // SourceDataQuality quality,
+    // SourceDataTagQuality quality,
     // long timestamp,
     // int priority,
     // boolean guaranteedDelivery,
@@ -156,7 +158,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
     long timestamp = System.currentTimeMillis();
     try {
       SourceDataTagValue aliveTagValue = new SourceDataTagValue(Long.valueOf(processConfiguration.getAliveTagID()), processConfiguration.getProcessName()
-          + "::AliveTag", true, Long.valueOf(timestamp), new SourceDataQuality(), timestamp,
+          + "::AliveTag", true, Long.valueOf(timestamp), new SourceDataTagQuality(), timestamp,
       /* DataTagAddress.PRIORITY_HIGH */9, // set the highest possible
                                            // prority
           false, null, 3 * processConfiguration.getAliveInterval());
@@ -191,7 +193,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
     // String name,
     // boolean controlTag,
     // Object value,
-    // SourceDataQuality quality,
+    // SourceDataTagQuality quality,
     // long timestamp,
     // int priority,
     // boolean guaranteedDelivery,
@@ -199,7 +201,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
 
     long timestamp = System.currentTimeMillis();
     SourceDataTagValue commfaultTagValue = new SourceDataTagValue(Long.valueOf(tagID), processConfiguration.getProcessName() + "::CommFaultTag", true, value,
-        new SourceDataQuality(), timestamp, DataTagAddress.PRIORITY_HIGH, false, pDescription, 9999999);
+        new SourceDataTagQuality(), timestamp, DataTagAddress.PRIORITY_HIGH, false, pDescription, 9999999);
 
     try {
       distributeValue(commfaultTagValue);

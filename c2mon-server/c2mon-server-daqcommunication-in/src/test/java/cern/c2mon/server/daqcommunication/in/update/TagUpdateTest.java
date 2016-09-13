@@ -16,16 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.daqcommunication.in.update;
 
-import cern.c2mon.server.cache.ControlTagCache;
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.dbaccess.ControlTagMapper;
-import cern.c2mon.server.cache.dbaccess.DataTagMapper;
-import cern.c2mon.server.cache.loading.ControlTagLoaderDAO;
-import cern.c2mon.server.cache.loading.DataTagLoaderDAO;
-import cern.c2mon.server.common.control.ControlTag;
-import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.daqcommunication.in.junit.CachePopulationRule;
-import cern.c2mon.shared.common.datatag.*;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -40,10 +33,18 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
+import cern.c2mon.server.cache.ControlTagCache;
+import cern.c2mon.server.cache.DataTagCache;
+import cern.c2mon.server.cache.dbaccess.ControlTagMapper;
+import cern.c2mon.server.cache.dbaccess.DataTagMapper;
+import cern.c2mon.server.common.control.ControlTag;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.daqcommunication.in.junit.CachePopulationRule;
+import cern.c2mon.shared.common.datatag.*;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Integration testing of the server-daqcommunication-in module.
@@ -140,7 +141,7 @@ public class TagUpdateTest implements ApplicationContextAware {
     SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(dataTag.getId(), 
                                                                    dataTag.getName(),
                                                                    false, 1,
-                                                                   new SourceDataQuality(),
+                                                                   new SourceDataTagQuality(),
                                                                    timestamp,
                                                                    DataTagConstants.PRIORITY_LOW,
                                                                    false,
@@ -188,7 +189,7 @@ public class TagUpdateTest implements ApplicationContextAware {
     SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(dataTag.getId(), 
                                                                    dataTag.getName(),
                                                                    false, 1,
-                                                                   new SourceDataQuality(Short.valueOf("4")), //invalid
+                                                                   new SourceDataTagQuality(SourceDataTagQualityCode.DATA_UNAVAILABLE), //invalid
                                                                    timestamp,
                                                                    DataTagConstants.PRIORITY_LOW,
                                                                    false,
@@ -237,7 +238,7 @@ public class TagUpdateTest implements ApplicationContextAware {
     SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(controlTag.getId(),
                                                                    controlTag.getName(),
                                                                    true, new Long(2000),   //CONTROL TAG WITH VALUE 2000
-                                                                   new SourceDataQuality(),
+                                                                   new SourceDataTagQuality(),
                                                                    timestamp,
                                                                    DataTagConstants.PRIORITY_LOW,
                                                                    false,

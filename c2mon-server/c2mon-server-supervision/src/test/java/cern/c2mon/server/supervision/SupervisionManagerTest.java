@@ -16,16 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.sql.Timestamp;
 import java.util.concurrent.CountDownLatch;
 
-import cern.c2mon.server.cache.*;
-import cern.c2mon.server.supervision.junit.CachePopulationRule;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
@@ -34,21 +27,27 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import cern.c2mon.server.cache.*;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.supervision.impl.SupervisionTagNotifier;
+import cern.c2mon.server.supervision.junit.CachePopulationRule;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Integration test of supervision module with core cache modules.
@@ -153,7 +152,7 @@ public class SupervisionManagerTest {
     long updateTime = System.currentTimeMillis();
     //process control tag
     supervisionManager.processControlTag(new SourceDataTagValue(1221L,
-        "test alive", true, 0L, new SourceDataQuality(), new Timestamp(updateTime), 4, false, "description", 10000));
+        "test alive", true, 0L, new SourceDataTagQuality(), new Timestamp(updateTime), 4, false, "description", 10000));
 
     //check alive is updated
     aliveTimer = aliveTimerCache.getCopy(1221L);
@@ -188,7 +187,7 @@ public class SupervisionManagerTest {
     long aliveTime = aliveTimer.getLastUpdate();
     //send alive 2 minutes old (should be rejected)
     SourceDataTagValue value = new SourceDataTagValue(1221L,
-        "test alive", true, 0L, new SourceDataQuality(), new Timestamp(System.currentTimeMillis()), 4, false, "description", 10000);
+        "test alive", true, 0L, new SourceDataTagQuality(), new Timestamp(System.currentTimeMillis()), 4, false, "description", 10000);
     value.setDaqTimestamp(new Timestamp(System.currentTimeMillis() - 130000));
     supervisionManager.processControlTag(value);
 
@@ -228,7 +227,7 @@ public class SupervisionManagerTest {
     long updateTime = System.currentTimeMillis();
     //process control tag
     supervisionManager.processControlTag(new SourceDataTagValue(1221L,
-        "test alive", true, 0L, new SourceDataQuality(), new Timestamp(updateTime), 4, false, "description", 10000));
+        "test alive", true, 0L, new SourceDataTagQuality(), new Timestamp(updateTime), 4, false, "description", 10000));
 
     //check alive is updated
     assertNotNull(aliveTimer.getLastUpdate());
@@ -277,7 +276,7 @@ public class SupervisionManagerTest {
 
     long updateTime = System.currentTimeMillis();
     supervisionManager.processControlTag(new SourceDataTagValue(1223L,
-        "test commfault", true, Boolean.TRUE, new SourceDataQuality(), new Timestamp(updateTime), 4, false, "description", 10000));
+        "test commfault", true, Boolean.TRUE, new SourceDataTagQuality(), new Timestamp(updateTime), 4, false, "description", 10000));
     //wait for Tag callback thread
     latch1.await();
 
@@ -304,7 +303,7 @@ public class SupervisionManagerTest {
 
     long updateTime2 = System.currentTimeMillis();
     supervisionManager.processControlTag(new SourceDataTagValue(1223L,
-        "test commfault", true, Boolean.FALSE, new SourceDataQuality(), new Timestamp(updateTime2), 4, false, "description", 10000));
+        "test commfault", true, Boolean.FALSE, new SourceDataTagQuality(), new Timestamp(updateTime2), 4, false, "description", 10000));
     latch2.await();
 
     controller.verify();
@@ -346,7 +345,7 @@ public class SupervisionManagerTest {
     controller.replay();
 
     long updateTime = System.currentTimeMillis();
-    supervisionManager.processControlTag(new SourceDataTagValue(1232L, "test commfault", true, Boolean.TRUE, new SourceDataQuality(),
+    supervisionManager.processControlTag(new SourceDataTagValue(1232L, "test commfault", true, Boolean.TRUE, new SourceDataTagQuality(),
         new Timestamp(updateTime), 4, false, "description", 10000));
     // wait for Tag callback thread
     latch1.await();
@@ -374,7 +373,7 @@ public class SupervisionManagerTest {
 
     long updateTime2 = System.currentTimeMillis();
     supervisionManager.processControlTag(new SourceDataTagValue(1232L,
-        "test commfault", true, Boolean.FALSE, new SourceDataQuality(), new Timestamp(updateTime2), 4, false, "description", 10000));
+        "test commfault", true, Boolean.FALSE, new SourceDataTagQuality(), new Timestamp(updateTime2), 4, false, "description", 10000));
     latch2.await();
 
     controller.verify();

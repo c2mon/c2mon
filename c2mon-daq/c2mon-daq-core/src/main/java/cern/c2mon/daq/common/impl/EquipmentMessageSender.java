@@ -35,7 +35,6 @@ import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
-import cern.c2mon.daq.tools.EquipmentSenderHelper;
 import cern.c2mon.shared.common.datatag.*;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.common.process.SubEquipmentConfiguration;
@@ -92,12 +91,6 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
    * Invalid Sender helper class
    */
   private EquipmentSenderInvalid equipmentSenderInvalid;
-
-  /**
-   * The equipment sender helper with many common and useful methods shared by
-   * sending classes
-   */
-  private EquipmentSenderHelper equipmentSenderHelper = new EquipmentSenderHelper();
 
   /**
    * The Equipment Alive sender helper class
@@ -161,8 +154,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
         equipmentLoggerFactory);
 
     // Valid Sender
-    this.equipmentSenderValid = new EquipmentSenderValid(this.equipmentSenderFilterModule, this.processMessageSender, this.equipmentSenderInvalid,
-        this.equipmentTimeDeadband, this, equipmentLoggerFactory);
+    this.equipmentSenderValid = new EquipmentSenderValid(this.equipmentSenderFilterModule, this.processMessageSender, this, this.equipmentTimeDeadband, this, equipmentLoggerFactory);
 
     // Alive Sender
     this.equipmentAliveSender = new EquipmentAliveSender(this.processMessageSender, this.equipmentConfiguration.getAliveTagId(), equipmentLoggerFactory);
@@ -211,150 +203,99 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
     this.equipmentAliveSender.sendEquipmentAlive(supAliveTag);
   }
 
-  /**
-   * Tries to send a new value to the server.
-   *
-   * @param currentTag The tag to which the value belongs.
-   * @param milisecTimestamp The timestamp of the tag.
-   * @param tagValue The tag value to send.
-   * @return True if the tag has been send successfully to the server. False if
-   *         the tag has been invalidated or filtered out.
-   */
-  @Override
+  @Override @Deprecated
   public boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long milisecTimestamp) {
     return sendTagFiltered(currentTag, tagValue, milisecTimestamp, null);
   }
 
-  /**
-   * Tries to send a new value to the server.
-   *
-   * @param currentTag The tag to which the value belongs.
-   * @param tagValue The tag value to send.
-   * @param milisecTimestamp The timestamp of the tag.
-   * @param pValueDescr A description belonging to the value.
-   * @return True if the tag has been send successfully to the server. False if
-   *         the tag has been invalidated or filtered out.
-   */
-  @Override
+  @Override @Deprecated
   public boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long milisecTimestamp, String pValueDescr) {
     return sendTagFiltered(currentTag, tagValue, milisecTimestamp, pValueDescr, false);
   }
 
-  /**
-   * Tries to send a new value to the server.
-   *
-   * @param currentTag The tag to which the value belongs.
-   * @param sourceTimestamp The source timestamp of the tag in milliseconds.
-   * @param tagValue The tag value to send.
-   * @param pValueDescr A description belonging to the value.
-   * @return True if the tag has been send successfully to the server. False if
-   *         the tag has been invalidated or filtered out.
-   */
-  @Override
+  @Override @Deprecated
   public boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long sourceTimestamp, String pValueDescr,
       boolean sentByValueCheckMonitor) {
+    if (currentTag != null) {
+      long tagID = currentTag.getId();
 
-    this.equipmentLogger.trace("sendTagFiltered - entering sendTagFiltered()");
-
-    boolean successfulSent = true;
-    long tagID = currentTag.getId();
-    SourceDataTag tag = getTag(tagID);
-
-    // If we received an update of equipment alive tag, we send immediately a
-    // message to the server
-    if (isAliveTag(tagID)) {
-      successfulSent = this.equipmentAliveSender.sendEquipmentAlive(tag, tagValue, sourceTimestamp, pValueDescr);
-    } else {
-      successfulSent = this.equipmentSenderValid.sendTagFiltered(tag, tagValue, sourceTimestamp, pValueDescr);
+      return update(tagID, new ValueUpdate(tagValue, pValueDescr, sourceTimestamp));
     }
 
-    this.equipmentLogger.trace("sendTagFiltered - leaving sendTagFiltered()");
-
-    return successfulSent;
+    return false;
   }
 
-  /**
-   * This method sends an invalid SourceDataTagValue to the server. Source and
-   * DAQ timestamps are set to the current DAQ system time.
-   *
-   * @param sourceDataTag SourceDataTag object
-   * @param pQualityCode the SourceDataTag's quality see
-   *          {@link SourceDataQuality} class for details
-   * @param pDescription the quality description (optional)
-   */
-  @Override
+  @Override @Deprecated
   public void sendInvalidTag(final ISourceDataTag sourceDataTag, final short pQualityCode, final String pDescription) {
     sendInvalidTag(sourceDataTag, pQualityCode, pDescription, null);
   }
 
-  /**
-   * This method sends an invalid SourceDataTagValue to the server, without
-   * changing its origin value.
-   *
-   * @param sourceDataTag SourceDataTag object
-   * @param pQualityCode the SourceDataTag's quality see
-   *          {@link SourceDataQuality} class for details
-   * @param qualityDescription the quality description (optional)
-   * @param pTimestamp time when the SourceDataTag's value has become invalid;
-   *          if null the source timestamp and DAQ timestamp will be set to the
-   *          current DAQ system time
-   */
-  @Override
+  @Override @Deprecated
   public void sendInvalidTag(final ISourceDataTag sourceDataTag, final short qualityCode, final String qualityDescription, final Timestamp pTimestamp) {
+    long time = pTimestamp == null ? System.currentTimeMillis() : pTimestamp.getTime();
+    SourceDataTagQuality quality = new SourceDataTagQuality(SourceDataTagQualityCode.getEnum(qualityCode), qualityDescription);
+    update(sourceDataTag.getId(), quality, time);
+  }
 
-    // Get the source data quality from the quality code
-    SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(qualityCode, qualityDescription);
+  @Override
+  public boolean update(String tagName, ValueUpdate update) {
+    return update(equipmentConfiguration.getSourceDataTagIdByName(tagName), update);
+  }
 
-    // The sendInvalidTag function with the value argument will take are of it
-    if (sourceDataTag.getCurrentValue() != null) {
-      sendInvalidTag(sourceDataTag, sourceDataTag.getCurrentValue().getValue(), sourceDataTag.getCurrentValue().getValueDescription(), newSDQuality, pTimestamp);
+  @Override
+  public boolean update(Long tagId, ValueUpdate update) {
+    // If we received an update of equipment alive tag, we send immediately a message to the server
+    if (isAliveTag(tagId)) {
+      return this.equipmentAliveSender.sendEquipmentAlive(getTag(tagId), update);
     } else {
-      sendInvalidTag(sourceDataTag, null, "", newSDQuality, pTimestamp);
+      return this.equipmentSenderValid.update(getTag(tagId), update);
+    }
+  }
+
+  @Override
+  public void update(String tagName, SourceDataTagQuality quality) {
+    update(equipmentConfiguration.getSourceDataTagIdByName(tagName), quality);
+  }
+
+  @Override
+  public void update(String tagName, SourceDataTagQuality quality, long sourceTimestamp) {
+    update(equipmentConfiguration.getSourceDataTagIdByName(tagName), quality, sourceTimestamp);
+  }
+
+  @Override
+  public void update(String tagName, ValueUpdate update, SourceDataTagQuality quality) {
+    update(equipmentConfiguration.getSourceDataTagIdByName(tagName), update, quality);
+  }
+
+  @Override
+  public void update(Long tagId, SourceDataTagQuality quality) {
+    update(tagId, quality, System.currentTimeMillis());
+  }
+
+  @Override
+  public void update(Long tagId, SourceDataTagQuality quality, long sourceTimestamp) {
+    SourceDataTag sdt = getTag(tagId);
+    String valueDescription = sdt.getCurrentValue() == null ? "" : sdt.getCurrentValue().getValueDescription();
+    Object currentValue = sdt.getCurrentValue() == null ? null : sdt.getCurrentValue().getValue();
+
+    update(tagId, new ValueUpdate(currentValue, valueDescription, sourceTimestamp), quality);
+  }
+
+  @Override
+  public void update(Long tagId, ValueUpdate update, SourceDataTagQuality quality) {
+    SourceDataTag sdt = getTag(tagId);
+    if (update.getValueDescription() == null) {
+      update.setValueDescription("");
+    }
+
+    if (quality.getQualityCode() == null || quality.getQualityCode() == SourceDataTagQualityCode.OK) {
+      this.equipmentSenderValid.update(sdt, update);
+    } else {
+      this.equipmentSenderInvalid.invalidate(sdt, update, quality);
     }
   }
 
   /**
-   * This method sends both an invalid and updated SourceDataTagValue to the
-   * server.
-   *
-   * @param sourceDataTag SourceDataTag object
-   * @param newValue The new update value that we want set to the tag
-   * @param newTagValueDesc The new value description
-   * @param newSDQuality the new SourceDataTag see {@link SourceDataQuality}
-   * @param pTimestamp time when the SourceDataTag's value has become invalid;
-   *          if null the source timestamp and DAQ timestamp will be set to the
-   *          current DAQ system time
-   */
-  protected void sendInvalidTag(final ISourceDataTag sourceDataTag, final Object newValue, final String newTagValueDesc, final SourceDataQuality newSDQuality,
-      final Timestamp pTimestamp) {
-    this.equipmentLogger.debug("sendInvalidTag - entering sendInvalidTag() for tag #" + sourceDataTag.getId());
-
-    long tagID = sourceDataTag.getId();
-    SourceDataTag tag = getTag(tagID);
-
-    if (newSDQuality == null || newSDQuality.isValid()) {
-      // this means we have a valid quality code 0 (OK)
-      this.equipmentLogger.warn("sendInvalidTag - method called with 0(OK) quality code for tag " + sourceDataTag.getId()
-          + ". This should normally not happen! Redirecting call to sendTagFiltered() method.");
-      this.equipmentSenderValid.sendTagFiltered(tag, newValue, pTimestamp.getTime(), newTagValueDesc);
-    } else {
-      if (this.equipmentLogger.isDebugEnabled()) {
-        this.equipmentLogger.debug("sendInvalidTag - Bad Quality confirmed. Invalidating ...");
-      }
-      this.equipmentSenderInvalid.sendInvalidTag(tag, newValue, newTagValueDesc, newSDQuality, pTimestamp);
-    }
-
-    this.equipmentLogger.debug("sendInvalidTag - leaving sendInvalidTag()");
-  }
-
-  /**
-   * TimeDeadband policy:
-   *
-   * Static TimeDeadband Dynamic TimeDeadband Filter applied -------------------
-   * -------------------- -------------- Yes Yes Static yes No Static No Yes
-   * Dynamic No No None
-   *
-   *
    * Static TimeDeadband has more priority than the Dynamic one. So if the
    * Static TimeDeadband for the current Tag is disable and the DAQ has the
    * Dynamic TimeDeadband enabled then the Tag will be recorded for dynamic time
@@ -532,7 +473,6 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
   /**
    * Sends all through timedeadband delayed values immediately
    */
-  @Override
   public void sendDelayedTimeDeadbandValues() {
     this.equipmentLogger.debug("sendDelayedTimeDeadbandValues - Sending all time deadband delayed values to the server");
 
@@ -542,18 +482,18 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
   /**
    * Gets a source data tag with the provided id.
    *
-   * @param tagID The id of the tag to get.
+   * @param tagId The id of the tag to get.
    * @return The SourceDataTag with this id.
    */
-  private SourceDataTag getTag(final Long tagID) {
-    if (tagID == null) {
+  private SourceDataTag getTag(final Long tagId) {
+    if (tagId == null) {
       throw new InvalidParameterException("Passed null parameter as tag ID");
     }
 
-    SourceDataTag sdt = (SourceDataTag) this.equipmentConfiguration.getSourceDataTag(tagID);
+    SourceDataTag sdt = (SourceDataTag) this.equipmentConfiguration.getSourceDataTag(tagId);
 
     if (sdt == null) {
-      throw new RuntimeException("Cannot find SourceDataTag #" + tagID + " in the equipment configuration cache of " + equipmentConfiguration.getName() + ". No update is sent!");
+      throw new InvalidParameterException("Could not get the SourceDataTag for tag " + tagId + ". The tag is not registered in the equipment configuration cache. No update is sent!");
     }
 
     return sdt;
@@ -626,5 +566,4 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
       onAddDataTag(sourceDataTag, changeReport);
     }
   }
-
 }

@@ -16,15 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.shared.daq.datatag;
 
-import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
-import cern.c2mon.shared.common.datatag.SourceDataQuality;
-import cern.c2mon.shared.common.datatag.SourceDataTag;
+import java.sql.Timestamp;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.sql.Timestamp;
+import cern.c2mon.shared.common.datatag.*;
 
 /**
  * Unit test of SourceDataTag class.
@@ -51,7 +49,7 @@ public class SourceDataTagTest {
     Object value = new Object();
 
     Timestamp timestamp = new Timestamp(System.currentTimeMillis() - 1);
-    tag.update(value, "test value description", timestamp);
+    tag.update(new ValueUpdate(value, "test value description", timestamp.getTime()));
 
     Assert.assertEquals(value, tag.getCurrentValue().getValue());
     Assert.assertEquals(timestamp, tag.getCurrentValue().getTimestamp());
@@ -64,7 +62,7 @@ public class SourceDataTagTest {
     Object newValue = new Object();
 
     Timestamp newTimestamp = new Timestamp(System.currentTimeMillis() - 1);
-    tag.update(newValue, "test value description", newTimestamp);
+    tag.update(new ValueUpdate(newValue, "test value description", newTimestamp.getTime()));
 
     Assert.assertEquals(newValue, tag.getCurrentValue().getValue());
     Assert.assertEquals(newTimestamp, tag.getCurrentValue().getTimestamp());
@@ -81,8 +79,8 @@ public class SourceDataTagTest {
   public void testInvalidateTimestamps() {
 
     Timestamp timestamp = new Timestamp(System.currentTimeMillis() - 1);
-    SourceDataQuality quality = new SourceDataQuality(SourceDataQuality.DATA_UNAVAILABLE);
-    tag.invalidate(quality, timestamp);
+    SourceDataTagQuality quality = new SourceDataTagQuality(SourceDataTagQualityCode.DATA_UNAVAILABLE);
+    tag.update(quality, System.currentTimeMillis() - 1);
 
     Assert.assertEquals(timestamp, tag.getCurrentValue().getTimestamp());
     //DAQ timestamp should be later
@@ -91,9 +89,9 @@ public class SourceDataTagTest {
 
 
     //for null timestamp, src and DAQ timestamp should be the same
-    tag.invalidate(quality, null);
+    tag.update(quality, 0);
 
-    Assert.assertEquals(tag.getCurrentValue().getDaqTimestamp(), tag.getCurrentValue().getTimestamp());
+    Assert.assertEquals(new Timestamp(0), tag.getCurrentValue().getTimestamp());
   }
 
 }

@@ -17,23 +17,18 @@
 package cern.c2mon.shared.daq.datatag;
 
 import java.io.ByteArrayInputStream;
-import java.sql.Timestamp;
-import java.util.Random;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.apache.xerces.jaxp.DocumentBuilderFactoryImpl;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
 import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
-import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.util.parser.ParserException;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
@@ -171,100 +166,8 @@ public class DataTagValueUpdateTest {
     for (SourceDataTagValue sdt : update.getValues()) {
       Assert.assertNotNull(sdt.getQuality().getDescription());
       Assert.assertEquals("", sdt.getQuality().getDescription());
-      Assert.assertEquals(4, sdt.getQuality().getQualityCode());
+      Assert.assertEquals(4, sdt.getQuality().getQualityCode().getQualityCode());
     }
-  }
-
-  @Test
-  public void testToXml() throws ParserConfigurationException, ParserException {
-    // We test with no PIK info
-    this.testType = TestType.NO_PIK;
-
-    // Send DataTagValueUpdate info to XML
-    sendToXML();
-    // Read DataTagValueUpdate from XML
-    readFromXML();
-
-    // Checks
-    Assert.assertEquals(this.dataTagValueUpdateTO.getProcessId(), this.dataTagValueUpdateFROM.getProcessId());
-    Assert.assertEquals(this.dataTagValueUpdateFROM.getProcessPIK(), null);
-  }
-
-  @Test
-  public void testToXmlWithPIK() {
-    // We test with PIK info
-    this.testType = TestType.PIK;
-
-    // Send DataTagValueUpdate info to XML
-    sendToXML();
-    // Read DataTagValueUpdate from XML
-    readFromXML();
-
-    // Checks
-    Assert.assertEquals(this.dataTagValueUpdateTO.getProcessId(), this.dataTagValueUpdateFROM.getProcessId());
-    Assert.assertEquals(this.dataTagValueUpdateTO.getProcessPIK(), this.dataTagValueUpdateFROM.getProcessPIK());
-    Assert.assertEquals(this.dataTagValueUpdateFROM.getProcessPIK(), TestType.PIK.getPik());
-  }
-
-  @Test
-  public void testToXmlWithWrongPIK() {
-    // We test with WRONG_PIK info
-    this.testType = TestType.WRONG_PIK;
-
-    // Send DataTagValueUpdate info to XML
-    sendToXML();
-    // Read DataTagValueUpdate from XML
-    readFromXML();
-
-    // Checks
-    Assert.assertEquals(this.dataTagValueUpdateTO.getProcessId(), this.dataTagValueUpdateFROM.getProcessId());
-    Assert.assertEquals(this.dataTagValueUpdateTO.getProcessPIK(), this.dataTagValueUpdateFROM.getProcessPIK());
-    Assert.assertEquals(this.dataTagValueUpdateFROM.getProcessPIK(), TestType.WRONG_PIK.getPik());
-  }
-
-  /*
-   * Function for sending the DataTagValueUpdate to a XMML file
-   */
-  public void sendToXML() {
-    try {
-      DocumentBuilderFactory factory = DocumentBuilderFactoryImpl.newInstance();
-      factory.setIgnoringComments(true);
-      factory.setValidating(false);
-      this.builder = factory.newDocumentBuilder();
-    } catch (ParserConfigurationException e) {
-      e.printStackTrace();
-    }
-
-    // Create the DataTagValueUpdate
-    Long number = Long.valueOf(new Random().nextInt(10));
-    switch (this.testType) {
-      case NO_PIK:
-        this.dataTagValueUpdateTO = new DataTagValueUpdate(number);
-        break;
-      case PIK:
-        this.dataTagValueUpdateTO = new DataTagValueUpdate(number, TestType.PIK.getPik());
-        break;
-      case WRONG_PIK:
-        this.dataTagValueUpdateTO = new DataTagValueUpdate(number, TestType.WRONG_PIK.getPik());
-        break;
-      default:
-        LOGGER.error("createXML - No test type found");
-        Assert.assertTrue(false);
-        return;
-    }
-
-    // Create SourceDataTagValue values to fill the DataTagValueUpdate
-    for (int j = 0; j < 5; j++) {
-      SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(
-          new Long(j), ("tag.name.of.tag." + j), false, new Boolean(false),
-          new SourceDataQuality((short) j, "everything rather OK" + j), System.currentTimeMillis(), 2, false, null, 1000
-      );
-      sourceDataTagValue.setDaqTimestamp(new Timestamp(System.currentTimeMillis()));
-      this.dataTagValueUpdateTO.addValue(sourceDataTagValue);
-    }
-
-    // Create XML from object
-    this.xml = dataTagValueUpdateTO.toXML();
   }
 
   /*

@@ -86,10 +86,8 @@ public final class TypeConverter  {
    * @param pTargetType the resulting class cast type
    * @return The resulting cast object.
    * @throws ClassCastException In case of a cast exception
-   * @deprecated Please use method {@link #castToType(Object, Class)} instead
    */
-  @Deprecated
-  public static final Object cast(final Object pValue, final Class< ? > pTargetType) throws ClassCastException {
+  private static final Object cast(final Object pValue, final Class< ? > pTargetType) throws ClassCastException {
     if (pValue == null || pTargetType == null) {
       return null;
     }
@@ -510,7 +508,7 @@ public final class TypeConverter  {
       // Checks if the color string is a field in the Color class
       try {
           Field field = Color.class.getField(str);
-          return (Color) field.get(null);
+          return field.get(null);
       } catch (Exception e) {
       }
 
@@ -539,7 +537,7 @@ public final class TypeConverter  {
     if (value != null && className != null && !className.isEmpty()) {
       try {
 
-        Class type = getType(className);
+        Class<?> type = getType(className);
 
         if (type != null) {
 

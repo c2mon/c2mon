@@ -16,16 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.impl;
 
-//import static org.junit.Assert.*;
-
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.isA;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.sql.Timestamp;
 import java.util.Timer;
 
 import org.easymock.EasyMock;
@@ -39,14 +30,13 @@ import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
 import cern.c2mon.daq.tools.DataTagValueFilter;
-import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
-import cern.c2mon.shared.common.datatag.DataTagDeadband;
-import cern.c2mon.shared.common.datatag.SourceDataTag;
-import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.datatag.*;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
+
+//import static org.junit.Assert.*;
+import static org.easymock.EasyMock.*;
 
 /**
  * @author vilches
@@ -100,7 +90,7 @@ public class SDTTimeDeadbandSchedulerTest {
     this.conf.getDataTags().put(1L, tag);
     //        equipmentMessageSender.setEquipmentConfiguration(conf);
 
-    tag.update("");
+    tag.update(new ValueUpdate(""));
     Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
       @Override
       public void uncaughtException(Thread t, Throwable e) {
@@ -120,7 +110,7 @@ public class SDTTimeDeadbandSchedulerTest {
   @Test
   public void testSchedule() throws Exception {
     // Tag update
-    this.tag.update(true, "test", new Timestamp(System.currentTimeMillis()));
+    this.tag.update(new ValueUpdate(true, "test", System.currentTimeMillis()));
 
     EasyMock.expect(this.configurationControllerMock.getProcessConfiguration()).andReturn(this.processConfigurationMock);
     EasyMock.expect(this.processConfigurationMock.getProcessName()).andReturn("TEST_PROCESS_NAME");
@@ -163,7 +153,7 @@ public class SDTTimeDeadbandSchedulerTest {
   @Test
   public void testScheduleNoFiltering() throws Exception {
     // Tag update
-    this.tag.update(true, "test", new Timestamp(System.currentTimeMillis()));
+    this.tag.update(new ValueUpdate(true, "test", System.currentTimeMillis()));
 
     EasyMock.expect(this.configurationControllerMock.getProcessConfiguration()).andReturn(this.processConfigurationMock);
     EasyMock.expect(this.processConfigurationMock.getProcessName()).andReturn("TEST_PROCESS_NAME");
@@ -196,7 +186,7 @@ public class SDTTimeDeadbandSchedulerTest {
     this.scheduler.run();
 
     // New value
-    this.tag.update(false, "nacho New", new Timestamp(System.currentTimeMillis()));
+    this.tag.update(new ValueUpdate(false, "test", System.currentTimeMillis()));
     scheduler.scheduleValueForSending();
     this.scheduler.run();
 
@@ -214,7 +204,7 @@ public class SDTTimeDeadbandSchedulerTest {
   public void testScheduleFilterRepeatedValue() throws Exception {
 
     // Tag update
-    this.tag.update(true, "test", new Timestamp(System.currentTimeMillis()));
+    this.tag.update(new ValueUpdate(true, "test", System.currentTimeMillis()));
 
     EasyMock.expect(this.configurationControllerMock.getProcessConfiguration()).andReturn(this.processConfigurationMock);
     EasyMock.expect(this.processConfigurationMock.getProcessName()).andReturn("TEST_PROCESS_NAME");
@@ -265,7 +255,7 @@ public class SDTTimeDeadbandSchedulerTest {
   public void testScheduleFlashAndReset() throws Exception {
 
     // Tag update
-    this.tag.update(true, "test", new Timestamp(System.currentTimeMillis()));
+    this.tag.update(new ValueUpdate(true, "test", System.currentTimeMillis()));
 
     EasyMock.expect(this.configurationControllerMock.getProcessConfiguration()).andReturn(this.processConfigurationMock);
     EasyMock.expect(this.processConfigurationMock.getProcessName()).andReturn("TEST_PROCESS_NAME");

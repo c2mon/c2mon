@@ -22,13 +22,12 @@ package cern.c2mon.shared.daq.datatag;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import cern.c2mon.shared.daq.messaging.DAQResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import cern.c2mon.shared.daq.messaging.DAQResponse;
 
 
 /**
@@ -40,13 +39,11 @@ import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
 @Data
 public class SourceDataTagValueResponse implements DAQResponse {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SourceDataTagValueRequest.class);
-
   private String status;
 
   private String errorMessage;
 
-  private ArrayList<DataTagValueUpdate> dataTagValueUpdates = new ArrayList();
+  private ArrayList<DataTagValueUpdate> dataTagValueUpdates = new ArrayList<>();
 
   public static final String STATUS_OK = "OK";
   public static final String STATUS_EXECUTION_FAILED = "FAILED";
@@ -60,8 +57,8 @@ public class SourceDataTagValueResponse implements DAQResponse {
   }
 
 
-  public SourceDataTagValueResponse(final Collection pDataTagVAlueUpdates) {
-    this.dataTagValueUpdates = new ArrayList(pDataTagVAlueUpdates);
+  public SourceDataTagValueResponse(final Collection<DataTagValueUpdate> pDataTagVAlueUpdates) {
+    this.dataTagValueUpdates = new ArrayList<>(pDataTagVAlueUpdates);
     this.status = STATUS_OK;
   }
 
@@ -85,11 +82,6 @@ public class SourceDataTagValueResponse implements DAQResponse {
       return false;
   }
 
-
-  public String getErrorMessage() {
-    return this.errorMessage;
-  }
-
   @JsonIgnore
   @Deprecated
   public DataTagValueUpdate getDataTagValueUpdate(int index) {
@@ -109,7 +101,7 @@ public class SourceDataTagValueResponse implements DAQResponse {
    */
   @JsonIgnore
   @Deprecated
-  public Collection getAllDataTagValueUpdatesObjects() {
+  public Collection<DataTagValueUpdate> getAllDataTagValueUpdatesObjects() {
     return this.dataTagValueUpdates;
   }
 
@@ -149,11 +141,11 @@ public class SourceDataTagValueResponse implements DAQResponse {
    * @return
    */
   @JsonIgnore
-  public Collection getAllDataTagValueObjects() {
-    Collection result = new ArrayList();
+  public Collection<SourceDataTagValue> getAllDataTagValueObjects() {
+    Collection<SourceDataTagValue> result = new ArrayList<>();
 
     for (int i = 0; i < this.dataTagValueUpdates.size(); i++) {
-      result.addAll(((DataTagValueUpdate) dataTagValueUpdates.get(i)).getValues());
+      result.addAll((dataTagValueUpdates.get(i)).getValues());
     }
 
     return result;

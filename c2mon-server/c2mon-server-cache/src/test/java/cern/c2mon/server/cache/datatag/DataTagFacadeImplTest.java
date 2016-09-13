@@ -16,10 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.datatag;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.sql.Timestamp;
 import java.util.Properties;
 
@@ -28,22 +24,16 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.server.cache.AlarmCache;
-import cern.c2mon.server.cache.AlarmFacade;
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.DataTagFacade;
-import cern.c2mon.server.cache.EquipmentFacade;
-import cern.c2mon.server.cache.SubEquipmentFacade;
+import cern.c2mon.server.cache.*;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.ConfigurationException;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
-import cern.c2mon.shared.common.datatag.DataTagQuality;
-import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.SourceDataQuality;
-import cern.c2mon.shared.common.datatag.SourceDataTagValue;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * JUnit class for unit testing the DataTagFacade implementation. Also instantiates
@@ -165,7 +155,7 @@ public class DataTagFacadeImplTest {
   @Test
   public void testSourceNullInvalidUpdate() {
     SourceDataTagValue sourceTag = new SourceDataTagValue(2L, "test tag", false); //has null value
-    sourceTag.setQuality(new SourceDataQuality(SourceDataQuality.OUT_OF_BOUNDS));
+    sourceTag.setQuality(new SourceDataTagQuality(SourceDataTagQualityCode.OUT_OF_BOUNDS));
     Timestamp newTime = new Timestamp(System.currentTimeMillis() + 1000);
     sourceTag.setTimestamp(newTime);
 
@@ -255,7 +245,7 @@ public class DataTagFacadeImplTest {
   @Test
   public void testValidUpdateAllFieldsSet() {
     Timestamp sourceTime = new Timestamp(System.currentTimeMillis() - 1000);
-    SourceDataTagValue sourceTag = new SourceDataTagValue(2L, "tag name", false, "new value", new SourceDataQuality(), sourceTime,
+    SourceDataTagValue sourceTag = new SourceDataTagValue(2L, "tag name", false, "new value", new SourceDataTagQuality(), sourceTime,
                     DataTagConstants.PRIORITY_HIGH, false, "value desc", DataTagConstants.TTL_FOREVER);
 
     //src, DAQ timestamps are null, cache t.s. is not null
@@ -344,7 +334,7 @@ public class DataTagFacadeImplTest {
    dataTag.setDataTagQuality(dataTagQuality);
    sourceTag = new SourceDataTagValue(Long.valueOf(2), "test tag", false);
    sourceTag.setValue(Float.valueOf(2));
-   sourceTag.setQuality(new SourceDataQuality(SourceDataQuality.OK));
+   sourceTag.setQuality(new SourceDataTagQuality());
    Timestamp identicalTimestamp = new Timestamp(currentMillis);
    dataTag.setSourceTimestamp(identicalTimestamp);
    sourceTag.setTimestamp(identicalTimestamp);

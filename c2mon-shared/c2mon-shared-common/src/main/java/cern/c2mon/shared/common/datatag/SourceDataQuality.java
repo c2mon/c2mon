@@ -33,8 +33,9 @@ import org.w3c.dom.NodeList;
  * @version $Revision: 1.21 $ ($Date: 2007/07/04 12:38:55 $ - $State: Exp $)
  * @see cern.c2mon.shared.common.datatag.DataTagCacheObject
  * @see cern.c2mon.server.datatag.impl.DataTagBean
+ * @deprecated Got replaced by {@link SourceDataTagQuality}
  */
- 
+ @Deprecated
 public final class SourceDataQuality implements Serializable, Cloneable {
   // ----------------------------------------------------------------------------
   // CONSTANT DEFINITIONS

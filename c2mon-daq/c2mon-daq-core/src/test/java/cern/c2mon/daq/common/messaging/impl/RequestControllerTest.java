@@ -16,26 +16,33 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.ValueUpdate;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 import cern.c2mon.shared.daq.config.*;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
-import org.junit.Before;
-import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest.DataTagRequestType.*;
-import static org.easymock.classextension.EasyMock.*;
+import static cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest.DataTagRequestType.DATATAG;
+import static cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest.DataTagRequestType.EQUIPMENT;
+import static cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest.DataTagRequestType.PROCESS;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -51,7 +58,7 @@ public class RequestControllerTest {
     @Test
     public void testApplyChange() {
         RequestController requestController = new RequestController(configurationControllerMock);
-        List<Change> changes = new ArrayList<Change>();
+        List<Change> changes = new ArrayList<>();
         /*
          *  Values in this case don't matter.
          *  Just add to the configuration controller and check
@@ -227,9 +234,9 @@ public class RequestControllerTest {
         SourceDataTag sourceDataTag3 = new SourceDataTag(3L, "asd", false, (short)0, "Integer", address);
         processConfiguration.setProcessID(1L);
         equipmentConfiguration.setId(1L);
-        sourceDataTag.update(25);
-        sourceDataTag2.update(25);
-        sourceDataTag3.update(25);
+        sourceDataTag.update(new ValueUpdate(25));
+        sourceDataTag2.update(new ValueUpdate(25));
+        sourceDataTag3.update(new ValueUpdate(25));
         configurationController.setProcessConfiguration(processConfiguration);
         processConfiguration.getEquipmentConfigurations().put(1L, equipmentConfiguration);
         processConfiguration.getEquipmentConfigurations().put(2L, equipmentConfiguration2);

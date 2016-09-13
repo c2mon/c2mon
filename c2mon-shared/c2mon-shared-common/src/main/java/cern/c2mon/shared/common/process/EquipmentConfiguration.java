@@ -116,9 +116,10 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
   /**
    * The source data tags of this equipment configuration.
    */
-  private Map<Long, SourceDataTag> sourceDataTags = new ConcurrentHashMap<Long, SourceDataTag>();
+  private Map<Long, SourceDataTag> sourceDataTags = new ConcurrentHashMap<>();
 
   /**
+   * Only used internally to deserialise from XML! Please use {@link #sourceDataTags} instead
    * The list of SourceDataTags that will be deserialised and converted to the
    * map later.
    */
@@ -128,7 +129,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
   /**
    * The command tags of this equipment configuration.
    */
-  private Map<Long, SourceCommandTag> sourceCommandTags = new ConcurrentHashMap<Long, SourceCommandTag>();
+  private Map<Long, SourceCommandTag> sourceCommandTags = new ConcurrentHashMap<>();
 
   /**
    * The list of SourceCommandTags that will be deserialised and converted to
@@ -398,7 +399,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
    */
   @Override
   public Map<Long, ISourceDataTag> getSourceDataTags() {
-    return new HashMap<Long, ISourceDataTag>(sourceDataTags);
+    return new HashMap<>(sourceDataTags);
   }
 
   /**
@@ -419,7 +420,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
    */
   @Override
   public Map<Long, ISourceCommandTag> getSourceCommandTags() {
-    return new HashMap<Long, ISourceCommandTag>(sourceCommandTags);
+    return new HashMap<>(sourceCommandTags);
   }
 
   /**

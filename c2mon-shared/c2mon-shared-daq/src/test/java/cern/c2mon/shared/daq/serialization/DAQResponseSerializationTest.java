@@ -17,16 +17,17 @@
 
 package cern.c2mon.shared.daq.serialization;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import org.junit.Test;
+
 import cern.c2mon.shared.common.datatag.*;
 import cern.c2mon.shared.daq.command.SourceCommandTagReport;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
-import org.junit.Test;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 
@@ -38,11 +39,14 @@ public class DAQResponseSerializationTest {
   @Test
   public void
   serializeSourceDataTagValueResponse() {
-    SourceDataTagValueResponse response = createDataTAgResponse();
+    SourceDataTagValueResponse response = createDataTagResponse();
     String jsonResponse = MessageConverter.responseToJson(response);
     SourceDataTagValueResponse responseFromJson = MessageConverter.responseFromJson(jsonResponse, SourceDataTagValueResponse.class);
 
-    assertEquals(response, responseFromJson);
+    assertEquals(response.getAllDataTagValueObjects().size(), responseFromJson.getAllDataTagValueObjects().size());
+    assertEquals(response.getAllDataTagValueObjects(), responseFromJson.getAllDataTagValueObjects());
+    assertEquals(response.getStatus(), responseFromJson.getStatus());
+    assertEquals(response.getErrorMessage(), responseFromJson.getErrorMessage());
   }
 
   @Test
@@ -65,13 +69,13 @@ public class DAQResponseSerializationTest {
     assertEquals(response, responseFromJson);
   }
 
-  private SourceDataTagValueResponse createDataTAgResponse() {
+  private SourceDataTagValueResponse createDataTagResponse() {
     SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(
         10L,
         "DataTag name",
         false,
         null,
-        new SourceDataQuality(Short.valueOf("4")), //invalid
+        new SourceDataTagQuality(SourceDataTagQualityCode.DATA_UNAVAILABLE), //invalid
         new Timestamp(System.currentTimeMillis()),
         DataTagConstants.PRIORITY_LOW,
         false,

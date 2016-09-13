@@ -16,13 +16,28 @@
  ******************************************************************************/
 package cern.c2mon.daq.common;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import javax.annotation.PostConstruct;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationFactory;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationHandler;
 import cern.c2mon.daq.common.impl.EquipmentCommandHandler;
 import cern.c2mon.daq.common.impl.EquipmentMessageSender;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
-import cern.c2mon.daq.common.messaging.JmsLifecycle;
 import cern.c2mon.daq.common.messaging.ProcessMessageReceiver;
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
 import cern.c2mon.daq.common.messaging.impl.ProcessMessageSender;
@@ -36,8 +51,9 @@ import cern.c2mon.daq.tools.processexceptions.ConfRejectedTypeException;
 import cern.c2mon.daq.tools.processexceptions.ConfUnknownTypeException;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.command.SourceCommandTag;
-import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTagQualityCode;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
@@ -45,20 +61,6 @@ import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
 import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * This Kernel is the main class of the daq. It aggregates other classes
@@ -119,7 +121,7 @@ public class DriverKernel implements ApplicationContextAware {
   /**
    * This hashtable contains all registered EquipmentMessageHandlers
    */
-  private final ConcurrentMap<Long, EquipmentMessageHandler> eqLookupTable = new ConcurrentHashMap<Long, EquipmentMessageHandler>();
+  private final ConcurrentMap<Long, EquipmentMessageHandler> eqLookupTable = new ConcurrentHashMap<>();
 
   /**
    * The Kernel's Shutdown-hook (defines an action to be taken on kernel's
@@ -408,16 +410,14 @@ public class DriverKernel implements ApplicationContextAware {
    * @param equipmentMessageSender The sender to use.
    */
   private void validateDataTags(final EquipmentConfiguration conf, final EquipmentMessageSender equipmentMessageSender) {
-    Iterator<SourceDataTag> dataTagIterator = conf.getDataTags().values().iterator();
-    while (dataTagIterator.hasNext()) {
-      SourceDataTag sourceDataTag = dataTagIterator.next();
+    for (SourceDataTag sourceDataTag: conf.getDataTags().values()) {
       try {
         LOGGER.debug("validateDataTags - validate DataTag " + sourceDataTag.getId());
         sourceDataTag.validate();
       } catch (ConfigurationException e) {
         LOGGER.error("Error validating configuration for DataTag " + sourceDataTag.getId(), e);
-        equipmentMessageSender.sendInvalidTag(sourceDataTag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS, e.getMessage(), null);
-        dataTagIterator.remove();
+        SourceDataTagQuality quality = new SourceDataTagQuality(SourceDataTagQualityCode.INCORRECT_NATIVE_ADDRESS, e.getMessage());
+        equipmentMessageSender.update(sourceDataTag.getId(), quality);
       }
     }
   }
@@ -439,9 +439,6 @@ public class DriverKernel implements ApplicationContextAware {
         sourceDataTag.validate();
       } catch (ConfigurationException e) {
         LOGGER.error("Error validating configuration for CommandTag " + sourceDataTag.getId(), e);
-        // equipmentMessageSender.sendInvalidTag(sourceDataTag,
-        // SourceDataQuality.INCORRECT_NATIVE_ADDRESS,
-        // e.getMessage(), null);
         commandTagIterator.remove();
       }
     }

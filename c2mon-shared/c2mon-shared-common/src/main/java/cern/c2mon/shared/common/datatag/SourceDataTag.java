@@ -16,25 +16,20 @@
  *****************************************************************************/
 package cern.c2mon.shared.common.datatag;
 
-import cern.c2mon.shared.common.ConfigurationException;
-import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import cern.c2mon.shared.common.filter.FilteredDataTagValue;
-import cern.c2mon.shared.common.type.TypeConverter;
+import java.sql.Timestamp;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
-import org.apache.commons.lang.ArrayUtils;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.Map;
+import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.type.TypeConverter;
 
 /**
  * The SourceDataTag class is the representation of a DataTag on the driver side. It contains all tag-specific
@@ -42,16 +37,9 @@ import java.util.Map;
  * server.
  *
  * @author Jan Stowisek
- * @version $Revision: 1.22 $ ($Date: 2009/05/12 13:05:39 $ - $State: Exp $)
  */
 @Data
-public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
-    /**
-     * Version number of the class used during serialization/deserialization. This is to ensure that minor changes to
-     * the class do not prevent us from reading back DataTagAddress objects we have serialized earlier. If fields are
-     * added/removed from the class, the version number needs to change.
-     */
-    private static final long serialVersionUID = -145678123L;
+public class SourceDataTag implements Cloneable, ISourceDataTag {
 
     private static ObjectMapper objectMapper = new ObjectMapper();
 
@@ -82,7 +70,6 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      * generics.
      */
     @Element(name = "min-value", required = false, type = Double.class) // Double is defined to make the serialization to Number work
-    @SuppressWarnings("unchecked")
     private Number minValue;
 
     /**
@@ -90,7 +77,6 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      * generics.
      */
     @Element(name = "max-value", required = false, type = Double.class) // Double is defined to make the serialization to Number work
-    @SuppressWarnings("unchecked")
     private Number maxValue;
 
     /**
@@ -208,200 +194,57 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      */
     @Override
     public synchronized SourceDataTagValue getCurrentValue() {
-      if (currentValue != null) {
-        return this.currentValue.clone();
-      } else {
+      if (currentValue == null) {
         return null;
-      }
-    }
-
-    /**
-     * Updates this source data tags value.
-     *
-     * @param value The new value. (Should match the right data type)
-     * @return A SourceDataTag value object to send to the server.
-     */
-    public synchronized SourceDataTagValue update(final Object value) {
-        return doUpdate(new SourceDataQuality(), value, null, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()));
-    }
-
-    /**
-     * Updates this source data tags value.
-     *
-     * @param value The new value. (Should match the right data type)
-     * @param srcTimestamp The source timestamp of the value.
-     * @return A SourceDataTag value object to send to the server.
-     */
-    public synchronized SourceDataTagValue update(final Object value, final Timestamp srcTimestamp) {
-        return doUpdate(new SourceDataQuality(), value, null, srcTimestamp, new Timestamp(System.currentTimeMillis()));
-    }
-
-    /**
-     * Updates this source data tags value.
-     *
-     * @param value The new value. (Should match the right data type)
-     * @param valueDescription The description of the new value.
-     * @param srcTimestamp The src timestamp of the value (the DAQ timestamp is set to the system time at this point)
-     * @return A SourceDataTag value object to send to the server.
-     */
-    public synchronized SourceDataTagValue update(final Object value, final String valueDescription, final Timestamp srcTimestamp) {
-      return doUpdate(new SourceDataQuality(), value, valueDescription, srcTimestamp, new Timestamp(System.currentTimeMillis()));
-    }
-
-    /**
-     * Updates this source data tags value.
-     *
-     * @param value The new value. (Should match the right data type)
-     * @param sourceDataQuality The quality of the new new SDValue
-     * @param valueDescription The description of the new value.
-     * @param srcTimestamp The src timestamp of the value (the DAQ timestamp is set to the system time at this point)
-     * @param daqTimestamp
-     *
-     * @return A SourceDataTag value object to send to the server.
-     */
-    private synchronized SourceDataTagValue doUpdate(final SourceDataQuality sourceDataQuality, final Object value, final String valueDescription,
-        final Timestamp srcTimestamp, final Timestamp daqTimestamp) {
-      if (this.currentValue != null) {
-        this.currentValue.setValue(value);
-        this.currentValue.setValueDescription(valueDescription);
-        this.currentValue.setTimestamp(srcTimestamp);
-        this.currentValue.setDaqTimestamp(daqTimestamp);
-        this.currentValue.setQuality(sourceDataQuality);
-      }
-      else {
-        this.currentValue = new SourceDataTagValue(this.id, this.name, this.control, value, sourceDataQuality, srcTimestamp, this.address.getPriority(),
-            this.address.isGuaranteedDelivery(), valueDescription, this.address.getTimeToLive());
-        this.currentValue.setDaqTimestamp(daqTimestamp);
       }
 
       return this.currentValue.clone();
     }
 
-    /**
-     * Returns a FilteredDataTagValue from the current tag, with adjusted quality fields. Is used to send invalidation
-     * messages to the filter queue.
-     *
-     * @param sourceDataQuality the quality object for the tag
-     * @param timestamp the time when the quality message was received
-     * @param dynamicFiltered flag for dynamic filtering
-     * @param filterApplied A constant which indicates which filter was applied. See {@link FilteredDataTagValue} for
-     *            details to the constants.
-     * @return the filtered value object
-     */
-    public final FilteredDataTagValue makeFilterValue(final SourceDataQuality sourceDataQuality,
-            final Timestamp timestamp, final boolean dynamicFiltered, final short filterApplied) {
-        SourceDataTagValue currentVal = (SourceDataTagValue) this.getCurrentValue();
+    private void initCurrentValue() {
+      SourceDataTagValue tagValue = new SourceDataTagValue(this.id, this.name, this.control);
+      tagValue.setPriority(this.address.getPriority());
+      tagValue.setGuaranteedDelivery(this.address.isGuaranteedDelivery());
+      tagValue.setTimeToLive(this.address.getTimeToLive());
+      tagValue.setDaqTimestamp(new Timestamp(System.currentTimeMillis()));
 
-        FilteredDataTagValue returnValue = new FilteredDataTagValue(currentVal.getId(), currentVal.getName(),
-                currentVal.getValue().toString(), new Short(sourceDataQuality.getQualityCode()), null, timestamp, null,
-                this.getDataType(), dynamicFiltered, filterApplied);
-        // quality and/or value description are set if not null
-        if (sourceDataQuality.getDescription() != null) {
-            returnValue.setQualityDescription(sourceDataQuality.getDescription());
-        }
-        if (currentVal.getValueDescription() == null) {
-            returnValue.setValueDescription(currentVal.getValueDescription());
-        }
-        return returnValue;
+      this.currentValue = tagValue;
+    }
+
+    public SourceDataTagValue update(final ValueUpdate update) {
+      return update(update, new SourceDataTagQuality());
     }
 
     /**
-     * Returns a FilteredDataTagValue object for the datatag, with updated value and timestamp.
+     * Updates this source data tags value.
      *
-     * @param timestamp the timestamp of the new value reading
-     * @param tagValue the tag value
-     * @param valueDescription the value description
-     * @param dynamicFiltered flag indicating the value was filtered out by the dynamic filtering mechanism (not
-     *            implemented)
-     * @param filterApplied A constant which indicates which filter was applied. See {@link FilteredDataTagValue} for
-     *            details to the constants.
-     * @return the value object
+     * @param update The new value. (Should match the right data type)
+     * @param quality The new value quality
+     * @return A SourceDataTag value object to send to the server.
      */
-    public final FilteredDataTagValue makeFilterValue(final Timestamp timestamp, final Object tagValue,
-            final String valueDescription, final boolean dynamicFiltered, final short filterApplied) {
-        SourceDataTagValue currentVal = (SourceDataTagValue) this.getCurrentValue();
-        // In constructor below arguments are:
-        // Long pId,
-        // String pName,
-        // String pValue,
-        // Short pQualityCode,
-        // String pQualityDescription,
-        // Timestamp pTimestamp,
-        // String pValueDescription,
-        // String pDataType,
-        // boolean pDynamicFiltered
-        // short filterApplied
-        FilteredDataTagValue returnValue = new FilteredDataTagValue(currentVal.getId(), currentVal.getName(),
-                tagValue.toString(), new Short(currentVal.getQuality().getQualityCode()), currentVal.getQuality()
-                        .getDescription(), timestamp, valueDescription, this.getDataType(), dynamicFiltered,
-                filterApplied);
-        return returnValue;
-    }
-
-    /**
-     * Invalidate the current value of a SourceDataTag The invalidate method will always return a SourceDataTagValue
-     * object, unless
-     * <UL>
-     * <LI>the quality object passed as a parameter is null
-     * <LI>the quality code of the SourceDataQuality object is OK
-     * <LI>the timestamp passed as a parameter is older than the timestamp of the current value
-     * </UL>
-     *
-     * @param quality The quality of the source data tag value.
-     * @return The SourceDataTagValue to send to the server.
-     */
-    @Override
-    public SourceDataTagValue invalidate(final SourceDataQuality quality) {
-        return update(quality, null, null, null);
-    }
-
-    /**
-     * Invalidate the current value of a SourceDataTag The invalidate method will always return a SourceDataTagValue
-     * object, unless
-     * <UL>
-     * <LI>the quality object passed as a parameter is null
-     * <LI>the quality code of the SourceDataQuality object is OK
-     * <LI>the timestamp passed as a parameter is older than the timestamp of the current value
-     * </UL>
-     * <p>
-     * If the timestamp passed is null, the current time is taken as source invalidation.
-     *
-     * @param quality The quality of the source data tag value.
-     * @param timestamp Timestamp for the invalidation.
-     * @return The SourceDataTagValue to send to the server.
-     */
-    @Override
-    public synchronized SourceDataTagValue invalidate(final SourceDataQuality quality, final Timestamp timestamp) {
-      if (quality == null || quality.isValid()) {
-        return null;
+    public synchronized SourceDataTagValue update(final ValueUpdate update, SourceDataTagQuality quality) {
+      if (this.currentValue == null) {
+        initCurrentValue();
       }
 
-      if (this.currentValue != null) {
-        return update(quality, this.currentValue.getValue(), this.currentValue.getValueDescription(), timestamp);
-      } else {
-        return update(quality, null, null, timestamp);
-      }
+      this.currentValue.setValue(update.getValue());
+      this.currentValue.setValueDescription(update.getValueDescription());
+      this.currentValue.setTimestamp(new Timestamp(update.getSourceTimestamp()));
+      this.currentValue.setDaqTimestamp(new Timestamp(System.currentTimeMillis()));
+      this.currentValue.setQuality(quality);
+
+      return this.currentValue.clone();
     }
 
-    /**
-     * Updates the current value of a SourceDataTag and its quality. The method will always return a SourceDataTagValue
-     * object, unless
-     * <UL>
-     * <LI>the timestamp passed as a parameter is older than the timestamp of the current value
-     * </UL>
-     *
-     * @param quality The quality of the source data tag value.
-     * @param value The new value. (Should match the right data type)
-     * @param valueDescription The description of the new value.
-     * @param timestamp Timestamp for the invalidation.
-     * @return The SourceDataTagValue to send to the server.
-     */
-    public SourceDataTagValue update(final SourceDataQuality quality, final Object value, final String valueDescription,
-        final Timestamp timestamp) {
-      Timestamp daqTimestamp = new Timestamp(System.currentTimeMillis());
-      Timestamp srcTimestamp = timestamp == null ? daqTimestamp : timestamp;
+    public synchronized SourceDataTagValue update(final SourceDataTagQuality quality, long timestamp) {
+      if (this.currentValue == null) {
+        initCurrentValue();
+      }
 
-      return doUpdate(quality, value, valueDescription, srcTimestamp, daqTimestamp);
+      this.currentValue.setQuality(quality);
+      this.currentValue.setTimestamp(new Timestamp(timestamp));
+
+      return this.currentValue.clone();
     }
 
     // ----------------------------------------------------------------------------
@@ -460,64 +303,6 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
     }
 
     /**
-     * Returns an XML representation of the SourceDataTag object. This XML snipplet is used in the configuration XML
-     * sent to the driver.
-     *
-     * @return XML String of this data tag.
-     */
-    public String toConfigXML() {
-        // <DataTag id="..." name="..." control="...">
-        StringBuffer str = new StringBuffer("    <DataTag id=\"");
-
-        str.append(id);
-        str.append("\" name=\"");
-        str.append(name);
-        if (isControl()) {
-            str.append("\" control=\"true\">\n");
-        } else {
-            str.append("\" control=\"false\">\n");
-        }
-
-        // <mode> ... </mode>
-        if (mode != DataTagConstants.MODE_OPERATIONAL) {
-            str.append("      <mode>");
-            str.append(mode);
-            str.append("</mode>\n");
-        }
-
-        // <data-type> ... </data-type>
-        str.append("      <data-type>");
-        str.append(dataType);
-        str.append("</data-type>\n");
-
-        if (minValue != null) {
-            str.append("        <min-value data-type=\"");
-            // str.append(minValue.getClass().getName().substring(10));
-            str.append(minValue.getClass().getSimpleName());
-            str.append("\">");
-            str.append(minValue);
-            str.append("</min-value>\n");
-        }
-
-        if (maxValue != null) {
-            str.append("        <max-value data-type=\"");
-            // str.append(maxValue.getClass().getName().substring(10));
-            str.append(maxValue.getClass().getSimpleName());
-            str.append("\">");
-            str.append(maxValue);
-            str.append("</max-value>\n");
-        }
-
-        // <HardwareAddress> ... </HardwareAddress>
-        if (address != null) {
-            str.append(getAddress().toConfigXML());
-        }
-
-        str.append("    </DataTag>\n");
-        return str.toString();
-    }
-
-    /**
      * Validates this data tag. At the moment this means only checking if the data tag address is != null and then
      * validating the data tag address.
      *
@@ -548,7 +333,6 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
             if (this.currentValue != null) {
               clonedSourceDataTag.currentValue = this.currentValue.clone();
             }
-            // TODO Comparables needs also cloning!
         } catch (CloneNotSupportedException e) {
             // This should not happen if nobody changes the address class
             e.printStackTrace();
@@ -598,101 +382,6 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
         }
         return timeDeabband;
     }
-
-    /**
-     * The two SourceDataTag objects are considered equal if they are of the same type and all their non-static
-     * attributes are equal
-     */
-    @Override
-    public boolean equals(final Object copy) {
-
-        boolean result = copy != null && copy instanceof SourceDataTag;
-
-        if (result) {
-
-            Field[] fields = this.getClass().getDeclaredFields();
-
-            for (Field field : fields) {
-                // compare non-final, non-static and non-transient fields only
-                if (!Modifier.isFinal(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())
-                        && !Modifier.isTransient(field.getModifiers())) {
-                    try {
-
-                        if ((field.get(this) != null && field.get(copy) == null)
-                                || (field.get(this) == null && field.get(copy) != null)) {
-                            result = false;
-                        } else if (field.get(this) != null && field.get(copy) != null) {
-
-                            if (field.getType().isArray()) {
-
-                                if (Object[].class.isAssignableFrom(field.getType())) {
-                                    result = Arrays.equals((Object[]) field.get(this), (Object[]) field.get(copy));
-                                } else {
-                                    result = ArrayUtils.isEquals(field.get(this), field.get(copy));
-                                }
-
-                            } else {
-                                result = field.get(this).equals(field.get(copy));
-                            }
-                        }
-                    } catch (Exception e) {
-                        result = false;
-                    }
-                }
-
-                if (!result)
-                    break;
-            }// for
-        }
-
-        return result;
-    }
-
-    @Override
-    public final int hashCode() {
-
-        int result = 0;
-
-        Field[] fields = this.getClass().getDeclaredFields();
-
-        for (Field field : fields) {
-            // compare non-final, non-static and non-transient fields only
-            if (!Modifier.isFinal(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())
-                    && !Modifier.isTransient(field.getModifiers())) {
-                try {
-
-                    // skip arrays
-                    if (!field.getType().isArray() && field.get(this) != null)
-                        // for string take its length
-                        if (field.getType().equals(String.class)) {
-                            result ^= ((String) field.get(this)).length();
-                        } else if (field.getType().equals(short.class)) {
-                            result ^= field.getShort(this);
-                        } else if (field.getType().equals(int.class)) {
-                            result ^= field.getInt(this);
-                        } else if (field.getType().equals(float.class)) {
-                            result ^= (int) field.getFloat(this);
-                        } else if (field.getType().equals(double.class)) {
-                            result ^= (int) field.getDouble(this);
-                        } else if (field.getType().equals(long.class)) {
-                            result ^= (int) field.getLong(this);
-                        } else if (field.getType().equals(byte.class)) {
-                            result ^= field.getByte(this);
-                        } else if (field.getType().equals(boolean.class)) {
-                            result ^= field.getBoolean(this) == Boolean.TRUE ? 1 : 0;
-                        }
-
-                } catch (Exception e) {
-                    // nothing more to be done
-                    e.printStackTrace();
-                }
-            }
-
-        }// for
-
-        return result;
-    }
-
 
   /**
    * Method for extracting the data from the addressParameters of thos object.

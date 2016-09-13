@@ -18,10 +18,7 @@ package cern.c2mon.server.cache.datatag;
 
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.shared.common.datatag.DataTagQuality;
-import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.SourceDataQuality;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.*;
 
 /**
  * Implementation of the QualityConverter service.
@@ -32,20 +29,31 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
 public class QualityConverterImpl implements QualityConverter {
 
   @Override
-  public DataTagQuality convert(final SourceDataQuality sourceDataQuality) {
+  public DataTagQuality convert(final SourceDataTagQuality sourceDataTagQuality) {
     DataTagQuality newTagQuality;
-    if (sourceDataQuality != null && sourceDataQuality.isInvalid()) {
-      if (sourceDataQuality.getQualityCode() == SourceDataQuality.OUT_OF_BOUNDS) {
-        newTagQuality = new DataTagQualityImpl(TagQualityStatus.VALUE_OUT_OF_BOUNDS, sourceDataQuality.getDescription());                         
-      } else if (sourceDataQuality.getQualityCode() == SourceDataQuality.DATA_UNAVAILABLE) {
-        newTagQuality = new DataTagQualityImpl(TagQualityStatus.INACCESSIBLE, sourceDataQuality.getDescription());          
-      } else {
-        newTagQuality = new DataTagQualityImpl(TagQualityStatus.UNKNOWN_REASON, sourceDataQuality.getDescription());                    
-      }      
-    } else {
+    
+    if (sourceDataTagQuality == null) {
       newTagQuality = new DataTagQualityImpl();
       newTagQuality.validate();
+      return newTagQuality;
     }
+      
+    switch(sourceDataTagQuality.getQualityCode()) {
+      case OK:
+        newTagQuality = new DataTagQualityImpl();
+        newTagQuality.validate();
+        break;
+      case OUT_OF_BOUNDS:
+        newTagQuality = new DataTagQualityImpl(TagQualityStatus.VALUE_OUT_OF_BOUNDS, sourceDataTagQuality.getDescription());
+        break;
+      case DATA_UNAVAILABLE:
+        newTagQuality = new DataTagQualityImpl(TagQualityStatus.INACCESSIBLE, sourceDataTagQuality.getDescription());
+        break;
+      default:
+        newTagQuality = new DataTagQualityImpl(TagQualityStatus.UNKNOWN_REASON, sourceDataTagQuality.getDescription());
+        break;
+    }
+            
     return newTagQuality;
   }
 
