@@ -16,8 +16,7 @@
  * * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************
  */
-
-package cern.c2mon.server.daqcommunication.in.config;
+package cern.c2mon.server.cachepersistence.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -26,25 +25,28 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
- * This class is responsible for configuring the Spring Context and beans used by DAQ Communication
- * for daqcommunication-in module. It is automatically detected.
+ * This class is responsible for configuring the Spring Context and beans used by CacheManager
+ * for cache-persistence module. It is automatically detected.
  *
  * @author Szymon Halastra
  */
 @Configuration
-@ComponentScan("cern.c2mon.server.daqcommunication.in")
-public class DaqCommunicationInConfiguration {
+@ComponentScan("cern.c2mon.server.cachepersistence")
+public class CachePersistenceConfiguration {
 
-  @Value("${c2mon.server.daqcommunication.jms.update.numExecutorThreads}")
+  @Value("${c2mon.server.cachepersistence.batchpersistence.numExecutorThreads}")
   private int corePoolSize;
 
-  @Value("${c2mon.server.daqcommunication.jms.update.numExecutorThreads}")
+  @Value("${c2mon.server.cachepersistence.batchpersistence.numExecutorThreads}")
   private int maxPoolSize;
 
-  @Value("${c2mon.server.daqcommunication.jms.update.keepAliveSeconds}")
+  @Value("${c2mon.server.cachepersistence.batchpersistence.keepAliveSeconds}")
   private int threadIdleLimit;
 
-  private static final String THREAD_NAME_PREFIX = "TagUpdater-";
+  @Value("${c2mon.server.cachepersistence.batchpersistence.queueCapacity}")
+  private int queueCapacity;
+
+  private static final String THREAD_NAME_PREFIX = "BatchPersist-";
 
   /**
    * Bean responsible for creating custom ThreadPool with custom thread name prefix
@@ -58,6 +60,7 @@ public class DaqCommunicationInConfiguration {
     executor.setCorePoolSize(corePoolSize);
     executor.setMaxPoolSize(maxPoolSize);
     executor.setKeepAliveSeconds(threadIdleLimit);
+    executor.setQueueCapacity(queueCapacity);
 
     executor.setAllowCoreThreadTimeOut(true);
 

@@ -16,31 +16,19 @@
  *****************************************************************************/
 package cern.c2mon.server.cachepersistence.common;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
-import org.springframework.transaction.TransactionTimedOutException;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import cern.c2mon.server.cache.C2monCache;
 import cern.c2mon.server.cache.ClusterCache;
@@ -129,7 +117,9 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
   /**
    * Executor running the persistence tasks.
    */
-  private ThreadPoolExecutor persistenceExecutor = new ThreadPoolExecutor(1, 1, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1000));
+  @Autowired
+  @Qualifier("threadPoolTaskExecutor")
+  private ThreadPoolTaskExecutor persistenceExecutor;
   
   /**
    * Is the Spring component started.
@@ -152,7 +142,7 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
   public void persistList(final Collection<Long> keyCollection) {
     clusterCache.acquireWriteLockOnKey(cachePersistenceLock);
     try {
-      LOGGER.debug("Submitting new persistence task (currently " + persistenceExecutor.getQueue().size() + " tasks in queue)");
+      LOGGER.debug("Submitting new persistence task (currently " + persistenceExecutor.getThreadPoolExecutor().getQueue().size() + " tasks in queue)");
       
       //local set, no synch needed; removes duplicates from collection (though unnecessary with current SynchroBuffer)
       Set<Long> localToBePersisted = new HashSet<Long>(keyCollection);
