@@ -99,8 +99,7 @@ public class TagLogCacheListener implements C2monBufferedCacheListener<Tag>, Sma
 
   @Override
   public String getThreadName() {
-    AtomicInteger counter = new AtomicInteger();
-    return "TagCache-" + counter.incrementAndGet();
+    return "DbPersister";
   }
 
   @Override

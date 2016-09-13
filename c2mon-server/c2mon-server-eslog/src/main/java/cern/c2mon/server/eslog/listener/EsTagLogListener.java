@@ -97,8 +97,7 @@ public class EsTagLogListener implements C2monBufferedCacheListener<Tag>, SmartL
 
   @Override
   public String getThreadName() {
-    AtomicInteger counter = new AtomicInteger();
-    return "ElasticSearch-" + counter.incrementAndGet();
+    return "EsPersister";
   }
 
   /**

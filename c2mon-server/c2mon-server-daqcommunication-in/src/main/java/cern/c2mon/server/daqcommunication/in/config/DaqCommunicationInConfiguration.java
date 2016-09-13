@@ -42,7 +42,7 @@ public class DaqCommunicationInConfiguration {
   private int maxPoolSize;
 
   private static final int THREAD_IDLE_LIMIT = 60;
-  private static final String THREAD_NAME_PREFIX = "TagUpdate-";
+  private static final String THREAD_NAME_PREFIX = "TagUpdater-";
 
   /**
    * Bean responsible for creating custom ThreadPool with custom thread name prefix

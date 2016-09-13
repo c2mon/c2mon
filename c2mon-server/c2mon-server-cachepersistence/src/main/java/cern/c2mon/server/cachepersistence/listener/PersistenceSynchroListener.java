@@ -106,8 +106,7 @@ public class PersistenceSynchroListener implements C2monBufferedCacheListener<Lo
 
   @Override
   public String getThreadName() {
-    AtomicInteger counter = new AtomicInteger();
-    return "PersistenceCache-" + counter.incrementAndGet();
+    return "CacheDbBackup";
   }
 
   @Override
