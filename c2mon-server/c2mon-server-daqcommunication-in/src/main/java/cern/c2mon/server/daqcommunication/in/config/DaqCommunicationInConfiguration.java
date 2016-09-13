@@ -32,7 +32,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  * @author Szymon Halastra
  */
 @Configuration
-@ComponentScan("cern.c2mon.server.daqcommunication.in")
 public class DaqCommunicationInConfiguration {
 
   @Value("${c2mon.server.daqcommunication.jms.update.numExecutorThreads}")
@@ -52,7 +51,7 @@ public class DaqCommunicationInConfiguration {
    * @return Spring ThreadPoolTaskExecutor with custom thread name prefix
    */
   @Bean
-  public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
+  public ThreadPoolTaskExecutor daqCommunicationThreadPoolTaskExecutor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
     executor.setCorePoolSize(corePoolSize);

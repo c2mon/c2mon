@@ -118,8 +118,7 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
    * Executor running the persistence tasks.
    */
   @Autowired
-  @Qualifier("threadPoolTaskExecutor")
-  private ThreadPoolTaskExecutor persistenceExecutor;
+  private ThreadPoolTaskExecutor cachePersistenceThreadPoolTaskExecutor;
   
   /**
    * Is the Spring component started.
@@ -142,7 +141,7 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
   public void persistList(final Collection<Long> keyCollection) {
     clusterCache.acquireWriteLockOnKey(cachePersistenceLock);
     try {
-      LOGGER.debug("Submitting new persistence task (currently " + persistenceExecutor.getThreadPoolExecutor().getQueue().size() + " tasks in queue)");
+      LOGGER.debug("Submitting new persistence task (currently " + cachePersistenceThreadPoolTaskExecutor.getThreadPoolExecutor().getQueue().size() + " tasks in queue)");
       
       //local set, no synch needed; removes duplicates from collection (though unnecessary with current SynchroBuffer)
       Set<Long> localToBePersisted = new HashSet<Long>(keyCollection);
@@ -173,7 +172,7 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
           counter++;
           persistedIds.push(currentId);
         }
-        Future< ? > result = persistenceExecutor.submit(task);
+        Future< ? > result = cachePersistenceThreadPoolTaskExecutor.submit(task);
         taskResults.offerLast(result);
         submittedSets.put(result, persistedIds);
       }    
@@ -317,7 +316,7 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
   public synchronized void stop() {    
     LOGGER.info("Shutting down cache persistence manager (" + cache.getClass().getSimpleName() + ")");
     started = false;
-    persistenceExecutor.shutdown();
+    cachePersistenceThreadPoolTaskExecutor.shutdown();
     //may be none-empty if added using addElementToPersist
     while (!toBePersisted.isEmpty()) {
       LOGGER.debug("Detected cache objects that need persisting... trying to persist them.");

@@ -31,7 +31,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  * @author Szymon Halastra
  */
 @Configuration
-@ComponentScan("cern.c2mon.server.cachepersistence")
 public class CachePersistenceConfiguration {
 
   @Value("${c2mon.server.cachepersistence.batchpersistence.numExecutorThreads}")
@@ -54,7 +53,7 @@ public class CachePersistenceConfiguration {
    * @return Spring ThreadPoolTaskExecutor with custom thread name prefix
    */
   @Bean
-  public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
+  public ThreadPoolTaskExecutor cachePersistenceThreadPoolTaskExecutor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
     executor.setCorePoolSize(corePoolSize);
@@ -65,6 +64,8 @@ public class CachePersistenceConfiguration {
     executor.setAllowCoreThreadTimeOut(true);
 
     executor.setThreadNamePrefix(THREAD_NAME_PREFIX);
+
+    executor.initialize();
 
     return executor;
   }
