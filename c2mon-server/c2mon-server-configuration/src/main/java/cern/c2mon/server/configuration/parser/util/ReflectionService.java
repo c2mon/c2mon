@@ -53,7 +53,8 @@ public class ReflectionService {
    * @param klass  the type of the object. Necessary to do reflection on the given object.
    * @return Properties which holds all relevant information of the {@link ConfigurationEntity}
    */
-   public static <T extends ConfigurationEntity> Properties extractPropertiesFromField(ConfigurationEntity object, Class<T> klass) {
+  public static <T extends ConfigurationEntity> Properties extractPropertiesFromField(ConfigurationEntity object,
+                                                                                      Class<T> klass) {
     Properties properties = new Properties();
     try {
       List<String> ignoreFields = new ArrayList<>();
@@ -74,23 +75,27 @@ public class ReflectionService {
           if (pd.getReadMethod().invoke(obj) != null) {
             String tempProp;
 
-            // check if the property is a TagMode. If so we have to call the ordinal() method manual because the enum toString method don't return the needed
+            // check if the property is a TagMode. If so we have to call the ordinal() method manual because the enum
+            // toString method don't return the needed
             // number.
             if (pd.getPropertyType().equals(TagMode.class)) {
               tempProp = String.valueOf(((TagMode) pd.getReadMethod().invoke(obj)).ordinal());
 
             } else if (pd.getPropertyType().equals(DataTagAddress.class)) {
-              // check if the property is a DataTagAddress. If so we have to call the toConfigXML() method because the server expect the xml string of a
+              // check if the property is a DataTagAddress. If so we have to call the toConfigXML() method because
+              // the server expect the xml string of a
               // DataTagAddress.
               tempProp = String.valueOf(((DataTagAddress) pd.getReadMethod().invoke(obj)).toConfigXML());
 
             } else if (pd.getPropertyType().equals(HardwareAddress.class)) {
-              // check if the property is a HardWareAddress. If so we have to call the toConfigXML() method because the server expect the xml string of a
+              // check if the property is a HardWareAddress. If so we have to call the toConfigXML() method because
+              // the server expect the xml string of a
               // DataTagAddress.
               tempProp = String.valueOf(((HardwareAddress) pd.getReadMethod().invoke(obj)).toConfigXML());
 
             } else if (pd.getPropertyType().equals(AlarmCondition.class)) {
-              // check if the property is a AlarmCondition. If so we have to call the getXMLCondition() method because the server expect the xml string of an
+              // check if the property is a AlarmCondition. If so we have to call the getXMLCondition() method
+              // because the server expect the xml string of an
               // AlarmCondition.
               tempProp = String.valueOf(((AlarmCondition) pd.getReadMethod().invoke(obj)).getXMLCondition());
 
@@ -100,7 +105,7 @@ public class ReflectionService {
             } else if (pd.getName().equals("expressions")) {
               tempProp = JacksonSerializer.mapper.writeValueAsString(pd.getReadMethod().invoke(obj));
 
-            } else{
+            } else {
               // default call of all properties. Returns the standard toStringValue of the given Type
               tempProp = pd.getReadMethod().invoke(obj).toString();
             }
@@ -152,7 +157,8 @@ public class ReflectionService {
           if (field.getType().getEnumConstants() == null) {
 
             properties.setProperty(field.getName(),
-                field.getType().getDeclaredConstructor(String.class).newInstance(field.getAnnotation(DefaultValue.class).value()).toString());
+                field.getType().getDeclaredConstructor(String.class).newInstance(field.getAnnotation(DefaultValue
+                    .class).value()).toString());
 
             // receive all default values from fields which type is an enum
           } else {
