@@ -19,8 +19,7 @@
     <constructor-arg ref="dataTagEhcache"/>
     <constructor-arg ref="dataTagLoaderDAO"/>
     <constructor-arg value="${c2mon.server.cacheloading.batchSize}"/>
-    <constructor-arg value="${c2mon.server.cacheloading.maxThreads}"/>
-    <constructor-arg value="${c2mon.server.cacheloading.queueSize}"/>
+    <constructor-arg value="DataTagCache-" />
   </bean>
   
 

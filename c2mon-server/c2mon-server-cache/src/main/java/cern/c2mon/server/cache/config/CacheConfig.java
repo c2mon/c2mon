@@ -1,12 +1,14 @@
 package cern.c2mon.server.cache.config;
 
+import java.io.IOException;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
-
-import java.io.IOException;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import static java.lang.String.format;
 
@@ -23,6 +25,14 @@ public class CacheConfig {
 
   @javax.annotation.Resource
   private Environment environment;
+
+  @Value("${c2mon.server.cacheloading.maxThreads}")
+  private int maxThreads;
+
+  @Value("${c2mon.server.cacheloading.queueSize}")
+  private int queueSize;
+
+  private static final int THREAD_TIMEOUT = 5; //in seconds
 
   @Bean(name = "cacheManager")
   public EhCacheManagerFactoryBean cacheManager() throws IOException {
@@ -45,5 +55,25 @@ public class CacheConfig {
     bean.setConfigLocation(new ClassPathResource(configLocation));
     bean.setShared(true);
     return bean;
+  }
+
+
+  /**
+   * Bean responsible for creating custom ThreadPoolTaskExecutor
+   *
+   * @return Spring ThreadPoolTaskExecutor
+   */
+  @Bean
+  public ThreadPoolTaskExecutor cacheThreadPoolTaskExecutor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+
+    executor.setCorePoolSize(maxThreads);
+    executor.setMaxPoolSize(maxThreads);
+
+    executor.setKeepAliveSeconds(THREAD_TIMEOUT);
+
+    executor.setQueueCapacity(queueSize);
+
+    return executor;
   }
 }

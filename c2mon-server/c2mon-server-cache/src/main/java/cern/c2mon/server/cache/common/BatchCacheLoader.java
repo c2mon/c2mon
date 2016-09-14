@@ -26,6 +26,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
 /**
  * Cache loader implementation that loads the cache on multiple threads. The cache
  * must provided a BatchCacheLoaderDAO implementation.
@@ -41,7 +44,8 @@ public class BatchCacheLoader<T extends Cacheable> implements C2monCacheLoader {
   /**
    * Executor for loading the cache using multiple threads.
    */
-  private ThreadPoolExecutor mapLoaderExecutor;
+  @Autowired
+  private ThreadPoolTaskExecutor cacheThreadPoolTaskExecutor;
 
   /**
    * Timeout before an inactive thread is returned to the pool
@@ -56,18 +60,9 @@ public class BatchCacheLoader<T extends Cacheable> implements C2monCacheLoader {
   private final int batchSize;
 
   /**
-   * The size of the queue containing the waiting tasks
-   * (should be large enough to contain all the tasks as
-   * the executor will throw an exception if a task is
-   * rejected).
+   * Name prefix for ThreadPool threads
    */
-  private final int taskQueueSize;
-
-  /**
-   * The number of threads used to load the cache.
-   */
-  private final int loaderThreads;
-
+  private final String threadNamePrefix;
   /**
    * Cache
    */
@@ -85,28 +80,26 @@ public class BatchCacheLoader<T extends Cacheable> implements C2monCacheLoader {
    * @param cache the cache to load from the DB
    * @param cacheLoaderDAO the DAO for accessing the DB
    * @param batchSize the number of object loaded in a single task
-   * @param loaderThreads the number of threads processing the loading tasks (fixed)
-   * @param taskQueueSize the size of the executor's queue
+   * @param threadNamePrefix the name of thread pool
    */
   public BatchCacheLoader(final Ehcache cache,
                           final BatchCacheLoaderDAO<T> cacheLoaderDAO,
                           final int batchSize,
-                          final int loaderThreads,
-                          final int taskQueueSize) {
+                          final String threadNamePrefix) {
     this.batchSize = batchSize;
-    this.loaderThreads = loaderThreads;
-    this.taskQueueSize = taskQueueSize;
     this.batchCacheLoaderDAO = cacheLoaderDAO;
     this.cache = cache;
+    this.threadNamePrefix = threadNamePrefix;
   }
 
   @Override
   public void preload() {
     log.debug("preload() - Start preloading data for cache " + cache.getName());
     Integer lastRow = batchCacheLoaderDAO.getMaxRow(); // 0 if no cache objects!
-    mapLoaderExecutor = new ThreadPoolExecutor(loaderThreads, loaderThreads,
-        THREAD_TIMEOUT, TimeUnit.SECONDS,
-        new ArrayBlockingQueue<Runnable>(taskQueueSize));
+
+    cacheThreadPoolTaskExecutor.setThreadNamePrefix(this.threadNamePrefix);
+    cacheThreadPoolTaskExecutor.initialize();
+
     Integer firstRow = 0;
     LinkedList<Callable<Object>> tasks = new LinkedList<Callable<Object>>();
     while (firstRow <= lastRow) {
@@ -115,7 +108,7 @@ public class BatchCacheLoader<T extends Cacheable> implements C2monCacheLoader {
       firstRow += batchSize;
     }
     try {
-      mapLoaderExecutor.invokeAll(tasks, 1800, TimeUnit.SECONDS);
+      cacheThreadPoolTaskExecutor.getThreadPoolExecutor().invokeAll(tasks, 1800, TimeUnit.SECONDS);
     } catch (RejectedExecutionException e) {
       log.error("Exception caught while loading a server cache from the database. This is probably due to the cache.loader.queue.size being"
           + "too small. Increase this to at least 'id range'/'cache loader batch size', or alternatively increase the"
@@ -124,7 +117,7 @@ public class BatchCacheLoader<T extends Cacheable> implements C2monCacheLoader {
     } catch (InterruptedException e) {
       log.error("Interrupted while waiting for cache loading threads to terminate.", e);
     }
-    mapLoaderExecutor.shutdown();
+    cacheThreadPoolTaskExecutor.shutdown();
     log.debug("preload() - Finished preload for cache " + cache.getName());
   }
 

@@ -17,8 +17,7 @@
     <constructor-arg ref="alarmEhcache"/>
     <constructor-arg ref="alarmLoaderDAO"/>
     <constructor-arg value="${c2mon.server.cacheloading.batchSize}"/>
-    <constructor-arg value="${c2mon.server.cacheloading.maxThreads}"/>
-    <constructor-arg value="${c2mon.server.cacheloading.queueSize}"/>
+    <constructor-arg value="AlarmCache-" />
   </bean>
 
 </beans>

@@ -20,8 +20,7 @@
     <constructor-arg ref="ruleTagEhcache"/>
     <constructor-arg ref="ruleTagLoaderDAO"/>
     <constructor-arg value="${c2mon.server.cacheloading.batchSize}"/>
-    <constructor-arg value="${c2mon.server.cacheloading.maxThreads}"/>
-    <constructor-arg value="${c2mon.server.cacheloading.queueSize}"/>
+    <constructor-arg value="RuleCache-" />
   </bean>
 
 </beans>
