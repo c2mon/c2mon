@@ -101,7 +101,7 @@ public final class RuleUpdateBuffer {
    */
   @Autowired
   private RuleUpdateBuffer(RuleTagFacade ruleTagFacade) {
-    this.timer = new Timer("RuleUpdateBuffer");
+    this.timer = new Timer("RuleUpdate");
     RuleUpdateBuffer.ruleTagFacade = ruleTagFacade;
   }
 
