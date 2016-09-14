@@ -18,8 +18,6 @@ package cern.c2mon.server.cache.rule;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -27,6 +25,7 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.ClusterCache;
@@ -52,11 +51,17 @@ public class RuleTagPostLoaderProcessor {
 
   private ClusterCache clusterCache;
 
+  @Autowired
+  private ThreadPoolTaskExecutor cacheThreadPoolTaskExecutor;
+
   /**
    * Thread pool settings.
    */
   private int threadPoolMax = 16;
   private int threadPoolMin = 4;
+
+  private static final int THREAD_IDLE_LIMIT = 5; // in seconds
+  private static final String THREAD_NAME_PREFIX = "RuleLoader-";
 
   /** Cluster Cache key to avoid loading twice the parent rule ids at startup */
   public static final String ruleCachePostProcessedKey = "c2mon.cache.rule.ruleCachePostProcessed";
@@ -86,22 +91,24 @@ public class RuleTagPostLoaderProcessor {
       }
       if (!isRuleCachePostProcessed.booleanValue()) {
         LOGGER.info("Setting parent ids for rules...");
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(threadPoolMin, threadPoolMax, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1000));
+
+        initializeThreadPool();
+
         LoaderTask task = new LoaderTask();
         int counter = 0;
         for (Long key : ruleTagCache.getKeys()) {
           task.addKey(key);
           counter++;
           if (counter == 500) {
-            threadPoolExecutor.execute(task);
+            cacheThreadPoolTaskExecutor.execute(task);
             task = new LoaderTask();
             counter = 0;
           }
         }
-        threadPoolExecutor.execute(task);
-        threadPoolExecutor.shutdown();
+        cacheThreadPoolTaskExecutor.execute(task);
+        cacheThreadPoolTaskExecutor.shutdown();
         try {
-          threadPoolExecutor.awaitTermination(1200, TimeUnit.SECONDS);
+          cacheThreadPoolTaskExecutor.getThreadPoolExecutor().awaitTermination(1200, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
           LOGGER.warn("Exception caught while waiting for rule parent id loading threads to complete (waited longer then timeout?): ", e);
         }
@@ -116,6 +123,15 @@ public class RuleTagPostLoaderProcessor {
     }
 
     LOGGER.trace("Leaving loadRuleParentIds()");
+  }
+
+  private void initializeThreadPool() {
+    cacheThreadPoolTaskExecutor.setCorePoolSize(threadPoolMin);
+    cacheThreadPoolTaskExecutor.setMaxPoolSize(threadPoolMax);
+    cacheThreadPoolTaskExecutor.setKeepAliveSeconds(THREAD_IDLE_LIMIT);
+
+    cacheThreadPoolTaskExecutor.setThreadNamePrefix(THREAD_NAME_PREFIX);
+    cacheThreadPoolTaskExecutor.initialize();
   }
 
   private class LoaderTask implements Runnable {
