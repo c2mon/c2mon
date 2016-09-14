@@ -83,9 +83,8 @@ public class DataTagFacadeImpl extends AbstractDataTagFacade<DataTag> implements
                            final AlarmFacade alarmFacade,
                            final AlarmCache alarmCache,
                            final EquipmentFacade equipmentFacade,
-                           final SubEquipmentFacade subEquipmentFacade,
-                           final Evaluator evaluator) {
-    super(dataTagCache, alarmFacade, alarmCache, dataTagCacheObjectFacade, dataTagCacheObjectFacade, qualityConverter, evaluator);
+                           final SubEquipmentFacade subEquipmentFacade) {
+    super(dataTagCache, alarmFacade, alarmCache, dataTagCacheObjectFacade, dataTagCacheObjectFacade, qualityConverter);
     super.setEquipmentFacade(equipmentFacade);
     super.setSubEquipmentFacade(subEquipmentFacade);
     this.dataTagCacheObjectFacade = dataTagCacheObjectFacade;

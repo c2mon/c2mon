@@ -71,11 +71,6 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
   private SubEquipmentFacade subEquipmentFacade = null;
 
   /**
-   * Evaluates alarm expressions of a tag.
-   */
-  private final Evaluator evaluator;
-
-  /**
    * Reference to qualityConverter bean.
    */
   private final QualityConverter qualityConverter;
@@ -97,12 +92,11 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
                                   final AlarmCache alarmCache,
                                   final CommonTagObjectFacade<T> commonTagObjectFacade,
                                   final DataTagCacheObjectFacade dataTagCacheObjectFacade,
-                                  final QualityConverter qualityConverter, final Evaluator evaluator) {
+                                  final QualityConverter qualityConverter) {
     super(tagCache, alarmFacade, alarmCache);
 
     this.dataTagCacheObjectFacade = dataTagCacheObjectFacade;
     this.qualityConverter = qualityConverter;
-    this.evaluator = evaluator;
   }
 
   /**
@@ -422,7 +416,7 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
       Event<Boolean> returnEvent = updateFromSource(dataTag, sourceDataTagValue);
 
       if (returnEvent.getReturnValue()) {
-        dataTag = (T) evaluator.evaluate(dataTag);
+        dataTag = Evaluator.evaluate(dataTag);
         tagCache.put(dataTagId, dataTag);
       }
       return returnEvent;

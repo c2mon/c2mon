@@ -20,7 +20,6 @@ import java.sql.Timestamp;
 import java.util.Properties;
 
 import cern.c2mon.server.common.expression.Evaluator;
-import cern.c2mon.server.common.tag.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,9 +54,6 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
    * Used for tracking nb of rule evaluations in testing. TODO remove once no longer necessary
    */
   private volatile int updateCount = 0; //not completely exact as no locking
-
-  @Autowired
-  private Evaluator evaluator;
 
   /**
    * Logger for logging updates made to rules.
@@ -164,7 +160,7 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
       if (!filterout(ruleTag, value, valueDescription, null, null, timestamp)) {
         ruleTagCacheObjectFacade.validate(ruleTag);
         ruleTagCacheObjectFacade.update(ruleTag, value, valueDescription, timestamp);
-        ruleTag = (RuleTag) evaluator.evaluate(ruleTag);
+        ruleTag = Evaluator.evaluate(ruleTag);
         tagCache.put(id, ruleTag);
         updateCount++;
         log((RuleTagCacheObject) ruleTag);
