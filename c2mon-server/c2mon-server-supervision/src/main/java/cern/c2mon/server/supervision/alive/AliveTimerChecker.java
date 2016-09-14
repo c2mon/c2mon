@@ -178,7 +178,7 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
   @Override
   public synchronized void start() {
     LOGGER.info("Starting the C2MON alive timer mechanism.");
-    timer = new Timer("C2MON-alive-timer");
+    timer = new Timer("AliveChecker");
     timer.schedule(this, INITIAL_SCAN_DELAY, SCAN_INTERVAL);
     running = true;
   }

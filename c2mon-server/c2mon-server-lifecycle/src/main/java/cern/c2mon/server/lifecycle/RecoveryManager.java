@@ -134,7 +134,7 @@ public class RecoveryManager implements SmartLifecycle {
             LOGGER.info("Running server recovery tasks.");
             recover();          
           }
-        }).start();             
+        }, "ServerRecovery").start();
       } else {              //run standard recovery tasks
         new Thread(new Runnable() {        
           @Override
@@ -142,7 +142,7 @@ public class RecoveryManager implements SmartLifecycle {
             LOGGER.info("Running standard start-up tasks (none configured so far)");
             refreshAfterStandardRestart();          
           }
-        }).start(); 
+        }, "ServerStartup").start();
       }
       running = true;
     }    

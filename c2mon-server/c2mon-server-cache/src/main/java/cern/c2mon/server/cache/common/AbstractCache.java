@@ -282,18 +282,18 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
     }
   }
 
-  public void registerSynchronousListener(C2monCacheListener<? super T> timCacheListener) {
-    cacheListeners.add(timCacheListener);
+  public void registerSynchronousListener(C2monCacheListener<? super T> cacheListener) {
+    cacheListeners.add(cacheListener);
   }
 
-  public Lifecycle registerListener(C2monCacheListener<? super T> timCacheListener) {
-    CacheListener<? super T> wrappedCacheListener = new CacheListener<>(timCacheListener);
+  public Lifecycle registerListener(C2monCacheListener<? super T> cacheListener) {
+    CacheListener<? super T> wrappedCacheListener = new CacheListener<>(cacheListener);
     cacheListeners.add(wrappedCacheListener);
     return wrappedCacheListener;
   }
 
-  public Lifecycle registerThreadedListener(C2monCacheListener<? super T> timCacheListener, int queueCapacity, int threadPoolSize) {
-    MultiThreadedCacheListener<? super T> threadedCacheListener = new MultiThreadedCacheListener<>(timCacheListener, queueCapacity, threadPoolSize);
+  public Lifecycle registerThreadedListener(C2monCacheListener<? super T> cacheListener, int queueCapacity, int threadPoolSize) {
+    MultiThreadedCacheListener<? super T> threadedCacheListener = new MultiThreadedCacheListener<>(cacheListener, queueCapacity, threadPoolSize);
     cacheListeners.add(threadedCacheListener);
     return threadedCacheListener;
   }

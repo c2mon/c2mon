@@ -280,7 +280,7 @@ public class TransportConnector implements Connector {
       } catch(InterruptedException e) {
         log.debug("clusterFinder - Interrupted.");
       }
-    }, "C2MON-ES-Module-Cluster-Health-Check");
+    }, "EsHealthChecker");
 
     log.info("init() - Trying to connect to Elasticsearch cluster {} on host={}, port={}", cluster, host, port);
     clusterFinder.start();
