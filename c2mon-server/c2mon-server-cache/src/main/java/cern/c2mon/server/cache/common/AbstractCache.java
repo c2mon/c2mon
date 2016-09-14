@@ -93,7 +93,7 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
   /**
    * Reference to the Ehcache event listeners
    */
-  private LinkedBlockingDeque<C2monCacheListener< ? super T>> cacheListeners = new LinkedBlockingDeque<C2monCacheListener< ? super T>>();
+  private LinkedBlockingDeque<C2monCacheListener<? super T>> cacheListeners = new LinkedBlockingDeque<>();
 
   /**
    * the RegisteredEventListeners instance for this cache which is used

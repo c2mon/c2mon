@@ -159,7 +159,14 @@ public class SupervisionNotifierImpl implements SupervisionNotifier, C2monCacheL
   public Lifecycle registerAsListener(final SupervisionListener supervisionListener, final int numberThreads, final int queueSize) {
     listenerLock.writeLock().lock();
     try {
-      ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(numberThreads, numberThreads, DEFAULT_THREAD_TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(queueSize), new ThreadPoolExecutor.AbortPolicy());
+      ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(numberThreads, numberThreads,
+              DEFAULT_THREAD_TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue<>(queueSize),
+              new ThreadPoolExecutor.AbortPolicy());
+      threadPoolExecutor.setThreadFactory(r -> {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Supervision-").append(executors.size()).append("-").append(threadPoolExecutor.getActiveCount());
+        return new Thread(r, builder.toString());
+      });
       threadPoolExecutor.allowCoreThreadTimeOut(true);
       executors.put(supervisionListener, threadPoolExecutor);
       supervisionListeners.add(supervisionListener);
