@@ -16,12 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.client.publish;
 
-import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import cern.c2mon.server.cache.*;
+import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.client.config.ClientProperties;
+import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 
 import lombok.extern.slf4j.Slf4j;
@@ -34,14 +35,7 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.alarm.AlarmAggregator;
 import cern.c2mon.server.alarm.AlarmAggregatorListener;
-import cern.c2mon.server.cache.AliveTimerFacade;
-import cern.c2mon.server.cache.TagFacadeGateway;
-import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.client.util.TransferObjectFactory;
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.alarm.TagWithAlarms;
-import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
-import cern.c2mon.server.common.republisher.Publisher;
 import cern.c2mon.server.common.republisher.Republisher;
 import cern.c2mon.server.common.republisher.RepublisherFactory;
 import cern.c2mon.server.common.tag.Tag;
@@ -72,7 +66,7 @@ import cern.c2mon.shared.util.jms.JmsSender;
 @Slf4j
 @Service
 @ManagedResource(description = "Bean publishing tag updates to the clients")
-public class TagValuePublisher implements AlarmAggregatorListener, ConfigurationUpdateListener, Publisher<TagWithAlarms> {
+public class TagValuePublisher implements C2monCacheListener<Tag>, ConfigurationUpdateListener, Publisher<TagWithAlarms> {
 
   /** Bean providing for sending JMS messages and waiting for a response */
   private final JmsSender jmsSender;
@@ -81,10 +75,16 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
   private final ConfigurationUpdate configurationUpdate;
 
   /** Listens for Tag updates, evaluates all associated alarms and passes the result */
+  @Deprecated
   private final AlarmAggregator alarmAggregator;
 
+  /**
+   * Used to register the aggregator as Tag update listener.
+   */
+  private final CacheRegistrationService cacheRegistrationService;
+
   /** Contains re-publication logic */
-  private Republisher<TagWithAlarms> republisher;
+  private Republisher<Tag> republisher;
 
   /** Time between republicaton attempts */
   private int republicationDelay;
@@ -119,7 +119,8 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
                            final ConfigurationUpdate configurationUpdate,
                            final TagFacadeGateway pTagFacadeGateway,
                            final TagLocationService tagLocationService,
-                           final ClientProperties properties) {
+                           final ClientProperties properties,
+                           final CacheRegistrationService cacheRegistrationService) {
     this.aliveTimerFacade = aliveTimerFacade;
     this.jmsSender = jmsSender;
     this.alarmAggregator = alarmAggregator;
@@ -128,6 +129,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
     this.tagLocationService = tagLocationService;
     this.republisher = RepublisherFactory.createRepublisher(this, "Tag");
     this.properties = properties;
+    this.cacheRegistrationService = cacheRegistrationService;
   }
 
   /**
@@ -138,14 +140,16 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
     log.info("init - Starting Tag publisher.");
     log.trace("init - Registering for Tag Updates.");
 
-    this.alarmAggregator.registerForTagUpdates(this);
+//  this.alarmAggregator.registerForTagUpdates(this);
+    cacheRegistrationService.registerSynchronousToAllTags(this);
 
     log.trace("init - Registering for Configuration Updates.");
 
     this.configurationUpdate.registerForConfigurationUpdates(this);
 
-    if (republicationDelay != 0)
+    if (republicationDelay != 0) {
       republisher.setRepublicationDelay(republicationDelay);
+    }
     republisher.start();
   }
 
@@ -158,24 +162,24 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
     republisher.stop();
   }
 
-  /**
-   * Generates for every notification a <code>TransferTagValue</code>
-   * object which is then sent as serialized GSON message trough the
-   * dedicated JMS client tag topic.
-   * @param tag the updated Tag
-   * @param alarms the new values of the associated alarms; this list
-   *               is null if no alarms are associated to the tag
-   */
-  @Override
-  public void notifyOnUpdate(final Tag tag, final List<Alarm> alarms) {
-    TagWithAlarms tagWithAlarms = new TagWithAlarmsImpl(tag, alarms);
-    try {
-      publish(tagWithAlarms);
-    } catch (JmsException e) {
-      log.error("notifyOnUpdate - Error publishing tag update to topic for tag " + tagWithAlarms.getTag().getId() + " - submitting for republication", e);
-      republisher.publicationFailed(tagWithAlarms);
-    }
-  }
+//  /**
+//   * Generates for every notification a <code>TransferTagValue</code>
+//   * object which is then sent as serialized GSON message trough the
+//   * dedicated JMS client tag topic.
+//   * @param tag the updated Tag
+//   * @param alarms the new values of the associated alarms; this list
+//   *               is null if no alarms are associated to the tag
+//   */
+//  @Deprecated
+//  public void notifyOnUpdate(final Tag tag, final List<Alarm> alarms) {
+//    TagWithAlarms tagWithAlarms = new TagWithAlarmsImpl(tag, alarms);
+//    try {
+//      publish(tagWithAlarms);
+//    } catch (JmsException e) {
+//      LOGGER.error("notifyOnUpdate - Error publishing tag update to topic for tag " + tagWithAlarms.getTag().getId() + " - submitting for republication", e);
+//      republisher.publicationFailed(tagWithAlarms);
+//    }
+//  }
 
   @Override
   public void publish(final TagWithAlarms tagWithAlarms) {
@@ -221,5 +225,24 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
   @ManagedOperation(description = "Returns the current number of events awaiting re-publication (should be 0 in normal operation)")
   public int getSizeUnpublishedList() {
     return republisher.getSizeUnpublishedList();
+  }
+
+  @Override
+  // TODO change the TagWithAlarmsImpl in order to send the expressions information to the client
+  public void notifyElementUpdated(Tag tag) {
+    try {
+      TagWithAlarms tagWithAlarms = this.tagFacadeGateway.getTagWithAlarms(tag.getId();
+      publish(tagWithAlarms);
+    } catch (JmsException e) {
+      log.error("notifyOnUpdate - Error publishing tag update to topic for tag " + tag.getId() + " - submitting for republication", e);
+      republisher.publicationFailed(tag);
+    }
+
+  }
+
+  @Override
+  // TODO implement
+  public void confirmStatus(Tag cacheable) {
+
   }
 }

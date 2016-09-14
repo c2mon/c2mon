@@ -63,6 +63,7 @@ public abstract class TransferObjectFactory {
    * @param aliveTag set to <code>true</code>, if tag is an Alive tag
    * @return The resulting <code>TransferTagImpl</code>
    */
+  @Deprecated
   public static TransferTagImpl createTransferTag(final TagWithAlarms tagWithAlarms, boolean aliveTag, String topic) {
     Tag tag = tagWithAlarms.getTag();
     TransferTagImpl transferTag = null;
@@ -106,11 +107,61 @@ public abstract class TransferObjectFactory {
   }
 
   /**
+   * Creates a <code>TransferTagImpl</code> object for the given parameters
+   *
+   * @param tag a tag from the cache
+   * @param aliveTag flag which indicates if the tag is an alive tag
+   *
+   * @return The resulting <code>TransferTagImpl</code>
+   */
+  public static TransferTagImpl createTransferTag(final Tag tag, boolean aliveTag, String topic) {
+    TransferTagImpl transferTag = null;
+    if (tag != null) {
+      transferTag =
+          new TransferTagImpl(
+              tag.getId(),
+              tag.getValue(),
+              tag.getValueDescription(),
+              (DataTagQualityImpl) tag.getDataTagQuality(),
+              getTagMode(tag),
+              tag.getTimestamp(),
+              tag instanceof DataTag ? ((DataTag) tag).getDaqTimestamp() : null,
+              tag.getCacheTimestamp(),
+              tag.getDescription(),
+              tag.getName(),
+              topic);
+
+      String dataType = isKnownClass(tag.getDataType()) ? getType(tag.getDataType()).getName() : tag.getDataType();
+      transferTag.setValueClassName(dataType);
+
+      transferTag.addExpressions(tag.getExpressions());
+      transferTag.setSimulated(tag.isSimulated());
+      transferTag.setUnit(tag.getUnit());
+      transferTag.addEquipmentIds(tag.getEquipmentIds());
+      transferTag.addSubEquipmentIds(tag.getSubEquipmentIds());
+      transferTag.addProcessIds(tag.getProcessIds());
+      if (tag.getMetadata() != null) {
+        transferTag.setMetadata(tag.getMetadata().getMetadata());
+      }
+
+      if (tag instanceof RuleTag) {
+        transferTag.defineRuleExpression(((RuleTag) tag).getRuleExpression());
+      } else if (tag instanceof ControlTag) {
+        transferTag.setControlTagFlag(true);
+        transferTag.setAliveTagFlag(aliveTag);
+      }
+    }
+
+    return transferTag;
+  }
+
+  /**
    * Creates a <code>TransferTagValueImpl</code> object for the given parameters
    *
    * @param tagWithAlarms A tag from the cache
    * @return The resulting <code>TransferTagValueImpl</code>
    */
+  @Deprecated
   public static TransferTagValueImpl createTransferTagValue(final TagWithAlarms tagWithAlarms) {
     Tag tag = tagWithAlarms.getTag();
     TransferTagValueImpl tagValue = null;
@@ -137,11 +188,42 @@ public abstract class TransferObjectFactory {
   }
 
   /**
+   * Creates a <code>TransferTagValueImpl</code> object for the given parameters
+   *
+   * @param tag A tag from the cache
+   * @return The resulting <code>TransferTagValueImpl</code>
+   */
+  public static TransferTagValueImpl createTransferTagValue(final Tag tag) {
+    TransferTagValueImpl tagValue = null;
+    if (tag != null) {
+      tagValue =
+          new TransferTagValueImpl(
+              tag.getId(),
+              tag.getValue(),
+              tag.getValueDescription(),
+              (DataTagQualityImpl) tag.getDataTagQuality(),
+              getTagMode(tag),
+              tag.getTimestamp(),
+              tag instanceof DataTag ? ((DataTag) tag).getDaqTimestamp() : null,
+              tag.getCacheTimestamp(),
+              tag.getDescription());
+
+      String dataType = isKnownClass(tag.getDataType()) ? getType(tag.getDataType()).getName() : tag.getDataType();
+      tagValue.setValueClassName(dataType);
+      tagValue.addExpressions(tag.getExpressions());
+      tagValue.setSimulated(tag.isSimulated());
+    }
+
+    return tagValue;
+  }
+
+  /**
    * Creates an <code>AlarmValueImpl</code> object for the given parameters
    *
    * @param alarm An alarm object
    * @return The resulting <code>AlarmValueImpl</code>
    */
+  @Deprecated
   public static AlarmValueImpl createAlarmValue(final Alarm alarm) {
     AlarmValueImpl alarmValueImpl = null;
 
@@ -171,6 +253,7 @@ public abstract class TransferObjectFactory {
    * @param tag   A tag object. Used to get Tag Description information.
    * @return The resulting <code>AlarmValueImpl</code>
    */
+  @Deprecated
   public static AlarmValueImpl createAlarmValue(Alarm alarm, Tag tag) {
     AlarmValueImpl alarmValueImpl = createAlarmValue(alarm);
     alarmValueImpl.setTagDescription(tag.getDescription());
@@ -279,6 +362,7 @@ public abstract class TransferObjectFactory {
    * @param tagValue The tag value to which the alarms will be added
    * @param alarms   The alarms from which the <code>AlarmValueImpl</code> are created from
    */
+  @Deprecated
   private static void addAlarmValues(final TransferTagValueImpl tagValue, final Collection<Alarm> alarms) {
     if (alarms != null) {
       List<AlarmValueImpl> alarmValues = new ArrayList<AlarmValueImpl>(alarms.size());
