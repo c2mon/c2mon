@@ -91,7 +91,8 @@ public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
    * Is only accessed to check Terracotta is working in case of distributed cache.
    */  
   private ClusterCache clusterCache;
-  
+
+  private static final String TIMER_NAME_PREFIX = "Heartbeat";
   /**
    * Constructor.
    * @param heartbeatSender the JmsSender for sending heartbeats to the clients 
@@ -101,7 +102,7 @@ public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
                               @Qualifier("clusterCache") final ClusterCache clusterCache) {
     super();   
     this.heartbeatSender = heartbeatSender;    
-    this.timer = new Timer();
+    this.timer = new Timer(TIMER_NAME_PREFIX);
     this.listeners = new ArrayList<HeartbeatListener>();
     this.clusterCache = clusterCache;
   }
