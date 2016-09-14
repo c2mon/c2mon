@@ -20,9 +20,7 @@ import java.sql.Timestamp;
 import java.util.Properties;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import cern.c2mon.server.common.expression.Evaluator;
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.cache.C2monCacheWithListeners;
@@ -49,9 +47,10 @@ import cern.c2mon.shared.daq.config.DataTagUpdate;
 import static cern.c2mon.shared.common.type.TypeConverter.isKnownClass;
 
 /**
- * {@link DataTagFacade} and {@link ControlTagFacade} have some functionalities in common which
- * have been joined into this abstract class. But also in the future this class may be useful
- * for all facades which provides methods for objects that implement the {@link DataTag} interface.
+ * {@link DataTagFacade} and {@link ControlTagFacade} have some functionality
+ * in common which have been joined into this abstract class. But also in the
+ * future this class may be useful for all facades which provides methods for
+ * objects that implement the {@link DataTag} interface.
  *
  * @author Matthias Braeger
  *
@@ -71,6 +70,10 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
   /** Reference to the SubEquipment facade */
   private SubEquipmentFacade subEquipmentFacade = null;
 
+  /**
+   * Evaluates alarm expressions of a tag.
+   */
+  private final Evaluator evaluator;
 
   /**
    * Reference to qualityConverter bean.
@@ -80,11 +83,12 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
   /**
    * Unique constructor.
    *
-   * @param tagCache the particular tag cache needs passing in from the facade implementation
+   * @param tagCache the particular tag cache needs passing in from the facade
+   *                 implementation
    * @param alarmFacade the alarm facade bean
    * @param alarmCache the alarm cache
-   * @param commonTagObjectFacade Interface exposing common methods for modifying Tag objects
-   *                              (DataTags, ControlTags and RuleTags)
+   * @param commonTagObjectFacade Interface exposing common methods for
+   *                              modifying Tag objects(DataTags, ControlTags and RuleTags)
    * @param dataTagCacheObjectFacade the object that acts directly on the cache object
    * @param qualityConverter the bean managing how the quality changes on incoming values
    */
@@ -93,16 +97,17 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
                                   final AlarmCache alarmCache,
                                   final CommonTagObjectFacade<T> commonTagObjectFacade,
                                   final DataTagCacheObjectFacade dataTagCacheObjectFacade,
-                                  final QualityConverter qualityConverter) {
+                                  final QualityConverter qualityConverter, final Evaluator evaluator) {
     super(tagCache, alarmFacade, alarmCache);
 
     this.dataTagCacheObjectFacade = dataTagCacheObjectFacade;
     this.qualityConverter = qualityConverter;
+    this.evaluator = evaluator;
   }
 
   /**
-   * Sets the reference to the equipment facade which is needed for the configuration
-   * of the cache object
+   * Sets the reference to the equipment facade which is needed for the
+   * configuration of the cache object
    * @param equipmentFacade Reference to the equipment facade
    */
   protected final void setEquipmentFacade(final EquipmentFacade equipmentFacade) {
@@ -110,8 +115,8 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
   }
 
   /**
-   * Sets the reference to the subequipment facade which is needed for the configuration
-   * of the cache object
+   * Sets the reference to the subequipment facade which is needed for the
+   * configuration of the cache object
    * @param subEquipmentFacade Reference to the subequipment facade
    */
   public void setSubEquipmentFacade(SubEquipmentFacade subEquipmentFacade) {
@@ -128,23 +133,28 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
    * <p>This method is thread-safe (it performs the required synchronization
    * on the cache object residing in the cache.
    *
-   * <p>This method should preferably be performed on an object outside the cache
-   * before being applied to the object residing in the cache, since changes cannot
-   * be rolled back if the validation fails.
+   * <p>This method should preferably be performed on an object outside the
+   * cache before being applied to the object residing in the cache, since
+   * changes cannot be rolled back if the validation fails.
    *
-   * <p>The returned change object can be used to inform the data when an update is
-   * performed (not used during DataTag creation).
+   * <p>The returned change object can be used to inform the data when an
+   * update is performed (not used during DataTag creation).
    *
-   * throws ConfigurationException if the reconfigured cache object fails validation checks (unchecked)
-   * throws IllegalArgumentException thrown when creating DAQ change event for HardwareAddress (unchecked)
+   * throws ConfigurationException if the reconfigured cache object fails
+   * validation checks (unchecked) throws IllegalArgumentException thrown
+   * when creating DAQ change event for HardwareAddress (unchecked)
    *
-   * @param dataTag the cache object to reconfigure (the object is modified by this method)
+   * @param dataTag the cache object to reconfigure (the object is modified by
+   *                this method)
    * @param properties the properties that need reconfiguring
-   * @return a DataTagUpdate object with the changes needed to be passed to the DAQ
-   * @throws IllegalAccessException thrown when creating DAQ change event for HardwareAddress
+   * @return a DataTagUpdate object with the changes needed to be passed to
+   * the DAQ
+   * @throws IllegalAccessException thrown when creating DAQ change event for
+   * HardwareAddress
    */
   @Override
-  public final DataTagUpdate configureCacheObject(final T dataTag, final Properties properties) throws ConfigurationException, IllegalArgumentException, IllegalAccessException {
+  public final DataTagUpdate configureCacheObject(final T dataTag, final Properties properties)
+      throws ConfigurationException, IllegalArgumentException, IllegalAccessException {
 
     DataTagCacheObject dataTagCacheObject = (DataTagCacheObject) dataTag;
     DataTagUpdate dataTagUpdate = setCommonProperties(dataTagCacheObject, properties);
@@ -215,8 +225,8 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
   }
 
   /**
-   * Method containing all the logic for filtering out incoming datatag updates before any updates are
-   * attempted. Call within synchronized block.
+   * Method containing all the logic for filtering out incoming datatag updates
+   * before any updates are attempted. Call within synchronized block.
    * @param dataTag
    * @param sourceDataTagValue
    * @return true if the update should be filtered out, false if it should be kept
@@ -380,16 +390,17 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
   }
 
   /**
-   * Updates the DataTag in the cache from the passed SourceDataTagValue. The method notifies
-   * any cache listeners if an update is made.
+   * Updates the DataTag in the cache from the passed SourceDataTagValue.
+   * The method notifies any cache listeners if an update is made.
    *
-   * <p>The cache timestamp is set to the current time. The DAQ and source timestamps are
-   * set to the values received in the SourceDataTagValue.
+   * <p>The cache timestamp is set to the current time. The DAQ and source
+   * timestamps are set to the values received in the SourceDataTagValue.
    *
    * @param dataTagId id of DataTag
    * @param sourceDataTagValue the value received from the data acquisition layer
-   * @return true if the tag was indeed updated (that is, the cache was modified, i.e. the update was not
-   * filtered out for some reason), together with the cache timestamp of this update
+   * @return true if the tag was indeed updated (that is, the cache was modified
+   * , i.e. the update was not filtered out for some reason), together with the
+   * cache timestamp of this update
    * @throws CacheElementNotFoundException if the Tag cannot be found in the cache
    */
   public final Event<Boolean> updateFromSource(final Long dataTagId, final SourceDataTagValue sourceDataTagValue) {
@@ -409,7 +420,9 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
       }
 
       Event<Boolean> returnEvent = updateFromSource(dataTag, sourceDataTagValue);
+
       if (returnEvent.getReturnValue()) {
+        dataTag = (T) evaluator.evaluate(dataTag);
         tagCache.put(dataTagId, dataTag);
       }
       return returnEvent;
@@ -447,13 +460,14 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
 
 
   /**
-   * Same as other updateAndValidate method but takes a tag id as parameter and does the cache lookup
-   * in the method.
+   * Same as other updateAndValidate method but takes a tag id as parameter and
+   * does the cache lookup in the method.
    *
-   * <p>The cache timestamp is set to the current time and the DAQ and source timestamps are
-   * reset to null.
+   * <p>The cache timestamp is set to the current time and the DAQ and source
+   * timestamps are reset to null.
    *
-   * <p>If the update causes no changes, the cache object is not updated (see filterout method in AbstracTagFacade).
+   * <p>If the update causes no changes, the cache object is not updated
+   * (see filterout method in AbstracTagFacade).
    *
    * <p>Notifies registered listeners if an update takes place.
    *

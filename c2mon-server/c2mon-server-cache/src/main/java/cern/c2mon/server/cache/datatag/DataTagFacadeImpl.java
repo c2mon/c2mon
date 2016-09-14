@@ -21,6 +21,7 @@ import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.common.expression.Evaluator;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import lombok.extern.slf4j.Slf4j;
@@ -82,8 +83,9 @@ public class DataTagFacadeImpl extends AbstractDataTagFacade<DataTag> implements
                            final AlarmFacade alarmFacade,
                            final AlarmCache alarmCache,
                            final EquipmentFacade equipmentFacade,
-                           final SubEquipmentFacade subEquipmentFacade) {
-    super(dataTagCache, alarmFacade, alarmCache, dataTagCacheObjectFacade, dataTagCacheObjectFacade, qualityConverter);
+                           final SubEquipmentFacade subEquipmentFacade,
+                           final Evaluator evaluator) {
+    super(dataTagCache, alarmFacade, alarmCache, dataTagCacheObjectFacade, dataTagCacheObjectFacade, qualityConverter, evaluator);
     super.setEquipmentFacade(equipmentFacade);
     super.setSubEquipmentFacade(subEquipmentFacade);
     this.dataTagCacheObjectFacade = dataTagCacheObjectFacade;

@@ -17,9 +17,10 @@
 package cern.c2mon.server.cache.rule;
 
 import java.sql.Timestamp;
-import java.util.HashSet;
 import java.util.Properties;
 
+import cern.c2mon.server.common.expression.Evaluator;
+import cern.c2mon.server.common.tag.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,6 @@ import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.cache.RuleTagFacade;
 import cern.c2mon.server.cache.common.AbstractTagFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -55,6 +55,9 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
    * Used for tracking nb of rule evaluations in testing. TODO remove once no longer necessary
    */
   private volatile int updateCount = 0; //not completely exact as no locking
+
+  @Autowired
+  private Evaluator evaluator;
 
   /**
    * Logger for logging updates made to rules.
@@ -134,6 +137,7 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
     }
   }
 
+  // TODO: remove?
 //  @Override
 //  public void invalidate(Long id, DataTagQuality dataTagQuality, Timestamp timestamp) {
 //    try {
@@ -160,6 +164,7 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
       if (!filterout(ruleTag, value, valueDescription, null, null, timestamp)) {
         ruleTagCacheObjectFacade.validate(ruleTag);
         ruleTagCacheObjectFacade.update(ruleTag, value, valueDescription, timestamp);
+        ruleTag = (RuleTag) evaluator.evaluate(ruleTag);
         tagCache.put(id, ruleTag);
         updateCount++;
         log((RuleTagCacheObject) ruleTag);
