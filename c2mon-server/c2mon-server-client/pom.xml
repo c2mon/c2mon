@@ -14,6 +14,7 @@
   <description>The C2MON server Client module handles the communication to the client layer API.</description>
 
   <dependencies>
+    <!--TODO-#49: exchange with server-cache and server-common because alarm will be obsolete-->
     <dependency>
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-alarm</artifactId>

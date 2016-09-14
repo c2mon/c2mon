@@ -18,6 +18,7 @@ package cern.c2mon.shared.client.tag;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
+import cern.c2mon.shared.client.expression.Expression;
 import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.type.TypeConverter;
@@ -77,6 +78,9 @@ public class TransferTagValueImpl extends ClientRequestReport implements TagValu
   /** Collection of <code>AlarmValue</code> objects */
   @Singular
   private Collection<AlarmValueImpl> alarmValues = new ArrayList<>();
+
+  @Singular
+  private final List<Expression> expressions;
 
   /** The quality of the tag */
   @NotNull
@@ -148,6 +152,7 @@ public class TransferTagValueImpl extends ClientRequestReport implements TagValu
     serverTimestamp = pServerTimestamp;
     description = pDescription;
     valueDescription = pValueDescription;
+    expressions = new ArrayList<>();
   }
 
   @Override
@@ -160,6 +165,10 @@ public class TransferTagValueImpl extends ClientRequestReport implements TagValu
   @JsonIgnore
   public DataTagQualityImpl getDataTagQuality(){
     return this.tagQuality;
+  }
+
+  public void addExpressions(Collection<Expression> expressions){
+    this.expressions.addAll(expressions);
   }
 
   /**
