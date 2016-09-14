@@ -20,7 +20,7 @@ import java.sql.Timestamp;
 import java.util.Properties;
 
 import lombok.extern.slf4j.Slf4j;
-
+import cern.c2mon.server.common.expression.Evaluator;
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.cache.C2monCacheWithListeners;
@@ -47,9 +47,10 @@ import cern.c2mon.shared.daq.config.DataTagUpdate;
 import static cern.c2mon.shared.common.type.TypeConverter.isKnownClass;
 
 /**
- * {@link DataTagFacade} and {@link ControlTagFacade} have some functionalities in common which
- * have been joined into this abstract class. But also in the future this class may be useful
- * for all facades which provides methods for objects that implement the {@link DataTag} interface.
+ * {@link DataTagFacade} and {@link ControlTagFacade} have some functionality
+ * in common which have been joined into this abstract class. But also in the
+ * future this class may be useful for all facades which provides methods for
+ * objects that implement the {@link DataTag} interface.
  *
  * @author Matthias Braeger
  *
@@ -69,6 +70,10 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
   /** Reference to the SubEquipment facade */
   private SubEquipmentFacade subEquipmentFacade = null;
 
+  /**
+   * Evaluates alarm expressions of a tag.
+   */
+  private final Evaluator evaluator;
 
   /**
    * Reference to qualityConverter bean.
@@ -78,7 +83,8 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
   /**
    * Unique constructor.
    *
-   * @param tagCache the particular tag cache needs passing in from the facade implementation
+   * @param tagCache the particular tag cache needs passing in from the facade
+   *                 implementation
    * @param alarmFacade the alarm facade bean
    * @param alarmCache the alarm cache
    * @param commonTagObjectFacade Interface exposing common methods for modifying Tag objects
@@ -91,11 +97,13 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
                                   final AlarmCache alarmCache,
                                   final CommonTagObjectFacade<T> commonTagObjectFacade,
                                   final DataTagCacheObjectFacade dataTagCacheObjectFacade,
-                                  final QualityConverter qualityConverter) {
+                                  final QualityConverter qualityConverter,
+                                  final Evaluator evaluator) {
     super(tagCache, alarmFacade, alarmCache);
 
     this.dataTagCacheObjectFacade = dataTagCacheObjectFacade;
     this.qualityConverter = qualityConverter;
+    this.evaluator = evaluator;
   }
 
   /**
@@ -142,7 +150,8 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
    * @throws IllegalAccessException thrown when creating DAQ change event for HardwareAddress
    */
   @Override
-  public final DataTagUpdate configureCacheObject(final T dataTag, final Properties properties) throws ConfigurationException, IllegalArgumentException, IllegalAccessException {
+  public final DataTagUpdate configureCacheObject(final T dataTag, final Properties properties)
+      throws ConfigurationException, IllegalArgumentException, IllegalAccessException {
 
     DataTagCacheObject dataTagCacheObject = (DataTagCacheObject) dataTag;
     DataTagUpdate dataTagUpdate = setCommonProperties(dataTagCacheObject, properties);
@@ -373,22 +382,24 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
   }
 
   /**
-   * Updates the DataTag in the cache from the passed SourceDataTagValue. The method notifies
-   * any cache listeners if an update is made.
+   * Updates the DataTag in the cache from the passed SourceDataTagValue.
+   * The method notifies any cache listeners if an update is made.
    *
-   * <p>The cache timestamp is set to the current time. The DAQ and source timestamps are
-   * set to the values received in the SourceDataTagValue.
+   * <p>The cache timestamp is set to the current time. The DAQ and source
+   * timestamps are set to the values received in the SourceDataTagValue.
    *
    * @param dataTagId id of DataTag
    * @param sourceDataTagValue the value received from the data acquisition layer
-   * @return true if the tag was indeed updated (that is, the cache was modified, i.e. the update was not
-   * filtered out for some reason), together with the cache timestamp of this update
+   * @return true if the tag was indeed updated (that is, the cache was modified
+   * , i.e. the update was not filtered out for some reason), together with the
+   * cache timestamp of this update
    * @throws CacheElementNotFoundException if the Tag cannot be found in the cache
    */
   public final Event<Boolean> updateFromSource(final Long dataTagId, final SourceDataTagValue sourceDataTagValue) {
     tagCache.acquireWriteLockOnKey(dataTagId);
     try {
       T dataTag = tagCache.get(dataTagId);
+
 
       // Before updating the new value to the cache convert the value to the proper type.
       // In the process of the deserialization the dataType can still divert from the defined dataType.
@@ -401,7 +412,9 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
       }
 
       Event<Boolean> returnEvent = updateFromSource(dataTag, sourceDataTagValue);
+
       if (returnEvent.getReturnValue()) {
+        dataTag = (T) evaluator.evaluate(dataTag);
         tagCache.put(dataTagId, dataTag);
       }
       return returnEvent;
@@ -439,13 +452,14 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
 
 
   /**
-   * Same as other updateAndValidate method but takes a tag id as parameter and does the cache lookup
-   * in the method.
+   * Same as other updateAndValidate method but takes a tag id as parameter and
+   * does the cache lookup in the method.
    *
-   * <p>The cache timestamp is set to the current time and the DAQ and source timestamps are
-   * reset to null.
+   * <p>The cache timestamp is set to the current time and the DAQ and source
+   * timestamps are reset to null.
    *
-   * <p>If the update causes no changes, the cache object is not updated (see filterout method in AbstracTagFacade).
+   * <p>If the update causes no changes, the cache object is not updated
+   * (see filterout method in AbstracTagFacade).
    *
    * <p>Notifies registered listeners if an update takes place.
    *

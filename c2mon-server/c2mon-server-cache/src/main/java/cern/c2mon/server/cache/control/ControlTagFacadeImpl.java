@@ -19,11 +19,8 @@ package cern.c2mon.server.cache.control;
 import java.util.Properties;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import cern.c2mon.server.common.expression.Evaluator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.AlarmCache;
@@ -47,21 +44,25 @@ import cern.c2mon.shared.common.ConfigurationException;
 @Service
 public class ControlTagFacadeImpl extends AbstractDataTagFacade<ControlTag> implements ControlTagFacade {
 
+  private AliveTimerCache aliveTimerCache;
+
   @Autowired
   public ControlTagFacadeImpl(final DataTagCacheObjectFacade dataTagCacheObjectFacade,
                               final ControlTagCache controlTagCache,
                               final AlarmFacade alarmFacade,
                               final AlarmCache alarmCache,
                               final ControlTagCacheObjectFacade controlTagCacheObjectFacade,
-                              final QualityConverter qualityConverter) {
-    super(controlTagCache, alarmFacade, alarmCache, controlTagCacheObjectFacade, dataTagCacheObjectFacade, qualityConverter);
+                              final QualityConverter qualityConverter,
+                              final Evaluator evaluator) {
+    super(controlTagCache, alarmFacade, alarmCache, controlTagCacheObjectFacade, dataTagCacheObjectFacade, qualityConverter, evaluator);
+    this.aliveTimerCache = aliveTimerCache;
   }
 
   @Override
   public ControlTagCacheObject createCacheObject(final Long id, final Properties properties) throws IllegalAccessException {
     ControlTagCacheObject controlTag = new ControlTagCacheObject(id);
     configureCacheObject(controlTag, properties);
-
+    
     validateConfig(controlTag);
     return controlTag;
   }

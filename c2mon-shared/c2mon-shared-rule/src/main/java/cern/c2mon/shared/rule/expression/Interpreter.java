@@ -13,7 +13,7 @@ public class Interpreter {
 
   /**
    * Takes a expression which needs one argument parameter and evaluates it.
-   * The result has to be a boolean and the parameter in the expression has has
+   * The result has to be a boolean and the parameter in the expression has
    * to be named '$value'.
    *
    * @param expression the groovy based expression which will be evaluated
