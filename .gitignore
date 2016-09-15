@@ -2,6 +2,7 @@
 *.class
 build/
 target/
+temp.json
 
 # IDE files
 *.iml
