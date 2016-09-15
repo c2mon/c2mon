@@ -71,6 +71,9 @@ public final class CacheListener<T extends Cacheable> extends ApplicationObjectS
     try {
       this.notifyUpdateThreadHandler = new ThreadHandler(timCacheListener, C2monCacheListener.class.getMethod("notifyElementUpdated", new Class< ? >[] {Cacheable.class}));
       this.statusConfirmationHandler = new ThreadHandler(timCacheListener, C2monCacheListener.class.getMethod("confirmStatus", new Class< ? >[] {Cacheable.class}));
+
+      this.notifyUpdateThreadHandler.setName("NotifyUpdater");
+      this.statusConfirmationHandler.setName("StatusConfirm");
     } catch (SecurityException e) {
       LOGGER.error("Security exception caught.", e);
     } catch (NoSuchMethodException e) {
