@@ -121,6 +121,5 @@
         SELECT E1.EQID
         FROM EQUIPMENT E1
         WHERE EQNAME = #{name}
-        AND E1.EQ_PROCID IS NOT NULL
     </select>
   </mapper>
