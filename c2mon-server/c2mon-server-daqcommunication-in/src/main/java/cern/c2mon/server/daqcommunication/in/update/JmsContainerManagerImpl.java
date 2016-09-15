@@ -329,7 +329,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
           }        
         }
         
-      }).start(); 
+      }, "JmsContainer").start();
       
       //start thread that will periodically check if a Process has been added or removed from a distributed cluster
       subscriptionChecker = new Timer();
