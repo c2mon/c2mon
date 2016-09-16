@@ -2,7 +2,7 @@
 <!-- the xsd schema is never used by ehcache and can be omitted -->
 <!-- updateCheck=false means ehcache will not seek to update via internet -->
 <ehcache xsi:noNamespaceSchemaLocation="classpath:resources/ehcache.xsd" updateCheck="false" name="tim-cachemanager">
-    <diskStore path="${c2mon.log.dir}/ehcache-diskstore"/>
+    <diskStore path="${logging.path}/ehcache-diskstore"/>
     <defaultCache
       eternal="true"
       maxElementsInMemory="500"
