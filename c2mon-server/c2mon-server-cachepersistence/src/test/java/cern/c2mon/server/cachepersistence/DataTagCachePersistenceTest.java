@@ -91,7 +91,7 @@ public class DataTagCachePersistenceTest {
   public void testTagPersistence() throws InterruptedException {
 
     //create a test cache object, put in the cache
-    dataTagCache.put(originalObject.getId(), originalObject);
+    dataTagCache.putQuiet(originalObject);
 
     //check it is in cache (only values so far...)
 
@@ -143,7 +143,7 @@ public class DataTagCachePersistenceTest {
 
     dataTagMapper.insertDataTag(floatTag);
     assertNotNull(dataTagMapper.getItem(floatTag.getId()));
-    dataTagCache.put(floatTag.getId(), floatTag);
+    dataTagCache.putQuiet(floatTag);
 
     //update the cache with the first value
     DataTagCacheObject cacheObject = (DataTagCacheObject) dataTagCache.get(floatTag.getId());

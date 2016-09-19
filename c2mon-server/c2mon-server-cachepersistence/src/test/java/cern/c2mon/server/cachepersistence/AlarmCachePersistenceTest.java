@@ -88,7 +88,7 @@ public class AlarmCachePersistenceTest {
   @Test
   public void testAlarmPersistence() {
 
-    alarmCache.put(originalObject.getId(), originalObject);
+    alarmCache.putQuiet(originalObject);
 
     //check state is as expected
     assertEquals(AlarmCondition.TERMINATE, originalObject.getState());

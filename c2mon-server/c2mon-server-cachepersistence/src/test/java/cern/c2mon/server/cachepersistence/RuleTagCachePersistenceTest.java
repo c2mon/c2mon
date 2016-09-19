@@ -93,7 +93,7 @@ public class RuleTagCachePersistenceTest {
   @Test
   public void testRuleTagPersistence() throws InterruptedException {
 
-    ruleTagCache.put(originalObject.getId(), originalObject);
+    ruleTagCache.putQuiet(originalObject);
 
     //check it is in cache (only values so far...)
 

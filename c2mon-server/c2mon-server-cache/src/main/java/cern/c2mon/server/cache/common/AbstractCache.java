@@ -233,6 +233,9 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
   /**
    * Put a new object in the cache, notifying the listeners.
    * The value object itself is put into the cache (not a copy).
+   *
+   * <p> Call this method only if the the value was already insert with the
+   * {@link #putQuiet(Cacheable)} method.
    * @param key
    * @param value
    */

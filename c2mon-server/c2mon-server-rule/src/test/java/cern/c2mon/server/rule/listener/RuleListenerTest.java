@@ -16,6 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.rule.listener;
 
+import java.sql.Timestamp;
+
 import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.DataTagFacade;
 import cern.c2mon.server.cache.RuleTagCache;
@@ -28,21 +30,13 @@ import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.rule.junit.RuleCachePopulationRule;
 import cern.c2mon.server.test.CacheObjectCreation;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.io.IOException;
-import java.sql.Timestamp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -98,9 +92,9 @@ public class RuleListenerTest {
     DataTag dataTag2 = CacheObjectCreation.createTestDataTag2();
     RuleTag ruleTag = CacheObjectCreation.createTestRuleTag();
 
-    dataTagCache.put(dataTag1.getId(), dataTag1);
-    dataTagCache.put(dataTag2.getId(), dataTag2);
-    ruleTagCache.put(ruleTag.getId(), ruleTag);
+    dataTagCache.putQuiet(dataTag1);
+    dataTagCache.putQuiet(dataTag2);
+    ruleTagCache.putQuiet(ruleTag);
 
     //check still set as expected in test class
     assertEquals(dataTag1.getValue(), Boolean.TRUE);
@@ -145,4 +139,5 @@ public class RuleListenerTest {
     }
     assertEquals(Integer.valueOf(2), ruleTag.getValue());
   }
+
 }
