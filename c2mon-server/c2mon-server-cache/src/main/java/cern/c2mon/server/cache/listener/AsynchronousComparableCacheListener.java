@@ -16,53 +16,53 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.listener;
 
-import cern.c2mon.server.cache.C2monCompareCacheListener;
+import cern.c2mon.server.cache.ComparableCacheListener;
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.util.threadhandler.ThreadHandler;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Asynchronous cache listener that passes events received by the Ehcache listener
- * to the wrapped {@link C2monCompareCacheListener} on a single thread.
+ * Asynchronous cache listener that passes events received by the Ehcache
+ * listener to the wrapped {@link ComparableCacheListener} on a single thread.
  *
- * <p>A new CacheListener is created each time a new (asynchronous) listener is registered, wrapping
- * the C2monCacheListener implemented by the module listener class.
+ * <p>A new CacheListener is created each time a new (asynchronous) listener is
+ * registered, wrapping the C2monCacheListener implemented by the module
+ * listener class.
  *
- * <p>It instantiates threads for each cache notification method, and passes each
- * received object to the appropriate thread.
+ * <p>It instantiates threads for each cache notification method, and passes
+ * each received object to the appropriate thread.
  *
  * @author Franz Ritter
  */
 @Slf4j
-public final class AsynchronousCompareCacheListener<T extends Cacheable> implements C2monCompareCacheListener<T>{
+public final class AsynchronousComparableCacheListener<T extends Cacheable> implements ComparableCacheListener<T> {
 
   /**
    * The threads dealing with updates.
    */
   public ThreadHandler notifyUpdateThreadHandler;
-//  private ThreadHandler statusConfirmationHandler;
 
   /**
-   * Constructor returning a CacheListener wrapping the {@link C2monCompareCacheListener}.
+   * Constructor returning a CacheListener wrapping the {@link ComparableCacheListener}.
    * Instantiates and starts the required threads.
    *
-   * @param timCacheListener the wrapped listener object
+   * @param cacheListener the wrapped listener object
    */
-  public AsynchronousCompareCacheListener(final C2monCompareCacheListener<T> timCacheListener) {
+  public AsynchronousComparableCacheListener(final ComparableCacheListener<T> cacheListener) {
     try {
-      this.notifyUpdateThreadHandler = new ThreadHandler(timCacheListener, C2monCompareCacheListener.class.getMethod
+      this.notifyUpdateThreadHandler = new ThreadHandler(cacheListener, ComparableCacheListener.class.getMethod
           ("notifyElementUpdated", Cacheable.class, Cacheable.class));
       this.notifyUpdateThreadHandler.start();
     } catch (SecurityException e) {
-      log.error("Security exception caught.", e);
+      log.error("Security exception caught", e);
     } catch (NoSuchMethodException e) {
-      log.error("No such method found in C2monCacheListener.", e);
+      log.error("No such method found in C2monCacheListener", e);
     }
   }
 
   @Override
-  public void notifyElementUpdated(T oldCacheable, T newCacheable) {
-    notifyUpdateThreadHandler.put(new Object[]{oldCacheable, newCacheable});
+  public void notifyElementUpdated(T original, T updated) {
+    notifyUpdateThreadHandler.put(new Object[]{original, updated});
 
   }
 }

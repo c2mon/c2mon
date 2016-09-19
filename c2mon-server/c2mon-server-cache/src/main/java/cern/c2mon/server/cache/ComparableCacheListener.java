@@ -28,17 +28,17 @@ import cern.c2mon.shared.common.Cacheable;
  * @param <T> the type the listener expects
  */
 //TODO: check if 'void confirmStatus(T cacheable);' is needed. See 'C2monCacheListener'
-public interface C2monCompareCacheListener<T extends Cacheable> {
+public interface ComparableCacheListener<T extends Cacheable> {
 
   /**
    * Callback when a cache object is modified. The passed object
    * can be queried but should in general not be modified.
    *
-   * @param oldCacheable the former cache object
-   * @param newCacheable the object in the cache that has been updated
+   * @param original the former cache object
+   * @param updated the object in the cache that has been updated
    *
    */
-  void notifyElementUpdated(T oldCacheable, T newCacheable);
+  void notifyElementUpdated(T original, T updated);
 
 
 
