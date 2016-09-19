@@ -27,22 +27,18 @@ import java.util.concurrent.LinkedBlockingDeque;
 import cern.c2mon.server.cache.config.CacheProperties;
 import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import lombok.extern.slf4j.Slf4j;
+import cern.c2mon.server.cache.C2monCompareCacheListener;
+import cern.c2mon.server.cache.listener.*;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.event.RegisteredEventListeners;
 import net.sf.ehcache.loader.CacheLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 
 import cern.c2mon.server.cache.C2monBufferedCacheListener;
 import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.cache.listener.BufferedKeyCacheListener;
-import cern.c2mon.server.cache.listener.CacheListener;
-import cern.c2mon.server.cache.listener.DefaultBufferedCacheListener;
-import cern.c2mon.server.cache.listener.MultiThreadedCacheListener;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.C2monCacheName;
@@ -93,7 +89,9 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
   /**
    * Reference to the Ehcache event listeners
    */
-  private LinkedBlockingDeque<C2monCacheListener<? super T>> cacheListeners = new LinkedBlockingDeque<>();
+  private LinkedBlockingDeque<C2monCacheListener< ? super T>> cacheListeners = new LinkedBlockingDeque<>();
+
+  private LinkedBlockingDeque<C2monCompareCacheListener< ? super T>> compareCacheListeners = new LinkedBlockingDeque<>();
 
   /**
    * the RegisteredEventListeners instance for this cache which is used
@@ -240,7 +238,9 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
    */
   @Override
   public void put(K key, T value) {
+    T oldValue = getCopy(key);
     super.put(key, value);
+    notifyCompareListenersOfUpdate(oldValue, value);
     notifyListenersOfUpdate(value);
   }
 
@@ -272,6 +272,29 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
     }
   }
 
+  /**
+   * Get called after a new cache element was put into the cache.
+   *
+   * Notifies the listeners that an update occurred for a cache object.
+   * The listener gets the information of the former cache object and the new
+   * cache object.
+   *
+   * @param oldCacheable the cache object which was in the cache before the new one.
+   * @param newCachable the cache object which was put into the cache
+   */
+  public void notifyCompareListenersOfUpdate(final T oldCacheable, final T newCachable) {
+    try {
+      T clonedNewCachable = (T) newCachable.clone();
+      if (oldCacheable != null) {
+        for (C2monCompareCacheListener<? super T> listener : compareCacheListeners) {
+          listener.notifyElementUpdated(oldCacheable, clonedNewCachable);
+        }
+      }
+    } catch (CloneNotSupportedException e) {
+      e.printStackTrace();
+    }
+  }
+
   public void notifyListenerStatusConfirmation(final T cacheable, final long timestamp) {
     try {
       @SuppressWarnings("unchecked")
@@ -295,8 +318,13 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
     return wrappedCacheListener;
   }
 
-  public Lifecycle registerThreadedListener(C2monCacheListener<? super T> cacheListener, int queueCapacity, int threadPoolSize) {
-    MultiThreadedCacheListener<? super T> threadedCacheListener = new MultiThreadedCacheListener<>(cacheListener, queueCapacity, threadPoolSize);
+  public void registerCompareListener(C2monCompareCacheListener<? super T> timCacheListener) {
+    AsynchronousCompareCacheListener<? super T> wrappedCacheListener = new AsynchronousCompareCacheListener<>(timCacheListener);
+    compareCacheListeners.add(wrappedCacheListener);
+  }
+
+  public Lifecycle registerThreadedListener(C2monCacheListener<? super T> timCacheListener, int queueCapacity, int threadPoolSize) {
+    MultiThreadedCacheListener<? super T> threadedCacheListener = new MultiThreadedCacheListener<>(timCacheListener, queueCapacity, threadPoolSize);
     cacheListeners.add(threadedCacheListener);
     return threadedCacheListener;
   }

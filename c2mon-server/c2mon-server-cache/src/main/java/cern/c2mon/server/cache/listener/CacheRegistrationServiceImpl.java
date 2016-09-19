@@ -17,18 +17,10 @@
 package cern.c2mon.server.cache.listener;
 
 import cern.c2mon.server.cache.config.CacheProperties;
+import cern.c2mon.server.cache.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.cache.AlarmCache;
-import cern.c2mon.server.cache.C2monBufferedCacheListener;
-import cern.c2mon.server.cache.C2monCacheListener;
-import cern.c2mon.server.cache.CacheRegistrationService;
-import cern.c2mon.server.cache.CacheSupervisionListener;
-import cern.c2mon.server.cache.ControlTagCache;
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.datatag.DataTag;
@@ -110,7 +102,7 @@ public class CacheRegistrationServiceImpl implements CacheRegistrationService {
     if (threads == 1) {
       return registerToAllTags(tagCacheListener);
     } else {
-      MultiThreadedCacheListener<Tag> threadedCacheListener = new MultiThreadedCacheListener<Tag>(tagCacheListener, QUEUE_SIZE_DEFAULT, threads);
+      MultiThreadedCacheListener<Tag> threadedCacheListener = new MultiThreadedCacheListener<>(tagCacheListener, QUEUE_SIZE_DEFAULT, threads);
       registerListenerToTags(threadedCacheListener);
       return threadedCacheListener;
     }
@@ -175,8 +167,16 @@ public class CacheRegistrationServiceImpl implements CacheRegistrationService {
   }
 
   @Override
+  @Deprecated
   public Lifecycle registerToAlarms(final C2monCacheListener<Alarm> cacheListener) {
     return alarmCache.registerListener(cacheListener);
+  }
+
+  @Override
+  public void registerToAlarmExpressions(final C2monCompareCacheListener<Tag> compareCacheListener) {
+    dataTagCache.registerCompareListener(compareCacheListener);
+    controlTagCache.registerCompareListener(compareCacheListener);
+    ruleTagCache.registerCompareListener(compareCacheListener);
   }
 
   private void registerListenerToTags(C2monCacheListener<Tag> cacheListener) {
