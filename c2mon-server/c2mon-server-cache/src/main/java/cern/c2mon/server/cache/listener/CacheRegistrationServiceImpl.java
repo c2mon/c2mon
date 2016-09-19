@@ -173,10 +173,10 @@ public class CacheRegistrationServiceImpl implements CacheRegistrationService {
   }
 
   @Override
-  public void registerToAlarmExpressions(final C2monCompareCacheListener<Tag> compareCacheListener) {
-    dataTagCache.registerCompareListener(compareCacheListener);
-    controlTagCache.registerCompareListener(compareCacheListener);
-    ruleTagCache.registerCompareListener(compareCacheListener);
+  public void registerToAlarmExpressions(final ComparableCacheListener<Tag> compareCacheListener) {
+    dataTagCache.registerComparableListener(compareCacheListener);
+    controlTagCache.registerComparableListener(compareCacheListener);
+    ruleTagCache.registerComparableListener(compareCacheListener);
   }
 
   private void registerListenerToTags(C2monCacheListener<Tag> cacheListener) {

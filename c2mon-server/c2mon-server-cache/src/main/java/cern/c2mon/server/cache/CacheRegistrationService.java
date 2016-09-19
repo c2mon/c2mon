@@ -155,13 +155,10 @@ public interface CacheRegistrationService {
   Lifecycle registerToAlarms(C2monCacheListener<Alarm> timCacheListener);
 
   /**
-   * Registers a compare listener to all tag caches. This listener is called on it's
-   * own thread.
+   * Registers a comparable listener to all tag caches. This listener is called
+   * on its own thread.
    *
    * @param compareCacheListener the listener
-   * @return a Lifecycle object to allow the registered listener to stop/start its thread as required;
-   *          in general, the start() method should be called at the end of its own lifecycle start method,
-   *          and the stop() at the beginning of its own stop method
    */
-  void registerToAlarmExpressions(final C2monCompareCacheListener<Tag> compareCacheListener);
+  void registerToAlarmExpressions(final ComparableCacheListener<Tag> compareCacheListener);
 }
