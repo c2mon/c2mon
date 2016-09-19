@@ -48,87 +48,87 @@
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-alarm</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-cache</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-cachedbaccess</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-cacheloading</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-cachepersistence</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-client</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-command</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-common</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-configuration</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-daqcommunication-in</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-daqcommunication-out</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-lifecycle</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-rule</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-shorttermlog</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-supervision</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-eslog</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-test</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
         <scope>test</scope>
       </dependency>
 
@@ -136,32 +136,32 @@
       <dependency>
         <groupId>cern.c2mon.shared</groupId>
         <artifactId>c2mon-shared-client</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.shared</groupId>
         <artifactId>c2mon-shared-common</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.shared</groupId>
         <artifactId>c2mon-shared-daq</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.shared</groupId>
         <artifactId>c2mon-shared-rule</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.shared</groupId>
         <artifactId>c2mon-shared-persistence-manager</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.shared</groupId>
         <artifactId>c2mon-shared-util</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
 
     </dependencies>

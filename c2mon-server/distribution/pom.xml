@@ -22,7 +22,7 @@
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
