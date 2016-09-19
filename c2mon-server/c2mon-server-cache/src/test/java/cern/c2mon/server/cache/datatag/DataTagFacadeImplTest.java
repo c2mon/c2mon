@@ -142,7 +142,7 @@ public class DataTagFacadeImplTest {
    */
   private final void recordUpdateFromSourceMock(final DataTag dataTag, boolean expectNotifyListeners) {
     dataTagCache.acquireWriteLockOnKey(dataTag.getId());
-    EasyMock.expect(dataTagCache.get(dataTag.getId())).andReturn(dataTag);
+    EasyMock.expect(dataTagCache.getCopy(dataTag.getId())).andReturn(dataTag);
     if (expectNotifyListeners) {
       dataTagCache.put(dataTag.getId(), dataTag);
     }

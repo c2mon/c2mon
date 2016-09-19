@@ -400,8 +400,7 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
   public final Event<Boolean> updateFromSource(final Long dataTagId, final SourceDataTagValue sourceDataTagValue) {
     tagCache.acquireWriteLockOnKey(dataTagId);
     try {
-      T dataTag = tagCache.get(dataTagId);
-
+      T dataTag = tagCache.getCopy(dataTagId);
 
       // Before updating the new value to the cache convert the value to the proper type.
       // In the process of the deserialization the dataType can still divert from the defined dataType.
