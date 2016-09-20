@@ -17,14 +17,7 @@
 package cern.c2mon.server.rule.evaluation;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +94,7 @@ public final class RuleUpdateBuffer {
    */
   @Autowired
   private RuleUpdateBuffer(RuleTagFacade ruleTagFacade) {
-    this.timer = new Timer("RuleUpdate");
+    this.timer = new Timer("RuleUpdater");
     RuleUpdateBuffer.ruleTagFacade = ruleTagFacade;
   }
 
