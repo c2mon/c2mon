@@ -18,14 +18,14 @@ build:
   except:
     - master
 
-#deploy_docs:
-#  type: deploy
-#  script:
-#    - echo "${KRB_PASSWORD}" | kinit ${KRB_USERNAME}@CERN.CH
-#    - mvn -q -B clean package -pl :docs
-#    - scp -r docs/target/* ${KRB_USERNAME}@lxplus:/afs/cern.ch/user/c/${KRB_USERNAME}/www/c2mon.web.cern.ch/docs
-#  only:
-#    - master
+deploy_docs:
+  type: deploy
+  script:
+    - echo "${KRB_PASSWORD}" | kinit ${KRB_USERNAME}@CERN.CH
+    - mvn -q -B clean package -pl :docs
+    - scp -r docs/target/* ${KRB_USERNAME}@lxplus:/afs/cern.ch/user/c/${KRB_USERNAME}/www/c2mon.web.cern.ch/docs
+  only:
+    - master
 
 # CERN-specific triggers. Should be removed one day.
 trigger:
@@ -37,6 +37,8 @@ trigger:
     - "curl -X POST -F token=$C2MON_DAQ_ALARMSOURCE_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9143/trigger/builds"
     # Trigger build of c2mon-daq-db
     - "curl -X POST -F token=$C2MON_DAQ_DB_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9147/trigger/builds"
+    # Trigger build of c2mon-daq-dip
+    - "curl -X POST -F token=$C2MON_DAQ_DIP_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9148/trigger/builds"
     # Trigger build of c2mon-daq-japc
     - "curl -X POST -F token=$C2MON_DAQ_JAPC_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9149/trigger/builds"
     # Trigger build of c2mon-daq-jec
