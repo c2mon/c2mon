@@ -6,7 +6,7 @@ stages:
 build_and_deploy:
   type: build
   script:
-    - mvn -q -B clean deploy --settings settings.xml
+    - mvn -q -U -B clean deploy --settings settings.xml
   only:
     - master
 
@@ -14,7 +14,7 @@ build_and_deploy:
 build:
   type: build
   script:
-    - mvn -q -B clean test -DskipDockerBuild -DskipDockerTag
+    - mvn -q -U -B clean test -DskipDockerBuild -DskipDockerTag
   except:
     - master
 
@@ -39,6 +39,8 @@ trigger:
     - "curl -X POST -F token=$C2MON_DAQ_DB_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9147/trigger/builds"
     # Trigger build of c2mon-daq-japc
     - "curl -X POST -F token=$C2MON_DAQ_JAPC_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9149/trigger/builds"
+    # Trigger build of c2mon-daq-jec
+    - "curl -X POST -F token=$C2MON_DAQ_JEC_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9150/trigger/builds"
     # Trigger build of c2mon-daq-opcua
     - "curl -X POST -F token=$C2MON_DAQ_OPCUA_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9153/trigger/builds"
     # Trigger build of c2mon-client-ext-history
