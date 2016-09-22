@@ -16,9 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.conf.core;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.PostConstruct;
+import javax.xml.parsers.ParserConfigurationException;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -32,13 +33,9 @@ import cern.c2mon.shared.common.process.SubEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ConfigurationXMLConstants;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
-import javax.annotation.PostConstruct;
-import javax.xml.parsers.ParserConfigurationException;
-
+@Slf4j
 @Component
 public class EquipmentConfigurationFactory extends XMLTagValueExtractor implements ConfigurationXMLConstants {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(EquipmentConfigurationFactory.class);
 
   private static EquipmentConfigurationFactory theInstance;
 
@@ -76,7 +73,7 @@ public class EquipmentConfigurationFactory extends XMLTagValueExtractor implemen
    */
   public EquipmentConfiguration createEquipmentConfiguration(final Element equipmentUnit) throws Exception {
     String eqID = equipmentUnit.getAttribute(ID_ATTRIBUTE);
-    LOGGER.debug("EQ ID : " + eqID);
+    log.debug("EQ ID : " + eqID);
     String eqName = equipmentUnit.getAttribute(NAME_ATTRIBUTE);
 
     EquipmentConfiguration equipmentConfiguration = new EquipmentConfiguration();
@@ -96,14 +93,14 @@ public class EquipmentConfigurationFactory extends XMLTagValueExtractor implemen
       try {
         equipmentConfiguration.setAliveTagId(Long.parseLong(getTagValue(equipmentUnit, ALIVE_TAG_ID_ELEMENT)));
       } catch (NullPointerException ex) {
-        LOGGER.debug("Process has no alive Tag id.");
+        log.debug("Equipment {} has no alive Tag id.", equipmentConfiguration.getName());
       }
       // try and be prepared to catch the exception, because the field is
       // not obligatory and may not exist
       try {
         equipmentConfiguration.setAliveTagInterval(Long.parseLong(getTagValue(equipmentUnit, ALIVE_INTERVAL_ELEMENT)));
       } catch (NullPointerException ex) {
-        LOGGER.debug("Process has no alive Tag interval.");
+        log.debug("Equipment {} has no alive Tag interval.", equipmentConfiguration.getName());
       }
 
       // try and be prepared to catch the exception, because the field is
@@ -139,10 +136,10 @@ public class EquipmentConfigurationFactory extends XMLTagValueExtractor implemen
     }
     if (subEquipmentUnitsElement != null) {
       NodeList subEquipmentUnitsNode = subEquipmentUnitsElement.getElementsByTagName(SUB_EQUIPMENT_UNIT_ELEMENT);
-      LOGGER.debug("\t" + subEquipmentUnitsNode.getLength() + " SubEquipments found for current equipment");
+      log.debug("\t" + subEquipmentUnitsNode.getLength() + " SubEquipments found for current equipment");
 
       for (int i = 0; i < subEquipmentUnitsNode.getLength(); i++) {
-        LOGGER.debug("Creating a SubEquipment configuration object...");
+        log.debug("Creating a SubEquipment configuration object...");
         Element subEquipmentConf = (Element) subEquipmentUnitsNode.item(i);
 
         String subEquipmentId = subEquipmentConf.getAttribute(ID_ATTRIBUTE);
@@ -177,22 +174,22 @@ public class EquipmentConfigurationFactory extends XMLTagValueExtractor implemen
   private void processDataTags(final Element equipmentUnit, final EquipmentConfiguration equipmentConfiguration) {
     Element dataTagsBlock = (Element) equipmentUnit.getElementsByTagName(DATA_TAGS_ELEMENT).item(0);
     NodeList dataTags = dataTagsBlock.getElementsByTagName(DATA_TAG_ELEMENT);
-    LOGGER.debug("\t" + dataTags.getLength() + " DataTags found for current equipment");
+    log.debug("\t" + dataTags.getLength() + " DataTags found for current equipment");
     SourceDataTag sourceDataTag = null;
     // for each SourceDataTag defined in the DataTags XML block
     for (int i = 0; i < dataTags.getLength(); i++) {
       sourceDataTag = SourceDataTag.fromConfigXML((Element) dataTags.item(i));
-      LOGGER.debug("\tCreating SourceDataTag object for id " + sourceDataTag.getId() + "..");
+      log.debug("\tCreating SourceDataTag object for id " + sourceDataTag.getId() + "..");
       if (sourceDataTag.getAddress().getTimeDeadband() > 0) {
         sourceDataTag.getAddress().setStaticTimedeadband(true);
       }
       if (sourceDataTag.getId().longValue() == equipmentConfiguration.getAliveTagId()) {
         if (sourceDataTag.getAddress().getPriority() != DataTagAddress.PRIORITY_HIGH) {
-          LOGGER.warn("\tPriority on equipment alive tag " + sourceDataTag.getId() + " is wrongly configured! Adjusting priority to HIGH (7)");
+          log.warn("\tPriority on equipment alive tag " + sourceDataTag.getId() + " is wrongly configured! Adjusting priority to HIGH (7)");
           sourceDataTag.getAddress().setPriority(DataTagAddress.PRIORITY_HIGH);
         }
         if (!sourceDataTag.isControl()) {
-          LOGGER.warn("\tEquipment alive tag " + sourceDataTag.getId() + " is not configured as control tag! Please correct this in the configuration.");
+          log.warn("\tEquipment alive tag " + sourceDataTag.getId() + " is not configured as control tag! Please correct this in the configuration.");
         }
       }
       equipmentConfiguration.getDataTags().put(sourceDataTag.getId(), sourceDataTag);
@@ -220,7 +217,7 @@ public class EquipmentConfigurationFactory extends XMLTagValueExtractor implemen
     // for each SourceDataTag defined in the DataTags XML block
     for (int i = 0; i < commandTags.getLength(); i++) {
       sourceCommandTag = SourceCommandTag.fromConfigXML((Element) commandTags.item(i));
-      LOGGER.debug("creating SourceCommandTag object for id " + sourceCommandTag.getId() + "..");
+      log.debug("creating SourceCommandTag object for id " + sourceCommandTag.getId() + "..");
       equipmentConfiguration.getCommandTags().put(sourceCommandTag.getId(), sourceCommandTag);
     }
   }
@@ -236,7 +233,7 @@ public class EquipmentConfigurationFactory extends XMLTagValueExtractor implemen
 
     Long subEquipmentId = Long.parseLong(subEquipmentElement.getAttribute(ID_ATTRIBUTE));
     String subEquipmentName = subEquipmentElement.getAttribute(NAME_ATTRIBUTE);
-    LOGGER.debug("Creating SubEquipment configuration: id=" + subEquipmentId + " name=" + subEquipmentName);
+    log.debug("Creating SubEquipment configuration: id=" + subEquipmentId + " name=" + subEquipmentName);
 
     Long commFaultTagId = Long.parseLong(getTagValue(subEquipmentElement, COMMFAULT_TAG_ID_ELEMENT));
     Boolean commFaultTagValue = Boolean.parseBoolean(getTagValue(subEquipmentElement, COMMFAULT_TAG_VALUE_ELEMENT));
@@ -246,13 +243,13 @@ public class EquipmentConfigurationFactory extends XMLTagValueExtractor implemen
     try {
       subEquipmentConfiguration.setAliveTagId(Long.parseLong(getTagValue(subEquipmentElement, ALIVE_TAG_ID_ELEMENT)));
     } catch (NullPointerException e) {
-      LOGGER.debug("SubEquipment has no alive tag id.");
+      log.debug("SubEquipment has no alive tag id.");
     }
 
     try {
       subEquipmentConfiguration.setAliveInterval(Long.parseLong(getTagValue(subEquipmentElement, ALIVE_INTERVAL_ELEMENT)));
     } catch (NullPointerException e) {
-      LOGGER.debug("SubEquipment has no alive tag interval.");
+      log.debug("SubEquipment has no alive tag interval.");
     }
 
     return subEquipmentConfiguration;
