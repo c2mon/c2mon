@@ -52,7 +52,7 @@ cd $DAQ_HOME
 
 
 # Default values
-LOGGING_CONFIG="-Dlogging.config=$DAQ_HOME/conf/logback.xml -Dlogging.path=$DAQ_HOME/log";
+LOGGING_CONFIG="-Dlogging.config=$DAQ_HOME/conf/logback.xml -Dlogging.path=$DAQ_HOME/log -Dlog4j.configuration=file:${DAQ_HOME}/conf/log4j.properties";
 DAQ_PROPERTIES_FILE="-Dc2mon.daq.properties.location=file://$DAQ_HOME/conf/c2mon-daq.properties"
 ADDITIONAL_PROPERTIES="";
 JVM_MEM="-Xms256m -Xmx256m"
