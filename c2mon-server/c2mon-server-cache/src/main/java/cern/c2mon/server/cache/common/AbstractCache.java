@@ -29,6 +29,7 @@ import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import lombok.extern.slf4j.Slf4j;
 import cern.c2mon.server.cache.ComparableCacheListener;
 import cern.c2mon.server.cache.listener.*;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.event.RegisteredEventListeners;
@@ -241,9 +242,9 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
    */
   @Override
   public void put(K key, T value) {
-    T oldValue = getCopy(key);
+    T originalValue = getCopy(key);
     super.put(key, value);
-    notifyCompareListenersOfUpdate(oldValue, value);
+    notifyCompareListenersOfUpdate(originalValue, value);
     notifyListenersOfUpdate(value);
   }
 

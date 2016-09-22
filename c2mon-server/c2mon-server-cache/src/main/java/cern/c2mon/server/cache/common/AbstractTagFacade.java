@@ -51,7 +51,6 @@ import cern.c2mon.shared.daq.config.DataTagAddressUpdate;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
 import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
 
-
 /**
  * Common implementation of the Tag facade logic.
  *
