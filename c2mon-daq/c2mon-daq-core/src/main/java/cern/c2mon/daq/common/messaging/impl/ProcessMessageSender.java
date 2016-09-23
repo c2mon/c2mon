@@ -173,22 +173,11 @@ public class ProcessMessageSender implements IProcessMessageSender {
 
   }
 
-  /**
-   * This methods is responsible for sending CommFaultTag message
-   *
-   * @param tagID The CommFaultTag identifier
-   */
   @Override
-  public final synchronized void sendCommfaultTag(final long tagID, final Object value) {
-    sendCommfaultTag(tagID, value, null);
-  }
-
-  @Override
-  public void sendCommfaultTag(long tagID, Object value, String pDescription) {
-    ProcessConfiguration processConfiguration = getConfigurationController().getProcessConfiguration();
+  public void sendCommfaultTag(long tagID, String tagName, boolean value, String pDescription) {
     LOGGER.debug("Sending CommfaultTag. tag id : " + tagID);
 
-    // Just to know what are the arguements :
+    // Just to know what are the arguments :
     // SourceDataTagValue(Long id,
     // String name,
     // boolean controlTag,
@@ -200,8 +189,17 @@ public class ProcessMessageSender implements IProcessMessageSender {
     // int timeToLive)
 
     long timestamp = System.currentTimeMillis();
-    SourceDataTagValue commfaultTagValue = new SourceDataTagValue(Long.valueOf(tagID), processConfiguration.getProcessName() + "::CommFaultTag", true, value,
-        new SourceDataTagQuality(), timestamp, DataTagAddress.PRIORITY_HIGH, false, pDescription, 9999999);
+    SourceDataTagValue commfaultTagValue =
+        new SourceDataTagValue(Long.valueOf(tagID),
+                                                      tagName,
+                                                      true,
+                                                      value,
+                                                      new SourceDataTagQuality(),
+                                                      timestamp,
+                                                      DataTagAddress.PRIORITY_HIGH,
+                                                      false,
+                                                      pDescription,
+                                                      9999999);
 
     try {
       distributeValue(commfaultTagValue);

@@ -351,27 +351,13 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
    */
   @Override
   public final void confirmEquipmentStateIncorrect(final String pDescription) {
-    sendCommfaultTag(this.equipmentConfiguration.getCommFaultTagId(), this.equipmentConfiguration.getCommFaultTagValue(), pDescription);
+    sendCommfaultTag(this.equipmentConfiguration.getCommFaultTagId(), equipmentConfiguration.getName(), this.equipmentConfiguration.getCommFaultTagValue(), pDescription);
 
     // Send the commFaultTag for the equipment's subequipments too
     Map<Long, SubEquipmentConfiguration> subEquipmentConfigurations = equipmentConfiguration.getSubEquipmentConfigurations();
 
     for (SubEquipmentConfiguration subEquipmentConfiguration : subEquipmentConfigurations.values()) {
-      sendCommfaultTag(subEquipmentConfiguration.getCommFaultTagId(), subEquipmentConfiguration.getCommFaultTagValue(), pDescription);
-    }
-  }
-
-  @Override
-  public void confirmSubEquipmentStateIncorrect(Long commFaultTagId) {
-    confirmSubEquipmentStateIncorrect(commFaultTagId, null);
-  }
-
-  @Override
-  public void confirmSubEquipmentStateIncorrect(Long commFaultTagId, String description) {
-    for (SubEquipmentConfiguration subEquipmentConfiguration : equipmentConfiguration.getSubEquipmentConfigurations().values()) {
-      if (subEquipmentConfiguration.getCommFaultTagId().equals(commFaultTagId)) {
-        sendCommfaultTag(commFaultTagId, subEquipmentConfiguration.getCommFaultTagValue(), description);
-      }
+      sendCommfaultTag(subEquipmentConfiguration.getCommFaultTagId(), subEquipmentConfiguration.getName(), subEquipmentConfiguration.getCommFaultTagValue(), pDescription);
     }
   }
 
@@ -382,17 +368,8 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
    * @param value The CommFaultTag value to send.
    * @param description The description of the CommfaultTag
    */
-  private void sendCommfaultTag(final long tagID, final Boolean value, final String description) {
-    if (this.equipmentLogger.isDebugEnabled()) {
-      this.equipmentLogger.debug("sendCommfaultTag - entering sendCommfaultTag()..");
-      this.equipmentLogger.debug("\tCommFaultTag: #" + tagID);
-    }
-    if (description == null) {
-      this.processMessageSender.sendCommfaultTag(tagID, value);
-    } else {
-      this.processMessageSender.sendCommfaultTag(tagID, value, description);
-    }
-    this.equipmentLogger.debug("sendCommfaultTag - leaving sendCommfaultTag()");
+  private void sendCommfaultTag(final long tagID, final String equipmentName, final boolean value, final String description) {
+    this.processMessageSender.sendCommfaultTag(tagID, equipmentName + ":COMM_FAULT", value, description);
   }
 
   /**
@@ -412,27 +389,13 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
    */
   @Override
   public final void confirmEquipmentStateOK(final String pDescription) {
-    sendCommfaultTag(this.equipmentConfiguration.getCommFaultTagId(), !this.equipmentConfiguration.getCommFaultTagValue(), pDescription);
+    sendCommfaultTag(this.equipmentConfiguration.getCommFaultTagId(), equipmentConfiguration.getName(), !this.equipmentConfiguration.getCommFaultTagValue(), pDescription);
 
     // Send the commFaultTag for the equipment's subequipments too
     Map<Long, SubEquipmentConfiguration> subEquipmentConfigurations = equipmentConfiguration.getSubEquipmentConfigurations();
 
     for (SubEquipmentConfiguration subEquipmentConfiguration : subEquipmentConfigurations.values()) {
-      sendCommfaultTag(subEquipmentConfiguration.getCommFaultTagId(), !subEquipmentConfiguration.getCommFaultTagValue(), pDescription);
-    }
-  }
-
-  @Override
-  public void confirmSubEquipmentStateOK(Long commFaultTagId) {
-    confirmSubEquipmentStateOK(commFaultTagId, null);
-  }
-
-  @Override
-  public void confirmSubEquipmentStateOK(Long commFaultTagId, String description) {
-    for (SubEquipmentConfiguration subEquipmentConfiguration : equipmentConfiguration.getSubEquipmentConfigurations().values()) {
-      if (subEquipmentConfiguration.getCommFaultTagId().equals(commFaultTagId)) {
-        sendCommfaultTag(commFaultTagId, !subEquipmentConfiguration.getCommFaultTagValue(), description);
-      }
+      sendCommfaultTag(subEquipmentConfiguration.getCommFaultTagId(), subEquipmentConfiguration.getName(), !subEquipmentConfiguration.getCommFaultTagValue(), pDescription);
     }
   }
 

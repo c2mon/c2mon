@@ -303,8 +303,8 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
    *
    * @return The value to send if there was an communication fault.
    */
-  public Boolean getCommFaultTagValue() {
-    return Boolean.valueOf(commfaultTagValue);
+  public boolean getCommFaultTagValue() {
+    return commfaultTagValue;
   }
 
   /**

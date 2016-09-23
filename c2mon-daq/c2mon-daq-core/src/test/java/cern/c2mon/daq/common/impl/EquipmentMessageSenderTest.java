@@ -117,9 +117,9 @@ public class EquipmentMessageSenderTest {
 
   @Test
   public void testEquipmentStateIncorrect() {
-    processMessageSenderMock.sendCommfaultTag(EQ_COMFAULT_ID, false);
-    processMessageSenderMock.sendCommfaultTag(SUB_KEY1, false);
-    processMessageSenderMock.sendCommfaultTag(SUB_KEY2, true);
+    processMessageSenderMock.sendCommfaultTag(EQ_COMFAULT_ID, "EQ::CommFault", false, null);
+    processMessageSenderMock.sendCommfaultTag(SUB_KEY1, "SUBEQ.1::CommFault", false, null);
+    processMessageSenderMock.sendCommfaultTag(SUB_KEY2, "SUBEQ2::CommFault", true, null);
 
     replay(processMessageSenderMock);
 
@@ -131,9 +131,9 @@ public class EquipmentMessageSenderTest {
   @Test
   public void testEquipmentStateIncorrectDescription() {
     String description = "description";
-    processMessageSenderMock.sendCommfaultTag(EQ_COMFAULT_ID, false, description);
-    processMessageSenderMock.sendCommfaultTag(SUB_KEY1, false, description);
-    processMessageSenderMock.sendCommfaultTag(SUB_KEY2, true, description);
+    processMessageSenderMock.sendCommfaultTag(EQ_COMFAULT_ID, "EQ::CommFault", false, null);
+    processMessageSenderMock.sendCommfaultTag(SUB_KEY1, "SUBEQ.1::CommFault", false, null);
+    processMessageSenderMock.sendCommfaultTag(SUB_KEY2, "SUBEQ2::CommFault", true, null);
 
     replay(processMessageSenderMock);
 
@@ -144,9 +144,9 @@ public class EquipmentMessageSenderTest {
 
   @Test
   public void testEquipmentStateOK() {
-    processMessageSenderMock.sendCommfaultTag(EQ_COMFAULT_ID, true);
-    processMessageSenderMock.sendCommfaultTag(SUB_KEY1, true);
-    processMessageSenderMock.sendCommfaultTag(SUB_KEY2, false);
+    processMessageSenderMock.sendCommfaultTag(EQ_COMFAULT_ID, "EQ::CommFault", true, null);
+    processMessageSenderMock.sendCommfaultTag(SUB_KEY1, "SUBEQ.1::CommFault", true, null);
+    processMessageSenderMock.sendCommfaultTag(SUB_KEY2, "SUBEQ2::CommFault", false, null);
 
     replay(processMessageSenderMock);
 
@@ -158,9 +158,9 @@ public class EquipmentMessageSenderTest {
   @Test
   public void testEquipmentStateOKDescription() {
     String description = "description";
-    processMessageSenderMock.sendCommfaultTag(EQ_COMFAULT_ID, true, description);
-    processMessageSenderMock.sendCommfaultTag(SUB_KEY1, true, description);
-    processMessageSenderMock.sendCommfaultTag(SUB_KEY2, false, description);
+    processMessageSenderMock.sendCommfaultTag(EQ_COMFAULT_ID, "EQ::CommFault", true, description);
+    processMessageSenderMock.sendCommfaultTag(SUB_KEY1, "SUBEQ.1::CommFault", true, description);
+    processMessageSenderMock.sendCommfaultTag(SUB_KEY2, "SUBEQ.2::CommFault", false, description);
 
     replay(processMessageSenderMock);
 

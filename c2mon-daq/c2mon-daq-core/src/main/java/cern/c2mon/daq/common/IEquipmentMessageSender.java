@@ -197,23 +197,6 @@ public interface IEquipmentMessageSender {
   void confirmEquipmentStateIncorrect(final String pDescription);
 
   /**
-   * Sends a note to the business layer, to confirm that a subequipment is not
-   * properly configured, or connected to its data source
-   *
-   * @param commFaultTagId the ID of the subequipment commfault tag
-   */
-  void confirmSubEquipmentStateIncorrect(Long commFaultTagId);
-
-  /**
-   * Sends a note to the business layer, to confirm that a subequipment is not
-   * properly configured, or connected to its data source
-   *
-   * @param commFaultTagId the ID of the subequipment commfault tag
-   * @param pDescription additional description
-   */
-  void confirmSubEquipmentStateIncorrect(Long commFaultTagId, final String pDescription);
-
-  /**
    * Sends a note to the business layer, to confirm that the equipment is
    * properly configured, connected to its source and running
    */
@@ -226,21 +209,4 @@ public interface IEquipmentMessageSender {
    * @param pDescription additional description
    */
   void confirmEquipmentStateOK(final String pDescription);
-
-  /**
-   * Sends a note to the business layer, to confirm that a subequipment is
-   * properly configured, connected to its source and running
-   *
-   * @param commFaultTagId the ID of the subequipment commfault tag
-   */
-  void confirmSubEquipmentStateOK(Long commFaultTagId);
-
-  /**
-   * Sends a note to the business layer, to confirm that a subequipment is
-   * properly configured, connected to its source and running
-   *
-   * @param commFaultTagId the ID of the subequipment commfault tag
-   * @param pDescription additional description
-   */
-  void confirmSubEquipmentStateOK(Long commFaultTagId, final String pDescription);
 }
