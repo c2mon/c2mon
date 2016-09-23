@@ -79,6 +79,7 @@ public class EquipmentMessageSenderTest {
     equipmentConfiguration.setId(EQUIPMENT_ID);
     equipmentConfiguration.setCommFaultTagId(EQ_COMFAULT_ID);
     equipmentConfiguration.setCommFaultTagValue(false);
+    equipmentConfiguration.setName("EQ");
 
     sdt1 = createSourceDataTag(1L, "sdt1", "Boolean", DataTagDeadband.DEADBAND_NONE, DataTagConstants.PRIORITY_LOW, false);
     sdt2 = createSourceDataTag(2L, "sdt2", "Float", DataTagDeadband.DEADBAND_PROCESS_ABSOLUTE, DataTagConstants.PRIORITY_MEDIUM, false);
@@ -97,8 +98,8 @@ public class EquipmentMessageSenderTest {
     equipmentConfiguration.getDataTags().put(6L, sdt6);
     equipmentConfiguration.getDataTags().put(0L, alive);
 
-    equipmentConfiguration.getSubEquipmentConfigurations().put(10L, new SubEquipmentConfiguration(10L, "test1", SUB_KEY1, false));
-    equipmentConfiguration.getSubEquipmentConfigurations().put(11L, new SubEquipmentConfiguration(11L, "test2", SUB_KEY2, true));
+    equipmentConfiguration.getSubEquipmentConfigurations().put(10L, new SubEquipmentConfiguration(10L, "SUBEQ.1", SUB_KEY1, false));
+    equipmentConfiguration.getSubEquipmentConfigurations().put(11L, new SubEquipmentConfiguration(11L, "SUBEQ.2", SUB_KEY2, true));
 
     // equipmentMessageSender.setEquipmentConfiguration(equipmentConfiguration);
     ProcessConfiguration processConf = new ProcessConfiguration();
@@ -117,9 +118,9 @@ public class EquipmentMessageSenderTest {
 
   @Test
   public void testEquipmentStateIncorrect() {
-    processMessageSenderMock.sendCommfaultTag(EQ_COMFAULT_ID, "EQ::CommFault", false, null);
-    processMessageSenderMock.sendCommfaultTag(SUB_KEY1, "SUBEQ.1::CommFault", false, null);
-    processMessageSenderMock.sendCommfaultTag(SUB_KEY2, "SUBEQ2::CommFault", true, null);
+    processMessageSenderMock.sendCommfaultTag(EQ_COMFAULT_ID, "EQ:COMM_FAULT", false, null);
+    processMessageSenderMock.sendCommfaultTag(SUB_KEY1, "SUBEQ.1:COMM_FAULT", false, null);
+    processMessageSenderMock.sendCommfaultTag(SUB_KEY2, "SUBEQ.2:COMM_FAULT", true, null);
 
     replay(processMessageSenderMock);
 
@@ -131,9 +132,9 @@ public class EquipmentMessageSenderTest {
   @Test
   public void testEquipmentStateIncorrectDescription() {
     String description = "description";
-    processMessageSenderMock.sendCommfaultTag(EQ_COMFAULT_ID, "EQ::CommFault", false, null);
-    processMessageSenderMock.sendCommfaultTag(SUB_KEY1, "SUBEQ.1::CommFault", false, null);
-    processMessageSenderMock.sendCommfaultTag(SUB_KEY2, "SUBEQ2::CommFault", true, null);
+    processMessageSenderMock.sendCommfaultTag(EQ_COMFAULT_ID, "EQ:COMM_FAULT", false, description);
+    processMessageSenderMock.sendCommfaultTag(SUB_KEY1, "SUBEQ.1:COMM_FAULT", false, description);
+    processMessageSenderMock.sendCommfaultTag(SUB_KEY2, "SUBEQ.2:COMM_FAULT", true, description);
 
     replay(processMessageSenderMock);
 
@@ -144,9 +145,9 @@ public class EquipmentMessageSenderTest {
 
   @Test
   public void testEquipmentStateOK() {
-    processMessageSenderMock.sendCommfaultTag(EQ_COMFAULT_ID, "EQ::CommFault", true, null);
-    processMessageSenderMock.sendCommfaultTag(SUB_KEY1, "SUBEQ.1::CommFault", true, null);
-    processMessageSenderMock.sendCommfaultTag(SUB_KEY2, "SUBEQ2::CommFault", false, null);
+    processMessageSenderMock.sendCommfaultTag(EQ_COMFAULT_ID, "EQ:COMM_FAULT", true, null);
+    processMessageSenderMock.sendCommfaultTag(SUB_KEY1, "SUBEQ.1:COMM_FAULT", true, null);
+    processMessageSenderMock.sendCommfaultTag(SUB_KEY2, "SUBEQ.2:COMM_FAULT", false, null);
 
     replay(processMessageSenderMock);
 
@@ -158,9 +159,9 @@ public class EquipmentMessageSenderTest {
   @Test
   public void testEquipmentStateOKDescription() {
     String description = "description";
-    processMessageSenderMock.sendCommfaultTag(EQ_COMFAULT_ID, "EQ::CommFault", true, description);
-    processMessageSenderMock.sendCommfaultTag(SUB_KEY1, "SUBEQ.1::CommFault", true, description);
-    processMessageSenderMock.sendCommfaultTag(SUB_KEY2, "SUBEQ.2::CommFault", false, description);
+    processMessageSenderMock.sendCommfaultTag(EQ_COMFAULT_ID, "EQ:COMM_FAULT", true, description);
+    processMessageSenderMock.sendCommfaultTag(SUB_KEY1, "SUBEQ.1:COMM_FAULT", true, description);
+    processMessageSenderMock.sendCommfaultTag(SUB_KEY2, "SUBEQ.2:COMM_FAULT", false, description);
 
     replay(processMessageSenderMock);
 
