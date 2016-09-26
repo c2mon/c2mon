@@ -15,8 +15,6 @@
 
   <properties>
     <docker.image.base>java:8-jdk</docker.image.base>
-    <arch.prefix></arch.prefix>
-    <arch.suffix></arch.suffix>
   </properties>
 
   <build>
@@ -66,15 +64,15 @@
               <goal>push</goal>
             </goals>
             <configuration>
-              <imageName>docker.cern.ch/c2mon-project/server</imageName>
+              <imageName>gitlab-registry.cern.ch/c2mon/c2mon</imageName>
             </configuration>
           </execution>
         </executions>
         <configuration>
-          <imageName>docker.cern.ch/c2mon-project/server${arch.suffix}</imageName>
+          <imageName>gitlab-registry.cern.ch/c2mon/c2mon</imageName>
           <baseImage>${docker.image.base}</baseImage>
-          <serverId>docker.cern.ch</serverId>
-          <registryUrl>https://docker.cern.ch</registryUrl>
+          <serverId>gitlab-registry.cern.ch</serverId>
+          <registryUrl>https://gitlab-registry.cern.ch</registryUrl>
           <forceTags>true</forceTags>
           <imageTags>
             <imageTag>${project.version}</imageTag>

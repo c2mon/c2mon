@@ -15,10 +15,10 @@ You can run a server by downloading and executing a tarball distribution, or by 
 
 ### Using the Docker image
 
-We push a Docker image of the server to the [CERN Docker registry](https://docker.cern.ch/registrytags?c2mon-project). To run the image:
+We push a Docker image of the server to the [CERN Docker registry](https://gitlab-registry.cern.ch). To run the image:
 
 ```bash
-docker run --rm --name c2mon -it -p 0.0.0.0:1099:1099 -p 0.0.0.0:9001:9001 -p 0.0.0.0:61616:61616 -p 0.0.0.0:9200:9200 docker.cern.ch/c2mon-project/server
+docker run --rm --name c2mon -it -p 0.0.0.0:1099:1099 -p 0.0.0.0:9001:9001 -p 0.0.0.0:61616:61616 -p 0.0.0.0:9200:9200 gitlab-registry.cern.ch/c2mon/c2mon
 ```
 
 # Publishing data
@@ -52,7 +52,7 @@ view statistics about C2MON clusters.
 ## Using the Docker image
 
 ```bash
-docker run --rm --name web-ui -ti --link c2mon:c2mon -p 0.0.0.0:8080:8080 docker.cern.ch/c2mon-project/web-ui
+docker run --rm --name web-ui -ti --link c2mon:c2mon -p 0.0.0.0:8080:8080 gitlab-registry.cern.ch/c2mon/c2mon-web-ui
 ```
 
 ## Inspecting the data

@@ -9,7 +9,7 @@
       <password>${env.ARTIFACTORY_PASSWORD}</password>
     </server>
     <server>
-      <id>docker.cern.ch</id>
+      <id>gitlab-registry.cern.ch</id>
       <username>${env.DOCKER_USERNAME}</username>
       <password>${env.DOCKER_PASSWORD}</password>
       <configuration>
