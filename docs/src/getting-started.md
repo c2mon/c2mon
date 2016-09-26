@@ -26,14 +26,14 @@ docker run --rm --name c2mon -it -p 0.0.0.0:1099:1099 -p 0.0.0.0:9001:9001 -p 0.
 Once you have your server running, you can use one of several pre-provided acquisition processes (DAQs) that will grab data from some service and send it to
 the C2MON server for monitoring. (Alternatively, you can of course write your own DAQ to publish any type of metric using the [DAQ API](daq-api)).
 
-Perhaps the easiest DAQ to understand is the `Monit` DAQ, which interacts with the well-known `Monit` daemon to monitor and publish metrics about Unix
-systems. Again, you can download and execute a tarball or run a Docker image to get it up and running.
+Perhaps the easiest DAQ to understand is the `hostmetrics` DAQ, which uses a simple library to monitor and publish metrics about the host machine on which
+the DAQ runs. Again, you can download and execute a tarball or run a Docker image to get it up and running.
 
-### Running the Monit DAQ tarball distribution
+### Running the hostmetrics DAQ tarball distribution
 
 **Coming soon!**
 
-### Using the Monit DAQ Docker image
+### Using the hostmetrics DAQ Docker image
 
 **Coming soon!**
 

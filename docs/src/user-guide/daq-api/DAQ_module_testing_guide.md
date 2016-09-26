@@ -21,9 +21,9 @@ In order to use DAQ testing framework for your JUnit tests, you need to include 
 
 ```xml
 <dependency>
-    <groupId>cern.c2mon.c2mon-daq</groupId>
+    <groupId>cern.c2mon.daq</groupId>
     <artifactId>c2mon-daq-test</artifactId>
-    <version>RELEASE</version>
+    <version>__insert_version_here__</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -38,7 +38,7 @@ The presented template can be used as a start point for building more advanced t
 **Example for test class:**
 ```java
 // you will need the following imports
-import cern.c2mon.daq.test.GenericMessageHandlerTst;
+import cern.c2mon.daq.test.GenericMessageHandlerTest;
 import cern.c2mon.daq.test.UseHandler;
 
 // Specify the Handler class that is to be tested using @UseHandler annotation
