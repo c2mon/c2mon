@@ -514,7 +514,7 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
    * @see #removeUpdateListener(BaseListener)
    */
   public void addUpdateListener(final BaseListener<Tag> listener, final Tag initialValue) {
-      log.trace("addUpdateListener() for the tag {} called", initialValue.getName());
+    log.trace("addUpdateListener() for the tag called");
     listeners.add(listener);
 
     Tag clone = null;
