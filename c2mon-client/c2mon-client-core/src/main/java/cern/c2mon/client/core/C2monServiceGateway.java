@@ -74,6 +74,8 @@ public class C2monServiceGateway implements ApplicationContextAware {
   /** Static reference to the <code>AlarmService</code> singleton instance */
   private static AlarmService alarmService = null;
 
+  private static AlarmExpressionService alarmExpressionService = null;
+
   /** Static reference to the <code>StatisticsService</code> singleton instance */
   private static StatisticsService statisticsService = null;
 
@@ -102,7 +104,6 @@ public class C2monServiceGateway implements ApplicationContextAware {
    */
   public static CommandService getCommandService() {
     startC2monClientSynchronous();
-    
     return commandServiceImpl;
   }
 
@@ -114,6 +115,16 @@ public class C2monServiceGateway implements ApplicationContextAware {
     startC2monClientSynchronous();
 
     return alarmService;
+  }
+
+  /**
+   * @return The C2MON alarm service, which provides
+   *         methods for alarm subscription and unsubscription.
+   */
+  public static AlarmExpressionService getAlarmExpressionService() {
+    startC2monClientSynchronous();
+
+    return alarmExpressionService;
   }
 
   /**
@@ -143,7 +154,6 @@ public class C2monServiceGateway implements ApplicationContextAware {
    */
   public static TagService getTagService() {
     startC2monClientSynchronous();
-
     return tagService;
   }
 
@@ -155,7 +165,6 @@ public class C2monServiceGateway implements ApplicationContextAware {
    */
   public static SupervisionService getSupervisionService() {
     startC2monClientSynchronous();
-    
     return supervisionServiceImpl;
   }
 
@@ -240,6 +249,7 @@ public class C2monServiceGateway implements ApplicationContextAware {
     commandServiceImpl = context.getBean(CommandServiceImpl.class);
 
     alarmService = context.getBean(AlarmService.class);
+    alarmExpressionService = context.getBean(AlarmExpressionService.class);
     configurationService = context.getBean(ConfigurationService.class);
     statisticsService = context.getBean(StatisticsService.class);
     tagService = context.getBean(TagService.class);
