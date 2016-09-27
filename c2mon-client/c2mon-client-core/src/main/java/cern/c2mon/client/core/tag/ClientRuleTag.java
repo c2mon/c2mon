@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -21,6 +21,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import cern.c2mon.shared.client.expression.Expression;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,9 +47,8 @@ import cern.c2mon.shared.rule.RuleExpression;
  *
  * @author Matthias Braeger
  */
+@Slf4j
 public class ClientRuleTag<T> implements Tag, BaseTagListener {
-  /** Log4j Logger for this class */
-  private static final Logger LOG = LoggerFactory.getLogger(ClientRuleTag.class);
 
   /** The rule expression of the client rule */
   private final RuleExpression rule;
@@ -68,7 +69,8 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
   private Long id;
 
   /** List of unique update listeners */
-  private final List<BaseTagListener> listeners = new ArrayList<>();;
+  private final List<BaseTagListener> listeners = new ArrayList<>();
+  ;
 
   /** The actual list of rule input values, that was received by onUpdate() method */
   private final Map<Long, Tag> ruleInputValues = new Hashtable<Long, Tag>();
@@ -121,7 +123,8 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
    * Default Constructor<br>
    * Do not forget to unsubscribe from the input tags once you not need anymore
    * this <code>ClientRuleTag</code> instance.
-   * @param pRule The client rule expression
+   *
+   * @param pRule       The client rule expression
    * @param pResultType The result type of the rule expression
    * @see ClientRuleTag#unsubscribe()
    */
@@ -164,7 +167,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
    * Client Rule Tag id's can only be a minus value.
    * Positive values are ignored.
    */
-  public void setId(final Long id)  {
+  public void setId(final Long id) {
 
     if (id >= 0) {
       return;
@@ -187,6 +190,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
    * Check whether this DataTag is the result of a rule. Rules are internal TIM
    * tags as opposed to regular DataTags which are acquired from an external
    * source.
+   *
    * @return true if the DataTag is the result of a rule.
    */
   @Override
@@ -196,6 +200,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
 
   /**
    * Returns DataTagQuality object of the client rule
+   *
    * @return the DataTagQuality object for this client rule.
    */
   @Override
@@ -205,6 +210,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
 
   /**
    * Get the RuleExpression associated with this class.
+   *
    * @return the RuleExpression associated with this class
    */
   @Override
@@ -215,8 +221,9 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
   /**
    * Returns the rule result. Value should be casted to the correct type
    * The tag type is available with the getType() method
-   * @see #getType
+   *
    * @return the tag value
+   * @see #getType
    */
   @Override
   public T getValue() {
@@ -225,17 +232,18 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
 
   /**
    * Returns the type of the tagValue attribute
-   * @see #getValue
+   *
    * @return the class of the tag value
+   * @see #getValue
    */
   @Override
-  public final Class< T > getType() {
+  public final Class<T> getType() {
     return resultType;
   }
 
   @Override
   public TypeNumeric getTypeNumeric() {
-    Class< ? > type = getType();
+    Class<?> type = getType();
     if (type != null) {
       int typeNumeric = type.hashCode();
       for (TypeNumeric t : TypeNumeric.values()) {
@@ -268,16 +276,16 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
             this.simulated |= inputValue.isSimulated();
             // Compute rule mode
             switch (inputValue.getMode()) {
-            case TEST:
-              if (!newRuleMode.equals(TagMode.MAINTENANCE)) {
-                newRuleMode = TagMode.TEST;
-              }
-              break;
-            case MAINTENANCE:
-              newRuleMode = TagMode.MAINTENANCE;
-              break;
-            default:
-              // Do nothing
+              case TEST:
+                if (!newRuleMode.equals(TagMode.MAINTENANCE)) {
+                  newRuleMode = TagMode.TEST;
+                }
+                break;
+              case MAINTENANCE:
+                newRuleMode = TagMode.MAINTENANCE;
+                break;
+              default:
+                // Do nothing
             }
 
           } // end of for loop
@@ -289,28 +297,23 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
 
           try {
             this.ruleResult = rule.evaluate(new Hashtable<Long, Object>(ruleInputValues), resultType);
-          }
-          catch (RuleEvaluationException e) {
-            LOG.debug("computeRule() - \"" + rule.getExpression()
-                + "\" is Invalid.", e);
+          } catch (RuleEvaluationException e) {
+            log.debug("computeRule() - \"" + rule.getExpression() + "\" is Invalid.", e);
 
             ruleError = null;
             this.ruleQuality = getInvalidTagQuality();
             this.ruleResult = rule.forceEvaluate(new Hashtable<Long, Object>(ruleInputValues), resultType);
-          }
-          catch (Exception e) {
+          } catch (Exception e) {
             this.ruleQuality.setInvalidStatus(TagQualityStatus.UNKNOWN_REASON, RULE_ERROR_MESSAGE);
             ruleError = e.getMessage();
-            LOG.debug("computeRule() - \"" + rule.getExpression()
-                + "\" could not be evaluated.", e);
+            log.debug("computeRule() - \"" + rule.getExpression() + "\" could not be evaluated.", e);
 
             this.ruleResult = rule.forceEvaluate(new Hashtable<Long, Object>(ruleInputValues), resultType);
           }
           // Update the time stamp of the ClientRuleTag
           this.timestamp = new Timestamp(System.currentTimeMillis());
         }
-      }
-      finally {
+      } finally {
         ruleMapLock.readLock().unlock();
       }
     }
@@ -327,7 +330,6 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
    *
    * This is because a rule can be VALID, even though it contains INVALID tags. In such a case
    * calling this method will give the wrong result..
-   *
    * @see https://issues.cern.ch/browse/TIMS-833
    */
   private DataTagQuality getInvalidTagQuality() {
@@ -359,6 +361,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
 
   /**
    * Sets the client rule tag name.
+   *
    * @param pName The name of the client rule tag
    */
   public void setName(final String pName) {
@@ -368,6 +371,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
   /**
    * Returns the rule tag name or <code>UNKNOWN</code>,
    * if not set explicitly.
+   *
    * @return The rule tag name or <code>UNKNOWN</code>,
    * if not set explicitly.
    */
@@ -378,6 +382,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
 
   /**
    * Sets the client rule tag description
+   *
    * @param pDescription The description of the client rule
    */
   public void setDescription(final String pDescription) {
@@ -395,6 +400,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
 
   /**
    * Sets the value Description
+   *
    * @param pValueDescription the value description
    */
   public void setValueDescription(final String pValueDescription) {
@@ -410,8 +416,13 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
   }
 
   @Override
-  public Map<String, Object> getMetadata(){
+  public Map<String, Object> getMetadata() {
     return Collections.emptyMap();
+  }
+
+  @Override
+  public Collection<Expression> getExpressions() {
+    return null;
   }
 
   @Override
@@ -428,8 +439,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
     try {
       listenersLock.writeLock().lock();
       listeners.clear();
-    }
-    finally {
+    } finally {
       listenersLock.writeLock().unlock();
     }
   }
@@ -439,8 +449,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
     ruleMapLock.writeLock().lock();
     try {
       ruleInputValues.put(cdt.getId(), cdt);
-    }
-    finally {
+    } finally {
       ruleMapLock.writeLock().unlock();
     }
     forceUpdate();
@@ -471,6 +480,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
    * Registers a <code>ClientDataTagValueUpdateListener</code> instance as
    * listener that will be informed when this <code>ClientRuleTag</code> gets
    * updated.
+   *
    * @param pListener Listener to be registered for updates
    * @return <code>true</code>, if the listener was not already registered
    */
@@ -491,8 +501,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
       if (!isRegistered) {
         retval = listeners.add(pListener);
       }
-    }
-    finally {
+    } finally {
       listenersLock.writeLock().unlock();
     }
     return retval;
@@ -502,17 +511,17 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
    * Removes a <code>ClientDataTagValueUpdateListener</code> instance from
    * listener that will be informed when this <code>ClientRuleTag</code> gets
    * updated.
+   *
    * @param listener Listener to be removed
    * @return <code>true</code>, if the listener successfully removed from
-   *         the listeners list
+   * the listeners list
    */
   public boolean removeClientDataTagUpdateListener(final BaseTagListener listener) {
     boolean retval = false;
     try {
       listenersLock.writeLock().lock();
       retval = listeners.remove(listener);
-    }
-    finally {
+    } finally {
       listenersLock.writeLock().unlock();
     }
     return retval;
@@ -527,8 +536,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
       for (BaseTagListener listener : listeners) {
         listener.onUpdate(this);
       }
-    }
-    finally {
+    } finally {
       listenersLock.readLock().unlock();
     }
   }
@@ -564,7 +572,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
 
   /**
    * @return By definition the <code>ClientRuleTag</code> will always return
-   *         <code>null</code> as DAQ timestamp.
+   * <code>null</code> as DAQ timestamp.
    */
   @Override
   public Timestamp getDaqTimestamp() {
@@ -573,7 +581,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
 
   /**
    * @return By definition the <code>ClientRuleTag</code> will always return
-   *         <code>null</code> as server timestamp.
+   * <code>null</code> as server timestamp.
    */
   @Override
   public Timestamp getServerTimestamp() {

@@ -18,8 +18,10 @@ package cern.c2mon.shared.client.tag;
 
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Map;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.expression.Expression;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 
@@ -114,6 +116,11 @@ public interface TagValueUpdate extends ClientRequestResult {
    * @return
    */
   String getValueClassName();
+
+  /**
+   * Set the tag value;
+   */
+  Collection<Expression> getExpressions();
 
   /**
    * Set the tag value;
