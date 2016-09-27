@@ -12,6 +12,11 @@ import lombok.Data;
 public class Expression implements Serializable {
 
   /**
+   * The name of the expression. The name has to be unique inside a tag.
+   */
+  private String name;
+
+  /**
    * A flag which indicates if this expression is also an alarm.
    * If this flag is true, the result of the expression has to be a boolean.
    */
@@ -42,8 +47,9 @@ public class Expression implements Serializable {
     this.alarm = true;
   }
 
-  public Expression(String expression) {
+  public Expression(String name, String expression) {
     this();
+    this.name = name;
     this.expression = expression;
   }
 
