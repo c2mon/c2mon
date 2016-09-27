@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+import cern.c2mon.shared.client.expression.Expression;
 import org.junit.Test;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
@@ -618,6 +619,11 @@ public class TagControllerIsValidUpdateTest {
     }
 
     @Override
+    public Collection<Expression> getExpressions() {
+      return null;
+    }
+
+    @Override
     public void setValue(Object arg) {
     }
   }
@@ -715,6 +721,11 @@ public class TagControllerIsValidUpdateTest {
     @Override
     public String getValueClassName() {
       return this.valueClassName;
+    }
+
+    @Override
+    public Collection<Expression> getExpressions() {
+      return null;
     }
 
     @Override

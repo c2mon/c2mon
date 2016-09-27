@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.expression.Expression;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.rule.RuleInputValue;
@@ -194,10 +195,16 @@ public interface Tag extends RuleInputValue {
   TypeNumeric getTypeNumeric();
 
   /**
-   * Returns the Meta Data from the Tag
-   * @return all meta data as a Map
+   * Returns the metadata from the Tag
+   * @return all metadata as a Map
    */
   Map<String, Object> getMetadata();
+
+  /**
+   * Returns all expressions attached to that tag.
+   * @return all expressions
+   */
+  Collection<Expression> getExpressions();
 
   /**
    * @return  <code>true</code>, if tag represents an Alive Control tag
