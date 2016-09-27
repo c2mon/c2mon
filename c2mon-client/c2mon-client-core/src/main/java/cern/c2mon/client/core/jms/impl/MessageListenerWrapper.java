@@ -28,6 +28,7 @@ import javax.jms.Message;
 import javax.jms.TextMessage;
 
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,12 +47,8 @@ import cern.c2mon.shared.client.tag.TransferTagValueImpl;
  *
  * @author Mark Brightwell
  */
+@Slf4j
 class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
-
-    /**
-     * Class logger.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(MessageListenerWrapper.class);
 
     /**
      * Wrapped listener. Methods accessing this field are synchronized.
@@ -116,23 +113,16 @@ class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
     @Override
     protected synchronized void notifyListeners(TagValueUpdate tagValueUpdate) {
 
-        if (listeners.containsKey(tagValueUpdate.getId())) {
-            if (!filterout(tagValueUpdate)) {
-              if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace(format(
-                        "notifying listener about TagValueUpdate event. tag id: %d  value: %s timestamp: %s",
-                        tagValueUpdate.getId(), tagValueUpdate.getValue(), tagValueUpdate.getServerTimestamp()));
-              }
-              listeners.get(tagValueUpdate.getId()).onUpdate(tagValueUpdate);
-            }
-        } else {
-          if (LOGGER.isTraceEnabled()) {
-              LOGGER.trace(format(
-                      "no subscribed listener for TagValueUpdate event. tag id: %d  value: %s timestamp: %s - filtering out",
-                      tagValueUpdate.getId(), tagValueUpdate.getValue(), tagValueUpdate.getServerTimestamp()));
-          }
+      if (listeners.containsKey(tagValueUpdate.getId())) {
+        if (!filterout(tagValueUpdate)) {
+          log.trace("notifying listener about TagValueUpdate event. tag id: {}  value: {} timestamp: {}",
+                  tagValueUpdate.getId(), tagValueUpdate.getValue(), tagValueUpdate.getServerTimestamp());
+          listeners.get(tagValueUpdate.getId()).onUpdate(tagValueUpdate);
         }
-
+      } else {
+        log.trace("no subscribed listener for TagValueUpdate event. tag id: {}  value: {} timestamp: {} - filtering out",
+                tagValueUpdate.getId(), tagValueUpdate.getValue(), tagValueUpdate.getServerTimestamp());
+      }
     }
 
     private boolean filterout(TagValueUpdate tagValueUpdate) {
@@ -142,7 +132,8 @@ class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
         eventTimes.put(tagValueUpdate.getId(), newTime);
         return false;
       } else {
-        LOGGER.warn(format("Filtering out Tag update as newer update already received (tag id: %d, value: %s)", tagValueUpdate.getId(), tagValueUpdate.getValue()));
+        log.warn("Filtering out Tag update as newer update already received (tag id: {}, value: {})",
+            tagValueUpdate.getId(), tagValueUpdate.getValue());
         return true;
       }
     }
