@@ -179,9 +179,8 @@ public class TransportConnector implements Connector {
     if (!host.equalsIgnoreCase("localhost") && !host.equalsIgnoreCase("local")) {
       setLocal(false);
     }
+    initializationSteps();
     findClusterAndLaunchBulk();
-    log.debug("init() - Initial test passed: Transport client is connected to the cluster " + cluster + ".");
-    log.info("init() - Connected to cluster " + cluster + " with node " + node + ".");
   }
 
   /**
@@ -194,9 +193,9 @@ public class TransportConnector implements Connector {
       setPort(LOCAL_PORT);
 
       localNode = launchLocalCluster();
-      log.info("init() - Connecting to local ElasticSearch instance (inside same JVM) is enabled.");
+      log.debug("init() - Connecting to local ElasticSearch instance (inside same JVM) is enabled.");
     } else {
-      log.info("init() - Connecting to local ElasticSearch instance (inside same JVM) is disabled.");
+      log.debug("init() - Connecting to local ElasticSearch instance (inside same JVM) is disabled.");
     }
 
     client = createClient();
@@ -244,30 +243,39 @@ public class TransportConnector implements Connector {
    * according to the parameters set.
    */
   private void findClusterAndLaunchBulk() {
+
     Thread clusterFinder = new Thread(() -> {
       try {
         do {
-          initializationSteps();
-          Thread.sleep(1000);
-          isConnected = waitForYellowStatus();
+          log.debug("Waiting for yellow status of Elasticsearch cluster...");
+
+          try {
+            isConnected = waitForYellowStatus();
+
+            if (!isConnected) {
+              log.info("Did not receive yellow status from Elasticsearch!");
+            }
+          } catch(Exception ex) {
+            log.warn("Failed receiving yellow status from Elasticsearch: {}", ex.getMessage());
+          }
+
+          if (!isConnected) {
+            Thread.sleep(5000L);
+          }
+
         } while(!isConnected);
+
+        // The Connector found a connection to a cluster.
+        initBulkProcessor();
+        log.info("init() - Connected to cluster {} with node {}", cluster, node);
+
       } catch(InterruptedException e) {
         log.debug("clusterFinder - Interrupted.");
       }
     }, "C2MON-ES-Module-Cluster-Health-Check");
 
+    log.info("init() - Trying to connect to Elasticsearch cluster {} on host={}, port={}", cluster, host, port);
     clusterFinder.start();
-    log.debug("init() - Connecting to ElasticSearch cluster " + cluster + " on host=" + host + ", port=" + port + ".");
-
-    try {
-      clusterFinder.join();
-    } catch(InterruptedException e) {
-      log.warn("init() - Interruption of the Thread when trying to wait for clusterFinder.");
-    }
-
-    //The Connector found a connection to a cluster.
-    initBulkProcessor();
-
   }
 
   /**

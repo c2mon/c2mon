@@ -85,20 +85,31 @@ public abstract class EsIndexer<T extends IFallback> implements IDBPersistenceHa
   @PostConstruct
   public void init() throws IDBPersistenceException {
     waitForConnection();
-    log.info("init() - EsIndexer is ready to write data to ElasticSearch.");
   }
 
   private void waitForConnection() {
-    while(!connector.isConnected()) {
+
+    int count = 0;
+
+    while(!isAvailable) {
       try {
-        log.trace("waitForConnection() is sleepging for 200ms before checking again for valid ES connection");
-        Thread.sleep(200L);
+        log.trace("waitForConnection() is sleepging for 1s before checking again for valid ES connection");
+        Thread.sleep(1000L);
+
+        isAvailable = connector.isConnected();
+
+        if (count++ > 15) {
+          log.error("Connection to Elasticsearch not properly established. Please check the cluster state and the configuration!");
+          break;
+        }
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }
     }
 
-    isAvailable = true;
+    if (!isAvailable) {
+      log.info("init() - EsIndexer is ready to write data to ElasticSearch.");
+    }
   }
 
   @Override
