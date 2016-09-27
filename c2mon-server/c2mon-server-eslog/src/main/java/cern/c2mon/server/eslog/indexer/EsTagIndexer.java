@@ -153,7 +153,7 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
    */
   protected boolean sendTagToBatch(EsTag tag) {
     if (tag == null) {
-      log.warn("indexByBatch() - Error while indexing data. Tag has null rawValue");
+      log.warn("sendTagToBatch() - Error while indexing data. Tag has null rawValue");
       return false;
     }
 
@@ -162,13 +162,12 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
 
     if (log.isTraceEnabled()) {
       log.trace("Indexing a new tag (#{})", tag.getId());
-      log.trace("Index = " + index);
-      log.trace("Type = " + type);
+      log.trace("Index = {}", index);
+      log.trace("Type = {}", type);
     }
 
-
     if (index == null || type == null || !checkIndex(index)) {
-      log.warn("indexByBatch() - Error while indexing tag #{}. Bad index {}  -> Tag will not be sent to elasticsearch!", tag.getId(), index);
+      log.warn("sendTagToBatch() - Error while indexing tag #{}. Bad index {}  -> Tag will not be sent to elasticsearch!", tag.getId(), index);
       return false;
     }
 
@@ -176,8 +175,8 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
     boolean typeIsPresent = createNonExistentMapping(index, type, tag);
 
     String tagJson = tag.toString();
-    log.debug("indexByBatch() - New IndexRequest for index" + index + " and source " + tagJson);
     if (indexIsPresent && typeIsPresent) {
+      log.debug("sendTagToBatch() - New 'IndexRequest' for index {} and source {}", index, tagJson);
       IndexRequest indexNewTag = new IndexRequest(index, type).source(tagJson).routing(tag.getId());
       return connector.bulkAdd(indexNewTag);
     }
@@ -228,7 +227,7 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
     if (checkIndex(index)) {
       return connector.createIndex(index);
     }
-    log.debug("createIndex() - Bad index: " + index + ".");
+    log.debug("sendCreateIndex() - Bad index: {}", index);
     return false;
   }
 
@@ -266,13 +265,13 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
    */
   private boolean instantiateType(String index, String type, EsTag tag) {
     if ((cacheIndicesTypes.containsKey(index) && cacheIndicesTypes.get(index).contains(type)) || !checkIndex(index)) {
-      log.warn("instantiateType() - Bad type adding to index " + index + ", type: " + type);
+      log.warn("instantiateType() - Bad type adding to index {}, type: {}", index, type);
     }
 
     String mapping = null;
     if (!typeIsPresent(index, type)) {
       mapping = chooseMapping(tag);
-      log.debug("instantiateIndex() - Adding a new mapping to index " + index + " for type " + type + ": " + mapping);
+      log.debug("instantiateIndex() - Adding a new mapping to index {} for type {}: ", index, type, mapping);
     }
     return connector.createIndexTypeMapping(index, type, mapping);
   }
@@ -281,7 +280,7 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
    * Choose a {@link EsMapping} (to index the data in the right way in ElasticSearch) according to the {@param dataType}.
    */
   private String chooseMapping(EsTag tag) {
-    log.trace("chooseMapping() - Choose mapping for data type " + tag.getC2mon().getDataType());
+    log.trace("chooseMapping() - Choose mapping for data type {}", tag.getC2mon().getDataType());
 
     return new EsTagMapping(tag.getType(), tag.getC2mon().getDataType()).getMapping();
   }
@@ -295,9 +294,9 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
   public synchronized void addIndex(String indexName) {
     if (checkIndex(indexName)) {
       cacheIndicesTypes.put(indexName, new HashSet<>());
-      log.debug("addIndex() - Added index " + indexName + " in memory list.");
+      log.debug("addIndex() - Added index " + indexName + " in memory list");
     } else {
-      throw new IllegalArgumentException("addIndex() - Index " + indexName + " does not follow the format \"indexPrefix_dateFormat\".");
+      throw new IllegalArgumentException("addIndex() - Index " + indexName + " does not follow the format \"indexPrefix_dateFormat\"");
     }
   }
 
@@ -309,9 +308,9 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
   protected synchronized void addType(String index, String typeName) {
     if (cacheIndicesTypes.containsKey(index)) {
       cacheIndicesTypes.get(index).add(typeName);
-      log.debug("addType() - Added type " + typeName + " in memory list.");
+      log.debug("addType() - Added type {} in memory list", typeName);
     } else {
-      throw new IllegalArgumentException("Types must follow the format \"tag_dataType\".");
+      throw new IllegalArgumentException("Types must follow the format \"tag_dataType\"");
     }
   }
 
