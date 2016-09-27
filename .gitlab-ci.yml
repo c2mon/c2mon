@@ -23,7 +23,7 @@ deploy_docs:
   script:
     - echo ${KRB_PASSWORD} | kinit ${KRB_USERNAME}@CERN.CH
     - mvn -q -B clean package -pl :docs
-    - scp -B -r docs/target/* ${KRB_USERNAME}@lxplus:/afs/cern.ch/user/c/${KRB_USERNAME}/www/c2mon.web.cern.ch/docs
+    - scp -o 'StrictHostKeyChecking no' -B -r docs/target/* ${KRB_USERNAME}@lxplus:/afs/cern.ch/user/c/${KRB_USERNAME}/www/c2mon.web.cern.ch/docs
   only:
     - master
 
