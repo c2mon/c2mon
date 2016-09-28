@@ -303,16 +303,16 @@ public class EsIndexerTest {
     String expectedDay = indexer.millisecondsToYearMonthDay(millis);
 
     indexer.setIndexFormat("M");
-    String monthIndex = indexer.retrieveIndexFormat(indexer.indexPrefix, millis);
-    assertEquals(indexer.indexPrefix + expectedMonth, monthIndex);
+    String monthIndex = indexer.generateTagIndex(millis);
+    assertEquals(indexer.indexPrefix + "-tag_" + expectedMonth, monthIndex);
 
     indexer.setIndexFormat("W");
-    String weekIndex = indexer.retrieveIndexFormat(indexer.indexPrefix, millis);
-    assertEquals(indexer.indexPrefix + expectedWeek, weekIndex);
+    String weekIndex = indexer.generateTagIndex(millis);
+    assertEquals(indexer.indexPrefix + "-tag_" + expectedWeek, weekIndex);
 
     indexer.setIndexFormat("D");
-    String dayIndex = indexer.retrieveIndexFormat(indexer.indexPrefix, millis);
-    assertEquals(indexer.indexPrefix + expectedDay, dayIndex);
+    String dayIndex = indexer.generateTagIndex(millis);
+    assertEquals(indexer.indexPrefix + "-tag_" + expectedDay, dayIndex);
   }
 
   private SearchResponse getResponse(Client client, String[] indices) {
