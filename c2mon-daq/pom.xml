@@ -146,7 +146,7 @@
             </execution>
           </executions>
           <configuration>
-            <imageName>gitlab-registry.cern.ch/c2mon/-${project.artifactId}</imageName>
+            <imageName>gitlab-registry.cern.ch/c2mon/${project.artifactId}</imageName>
             <baseImage>${docker.image.base}</baseImage>
             <serverId>gitlab-registry.cern.ch</serverId>
             <registryUrl>https://gitlab-registry.cern.ch</registryUrl>
