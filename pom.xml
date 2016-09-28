@@ -60,8 +60,8 @@
 
   <scm>
     <url>https://gitlab.cern.ch/c2mon/c2mon</url>
-    <connection>scm:git:ssh://gitlab.cern.ch:7999/c2mon/c2mon.git</connection>
-    <developerConnection>scm:git:ssh://gitlab.cern.ch:7999/c2mon/c2mon.git</developerConnection>
+    <connection>scm:git:ssh://git@gitlab.cern.ch:7999/c2mon/c2mon.git</connection>
+    <developerConnection>scm:git:ssh://git@gitlab.cern.ch:7999/c2mon/c2mon.git</developerConnection>
   </scm>
 
 
