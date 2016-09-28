@@ -164,7 +164,7 @@ public class TransportConnectorTest {
     assertFalse(result);
 
     connector.setBulkProcessor(initBulkProcessor);
-    IndexRequest newIndex = new IndexRequest("c2mon_1973-06", "tag_boolean").source("");
+    IndexRequest newIndex = new IndexRequest("c2mon-tag_1973-06", "tag_boolean").source("");
     result = connector.bulkAdd(newIndex);
     assertTrue(result);
   }
