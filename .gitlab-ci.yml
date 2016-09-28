@@ -2,8 +2,8 @@ stages:
   - build
   - deploy
 
-# Fully build and deploy master branch
-build_and_deploy:
+# Fully build and publish master branch
+build_and_publish:
   type: build
   script:
     - mvn -q -U -B clean deploy --settings settings.xml
