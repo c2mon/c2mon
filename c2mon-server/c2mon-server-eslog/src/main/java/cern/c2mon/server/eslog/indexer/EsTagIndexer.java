@@ -184,7 +184,7 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
     return false;
   }
 
-  private String generateTagIndex(long serverTime) {
+  protected String generateTagIndex(long serverTime) {
     return retrieveIndexFormat(indexPrefix + "-tag_", serverTime);
   }
 
