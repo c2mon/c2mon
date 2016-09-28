@@ -3,7 +3,7 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 
-  <bean id="heartbeatConnectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory">
+  <bean id="heartbeatConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
     <property name="brokerURL" value="${c2mon.server.client.jms.url}" />
     <!--<property name="userName" value="${jms.client.user}" />-->
     <!--<property name="password" value="${jms.client.password}" />-->

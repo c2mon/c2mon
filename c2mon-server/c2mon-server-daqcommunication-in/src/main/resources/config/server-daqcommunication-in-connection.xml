@@ -5,7 +5,7 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
   <!-- used for incoming updates (connections are cached by Spring listener container) -->  
-  <bean id="daqInConnectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory">    
+  <bean id="daqInConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
     <property name="brokerURL" value="${c2mon.server.daqcommunication.jms.url}" />
 <!--    <property name="userName" value="${jms.daq.in.user}"/>-->
 <!--    <property name="password" value="${jms.daq.in.password}"/>-->
