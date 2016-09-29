@@ -27,12 +27,15 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import cern.c2mon.shared.client.expression.Expression;
-import cern.c2mon.shared.common.datatag.DataTagValueDictionary;
+import cern.c2mon.shared.common.metadata.Metadata;
+import groovy.lang.Script;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -111,6 +114,11 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
   @Getter
   @Setter
   private Collection<Expression> expressions;
+
+  // TODO: Add the script to the Tag interface -> remove the cast from the Evaluator
+  @Getter
+  @Setter
+  private transient Map<String, Script> expressionScripts;
 
   /**
    * DIP address for tags published on DIP
@@ -213,6 +221,7 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
     ruleIds = new ArrayList<>();
     cacheTimestamp = new Timestamp(System.currentTimeMillis());
     expressions = new ArrayList<>();
+    expressionScripts = new HashMap<>();
   }
 
   /**
@@ -244,6 +253,7 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
     if (cacheTimestamp != null) {
       cacheObject.cacheTimestamp = (Timestamp) cacheTimestamp.clone();
     }
+    cacheObject.setExpressionScripts(this.getExpressionScripts());
     return cacheObject;
   }
 
