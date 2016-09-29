@@ -4,7 +4,7 @@
 
   <groupId>cern.c2mon</groupId>
   <artifactId>c2mon</artifactId>
-  <version>1.8.1</version>
+  <version>1.8.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -61,7 +61,7 @@
     <url>https://gitlab.cern.ch/c2mon/c2mon</url>
     <connection>scm:git:ssh://git@gitlab.cern.ch:7999/c2mon/c2mon.git</connection>
     <developerConnection>scm:git:ssh://git@gitlab.cern.ch:7999/c2mon/c2mon.git</developerConnection>
-    <tag>1.8.1</tag>
+    <tag>HEAD</tag>
   </scm>
 
 
