@@ -391,7 +391,7 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
   public final Event<Boolean> updateFromSource(final Long dataTagId, final SourceDataTagValue sourceDataTagValue) {
     tagCache.acquireWriteLockOnKey(dataTagId);
     try {
-      T dataTag = tagCache.getCopy(dataTagId);
+      T dataTag = (T) tagCache.get(dataTagId).clone();
 
       // Before updating the new value to the cache convert the value to the proper type.
       // In the process of the deserialization the dataType can still divert from the defined dataType.
@@ -410,6 +410,8 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
         tagCache.put(dataTagId, dataTag);
       }
       return returnEvent;
+    } catch (CloneNotSupportedException e) {
+      throw new RuntimeException(e);
     } finally {
       tagCache.releaseWriteLockOnKey(dataTagId);
     }
