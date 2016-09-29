@@ -65,8 +65,6 @@ import static org.junit.Assert.assertTrue;
 @TestPropertySource("classpath:c2mon-server-default.properties")
 @RunWith(SpringJUnit4ClassRunner.class)
 public class TransportConnectorTest {
-  private int shards = 10;
-  private int replica = 0;
   private int localPort = 1;
   private String isLocal = "true";
 
@@ -170,13 +168,6 @@ public class TransportConnectorTest {
   }
 
   @Test
-  public void testGetIndexSettings() {
-    Settings expected = Settings.settingsBuilder().put("number_of_shards", shards).put("number_of_replicas", replica).build();
-    assertEquals(expected.get("number_of_shards"), getIndexSettings(shards, replica).get("number_of_shards"));
-    assertEquals(expected.get("number_of_replicas"), getIndexSettings(shards, replica).get("number_of_replicas"));
-  }
-
-  @Test
   public void testLogAlarmEvent() {
     final String indexName = "index-test_alarm";
     EsAlarmLogConverter esAlarmLogConverter = new EsAlarmLogConverter();
@@ -229,11 +220,5 @@ public class TransportConnectorTest {
     } catch(InterruptedException e) {
       e.printStackTrace();
     }
-  }
-
-
-  private Settings getIndexSettings(int numOfShards, int numOfReplicas) {
-    return Settings.settingsBuilder().put("number_of_shards", numOfShards)
-            .put("number_of_replicas", numOfReplicas).build();
   }
 }
