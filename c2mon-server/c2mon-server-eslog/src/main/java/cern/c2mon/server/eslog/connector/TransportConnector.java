@@ -111,6 +111,14 @@ public class TransportConnector implements Connector {
   @Value("${c2mon.server.eslog.cluster}")
   private String cluster;
 
+  /** Number of shards per index. Default is 10 */
+  @Value("${c2mon.server.eslog.shards}")
+  private int shards;
+
+  /** Number of replicas for each primary shard. Default is 1 */
+  @Value("${c2mon.server.eslog.replicas}")
+  private int replicas;
+
   /**
    * Name of the node in the cluster (more useful for debugging and to know which one is connected to the cluster).
    */
@@ -477,7 +485,16 @@ public class TransportConnector implements Connector {
    * Query the cluster in order to do an Index operation.
    */
   protected CreateIndexRequestBuilder prepareCreateIndexRequestBuilder(String index) {
-    return client.admin().indices().prepareCreate(index);
+    log.debug("Prepare ES request to create new index {} with {} shards and {} replicas", index, shards, replicas);
+    CreateIndexRequestBuilder builder = client.admin().indices().prepareCreate(index);
+
+    Settings indexSettings = Settings.settingsBuilder()
+                                              .put("number_of_shards", shards)
+                                              .put("number_of_replicas", replicas)
+                                              .build();
+    builder.setSettings(indexSettings);
+
+    return builder;
   }
 
   /**
