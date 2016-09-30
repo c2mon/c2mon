@@ -285,21 +285,10 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     }
 
     // Write lock needed to avoid parallel Batch persistence transactions
-    try {
-      clusterCache.acquireWriteLockOnKey(this.cachePersistenceLock);
-      if (runInParallel(configElements)) {
-        log.info("Enter parallel configuration");
-        configElements.parallelStream().forEach(element ->
-            applyConfigurationElement(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, configProgressMonitor));
+    log.info("Enter serialized configuration");
+    configElements.stream().forEach(element ->
+        applyConfigurationElement(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, configProgressMonitor));
 
-      } else {
-        log.info("Enter serialized configuration");
-        configElements.stream().forEach(element ->
-            applyConfigurationElement(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, configProgressMonitor));
-      }
-    } finally {
-      clusterCache.releaseWriteLockOnKey(this.cachePersistenceLock);
-    }
 
     //send events to Process if enabled, convert the responses and introduce them into the existing report; else set all DAQs to restart
     if (daqConfigEnabled) {
@@ -498,8 +487,11 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    **/
   private List<ProcessChange> applyConfigElement(final ConfigurationElement element,
                                                  final ConfigurationElementReport elementReport) throws IllegalAccessException {
+    clusterCache.acquireWriteLockOnKey(this.cachePersistenceLock);
+
     //initialize the DAQ config event
     List<ProcessChange> daqConfigEvents = new ArrayList<ProcessChange>();
+    try{
       if (log.isTraceEnabled()) {
         log.trace(element.getConfigId() + " Applying configuration element with sequence id " + element.getSequenceId());
       }
@@ -586,6 +578,9 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
           }
         }
       }
+  } finally {
+    clusterCache.releaseWriteLockOnKey(this.cachePersistenceLock);
+  }
 
     return daqConfigEvents;
   }
