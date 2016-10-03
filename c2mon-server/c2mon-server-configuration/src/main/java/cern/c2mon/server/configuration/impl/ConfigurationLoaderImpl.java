@@ -177,7 +177,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       try {
         List<ConfigurationElement> configurationElements = configParser.parse(configuration);
 
-        report = applyConfiguration(configId.intValue(), configuration.getName(), configurationElements, null);
+        report = applyConfiguration(configId.intValue(), configuration.getName(), configurationElements, null, false);
 
       } catch (Exception ex) {
         log.error("Exception caught while applying configuration", ex);
@@ -234,7 +234,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
           throw new RuntimeException(message, e);
         }
 
-        report = applyConfiguration(configId, configName, configElements, configProgressMonitor);
+        report = applyConfiguration(configId, configName, configElements, configProgressMonitor, true);
 
       } catch (Exception ex) {
         log.error("Exception caught while applying configuration " + configId, ex);
@@ -270,7 +270,11 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    * @param monitor
    * @return
    */
-  private ConfigurationReport applyConfiguration(final int configId, final String configName, final List<ConfigurationElement> configElements, final ConfigProgressMonitor configProgressMonitor) {
+  private ConfigurationReport applyConfiguration(final int configId, final String configName,
+                                                 final List<ConfigurationElement> configElements,
+                                                 final ConfigProgressMonitor configProgressMonitor,
+                                                 final boolean istDBConfig
+  ) {
     ConfigurationReport report = new ConfigurationReport(configId, configName, "");
 
     //map of element reports that need a DAQ child report adding
@@ -285,10 +289,21 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     }
 
     // Write lock needed to avoid parallel Batch persistence transactions
-    log.info("Enter serialized configuration");
-    configElements.stream().forEach(element ->
-        applyConfigurationElement(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, configProgressMonitor));
+    try {
+      clusterCache.acquireWriteLockOnKey(this.cachePersistenceLock);
+      if (!istDBConfig && runInParallel(configElements)) {
+        log.info("Enter parallel configuration");
+        configElements.parallelStream().forEach(element ->
+            applyConfigurationElement(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, configProgressMonitor));
 
+      } else {
+        log.info("Enter serialized configuration");
+        configElements.stream().forEach(element ->
+            applyConfigurationElement(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, configProgressMonitor));
+      }
+    } finally {
+      clusterCache.releaseWriteLockOnKey(this.cachePersistenceLock);
+    }
 
     //send events to Process if enabled, convert the responses and introduce them into the existing report; else set all DAQs to restart
     if (daqConfigEnabled) {
@@ -487,11 +502,9 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    **/
   private List<ProcessChange> applyConfigElement(final ConfigurationElement element,
                                                  final ConfigurationElementReport elementReport) throws IllegalAccessException {
-    clusterCache.acquireWriteLockOnKey(this.cachePersistenceLock);
 
     //initialize the DAQ config event
     List<ProcessChange> daqConfigEvents = new ArrayList<ProcessChange>();
-    try{
       if (log.isTraceEnabled()) {
         log.trace(element.getConfigId() + " Applying configuration element with sequence id " + element.getSequenceId());
       }
@@ -578,9 +591,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
           }
         }
       }
-  } finally {
-    clusterCache.releaseWriteLockOnKey(this.cachePersistenceLock);
-  }
 
     return daqConfigEvents;
   }
