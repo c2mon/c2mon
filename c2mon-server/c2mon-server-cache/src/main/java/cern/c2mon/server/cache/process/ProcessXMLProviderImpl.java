@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -27,19 +27,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import cern.c2mon.server.cache.*;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.cache.CommandTagFacade;
-import cern.c2mon.server.cache.ControlTagCache;
-import cern.c2mon.server.cache.DataTagFacade;
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.ProcessXMLProvider;
-import cern.c2mon.server.cache.SubEquipmentCache;
-import cern.c2mon.server.cache.SubEquipmentFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.SubEquipmentDAO;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
@@ -57,6 +51,7 @@ import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
  *
  */
 @Service
+@Slf4j
 public class ProcessXMLProviderImpl implements ProcessXMLProvider {
 
   /**
@@ -71,6 +66,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
   private SubEquipmentCache subEquipmentCache;
   private SubEquipmentDAO subEquipmentDAO;
   private SubEquipmentFacade subEquipmentFacade;
+  private EquipmentFacade equipmentFacade;
   private DataTagFacade dataTagFacade;
   private ControlTagCache controlTagCache;
   private ProcessCache processCache;
@@ -79,7 +75,8 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
   @Autowired
   public ProcessXMLProviderImpl(EquipmentCache equipmentCache, SubEquipmentDAO subEquipmentDAO,
       SubEquipmentFacade subEquipmentFacade, DataTagFacade dataTagFacade, ControlTagCache controlTagCache,
-      ProcessCache processCache, CommandTagFacade commandTagFacade, SubEquipmentCache subEquipmentCache) {
+      ProcessCache processCache, CommandTagFacade commandTagFacade, SubEquipmentCache subEquipmentCache,
+                                EquipmentFacade equipmentFacade) {
     super();
     this.equipmentCache = equipmentCache;
     this.subEquipmentDAO = subEquipmentDAO;
@@ -89,13 +86,12 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
     this.controlTagCache = controlTagCache;
     this.processCache= processCache;
     this.commandTagFacade = commandTagFacade;
+    this.equipmentFacade = equipmentFacade;
   }
 
   @Override
   public String getProcessConfigXML(Process process) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("getConfigXML() called.");
-    }
+    log.debug("getConfigXML() called.");
     if (process != null) {
 
       //cast to the internal cache object (change this if moved to other but cache module!)
@@ -128,9 +124,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
       str.append(processCacheObject.getMaxMessageDelay());
       str.append("</max-message-delay>\n");
 
-      if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("getting equipment ids");
-      }
 
       str.append("  <EquipmentUnits>\n");
       Collection<Long> equipmentIds = processCacheObject.getEquipmentIds();
@@ -145,7 +139,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
       return str.toString();
 
     } else {
-      LOGGER.error("Called getConfigXML() for a NULL process object - this should be avoided!"
+      log.error("Called getConfigXML() for a NULL process object - this should be avoided!"
           + "  ... throwing a runtime exception :)");
       throw new RuntimeException("Calling getConfigXML() on NULL process object.");
     }
@@ -209,7 +203,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
       str.append("</EquipmentUnit>");
       return str.toString();
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.error("Cannot locate Equipment in cache (Id=" + id + ") - throwing the exception.");
+      log.error("Cannot locate Equipment in cache (Id=" + id + ") - throwing the exception.");
       throw cacheEx;
     }
   }
@@ -223,11 +217,11 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
    * @return A string containing the XML describing the subequipments configuration
    */
   private String getSubEquipmentUnitsConfigXML(final EquipmentCacheObject equipment) {
-    if (LOGGER.isDebugEnabled()) {
+    if (log.isDebugEnabled()) {
       StringBuffer str = new StringBuffer("getSubEquipmentUnitsConfigXML([MonitoringEquipment: ");
       str.append(equipment.getId());
       str.append("]) called.");
-      LOGGER.debug(str.toString());
+      log.debug(str.toString());
     }
 
     // Initialise buffer for the XML structure to be generated
@@ -252,11 +246,11 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
    */
   @Override
   public String getSubEquipmentConfigXML(final Long equipmentId) {
-    if (LOGGER.isDebugEnabled()) {
+    if (log.isDebugEnabled()) {
       StringBuffer str = new StringBuffer("getConfigXML([EquipmentId: ");
       str.append(equipmentId.toString());
       str.append("]) called.");
-      LOGGER.debug(str.toString());
+      log.debug(str.toString());
     }
 
     // Initialise buffer for the XML structure to be generated
@@ -273,7 +267,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
         }
       }
     } catch (SubEquipmentException e) {
-      LOGGER.error("getConfigXML() : Unable to get the subequipments for the equipment ", e);
+      log.error("getConfigXML() : Unable to get the subequipments for the equipment ", e);
     }
 
     // Return the resulting XML structure
@@ -287,9 +281,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
    * @return XML as a String
    */
   public String getSubEquipmentConfigXML(final SubEquipmentCacheObject subEquipmentCacheObject) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("getConfigXML() - Creating the configuration for the subequipment with id: " + subEquipmentCacheObject.getId());
-    }
+    log.debug("getConfigXML() - Creating the configuration for the subequipment with id: " + subEquipmentCacheObject.getId());
     StringBuffer str = new StringBuffer("    <SubEquipmentUnit  id=\"");
     str.append(subEquipmentCacheObject.getId());
     str.append("\" name=\"");
@@ -324,11 +316,11 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
    * <p>Called within block synchronized on equipment.
    */
   private String getDataTagsConfigXML(final EquipmentCacheObject pEquipment) {
-    if (LOGGER.isDebugEnabled()) {
+    if (log.isDebugEnabled()) {
       StringBuffer str = new StringBuffer("getDataTagsConfigXML([MonitoringEquipment: ");
       str.append(pEquipment.getId());
       str.append("]) called.");
-      LOGGER.debug(str.toString());
+      log.debug(str.toString());
     }
 
     // Initialise buffer for the XML structure to be generated
@@ -338,8 +330,8 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
     // generate datatag XML:
     ThreadPoolExecutor tagXmlExecutor =
       new ThreadPoolExecutor(8, 10, 5, TimeUnit.SECONDS,
-                      new LinkedBlockingQueue<Runnable>(10000), new ThreadPoolExecutor.CallerRunsPolicy());
-    Collection<Long> dataTags = pEquipment.getDataTagIds();
+          new LinkedBlockingQueue<>(10000), new ThreadPoolExecutor.CallerRunsPolicy());
+    Collection<Long> dataTags = equipmentFacade.getDataTagIds(pEquipment.getId());
 
     // TIMS-851: Allow attachment of DataTags to SubEquipments
     //
@@ -369,9 +361,9 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
           str.append(futureXmlStrings.pollFirst().get());
         }
       } catch (InterruptedException e) {
-        LOGGER.error("Interrupted while waiting for XML tag threads to terminate - no datatags were added!");
+        log.error("Interrupted while waiting for XML tag threads to terminate - no datatags were added!");
       } catch (ExecutionException e) {
-        LOGGER.error("Interrupted while waiting for XML tag threads to terminate - no datatags were added!");
+        log.error("Interrupted while waiting for XML tag threads to terminate - no datatags were added!");
       }
     }
 
@@ -381,18 +373,18 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
     // and therefore need to be added to the list explicitly.
     Long aliveTagId = pEquipment.getAliveTagId();
     if (aliveTagId != null) {
-      LOGGER.debug("For equipment " + pEquipment.getId() + ", alive Tag defined : " + aliveTagId);
+      log.debug("For equipment " + pEquipment.getId() + ", alive Tag defined : " + aliveTagId);
       try {
         ControlTagCacheObject aliveTag = (ControlTagCacheObject) controlTagCache.getCopy(aliveTagId);
-        LOGGER.debug("alive tag obtained from cache): " + aliveTagId);
+        log.debug("alive tag obtained from cache): " + aliveTagId);
         if (aliveTag.getAddress() != null && aliveTag.getAddress().getHardwareAddress() != null) { //added check on address not null in C2MON, as we allow null address fields if the DB field is
-          LOGGER.debug("alive Tag has hardware address " + aliveTagId);
+          log.debug("alive Tag has hardware address " + aliveTagId);
           str.append(dataTagFacade.generateSourceXML(aliveTag));
         } else {
-          LOGGER.debug("Alive tag has no hardware address, so not including in DAQ XML.");
+          log.debug("Alive tag has no hardware address, so not including in DAQ XML.");
         }
       } catch (CacheElementNotFoundException cacheEx) {
-        LOGGER.error("Unable to locate alive tag with id " + aliveTagId + ") in the cache "
+        log.error("Unable to locate alive tag with id " + aliveTagId + ") in the cache "
             + "when checking if it needs adding as a data tag to the XML configuration document.", cacheEx);
       }
     }
@@ -401,18 +393,18 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
     for (Long subEquipmentId : pEquipment.getSubEquipmentIds()) {
       Long aliveId = subEquipmentCache.get(subEquipmentId).getAliveTagId();
       if (aliveId != null) {
-        LOGGER.debug("For sub-equipment " + subEquipmentId + ", alive Tag defined : " + aliveId);
+        log.debug("For sub-equipment " + subEquipmentId + ", alive Tag defined : " + aliveId);
         controlTagCache.acquireReadLockOnKey(aliveId);
         try {
           ControlTagCacheObject aliveTag = (ControlTagCacheObject) controlTagCache.get(aliveId);
           if (aliveTag.getAddress() != null && aliveTag.getAddress().getHardwareAddress() != null) {
-            LOGGER.debug("Alive tag has hardware address: " + aliveTag.getAddress().getHardwareAddress().toConfigXML());
+            log.debug("Alive tag has hardware address: " + aliveTag.getAddress().getHardwareAddress().toConfigXML());
             str.append(dataTagFacade.generateSourceXML(aliveTag));
           } else {
-            LOGGER.debug("Alive tag has no hardware address, so not including in DAQ XML.");
+            log.debug("Alive tag has no hardware address, so not including in DAQ XML.");
           }
         } catch (CacheElementNotFoundException cacheEx) {
-          LOGGER.error("Unable to locate subequipment alive tag with id " + aliveId + ") in the cache "
+          log.error("Unable to locate subequipment alive tag with id " + aliveId + ") in the cache "
               + "when checking if it needs adding as a data tag to the XML configuration document.", cacheEx);
         } finally {
           controlTagCache.releaseReadLockOnKey(aliveId);
@@ -432,11 +424,11 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
    * <p>Call within equipment lock.
    */
   private String getCommandTagsConfigXML(final EquipmentCacheObject pEquipment) {
-    if (LOGGER.isDebugEnabled()) {
+    if (log.isDebugEnabled()) {
       StringBuffer str = new StringBuffer("getCommandTagsConfigXML([Equipment: ");
       str.append(pEquipment.getId());
       str.append("]) called.");
-      LOGGER.debug(str.toString());
+      log.debug(str.toString());
     }
     StringBuffer str = new StringBuffer();
     Collection<Long> commandTagIds = pEquipment.getCommandTagIds();

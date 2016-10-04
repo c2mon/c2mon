@@ -67,18 +67,5 @@ public class EquipmentCacheTest extends AbstractCacheIntegrationTest {
     }
   }
 
-  /**
-   * This test checks if the equipments in the cache holds the same number of dataTags of the test db.
-   */
-  @Test
-  public void checkLoadingOfDataTags(){
-    Equipment equipment150 = equipmentCache.get(150L);
-    Equipment equipment160 = equipmentCache.get(160L);
-    Equipment equipment170 = equipmentCache.get(170L);
-
-    assertEquals(equipment150.getDataTagIds().size(), 6);
-    assertEquals(equipment160.getDataTagIds().size(), 0);
-    assertEquals(equipment170.getDataTagIds().size(), 1);
-  }
 
 }

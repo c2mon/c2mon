@@ -133,7 +133,6 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
         tagCache.putQuiet(dataTag);
 
         if (dataTag.getEquipmentId() != null) {
-          equipmentFacade.addTagToEquipment(dataTag.getEquipmentId(), dataTag.getId());
           DataTagAdd dataTagAdd = new DataTagAdd(element.getSequenceId(), dataTag.getEquipmentId(),
               ((DataTagFacade) commonTagFacade).generateSourceDataTag(dataTag));
           return new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(dataTag.getEquipmentId()), dataTagAdd);
@@ -154,13 +153,8 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
         LOGGER.error("Exception caught when attempting to create a DataTag - rolling back the DB transaction and undoing cache changes.");
         tagCache.remove(dataTag.getId());
 
-        if (dataTag.getEquipmentId() != null) {
-          if (equipmentFacade.getDataTagIds(dataTag.getEquipmentId()).contains(dataTag.getId())) {
-            equipmentFacade.removeTagFromEquipment(dataTag.getEquipmentId(), dataTag.getId());
-          }
-        }
 
-        else if (dataTag.getSubEquipmentId() != null) {
+        if (dataTag.getSubEquipmentId() != null) {
           if (subEquipmentFacade.getDataTagIds(dataTag.getSubEquipmentId()).contains(dataTag.getId())) {
             subEquipmentFacade.removeTagFromSubEquipment(dataTag.getSubEquipmentId(), dataTag.getId());
           }

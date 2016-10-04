@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,10 +54,9 @@ import cern.c2mon.shared.daq.config.IChange;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service
 public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<Equipment> implements EquipmentConfigHandler {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(EquipmentConfigHandlerImpl.class);
 
   private EquipmentConfigTransacted equipmentConfigTransacted;
 
@@ -96,7 +96,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
 
   @Override
   public ProcessChange removeEquipment(final Long equipmentid, final ConfigurationElementReport equipmentReport) {
-    LOGGER.debug("Removing Equipment " + equipmentid);
+    log.debug("Removing Equipment " + equipmentid);
     try {
       Equipment equipmentCopy = equipmentCache.getCopy(equipmentid);
       //WARNING: outside equipment lock, as all these use methods that access a Process (to create ProcessChange object)!
@@ -124,7 +124,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
       return new ProcessChange(equipmentCopy.getProcessId(), equipmentUnitRemove);
 
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.debug("Equipment not found in cache - unable to remove it.");
+      log.debug("Equipment not found in cache - unable to remove it.");
       equipmentReport.setWarning("Equipment not found in cache so cannot be removed.");
       return new ProcessChange();
     }
@@ -140,7 +140,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
   @Override
   public List<ProcessChange> updateEquipment(Long equipmentId, Properties elementProperties) throws IllegalAccessException {
     if (elementProperties.containsKey("processId")) {
-      LOGGER.warn("Attempting to change the parent process id of an equipment - this is not currently supported!");
+      log.warn("Attempting to change the parent process id of an equipment - this is not currently supported!");
       elementProperties.remove("processId");
     }
     return commonUpdate(equipmentId, elementProperties);
@@ -153,7 +153,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
    *
    *<p>Call within Equipment lock.
    *
-   * @param equipment the equipment for which the subequipments should be removed
+   * @param subEquipmentIds the equipment ids for which the subequipments should be removed
    * @param equipmentReport the report at the equipment level
    */
   private void removeSubEquipments(Collection<Long> subEquipmentIds, ConfigurationElementReport equipmentReport) {
@@ -180,7 +180,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
    * @throws RuntimeException if fail to remove tag
    */
   private void removeEquipmentTags(Equipment equipment, ConfigurationElementReport equipmentReport) {
-    for (Long dataTagId : new ArrayList<Long>(equipment.getDataTagIds())) { //copy as list is modified by removeDataTag
+    for (Long dataTagId : new ArrayList<>(equipmentFacade.getDataTagIds(equipment.getId()))) { //copy as list is modified by removeDataTag
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.DATATAG, dataTagId);
       equipmentReport.addSubReport(tagReport);
       dataTagConfigHandler.removeDataTag(dataTagId, tagReport);

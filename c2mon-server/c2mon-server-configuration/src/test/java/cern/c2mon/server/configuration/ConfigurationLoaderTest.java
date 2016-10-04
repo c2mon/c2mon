@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -166,6 +166,9 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   private EquipmentMapper equipmentMapper;
 
   @Autowired
+  private EquipmentFacade equipmentFacade;
+
+  @Autowired
   private SubEquipmentCache subEquipmentCache;
 
   @Autowired
@@ -244,7 +247,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   public void testCreateUpdateRemoveControlTag() {
     // create
     ConfigurationReport report = configurationLoader.applyConfiguration(2);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty()); // empty because no
@@ -271,7 +274,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     ObjectEqualityComparison.assertDataTagConfigEquals(expectedObject, cacheObject);
     // test update of control tag
     report = configurationLoader.applyConfiguration(6);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
@@ -296,7 +299,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     ConfigurationReport report = configurationLoader.applyConfiguration(8);
 
     // check outcome
-    
+
     assertEquals(Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty()); // empty because no
                                                          // process/equipment
@@ -317,7 +320,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(3);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     CommandTagCacheObject cacheObject = (CommandTagCacheObject) commandTagCache.get(10000L);
 
@@ -342,7 +345,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     // test update
     report = configurationLoader.applyConfiguration(5);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     CommandTagCacheObject cacheObjectUpdated = (CommandTagCacheObject) commandTagCache.get(10000L);
@@ -388,7 +391,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(1);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
@@ -431,12 +434,12 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     equipmentCache.acquireWriteLockOnKey(cacheObject.getEquipmentId());
     Equipment equipment = equipmentCache.get(cacheObject.getEquipmentId());
     // check equipment now has datatag in list
-    assertTrue(equipmentCache.get(cacheObject.getEquipmentId()).getDataTagIds().contains(5000000L));
+    assertTrue(equipmentFacade.getDataTagIds(cacheObject.getEquipmentId()).contains(5000000L));
     equipmentCache.releaseWriteLockOnKey(cacheObject.getEquipmentId());
 
     // test update of this datatag
     report = configurationLoader.applyConfiguration(4);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
@@ -470,7 +473,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     ConfigurationReport report = configurationLoader.applyConfiguration(7);
 
     // check successful
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
@@ -504,7 +507,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     // insert datatag to base rule on
     configurationLoader.applyConfiguration(1);
     ConfigurationReport report = configurationLoader.applyConfiguration(10);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     RuleTagCacheObject cacheObject = (RuleTagCacheObject) ruleTagCache.get(50100L);
 
@@ -538,7 +541,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     report = configurationLoader.applyConfiguration(11);
     Thread.sleep(1000); // sleep 1s to allow for rule evaluation on separate
                         // thread
-    
+
     RuleTagCacheObject updatedCacheObject = (RuleTagCacheObject) ruleTagCache.get(50100L);
     ObjectEqualityComparison.assertRuleTagConfigEquals(expectedObject, updatedCacheObject);
 
@@ -553,7 +556,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     // remove ruletag
     ConfigurationReport report = configurationLoader.applyConfiguration(12);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertFalse(ruleTagCache.hasKey(60007L));
     assertNull(ruleTagMapper.getItem(60007L));
@@ -568,7 +571,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   /**
    * Tests a dependent rule is removed when a tag is.
    */
-  
+
   @Test
   public void testRuleRemovedOnTagRemoval() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
       NoSuchFieldException, NoSimpleValueParseException {
@@ -657,7 +660,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(13);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus()); // ok as DAQ handles Equipment
                                                  // creation
@@ -689,7 +692,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     // update (creates controltag and updates equipment) - should succeed
     report = configurationLoader.applyConfiguration(25);
-    
+
     // expect 2 top elements (control and equipment, with control first)
     // equipment report should have 1 sub-reports from DAQ (control tag has no
     // address)
@@ -765,7 +768,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     // remove equipment
     // remove completes successfully; both Equipment and ControlTags are removed
     ConfigurationReport report = configurationLoader.applyConfiguration(15);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus()); // DAQ deals with Equipment
                                                  // removal
@@ -786,7 +789,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(16);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     ProcessCacheObject cacheObject = (ProcessCacheObject) processCache.get(2L);
@@ -806,7 +809,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     // update
     report = configurationLoader.applyConfiguration(17);
-    
+
 
     cacheObject = (ProcessCacheObject) processCache.getCopy(2L);
     expectedObject.setDescription("updated description");
@@ -831,7 +834,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(28);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     verify(mockManager);
     // check process, tag, rules and alarms are gone
@@ -942,7 +945,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   /**
    * Test the creation, update and removal of equipment.
    */
-  
+
   @Test
   public void testCreateUpdateSubEquipment() throws IllegalAccessException, InstantiationException, NoSuchFieldException, ParserConfigurationException,
       TransformerException, NoSimpleValueParseException {
@@ -950,7 +953,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(19);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     SubEquipmentCacheObject cacheObject = (SubEquipmentCacheObject) subEquipmentCache.get(200L);
@@ -980,7 +983,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getEquipmentId());
 
     report = configurationLoader.applyConfiguration(20);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     verify(mockManager);
@@ -996,7 +999,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     // Create another DataTag attached to the SubEquipment (two already exist in
     // permanent test data)
     ConfigurationReport report = configurationLoader.applyConfiguration(99);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     SubEquipment subEquipment = subEquipmentCache.get(250L);
@@ -1008,7 +1011,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   }
 
   @Test
-  
+
   public void testRemoveSubEquipmentDataTag() throws IllegalAccessException, InstantiationException, NoSuchFieldException, ParserConfigurationException,
       TransformerException, NoSimpleValueParseException {
 
@@ -1018,7 +1021,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     // Create another DataTag attached to the SubEquipment (two already exist in
     // permanent test data)
     ConfigurationReport report = configurationLoader.applyConfiguration(99);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     SubEquipment subEquipment = subEquipmentCache.get(250L);
@@ -1034,7 +1037,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     }
 
     report = configurationLoader.applyConfiguration(21);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertFalse(subEquipmentCache.hasKey(250L));
     assertNull(equipmentMapper.getItem(250L));
@@ -1056,7 +1059,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   }
 
   @Test
-  
+
   public void testRemoveSubEquipment() throws IllegalAccessException, InstantiationException, NoSuchFieldException, ParserConfigurationException,
       TransformerException, NoSimpleValueParseException {
     expect(mockManager.sendConfiguration(EasyMock.anyLong(), EasyMock.<List<Change>> anyObject())).andReturn(new ConfigurationChangeEventReport());
@@ -1064,7 +1067,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     // Create the subequipment
     ConfigurationReport report = configurationLoader.applyConfiguration(19);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     SubEquipment subEquipment = subEquipmentCache.get(200L);
@@ -1080,7 +1083,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     report = configurationLoader.applyConfiguration(98);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertFalse(subEquipmentCache.hasKey(200L));
     assertNull(equipmentMapper.getItem(200L));
@@ -1106,7 +1109,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   /**
    * Test the creation, update and removal of alarm.
    */
-  
+
   @Test
   public void testCreateAlarmWithExistingDatatag() {
     replay(mockManager);
@@ -1133,7 +1136,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   /**
    * Test the creation, update and removal of alarm.
    */
-  
+
   @Test
   public void testCreateUpdateAlarm() {
     replay(mockManager);
@@ -1146,7 +1149,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     alarmCache.registerSynchronousListener(checker);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(22);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     AlarmCacheObject cacheObject = (AlarmCacheObject) alarmCache.get(300000L);
@@ -1167,7 +1170,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     // update should succeed
     report = configurationLoader.applyConfiguration(23);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     cacheObject = (AlarmCacheObject) alarmCache.get(300000L);
     expectedObject.setFaultFamily("updated fault family");
@@ -1195,7 +1198,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     alarmCache.registerSynchronousListener(checker);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(24);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertFalse(alarmCache.hasKey(350000L));
     assertNull(alarmMapper.getItem(350000L));
@@ -1216,7 +1219,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(30);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     DeviceClassCacheObject expectedObject = (DeviceClassCacheObject) deviceClassMapper.getItem(10L);
@@ -1252,7 +1255,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     // Update should succeed
     report = configurationLoader.applyConfiguration(31);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     cacheObject = (DeviceClassCacheObject) deviceClassCache.get(10L);
 
@@ -1264,7 +1267,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   }
 
   @Test
-  
+
   public void testRemoveDeviceClass() {
     DeviceClass deviceClass = deviceClassCache.get(400L);
     assertNotNull(deviceClass);
@@ -1274,7 +1277,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(33);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     deviceClass = deviceClassCache.get(400L);
@@ -1284,7 +1287,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertNotNull(device);
 
     report = configurationLoader.applyConfiguration(32);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertFalse(deviceClassCache.hasKey(400L));
     DeviceClass cacheObject = deviceClassMapper.getItem(400L);
@@ -1294,12 +1297,12 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   }
 
   @Test
-  
+
   public void testCreateUpdateDevice() throws ClassNotFoundException {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(33);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     DeviceCacheObject cacheObject = (DeviceCacheObject) deviceCache.get(20L);
@@ -1326,7 +1329,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     // Update should succeed
     report = configurationLoader.applyConfiguration(34);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     cacheObject = (DeviceCacheObject) deviceCache.get(20L);
 
@@ -1347,7 +1350,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(35);
-    
+
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertFalse(deviceCache.hasKey(300L));
     assertNull(deviceMapper.getItem(300L));
@@ -1369,7 +1372,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
       t.join();
 
       report = ccr.report;
-      
+
       assertTrue(report.toXML().contains(Status.FAILURE.toString()));
       assertTrue(report.toXML().contains("rejected since another configuration is still running"));
 

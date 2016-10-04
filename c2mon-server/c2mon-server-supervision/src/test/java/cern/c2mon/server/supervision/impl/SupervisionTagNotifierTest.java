@@ -214,7 +214,7 @@ public class SupervisionTagNotifierTest {
 
     EasyMock.expect(processCache.getCopy(10L)).andReturn(process);
     //EasyMock.expect(equipmentFacade.getProcessForAbstractEquipment(30L)).andReturn(process);
-    EasyMock.expect(equipmentCache.getCopy(30L)).andReturn(equipment);
+    EasyMock.expect(equipmentFacade.getDataTagIds(30L)).andReturn(Arrays.asList(100L, 101L));
     EasyMock.expect(tagLocationService.getCopy(100L)).andReturn(dataTag);
     EasyMock.expect(tagLocationService.getCopy(101L)).andReturn(dataTag2);
     EasyMock.expect(tagLocationService.getCopy(200L)).andReturn(ruleTag).times(2);
@@ -247,7 +247,7 @@ public class SupervisionTagNotifierTest {
     SupervisionEvent event = new SupervisionEventImpl(SupervisionEntity.EQUIPMENT, 30L, "E_TEST", SupervisionStatus.RUNNING, new Timestamp(System.currentTimeMillis()), "test message");
     mockControl.reset();
     //EasyMock.expect(equipmentFacade.getProcessForAbstractEquipment(30L)).andReturn(process);
-    EasyMock.expect(equipmentCache.getCopy(30L)).andReturn(equipment);
+    EasyMock.expect(equipmentFacade.getDataTagIds(30L)).andReturn(Arrays.asList(100L, 101L));
     EasyMock.expect(tagLocationService.getCopy(100L)).andReturn(dataTag);
     EasyMock.expect(tagLocationService.getCopy(101L)).andReturn(dataTag2);
     EasyMock.expect(tagLocationService.getCopy(200L)).andReturn(ruleTag).times(2);

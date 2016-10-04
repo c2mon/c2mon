@@ -18,7 +18,7 @@ package cern.c2mon.server.cache.equipment;
 
 import javax.annotation.PostConstruct;
 
-import cern.c2mon.server.cache.DataTagCache;
+import cern.c2mon.server.cache.*;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +27,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.cache.ClusterCache;
-import cern.c2mon.server.cache.ControlTagCache;
-import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.common.AbstractCache;
 import cern.c2mon.server.cache.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
@@ -111,12 +108,6 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment>implements
   protected void doPostDbLoading(Equipment equipment) {
     Long processId = equipment.getProcessId();
     Long equipmentId = equipment.getId();
-
-    // set the dataTag ids to the equipment:
-    List<Long> dataTagIds = dataTagCache.getDataTagIdsByEquipmentId(equipmentId);
-    Collection<Long> oldIdList = equipment.getDataTagIds();
-    oldIdList.clear();
-    oldIdList.addAll(dataTagIds);
 
     Long aliveTagId = equipment.getAliveTagId();
     if (aliveTagId != null) {
