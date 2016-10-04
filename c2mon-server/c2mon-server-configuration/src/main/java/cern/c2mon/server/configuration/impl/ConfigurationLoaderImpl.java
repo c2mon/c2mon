@@ -273,7 +273,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   private ConfigurationReport applyConfiguration(final int configId, final String configName,
                                                  final List<ConfigurationElement> configElements,
                                                  final ConfigProgressMonitor configProgressMonitor,
-                                                 final boolean istDBConfig
+                                                 final boolean isDBConfig
   ) {
     ConfigurationReport report = new ConfigurationReport(configId, configName, "");
 
@@ -291,13 +291,13 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     // Write lock needed to avoid parallel Batch persistence transactions
     try {
       clusterCache.acquireWriteLockOnKey(this.cachePersistenceLock);
-      if (!istDBConfig && runInParallel(configElements)) {
-        log.info("Enter parallel configuration");
+      if (!isDBConfig && runInParallel(configElements)) {
+        log.debug("Enter parallel configuration");
         configElements.parallelStream().forEach(element ->
             applyConfigurationElement(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, configProgressMonitor));
 
       } else {
-        log.info("Enter serialized configuration");
+        log.debug("Enter serialized configuration");
         configElements.stream().forEach(element ->
             applyConfigurationElement(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, configProgressMonitor));
       }
