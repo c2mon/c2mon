@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -24,9 +24,9 @@ import cern.c2mon.shared.common.Cacheable;
  * Interface to Equipment objects residing in cache. The methods exposed
  * here are thread safe and can be used on objects residing in the cache.
  * Non-exposed methods in the implementation should not be accessed.
- * Modifications to objects in the cache should be made using the 
+ * Modifications to objects in the cache should be made using the
  * EquipmentFacade bean.
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -39,14 +39,7 @@ public interface Equipment extends AbstractEquipment, Cacheable {
    * @return list of ids
    */
   Collection<Long> getSubEquipmentIds();
-  
-  /**
-   * Returns the live list of DataTag ids attached to this
-   * Equipment; locking on Equipment level required if accessing
-   * this.
-   * @return list of DataTag ids
-   */
-  Collection<Long> getDataTagIds();
+
 
   /**
    * Returns the parent process id.
@@ -61,6 +54,6 @@ public interface Equipment extends AbstractEquipment, Cacheable {
    * @return list of CommandTag ids
    */
   Collection<Long> getCommandTagIds();
-  
+
 
 }

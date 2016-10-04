@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -47,11 +47,6 @@ public class EquipmentCacheObject extends AbstractEquipmentCacheObject implement
     private LinkedList<Long> subEquipmentIds = new LinkedList<Long>();
 
     /**
-     * Collection of ids for all the datatags attached to this equipment (not control tags?).
-     */
-    private LinkedList<Long> dataTagIds = new LinkedList<Long>();
-
-    /**
      * Ids of all command tag attached to this equipment.
      */
     private LinkedList<Long> commandTagIds = new LinkedList<Long>();
@@ -67,7 +62,6 @@ public class EquipmentCacheObject extends AbstractEquipmentCacheObject implement
     public EquipmentCacheObject clone() {
         EquipmentCacheObject equipmentCacheObject = (EquipmentCacheObject) super.clone();
         equipmentCacheObject.commandTagIds = (LinkedList<Long>) this.commandTagIds.clone();
-        equipmentCacheObject.dataTagIds = (LinkedList<Long>) this.dataTagIds.clone();
         equipmentCacheObject.subEquipmentIds = (LinkedList<Long>) this.subEquipmentIds.clone();
 
         return equipmentCacheObject;
@@ -152,15 +146,6 @@ public class EquipmentCacheObject extends AbstractEquipmentCacheObject implement
      */
     public void setSubEquipmentIds(Collection<Long> subEquipmentIds) {
         this.subEquipmentIds = (LinkedList<Long>) subEquipmentIds;
-    }
-
-    public void setDataTagIds(Collection<Long> dataTagIds) {
-        this.dataTagIds = (LinkedList<Long>) dataTagIds;
-    }
-
-    @Override
-    public Collection<Long> getDataTagIds() {
-        return dataTagIds;
     }
 
     @Override

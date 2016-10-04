@@ -168,8 +168,6 @@ public class EquipmentMapperTest {
     subEquipmentIds.add(subEquipmentCacheObject.getId());
 //    subEquipmentIds.add(subEquipmentCacheObject2.getId());
     assertEquals(subEquipmentIds, retrievedObject.getSubEquipmentIds());
-    assertTrue(retrievedObject.getDataTagIds().contains(dataTagCacheObject1.getId())); //contains 2 datatags - check for one ...
-    assertTrue(retrievedObject.getDataTagIds().contains(dataTagCacheObject2.getId())); // ... check for the other
     assertTrue(retrievedObject.getCommandTagIds().contains(commandTag.getId())); //check it contains the commandtag
 
     //assertEquals(dataTagCacheObject.getId(), retrievedObject.getDataTagIds().iterator().next()); //TODO just one in array so far
@@ -196,7 +194,6 @@ public class EquipmentMapperTest {
   public void testTagCollectionLoading() {
     EquipmentCacheObject equipment = (EquipmentCacheObject) equipmentMapper.getItem(150L); //using test DB data for this!! TODO use permanent
     // data instead
-    assertEquals(6, equipment.getDataTagIds().size());
     assertEquals(2, equipment.getCommandTagIds().size());
   }
 

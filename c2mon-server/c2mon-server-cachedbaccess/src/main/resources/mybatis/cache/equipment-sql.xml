@@ -23,16 +23,11 @@
       <result property="address" column="equipment_address"/>
       <result property="processId" column="equipment_procid"/>
       <collection property="subEquipmentIds" ofType="Long" javaType="java.util.LinkedList" resultMap="subEquipmentIdsResultMap"/>
-      <collection property="dataTagIds" ofType="Long" javaType="java.util.LinkedList" resultMap="dataTagIdsResultMap"/>
       <collection property="commandTagIds" ofType="Long" javaType="java.util.LinkedList" resultMap="commandTagIdsResultMap"/>
     </resultMap>
 
     <resultMap id="subEquipmentIdsResultMap" type="Long">
       <id column="subequipment_id"/>
-    </resultMap>
-
-    <resultMap id="dataTagIdsResultMap" type="Long">
-      <id column="datatag_id"/>
     </resultMap>
 
     <resultMap id="commandTagIdsResultMap" type="Long">
@@ -46,8 +41,7 @@
              E1.EQALIVEINTERVAL AS equipment_aliveinterval, E1.EQCOMMFAULT_TAGID AS equipment_commfaulttagid,
              E1.EQADDRESS AS equipment_address, E1.EQ_PROCID AS equipment_procid,
              E1.EQSTATUSTIME AS equipment_status_time, E1.EQSTATUSDESC AS equipment_status_desc,
-             E2.EQID AS subequipment_id, NULL as datatag_id,
-             C.CMDID AS commandtag_id, E1.EQSTATE as equipment_state
+             E2.EQID AS subequipment_id, C.CMDID AS commandtag_id, E1.EQSTATE as equipment_state
         FROM EQUIPMENT E1 LEFT OUTER JOIN EQUIPMENT E2
                          ON E1.EQID = E2.EQ_PARENT_ID
               LEFT OUTER JOIN COMMANDTAG C
@@ -64,7 +58,7 @@
              E1.EQHANDLERCLASS AS equipment_handlerclass, E1.EQSTATE_TAGID AS equipment_statetagid, E1.EQALIVE_TAGID AS equipment_alivetagid,
              E1.EQALIVEINTERVAL AS equipment_aliveinterval, E1.EQCOMMFAULT_TAGID AS equipment_commfaulttagid,
              E1.EQSTATUSTIME AS equipment_status_time, E1.EQSTATUSDESC AS equipment_status_desc,
-             E1.EQADDRESS AS equipment_address, E1.EQ_PROCID AS equipment_procid, E2.EQID AS subequipment_id, D.TAGID as datatag_id,
+             E1.EQADDRESS AS equipment_address, E1.EQ_PROCID AS equipment_procid, E2.EQID AS subequipment_id,
              C.CMDID AS commandtag_id, E1.EQSTATE as equipment_state
         FROM EQUIPMENT E1 LEFT OUTER JOIN EQUIPMENT E2
                          ON E1.EQID = E2.EQ_PARENT_ID

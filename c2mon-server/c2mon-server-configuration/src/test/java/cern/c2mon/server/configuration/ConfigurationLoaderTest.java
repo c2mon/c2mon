@@ -480,7 +480,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertFalse(dataTagCache.hasKey(tagId));
     assertNull(dataTagMapper.getItem(tagId));
     // tag id is no longer in equipment
-    assertFalse(equipmentCache.get(cacheObject.getEquipmentId()).getDataTagIds().contains(tagId));
+    assertFalse(equipmentFacade.getDataTagIds(cacheObject.getEquipmentId()).contains(tagId));
 
     verify(mockManager);
   }

@@ -79,7 +79,6 @@ import static org.junit.Assert.*;
 /**
  * @author Franz Ritter
  */
-@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({
     "classpath:test-config/process-communication-manager-mock.xml",
@@ -139,6 +138,9 @@ public class ConfigurationLoaderTest {
 
   @Autowired
   private EquipmentMapper equipmentMapper;
+
+  @Autowired
+  private EquipmentFacade equipmentFacade;
 
   @Autowired
   private SubEquipmentCache subEquipmentCache;
@@ -815,7 +817,7 @@ public class ConfigurationLoaderTest {
     ObjectEqualityComparison.assertDataTagConfigEquals(expectedCacheObjectData, cacheObjectData);
     // Check if all caches are updated
     equipmentCache.acquireWriteLockOnKey(cacheObjectData.getEquipmentId());
-    assertTrue(equipmentCache.get(cacheObjectData.getEquipmentId()).getDataTagIds().contains(1000L));
+    assertTrue(equipmentFacade.getDataTagIds(cacheObjectData.getEquipmentId()).contains(1000L));
     equipmentCache.releaseWriteLockOnKey(cacheObjectData.getEquipmentId());
 
     verify(mockManager);
