@@ -69,7 +69,7 @@
   <appender name="ReconfigurationAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${RECONFIGURATION_LOG_FILE}</file>
     <encoder>
-      <pattern>%msg%n</pattern>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %msg%n</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
       <fileNamePattern>${RECONFIGURATION_LOG_FILE}.%i</fileNamePattern>
@@ -93,8 +93,6 @@
   </appender>
 
 
-
-
   <logger name="SourceDataTagLogger" level="INFO" additivity="false">
     <appender-ref ref="TagAppender"/>
   </logger>
@@ -108,10 +106,7 @@
     <appender-ref ref="ReconfigurationAppender"/>
   </logger>
   
-  
-  <logger name="cern.c2mon" level="DEBUG"/>
-  <logger name="cern.c2mon.server.shorttermlog" level="DEBUG"/>
-  <logger name="cern.c2mon.pmanager" level="DEBUG"/>
+  <logger name="cern.c2mon" level="INFO"/>
   <logger name="org.apache.activemq" level="WARN"/>
   <logger name="org.springframework" level="WARN"/>
 
