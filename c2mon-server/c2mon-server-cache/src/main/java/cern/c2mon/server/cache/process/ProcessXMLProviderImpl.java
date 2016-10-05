@@ -339,7 +339,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
     // and not the SubEquipment block. This is to avoid modification of the DAQ
     // layer when supporting tags attached to SubEquipments.
     for (Long subEquipmentId : pEquipment.getSubEquipmentIds()) {
-      dataTags.addAll(subEquipmentCache.get(subEquipmentId).getDataTagIds());
+      dataTags.addAll(subEquipmentFacade.getDataTagIds(subEquipmentId));
     }
 
     if (dataTags != null) {

@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,10 +49,9 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service
 public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<SubEquipment> implements SubEquipmentConfigHandler {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(SubEquipmentConfigHandlerImpl.class);
 
   private SubEquipmentConfigTransacted subEquipmentConfigTransacted;
 
@@ -90,7 +90,7 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
    */
   @Override
   public List<ProcessChange> removeSubEquipment(final Long subEquipmentId, final ConfigurationElementReport subEquipmentReport) {
-    LOGGER.debug("Removing SubEquipment " + subEquipmentId);
+    log.debug("Removing SubEquipment " + subEquipmentId);
     subEquipmentCache.acquireWriteLockOnKey(subEquipmentId);
     try {
       SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);
@@ -116,7 +116,7 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
         throw new UnexpectedRollbackException("Exception caught while removing Sub-equipment", e);
       }
     } catch (CacheElementNotFoundException e) {
-      LOGGER.debug("SubEquipment not found in cache - unable to remove it.", e);
+      log.debug("SubEquipment not found in cache - unable to remove it.", e);
       subEquipmentReport.setWarning("SubEquipment not found in cache so cannot be removed.");
       return new ArrayList<ProcessChange>();
     } finally {
@@ -137,12 +137,12 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
   public List<ProcessChange> updateSubEquipment(Long subEquipmentId, Properties elementProperties) throws IllegalAccessException {
     // TODO: Remove obsolete parent_equip_id property
     if (elementProperties.containsKey("parent_equip_id")) {
-      LOGGER.warn("Attempting to change the parent equipment id of a subequipment - this is not currently supported!");
+      log.warn("Attempting to change the parent equipment id of a subequipment - this is not currently supported!");
       elementProperties.remove("parent_equip_id");
     }
 
     if (elementProperties.containsKey("equipmentId")) {
-      LOGGER.warn("Attempting to change the parent equipment id of a subequipment - this is not currently supported!");
+      log.warn("Attempting to change the parent equipment id of a subequipment - this is not currently supported!");
       elementProperties.remove("equipmentId");
     }
 
@@ -155,13 +155,14 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
    *
    * Call within equipment lock.
    *
-   * @param equipment for which the tags should be removed
+   * @param subEquipment for which the tags should be removed
+   * @param subEquipmentReport the report which is build based on the removed entities
    * @throws RuntimeException if fail to remove tag
    */
   private List<ProcessChange> removeSubEquipmentTags(SubEquipment subEquipment, ConfigurationElementReport subEquipmentReport) {
     List<ProcessChange> processChanges = new ArrayList<>();
 
-    for (Long dataTagId : new ArrayList<Long>(subEquipment.getDataTagIds())) {
+    for (Long dataTagId : subEquipmentFacade.getDataTagIds(subEquipment.getId())) {
       // copy as list is modified by removeDataTag
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.DATATAG, dataTagId);
       subEquipmentReport.addSubReport(tagReport);

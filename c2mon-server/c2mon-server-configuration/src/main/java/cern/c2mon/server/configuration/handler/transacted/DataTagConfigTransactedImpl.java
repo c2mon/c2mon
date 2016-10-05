@@ -140,7 +140,6 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
 
         if (dataTag.getSubEquipmentId() != null) {
           // TIMS-951: Allow attachment of DataTags to SubEquipments
-          subEquipmentFacade.addTagToSubEquipment(dataTag.getSubEquipmentId(), dataTag.getId());
           DataTagAdd dataTagAdd = new DataTagAdd(element.getSequenceId(), subEquipmentFacade.getEquipmentIdForSubEquipment(dataTag.getSubEquipmentId()),
               ((DataTagFacade) commonTagFacade).generateSourceDataTag(dataTag));
           return new ProcessChange(subEquipmentFacade.getProcessIdForAbstractEquipment(dataTag.getSubEquipmentId()), dataTagAdd);
@@ -152,13 +151,6 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
       } catch (Exception ex) {
         LOGGER.error("Exception caught when attempting to create a DataTag - rolling back the DB transaction and undoing cache changes.");
         tagCache.remove(dataTag.getId());
-
-
-        if (dataTag.getSubEquipmentId() != null) {
-          if (subEquipmentFacade.getDataTagIds(dataTag.getSubEquipmentId()).contains(dataTag.getId())) {
-            subEquipmentFacade.removeTagFromSubEquipment(dataTag.getSubEquipmentId(), dataTag.getId());
-          }
-        }
 
         throw new UnexpectedRollbackException("Unexpected exception while creating a DataTag: rolling back the change", ex);
       }

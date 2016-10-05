@@ -112,12 +112,6 @@ public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> imp
       throw new NullPointerException(String.format("Equipment %s (%d) has no associated Process id - this should never happen!", parent.getName(), parent.getId()));
     }
 
-    // set the dataTag ids to the equipment:
-    List<Long> dataTagIds = dataTagCache.getDataTagIdsBySubEquipmentId(subEquipment.getId());
-    Collection<Long> oldIdList = subEquipment.getDataTagIds();
-    oldIdList.clear();
-    oldIdList.addAll(dataTagIds);
-
     Long aliveTagId = subEquipment.getAliveTagId();
     if (aliveTagId != null) {
       ControlTag aliveTagCopy = controlCache.getCopy(aliveTagId);

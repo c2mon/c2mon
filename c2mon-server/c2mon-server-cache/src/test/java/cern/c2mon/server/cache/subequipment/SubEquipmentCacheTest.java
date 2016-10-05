@@ -67,15 +67,4 @@ public class SubEquipmentCacheTest extends AbstractCacheIntegrationTest {
       assertEquals(currentSubEquipment.getName(), (((SubEquipment) subEquipmentCache.getCopy(currentSubEquipment.getId())).getName()));
     }
   }
-
-  /**
-   * This test checks if the equipments in the cache holds the same number of dataTags of the test db.
-   */
-  @Test
-  public void checkLoadingOfDataTags(){
-    SubEquipment subEquipment250 = subEquipmentCache.get(250L);
-
-    assertEquals(subEquipment250.getDataTagIds().size(), 2);
-  }
-
 }

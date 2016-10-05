@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -19,18 +19,13 @@ package cern.c2mon.server.cache.subequipment;
 import java.util.Collection;
 import java.util.Properties;
 
+import cern.c2mon.server.cache.*;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.cache.AliveTimerCache;
-import cern.c2mon.server.cache.AliveTimerFacade;
-import cern.c2mon.server.cache.CommFaultTagCache;
-import cern.c2mon.server.cache.CommFaultTagFacade;
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.SubEquipmentCache;
-import cern.c2mon.server.cache.SubEquipmentFacade;
 import cern.c2mon.server.cache.equipment.AbstractEquipmentFacade;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.subequipment.SubEquipment;
@@ -46,15 +41,16 @@ import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service
 public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment> implements SubEquipmentFacade {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(SubEquipmentFacadeImpl.class);
 
   /**
    * Equipment cache bean.
    */
-  private EquipmentCache equipmentCache;
+  private final EquipmentCache equipmentCache;
+
+  private final DataTagCache dataTagCache;
 
   /**
    * Autowired constructor.
@@ -65,9 +61,11 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
                                 final AliveTimerFacade aliveTimerFacade,
                                 final AliveTimerCache aliveTimerCache,
                                 final CommFaultTagCache commFaultTagCache,
-                                final CommFaultTagFacade commFaultTagFacade) {
+                                final CommFaultTagFacade commFaultTagFacade,
+                                final DataTagCache dataTagCache) {
     super(subEquipmentCache, aliveTimerFacade, aliveTimerCache, commFaultTagCache, commFaultTagFacade);
     this.equipmentCache = equipmentCache;
+    this.dataTagCache = dataTagCache;
   }
 
   @Override
@@ -162,7 +160,7 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
     try {
       Equipment equipment = equipmentCache.get(parentId);
       if (equipment.getSubEquipmentIds().contains(id)) {
-        LOGGER.warn("Trying to add existing SubEquipment to an Equipment!");
+        log.warn("Trying to add existing SubEquipment to an Equipment!");
       } else {
         equipment.getSubEquipmentIds().add(id);
         equipmentCache.putQuiet(equipment);
@@ -189,33 +187,8 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
   }
 
   @Override
-  public void addTagToSubEquipment(Long subEquipmentId, Long dataTagId) {
-    cache.acquireWriteLockOnKey(subEquipmentId);
-    try {
-      SubEquipment subEquipment = cache.get(subEquipmentId);
-      subEquipment.getDataTagIds().add(dataTagId);
-      cache.putQuiet(subEquipment);
-    } finally {
-      cache.releaseWriteLockOnKey(subEquipmentId);
-    }
-  }
-
-  @Override
-  public void removeTagFromSubEquipment(Long subEquipmentId, Long dataTagId) {
-    cache.acquireWriteLockOnKey(subEquipmentId);
-    try {
-      SubEquipment subEquipment = cache.get(subEquipmentId);
-      subEquipment.getDataTagIds().remove(dataTagId);
-      cache.putQuiet(subEquipment);
-    } finally {
-      cache.releaseWriteLockOnKey(subEquipmentId);
-    }
-  }
-
-  @Override
   public Collection<Long> getDataTagIds(Long subEquipmentId) {
-    SubEquipment subEquipment = cache.getCopy(subEquipmentId);
-    return subEquipment.getDataTagIds();
+    return  dataTagCache.getDataTagIdsBySubEquipmentId(subEquipmentId);
   }
 
   @Override

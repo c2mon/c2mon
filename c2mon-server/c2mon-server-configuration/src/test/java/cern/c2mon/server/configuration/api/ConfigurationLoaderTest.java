@@ -149,6 +149,9 @@ public class ConfigurationLoaderTest {
   private SubEquipmentMapper subEquipmentMapper;
 
   @Autowired
+  private SubEquipmentFacade subEquipmentFacade;
+
+  @Autowired
   private ProcessCache processCache;
 
   @Autowired
@@ -964,7 +967,7 @@ public class ConfigurationLoaderTest {
     ObjectEqualityComparison.assertDataTagConfigEquals(expectedCacheObjectData, cacheObjectData);
     // Check if all caches are updated
     subEquipmentCache.acquireWriteLockOnKey(cacheObjectData.getSubEquipmentId());
-    assertTrue(subEquipmentCache.get(cacheObjectData.getSubEquipmentId()).getDataTagIds().contains(1000L));
+    assertTrue(subEquipmentFacade.getDataTagIds(cacheObjectData.getSubEquipmentId()).contains(1000L));
     subEquipmentCache.releaseWriteLockOnKey(cacheObjectData.getSubEquipmentId());
 
     verify(mockManager);

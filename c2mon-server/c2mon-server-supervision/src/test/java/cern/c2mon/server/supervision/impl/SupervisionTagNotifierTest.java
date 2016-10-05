@@ -121,6 +121,7 @@ public class SupervisionTagNotifierTest {
     dataTagCache = mockControl.createMock(DataTagCache.class);
     ruleTagCache = mockControl.createMock(RuleTagCache.class);
     equipmentFacade = mockControl.createMock(EquipmentFacade.class);
+    subEquipmentFacade = mockControl.createMock(SubEquipmentFacade.class);
     supervisionAppender = mockControl.createMock(SupervisionAppender.class);
     processFacade = mockControl.createMock(ProcessFacade.class);
 
@@ -276,7 +277,7 @@ public class SupervisionTagNotifierTest {
     SupervisionEvent event = new SupervisionEventImpl(SupervisionEntity.SUBEQUIPMENT, 50L, "E_SUBTEST", SupervisionStatus.DOWN, new Timestamp(System.currentTimeMillis()),
         "test message");
     mockControl.reset();
-    EasyMock.expect(subEquipmentCache.getCopy(50L)).andReturn(subEquipment);
+    EasyMock.expect(subEquipmentFacade.getDataTagIds(50L)).andReturn(Arrays.asList(102L, 103L));
     EasyMock.expect(tagLocationService.getCopy(102L)).andReturn(dataTag3);
     EasyMock.expect(tagLocationService.getCopy(103L)).andReturn(dataTag4);
     EasyMock.expect(tagLocationService.getCopy(203L)).andReturn(ruleTag4).times(2);

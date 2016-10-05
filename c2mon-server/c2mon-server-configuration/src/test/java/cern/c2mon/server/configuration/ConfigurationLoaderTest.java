@@ -175,6 +175,9 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   private SubEquipmentMapper subEquipmentMapper;
 
   @Autowired
+  private SubEquipmentFacade subEquipmentFacade;
+
+  @Autowired
   private ProcessCache processCache;
 
   @Autowired
@@ -1004,14 +1007,13 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     SubEquipment subEquipment = subEquipmentCache.get(250L);
     assertNotNull(subEquipment);
-    assertTrue(subEquipment.getDataTagIds().size() == 3);
+    assertTrue(subEquipmentFacade.getDataTagIds(250L).size() == 3);
 
     DataTagCacheObject cacheObject = (DataTagCacheObject) dataTagCache.get(new Long(7000000));
     assertTrue(cacheObject.getSubEquipmentId() == 250L);
   }
 
   @Test
-
   public void testRemoveSubEquipmentDataTag() throws IllegalAccessException, InstantiationException, NoSuchFieldException, ParserConfigurationException,
       TransformerException, NoSimpleValueParseException {
 
@@ -1031,7 +1033,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertTrue(controlTagCache.hasKey(subEquipment.getAliveTagId()));
     assertTrue(controlTagCache.hasKey(subEquipment.getStateTagId()));
     assertTrue(controlTagCache.hasKey(subEquipment.getCommFaultTagId()));
-    assertTrue(subEquipment.getDataTagIds().size() == 3);
+    assertTrue(subEquipmentFacade.getDataTagIds(250L).size() == 3);
     for (Long tagId : subEquipment.getDataTagIds()) {
       assertTrue(dataTagCache.hasKey(tagId));
     }
