@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -40,11 +40,6 @@ public class SubEquipmentCacheObject extends AbstractEquipmentCacheObject implem
      * The id of the subequipment's parent, to the equipment it is attached
      */
     private Long parentId;
-
-    /**
-     * Collection of ids for all the datatags attached to this sub equipment.
-     */
-    private LinkedList<Long> dataTagIds = new LinkedList<Long>();
 
     /**
      * Public default constructor (needed by iBatis).
@@ -114,19 +109,5 @@ public class SubEquipmentCacheObject extends AbstractEquipmentCacheObject implem
     @Override
     public SupervisionEntity getSupervisionEntity() {
         return SupervisionEntity.SUBEQUIPMENT;
-    }
-
-    /**
-     * Set the data tag IDs attached to this sub equipment.
-     *
-     * @param dataTagIds the tag IDs to add
-     */
-    public void setDataTagIds(Collection<Long> dataTagIds) {
-      this.dataTagIds = (LinkedList<Long>) dataTagIds;
-    }
-
-    @Override
-    public Collection<Long> getDataTagIds() {
-      return dataTagIds;
     }
 }

@@ -144,7 +144,6 @@ public class SupervisionTagNotifierTest {
     equipment = new EquipmentCacheObject(30L);
     equipment.setSubEquipmentIds(new LinkedList<>(Arrays.asList(50L)));
     subEquipment = new SubEquipmentCacheObject(50L);
-    subEquipment.setDataTagIds(new LinkedList<Long>(Arrays.asList(102L, 103L)));
     dataTag = new DataTagCacheObject(100L);
     dataTag.setRuleIds(new ArrayList<Long>(Arrays.asList(200L, 201L)));
     dataTag.setEquipmentId(30L);

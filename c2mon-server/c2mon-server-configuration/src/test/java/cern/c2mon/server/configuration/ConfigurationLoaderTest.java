@@ -1034,7 +1034,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertTrue(controlTagCache.hasKey(subEquipment.getStateTagId()));
     assertTrue(controlTagCache.hasKey(subEquipment.getCommFaultTagId()));
     assertTrue(subEquipmentFacade.getDataTagIds(250L).size() == 3);
-    for (Long tagId : subEquipment.getDataTagIds()) {
+    for (Long tagId : subEquipmentFacade.getDataTagIds(250L)) {
       assertTrue(dataTagCache.hasKey(tagId));
     }
 
@@ -1053,7 +1053,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertNull(controlTagMapper.getItem(subEquipment.getStateTagId()));
     assertFalse(controlTagCache.hasKey(subEquipment.getCommFaultTagId()));
     assertNull(controlTagMapper.getItem(subEquipment.getCommFaultTagId()));
-    for (Long tagId : subEquipment.getDataTagIds()) {
+    for (Long tagId : subEquipmentFacade.getDataTagIds(250L)) {
       assertFalse(dataTagCache.hasKey(tagId));
     }
 
