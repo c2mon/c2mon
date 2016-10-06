@@ -16,6 +16,18 @@
  ******************************************************************************/
 package cern.c2mon.daq.config;
 
+import java.util.Arrays;
+import java.util.Collections;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.Profile;
+import org.springframework.jms.core.JmsTemplate;
+
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.messaging.JmsSender;
 import cern.c2mon.daq.common.messaging.impl.ActiveJmsSender;
@@ -25,18 +37,6 @@ import cern.c2mon.daq.common.messaging.impl.ProxyJmsSender;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.filter.impl.ActiveFilterSender;
 import cern.c2mon.daq.filter.impl.DummyFilterSender;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
-import org.springframework.context.annotation.Profile;
-import org.springframework.core.env.Environment;
-import org.springframework.jms.core.JmsTemplate;
-
-import java.util.Arrays;
-import java.util.Collections;
 
 /**
  * This configuration class is responsible for instantiating the various {@link ProcessMessageSender} beans used within the DAQ core. The {@link
@@ -58,9 +58,6 @@ import java.util.Collections;
 public class ProcessMessageSenderConfig {
 
   @Autowired
-  Environment environment;
-
-  @Autowired
   ConfigurationController configurationController;
 
   @Autowired
@@ -70,6 +67,14 @@ public class ProcessMessageSenderConfig {
   @Autowired
   @Qualifier("secondSourceUpdateJmsTemplate")
   JmsTemplate secondSourceUpdateJmsTemplate;
+
+  @Autowired
+  @Qualifier("filterJmsTemplate")
+  JmsTemplate filterJmsTemplate;
+
+  @Value("${c2mon.daq.filter.enabled}")
+  private boolean sendFilteredData;
+
 
   @Bean
   @Profile("single")
@@ -118,15 +123,13 @@ public class ProcessMessageSenderConfig {
   }
 
   @Bean(name = "filterMessageSender")
-  @Profile("single")
-  public IFilterMessageSender singleFilterMessageSender() {
-    return new ActiveFilterSender(configurationController, sourceUpdateJmsTemplate, environment);
-  }
-  
-  @Bean(name = "filterMessageSender")
-  @Profile("double")
-  public IFilterMessageSender doubleFilterMessageSender() {
-    return new ActiveFilterSender(configurationController, sourceUpdateJmsTemplate, environment);
+  @Profile({ "single", "double" })
+  public IFilterMessageSender filterMessageSender() {
+    if (sendFilteredData) {
+      return new ActiveFilterSender(configurationController, filterJmsTemplate);
+    } else {
+      return new DummyFilterSender();
+    }
   }
 
   @Bean(name = "filterMessageSender")
