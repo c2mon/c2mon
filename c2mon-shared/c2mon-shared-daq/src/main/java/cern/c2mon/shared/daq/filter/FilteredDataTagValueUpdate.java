@@ -18,11 +18,9 @@
 package cern.c2mon.shared.daq.filter;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -40,6 +38,8 @@ import cern.c2mon.shared.common.filter.FilteredDataTagValue;
  * @author mbrightw
  *
  */
+@Data
+@Slf4j
 public class FilteredDataTagValueUpdate {
 
     // ----------------------------------------------------------------------------
@@ -57,15 +57,6 @@ public class FilteredDataTagValueUpdate {
     private static final String XML_ATTRIBUTE_PROCESS_ID = "process-id";
 
     // ----------------------------------------------------------------------------
-    // PRIVATE STATIC MEMBERS
-    // ----------------------------------------------------------------------------
-
-    /**
-     * Log4j Logger for the FilteredDataTagValueUpdate class.
-     */
-    private static final Logger LOG = LoggerFactory.getLogger(FilteredDataTagValueUpdate.class);
-
-    // ----------------------------------------------------------------------------
     // MEMBERS
     // ----------------------------------------------------------------------------
 
@@ -77,7 +68,7 @@ public class FilteredDataTagValueUpdate {
     /**
      * The collection of tag values.
      */
-    private ArrayList tagValues = null;
+    private ArrayList<FilteredDataTagValue> values = null;
 
     // ----------------------------------------------------------------------------
     // CONSTRUCTORS
@@ -95,7 +86,7 @@ public class FilteredDataTagValueUpdate {
      */
     public FilteredDataTagValueUpdate(final Long pProcessId) {
         this.processId = pProcessId;
-        this.tagValues = new ArrayList(10);
+        this.values = new ArrayList<>(10);
     }
 
     /**
@@ -103,25 +94,9 @@ public class FilteredDataTagValueUpdate {
      * @param pProcessId the unique DAQ process id number
      * @param pTagValues the collection of tag values
      */
-    public FilteredDataTagValueUpdate(final Long pProcessId, final ArrayList pTagValues) {
+    public FilteredDataTagValueUpdate(final Long pProcessId, final ArrayList<FilteredDataTagValue> pTagValues) {
         this.processId = pProcessId;
-        this.tagValues = pTagValues;
-    }
-
-    /**
-     * Sets the process id of the value.
-     * @param pProcessId the DAQ process id
-     */
-    public final void setProcessId(final Long pProcessId) {
-        this.processId = pProcessId;
-    }
-
-    /**
-     * Returns the process id.
-     * @return the DAQ process id number
-     */
-    public final Long getProcessId() {
-        return this.processId;
+        this.values = pTagValues;
     }
 
     /**
@@ -129,24 +104,9 @@ public class FilteredDataTagValueUpdate {
      * @param pValue the value to be added
      */
     public final void addValue(final FilteredDataTagValue pValue) {
-        this.tagValues.add(pValue);
+        this.values.add(pValue);
     }
 
-    /**
-     * Sets the collection of values the FilteredDataTagValueUpdate object is wrapping.
-     * @param pFilteredDataTagValues the collection of values
-     */
-    public final void setValues(final ArrayList pFilteredDataTagValues) {
-        this.tagValues = pFilteredDataTagValues;
-    }
-
-    /**
-     * Returns the collection of values the object contains.
-     * @return the collection of filtered tag values
-     */
-    public final Collection getValues() {
-        return this.tagValues;
-    }
 
     // ----------------------------------------------------------------------------
     // METHODS FOR XML-IFICATION and DE-XML-IFICATION
@@ -176,11 +136,9 @@ public class FilteredDataTagValueUpdate {
          * Add a <DataTag> section for each FilteredDataTagValue in the
          * collection
          */
-        if (tagValues != null) {
-            Iterator it = tagValues.iterator();
-
-            while (it.hasNext()) {
-                str.append(((FilteredDataTagValue) it.next()).toXML());
+        if (values != null) {
+            for (FilteredDataTagValue value : values) {
+                str.append(value.toXML());
             }
         }
 
@@ -221,37 +179,36 @@ public class FilteredDataTagValueUpdate {
                     NodeList fields = domElement.getChildNodes();
                     int fieldsCount = fields.getLength();
 
-                    result.tagValues = new ArrayList(fieldsCount);
+                    result.values = new ArrayList<>(fieldsCount);
 
                     for (int i = 0; i < fieldsCount; i++) {
                         fieldNode = fields.item(i);
                         if (fieldNode.getNodeType() == Node.ELEMENT_NODE && fieldNode.getNodeName().equals(FilteredDataTagValue.XML_ROOT_ELEMENT)) {
-                            result.tagValues.add(FilteredDataTagValue.fromXML((Element) fieldNode));
+                            result.values.add(FilteredDataTagValue.fromXML((Element) fieldNode));
                         }
                     } // for
                 } // if processId != null
 
             } catch (NumberFormatException nfe) {
                 result = null;
-                LOG.error("Cannot extract valid process-id from FilteredDataTagValueUpdate message. Returning null.");
+                log.error("Cannot extract valid process-id from FilteredDataTagValueUpdate message. Returning null.");
             }
         } // if DataTagValueUpdate
         else {
             result = null;
-            LOG.error("Cannot decode FilteredDataTagValueUpdate message. Root element is not <FilteredDataTagValueUpdate>");
+            log.error("Cannot decode FilteredDataTagValueUpdate message. Root element is not <FilteredDataTagValueUpdate>");
         }
         return result;
     }
 
-    /**
-     * The method for logging a FilteredDataTagValueUpdate object in log4j.
-     */
-    public final void log() {
-        if (this.tagValues != null) {
-            int size = tagValues.size();
-            for (int i = 0; i != size; i++) {
-                ((FilteredDataTagValue) tagValues.get(i)).log();
-            }
-        }
+  /**
+   * The method for logging a FilteredDataTagValueUpdate object in Slf4j.
+   */
+  public final void log() {
+    if (this.values != null) {
+      for (FilteredDataTagValue tagValue : values) {
+        tagValue.log();
+      }
     }
+  }
 }
