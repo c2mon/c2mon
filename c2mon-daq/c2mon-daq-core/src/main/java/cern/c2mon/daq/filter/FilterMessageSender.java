@@ -16,17 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.daq.filter;
 
-import java.util.Iterator;
+import java.util.Collection;
 
 import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 
-import cern.c2mon.daq.config.Options;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.common.messaging.JmsLifecycle;
+import cern.c2mon.daq.config.Options;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.filter.FilteredDataTagValueUpdate;
@@ -45,12 +43,8 @@ import cern.c2mon.shared.util.buffer.SynchroBufferListener;
  *
  * @author Mark Brightwell
  */
+@Slf4j
 public abstract class FilterMessageSender implements IFilterMessageSender{
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(FilterMessageSender.class);
 
   /**
    * The SynchroBuffer minimum window size.
@@ -108,9 +102,7 @@ public abstract class FilterMessageSender implements IFilterMessageSender{
   public void init() {
     Integer bufferCapacity = configurationController.getEnvironment().getRequiredProperty(Options.FILTER_BUFFER_CAPACITY, Integer.class);
     // set up and enable the synchrobuffer for storing the tags
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("initializing filtering synchrobuffer with max delay :" + MAX_MESSAGE_DELAY + " and capacity : " + bufferCapacity);
-    }
+    log.debug("initializing filtering synchrobuffer with max delay :" + MAX_MESSAGE_DELAY + " and capacity : " + bufferCapacity);
 
     tagBuffer = new SynchroBuffer(MIN_WINDOW_SIZE, MAX_MESSAGE_DELAY, WINDOW_GROWTH_FACTOR, SynchroBuffer.DUPLICATE_OK, bufferCapacity,
         true);
@@ -127,17 +119,12 @@ public abstract class FilterMessageSender implements IFilterMessageSender{
    */
   @Override
   public void addValue(final FilteredDataTagValue dataTagValue) {
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("entering addValue()...");
-      LOGGER.trace("\tadding value to buffer");
-    }
+    log.trace("entering addValue()...");
+    log.trace("\tadding value to buffer");
 
     tagBuffer.push(dataTagValue);
 
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("...leaving addValue()");
-    }
-
+    log.trace("...leaving addValue()");
   }
 
   /**
@@ -158,7 +145,7 @@ public abstract class FilterMessageSender implements IFilterMessageSender{
     try {
       Thread.sleep(MAX_MESSAGE_DELAY);
     } catch (InterruptedException e) {
-      LOGGER.warn("Interrupted exception caught while waiting for filter buffer to empty", e);
+      log.warn("Interrupted exception caught while waiting for filter buffer to empty", e);
     }
     tagBuffer.empty();
     tagBuffer.close();
@@ -180,19 +167,16 @@ public abstract class FilterMessageSender implements IFilterMessageSender{
      * @param event the PullEvent triggered by the SynchroBuffer
      * @throws PullException exception in SychroBuffer pull method
      */
+    @SuppressWarnings("unchecked")
+    @Override
     public void pull(final PullEvent event) throws PullException {
-      if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace("entering FilterMessageSender pull()...");
-      }
-      LOGGER.debug("\t Number of pulled objects : " + event.getPulled().size());
+      log.trace("entering FilterMessageSender pull()...");
+      log.debug("\t Number of pulled objects : " + event.getPulled().size());
       ProcessConfiguration pconf = configurationController.getProcessConfiguration();
       FilteredDataTagValueUpdate dataTagValueUpdate = new FilteredDataTagValueUpdate(pconf.getProcessID());
 
-      Iterator it = event.getPulled().iterator();
       long currentMsgSize = 0;
-
-      // iterate through all pulled SourceDataTagValue's
-      while (it.hasNext()) {
+      for (FilteredDataTagValue filteredTagValue : (Collection<FilteredDataTagValue>) event.getPulled()) {
         // check if the maximum allowed message size has been reached;
         if (currentMsgSize == MAX_MESSAGE_SIZE) {
           // if so, send them (the values have been gathered in the
@@ -206,11 +190,9 @@ public abstract class FilterMessageSender implements IFilterMessageSender{
             // next batch of values
             dataTagValueUpdate = null;
 
-            if (LOGGER.isDebugEnabled()) {
-              LOGGER.debug("\t sent " + currentMsgSize + " SourceDataTagValue objects to Statistics module");
-            }
+            log.debug("\t sent " + currentMsgSize + " SourceDataTagValue objects to Statistics module");
           } catch (JMSException ex) {
-            LOGGER.error("\tpull : JMSException caught while invoking processValue method:" + ex.getMessage());
+            log.error("\tpull : JMSException caught while invoking processValue method:" + ex.getMessage());
           }
 
           // create new dataTagValueUpdate object for the next batch
@@ -223,7 +205,7 @@ public abstract class FilterMessageSender implements IFilterMessageSender{
         } // if
 
         // append next SourceDataTagValue object to the message
-        dataTagValueUpdate.addValue((FilteredDataTagValue) it.next());
+        dataTagValueUpdate.addValue(filteredTagValue);
 
         // increase the message size counter
         currentMsgSize++;
@@ -235,16 +217,12 @@ public abstract class FilterMessageSender implements IFilterMessageSender{
       if (dataTagValueUpdate != null && currentMsgSize > 0) {
         try {
           processValues(dataTagValueUpdate);
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("\t sent " + dataTagValueUpdate.getValues().size() + " FilteredDataTagValue objects");
-          }
+          log.debug("\t sent " + dataTagValueUpdate.getValues().size() + " FilteredDataTagValue objects");
         } catch (JMSException ex) {
-          LOGGER.error("\t pull : JMSException caught while invoking processValue method :" + ex.getMessage());
+          log.error("\t pull : JMSException caught while invoking processValue method :" + ex.getMessage());
         }
       } // if
-      if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace("leaving FilterMessageSender pull method");
-      }
+      log.trace("leaving FilterMessageSender pull method");
     }
   }
 }
