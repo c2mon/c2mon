@@ -9,12 +9,12 @@
     <persistence strategy="localRestartable" />
   </defaultCache>
 
-  <!-- notice maxElementsInMemory below must be large enough for all data 
+  <!-- notice maxElementsInMemory below must be large enough for all data
     tags, since all are in memory -->
   <cache name="tagCache" eternal="true" maxElementsInMemory="500000"
-    statistics="true" transactionalMode="off" memoryStoreEvictionPolicy="FIFO">
-    <!-- Enables the RestartStore and copies all cache entries (on-heap and/or 
-      off-heap) to disk. This option provides fast restartability with fault tolerant 
+    statistics="true" transactionalMode="off" memoryStoreEvictionPolicy="LFU">
+    <!-- Enables the RestartStore and copies all cache entries (on-heap and/or
+      off-heap) to disk. This option provides fast restartability with fault tolerant
       cache persistence on disk. This option is available for BigMemory Go only. -->
     <persistence strategy="localRestartable" />
     <searchable keys="false" values="false">

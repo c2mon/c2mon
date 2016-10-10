@@ -18,7 +18,7 @@
       maxElementsInMemory="500000"
       statistics="true"
       transactionalMode="off"
-      memoryStoreEvictionPolicy="FIFO">
+      memoryStoreEvictionPolicy="LFU">
       <searchable keys="false" values="false">
         <searchAttribute name="tagName" expression="value.getName()"/>
         <searchAttribute name="equipmentId" expression="value.getEquipmentId()"/>
