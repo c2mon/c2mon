@@ -83,6 +83,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    */
   private final String cachePersistenceLock = "c2mon.cachepersistence.cachePersistenceLock";
 
+  private static final long DEFAULT_TIMEOUT = 300000;
+
   int changeId = 0; //unique id for all generated changes (including those recursive ones during removal)
 
   private final ProcessCommunicationManager processCommunicationManager;
@@ -173,7 +175,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     ConfigurationReport report = null;
 
     // Try to acquire the configuration lock.
-    if (clusterCache.tryWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY, 1L)) {
+    if (clusterCache.tryWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY, DEFAULT_TIMEOUT)) {
       try {
         List<ConfigurationElement> configurationElements = configParser.parse(configuration);
 
@@ -208,7 +210,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     ConfigurationReport report = null;
 
     // Try to acquire the configuration lock.
-    if (clusterCache.tryWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY, 1L)) {
+    if (clusterCache.tryWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY, DEFAULT_TIMEOUT)) {
       try {
 
         String configName = configurationDAO.getConfigName(configId);
