@@ -1,32 +1,28 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- *
+ * <p/>
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- *
+ * <p/>
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- *
+ * <p/>
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.shared.daq.datatag;
 
 import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
-import cern.c2mon.shared.util.parser.SimpleXMLParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.jms.support.converter.MessageConverter;
-import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
@@ -36,7 +32,7 @@ import javax.jms.TextMessage;
 import java.io.IOException;
 
 /**
- * Converter class used to convert between JMS messages and
+ * Converter class used to convert between JSON messages and
  * {@link DataTagValueUpdate} instances.
  *
  * @author Mark Brightwell
@@ -46,100 +42,62 @@ public class DataTagValueUpdateConverter implements MessageConverter {
 
   private ObjectMapper mapper;
 
-  private SimpleXMLParser parser;
-
-  public DataTagValueUpdateConverter() {
+  @PostConstruct
+  public void init() {
     this.mapper = new ObjectMapper();
     mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     mapper.enable(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY);
-
-    try {
-      this.parser = new SimpleXMLParser();
-    } catch (Exception e) {
-      throw new RuntimeException("Error creating instance of SimpleXMLParser", e);
-    }
   }
 
   /**
-   * Converts an incoming message into a {@link DataTagValueUpdate}. Never
-   * returns null.
+   * Converts an incoming tag update into a {@link DataTagValueUpdate} object.
    *
-   * @param message the incoming JMS message
-   * @throws JMSException               if the content of the message cannot
-   *                                    be extracted due to some JMS problem
-   * @throws MessageConversionException if error occurs during parsing of
-   *                                    message content (including non-text
-   *                                    message reception)
+   * @param message the incoming tag update
+   *
+   * @throws JMSException if an error occurs converting the message
    */
   @Override
   public Object fromMessage(final Message message) throws JMSException {
+
     if (message == null) {
-      throw new MessageConversionException("Listener called with null JMS message argument");
+      throw new MessageConversionException("Message must not be null!");
     }
 
     if (!(message instanceof TextMessage)) {
-      throw new MessageConversionException("Received a non text message from JMS: unable to process it");
+      throw new MessageConversionException("Message must be an instance of TextMessage!");
     }
 
     try {
-      String text = ((TextMessage) message).getText();
-      log.trace("Update received from DAQ: \n{}", text);
+      String json = ((TextMessage) message).getText();
+      log.trace("Update received from DAQ:\n" + json);
 
-      if (isJsonString(text)) {
-        return readJsonString(text);
-      } else {
-        // If the message isn't JSON, then it must be a legacy XML update
-        return readXmlString(text);
-      }
-
-    } catch (IOException | RuntimeException ex) {
-      log.error("Exception caught on update reception", ex);
-      throw new MessageConversionException("Error parsing incoming tag update. "
-          + "Message content was: " + ((TextMessage) message).getText(), ex);
+      return mapper.readValue(json, DataTagValueUpdate.class);
+    } catch (IOException | RuntimeException e) {
+      log.error("Exception caught while parsing incoming update", e);
+      throw new MessageConversionException("Exception caught while parsing incoming update: " + ((TextMessage) message).getText(), e);
     }
   }
 
   /**
-   * Converts a {@link DataTagValueUpdate} to a JMS Message
+   * Converts a {@link DataTagValueUpdate} to a JMS {@link Message}
    *
-   * @param dataTagValueUpdate the update object to convert
-   * @param session            the JMS session in which the message must be created
-   * @return the resulting JMS message
-   * @throws JMSException if an error occurs in creating the JMS message
+   * @param tag     the tag to convert
+   * @param session the session in which the message must be created
+   *
+   * @return the resulting message
+   * @throws JMSException if an error occurs in creating the message
    */
   @Override
-  public Message toMessage(final Object dataTagValueUpdate, final Session session) throws JMSException {
+  public Message toMessage(final Object tag, final Session session) throws JMSException {
     try {
-      String jsonString = mapper.writeValueAsString(dataTagValueUpdate);
-      return session.createTextMessage(jsonString);
+      String json = mapper.writeValueAsString(tag);
+      return session.createTextMessage(json);
 
     } catch (JsonProcessingException e) {
       log.error("Exception caught on update reception", e.getMessage());
-      throw new MessageConversionException("Exception caught in converting dataTagValueUpdate to a json String:" + e.getMessage());
-    }
-  }
-
-  private DataTagValueUpdate readJsonString(String jsonString) throws IOException {
-    return mapper.readValue(jsonString, DataTagValueUpdate.class);
-  }
-
-  private DataTagValueUpdate readXmlString(String xmlString) {
-    Document xmlDocument = parser.parse(xmlString);
-    Element rootElement = xmlDocument.getDocumentElement();
-    return DataTagValueUpdate.fromXML(rootElement);
-  }
-
-  /**
-   * @return true if the given string is a valid JSON string, false otherwise
-   */
-  private boolean isJsonString(final String string) {
-    try {
-      mapper.readTree(string);
-      return true;
-    } catch (IOException ioe) {
-      return false;
+      throw new MessageConversionException("Exception caught in converting dataTagValueUpdate to a json String:"
+          + e.getMessage());
     }
   }
 }
-
 
