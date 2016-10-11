@@ -16,11 +16,9 @@
  ******************************************************************************/
 package cern.c2mon.daq;
 
-import static java.lang.String.format;
-import static java.lang.System.getProperty;
-
 import java.io.IOException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.Banner;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -28,9 +26,12 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
 import org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.core.env.AbstractEnvironment;
 
 import cern.c2mon.daq.config.Options;
-import lombok.extern.slf4j.Slf4j;
+
+import static java.lang.String.format;
+import static java.lang.System.getProperty;
 
 /**
  * This class is responsible for bootstrapping a C2MON DAQ process.
@@ -50,8 +51,12 @@ public class DaqStartup {
 
     // The JMS mode (single, double, test) is controlled via Spring profiles
     String mode = getProperty(Options.JMS_MODE);
-    System.setProperty("spring.profiles.active", mode == null ? "single" : mode);
+    if (mode != null) {
+      System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, mode);
+    }
 
     new SpringApplicationBuilder(DaqStartup.class).bannerMode(Banner.Mode.OFF).build().run(args);
+    
+    log.info("DAQ core is now initialized");
   }
 }
