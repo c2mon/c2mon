@@ -83,7 +83,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    */
   private final String cachePersistenceLock = "c2mon.cachepersistence.cachePersistenceLock";
 
-  private static final long DEFAULT_TIMEOUT = 300000;
+  private static final long DEFAULT_TIMEOUT = 30_000;
 
   int changeId = 0; //unique id for all generated changes (including those recursive ones during removal)
 
