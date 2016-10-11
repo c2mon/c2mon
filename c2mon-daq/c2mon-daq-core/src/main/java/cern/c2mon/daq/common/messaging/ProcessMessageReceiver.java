@@ -17,6 +17,18 @@
 
 package cern.c2mon.daq.common.messaging;
 
+import java.util.List;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Session;
+
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cern.c2mon.daq.common.DriverKernel;
 import cern.c2mon.daq.common.messaging.impl.RequestController;
 import cern.c2mon.shared.daq.command.SourceCommandTagReport;
@@ -25,17 +37,6 @@ import cern.c2mon.shared.daq.config.*;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
 import cern.c2mon.shared.daq.messaging.DAQResponse;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-
-import javax.annotation.Resource;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Session;
-import java.util.List;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * The ProcessMessageReceiver is responsible for listening to incoming messages
@@ -49,11 +50,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 @Slf4j
 public abstract class ProcessMessageReceiver {
-
-  /**
-   * The logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessMessageReceiver.class);
 
   /**
    * Reconfiguration logger to log the reconfiguration separately.
@@ -70,20 +66,14 @@ public abstract class ProcessMessageReceiver {
   /**
    * Reference to the DriverKernel
    */
-  @Resource
+  @Setter
   private DriverKernel kernel;
 
-  /**
-   * The configuration object factory to create the objects for the
-   * reconfiguration from an XML message.
-   */
-
-  // TODO Use autowired instead of resource
   /**
    * The RequestController delivers the request from the server to the right
    * parts of the core and the equipment.
    */
-  @Resource
+  @Setter
   private RequestController requestController;
 
   /**
@@ -197,49 +187,4 @@ public abstract class ProcessMessageReceiver {
     requestLock.writeLock().unlock();
     return sourceCommandTagReport;
   }
-
-  /**
-   * This method is called each time ProcessMessageReceiver receives
-   * MSG_CHANGE_LOGGING_LEVEL message. For schema definition and some examples
-   * of the XML go to the TIMDriverLog4j document.
-   *
-   * @param doc - DOM message document
-   */
-  @Deprecated
-  public void onChangeLoggingLevel(final Document doc) {
-    requestLock.writeLock().lock();
-    try {
-      log.debug("entering onChangeLoggingLevel()..");
-
-      log.debug("Not doing anything as this feature has been disabled");
-
-//      Element rootEl = doc.getDocumentElement();
-//      NodeList n1 = rootEl.getElementsByTagName("process");
-//      if (n1.getLength() == 1) {
-//        if (LOGGER.isDebugEnabled())
-//          LOGGER.debug("calling kernel\'s setRootLoggerLevel() with level : " + n1.item(0).getFirstChild().getNodeValue());
-//
-//        this.kernel.setRootLoggerLevel(n1.item(0).getFirstChild().getNodeValue());
-//      }
-//
-//      Element eqUnitsBlock = (Element) rootEl.getElementsByTagName("EquipmentUnits").item(0);
-//      NodeList eqUnits = eqUnitsBlock.getElementsByTagName("EquipmentUnit");
-//      for (int i = 0; i < eqUnits.getLength(); i++) {
-//        Element eqUnit = (Element) eqUnits.item(i);
-//        String eqID = eqUnit.getAttribute("id");
-//        String eqName = eqUnit.getAttribute("name");
-//
-//        if (LOGGER.isDebugEnabled())
-//          LOGGER.debug("calling kernel\'s setEqLoggerLevel() for eqUnit id : " + eqID + " name : " + eqName + " with level : "
-//              + eqUnit.getFirstChild().getNodeValue());
-//
-//        this.kernel.setEqLoggerLevel(Long.getLong(eqID), eqName, eqUnit.getFirstChild().getNodeValue());
-//      }
-
-      log.debug("leaving onChangeLoggingLevel()");
-    } finally {
-      requestLock.writeLock().unlock();
-    }
-  }
-
 }

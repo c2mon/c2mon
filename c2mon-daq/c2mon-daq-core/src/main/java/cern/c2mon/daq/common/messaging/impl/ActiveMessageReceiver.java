@@ -16,6 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
+import javax.jms.*;
+import javax.xml.parsers.ParserConfigurationException;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.activemq.command.ActiveMQQueue;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jms.listener.DefaultMessageListenerContainer;
+import org.springframework.jms.listener.SessionAwareMessageListener;
+
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.messaging.ProcessMessageReceiver;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
@@ -26,19 +35,6 @@ import cern.c2mon.shared.daq.messaging.DAQResponse;
 import cern.c2mon.shared.daq.messaging.ServerRequest;
 import cern.c2mon.shared.daq.messaging.response.ServerErrorResponse;
 import cern.c2mon.shared.daq.serialization.MessageConverter;
-import org.apache.activemq.command.ActiveMQQueue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Profile;
-import org.springframework.jms.listener.DefaultMessageListenerContainer;
-import org.springframework.jms.listener.SessionAwareMessageListener;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import javax.jms.*;
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Implementation of the ProcessMessageReceiver interface for ActiveMQ JMS
@@ -53,14 +49,8 @@ import javax.xml.parsers.ParserConfigurationException;
  * @author mbrightw
  *
  */
-@Component
-@Profile({ "single", "double" })
-public class ActiveMessageReceiver extends ProcessMessageReceiver implements SessionAwareMessageListener {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ActiveMessageReceiver.class);
+@Slf4j
+public class ActiveMessageReceiver extends ProcessMessageReceiver implements SessionAwareMessageListener<TextMessage> {
 
   /**
    * Wire field to resolve circular reference.
@@ -82,25 +72,20 @@ public class ActiveMessageReceiver extends ProcessMessageReceiver implements Ses
    * @param serverRequestJmsContainer
    *            the message listener
    */
-  @Autowired
-  public ActiveMessageReceiver(final ConfigurationController configurationController, @Qualifier
-      ("serverRequestListenerContainer") final DefaultMessageListenerContainer serverRequestJmsContainer) throws ParserConfigurationException {
+  public ActiveMessageReceiver(final ConfigurationController configurationController,
+      @Qualifier("serverRequestListenerContainer") final DefaultMessageListenerContainer serverRequestJmsContainer) throws ParserConfigurationException {
     super();
     this.configurationController = configurationController;
     this.listenerContainer = serverRequestJmsContainer;
   }
 
   /**
-   * Initialization method that must be called after bean creation (done
-   * automatically in Spring). Sets the destination and registers as listener
+   * Initialization method that must be called after bean creation. Sets the destination and registers as listener
    * in the Spring listener container.
    */
-  @PostConstruct
   public void init() {
     ProcessConfiguration processConfiguration = configurationController.getProcessConfiguration();
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("init - Setting ActiveMessageReceiver listener destination to " + processConfiguration.getJmsDaqCommandQueue());
-    }
+    log.debug("Setting ActiveMessageReceiver listener destination to {}", processConfiguration.getJmsDaqCommandQueue());
     listenerContainer.setMessageListener(this);
     listenerContainer.setDestination(new ActiveMQQueue(processConfiguration.getJmsDaqCommandQueue()));
     listenerContainer.initialize();
@@ -122,9 +107,7 @@ public class ActiveMessageReceiver extends ProcessMessageReceiver implements Ses
   @Override
   public void disconnect() {
     ProcessConfiguration processConfiguration = configurationController.getProcessConfiguration();
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("disconnect - Disconnecting ActiveMessageReceiver listener with destination to " + processConfiguration.getJmsDaqCommandQueue());
-    }
+    log.debug("Disconnecting ActiveMessageReceiver listener with destination to {}", processConfiguration.getJmsDaqCommandQueue());
     listenerContainer.shutdown();
   }
 
@@ -155,9 +138,7 @@ public class ActiveMessageReceiver extends ProcessMessageReceiver implements Ses
     try {
       TextMessage message = session.createTextMessage();
       message.setText(messageText);
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Sending response to DataTagValueRequest.");
-      }
+      log.debug("Sending response to DataTagValueRequest");
       messageProducer.send(destination, message);
     } finally {
       messageProducer.close();
@@ -173,46 +154,39 @@ public class ActiveMessageReceiver extends ProcessMessageReceiver implements Ses
    * answer message failed.
    */
   @Override
-  // TODO change commands & requests to Queue (need change in DAQ tim-shared,
-  // so postponed until prototype is working)
-  public void onMessage(final Message message, final Session session) throws JMSException {
-    LOGGER.debug("Request/Command received from the server.");
+  public void onMessage(final TextMessage message, final Session session) throws JMSException {
+    log.debug("Request/Command received from the server");
     if (message.getJMSReplyTo() == null) {
-      LOGGER.warn("\tthe \"replyTo\" property was not set in the JMS message. Ignoring request.");
+      log.warn("\tthe \"replyTo\" property was not set in the JMS message. Ignoring request.");
       return;
     }
     DAQResponse response;
 
+    TextMessage textMessage = message;
+    String messageContent = textMessage.getText();
 
-    if (message instanceof TextMessage) {
-      TextMessage textMessage = (TextMessage) message;
-      String messageContent = textMessage.getText();
+    log.trace("message received from server: {}", textMessage.getText());
+    try {
+      ServerRequest request = MessageConverter.requestFromJson(messageContent);
 
-      LOGGER.trace("message received from server: " + textMessage.getText());
-      try {
-        ServerRequest request = MessageConverter.requestFromJson(messageContent);
+      if (request instanceof SourceDataTagValueRequest) {
+        log.debug("Processing server request for current data tag values");
+        response = onSourceDataTagValueUpdateRequest((SourceDataTagValueRequest) request);
 
-        if (request instanceof SourceDataTagValueRequest) {
-          LOGGER.debug("Processing server request for current data tag values.");
-          response = onSourceDataTagValueUpdateRequest((SourceDataTagValueRequest) request);
+      } else if (request instanceof SourceCommandTagValue) {
+        response = onExecuteCommand((SourceCommandTagValue) request);
 
-        } else if (request instanceof SourceCommandTagValue) {
-          response = onExecuteCommand((SourceCommandTagValue) request);
+      } else if (request instanceof ChangeRequest) {
+        response = onReconfigureProcess((ChangeRequest) request);
 
-        } else if (request instanceof ChangeRequest) {
-          response = onReconfigureProcess((ChangeRequest) request);
-
-        } else {
-          LOGGER.warn("Request received from server not recognized");
-          response = new ServerErrorResponse("Request received from server not recognized: " + request.getClass() + " not supported from the DAQ.");
-        }
-        sendDAQResponse(response, message.getJMSReplyTo(), session);
-
-      } catch (Exception e) {
-        LOGGER.error("Unexpected exception caught while processing server request.", e);
+      } else {
+        log.warn("Request received from server not recognized");
+        response = new ServerErrorResponse("Request received from server not recognized: " + request.getClass() + " not supported from the DAQ.");
       }
-    } else {
-      LOGGER.warn("Received non-text message - unable to process.");
+      sendDAQResponse(response, message.getJMSReplyTo(), session);
+
+    } catch (Exception e) {
+      log.error("Unexpected exception caught while processing server request", e);
     }
   }
 

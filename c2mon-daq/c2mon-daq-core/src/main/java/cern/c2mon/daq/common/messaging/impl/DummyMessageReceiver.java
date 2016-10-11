@@ -22,8 +22,6 @@ import javax.jms.Session;
 
 import cern.c2mon.daq.common.messaging.ProcessMessageReceiver;
 import cern.c2mon.shared.daq.messaging.DAQResponse;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
 
 /**
  * Dummy implementation of the ProcessMessageReceiver that can be used in the
@@ -31,8 +29,6 @@ import org.springframework.stereotype.Component;
  *
  * @author mbrightw
  */
-@Component("activeMessageReceiver")
-@Profile("test")
 public class DummyMessageReceiver extends ProcessMessageReceiver {
 
   @Override

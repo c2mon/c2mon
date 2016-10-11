@@ -16,6 +16,8 @@
  ******************************************************************************/
 package cern.c2mon.daq.config;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -24,9 +26,15 @@ import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
+import cern.c2mon.daq.common.DriverKernel;
+import cern.c2mon.daq.common.conf.core.ConfigurationController;
+import cern.c2mon.daq.common.messaging.ProcessMessageReceiver;
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
+import cern.c2mon.daq.common.messaging.impl.ActiveMessageReceiver;
 import cern.c2mon.daq.common.messaging.impl.ActiveRequestSender;
+import cern.c2mon.daq.common.messaging.impl.DummyMessageReceiver;
 import cern.c2mon.daq.common.messaging.impl.TestModeRequestSender;
 
 /**
@@ -60,6 +68,13 @@ public class ProcessRequestSenderConfig {
   @Qualifier("secondProcessRequestJmsTemplate")
   JmsTemplate secondProcessRequestJmsTemplate;
 
+  @Autowired
+  ConfigurationController configurationController;
+
+  @Autowired
+  @Qualifier("serverRequestListenerContainer")
+  DefaultMessageListenerContainer serverRequestJmsContainer;
+
   @Bean(name = "primaryRequestSender")
   @Profile({ "single", "double" })
   public ProcessRequestSender primaryRequestSender() {
@@ -78,4 +93,23 @@ public class ProcessRequestSenderConfig {
     return new ActiveRequestSender(environment, secondProcessRequestJmsTemplate);
   }
 
+  /**
+   * Bean required in {@link DriverKernel}
+   */
+  @Bean
+  @Profile({ "single", "double" })
+  public ProcessMessageReceiver activeMessageReceiver() throws ParserConfigurationException {
+    ActiveMessageReceiver activeMessageReceiver = new ActiveMessageReceiver(configurationController, serverRequestJmsContainer);
+    activeMessageReceiver.init();
+    return activeMessageReceiver;
+  }
+
+  /**
+   * Bean required in {@link DriverKernel}
+   */
+  @Bean
+  @Profile("test")
+  public ProcessMessageReceiver dummyMessageReceiver() {
+    return new DummyMessageReceiver();
+  }
 }
