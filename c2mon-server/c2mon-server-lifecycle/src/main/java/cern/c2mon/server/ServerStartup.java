@@ -16,6 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server;
 
+import java.io.IOException;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -25,9 +27,6 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
 import org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.SmartLifecycle;
-
-import java.io.IOException;
 
 /**
  * This class is responsible for bootstrapping the C2MON application server.
@@ -57,5 +56,7 @@ public class ServerStartup {
     // removed by playing around with {@link SmartLifecycle#isAutoStartup()}.
     context.start();
     context.registerShutdownHook();
+
+    log.info("C2MON server is now initialised");
   }
 }
