@@ -57,24 +57,27 @@ import cern.c2mon.daq.filter.impl.DummyFilterSender;
 })
 public class ProcessMessageSenderConfig {
 
+  // Ensures that all configured properties are set before initialising the beans
   @Autowired
-  ConfigurationController configurationController;
+  private EnvironmentConfig config;
+
+  @Autowired
+  private ConfigurationController configurationController;
 
   @Autowired
   @Qualifier("sourceUpdateJmsTemplate")
-  JmsTemplate sourceUpdateJmsTemplate;
+  private JmsTemplate sourceUpdateJmsTemplate;
 
   @Autowired
   @Qualifier("secondSourceUpdateJmsTemplate")
-  JmsTemplate secondSourceUpdateJmsTemplate;
+  private JmsTemplate secondSourceUpdateJmsTemplate;
 
   @Autowired
   @Qualifier("filterJmsTemplate")
-  JmsTemplate filterJmsTemplate;
+  private JmsTemplate filterJmsTemplate;
 
   @Value("${c2mon.daq.filter.enabled}")
   private boolean sendFilteredData;
-
 
   @Bean
   @Profile("single")
