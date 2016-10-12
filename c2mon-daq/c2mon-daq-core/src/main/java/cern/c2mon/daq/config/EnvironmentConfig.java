@@ -16,6 +16,10 @@
  ******************************************************************************/
 package cern.c2mon.daq.config;
 
+import javax.annotation.PostConstruct;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -34,7 +38,16 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
     @PropertySource(value = "classpath:c2mon-daq-default.properties"),
     @PropertySource(value = "${c2mon.daq.properties.location}", ignoreResourceNotFound = true)
 })
+@Slf4j
 public class EnvironmentConfig {
+
+  @Value("${c2mon.daq.jms.mode}")
+  private String mode;
+
+  @PostConstruct
+  public void showJmsMode() {
+    log.info("The following JMS mode is active: {}", mode);
+  }
 
   @Bean
   public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
