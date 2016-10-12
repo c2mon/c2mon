@@ -45,6 +45,8 @@ trigger:
     - "curl -X POST -F token=$C2MON_DAQ_JEC_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9150/trigger/builds"
     # Trigger build of c2mon-daq-opcua
     - "curl -X POST -F token=$C2MON_DAQ_OPCUA_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9153/trigger/builds"
+    # Trigger build of c2mon-daq-rest
+    - "curl -X POST -F token=$C2MON_DAQ_REST_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9155/trigger/builds"
     # Trigger build of c2mon-client-ext-history
     - "curl -X POST -F token=$C2MON_CLIENT_EXT_HISTORY_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9115/trigger/builds"
   only:
