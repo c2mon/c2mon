@@ -25,8 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
@@ -61,9 +60,8 @@ import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
  * @author vilches (refactoring updates)
  */
 @Component
+@Slf4j
 public class ConfigurationController {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationController.class);
 
   @Autowired
   private Environment environment;
@@ -99,25 +97,25 @@ public class ConfigurationController {
   /**
    * Map of data tag changers. It maps equipment id - > changer.
    */
-  private Map<Long, IDataTagChanger> dataTagChangers = new ConcurrentHashMap<Long, IDataTagChanger>();
+  private Map<Long, IDataTagChanger> dataTagChangers = new ConcurrentHashMap<>();
   /**
    * Map of command tag changers. It maps equipment id - > changer.
    */
-  private Map<Long, ICommandTagChanger> commandTagChangers = new ConcurrentHashMap<Long, ICommandTagChanger>();
+  private Map<Long, ICommandTagChanger> commandTagChangers = new ConcurrentHashMap<>();
   /**
    * Map of equipment changers. It maps equipment id - > changer.
    */
-  private Map<Long, IEquipmentConfigurationChanger> equipmentChangers = new ConcurrentHashMap<Long, IEquipmentConfigurationChanger>();
+  private Map<Long, IEquipmentConfigurationChanger> equipmentChangers = new ConcurrentHashMap<>();
   /**
    * These are additional changers of the core. Which can be used to inform
    * other parts of the core about changes.
    */
-  private Map<Long, List<ICoreDataTagChanger>> coreDataTagChangers = new ConcurrentHashMap<Long, List<ICoreDataTagChanger>>();
+  private Map<Long, List<ICoreDataTagChanger>> coreDataTagChangers = new ConcurrentHashMap<>();
   /**
    * These are additional changers of the core. Which can be used to inform
    * other parts of the core about changes.
    */
-  private Map<Long, List<ICoreCommandTagChanger>> coreCommandTagChangers = new ConcurrentHashMap<Long, List<ICoreCommandTagChanger>>();
+  private Map<Long, List<ICoreCommandTagChanger>> coreCommandTagChangers = new ConcurrentHashMap<>();
   /**
    * The core equipment configuration changers.
    */
@@ -145,12 +143,12 @@ public class ConfigurationController {
 
     try {
       // Get the PIK from the server
-      LOGGER.trace("initProcess - Process Connection called.");
+      log.trace("initProcess - Process Connection called.");
       this.loadProcessConnection();
 
       // Configuration
 
-      LOGGER.trace("initProcess - Process Configuration called.");
+      log.trace("initProcess - Process Configuration called.");
       this.loadProcessConfiguration();
 
     } catch (Exception ex) {
@@ -187,20 +185,20 @@ public class ConfigurationController {
   public void loadProcessConfiguration() {
     Document xmlConfiguration;
     ProcessConfigurationResponse processConfigurationResponse = null;
-    LOGGER.trace("loadProcessConfiguration - Configuration process started");
+    log.trace("Configuration process started");
 
     boolean localConfiguration = false;
 
     if (environment.containsProperty(Options.LOCAL_CONFIG_FILE)) {
-
-      LOGGER.info("loadProcessConfiguration - Taking Configuration from file");
       localConfiguration = true;
       String fileSystemLocation = environment.getProperty(Options.LOCAL_CONFIG_FILE);
+
+      log.info("Loading configuration from file: {}", fileSystemLocation);
+
       xmlConfiguration = this.processConfigurationLoader.fromFiletoDOC(fileSystemLocation);
-
-
-    } else {
-      LOGGER.info("loadProcessConfiguration - Taking Configuration from remote server");
+    }
+    else {
+      log.info("Loading configuration from server");
       processConfigurationResponse = this.processConfigurationLoader.getProcessConfiguration();
 
       // If Process Configuration is REJECTED we exit
@@ -224,11 +222,11 @@ public class ConfigurationController {
       if (!localConfiguration) {
         saveConfiguration(xmlConfiguration);
       } else {
-        LOGGER.info("loadProcessConfiguration - Local configuration will not be saved. It is already in local disk. ");
+        log.info("Local configuration will not be saved. It is already in local disk");
       }
     }
 
-    LOGGER.debug("loadProcessConfiguration - Loading DAQ configuration properties from XML document...");
+    log.debug("Loading DAQ configuration properties from XML document...");
 
     // try to create process configuration object (with the PIK saved in the
     // provisional ProcessConfiguration)
@@ -238,7 +236,7 @@ public class ConfigurationController {
           configuration.getprocessPIK(), xmlConfiguration, localConfiguration);
       ProcessConfigurationHolder.setInstance(configuration);
 
-      LOGGER.debug("loadProcessConfiguration - ... properties loaded successfully.");
+      log.debug("Process configuration successfully loaded");
     } catch (ConfUnknownTypeException ex) {
       sendDisconnectionNotification();
       throw new RuntimeException("UNKNOWN configuration received");
@@ -255,19 +253,19 @@ public class ConfigurationController {
   private void saveConfiguration(Document docXMLConfig) {
     String fileToSaveConf = environment.getProperty(Options.REMOTE_CONFIG_FILE);
     if (fileToSaveConf.length() > 0 && docXMLConfig != null) {
-      LOGGER.info("saveConfiguration - saving the process configuration XML in a file " + fileToSaveConf + " due to user request");
+      log.info("saveConfiguration - saving the process configuration XML in a file " + fileToSaveConf + " due to user request");
 
       File file = new File(fileToSaveConf);
       if (file.isDirectory() || !fileToSaveConf.endsWith(".xml")) {
         throw new RuntimeException("File name provided by '" + Options.REMOTE_CONFIG_FILE +"' option must end with '.xml'");
       }
-      
+
       try {
         DOMImplementationLS domImplementation = (DOMImplementationLS) docXMLConfig.getImplementation();
         LSSerializer lsSerializer = domImplementation.createLSSerializer();
         lsSerializer.writeToURI(docXMLConfig, file.toURI().toURL().toString());
       } catch (java.io.IOException ex) {
-        LOGGER.error("saveConfiguration - Could not save the configuration to the file " + fileToSaveConf, ex);
+        log.error("saveConfiguration - Could not save the configuration to the file " + fileToSaveConf, ex);
       }
     }
   }
@@ -276,12 +274,12 @@ public class ConfigurationController {
    * Sends disconnection notifications to all request senders.
    */
   private void sendDisconnectionNotification() {
-    LOGGER.trace("sendDisconnectionNotification - Primary Request Sender disconnection");
+    log.trace("sendDisconnectionNotification - Primary Request Sender disconnection");
     primaryRequestSender.sendProcessDisconnectionRequest(ProcessConfigurationHolder.getInstance(), startUp);
 
     // send in separate thread as may block if broker problem
     if (secondaryRequestSender != null) {
-      LOGGER.trace("sendDisconnectionNotification - Secondary Request Sender disconnection (new thread)");
+      log.trace("sendDisconnectionNotification - Secondary Request Sender disconnection (new thread)");
       Thread disconnectSend = new Thread(new Runnable() {
         @Override
         public void run() {
@@ -303,8 +301,8 @@ public class ConfigurationController {
    * @return A report with information if the change was successful.
    */
   public synchronized ChangeReport onDataTagAdd(final DataTagAdd dataTagAddChange) {
-    LOGGER.debug("onDataTagAdd - entering onDataTagAdd()");
-    if (LOGGER.isDebugEnabled()) LOGGER.debug("changeId: " + dataTagAddChange.getChangeId());
+    log.debug("onDataTagAdd - entering onDataTagAdd()");
+    if (log.isDebugEnabled()) log.debug("changeId: " + dataTagAddChange.getChangeId());
 
     ChangeReport changeReport = new ChangeReport(dataTagAddChange);
     Long equipmentId = dataTagAddChange.getEquipmentId();
@@ -324,7 +322,7 @@ public class ConfigurationController {
     Long dataTagId = sourceDataTag.getId();
     Map<Long, SourceDataTag> sourceDataTags = getSourceDataTags(equipmentId);
     if (sourceDataTags == null) {
-      LOGGER.warn("cannot add data tag - equipment id: " + dataTagAddChange.getEquipmentId() + " is unknown");
+      log.warn("cannot add data tag - equipment id: " + dataTagAddChange.getEquipmentId() + " is unknown");
       changeReport.appendError("Equipment does not exist: " + equipmentId);
       return changeReport;
     }
@@ -338,7 +336,7 @@ public class ConfigurationController {
 
     if (sourceDataTags.containsKey(dataTagId)) {
 
-      LOGGER.warn("onDataTagAdd - cannot add data tag id: " + dataTagId + " to equipment id: " + dataTagAddChange.getEquipmentId() + " This equipment already" +
+      log.warn("onDataTagAdd - cannot add data tag id: " + dataTagId + " to equipment id: " + dataTagAddChange.getEquipmentId() + " This equipment already" +
           " has tag with that id");
 
       changeReport.appendError("DataTag " + dataTagId + " is already in equipment " + equipmentId);
@@ -360,7 +358,7 @@ public class ConfigurationController {
         changeReport.setState(CHANGE_STATE.REBOOT);
       }
     }
-    LOGGER.debug("onDataTagAdd - exiting onDataTagAdd()");
+    log.debug("onDataTagAdd - exiting onDataTagAdd()");
     return changeReport;
   }
 
@@ -374,8 +372,8 @@ public class ConfigurationController {
    * @return A report with information if the change was successful.
    */
   public synchronized ChangeReport onCommandTagAdd(final CommandTagAdd commandTagAddChange) {
-    LOGGER.debug("entering onCommandTagAdd()");
-    if (LOGGER.isDebugEnabled()) LOGGER.debug("changeId: " + commandTagAddChange.getChangeId());
+    log.debug("entering onCommandTagAdd()");
+    if (log.isDebugEnabled()) log.debug("changeId: " + commandTagAddChange.getChangeId());
 
     ChangeReport changeReport = new ChangeReport(commandTagAddChange);
     Long equipmentId = commandTagAddChange.getEquipmentId();
@@ -393,7 +391,7 @@ public class ConfigurationController {
 
     Map<Long, SourceCommandTag> sourceCommandTags = getSourceCommandTags(equipmentId);
     if (sourceCommandTags == null) {
-      LOGGER.warn("cannot add command tag - equipment id: " + commandTagAddChange.getEquipmentId() + " is unknown");
+      log.warn("cannot add command tag - equipment id: " + commandTagAddChange.getEquipmentId() + " is unknown");
       changeReport.appendError("Equipment does not exist: " + equipmentId);
       return changeReport;
     }
@@ -408,7 +406,7 @@ public class ConfigurationController {
     Long commandTagId = sourceCommandTag.getId();
     if (sourceCommandTags.containsKey(commandTagId)) {
 
-      LOGGER.warn("cannot add command tag id: " + commandTagId + " to equipment id: " + commandTagAddChange.getEquipmentId() + " This equipment already has " +
+      log.warn("cannot add command tag id: " + commandTagId + " to equipment id: " + commandTagAddChange.getEquipmentId() + " This equipment already has " +
           "tag with that id");
 
       changeReport.appendError("CommandTag " + commandTagId + " is already in equipment " + equipmentId);
@@ -441,7 +439,7 @@ public class ConfigurationController {
    * @return A change report with success information.
    */
   public synchronized ChangeReport onDataTagRemove(final DataTagRemove dataTagRemoveChange) {
-    LOGGER.debug("Entering onDataTagRemove: ");
+    log.debug("Entering onDataTagRemove: ");
 
     ChangeReport changeReport = new ChangeReport(dataTagRemoveChange);
     Long equipmentId = dataTagRemoveChange.getEquipmentId();
@@ -451,12 +449,12 @@ public class ConfigurationController {
       return changeReport;
     }
 
-    LOGGER.debug("onDataTagRemove - removing " + dataTagRemoveChange.getDataTagId());
+    log.debug("onDataTagRemove - removing " + dataTagRemoveChange.getDataTagId());
 
     SourceDataTag sourceDataTag = sourceDataTags.get(dataTagRemoveChange.getDataTagId());
 
     if (sourceDataTag != null) {
-      LOGGER.debug("onDataTagRemove - Core removed data tag with id " + dataTagRemoveChange.getDataTagId() + " successfully from equipment " + equipmentId);
+      log.debug("onDataTagRemove - Core removed data tag with id " + dataTagRemoveChange.getDataTagId() + " successfully from equipment " + equipmentId);
       changeReport.appendInfo("Core removed data tag with id " + dataTagRemoveChange.getDataTagId() + " successfully from equipment " + equipmentId);
       List<ICoreDataTagChanger> coreChangers = coreDataTagChangers.get(equipmentId);
 
@@ -479,7 +477,7 @@ public class ConfigurationController {
       sourceDataTags.remove(dataTagRemoveChange.getDataTagId());
 
     } else {
-      LOGGER.debug("onDataTagRemove - The data tag with id " + dataTagRemoveChange.getDataTagId() + " to remove was not found" + " in equipment with id " +
+      log.debug("onDataTagRemove - The data tag with id " + dataTagRemoveChange.getDataTagId() + " to remove was not found" + " in equipment with id " +
           equipmentId);
       // The data tag which should be removed was not found which means the same
       // result as foudn and removed.
@@ -488,7 +486,7 @@ public class ConfigurationController {
       changeReport.setState(CHANGE_STATE.SUCCESS);
     }
 
-    LOGGER.debug("Exiting onDataTagRemove: ");
+    log.debug("Exiting onDataTagRemove: ");
 
     return changeReport;
   }
@@ -760,7 +758,7 @@ public class ConfigurationController {
    * @return a change report with information about the success of the update.
    */
   public ChangeReport onSubEquipmentUnitRemove(SubEquipmentUnitRemove subEquipmentUnitRemove) {
-    LOGGER.debug("onSubEquipmentUnitRemove - entering onSubEquipmentUnitRemove()..");
+    log.debug("onSubEquipmentUnitRemove - entering onSubEquipmentUnitRemove()..");
     ProcessConfiguration configuration = ProcessConfigurationHolder.getInstance();
 
     ChangeReport changeReport = new ChangeReport(subEquipmentUnitRemove);
@@ -795,7 +793,7 @@ public class ConfigurationController {
    */
 
   public ChangeReport onSubEquipmentUnitAdd(final SubEquipmentUnitAdd subEquipmentUnitAdd) {
-    LOGGER.debug("onSubEquipmentUnitAdd - entering onSubEquipmentUnitAdd()..");
+    log.debug("onSubEquipmentUnitAdd - entering onSubEquipmentUnitAdd()..");
     ProcessConfiguration configuration = ProcessConfigurationHolder.getInstance();
 
     ChangeReport changeReport = new ChangeReport(subEquipmentUnitAdd);
@@ -874,7 +872,7 @@ public class ConfigurationController {
       // Try to find a SubEquipment that matches the given equipment ID
       for (EquipmentConfiguration configuration : processConfiguration.getEquipmentConfigurations().values()) {
         if (configuration.getSubEquipmentConfigurations().containsKey(equipmentId)) {
-          LOGGER.debug("Getting source data tags of equipment " + configuration.getId() + " which is parent of SubEquipment " + equipmentId);
+          log.debug("Getting source data tags of equipment " + configuration.getId() + " which is parent of SubEquipment " + equipmentId);
           sourceDataTags = configuration.getDataTags();
         }
       }
@@ -920,7 +918,7 @@ public class ConfigurationController {
   public void addCoreDataTagChanger(final Long equipmentId, final ICoreDataTagChanger dataTagChanger) {
     List<ICoreDataTagChanger> changers = coreDataTagChangers.get(equipmentId);
     if (changers == null) {
-      changers = new ArrayList<ICoreDataTagChanger>();
+      changers = new ArrayList<>();
       coreDataTagChangers.put(equipmentId, changers);
     }
     changers.add(dataTagChanger);
@@ -936,7 +934,7 @@ public class ConfigurationController {
   public void addCoreCommandTagChanger(final Long equipmentId, final ICoreCommandTagChanger commandTagChanger) {
     List<ICoreCommandTagChanger> changers = coreCommandTagChangers.get(equipmentId);
     if (changers == null) {
-      changers = new ArrayList<ICoreCommandTagChanger>();
+      changers = new ArrayList<>();
       coreCommandTagChangers.put(equipmentId, changers);
     }
     changers.add(commandTagChanger);
@@ -951,7 +949,7 @@ public class ConfigurationController {
   public void addCoreEquipmentConfigurationChanger(final long equipmentId, final ICoreEquipmentConfigurationChanger coreEquipmentConfigurationChanger) {
     List<ICoreEquipmentConfigurationChanger> changers = coreEquipmentConfigurationChangers.get(equipmentId);
     if (changers == null) {
-      changers = new ArrayList<ICoreEquipmentConfigurationChanger>();
+      changers = new ArrayList<>();
       coreEquipmentConfigurationChangers.put(equipmentId, changers);
     }
     changers.add(coreEquipmentConfigurationChanger);

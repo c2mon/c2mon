@@ -21,9 +21,7 @@ import java.net.UnknownHostException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import cern.c2mon.daq.config.Options;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.xerces.parsers.DOMParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -36,6 +34,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
+import cern.c2mon.daq.config.Options;
 import cern.c2mon.daq.tools.processexceptions.ConfRejectedTypeException;
 import cern.c2mon.daq.tools.processexceptions.ConfUnknownTypeException;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
@@ -53,11 +52,8 @@ import cern.c2mon.shared.util.parser.SimpleXMLParser;
  * @author Andreas Lang
  */
 @Component
+@Slf4j
 public class ProcessConfigurationLoader extends XMLTagValueExtractor implements ConfigurationXMLConstants {
-  /**
-   * The logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessConfigurationLoader.class);
 
   /**
    * JMS DAq queue trunk
@@ -78,21 +74,10 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
 
   private EquipmentConfigurationFactory equipmentConfigurationFactory;
 
-//  /**
-//   * The process message sender used during the creation of the configuration to send commFaults.
-//   */
-//  private ProcessMessageSender processMessageSender;
-
-
   @Autowired
   public void setEquipmentConfigurationFactory(EquipmentConfigurationFactory eqConfFactory) {
     this.equipmentConfigurationFactory = eqConfFactory;
   }
-
-//  @Autowired
-//  public void setJmsDaqQueueTrunk(String jmsDaqQueueTrunk) {
-//    this.jmsDaqQueueTrunk = jmsDaqQueueTrunk;
-//  }
 
   /**
    * Gets the Process configuration from the server and saves it to the provided location.
@@ -102,14 +87,14 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
    */
   public ProcessConfigurationResponse getProcessConfiguration() {
     ProcessConfigurationResponse processConfigurationResponse;
-    LOGGER.trace("getProcessConfiguration - getting Process Configuration");
+    log.trace("getProcessConfiguration - getting Process Configuration");
 
     processConfigurationResponse = processRequestSender.sendProcessConfigurationRequest(environment.getRequiredProperty(Options.C2MON_DAQ_NAME));
 
     if (processConfigurationResponse == null) {
       throw new RuntimeException("Configuration request to server: timeout waiting for server response");
     }
-    LOGGER.info("getProcessConfiguration - Configuration XML received from server and parsed");
+    log.info("getProcessConfiguration - Configuration XML received from server and parsed");
     return processConfigurationResponse;
   }
 
@@ -121,7 +106,7 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
    */
   public final ProcessConnectionResponse getProcessConnection() {
     ProcessConnectionResponse processConnectionResponse;
-    LOGGER.trace("getProcessConnection - getting Process Connection");
+    log.trace("getting Process Connection");
 
     // Ask for XML file to the server
     processConnectionResponse = processRequestSender.sendProcessConnectionRequest(environment.getRequiredProperty(Options.C2MON_DAQ_NAME));
@@ -129,7 +114,7 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
     if (processConnectionResponse == null) {
       throw new RuntimeException("Connection request to server: timeout waiting for server response");
     }
-    LOGGER.info("getProcessConnection - Process Identifier Key (PIK) received from server: " + processConnectionResponse.getProcessPIK());
+    log.info("Process Identifier Key (PIK) received from server: " + processConnectionResponse.getProcessPIK());
     return processConnectionResponse;
   }
 
@@ -141,21 +126,21 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
    */
   public Document fromFiletoDOC(final String file) {
     Document confXMLDoc;
-    LOGGER.trace("fromFiletoDOC - trying to configure process using configuration xml from the file " + file);
+    log.trace("fromFiletoDOC - trying to configure process using configuration xml from the file " + file);
 
     DOMParser parser = new DOMParser();
     try {
       parser.parse(file);
       confXMLDoc = parser.getDocument();
     } catch (java.io.IOException ex) {
-      LOGGER.error("fromFiletoDOC - Could not open processConfiguration XML file : " + file);
+      log.error("fromFiletoDOC - Could not open processConfiguration XML file : " + file);
       return null;
     } catch (org.xml.sax.SAXException ex) {
-      LOGGER.error("fromFiletoDOC - Could not parse processConfiguration XML file : " + file);
+      log.error("fromFiletoDOC - Could not parse processConfiguration XML file : " + file);
       return null;
     }
 
-    LOGGER.trace("fromFiletoDOC - Configuration XML loaded from filesystem and parsed");
+    log.trace("fromFiletoDOC - Configuration XML loaded from filesystem and parsed");
     return confXMLDoc;
   }
 
@@ -167,7 +152,7 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
    */
   public Document fromXMLtoDOC(final String xml) {
     Document confXMLDoc;
-    LOGGER.trace("fromXMLtoDOC - trying to configure process using configuration XML");
+    log.trace("fromXMLtoDOC - trying to configure process using configuration XML");
 
     SimpleXMLParser parser = null;
     // Simple DOM parser for parsing XML message content
@@ -175,15 +160,15 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
       parser = new SimpleXMLParser();
       confXMLDoc = parser.parse(xml);
     } catch (ParserConfigurationException e) {
-      LOGGER.error("fromXMLtoDOC - Error creating instance of SimpleXMLParser");
+      log.error("fromXMLtoDOC - Error creating instance of SimpleXMLParser");
       return null;
     } catch (ParserException ex) {
-      LOGGER.error("fromXMLtoDOC - Exception caught in DOM parsing processConfiguration XML");
-      LOGGER.trace("fromXMLtoDOC - processConfiguration XML was: " + xml);
+      log.error("fromXMLtoDOC - Exception caught in DOM parsing processConfiguration XML");
+      log.trace("fromXMLtoDOC - processConfiguration XML was: " + xml);
       return null;
     }
 
-    LOGGER.trace("fromXMLtoDOC - Configuration XML loaded and parsed");
+    log.trace("fromXMLtoDOC - Configuration XML loaded and parsed");
     return confXMLDoc;
   }
 
@@ -257,7 +242,7 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
       String jmsDaqQueue = this.jmsDaqQueueTrunk + ".command." + processConfiguration.getHostName() + "."
           + processConfiguration.getProcessName() + "." + pik;
       processConfiguration.setJmsDaqCommandQueue(jmsDaqQueue);
-      LOGGER.trace("createProcessConfiguration - jms Daq Queue: " + jmsDaqQueue);
+      log.trace("createProcessConfiguration - jms Daq Queue: " + jmsDaqQueue);
 
       processConfiguration.setAliveTagID(Long.parseLong(getTagValue(rootElem, ALIVE_TAG_ID_ELEMENT)));
 
@@ -278,20 +263,20 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
                 .createEquipmentConfiguration((Element) currentNode);
             processConfiguration.addEquipmentConfiguration(equipmentConfiguration);
           } catch (Exception ex) {
-            LOGGER.error("Exception caught while trying to create an instance of EquipmentUnit.", ex);
+            log.error("Exception caught while trying to create an instance of EquipmentUnit.", ex);
           }
         }
       }
     } // try
     catch (NullPointerException ex) {
-      LOGGER.error("NullPointerException caught while trying to configure the process. Ex. message = "
+      log.error("NullPointerException caught while trying to configure the process. Ex. message = "
           + ex.getMessage());
-      LOGGER.error("The structure of ProcessConfiguration XML might contain some mistakes !");
+      log.error("The structure of ProcessConfiguration XML might contain some mistakes !");
       throw ex;
     } catch (NumberFormatException ex) {
-      LOGGER.error("NumberFormatException caught while trying to configure the process. Ex. message = "
+      log.error("NumberFormatException caught while trying to configure the process. Ex. message = "
           + ex.getMessage());
-      LOGGER.error("The structure of ProcessConfiguration XML might contain some mistakes !");
+      log.error("The structure of ProcessConfiguration XML might contain some mistakes !");
       throw ex;
     }
     return processConfiguration;
