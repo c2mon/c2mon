@@ -11,6 +11,9 @@ See the current [reference docs][].
 ## Issue Tracking
 Please report issues on GitLab via the [issue tracker][].
 
+## Milestone planning
+[Find here][] the complete list of all existing version milestones.
+
 ## Building from Source
 C2MON uses a [Maven][]-based build system. In the instructions
 below, `./mvnw` is invoked from the root of the source tree and serves as
@@ -38,6 +41,7 @@ C2MON is released under the [GPLv3 License][].
 [Javadoc]: https://c2mon.web.cern.ch/c2mon/javadoc/
 [reference docs]: http://c2mon.web.cern.ch/c2mon/docs/latest/
 [issue tracker]: https://gitlab.cern.ch/c2mon/c2mon/issues
+[Find here]: https://gitlab.cern.ch/c2mon/c2mon/milestones?state=all
 [Maven]: http://maven.apache.org
 [Git]: http://help.github.com/set-up-git-redirect
 [JDK8 build]: http://www.oracle.com/technetwork/java/javase/downloads
