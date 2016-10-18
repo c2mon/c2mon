@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -24,6 +24,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
@@ -42,12 +43,8 @@ import cern.c2mon.shared.common.Cacheable;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 public class BatchCacheLoader<T extends Cacheable> implements C2monCacheLoader {
-
-  /**
-   * Private logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(BatchCacheLoader.class);
 
   /**
    * Executor for loading the cache using multiple threads.
@@ -113,30 +110,30 @@ public class BatchCacheLoader<T extends Cacheable> implements C2monCacheLoader {
 
   @Override
   public void preload() {
-    LOGGER.debug("preload() - Start preloading data for cache " + cache.getName());
-    Long maxId = batchCacheLoaderDAO.getMaxId(); // 0 if no cache objects!
+    log.debug("preload() - Start preloading data for cache " + cache.getName());
+    Integer lastRow = batchCacheLoaderDAO.getMaxRow(); // 0 if no cache objects!
     mapLoaderExecutor = new ThreadPoolExecutor(loaderThreads, loaderThreads,
         THREAD_TIMEOUT, TimeUnit.SECONDS,
         new ArrayBlockingQueue<Runnable>(taskQueueSize));
-    Long firstId = batchCacheLoaderDAO.getMinId();
+    Integer firstRow = 0;
     LinkedList<Callable<Object>> tasks = new LinkedList<Callable<Object>>();
-    while (firstId <= maxId) {
-      MapLoaderTask mapTask = new MapLoaderTask(firstId , firstId + batchSize - 1);
+    while (firstRow <= lastRow) {
+      MapLoaderTask mapTask = new MapLoaderTask(firstRow , firstRow + batchSize - 1);
       tasks.push(mapTask);
-      firstId = firstId + batchSize;
+      firstRow += batchSize;
     }
     try {
       mapLoaderExecutor.invokeAll(tasks, 1800, TimeUnit.SECONDS);
     } catch (RejectedExecutionException e) {
-      LOGGER.error("Exception caught while loading a server cache from the database. This is probably due to the cache.loader.queue.size being"
+      log.error("Exception caught while loading a server cache from the database. This is probably due to the cache.loader.queue.size being"
           + "too small. Increase this to at least 'id range'/'cache loader batch size', or alternatively increase the"
           + "batch size.");
       throw e;
     } catch (InterruptedException e) {
-      LOGGER.error("Interrupted while waiting for cache loading threads to terminate.", e);
+      log.error("Interrupted while waiting for cache loading threads to terminate.", e);
     }
     mapLoaderExecutor.shutdown();
-    LOGGER.debug("preload() - Finished preload for cache " + cache.getName());
+    log.debug("preload() - Finished preload for cache " + cache.getName());
   }
 
   /**
@@ -165,11 +162,10 @@ public class BatchCacheLoader<T extends Cacheable> implements C2monCacheLoader {
       Map<Object, T> cacheLoaderMap = batchCacheLoaderDAO.getBatchAsMap(firstId, lastId);
       //preloadBuffer.putAll(cacheLoaderMap);
       for (Object key : cacheLoaderMap.keySet()) {
-        if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace("MapLoaderTask - Putting key " + key + " to cache " + cache.getName());
+        if (log.isTraceEnabled()) {
+          log.trace("MapLoaderTask - Putting key {} to cache {}", key, cache.getName());
         }
         cache.putQuiet(new Element(key, cacheLoaderMap.get(key)));
-        //Object cacheObject = cache.get(key);
       }
       return null;
     }
