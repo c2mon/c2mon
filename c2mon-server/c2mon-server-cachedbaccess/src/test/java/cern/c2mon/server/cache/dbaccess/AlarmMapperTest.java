@@ -83,16 +83,8 @@ public class AlarmMapperTest {
    * Checks runs.
    */
   @Test
-  public void testGetMinId() {
-    alarmMapper.getMinId();
-  }
-
-  /**
-   * Checks runs.
-   */
-  @Test
   public void testGetMaxId() {
-    alarmMapper.getMaxId();
+    alarmMapper.getNumberItems();
   }
 
   /**

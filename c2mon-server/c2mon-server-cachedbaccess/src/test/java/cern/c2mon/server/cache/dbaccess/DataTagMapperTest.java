@@ -189,15 +189,23 @@ public class DataTagMapperTest {
 
   @Test
   public void testGetRowBatch() {
-    DBBatch dbBatch = new DBBatch(200000L, 200002L);
+    DBBatch dbBatch = new DBBatch(1L, 3L);
     List<DataTag> datatags = dataTagMapper.getRowBatch(dbBatch);
     assertNotNull(datatags);
     assertTrue(datatags.size() == 3);
 
-    DBBatch dbBatch2 = new DBBatch(200002L, 200006L);
+    DBBatch dbBatch2 = new DBBatch(16L, 20L);
     List<DataTag> datatags2 = dataTagMapper.getRowBatch(dbBatch2);
     assertNotNull(datatags2);
-    assertTrue(datatags2.size() == 4); //since 200006 is not in DB
+    assertTrue(datatags2.size() == 1); //since there are only 16 entries in the db
+  }
+
+  @Test
+  public void loadEmptyRowBatch() {
+    DBBatch dbBatch = new DBBatch(100L, 200L);
+    List<DataTag> dataTags = dataTagMapper.getRowBatch(dbBatch);
+    assertNotNull(dataTags);
+    assertTrue(dataTags.size() == 0);
   }
 
   @Test
