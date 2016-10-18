@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -50,43 +50,43 @@ public class RuleTagMapperTest {
 
   @Resource
   private RuleTagMapper ruleTagMapper;
-  
+
   @Test
   public void testInsertCompletes() {
     RuleTagCacheObject ruleTag = CacheObjectCreation.createTestRuleTag();
     ruleTagMapper.insertRuleTag(ruleTag);
     ruleTagMapper.deleteRuleTag(ruleTag.getId());
   }
-  
-  
+
+
   @Test
   public void testGetAllControlTags() {
     assertNotNull(ruleTagMapper);
     List<RuleTag> allList = ruleTagMapper.getAll();
     assertTrue(allList.size() != 0);
   }
-  
+
   @Test
   public void testGetNumberItems() {
-    assertTrue(ruleTagMapper.getNumberItems() > 5);  
+    assertTrue(ruleTagMapper.getNumberItems() > 5);
   }
-  
+
   @Test
   /**
    * Need 25 rules in the DATATAG table.
    */
   public void testGetRowBatch() {
-    DBBatch dbBatch = new DBBatch(60000L, 60006L);
+    DBBatch dbBatch = new DBBatch(1L, 7L);
     List<RuleTag> ruletags = ruleTagMapper.getRowBatch(dbBatch);
     assertNotNull(ruletags);
     assertEquals(7, ruletags.size());
-    
-    DBBatch dbBatch2 = new DBBatch(60000L, 60000L);
+
+    DBBatch dbBatch2 = new DBBatch(1L, 1L);
     List<RuleTag> ruletags2 = ruleTagMapper.getRowBatch(dbBatch2);
     assertNotNull(ruletags2);
-    assertEquals(1, ruletags2.size()); 
+    assertEquals(1, ruletags2.size());
   }
-  
+
   @Test
   public void testInsertAndRetrieve() {
     RuleTagCacheObject ruleTag = CacheObjectCreation.createTestRuleTag();
@@ -94,10 +94,10 @@ public class RuleTagMapperTest {
     ruleTag.setTopic("c2mon.tag.default.publication");
     ruleTagMapper.insertRuleTag(ruleTag);
     RuleTagCacheObject retrievedObject = (RuleTagCacheObject) ruleTagMapper.getItem(ruleTag.getId());
-    
+
     assertNotNull(retrievedObject);
-    
-    //compare        
+
+    //compare
     assertEquals(ruleTag.getId(), retrievedObject.getId());
     assertEquals(ruleTag.getName(), retrievedObject.getName());
     assertEquals(ruleTag.getDescription(), retrievedObject.getDescription());
@@ -110,43 +110,43 @@ public class RuleTagMapperTest {
     assertEquals(ruleTag.getValue(), retrievedObject.getValue());
     assertEquals(ruleTag.getTopic(), retrievedObject.getTopic());
     assertEquals(ruleTag.getValueDescription(), retrievedObject.getValueDescription());
-    assertEquals(ruleTag.isSimulated(), retrievedObject.isSimulated());    
-    assertEquals(ruleTag.getValueDictionary().toXML(), retrievedObject.getValueDictionary().toXML()); //compare XML of value dictionary  
-    assertEquals(ruleTag.getDataTagQuality(), retrievedObject.getDataTagQuality()); 
+    assertEquals(ruleTag.isSimulated(), retrievedObject.isSimulated());
+    assertEquals(ruleTag.getValueDictionary().toXML(), retrievedObject.getValueDictionary().toXML()); //compare XML of value dictionary
+    assertEquals(ruleTag.getDataTagQuality(), retrievedObject.getDataTagQuality());
     assertEquals(ruleTag.getTimestamp(), retrievedObject.getTimestamp());
     assertEquals(ruleTag.getRuleIdsString(), retrievedObject.getRuleIdsString());
-    
+
     //rule specific
     assertEquals(ruleTag.getRuleIdsString(), retrievedObject.getRuleIdsString());
   }
-  
+
   @Test
   public void testUpdateRuleTag() {
     RuleTagCacheObject ruleTag = CacheObjectCreation.createTestRuleTag();
     ruleTagMapper.insertRuleTag(ruleTag);
-    
-    ruleTag.setValue(new Integer(2000));    
+
+    ruleTag.setValue(new Integer(2000));
     ruleTag.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
     ruleTag.setValueDescription("new control value");
     ruleTag.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.UNKNOWN_REASON, "test quality unknown reason"));
     ruleTag.setSimulated(false);
-    
+
     ruleTagMapper.updateCacheable(ruleTag);
-    
+
     RuleTagCacheObject retrievedObject = (RuleTagCacheObject) ruleTagMapper.getItem(ruleTag.getId());
-    
+
     assertEquals(ruleTag.getValue(), retrievedObject.getValue());
-    assertEquals(ruleTag.getValueDescription(), retrievedObject.getValueDescription());    
-    assertEquals(ruleTag.getDataTagQuality(), retrievedObject.getDataTagQuality()); 
-    assertEquals(ruleTag.getTimestamp(), retrievedObject.getTimestamp());    
+    assertEquals(ruleTag.getValueDescription(), retrievedObject.getValueDescription());
+    assertEquals(ruleTag.getDataTagQuality(), retrievedObject.getDataTagQuality());
+    assertEquals(ruleTag.getTimestamp(), retrievedObject.getTimestamp());
     assertEquals(ruleTag.isSimulated(), retrievedObject.isSimulated());
   }
-  
+
   @Test
   public void testIsInDB() {
     assertTrue(ruleTagMapper.isInDb(60001L));
   }
-  
+
   @Test
   public void testNotInDB() {
     assertFalse(ruleTagMapper.isInDb(200000L));
