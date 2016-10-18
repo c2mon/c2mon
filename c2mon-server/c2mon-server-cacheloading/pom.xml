@@ -22,6 +22,9 @@
       <groupId>cern.c2mon.shared</groupId>
       <artifactId>c2mon-shared-common</artifactId>
     </dependency>
+
+    <!--3rd party dependencies-->
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-tx</artifactId>
@@ -30,8 +33,6 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
     </dependency>
-
-    <!--3rd party dependencies-->
     <dependency>
       <groupId>org.mybatis</groupId>
       <artifactId>mybatis</artifactId>
@@ -42,13 +43,10 @@
     </dependency>
 
     <!-- Test dependencies -->
+    
     <dependency>
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-test</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
