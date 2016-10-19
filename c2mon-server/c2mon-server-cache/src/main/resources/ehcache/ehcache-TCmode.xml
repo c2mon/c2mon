@@ -7,12 +7,12 @@
     eternal="true"
     maxElementsInMemory="500"
     maxEntriesInCache="1000"
-    memoryStoreEvictionPolicy="LFU" />
+    memoryStoreEvictionPolicy="LRU" />
 
   <cache
     name="tagCache"
     eternal="true"
-    maxElementsInMemory="600000"
+    maxElementsInMemory="300000"
     maxEntriesInCache="600000">
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
