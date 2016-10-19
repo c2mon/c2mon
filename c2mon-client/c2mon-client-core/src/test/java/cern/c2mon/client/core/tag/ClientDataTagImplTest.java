@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import cern.c2mon.client.core.refactoring.CloneableTagBean;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.shared.common.metadata.Metadata;
@@ -144,7 +145,7 @@ public class ClientDataTagImplTest {
     }
   }
 
-  private void checkTagCopy(final ClientDataTagImpl original, final ClientDataTagImpl copy) {
+  private void checkTagCopy(final CloneableTagBean original, final CloneableTagBean copy) {
     checkTagValueCopy(original, copy);
     if (original.getUpdateListeners().isEmpty()) {
       assertEquals(original.getUpdateListeners().size(), copy.getUpdateListeners().size());
@@ -160,63 +161,63 @@ public class ClientDataTagImplTest {
     cdt.onUpdate(createValidTransferTag(1234L));
 
     Tag copy = cdt.clone();
-    ((ClientDataTagImpl) copy).getClientDataTagValuesBean().clean();
+    ((ClientDataTagImpl) copy).getCloneableTagBean().clean();
 
     assertNotSame("The two objects should not point to the same reference in memory!", cdt, copy);
     assertTrue(cdt.equals(copy));
     assertNotNull(copy.getServerTimestamp());
-    assertTrue(cdt.getServerTimestamp().after(copy.getServerTimestamp()));
+    assertTrue(cdt.getCloneableTagBean().getServerTimestamp().after(copy.getServerTimestamp()));
     assertNull(copy.getValue());
     assertEquals(0, copy.getAlarmIds().size());
     assertEquals(new Timestamp(0L), copy.getTimestamp());
     assertEquals("Tag not initialised.", copy.getDescription());
-    assertFalse(copy.getClientDataTagValuesBean().getDataTagQuality().isInitialised());
-    assertEquals(cdt.getName(), copy.getName());
-    assertEquals(cdt.getRuleExpression(), copy.getRuleExpression());
+    assertFalse(((ClientDataTagImpl) copy).getCloneableTagBean().getDataTagQuality().isInitialised());
+    assertEquals(cdt.getCloneableTagBean().getName(), copy.getName());
+    assertEquals(cdt.getCloneableTagBean().getRuleExpression(), copy.getRuleExpression());
     assertNull(copy.getType());
     assertEquals(TypeNumeric.TYPE_UNKNOWN, copy.getTypeNumeric());
-    assertEquals(cdt.getUnit(), copy.getUnit());
+    assertEquals(cdt.getCloneableTagBean().getUnit(), copy.getUnit());
     assertNull(copy.getValue());
   }
 
   @Test
   public void testTypeNumeric() {
-    final Tag cdt = new ClientDataTagImpl(1234L);
+    final ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
 
-    ((ClientDataTagImpl) cdt).onUpdate(createValidTransferTag(1234L, Float.valueOf(1.234f)));
-    assertEquals(TypeNumeric.TYPE_FLOAT, cdt.getTypeNumeric());
+    cdt.onUpdate(createValidTransferTag(1234L, Float.valueOf(1.234f)));
+    assertEquals(TypeNumeric.TYPE_FLOAT, cdt.getCloneableTagBean().getTypeNumeric());
 
-    ((ClientDataTagImpl) cdt).getClientDataTagValuesBean().clean();
-    ((ClientDataTagImpl) cdt).onUpdate(createValidTransferTag(1234L, Long.valueOf(234324L)));
-    assertEquals(TypeNumeric.TYPE_LONG, cdt.getTypeNumeric());
+    cdt.getCloneableTagBean().clean();
+    cdt.onUpdate(createValidTransferTag(1234L, Long.valueOf(234324L)));
+    assertEquals(TypeNumeric.TYPE_LONG, cdt.getCloneableTagBean().getTypeNumeric());
 
-    ((ClientDataTagImpl) cdt).getClientDataTagValuesBean().clean();
-    ((ClientDataTagImpl) cdt).onUpdate(createValidTransferTag(1234L, Boolean.FALSE));
-    assertEquals(TypeNumeric.TYPE_BOOLEAN, cdt.getTypeNumeric());
+    cdt.getCloneableTagBean().clean();
+    cdt.onUpdate(createValidTransferTag(1234L, Boolean.FALSE));
+    assertEquals(TypeNumeric.TYPE_BOOLEAN, cdt.getCloneableTagBean().getTypeNumeric());
 
-    ((ClientDataTagImpl) cdt).getClientDataTagValuesBean().clean();
-    ((ClientDataTagImpl) cdt).onUpdate(createValidTransferTag(1234L, Byte.valueOf((byte) 0x000A)));
-    assertEquals(TypeNumeric.TYPE_BYTE, cdt.getTypeNumeric());
+    cdt.getCloneableTagBean().clean();
+    cdt.onUpdate(createValidTransferTag(1234L, Byte.valueOf((byte) 0x000A)));
+    assertEquals(TypeNumeric.TYPE_BYTE, cdt.getCloneableTagBean().getTypeNumeric());
 
-    ((ClientDataTagImpl) cdt).getClientDataTagValuesBean().clean();
-    ((ClientDataTagImpl) cdt).onUpdate(createValidTransferTag(1234L, Double.valueOf(1231231324123d)));
-    assertEquals(TypeNumeric.TYPE_DOUBLE, cdt.getTypeNumeric());
+    cdt.getCloneableTagBean().clean();
+    cdt.onUpdate(createValidTransferTag(1234L, Double.valueOf(1231231324123d)));
+    assertEquals(TypeNumeric.TYPE_DOUBLE, cdt.getCloneableTagBean().getTypeNumeric());
 
-    ((ClientDataTagImpl) cdt).getClientDataTagValuesBean().clean();
-    ((ClientDataTagImpl) cdt).onUpdate(createValidTransferTag(1234L, Integer.valueOf(123324123)));
-    assertEquals(TypeNumeric.TYPE_INTEGER, cdt.getTypeNumeric());
+    cdt.getCloneableTagBean().clean();
+    cdt.onUpdate(createValidTransferTag(1234L, Integer.valueOf(123324123)));
+    assertEquals(TypeNumeric.TYPE_INTEGER, cdt.getCloneableTagBean().getTypeNumeric());
 
-    ((ClientDataTagImpl) cdt).getClientDataTagValuesBean().clean();
-    ((ClientDataTagImpl) cdt).onUpdate(createValidTransferTag(1234L, Short.valueOf((short) -123)));
-    assertEquals(TypeNumeric.TYPE_SHORT, cdt.getTypeNumeric());
+    cdt.getCloneableTagBean().clean();
+    cdt.onUpdate(createValidTransferTag(1234L, Short.valueOf((short) -123)));
+    assertEquals(TypeNumeric.TYPE_SHORT, cdt.getCloneableTagBean().getTypeNumeric());
 
-    ((ClientDataTagImpl) cdt).getClientDataTagValuesBean().clean();
-    ((ClientDataTagImpl) cdt).onUpdate(createValidTransferTag(1234L, "Test string"));
-    assertEquals(TypeNumeric.TYPE_STRING, cdt.getTypeNumeric());
+    cdt.getCloneableTagBean().clean();
+    cdt.onUpdate(createValidTransferTag(1234L, "Test string"));
+    assertEquals(TypeNumeric.TYPE_STRING, cdt.getCloneableTagBean().getTypeNumeric());
 
-    ((ClientDataTagImpl) cdt).getClientDataTagValuesBean().clean();
-    ((ClientDataTagImpl) cdt).onUpdate(createValidTransferTag(1234L, null));
-    assertEquals(TypeNumeric.TYPE_UNKNOWN, cdt.getTypeNumeric());
+    cdt.getCloneableTagBean().clean();
+    cdt.onUpdate(createValidTransferTag(1234L, null));
+    assertEquals(TypeNumeric.TYPE_UNKNOWN, cdt.getCloneableTagBean().getTypeNumeric());
   }
 
   @Test
@@ -269,7 +270,7 @@ public class ClientDataTagImplTest {
     clone = cdt.clone();
     checkTagCopy(cdt, clone);
 
-    cdt.getClientDataTagValuesBean().getDataTagQuality().validate();
+    cdt.getCloneableTagBean().getDataTagQuality().validate();
     clone = cdt.clone();
     checkTagCopy(cdt, clone);
   }
@@ -278,7 +279,7 @@ public class ClientDataTagImplTest {
   public void testEquals() throws CloneNotSupportedException {
     ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
     Tag clone = cdt.clone();
-    ((ClientDataTagImpl) clone).getClientDataTagValuesBean().clean();
+    ((ClientDataTagImpl) clone).getCloneableTagBean().clean();
 
     assertEquals(cdt, clone);
 
@@ -296,14 +297,14 @@ public class ClientDataTagImplTest {
     assertTrue(cdt.getXml().contains("<isValid>true</isValid>"));
     TagQualityStatus statusToAdd1 = TagQualityStatus.VALUE_OUT_OF_BOUNDS;
     TagQualityStatus statusToAdd2 = TagQualityStatus.INACCESSIBLE;
-    cdt.getClientDataTagValuesBean().getDataTagQuality().addInvalidStatus(statusToAdd1, "Value is over 9000!");
-    cdt.getClientDataTagValuesBean().getDataTagQuality().addInvalidStatus(statusToAdd2, "It's down!");
+    cdt.getCloneableTagBean().getDataTagQuality().addInvalidStatus(statusToAdd1, "Value is over 9000!");
+    cdt.getCloneableTagBean().getDataTagQuality().addInvalidStatus(statusToAdd2, "It's down!");
     assertTrue(cdt.getXml().contains("<isValid>false</isValid>"));
-    cdt.getClientDataTagValuesBean().getDataTagQuality().removeInvalidStatus(statusToAdd1);
-    cdt.getClientDataTagValuesBean().getDataTagQuality().removeInvalidStatus(statusToAdd2);
+    cdt.getCloneableTagBean().getDataTagQuality().removeInvalidStatus(statusToAdd1);
+    cdt.getCloneableTagBean().getDataTagQuality().removeInvalidStatus(statusToAdd2);
     assertTrue(cdt.getXml().contains("<isValid>true</isValid>"));
-    cdt.getClientDataTagValuesBean().getDataTagQuality().addInvalidStatus(statusToAdd1, "Value is over 9000!");
-    cdt.getClientDataTagValuesBean().getDataTagQuality().addInvalidStatus(statusToAdd2, "It's down!");
+    cdt.getCloneableTagBean().getDataTagQuality().addInvalidStatus(statusToAdd1, "Value is over 9000!");
+    cdt.getCloneableTagBean().getDataTagQuality().addInvalidStatus(statusToAdd2, "It's down!");
     assertTrue(cdt.getXml().contains("<isValid>false</isValid>"));
 
     ClientDataTagImpl cdt2 = ClientDataTagImpl.fromXml(cdt.toString());

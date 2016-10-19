@@ -15,7 +15,7 @@
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package cern.c2mon.client.core.tag;
+package cern.c2mon.client.core.refactoring;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -54,6 +54,7 @@ public class TagBean implements ClientDataTagValue, Tag {
   /**
    * The value of the tag
    */
+  @Setter
   @Element(required = false)
   private Object tagValue;
 
@@ -76,7 +77,7 @@ public class TagBean implements ClientDataTagValue, Tag {
    * Unique identifier for a DataTag
    */
   @Attribute
-  private Long id;
+  protected Long id;
 
   /**
    * Containing all process id's which are relevant to compute the
@@ -126,12 +127,22 @@ public class TagBean implements ClientDataTagValue, Tag {
   /**
    * <code>true</code>, if tag represents an Alive Control tag
    */
-  private boolean aliveTagFlag = false;
+  protected boolean aliveTagFlag = false;
 
   /**
    * <code>true</code>, if tag represents a CommFault-, Alive- or Status tag
    */
-  private boolean controlTagFlag = false;
+  protected boolean controlTagFlag = false;
+
+
+  /**
+   * String representation of the JMS destination where the DataTag
+   * is published on change.
+   */
+  @Setter
+  @Getter
+  @Element(required = false)
+  protected String topicName = null;
 
   /**
    * The alarm objects associated to this data tag

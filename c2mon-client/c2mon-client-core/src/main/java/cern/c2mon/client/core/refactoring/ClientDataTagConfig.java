@@ -15,17 +15,19 @@
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package cern.c2mon.client.core.tag;
+package cern.c2mon.client.core.refactoring;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Szymon Halastra
  */
-public class ExtendedTagBean extends TagBean implements Cloneable {
+@Configuration
+public class ClientDataTagConfig {
 
-  @Override
-  protected ExtendedTagBean clone() throws CloneNotSupportedException {
-    ExtendedTagBean extendedTagBean = (ExtendedTagBean) super.clone();
-
-    return extendedTagBean;
+  @Bean
+  TagUpdaterBean tagUpdaterBean() {
+    return new TagUpdaterBean();
   }
 }

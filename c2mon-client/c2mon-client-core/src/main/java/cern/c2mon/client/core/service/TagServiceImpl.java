@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.common.listener.BaseTagListener;
 import cern.c2mon.client.common.listener.TagListener;
+import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.cache.CacheSynchronizationException;
@@ -316,9 +317,9 @@ public class TagServiceImpl implements AdvancedTagService {
 
   @Override
   public Collection<Tag> get(final Collection<Long> tagIds) {
-    Collection<Tag> resultList = new ArrayList<Tag>();
-    Collection<Long> missingTags = new ArrayList<Long>();
-    Map<Long, Tag> cachedValues = cache.get(new HashSet<Long>(tagIds));
+    Collection<ClientDataTagImpl> resultList = new ArrayList<>();
+    Collection<Long> missingTags = new ArrayList<>();
+    Map<Long, Tag> cachedValues = cache.get(new HashSet<>(tagIds));
 
     for (Entry<Long, Tag> cacheEntry : cachedValues.entrySet()) {
       if (cacheEntry.getValue() != null) {
@@ -339,7 +340,7 @@ public class TagServiceImpl implements AdvancedTagService {
             
             // In case of a CommFault- or Status control tag, we don't register to supervision invalidations
             if (!tagUpdate.isControlTag() || tagUpdate.isAliveTag()) {
-              supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
+              supervisionManager.addSupervisionListener(cdt, cdt.getCloneableTagBean().getProcessIds(), cdt.getCloneableTagBean().getEquipmentIds(), cdt.getCloneableTagBean().getSubEquipmentIds());
             }
             
             missingTags.remove(cdt.getId());

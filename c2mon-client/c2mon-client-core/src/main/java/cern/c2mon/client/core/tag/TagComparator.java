@@ -17,6 +17,7 @@
 package cern.c2mon.client.core.tag;
 
 import cern.c2mon.client.common.tag.Tag;
+import cern.c2mon.client.core.refactoring.CloneableTagBean;
 
 /**
  * Helper class used by {@link ClientDataTagImpl} to 
@@ -40,7 +41,7 @@ class TagComparator {
     if (tag1 == null || tag2 == null) {
       return false;
     }
-    if (!(tag2 instanceof ClientDataTagImpl)) {
+    if (!(tag2 instanceof CloneableTagBean)) {
       return false;
     }
 
