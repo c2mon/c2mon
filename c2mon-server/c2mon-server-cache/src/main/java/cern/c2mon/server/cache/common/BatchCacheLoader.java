@@ -18,21 +18,13 @@ package cern.c2mon.server.cache.common;
 
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Callable;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import lombok.extern.slf4j.Slf4j;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.concurrent.*;
 
 import cern.c2mon.server.cache.loading.BatchCacheLoaderDAO;
 import cern.c2mon.shared.common.Cacheable;
+import lombok.extern.slf4j.Slf4j;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
 
 /**
  * Cache loader implementation that loads the cache on multiple threads. The cache
@@ -118,7 +110,7 @@ public class BatchCacheLoader<T extends Cacheable> implements C2monCacheLoader {
     Integer firstRow = 0;
     LinkedList<Callable<Object>> tasks = new LinkedList<Callable<Object>>();
     while (firstRow <= lastRow) {
-      MapLoaderTask mapTask = new MapLoaderTask(firstRow , firstRow + batchSize - 1);
+      MapLoaderTask mapTask = new MapLoaderTask(firstRow + 1, firstRow + batchSize);
       tasks.push(mapTask);
       firstRow += batchSize;
     }
@@ -169,7 +161,6 @@ public class BatchCacheLoader<T extends Cacheable> implements C2monCacheLoader {
       }
       return null;
     }
-
   }
 
 }

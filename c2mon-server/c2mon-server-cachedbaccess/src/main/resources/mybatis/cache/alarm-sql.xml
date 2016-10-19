@@ -43,7 +43,7 @@
         ORDER BY alarmid
       )
       WHERE RN <![CDATA[ >= ]]> #{startRow}
-      AND RN <![CDATA[ <= ]]> #{endRow};
+      AND RN <![CDATA[ <= ]]> #{endRow}
     </select>
 
     <!-- getItem needed for persistence caches -->
