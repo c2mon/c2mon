@@ -23,7 +23,6 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.Serializer;
@@ -288,6 +287,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
     if (configProgressMonitor != null){
       configProgressMonitor.serverTotalParts(configElements.size());
+      configProgressMonitor.resetCounter();
     }
 
     // Write lock needed to avoid parallel Batch persistence transactions
@@ -311,11 +311,11 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     if (daqConfigEnabled) {
       if (configProgressMonitor != null){
         configProgressMonitor.daqTotalParts(processLists.size());
+        configProgressMonitor.resetCounter();
       }
 
       log.info(configId + " Reconfiguring " + processLists.keySet().size()+ " processes ...");
 
-      AtomicInteger daqProgressCounter = new AtomicInteger(1);
       for (Long processId : processLists.keySet()) {
         if (!cancelRequested){
           List<Change> processChangeEvents = processLists.get(processId);
@@ -363,7 +363,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
             report.addStatus(Status.RESTART);
           }
           if (configProgressMonitor != null) {
-            configProgressMonitor.onDaqProgress(daqProgressCounter.getAndIncrement());
+            configProgressMonitor.incrementDaqProgress();
           }
         } else {
           log.info("Interrupting configuration " + configId + " due to cancel request.");
@@ -424,7 +424,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                                          Map<Long, ConfigurationElementReport> daqReportPlaceholder,
                                          ConfigurationReport report, Integer configId,
                                          final ConfigProgressMonitor configProgressMonitor){
-    AtomicInteger progressCounter = new AtomicInteger(1);
     if (!cancelRequested) {
       //initialize success report
       ConfigurationElementReport elementReport = new ConfigurationElementReport(element.getAction(),
@@ -482,7 +481,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         report.setStatusDescription("Failure: see details below.");
       }
       if (configProgressMonitor != null){
-        configProgressMonitor.onServerProgress(progressCounter.getAndIncrement());
+        configProgressMonitor.incrementServerProgress();
       }
     } else {
       log.info(configId + " Interrupting configuration due to cancel request.");

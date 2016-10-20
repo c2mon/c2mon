@@ -1,23 +1,24 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.client.request;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
@@ -26,6 +27,7 @@ import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,44 +42,42 @@ import com.google.gson.Gson;
 /**
  * Receives updates about long - running requests in the server
  * and sends them back as Progress Reports to the client.
- * 
+ *
  * Currently only used for APPLY_CONFIGURATION requests.
  * @see ClientRequestProgressReport
- * 
+ *
  * @author ekoufaki
  */
+@Slf4j
 public class ClientRequestReportHandler implements ConfigProgressMonitor {
-
-  /** Private class logger */
-  private static final Logger LOG = LoggerFactory.getLogger(ClientRequestReportHandler.class);
 
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();
 
-  /** 
+  /**
    * Every progress report consists of a number of operations.
-   * 
-   * Right now only ConfigurationReports are supported and 
+   *
+   * Right now only ConfigurationReports are supported and
    * the number of operations for that case == 2.
    * This can change in the future.
    */
-  private static final int TOTAL_OPERATIONS = 2;  
+  private static final int TOTAL_OPERATIONS = 2;
 
-  /** 
+  /**
    * The current operation.
    */
-  private int currentOperation;  
+  private int currentOperation;
 
-  /** 
+  /**
    * How many parts to expect for this progress report.
    */
-  private int totalParts;  
+  private int totalParts;
 
   /**
    * Default TTL of replies to client requests
    */
   private final long defaultReplyTTL;
-  
+
   /**
    * Used to send the reports.
    */
@@ -88,13 +88,16 @@ public class ClientRequestReportHandler implements ConfigProgressMonitor {
    */
   private final Destination replyDestination;
 
+  private AtomicInteger progressCounter;
 
-  public ClientRequestReportHandler(final Session pSession, final Destination pReplyDestination
-      , final long pDefaultReplyTTL) {
+
+  public ClientRequestReportHandler(final Session pSession, final Destination pReplyDestination ,
+                                    final long pDefaultReplyTTL) {
 
     this.session = pSession;
     this.replyDestination = pReplyDestination;
     this.defaultReplyTTL = pDefaultReplyTTL;
+    this.progressCounter = new AtomicInteger(1);
   }
 
   /**
@@ -104,7 +107,7 @@ public class ClientRequestReportHandler implements ConfigProgressMonitor {
   private void sendJsonResponse(final String jsonResponse) {
 
     if (replyDestination == null) {
-      LOG.error("sendJsonResponse() : JMSReplyTo destination is null - cannot send reply.");
+      log.error("sendJsonResponse() : JMSReplyTo destination is null - cannot send reply.");
       return;
     }
 
@@ -120,12 +123,9 @@ public class ClientRequestReportHandler implements ConfigProgressMonitor {
       replyMessage = session.createTextMessage(jsonResponse);
       messageProducer.send(replyMessage);
 
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("ClientRequestReportHandler() : Report sent.");
-      }
-
+      log.debug("ClientRequestReportHandler() : Report sent.");
     } catch (Throwable e) {
-      LOG.warn("daqTotalParts(): Failed to send Progress report :" + e.getMessage(), e);
+      log.warn("daqTotalParts(): Failed to send Progress report :" + e.getMessage(), e);
     } finally {
       if (messageProducer != null) {
         try {
@@ -134,9 +134,7 @@ public class ClientRequestReportHandler implements ConfigProgressMonitor {
         }
       }
     }
-  } 
-    
-  
+  }
 
   /**
    * Helper method. Encodes the progress report in JSON format.
@@ -164,9 +162,7 @@ public class ClientRequestReportHandler implements ConfigProgressMonitor {
 
     ClientRequestResult report = new ConfigurationReport(totalOperations, currentOperation, totalParts, currentPart, description);
 
-    Collection<ClientRequestResult> response = new ArrayList<ClientRequestResult>();
-    response.add(report);
-    sendResponse(response);
+    sendResponse(Collections.singletonList(report));
   }
 
   @Override
@@ -174,36 +170,37 @@ public class ClientRequestReportHandler implements ConfigProgressMonitor {
 
     currentOperation = 2; // we know this operation is performed 2nd
     totalParts = nbParts;
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("daqTotalParts() : totalParts=" + nbParts + " Sending Report..");
-    }
+
+    log.debug("daqTotalParts() : totalParts=" + nbParts + " Sending Report..");
+
     sendProgressReport(TOTAL_OPERATIONS, currentOperation, totalParts, 1, "Applying DAQ configurations");
   }
 
   @Override
-  public void onDaqProgress(final int partNb) {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("onDaqProgress() : currentPart=" + partNb + " Sending Report..");
-    }
-    sendProgressReport(TOTAL_OPERATIONS, currentOperation, totalParts, partNb, "Applying DAQ configurations");
+  public void incrementDaqProgress() {
+    log.debug("incrementDaqProgress() : currentPart=" + progressCounter + " Sending Report..");
+    sendProgressReport(TOTAL_OPERATIONS, currentOperation, totalParts, progressCounter.getAndIncrement(),
+        "Applying DAQ configurations");
   }
 
   @Override
-  public void onServerProgress(final int partNb) {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("onServerProgress() : currentPart=" + partNb + " Sending Report..");
-    }
-    sendProgressReport(TOTAL_OPERATIONS, currentOperation, totalParts, partNb, "Applying configuration to Server");
+  public void resetCounter() {
+    progressCounter = new AtomicInteger(1);
+  }
+
+  @Override
+  public void incrementServerProgress() {
+    log.debug("incrementServerProgress() : currentPart=" + progressCounter + " Sending Report...");
+    sendProgressReport(TOTAL_OPERATIONS, currentOperation, totalParts, progressCounter.getAndIncrement(),
+        "Applying configuration to Server");
   }
 
   @Override
   public void serverTotalParts(final int nbParts) {
-    
+
     currentOperation = 1; // we know this operation is performed 1st
     totalParts = nbParts;
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("serverTotalParts() : totalParts=" + nbParts + " Sending Report..");
-    }
+    log.debug("serverTotalParts() : totalParts=" + nbParts + " Sending Report..");
     sendProgressReport(TOTAL_OPERATIONS, currentOperation, totalParts, 1, "Applying configuration to Server");
   }
 }
