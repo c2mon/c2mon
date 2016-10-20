@@ -103,7 +103,7 @@ public class ClientDataTagImplTest {
 
   private void checkTagValueCopy(final CloneableTagBean original, final CloneableTagBean copy) {
     assertNotSame("The two objects should not point to the same reference in memory!", original, copy);
-    assertTrue(original.equals(copy));
+    assertTrue(original.getTagBean().equals(copy.getTagBean()));
     assertEquals(original.getTagBean().getServerTimestamp(), copy.getTagBean().getServerTimestamp());
     assertEquals(original.getTagBean().getTimestamp(), copy.getTagBean().getTimestamp());
     assertEquals(original.getTagBean().getDescription(), copy.getTagBean().getDescription());
@@ -159,25 +159,25 @@ public class ClientDataTagImplTest {
     final CloneableTagBean cdt = new CloneableTagBean(1234L);
     cdt.onUpdate(createValidTransferTag(1234L));
 
-    Tag copy = cdt.getTagBean().clone();
+    CloneableTagBean copy = new CloneableTagBean(cdt.getTagBean().clone());
 
-    ((CloneableTagBean) copy).clean();
+    copy.clean();
 
     assertNotSame("The two objects should not point to the same reference in memory!", cdt, copy);
-    assertTrue(cdt.equals(copy));
-    assertNotNull(copy.getServerTimestamp());
-    assertTrue(cdt.getTagBean().getServerTimestamp().after(copy.getServerTimestamp()));
-    assertNull(copy.getValue());
-    assertEquals(0, copy.getAlarmIds().size());
-    assertEquals(new Timestamp(0L), copy.getTimestamp());
-    assertEquals("Tag not initialised.", copy.getDescription());
-    assertFalse(((CloneableTagBean) copy).getTagBean().getDataTagQuality().isInitialised());
-    assertEquals(cdt.getTagBean().getName(), copy.getName());
-    assertEquals(cdt.getTagBean().getRuleExpression(), copy.getRuleExpression());
-    assertNull(copy.getType());
-    assertEquals(TypeNumeric.TYPE_UNKNOWN, copy.getTypeNumeric());
-    assertEquals(cdt.getTagBean().getUnit(), copy.getUnit());
-    assertNull(copy.getValue());
+    assertTrue(cdt.getTagBean().equals(copy.getTagBean()));
+    assertNotNull(copy.getTagBean().getServerTimestamp());
+    assertTrue(cdt.getTagBean().getServerTimestamp().after(copy.getTagBean().getServerTimestamp()));
+    assertNull(copy.getTagBean().getValue());
+    assertEquals(0, copy.getTagBean().getAlarmIds().size());
+    assertEquals(new Timestamp(0L), copy.getTagBean().getTimestamp());
+    assertEquals("Tag not initialised.", copy.getTagBean().getDescription());
+    assertFalse(copy.getTagBean().getDataTagQuality().isInitialised());
+    assertEquals(cdt.getTagBean().getName(), copy.getTagBean().getName());
+    assertEquals(cdt.getTagBean().getRuleExpression(), copy.getTagBean().getRuleExpression());
+    assertNull(copy.getTagBean().getType());
+    assertEquals(TypeNumeric.TYPE_UNKNOWN, copy.getTagBean().getTypeNumeric());
+    assertEquals(cdt.getTagBean().getUnit(), copy.getTagBean().getUnit());
+    assertNull(copy.getTagBean().getValue());
   }
 
   @Test
@@ -278,10 +278,10 @@ public class ClientDataTagImplTest {
   @Test
   public void testEquals() throws CloneNotSupportedException {
     CloneableTagBean cdt = new CloneableTagBean(1234L);
-    Tag clone = cdt.getTagBean().clone();
-    ((CloneableTagBean) clone).clean();
+    CloneableTagBean clone = new CloneableTagBean(cdt.getTagBean().clone());
+    clone.clean();
 
-    assertEquals(cdt, clone);
+    assertEquals(cdt.getTagBean(), clone.getTagBean());
 
     CloneableTagBean cdt2 = new CloneableTagBean(4321L);
     assertFalse(cdt.equals(cdt2));
