@@ -28,8 +28,6 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.configuration.ConfigProgressMonitor;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
@@ -189,10 +187,10 @@ public class ClientRequestReportHandler implements ConfigProgressMonitor {
   }
 
   @Override
-  public void incrementServerProgress() {
+  public void incrementServerProgress(String operationDescription) {
     log.debug("incrementServerProgress() : currentPart=" + progressCounter + " Sending Report...");
     sendProgressReport(TOTAL_OPERATIONS, currentOperation, totalParts, progressCounter.getAndIncrement(),
-        "Applying configuration to Server");
+        "Applying configuration to Server: " + operationDescription);
   }
 
   @Override

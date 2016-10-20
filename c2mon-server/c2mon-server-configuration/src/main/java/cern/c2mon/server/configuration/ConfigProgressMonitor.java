@@ -41,7 +41,7 @@ public interface ConfigProgressMonitor {
    * this method will be called n times.
    *
    */
-  void incrementServerProgress();
+  void incrementServerProgress(String operationDescription);
 
   /**
    * Will be called when all changes are done on the server before sending

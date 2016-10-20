@@ -481,7 +481,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         report.setStatusDescription("Failure: see details below.");
       }
       if (configProgressMonitor != null){
-        configProgressMonitor.incrementServerProgress();
+        configProgressMonitor.incrementServerProgress(element.getAction().name() +" " +element.getEntity().name());
       }
     } else {
       log.info(configId + " Interrupting configuration due to cancel request.");
