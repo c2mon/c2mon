@@ -33,6 +33,10 @@
 
       <result property="metadata" column="TAGMETADATA" javaType="cern.c2mon.server.common.metadata.Metadata" jdbcType="VARCHAR"/>
 
+      <!--<result property="expressions" column="TAGEXPRESSIONS" javaType="Collection" jdbcType="VARCHAR"/>-->
+      <collection property="expressions" ofType="cern.c2mon.shared.client.expression.Expression" javaType="java.util.ArrayList" column="TAGID"
+                  select="selectExpressions"/>
+
       <collection property="alarmIds" ofType="Long" javaType="java.util.ArrayList" resultMap="tagAlarmIdsResultMap"/>
 
     </resultMap>
@@ -40,6 +44,18 @@
     <resultMap id="tagAlarmIdsResultMap" type="Long">
       <id column="ALARMID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
     </resultMap>
+
+  <resultMap id="expressionResultMap" type="Expression">
+    <id column="TAGID"/>
+    <result property="name" column="EXPRESSIONNAME"/>
+    <result property="alarm" column="EXPRESSIONALARM" javaType="java.lang.Boolean" jdbcType="NUMERIC"/>
+    <result property="expression" column="EXPRESSION" jdbcType="VARCHAR"/>
+    <result property="result" column="EXPRESSIONVALUE" javaType="java.lang.Object" jdbcType="VARCHAR"/>
+    <result property="metadata" column="EXPRESSIONMETADATA" jdbcType="VARCHAR"/>
+    <result property="dataType" column="EXPRESSIONDATATYPE" jdbcType="VARCHAR"/>
+  </resultMap>
+
+<!--      <result property="" column="TAGCONTROLTAG"/>-->
 
     <resultMap id="dataTagResultMap" type="cern.c2mon.server.common.datatag.DataTagCacheObject"
                                                                   extends="abstractTagResultMap">
@@ -58,6 +74,10 @@
       <result property="" column="TAGRULE" jdbcType="VARCHAR"/>
       <result property="" column="TAGRULEIDS" jdbcType="VARCHAR"/>
     </resultMap>
+
+  <select id="selectExpressions" resultMap="expressionResultMap">
+    SELECT * FROM EXPRESSION WHERE TAGID = #{id}
+  </select>
 
     <select id="getAll" resultMap="dataTagResultMap">
     <!-- fill in with adapted SQL for datatags only -->
@@ -196,6 +216,16 @@
               0, #{metadata, jdbcType=VARCHAR}
                 )
     </insert>
+
+  <insert id="insertExpressions" parameterType="cern.c2mon.server.common.datatag.DataTagCacheObject">
+    INSERT INTO EXPRESSION (TAGID, EXPRESSIONNAME, EXPRESSIONVALUE, EXPRESSION, EXPRESSIONDATATYPE,
+                            EXPRESSIONALARM, EXPRESSIONMETADATA)
+    VALUES
+    <foreach item="expression" index="index" collection="expressions" open="(" separator="),(" close=")">
+      #{id}, #{expression.name}, #{expression.result}, #{expression.expression}, #{expression.dataType},
+      #{expression.alarm}, #{expression.metadata, jdbcType=VARCHAR}
+    </foreach>
+  </insert>
 
     <select id="getNumberItems" resultType="Integer">
       SELECT COUNT(DISTINCT TAGID)

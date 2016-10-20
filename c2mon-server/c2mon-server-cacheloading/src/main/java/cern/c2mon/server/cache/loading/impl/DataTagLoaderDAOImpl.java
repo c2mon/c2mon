@@ -17,8 +17,6 @@
 package cern.c2mon.server.cache.loading.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.dbaccess.DataTagMapper;
@@ -26,7 +24,6 @@ import cern.c2mon.server.cache.loading.ConfigurableDAO;
 import cern.c2mon.server.cache.loading.DataTagLoaderDAO;
 import cern.c2mon.server.cache.loading.common.AbstractBatchLoaderDAO;
 import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
 
 /**
  * DataTag loader DAO implementation.
@@ -52,7 +49,9 @@ public class DataTagLoaderDAOImpl extends AbstractBatchLoaderDAO<DataTag> implem
   @Override
   public void insert(DataTag dataTag) {
     dataTagMapper.insertDataTag(dataTag);
+    dataTagMapper.insertExpressions(dataTag);
   }
+
 
   @Override
   public void updateConfig(DataTag dataTag) {
