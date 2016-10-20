@@ -17,6 +17,11 @@ public class Expression implements Serializable {
   private String name;
 
   /**
+   * The datatype of the expression result
+   */
+  private String dataType;
+
+  /**
    * A flag which indicates if this expression is also an alarm.
    * If this flag is true, the result of the expression has to be a boolean.
    */
@@ -36,11 +41,6 @@ public class Expression implements Serializable {
    * The last result of the expression.
    */
   private Object result;
-
-  /**
-   * The datatype of the expression result
-   */
-  private String dataType;
 
   private Expression() {
     this.dataType = Boolean.class.getName();
