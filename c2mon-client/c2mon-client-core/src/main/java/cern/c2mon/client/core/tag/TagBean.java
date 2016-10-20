@@ -17,6 +17,9 @@
 
 package cern.c2mon.client.core.tag;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,6 +32,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.convert.AnnotationStrategy;
+import org.simpleframework.xml.core.Persister;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.Tag;
@@ -569,5 +575,74 @@ public class TagBean implements ClientDataTagValue, Tag, TopicRegistrationDetail
     }
 
     return false;
+  }
+
+  /**
+   * Creates a XML representation of this class by making use of
+   * the simpleframework XML library.
+   *
+   * @return The XML representation of this class
+   * @see #fromXml(String)
+   */
+  public String getXml() {
+    Serializer serializer = new Persister(new AnnotationStrategy());
+    StringWriter fw = null;
+    String result = null;
+
+    try {
+      fw = new StringWriter();
+      serializer.write(this, fw);
+      result = fw.toString();
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      if (fw != null) {
+        try {
+          fw.close();
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Static method for creating a <code>ClientDataTagImpl</code> object
+   * from a XML String by making use of the simpleframework XML library.
+   *
+   * @param xml The XML representation of a <code>ClientDataTagImpl</code> object
+   *
+   * @return <code>ClientDataTagImpl</code> object created from the given XML String
+   * @throws Exception In case of a parsing error or a wrong XML definition
+   * @see #getXml()
+   */
+  public static TagBean fromXml(final String xml) throws Exception {
+
+    TagBean cdt = null;
+    StringReader sr = null;
+    Serializer serializer = new Persister(new AnnotationStrategy());
+
+    try {
+      sr = new StringReader(xml);
+      cdt = serializer.read(TagBean.class, new StringReader(xml), false);
+    } finally {
+
+      if (sr != null) {
+        sr.close();
+      }
+    }
+
+    return cdt;
+  }
+
+  /**
+   * @return A XML representation of this class instance.
+   */
+  @Override
+  public String toString() {
+    return this.getXml();
   }
 }

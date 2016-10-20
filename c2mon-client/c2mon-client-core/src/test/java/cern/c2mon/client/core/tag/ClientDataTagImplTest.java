@@ -294,21 +294,21 @@ public class ClientDataTagImplTest {
     CloneableTagBean cdt = new CloneableTagBean(1234L);
     cdt.onUpdate(createValidTransferTag(1234L));
 
-    assertTrue(cdt.getXml().contains("<isValid>true</isValid>"));
+    assertTrue(cdt.getTagBean().getXml().contains("<isValid>true</isValid>"));
     TagQualityStatus statusToAdd1 = TagQualityStatus.VALUE_OUT_OF_BOUNDS;
     TagQualityStatus statusToAdd2 = TagQualityStatus.INACCESSIBLE;
     cdt.getTagBean().getDataTagQuality().addInvalidStatus(statusToAdd1, "Value is over 9000!");
     cdt.getTagBean().getDataTagQuality().addInvalidStatus(statusToAdd2, "It's down!");
-    assertTrue(cdt.getXml().contains("<isValid>false</isValid>"));
+    assertTrue(cdt.getTagBean().getXml().contains("<isValid>false</isValid>"));
     cdt.getTagBean().getDataTagQuality().removeInvalidStatus(statusToAdd1);
     cdt.getTagBean().getDataTagQuality().removeInvalidStatus(statusToAdd2);
-    assertTrue(cdt.getXml().contains("<isValid>true</isValid>"));
+    assertTrue(cdt.getTagBean().getXml().contains("<isValid>true</isValid>"));
     cdt.getTagBean().getDataTagQuality().addInvalidStatus(statusToAdd1, "Value is over 9000!");
     cdt.getTagBean().getDataTagQuality().addInvalidStatus(statusToAdd2, "It's down!");
-    assertTrue(cdt.getXml().contains("<isValid>false</isValid>"));
+    assertTrue(cdt.getTagBean().getXml().contains("<isValid>false</isValid>"));
 
-    CloneableTagBean cdt2 = CloneableTagBean.fromXml(cdt.toString());
-    assertEquals(cdt.getTagBean().getId(), cdt2.getTagBean().getId());
+    TagBean cdt2 = TagBean.fromXml(cdt.getTagBean().toString());
+    assertEquals(cdt.getTagBean().getId(), cdt2.getId());
   }
 
 }
