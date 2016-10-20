@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
@@ -33,6 +33,7 @@ import org.simpleframework.xml.ElementList;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TypeNumeric;
+import cern.c2mon.client.core.jms.TopicRegistrationDetails;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagMode;
@@ -44,24 +45,24 @@ import cern.c2mon.shared.rule.RuleExpression;
 /**
  * @author Szymon Halastra
  */
-public class TagBean implements ClientDataTagValue, Tag {
+@Slf4j
+@Data
+public class TagBean implements ClientDataTagValue, Tag, TopicRegistrationDetails, Cloneable {
 
   /**
-   * Default description when the object is not yet initialized
+   * Unique identifier for a DataTag
    */
-  private static final String DEFAULT_DESCRIPTION = "Tag not initialised.";
+  public static final String DEFAULT_DESCRIPTION = "Tag not initialised.";
 
   /**
    * The value of the tag
    */
-  @Setter
   @Element(required = false)
   private Object tagValue;
 
   /**
    * The current tag mode
    */
-  @Setter
   @Element
   private TagMode mode = TagMode.TEST;
 
@@ -69,7 +70,6 @@ public class TagBean implements ClientDataTagValue, Tag {
    * <code>true</code>, if the tag value is currently simulated and not
    * corresponding to a live event.
    */
-  @Setter
   @Element
   private boolean simulated = false;
 
@@ -85,8 +85,6 @@ public class TagBean implements ClientDataTagValue, Tag {
    * is just one id defined. Only rules might have dependencies
    * to multiple processes (DAQs).
    */
-  @Getter
-  @Setter
   private Map<Long, SupervisionEvent> processSupervisionStatus = new HashMap<>();
 
   /**
@@ -95,8 +93,6 @@ public class TagBean implements ClientDataTagValue, Tag {
    * is just one id defined. Only rules might have dependencies
    * to multiple equipments.
    */
-  @Setter
-  @Getter
   private Map<Long, SupervisionEvent> equipmentSupervisionStatus = new HashMap<>();
 
   /**
@@ -105,21 +101,17 @@ public class TagBean implements ClientDataTagValue, Tag {
    * is just one id defined. Only rules might have dependencies
    * to multiple sub equipments.
    */
-  @Getter
-  @Setter
   private Map<Long, SupervisionEvent> subEquipmentSupervisionStatus = new HashMap<>();
 
   /**
    * The unique name of the tag
    */
-  @Setter
   @Element(required = false)
   private String tagName = null;
 
   /**
    * The quality of the tag
    */
-  @Setter
   @Element(required = false)
   private DataTagQuality tagQuality =
           new DataTagQualityImpl(TagQualityStatus.UNINITIALISED, DEFAULT_DESCRIPTION);
@@ -139,8 +131,6 @@ public class TagBean implements ClientDataTagValue, Tag {
    * String representation of the JMS destination where the DataTag
    * is published on change.
    */
-  @Setter
-  @Getter
   @Element(required = false)
   protected String topicName = null;
 
@@ -148,55 +138,47 @@ public class TagBean implements ClientDataTagValue, Tag {
    * The alarm objects associated to this data tag
    */
   @ElementList
-  @Setter
   private ArrayList<AlarmValue> alarms = new ArrayList<>();
 
   /**
    * The source timestamp that indicates when the value change was generated
    */
   @Element(required = false)
-  @Setter
   private java.sql.Timestamp sourceTimestamp = null;
 
   /**
    * The DAQ timestamp that indicates when the change message passed the DAQ module
    */
   @Element(required = false)
-  @Setter
   private java.sql.Timestamp daqTimestamp = null;
 
   /**
    * The server timestamp that indicates when the change message passed the server
    */
   @Element
-  @Setter
   private java.sql.Timestamp serverTimestamp = new java.sql.Timestamp(0L);
 
   /**
    * Unit of the tag
    */
-  @Setter
   @Element(required = false)
   private String unit = null;
 
   /**
    * The description of the Tag
    */
-  @Setter
   @Element(required = false)
   private String description = "";
 
   /**
    * The description of the value
    */
-  @Setter
   @Element(required = false)
   private String valueDescription = "";
 
   /**
    * In case this data tag is a rule this variable contains its rule expression
    */
-  @Setter
   private RuleExpression ruleExpression = null;
 
   /**
@@ -208,6 +190,46 @@ public class TagBean implements ClientDataTagValue, Tag {
    * Lock to prevent more than one thread at a time to update the value
    */
   private ReentrantReadWriteLock updateTagLock = new ReentrantReadWriteLock();
+
+  /**
+   * Protected default constructor that initializes the tag id with -1L
+   */
+  protected TagBean() {
+    this.id = -1L;
+  }
+
+  /**
+   * Constructor
+   * Creates a Tag with a tagID and a javax.jms.TopicSession
+   * object to be used for subscriptions.
+   * Sets the tag name to "Not.initialized" and the quality to uninitialized.
+   *
+   * @param tagId the unique identifier for the DataTag
+   */
+  public TagBean(final Long tagId) {
+    id = tagId;
+  }
+
+  /**
+   * Constructor
+   * Creates a Tag with a tagID and a javax.jms.TopicSession
+   * object to be used for subscriptions.
+   * Sets the tag name to "Not.initialized" and the quality to UNINITIALIZED.
+   *
+   * @param tagId the unique identifier for the DataTag
+   * @param If    true, it will set the quality to UNDEFINED_TAG instead of UNINITIALIZED
+   */
+  public TagBean(final Long tagId, boolean unknown) {
+    id = tagId;
+
+    if (unknown) {
+      setUnknown();
+    }
+  }
+
+  private void setUnknown() {
+    getDataTagQuality().setInvalidStatus(TagQualityStatus.UNDEFINED_TAG, "Tag is not known by the system");
+  }
 
   /* (non-Javadoc)
    * @see cern.c2mon.client.tag.Tag#getId()
@@ -337,17 +359,17 @@ public class TagBean implements ClientDataTagValue, Tag {
 
   @Override
   public Collection<Long> getEquipmentIds() {
-    return new ArrayList<Long>(equipmentSupervisionStatus.keySet());
+    return equipmentSupervisionStatus.keySet();
   }
 
   @Override
   public Collection<Long> getSubEquipmentIds() {
-    return new ArrayList<Long>(subEquipmentSupervisionStatus.keySet());
+    return subEquipmentSupervisionStatus.keySet();
   }
 
   @Override
   public Collection<Long> getProcessIds() {
-    return new ArrayList<Long>(processSupervisionStatus.keySet());
+    return processSupervisionStatus.keySet();
   }
 
   /* (non-Javadoc)
@@ -482,32 +504,64 @@ public class TagBean implements ClientDataTagValue, Tag {
     return controlTagFlag;
   }
 
-  /**
-   * Removes all information from the object.
-   * This is in particular interesting for the history mode which sometimes just
-   * uses the static information from the live tag object.
+  /* (non-Javadoc)
+   * @see cern.c2mon.client.tag.Tag#getTopicName()
    */
-  public void clean() {
-    updateTagLock.writeLock().lock();
+  @Override
+  public String getTopicName() {
+    this.getUpdateTagLock().readLock().lock();
     try {
-      this.alarms.clear();
-      this.description = DEFAULT_DESCRIPTION;
-      this.tagQuality.setInvalidStatus(TagQualityStatus.UNINITIALISED, DEFAULT_DESCRIPTION);
-      this.serverTimestamp = new Timestamp(0L);
-      this.daqTimestamp = null;
-      this.sourceTimestamp = null;
-      this.tagValue = null;
-      for (Long id : processSupervisionStatus.keySet()) {
-        processSupervisionStatus.put(id, null);
+      if (this.getTopicName() != null) {
+        return this.getTopicName();
       }
-      for (Long id : equipmentSupervisionStatus.keySet()) {
-        equipmentSupervisionStatus.put(id, null);
-      }
-      for (Long id : subEquipmentSupervisionStatus.keySet()) {
-        subEquipmentSupervisionStatus.put(id, null);
-      }
+      return "";
     } finally {
-      updateTagLock.writeLock().unlock();
+      this.getUpdateTagLock().readLock().unlock();
     }
+  }
+
+  /**
+   * Creates a clone of the this object. The only difference is that
+   * it does not copy the registered listeners. If you are only interested
+   * in the static information of the object you should call after cloning
+   * the {@link #clean()} method.
+   *
+   * @return The clone of this object
+   * @throws CloneNotSupportedException Thrown, if one of the field does not support cloning.
+   * @see #clean()
+   */
+  @Override
+  public TagBean clone() {
+    try {
+      TagBean tagBean = (TagBean) super.clone();
+
+      return tagBean;
+    }
+    catch (CloneNotSupportedException e) {
+      log.error("clone() - Cloning the CloneableTagBean object failed! No update send to the client.");
+      throw new RuntimeException(e);
+    }
+  }
+
+  /* (non-Javadoc)
+ * @see cern.c2mon.client.tag.Tag#hashCode()
+ */
+  @Override
+  public int hashCode() {
+    return this.id.hashCode();
+  }
+
+  /* (non-Javadoc)
+   * @see cern.c2mon.client.tag.Tag#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object pRight) {
+    if (pRight instanceof TagBean) {
+      if (this.id.equals(((TagBean) pRight).id)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

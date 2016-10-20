@@ -20,21 +20,17 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.Tag;
-import cern.c2mon.client.core.jms.TopicRegistrationDetails;
 import cern.c2mon.client.core.refactoring.CloneableTagBean;
 import cern.c2mon.client.core.refactoring.TagBean;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
@@ -53,22 +49,13 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
  */
 @Root(name = "Tag")
 @Slf4j
-public class ClientDataTagImpl implements TopicRegistrationDetails {
+public class ClientDataTagImpl {
 
-  @Getter
-  @Autowired
   private CloneableTagBean cloneableTagBean;
-
   /**
    * Default description when the object is not yet initialized
    */
   private static final String DEFAULT_DESCRIPTION = "Tag not initialised.";
-
-  /**
-   * Unique identifier for a DataTag
-   */
-  @Attribute
-  private Long id;
 
   /**
    * Only used for xml serialization.
@@ -76,60 +63,11 @@ public class ClientDataTagImpl implements TopicRegistrationDetails {
   @Element(required = false)
   private String ruleExpressionString;
 
-  /**
-   * Protected default constructor that initializes the tag id with -1L
-   */
-  protected ClientDataTagImpl() {
-    this.id = -1L;
-  }
-
-  /**
-   * Constructor
-   * Creates a Tag with a tagID and a javax.jms.TopicSession
-   * object to be used for subscriptions.
-   * Sets the tag name to "Not.initialized" and the quality to uninitialized.
-   *
-   * @param tagId the unique identifier for the DataTag
-   */
-  public ClientDataTagImpl(final Long tagId) {
-    id = tagId;
-  }
-
-  /**
-   * Constructor
-   * Creates a Tag with a tagID and a javax.jms.TopicSession
-   * object to be used for subscriptions.
-   * Sets the tag name to "Not.initialized" and the quality to UNINITIALIZED.
-   *
-   * @param tagId the unique identifier for the DataTag
-   * @param If    true, it will set the quality to UNDEFINED_TAG instead of UNINITIALIZED
-   */
-  public ClientDataTagImpl(final Long tagId, boolean unknown) {
-    id = tagId;
-
-    if (unknown) {
-      setUnknown();
-    }
-  }
-
-  private void setUnknown() {
-    cloneableTagBean.getDataTagQuality().setInvalidStatus(TagQualityStatus.UNDEFINED_TAG, "Tag is not known by the system");
-  }
-
   @org.simpleframework.xml.core.Persist
   public void prepare() {
 
-    if (cloneableTagBean.getRuleExpression() != null)
-      ruleExpressionString = cloneableTagBean.getRuleExpression().getExpression();
-  }
-
-
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.Tag#getId()
-   */
-  @Override
-  public Long getId() {
-    return this.id;
+    if (cloneableTagBean.getTagBean().getRuleExpression() != null)
+      ruleExpressionString = cloneableTagBean.getTagBean().getRuleExpression().getExpression();
   }
 
   /**
@@ -140,22 +78,22 @@ public class ClientDataTagImpl implements TopicRegistrationDetails {
    */
   public void validate(final TagQualityStatus statusToRemove) {
     Tag clone = null;
-    getCloneableTagBean().getUpdateTagLock().writeLock().lock();
+    cloneableTagBean.getUpdateTagLock().writeLock().lock();
     try {
       if (log.isTraceEnabled()) {
-        log.trace("validate() - Removing " + statusToRemove + " quality status from tag " + this.id);
+        log.trace("validate() - Removing " + statusToRemove + " quality status from tag " + cloneableTagBean.getTagBean().getId());
       }
-      if (cloneableTagBean.getDataTagQuality().isInvalidStatusSet(statusToRemove)) {
+      if (cloneableTagBean.getTagBean().getDataTagQuality().isInvalidStatusSet(statusToRemove)) {
         // remove the quality status
-        cloneableTagBean.getDataTagQuality().removeInvalidStatus(statusToRemove);
-        clone = this.clone();
+        cloneableTagBean.getTagBean().getDataTagQuality().removeInvalidStatus(statusToRemove);
+        clone = cloneableTagBean.getTagBean().clone();
       }
     } finally {
-      getCloneableTagBean().getUpdateTagLock().writeLock().unlock();
+      cloneableTagBean.getTagBean().getUpdateTagLock().writeLock().unlock();
     }
 
     if (clone != null) {
-      getCloneableTagBean().notifyListeners(clone);
+      cloneableTagBean.notifyListeners(clone);
     }
   }
 
@@ -170,21 +108,21 @@ public class ClientDataTagImpl implements TopicRegistrationDetails {
    */
   public void invalidate(final TagQualityStatus status, final String description) {
     TagBean clone = null;
-    getCloneableTagBean().getUpdateTagLock().writeLock().lock();
+    cloneableTagBean.getTagBean().getUpdateTagLock().writeLock().lock();
     try {
       if (log.isTraceEnabled()) {
-        log.trace("invalidate() - Invalidating tag " + this.id + " with quality status " + status);
+        log.trace("invalidate() - Invalidating tag " + cloneableTagBean.getTagBean().getId() + " with quality status " + status);
       }
       // Invalidate the object.
-      cloneableTagBean.getDataTagQuality().addInvalidStatus(status, description);
+      cloneableTagBean.getTagBean().getDataTagQuality().addInvalidStatus(status, description);
 
-      clone = this.clone();
+      clone = cloneableTagBean.getTagBean().clone();
     } finally {
-      getCloneableTagBean().getUpdateTagLock().writeLock().unlock();
+      cloneableTagBean.getTagBean().getUpdateTagLock().writeLock().unlock();
     }
 
     if (clone != null) {
-      getCloneableTagBean().notifyListeners(clone);
+      cloneableTagBean.notifyListeners(clone);
     }
   }
 
@@ -207,18 +145,18 @@ public class ClientDataTagImpl implements TopicRegistrationDetails {
     if (log.isTraceEnabled()) {
       log.trace("addUpdateListener() called.");
     }
-    getCloneableTagBean().getListeners().add(listener);
+    cloneableTagBean.getListeners().add(listener);
 
     Tag clone = null;
-    getCloneableTagBean().getUpdateTagLock().readLock().lock();
+    cloneableTagBean.getTagBean().getUpdateTagLock().readLock().lock();
     try {
-      boolean sendInitialUpdate = !TagComparator.compare(cloneableTagBean, initialValue);
+      boolean sendInitialUpdate = !TagComparator.compare(cloneableTagBean.getTagBean(), initialValue);
 
       if (sendInitialUpdate) {
-        clone = this.clone();
+        clone = cloneableTagBean.getTagBean().clone();
       }
     } finally {
-      getCloneableTagBean().getUpdateTagLock().readLock().unlock();
+      cloneableTagBean.getTagBean().getUpdateTagLock().readLock().unlock();
     }
 
     if (clone != null) {
@@ -268,7 +206,7 @@ public class ClientDataTagImpl implements TopicRegistrationDetails {
    * @return All listeners registered to this data tag
    */
   public Collection<BaseListener> getUpdateListeners() {
-    return new ArrayList<>(getCloneableTagBean().getListeners());
+    return new ArrayList<>(cloneableTagBean.getListeners());
   }
 
   /**
@@ -281,7 +219,7 @@ public class ClientDataTagImpl implements TopicRegistrationDetails {
    * for receiving updates of that tag.
    */
   public boolean isUpdateListenerRegistered(final BaseListener<? extends Tag> pListener) {
-    boolean isRegistered = getCloneableTagBean().getListeners().contains(pListener);
+    boolean isRegistered = cloneableTagBean.getListeners().contains(pListener);
     return isRegistered;
   }
 
@@ -293,14 +231,14 @@ public class ClientDataTagImpl implements TopicRegistrationDetails {
    * @see #addUpdateListener
    */
   public void removeUpdateListener(final BaseListener<? extends Tag> pListener) {
-    getCloneableTagBean().getListeners().remove(pListener);
+    cloneableTagBean.getListeners().remove(pListener);
   }
 
   /**
    * Removes all previously registered <code>DataTagUpdateListener</code>
    */
   public void removeAllUpdateListeners() {
-    getCloneableTagBean().getListeners().clear();
+    cloneableTagBean.getListeners().clear();
   }
 
   /**
@@ -311,46 +249,8 @@ public class ClientDataTagImpl implements TopicRegistrationDetails {
    * update listeners registered.
    */
   public boolean hasUpdateListeners() {
-    boolean isEmpty = !getCloneableTagBean().getListeners().isEmpty();
+    boolean isEmpty = cloneableTagBean.getListeners().isEmpty();
     return isEmpty;
-  }
-
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.Tag#getTopicName()
-   */
-  @Override
-  public String getTopicName() {
-    getCloneableTagBean().getUpdateTagLock().readLock().lock();
-    try {
-      if (getCloneableTagBean().getTopicName() != null) {
-        return getCloneableTagBean().getTopicName();
-      }
-      return "";
-    } finally {
-      getCloneableTagBean().getUpdateTagLock().readLock().unlock();
-    }
-  }
-
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.Tag#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    return this.id.hashCode();
-  }
-
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.Tag#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(Object pRight) {
-    if (pRight instanceof ClientDataTagImpl) {
-      if (this.id.equals(((ClientDataTagImpl) pRight).id)) {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   private <T> T deepClone(T object) {
@@ -374,7 +274,7 @@ public class ClientDataTagImpl implements TopicRegistrationDetails {
 
   @SuppressWarnings("unchecked")
   @Override
-  public CloneableTagBean clone() {
+  public TagBean clone() {
 //    getCloneableTagBean().getUpdateTagLock().readLock().lock();
 //    try {
 //      ClientDataTagImpl clone = (ClientDataTagImpl) super.clone();
@@ -455,7 +355,7 @@ public class ClientDataTagImpl implements TopicRegistrationDetails {
 //      updateTagLock.readLock().unlock();
 //    }
 
-    return cloneableTagBean.clone();
+    return cloneableTagBean.getTagBean().clone();
   }
 
   /**

@@ -40,6 +40,7 @@ import cern.c2mon.client.core.cache.CacheSynchronizationException;
 import cern.c2mon.client.core.cache.ClientDataTagCache;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.manager.CoreSupervisionManager;
+import cern.c2mon.client.core.refactoring.CloneableTagBean;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.shared.client.tag.TagUpdate;
@@ -336,7 +337,7 @@ public class TagServiceImpl implements AdvancedTagService {
         for (TagUpdate tagUpdate : tagUpdates) {
           try {
             ClientDataTagImpl cdt = new ClientDataTagImpl(tagUpdate.getId());
-            cdt.update(tagUpdate);
+            cdt.getCloneableTagBean().update(tagUpdate);
             
             // In case of a CommFault- or Status control tag, we don't register to supervision invalidations
             if (!tagUpdate.isControlTag() || tagUpdate.isAliveTag()) {
@@ -465,11 +466,13 @@ public class TagServiceImpl implements AdvancedTagService {
       for (TagUpdate tagUpdate : tagUpdates) {
         try {
           ClientDataTagImpl cdt = new ClientDataTagImpl(tagUpdate.getId());
-          cdt.update(tagUpdate);
+          CloneableTagBean cloneableTagBean = cdt.getCloneableTagBean();
+
+          cloneableTagBean.update(tagUpdate);
           
           // In case of a CommFault- or Status control tag, we don't register to supervision invalidations
           if (!tagUpdate.isControlTag() || tagUpdate.isAliveTag()) {
-            supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
+            supervisionManager.addSupervisionListener(cdt, cloneableTagBean.getProcessIds(), cloneableTagBean.getEquipmentIds(), cloneableTagBean.getSubEquipmentIds());
           }
           
           resultList.add(cdt.clone());
