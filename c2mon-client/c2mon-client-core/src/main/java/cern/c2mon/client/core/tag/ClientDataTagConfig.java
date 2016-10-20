@@ -15,7 +15,7 @@
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package cern.c2mon.client.core.refactoring;
+package cern.c2mon.client.core.tag;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -59,7 +59,7 @@ public class ClientDataTagImplIsValidUpdateTest {
    */
   public void testCase1() {
 
-    ClientDataTagImpl clientTagImpl = new ClientDataTagImpl(TAG_ID);
+    CloneableTagBean clientTagImpl = new CloneableTagBean(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_PAST = createTagVUpdate();
     tagValueUpdate_PAST.setServerTimestamp(TIME_JUST_A_BIT_AGO);
@@ -118,7 +118,7 @@ public class ClientDataTagImplIsValidUpdateTest {
    */
   public void testCase2() {
 
-    ClientDataTagImpl clientTagImpl = new ClientDataTagImpl(TAG_ID);
+    CloneableTagBean clientTagImpl = new CloneableTagBean(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_CURRENT = createTagVUpdate();
     tagValueUpdate_CURRENT.setServerTimestamp(CURRENT_TIME);
@@ -174,7 +174,7 @@ public class ClientDataTagImplIsValidUpdateTest {
    */
   public void testCase3() {
 
-    ClientDataTagImpl clientTagImpl = new ClientDataTagImpl(TAG_ID);
+    CloneableTagBean clientTagImpl = new CloneableTagBean(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
@@ -209,7 +209,7 @@ public class ClientDataTagImplIsValidUpdateTest {
    */
   public void testCase4() {
 
-    ClientDataTagImpl clientTagImpl = new ClientDataTagImpl(TAG_ID);
+    CloneableTagBean clientTagImpl = new CloneableTagBean(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
@@ -242,7 +242,7 @@ public class ClientDataTagImplIsValidUpdateTest {
    */
   public void testCase5() {
 
-    ClientDataTagImpl clientTagImpl = new ClientDataTagImpl(TAG_ID);
+    CloneableTagBean clientTagImpl = new CloneableTagBean(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
@@ -276,7 +276,7 @@ public class ClientDataTagImplIsValidUpdateTest {
    */
   public void testCase6() {
 
-    ClientDataTagImpl clientTagImpl = new ClientDataTagImpl(TAG_ID);
+    CloneableTagBean clientTagImpl = new CloneableTagBean(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
@@ -310,7 +310,7 @@ public class ClientDataTagImplIsValidUpdateTest {
    */
   public void testCase7() {
 
-    ClientDataTagImpl clientTagImpl = new ClientDataTagImpl(TAG_ID);
+    CloneableTagBean clientTagImpl = new CloneableTagBean(TAG_ID);
 
     TestTagUpdate tagValueUpdate_1 = createTagUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
@@ -334,7 +334,7 @@ public class ClientDataTagImplIsValidUpdateTest {
    */
   public void testCase8() {
 
-    ClientDataTagImpl clientTagImpl = new ClientDataTagImpl(TAG_ID);
+    CloneableTagBean clientTagImpl = new CloneableTagBean(TAG_ID);
 
     TestTagUpdate tagValueUpdate_1 = createTagUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
@@ -359,7 +359,7 @@ public class ClientDataTagImplIsValidUpdateTest {
    */
   public void testCase9() {
 
-    ClientDataTagImpl clientTagImpl = new ClientDataTagImpl(TAG_ID);
+    CloneableTagBean clientTagImpl = new CloneableTagBean(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
@@ -396,7 +396,7 @@ public class ClientDataTagImplIsValidUpdateTest {
    */
   public void testCase10() {
 
-    ClientDataTagImpl clientTagImpl = new ClientDataTagImpl(TAG_ID);
+    CloneableTagBean clientTagImpl = new CloneableTagBean(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
@@ -433,7 +433,7 @@ public class ClientDataTagImplIsValidUpdateTest {
    */
   public void testCase11() {
 
-    ClientDataTagImpl clientTagImpl = new ClientDataTagImpl(TAG_ID);
+    CloneableTagBean clientTagImpl = new CloneableTagBean(TAG_ID);
 
     TestTagUpdate tagValueUpdate_1 = createTagUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
@@ -457,7 +457,7 @@ public class ClientDataTagImplIsValidUpdateTest {
    */
   public void testCase12() {
 
-    ClientDataTagImpl clientTagImpl = new ClientDataTagImpl(TAG_ID);
+    CloneableTagBean clientTagImpl = new CloneableTagBean(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
@@ -481,7 +481,7 @@ public class ClientDataTagImplIsValidUpdateTest {
    */
   public void testCase13() {
 
-    ClientDataTagImpl clientTagImpl = new ClientDataTagImpl(TAG_ID);
+    CloneableTagBean clientTagImpl = new CloneableTagBean(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);

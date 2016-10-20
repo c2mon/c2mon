@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -34,6 +35,8 @@ import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
+import cern.c2mon.client.core.tag.CloneableTagBean;
+import cern.c2mon.client.core.tag.TagBean;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 
 /**
@@ -104,7 +107,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
     cacheReadLock.lock();
     try {
-      cdt = controller.getActiveCache().get(tagId);
+      cdt = controller.getActiveCache().get(tagId).getTagBean();
     } finally {
       cacheReadLock.unlock();
     }
@@ -116,10 +119,10 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   public Tag getByName(final String tagName) {
     cacheReadLock.lock();
     try {
-      Collection<ClientDataTagImpl> values = controller.getActiveCache().values();
-      for (Tag cdt : values) {
-        if (cdt.getName().equalsIgnoreCase(tagName)) {
-          return cdt;
+      Collection<CloneableTagBean> values = controller.getActiveCache().values();
+      for (CloneableTagBean cdt : values) {
+        if (cdt.getTagBean().getName().equalsIgnoreCase(tagName)) {
+          return cdt.getTagBean();
         }
       }
     } finally {
@@ -131,13 +134,13 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
   @Override
   public Collection<Tag> getAllSubscribedDataTags() {
-    Collection<Tag> list = new ArrayList<Tag>(controller.getActiveCache().size());
+    Collection<Tag> list = new ArrayList<>(controller.getActiveCache().size());
 
     cacheReadLock.lock();
     try {
-      for (ClientDataTagImpl cdt : controller.getActiveCache().values()) {
+      for (CloneableTagBean cdt : controller.getActiveCache().values()) {
         if (cdt.hasUpdateListeners()) {
-          list.add(cdt);
+          list.add(cdt.getTagBean());
         }
       }
     } finally {
@@ -149,13 +152,13 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
   @Override
   public Collection<Tag> getAllTagsForEquipment(final Long equipmentId) {
-    Collection<Tag> list = new ArrayList<Tag>();
+    Collection<Tag> list = new ArrayList<>();
 
     cacheReadLock.lock();
     try {
-      for (Tag cdt : controller.getActiveCache().values()) {
-        if (cdt.getEquipmentIds().contains(equipmentId)) {
-          list.add(cdt);
+      for (CloneableTagBean cdt : controller.getActiveCache().values()) {
+        if (cdt.getTagBean().getEquipmentIds().contains(equipmentId)) {
+          list.add(cdt.getTagBean());
         }
       }
     } finally {
@@ -167,13 +170,13 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
   @Override
   public Collection<Tag> getAllTagsForListener(final BaseListener listener) {
-    Collection<Tag> list = new ArrayList<Tag>();
+    Collection<Tag> list = new ArrayList<>();
 
     cacheReadLock.lock();
     try {
-      for (ClientDataTagImpl cdt : controller.getActiveCache().values()) {
+      for (CloneableTagBean cdt : controller.getActiveCache().values()) {
         if (cdt.isUpdateListenerRegistered(listener)) {
-          list.add(cdt);
+          list.add(cdt.getTagBean());
         }
       }
     } finally {
@@ -185,13 +188,13 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
   @Override
   public Set<Long> getAllTagIdsForListener(final BaseListener listener) {
-    Set<Long> list = new HashSet<Long>();
+    Set<Long> list = new HashSet<>();
 
     cacheReadLock.lock();
     try {
-      for (ClientDataTagImpl cdt : controller.getActiveCache().values()) {
+      for (CloneableTagBean cdt : controller.getActiveCache().values()) {
         if (cdt.isUpdateListenerRegistered(listener)) {
-          list.add(cdt.getId());
+          list.add(cdt.getTagBean().getId());
         }
       }
     } finally {
@@ -207,9 +210,9 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
     cacheReadLock.lock();
     try {
-      for (Tag cdt : controller.getActiveCache().values()) {
-        if (cdt.getProcessIds().contains(processId)) {
-          list.add(cdt);
+      for (CloneableTagBean cdt : controller.getActiveCache().values()) {
+        if (cdt.getTagBean().getProcessIds().contains(processId)) {
+          list.add(cdt.getTagBean());
         }
       }
     } finally {
@@ -245,7 +248,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     cacheReadLock.lock();
     try {
       for (Long tagId : tagIds) {
-        resultMap.put(tagId, controller.getActiveCache().get(tagId));
+        resultMap.put(tagId, controller.getActiveCache().get(tagId).getTagBean());
       }
     } finally {
       cacheReadLock.unlock();
@@ -265,11 +268,11 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     
     cacheReadLock.lock();
     try {
-      Collection<ClientDataTagImpl> values = controller.getActiveCache().values();
-      for (Tag cdt : values) {
+      Collection<CloneableTagBean> values = controller.getActiveCache().values();
+      for (CloneableTagBean cdt : values) {
         for (String tagName : tagNames) {
-          if (cdt.getName().equalsIgnoreCase(tagName)) {
-            resultMap.put(tagName, cdt);
+          if (cdt.getTagBean().getName().equalsIgnoreCase(tagName)) {
+            resultMap.put(tagName, cdt.getTagBean());
           }
         }
       }

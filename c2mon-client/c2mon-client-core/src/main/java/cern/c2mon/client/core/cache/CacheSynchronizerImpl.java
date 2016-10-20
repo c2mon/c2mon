@@ -39,7 +39,8 @@ import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.client.core.listener.HeartbeatListener;
 import cern.c2mon.client.core.manager.CoreSupervisionManager;
 import cern.c2mon.client.core.manager.SupervisionManager;
-import cern.c2mon.client.core.refactoring.CloneableTagBean;
+import cern.c2mon.client.core.tag.CloneableTagBean;
+import cern.c2mon.client.core.tag.TagBean;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.client.tag.TagUpdate;
@@ -98,13 +99,13 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
    * <code>Map</code> reference containing all subscribed data tags which are
    * updated via the <code>JmsProxy</code>
    */
-  private Map<Long, ClientDataTagImpl> liveCache = null;
+  private Map<Long, CloneableTagBean> liveCache = null;
 
   /**
    * <code>Map</code> reference containing all subscribed data tags which are
    * updated via the <code>HistoryManager</code>
    */
-  private Map<Long, ClientDataTagImpl> historyCache = null;
+  private Map<Long, CloneableTagBean> historyCache = null;
 
   /** Reference to the cache read lock */
   private ReadLock cacheReadLock = null;
@@ -155,11 +156,11 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
     Set<Long> newTags = new HashSet<>();
 
     if (tagIds.size() > 0) {
-      ClientDataTagImpl cdt = null;
+      CloneableTagBean cdt = null;
       for (Long tagId : tagIds) {
         if (!liveCache.containsKey(tagId)) {
-          cdt = new ClientDataTagImpl(tagId, true);
-          liveCache.put(cdt.getId(), cdt);
+          cdt = new CloneableTagBean(tagId, true);
+          liveCache.put(cdt.getTagBean().getId(), cdt);
           newTags.add(tagId);
         }
       }
@@ -200,11 +201,10 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
           controller.getWriteLock().lock();
           try {
             if (!liveCache.containsKey(tagUpdate.getId())) {
-              ClientDataTagImpl cdt = new ClientDataTagImpl(tagUpdate.getId());
 
-              CloneableTagBean cloneableTagBean = cdt.getCloneableTagBean();
+              CloneableTagBean cdt = new CloneableTagBean(tagUpdate.getId());
 
-              cloneableTagBean.update(tagUpdate);
+              cdt.update(tagUpdate);
               subscribeToSupervisionManager(cdt);
               liveCache.put(cdt.getId(), cdt);
 
@@ -253,8 +253,8 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
         if (controller.isHistoryModeEnabled()) {
           historyCache.remove(tagId);
         }
-        ClientDataTagImpl liveTag = liveCache.remove(tagId);
-        if (liveTag.getCloneableTagBean().getDataTagQuality().isExistingTag()) {
+        CloneableTagBean liveTag = liveCache.remove(tagId);
+        if (liveTag.getTagBean().getDataTagQuality().isExistingTag()) {
           try {
             jmsProxy.unregisterUpdateListener(liveTag);
           } catch (Exception e) {
@@ -282,7 +282,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
    */
   private void invalidateLiveCache(final TagQualityStatus status, final String invalidationMessage) {
     LOG.debug("invalidateLiveCache() - Invalidating " + liveCache.size() + " tag entries with " + status + ".");
-    for (ClientDataTagImpl cdt : liveCache.values()) {
+    for (CloneableTagBean cdt : liveCache.values()) {
       cdt.invalidate(status, invalidationMessage);
     }
   }
@@ -295,7 +295,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
    */
   private void removeLiveCacheInvalidation(final TagQualityStatus statusToRemove) {
     LOG.debug("removeLiveCacheInvalidation() - removing " + statusToRemove + " from " + liveCache.size() + " tag entries.");
-    for (ClientDataTagImpl cdt : liveCache.values()) {
+    for (CloneableTagBean cdt : liveCache.values()) {
       cdt.validate(statusToRemove);
     }
   }
@@ -325,8 +325,8 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
         // Set all tags to unknown which were not returned by the C2MON server
         // Please note that we do not touch at this point the history cache.
         for (Long tagId : unsynchronizedTagIds) {
-          final ClientDataTagImpl liveTag = liveCache.get(tagId);
-          if (liveTag.getCloneableTagBean().getDataTagQuality().isExistingTag()) {
+          final CloneableTagBean liveTag = liveCache.get(tagId);
+          if (liveTag.getTagBean().getDataTagQuality().isExistingTag()) {
             if (jmsProxy.isRegisteredListener(liveTag)) {
               try {
                 jmsProxy.unregisterUpdateListener(liveTag);
@@ -335,7 +335,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
               }
             }
             supervisionManager.removeSupervisionListener(liveTag);
-            final ClientDataTagImpl unkownTag = new ClientDataTagImpl(tagId, true);
+            final CloneableTagBean unkownTag = new CloneableTagBean(tagId, true);
             unkownTag.addUpdateListeners(liveTag.getUpdateListeners());
             liveCache.put(tagId, unkownTag);
           }
@@ -366,14 +366,10 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
     final Collection<TagUpdate> tagUpdates = tagRequestHandler.requestTags(tagIds);
     for (TagUpdate tagUpdate : tagUpdates) {
       try {
-        ClientDataTagImpl liveTag = liveCache.get(tagUpdate.getId());
-        boolean wasUnknown = !liveTag.getDataTagQuality().isExistingTag();
+        CloneableTagBean liveTag = liveCache.get(tagUpdate.getId());
+        boolean wasUnknown = !liveTag.getTagBean().getDataTagQuality().isExistingTag();
 
         liveTag.update(tagUpdate);
-
-        boolean wasUnknown = !liveTag.getCloneableTagBean().getDataTagQuality().isExistingTag();
-
-        liveTag.getCloneableTagBean().update(tagUpdate);
 
         if (wasUnknown) {
           subscribeToSupervisionManager(liveTag);
@@ -434,7 +430,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
         LOG.info("Subscribing to tag value update topic");
 
         for (Long tagId : tagIds) {
-          ClientDataTagImpl liveTag = liveCache.get(tagId);
+          CloneableTagBean liveTag = liveCache.get(tagId);
 
           // It's possible that really fast clients can unsubscribe from a tag
           // before getting to this point (see TIMS-979). In this case, the tag
@@ -469,12 +465,12 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
      */
     private void synchronizeTagValues(final Set<Long> newTags) throws JMSException {
       if (!newTags.isEmpty()) {
-        ClientDataTagImpl newTag = null;
+        CloneableTagBean newTag = null;
         Collection<TagValueUpdate> requestedTagValues = tagRequestHandler.requestTagValues(newTags);
         for (TagValueUpdate tagValueUpdate : requestedTagValues) {
           newTag = liveCache.get(tagValueUpdate.getId());
           if (newTag != null) {
-            newTag.getCloneableTagBean().update(tagValueUpdate);
+            newTag.update(tagValueUpdate);
           }
         }
       }
@@ -492,12 +488,12 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
      * @throws JMSException in case of problems while registering the the tag
      *           for live updates.
      */
-    private boolean handleLiveTagRegistration(final ClientDataTagImpl liveTag) throws JMSException {
-      final DataTagQuality tagQuality = liveTag.getCloneableTagBean().getDataTagQuality();
+    private boolean handleLiveTagRegistration(final CloneableTagBean liveTag) throws JMSException {
+      final DataTagQuality tagQuality = liveTag.getTagBean().getDataTagQuality();
 
       if (tagQuality.isExistingTag()) {
         if (!jmsProxy.isRegisteredListener(liveTag)) {
-          jmsProxy.registerUpdateListener(liveTag, liveTag);
+          jmsProxy.registerUpdateListener(liveTag, liveTag.getTagBean());
           return true;
         }
       } else {
@@ -527,11 +523,11 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
    */
   private void synchronizeHistoryCache(Set<Long> historyCacheUpdateList) {
     if (controller.isHistoryModeEnabled()) {
-      ClientDataTagImpl cdt = null;
-      ClientDataTagImpl historyTag = null;
+      CloneableTagBean cdt = null;
+      CloneableTagBean historyTag = null;
       for (Long tagId : historyCacheUpdateList) {
         cdt = liveCache.get(tagId);
-        historyTag = cdt.clone();
+        historyTag.setTagBean(cdt.getTagBean().clone());
         // Adds the clone (without listeners) to the history cache.
         historyCache.put(tagId, historyTag);
       }
@@ -625,11 +621,11 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
    * Subscribes the given tag to the {@link SupervisionManager}
    * @param cdt a newly created tag
    */
-  private void subscribeToSupervisionManager(final ClientDataTagImpl cdt) {
+  private void subscribeToSupervisionManager(final CloneableTagBean cdt) {
     // In case of a CommFault- or Status control tag, we don't register to supervision invalidations
-    CloneableTagBean cloneableTagBean = cdt.getCloneableTagBean();
-    if (!cloneableTagBean.isControlTag() || cloneableTagBean.isAliveTag()) {
-      supervisionManager.addSupervisionListener(cdt, cloneableTagBean.getProcessIds(), cloneableTagBean.getEquipmentIds(), cloneableTagBean.getSubEquipmentIds());
+    TagBean tagBean = cdt.getTagBean();
+    if (!tagBean.isControlTag() || tagBean.isAliveTag()) {
+      supervisionManager.addSupervisionListener(cdt, tagBean.getProcessIds(), tagBean.getEquipmentIds(), tagBean.getSubEquipmentIds());
     }
   }
 }

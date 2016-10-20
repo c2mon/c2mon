@@ -15,7 +15,7 @@
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package cern.c2mon.client.core.refactoring;
+package cern.c2mon.client.core.tag;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -108,6 +108,12 @@ public class TagBean implements ClientDataTagValue, Tag, TopicRegistrationDetail
    */
   @Element(required = false)
   private String tagName = null;
+
+  /**
+   * Only used for xml serialization.
+   */
+  @Element(required = false)
+  private String ruleExpressionString;
 
   /**
    * The quality of the tag
@@ -227,7 +233,7 @@ public class TagBean implements ClientDataTagValue, Tag, TopicRegistrationDetail
     }
   }
 
-  private void setUnknown() {
+  protected void setUnknown() {
     getDataTagQuality().setInvalidStatus(TagQualityStatus.UNDEFINED_TAG, "Tag is not known by the system");
   }
 

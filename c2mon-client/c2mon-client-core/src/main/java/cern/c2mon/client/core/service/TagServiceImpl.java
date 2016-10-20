@@ -33,14 +33,14 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.common.listener.BaseTagListener;
 import cern.c2mon.client.common.listener.TagListener;
-import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.cache.CacheSynchronizationException;
 import cern.c2mon.client.core.cache.ClientDataTagCache;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.manager.CoreSupervisionManager;
-import cern.c2mon.client.core.refactoring.CloneableTagBean;
+import cern.c2mon.client.core.tag.CloneableTagBean;
+import cern.c2mon.client.core.tag.TagBean;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.shared.client.tag.TagUpdate;
@@ -318,13 +318,13 @@ public class TagServiceImpl implements AdvancedTagService {
 
   @Override
   public Collection<Tag> get(final Collection<Long> tagIds) {
-    Collection<ClientDataTagImpl> resultList = new ArrayList<>();
+    Collection<Tag> resultList = new ArrayList<>();
     Collection<Long> missingTags = new ArrayList<>();
     Map<Long, Tag> cachedValues = cache.get(new HashSet<>(tagIds));
 
     for (Entry<Long, Tag> cacheEntry : cachedValues.entrySet()) {
       if (cacheEntry.getValue() != null) {
-        resultList.add(((ClientDataTagImpl) cacheEntry.getValue()).clone());
+        resultList.add(((ClientDataTagImpl) cacheEntry.getValue()).getCloneableTagBean().getTagBean().clone());
       } else {
         missingTags.add(cacheEntry.getKey());
       }
@@ -336,19 +336,21 @@ public class TagServiceImpl implements AdvancedTagService {
         Collection<TagUpdate> tagUpdates = clientRequestHandler.requestTags(missingTags);
         for (TagUpdate tagUpdate : tagUpdates) {
           try {
-            ClientDataTagImpl cdt = new ClientDataTagImpl(tagUpdate.getId());
-            cdt.getCloneableTagBean().update(tagUpdate);
-            
+            CloneableTagBean cloneableTagBean = new CloneableTagBean(tagUpdate.getId());
+            TagBean tagBean = cloneableTagBean.getTagBean();
+
+            cloneableTagBean.update(tagUpdate);
+
             // In case of a CommFault- or Status control tag, we don't register to supervision invalidations
             if (!tagUpdate.isControlTag() || tagUpdate.isAliveTag()) {
-              supervisionManager.addSupervisionListener(cdt, cdt.getCloneableTagBean().getProcessIds(), cdt.getCloneableTagBean().getEquipmentIds(), cdt.getCloneableTagBean().getSubEquipmentIds());
+              supervisionManager.addSupervisionListener(cloneableTagBean, tagBean.getProcessIds(), tagBean.getEquipmentIds(), tagBean.getSubEquipmentIds());
             }
             
-            missingTags.remove(cdt.getId());
-            resultList.add(cdt.clone());
+            missingTags.remove(tagBean.getId());
+            resultList.add(tagBean.clone());
 
             if (!tagUpdate.isControlTag() || tagUpdate.isAliveTag()) {
-              supervisionManager.removeSupervisionListener(cdt);
+              supervisionManager.removeSupervisionListener(cloneableTagBean);
             }
           } catch (RuleFormatException e) {
             log.error("get() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
@@ -361,7 +363,7 @@ public class TagServiceImpl implements AdvancedTagService {
       }
       
       for (Long tagId : missingTags) {
-        resultList.add(new ClientDataTagImpl(tagId, true));
+        resultList.add(new TagBean(tagId, true));
       }
     }
 
@@ -381,7 +383,7 @@ public class TagServiceImpl implements AdvancedTagService {
       return cdt;
     }
 
-    return new ClientDataTagImpl(tagId, true);
+    return new TagBean(tagId, true);
   }
 
   @Override
@@ -465,20 +467,20 @@ public class TagServiceImpl implements AdvancedTagService {
       Collection<TagUpdate> tagUpdates = clientRequestHandler.requestTagsByRegex(regexList);
       for (TagUpdate tagUpdate : tagUpdates) {
         try {
-          ClientDataTagImpl cdt = new ClientDataTagImpl(tagUpdate.getId());
-          CloneableTagBean cloneableTagBean = cdt.getCloneableTagBean();
+          CloneableTagBean cloneableTagBean = new CloneableTagBean(tagUpdate.getId());
+          TagBean tagBean = cloneableTagBean.getTagBean();
 
           cloneableTagBean.update(tagUpdate);
           
           // In case of a CommFault- or Status control tag, we don't register to supervision invalidations
           if (!tagUpdate.isControlTag() || tagUpdate.isAliveTag()) {
-            supervisionManager.addSupervisionListener(cdt, cloneableTagBean.getProcessIds(), cloneableTagBean.getEquipmentIds(), cloneableTagBean.getSubEquipmentIds());
+            supervisionManager.addSupervisionListener(cloneableTagBean, tagBean.getProcessIds(), tagBean.getEquipmentIds(), tagBean.getSubEquipmentIds());
           }
           
-          resultList.add(cdt.clone());
+          resultList.add(tagBean.clone());
 
           if (!tagUpdate.isControlTag() || tagUpdate.isAliveTag()) {
-            supervisionManager.removeSupervisionListener(cdt);
+            supervisionManager.removeSupervisionListener(cloneableTagBean);
           }
         } catch (RuleFormatException e) {
           log.error("findByName() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);

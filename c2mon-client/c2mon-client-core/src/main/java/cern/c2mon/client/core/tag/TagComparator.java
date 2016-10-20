@@ -17,7 +17,6 @@
 package cern.c2mon.client.core.tag;
 
 import cern.c2mon.client.common.tag.Tag;
-import cern.c2mon.client.core.refactoring.CloneableTagBean;
 
 /**
  * Helper class used by {@link ClientDataTagImpl} to 

@@ -25,7 +25,7 @@ import cern.c2mon.client.core.config.mock.RequestHandlerMock;
 import cern.c2mon.client.core.jms.JmsProxy;
 import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.client.core.manager.CoreSupervisionManager;
-import cern.c2mon.client.core.tag.ClientDataTagImpl;
+import cern.c2mon.client.core.tag.CloneableTagBean;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
@@ -132,13 +132,13 @@ public class ClientDataTagCacheImplTest {
   @Test
   public void testUnsubscribeAllDataTags() throws Exception {
     // test setup
-    Set<Long> tagIds = new HashSet<Long>();
+    Set<Long> tagIds = new HashSet<>();
     tagIds.add(1L);
     tagIds.add(2L);
     Collection<TagUpdate> serverUpdates = new ArrayList<TagUpdate>(tagIds.size());
     for (Long tagId : tagIds) {
       serverUpdates.add(createValidTransferTag(tagId));
-      ClientDataTagImpl cdtMock = prepareClientDataTagCreateMock(tagId);
+      CloneableTagBean cdtMock = prepareClientDataTagCreateMock(tagId);
       jmsProxyMock.unregisterUpdateListener(cdtMock);
       supervisionManagerMock.removeSupervisionListener(cdtMock);
     }
@@ -238,15 +238,15 @@ public class ClientDataTagCacheImplTest {
   }
 
 
-  private ClientDataTagImpl prepareClientDataTagCreateMock(final Long tagId) throws RuleFormatException, JMSException {
-    ClientDataTagImpl cdtMock = new ClientDataTagImpl(tagId);
+  private CloneableTagBean prepareClientDataTagCreateMock(final Long tagId) throws RuleFormatException, JMSException {
+    CloneableTagBean cdtMock = new CloneableTagBean(tagId);
     cdtMock.update(createValidTransferTag(tagId));
     // In case of a CommFault- or Status control tag, we don't register to supervision invalidations
-    if (!cdtMock.isControlTag() || cdtMock.isAliveTag()) {
-      supervisionManagerMock.addSupervisionListener(cdtMock, cdtMock.getProcessIds(), cdtMock.getEquipmentIds(), cdtMock.getSubEquipmentIds());
+    if (!cdtMock.getTagBean().isControlTag() || cdtMock.getTagBean().isAliveTag()) {
+      supervisionManagerMock.addSupervisionListener(cdtMock, cdtMock.getTagBean().getProcessIds(), cdtMock.getTagBean().getEquipmentIds(), cdtMock.getTagBean().getSubEquipmentIds());
     }
     EasyMock.expect(jmsProxyMock.isRegisteredListener(cdtMock)).andReturn(false);
-    jmsProxyMock.registerUpdateListener(cdtMock, cdtMock);
+    jmsProxyMock.registerUpdateListener(cdtMock, cdtMock.getTagBean());
 
     return cdtMock;
   }

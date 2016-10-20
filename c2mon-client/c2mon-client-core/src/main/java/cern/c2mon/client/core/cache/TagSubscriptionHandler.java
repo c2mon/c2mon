@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,10 @@ import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
+import cern.c2mon.client.core.tag.CloneableTagBean;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
+import cern.c2mon.client.core.tag.TagBean;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -114,11 +118,11 @@ class TagSubscriptionHandler {
     // Needed if, the initial values shall be sent on the separate #onInitialUpdate() method
     final Map<Long, Tag> initialUpdates = new HashMap<>(subscriptionList.size());
     
-    ClientDataTagImpl cdt = null;
+    CloneableTagBean cdt = null;
     for (Long tagId : subscriptionList) {
       cdt = controller.getActiveCache().get(tagId);
       if (sendInitialUpdateSeperately) {
-        initialUpdates.put(tagId, cdt.clone());
+        initialUpdates.put(tagId, cdt.getTagBean().clone());
       }
     } // end for
  
@@ -131,9 +135,7 @@ class TagSubscriptionHandler {
       }
       
       Collection<ClientDataTagValue> oldFormat = new ArrayList<>(initialUpdates.size());
-      for (Tag value : initialUpdates.values()) {
-        oldFormat.add((ClientDataTagValue) value);
-      }
+      oldFormat.addAll(initialUpdates.values().stream().map(value -> (ClientDataTagValue) value).collect(Collectors.toList()));
       ((DataTagListener) listener).onInitialUpdate(oldFormat);
     }
     else if (sendInitialUpdateSeperately && listener instanceof TagListener) {
@@ -165,11 +167,11 @@ class TagSubscriptionHandler {
     Set<Long> tagsToRemove = new HashSet<Long>();
     controller.getWriteLock().lock();
     try {
-      for (ClientDataTagImpl cdt : controller.getActiveCache().values()) {
+      for (CloneableTagBean cdt : controller.getActiveCache().values()) {
         if (cdt.isUpdateListenerRegistered(listener)) {
           cdt.removeUpdateListener(listener);
           if (!cdt.hasUpdateListeners()) {
-            tagsToRemove.add(cdt.getId());
+            tagsToRemove.add(cdt.getTagBean().getId());
           }
         }
       }
@@ -184,10 +186,10 @@ class TagSubscriptionHandler {
   }
 
   void unsubscribeTags(final Set<Long> dataTagIds, final BaseListener listener) {
-    Set<Long> tagsToRemove = new HashSet<Long>();
+    Set<Long> tagsToRemove = new HashSet<>();
     controller.getWriteLock().lock();
     try {
-      ClientDataTagImpl cdt = null;
+      CloneableTagBean cdt = null;
       for (Long tagId : dataTagIds) {
         cdt = controller.getActiveCache().get(tagId);
         if (cdt != null) {
@@ -217,7 +219,7 @@ class TagSubscriptionHandler {
     if (!tagIds.isEmpty()) {
       listenersLock.readLock().lock();
       try {
-        Set<Long> copyList = new HashSet<Long>(tagIds);
+        Set<Long> copyList = new HashSet<>(tagIds);
         for (TagSubscriptionListener listener : tagSubscriptionListeners) {
           listener.onNewTagSubscriptions(copyList);
         }
