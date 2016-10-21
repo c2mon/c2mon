@@ -310,7 +310,7 @@ public class ClientDataTagImplIsValidUpdateTest {
    */
   public void testCase7() {
 
-    CloneableTagBean clientTagImpl = new CloneableTagBean(TAG_ID);
+    CloneableTagBean cloneableTagBean = new CloneableTagBean(TAG_ID);
 
     TestTagUpdate tagValueUpdate_1 = createTagUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
@@ -322,8 +322,8 @@ public class ClientDataTagImplIsValidUpdateTest {
     tagValueUpdate_2.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setSourceTimestamp(null);
 
-    clientTagImpl.onUpdate(tagValueUpdate_1);
-    final boolean status = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    cloneableTagBean.onUpdate(tagValueUpdate_1);
+    final boolean status = cloneableTagBean.isValidUpdate(tagValueUpdate_2);
 
     assertTrue(status == true);
   }
@@ -334,7 +334,7 @@ public class ClientDataTagImplIsValidUpdateTest {
    */
   public void testCase8() {
 
-    CloneableTagBean clientTagImpl = new CloneableTagBean(TAG_ID);
+    CloneableTagBean cloneableTagBean = new CloneableTagBean(TAG_ID);
 
     TestTagUpdate tagValueUpdate_1 = createTagUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
@@ -346,8 +346,8 @@ public class ClientDataTagImplIsValidUpdateTest {
     tagValueUpdate_2.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setSourceTimestamp(null);
 
-    clientTagImpl.onUpdate(tagValueUpdate_1);
-    final boolean status = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    cloneableTagBean.onUpdate(tagValueUpdate_1);
+    final boolean status = cloneableTagBean.isValidUpdate(tagValueUpdate_2);
 
     assertTrue(status == true);
   }
@@ -359,13 +359,13 @@ public class ClientDataTagImplIsValidUpdateTest {
    */
   public void testCase9() {
 
-    CloneableTagBean clientTagImpl = new CloneableTagBean(TAG_ID);
+    CloneableTagBean cloneableTagBean = new CloneableTagBean(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setSourceTimestamp(null);
-    clientTagImpl.onUpdate(tagValueUpdate_1);
+    cloneableTagBean.onUpdate(tagValueUpdate_1);
 
     /**
      * Result should be the same for both cases a, b that follow.
@@ -376,7 +376,7 @@ public class ClientDataTagImplIsValidUpdateTest {
     tagValueUpdate_2A.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_2A.setSourceTimestamp(CURRENT_TIME);
 
-    final boolean statusA = clientTagImpl.isValidUpdate(tagValueUpdate_2A);
+    final boolean statusA = cloneableTagBean.isValidUpdate(tagValueUpdate_2A);
     assertTrue(statusA == true);
 
     // case b: Update is instance of TagUpdate
@@ -385,7 +385,7 @@ public class ClientDataTagImplIsValidUpdateTest {
     tagValueUpdate_2B.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_2B.setSourceTimestamp(CURRENT_TIME);
 
-    final boolean statusB = clientTagImpl.isValidUpdate(tagValueUpdate_2B);
+    final boolean statusB = cloneableTagBean.isValidUpdate(tagValueUpdate_2B);
     assertTrue(statusB == true);
   }
 

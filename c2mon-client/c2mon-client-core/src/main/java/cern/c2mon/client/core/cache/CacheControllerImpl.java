@@ -165,7 +165,7 @@ class CacheControllerImpl implements CacheController {
     for (Entry<Long, CloneableTagBean> entry : liveCache.entrySet()) {
       liveTag = entry.getValue();
       
-      historyTag.setTagBean(liveTag.getTagBean().clone());
+      historyTag = new CloneableTagBean(liveTag.getTagBean().clone());
       
       listeners = liveTag.getUpdateListeners();
       liveTag.removeAllUpdateListeners();

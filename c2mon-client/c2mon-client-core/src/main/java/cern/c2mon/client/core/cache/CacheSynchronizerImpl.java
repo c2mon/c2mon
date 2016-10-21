@@ -527,7 +527,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
       CloneableTagBean historyTag = null;
       for (Long tagId : historyCacheUpdateList) {
         cdt = liveCache.get(tagId);
-        historyTag.setTagBean(cdt.getTagBean().clone());
+        historyTag = new CloneableTagBean(cdt.getTagBean().clone());
         // Adds the clone (without listeners) to the history cache.
         historyCache.put(tagId, historyTag);
       }

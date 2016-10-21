@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.shared.common.metadata.Metadata;
@@ -100,24 +101,23 @@ public class ClientDataTagImplTest {
     return alarmValue;
   }
 
-
-  private void checkTagValueCopy(final CloneableTagBean original, final CloneableTagBean copy) {
+  private void checkTagValueCopy(final ClientDataTagValue original, final ClientDataTagValue copy) {
     assertNotSame("The two objects should not point to the same reference in memory!", original, copy);
-    assertTrue(original.getTagBean().equals(copy.getTagBean()));
-    assertEquals(original.getTagBean().getServerTimestamp(), copy.getTagBean().getServerTimestamp());
-    assertEquals(original.getTagBean().getTimestamp(), copy.getTagBean().getTimestamp());
-    assertEquals(original.getTagBean().getDescription(), copy.getTagBean().getDescription());
-    assertEquals(original.getTagBean().getDataTagQuality(), copy.getTagBean().getDataTagQuality());
-    assertEquals(original.getTagBean().getId(), copy.getTagBean().getId());
-    assertEquals(original.getTagBean().getName(), copy.getTagBean().getName());
-    assertEquals(original.getTagBean().getRuleExpression(), copy.getTagBean().getRuleExpression());
-    assertEquals(original.getTagBean().getType(), copy.getTagBean().getType());
-    assertEquals(original.getTagBean().getTypeNumeric(), copy.getTagBean().getTypeNumeric());
-    assertEquals(original.getTagBean().getUnit(), copy.getTagBean().getUnit());
-    assertEquals(original.getTagBean().getValue(), copy.getTagBean().getValue());
-    assertEquals(original.getTagBean().getValueDescription(), copy.getTagBean().getValueDescription());
+    assertTrue(original.equals(copy));
+    assertEquals(original.getServerTimestamp(), copy.getServerTimestamp());
+    assertEquals(original.getTimestamp(), copy.getTimestamp());
+    assertEquals(original.getDescription(), copy.getDescription());
+    assertEquals(original.getDataTagQuality(), copy.getDataTagQuality());
+    assertEquals(original.getId(), copy.getId());
+    assertEquals(original.getName(), copy.getName());
+    assertEquals(original.getRuleExpression(), copy.getRuleExpression());
+    assertEquals(original.getType(), copy.getType());
+    assertEquals(original.getTypeNumeric(), copy.getTypeNumeric());
+    assertEquals(original.getUnit(), copy.getUnit());
+    assertEquals(original.getValue(), copy.getValue());
+    assertEquals(original.getValueDescription(), copy.getValueDescription());
     checkMetadataCopy(original.getMetadata(), copy.getMetadata());
-    checkAlarmValueCopy(new ArrayList<>(original.getTagBean().getAlarms()),new ArrayList<>(copy.getTagBean().getAlarms()));
+    checkAlarmValueCopy(new ArrayList<>(original.getAlarms()),new ArrayList<>(copy.getAlarms()));
   }
 
   private void checkAlarmValueCopy(final List<AlarmValue> original, final List<AlarmValue> copy) {
@@ -145,7 +145,7 @@ public class ClientDataTagImplTest {
   }
 
   private void checkTagCopy(final CloneableTagBean original, final CloneableTagBean copy) {
-    checkTagValueCopy(original, copy);
+    checkTagValueCopy(original.getTagBean(), copy.getTagBean());
     if (original.getUpdateListeners().isEmpty()) {
       assertEquals(original.getUpdateListeners().size(), copy.getUpdateListeners().size());
     } else {
@@ -220,34 +220,37 @@ public class ClientDataTagImplTest {
     assertEquals(TypeNumeric.TYPE_UNKNOWN, cdt.getTagBean().getTypeNumeric());
   }
 
-//  @Test
-//  public void testUpdateListenerIntialUpdate() throws CloneNotSupportedException {
-//    //test setup
-//    CloneableTagBean cdt = new CloneableTagBean(1234L);
-//    cdt.onUpdate(createValidTransferTag(1234L));
-//    BaseListener<Tag> mockUpdateListener = EasyMock.createMock(BaseListener.class);
-//    mockUpdateListener.onUpdate(EasyMock.and(EasyMock.not(EasyMock.same(cdt)), EasyMock.eq(cdt)));
-//
-//    //run test
-//    EasyMock.replay(mockUpdateListener);
-//    cdt.addUpdateListener(mockUpdateListener);
-//
-//    //check test success
-//    EasyMock.verify(mockUpdateListener);
-//  }
+  @Test
+  public void testUpdateListenerIntialUpdate() throws CloneNotSupportedException {
+    //test setup
+    CloneableTagBean cdt = new CloneableTagBean(1234L);
+    cdt.onUpdate(createValidTransferTag(1234L));
+    BaseListener<Tag> mockUpdateListener = EasyMock.createMock(BaseListener.class);
+    mockUpdateListener.onUpdate(EasyMock.and(EasyMock.not(EasyMock.same(cdt.getTagBean())), EasyMock.eq(cdt.getTagBean())));
 
-//  @Test
-//  public void testUpdateListener() {
-//    final CloneableTagBean cdt = new CloneableTagBean(1234L);
-//    cdt.addUpdateListener((DataTagUpdateListener) tagUpdate -> {
-//      assertNotNull(tagUpdate);
-//      assertEquals(cdt, tagUpdate);
-//      checkTagValueCopy(cdt, tagUpdate);
-//      assertFalse(cdt == tagUpdate);
-//    });
-//
-//    cdt.onUpdate(createValidTransferTag(1234L));
-//  }
+    //run test
+    EasyMock.replay(mockUpdateListener);
+    cdt.addUpdateListener(mockUpdateListener);
+
+    //check test success
+    EasyMock.verify(mockUpdateListener);
+  }
+
+  @Test
+  public void testUpdateListener() {
+    final CloneableTagBean cdt = new CloneableTagBean(1234L);
+    cdt.addUpdateListener(new DataTagUpdateListener() {
+      @Override
+      public void onUpdate(final ClientDataTagValue tagUpdate) {
+        assertNotNull(tagUpdate);
+        assertEquals(cdt.getTagBean(), tagUpdate);
+        checkTagValueCopy(cdt.getTagBean(), tagUpdate);
+        assertFalse(cdt == tagUpdate);
+      }
+    });
+
+    ((CloneableTagBean) cdt).onUpdate(createValidTransferTag(1234L));
+  }
 
   @Test
   public void testClone() throws Exception {

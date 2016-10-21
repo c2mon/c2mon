@@ -101,16 +101,16 @@ public class ClientDataTagCacheImplTest {
   @Test
   public void testAddDataTagUpdateListener() throws Exception {
     // Test setup
-    Set<Long> tagIds = new HashSet<Long>();
+    Set<Long> tagIds = new HashSet<>();
     tagIds.add(1L);
     tagIds.add(2L);
-    Collection<TagUpdate> serverUpdates = new ArrayList<TagUpdate>(tagIds.size());
+    Collection<TagUpdate> serverUpdates = new ArrayList<>(tagIds.size());
     for (Long tagId : tagIds) {
       serverUpdates.add(createValidTransferTag(tagId));
       prepareClientDataTagCreateMock(tagId);
     }
     EasyMock.expect(requestHandlerMock.requestTags(tagIds)).andReturn(serverUpdates);
-    EasyMock.expect(requestHandlerMock.requestTagValues(tagIds)).andReturn(new ArrayList<TagValueUpdate>(serverUpdates));
+    EasyMock.expect(requestHandlerMock.requestTagValues(tagIds)).andReturn(new ArrayList<>(serverUpdates));
     DataTagUpdateListener listener = EasyMock.createMock(DataTagUpdateListener.class);
 
     // run test
@@ -204,7 +204,7 @@ public class ClientDataTagCacheImplTest {
   @Test
   public void testHistoryMode() throws Exception {
     // Test setup
-    Set<Long> tagIds = new HashSet<Long>();
+    Set<Long> tagIds = new HashSet<>();
     tagIds.add(1L);
     tagIds.add(2L);
     Collection<TagUpdate> serverUpdates = new ArrayList<TagUpdate>(tagIds.size());
