@@ -112,7 +112,7 @@ Braces mostly follow the _Kernighan and Ritchie style_ (a.k.a., "Egyptian bracke
 * Line break after the opening brace
 * Line break before the closing brace
 * Line break after the closing brace if that brace terminates a statement or the body of a method, constructor, or named class
-* Line break before else, catch and finally statements
+* No line break before else, catch and finally statements
 
 Example:
 
@@ -122,12 +122,10 @@ return new MyClass() {
   public void method() {
     if (condition()) {
       something();
-    }
-    else {
+    } else {
       try {
         alternative();
-      }
-      catch (ProblemException ex) {
+      } catch (ProblemException ex) {
         recover();
       }
     }
@@ -209,7 +207,7 @@ private static final ThreadLocal<Executor> executorHolder = new ThreadLocal<Exec
 private static final Set<String> internalAnnotationAttributes = new HashSet<String>();
 ```
 
-### variable names
+### Variable names
 
 Avoid using variable name for a single character. For instance prefer `Method method` to `Method m`.
 
