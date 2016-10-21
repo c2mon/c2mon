@@ -189,8 +189,7 @@ public class ClientRequestReportHandler implements ConfigProgressMonitor {
   @Override
   public void incrementServerProgress(String description) {
     log.debug("incrementServerProgress() : currentPart=" + progressCounter + " Sending Report...");
-    sendProgressReport(TOTAL_OPERATIONS, currentOperation, totalParts, progressCounter.getAndIncrement(),
-        "Applying configuration to Server: " + description);
+    sendProgressReport(TOTAL_OPERATIONS, currentOperation, totalParts, progressCounter.getAndIncrement(), description);
   }
 
   @Override
