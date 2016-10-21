@@ -34,9 +34,10 @@ import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
-import cern.c2mon.client.core.tag.CloneableTagBean;
+import cern.c2mon.client.core.tag.TagController;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
-import cern.c2mon.client.core.tag.TagBean;
+import cern.c2mon.client.core.tag.TagImpl;
+import cern.c2mon.client.core.tag.TagController;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -118,11 +119,11 @@ class TagSubscriptionHandler {
     // Needed if, the initial values shall be sent on the separate #onInitialUpdate() method
     final Map<Long, Tag> initialUpdates = new HashMap<>(subscriptionList.size());
     
-    CloneableTagBean cdt = null;
+    TagController cdt = null;
     for (Long tagId : subscriptionList) {
       cdt = controller.getActiveCache().get(tagId);
       if (sendInitialUpdateSeperately) {
-        initialUpdates.put(tagId, cdt.getTagBean().clone());
+        initialUpdates.put(tagId, cdt.getTagImpl().clone());
       }
     } // end for
  
@@ -167,11 +168,11 @@ class TagSubscriptionHandler {
     Set<Long> tagsToRemove = new HashSet<Long>();
     controller.getWriteLock().lock();
     try {
-      for (CloneableTagBean cdt : controller.getActiveCache().values()) {
+      for (TagController cdt : controller.getActiveCache().values()) {
         if (cdt.isUpdateListenerRegistered(listener)) {
           cdt.removeUpdateListener(listener);
           if (!cdt.hasUpdateListeners()) {
-            tagsToRemove.add(cdt.getTagBean().getId());
+            tagsToRemove.add(cdt.getTagImpl().getId());
           }
         }
       }
@@ -189,7 +190,7 @@ class TagSubscriptionHandler {
     Set<Long> tagsToRemove = new HashSet<>();
     controller.getWriteLock().lock();
     try {
-      CloneableTagBean cdt = null;
+      TagController cdt = null;
       for (Long tagId : dataTagIds) {
         cdt = controller.getActiveCache().get(tagId);
         if (cdt != null) {

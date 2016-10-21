@@ -53,7 +53,7 @@ import cern.c2mon.shared.rule.RuleExpression;
  */
 @Slf4j
 @Data
-public class TagBean implements ClientDataTagValue, Tag, TopicRegistrationDetails, Cloneable {
+public class TagImpl implements ClientDataTagValue, Tag, TopicRegistrationDetails, Cloneable {
 
   /**
    * Unique identifier for a DataTag
@@ -206,7 +206,7 @@ public class TagBean implements ClientDataTagValue, Tag, TopicRegistrationDetail
   /**
    * Protected default constructor that initializes the tag id with -1L
    */
-  protected TagBean() {
+  protected TagImpl() {
     this.id = -1L;
   }
 
@@ -218,7 +218,7 @@ public class TagBean implements ClientDataTagValue, Tag, TopicRegistrationDetail
    *
    * @param tagId the unique identifier for the DataTag
    */
-  public TagBean(final Long tagId) {
+  public TagImpl(final Long tagId) {
     id = tagId;
   }
 
@@ -231,7 +231,7 @@ public class TagBean implements ClientDataTagValue, Tag, TopicRegistrationDetail
    * @param tagId the unique identifier for the DataTag
    * @param If    true, it will set the quality to UNDEFINED_TAG instead of UNINITIALIZED
    */
-  public TagBean(final Long tagId, boolean unknown) {
+  public TagImpl(final Long tagId, boolean unknown) {
     id = tagId;
 
     if (unknown) {
@@ -543,11 +543,11 @@ public class TagBean implements ClientDataTagValue, Tag, TopicRegistrationDetail
    * @see #clean()
    */
   @Override
-  public TagBean clone() {
+  public TagImpl clone() {
     try {
-      TagBean tagBean = (TagBean) super.clone();
+      TagImpl tagImpl = (TagImpl) super.clone();
 
-      return tagBean;
+      return tagImpl;
     }
     catch (CloneNotSupportedException e) {
       log.error("clone() - Cloning the CloneableTagBean object failed! No update send to the client.");
@@ -568,8 +568,8 @@ public class TagBean implements ClientDataTagValue, Tag, TopicRegistrationDetail
    */
   @Override
   public boolean equals(Object pRight) {
-    if (pRight instanceof TagBean) {
-      if (this.id.equals(((TagBean) pRight).id)) {
+    if (pRight instanceof TagImpl) {
+      if (this.id.equals(((TagImpl) pRight).id)) {
         return true;
       }
     }
@@ -619,15 +619,15 @@ public class TagBean implements ClientDataTagValue, Tag, TopicRegistrationDetail
    * @throws Exception In case of a parsing error or a wrong XML definition
    * @see #getXml()
    */
-  public static TagBean fromXml(final String xml) throws Exception {
+  public static TagImpl fromXml(final String xml) throws Exception {
 
-    TagBean cdt = null;
+    TagImpl cdt = null;
     StringReader sr = null;
     Serializer serializer = new Persister(new AnnotationStrategy());
 
     try {
       sr = new StringReader(xml);
-      cdt = serializer.read(TagBean.class, new StringReader(xml), false);
+      cdt = serializer.read(TagImpl.class, new StringReader(xml), false);
     } finally {
 
       if (sr != null) {

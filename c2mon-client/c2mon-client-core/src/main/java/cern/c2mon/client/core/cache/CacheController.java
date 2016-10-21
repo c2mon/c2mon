@@ -20,8 +20,9 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import cern.c2mon.client.core.tag.CloneableTagBean;
-import cern.c2mon.client.core.tag.TagBean;
+import cern.c2mon.client.core.tag.TagController;
+import cern.c2mon.client.core.tag.TagImpl;
+import cern.c2mon.client.core.tag.TagController;
 
 /**
  * This interface describes the methods which are provided by the internal
@@ -37,17 +38,17 @@ interface CacheController {
    * @return The current active cache reference, which is either the 
    *         live cache or the history cache.
    */
-  Map<Long, CloneableTagBean> getActiveCache();
+  Map<Long, TagController> getActiveCache();
   
   /**
    * @return The live cache reference
    */
-  Map<Long, CloneableTagBean> getLiveCache();
+  Map<Long, TagController> getLiveCache();
   
   /**
    * @return The history cache reference
    */
-  Map<Long, CloneableTagBean> getHistoryCache();
+  Map<Long, TagController> getHistoryCache();
   
   /**
    * @return <code>true</code>, if the history mode of the cache is enabled 

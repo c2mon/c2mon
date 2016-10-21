@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Configuration;
 public class ClientDataTagConfig {
 
   @Bean
-  public TagBean doUpdates() {
+  public TagImpl doUpdates() {
     return null;
   }
 }

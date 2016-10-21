@@ -49,9 +49,9 @@ import cern.c2mon.shared.rule.RuleFormatException;
  */
 @Data
 @Slf4j
-public class CloneableTagBean implements TagUpdateListener, SupervisionListener {
+public class TagController implements TagUpdateListener, SupervisionListener {
 
-  private TagBean tagBean;
+  private TagImpl tagImpl;
 
   /**
    * Lock to prevent more than one thread at a time to update the value
@@ -69,31 +69,31 @@ public class CloneableTagBean implements TagUpdateListener, SupervisionListener 
    */
   private Map<String, Object> metadata = new HashMap<>();
 
-  public CloneableTagBean() {
-    this.tagBean = new TagBean();
+  public TagController() {
+    this.tagImpl = new TagImpl();
   }
 
-  public CloneableTagBean(long id) {
-    this.tagBean = new TagBean(id);
+  public TagController(long id) {
+    this.tagImpl = new TagImpl(id);
   }
 
-  public CloneableTagBean(long id, boolean unknown) {
-    this.tagBean = new TagBean(id);
+  public TagController(long id, boolean unknown) {
+    this.tagImpl = new TagImpl(id);
 
     if (unknown) {
-      this.tagBean.setUnknown();
+      this.tagImpl.setUnknown();
     }
   }
 
-  public CloneableTagBean(TagBean tagBean) {
-    this.tagBean = tagBean;
+  public TagController(TagImpl tagImpl) {
+    this.tagImpl = tagImpl;
   }
 
   @org.simpleframework.xml.core.Persist
   public void prepare() {
 
-    if(getTagBean().getRuleExpression() != null)
-      this.getTagBean().setRuleExpressionString(getTagBean().getRuleExpression().getExpression());
+    if(this.getTagImpl().getRuleExpression() != null)
+      this.getTagImpl().setRuleExpressionString(this.getTagImpl().getRuleExpression().getExpression());
   }
 
   @Override
@@ -116,7 +116,7 @@ public class CloneableTagBean implements TagUpdateListener, SupervisionListener 
       return;
     }
     // In case of a CommFault- or Status control tag, we ignore supervision events
-    if (tagBean.isControlTag() && !tagBean.isAliveTag()) {
+    if (tagImpl.isControlTag() && !tagImpl.isAliveTag()) {
       return;
     }
 
@@ -125,23 +125,23 @@ public class CloneableTagBean implements TagUpdateListener, SupervisionListener 
     updateTagLock.writeLock().lock();
     try {
       boolean validUpdate = false;
-      validUpdate |= tagBean.getEquipmentSupervisionStatus().containsKey(supervisionEvent.getEntityId());
-      validUpdate |= tagBean.getSubEquipmentSupervisionStatus().containsKey(supervisionEvent.getEntityId());
-      validUpdate |= tagBean.getProcessSupervisionStatus().containsKey(supervisionEvent.getEntityId());
+      validUpdate |= tagImpl.getEquipmentSupervisionStatus().containsKey(supervisionEvent.getEntityId());
+      validUpdate |= tagImpl.getSubEquipmentSupervisionStatus().containsKey(supervisionEvent.getEntityId());
+      validUpdate |= tagImpl.getProcessSupervisionStatus().containsKey(supervisionEvent.getEntityId());
 
       if (validUpdate) {
         SupervisionEvent oldEvent;
         switch (supervisionEvent.getEntity()) {
           case PROCESS:
-            oldEvent = tagBean.getProcessSupervisionStatus().put(supervisionEvent.getEntityId(), supervisionEvent);
+            oldEvent = tagImpl.getProcessSupervisionStatus().put(supervisionEvent.getEntityId(), supervisionEvent);
             updateProcessStatus();
             break;
           case EQUIPMENT:
-            oldEvent = tagBean.getEquipmentSupervisionStatus().put(supervisionEvent.getEntityId(), supervisionEvent);
+            oldEvent = tagImpl.getEquipmentSupervisionStatus().put(supervisionEvent.getEntityId(), supervisionEvent);
             updateEquipmentStatus();
             break;
           case SUBEQUIPMENT:
-            oldEvent = tagBean.getSubEquipmentSupervisionStatus().put(supervisionEvent.getEntityId(), supervisionEvent);
+            oldEvent = tagImpl.getSubEquipmentSupervisionStatus().put(supervisionEvent.getEntityId(), supervisionEvent);
             updateSubEquipmentStatus();
             break;
           default:
@@ -152,7 +152,7 @@ public class CloneableTagBean implements TagUpdateListener, SupervisionListener 
 
         if (oldEvent == null || !supervisionEvent.equals(oldEvent)) {
           // Notify all listeners of the update
-          clone = tagBean.clone();
+          clone = tagImpl.clone();
         }
       }
     } finally {
@@ -171,15 +171,15 @@ public class CloneableTagBean implements TagUpdateListener, SupervisionListener 
   private void updateProcessStatus() {
     boolean down = false;
     StringBuilder invalidationMessage = new StringBuilder();
-    for (SupervisionEvent event : tagBean.getProcessSupervisionStatus().values()) {
+    for (SupervisionEvent event : tagImpl.getProcessSupervisionStatus().values()) {
       this.invalidateMessage(invalidationMessage, event);
     }
 
     if (down) {
-      tagBean.getDataTagQuality().addInvalidStatus(TagQualityStatus.PROCESS_DOWN, invalidationMessage.toString());
+      tagImpl.getDataTagQuality().addInvalidStatus(TagQualityStatus.PROCESS_DOWN, invalidationMessage.toString());
     }
     else {
-      tagBean.getDataTagQuality().removeInvalidStatus(TagQualityStatus.PROCESS_DOWN);
+      tagImpl.getDataTagQuality().removeInvalidStatus(TagQualityStatus.PROCESS_DOWN);
     }
   }
 
@@ -190,15 +190,15 @@ public class CloneableTagBean implements TagUpdateListener, SupervisionListener 
   private void updateEquipmentStatus() {
     boolean down = false;
     StringBuilder invalidationMessage = new StringBuilder();
-    for (SupervisionEvent event : tagBean.getEquipmentSupervisionStatus().values()) {
+    for (SupervisionEvent event : tagImpl.getEquipmentSupervisionStatus().values()) {
       this.invalidateMessage(invalidationMessage, event);
     }
 
     if (down) {
-      tagBean.getDataTagQuality().addInvalidStatus(TagQualityStatus.EQUIPMENT_DOWN, invalidationMessage.toString());
+      tagImpl.getDataTagQuality().addInvalidStatus(TagQualityStatus.EQUIPMENT_DOWN, invalidationMessage.toString());
     }
     else {
-      tagBean.getDataTagQuality().removeInvalidStatus(TagQualityStatus.EQUIPMENT_DOWN);
+      tagImpl.getDataTagQuality().removeInvalidStatus(TagQualityStatus.EQUIPMENT_DOWN);
     }
   }
 
@@ -208,15 +208,15 @@ public class CloneableTagBean implements TagUpdateListener, SupervisionListener 
    */
   private void updateSubEquipmentStatus() {
     StringBuilder invalidationMessage = new StringBuilder();
-    for (SupervisionEvent event : tagBean.getSubEquipmentSupervisionStatus().values()) {
+    for (SupervisionEvent event : tagImpl.getSubEquipmentSupervisionStatus().values()) {
       this.invalidateMessage(invalidationMessage, event);
     }
 
     if (invalidationMessage.length() == 0) {
-      tagBean.getDataTagQuality().addInvalidStatus(TagQualityStatus.SUBEQUIPMENT_DOWN, invalidationMessage.toString());
+      tagImpl.getDataTagQuality().addInvalidStatus(TagQualityStatus.SUBEQUIPMENT_DOWN, invalidationMessage.toString());
     }
     else {
-      tagBean.getDataTagQuality().removeInvalidStatus(TagQualityStatus.SUBEQUIPMENT_DOWN);
+      tagImpl.getDataTagQuality().removeInvalidStatus(TagQualityStatus.SUBEQUIPMENT_DOWN);
     }
   }
 
@@ -280,7 +280,7 @@ public class CloneableTagBean implements TagUpdateListener, SupervisionListener 
       if (valid) {
         doUpdateValues(tagValueUpdate);
         // Notify all listeners of the update
-        clone = tagBean.clone();
+        clone = tagImpl.clone();
       }
     } finally {
       updateTagLock.writeLock().unlock();
@@ -321,7 +321,7 @@ public class CloneableTagBean implements TagUpdateListener, SupervisionListener 
 
       if (valid) {
         if (tagUpdate.getRuleExpression() != null) {
-          tagBean.setRuleExpression(RuleExpression.createExpression(tagUpdate.getRuleExpression()));
+          tagImpl.setRuleExpression(RuleExpression.createExpression(tagUpdate.getRuleExpression()));
         }
 
         doUpdateValues(tagUpdate);
@@ -329,34 +329,34 @@ public class CloneableTagBean implements TagUpdateListener, SupervisionListener 
         // update process map
         Map<Long, SupervisionEvent> updatedProcessMap = new HashMap<>();
         for (Long processId : tagUpdate.getProcessIds()) {
-          updatedProcessMap.put(processId, tagBean.getProcessSupervisionStatus().get(processId));
+          updatedProcessMap.put(processId, tagImpl.getProcessSupervisionStatus().get(processId));
         }
-        tagBean.setProcessSupervisionStatus(updatedProcessMap);
+        tagImpl.setProcessSupervisionStatus(updatedProcessMap);
 
         // update equipment map
         Map<Long, SupervisionEvent> updatedEquipmentMap = new HashMap<>();
         for (Long equipmentId : tagUpdate.getEquipmentIds()) {
-          updatedEquipmentMap.put(equipmentId, tagBean.getEquipmentSupervisionStatus().get(equipmentId));
+          updatedEquipmentMap.put(equipmentId, tagImpl.getEquipmentSupervisionStatus().get(equipmentId));
         }
-        tagBean.setEquipmentSupervisionStatus(updatedEquipmentMap);
+        tagImpl.setEquipmentSupervisionStatus(updatedEquipmentMap);
 
         // update sub equipment map
         Map<Long, SupervisionEvent> updatedSubEquipmentMap = new HashMap<>();
         for (Long subEquipmentId : tagUpdate.getSubEquipmentIds()) {
-          updatedSubEquipmentMap.put(subEquipmentId, tagBean.getSubEquipmentSupervisionStatus().get(subEquipmentId));
+          updatedSubEquipmentMap.put(subEquipmentId, tagImpl.getSubEquipmentSupervisionStatus().get(subEquipmentId));
         }
-        tagBean.setSubEquipmentSupervisionStatus(updatedSubEquipmentMap);
+        tagImpl.setSubEquipmentSupervisionStatus(updatedSubEquipmentMap);
 
-        tagBean.setTagName(tagUpdate.getName());
-        tagBean.setTopicName(tagUpdate.getTopicName());
-        tagBean.setUnit(tagUpdate.getUnit());
+        tagImpl.setTagName(tagUpdate.getName());
+        tagImpl.setTopicName(tagUpdate.getTopicName());
+        tagImpl.setUnit(tagUpdate.getUnit());
 
-        tagBean.aliveTagFlag = tagUpdate.isAliveTag();
-        tagBean.controlTagFlag = tagUpdate.isControlTag();
+        tagImpl.aliveTagFlag = tagUpdate.isAliveTag();
+        tagImpl.controlTagFlag = tagUpdate.isControlTag();
         this.metadata = tagUpdate.getMetadata();
 
         // Notify all listeners of the update
-        clone = tagBean.clone();
+        clone = tagImpl.clone();
       }
     } finally {
       updateTagLock.writeLock().unlock();
@@ -379,17 +379,17 @@ public class CloneableTagBean implements TagUpdateListener, SupervisionListener 
   private void doUpdateValues(final TagValueUpdate tagValueUpdate) {
     updateTagQuality(tagValueUpdate.getDataTagQuality());
 
-    tagBean.getAlarms().clear();
-    tagBean.getAlarms().addAll(tagValueUpdate.getAlarms());
+    tagImpl.getAlarms().clear();
+    tagImpl.getAlarms().addAll(tagValueUpdate.getAlarms());
 
-    tagBean.setDescription(tagValueUpdate.getDescription());
-    tagBean.setValueDescription(tagValueUpdate.getValueDescription());
-    tagBean.setServerTimestamp(tagValueUpdate.getServerTimestamp());
-    tagBean.setDaqTimestamp(tagValueUpdate.getDaqTimestamp());
-    tagBean.setSourceTimestamp(tagValueUpdate.getSourceTimestamp());
-    tagBean.setTagValue(tagValueUpdate.getValue());
-    tagBean.setMode(tagValueUpdate.getMode());
-    tagBean.setSimulated(tagValueUpdate.isSimulated());
+    tagImpl.setDescription(tagValueUpdate.getDescription());
+    tagImpl.setValueDescription(tagValueUpdate.getValueDescription());
+    tagImpl.setServerTimestamp(tagValueUpdate.getServerTimestamp());
+    tagImpl.setDaqTimestamp(tagValueUpdate.getDaqTimestamp());
+    tagImpl.setSourceTimestamp(tagValueUpdate.getSourceTimestamp());
+    tagImpl.setTagValue(tagValueUpdate.getValue());
+    tagImpl.setMode(tagValueUpdate.getMode());
+    tagImpl.setSimulated(tagValueUpdate.isSimulated());
   }
 
   /**
@@ -399,22 +399,22 @@ public class CloneableTagBean implements TagUpdateListener, SupervisionListener 
    * @param qualityUpdate The tag quality update
    */
   private void updateTagQuality(final DataTagQuality qualityUpdate) {
-    if (!tagBean.getDataTagQuality().isAccessible()) {
-      Map<TagQualityStatus, String> oldQualityStates = tagBean.getDataTagQuality().getInvalidQualityStates();
-      tagBean.getDataTagQuality().setInvalidStates(qualityUpdate.getInvalidQualityStates());
+    if (!tagImpl.getDataTagQuality().isAccessible()) {
+      Map<TagQualityStatus, String> oldQualityStates = tagImpl.getDataTagQuality().getInvalidQualityStates();
+      tagImpl.getDataTagQuality().setInvalidStates(qualityUpdate.getInvalidQualityStates());
 
       if (oldQualityStates.containsKey(TagQualityStatus.PROCESS_DOWN)) {
-        tagBean.getDataTagQuality().addInvalidStatus(TagQualityStatus.PROCESS_DOWN, oldQualityStates.get(TagQualityStatus.PROCESS_DOWN));
+        tagImpl.getDataTagQuality().addInvalidStatus(TagQualityStatus.PROCESS_DOWN, oldQualityStates.get(TagQualityStatus.PROCESS_DOWN));
       }
       else if (oldQualityStates.containsKey(TagQualityStatus.EQUIPMENT_DOWN)) {
-        tagBean.getDataTagQuality().addInvalidStatus(TagQualityStatus.EQUIPMENT_DOWN, oldQualityStates.get(TagQualityStatus.EQUIPMENT_DOWN));
+        tagImpl.getDataTagQuality().addInvalidStatus(TagQualityStatus.EQUIPMENT_DOWN, oldQualityStates.get(TagQualityStatus.EQUIPMENT_DOWN));
       }
       else if (oldQualityStates.containsKey(TagQualityStatus.SUBEQUIPMENT_DOWN)) {
-        tagBean.getDataTagQuality().addInvalidStatus(TagQualityStatus.SUBEQUIPMENT_DOWN, oldQualityStates.get(TagQualityStatus.SUBEQUIPMENT_DOWN));
+        tagImpl.getDataTagQuality().addInvalidStatus(TagQualityStatus.SUBEQUIPMENT_DOWN, oldQualityStates.get(TagQualityStatus.SUBEQUIPMENT_DOWN));
       }
     }
     else {
-      tagBean.getDataTagQuality().setInvalidStates(qualityUpdate.getInvalidQualityStates());
+      tagImpl.getDataTagQuality().setInvalidStates(qualityUpdate.getInvalidQualityStates());
     }
   }
 
@@ -448,7 +448,7 @@ public class CloneableTagBean implements TagUpdateListener, SupervisionListener 
 
       // Check server cache timestamp
       final long newServerTime = tagValueUpdate.getServerTimestamp().getTime();
-      final long oldServerTime = tagBean.getServerTimestamp().getTime();
+      final long oldServerTime = tagImpl.getServerTimestamp().getTime();
 
       if (newServerTime > oldServerTime) {
         return true;
@@ -459,28 +459,28 @@ public class CloneableTagBean implements TagUpdateListener, SupervisionListener 
       if (newServerTime == oldServerTime && tagValueUpdate.getDaqTimestamp() != null) {
         final long newDaqTime = tagValueUpdate.getDaqTimestamp().getTime();
 
-        if (tagBean.getDaqTimestamp() == null) { // old DAQ timestamp is not set
+        if (tagImpl.getDaqTimestamp() == null) { // old DAQ timestamp is not set
           return true;
         }
 
-        final long oldDaqTime = tagBean.getDaqTimestamp().getTime();
+        final long oldDaqTime = tagImpl.getDaqTimestamp().getTime();
         if (newDaqTime > oldDaqTime) {
           return true;
         }
         else if (newDaqTime == oldDaqTime && tagValueUpdate.getSourceTimestamp() != null) {
           final long newSourceTime = tagValueUpdate.getSourceTimestamp().getTime();
 
-          if (tagBean.getTimestamp() == null) { // old source timestamp is not set
+          if (tagImpl.getTimestamp() == null) { // old source timestamp is not set
             return true;
           }
 
-          final long oldSourceTime = tagBean.getTimestamp().getTime();
+          final long oldSourceTime = tagImpl.getTimestamp().getTime();
           if (tagValueUpdate instanceof TagUpdate || newSourceTime != oldSourceTime) {
             // We basically allow non-continuous source timestamps
             return true;
           }
         }
-        else if (tagValueUpdate instanceof TagUpdate && newDaqTime == oldDaqTime && tagBean.getTimestamp() == null) {
+        else if (tagValueUpdate instanceof TagUpdate && newDaqTime == oldDaqTime && tagImpl.getTimestamp() == null) {
           // This means we accept a TagUpdate also when server & DAQ time are equals
           // but both source timestamps are not set
           return true;
@@ -525,15 +525,15 @@ public class CloneableTagBean implements TagUpdateListener, SupervisionListener 
     this.getListeners().add(listener);
 
     Tag clone = null;
-    this.getTagBean().getUpdateTagLock().readLock().lock();
+    this.getTagImpl().getUpdateTagLock().readLock().lock();
     try {
-      boolean sendInitialUpdate = !TagComparator.compare(this.getTagBean(), initialValue);
+      boolean sendInitialUpdate = !TagComparator.compare(this.getTagImpl(), initialValue);
 
       if (sendInitialUpdate) {
-        clone = this.getTagBean().clone();
+        clone = this.getTagImpl().clone();
       }
     } finally {
-      this.getTagBean().getUpdateTagLock().readLock().unlock();
+      this.getTagImpl().getUpdateTagLock().readLock().unlock();
     }
 
     if (clone != null) {
@@ -649,15 +649,15 @@ public class CloneableTagBean implements TagUpdateListener, SupervisionListener 
     getUpdateTagLock().writeLock().lock();
     try {
       if (log.isTraceEnabled()) {
-        log.trace("validate() - Removing " + statusToRemove + " quality status from tag " + getTagBean().getId());
+        log.trace("validate() - Removing " + statusToRemove + " quality status from tag " + this.getTagImpl().getId());
       }
-      if (getTagBean().getDataTagQuality().isInvalidStatusSet(statusToRemove)) {
+      if (this.getTagImpl().getDataTagQuality().isInvalidStatusSet(statusToRemove)) {
         // remove the quality status
-        getTagBean().getDataTagQuality().removeInvalidStatus(statusToRemove);
-        clone = getTagBean().clone();
+        this.getTagImpl().getDataTagQuality().removeInvalidStatus(statusToRemove);
+        clone = this.getTagImpl().clone();
       }
     } finally {
-      getTagBean().getUpdateTagLock().writeLock().unlock();
+      this.getTagImpl().getUpdateTagLock().writeLock().unlock();
     }
 
     if (clone != null) {
@@ -675,18 +675,18 @@ public class CloneableTagBean implements TagUpdateListener, SupervisionListener 
    * @param description the quality description
    */
   public void invalidate(final TagQualityStatus status, final String description) {
-    TagBean clone = null;
-    getTagBean().getUpdateTagLock().writeLock().lock();
+    TagImpl clone = null;
+    this.getTagImpl().getUpdateTagLock().writeLock().lock();
     try {
       if (log.isTraceEnabled()) {
-        log.trace("invalidate() - Invalidating tag " + getTagBean().getId() + " with quality status " + status);
+        log.trace("invalidate() - Invalidating tag " + this.getTagImpl().getId() + " with quality status " + status);
       }
       // Invalidate the object.
-      getTagBean().getDataTagQuality().addInvalidStatus(status, description);
+      this.getTagImpl().getDataTagQuality().addInvalidStatus(status, description);
 
-      clone = getTagBean().clone();
+      clone = this.getTagImpl().clone();
     } finally {
-      getTagBean().getUpdateTagLock().writeLock().unlock();
+      this.getTagImpl().getUpdateTagLock().writeLock().unlock();
     }
 
     if (clone != null) {
@@ -702,21 +702,21 @@ public class CloneableTagBean implements TagUpdateListener, SupervisionListener 
   public void clean() {
     updateTagLock.writeLock().lock();
     try {
-      tagBean.getAlarms().clear();
-      tagBean.setDescription(tagBean.DEFAULT_DESCRIPTION);
-      tagBean.getDataTagQuality().setInvalidStatus(TagQualityStatus.UNINITIALISED, tagBean.DEFAULT_DESCRIPTION);
-      tagBean.setServerTimestamp(new Timestamp(0L));
-      tagBean.setDaqTimestamp(null);
-      tagBean.setSourceTimestamp(null);
-      tagBean.setTagValue(null);
-      for (Long id : tagBean.getProcessSupervisionStatus().keySet()) {
-        tagBean.getProcessSupervisionStatus().put(id, null);
+      tagImpl.getAlarms().clear();
+      tagImpl.setDescription(tagImpl.DEFAULT_DESCRIPTION);
+      tagImpl.getDataTagQuality().setInvalidStatus(TagQualityStatus.UNINITIALISED, tagImpl.DEFAULT_DESCRIPTION);
+      tagImpl.setServerTimestamp(new Timestamp(0L));
+      tagImpl.setDaqTimestamp(null);
+      tagImpl.setSourceTimestamp(null);
+      tagImpl.setTagValue(null);
+      for (Long id : tagImpl.getProcessSupervisionStatus().keySet()) {
+        tagImpl.getProcessSupervisionStatus().put(id, null);
       }
-      for (Long id : tagBean.getEquipmentSupervisionStatus().keySet()) {
-        tagBean.getEquipmentSupervisionStatus().put(id, null);
+      for (Long id : tagImpl.getEquipmentSupervisionStatus().keySet()) {
+        tagImpl.getEquipmentSupervisionStatus().put(id, null);
       }
-      for (Long id : tagBean.getSubEquipmentSupervisionStatus().keySet()) {
-        tagBean.getSubEquipmentSupervisionStatus().put(id, null);
+      for (Long id : tagImpl.getSubEquipmentSupervisionStatus().keySet()) {
+        tagImpl.getSubEquipmentSupervisionStatus().put(id, null);
       }
     } finally {
       updateTagLock.writeLock().unlock();

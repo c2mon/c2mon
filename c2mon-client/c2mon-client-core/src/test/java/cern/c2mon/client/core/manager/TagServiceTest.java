@@ -50,7 +50,7 @@ import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.jms.JmsProxy;
 import cern.c2mon.client.core.jms.RequestHandler;
-import cern.c2mon.client.core.tag.CloneableTagBean;
+import cern.c2mon.client.core.tag.TagController;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
@@ -281,7 +281,7 @@ public class TagServiceTest {
     Set<Long> tagId = new HashSet<>();
     tagId.add(1L);
     EasyMock.expect(requestHandlerMock.requestTags(tagId)).andReturn(new ArrayList<>(0));
-    CloneableTagBean cdt = new CloneableTagBean(1L, true);
+    TagController cdt = new TagController(1L, true);
     EasyMock.expect(jmsProxyMock.isRegisteredListener(cdt)).andReturn(false);
     EasyMock.replay(requestHandlerMock, jmsProxyMock);
 
@@ -355,9 +355,9 @@ public class TagServiceTest {
 
     EasyMock.expect(requestHandlerMock.requestTags(tagIds)).andReturn(serverUpdates);
     for (Long tagId : tagIds) {
-      CloneableTagBean cdt = new CloneableTagBean(tagId);
+      TagController cdt = new TagController(tagId);
       EasyMock.expect(jmsProxyMock.isRegisteredListener(cdt)).andReturn(false);
-      jmsProxyMock.registerUpdateListener(cdt, cdt.getTagBean());
+      jmsProxyMock.registerUpdateListener(cdt, cdt.getTagImpl());
     }
     EasyMock.expect(requestHandlerMock.requestTagValues(tagIds)).andReturn(serverUpdateValues);
   }

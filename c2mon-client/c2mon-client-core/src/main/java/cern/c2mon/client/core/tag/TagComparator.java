@@ -40,7 +40,7 @@ class TagComparator {
     if (tag1 == null || tag2 == null) {
       return false;
     }
-    if (!(tag2 instanceof CloneableTagBean)) {
+    if (!(tag2 instanceof TagController)) {
       return false;
     }
 

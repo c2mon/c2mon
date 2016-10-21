@@ -30,7 +30,8 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
-import cern.c2mon.client.core.tag.CloneableTagBean;
+import cern.c2mon.client.core.tag.TagController;
+import cern.c2mon.client.core.tag.TagController;
 
 @Service
 class CacheControllerImpl implements CacheController {
@@ -40,7 +41,7 @@ class CacheControllerImpl implements CacheController {
   /**
    * Pointer to the actual used cache instance (live or history)
    */
-  private Map<Long, CloneableTagBean> activeCache = null;
+  private Map<Long, TagController> activeCache = null;
   
   /** Thread synchronization lock for avoiding a cache mode switch */ 
   private final Object historyModeLock = new Object();
@@ -49,13 +50,13 @@ class CacheControllerImpl implements CacheController {
    * <code>Map</code> containing all subscribed data tags which are updated via the
    * <code>JmsProxy</code>
    */
-  private final Map<Long, CloneableTagBean> liveCache = new Hashtable<>(1500);
+  private final Map<Long, TagController> liveCache = new Hashtable<>(1500);
   
   /** 
    * <code>Map</code> containing all subscribed data tags which are updated via the
    * <code>HistoryManager</code>
    */
-  private final Map<Long, CloneableTagBean> historyCache = new Hashtable<>(1500);
+  private final Map<Long, TagController> historyCache = new Hashtable<>(1500);
   
   /**
    * Flag to remember whether the cache is in history mode or not
@@ -73,17 +74,17 @@ class CacheControllerImpl implements CacheController {
   }
   
   @Override
-  public Map<Long, CloneableTagBean> getActiveCache() {
+  public Map<Long, TagController> getActiveCache() {
     return activeCache;
   }
   
   @Override
-  public Map<Long, CloneableTagBean> getHistoryCache() {
+  public Map<Long, TagController> getHistoryCache() {
     return historyCache;
   }
   
   @Override
-  public Map<Long, CloneableTagBean> getLiveCache() {
+  public Map<Long, TagController> getLiveCache() {
     return liveCache;
   }
   
@@ -137,10 +138,10 @@ class CacheControllerImpl implements CacheController {
    * listeners back to the live cache instance.
    */
   private void disableHistoryMode() {
-    CloneableTagBean historyTag = null;
+    TagController historyTag = null;
     Collection<BaseListener> listeners = null;
     
-    for (Entry<Long, CloneableTagBean> entry : historyCache.entrySet()) {
+    for (Entry<Long, TagController> entry : historyCache.entrySet()) {
       historyTag = entry.getValue();
       listeners = historyTag.getUpdateListeners();
       
@@ -158,14 +159,14 @@ class CacheControllerImpl implements CacheController {
    */
   private void enableHistoryMode() {
     historyCache.clear();
-    CloneableTagBean liveTag = null;
-    CloneableTagBean historyTag = null;
+    TagController liveTag = null;
+    TagController historyTag = null;
     Collection<BaseListener> listeners = null;
     
-    for (Entry<Long, CloneableTagBean> entry : liveCache.entrySet()) {
+    for (Entry<Long, TagController> entry : liveCache.entrySet()) {
       liveTag = entry.getValue();
       
-      historyTag = new CloneableTagBean(liveTag.getTagBean().clone());
+      historyTag = new TagController(liveTag.getTagImpl().clone());
       
       listeners = liveTag.getUpdateListeners();
       liveTag.removeAllUpdateListeners();

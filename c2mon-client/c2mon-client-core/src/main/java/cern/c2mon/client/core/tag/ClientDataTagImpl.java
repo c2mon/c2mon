@@ -594,7 +594,7 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
 >>>>>>> e749719... Adjust code to Java 8, issue: #53
 
   @Getter
-  private CloneableTagBean cloneableTagBean;
+  private TagController tagController;
   /**
    * Default description when the object is not yet initialized
    */
@@ -1073,7 +1073,11 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
   @SuppressWarnings("unchecked")
   @Override
 <<<<<<< HEAD
+<<<<<<< HEAD
   public TagBean clone() {
+=======
+  public TagImpl clone() {
+>>>>>>> ad2a26f... Rename TagBean and CloneableTagBean, issue: #53
 //    getCloneableTagBean().getUpdateTagLock().readLock().lock();
 //    try {
 //      ClientDataTagImpl clone = (ClientDataTagImpl) super.clone();
@@ -1154,6 +1158,7 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
 //      updateTagLock.readLock().unlock();
 //    }
 
+<<<<<<< HEAD
     return cloneableTagBean.getTagBean().clone();
 =======
   public ClientDataTagImpl clone() {
@@ -1413,5 +1418,8 @@ public class ClientDataTagImpl implements Tag, ClientDataTagValue, TagUpdateList
   public String toString() {
       return this.getXml();
 >>>>>>> e749719... Adjust code to Java 8, issue: #53
+=======
+    return tagController.getTagImpl().clone();
+>>>>>>> ad2a26f... Rename TagBean and CloneableTagBean, issue: #53
   }
 }
