@@ -481,7 +481,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         report.setStatusDescription("Failure: see details below.");
       }
       if (configProgressMonitor != null){
-        configProgressMonitor.incrementServerProgress(element.getAction().name() +" " +element.getEntity().name());
+        configProgressMonitor.incrementServerProgress(element.buildDescription());
       }
     } else {
       log.info(configId + " Interrupting configuration due to cancel request.");
@@ -514,11 +514,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         elementReport.setFailure("Parameter missing in configuration line with sequence id " + element.getSequenceId());
         return null;
       }
-
-//    String fieldName = element.getEntity().toString().toLowerCase() + "ConfigHandler";
-//    Object configHandler = this.getClass().getField(fieldName).get(this);
-//    Method createMethod = configHandler.getClass().getMethod("create" + element.getEntity().toString().toLowerCase(), parameterTypes)
-
       switch (element.getAction()) {
       case CREATE :
         switch (element.getEntity()) {
