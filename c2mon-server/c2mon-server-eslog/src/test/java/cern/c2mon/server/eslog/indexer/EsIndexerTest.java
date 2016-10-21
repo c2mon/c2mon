@@ -298,9 +298,9 @@ public class EsIndexerTest {
   @Test
   public void testRetrieveIndexFormat() {
     long millis = 123456789;
-    String expectedMonth = indexer.millisecondsToYearMonth(millis);
-    String expectedWeek = indexer.millisecondsToYearWeek(millis);
-    String expectedDay = indexer.millisecondsToYearMonthDay(millis);
+    String expectedMonth = indexer.millisecondsToYearMonth(millis).toLowerCase();
+    String expectedWeek = indexer.millisecondsToYearWeek(millis).toLowerCase();
+    String expectedDay = indexer.millisecondsToYearMonthDay(millis).toLowerCase();
 
     indexer.setIndexFormat("M");
     String monthIndex = indexer.generateTagIndex(millis);
