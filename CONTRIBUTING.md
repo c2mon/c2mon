@@ -36,13 +36,15 @@ Please submit all pull requests to master, even bug fixes and minor improvements
 
 ### Use short branch names
 
-Branches used when submitting pull requests should preferably be named
-according to issues, e.g. 'issue-123'. Otherwise, use succinct, lower-case,
-dash (-) delimited names, such as 'fix-warnings', 'fix-typo', etc.
+Branches used when submitting pull requests should preferably be named using
+succinct, lower-case, dash (-) delimited names, such as 'fix-warnings',
+'fix-typo', etc. Otherwise, name the branch according to the issue number,
+e.g. 'issue-123'.
 
-## Use C2MON Code Style
 
-The complete [C2MON Code Style][] reference will soon be available, but for the
+## Use the C2MON code style
+
+Please read the [C2MON code style guide][] for full details, but for the
 meantime, here's a quick summary:
 
 ### Mind the whitespace
@@ -62,7 +64,7 @@ present in the framework.
     if necessary
 
 
-### Add GPLv3 license header to all new classes
+### Add LGPLv3 license header to all new classes
 
 ```java
 /******************************************************************************
@@ -85,7 +87,7 @@ present in the framework.
 package ...;
 ```
 
-### Update GPLv3 license header in modified files as necessary
+### Update LGPLv3 license header in modified files as necessary
 
 Always check the date range in the license header. For example, if you've
 modified a file in 2016 whose header still reads:
@@ -104,7 +106,7 @@ Then be sure to update it to 2016 accordingly:
 
 ## Prepare Your Commit
 
-### Submit JUnit test cases for all behavior changes
+### Submit JUnit test cases for all behaviour changes
 
 Search the codebase to find related tests and add additional `@Test` methods
 as appropriate.
@@ -144,7 +146,7 @@ Please read and follow the [Commit Guidelines section of Pro Git][].
 Most importantly, please format your commit messages in the following way
 (adapted from the commit template in the link above):
 
-    Short (50 chars or less) summary of changes
+    #25: Short (50 chars or less) summary of changes
 
     More detailed explanatory text, if necessary. Wrap it to about 72
     characters or so. In some contexts, the first line is treated as the
@@ -160,12 +162,12 @@ Most importantly, please format your commit messages in the following way
      - Typically a hyphen or asterisk is used for the bullet, preceded by a
        single space, with blank lines in between, but conventions vary here
 
-    Issue: #42, #96
 
-
+1. Prefix the subject line with the a hash symbol, followed by the related
+   issue number, followed by a colon and a space, e.g. "#25: Fix ...".
 1. Use imperative statements in the subject line, e.g. "Fix broken Javadoc link".
 1. Begin the subject line with a capitalized verb, e.g. "Add, Prune, Fix,
-    Introduce, Avoid, etc."
+    Introduce, Avoid" etc.
 1. Do not end the subject line with a period.
 1. Restrict the subject line to 50 characters or less if possible.
 1. Wrap lines in the body at 72 characters or less.
