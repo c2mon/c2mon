@@ -125,18 +125,22 @@ public abstract class EsIndexer<T extends IFallback> implements IDBPersistenceHa
    * @return the index name.
    */
   protected String retrieveIndexFormat(String prefix, long millis) {
+    String result;
     switch(indexFormat) {
       case "D":
       case "d":
-        return prefix + millisecondsToYearMonthDay(millis);
+        result = prefix + millisecondsToYearMonthDay(millis);
+        break;
       case "W":
       case "w":
-        return prefix + millisecondsToYearWeek(millis);
+        result = prefix + millisecondsToYearWeek(millis);
+        break;
       case "M":
       case "m":
       default:
-        return prefix + millisecondsToYearMonth(millis);
+        result = prefix + millisecondsToYearMonth(millis);
     }
+    return result.toLowerCase();
   }
 
   /**
