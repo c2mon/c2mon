@@ -121,17 +121,13 @@ public final class DataTagValueUpdate {
               result.tagValues.add(
                   SourceDataTagValue.fromXML((Element) fieldNode));
             }
-          } // for
-        } // if processId != null
-
+          }
+        }
       } catch (NumberFormatException nfe) {
-        result = null;
-        log.error("DataTagValueUpdate - Cannot extract valid process-id from DataTagValueUpdate message. Returning null.");
+        throw new RuntimeException("Cannot extract valid process id from DataTagValueUpdate message");
       }
-    } // if DataTagValueUpdate
-    else {
-      result = null;
-      log.error("DataTagValueUpdate - Cannot decode DataTagValueUpdate message. Root element is not <DataTagValueUpdate>");
+    } else {
+      throw new RuntimeException("Cannot decode DataTagValueUpdate message: Root element is not <DataTagValueUpdate>");
     }
     return result;
   }
