@@ -80,7 +80,6 @@ public class ControlTagMapperTest extends AbstractMapperTest {
     assertEquals(cacheObject.getEquipmentId(), retrievedObject.getEquipmentId());
     assertEquals(cacheObject.getMinValue(), retrievedObject.getMinValue());
     assertEquals(cacheObject.getMaxValue(), retrievedObject.getMaxValue());
-    assertEquals(cacheObject.getValueDictionary().toXML(), retrievedObject.getValueDictionary().toXML()); //compare XML of value dictionary
     assertEquals(cacheObject.getAddress(), retrievedObject.getAddress());
     assertEquals(cacheObject.getDataTagQuality(), retrievedObject.getDataTagQuality());//quality compare code and string
     assertEquals(cacheObject.getTimestamp(), retrievedObject.getTimestamp());

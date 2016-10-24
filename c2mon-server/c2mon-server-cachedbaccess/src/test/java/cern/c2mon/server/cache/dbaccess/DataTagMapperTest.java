@@ -59,7 +59,6 @@ public class DataTagMapperTest extends AbstractMapperTest {
     cacheObject.setValueDescription("test value description");
     cacheObject.setSimulated(false); //null allowed
     cacheObject.setEquipmentId(new Long(150)); //need test equipment inserted
-    cacheObject.setValueDictionary(new DataTagValueDictionary());
     cacheObject.setAddress(new DataTagAddress());
     cacheObject.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.EQUIPMENT_DOWN));
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
@@ -86,7 +85,6 @@ public class DataTagMapperTest extends AbstractMapperTest {
     assertEquals(cacheObject.getProcessId(), retrievedObject.getProcessId());
     assertEquals(null, retrievedObject.getMinValue()); // min value is not persisted for boolean data types
     assertEquals(null, retrievedObject.getMaxValue()); // max value is not persisted for boolean data types
-    assertEquals(cacheObject.getValueDictionary().toXML(), retrievedObject.getValueDictionary().toXML()); //compare XML of value dictionary
     assertEquals(cacheObject.getAddress(), retrievedObject.getAddress());
     assertEquals(cacheObject.getDataTagQuality(), retrievedObject.getDataTagQuality());
     assertEquals(cacheObject.getTimestamp(), retrievedObject.getTimestamp());
@@ -115,7 +113,6 @@ public class DataTagMapperTest extends AbstractMapperTest {
       cacheObject.setValueDescription("test value description");
       cacheObject.setSimulated(false); //null allowed
       cacheObject.setEquipmentId(new Long(150)); //need test equipment inserted
-      cacheObject.setValueDictionary(new DataTagValueDictionary());
       cacheObject.setAddress(new DataTagAddress());
       cacheObject.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.EQUIPMENT_DOWN));
       cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
@@ -141,7 +138,6 @@ public class DataTagMapperTest extends AbstractMapperTest {
       assertEquals(cacheObject.getProcessId(), retrievedObject.getProcessId());
       assertEquals(null, retrievedObject.getMinValue()); // min value is not persisted for boolean data types
       assertEquals(null, retrievedObject.getMaxValue()); // max value is not persisted for boolean data types
-      assertEquals(cacheObject.getValueDictionary().toXML(), retrievedObject.getValueDictionary().toXML()); //compare XML of value dictionary
       assertEquals(cacheObject.getAddress(), retrievedObject.getAddress());
       assertEquals(cacheObject.getDataTagQuality(), retrievedObject.getDataTagQuality());
       assertEquals(cacheObject.getTimestamp(), retrievedObject.getTimestamp());
@@ -216,7 +212,6 @@ public class DataTagMapperTest extends AbstractMapperTest {
     cacheObject.setEquipmentId(new Long(150)); //need test equipment inserted - use EquipmentMapperTest
     cacheObject.setMinValue(new Float(23.3));
     cacheObject.setMaxValue(new Float(12.2));
-    cacheObject.setValueDictionary(new DataTagValueDictionary());
     cacheObject.setAddress(new DataTagAddress());
     cacheObject.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.EQUIPMENT_DOWN));
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
@@ -248,7 +243,6 @@ public class DataTagMapperTest extends AbstractMapperTest {
     assertEquals(cacheObject.getProcessId(), retrievedObject.getProcessId());
     assertEquals(null, retrievedObject.getMinValue()); // min value is not persisted for boolean data types
     assertEquals(null, retrievedObject.getMaxValue()); // max value is not persisted for boolean data types
-    assertEquals(cacheObject.getValueDictionary().toXML(), retrievedObject.getValueDictionary().toXML()); //compare XML of value dictionary
     assertEquals(cacheObject.getAddress(), retrievedObject.getAddress());
     assertEquals(cacheObject.getDataTagQuality(), retrievedObject.getDataTagQuality());
     assertEquals(cacheObject.getTimestamp(), retrievedObject.getTimestamp());
@@ -294,7 +288,6 @@ public class DataTagMapperTest extends AbstractMapperTest {
     cacheObject.setSubEquipmentId(new Long(250)); //need test equipment inserted - use EquipmentMapperTest
     cacheObject.setMinValue(new Float(23.3));
     cacheObject.setMaxValue(new Float(12.2));
-    cacheObject.setValueDictionary(new DataTagValueDictionary());
     cacheObject.setAddress(new DataTagAddress());
     cacheObject.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.EQUIPMENT_DOWN));
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
@@ -328,7 +321,6 @@ public class DataTagMapperTest extends AbstractMapperTest {
     assertEquals(cacheObject.getProcessId(), retrievedObject.getProcessId());
     assertEquals(null, retrievedObject.getMinValue()); // min value is not persisted for boolean data types
     assertEquals(null, retrievedObject.getMaxValue()); // max value is not persisted for boolean data types
-    assertEquals(cacheObject.getValueDictionary().toXML(), retrievedObject.getValueDictionary().toXML()); //compare XML of value dictionary
     assertEquals(cacheObject.getAddress(), retrievedObject.getAddress());
     assertEquals(cacheObject.getDataTagQuality(), retrievedObject.getDataTagQuality());
     assertEquals(cacheObject.getTimestamp(), retrievedObject.getTimestamp());
@@ -384,7 +376,6 @@ public class DataTagMapperTest extends AbstractMapperTest {
     assertNull(retrievedObject.getJapcAddress());
     assertNull(retrievedObject.getMinValue());
     assertNull(retrievedObject.getMaxValue());
-    assertEquals(cacheObject.getValueDictionary().toXML(), retrievedObject.getValueDictionary().toXML());
     assertNull(retrievedObject.getAddress());
 
     dataTagMapper.deleteDataTag(cacheObject.getId());

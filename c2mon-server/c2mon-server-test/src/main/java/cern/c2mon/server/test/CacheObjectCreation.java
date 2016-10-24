@@ -135,7 +135,6 @@ public final class CacheObjectCreation {
     cacheObject.setEquipmentId(new Long(150)); //need test equipment inserted
     cacheObject.setMinValue(new Float(100));
     cacheObject.setMaxValue(new Float(2000));
-    cacheObject.setValueDictionary(new DataTagValueDictionary());
     cacheObject.setAddress(new DataTagAddress());
     cacheObject.setDataTagQuality(createValidQuality());
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
@@ -168,7 +167,6 @@ public final class CacheObjectCreation {
     cacheObject.setEquipmentId(new Long(100)); //need test equipment inserted
     cacheObject.setMinValue(new Float(23.3));
     cacheObject.setMaxValue(new Float(12.2));
-    cacheObject.setValueDictionary(new DataTagValueDictionary());
     cacheObject.setAddress(new DataTagAddress());
     cacheObject.setDataTagQuality(createValidQuality());
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
@@ -200,7 +198,6 @@ public final class CacheObjectCreation {
     cacheObject.setEquipmentId(new Long(100)); //need test equipment inserted - using JAPC currently
     cacheObject.setMinValue(new Float(23.3));
     cacheObject.setMaxValue(new Float(12.2));
-    cacheObject.setValueDictionary(new DataTagValueDictionary());
     cacheObject.setAddress(new DataTagAddress());
     cacheObject.setDataTagQuality(createValidQuality());
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
@@ -233,7 +230,6 @@ public final class CacheObjectCreation {
     cacheObject.setEquipmentId(new Long(100)); //need test equipment inserted
     cacheObject.setMinValue(new Float(23.3));
     cacheObject.setMaxValue(new Float(12.2));
-    cacheObject.setValueDictionary(new DataTagValueDictionary());
     cacheObject.setAddress(new DataTagAddress());
     cacheObject.setDataTagQuality(createValidQuality());
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
@@ -363,7 +359,6 @@ public final class CacheObjectCreation {
     cacheObject.setValue(new Integer(1000));
     cacheObject.setValueDescription("test value description");
     cacheObject.setSimulated(false); //null allowed
-    cacheObject.setValueDictionary(new DataTagValueDictionary());
     cacheObject.setDataTagQuality(createValidQuality());
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setRuleIdsString("");
@@ -395,7 +390,6 @@ public final class CacheObjectCreation {
     //cacheObject.setEquipmentId(new Long(300000)); //null for alive tags!
     cacheObject.setMinValue(Long.MIN_VALUE);
     cacheObject.setMaxValue(Long.MAX_VALUE);
-    cacheObject.setValueDictionary(new DataTagValueDictionary());
     cacheObject.setAddress(new DataTagAddress());
     cacheObject.setDataTagQuality(createValidQuality());
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
@@ -429,7 +423,6 @@ public final class CacheObjectCreation {
     //cacheObject.setEquipmentId(new Long(300000)); //null for alive tags!
     cacheObject.setMinValue(Long.MIN_VALUE);
     cacheObject.setMaxValue(Long.MAX_VALUE);
-    cacheObject.setValueDictionary(new DataTagValueDictionary());
     cacheObject.setAddress(new DataTagAddress());
     cacheObject.setDataTagQuality(createValidQuality());
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
@@ -463,7 +456,6 @@ public final class CacheObjectCreation {
     //cacheObject.setEquipmentId(new Long(300000)); //null for alive tags!
     cacheObject.setMinValue(Long.MIN_VALUE);
     cacheObject.setMaxValue(Long.MAX_VALUE);
-    cacheObject.setValueDictionary(new DataTagValueDictionary());
     cacheObject.setAddress(new DataTagAddress());
     cacheObject.setDataTagQuality(createValidQuality());
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));

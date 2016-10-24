@@ -63,7 +63,6 @@ import cern.c2mon.shared.common.NoSimpleValueParseException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.DataTagValueDictionary;
 import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 import cern.c2mon.shared.daq.config.Change;
@@ -403,7 +402,6 @@ public class ConfigurationLoaderTest {
     expectedObject.setProcessId(50L);
     expectedObject.setMinValue(new Float(12.2));
     expectedObject.setMaxValue(new Float(23.3));
-    expectedObject.setValueDictionary(new DataTagValueDictionary());
     expectedObject.setAddress(new DataTagAddress(new OPCHardwareAddressImpl("CW_TEMP_IN_COND3")));
     expectedObject.setDataTagQuality(new DataTagQualityImpl());
     // expectedObject.setCacheTimestamp(new

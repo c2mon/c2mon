@@ -68,7 +68,7 @@ public class RuleTagMapperTest extends AbstractMapperTest {
     assertNotNull(ruletags);
     assertEquals(7, ruletags.size());
 
-    DBBatch dbBatch2 = new DBBatch(1L, 1L);
+    DBBatch dbBatch2 = new DBBatch(60000L, 60000L);
     List<RuleTag> ruletags2 = ruleTagMapper.getRowBatch(dbBatch2);
     assertNotNull(ruletags2);
     assertEquals(1, ruletags2.size());
@@ -95,7 +95,6 @@ public class RuleTagMapperTest extends AbstractMapperTest {
     assertEquals(ruleTag.getValue(), retrievedObject.getValue());
     assertEquals(ruleTag.getValueDescription(), retrievedObject.getValueDescription());
     assertEquals(ruleTag.isSimulated(), retrievedObject.isSimulated());
-    assertEquals(ruleTag.getValueDictionary().toXML(), retrievedObject.getValueDictionary().toXML()); //compare XML of value dictionary
     assertEquals(ruleTag.getDataTagQuality(), retrievedObject.getDataTagQuality());
     assertEquals(ruleTag.getTimestamp(), retrievedObject.getTimestamp());
     assertEquals(ruleTag.getRuleIdsString(), retrievedObject.getRuleIdsString());

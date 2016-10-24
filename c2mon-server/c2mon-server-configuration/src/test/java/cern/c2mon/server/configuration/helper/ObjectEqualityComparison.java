@@ -94,7 +94,6 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getJapcAddress(), object.getJapcAddress());
     assertEquals(expectedObject.isSimulated(), object.isSimulated());
     assertEquals(expectedObject.getMetadata(), object.getMetadata());
-    assertNotNull(object.getValueDictionary());
     // assertEquals(expectedObject.getValueDictionary().toXML(),
     // object.getValueDictionary().toXML()); //compare XML of value dictionary
     assertEquals(expectedObject.getDataTagQuality(), object.getDataTagQuality());
