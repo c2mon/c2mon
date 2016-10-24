@@ -29,8 +29,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.BaseListener;
-import cern.c2mon.client.core.tag.ClientDataTagImpl;
-import cern.c2mon.client.core.tag.TagController;
 import cern.c2mon.client.core.tag.TagController;
 
 @Service

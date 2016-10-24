@@ -41,14 +41,7 @@ import cern.c2mon.client.core.manager.CoreSupervisionManager;
 import cern.c2mon.client.core.manager.SupervisionManager;
 import cern.c2mon.client.core.tag.TagController;
 import cern.c2mon.client.core.tag.TagImpl;
-import cern.c2mon.client.core.tag.ClientDataTagImpl;
-<<<<<<< 022c9e24774cfff54cd2f5717625cafa0022dec5
-=======
-import cern.c2mon.client.core.jms.ConnectionListener;
-import cern.c2mon.client.core.jms.JmsProxy;
-import cern.c2mon.client.core.jms.RequestHandler;
-import cern.c2mon.client.core.tag.TagController;
->>>>>>> Rename TagBean and CloneableTagBean, issue: #53
+
 import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;

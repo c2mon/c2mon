@@ -23,6 +23,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.simpleframework.xml.Root;
 
 import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.common.listener.DataTagListener;
@@ -45,6 +46,7 @@ import cern.c2mon.shared.rule.RuleFormatException;
  */
 @Data
 @Slf4j
+@Root(name = "Tag")
 public class TagController implements TagUpdateListener, SupervisionListener {
 
   private TagImpl tagImpl;

@@ -1,29 +1,23 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.client.core.cache;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -36,9 +30,7 @@ import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.tag.TagController;
-import cern.c2mon.client.core.tag.TagImpl;
-import cern.c2mon.client.core.tag.ClientDataTagImpl;
-import cern.c2mon.client.core.tag.TagController;
+
 
 /**
  * This class implements the cache of the C2MON client API. The public method
@@ -115,7 +107,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
     return cdt;
   }
-  
+
   @Override
   public Tag getByName(final String tagName) {
     cacheReadLock.lock();
@@ -258,7 +250,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
     return resultMap;
   }
-  
+
   @Override
   public Map<String, Tag> getByNames(final Set<String> tagNames) {
     Map<String, Tag> resultMap = new HashMap<>(tagNames.size());
@@ -267,7 +259,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     for (String tagName : tagNames) {
       resultMap.put(tagName, null);
     }
-    
+
     cacheReadLock.lock();
     try {
       Collection<TagController> values = controller.getActiveCache().values();
@@ -309,13 +301,13 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   public <T extends BaseListener> void subscribe(final Set<Long> tagIds, final T listener) throws CacheSynchronizationException {
     tagSubscriptionHandler.subscribe(tagIds, listener, (listener instanceof DataTagListener) || (listener instanceof TagListener));
   }
-  
+
 
   @Override
   public int getCacheSize() {
     return controller.getLiveCache().size();
   }
-  
+
   @Override
   public void addTagSubscriptionListener(final TagSubscriptionListener listener) {
     tagSubscriptionHandler.addSubscriptionListener(listener);

@@ -35,9 +35,6 @@ import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.tag.TagController;
-import cern.c2mon.client.core.tag.ClientDataTagImpl;
-import cern.c2mon.client.core.tag.TagImpl;
-import cern.c2mon.client.core.tag.TagController;
 
 import lombok.extern.slf4j.Slf4j;
 
