@@ -274,7 +274,7 @@ public class ClientDataTagImplTest {
     checkTagCopy(cdt, clone);
 
     cdt.getTagImpl().getDataTagQuality().validate();
-    clone.setTagBean(cdt.getTagImpl().clone());
+    clone.setTagImpl(cdt.getTagImpl().clone());
     checkTagCopy(cdt, clone);
   }
 

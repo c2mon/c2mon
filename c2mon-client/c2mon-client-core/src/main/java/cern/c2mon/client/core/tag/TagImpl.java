@@ -17,9 +17,7 @@
 
 package cern.c2mon.client.core.tag;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -219,7 +217,7 @@ public class TagImpl implements ClientDataTagValue, Tag, TopicRegistrationDetail
    * @param tagId the unique identifier for the DataTag
    */
   public TagImpl(final Long tagId) {
-    id = tagId;
+    this.id = tagId;
   }
 
   /**
@@ -537,21 +535,92 @@ public class TagImpl implements ClientDataTagValue, Tag, TopicRegistrationDetail
    * it does not copy the registered listeners. If you are only interested
    * in the static information of the object you should call after cloning
    * the {@link #clean()} method.
-   *
    * @return The clone of this object
    * @throws CloneNotSupportedException Thrown, if one of the field does not support cloning.
    * @see #clean()
    */
+  @SuppressWarnings("unchecked")
   @Override
   public TagImpl clone() {
+    updateTagLock.readLock().lock();
     try {
-      TagImpl tagImpl = (TagImpl) super.clone();
+      TagImpl clone = (TagImpl) super.clone();
 
-      return tagImpl;
+      clone.updateTagLock = new ReentrantReadWriteLock();
+
+      // clone the process id map
+      clone.processSupervisionStatus = new HashMap<>(processSupervisionStatus.size());
+      for (Map.Entry<Long, SupervisionEvent> entry : processSupervisionStatus.entrySet()) {
+        if (entry.getValue() != null) {
+          clone.processSupervisionStatus.put(entry.getKey(), entry.getValue().clone());
+        }
+        else {
+          clone.processSupervisionStatus.put(entry.getKey(), null);
+        }
+      }
+
+      // clone the equipment id map
+      clone.equipmentSupervisionStatus = new HashMap<>(equipmentSupervisionStatus.size());
+      for (Map.Entry<Long, SupervisionEvent> entry : equipmentSupervisionStatus.entrySet()) {
+        if (entry.getValue() != null) {
+          clone.equipmentSupervisionStatus.put(entry.getKey(), entry.getValue().clone());
+        }
+        else {
+          clone.equipmentSupervisionStatus.put(entry.getKey(), null);
+        }
+      }
+
+      // clone the sub equipment id map
+      clone.subEquipmentSupervisionStatus = new HashMap<>(subEquipmentSupervisionStatus.size());
+      for (Map.Entry<Long, SupervisionEvent> entry : subEquipmentSupervisionStatus.entrySet()) {
+        if (entry.getValue() != null) {
+          clone.subEquipmentSupervisionStatus.put(entry.getKey(), entry.getValue().clone());
+        }
+        else {
+          clone.subEquipmentSupervisionStatus.put(entry.getKey(), null);
+        }
+      }
+
+      // clone the metadata map - alternative:
+      //clone.metadata = (Map<String, Object>) ((HashMap)this.metadata).clone();
+      //clone.metadata.putAll(metadata);
+      clone.metadata = new HashMap<>();
+      for(Map.Entry<String, Object> entry : metadata.entrySet()) {
+        clone.metadata.put(deepClone(entry.getKey()), deepClone(entry.getValue()));
+      }
+
+      // AlarmsValue objects are immutable
+      clone.alarms = new ArrayList<>();
+      for(AlarmValue alarm : alarms){
+        clone.alarms.add(alarm.clone());
+      }
+
+      if (tagQuality != null) {
+        clone.tagQuality = tagQuality.clone();
+      }
+      if (sourceTimestamp != null) {
+        clone.sourceTimestamp = (Timestamp) sourceTimestamp.clone();
+      }
+      if (daqTimestamp != null) {
+        clone.daqTimestamp = (Timestamp) daqTimestamp.clone();
+      }
+      if (serverTimestamp != null) {
+        clone.serverTimestamp = (Timestamp) serverTimestamp.clone();
+      }
+      if (ruleExpression != null) {
+        clone.ruleExpression = (RuleExpression) ruleExpression.clone();
+      }
+//      clone.listeners = new ConcurrentIdentitySet<>();
+
+      return clone;
     }
-    catch (CloneNotSupportedException e) {
-      log.error("clone() - Cloning the CloneableTagBean object failed! No update send to the client.");
-      throw new RuntimeException(e);
+    catch (CloneNotSupportedException cloneException) {
+      log.error(
+              "clone() - Cloning the ClientDataTagImpl object failed! No update sent to the client.");
+      throw new RuntimeException(cloneException);
+    }
+    finally {
+      updateTagLock.readLock().unlock();
     }
   }
 
@@ -644,5 +713,24 @@ public class TagImpl implements ClientDataTagValue, Tag, TopicRegistrationDetail
   @Override
   public String toString() {
     return this.getXml();
+  }
+
+  private <T> T deepClone(T object) {
+    if (object == null) {
+      return null;
+    }
+
+    try {
+      ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+      ObjectOutputStream out = null;
+      out = new ObjectOutputStream(byteOut);
+      out.writeObject(object);
+      out.flush();
+      ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(byteOut.toByteArray()));
+      return (T) object.getClass().cast(in.readObject());
+    }
+    catch (IOException | ClassNotFoundException e) {
+      throw new RuntimeException("Error cloning metadata: the object is not serializable");
+    }
   }
 }

@@ -332,37 +332,6 @@ public class TagServiceTest {
     EasyMock.verify(requestHandlerMock);
   }
 
-<<<<<<< ada3a6b575f62a65038a7095e667511a0d9000eb
-=======
-
-  /**
-   * Prepares all EasyMock calls for doing a <code>tagManager.subscribeDataTags()</code> call
-   * @param tagIds list of tag ids to subscribe to
-   * @param listener the listener to be subscribed
-   * @throws JMSException
-   */
-  private void prepareSubscribeDataTagsMock(final Set<Long> tagIds, final BaseTagListener listener) throws JMSException {
-    Collection<TagUpdate> serverUpdates = new ArrayList<TagUpdate>(tagIds.size());
-    for (Long tagId : tagIds) {
-      serverUpdates.add(createValidTransferTag(tagId));
-    }
-
-    Collection<TagValueUpdate> serverUpdateValues = new ArrayList<>();
-    for (Long tagId : tagIds) {
-      serverUpdateValues.add(createValidTransferTag(tagId));
-    }
-
-
-    EasyMock.expect(requestHandlerMock.requestTags(tagIds)).andReturn(serverUpdates);
-    for (Long tagId : tagIds) {
-      TagController cdt = new TagController(tagId);
-      EasyMock.expect(jmsProxyMock.isRegisteredListener(cdt)).andReturn(false);
-      jmsProxyMock.registerUpdateListener(cdt, cdt.getTagImpl());
-    }
-    EasyMock.expect(requestHandlerMock.requestTagValues(tagIds)).andReturn(serverUpdateValues);
-  }
-
->>>>>>> Update dependencies in tests and classes using ClientDataTagImpl, issue: #53
   private TagUpdate createValidTransferTag(final Long tagId) {
     return createValidTransferTag(tagId, Float.valueOf(1.234f));
   }

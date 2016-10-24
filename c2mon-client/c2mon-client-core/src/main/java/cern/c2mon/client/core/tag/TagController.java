@@ -17,16 +17,12 @@
 
 package cern.c2mon.client.core.tag;
 
-import java.io.*;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.convert.AnnotationStrategy;
-import org.simpleframework.xml.core.Persister;
 
 import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.common.listener.DataTagListener;
@@ -440,7 +436,7 @@ public class TagController implements TagUpdateListener, SupervisionListener {
    */
   protected boolean isValidUpdate(final TagValueUpdate tagValueUpdate) {
 
-    if (tagValueUpdate != null && tagValueUpdate.getId().equals(tagValueUpdate.getId())) {
+    if (tagValueUpdate != null && tagValueUpdate.getId().equals(tagImpl.getId())) {
 
       if (tagValueUpdate.getServerTimestamp() == null) {
         return false;
@@ -450,6 +446,7 @@ public class TagController implements TagUpdateListener, SupervisionListener {
       final long newServerTime = tagValueUpdate.getServerTimestamp().getTime();
       final long oldServerTime = tagImpl.getServerTimestamp().getTime();
 
+      int test;
       if (newServerTime > oldServerTime) {
         return true;
       }
@@ -617,25 +614,6 @@ public class TagController implements TagUpdateListener, SupervisionListener {
    */
   public void removeAllUpdateListeners() {
     this.getListeners().clear();
-  }
-
-  private <T> T deepClone(T object) {
-    if (object == null) {
-      return null;
-    }
-
-    try {
-      ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-      ObjectOutputStream out = null;
-      out = new ObjectOutputStream(byteOut);
-      out.writeObject(object);
-      out.flush();
-      ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(byteOut.toByteArray()));
-      return (T) object.getClass().cast(in.readObject());
-    }
-    catch (IOException | ClassNotFoundException e) {
-      throw new RuntimeException("Error cloning metadata: the object is not serializable");
-    }
   }
 
   /**
