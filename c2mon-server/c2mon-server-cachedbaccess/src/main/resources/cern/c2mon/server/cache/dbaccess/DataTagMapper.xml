@@ -6,13 +6,6 @@
   <!-- take "namespace=Mapper interface" for the mapper SQL statements to be picked up automatically -->
   <mapper namespace="cern.c2mon.server.cache.dbaccess.DataTagMapper">
 
-    <!-- result map for constructing a ValueDictionary from the database String -->
-<!--    <resultMap id="valueDictionaryResultMap" type="cern.c2mon.shared.client.datatag.DataTagValueDictionary">-->
-<!--      <constructor>-->
-<!--        <arg column="TAGVALUEDICTIONARY" javaType="String"/>-->
-<!--      </constructor>-->
-<!--    </resultMap>-->
-
     <!-- result map below corresponds to the abstract AbstractTagCacheObject -->
     <resultMap id="abstractTagResultMap" type="cern.c2mon.server.common.tag.AbstractTagCacheObject">
       <id property="id" column="TAGID"/>
@@ -35,7 +28,6 @@
       <result property="dipAddress" column="TAGDIPADDRESS" jdbcType="VARCHAR"/>
       <result property="japcAddress" column="TAGJAPCADDRESS" jdbcType="VARCHAR"/>
 
-      <result property="valueDictionary" column="TAGVALUEDICTIONARY" javaType="cern.c2mon.shared.common.datatag.DataTagValueDictionary" jdbcType="VARCHAR"/>
       <result property="address" column="TAGADDRESS" javaType="cern.c2mon.shared.common.datatag.DataTagAddress" jdbcType="VARCHAR"/>
 
       <result property="ruleIdsString" column="TAGRULEIDS" jdbcType="VARCHAR"/>
@@ -77,7 +69,7 @@
             E1.EQID as EQUIPMENT_ID,
             E2.EQID as SUBEQUIPMENT_ID,
             TAGMINVAL, TAGMAXVAL, TAGUNIT, TAGSIMULATED, TAGLOGGED,
-            TAGVALUEDICTIONARY, TAGADDRESS, TAGDIPADDRESS,
+            TAGADDRESS, TAGDIPADDRESS,
             TAGJAPCADDRESS, TAGRULEIDS, ALARMID, PROCID, TAGMETADATA
      FROM DATATAG LEFT OUTER JOIN ALARM
             ON ALARM_TAGID = TAGID
@@ -91,30 +83,30 @@
        AND TAGRULE IS NULL
     </select>
 
-  <select id="getRowBatch" resultMap="dataTagResultMap" parameterType="cern.c2mon.server.cache.dbaccess.structure.DBBatch">
-    SELECT TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE, TAGVALUE, TAGVALUEDESC,
-      TAGTIMESTAMP, TAGDAQTIMESTAMP, TAGSRVTIMESTAMP, TAGQUALITYDESC, TAG_EQID,
-      E1.EQID as EQUIPMENT_ID, E2.EQID as SUBEQUIPMENT_ID, TAGMINVAL, TAGMAXVAL,
-      TAGUNIT, TAGSIMULATED, TAGLOGGED, TAGVALUEDICTIONARY, TAGADDRESS, TAGDIPADDRESS,
-      TAGJAPCADDRESS, TAGRULEIDS, ALARMID, PROCID, TAGMETADATA
-    FROM DATATAG LEFT OUTER JOIN ALARM
-      ON ALARM_TAGID = TAGID
-      LEFT OUTER JOIN EQUIPMENT E1
-      ON E1.EQID = TAG_EQID AND E1.EQ_PARENT_ID IS NULL
-      LEFT OUTER JOIN EQUIPMENT E2
-      ON E2.EQID = TAG_EQID AND E2.EQ_PARENT_ID IS NOT NULL
-      LEFT OUTER JOIN PROCESS
-      ON PROCID = E1.EQ_PROCID
-    WHERE TAGID iN  (
-      Select TAGID FROM (
-        Select rownum as RN, TAGID
-        FROM DATATAG
-        WHERE TAGCONTROLTAG=0
-        AND TAGRULE IS NULL
-        ORDER BY TAGID)
-      WHERE RN <![CDATA[ >= ]]> #{startRow}
-        AND RN <![CDATA[ <= ]]> #{endRow})
-  </select>
+    <select id="getRowBatch" resultMap="dataTagResultMap" parameterType="cern.c2mon.server.cache.dbaccess.structure.DBBatch">
+      SELECT TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE, TAGVALUE, TAGVALUEDESC,
+        TAGTIMESTAMP, TAGDAQTIMESTAMP, TAGSRVTIMESTAMP, TAGQUALITYDESC, TAG_EQID,
+        E1.EQID as EQUIPMENT_ID, E2.EQID as SUBEQUIPMENT_ID, TAGMINVAL, TAGMAXVAL,
+        TAGUNIT, TAGSIMULATED, TAGLOGGED, TAGVALUEDICTIONARY, TAGADDRESS, TAGDIPADDRESS,
+        TAGJAPCADDRESS, TAGRULEIDS, ALARMID, PROCID, TAGMETADATA
+      FROM DATATAG LEFT OUTER JOIN ALARM
+        ON ALARM_TAGID = TAGID
+        LEFT OUTER JOIN EQUIPMENT E1
+        ON E1.EQID = TAG_EQID AND E1.EQ_PARENT_ID IS NULL
+        LEFT OUTER JOIN EQUIPMENT E2
+        ON E2.EQID = TAG_EQID AND E2.EQ_PARENT_ID IS NOT NULL
+        LEFT OUTER JOIN PROCESS
+        ON PROCID = E1.EQ_PROCID
+      WHERE TAGID iN  (
+        Select TAGID FROM (
+          Select rownum as RN, TAGID
+          FROM DATATAG
+          WHERE TAGCONTROLTAG=0
+          AND TAGRULE IS NULL
+          ORDER BY TAGID)
+        WHERE RN <![CDATA[ >= ]]> #{startRow}
+          AND RN <![CDATA[ <= ]]> #{endRow})
+    </select>
 
     <select id="getItem" resultMap="dataTagResultMap" parameterType="Long">
       SELECT TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE,
@@ -124,7 +116,7 @@
             E1.EQID as EQUIPMENT_ID,
             E2.EQID as SUBEQUIPMENT_ID,
             TAGMINVAL, TAGMAXVAL, TAGUNIT, TAGSIMULATED, TAGLOGGED,
-            TAGVALUEDICTIONARY, TAGADDRESS, TAGDIPADDRESS,
+            TAGADDRESS, TAGDIPADDRESS,
             TAGJAPCADDRESS, TAGRULEIDS, ALARMID, PROCID, TAGMETADATA
      FROM DATATAG LEFT OUTER JOIN ALARM
             ON ALARM_TAGID = TAGID
@@ -167,7 +159,6 @@
              TAGMAXVAL = #{maxValue,javaType=java.lang.Comparable,jdbcType=VARCHAR},
              TAGUNIT =  #{unit,jdbcType=VARCHAR},
              TAGLOGGED = #{logged,jdbcType=NUMERIC},
-             TAGVALUEDICTIONARY = #{valueDictionary,jdbcType=VARCHAR},
              TAGADDRESS = #{address,jdbcType=VARCHAR},
              TAGDIPADDRESS = #{dipAddress,jdbcType=VARCHAR},
              TAGJAPCADDRESS = #{japcAddress,jdbcType=VARCHAR},
@@ -183,8 +174,7 @@
                             TAGTIMESTAMP, TAGDAQTIMESTAMP, TAGSRVTIMESTAMP,
                             TAGQUALITYDESC, TAG_EQID,
                             TAGMINVAL, TAGMAXVAL,
-                            TAGUNIT, TAGSIMULATED, TAGLOGGED,
-                            TAGVALUEDICTIONARY, TAGADDRESS,
+                            TAGUNIT, TAGSIMULATED, TAGLOGGED, TAGADDRESS,
                             TAGDIPADDRESS, TAGJAPCADDRESS,
                             TAGRULEIDS, TAGCONTROLTAG, TAGMETADATA
                 )
@@ -202,8 +192,7 @@
 
               #{minValue,javaType=java.lang.Comparable,jdbcType=VARCHAR},#{maxValue,javaType=java.lang.Comparable,jdbcType=VARCHAR},
               #{unit,jdbcType=VARCHAR},#{simulated,jdbcType=NUMERIC},#{logged,jdbcType=NUMERIC},
-              #{valueDictionary,jdbcType=VARCHAR},#{address,jdbcType=VARCHAR},
-              #{dipAddress,jdbcType=VARCHAR},#{japcAddress,jdbcType=VARCHAR},
+              #{address,jdbcType=VARCHAR}, #{dipAddress,jdbcType=VARCHAR},#{japcAddress,jdbcType=VARCHAR},
               #{ruleIdsString, jdbcType=VARCHAR},
               0, #{metadata, jdbcType=VARCHAR}
                 )
@@ -216,7 +205,7 @@
          AND TAGCONTROLTAG=0
     </select>
 
-  <delete id="deleteDataTag" parameterType="Long">
+    <delete id="deleteDataTag" parameterType="Long">
       delete from DATATAG where TAGID = #{id}
     </delete>
 

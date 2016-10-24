@@ -16,7 +16,7 @@
             TAGVALUE, TAGVALUEDESC, TAGSRVTIMESTAMP,
             TAGQUALITYDESC,
             TAGUNIT, TAGSIMULATED, TAGLOGGED,
-            TAGVALUEDICTIONARY, TAGDIPADDRESS,
+            TAGDIPADDRESS,
             TAGJAPCADDRESS, TAGRULE,
             TAGRULEIDS, ALARMID, TAGMETADATA
        FROM DATATAG LEFT OUTER JOIN ALARM
@@ -50,7 +50,7 @@
             TAGVALUE, TAGVALUEDESC, TAGSRVTIMESTAMP,
             TAGQUALITYDESC,
             TAGUNIT, TAGSIMULATED, TAGLOGGED,
-            TAGVALUEDICTIONARY, TAGDIPADDRESS,
+            TAGDIPADDRESS,
             TAGJAPCADDRESS, TAGRULE,
             TAGRULEIDS, ALARMID, TAGMETADATA
        FROM DATATAG LEFT OUTER JOIN ALARM
@@ -78,7 +78,6 @@
              TAGDATATYPE = #{dataType},
              TAGUNIT =  #{unit,jdbcType=VARCHAR},
              TAGLOGGED = #{logged,jdbcType=NUMERIC},
-             TAGVALUEDICTIONARY = #{valueDictionary,jdbcType=VARCHAR},
              TAGDIPADDRESS = #{dipAddress,jdbcType=VARCHAR},
              TAGJAPCADDRESS = #{japcAddress,jdbcType=VARCHAR},
              TAGRULEIDS = #{ruleIdsString, jdbcType=VARCHAR},
@@ -93,7 +92,7 @@
                            TAGVALUE, TAGVALUEDESC, TAGSRVTIMESTAMP,
                            TAGQUALITYDESC,
                            TAGUNIT, TAGSIMULATED, TAGLOGGED,
-                           TAGVALUEDICTIONARY, TAGDIPADDRESS,
+                           TAGDIPADDRESS,
                            TAGJAPCADDRESS, TAGRULE,
                            TAGRULEIDS, TAGCONTROLTAG, TAGMETADATA
                 )
@@ -102,7 +101,6 @@
               #{cacheTimestamp, jdbcType=TIMESTAMP},
               SUBSTR(#{dataTagQuality,javaType=cern.c2mon.shared.common.datatag.DataTagQuality,jdbcType=VARCHAR}, 1, 1000),
               #{unit,jdbcType=VARCHAR},#{simulated,jdbcType=NUMERIC},#{logged,jdbcType=NUMERIC},
-              #{valueDictionary,jdbcType=VARCHAR},
               #{dipAddress,jdbcType=VARCHAR},#{japcAddress,jdbcType=VARCHAR}, #{ruleText,jdbcType=VARCHAR},
               #{ruleIdsString, jdbcType=VARCHAR},
               0, #{metadata, jdbcType=VARCHAR}
