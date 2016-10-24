@@ -18,7 +18,9 @@ You can run a server by downloading and executing a tarball distribution, or by 
 We push a Docker image of the server to the [CERN Docker registry](https://gitlab-registry.cern.ch). To run the image:
 
 ```bash
-docker run --rm --name c2mon -it -p 0.0.0.0:1099:1099 -p 0.0.0.0:9001:9001 -p 0.0.0.0:61616:61616 -p 0.0.0.0:9200:9200 gitlab-registry.cern.ch/c2mon/c2mon
+docker run --rm --name c2mon -it -p 0.0.0.0:1099:1099 -p 0.0.0.0:9001:9001 -p 0.0.0.0:61616:61616 -p 0.0.0.0:9200:9200 \
+  -e "c2mon.server.cachedbaccess.insertTestData=true" \
+  gitlab-registry.cern.ch/c2mon/c2mon
 ```
 
 # Publishing data
@@ -36,7 +38,8 @@ the DAQ runs. Again, you can download and execute a tarball or run a Docker imag
 ### Using the hostmetrics DAQ Docker image
 
 ```bash
-docker run --rm --name daq-hostmetrics -it --net=host -e "C2MON_PORT_61616_TCP=tcp://localhost:61616" gitlab-registry.cern.ch/c2mon/c2mon-daq-hostmetrics bin/C2MON-DAQ-STARTUP.jvm -f P_HOST01
+docker run --rm --name daq-hostmetrics -it --net=host -e "C2MON_PORT_61616_TCP=tcp://localhost:61616" \
+  gitlab-registry.cern.ch/c2mon/c2mon-daq-hostmetrics bin/C2MON-DAQ-STARTUP.jvm -f P_HOST01
 ```
 
 # Reading data
