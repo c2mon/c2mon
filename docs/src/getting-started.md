@@ -36,7 +36,7 @@ the DAQ runs. Again, you can download and execute a tarball or run a Docker imag
 ### Using the hostmetrics DAQ Docker image
 
 ```bash
-docker run --rm --name daq-hostmetrics -it gitlab-registry.cern.ch/c2mon/c2mon-daq-hostmetrics bin/C2MON-DAQ-STARTUP.jvm -f $@
+docker run --rm --name daq-hostmetrics -it --net=host -e "C2MON_PORT_61616_TCP=tcp://localhost:61616" gitlab-registry.cern.ch/c2mon/c2mon-daq-hostmetrics bin/C2MON-DAQ-STARTUP.jvm -f P_HOST01
 ```
 
 # Reading data
