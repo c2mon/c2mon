@@ -447,7 +447,6 @@ public class TagController implements TagUpdateListener, SupervisionListener {
       final long newServerTime = tagValueUpdate.getServerTimestamp().getTime();
       final long oldServerTime = tagImpl.getServerTimestamp().getTime();
 
-      int test;
       if (newServerTime > oldServerTime) {
         return true;
       }
@@ -468,11 +467,11 @@ public class TagController implements TagUpdateListener, SupervisionListener {
         else if (newDaqTime == oldDaqTime && tagValueUpdate.getSourceTimestamp() != null) {
           final long newSourceTime = tagValueUpdate.getSourceTimestamp().getTime();
 
-          if (tagImpl.getTimestamp() == null) { // old source timestamp is not set
+          if (tagImpl.getSourceTimestamp() == null) { // old source timestamp is not set
             return true;
           }
 
-          final long oldSourceTime = tagImpl.getTimestamp().getTime();
+          final long oldSourceTime = tagImpl.getSourceTimestamp().getTime();
           if (tagValueUpdate instanceof TagUpdate || newSourceTime != oldSourceTime) {
             // We basically allow non-continuous source timestamps
             return true;
