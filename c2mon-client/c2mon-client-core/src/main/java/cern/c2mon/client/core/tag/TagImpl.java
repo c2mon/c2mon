@@ -27,10 +27,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.ElementList;
-import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.*;
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
 
@@ -51,6 +48,7 @@ import cern.c2mon.shared.rule.RuleExpression;
  */
 @Slf4j
 @Data
+@Root(name = "Tag")
 public class TagImpl implements ClientDataTagValue, Tag, TopicRegistrationDetails, Cloneable {
 
   /**

@@ -46,7 +46,6 @@ import cern.c2mon.shared.rule.RuleFormatException;
  */
 @Data
 @Slf4j
-@Root(name = "Tag")
 public class TagController implements TagUpdateListener, SupervisionListener {
 
   private TagImpl tagImpl;
@@ -479,7 +478,7 @@ public class TagController implements TagUpdateListener, SupervisionListener {
             return true;
           }
         }
-        else if (tagValueUpdate instanceof TagUpdate && newDaqTime == oldDaqTime && tagImpl.getTimestamp() == null) {
+        else if (tagValueUpdate instanceof TagUpdate && newDaqTime == oldDaqTime && tagImpl.getSourceTimestamp() == null) {
           // This means we accept a TagUpdate also when server & DAQ time are equals
           // but both source timestamps are not set
           return true;
