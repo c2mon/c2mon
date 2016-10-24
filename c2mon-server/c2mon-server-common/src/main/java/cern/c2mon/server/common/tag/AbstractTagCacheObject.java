@@ -19,10 +19,9 @@ package cern.c2mon.server.common.tag;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.DataTagValueDictionary;
 import cern.c2mon.shared.common.metadata.Metadata;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -37,14 +36,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
  * DataTag, ControlTag and RuleTag.
  *
  * @author Mark Brightwell
- *
  */
-public abstract class AbstractTagCacheObject implements DataTagConstants, Cloneable, Serializable { //removed cacheable for the time being... may not be needed
-
-  /**
-   * Private class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTagCacheObject.class);
+@Slf4j
+@Data
+public abstract class AbstractTagCacheObject implements DataTagConstants, Cloneable, Serializable {
 
   // TODO remove UID if not needed
   /**
@@ -79,11 +74,6 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
   private String dataType;
 
   /**
-   * Static dictionary for looking up preconfigured descriptions for tag values
-   */
-  private DataTagValueDictionary valueDictionary;
-
-  /**
    * Indicates whether a tag is "in operation", "in maintenance" or "in test".
    */
   private short mode;
@@ -113,9 +103,6 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
    */
   private Metadata metadata;
 
-  // -----------------------
-  // PUBLISHING ADDRESSES
-  // -----------------------
   /**
    * DIP address for tags published on DIP
    */
@@ -125,11 +112,6 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
    * JAPC address for tags published on JAPC
    */
   private String japcAddress;
-
-
-  // -------------------------------------------------------------------------------
-  // RUN-TIME PROPERTIES (i.e. those updated when new values arrive from DAQ layer)
-  // -------------------------------------------------------------------------------
 
   /**
    * Current value of the datatag (if any, null before first value reception). The value is of type
@@ -164,10 +146,6 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
   //TODO replace with new OVERRIDDEN mode
   private boolean simulated;
 
-  // --------------------------
-  // REFERENCES TO OTHER CACHE ELEMENTS
-  // --------------------------
-
   /**
    * Identifiers of all alarms attached to the datatag
    */
@@ -176,7 +154,7 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
   /**
    * Identifiers of all rules attached to the datatag
    * (tests will fail if not initialized as this field
-   *  is set during cache loading from DB).
+   * is set during cache loading from DB).
    */
   private Collection<Long> ruleIds;
 
@@ -208,10 +186,6 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
   private ReadLock readLock;
   private WriteLock writeLock;
 
-  // --------------------------
-  // CONSTRUCTORS
-  // --------------------------
-
   /**
    * Default public constructor. TODO remove unused constructors
    *
@@ -221,31 +195,25 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
    */
   protected AbstractTagCacheObject() {
     //TODO check this - done by config loader
-    //setDataTagQuality(new DataTagQuality(DataTagQuality.UNINITIALISED, "No value received for this data tag so far."));
     ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     readLock = lock.readLock();
     writeLock = lock.writeLock();
 
     dataTagQuality = new DataTagQualityImpl();
-    valueDictionary = new DataTagValueDictionary();
-    //status = Status.OK;
-    alarmIds = new ArrayList<Long>();
-    ruleIds = new ArrayList<Long>();
+    alarmIds = new ArrayList<>();
+    ruleIds = new ArrayList<>();
     cacheTimestamp = new Timestamp(System.currentTimeMillis());
   }
 
   /**
    * Constructor used in implementations of the class.
+   *
    * @param id
    */
   protected AbstractTagCacheObject(final Long id) {
     this();
     this.id = id;
   }
-
-  // ------------------------
-  // CLONING AND EQUALITY
-  // ------------------------
 
   /**
    * The clone is provided with <b>new</b> locks: these do not lock access
@@ -258,9 +226,6 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
     ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     cacheObject.readLock = lock.readLock();
     cacheObject.writeLock = lock.writeLock();
-    if (valueDictionary != null) {
-      cacheObject.valueDictionary = (DataTagValueDictionary) valueDictionary.clone();
-    }
     if (dataTagQuality != null) {
       cacheObject.dataTagQuality = (DataTagQuality) dataTagQuality.clone();
     }
@@ -292,30 +257,16 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
     return this.id.hashCode();
   }
 
-  // ----------------------------------------------------------------
-  // METHODS MANAGING RULE IDS (i.e. rules in which this tag is used)
-  // ----------------------------------------------------------------
-
-  /**
-   * Returns a collection containing the identifiers of all rules that need to
-   * be evaluated when THIS tags changes. If this tag isn't used by any rule,
-   * an empty collection is returned.
-   *
-   * @return returns the collection of Tag ids that need evaluating; never returns null
-   */
-  public final Collection<Long> getRuleIds() {
-    return this.ruleIds;
-  }
-
   /**
    * Returns an own copy of the list of rules that need evaluating when
    * this tag changes.
+   *
    * @return list of rule ids
    */
   public final Collection<Long> getCopyRuleIds() {
     readLock.lock();
     try {
-      return new ArrayList<Long>(ruleIds);
+      return new ArrayList<>(ruleIds);
     } finally {
       readLock.unlock();
     }
@@ -349,33 +300,6 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
     }
   }
 
-  // --------------------------
-  // GETTERS AND SETTERS
-  // --------------------------
-  public final Object getValue() {
-    return this.value;
-  }
-
-  public final String getValueDescription() {
-    return this.valueDescription;
-  }
-
-  /**
-   * Setter method.
-   * @param valueDescription the valueDescription to set
-   */
-  public void setValueDescription(String valueDescription) {
-    this.valueDescription = valueDescription;
-  }
-
-  public final Timestamp getCacheTimestamp() {
-    return this.cacheTimestamp;
-  }
-
-  public final DataTagQuality getDataTagQuality() {
-    return this.dataTagQuality;
-  }
-
   public final boolean isValid() {
     return dataTagQuality.isValid();
   }
@@ -384,91 +308,26 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
     return dataTagQuality.isExistingTag();
   }
 
-  public final boolean isSimulated() {
-    return this.simulated;
-  }
-
-  public final Collection<Long> getAlarmIds() {
-    return this.alarmIds;
-  }
-
   public final Collection<Long> getCopyAlarmIds() {
     readLock.lock();
     try {
-      return new ArrayList<Long>(this.alarmIds);
+      return new ArrayList<>(this.alarmIds);
     } finally {
       readLock.unlock();
     }
   }
 
-  public final String getDipAddress() {
-    return this.dipAddress;
-  }
-
-  /**
-   * @return the JAPC address on which the data tag is published,
-   *         or <code>null</code> if not.
-   */
-  public final String getJapcAddress() {
-    return japcAddress;
-  }
-
-  /**
-   * @param id the id to set
-   */
-  public final void setId(Long id) {
-    this.id = id;
-  }
-
   /**
    * Sets the tag name (no longer the topic, which depends on Process)
+   *
    * @param name the name to set
    */
   public final void setName(final String name) {
     if (name != null) {
       this.name = name;
-//       StringBuffer str = new StringBuffer("tim.datatag.");
-//       char[] topicName = null;
-//
-//       topicName = name.toCharArray();
-//       for (int i=0; i != topicName.length; i++) {
-//         if (topicName[i] == '$' || topicName[i]=='*' || topicName[i] =='#') {
-//           topicName[i]='X';
-//         }
-//       }
-//       str.append(topicName);
-//       this.topic = str.toString();
     } else {
       throw new IllegalArgumentException("Attempt to set Tag name to null!");
     }
-  }
-
-  /**
-   * @param dataType the dataType to set
-   */
-  public final void setDataType(String dataType) {
-    this.dataType = dataType;
-  }
-
-  /**
-   * @param mode the mode to set
-   */
-  public final void setMode(short mode) {
-    this.mode = mode;
-  }
-
-  /**
-   * @param value the value to set
-   */
-  public final void setValue(Object value) {
-    this.value = value;
-  }
-
-  /**
-   * @param dataTagQuality the dataQuality to set
-   */
-  public final void setDataTagQuality(DataTagQuality dataTagQuality) {
-    this.dataTagQuality = dataTagQuality;
   }
 
   /**
@@ -480,30 +339,6 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
     } else {
       this.cacheTimestamp.setTime(timestamp.getTime());
     }
-  }
-
-  public final Long getId() {
-    return this.id;
-  }
-
-  public final String getName() {
-    return this.name;
-  }
-
-  public final String getDescription() {
-    return this.description;
-  }
-
-  public final String getDataType() {
-    return this.dataType;
-  }
-
-  public final DataTagValueDictionary getValueDictionary() {
-    return this.valueDictionary;
-  }
-
-  public final short getMode() {
-    return this.mode;
   }
 
   public final boolean isInOperation() {
@@ -559,61 +394,8 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
     this.simulated = simulated;
   }
 
-  // ----------------------------------------------------------------------------
-  // FIELDS RELEVANT FOR PERSISTENCE
-  // ----------------------------------------------------------------------------
-
   public final short getDataTagChange() {
     return this.tagChange;
-  }
-
-  /**
-   * @param unit the unit to set
-   */
-  public void setUnit(String unit) {
-    this.unit = unit;
-  }
-
-  /**
-   * @param dipAddress the dipAddress to set
-   */
-  public void setDipAddress(String dipAddress) {
-    this.dipAddress = dipAddress;
-  }
-
-  /**
-   * @param japcAddress the japcAddress to set
-   */
-  public void setJapcAddress(String japcAddress) {
-    this.japcAddress = japcAddress;
-  }
-
-  /**
-   * @param valueDictionary the valueDictionary to set
-   */
-  public void setValueDictionary(DataTagValueDictionary valueDictionary) {
-    this.valueDictionary = valueDictionary;
-  }
-
-  /**
-   * @param alarmIds the alarmIds to set
-   */
-  public void setAlarmIds(Collection<Long> alarmIds) {
-    this.alarmIds = alarmIds;
-  }
-
-  public String getRuleIdsString() {
-    return ruleIdsString;
-  }
-
-  /**
-   * See the comment in setRuleIdsString method, which
-   * should preferably be used.
-   *
-   * @param ruleIds the ruleIds to set
-   */
-  public void setRuleIds(Collection<Long> ruleIds) {
-    this.ruleIds = ruleIds;
   }
 
   /**
@@ -638,13 +420,13 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
           }
         }
       } else {
-        setRuleIds(new ArrayList<Long>(0));
+        setRuleIds(new ArrayList<>(0));
         this.ruleIdsString = null;
       }
     } catch (Exception e) {
-      LOGGER.error("Exception caught while parsing the rule String field for tag "
-          + id + "; setting collection to empty collection.", e);
-      setRuleIds(new ArrayList<Long>(0));
+      log.error("Exception caught while parsing the rule string field for tag #{}: " +
+          "setting to empty collection", id, e);
+      setRuleIds(new ArrayList<>(0));
       this.ruleIdsString = null;
     }
 

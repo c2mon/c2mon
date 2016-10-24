@@ -18,12 +18,10 @@ package cern.c2mon.server.common.tag;
 
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
-import cern.c2mon.shared.common.datatag.DataTagValueDictionary;
 import cern.c2mon.shared.common.metadata.Metadata;
 import cern.c2mon.shared.common.rule.RuleInputValue;
 
@@ -117,9 +115,6 @@ public interface Tag extends RuleInputValue, Cacheable {
    * @return all meta data as a Map
    */
   Metadata getMetadata();
-
-  /** Returns the tag's value dictionary */
-  DataTagValueDictionary getValueDictionary();
 
   /** Returns true if the tag's value is valid */
   boolean isValid();
@@ -223,5 +218,4 @@ public interface Tag extends RuleInputValue, Cacheable {
    * @return true if needs logging
    */
   boolean isLogged();
-
 }

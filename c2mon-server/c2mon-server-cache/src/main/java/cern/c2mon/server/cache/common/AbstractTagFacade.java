@@ -29,10 +29,10 @@ import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.SimpleTypeReflectionHandler;
 import cern.c2mon.shared.common.datatag.*;
 import cern.c2mon.shared.common.metadata.Metadata;
-import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.daq.config.DataTagAddressUpdate;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
 import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,12 +58,8 @@ import java.util.*;
  * @param <T> the Tag type on which this facade acts
  * @author Mark Brightwell
  */
+@Slf4j
 public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T> implements CommonTagFacade<T> {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTagFacade.class);
 
   /**
    * The cache for objects of type T.
@@ -185,27 +181,6 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
       if (tmpStr != null) {
         tag.setUnit(checkAndSetNull(tmpStr));
       }
-
-
-      // TAG value dictionary
-      if (properties.getProperty("valueDictionary") != null) {
-        tag.setValueDictionary(new DataTagValueDictionary());
-        tmpStr = properties.getProperty("valueDictionary");
-        if (tmpStr != null) {
-          StringTokenizer dictionaryTokens = new StringTokenizer(tmpStr, ";");
-          String[] valueDescriptions = null;
-          while (dictionaryTokens.hasMoreTokens()) {
-           valueDescriptions = dictionaryTokens.nextToken().split("=");
-            if (valueDescriptions.length == 2) {
-              tag.getValueDictionary().addDescription(
-                TypeConverter.cast(valueDescriptions[0], tag.getDataType()),
-                valueDescriptions[1]
-              );
-            }
-          }
-        }
-      }
-
 
       // DIP address
       if (properties.getProperty("dipAddress") != null) {
@@ -391,7 +366,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
                             final Map<TagQualityStatus, String> qualityDescription,
                             final Timestamp timestamp) {
     if (flagsToRemove == null && flagsToAdd == null) {
-      LOGGER.warn("Attempting to set quality in TagFacade with no Quality flags to remove or set!");
+      log.warn("Attempting to set quality in TagFacade with no Quality flags to remove or set!");
     }
 
     if (flagsToRemove != null) {
