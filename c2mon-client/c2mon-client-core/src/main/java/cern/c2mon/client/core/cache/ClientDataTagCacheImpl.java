@@ -242,7 +242,11 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     try {
       for (Long tagId : tagIds) {
         TagController tagBean = controller.getActiveCache().get(tagId);
-        resultMap.put(tagId, tagBean.getTagImpl());
+        if (tagBean != null) {
+          resultMap.put(tagId, tagBean.getTagImpl());
+        } else {
+          resultMap.put(tagId, null);
+        }
       }
     } finally {
       cacheReadLock.unlock();
