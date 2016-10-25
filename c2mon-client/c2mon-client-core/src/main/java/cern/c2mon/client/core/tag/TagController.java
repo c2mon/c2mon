@@ -496,7 +496,7 @@ public class TagController implements TagUpdateListener, SupervisionListener {
    * update listeners registered.
    */
   public boolean hasUpdateListeners() {
-    boolean isEmpty = this.getListeners().isEmpty();
+    boolean isEmpty = !this.getListeners().isEmpty();
     return isEmpty;
   }
 

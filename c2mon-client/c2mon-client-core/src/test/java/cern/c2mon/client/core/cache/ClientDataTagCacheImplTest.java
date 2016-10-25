@@ -141,7 +141,7 @@ public class ClientDataTagCacheImplTest {
     Set<Long> tagIds = new HashSet<>();
     tagIds.add(1L);
     tagIds.add(2L);
-    Collection<TagUpdate> serverUpdates = new ArrayList<TagUpdate>(tagIds.size());
+    Collection<TagUpdate> serverUpdates = new ArrayList<>(tagIds.size());
     for (Long tagId : tagIds) {
       serverUpdates.add(createValidTransferTag(tagId));
       TagController cdtMock = prepareClientDataTagCreateMock(tagId);
