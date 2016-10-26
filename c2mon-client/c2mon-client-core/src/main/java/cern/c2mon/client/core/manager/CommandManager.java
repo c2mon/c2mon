@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.common.tag.ClientCommandTag;
+import cern.c2mon.client.common.tag.CommandTag;
 import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.CommandService;
 import cern.c2mon.client.core.tag.ClientCommandTagImpl;
@@ -134,9 +134,9 @@ public class CommandManager implements C2monCommandManager, CommandService {
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
-  public <T> Set<ClientCommandTag<T>> getCommandTags(final Set<Long> pIds) {
-    Set<ClientCommandTag<T>> resultSet = new HashSet<ClientCommandTag<T>>();
-    Set<Long> newCommandTagIds = new HashSet<Long>();
+  public <T> Set<CommandTag<T>> getCommandTags(final Set<Long> pIds) {
+    Set<CommandTag<T>> resultSet = new HashSet<>();
+    Set<Long> newCommandTagIds = new HashSet<>();
 
     if (LOG.isDebugEnabled()) {
       StringBuilder str = new StringBuilder("getCommandTags() - creating ");
@@ -191,7 +191,7 @@ public class CommandManager implements C2monCommandManager, CommandService {
       // skip all fake tags
       if (!commandId.equals(UNKNOWN_TAG_ID)) {
         try {
-          resultSet.add((ClientCommandTag<T>) commandCache.get(commandId).clone());
+          resultSet.add((CommandTag<T>) commandCache.get(commandId).clone());
         }
         catch (CloneNotSupportedException e) {
           LOG.error("getCommandTags() - Error while cloning command tag with id " + commandId);
@@ -264,10 +264,10 @@ public class CommandManager implements C2monCommandManager, CommandService {
   }
 
   @Override
-  public <T> ClientCommandTag<T> getCommandTag(final Long commandId) {
+  public <T> CommandTag<T> getCommandTag(final Long commandId) {
     Set<Long> commandTagIds = new HashSet<Long>();
     commandTagIds.add(commandId);
-    Set<ClientCommandTag<T>> commandTags = getCommandTags(commandTagIds);
+    Set<CommandTag<T>> commandTags = getCommandTags(commandTagIds);
 
     return commandTags.iterator().next();
   }

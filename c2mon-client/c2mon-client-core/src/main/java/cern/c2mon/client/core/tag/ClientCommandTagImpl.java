@@ -30,7 +30,7 @@ import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
 
-import cern.c2mon.client.common.tag.ClientCommandTag;
+import cern.c2mon.client.common.tag.CommandTag;
 import cern.c2mon.client.core.manager.CommandManager;
 import cern.c2mon.shared.client.command.CommandTagHandle;
 import cern.c2mon.shared.client.command.CommandTagValueException;
@@ -49,7 +49,7 @@ import cern.c2mon.shared.common.datatag.address.HardwareAddress;
  * @see CommandManager
  */
 @Root(name = "ClientCommandTag")
-public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
+public class ClientCommandTagImpl<T> implements CommandTag<T>, Cloneable {
 
   /** standard String used for unknown commands */
   private static final String CMD_UNKNOWN = "UNKNOWN";
@@ -335,7 +335,7 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
    */
   @SuppressWarnings("unchecked")
   @Override
-  public ClientCommandTag<T> clone() throws CloneNotSupportedException {
+  public CommandTag<T> clone() throws CloneNotSupportedException {
     ClientCommandTagImpl<T> clone = (ClientCommandTagImpl<T>) super.clone();
     clone.authorizationDetails = null;
     return clone;

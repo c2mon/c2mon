@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import cern.c2mon.client.common.tag.ClientCommandTag;
+import cern.c2mon.client.common.tag.CommandTag;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.shared.client.command.CommandTagHandleImpl;
 import cern.c2mon.shared.client.command.CommandTagHandleImpl.Builder;
@@ -57,7 +57,7 @@ public class ClientCommandTagImplTest {
   public void startClientWithProperties() throws InterruptedException {
     System.setProperty("c2mon.client.conf.url", "http://timweb/test/conf/c2mon-client.properties");
     C2monServiceGateway.startC2monClientSynchronous();
-    ClientCommandTag<Boolean> commandTag = C2monServiceGateway.getCommandManager().getCommandTag(104974L);
+    CommandTag<Boolean> commandTag = C2monServiceGateway.getCommandManager().getCommandTag(104974L);
     assertNotNull(commandTag.getName());
     assertTrue(!commandTag.getName().equalsIgnoreCase(""));
     assertNotNull(commandTag.getProcessId());

@@ -19,7 +19,7 @@ package cern.c2mon.client.core;
 import java.util.Set;
 
 import cern.c2mon.client.common.service.SessionService;
-import cern.c2mon.client.common.tag.ClientCommandTag;
+import cern.c2mon.client.common.tag.CommandTag;
 import cern.c2mon.shared.client.command.CommandReport;
 import cern.c2mon.shared.client.command.CommandTagValueException;
 
@@ -38,19 +38,19 @@ public interface CommandService {
    *        ClientCommandTags from
    * @return Collection of clientCommandTag instances
    **/
-  <T> Set<ClientCommandTag<T>> getCommandTags(final Set<Long> pCommandIds);
+  <T> Set<CommandTag<T>> getCommandTags(final Set<Long> pCommandIds);
   
   /**
-   * Returns the {@link ClientCommandTag} object for the given
+   * Returns the {@link CommandTag} object for the given
    * command id. If the command is unknown to the system it will
-   * nevertheless return a {@link ClientCommandTag} instance but
+   * nevertheless return a {@link CommandTag} instance but
    * with most of the fields left uninitialized. 
    * @param <T> The value type of the command
    * @param commandId The command tag id
-   * @return A copy of the {@link ClientCommandTag} instance in the
+   * @return A copy of the {@link CommandTag} instance in the
    *         command cache.
    */
-  <T> ClientCommandTag<T> getCommandTag(final Long commandId);
+  <T> CommandTag<T> getCommandTag(final Long commandId);
   
   /**
    * Executes the command and returns a {@link CommandReport} object.
@@ -61,8 +61,8 @@ public interface CommandService {
    * @return the report on the success/failure of the execution
    * @throws CommandTagValueException In case the method is called with a
    *         value object which is not of expected type of the specified
-   *         {@link ClientCommandTag}.
-   * @see ClientCommandTag#getType()
+   *         {@link CommandTag}.
+   * @see CommandTag#getType()
    */  
   CommandReport executeCommand(String userName, Long commandId, Object value) throws CommandTagValueException;
   
