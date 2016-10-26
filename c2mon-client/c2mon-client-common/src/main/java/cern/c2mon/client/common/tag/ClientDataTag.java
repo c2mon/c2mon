@@ -33,7 +33,7 @@ import cern.c2mon.shared.rule.RuleFormatException;
  * @author Matthias Braeger
  */
 @Deprecated
-public interface ClientDataTag extends ClientDataTagValue, TagUpdateListener, Cloneable {
+public interface ClientDataTag extends Tag, TagUpdateListener, Cloneable {
   
   /**
    * This thread safe method updates the given <code>ClientDataTag</code> object.

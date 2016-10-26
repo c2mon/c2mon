@@ -24,7 +24,7 @@ import javax.jms.JMSException;
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.cache.CacheSynchronizationException;
 import cern.c2mon.client.core.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
@@ -59,7 +59,7 @@ public interface C2monTagManager {
    * for the list of specified data tags.<p>
    * The C2MON client API will handle for you in the background the initialization of the data
    * tags with the C2MON server, if this was not already done before. <p>
-   * You will be informed about new updates via the <code>onUpdate(ClientDataTagValue)</code>
+   * You will be informed about new updates via the <code>onUpdate(Tag)</code>
    * method.
    *
    * @param dataTagIds A collection of data tag IDs
@@ -78,7 +78,7 @@ public interface C2monTagManager {
    * Registers a listener to receive the current (initial) value and updates for one specific data tag.<p>
    * The C2MON client API will handle for you in the background the initialization of the data
    * tags with the C2MON server, if this was not already done before. <p>
-   * You will be informed about new updates via the <code>onUpdate(ClientDataTagValue)</code>
+   * You will be informed about new updates via the <code>onUpdate(Tag)</code>
    * method.
    *
    * @param dataTagId The unique identifier of the data tag you want to subscribe to
@@ -96,11 +96,11 @@ public interface C2monTagManager {
   /**
    * Registers a listener to receive updates for specific data tags.
    * The method will return the initial values of the subscribed tags to {@link DataTagListener#onInitialUpdate(Collection)}.
-   * <b>Please note</b> that the {@link DataTagListener#onUpdate(ClientDataTagValue)} method will then not
+   * <b>Please note</b> that the {@link DataTagListener#onUpdate(Tag)} method will then not
    * receive the initial values.<p>
    * The C2MON client API will handle for you in the background the initialization of the data
    * tags with the C2MON server, if this was not already done before. <p>
-   * You will be informed about new updates via the <code>onUpdate(ClientDataTagValue)</code>
+   * You will be informed about new updates via the <code>onUpdate(Tag)</code>
    * method.
    *
    * @param dataTagIds A collection of data tag IDs
@@ -116,10 +116,10 @@ public interface C2monTagManager {
   /**
    * Registers a listener to receive updates for a specific data tag.
    * The method will return the initial value of the subscribed tag to {@link DataTagListener#onInitialUpdate(Collection)}. <b>Please note</b>
-   * that the {@link DataTagListener#onUpdate(ClientDataTagValue)} method will then not receive the initial value.<p>
+   * that the {@link DataTagListener#onUpdate(Tag)} method will then not receive the initial value.<p>
    * The C2MON client API will handle for you in the background the initialization of the data
    * tags with the C2MON server, if this was not already done before. <p>
-   * You will be informed about new updates via the <code>onUpdate(ClientDataTagValue)</code>
+   * You will be informed about new updates via the <code>onUpdate(Tag)</code>
    * method.
    *
    * @param dataTagId The unique identifier of the data tag you want to subscribe to
@@ -160,13 +160,13 @@ public interface C2monTagManager {
 
   /**
    * Returns for a given listener a copy of all subscribed data tags with
-   * their current state as <code>ClientDataTagValue</code> instances.
+   * their current state as <code>Tag</code> instances.
    *
    * @param listener The listener for which we want to get the data tags
    *        subscriptions
    * @return A collection of <code>ClientDataTag</code> objects
    */
-  Collection<ClientDataTagValue> getAllSubscribedDataTags(final DataTagUpdateListener listener);
+  Collection<Tag> getAllSubscribedDataTags(final DataTagUpdateListener listener);
 
   /**
    * Returns for a given listener a list of all subscribed data tags ids.
@@ -180,7 +180,7 @@ public interface C2monTagManager {
   /**
    * Returns for the given id a copy of the cached data tag.
    * If the tag is not in the local cache it will try to fetch it from the server.
-   * In case of an unknown tag id the result will be an empty {@link ClientDataTagValue}
+   * In case of an unknown tag id the result will be an empty {@link Tag}
    * object.
    * <p>
    * <b>Please notice</b>, that this method call does not write anything to the local
@@ -195,7 +195,7 @@ public interface C2monTagManager {
    * @see #subscribeDataTags(Set, DataTagUpdateListener)
    * @see C2monSupervisionManager#isServerConnectionWorking()
    */
-  ClientDataTagValue getDataTag(final Long tagId);
+  Tag getDataTag(final Long tagId);
 
   /**
    * Returns for every valid id of the list a copy of the cached data tag.
@@ -213,7 +213,7 @@ public interface C2monTagManager {
    * @see #subscribeDataTags(Set, DataTagUpdateListener)
    * @see C2monSupervisionManager#isServerConnectionWorking();
    */
-  Collection<ClientDataTagValue> getDataTags(final Collection<Long> tagIds);
+  Collection<Tag> getDataTags(final Collection<Long> tagIds);
 
   /**
    * Returns a TagConfiguration object for every valid id on the list.

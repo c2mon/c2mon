@@ -29,7 +29,6 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.common.listener.BaseTagListener;
 import cern.c2mon.client.common.listener.TagListener;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.cache.CacheSynchronizationException;
 import cern.c2mon.client.core.cache.ClientDataTagCache;
@@ -87,9 +86,9 @@ public class TagServiceImpl implements AdvancedTagService {
   }
   
   @Deprecated
-  public Collection<ClientDataTagValue> getSubscriptions(final BaseListener listener) {
+  public Collection<Tag> getSubscriptions(final BaseListener listener) {
     Collection<Tag> cacheTagList = cache.getAllTagsForListener(listener);
-    Collection<ClientDataTagValue> clonedDataTags = new ArrayList<>(cacheTagList.size());
+    Collection<Tag> clonedDataTags = new ArrayList<>(cacheTagList.size());
 
     for (Tag cdt : cacheTagList) {
       clonedDataTags.add(((TagImpl) cdt).clone());

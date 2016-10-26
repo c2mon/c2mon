@@ -31,7 +31,6 @@ import org.simpleframework.xml.*;
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TypeNumeric;
 import cern.c2mon.client.core.jms.TopicRegistrationDetails;
@@ -49,7 +48,7 @@ import cern.c2mon.shared.rule.RuleExpression;
 @Slf4j
 @Data
 @Root(name = "Tag")
-public class TagImpl implements ClientDataTagValue, Tag, TopicRegistrationDetails, Cloneable {
+public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
 
   /**
    * Unique identifier for a DataTag

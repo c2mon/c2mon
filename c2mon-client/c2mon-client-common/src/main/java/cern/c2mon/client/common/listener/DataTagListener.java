@@ -18,12 +18,12 @@ package cern.c2mon.client.common.listener;
 
 import java.util.Collection;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.Tag;
 
 /**
  * This interface extends the {@link DataTagUpdateListener} and can be used to
  * subscribe to tags via the C2monTagManager. Different to the {@link DataTagUpdateListener}
- * interface, the initial tag values are not passed to the {@link #onUpdate(ClientDataTagValue)}
+ * interface, the initial tag values are not passed to the {@link #onUpdate(Tag)}
  * method. Instead, the {@link #onInitialUpdate(Collection)} method gets called.
  * This allows a better differentiation between inital values and updates. However,
  * it is also possible to just subscribe with the {@link DataTagUpdateListener} interface,
@@ -37,11 +37,11 @@ public interface DataTagListener extends DataTagUpdateListener {
    * This method is only called once before the listener gets subscribed
    * to list of tags, in order to provide the initial values.<p>
    * Please note, that this method has to return in order to not block
-   * the listener subscription. Only after its return the {@link #onUpdate(ClientDataTagValue)}
+   * the listener subscription. Only after its return the {@link #onUpdate(Tag)}
    * will be called.
    * 
    * @param initialValues The initial values of the tags to which the 
    *        listener got subscribed to.
    */
-  void onInitialUpdate(Collection<ClientDataTagValue> initialValues);
+  void onInitialUpdate(Collection<Tag> initialValues);
 }

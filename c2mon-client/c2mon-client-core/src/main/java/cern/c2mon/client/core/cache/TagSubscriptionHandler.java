@@ -31,7 +31,6 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.listener.TagListener;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.tag.TagController;
@@ -132,8 +131,8 @@ class TagSubscriptionHandler {
         log.debug("handleTagSubscription() - Sending initial values to DataTagListener");
       }
       
-      Collection<ClientDataTagValue> oldFormat = new ArrayList<>(initialUpdates.size());
-      oldFormat.addAll(initialUpdates.values().stream().map(value -> (ClientDataTagValue) value).collect(Collectors.toList()));
+      Collection<Tag> oldFormat = new ArrayList<>(initialUpdates.size());
+      oldFormat.addAll(initialUpdates.values().stream().map(value -> (Tag) value).collect(Collectors.toList()));
       ((DataTagListener) listener).onInitialUpdate(oldFormat);
     }
     else if (sendInitialUpdateSeperately && listener instanceof TagListener) {

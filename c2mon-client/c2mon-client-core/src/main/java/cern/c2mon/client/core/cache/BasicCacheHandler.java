@@ -21,8 +21,6 @@ import java.util.Map;
 import java.util.Set;
 
 import cern.c2mon.client.common.listener.BaseListener;
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.Tag;
 
 /**

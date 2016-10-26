@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.AlarmService;
 import cern.c2mon.client.core.ConfigurationService;
@@ -138,7 +137,7 @@ public class TagManager implements CoreTagManager {
   }
 
   @Override
-  public Collection<ClientDataTagValue> getAllSubscribedDataTags(DataTagUpdateListener listener) {
+  public Collection<Tag> getAllSubscribedDataTags(DataTagUpdateListener listener) {
     return tagService.getSubscriptions(listener);
   }
 
@@ -148,14 +147,14 @@ public class TagManager implements CoreTagManager {
   }
 
   @Override
-  public ClientDataTagValue getDataTag(Long tagId) {
-    return (ClientDataTagValue) tagService.get(tagId);
+  public Tag getDataTag(Long tagId) {
+    return (Tag) tagService.get(tagId);
   }
 
   @Override
-  public Collection<ClientDataTagValue> getDataTags(Collection<Long> tagIds) {
+  public Collection<Tag> getDataTags(Collection<Long> tagIds) {
     Collection<? extends Tag> result =  tagService.get(tagIds);
-    return (Collection<ClientDataTagValue>) result;
+    return (Collection<Tag>) result;
   }
 
   @Override

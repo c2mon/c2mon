@@ -16,36 +16,29 @@
  *****************************************************************************/
 package cern.c2mon.client.core.tag;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNotSame;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.assertTrue;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import cern.c2mon.client.common.tag.ClientDataTag;
-import cern.c2mon.shared.client.alarm.AlarmValue;
-import cern.c2mon.shared.client.alarm.AlarmValueImpl;
-import cern.c2mon.shared.common.metadata.Metadata;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
 import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.Tag;
-import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.TypeNumeric;
+import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.metadata.Metadata;
+
+import static junit.framework.Assert.*;
 
 public class ClientDataTagImplTest {
 
@@ -101,7 +94,7 @@ public class ClientDataTagImplTest {
     return alarmValue;
   }
 
-  private void checkTagValueCopy(final ClientDataTagValue original, final ClientDataTagValue copy) {
+  private void checkTagValueCopy(final Tag original, final Tag copy) {
     assertNotSame("The two objects should not point to the same reference in memory!", original, copy);
     assertTrue(original.equals(copy));
     assertEquals(original.getServerTimestamp(), copy.getServerTimestamp());
@@ -241,7 +234,7 @@ public class ClientDataTagImplTest {
     final TagController cdt = new TagController(1234L);
     cdt.addUpdateListener(new DataTagUpdateListener() {
       @Override
-      public void onUpdate(final ClientDataTagValue tagUpdate) {
+      public void onUpdate(final Tag tagUpdate) {
         assertNotNull(tagUpdate);
         assertEquals(cdt.getTagImpl(), tagUpdate);
         checkTagValueCopy(cdt.getTagImpl(), tagUpdate);
