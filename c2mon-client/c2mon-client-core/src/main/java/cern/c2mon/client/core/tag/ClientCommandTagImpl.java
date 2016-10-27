@@ -31,7 +31,7 @@ import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
 
 import cern.c2mon.client.common.tag.CommandTag;
-import cern.c2mon.client.core.manager.CommandManager;
+import cern.c2mon.client.core.service.impl.CommandServiceImpl;
 import cern.c2mon.shared.client.command.CommandTagHandle;
 import cern.c2mon.shared.client.command.CommandTagValueException;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
@@ -39,14 +39,14 @@ import cern.c2mon.shared.common.command.AuthorizationDetails;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 
 /**
- * This class is used by the {@link CommandManager} to cache
+ * This class is used by the {@link CommandServiceImpl} to cache
  * locally on the C2MON client API information about commands.
  * A command is updated by the {@link CommandTagHandle} object
  * which is sent by the C2MON server.
  *
  * @param <T> The class type of the command value
  * @author Matthias Braeger
- * @see CommandManager
+ * @see CommandServiceImpl
  */
 @Root(name = "ClientCommandTag")
 public class ClientCommandTagImpl<T> implements CommandTag<T>, Cloneable {
@@ -167,7 +167,7 @@ public class ClientCommandTagImpl<T> implements CommandTag<T>, Cloneable {
   }
 
   /**
-   * This method is used by the {@link CommandManager} to update the client command cache
+   * This method is used by the {@link CommandServiceImpl} to update the client command cache
    * object with the information received from the C2MON server.
    * 
    * @param commandTagHandle The update sent by the C2MON server

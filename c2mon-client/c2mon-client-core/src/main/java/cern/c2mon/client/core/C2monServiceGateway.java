@@ -26,7 +26,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import cern.c2mon.client.core.manager.CommandManager;
+import cern.c2mon.client.core.service.impl.CommandServiceImpl;
 import cern.c2mon.client.core.manager.SupervisionManager;
 import cern.c2mon.client.core.service.*;
 
@@ -62,7 +62,7 @@ public class C2monServiceGateway implements ApplicationContextAware {
   private static final Long MAX_INITIALIZATION_TIME = 60000L;
 
   /** Static reference to the <code>C2monCommandManager</code> singleton instance */
-  private static CommandManager commandManager = null;
+  private static CommandServiceImpl commandServiceImpl = null;
 
   /** Static reference to the <code>TagService</code> singleton instance */
   private static TagService tagService = null;
@@ -101,8 +101,8 @@ public class C2monServiceGateway implements ApplicationContextAware {
    */
   public static CommandService getCommandService() {
     startC2monClientSynchronous();
-
-    return commandManager;
+    
+    return commandServiceImpl;
   }
 
   /**
@@ -236,7 +236,7 @@ public class C2monServiceGateway implements ApplicationContextAware {
    */
   private static void initiateGatewayFields(final ApplicationContext context) {
     supervisionManager = context.getBean(SupervisionManager.class);
-    commandManager = context.getBean(CommandManager.class);
+    commandServiceImpl = context.getBean(CommandServiceImpl.class);
 
     alarmService = context.getBean(AlarmService.class);
     configurationService = context.getBean(ConfigurationService.class);
