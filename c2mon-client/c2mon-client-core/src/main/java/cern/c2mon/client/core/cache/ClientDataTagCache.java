@@ -20,7 +20,7 @@ import java.util.Set;
 
 import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
-import cern.c2mon.client.core.service.TagServiceImpl;
+import cern.c2mon.client.core.service.impl.TagServiceImpl;
 
 /**
  * This interface describes the methods which are provided manipulate

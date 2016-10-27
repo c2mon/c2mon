@@ -1,4 +1,4 @@
-/******************************************************************************
+/*******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
@@ -13,8 +13,8 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
- *****************************************************************************/
-package cern.c2mon.client.core;
+ ******************************************************************************/
+package cern.c2mon.client.core.service;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.core.configuration.*;
@@ -25,7 +25,6 @@ import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.request.ClientRequestErrorReport;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
 import cern.c2mon.shared.client.tag.TagConfig;
-import org.apache.activemq.command.Command;
 
 import java.util.Collection;
 

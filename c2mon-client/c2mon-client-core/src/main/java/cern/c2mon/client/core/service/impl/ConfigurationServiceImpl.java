@@ -1,4 +1,4 @@
-/******************************************************************************
+/*******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
@@ -13,13 +13,13 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
- *****************************************************************************/
-package cern.c2mon.client.core.service;
+ ******************************************************************************/
+package cern.c2mon.client.core.service.impl;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
-import cern.c2mon.client.core.ConfigurationService;
 import cern.c2mon.client.core.configuration.*;
 import cern.c2mon.client.core.jms.RequestHandler;
+import cern.c2mon.client.core.service.ConfigurationService;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
 import cern.c2mon.shared.client.configuration.api.Configuration;

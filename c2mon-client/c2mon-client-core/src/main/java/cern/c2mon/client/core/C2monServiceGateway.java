@@ -29,8 +29,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import cern.c2mon.client.core.manager.CommandManager;
 import cern.c2mon.client.core.manager.SupervisionManager;
 import cern.c2mon.client.core.manager.TagManager;
-import cern.c2mon.client.core.service.CommandService;
-import cern.c2mon.client.core.service.SupervisionService;
+import cern.c2mon.client.core.service.*;
 
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.stereotype.Component;

@@ -16,7 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.client.core.service;
 
-import cern.c2mon.client.core.TagService;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
 
 /**
