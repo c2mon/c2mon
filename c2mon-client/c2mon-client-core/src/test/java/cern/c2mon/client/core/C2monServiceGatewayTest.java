@@ -50,7 +50,6 @@ public class C2monServiceGatewayTest {
   @Test
   public void startClient() throws Exception {
     C2monServiceGateway.startC2monClient();
-    assertNotNull(C2monServiceGateway.getCommandManager());
     assertNotNull(C2monServiceGateway.getCommandService());
     assertNotNull(C2monServiceGateway.getSupervisionService());
     assertNotNull(C2monServiceGateway.getSupervisionManager());

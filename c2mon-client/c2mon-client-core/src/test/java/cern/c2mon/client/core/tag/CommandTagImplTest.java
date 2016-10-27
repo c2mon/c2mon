@@ -57,7 +57,7 @@ public class CommandTagImplTest {
   public void startClientWithProperties() throws InterruptedException {
     System.setProperty("c2mon.client.conf.url", "http://timweb/test/conf/c2mon-client.properties");
     C2monServiceGateway.startC2monClientSynchronous();
-    CommandTag<Boolean> commandTag = C2monServiceGateway.getCommandManager().getCommandTag(104974L);
+    CommandTag<Boolean> commandTag = C2monServiceGateway.getCommandService().getCommandTag(104974L);
     assertNotNull(commandTag.getName());
     assertTrue(!commandTag.getName().equalsIgnoreCase(""));
     assertNotNull(commandTag.getProcessId());

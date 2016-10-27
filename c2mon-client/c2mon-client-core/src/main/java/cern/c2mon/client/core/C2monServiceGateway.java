@@ -29,6 +29,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import cern.c2mon.client.core.manager.CommandManager;
 import cern.c2mon.client.core.manager.SupervisionManager;
 import cern.c2mon.client.core.manager.TagManager;
+import cern.c2mon.client.core.service.CommandService;
+
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -95,19 +97,6 @@ public class C2monServiceGateway implements ApplicationContextAware {
    */
   public static final ApplicationContext getApplicationContext() {
     return context;
-  }
-
-
-  /**
-   * @deprecated Please use {@link #getCommandService()} instead
-   * @return The C2MON command service, which shall be used
-   *         for executing commands
-   */
-  @Deprecated
-  public static C2monCommandManager getCommandManager() {
-    startC2monClientSynchronous();
-
-    return commandManager;
   }
 
   /**

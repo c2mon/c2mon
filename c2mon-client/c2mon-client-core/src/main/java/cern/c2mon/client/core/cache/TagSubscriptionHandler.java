@@ -44,7 +44,8 @@ import lombok.extern.slf4j.Slf4j;
  *
  * @author Matthias Braeger
  */
-@Service @Slf4j
+@Service
+@Slf4j
 class TagSubscriptionHandler {
 
   /** The cache controller manages the cache references */
