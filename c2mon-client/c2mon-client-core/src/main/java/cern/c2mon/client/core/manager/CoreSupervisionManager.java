@@ -18,8 +18,7 @@ package cern.c2mon.client.core.manager;
 
 import java.util.Collection;
 
-import cern.c2mon.client.core.C2monSupervisionManager;
-import cern.c2mon.client.core.SupervisionService;
+import cern.c2mon.client.core.service.SupervisionService;
 import cern.c2mon.client.core.jms.SupervisionListener;
 
 /**
@@ -30,7 +29,7 @@ import cern.c2mon.client.core.jms.SupervisionListener;
  *
  * @author Matthias Braeger
  */
-public interface CoreSupervisionManager extends C2monSupervisionManager, SupervisionService {
+public interface CoreSupervisionManager extends SupervisionService {
 
   /**
    * Registers a <code>SupervisionListener</code> which is then getting informed

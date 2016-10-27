@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.core.C2monSupervisionManager;
 import cern.c2mon.client.core.listener.HeartbeatListener;
 import cern.c2mon.client.core.jms.JmsProxy;
 import cern.c2mon.shared.client.supervision.Heartbeat;
@@ -38,7 +37,7 @@ import cern.c2mon.shared.client.supervision.Heartbeat;
 /**
  * The heartbeat manager checks whether the C2MON server heartbeat has expired or not.
  * All registered listeners are informed about all occuring events (update, expiration, resumed heartbeat).
- * The <code>HeartbeatManager</code> belongs to the {@link C2monSupervisionManager} service and get
+ * The <code>HeartbeatManager</code> belongs to the {@link cern.c2mon.client.core.service.SupervisionService} service and get
  * listener registration requests delegated by the <code>SupervisionManager</code> 
  *
  * @author Matthias Braeger

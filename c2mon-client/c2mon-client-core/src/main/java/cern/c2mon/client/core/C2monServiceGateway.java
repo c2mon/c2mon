@@ -30,6 +30,7 @@ import cern.c2mon.client.core.manager.CommandManager;
 import cern.c2mon.client.core.manager.SupervisionManager;
 import cern.c2mon.client.core.manager.TagManager;
 import cern.c2mon.client.core.service.CommandService;
+import cern.c2mon.client.core.service.SupervisionService;
 
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.stereotype.Component;
@@ -160,17 +161,6 @@ public class C2monServiceGateway implements ApplicationContextAware {
     startC2monClientSynchronous();
 
     return tagService;
-  }
-
-  /**
-   * @deprecated Please use {@link #getSupervisionService()} instead
-   * @return the supervision manager
-   */
-  @Deprecated
-  public static C2monSupervisionManager getSupervisionManager() {
-    startC2monClientSynchronous();
-
-    return supervisionManager;
   }
 
   /**

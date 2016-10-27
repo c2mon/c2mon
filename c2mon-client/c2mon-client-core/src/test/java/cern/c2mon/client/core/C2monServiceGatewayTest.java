@@ -52,7 +52,6 @@ public class C2monServiceGatewayTest {
     C2monServiceGateway.startC2monClient();
     assertNotNull(C2monServiceGateway.getCommandService());
     assertNotNull(C2monServiceGateway.getSupervisionService());
-    assertNotNull(C2monServiceGateway.getSupervisionManager());
     assertNotNull(C2monServiceGateway.getTagService());
     assertNotNull(C2monServiceGateway.getAlarmService());
     assertNotNull(C2monServiceGateway.getConfigurationService());
