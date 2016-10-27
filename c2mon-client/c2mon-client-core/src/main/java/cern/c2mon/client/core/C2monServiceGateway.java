@@ -28,7 +28,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import cern.c2mon.client.core.manager.CommandManager;
 import cern.c2mon.client.core.manager.SupervisionManager;
-import cern.c2mon.client.core.manager.TagManager;
 import cern.c2mon.client.core.service.*;
 
 import org.springframework.context.support.AbstractApplicationContext;
@@ -64,9 +63,6 @@ public class C2monServiceGateway implements ApplicationContextAware {
 
   /** Static reference to the <code>C2monCommandManager</code> singleton instance */
   private static CommandManager commandManager = null;
-
-  /** Static reference to the <code>C2monTagManager</code> singleton instance */
-  private static TagManager tagManager = null;
 
   /** Static reference to the <code>TagService</code> singleton instance */
   private static TagService tagService = null;
@@ -107,18 +103,6 @@ public class C2monServiceGateway implements ApplicationContextAware {
     startC2monClientSynchronous();
 
     return commandManager;
-  }
-
-  /**
-   * @deprecated Use {@link #getTagService()} instead
-   * @return The C2MON tag manager, which is managing
-   *         the tag subscription and unsubscription.
-   */
-  @Deprecated
-  public static C2monTagManager getTagManager() {
-    startC2monClientSynchronous();
-
-    return tagManager;
   }
 
   /**
@@ -251,7 +235,6 @@ public class C2monServiceGateway implements ApplicationContextAware {
    * @param context the application context
    */
   private static void initiateGatewayFields(final ApplicationContext context) {
-    tagManager = context.getBean(TagManager.class);
     supervisionManager = context.getBean(SupervisionManager.class);
     commandManager = context.getBean(CommandManager.class);
 

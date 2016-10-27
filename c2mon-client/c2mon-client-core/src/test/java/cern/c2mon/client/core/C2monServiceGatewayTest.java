@@ -59,6 +59,5 @@ public class C2monServiceGatewayTest {
     assertNotNull(C2monServiceGateway.getConfigurationService());
 //    assertNotNull(C2monServiceGateway.getSessionService());
     assertNotNull(C2monServiceGateway.getStatisticsService());
-    assertNotNull(C2monServiceGateway.getTagManager());
   }
 }
