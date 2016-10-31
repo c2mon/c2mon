@@ -20,7 +20,6 @@ import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationHandler;
 import cern.c2mon.daq.common.impl.EquipmentMessageSender;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.shared.common.process.IEquipmentConfiguration;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -33,25 +32,27 @@ import org.springframework.context.ApplicationContext;
  * logging or command handling.
  */
 @Slf4j
-@Data
 public abstract class EquipmentMessageHandler {
   /**
    * The equipment message sender to send and filter data tags which should be
    * send to the server.
    */
+  @Setter
   private EquipmentMessageSender equipmentMessageSender;
   /**
    * The Equipment configuration object.
    */
+  @Getter
   private IEquipmentConfigurationHandler equipmentConfigurationHandler;
   /**
    * The command handler to register the command runner.
    */
+  @Setter @Getter
   private IEquipmentCommandHandler equipmentCommandHandler;
 
-  @Setter
-  @Getter
+  @Setter @Getter
   ApplicationContext context;
+
 
   /**
    * This static method is used to create an instance of appropriate
@@ -146,6 +147,15 @@ public abstract class EquipmentMessageHandler {
    * @param dataTagId The id of the data tag to refresh.
    */
   public abstract void refreshDataTag(final long dataTagId);
+
+  /**
+   * Returns the equipment message sender.
+   *
+   * @return The current equipment message sender.
+   */
+  public IEquipmentMessageSender getEquipmentMessageSender() {
+    return equipmentMessageSender;
+  }
 
   /**
    * This disconnects the DAQ from the datasource and makes sure

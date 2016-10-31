@@ -145,8 +145,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
     this.equipmentSenderInvalid = new EquipmentSenderInvalid(this.equipmentSenderFilterModule, this.processMessageSender, this.equipmentTimeDeadband, this);
 
     // Valid Sender
-    this.equipmentSenderValid = new EquipmentSenderValid(this.equipmentSenderFilterModule, this.processMessageSender,
-            this.equipmentTimeDeadband, this);
+    this.equipmentSenderValid = new EquipmentSenderValid(this.equipmentSenderFilterModule, this.processMessageSender, this, this.equipmentTimeDeadband, this);
 
     // Alive Sender
     this.equipmentAliveSender = new EquipmentAliveSender(this.processMessageSender, this.equipmentConfiguration.getAliveTagId());
