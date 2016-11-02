@@ -170,12 +170,13 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   @Override
   public ConfigurationReport applyConfiguration(Configuration configuration) {
     log.info("Applying configuration with {} item(s)", configuration.getEntities().size());
-    Long configId = sequenceDAO.getNextConfigId();
+    Long configId = -1L;
     ConfigurationReport report = null;
 
     // Try to acquire the configuration lock.
     if (clusterCache.tryWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY, DEFAULT_TIMEOUT)) {
       try {
+        configId = sequenceDAO.getNextConfigId();
         List<ConfigurationElement> configurationElements = configParser.parse(configuration);
 
         report = applyConfiguration(configId.intValue(), configuration.getName(), configurationElements, null, false);
