@@ -19,7 +19,11 @@ package cern.c2mon.daq.common.conf;
 import cern.c2mon.daq.common.DriverKernel;
 import cern.c2mon.daq.common.ProcessMessageSenderMock;
 import cern.c2mon.daq.common.messaging.impl.DummyJmsSender;
+<<<<<<< 5f4d178256ae4d90ff2fd731d7f78ff3f8650a87
 import cern.c2mon.daq.config.DaqCoreModule;
+=======
+import cern.c2mon.daq.common.timer.FreshnessMonitor;
+>>>>>>> #63: Update tests
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
 import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
@@ -28,6 +32,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -46,7 +51,8 @@ import static org.junit.Assert.*;
         "c2mon.daq.name=P_TEST",
         "jms.broker.url=vm://localhost:61616?broker.persistent=false&broker.useShutdownHook=false&broker.useJmx=false"
     }
-)public class EquipmentUnitAddRemoveTest {
+)
+public class EquipmentUnitAddRemoveTest {
 
   @Autowired
   DriverKernel kernel;
@@ -54,6 +60,9 @@ import static org.junit.Assert.*;
 //  @Autowired
 //  @Qualifier("dummyJmsSender")
 //  DummyJmsSender sender;
+
+  @Autowired
+  FreshnessMonitor monitor;
 
   @Before
   public void setUp() throws Exception {

@@ -19,10 +19,12 @@ package cern.c2mon.daq.common.impl;
 import java.io.File;
 import java.io.IOException;
 
+import cern.c2mon.daq.common.timer.FreshnessMonitor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
 import lombok.Data;
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,6 +55,7 @@ public class EquipmentMessageSenderTest {
   private IProcessMessageSender processMessageSenderMock;
   private IDynamicTimeDeadbandFilterActivator medDynamicTimeDeadbandFilterActivatorMock;
   private IDynamicTimeDeadbandFilterActivator lowDynamicTimeDeadbandFilterActivatorMock;
+  private FreshnessMonitor freshnessMonitorMock;
 
   private SourceDataTag sdt1;
   private SourceDataTag sdt2;
@@ -70,8 +73,13 @@ public class EquipmentMessageSenderTest {
     processMessageSenderMock = createStrictMock(IProcessMessageSender.class);
     medDynamicTimeDeadbandFilterActivatorMock = createStrictMock(IDynamicTimeDeadbandFilterActivator.class);
     lowDynamicTimeDeadbandFilterActivatorMock = createStrictMock(IDynamicTimeDeadbandFilterActivator.class);
+    freshnessMonitorMock = createMock(FreshnessMonitor.class);
     equipmentMessageSender = new EquipmentMessageSender(filterMessageSenderMock, processMessageSenderMock, medDynamicTimeDeadbandFilterActivatorMock,
-        lowDynamicTimeDeadbandFilterActivatorMock);
+        lowDynamicTimeDeadbandFilterActivatorMock, freshnessMonitorMock);
+
+    freshnessMonitorMock.setIEquipmentMessageSender(equipmentMessageSender);
+    EasyMock.expectLastCall();
+
     EquipmentConfiguration equipmentConfiguration = new EquipmentConfiguration();
     equipmentConfiguration.setId(EQUIPMENT_ID);
     equipmentConfiguration.setCommFaultTagId(EQ_COMFAULT_ID);

@@ -22,6 +22,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import cern.c2mon.daq.common.IEquipmentMessageSender;
+import cern.c2mon.daq.common.timer.FreshnessMonitor;
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -81,6 +84,7 @@ public class ConfigurationControllerTest {
     @Before
     public void setUp() {
         configurationController = new ConfigurationController();
+        configurationController.setFreshnessMonitor(new FreshnessMonitor());
         processConfiguration = new ProcessConfiguration();
         processConfiguration.setProcessID(TEST_PROCESS_ID);
         configurationController.setProcessConfiguration(processConfiguration);

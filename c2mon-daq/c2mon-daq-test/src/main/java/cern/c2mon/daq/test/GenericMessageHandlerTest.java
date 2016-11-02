@@ -143,7 +143,7 @@ public abstract class GenericMessageHandlerTest {
       medDynamicTimeDeadbandFilterActivator = new TimeDifferenceMovingAverageTimeDeadbandActivator(6, 6000, 44, 44);
 
       equipmentMessageSender = new EquipmentMessageSender(filterMessageSender, messageSender,
-              medDynamicTimeDeadbandFilterActivator, lowDynamicTimeDeadbandFilterActivator);
+              medDynamicTimeDeadbandFilterActivator, lowDynamicTimeDeadbandFilterActivator, null);
 
       configurationController = new ConfigurationController();
       configurationController.setProcessConfiguration(pconf);
