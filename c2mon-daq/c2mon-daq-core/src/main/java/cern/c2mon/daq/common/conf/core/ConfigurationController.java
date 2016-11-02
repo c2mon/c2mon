@@ -25,6 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.daq.common.timer.FreshnessMonitor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -65,6 +67,10 @@ public class ConfigurationController {
 
   @Autowired
   private Environment environment;
+
+  @Setter
+  @Autowired
+  FreshnessMonitor freshnessMonitor;
 
   private long startUp;
 
@@ -450,7 +456,6 @@ public class ConfigurationController {
     }
 
     log.debug("onDataTagRemove - removing " + dataTagRemoveChange.getDataTagId());
-
     SourceDataTag sourceDataTag = sourceDataTags.get(dataTagRemoveChange.getDataTagId());
 
     if (sourceDataTag != null) {
@@ -472,6 +477,8 @@ public class ConfigurationController {
         changeReport.appendError("It was not possible to apply the changes" + "to the implementation part. No data tag changer was found.");
         changeReport.setState(CHANGE_STATE.REBOOT);
       }
+
+      freshnessMonitor.removeDataTag(sourceDataTag);
 
       // remove the tag from the core's map
       sourceDataTags.remove(dataTagRemoveChange.getDataTagId());

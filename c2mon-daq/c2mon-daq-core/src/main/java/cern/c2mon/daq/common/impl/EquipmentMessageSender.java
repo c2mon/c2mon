@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import lombok.extern.slf4j.Slf4j;
+import cern.c2mon.daq.common.timer.FreshnessMonitor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -102,6 +103,8 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
    */
   private EquipmentSenderFilterModule equipmentSenderFilterModule;
 
+  private FreshnessMonitor freshnessMonitor;
+
   /**
    * Creates a new EquipmentMessageSender.
    *
@@ -118,12 +121,14 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
   public EquipmentMessageSender(final IFilterMessageSender filterMessageSender,
                                 final IProcessMessageSender processMessageSender,
                                 @Qualifier("medDynamicTimeDeadbandFilterActivator") final IDynamicTimeDeadbandFilterActivator medDynamicTimeDeadbandFilterActivator,
-                                @Qualifier("lowDynamicTimeDeadbandFilterActivator") final IDynamicTimeDeadbandFilterActivator lowDynamicTimeDeadbandFilterActivator) {
+                                @Qualifier("lowDynamicTimeDeadbandFilterActivator") final IDynamicTimeDeadbandFilterActivator lowDynamicTimeDeadbandFilterActivator,
+                                FreshnessMonitor freshnessMonitor) {
     super();
     this.filterMessageSender = filterMessageSender;
     this.processMessageSender = processMessageSender;
     this.medDynamicTimeDeadbandFilterActivator = medDynamicTimeDeadbandFilterActivator;
     this.lowDynamicTimeDeadbandFilterActivator = lowDynamicTimeDeadbandFilterActivator;
+    this.freshnessMonitor = freshnessMonitor;
   }
 
   /**
@@ -150,6 +155,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
     // Alive Sender
     this.equipmentAliveSender = new EquipmentAliveSender(this.processMessageSender, this.equipmentConfiguration.getAliveTagId());
     this.equipmentAliveSender.init(this.equipmentConfiguration.getAliveTagInterval(), this.equipmentConfiguration.getName());
+    this.freshnessMonitor.setIEquipmentMessageSender(this);
   }
 
   /**
@@ -236,7 +242,9 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
 
   @Override
   public boolean update(Long tagId, ValueUpdate update) {
-    // If we received an update of equipment alive tag, we send immediately a message to the server
+    SourceDataTag sdt = getTag(tagId);
+    freshnessMonitor.refreshValue(sdt);
+
     if (isAliveTag(tagId)) {
       return this.equipmentAliveSender.sendEquipmentAlive(getTag(tagId), update);
     } else {
@@ -276,6 +284,11 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
   @Override
   public void update(Long tagId, ValueUpdate update, SourceDataTagQuality quality) {
     SourceDataTag sdt = getTag(tagId);
+    if(quality.getQualityCode() == null ||
+        (quality.getQualityCode() != null && quality.getQualityCode() != SourceDataTagQualityCode.STALE)) {
+      freshnessMonitor.refreshValue(sdt);
+    }
+
     if (update.getValueDescription() == null) {
       update.setValueDescription("");
     }
