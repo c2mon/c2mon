@@ -151,8 +151,8 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
    * The time in which a new value is expected. If this time expire the the
    * status of the tag changes to STALE.
    */
-  @Element(required = false, name = "refresh-time")
-  private Integer freshnessTime;
+  @Element(required = false, name = "freshness-interval")
+  private Integer freshnessInterval;
 
   /**
    * Default constructor creating an uninitialised DataTagAddress object. The
@@ -462,10 +462,10 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
       str.append("</time-deadband>\n");
     }
 
-    if (freshnessTime != null) {
-      str.append("        <refresh-time>");
-      str.append(freshnessTime);
-      str.append("</refresh-time>\n");
+    if (freshnessInterval != null) {
+      str.append("        <freshness-interval>");
+      str.append(freshnessInterval);
+      str.append("</freshness-interval>\n");
     }
 
     str.append("        <priority>");
@@ -539,8 +539,8 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
             result.timeDeadband = Integer.parseInt(fieldValueString);
           } else if (fieldName.equals("priority")) {
             result.priority = Integer.parseInt(fieldValueString);
-          } else if (fieldName.equals("refresh-time") && !fieldValueString.equals("null")) {
-            result.freshnessTime = Integer.parseInt(fieldValueString);
+          } else if (fieldName.equals("freshness-interval") && !fieldValueString.equals("null")) {
+            result.freshnessInterval = Integer.parseInt(fieldValueString);
           } else if (fieldName.equals("guaranteed-delivery")) {
             result.guaranteedDelivery = fieldValueString.equals("true");
           }

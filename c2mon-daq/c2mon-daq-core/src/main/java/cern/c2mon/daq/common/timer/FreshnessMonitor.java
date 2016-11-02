@@ -43,8 +43,8 @@ public class FreshnessMonitor {
   public void refreshValue(SourceDataTag sourceDataTag) {
 
     if (sourceDataTag.getAddress() != null
-        && sourceDataTag.getAddress().getFreshnessTime() != null
-        && sourceDataTag.getAddress().getFreshnessTime() != 0L) {
+        && sourceDataTag.getAddress().getFreshnessInterval() != null
+        && sourceDataTag.getAddress().getFreshnessInterval() != 0L) {
 
       log.trace("Checking freshness for tag {}", sourceDataTag.getName());
       Long tagId = sourceDataTag.getId();
@@ -62,15 +62,15 @@ public class FreshnessMonitor {
 
       Double freshnessTolerance = environment.getRequiredProperty("c2mon.daq.freshness.tolerance", Double.class);
 
-      log.info("" + (long) (sourceDataTag.getAddress().getFreshnessTime() * freshnessTolerance));
-      timer.schedule(task, (long) (sourceDataTag.getAddress().getFreshnessTime() * freshnessTolerance), TimeUnit.SECONDS);
+      log.info("" + (long) (sourceDataTag.getAddress().getFreshnessInterval() * freshnessTolerance));
+      timer.schedule(task, (long) (sourceDataTag.getAddress().getFreshnessInterval() * freshnessTolerance), TimeUnit.SECONDS);
     }
   }
 
   public void removeDataTag(SourceDataTag sourceDataTag) {
     if (sourceDataTag.getAddress() != null
-        && sourceDataTag.getAddress().getFreshnessTime() != null
-        && sourceDataTag.getAddress().getFreshnessTime() != 0L) {
+        && sourceDataTag.getAddress().getFreshnessInterval() != null
+        && sourceDataTag.getAddress().getFreshnessInterval() != 0L) {
 
       Long tagId = sourceDataTag.getId();
       if (freshnessTasks.containsKey(tagId)) {

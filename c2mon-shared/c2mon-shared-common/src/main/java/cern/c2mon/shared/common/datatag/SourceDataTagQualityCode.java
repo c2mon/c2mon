@@ -84,7 +84,7 @@ public enum SourceDataTagQualityCode {
    * Quality code representing a SourceDataTag value which did not receive a
    * update in a given time.
    */
-  STALE(9, "No value received in the expected interval of the tag");
+  STALE(9, "Value is stale");
 
 
   /** quality code sent by the data source */
