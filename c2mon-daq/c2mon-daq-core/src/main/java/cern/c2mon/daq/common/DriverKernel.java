@@ -327,7 +327,7 @@ public class DriverKernel implements ApplicationContextAware {
         validateDataTags(conf, equipmentMessageSender);
         validateCommandTags(conf, equipmentMessageSender);
         equnit = EquipmentMessageHandler.createEquipmentMessageHandler(conf.getHandlerClassName(), new EquipmentCommandHandler(equipmentId,
-            requestController), new EquipmentConfigurationHandler(equipmentId, configurationController), equipmentMessageSender);
+            requestController), new EquipmentConfigurationHandler(equipmentId, configurationController), equipmentMessageSender, applicationContext);
         equnit.setEquipmentLoggerFactory(equipmentLoggerFactory);
       } catch (InstantiationException e) {
         String msg = "Error while instantiating " + conf.getHandlerClassName();
@@ -623,7 +623,7 @@ public class DriverKernel implements ApplicationContextAware {
       validateDataTags(conf, equipmentMessageSender);
       validateCommandTags(conf, equipmentMessageSender);
       equnit = EquipmentMessageHandler.createEquipmentMessageHandler(conf.getHandlerClassName(), new EquipmentCommandHandler(conf.getId(), requestController)
-          , new EquipmentConfigurationHandler(conf.getId(), configurationController), equipmentMessageSender);
+          , new EquipmentConfigurationHandler(conf.getId(), configurationController), equipmentMessageSender, applicationContext);
       equnit.setEquipmentLoggerFactory(equipmentLoggerFactory);
 
       // put the equipment configuration into the process configuration's map
