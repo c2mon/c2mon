@@ -464,7 +464,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
         hardwareAddressUpdate.getChangedValues().put(field.getName(), field.get(dataTagAddress.getHardwareAddress()));
       }
     }
-    if(dataTagAddress.getFreshnessInterval() != null) {
+    if (dataTagAddress.getFreshnessInterval() != null) {
       dataTagAddressUpdate.setFreshnessInterval(dataTagAddress.getFreshnessInterval());
     }
   }

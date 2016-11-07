@@ -40,7 +40,7 @@ public class FreshnessMonitor {
     this.equipmentMessageSender = equipmentMessageSender;
   }
 
-  public void refreshValue(SourceDataTag sourceDataTag) {
+  public void reset(SourceDataTag sourceDataTag) {
 
     if (sourceDataTag.getAddress() != null
         && sourceDataTag.getAddress().getFreshnessInterval() != null

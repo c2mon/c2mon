@@ -243,7 +243,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
   @Override
   public boolean update(Long tagId, ValueUpdate update) {
     SourceDataTag sdt = getTag(tagId);
-    freshnessMonitor.refreshValue(sdt);
+    freshnessMonitor.reset(sdt);
 
     if (isAliveTag(tagId)) {
       return this.equipmentAliveSender.sendEquipmentAlive(getTag(tagId), update);
@@ -284,9 +284,9 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
   @Override
   public void update(Long tagId, ValueUpdate update, SourceDataTagQuality quality) {
     SourceDataTag sdt = getTag(tagId);
-    if(quality.getQualityCode() == null ||
+    if (quality.getQualityCode() == null ||
         (quality.getQualityCode() != null && quality.getQualityCode() != SourceDataTagQualityCode.STALE)) {
-      freshnessMonitor.refreshValue(sdt);
+      freshnessMonitor.reset(sdt);
     }
 
     if (update.getValueDescription() == null) {
