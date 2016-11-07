@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -36,9 +36,9 @@ public class ConfigurationUpdaterTest {
     private ConfigurationUpdater configurationUpdater = new ConfigurationUpdater();
 
     private class TestHardwareAddress implements HardwareAddress {
-        
+
         private String testField;
-        
+
         public TestHardwareAddress(String testField) {
             this.setTestField(testField);
         }
@@ -50,9 +50,9 @@ public class ConfigurationUpdaterTest {
 
         @Override
         public void validate() throws ConfigurationException {
-            
+
         }
-        
+
         @Override
         public HardwareAddress clone() throws CloneNotSupportedException {
             return (HardwareAddress) super.clone();
@@ -71,7 +71,7 @@ public class ConfigurationUpdaterTest {
         public String getTestField() {
             return testField;
         }
-        
+
     }
     @Test
     public void testUpdateCommandTag() throws IllegalAccessException, NoSuchFieldException {
@@ -94,7 +94,7 @@ public class ConfigurationUpdaterTest {
         assertEquals(0, sourceCommandTag.getSourceTimeout());
         assertEquals("new", ((TestHardwareAddress)sourceCommandTag.getHardwareAddress()).getTestField());
     }
-    
+
     @Test
     public void testUpdateDataTag() throws IllegalAccessException, NoSuchFieldException {
         SourceDataTag sourceDataTag = new SourceDataTag(1L, "asd", false);
@@ -105,17 +105,18 @@ public class ConfigurationUpdaterTest {
         address.setTimeDeadband(100);
         sourceDataTag.setAddress(address);
         address.setHardwareAddress(oldHwAddress);
-        
+
         DataTagUpdate update = new DataTagUpdate();
         update.setMaxValue(1000L);
         update.addFieldToRemove("mode");
         DataTagAddressUpdate dataTagAddressUpdate = new DataTagAddressUpdate();
         dataTagAddressUpdate.setTimeDeadband(10);
+        dataTagAddressUpdate.setFreshnessInterval(100);
         update.setDataTagAddressUpdate(dataTagAddressUpdate);
         HardwareAddressUpdate hwUpdate = new HardwareAddressUpdate();
         hwUpdate.getChangedValues().put("testField", "new");
         dataTagAddressUpdate.setHardwareAddressUpdate(hwUpdate);
-        
+
         assertEquals(1,sourceDataTag.getMode());
         assertNotSame(update.getMaxValue(), sourceDataTag.getMaxValue());
         configurationUpdater.updateDataTag(update, sourceDataTag);
@@ -124,8 +125,9 @@ public class ConfigurationUpdaterTest {
         assertEquals(0,sourceDataTag.getMode());
         assertEquals(10, address.getTimeDeadband());
         assertEquals("new", ((TestHardwareAddress)sourceDataTag.getHardwareAddress()).getTestField());
+        assertTrue(address.getFreshnessInterval() == 100);
     }
-    
+
     @Test
     public void testEquipmentConfigurationUpdate() throws IllegalAccessException, NoSuchFieldException {
         EquipmentConfiguration equipmentConfiguration = new EquipmentConfiguration();

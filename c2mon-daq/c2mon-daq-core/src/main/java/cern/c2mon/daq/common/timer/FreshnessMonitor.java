@@ -61,8 +61,6 @@ public class FreshnessMonitor {
       }
 
       Double freshnessTolerance = environment.getRequiredProperty("c2mon.daq.freshness.tolerance", Double.class);
-
-      log.info("" + (long) (sourceDataTag.getAddress().getFreshnessInterval() * freshnessTolerance));
       timer.schedule(task, (long) (sourceDataTag.getAddress().getFreshnessInterval() * freshnessTolerance), TimeUnit.SECONDS);
     }
   }
