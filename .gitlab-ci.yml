@@ -1,0 +1,15 @@
+image: maven:3.3-jdk-8
+
+# Fully build and publish master branch
+build_and_publish:
+  script: 
+    - mvn -q -U -B -T4 clean deploy --settings settings.xml
+  only:
+    - master
+    
+# Just run tests on feature branches
+build:
+  script:
+    - mvn -q -U -B -T4 clean test --settings settings.xml
+  except:
+    - master
