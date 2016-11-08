@@ -80,7 +80,7 @@ public class SourceDataTagTest {
 
     Timestamp timestamp = new Timestamp(System.currentTimeMillis() - 1);
     SourceDataTagQuality quality = new SourceDataTagQuality(SourceDataTagQualityCode.DATA_UNAVAILABLE);
-    tag.update(quality, System.currentTimeMillis() - 1);
+    tag.update(quality, timestamp.getTime());
 
     Assert.assertEquals(timestamp, tag.getCurrentValue().getTimestamp());
     //DAQ timestamp should be later
