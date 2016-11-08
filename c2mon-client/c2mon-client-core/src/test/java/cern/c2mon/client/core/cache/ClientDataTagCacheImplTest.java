@@ -145,7 +145,6 @@ public class ClientDataTagCacheImplTest {
     for (Long tagId : tagIds) {
       serverUpdates.add(createValidTransferTag(tagId));
       TagController cdtMock = prepareClientDataTagCreateMock(tagId);
-      jmsProxyMock.unregisterUpdateListener(cdtMock);
       supervisionManagerMock.removeSupervisionListener(cdtMock);
     }
     EasyMock.expect(requestHandlerMock.requestTags(tagIds)).andReturn(serverUpdates);
@@ -171,7 +170,6 @@ public class ClientDataTagCacheImplTest {
     assertEquals(0, cachedTags.size());
 
     Thread.sleep(200);
-    //Thread.sleep(2500);
 
     // check test success
     EasyMock.verify(jmsProxyMock, requestHandlerMock);
@@ -181,10 +179,10 @@ public class ClientDataTagCacheImplTest {
   @Test
   public void testContainsTag() throws Exception {
     // Test setup
-    Set<Long> tagIds = new HashSet<Long>();
+    Set<Long> tagIds = new HashSet<>();
     tagIds.add(1L);
     tagIds.add(2L);
-    Collection<TagUpdate> serverUpdates = new ArrayList<TagUpdate>(tagIds.size());
+    Collection<TagUpdate> serverUpdates = new ArrayList<>(tagIds.size());
     for (Long tagId : tagIds) {
       serverUpdates.add(createValidTransferTag(tagId));
       prepareClientDataTagCreateMock(tagId);
@@ -213,7 +211,7 @@ public class ClientDataTagCacheImplTest {
     Set<Long> tagIds = new HashSet<>();
     tagIds.add(1L);
     tagIds.add(2L);
-    Collection<TagUpdate> serverUpdates = new ArrayList<TagUpdate>(tagIds.size());
+    Collection<TagUpdate> serverUpdates = new ArrayList<>(tagIds.size());
     for (Long tagId : tagIds) {
       serverUpdates.add(createValidTransferTag(tagId));
       prepareClientDataTagCreateMock(tagId);
@@ -247,12 +245,6 @@ public class ClientDataTagCacheImplTest {
   private TagController prepareClientDataTagCreateMock(final Long tagId) throws RuleFormatException, JMSException {
     TagController cdtMock = new TagController(tagId);
     cdtMock.update(createValidTransferTag(tagId));
-    // In case of a CommFault- or Status control tag, we don't register to supervision invalidations
-    if (!cdtMock.getTagImpl().isControlTag() || cdtMock.getTagImpl().isAliveTag()) {
-      supervisionManagerMock.addSupervisionListener(cdtMock, cdtMock.getTagImpl().getProcessIds(), cdtMock.getTagImpl().getEquipmentIds(), cdtMock.getTagImpl().getSubEquipmentIds());
-    }
-    EasyMock.expect(jmsProxyMock.isRegisteredListener(cdtMock)).andReturn(false);
-    jmsProxyMock.registerUpdateListener(cdtMock, cdtMock.getTagImpl());
 
     return cdtMock;
   }
