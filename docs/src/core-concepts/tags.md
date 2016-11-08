@@ -28,7 +28,7 @@ It is attached to an Equipment, which embodies the type of data source it origin
 
 Every DataTag has to provide a so-called "hardware address", which contains the information needed for subscribing to this data point.
 C2MON leaves it completely free how that hardware address is formatted.
-More information about that topic is provided in [Creating a new DAQ module from scratch](/user-guide/daq-api/DAQ_module_developer_guide.md).
+More information about that topic is provided in [Creating a new DAQ module from scratch](user-guide/daq-api/DAQ_module_developer_guide.md).
 
 
 !!! info "Please note!"
