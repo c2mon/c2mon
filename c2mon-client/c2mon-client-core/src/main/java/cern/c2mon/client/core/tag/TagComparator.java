@@ -40,7 +40,7 @@ class TagComparator {
     if (tag1 == null || tag2 == null) {
       return false;
     }
-    if (!(tag2 instanceof TagController)) {
+    if (!(tag2 instanceof TagImpl)) {
       return false;
     }
 
