@@ -29,38 +29,43 @@ import cern.c2mon.shared.common.datatag.address.HardwareAddress;
  * 
  */
 public abstract class TagChangerHelper {
-    /**
-     * Checks if all fields are the same.
-     * 
-     * @param hardwareAddress
-     *            The new hardware address.
-     * @param oldHardwareAddress
-     *            The old hardware address.
-     * @return True if a field is not equal with the field in the old address.
-     *         If all fields are the same it returns false.
-     */
-    public static boolean hasHardwareAddressChanged(final HardwareAddress hardwareAddress, final HardwareAddress oldHardwareAddress) {
-        SimpleTypeReflectionHandler simpleTypeReflectionHandler = new SimpleTypeReflectionHandler();
-        List<Field> sctHardwareAddressFields = simpleTypeReflectionHandler.getNonTransientSimpleFields(hardwareAddress.getClass());
-        List<Field> oldSctHardwareAddressFields = simpleTypeReflectionHandler.getNonTransientSimpleFields(oldHardwareAddress.getClass());
-        int i = 0;
-        for (Field field : sctHardwareAddressFields) {
-            try {
-                Object fieldValue = field.get(hardwareAddress);
-                Object oldFieldValue = oldSctHardwareAddressFields.get(i);
-                if (fieldValue == null) {
-                    if (oldFieldValue == null) {
-                        return true;
-                    }
-                } else if (!field.get(hardwareAddress).equals(oldSctHardwareAddressFields.get(i))) {
-                    return true;
-                }
-            } catch (Exception e) {
-                return true; // if not sure return that they are not equal
-            }
-            i++;
-        }
-        return false; // nothing found
+  /**
+   * Checks if all fields are the same.
+   *
+   * @param hardwareAddress    The new hardware address.
+   * @param oldHardwareAddress The old hardware address.
+   *
+   * @return True if a field is not equal with the field in the old address.
+   * If all fields are the same it returns false.
+   */
+  public static boolean hasHardwareAddressChanged(final HardwareAddress hardwareAddress, final HardwareAddress oldHardwareAddress) {
+    if (hardwareAddress == null || oldHardwareAddress == null) {
+      return !(hardwareAddress == null && oldHardwareAddress == null);
     }
 
+    SimpleTypeReflectionHandler simpleTypeReflectionHandler = new SimpleTypeReflectionHandler();
+    List<Field> sctHardwareAddressFields = simpleTypeReflectionHandler.getNonTransientSimpleFields(hardwareAddress.getClass());
+    List<Field> oldSctHardwareAddressFields = simpleTypeReflectionHandler.getNonTransientSimpleFields(oldHardwareAddress.getClass());
+
+    int i = 0;
+    for (Field field : sctHardwareAddressFields) {
+      try {
+        Object fieldValue = field.get(hardwareAddress);
+        Object oldFieldValue = oldSctHardwareAddressFields.get(i);
+        if (fieldValue == null) {
+          if (oldFieldValue == null) {
+            return true;
+          }
+        }
+        else if (!field.get(hardwareAddress).equals(oldSctHardwareAddressFields.get(i))) {
+          return true;
+        }
+      }
+      catch (Exception e) {
+        return true; // if not sure return that they are not equal
+      }
+      i++;
+    }
+    return false; // nothing found
+  }
 }
