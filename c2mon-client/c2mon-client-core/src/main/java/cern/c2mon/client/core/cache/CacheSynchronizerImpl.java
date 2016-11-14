@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -33,13 +33,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.client.core.jms.ConnectionListener;
+import cern.c2mon.client.core.jms.JmsProxy;
+import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.client.core.listener.HeartbeatListener;
 import cern.c2mon.client.core.manager.CoreSupervisionManager;
 import cern.c2mon.client.core.manager.SupervisionManager;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
-import cern.c2mon.client.core.jms.ConnectionListener;
-import cern.c2mon.client.core.jms.JmsProxy;
-import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
@@ -133,12 +133,12 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
 
   @PostConstruct
   protected void init() {
-    supervisionManager.addConnectionListener(this);
-    supervisionManager.addHeartbeatListener(this);
-
     cacheReadLock = controller.getReadLock();
     historyCache = controller.getHistoryCache();
     liveCache = controller.getLiveCache();
+
+    supervisionManager.addConnectionListener(this);
+    supervisionManager.addHeartbeatListener(this);
   }
 
   @Override
@@ -152,7 +152,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
   @Override
   public Set<Long> initTags(final Set<Long> tagIds) throws CacheSynchronizationException {
     Set<Long> newTags = new HashSet<>();
-    
+
     if (tagIds.size() > 0) {
       ClientDataTagImpl cdt = null;
       for (Long tagId : tagIds) {
@@ -174,43 +174,43 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
           throw new CacheSynchronizationException(e);
         }
       }
-      
+
       // Checks, if there are tags which needs to be synchronized with
       // the history cache.
       if (controller.isHistoryModeEnabled()) {
         synchronizeHistoryCache(newTags);
       }
     }
-    
+
     return newTags;
   }
-  
+
   @Override
   public Set<Long> initTags(final Set<String> regexList, final Set<Long> allMatchingTags) throws CacheSynchronizationException {
     final Set<Long> newTags = new HashSet<>();
 
     try {
       Collection<TagUpdate> tagUpdates = tagRequestHandler.requestTagsByRegex(regexList);
-      
+
       for (TagUpdate tagUpdate : tagUpdates) {
-        
+
         try {
 
           controller.getWriteLock().lock();
           try {
             if (!liveCache.containsKey(tagUpdate.getId())) {
               ClientDataTagImpl cdt = new ClientDataTagImpl(tagUpdate.getId());
-              
+
               cdt.update(tagUpdate);
               subscribeToSupervisionManager(cdt);
               liveCache.put(cdt.getId(), cdt);
-              
+
               newTags.add(cdt.getId());
             }
           } finally {
             controller.getWriteLock().unlock();
           }
-          
+
           allMatchingTags.add(tagUpdate.getId());
 
         } catch (RuleFormatException e) {
@@ -224,12 +224,12 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
     }
 
     if (!newTags.isEmpty()) {
-      // Checks, if we need to synchonize the 
+      // Checks, if we need to synchonize the
       if (controller.isHistoryModeEnabled()) {
         synchronizeHistoryCache(newTags);
       }
     }
-    
+
     return newTags;
   }
 
@@ -260,7 +260,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
         }
         supervisionManager.removeSupervisionListener(liveTag);
       }
-      
+
       if (liveCache.isEmpty()) {
         LOG.info("removeTags() - Cache is now empty.");
       }
@@ -312,10 +312,10 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
 
         if (pTagIds == null || jmsConnectionDown || heartbeatExpired) {
           // Refresh entire cache
-          unsynchronizedTagIds = new HashSet<Long>(liveCache.keySet());
+          unsynchronizedTagIds = new HashSet<>(liveCache.keySet());
         } else {
-          unsynchronizedTagIds = new HashSet<Long>(pTagIds);
-        }  
+          unsynchronizedTagIds = new HashSet<>(pTagIds);
+        }
 
         unsynchronizedTagIds.removeAll(synchronizeTags(unsynchronizedTagIds));
 
@@ -347,7 +347,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
       throw new CacheSynchronizationException("Could not refresh tags in the live cache.", e);
     }
   }
-  
+
   /**
    * Gets the list of tags out of the live cache and synchronizes them again with
    * the server.
@@ -356,29 +356,29 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
    */
   private Set<Long> synchronizeTags(Set<Long> tagIds) throws JMSException {
     Set<Long> tagsKnownByServer = new HashSet<>();
-    
+
     LOG.info("synchronizeTags() - Synchronizing " + tagIds.size() + " live cache entries with the server.");
-    
+
     // Get and update the initial tags
     final Collection<TagUpdate> tagUpdates = tagRequestHandler.requestTags(tagIds);
     for (TagUpdate tagUpdate : tagUpdates) {
       try {
         ClientDataTagImpl liveTag = liveCache.get(tagUpdate.getId());
         boolean wasUnknown = !liveTag.getDataTagQuality().isExistingTag();
-        
+
         liveTag.update(tagUpdate);
-        
+
         if (wasUnknown) {
           subscribeToSupervisionManager(liveTag);
         }
-        
+
         tagsKnownByServer.add(tagUpdate.getId());
       } catch (RuleFormatException e) {
         LOG.error("synchronizeCache() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
         throw new RuntimeException("Received an incorrect rule tag from the server for tag id " + tagUpdate.getId());
       }
     }
-    
+
     return tagsKnownByServer;
   }
 
@@ -422,7 +422,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
 
       // Keep a reference to all newly registered tags whose values have to be
       // synchronised with a second server call.
-      Set<Long> newKnownTags = new HashSet<Long>();
+      Set<Long> newKnownTags = new HashSet<>();
       try {
         LOG.info("Subscribing to tag value update topic");
 
@@ -447,12 +447,12 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
         // update has been missed whilst subscribing to the topic
         LOG.info("Synchronizing cache values after update topic registration");
         synchronizeTagValues(newKnownTags);
-        
+
       } catch (JMSException e) {
         throw new CacheSynchronizationException("Could not refresh tags in the live cache.", e);
       }
     }
-    
+
     /**
      * Inner method that updates a second time in case an update was sent before
      * the Tag was subscribed to the topic.
@@ -510,7 +510,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
    * information from the C2MON server. This call is then updating the history
    * cache with the cloned tags from the live cache, but only if the cache is
    * currently set to history mode.
-   * 
+   *
    * @param historyCacheUpdateList When the cache is in history mode, the <code>TagServiceImpl</code> still needs
    *        to initialize new tags with the static information which it requests from
    *        the C2MON server. Those information are also used for the tags in the
@@ -613,7 +613,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
       }
     }
   }
-  
+
   /**
    * Subscribes the given tag to the {@link SupervisionManager}
    * @param cdt a newly created tag
