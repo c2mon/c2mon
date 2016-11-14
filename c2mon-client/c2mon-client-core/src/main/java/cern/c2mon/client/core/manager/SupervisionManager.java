@@ -1,42 +1,32 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.client.core.manager;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.client.core.jms.*;
 import cern.c2mon.client.core.listener.HeartbeatListener;
-import cern.c2mon.client.core.jms.ClientHealthListener;
-import cern.c2mon.client.core.jms.ClientHealthMonitor;
-import cern.c2mon.client.core.jms.ConnectionListener;
-import cern.c2mon.client.core.jms.JmsProxy;
-import cern.c2mon.client.core.jms.RequestHandler;
-import cern.c2mon.client.core.jms.SupervisionListener;
 import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
@@ -50,11 +40,9 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
  *
  * @author Matthias Braeger
  */
+@Slf4j
 @Service
 public class SupervisionManager implements CoreSupervisionManager, SupervisionListener, ConnectionListener, HeartbeatListener {
-
-  /** Log4j logger instance */
-  private static final Logger LOG = LoggerFactory.getLogger(SupervisionManager.class);
 
   /**
    * Set to <code>true</code>, if the supervision cache is correctly initialized
@@ -77,37 +65,37 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
    * Lookup table for all registered listeners on a given process supervision
    * event
    */
-  private final Map<Long, Set<SupervisionListener>> processSupervisionListeners = new HashMap<Long, Set<SupervisionListener>>();
+  private final Map<Long, Set<SupervisionListener>> processSupervisionListeners = new HashMap<>();
 
   /**
    * Lookup table for all registered listeners on a given equipment supervision
    * event
    */
-  private final Map<Long, Set<SupervisionListener>> equipmentSupervisionListeners = new HashMap<Long, Set<SupervisionListener>>();
+  private final Map<Long, Set<SupervisionListener>> equipmentSupervisionListeners = new HashMap<>();
 
   /**
    * Lookup table for all registered listeners on a given sub equipment
    * supervision event
    */
-  private final Map<Long, Set<SupervisionListener>> subEquipmentSupervisionListeners = new HashMap<Long, Set<SupervisionListener>>();
+  private final Map<Long, Set<SupervisionListener>> subEquipmentSupervisionListeners = new HashMap<>();
 
   /**
    * Map containing the latest process supervision events. The key of the map is
    * the process id.
    */
-  private final Map<Long, SupervisionEvent> processEventCache = new HashMap<Long, SupervisionEvent>();
+  private final Map<Long, SupervisionEvent> processEventCache = new HashMap<>();
 
   /**
    * Map containing the latest equipment supervision events. The key of the map
    * is the equipment id.
    */
-  private final Map<Long, SupervisionEvent> equipmentEventCache = new HashMap<Long, SupervisionEvent>();
+  private final Map<Long, SupervisionEvent> equipmentEventCache = new HashMap<>();
 
   /**
    * Map containing the latest sub equipment supervision events. The key of the
    * map is the sub equipment id.
    */
-  private final Map<Long, SupervisionEvent> subEquipmentEventCache = new HashMap<Long, SupervisionEvent>();
+  private final Map<Long, SupervisionEvent> subEquipmentEventCache = new HashMap<>();
 
   /** Reference to the <code>JmsProxy</code> singleton instance */
   private final JmsProxy jmsProxy;
@@ -180,7 +168,7 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
           break;
         default:
           String errMsg = supervisionEvent.getEntity() + " SupervisionEvent is not supported by this client - not taking any action";
-          LOG.debug("onSupervisionUpdate() - " + errMsg);
+          log.debug("onSupervisionUpdate() - " + errMsg);
         }
       }
       finally {
@@ -191,7 +179,7 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
 
   /**
    * Inner method to update supervision event cache maps
-   * 
+   *
    * @param supervisionEvent The new event
    * @return <code>true</code>, if the cache was updated otherwise
    *         <code>false</code>
@@ -237,7 +225,7 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
         break;
       default:
         String errMsg = supervisionEvent.getEntity() + " SupervisionEvent is not supported by this client - ignoring the event";
-        LOG.debug("updateEventCache() - " + errMsg);
+        log.debug("updateEventCache() - " + errMsg);
         updated = false;
       }
     }
@@ -251,7 +239,7 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
   /**
    * Inner method to inform all subscribed listeners of the process supervision
    * event
-   * 
+   *
    * @param supervisionEvent The event
    */
   private void fireProcessSupervisionUpdate(final SupervisionEvent supervisionEvent) {
@@ -266,7 +254,7 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
   /**
    * Inner method to inform all subscribed listeners of the equipment
    * supervision event
-   * 
+   *
    * @param supervisionEvent The event
    */
   private void fireEquipmentSupervisionUpdate(final SupervisionEvent supervisionEvent) {
@@ -281,7 +269,7 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
   /**
    * Inner method to inform all subscribed listeners of the sub equipment
    * supervision event
-   * 
+   *
    * @param supervisionEvent The event
    */
   private void fireSubEquipmentSupervisionUpdate(final SupervisionEvent supervisionEvent) {
@@ -375,10 +363,10 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
         onSupervisionUpdate(event);
       }
       c2monConnectionEstablished = true;
-      LOG.info("refreshSupervisionStatus() - supervision event cache was successfully updated with " + allCurrentEvents.size() + " events.");
+      log.info("refreshSupervisionStatus() - supervision event cache was successfully updated with " + allCurrentEvents.size() + " events.");
     }
     catch (Exception e) {
-      LOG.error("refreshSupervisionStatus() - Could not initialize/update the supervision event cache. Reason: " + e.getMessage(), e);
+      log.error("refreshSupervisionStatus() - Could not initialize/update the supervision event cache. Reason: " + e.getMessage(), e);
       c2monConnectionEstablished = false;
     }
   }
