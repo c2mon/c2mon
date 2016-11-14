@@ -1,22 +1,23 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.client.core.jms.impl;
 
 import java.io.Serializable;
+import java.lang.IllegalStateException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -32,48 +33,22 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.ExceptionListener;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.ObjectMessage;
-import javax.jms.Session;
-import javax.jms.TemporaryQueue;
-import javax.jms.TextMessage;
-import javax.jms.Topic;
+import javax.jms.*;
 
+import com.google.gson.JsonSyntaxException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
-import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.common.listener.TagUpdateListener;
-import cern.c2mon.client.core.jms.BroadcastMessageListener;
-import cern.c2mon.client.core.jms.AlarmListener;
-import cern.c2mon.client.core.jms.ConnectionListener;
-import cern.c2mon.client.core.jms.HeartbeatListener;
-import cern.c2mon.client.core.jms.JmsProxy;
-import cern.c2mon.client.core.jms.SupervisionListener;
-import cern.c2mon.client.core.jms.TopicRegistrationDetails;
-import cern.c2mon.shared.client.request.ClientRequestErrorReport;
-import cern.c2mon.shared.client.request.ClientRequestProgressReport;
+import cern.c2mon.client.core.jms.*;
 import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
-
-import com.google.gson.JsonSyntaxException;
 
 /**
  * Implementation of the JmsProxy singleton bean. Also see the interface for
@@ -100,11 +75,6 @@ import com.google.gson.JsonSyntaxException;
 @Slf4j
 @ManagedResource(objectName = "cern.c2mon:type=JMS,name=JmsProxy")
 public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(JmsProxyImpl.class);
 
   /**
    * Time between reconnection attempts if the first attempt fails (in
@@ -305,11 +275,11 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       }
     });
 
-    sessions = new ConcurrentHashMap<MessageListenerWrapper, Session>();
-    topicToWrapper = new ConcurrentHashMap<String, MessageListenerWrapper>();
-    registeredListeners = new ConcurrentHashMap<TagUpdateListener, TopicRegistrationDetails>();
+    sessions = new ConcurrentHashMap<>();
+    topicToWrapper = new ConcurrentHashMap<>();
+    registeredListeners = new ConcurrentHashMap<>();
     listenerLock = new ReentrantReadWriteLock().writeLock();
-    connectionListeners = new ArrayList<ConnectionListener>();
+    connectionListeners = new ArrayList<>();
     connectionListenersLock = new ReentrantReadWriteLock();
     supervisionListenerWrapper = new SupervisionListenerWrapper(HIGH_LISTENER_QUEUE_SIZE, slowConsumerListener, topicPollingExecutor);
     supervisionListenerWrapper.start();
@@ -359,11 +329,11 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
         connection.start();
         connected = true;
       } catch (Exception e) {
-        LOGGER.error("Exception caught while trying to refresh the JMS connection; sleeping 5s before retrying.", e);
+        log.error("Exception caught while trying to refresh the JMS connection; sleeping 5s before retrying.", e);
         try {
           Thread.sleep(SLEEP_BETWEEN_CONNECTION_ATTEMPTS);
         } catch (InterruptedException interEx) {
-          LOGGER.error("InterruptedException caught while waiting to reconnect.", interEx);
+          log.error("InterruptedException caught while waiting to reconnect.", interEx);
         }
       }
     }
@@ -422,7 +392,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       try {
         connection.close(); // closes all consumers and sessions also
       } catch (JMSException jmsEx) {
-        LOGGER.error("disconnect() - Exception caught while attempting to disconnect from JMS - aborting this attempt.", jmsEx);
+        log.error("disconnect() - Exception caught while attempting to disconnect from JMS - aborting this attempt.", jmsEx);
       }
     }
   }
@@ -469,17 +439,17 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
           registerUpdateListener(entry.getKey(), entry.getValue());
         }
       }
-      
+
       if (alarmListenerWrapper.getListenerCount() > 0) {
         subscribeToAlarmTopic();
       }
-      
+
       // refresh supervision subscription
       subscribeToSupervisionTopic();
       subscribeToHeartbeatTopic();
       subscribeToAdminMessageTopic();
     } catch (JMSException e) {
-      LOGGER.error("Did not manage to refresh Topic subscriptions.", e);
+      log.error("Did not manage to refresh Topic subscriptions.", e);
       throw e;
     } finally {
       refreshLock.writeLock().unlock();
@@ -494,7 +464,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     alarmSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
     alarmConsumer = alarmSession.createConsumer(alarmTopic);
     alarmConsumer.setMessageListener(alarmListenerWrapper);
-    LOGGER.debug("Successfully subscribed to alarm topic");
+    log.debug("Successfully subscribed to alarm topic");
   }
 
   /**
@@ -507,7 +477,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     alarmSession = null;
     alarmConsumer.close();
     alarmConsumer = null;
-    LOGGER.debug("Successfully unsubscribed from alarm topic");
+    log.debug("Successfully unsubscribed from alarm topic");
   }
 
   /**
@@ -587,7 +557,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
                 topicToWrapper.put(topicName, wrapper);
                 sessions.put(wrapper, session);
               }
-              
+
               if (!refreshSubscriptions) {
                 registeredListeners.put(serverUpdateListener, topicRegistrationDetails);
               }
@@ -595,14 +565,14 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
               throw new JMSException("Not currently connected - will attempt to subscribe on reconnection. Attempting to reconnect.");
             }
           } catch (JMSException e) {
-            LOGGER.error("Failed to subscribe to topic - will do so on reconnection.", e);
+            log.error("Failed to subscribe to topic - will do so on reconnection.", e);
             if (!refreshSubscriptions) {
               registeredListeners.put(serverUpdateListener, topicRegistrationDetails);
             }
             throw e;
           }
         } else {
-          LOGGER.debug("Update listener already registered; skipping registration (for Tag " + topicRegistrationDetails.getId() + ")");
+          log.debug("Update listener already registered; skipping registration (for Tag " + topicRegistrationDetails.getId() + ")");
         }
       } finally {
         listenerLock.unlock();
@@ -700,7 +670,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
 
             Message replyMessage = consumer.receive(timeout);
             if (replyMessage == null) {
-              LOGGER.error("No reply received from server on ClientRequest. I was waiting for " + timeout + " milliseconds..");
+              log.error("No reply received from server on ClientRequest. I was waiting for " + timeout + " milliseconds..");
               throw new RuntimeException("No reply received from server - possible timeout?");
             }
 
@@ -784,21 +754,21 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   private void handleJsonReportResponse(final ClientRequestReport report, final ClientRequestReportListener reportListener) {
 
     if (reportListener == null) { // is someone waiting for the report?
-      LOGGER.debug("handleJsonReportResponse(): Received a report, but no reportListener is registered. Ignoring..");
+      log.debug("handleJsonReportResponse(): Received a report, but no reportListener is registered. Ignoring..");
       return;
     }
 
     if (report.isErrorReport()) {
-      LOGGER.debug("handleJsonReportResponse(): Received an error report. Informing listener.");
-      reportListener.onErrorReportReceived((ClientRequestErrorReport) report);
+      log.debug("handleJsonReportResponse(): Received an error report. Informing listener.");
+      reportListener.onErrorReportReceived(report);
       throw new RuntimeException("Error report received from server on client request: " + report.getErrorMessage());
     }
     else if (report.isProgressReport()) {
-      LOGGER.debug("handleJsonReportResponse(): Received a progress report. Informing listener.");
-      reportListener.onProgressReportReceived((ClientRequestProgressReport) report);
+      log.debug("handleJsonReportResponse(): Received a progress report. Informing listener.");
+      reportListener.onProgressReportReceived(report);
     }
     else
-      LOGGER.warn("handleJsonReportResponse(): Received a report of unknown type. Ignoring..");
+      log.warn("handleJsonReportResponse(): Received a report of unknown type. Ignoring..");
   }
 
   /**
@@ -822,12 +792,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
           MessageListenerWrapper wrapper = topicToWrapper.get(subsribedToTag.getTopicName());
           wrapper.removeListener(subsribedToTag.getId());
           if (wrapper.isEmpty()) { // no subscribed listeners, so close session
-            LOGGER.trace("No listeners registered to topic " + subsribedToTag.getTopicName() + " so closing down MessageListenerWrapper");
+            log.trace("No listeners registered to topic " + subsribedToTag.getTopicName() + " so closing down MessageListenerWrapper");
             try {
               Session session = sessions.get(wrapper);
               session.close();
             } catch (JMSException ex) {
-              LOGGER.error("Failed to unregister properly from a Tag update; subscriptions will be refreshed.");
+              log.error("Failed to unregister properly from a Tag update; subscriptions will be refreshed.");
               startReconnectThread();
             } finally {
               wrapper.stop();
@@ -863,7 +833,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    */
   @Override
   public void onException(final JMSException exception) {
-    LOGGER.error("JMSException caught by JMS connection exception listener. Attempting to reconnect.", exception);
+    log.error("JMSException caught by JMS connection exception listener. Attempting to reconnect.", exception);
     startReconnectThread();
   }
 
@@ -913,7 +883,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       try {
         subscribeToAlarmTopic();
       } catch (JMSException e) {
-        LOGGER.error("Did not manage to subscribe To Alarm Topic.", e);
+        log.error("Did not manage to subscribe To Alarm Topic.", e);
         throw e;
       }
     }
@@ -932,7 +902,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       try {
         unsubscribeFromAlarmTopic();
       } catch (JMSException e) {
-        LOGGER.error("Did not manage to subscribe To Alarm Topic.", e);
+        log.error("Did not manage to subscribe To Alarm Topic.", e);
         throw e;
       }
     }
@@ -966,7 +936,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       try {
         subscribeToAdminMessageTopic();
       } catch (JMSException e) {
-        LOGGER.error("Unable to subscribe to the admin message topic, this functionality may not function properly.", e);
+        log.error("Unable to subscribe to the admin message topic, this functionality may not function properly.", e);
       }
     }
   }
@@ -983,7 +953,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    */
   @PreDestroy
   public void stop() {
-    LOGGER.debug("Stopping JmsProxy and dependent listeners");
+    log.debug("Stopping JmsProxy and dependent listeners");
     shutdownRequested = true;
     supervisionListenerWrapper.stop();
     alarmListenerWrapper.stop();
@@ -1002,7 +972,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
 
   @ManagedOperation(description = "Get size of current internal listener queues")
   public Map<String, Integer> getQueueSizes() {
-    Map<String, Integer> returnMap = new HashMap<String, Integer>();
+    Map<String, Integer> returnMap = new HashMap<>();
     for (Map.Entry<String, MessageListenerWrapper> entry : topicToWrapper.entrySet()) {
       returnMap.put(entry.getKey(), entry.getValue().getQueueSize());
     }
