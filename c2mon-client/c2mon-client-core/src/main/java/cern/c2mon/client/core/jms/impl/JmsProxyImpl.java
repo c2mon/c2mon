@@ -823,6 +823,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     connectionListenersLock.writeLock().lock();
     try {
       connectionListeners.add(connectionListener);
+      if (connected) {
+        connectionListener.onConnection();
+      }
+      else {
+        connectionListener.onDisconnection();
+      }
     } finally {
       connectionListenersLock.writeLock().unlock();
     }
