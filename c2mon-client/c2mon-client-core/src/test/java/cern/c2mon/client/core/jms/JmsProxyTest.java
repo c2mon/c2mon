@@ -25,9 +25,12 @@ import javax.jms.*;
 
 import org.apache.activemq.command.ActiveMQQueue;
 import org.easymock.EasyMock;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;
 import org.springframework.test.annotation.DirtiesContext;
@@ -37,8 +40,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.common.listener.TagUpdateListener;
-import cern.c2mon.client.core.config.C2monAutoConfiguration;
 import cern.c2mon.client.core.config.C2monClientProperties;
+import cern.c2mon.client.core.config.TestConfig;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.request.*;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
@@ -62,10 +65,10 @@ import static org.junit.Assert.assertTrue;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = C2monAutoConfiguration.class)
+@ContextConfiguration(classes = TestConfig.class )
 @TestPropertySource(
     properties = {
-        "c2mon.client.jms.url=vm://localhost"
+        "c2mon.client.jms.url=vm://localhost:61616?broker.persistent=false"
     }
 )
 public class JmsProxyTest {
@@ -86,7 +89,9 @@ public class JmsProxyTest {
 
   private JmsTemplate serverTemplate;
 
-  private static ConnectionFactory connectionFactory;
+  @Autowired
+  @Qualifier("clientActiveMQConnectionFactory")
+  private ConnectionFactory connectionFactory;
 
   TopicRegistrationDetails details = new TopicRegistrationDetails() {
     @Override
@@ -99,13 +104,6 @@ public class JmsProxyTest {
       return 1L;
     }
   };
-
-
-  @BeforeClass
-  public static void startBroker() throws Exception {
-    TestBrokerService.createAndStartBroker();
-    connectionFactory = TestBrokerService.getConnectionFactory();
-  }
 
   /**
    * Starts context.
@@ -125,11 +123,6 @@ public class JmsProxyTest {
     } catch (Exception ignored) {
       Thread.sleep(200);
     }
-  }
-
-  @AfterClass
-  public static void stopBroker() throws Exception {
-    TestBrokerService.stopBroker();
   }
 
   /**
@@ -355,8 +348,8 @@ public class JmsProxyTest {
     EasyMock.verify(connectionListener);
 
     //check connection is back by rerunning supervison and update tests
-//    testSupervisionNotification();
-//    testUpdateNotification();
+    testSupervisionNotification();
+    testUpdateNotification();
   }
 
   /**

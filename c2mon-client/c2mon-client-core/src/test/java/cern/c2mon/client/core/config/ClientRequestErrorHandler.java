@@ -16,17 +16,23 @@
  *****************************************************************************/
 package cern.c2mon.client.core.config;
 
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.util.ErrorHandler;
 
 /**
- * @author Justin Lewis Salmon
+ * This class is responsible for logging all uncatched
+ * exceptions of the <code>TagRequestHandler</code>.
+ *
+ * @author Matthias Braeger
  */
-@Configuration
-@EnableConfigurationProperties(C2monClientProperties.class)
-@ComponentScan({
-    "cern.c2mon.client.core",
-    "cern.c2mon.client.ext"
-})
-public class C2monAutoConfiguration {}
+@Slf4j
+@Service("tagRequestErrorHandler")
+public class ClientRequestErrorHandler implements ErrorHandler {
+
+  @Override
+  public void handleError(final Throwable exception) {
+    log.error("A problem occured while handling a tag request.", exception);
+  }
+
+}
