@@ -298,6 +298,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
       }
     } catch (CloneNotSupportedException e) {
       // Should not happen if the hardware addresses remain as they are.
+      log.error("Cloning of DataTagAddress failed: {}", this.toConfigXML(), e.getMessage());
       e.printStackTrace();
     }
     return clonedAddress;
