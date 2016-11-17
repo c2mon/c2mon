@@ -21,6 +21,7 @@ import java.util.Properties;
 
 import lombok.extern.slf4j.Slf4j;
 import cern.c2mon.server.common.expression.Evaluator;
+
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.cache.C2monCacheWithListeners;
@@ -391,9 +392,9 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
   public final Event<Boolean> updateFromSource(final Long dataTagId, final SourceDataTagValue sourceDataTagValue) {
     tagCache.acquireWriteLockOnKey(dataTagId);
     try {
-      T dataTag = (T) tagCache.get(dataTagId).clone();
+      T dataTag = tagCache.getCopy(dataTagId);
 
-      // Before updating the new value to the cache convert the value to the proper type.
+      // Before updating the new value to the cache convert the value to the correct type.
       // In the process of the deserialization the dataType can still divert from the defined dataType.
       // If the dataType is an arbitrary object do nothing because the server don't work with this kind of values at all.
       if(sourceDataTagValue != null
@@ -410,8 +411,6 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
         tagCache.put(dataTagId, dataTag);
       }
       return returnEvent;
-    } catch (CloneNotSupportedException e) {
-      throw new RuntimeException(e);
     } finally {
       tagCache.releaseWriteLockOnKey(dataTagId);
     }
