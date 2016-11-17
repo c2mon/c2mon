@@ -2,6 +2,7 @@ package cern.c2mon.shared.client.expression;
 
 import java.io.Serializable;
 
+import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.metadata.Metadata;
 import lombok.Data;
 
@@ -12,12 +13,17 @@ import lombok.Data;
 public class Expression implements Serializable {
 
   /**
+   * Id of the overlying tag. This information is needed for the stl storing.
+   */
+  private transient Long tagId;
+
+  /**
    * The name of the expression. The name has to be unique inside a tag.
    */
   private String name;
 
   /**
-   * The datatype of the expression result
+   * The data type of the expression result
    */
   private String dataType;
 
@@ -41,6 +47,8 @@ public class Expression implements Serializable {
    * The last result of the expression.
    */
   private Object result;
+
+  private long lastCompileCounter;
 
   private Expression() {
     this.dataType = Boolean.class.getName();
