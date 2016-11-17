@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
+import cern.c2mon.server.common.expression.Evaluator;
+import cern.c2mon.server.common.expression.LocalExpressionCache;
 import javax.naming.ConfigurationException;
 
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
@@ -89,6 +91,15 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
   @Autowired
   private AlarmConfigHandler alarmConfigHandler;
 
+  /**
+   * Autowired constructor.
+   * @param dataTagFacade      reference to facade bean
+   * @param dataTagLoaderDAO   reference to DAO
+   * @param dataTagCache       reference to cache
+   * @param equipmentFacade    reference to equipment facade
+   * @param tagLocationService reference to tag location bean
+   * @param context            reference to the application context
+   */
   @Autowired
   public DataTagConfigTransactedImpl(final DataTagFacade dataTagFacade,
                                      final DataTagLoaderDAO dataTagLoaderDAO,
@@ -120,7 +131,8 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
     tagCache.acquireWriteLockOnKey(element.getEntityId());
     try {
       LOGGER.trace("Creating DataTag " + element.getEntityId());
-      DataTag dataTag = (DataTag) commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+      DataTag dataTag = commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+      dataTag = Evaluator.evaluate(dataTag);
       try {
         configurableDAO.insert(dataTag);
       } catch (Exception e) {
@@ -149,7 +161,6 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
 
         throw new IllegalArgumentException("No (sub)equipment id set in datatag (" + dataTag.getId() + ") configuration.");
 
-
       } catch (Exception ex) {
         LOGGER.error("Exception caught when attempting to create a DataTag - rolling back the DB transaction and undoing cache changes.");
         tagCache.remove(dataTag.getId());
@@ -159,7 +170,6 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
     } finally {
       tagCache.releaseWriteLockOnKey(element.getEntityId());
     }
-
   }
 
   /**
@@ -192,6 +202,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
       DataTag dataTagCopy = tagCache.getCopy(id);
       dataTagUpdate = commonTagFacade.updateConfig(dataTagCopy, properties);
 
+      dataTagCopy = Evaluator.evaluate(dataTagCopy);
       configurableDAO.updateConfig(dataTagCopy);
 
       for (ConfigurationEventListener listener : configurationEventListeners) {
@@ -252,6 +263,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
           listener.onConfigurationEvent(tagCopy, Action.REMOVE);
         }
 
+        LocalExpressionCache.removeTagInformation(tagCopy.getId());
         configurableDAO.deleteItem(tagCopy.getId());
       } catch (Exception ex) {
         //commonTagFacade.setStatus(dataTag, Status.RECONFIGURATION_ERROR);
@@ -286,5 +298,4 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
     }
     return processChange;
   }
-
 }
