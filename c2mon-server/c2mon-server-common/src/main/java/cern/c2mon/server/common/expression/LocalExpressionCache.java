@@ -1,8 +1,6 @@
 package cern.c2mon.server.common.expression;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import cern.c2mon.server.common.tag.Tag;
@@ -23,7 +21,7 @@ public class LocalExpressionCache {
   /**
    * Holds the information to which time the expression got compiled the last time.
    */
-  private static Map<Long, Map<String, Long>> tagIdToLocalScriptCounter = new ConcurrentHashMap<>();
+  private static Map<Long, Map<String, Long>> tagIdToVersion = new ConcurrentHashMap<>();
 
   /**
    * Holds the compiled expressions.
@@ -48,9 +46,9 @@ public class LocalExpressionCache {
    *
    * @param id The id of the tag which expression information needs to be deleted
    */
-  public static void removeTagInformation(Long id) {
+  public static void removeTag(Long id) {
     tagIdToLocalScripts.remove(id);
-    tagIdToLocalScriptCounter.remove(id);
+    tagIdToVersion.remove(id);
   }
 
   /**
@@ -58,57 +56,67 @@ public class LocalExpressionCache {
    *
    * @param tagIds The ids of the tags which expression information needs to be deleted
    */
-  public static void removeStaleTags(List<Long> tagIds) {
-    tagIds.stream().forEach(id -> removeTagInformation(id));
+  public static void removeTags(List<Long> tagIds) {
+    tagIds.stream().forEach(LocalExpressionCache::removeTag);
   }
 
   protected static GroovyObject getScript(Long tagId, String expressionName) {
     return tagIdToLocalScripts.get(tagId).get(expressionName);
   }
 
-  protected static <T extends Tag> void initializeLocalCache(Long tagId) {
-    if (tagIdToLocalScriptCounter.get(tagId) == null) {
-      tagIdToLocalScriptCounter.put(tagId, new ConcurrentHashMap<>());
+  protected static <T extends Tag> void initializeTag(T tag) {
+    Long tagId = tag.getId();
+
+    if (tagIdToVersion.get(tagId) == null) {
+      tagIdToVersion.put(tagId, new ConcurrentHashMap<>());
     }
     if (tagIdToLocalScripts.get(tagId) == null) {
       tagIdToLocalScripts.put(tagId, new ConcurrentHashMap<>());
     }
+    purgeRemovedExpressions(tag);
   }
 
-  protected static <T extends Tag> void checkLocalCounter(T tag, String expressionName) {
-    if (tagIdToLocalScriptCounter.get(tag.getId()).get(expressionName) == null) {
-      tagIdToLocalScriptCounter.get(tag.getId()).put(expressionName, -1L);
+  protected static <T extends Tag> void addExpressionToTag(T tag, Expression expression) {
+    Long version = tagIdToVersion.get(tag.getId()).get(expression.getName());
+    version = version == null ? -1L : version;
+
+    if (version < expression.getVersion()) {
+      GroovyObject script = ExpressionFactory.createScript(expression.getExpression());
+
+      tagIdToLocalScripts.get(tag.getId()).put(expression.getName(), script);
+      tagIdToVersion.get(tag.getId()).put(expression.getName(), expression.getVersion());
     }
   }
 
-  protected static <T extends Tag> void checkLocalCacheConsistency(T updateTag) {
-    Long tagId = updateTag.getId();
-    if (updateTag.getExpressions().size() < tagIdToLocalScripts.size()) {
-      tagIdToLocalScripts.get(tagId).keySet().stream().filter(localExpressionName -> !updateTag.getExpressions()
-          .stream()
-          .filter(cacheExpression -> cacheExpression.getName().equals(localExpressionName))
-          .findFirst()
-          .isPresent()).forEach(expressionName -> {
-        log.debug("Remove the script {} of the tag {} from the local cache", expressionName, tagId);
-        tagIdToLocalScripts.get(tagId).remove(expressionName);
-        tagIdToLocalScriptCounter.get(tagId).remove(expressionName);
-      });
-    }
-  }
+  private static <T extends Tag> void purgeRemovedExpressions(T tag) {
+    Long tagId = tag.getId();
+    Map<String, GroovyObject> scripts = tagIdToLocalScripts.get(tagId);
 
-  protected static <T extends Tag> void checkScriptState(T tag, Expression localExpression) {
+    if (tag.getExpressions().size() < scripts.size()) {
+      List<String> expressionsToPurge = getExpressionsToPurge(tagId, tag.getExpressions());
 
-    if (tagIdToLocalScriptCounter.get(tag.getId()).get(localExpression.getName()) < localExpression
-        .getLastCompileCounter()) {
-      GroovyObject currentScript = ExpressionFactory.createScript(localExpression.getExpression());
-      tagIdToLocalScripts.get(tag.getId()).put(localExpression.getName(), currentScript);
-
-      if (localExpression.getLastCompileCounter() == 0l) {
-        localExpression.setLastCompileCounter(System.currentTimeMillis());
+      for (String expression : expressionsToPurge) {
+        log.debug("Remove the script {} of the tag {} from the local cache", expression, tagId);
+        tagIdToLocalScripts.get(tagId).remove(expression);
+        tagIdToVersion.get(tagId).remove(expression);
       }
-      tagIdToLocalScriptCounter.get(tag.getId()).put(localExpression.getName(), localExpression.getLastCompileCounter
-          ());
     }
   }
 
+  private static List<String> getExpressionsToPurge(Long tagId, Collection<Expression> expressions) {
+    List<String> expressionsToPurge = new ArrayList<>();
+    Map<String, GroovyObject> scripts = tagIdToLocalScripts.get(tagId);
+
+    for (String localExpressionName : scripts.keySet()) {
+      boolean isInExpression = false;
+      for (Expression cacheExpression : expressions) {
+        isInExpression |= cacheExpression.getName().equals(localExpressionName);
+      }
+
+      if (!isInExpression) {
+        expressionsToPurge.add(localExpressionName);
+      }
+    }
+    return expressionsToPurge;
+  }
 }

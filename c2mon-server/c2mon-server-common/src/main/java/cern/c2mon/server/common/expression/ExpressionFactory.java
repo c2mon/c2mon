@@ -2,12 +2,14 @@ package cern.c2mon.server.common.expression;
 
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * A Factory to create objects which can evaluate expressions.
  *
  * @author Franz Ritter
  */
+@Slf4j
 public class ExpressionFactory {
 
   private static GroovyClassLoader classLoader = new GroovyClassLoader();
@@ -22,23 +24,19 @@ public class ExpressionFactory {
   }
 
   /**
-   * Builds dynamically an object which can evaluate an expression.
+   * Compile an invokable {@link GroovyObject} object from a given expression.
    *
-   * @param expression The expression which needs to be evaluated from the object
-   * @return A object with a run method to evaluate the given expression.=
+   * @param expression the expression to evaluate
+   * @return an invokable {@link GroovyObject}
    */
   public static GroovyObject createScript(String expression) {
-
     String temporaryClass = buildGroovyClass(expression);
     Class clazz = classLoader.parseClass(temporaryClass);
+
     try {
       return (GroovyObject) clazz.newInstance();
-    } catch (InstantiationException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
+    } catch (InstantiationException | IllegalAccessException e) {
+      throw new RuntimeException("Error creating script", e);
     }
-    return null;
   }
-
 }
