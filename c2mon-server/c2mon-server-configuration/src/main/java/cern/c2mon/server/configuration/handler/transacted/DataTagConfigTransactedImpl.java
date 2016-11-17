@@ -20,12 +20,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
-import javax.naming.ConfigurationException;
-
+import cern.c2mon.server.common.expression.Evaluator;
+import cern.c2mon.server.common.expression.LocalExpressionCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Isolation;
@@ -122,7 +121,8 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
     tagCache.acquireWriteLockOnKey(element.getEntityId());
     try {
       LOGGER.trace("Creating DataTag " + element.getEntityId());
-      DataTag dataTag = (DataTag) commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+      DataTag dataTag = commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+      dataTag = Evaluator.evaluate(dataTag);
       try {
         configurableDAO.insert(dataTag);
       } catch (Exception e) {
@@ -190,6 +190,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
       DataTag dataTagCopy = tagCache.getCopy(id);
       dataTagUpdate = commonTagFacade.updateConfig(dataTagCopy, properties);
 
+      dataTagCopy = Evaluator.evaluate(dataTagCopy);
       configurableDAO.updateConfig(dataTagCopy);
       tagCache.putQuiet(dataTagCopy);
       if (((DataTagUpdate) dataTagUpdate).isEmpty()) {
@@ -240,6 +241,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
             alarmConfigHandler.removeAlarm(alarmId, alarmReport);
           }
         }
+        LocalExpressionCache.removeTagInformation(tagCopy.getId());
         configurableDAO.deleteItem(tagCopy.getId());
       } catch (Exception ex) {
         //commonTagFacade.setStatus(dataTag, Status.RECONFIGURATION_ERROR);
