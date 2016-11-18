@@ -71,4 +71,15 @@ CREATE TABLE IF NOT EXISTS ALARMLOG (
   info            VARCHAR(100)  DEFAULT NULL
 );
 
+CREATE TABLE IF NOT EXISTS EXPRESSION_LOG (
+tagId           INTEGER       NOT NULL,
+exprName        VARCHAR(255)  NOT NULL,
+exprValue       VARCHAR(4000) NOT NULL,
+exprDataType    VARCHAR(200),
+exprTimestamp   DATE,
+exprInfo        VARCHAR(100)  DEFAULT NULL,
+PRIMARY KEY (TAGID, exprName, exprTimestamp)
+);
+
+
 

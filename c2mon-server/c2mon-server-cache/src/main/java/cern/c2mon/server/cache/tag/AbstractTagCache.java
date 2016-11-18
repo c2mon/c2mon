@@ -244,7 +244,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
         }
       }
     }
-    
+
     log.debug(String.format("findByNameWildcard() - Found %d (maxResultSize = %d) tags in %s cache where tag names are matching wildcard \"%s\"", resultList.size(), maxResults, getCacheName(), regex));
     return resultList;
   }
