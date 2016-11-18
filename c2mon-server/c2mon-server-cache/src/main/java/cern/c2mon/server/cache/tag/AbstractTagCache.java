@@ -18,19 +18,19 @@ package cern.c2mon.server.cache.tag;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import cern.c2mon.server.cache.config.CacheProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.cache.C2monCacheWithSupervision;
 import cern.c2mon.server.cache.CacheSupervisionListener;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.common.AbstractCache;
 import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
@@ -244,9 +244,33 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
         }
       }
     }
-
+    
     log.debug(String.format("findByNameWildcard() - Found %d (maxResultSize = %d) tags in %s cache where tag names are matching wildcard \"%s\"", resultList.size(), maxResults, getCacheName(), regex));
-
     return resultList;
+  }
+
+  @Override
+  public List<T> getActiveAlarms() {
+    List<T> tags = new LinkedList<>();
+    Results results = null;
+
+    try {
+      Attribute<Boolean> isActiveAlarm = getCache().getSearchAttribute("activeAlarm");
+      results = getCache().createQuery().includeKeys().includeValues().addCriteria(isActiveAlarm.eq(true))
+          .includeValues().execute();
+
+      if (results == null) {
+        throw new CacheElementNotFoundException("Failed to execute query");
+      }
+
+      results.all().forEach(r -> tags.add((T) r.getValue()));
+
+    } finally {
+      if (results != null) {
+        // Discard the results when done to free up cache resources.
+        results.discard();
+      }
+    }
+    return tags;
   }
 }

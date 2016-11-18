@@ -114,11 +114,6 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
   @Setter
   private Collection<Expression> expressions;
 
-  // TODO: Add the script to the Tag interface -> remove the cast from the Evaluator
-  @Getter
-  @Setter
-  private transient Map<String, Script> expressionScripts;
-
   /**
    * DIP address for tags published on DIP
    */
@@ -220,7 +215,6 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
     ruleIds = new ArrayList<>();
     cacheTimestamp = new Timestamp(System.currentTimeMillis());
     expressions = new ArrayList<>();
-    expressionScripts = new HashMap<>();
     metadata = new Metadata();
   }
 
@@ -253,7 +247,6 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
     if (cacheTimestamp != null) {
       cacheObject.cacheTimestamp = (Timestamp) cacheTimestamp.clone();
     }
-    cacheObject.setExpressionScripts(this.getExpressionScripts());
     return cacheObject;
   }
 
@@ -410,7 +403,7 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
     try {
       if (ruleIdsString != null && !ruleIdsString.isEmpty()) {
         String[] ruleIdArray = ruleIdsString.split(",");
-        setRuleIds(new ArrayList<Long>(ruleIdArray.length));
+        setRuleIds(new ArrayList<>(ruleIdArray.length));
         for (int i = 0; i != ruleIdArray.length; i++) {
           if (!ruleIdArray[i].equals("")) {
             addRuleId(Long.valueOf(ruleIdArray[i].trim()));
@@ -426,7 +419,6 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
       setRuleIds(new ArrayList<>(0));
       this.ruleIdsString = null;
     }
-
   }
 
   public void setStatus(DataTagConstants.Status status) {
@@ -437,4 +429,18 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
     return status;
   }
 
+  /**
+   * Checks if this tag has an active alarm attached.
+   * Currently used form the eh cache searchable query.
+   *
+   * @return ture if this tag has an active alarm attached.
+   */
+  public boolean isActiveAlarm() {
+    for (Expression expr : expressions) {
+      if (expr.getAlarm() && expr.getResult() != null) {
+        return Boolean.valueOf(expr.getResult().toString());
+      }
+    }
+    return false;
+  }
 }
