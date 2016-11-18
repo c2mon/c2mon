@@ -13,6 +13,7 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 
 /**
  * @author Justin Lewis Salmon
@@ -41,5 +42,24 @@ public class TagHistoryConfig {
   public LoggerDAO<TagRecord> tagLoggerDAO() throws Exception {
     return new LoggerDAO<>(historySqlSessionFactory.getObject(), TagRecordMapper.class.getCanonicalName(),
         properties.getJdbc().getUrl());
+  }
+
+  @Autowired
+  Environment environment;
+
+  @Bean(name = "expressionLoggerDAO")
+  public LoggerDAO<ExpressionLog> expressionLoggerDAO() throws ClassNotFoundException {
+
+    return new LoggerDAO<>(historySqlSessionFactory,
+        "cern.c2mon.server.history.mapper.ExpressionLogMapper",
+        environment.getRequiredProperty("c2mon.server.history.jdbc.url"));
+  }
+
+  @Bean(name = "stlExpressionPersistenceManager")
+  public IPersistenceManager<ExpressionLog> stlExpressionPersistenceManager() {
+
+    return new PersistenceManager<>(expressionLoggerDAO(),
+        environment.getRequiredProperty("c2mon.server.shorttermlog.fallback.expression"),
+        new AlarmListener(), new ExpressionLog());
   }
 }
