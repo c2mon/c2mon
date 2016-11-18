@@ -170,11 +170,11 @@ public class RequestHandlerImpl implements RequestHandler {
   }
 
   @Override
-  public Collection<TagValueUpdate> requestAlarmExpressions(final Collection<Long> tagIdsIds) throws JMSException {
-    if (tagIdsIds== null) {
-      throw new NullPointerException("requestAlarmExpressions(..) method called with null parameter.");
+  public Collection<TagValueUpdate> requestAlarmsNew(final Collection<Long> tagIds) throws JMSException {
+    if (tagIds == null) {
+      throw new NullPointerException("requestAlarmsNew(..) method called with null parameter.");
     }
-    return executeRequest(tagIdsIds, TagValueUpdate.class, null, defaultRequestQueue);
+    return executeRequest(tagIds, TagValueUpdate.class, null, defaultRequestQueue);
   }
 
   @Override
@@ -182,7 +182,7 @@ public class RequestHandlerImpl implements RequestHandler {
 
     ClientRequestImpl<TagValueUpdate> activeAlarmsRequest = new ClientRequestImpl<>(
         ClientRequest.ResultType.TRANSFER_TAG_VALUE_LIST,
-        RequestType.ACTIVE_EXPRESSION_ALARMS_REQUEST,
+        RequestType.ACTIVE_ALARMS_REQUEST_NEW,
         60000); // == timeout
 
     Collection<TagValueUpdate> result = jmsProxy.sendRequest(activeAlarmsRequest, defaultRequestQueue,
