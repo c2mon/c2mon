@@ -32,6 +32,12 @@ pages:
     - Rule Engine: 'user-guide/rule-engine.md'
   - Appendices:
     - 'appendices/database_structure.md'
+    - Modules:
+          - 'appendices/modules/index.md'
+          - Elasticsearch module:
+            - 'appendices/modules/elasticsearch-module/index.md'
+            - 'appendices/modules/elasticsearch-module/properties-appendix.md'
+            - 'appendices/modules/elasticsearch-module/getting-started.md'
 
 markdown_extensions:
   - toc:
