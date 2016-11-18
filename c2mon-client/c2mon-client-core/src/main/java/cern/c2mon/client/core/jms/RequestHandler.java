@@ -49,10 +49,11 @@ public interface RequestHandler {
   /**
    * Applies the configuration and returns a Configuration Report.
    * The values are fetched from the server.
-   * However, in case of a connection error or an unknown configuration Id the corresponding
-   * tag might be missing.
+   * However, in case of a connection error or an unknown configuration Id the
+   * corresponding tag might be missing.
    *
-   * @param configurationId The configuration id used to fetch the Configuration Report object
+   * @param configurationId The configuration id used to fetch the
+   *                        Configuration Report object
    * @return A Configuration Report object
    */
     ConfigurationReport applyConfiguration(Long configurationId);
@@ -60,11 +61,13 @@ public interface RequestHandler {
     /**
      * Applies the configuration and returns a Configuration Report.
      * The values are fetched from the server.
-     * However, in case of a connection error or an unknown configuration Id the corresponding
-     * tag might be missing.
+     * However, in case of a connection error or an unknown configuration Id
+     * the corresponding tag might be missing.
      *
-     * @param configurationId The configuration id used to fetch the Configuration Report object
-     * @param reportListener Is informed about the progress of the operation on the server side.
+     * @param configurationId The configuration id used to fetch the
+     *                        Configuration Report object
+     * @param reportListener Is informed about the progress of the
+     *                       operation on the server side.
      * @see ClientRequestProgressReport
      * @see ClientRequestErrorReport
      * @return A Configuration Report object
@@ -79,7 +82,8 @@ public interface RequestHandler {
      *
      * @param tagIds the ids of the tags
      * @return a collection of Alarms ({@link AlarmValue})
-     * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
+     * @throws JMSException if not currently connected or if a JMS problem
+     * occurs while making the request
      * @throws NullPointerException if called with a null argument
      * @throws RuntimeException if the response from the server is null (probable timeout)
      */
@@ -89,7 +93,8 @@ public interface RequestHandler {
      * Queries the server for a collection of the (latest) active alarms.
      *
      * @return a collection of active alarms ({@link AlarmValue})
-     * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
+     * @throws JMSException if not currently connected or if a JMS problem
+     * occurs while making the request
      * @throws NullPointerException if called with a null argument
      * @throws RuntimeException if the response from the server is null (probable timeout)
      */
@@ -100,13 +105,16 @@ public interface RequestHandler {
    * details for the request tags.
    *
    * @param tagIdsIds the ids of the tags with alarms
-   * @return a collection of {@link TagValueUpdate} with the attached alarm expressions
+   * @return a collection of {@link TagValueUpdate} with the attached alarm
+   * expressions
    * @throws JMSException
    */
-  Collection<TagValueUpdate> requestAlarmExpressions(final Collection<Long> tagIdsIds) throws JMSException;
+  Collection<TagValueUpdate> requestAlarmsNew(final Collection<Long> tagIdsIds) throws JMSException;
 
   /**
-   * Queries the server for a collection of {@link TagValueUpdate} with the (latest) active alarm expressions.
+   * Queries the server for a collection of {@link TagValueUpdate} with the
+   * (latest) active alarm expressions.
+   *
    * @return a collection of {@link TagValueUpdate} with active alarm expressions
    * @throws JMSException
    */
@@ -120,7 +128,8 @@ public interface RequestHandler {
      *
      * @param tagIds the ids of the tags
      * @return a collection of TagConfigurations
-     * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
+     * @throws JMSException if not currently connected or if a JMS problem
+     * occurs while making the request
      * @throws NullPointerException if called with a null argument
      * @throws RuntimeException if the response from the server is null (probable timeout)
      */
@@ -134,8 +143,10 @@ public interface RequestHandler {
    * <p>If called with an empty collection returns an empty collection.
    *
    * @param tagIds the ids of the tags
-   * @return a collection of transfer objects with the values/configuration information
-   * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
+   * @return a collection of transfer objects with the values/configuration
+   * information
+   * @throws JMSException if not currently connected or if a JMS problem occurs
+   * while making the request
    * @throws NullPointerException if called with a null argument
    * @throws RuntimeException if the response from the server is null (probable timeout)
    */
@@ -147,10 +158,13 @@ public interface RequestHandler {
    *
    * <p>If called with an empty collection returns an empty collection.
    *
-   * @param regexList list of tag names or regular expressions which shall be used to
+   * @param regexList list of tag names or regular expressions which shall be
+   *                  used to
    *                  find the matching tags
-   * @return a collection of transfer objects with the values/configuration information
-   * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
+   * @return a collection of transfer objects with the values/configuration
+   * information
+   * @throws JMSException if not currently connected or if a JMS problem occurs
+   * while making the request
    * @throws NullPointerException if called with a null argument
    * @throws RuntimeException if the response from the server is null (probable timeout)
    */
@@ -163,17 +177,21 @@ public interface RequestHandler {
    *
    * @param tagIds the ids of the tags
    * @return a collection of transfer objects with the value information
-   * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
+   * @throws JMSException if not currently connected or if a JMS problem occurs
+   * while making the request
    * @throws NullPointerException if called with a null argument
    * @throws RuntimeException if the response from the server is null (probable timeout)
    */
   Collection<TagValueUpdate> requestTagValues(Collection<Long> tagIds) throws JMSException;
 
   /**
-   * Queries the server for statistics about the number of configured and invalid tags.
+   * Queries the server for statistics about the number of configured and
+   * invalid tags.
    *
-   * @return a {@link TagStatisticsResponse} object contining the tag statistics
-   * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
+   * @return a {@link TagStatisticsResponse} object contining the tag
+   * statistics
+   * @throws JMSException if not currently connected or if a JMS problem occurs
+   * while making the request
    */
   TagStatisticsResponse requestTagStatistics() throws JMSException;
 
@@ -182,7 +200,8 @@ public interface RequestHandler {
    * entities in the server (Process, Equipment and SubEquipment).
    * @return a collection of current events, each containing the status
    *                  of one of the entities
-   * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
+   * @throws JMSException if not currently connected or if a JMS problem occurs
+   * while making the request
    * @throws RuntimeException if the response from the server is null (probable timeout)
    */
   Collection<SupervisionEvent> getCurrentSupervisionStatus() throws JMSException;
@@ -191,7 +210,8 @@ public interface RequestHandler {
    * Request CommandTags from the server.
    * @param commandIds ids of desired command tags
    * @return a collection of command handle objects
-   * @throws JMSException if a JMS problems occurs or if not connected at the moment
+   * @throws JMSException if a JMS problems occurs or if not connected at the
+   * moment
    * @throws RuntimeException if no response is received from the server (probably timeout)
    */
   Collection<CommandTagHandle> requestCommandTagHandles(Collection<Long> commandIds);
@@ -201,7 +221,8 @@ public interface RequestHandler {
    * @param <T> the value type of the command
    * @param commandExecuteRequest the request details for executing this command
    * @return a report about this execution
-   * @throws JMSException if a JMS problems occurs or if not connected at the moment
+   * @throws JMSException if a JMS problems occurs or if not connected at the
+   * moment
    * @throws RuntimeException if no response is received from the server (probably timeout)
    */
   <T> CommandReport executeCommand(CommandExecuteRequest<T> commandExecuteRequest) throws JMSException;
@@ -226,8 +247,8 @@ public interface RequestHandler {
   /**
    * Requests a list of all previously applied configuration reports from the
    * server. Note that this method will only return partial information about
-   * each report. This is done to reduce the size of the message returned by the
-   * server.
+   * each report. This is done to reduce the size of the message returned by
+   * the server.
    *
    * To get the full report(s) for a particular configuration, use
    * {@link RequestHandler#getConfigurationReports(Long)}.

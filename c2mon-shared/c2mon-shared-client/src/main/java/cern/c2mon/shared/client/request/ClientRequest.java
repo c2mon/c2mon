@@ -71,11 +71,11 @@ public interface ClientRequest {
     /**
      * Used to request a list of tags which have an alarm expression attached
      */
-    ALARM_EXPRESSION_REQUEST,
+    ALARM_REQUEST_NEW,
     /**
      * Used to request a list of all tags which have an ACTIVE alarm expression attached
      */
-    ACTIVE_EXPRESSION_ALARMS_REQUEST,
+    ACTIVE_ALARMS_REQUEST_NEW,
     /**
      * Used to request a list of Command handles from the server.
      */

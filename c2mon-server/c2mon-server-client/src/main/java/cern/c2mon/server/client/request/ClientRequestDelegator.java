@@ -30,8 +30,6 @@ import javax.validation.Valid;
 
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.jms.support.converter.MessageConversionException;
@@ -62,7 +60,7 @@ public class ClientRequestDelegator implements SessionAwareMessageListener<Messa
 
   private final ClientAlarmRequestHandler clientAlarmRequestHandler;
 
-  private final ClientAlarmExpressionRequestHandler clientAlarmExpressionRequestHandler;
+  private final ClientAlarmRequestHandlerNew clientAlarmRequestHandlerNew;
 
   private final ClientCommandRequestHandler clientCommandRequestHandler;
 
@@ -94,7 +92,7 @@ public class ClientRequestDelegator implements SessionAwareMessageListener<Messa
   @Autowired
   public ClientRequestDelegator(final SupervisionFacade supervisionFacade,
                                 final ClientAlarmRequestHandler clientAlarmRequestHandler,
-                                final ClientAlarmExpressionRequestHandler clientAlarmExpressionRequestHandler,
+                                final ClientAlarmRequestHandlerNew clientAlarmRequestHandlerNew,
                                 final ClientCommandRequestHandler clientCommandRequestHandler,
                                 final ClientTagRequestHelper tagrequestHelper,
                                 final ClientDeviceRequestHelper clientDeviceRequestHelper,
@@ -103,7 +101,7 @@ public class ClientRequestDelegator implements SessionAwareMessageListener<Messa
 
     this.supervisionFacade = supervisionFacade;
     this.clientAlarmRequestHandler = clientAlarmRequestHandler;
-    this.clientAlarmExpressionRequestHandler = clientAlarmExpressionRequestHandler;
+    this.clientAlarmRequestHandlerNew = clientAlarmRequestHandlerNew;
     this.clientCommandRequestHandler = clientCommandRequestHandler;
     this.tagrequestHelper = tagrequestHelper;
     this.clientDeviceRequestHelper = clientDeviceRequestHelper;
@@ -239,15 +237,15 @@ public class ClientRequestDelegator implements SessionAwareMessageListener<Messa
         log.debug("handleClientRequest() - Received an ACTIVE_ALARMS_REQUEST.");
       }
       return clientAlarmRequestHandler.handleActiveAlarmRequest(clientRequest);
-    case ALARM_EXPRESSION_REQUEST:T:
+    case ALARM_REQUEST_NEW:
       if (log.isDebugEnabled()) {
         // ! TagId field is also used for Alarm ids
-        log.debug("handleClientRequest() - Received an ALARM_EXPRESSION_REQUEST for " + clientRequest.getIds().size() + " alarms.");
+        log.debug("handleClientRequest() - Received an ALARM_REQUEST_NEW for " + clientRequest.getIds().size() + " alarms.");
       }
-      return clientAlarmExpressionRequestHandler.handleAlarmRequest(clientRequest);
-    case ACTIVE_EXPRESSION_ALARMS_REQUEST:
-      log.debug("handleClientRequest() - Received an ACTIVE_EXPRESSION_ALARMS_REQUEST.");
-      return clientAlarmExpressionRequestHandler.handleActiveAlarmRequest();
+      return clientAlarmRequestHandlerNew.handleAlarmRequest(clientRequest);
+    case ACTIVE_ALARMS_REQUEST_NEW:
+      log.debug("handleClientRequest() - Received an ACTIVE_ALARMS_REQUEST_NEW.");
+      return clientAlarmRequestHandlerNew.handleActiveAlarmRequest();
     case SUPERVISION_REQUEST:
       if (log.isDebugEnabled()) {
         log.debug("handleClientRequest() - Received a SUPERVISION_REQUEST.");

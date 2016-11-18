@@ -39,13 +39,13 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-class ClientAlarmExpressionRequestHandler {
+class ClientAlarmRequestHandlerNew {
 
   /** Reference to the tag location service to check whether a tag exists */
   private final TagLocationService tagLocationService;
 
   @Autowired
-  protected ClientAlarmExpressionRequestHandler(final TagLocationService tagLocationService) {
+  protected ClientAlarmRequestHandlerNew(final TagLocationService tagLocationService) {
     this.tagLocationService = tagLocationService;
   }
 
@@ -68,7 +68,7 @@ class ClientAlarmExpressionRequestHandler {
   /**
    * Inner method which handles the alarm request.
    *
-   * @param alarmRequest The alarm request sent from the client
+   * @param alarmRequest the alarm request sent from the client
    * @return Collection of alarms
    */
   Collection<? extends ClientRequestResult> handleAlarmRequest(final ClientRequest alarmRequest) {
@@ -76,19 +76,17 @@ class ClientAlarmExpressionRequestHandler {
     final Collection<TransferTagValueImpl> alarms = new ArrayList<>();
 
     for (Long tagId : alarmRequest.getIds()) {
-      switch (alarmRequest.getResultType()) {
-        case TRANSFER_ALARM_LIST:
-          if (tagLocationService.isInTagCache(tagId)) {
-            Tag tag = tagLocationService.getCopy(tagId);
-            alarms.add(TransferObjectFactory.createTransferTagValue(tag));
-          } else {
-            log.warn("handleAlarmRequest() - unrecognized Tag with id {}", tagId);
-          }
+      if (!alarmRequest.getResultType().equals(ClientRequest.ResultType.TRANSFER_ALARM_LIST)) {
+        log.error("handleAlarmRequest() - Could not generate response message. Unknown enum ResultType {}",
+            alarmRequest.getResultType());
 
-          break;
-        default:
-          log.error("handleAlarmRequest() - Could not generate response message. Unknown enum ResultType {}",
-              alarmRequest.getResultType());
+      } else {
+        if (tagLocationService.isInTagCache(tagId)) {
+          Tag tag = tagLocationService.getCopy(tagId);
+          alarms.add(TransferObjectFactory.createTransferTagValue(tag));
+        } else {
+          log.warn("handleAlarmRequest() - unrecognized Tag with id {}", tagId);
+        }
       }
     }
     log.debug("Finished processing Alarm request: returning {} Alarms", alarms.size());
