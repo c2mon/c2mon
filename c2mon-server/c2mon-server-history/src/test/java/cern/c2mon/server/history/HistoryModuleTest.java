@@ -51,9 +51,6 @@ import cern.c2mon.shared.client.command.CommandReportImpl;
 import cern.c2mon.shared.common.command.CommandTag;
 
 /**
- * Tests the module works correctly, mocking all other
- * server modules.
- *
  * @author Mark Brightwell
  */
 @RunWith(SpringJUnit4ClassRunner.class)
