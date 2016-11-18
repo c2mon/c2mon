@@ -215,7 +215,7 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
             alarmConfigHandler.removeAlarm(alarmId, alarmReport);
           }
         }
-        LocalExpressionCache.removeTagInformation(controlTag.getId());
+        LocalExpressionCache.removeTag(controlTag.getId());
         configurableDAO.deleteItem(controlTag.getId());
         //if the ControlTag has no Address, do not send anything to the DAQ so return null
         if (((ControlTagFacade) commonTagFacade).isInProcessList(controlTag)) {

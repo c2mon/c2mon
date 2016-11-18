@@ -255,7 +255,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
         for (Long inputTagId : ruleInputTagIds) {
           tagConfigGateway.removeRuleFromTag(inputTagId, id); //allowed to lock tag below the rule...
         }
-        LocalExpressionCache.removeTagInformation(ruleTag.getId());
+        LocalExpressionCache.removeTag(ruleTag.getId());
         configurableDAO.deleteItem(ruleTag.getId());
       }
       catch (RuntimeException rEx) {

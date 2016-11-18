@@ -138,7 +138,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
     dataTagUpdate.setDataTagId(tag.getId());
     tagCache.acquireWriteLockOnKey(tag.getId());
     try {
-      String tmpStr = null;
+      String tmpStr;
 
       // TAG name and topic derived from name
       if ((tmpStr = properties.getProperty("name")) != null) {
@@ -222,6 +222,9 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
         ArrayList<Expression> expressions = null;
         try {
           expressions = JacksonSerializer.mapper.readValue(tmpStr, typeReference);
+          if(expressions != null ) {
+            expressions.stream().forEach(exp -> exp.setVersion(System.currentTimeMillis()));
+          }
         } catch (IOException e) {
           e.printStackTrace();
         }
