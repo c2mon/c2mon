@@ -17,18 +17,17 @@
 package cern.c2mon.server.daqcommunication.out;
 
 
-
-
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.daqcommunication.out.junit.CachePopulationRule;
-import cern.c2mon.server.test.broker.TestBrokerService;
 import cern.c2mon.shared.common.NoSimpleValueParseException;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 import cern.c2mon.shared.daq.serialization.MessageConverter;
 import org.apache.activemq.command.ActiveMQQueue;
-import org.junit.*;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;
 import org.springframework.test.context.ContextConfiguration;
@@ -63,6 +62,10 @@ public class ProcessCommunicationManagerTest {
   @Autowired
   public CachePopulationRule cachePopulationRule;
 
+  @Autowired
+  @Qualifier("daqOutActiveMQConnectionFactory")
+  private ConnectionFactory connectionFactory;
+
   /**
    * To test.
    */
@@ -72,36 +75,14 @@ public class ProcessCommunicationManagerTest {
   @Autowired
   private ProcessCache processCache;
 
-  private static TestBrokerService testBrokerService = new TestBrokerService();
-
-  /**
-   * Starts in-memory broker.
-   */
-  @BeforeClass
-  public static void init() throws Exception {
-    testBrokerService.createAndStartBroker();
-  }
-
-  @AfterClass
-  public static void stopBroker() throws Exception {
-    testBrokerService.stopBroker();
-  }
-
   /**
    * Tests request is sent and response is processed. Connects to in-memory
    * broker.
-   * @throws NoSimpleValueParseException
-   * @throws NoSuchFieldException
-   * @throws TransformerException
-   * @throws InstantiationException
-   * @throws IllegalAccessException
-   * @throws ParserConfigurationException
    */
   @Test
-  @Ignore
-  public void testConfigurationRequest() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
+  public void testConfigurationRequest() throws Exception {
     //fake DAQ responding to request
-    final JmsTemplate daqTemplate = new JmsTemplate(testBrokerService.getConnectionFactory());
+    final JmsTemplate daqTemplate = new JmsTemplate(connectionFactory);
     new Thread(new Runnable() {
 
       @Override
