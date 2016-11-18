@@ -104,7 +104,7 @@ configurationService.updateEquipment(equipmentToUpdate);
 The following code shows the simplest way to create a `DataTag`:
 
 ```java
-configurationService.createDataTag("E_EXAMPLE", "TAG_EXAMPLE", Integer.class, new DataTagAdress());
+configurationService.createDataTag("E_EXAMPLE", "TAG_EXAMPLE", Integer.class, new DataTagAddress());
 ```
 
 An ID for the tag will be generated automatically on the server. The first parameter expects the name of an existing `Equipment`.
@@ -113,7 +113,7 @@ If you need more control about the created entity (such as adding metadata, sett
 `DataTag#create` builder method:
 
 ```java
-DataTag tagToCreate = DataTag.create("TAG_EXAMPLE", Integer.class, new DataTagAdress())
+DataTag tagToCreate = DataTag.create("TAG_EXAMPLE", Integer.class, new DataTagAddress())
         .description("An example datatag")
         .metadata(Metadata.builder().addMetadata("myCustomKey", "someValue"))
         .build();
