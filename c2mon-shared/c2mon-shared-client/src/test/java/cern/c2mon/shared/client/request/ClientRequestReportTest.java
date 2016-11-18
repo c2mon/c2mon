@@ -72,7 +72,7 @@ public class ClientRequestReportTest {
     assertTrue(!report.isResult());
     assertTrue(report.isErrorReport());
     assertTrue(!report.isProgressReport());
-    assertTrue(!report.executedSuccessfully());
+    assertTrue(report.getRequestExecutionStatus() != ClientRequestErrorReport.RequestExecutionStatus.REQUEST_EXECUTED_SUCCESSFULLY);
     assertTrue(report.getErrorMessage() == null);      
   }
 }

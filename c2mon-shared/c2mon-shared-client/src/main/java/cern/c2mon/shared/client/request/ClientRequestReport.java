@@ -180,11 +180,6 @@ public abstract class ClientRequestReport implements ClientRequestProgressReport
   }
 
   @Override
-  public boolean executedSuccessfully() {
-    return getRequestExecutionStatus() == RequestExecutionStatus.REQUEST_EXECUTED_SUCCESSFULLY;
-  }
-
-  @Override
   public String getErrorMessage() {
     return errorMessage;
   }

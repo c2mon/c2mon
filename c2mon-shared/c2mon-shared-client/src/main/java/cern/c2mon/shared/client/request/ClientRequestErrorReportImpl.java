@@ -66,12 +66,6 @@ public class ClientRequestErrorReportImpl implements ClientRequestErrorReport {
   }
 
   @Override
-  public boolean executedSuccessfully() {
-    
-    return getRequestExecutionStatus() == RequestExecutionStatus.REQUEST_EXECUTED_SUCCESSFULLY;
-  }
-
-  @Override
   public String getErrorMessage() {
     return errorMessage;
   }

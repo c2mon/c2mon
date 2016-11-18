@@ -53,13 +53,6 @@ public interface ClientRequestErrorReport {
    * @return Error description.
    */
   String getErrorMessage();
-  
-  /**
-   * 
-   * @return True if the command was executed successfully.
-   * @see RequestExecutionStatus
-   */  
-  boolean executedSuccessfully();
 
   /**
    * This method returns the Request Execution Status
