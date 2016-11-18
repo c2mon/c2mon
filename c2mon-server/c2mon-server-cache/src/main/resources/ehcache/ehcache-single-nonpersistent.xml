@@ -23,6 +23,7 @@
         <searchAttribute name="tagName" expression="value.getName()"/>
         <searchAttribute name="equipmentId" expression="value.getEquipmentId()"/>
         <searchAttribute name="subEquipmentId" expression="value.getSubEquipmentId()"/>
+        <searchAttribute name="activeAlarm" expression="value.isActiveAlarm()"/>
       </searchable>
     </cache>
 
@@ -35,6 +36,7 @@
       memoryStoreEvictionPolicy="LFU">
       <searchable keys="false" values="false">
         <searchAttribute name="tagName" expression="value.getName()"/>
+        <searchAttribute name="activeAlarm" expression="value.isActiveAlarm()"/>
       </searchable>
     </cache>
 
@@ -59,6 +61,7 @@
       memoryStoreEvictionPolicy="LFU">
       <searchable keys="false" values="false">
         <searchAttribute name="tagName" expression="value.getName()"/>
+        <searchAttribute name="activeAlarm" expression="value.isActiveAlarm()"/>
       </searchable>
     </cache>
 
