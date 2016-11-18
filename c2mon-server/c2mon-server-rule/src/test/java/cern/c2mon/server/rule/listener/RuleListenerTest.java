@@ -21,7 +21,7 @@ import cern.c2mon.server.cache.DataTagFacade;
 import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
-import cern.c2mon.server.rule.junit.CachePopulationRule;
+import cern.c2mon.server.rule.junit.RuleCachePopulationRule;
 import cern.c2mon.server.test.CacheObjectCreation;
 import org.junit.Before;
 import org.junit.Rule;
@@ -64,7 +64,7 @@ public class RuleListenerTest implements ApplicationContextAware {
 
   @Rule
   @Autowired
-  public CachePopulationRule cachePopulationRule;
+  public RuleCachePopulationRule ruleCachePopulationRule;
 
   /**
    * The time the main thread sleeps to allow listeners to act on

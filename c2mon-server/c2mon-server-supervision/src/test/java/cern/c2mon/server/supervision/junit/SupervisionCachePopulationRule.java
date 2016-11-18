@@ -1,4 +1,4 @@
-package cern.c2mon.server.daqcommunication.in.junit;
+package cern.c2mon.server.supervision.junit;
 
 import cern.c2mon.server.cache.alarm.AlarmCacheImpl;
 import cern.c2mon.server.cache.alive.AliveTimerCacheImpl;
@@ -29,7 +29,7 @@ import javax.sql.DataSource;
  * @author Justin Lewis Salmon
  */
 @Service
-public class CachePopulationRule extends ExternalResource {
+public class SupervisionCachePopulationRule extends ExternalResource {
 
   @Autowired
   private DataSource cacheDataSource;

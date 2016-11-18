@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import cern.c2mon.server.cache.dbaccess.junit.DatabasePopulationRule;
+import cern.c2mon.server.test.DatabasePopulationRule;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.test.CacheObjectCreation;

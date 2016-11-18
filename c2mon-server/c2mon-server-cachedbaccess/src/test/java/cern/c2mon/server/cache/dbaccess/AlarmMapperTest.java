@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import cern.c2mon.server.cache.dbaccess.junit.DatabasePopulationRule;
+import cern.c2mon.server.test.DatabasePopulationRule;
 import cern.c2mon.server.cache.dbaccess.structure.DBBatch;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;

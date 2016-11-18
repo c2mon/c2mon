@@ -19,6 +19,7 @@ package cern.c2mon.server.cachepersistence;
 import java.io.IOException;
 import java.sql.Timestamp;
 
+import cern.c2mon.server.test.DatabasePopulationRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,7 +32,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import cern.c2mon.server.cache.datatag.DataTagCacheImpl;
 import cern.c2mon.server.cache.dbaccess.DataTagMapper;
 import cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl;
-import cern.c2mon.server.cachepersistence.junit.DatabasePopulationRule;
 import cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;

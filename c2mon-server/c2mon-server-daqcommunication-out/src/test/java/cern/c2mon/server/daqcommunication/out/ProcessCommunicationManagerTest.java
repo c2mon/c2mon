@@ -18,8 +18,7 @@ package cern.c2mon.server.daqcommunication.out;
 
 
 import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.daqcommunication.out.junit.CachePopulationRule;
-import cern.c2mon.shared.common.NoSimpleValueParseException;
+import cern.c2mon.server.daqcommunication.out.junit.DaqOutCachePopulationRule;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 import cern.c2mon.shared.daq.serialization.MessageConverter;
 import org.apache.activemq.command.ActiveMQQueue;
@@ -35,8 +34,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.jms.*;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.util.Collections;
 
 import static org.junit.Assert.assertNotNull;
@@ -60,7 +57,7 @@ public class ProcessCommunicationManagerTest {
 
   @Rule
   @Autowired
-  public CachePopulationRule cachePopulationRule;
+  public DaqOutCachePopulationRule daqOutCachePopulationRule;
 
   @Autowired
   @Qualifier("daqOutActiveMQConnectionFactory")

@@ -28,7 +28,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.dbaccess.AlarmMapper;
 import cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl;
-import cern.c2mon.server.cachepersistence.junit.DatabasePopulationRule;
+import cern.c2mon.server.test.DatabasePopulationRule;
 import cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;

@@ -34,13 +34,12 @@ import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.configuration.junit.CachePopulationRule;
+import cern.c2mon.server.configuration.junit.ConfigurationCachePopulationRule;
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
 import cern.c2mon.server.configuraton.helper.ObjectEqualityComparison;
 import cern.c2mon.server.daqcommunication.in.JmsContainerManager;
 import cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
-import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
@@ -124,7 +123,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
   @Rule
   @Autowired
-  public CachePopulationRule cachePopulationRule;
+  public ConfigurationCachePopulationRule configurationCachePopulationRule;
 
   /**
    * Mocked daqcommunication-out module.
@@ -1361,6 +1360,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   }
 
   @Test
+  @Ignore
   public void testConcurrentConfigRequestRejected() throws InterruptedException, IllegalAccessException, InstantiationException, NoSuchFieldException,
       ParserConfigurationException, TransformerException, NoSimpleValueParseException {
 

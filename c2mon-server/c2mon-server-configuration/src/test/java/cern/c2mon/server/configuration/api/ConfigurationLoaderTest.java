@@ -30,7 +30,7 @@ import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.api.util.CacheObjectFactory;
 import cern.c2mon.server.configuration.api.util.TestConfigurationProvider;
-import cern.c2mon.server.configuration.junit.CachePopulationRule;
+import cern.c2mon.server.configuration.junit.ConfigurationCachePopulationRule;
 import cern.c2mon.server.configuration.parser.util.*;
 import cern.c2mon.server.configuraton.helper.ObjectEqualityComparison;
 import cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager;
@@ -54,7 +54,6 @@ import junit.framework.Assert;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -98,7 +97,7 @@ public class ConfigurationLoaderTest {
 
   @Rule
   @Autowired
-  public CachePopulationRule cachePopulationRule;
+  public ConfigurationCachePopulationRule configurationCachePopulationRule;
 
   @Autowired
   CacheObjectFactory cacheObjectFactory;

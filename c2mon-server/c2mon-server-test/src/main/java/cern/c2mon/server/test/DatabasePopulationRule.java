@@ -1,4 +1,4 @@
-package cern.c2mon.server.client.junit;
+package cern.c2mon.server.test;
 
 import org.junit.rules.ExternalResource;
 import org.springframework.beans.factory.annotation.Autowired;

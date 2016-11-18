@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 import java.sql.Timestamp;
 import java.util.List;
 
-import cern.c2mon.server.cache.dbaccess.junit.DatabasePopulationRule;
+import cern.c2mon.server.test.DatabasePopulationRule;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;

@@ -18,7 +18,7 @@ package cern.c2mon.server.client.publish;
 
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.TagLocationService;
-import cern.c2mon.server.client.junit.CachePopulationRule;
+import cern.c2mon.server.client.junit.ClientCachePopulationRule;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
@@ -76,7 +76,7 @@ public class TagValuePublisherTest {
 
   @Rule
   @Autowired
-  public CachePopulationRule cachePopulationRule;
+  public ClientCachePopulationRule clientCachePopulationRule;
 
   /**
    * To test.

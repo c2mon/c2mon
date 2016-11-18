@@ -20,7 +20,7 @@ import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
 
-import cern.c2mon.server.cache.dbaccess.junit.DatabasePopulationRule;
+import cern.c2mon.server.test.DatabasePopulationRule;
 import cern.c2mon.server.test.CacheObjectCreation;
 import org.junit.Before;
 import org.junit.Rule;

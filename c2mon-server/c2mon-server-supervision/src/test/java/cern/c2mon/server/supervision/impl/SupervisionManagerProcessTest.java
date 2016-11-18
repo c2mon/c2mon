@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -22,15 +22,15 @@ import static org.junit.Assert.assertNotNull;
 
 import java.sql.Timestamp;
 
-import cern.c2mon.server.supervision.junit.CachePopulationRule;
+import cern.c2mon.server.supervision.junit.SupervisionCachePopulationRule;
 import org.junit.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -56,12 +56,13 @@ import cern.c2mon.shared.daq.process.XMLConverter;
     "classpath:config/server-supervision.xml",
     "classpath:test-config/server-test-properties.xml"
 })
+@DirtiesContext(classMode= DirtiesContext.ClassMode.AFTER_CLASS)
 @TestPropertySource("classpath:c2mon-server-default.properties")
 public class SupervisionManagerProcessTest {
 
   @Rule
   @Autowired
-  public CachePopulationRule cachePopulationRule;
+  public SupervisionCachePopulationRule supervisionCachePopulationRule;
 
   /**
    * The system's logger
@@ -128,16 +129,16 @@ public class SupervisionManagerProcessTest {
 //    this.processDisconnectionBC = null;
   }
 
-  @After
-  public void disconnection() {
-    // Disconnection
-    if((this.processConnectionResponse != null) && (this.processConnectionRequest != null) /*&& (this.processDisconnectionBC == null)*/) {
-      this.processDisconnectionRequest = new ProcessDisconnectionRequest(GOOD_PROCESSNAME, this.processConnectionResponse.getProcessPIK(),
-          this.processConnectionRequest.getProcessStartupTime().getTime());
-
-      onProcessDisconnection();
-    }
-  }
+//  @After
+//  public void disconnection() {
+//    // Disconnection
+//    if((this.processConnectionResponse != null) && (this.processConnectionRequest != null) /*&& (this.processDisconnectionBC == null)*/) {
+//      this.processDisconnectionRequest = new ProcessDisconnectionRequest(GOOD_PROCESSNAME, this.processConnectionResponse.getProcessPIK(),
+//          this.processConnectionRequest.getProcessStartupTime().getTime());
+//
+//      onProcessDisconnection();
+//    }
+//  }
 
   @Test
   public void testOnProcessConnectionNull() {

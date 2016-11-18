@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -21,13 +21,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-
-import cern.c2mon.server.configuration.junit.CachePopulationRule;
+import cern.c2mon.server.configuration.junit.ConfigurationCachePopulationRule;
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -71,7 +68,7 @@ import cern.c2mon.shared.client.configuration.ConfigurationReport;
 /**
  * Tests the ConfigHandler's when DB persitence fails, for instance when a constraint
  * if violated. Checks the cache is left in a consistent state.
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -95,72 +92,72 @@ public class DbFailureTest implements ApplicationContextAware {
 
   @Rule
   @Autowired
-  public CachePopulationRule cachePopulationRule;
+  public ConfigurationCachePopulationRule configurationCachePopulationRule;
 
   private IMocksControl mockControl = EasyMock.createNiceControl();
-  
+
   @Autowired
   private ProcessConfigHandlerImpl processConfigHandler;
-  
+
   @Autowired
   private ConfigurationLoader configurationLoader;
-  
+
   private ApplicationContext context;
-  
+
   @Autowired
   private DataTagCache dataTagCache;
-  
+
   @Autowired
   private DataTagMapper dataTagMapper;
 
   @Autowired
   private ControlTagCache controlTagCache;
-  
+
   @Autowired
   private ControlTagMapper controlTagMapper;
-  
+
   @Autowired
   private CommandTagCache commandTagCache;
-  
+
   @Autowired
   private CommandTagMapper commandTagMapper;
-  
+
   @Autowired
   private RuleTagCache ruleTagCache;
-  
+
   @Autowired
   private RuleTagMapper ruleTagMapper;
-  
+
   @Autowired
   private EquipmentCache equipmentCache;
-  
+
   @Autowired
   private EquipmentMapper equipmentMapper;
-  
+
   @Autowired
   private SubEquipmentCache subEquipmentCache;
-  
+
   @Autowired
-  private SubEquipmentMapper subEquipmentMapper;  
-  
+  private SubEquipmentMapper subEquipmentMapper;
+
   @Autowired
   private ProcessCache processCache;
-  
+
   @Autowired
   private ProcessMapper processMapper;
-  
+
   @Autowired
   private AliveTimerCache aliveTimerCache;
-  
+
   @Autowired
   private CommFaultTagCache commFaultTagCache;
-  
+
   @Autowired
   private AlarmCache alarmCache;
-    
+
   @Autowired
   private AlarmMapper alarmMapper;
-  
+
   @Autowired
   private ProcessFacade processFacade;
 
@@ -169,7 +166,7 @@ public class DbFailureTest implements ApplicationContextAware {
     ((AbstractApplicationContext) context).start();
     mockControl.reset();
   }
-  
+
   /**
    * Tests the system is left in the correct consistent state if the removal of
    * the Process from the DB fails.
@@ -181,10 +178,10 @@ public class DbFailureTest implements ApplicationContextAware {
     ProcessConfigTransacted processConfigTransacted = mockControl.createMock(ProcessConfigTransacted.class);
     processConfigHandler.setProcessConfigTransacted(processConfigTransacted);
     processConfigTransacted.doRemoveProcess(EasyMock.isA(Process.class), EasyMock.isA(ConfigurationElementReport.class));
-    EasyMock.expectLastCall().andThrow(new RuntimeException("fake exception thrown"));        
-    
+    EasyMock.expectLastCall().andThrow(new RuntimeException("fake exception thrown"));
+
     mockControl.replay();
-    
+
     ConfigurationReport report = configurationLoader.applyConfiguration(28);
     assertTrue(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     //check all is removed except Process & its Control tags
@@ -208,12 +205,12 @@ public class DbFailureTest implements ApplicationContextAware {
     assertTrue(controlTagCache.hasKey(1220L));
     assertNotNull(controlTagMapper.getItem(1220L));
     assertTrue(controlTagCache.hasKey(1221L));
-    assertNotNull(controlTagMapper.getItem(1221L)); 
+    assertNotNull(controlTagMapper.getItem(1221L));
     //equipment control tags are gone
     assertFalse(controlTagCache.hasKey(1222L));
     assertNull(controlTagMapper.getItem(1222L));
     assertFalse(controlTagCache.hasKey(1223L));
-    assertNull(controlTagMapper.getItem(1223L)); 
+    assertNull(controlTagMapper.getItem(1223L));
     //equipment commfault is gone
     assertFalse(commFaultTagCache.hasKey(1223L));
     //process alive is still here (may be active or not, depending on status when removed)
@@ -223,10 +220,10 @@ public class DbFailureTest implements ApplicationContextAware {
     assertNull(alarmMapper.getItem(350000L));
     assertFalse(alarmCache.hasKey(350001L));
     assertNull(alarmMapper.getItem(350001L));
-    
+
     mockControl.verify();
   }
-  
+
   @Override
   public void setApplicationContext(ApplicationContext arg0) throws BeansException {
     context = arg0;

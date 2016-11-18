@@ -16,8 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loading;
 
-import cern.c2mon.server.cache.loading.junit.DatabasePopulationRule;
 import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.test.DatabasePopulationRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
