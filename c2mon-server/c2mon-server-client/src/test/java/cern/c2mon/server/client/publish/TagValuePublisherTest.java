@@ -23,18 +23,23 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
 import cern.c2mon.server.client.junit.CachePopulationRule;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
+import org.apache.activemq.broker.BrokerFactory;
+import org.apache.activemq.broker.BrokerService;
+import org.apache.activemq.broker.BrokerServiceAware;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -87,8 +92,6 @@ public class TagValuePublisherTest {
   @Autowired
   public CachePopulationRule cachePopulationRule;
 
-  private static TestBrokerService testBrokerService = new TestBrokerService();
-
   /**
    * To test.
    */
@@ -101,17 +104,16 @@ public class TagValuePublisherTest {
   @Autowired
   private TagFacadeGateway tagFacadeGateway;
 
+  @Autowired
+  @Qualifier("clientActiveMQConnectionFactory")
+  private ConnectionFactory connectionFactory;
+
   /**
    * Used for holding update received in test with lock.
    */
   private TagValueUpdate update;
   private TagUpdate updateFromConfig;
   private Object updateLock = new Object();
-
-  @BeforeClass
-  public static void startBroker() throws Exception {
-    testBrokerService.createAndStartBroker();
-  }
 
   @After
   public void afterTest() {
@@ -210,7 +212,7 @@ public class TagValuePublisherTest {
       @Override
       public void run() {
         try {
-          JmsTemplate template = new JmsTemplate(testBrokerService.getConnectionFactory());
+          JmsTemplate template = new JmsTemplate(connectionFactory);
           template.setReceiveTimeout(1000);
           synchronized (updateLock) {
             Message message = template.receive(new ActiveMQTopic(tag.getTopic()));
@@ -237,7 +239,7 @@ public class TagValuePublisherTest {
       @Override
       public void run() {
         try {
-          JmsTemplate template = new JmsTemplate(testBrokerService.getConnectionFactory());
+          JmsTemplate template = new JmsTemplate(connectionFactory);
           template.setReceiveTimeout(5000);
           synchronized (updateLock) {
             Message message = template.receive(new ActiveMQTopic(tag.getTopic()));
@@ -267,7 +269,7 @@ public class TagValuePublisherTest {
     synchronized (updateLock) {
       this.update = null;
     }
-    testBrokerService.stopBroker();
+//    testBrokerService.stop();
 
     //try publication
     final DataTag tag = CacheObjectCreation.createTestDataTag3();
@@ -288,7 +290,7 @@ public class TagValuePublisherTest {
 
     Thread.sleep(2000); //allow another republication to fail (after 1s=republication delay)
                         //then start broker & listener before next republication attempt!
-    testBrokerService.createAndStartBroker();  //connection to listener thread must have time to establish itself before republication
+//    testBrokerService.start();  //connection to listener thread must have time to establish itself before republication
     listenerThread = startListenerThread(tag); //new thread
 
     listenerThread.join(1000);
@@ -305,7 +307,7 @@ public class TagValuePublisherTest {
     synchronized (updateLock) {
       this.updateFromConfig = null;
     }
-    testBrokerService.stopBroker();
+//    testBrokerService.stop();
 
     //try publication
     final DataTag tag = CacheObjectCreation.createTestDataTag3();
@@ -329,7 +331,7 @@ public class TagValuePublisherTest {
 
     Thread.sleep(1000); //allow another republication to fail (after 1s=republication delay)
                         //then start broker & listener before next republication attempt!
-    testBrokerService.createAndStartBroker();  //connection to listener thread must have time to establish itself before republication
+//    testBrokerService.start();  //connection to listener thread must have time to establish itself before republication
     listenerThread = startListenerThreadForTransferTag(tag); //new thread
 
     listenerThread.join(1000);
@@ -338,10 +340,4 @@ public class TagValuePublisherTest {
 
     EasyMock.verify();
   }
-
-  @AfterClass
-  public static void stopBroker() throws Exception {
-    testBrokerService.stopBroker();
-  }
-
 }
