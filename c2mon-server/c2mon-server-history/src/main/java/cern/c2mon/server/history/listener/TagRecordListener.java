@@ -21,6 +21,8 @@ import java.util.Collection;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.shorttermlog.logger.ExpressionLogger;
+import cern.c2mon.shared.client.expression.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +63,11 @@ public class TagRecordListener implements C2monBufferedCacheListener<Tag>, Smart
   private BatchLogger<Tag> tagLogger;
 
   /**
+   * Bean that logs expressions into the STL.
+   */
+  private ExpressionLogger expressionLogger;
+
+  /**
    * Listener container lifecycle hook.
    */
   private Lifecycle listenerContainer;
@@ -77,10 +84,13 @@ public class TagRecordListener implements C2monBufferedCacheListener<Tag>, Smart
    * @param tagLogger for logging cache objects to the STL
    */
   @Autowired
-  public TagRecordListener(final CacheRegistrationService cacheRegistrationService, @Qualifier("tagLogger") final BatchLogger<Tag> tagLogger) {
+  public TagLogCacheListener(final CacheRegistrationService cacheRegistrationService,
+                             @Qualifier("tagLogger") final BatchLogger<Tag> tagLogger,
+                             ExpressionLogger expressionLogger) {
     super();
     this.cacheRegistrationService = cacheRegistrationService;
     this.tagLogger = tagLogger;
+    this.expressionLogger = expressionLogger;
   }
 
   /**
@@ -103,12 +113,14 @@ public class TagRecordListener implements C2monBufferedCacheListener<Tag>, Smart
 
   @Override
   public void notifyElementUpdated(Collection<Tag> tagCollection) {
-    ArrayList<Tag> tagsToLog = new ArrayList<Tag>(tagCollection.size());
+    ArrayList<Tag> tagsToLog = new ArrayList<>(tagCollection.size());
     for (Tag tag : tagCollection) {
       if (tag.isLogged())
         tagsToLog.add(tag);
     }
     tagLogger.log(tagsToLog);
+    tagsToLog.stream()
+        .forEach(tag -> expressionLogger.log(tag.getExpressions(), tag.getId(), tag.getTimestamp()));
   }
 
   @Override
