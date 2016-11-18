@@ -1,57 +1,55 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.daqcommunication.in;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.concurrent.CountDownLatch;
-
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-
+import cern.c2mon.server.cache.ClusterCache;
+import cern.c2mon.server.cache.ProcessCache;
+import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl;
+import cern.c2mon.shared.util.jms.ActiveJmsSender;
 import org.easymock.EasyMock;
-import org.easymock.IAnswer;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.cache.ClusterCache;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.common.process.Process;
-import cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl;
-import cern.c2mon.server.test.broker.TestBrokerService;
-import cern.c2mon.shared.util.jms.ActiveJmsSender;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Integration test of JmsContainerManager component with ActiveMQ broker (rest
  * of server core dependencies are mocked).
- * 
+ *
  * <p>Imports connection XML and properties import XML.
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -61,14 +59,14 @@ import cern.c2mon.shared.util.jms.ActiveJmsSender;
     "classpath:config/server-daqcommunication-in-connection.xml",
     "classpath:test-config/server-test-properties.xml"
 })
-@Ignore("This test is flaky when built on GitLab")
+@TestPropertySource("classpath:c2mon-server-default.properties")
 public class JmsContainerManagerTest {
 
   /**
    * Component to test.
    */
   private JmsContainerManagerImpl jmsContainerManager;
-  
+
   /*
    * Mocks
    */
@@ -78,42 +76,34 @@ public class JmsContainerManagerTest {
   //for tests that share a process and queue name
   private Process mockProcess;
   private String tmpQueueName;
-  
+
   /**
    * Test queue trunk name.
    */
   private String testTrunkName = "c2mon.server.jmscontainermanager.test";
-  
+
   /**
    * Sender used for testing messages are picked up.
    */
   private ActiveJmsSender jmsSender;
-  
-  /**
-   * Connection to JMS instantiated in XML.
-   */  
+
+  @Autowired
+  @Qualifier("daqInConnectionFactory")
   private ConnectionFactory daqInConnectionFactory;
-  
-  private TestBrokerService testBrokerService;
-  
+
   @Before
   public void setUp() throws Exception {
-    //start in-memory test broker
-    testBrokerService = new TestBrokerService();
-    testBrokerService.createAndStartBroker();
-    daqInConnectionFactory = testBrokerService.getConnectionFactory();
-    
     mockProcessCache = EasyMock.createMock(ProcessCache.class);
     mockListener = EasyMock.createMock(SessionAwareMessageListener.class);
     mockClusterCache = EasyMock.createMock(ClusterCache.class);
-        
+
     jmsSender = new ActiveJmsSender();
     JmsTemplate template = new JmsTemplate();
     template.setConnectionFactory(daqInConnectionFactory);
     template.setTimeToLive(60000);
     jmsSender.setJmsTemplate(template);
-    
-    jmsContainerManager = new JmsContainerManagerImpl(mockProcessCache, daqInConnectionFactory, mockListener, mockClusterCache); 
+
+    jmsContainerManager = new JmsContainerManagerImpl(mockProcessCache, daqInConnectionFactory, mockListener, mockClusterCache);
     jmsContainerManager.setConsumersInitial(1);
     jmsContainerManager.setConsumersMax(1);
     jmsContainerManager.setNbExecutorThreads(2);
@@ -124,12 +114,7 @@ public class JmsContainerManagerTest {
     jmsContainerManager.setSessionTransacted(true);
     jmsContainerManager.setUpdateWarmUpSeconds(60);
   }
-  
-  @After
-  public void stopBroker() throws Exception {
-    testBrokerService.stopBroker();
-  }
-  
+
   /**
    * For tests that assume the container manager is started.
    */
@@ -144,11 +129,11 @@ public class JmsContainerManagerTest {
   /**
    * Tests that all containers are subscribed at start-up to the
    * correct JMS queues (by sending message to expected subscribed).
-   * @throws InterruptedException 
-   * @throws JMSException 
+   * @throws InterruptedException
+   * @throws JMSException
    */
   @Test
-  @Ignore("This test is flaky when built on GitLab")
+  @Ignore("This test is broken")
   public void testInitAtStartUp() throws InterruptedException, JMSException {
     ArrayList<Long> keys = new ArrayList<Long>();
     keys.add(0, 1L);
@@ -178,39 +163,39 @@ public class JmsContainerManagerTest {
       latch.countDown();
       return null;
     });
-    
+
     //run test
     EasyMock.replay(mockProcessCache);
     EasyMock.replay(mockProcess1);
     EasyMock.replay(mockProcess2);
     EasyMock.replay(mockListener);
-    
+
     //init subscriptions
     ((JmsContainerManagerImpl) jmsContainerManager).init();
     ((SmartLifecycle) jmsContainerManager).start();
-    //check messages are picked up    
+    //check messages are picked up
     jmsSender.sendToQueue("test message from process 1", testTrunkName + ".Process-1-" + millis);
     jmsSender.sendToQueue("test message from process 2", testTrunkName + ".Process-2-" + millis);
-    
+
     // wait for the listeners to fire
     latch.await();
 
     EasyMock.verify(mockProcessCache);
     EasyMock.verify(mockProcess1);
     EasyMock.verify(mockProcess2);
-    EasyMock.verify(mockListener);    
+    EasyMock.verify(mockListener);
   }
-  
+
   /**
    * Tests a single subscription works.
-   * @throws InterruptedException 
-   * @throws JMSException 
+   * @throws InterruptedException
+   * @throws JMSException
    */
   @Test
-  @Ignore("This test is flaky when built on GitLab")
+  @Ignore("This test is broken")
   public void testSubscribe() throws InterruptedException, JMSException {
     startContainerManager();
-    mockProcess = EasyMock.createMock(Process.class); 
+    mockProcess = EasyMock.createMock(Process.class);
     long millis = System.currentTimeMillis();
     EasyMock.expect(mockProcess.getId()).andReturn(10L).times(3);
     EasyMock.expect(mockProcess.getName()).andReturn("Process-3-" + millis).times(2);
@@ -223,50 +208,50 @@ public class JmsContainerManagerTest {
       latch.countDown();
       return null;
     });
-    
-    //run test   
-    EasyMock.replay(mockProcess);    
+
+    //run test
+    EasyMock.replay(mockProcess);
     EasyMock.replay(mockListener);
-    
+
     //init subscriptions
     jmsContainerManager.subscribe(mockProcess);
-    //check messages are picked up    
+    //check messages are picked up
     jmsSender.sendToQueue("test subscribe to process 3", testTrunkName + ".Process-3-" + millis);
 
     // wait for the listeners to fire
     latch.await();
 
-    EasyMock.verify(mockProcess);   
+    EasyMock.verify(mockProcess);
     EasyMock.verify(mockListener);
-    
+
     //for unsubscribe test
     tmpQueueName = testTrunkName + ".Process-3-" + millis;
   }
-  
+
   /**
    * Tests unsubscription from a Process.
-   * 
+   *
    * <p>Runs subscription test first and accesses process and queue name
    * through global variables.
-   * 
-   * @throws InterruptedException 
-   * @throws JMSException 
+   *
+   * @throws InterruptedException
+   * @throws JMSException
    */
   @Test
-  @Ignore("This test is flaky when built on GitLab")
+  @Ignore("This test is broken")
   public void testUnsubscribe() throws InterruptedException, JMSException {
     testSubscribe();
     EasyMock.reset(mockListener);
     EasyMock.reset(mockProcess);
     EasyMock.expect(mockProcess.getId()).andReturn(10L);
 
-    //run test   
+    //run test
     EasyMock.replay(mockProcess);
-    EasyMock.replay(mockListener);    
+    EasyMock.replay(mockListener);
     jmsContainerManager.unsubscribe(mockProcess);
-    //check messages are picked up    
-    jmsSender.sendToQueue("test unsubscribe from process 3", tmpQueueName);    
-    
+    //check messages are picked up
+    jmsSender.sendToQueue("test unsubscribe from process 3", tmpQueueName);
+
     //check that listener was NOT called
     EasyMock.verify(mockListener);
     EasyMock.verify(mockProcess);
