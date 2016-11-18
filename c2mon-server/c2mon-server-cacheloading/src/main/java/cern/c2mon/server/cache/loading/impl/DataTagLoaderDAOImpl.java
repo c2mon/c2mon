@@ -49,7 +49,9 @@ public class DataTagLoaderDAOImpl extends AbstractBatchLoaderDAO<DataTag> implem
   @Override
   public void insert(DataTag dataTag) {
     dataTagMapper.insertDataTag(dataTag);
-    dataTagMapper.insertExpressions(dataTag);
+    if (!dataTag.getExpressions().isEmpty()){
+      dataTagMapper.insertExpressions(dataTag);
+    }
   }
 
 
