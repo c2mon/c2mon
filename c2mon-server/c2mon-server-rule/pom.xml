@@ -56,20 +56,5 @@
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-test</artifactId>
     </dependency>
-    <dependency>
-      <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-supervision</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-daqcommunication-in</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-cachepersistence</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 </project>

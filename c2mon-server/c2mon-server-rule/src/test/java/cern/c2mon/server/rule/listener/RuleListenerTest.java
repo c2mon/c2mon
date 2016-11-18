@@ -16,16 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.rule.listener;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-import java.sql.Timestamp;
-
-import cern.c2mon.server.cache.dbaccess.DataTagMapper;
+import cern.c2mon.server.cache.DataTagCache;
+import cern.c2mon.server.cache.DataTagFacade;
+import cern.c2mon.server.cache.RuleTagCache;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.rule.junit.CachePopulationRule;
 import cern.c2mon.server.test.CacheObjectCreation;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,11 +36,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.DataTagFacade;
-import cern.c2mon.server.cache.RuleTagCache;
-import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.common.rule.RuleTag;
+import java.io.IOException;
+import java.sql.Timestamp;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -59,9 +56,6 @@ import cern.c2mon.server.common.rule.RuleTag;
     "classpath:config/server-cache.xml",
     "classpath:config/server-cachedbaccess.xml",
     "classpath:config/server-cacheloading.xml",
-    "classpath:config/server-cachepersistence.xml",
-    "classpath:config/server-daqcommunication-out.xml",
-    "classpath:config/server-supervision.xml",
     "classpath:config/server-rule.xml",
     "classpath:test-config/server-test-properties.xml"
 })
