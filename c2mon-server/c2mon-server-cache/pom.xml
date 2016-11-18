@@ -15,15 +15,7 @@
     <!-- Internal C2MON dependencies -->
     <dependency>
       <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-cacheloading</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-cachedbaccess</artifactId>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.shared</groupId>

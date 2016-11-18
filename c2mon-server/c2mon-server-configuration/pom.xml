@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-common</artifactId>
+      <artifactId>c2mon-server-daqcommunication-in</artifactId>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
@@ -31,10 +31,7 @@
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-rule</artifactId>
     </dependency>
-    <dependency>
-      <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-daqcommunication-in</artifactId>
-    </dependency>
+
 
     <!-- 3rd party dependencies -->
     <dependency>
