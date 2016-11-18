@@ -1,5 +1,7 @@
 package cern.c2mon.server.config;
 
+import cern.c2mon.server.client.config.ClientConfig;
+import cern.c2mon.server.client.config.ClientJmsConfig;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.DefaultLifecycleProcessor;
 
@@ -21,9 +23,12 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
     "classpath:config/server-daqcommunication-out.xml",
     "classpath:config/server-rule.xml",
     "classpath:config/server-configuration.xml",
-    "classpath:config/server-client.xml",
+//    "classpath:config/server-client.xml",
     "classpath:config/server-alarm.xml",
     "classpath:config/server-command.xml",
+})
+@Import({
+    ClientConfig.class
 })
 @PropertySources({
     @PropertySource("classpath:c2mon-server-default.properties"),

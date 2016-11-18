@@ -18,6 +18,7 @@ package cern.c2mon.server.client.publish;
 
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.server.client.config.ClientConfig;
 import cern.c2mon.server.client.junit.ClientCachePopulationRule;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
@@ -25,6 +26,8 @@ import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.server.test.broker.EmbeddedBrokerRule;
+import cern.c2mon.server.test.config.TestConfig;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 import cern.c2mon.shared.client.tag.*;
 import org.apache.activemq.command.ActiveMQTopic;
@@ -36,8 +39,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -58,25 +61,34 @@ import static org.junit.Assert.*;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({
-    "classpath:config/server-client.xml",
-    "classpath:config/server-cache.xml",
-    "classpath:config/server-cachedbaccess.xml",
-    "classpath:config/server-configuration.xml",
-    "classpath:config/server-daqcommunication-in.xml",
-    "classpath:config/server-daqcommunication-out.xml",
-    "classpath:config/server-rule.xml",
-    "classpath:config/server-supervision.xml",
-    "classpath:config/server-alarm.xml",
-    "classpath:config/server-command.xml",
-    "classpath:test-config/server-test-properties.xml"
-})
+@SpringApplicationConfiguration(
+    locations = {
+        "classpath:config/server-cache.xml",
+        "classpath:config/server-cachedbaccess.xml",
+        "classpath:config/server-configuration.xml",
+        "classpath:config/server-daqcommunication-in.xml",
+        "classpath:config/server-daqcommunication-out.xml",
+        "classpath:config/server-rule.xml",
+        "classpath:config/server-supervision.xml",
+        "classpath:config/server-alarm.xml",
+        "classpath:config/server-command.xml",
+        "classpath:test-config/server-test-properties.xml"
+    },
+    classes = {
+        ClientConfig.class,
+        TestConfig.class
+    }
+)
 @TestPropertySource("classpath:c2mon-server-default.properties")
 public class TagValuePublisherTest {
 
   @Rule
   @Autowired
   public ClientCachePopulationRule clientCachePopulationRule;
+
+  @Rule
+  @Autowired
+  public EmbeddedBrokerRule brokerRule;
 
   /**
    * To test.
@@ -113,7 +125,7 @@ public class TagValuePublisherTest {
    * @throws InterruptedException
    */
   @Test
-  @Ignore("This test is flaky, maybe due to all the sleep() calls")
+//  @Ignore("This test is flaky, maybe due to all the sleep() calls")
   public void testPublication() throws JMSException, InterruptedException {
     EasyMock.reset();
     synchronized (updateLock) {
