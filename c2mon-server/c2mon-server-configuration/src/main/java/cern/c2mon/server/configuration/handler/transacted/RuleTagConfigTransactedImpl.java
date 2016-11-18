@@ -141,7 +141,6 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
     } finally {
       tagCache.releaseWriteLockOnKey(element.getEntityId());
     }
-
   }
 
   /**
@@ -275,6 +274,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
         }
 
         LocalExpressionCache.removeTagInformation(ruleTag.getId());
+        LocalExpressionCache.removeTag(ruleTag.getId());
         configurableDAO.deleteItem(ruleTag.getId());
       }
       catch (RuntimeException rEx) {

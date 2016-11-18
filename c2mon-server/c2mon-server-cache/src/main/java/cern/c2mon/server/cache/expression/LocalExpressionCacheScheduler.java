@@ -44,7 +44,7 @@ public class LocalExpressionCacheScheduler {
         .stream()
         .filter(key -> !(dataTagCache.hasKey(key) || ruleTagCache.hasKey(key) || controlTagCache.hasKey(key)))
         .collect(Collectors.toList());
-    LocalExpressionCache.removeStaleTags(staleIds);
+    LocalExpressionCache.removeTags(staleIds);
   }
 
 }
