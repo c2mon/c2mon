@@ -40,7 +40,8 @@ import cern.c2mon.server.common.device.Property;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({
-    "classpath:config/server-cachedbaccess.xml"
+    "classpath:config/server-cachedbaccess.xml",
+    "classpath:test-config/database-population-rule.xml"
 })
 @TestPropertySource("classpath:c2mon-server-default.properties")
 //@ContextConfiguration({ "classpath:config/server-cachedbaccess-test.xml" })

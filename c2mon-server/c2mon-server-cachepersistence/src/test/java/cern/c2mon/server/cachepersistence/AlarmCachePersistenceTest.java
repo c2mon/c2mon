@@ -48,6 +48,7 @@ import static org.junit.Assert.assertNotNull;
     "classpath:config/server-cache.xml",
     "classpath:config/server-cachedbaccess.xml",
     "classpath:config/server-cachepersistence.xml",
+    "classpath:test-config/database-population-rule.xml",
     "classpath:test-config/server-test-properties.xml"
 })
 @TestPropertySource("classpath:c2mon-server-default.properties")

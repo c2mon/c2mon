@@ -34,6 +34,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration({
     "classpath:config/server-cachedbaccess.xml",
     "classpath:config/server-cacheloading.xml",
+    "classpath:test-config/database-population-rule.xml",
     "classpath:test-config/server-test-properties.xml"
 })
 @TestPropertySource("classpath:c2mon-server-default.properties")

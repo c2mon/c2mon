@@ -44,7 +44,8 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({
-    "classpath:config/server-cachedbaccess.xml"
+    "classpath:config/server-cachedbaccess.xml",
+    "classpath:test-config/database-population-rule.xml"
 })
 @TestPropertySource("classpath:c2mon-server-default.properties")
 //@TransactionConfiguration(transactionManager = "cacheTransactionManager", defaultRollback = true)
