@@ -29,6 +29,7 @@ import javax.jms.Session;
 import javax.validation.Valid;
 
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,13 +56,13 @@ import cern.c2mon.shared.util.json.GsonFactory;
  *
  * @author Matthias Braeger
  */
+@Slf4j
 @Service("clientRequestDelegator")
 public class ClientRequestDelegator implements SessionAwareMessageListener<Message> {
 
-  /** Private class logger */
-  private static final Logger LOG = LoggerFactory.getLogger(ClientRequestDelegator.class);
-
   private final ClientAlarmRequestHandler clientAlarmRequestHandler;
+
+  private final ClientAlarmExpressionRequestHandler clientAlarmExpressionRequestHandler;
 
   private final ClientCommandRequestHandler clientCommandRequestHandler;
 
@@ -93,6 +94,7 @@ public class ClientRequestDelegator implements SessionAwareMessageListener<Messa
   @Autowired
   public ClientRequestDelegator(final SupervisionFacade supervisionFacade,
                                 final ClientAlarmRequestHandler clientAlarmRequestHandler,
+                                final ClientAlarmExpressionRequestHandler clientAlarmExpressionRequestHandler,
                                 final ClientCommandRequestHandler clientCommandRequestHandler,
                                 final ClientTagRequestHelper tagrequestHelper,
                                 final ClientDeviceRequestHelper clientDeviceRequestHelper,
@@ -101,6 +103,7 @@ public class ClientRequestDelegator implements SessionAwareMessageListener<Messa
 
     this.supervisionFacade = supervisionFacade;
     this.clientAlarmRequestHandler = clientAlarmRequestHandler;
+    this.clientAlarmExpressionRequestHandler = clientAlarmExpressionRequestHandler;
     this.clientCommandRequestHandler = clientCommandRequestHandler;
     this.tagrequestHelper = tagrequestHelper;
     this.clientDeviceRequestHelper = clientDeviceRequestHelper;
@@ -124,15 +127,15 @@ public class ClientRequestDelegator implements SessionAwareMessageListener<Messa
   @Override
   public void onMessage(final Message message, final Session session) throws JMSException {
 
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("onMessage() : Client request received.");
+    if (log.isDebugEnabled()) {
+      log.debug("onMessage() : Client request received.");
     }
     try {
       Destination replyDestination = null;
       try {
         replyDestination = message.getJMSReplyTo();
       } catch (JMSException jmse) {
-        LOG.error("onMessage() : Cannot extract ReplyTo from message.", jmse);
+        log.error("onMessage() : Cannot extract ReplyTo from message.", jmse);
         throw jmse;
       }
 
@@ -167,19 +170,19 @@ public class ClientRequestDelegator implements SessionAwareMessageListener<Messa
             }
           }
 
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("onMessage() : Responded to ClientRequest.");
+          if (log.isDebugEnabled()) {
+            log.debug("onMessage() : Responded to ClientRequest.");
           }
           messageProducer.send(replyMessage);
         } finally {
           messageProducer.close();
         }
       } else {
-        LOG.error("onMessage() : JMSReplyTo destination is null - cannot send reply.");
+        log.error("onMessage() : JMSReplyTo destination is null - cannot send reply.");
         throw new MessageConversionException("JMS reply queue could not be extracted (returned null).");
       }
     } catch (Exception e) {
-      LOG.error("Exception caught while processing client request - unable to process it; request will time out", e);
+      log.error("Exception caught while processing client request - unable to process it; request will time out", e);
     }
   }
 
@@ -200,84 +203,93 @@ public class ClientRequestDelegator implements SessionAwareMessageListener<Messa
     switch (clientRequest.getRequestType()) {
 
     case TAG_CONFIGURATION_REQUEST:
-      if (LOG.isDebugEnabled()) {
-        LOG.debug(String.format("handleClientRequest() - Received a TAG_CONFIGURATION_REQUEST for %d tags (with configuration details).", clientRequest.getIds().size()));
+      if (log.isDebugEnabled()) {
+        log.debug(String.format("handleClientRequest() - Received a TAG_CONFIGURATION_REQUEST for %d tags (with configuration details).", clientRequest.getIds().size()));
       }
       return tagrequestHelper.handleTagConfigurationRequest(clientRequest);
 
     case APPLY_CONFIGURATION_REQUEST:
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("handleClientRequest() - Received an APPLY_CONFIGURATION_REQUEST with " + clientRequest.getIds().size() + " configurations.");
+      if (log.isDebugEnabled()) {
+        log.debug("handleClientRequest() - Received an APPLY_CONFIGURATION_REQUEST with " + clientRequest.getIds().size() + " configurations.");
       }
       return clientConfigurationRequestHandler.handleApplyConfigurationRequest(clientRequest, session, replyDestination);
     case RETRIEVE_CONFIGURATION_REQUEST:
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("handleClientRequest() - Received a RETRIEVE_CONFIGURATION_REQUEST.");
+      if (log.isDebugEnabled()) {
+        log.debug("handleClientRequest() - Received a RETRIEVE_CONFIGURATION_REQUEST.");
       }
       return clientConfigurationRequestHandler.handleRetrieveConfigurationsRequest(clientRequest, session, replyDestination);
     case TAG_REQUEST:
-      if (LOG.isDebugEnabled()) {
+      if (log.isDebugEnabled()) {
         if (clientRequest.getIds().isEmpty()) {
-          LOG.debug(String.format("handleClientRequest() - Received a TAG_REQUEST with %d wildcard(s) for tag name search: %s", clientRequest.getRegexList().size(), clientRequest.getRegexList()));
+          log.debug(String.format("handleClientRequest() - Received a TAG_REQUEST with %d wildcard(s) for tag name search: %s", clientRequest.getRegexList().size(), clientRequest.getRegexList()));
         }
         else {
-          LOG.debug("handleClientRequest() - Received a TAG_REQUEST for " + clientRequest.getIds().size() + " tags.");
+          log.debug("handleClientRequest() - Received a TAG_REQUEST for " + clientRequest.getIds().size() + " tags.");
         }
       }
       return tagrequestHelper.handleTagRequest(clientRequest);
     case ALARM_REQUEST:
-      if (LOG.isDebugEnabled()) {
+      if (log.isDebugEnabled()) {
         // ! TagId field is also used for Alarm ids
-        LOG.debug("handleClientRequest() - Received an ALARM_REQUEST for " + clientRequest.getIds().size() + " alarms.");
+        log.debug("handleClientRequest() - Received an ALARM_REQUEST for " + clientRequest.getIds().size() + " alarms.");
       }
       return clientAlarmRequestHandler.handleAlarmRequest(clientRequest);
     case ACTIVE_ALARMS_REQUEST:
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("handleClientRequest() - Received an ACTIVE_ALARMS_REQUEST.");
+      if (log.isDebugEnabled()) {
+        log.debug("handleClientRequest() - Received an ACTIVE_ALARMS_REQUEST.");
       }
       return clientAlarmRequestHandler.handleActiveAlarmRequest(clientRequest);
+    case ALARM_EXPRESSION_REQUEST:T:
+      if (log.isDebugEnabled()) {
+        // ! TagId field is also used for Alarm ids
+        log.debug("handleClientRequest() - Received an ALARM_EXPRESSION_REQUEST for " + clientRequest.getIds().size() + " alarms.");
+      }
+      return clientAlarmExpressionRequestHandler.handleAlarmRequest(clientRequest);
+    case ACTIVE_EXPRESSION_ALARMS_REQUEST:
+      log.debug("handleClientRequest() - Received an ACTIVE_EXPRESSION_ALARMS_REQUEST.");
+      return clientAlarmExpressionRequestHandler.handleActiveAlarmRequest();
     case SUPERVISION_REQUEST:
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("handleClientRequest() - Received a SUPERVISION_REQUEST.");
+      if (log.isDebugEnabled()) {
+        log.debug("handleClientRequest() - Received a SUPERVISION_REQUEST.");
       }
       return supervisionFacade.getAllSupervisionStates();
     case COMMAND_HANDLE_REQUEST:
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("handleClientRequest() - Received a COMMAND_HANDLE_REQUEST for " + clientRequest.getIds().size() + " commands.");
+      if (log.isDebugEnabled()) {
+        log.debug("handleClientRequest() - Received a COMMAND_HANDLE_REQUEST for " + clientRequest.getIds().size() + " commands.");
       }
       return clientCommandRequestHandler.handleCommandHandleRequest(clientRequest);
     case EXECUTE_COMMAND_REQUEST:
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("handleClientRequest() - Received an EXECUTE_COMMAND_REQUEST.");
+      if (log.isDebugEnabled()) {
+        log.debug("handleClientRequest() - Received an EXECUTE_COMMAND_REQUEST.");
       }
       return clientCommandRequestHandler.handleExecuteCommandRequest(clientRequest);
     case DAQ_XML_REQUEST:
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("handleClientRequest() - Received a DAQ_XML_REQUEST");
+      if (log.isDebugEnabled()) {
+        log.debug("handleClientRequest() - Received a DAQ_XML_REQUEST");
       }
       return clientProcessRequestHandler.handleDaqXmlRequest(clientRequest);
     case PROCESS_NAMES_REQUEST:
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("handleClientRequest() - Received a PROCESS_NAMES_REQUEST");
+      if (log.isDebugEnabled()) {
+        log.debug("handleClientRequest() - Received a PROCESS_NAMES_REQUEST");
       }
       return clientProcessRequestHandler.handleProcessNamesRequest(clientRequest);
     case DEVICE_CLASS_NAMES_REQUEST:
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("handleClientRequest() - Received a DEVICE_CLASS_NAMES_REQUEST");
+      if (log.isDebugEnabled()) {
+        log.debug("handleClientRequest() - Received a DEVICE_CLASS_NAMES_REQUEST");
       }
       return clientDeviceRequestHelper.handleDeviceClassNamesRequest(clientRequest);
     case DEVICE_REQUEST:
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("handleClientRequest() - Received a DEVICE_REQUEST");
+      if (log.isDebugEnabled()) {
+        log.debug("handleClientRequest() - Received a DEVICE_REQUEST");
       }
       return clientDeviceRequestHelper.handleDeviceRequest(clientRequest);
     case TAG_STATISTICS_REQUEST:
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("handleClientRequest() - Received a TAG_STATISTICS_REQUEST");
+      if (log.isDebugEnabled()) {
+        log.debug("handleClientRequest() - Received a TAG_STATISTICS_REQUEST");
       }
       return tagrequestHelper.handleTagStatisticsRequest(clientRequest);
     default:
-      LOG.error("handleClientRequest() - Client request not supported: " + clientRequest.getRequestType());
+      log.error("handleClientRequest() - Client request not supported: " + clientRequest.getRequestType());
       return Collections.emptyList();
     } // end switch
   }
