@@ -2,6 +2,7 @@ package cern.c2mon.server.common.expression;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.expression.Expression;
@@ -104,19 +105,17 @@ public class LocalExpressionCache {
   }
 
   private static List<String> getExpressionsToPurge(Long tagId, Collection<Expression> expressions) {
-    List<String> expressionsToPurge = new ArrayList<>();
-    Map<String, GroovyObject> scripts = tagIdToLocalScripts.get(tagId);
+    Set<String> localExpressions =  tagIdToLocalScripts.get(tagId).keySet();
+    List<String> cacheExpressions = expressions
+        .stream()
+        .map(Expression::getName)
+        .collect(Collectors.toList());
 
-    for (String localExpressionName : scripts.keySet()) {
-      boolean isInExpression = false;
-      for (Expression cacheExpression : expressions) {
-        isInExpression |= cacheExpression.getName().equals(localExpressionName);
-      }
+    List<String> expressionsToPurge = localExpressions
+        .stream()
+        .filter(exp -> !cacheExpressions.contains(exp))
+        .collect(Collectors.toList());
 
-      if (!isInExpression) {
-        expressionsToPurge.add(localExpressionName);
-      }
-    }
     return expressionsToPurge;
   }
 }
