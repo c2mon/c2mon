@@ -16,27 +16,23 @@
  *****************************************************************************/
 package cern.c2mon.server.client.publish;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.TextMessage;
-
+import cern.c2mon.server.cache.TagFacadeGateway;
+import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.client.junit.CachePopulationRule;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.TagWithAlarms;
+import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
-import org.apache.activemq.broker.BrokerFactory;
-import org.apache.activemq.broker.BrokerService;
-import org.apache.activemq.broker.BrokerServiceAware;
+import cern.c2mon.shared.client.tag.*;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,24 +41,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.alarm.AlarmAggregator;
-import cern.c2mon.server.cache.AliveTimerFacade;
-import cern.c2mon.server.cache.TagFacadeGateway;
-import cern.c2mon.server.cache.TagLocationService;
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.alarm.TagWithAlarms;
-import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
-import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.configuration.ConfigurationUpdate;
-import cern.c2mon.server.test.CacheObjectCreation;
-import cern.c2mon.server.test.broker.TestBrokerService;
-import cern.c2mon.shared.client.tag.TagMode;
-import cern.c2mon.shared.client.tag.TagUpdate;
-import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.c2mon.shared.client.tag.TransferTagImpl;
-import cern.c2mon.shared.client.tag.TransferTagValueImpl;
-import cern.c2mon.shared.util.jms.JmsSender;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.TextMessage;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * Integration test of TagValuePublisher with broker.
