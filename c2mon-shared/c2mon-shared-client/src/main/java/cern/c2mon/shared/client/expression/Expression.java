@@ -13,17 +13,12 @@ import lombok.Data;
 public class Expression implements Serializable {
 
   /**
-   * Id of the overlying tag. This information is needed for the stl storing.
-   */
-  private transient Long tagId;
-
-  /**
    * The name of the expression. The name has to be unique inside a tag.
    */
   private String name;
 
   /**
-   * The data type of the expression result
+   * The data type of the expression result.
    */
   private String dataType;
 
@@ -48,7 +43,10 @@ public class Expression implements Serializable {
    */
   private Object result;
 
-  private long lastCompileCounter;
+  /**
+   * The current version of the expression.
+   */
+  private long version;
 
   private Expression() {
     this.dataType = Boolean.class.getName();
