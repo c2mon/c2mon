@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -32,12 +32,12 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 /**
  * Manages re-publication of failed events. Is used in server for
  * JMS re-publication.
- * 
+ *
  * <p>To use this class, implement the associated Publisher interface
  * and instantiate a Republisher in your code.
- * 
+ *
  * @see TagValuePublisher for an example.
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -45,36 +45,36 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 class RepublisherImpl<T> implements Republisher<T> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RepublisherImpl.class);
-  
+
   private int republicationDelay = 10000;
-  
+
   /** For statistics */
   private AtomicLong totalRepublicationAttempts = new AtomicLong(0);
-  
+
   /** Bean that republishes */
   private Publisher<T> publisher;
-  
+
   /** Used to describe events in log */
   private String eventName;
-  
+
   /** For re-publication */
   private Timer timer;
-  
+
   /** For re-publication */
   private PublicationTask publicationTask;
-  
+
   /**
    * Ids of tags that need re-publishing as publication failed (local collection not shared across cluster)
    * (map used as set, with value set as constant).
    */
   private ConcurrentHashMap<T, Long> toBePublished = new ConcurrentHashMap<T, Long>();
-  
+
   /** For scheduling re-publication task */
   private Object republicatonLock = new Object();
-  
+
   /**
    * Constructs a Republisher for the provided Publisher.
-   * 
+   *
    * @param publisher publisher for which re-publication is needed
    * @param eventName used to describe the events in log
    */
@@ -86,7 +86,7 @@ class RepublisherImpl<T> implements Republisher<T> {
 
   @Override
   public void publicationFailed(T event) {
-    if (isRunning()) {  
+    if (isRunning()) {
       totalRepublicationAttempts.incrementAndGet();
       synchronized (republicatonLock) { //lock required for if logic, to make sure the added publication is picked up in other thread
         toBePublished.put(event, Long.valueOf(1));
@@ -99,7 +99,7 @@ class RepublisherImpl<T> implements Republisher<T> {
     } else {
       throw new IllegalStateException("Event submitted to Republisher before it has been started up!");
     }
-        
+
   }
 
   @Override
@@ -116,12 +116,12 @@ class RepublisherImpl<T> implements Republisher<T> {
   @Override
   public void stop() {
     if (isRunning())
-      timer.cancel();    
+      timer.cancel();
   }
 
   /**
    * Checks if un-published evemts need publishing. If so, will publish them.
-   * 
+   *
    * @author Mark Brightwell
    *
    */
@@ -129,15 +129,15 @@ class RepublisherImpl<T> implements Republisher<T> {
 
     @Override
     public void run() {
-      
-        LOGGER.debug("Checking for " + eventName + " re-publications");      
+
+        LOGGER.debug("Checking for " + eventName + " re-publications");
         if (!toBePublished.isEmpty()) {
-          LOGGER.info("Detected " + eventName +  " events that failed to be published - will attempt republication of these");          
+          LOGGER.info("Detected " + eventName +  " events that failed to be published - will attempt republication of these");
           for (T event : Collections.list(toBePublished.keys())) {  //take copy as these tasks also add to this map if publication fails again
             try {
               publisher.publish(event);
               toBePublished.remove(event);
-            } catch (JmsException e) {              
+            } catch (JmsException e) {
               LOGGER.error("JMS exception caught while attempting re-publication. Will retry shortly.");
               totalRepublicationAttempts.incrementAndGet();
             } catch (Exception e) {
@@ -145,17 +145,17 @@ class RepublisherImpl<T> implements Republisher<T> {
               totalRepublicationAttempts.incrementAndGet();
               toBePublished.remove(event);
             }
-          }                 
-        }      
+          }
+        }
       synchronized (republicatonLock) {
         if (toBePublished.isEmpty()) {
           publicationTask = null;
-        } else {          
-          LOGGER.debug("Rescheduling " + eventName + " republication task in " + republicationDelay + " milliseconds");          
+        } else {
+          LOGGER.debug("Rescheduling " + eventName + " republication task in " + republicationDelay + " milliseconds");
           timer.schedule(new PublicationTask(), republicationDelay);
-        }        
+        }
       }
-    }    
+    }
   }
 
   /**
@@ -174,8 +174,8 @@ class RepublisherImpl<T> implements Republisher<T> {
 
   @ManagedOperation(description = "Returns the current number of events awaiting re-publication (should be 0 in normal operation)")
   @Override
-  public int getSizeUnpublishedList() {    
+  public int getSizeUnpublishedList() {
     return toBePublished.size();
   }
-  
+
 }
