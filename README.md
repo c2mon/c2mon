@@ -36,7 +36,7 @@ extracted from the JDK download.
 [Pull requests][] are welcome; see the [contributor guidelines][] for details.
 
 ## License
-C2MON is released under the [GPLv3 License][].
+C2MON is released under the [GNU LGPLv3 License][].
 
 [Javadoc]: https://c2mon.web.cern.ch/c2mon/javadoc/
 [reference docs]: http://c2mon.web.cern.ch/c2mon/docs/latest/
@@ -47,4 +47,4 @@ C2MON is released under the [GPLv3 License][].
 [JDK8 build]: http://www.oracle.com/technetwork/java/javase/downloads
 [Pull requests]: http://help.github.com/send-pull-requests
 [contributor guidelines]: /CONTRIBUTING.md
-[GPLv3 License]: https://www.gnu.org/licenses/gpl-3.0.en.html
+[GNU LGPLv3 License]: /LICENSE.MD
