@@ -238,7 +238,7 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
 
   @Override
   public boolean isAutoStartup() {
-    return false;
+    return true;
   }
 
   @Override

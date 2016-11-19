@@ -60,7 +60,7 @@ import static org.junit.Assert.assertTrue;
     "classpath:test-config/server-test-properties.xml"
 })
 @TestPropertySource("classpath:c2mon-server-default.properties")
-public class RuleListenerTest implements ApplicationContextAware {
+public class RuleListenerTest {
 
   @Rule
   @Autowired
@@ -72,8 +72,6 @@ public class RuleListenerTest implements ApplicationContextAware {
    */
   private static final int SLEEP_TIME = 2000;
 
-  private ApplicationContext context;
-
   @Autowired
   private DataTagFacade dataTagFacade;
 
@@ -82,11 +80,6 @@ public class RuleListenerTest implements ApplicationContextAware {
 
   @Autowired
   private RuleTagCache ruleTagCache;
-
-  @Before
-  public void setUp() throws IOException {
-    ((AbstractApplicationContext) context).start();
-  }
 
   /**
    * Tests that a update to a data tag in the cache results in
@@ -148,11 +141,4 @@ public class RuleListenerTest implements ApplicationContextAware {
     }
     assertEquals(Integer.valueOf(2), ruleTag.getValue());
   }
-
-  @Override
-  public void setApplicationContext(ApplicationContext arg0) throws BeansException {
-    context = arg0;
-  }
-
-
 }
