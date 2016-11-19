@@ -1,48 +1,48 @@
 -- control tags needed for cache module tests
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (1200, 'P_TEST_PROCESS:STATUS', 0,'String', 1, 1, 1, 'UNINITIALISED');
+VALUES (1200, 'P_TEST_PROCESS:STATUS', 0,'String', 1, 1, 1, '{}');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (1205, 'P_TEST_EQUIPMENT:STATUS', 0,'String', 1, 1, 1, 'UNINITIALISED');
+VALUES (1205, 'P_TEST_EQUIPMENT:STATUS', 0,'String', 1, 1, 1, '{}');
 -- control tags for Process and Equipment TESTHANDLER03
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (1220, 'P_TESTHANDLER03:STATUS', 0,'String', 1, 1, 1, 'UNINITIALISED');
+VALUES (1220, 'P_TESTHANDLER03:STATUS', 0,'String', 1, 1, 1, '{}');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (1221, 'P_TESTHANDLER03:ALIVE', 0,'Integer', 1, 0, 1, 'UNINITIALISED');
+VALUES (1221, 'P_TESTHANDLER03:ALIVE', 0,'Integer', 1, 0, 1, '{}');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (1222, 'E_TESTHANDLER_TESTHANDLER03:STATUS', 0,'String', 1, 1, 1, 'UNINITIALISED');
+VALUES (1222, 'E_TESTHANDLER_TESTHANDLER03:STATUS', 0,'String', 1, 1, 1, '{}');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (1223, 'E_TESTHANDLER_TESTHANDLER03:COMM_FAULT', 0,'Integer', 1, 1, 1, 'UNINITIALISED');
+VALUES (1223, 'E_TESTHANDLER_TESTHANDLER03:COMM_FAULT', 0,'Integer', 1, 1, 1, '{}');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (1224, 'E_TESTHANDLER_TESTHANDLER03:ALIVE', 0,'Integer', 1, 0, 1, 'UNINITIALISED');
+VALUES (1224, 'E_TESTHANDLER_TESTHANDLER03:ALIVE', 0,'Integer', 1, 0, 1, '{}');
 -- control tags for process P_TESTHANDLER04
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (1260, 'P_TESTHANDLER04:STATUS', 0,'String', 1, 1, 1, 'UNINITIALISED');
+VALUES (1260, 'P_TESTHANDLER04:STATUS', 0,'String', 1, 1, 1, '{}');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (1261, 'P_TESTHANDLER04:ALIVE', 0,'Integer', 1, 0, 1, 'UNINITIALISED');
+VALUES (1261, 'P_TESTHANDLER04:ALIVE', 0,'Integer', 1, 0, 1, '{}');
 -- control tags for equipment E_TESTHANDLER04
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (1262, 'E_TESTHANDLER_TESTHANDLER04:STATUS', 0,'String', 1, 1, 1, 'UNINITIALISED');
+VALUES (1262, 'E_TESTHANDLER_TESTHANDLER04:STATUS', 0,'String', 1, 1, 1, '{}');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (1263, 'E_TESTHANDLER_TESTHANDLER04:COMM_FAULT', 0,'Integer', 1, 1, 1, 'UNINITIALISED');
+VALUES (1263, 'E_TESTHANDLER_TESTHANDLER04:COMM_FAULT', 0,'Integer', 1, 1, 1, '{}');
 -- control tags for equipment E_TEST_2
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (1240, 'E_TEST_2:STATUS', 0,'String', 1, 1, 1, 'UNINITIALISED');
+VALUES (1240, 'E_TEST_2:STATUS', 0,'String', 1, 1, 1, '{}');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (1241, 'E_TEST_2:COMM_FAULT', 0,'Integer', 1, 1, 1, 'UNINITIALISED');
+VALUES (1241, 'E_TEST_2:COMM_FAULT', 0,'Integer', 1, 1, 1, '{}');
 -- control tags ready for subequipment
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (1230, 'SUB_E_TESTHANDLER_TESTHANDLER03:STATUS', 0,'String', 1, 1, 1, 'UNINITIALISED');
+VALUES (1230, 'SUB_E_TESTHANDLER_TESTHANDLER03:STATUS', 0,'String', 1, 1, 1, '{}');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (1231, 'SUB_E_TESTHANDLER_TESTHANDLER03:ALIVE', 0,'Integer', 1, 0, 1, 'UNINITIALISED');
+VALUES (1231, 'SUB_E_TESTHANDLER_TESTHANDLER03:ALIVE', 0,'Integer', 1, 0, 1, '{}');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (1232, 'SUB_E_TESTHANDLER_TESTHANDLER03:COMM_FAULT', 0,'Integer', 1, 1, 1, 'UNINITIALISED');
+VALUES (1232, 'SUB_E_TESTHANDLER_TESTHANDLER03:COMM_FAULT', 0,'Integer', 1, 1, 1, '{}');
 -- control tags not associated to Equipment but used to test config loading (& mapper tests)
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (1250, 'E_CONFIG_TEST:STATUS', 0,'String', 1, 1, 1, 'UNINITIALISED');
+VALUES (1250, 'E_CONFIG_TEST:STATUS', 0,'String', 1, 1, 1, '{}');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAGADDRESS)
-VALUES (1251, 'E_CONFIG_TEST:ALIVE', 0,'Integer', 1, 0, 1, 'UNINITIALISED', '<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl"><address>test</address></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
+VALUES (1251, 'E_CONFIG_TEST:ALIVE', 0,'Integer', 1, 0, 1, '{}', '<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl"><address>test</address></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (1252, 'E_CONFIG_TEST:COMM_FAULT', 0,'Integer', 1, 1, 1, 'UNINITIALISED');
+VALUES (1252, 'E_CONFIG_TEST:COMM_FAULT', 0,'Integer', 1, 1, 1, '{}');
 -- process
 INSERT INTO PROCESS (PROCID, PROCNAME, PROCDESC, PROCSTATE_TAGID, PROCALIVE_TAGID, PROCALIVEINTERVAL, PROCMAXMSGSIZE, PROCMAXMSGDELAY, PROCSTATE)
 VALUES (50,'P_TESTHANDLER03','PROCESS TESTHANDLER03',1220,1221,60000,100,300,'DOWN');
@@ -60,56 +60,56 @@ INSERT INTO EQUIPMENT (EQID, EQNAME, EQDESC, EQHANDLERCLASS, EQSTATE_TAGID, EQAL
 VALUES (250, 'SUB_E_TESTHANDLER_TESTHANDLER03', 'TESTHANDLER03 SUBEQUIPMENT', '-', 1230, 1231, 30000, 1232, 150);
 -- tags
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAG_EQID, TAGRULEIDS, TAGADDRESS)
-VALUES (200000, 'sys.proc.serverinit', 0, 'Integer', 0, 1, 1, 'UNINITIALISED',150,NULL,'<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl"><protocol>yami</protocol><service>yami</service><device-name>TEST.CLIC.DIAMON.1</device-name><property-name>Acquisition</property-name><data-field-name>sys.proc.serverinit</data-field-name><column-index>-1</column-index><row-index>-1</row-index></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
+VALUES (200000, 'sys.proc.serverinit', 0, 'Integer', 0, 1, 1, '{}',150,NULL,'<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl"><protocol>yami</protocol><service>yami</service><device-name>TEST.CLIC.DIAMON.1</device-name><property-name>Acquisition</property-name><data-field-name>sys.proc.serverinit</data-field-name><column-index>-1</column-index><row-index>-1</row-index></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAG_EQID, TAGRULEIDS, TAGADDRESS)
-VALUES (200001, 'sys.mem.inactpct', 0, 'Integer', 0, 1, 1, 'UNINITIALISED',150,'60000,60001,60002,60003,60004,60005,60006','<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl"><protocol>yami</protocol><service>yami</service><device-name>TEST.CLIC.DIAMON.1</device-name><property-name>Acquisition</property-name><data-field-name>sys.mem.inactpct</data-field-name><column-index>-1</column-index><row-index>-1</row-index></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
+VALUES (200001, 'sys.mem.inactpct', 0, 'Integer', 0, 1, 1, '{}',150,'60000,60001,60002,60003,60004,60005,60006','<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl"><protocol>yami</protocol><service>yami</service><device-name>TEST.CLIC.DIAMON.1</device-name><property-name>Acquisition</property-name><data-field-name>sys.mem.inactpct</data-field-name><column-index>-1</column-index><row-index>-1</row-index></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAG_EQID, TAGRULEIDS, TAGADDRESS)
-VALUES (200002, 'sys.loadavg', 0, 'Integer', 0, 1, 1, 'UNINITIALISED',150,'60000,60001,60002,60003,60004,60005,60006,60007,60008,60009','<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl"><protocol>yami</protocol><service>yami</service><device-name>TEST.CLIC.DIAMON.1</device-name><property-name>Acquisition</property-name><data-field-name>sys.loadavg</data-field-name><column-index>-1</column-index><row-index>-1</row-index></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
+VALUES (200002, 'sys.loadavg', 0, 'Integer', 0, 1, 1, '{}',150,'60000,60001,60002,60003,60004,60005,60006,60007,60008,60009','<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl"><protocol>yami</protocol><service>yami</service><device-name>TEST.CLIC.DIAMON.1</device-name><property-name>Acquisition</property-name><data-field-name>sys.loadavg</data-field-name><column-index>-1</column-index><row-index>-1</row-index></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAG_EQID, TAGRULEIDS, TAGADDRESS)
-VALUES (200003, 'tag_200003', 0, 'Integer', 0, 1, 1, 'UNINITIALISED',150,'60000,60001,60002,60003,60004,60005,60006,60007,60008,60009','<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl"><protocol>yami</protocol><service>yami</service><device-name>TEST.CLIC.DIAMON.1</device-name><property-name>Acquisition</property-name><data-field-name>sys.mem.inactpct</data-field-name><column-index>-1</column-index><row-index>-1</row-index></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
+VALUES (200003, 'tag_200003', 0, 'Integer', 0, 1, 1, '{}',150,'60000,60001,60002,60003,60004,60005,60006,60007,60008,60009','<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl"><protocol>yami</protocol><service>yami</service><device-name>TEST.CLIC.DIAMON.1</device-name><property-name>Acquisition</property-name><data-field-name>sys.mem.inactpct</data-field-name><column-index>-1</column-index><row-index>-1</row-index></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAG_EQID, TAGRULEIDS, TAGADDRESS)
-VALUES (200004, 'tag_200004', 0, 'Integer', 0, 1, 1, 'UNINITIALISED',150,NULL,'<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl"><protocol>yami</protocol><service>yami</service><device-name>TEST.CLIC.DIAMON.1</device-name><property-name>Acquisition</property-name><data-field-name>sys.mem.inactpct</data-field-name><column-index>-1</column-index><row-index>-1</row-index></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
+VALUES (200004, 'tag_200004', 0, 'Integer', 0, 1, 1, '{}',150,NULL,'<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl"><protocol>yami</protocol><service>yami</service><device-name>TEST.CLIC.DIAMON.1</device-name><property-name>Acquisition</property-name><data-field-name>sys.mem.inactpct</data-field-name><column-index>-1</column-index><row-index>-1</row-index></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAG_EQID, TAGRULEIDS, TAGADDRESS)
-VALUES (200005, 'tag_200005', 0, 'Integer', 0, 1, 1, 'UNINITIALISED',150,NULL,'<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl"><protocol>yami</protocol><service>yami</service><device-name>TEST.CLIC.DIAMON.1</device-name><property-name>Acquisition</property-name><data-field-name>sys.mem.inactpct</data-field-name><column-index>-1</column-index><row-index>-1</row-index></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
+VALUES (200005, 'tag_200005', 0, 'Integer', 0, 1, 1, '{}',150,NULL,'<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl"><protocol>yami</protocol><service>yami</service><device-name>TEST.CLIC.DIAMON.1</device-name><property-name>Acquisition</property-name><data-field-name>sys.mem.inactpct</data-field-name><column-index>-1</column-index><row-index>-1</row-index></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAG_EQID, TAGRULEIDS, TAGADDRESS)
-VALUES (200010, 'tag_200010', 0, 'Integer', 0, 1, 1, 'UNINITIALISED',170,'60011,60012','<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl"><protocol>yami</protocol><service>yami</service><device-name>TEST.CLIC.DIAMON.1</device-name><property-name>Acquisition</property-name><data-field-name>sys.mem.inactpct</data-field-name><column-index>-1</column-index><row-index>-1</row-index></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
+VALUES (200010, 'tag_200010', 0, 'Integer', 0, 1, 1, '{}',170,'60011,60012','<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl"><protocol>yami</protocol><service>yami</service><device-name>TEST.CLIC.DIAMON.1</device-name><property-name>Acquisition</property-name><data-field-name>sys.mem.inactpct</data-field-name><column-index>-1</column-index><row-index>-1</row-index></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
 -- tags attached to subequipment
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAG_EQID, TAGRULEIDS, TAGADDRESS)
-VALUES (200011, 'tag_200011', 0, 'Integer', 0, 1, 1, 'UNINITIALISED',250,NULL,'<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl"><protocol>yami</protocol><service>yami</service><device-name>TEST.CLIC.DIAMON.1</device-name><property-name>Acquisition</property-name><data-field-name>sys.mem.inactpct</data-field-name><column-index>-1</column-index><row-index>-1</row-index></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
+VALUES (200011, 'tag_200011', 0, 'Integer', 0, 1, 1, '{}',250,NULL,'<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl"><protocol>yami</protocol><service>yami</service><device-name>TEST.CLIC.DIAMON.1</device-name><property-name>Acquisition</property-name><data-field-name>sys.mem.inactpct</data-field-name><column-index>-1</column-index><row-index>-1</row-index></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAG_EQID, TAGRULEIDS, TAGADDRESS)
-VALUES (200012, 'tag_200012', 0, 'Integer', 0, 1, 1, 'UNINITIALISED',250,NULL,'<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl"><protocol>yami</protocol><service>yami</service><device-name>TEST.CLIC.DIAMON.1</device-name><property-name>Acquisition</property-name><data-field-name>sys.mem.inactpct</data-field-name><column-index>-1</column-index><row-index>-1</row-index></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
+VALUES (200012, 'tag_200012', 0, 'Integer', 0, 1, 1, '{}',250,NULL,'<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl"><protocol>yami</protocol><service>yami</service><device-name>TEST.CLIC.DIAMON.1</device-name><property-name>Acquisition</property-name><data-field-name>sys.mem.inactpct</data-field-name><column-index>-1</column-index><row-index>-1</row-index></HardwareAddress><time-to-live>3600000</time-to-live><priority>2</priority><guaranteed-delivery>false</guaranteed-delivery></DataTagAddress>');
 -- rules
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAGRULE, TAGRULEIDS)
-VALUES (60000, 'DIAMON_CLIC_CS-CCR-DEV3', 0, 'Integer', 0, 1, 1, 'UNINITIALISED','(#200001 > 0)|(#200002 < 200)|(#200003 > 450)[2],(#200002 < 500)|(#200003 > 400)[1],true[0]', '59999');
+VALUES (60000, 'DIAMON_CLIC_CS-CCR-DEV3', 0, 'Integer', 0, 1, 1, '{}','(#200001 > 0)|(#200002 < 200)|(#200003 > 450)[2],(#200002 < 500)|(#200003 > 400)[1],true[0]', '59999');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAGRULE, TAGRULEIDS)
-VALUES (60001, 'DIAMON_CLIC_CS-CCR-DEV4', 0, 'Integer', 0, 1, 1, 'UNINITIALISED','(#200001 > 0)|(#200002 < 200)|(#200003 > 450)[2],(#200002 < 500)|(#200003 > 400)[1],true[0]', '60008,60009,60010,60011');
+VALUES (60001, 'DIAMON_CLIC_CS-CCR-DEV4', 0, 'Integer', 0, 1, 1, '{}','(#200001 > 0)|(#200002 < 200)|(#200003 > 450)[2],(#200002 < 500)|(#200003 > 400)[1],true[0]', '60008,60009,60010,60011');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAGRULE)
-VALUES (60002, 'DIAMON_CLIC_CS-CCR-DEV5', 0, 'Integer', 0, 1, 1, 'UNINITIALISED','(#200001 > 0)|(#200002 < 200)|(#200003 > 450)[2],(#200002 < 500)|(#200003 > 400)[1],true[0]');
+VALUES (60002, 'DIAMON_CLIC_CS-CCR-DEV5', 0, 'Integer', 0, 1, 1, '{}','(#200001 > 0)|(#200002 < 200)|(#200003 > 450)[2],(#200002 < 500)|(#200003 > 400)[1],true[0]');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAGRULE, TAGRULEIDS)
-VALUES (60003, 'DIAMON_CLIC_CS-CCR-DEV6', 0, 'Integer', 0, 1, 1, 'UNINITIALISED','(#200001 > 0)|(#200002 < 200)|(#200003 > 450)[2],(#200002 < 500)|(#200003 > 400)[1],true[0]', '60007,60008,60009,60010');
+VALUES (60003, 'DIAMON_CLIC_CS-CCR-DEV6', 0, 'Integer', 0, 1, 1, '{}','(#200001 > 0)|(#200002 < 200)|(#200003 > 450)[2],(#200002 < 500)|(#200003 > 400)[1],true[0]', '60007,60008,60009,60010');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAGRULE, TAGRULEIDS)
-VALUES (60004, 'DIAMON_CLIC_CS-CCR-DEV7', 0, 'Integer', 0, 1, 1, 'UNINITIALISED','(#200001 > 0)|(#200002 < 200)|(#200003 > 450)[2],(#200002 < 500)|(#200003 > 400)[1],true[0]', '60007,60008,60011');
+VALUES (60004, 'DIAMON_CLIC_CS-CCR-DEV7', 0, 'Integer', 0, 1, 1, '{}','(#200001 > 0)|(#200002 < 200)|(#200003 > 450)[2],(#200002 < 500)|(#200003 > 400)[1],true[0]', '60007,60008,60011');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAGRULE)
-VALUES (60005, 'DIAMON_CLIC_CS-CCR-DEV8', 0, 'Integer', 0, 1, 1, 'UNINITIALISED','(#200001 > 0)|(#200002 < 200)|(#200003 > 450)[2],(#200002 < 500)|(#200003 > 400)[1],true[0]');
+VALUES (60005, 'DIAMON_CLIC_CS-CCR-DEV8', 0, 'Integer', 0, 1, 1, '{}','(#200001 > 0)|(#200002 < 200)|(#200003 > 450)[2],(#200002 < 500)|(#200003 > 400)[1],true[0]');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAGRULE, TAGRULEIDS)
-VALUES (60006, 'DIAMON_CLIC_CS-CCR-DEV9', 0, 'Integer', 0, 1, 1, 'UNINITIALISED','(#200001 > 0)|(#200002 < 200)|(#200003 > 450)[2],(#200002 < 500)|(#200003 > 400)[1],true[0]', '60007');
+VALUES (60006, 'DIAMON_CLIC_CS-CCR-DEV9', 0, 'Integer', 0, 1, 1, '{}','(#200001 > 0)|(#200002 < 200)|(#200003 > 450)[2],(#200002 < 500)|(#200003 > 400)[1],true[0]', '60007');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAGRULE, TAGRULEIDS)
-VALUES (60007, 'DIAMON_CLIC_CS-CCR-DEV10', 0, 'Integer', 0, 1, 1, 'UNINITIALISED','(#60006 > 0)|(#200002 < 200)|(#60004 > 450)[2],(#60003 < 500)|(#200003 > 400)[1],true[0]', '60009,60010,60011');
+VALUES (60007, 'DIAMON_CLIC_CS-CCR-DEV10', 0, 'Integer', 0, 1, 1, '{}','(#60006 > 0)|(#200002 < 200)|(#60004 > 450)[2],(#60003 < 500)|(#200003 > 400)[1],true[0]', '60009,60010,60011');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAGRULE, TAGRULEIDS)
-VALUES (60008, 'DIAMON_CLIC_CS-CCR-DEV11', 0, 'Integer', 0, 1, 1, 'UNINITIALISED','(#60001 > 0)|(#200002 < 200)|(#60004 > 450)[2],(#60003 < 500)|(#200003 > 400)[1],true[0]', '60010,60011');
+VALUES (60008, 'DIAMON_CLIC_CS-CCR-DEV11', 0, 'Integer', 0, 1, 1, '{}','(#60001 > 0)|(#200002 < 200)|(#60004 > 450)[2],(#60003 < 500)|(#200003 > 400)[1],true[0]', '60010,60011');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAGRULE)
-VALUES (60009, 'DIAMON_CLIC_CS-CCR-DEV12', 0, 'Integer', 0, 1, 1, 'UNINITIALISED','(#60001 > 0)|(#200002 < 200)|(#60004 > 450)[2],(#60007 < 500)|(#200003 > 400)[1],true[0]');
+VALUES (60009, 'DIAMON_CLIC_CS-CCR-DEV12', 0, 'Integer', 0, 1, 1, '{}','(#60001 > 0)|(#200002 < 200)|(#60004 > 450)[2],(#60007 < 500)|(#200003 > 400)[1],true[0]');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAGRULE)
-VALUES (60010, 'DIAMON_CLIC_CS-CCR-DEV13', 0, 'Integer', 0, 1, 1, 'UNINITIALISED','(#60008> 0)|(#60007 < 200)|(#60004 > 450)[2],(#60007 < 500)|(#60001 > 400)[1],true[0]');
+VALUES (60010, 'DIAMON_CLIC_CS-CCR-DEV13', 0, 'Integer', 0, 1, 1, '{}','(#60008> 0)|(#60007 < 200)|(#60004 > 450)[2],(#60007 < 500)|(#60001 > 400)[1],true[0]');
 --depends on 2 processes and 2 equipments
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAGRULE)
-VALUES (60011, 'RULE_WITH_MULTIPLE_PARENTS', 0, 'Integer', 0, 1, 1, 'UNINITIALISED','(#60008> 0)|(#60007 < 200)|(#60004 > 450)[2],(#60007 < 500)|(#60001 > 400)|(#200010 > 300)[1],true[0]');
+VALUES (60011, 'RULE_WITH_MULTIPLE_PARENTS', 0, 'Integer', 0, 1, 1, '{}','(#60008> 0)|(#60007 < 200)|(#60004 > 450)[2],(#60007 < 500)|(#60001 > 400)|(#200010 > 300)[1],true[0]');
 -- new rules for parent id loading test
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAGRULE, TAGRULEIDS)
-VALUES (60012, 'RULE_ON_EQUIP_170', 0, 'Integer', 0, 1, 1, 'UNINITIALISED','(#200010 > 0)[0]', '59999');
+VALUES (60012, 'RULE_ON_EQUIP_170', 0, 'Integer', 0, 1, 1, '{}','(#200010 > 0)[0]', '59999');
 -- use id to get to start in SQL query
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAGRULE)
-VALUES (59999, 'RULE_ON_EQUIP_150_170', 0, 'Integer', 0, 1, 1, 'UNINITIALISED','(#60000 > 0)|(#60012 < 200)[1]');
+VALUES (59999, 'RULE_ON_EQUIP_150_170', 0, 'Integer', 0, 1, 1, '{}','(#60000 > 0)|(#60012 < 200)[1]');
 --alarms
 insert into alarm (ALARMID, ALARM_TAGID, ALARMFFAMILY, ALARMFMEMBER, ALARMFCODE, ALARMSTATE, ALARMTIME, ALARMINFO, ALARMCONDITION)
 values (350000, 60000, 'TEST_FAMILY', 'TEST_MEMBER', '20', 'TERMINATE', NULL, 'TEST_INFO', '<AlarmCondition class="cern.c2mon.server.common.alarm.ValueAlarmCondition"><alarm-value type="Integer">33</alarm-value></AlarmCondition>');
@@ -125,29 +125,29 @@ INSERT INTO COMMANDTAG(CMDID, CMDNAME, CMDDESC, CMDMODE, CMDDATATYPE, CMDSOURCER
 VALUES (11001, 'CMD_11001', 'CMD_11001_DESC', 0, 'Integer', 1, 1000, 1000, 5000, '<HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl"><opc-item-name>CDE_N2_ARR_EJP_UAPE_X93X94</opc-item-name><command-pulse-length>100</command-pulse-length></HardwareAddress>',NULL,NULL,150,'TIM_COMMANDS','TIM_CMD_TYPE2','WRITE');
 -- tags for device properties
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (210000, 'D_PROPERTY_TEST_1', 0, 'Integer', 0, 1, 1, 'UNINITIALISED');
+VALUES (210000, 'D_PROPERTY_TEST_1', 0, 'Integer', 0, 1, 1, '{}');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (210001, 'D_PROPERTY_TEST_2', 0, 'Integer', 0, 1, 1, 'UNINITIALISED');
+VALUES (210001, 'D_PROPERTY_TEST_2', 0, 'Integer', 0, 1, 1, '{}');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (210002, 'D_PROPERTY_TEST_3', 0, 'Integer', 0, 1, 1, 'UNINITIALISED');
+VALUES (210002, 'D_PROPERTY_TEST_3', 0, 'Integer', 0, 1, 1, '{}');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (210003, 'D_PROPERTY_TEST_4', 0, 'Integer', 0, 1, 1, 'UNINITIALISED');
+VALUES (210003, 'D_PROPERTY_TEST_4', 0, 'Integer', 0, 1, 1, '{}');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (210008, 'D_PROPERTY_TEST_5', 0, 'Integer', 0, 1, 1, 'UNINITIALISED');
+VALUES (210008, 'D_PROPERTY_TEST_5', 0, 'Integer', 0, 1, 1, '{}');
 -- tags for device commands
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (210004, 'D_COMMAND_TEST_1', 0,'Integer', 1, 1, 1, 'UNINITIALISED');
+VALUES (210004, 'D_COMMAND_TEST_1', 0,'Integer', 1, 1, 1, '{}');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (210005, 'D_COMMAND_TEST_2', 0,'Integer', 1, 1, 1, 'UNINITIALISED');
+VALUES (210005, 'D_COMMAND_TEST_2', 0,'Integer', 1, 1, 1, '{}');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (210006, 'D_COMMAND_TEST_3', 0,'Integer', 1, 1, 1, 'UNINITIALISED');
+VALUES (210006, 'D_COMMAND_TEST_3', 0,'Integer', 1, 1, 1, '{}');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (210007, 'D_COMMAND_TEST_4', 0,'Integer', 1, 1, 1, 'UNINITIALISED');
+VALUES (210007, 'D_COMMAND_TEST_4', 0,'Integer', 1, 1, 1, '{}');
 -- tags for device fields
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (210009, 'D_FIELD_TEST_1', 0, 'Integer', 0, 1, 1, 'UNINITIALISED');
+VALUES (210009, 'D_FIELD_TEST_1', 0, 'Integer', 0, 1, 1, '{}');
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC)
-VALUES (210010, 'D_FIELD_TEST_2', 0, 'Integer', 0, 1, 1, 'UNINITIALISED');
+VALUES (210010, 'D_FIELD_TEST_2', 0, 'Integer', 0, 1, 1, '{}');
 -- device classes
 INSERT INTO DEVICECLASS (DEVCLASSID, DEVCLASSNAME, DEVCLASSDESC)
 VALUES (400, 'TEST_DEVICE_CLASS_1', 'Description of TEST_DEVICE_CLASS_1');
