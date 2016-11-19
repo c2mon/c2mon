@@ -19,6 +19,8 @@ package cern.c2mon.server.daqcommunication.out;
 
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.daqcommunication.out.junit.DaqOutCachePopulationRule;
+import cern.c2mon.server.test.broker.EmbeddedBrokerRule;
+import cern.c2mon.server.test.config.TestConfig;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 import cern.c2mon.shared.daq.serialization.MessageConverter;
 import org.apache.activemq.command.ActiveMQQueue;
@@ -27,9 +29,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -45,19 +47,27 @@ import static org.junit.Assert.assertNotNull;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({
-    "classpath:config/server-cache.xml",
-    "classpath:config/server-cachedbaccess.xml",
-    "classpath:config/server-cacheloading.xml",
-    "classpath:config/server-daqcommunication-out.xml",
-    "classpath:test-config/server-test-properties.xml"
-})
-@TestPropertySource("classpath:c2mon-server-default.properties")
+@SpringApplicationConfiguration(
+    locations = {
+        "classpath:config/server-cache.xml",
+        "classpath:config/server-cachedbaccess.xml",
+        "classpath:config/server-cacheloading.xml",
+        "classpath:config/server-daqcommunication-out.xml",
+        "classpath:test-config/server-test-properties.xml"
+    },
+    classes = {
+        TestConfig.class
+    })
+@TestPropertySource(value = "classpath:c2mon-server-default.properties", properties = "spring.main.show_banner=false")
 public class ProcessCommunicationManagerTest {
 
   @Rule
   @Autowired
   public DaqOutCachePopulationRule daqOutCachePopulationRule;
+
+  @Rule
+  @Autowired
+  public EmbeddedBrokerRule brokerRule;
 
   @Autowired
   @Qualifier("daqOutActiveMQConnectionFactory")
