@@ -89,12 +89,6 @@ public class ProcessLoaderDAOTest {
     assertTrue(processDAO.getNumTags(50L).equals(6));
   }
 
-  @Test
-  public void testGetNumInvalidTags() {
-    // All the test tags are UNINITIALISED and hence invalid
-    assertTrue(processDAO.getNumInvalidTags(50L).equals(6));
-  }
-
   private void assertTopicSetCorrectly(Process process) {
     assertEquals(this.jmsDaqQueueTrunk + ".command." + process.getCurrentHost() + "." + process.getName() + "." + process.getProcessPIK(), process.getJmsDaqCommandQueue());
   }
