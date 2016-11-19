@@ -25,6 +25,7 @@ import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.daqcommunication.in.config.DaqCommunicationInConfiguration;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.server.test.broker.EmbeddedBrokerRule;
 import cern.c2mon.server.test.config.TestConfig;
@@ -76,10 +77,11 @@ import static org.junit.Assert.*;
     },
     classes = {
         ClientConfig.class,
+        DaqCommunicationInConfiguration.class,
         TestConfig.class
     }
 )
-@TestPropertySource("classpath:c2mon-server-default.properties")
+@TestPropertySource(value = "classpath:c2mon-server-default.properties", properties = "spring.main.show_banner=false")
 public class TagValuePublisherTest {
 
   @Rule
@@ -125,7 +127,7 @@ public class TagValuePublisherTest {
    * @throws InterruptedException
    */
   @Test
-//  @Ignore("This test is flaky, maybe due to all the sleep() calls")
+  @Ignore("This test is flaky, maybe due to all the sleep() calls")
   public void testPublication() throws JMSException, InterruptedException {
     EasyMock.reset();
     synchronized (updateLock) {
