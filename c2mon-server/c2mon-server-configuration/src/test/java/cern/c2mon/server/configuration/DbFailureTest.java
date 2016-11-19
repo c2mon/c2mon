@@ -16,54 +16,31 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
+import cern.c2mon.server.cache.*;
+import cern.c2mon.server.cache.dbaccess.*;
+import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.configuration.handler.impl.ProcessConfigHandlerImpl;
+import cern.c2mon.server.configuration.handler.transacted.ProcessConfigTransacted;
 import cern.c2mon.server.configuration.junit.ConfigurationCachePopulationRule;
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
+import cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.configuration.handler.impl.ProcessConfigHandlerImpl;
-import cern.c2mon.server.configuration.handler.transacted.ProcessConfigTransacted;
-import cern.c2mon.server.cache.AlarmCache;
-import cern.c2mon.server.cache.AliveTimerCache;
-import cern.c2mon.server.cache.CommFaultTagCache;
-import cern.c2mon.server.cache.CommandTagCache;
-import cern.c2mon.server.cache.ControlTagCache;
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.ProcessFacade;
-import cern.c2mon.server.cache.RuleTagCache;
-import cern.c2mon.server.cache.SubEquipmentCache;
-import cern.c2mon.server.cache.dbaccess.AlarmMapper;
-import cern.c2mon.server.cache.dbaccess.CommandTagMapper;
-import cern.c2mon.server.cache.dbaccess.ControlTagMapper;
-import cern.c2mon.server.cache.dbaccess.DataTagMapper;
-import cern.c2mon.server.cache.dbaccess.EquipmentMapper;
-import cern.c2mon.server.cache.dbaccess.ProcessMapper;
-import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
-import cern.c2mon.server.cache.dbaccess.SubEquipmentMapper;
-import cern.c2mon.server.common.process.Process;
-import cern.c2mon.shared.client.configuration.ConfigConstants;
-import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
-import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import static org.junit.Assert.*;
 
 /**
  * Tests the ConfigHandler's when DB persitence fails, for instance when a constraint
@@ -84,7 +61,7 @@ import cern.c2mon.shared.client.configuration.ConfigurationReport;
     "classpath:test-config/server-test-properties.xml"
 })
 @TestPropertySource("classpath:c2mon-server-default.properties")
-public class DbFailureTest implements ApplicationContextAware {
+public class DbFailureTest {
 
   @Rule
   @Autowired
@@ -101,8 +78,6 @@ public class DbFailureTest implements ApplicationContextAware {
 
   @Autowired
   private ConfigurationLoader configurationLoader;
-
-  private ApplicationContext context;
 
   @Autowired
   private DataTagCache dataTagCache;
@@ -161,10 +136,20 @@ public class DbFailureTest implements ApplicationContextAware {
   @Autowired
   private ProcessFacade processFacade;
 
+  @Autowired
+  private JmsContainerManagerImpl jmsContainerManager;
+
   @Before
   public void init() {
-    ((AbstractApplicationContext) context).start();
     mockControl.reset();
+  }
+
+  @After
+  public void cleanUp() {
+    // Make sure the JmsContainerManager is stopped, otherwise the
+    // DefaultMessageListenerContainers inside will keep trying to connect to
+    // a JMS broker (which will not be running)
+    jmsContainerManager.stop();
   }
 
   /**
@@ -222,10 +207,5 @@ public class DbFailureTest implements ApplicationContextAware {
     assertNull(alarmMapper.getItem(350001L));
 
     mockControl.verify();
-  }
-
-  @Override
-  public void setApplicationContext(ApplicationContext arg0) throws BeansException {
-    context = arg0;
   }
 }

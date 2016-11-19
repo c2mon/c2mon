@@ -16,11 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.mybatis;
 
-import static org.junit.Assert.*;
-
-import java.util.List;
-
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,10 +29,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.shared.client.configuration.ConfigurationElement;
-import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
-import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
-import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Integration tests of the configuration Mybatis mapper with

@@ -38,6 +38,7 @@ import cern.c2mon.server.configuration.junit.ConfigurationCachePopulationRule;
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
 import cern.c2mon.server.configuraton.helper.ObjectEqualityComparison;
 import cern.c2mon.server.daqcommunication.in.JmsContainerManager;
+import cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl;
 import cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
@@ -62,17 +63,10 @@ import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -90,14 +84,6 @@ import static org.junit.Assert.*;
  * Component/integration tests of the configuration module (integrates the cache
  * modules, but mocks the daqcommunication-out module).
  *
- * <p>
- * These tests assume the test data is present before the test is run. The data
- * is removed and inserted after every test, ready to run the next one. If a
- * test is interrupted, will need to run twice to correct this.
- *
- * <p>
- * (Notice the data must be in the DB *before* the context is loaded!)
- *
  * @author Mark Brightwell
  *
  */
@@ -114,8 +100,8 @@ import static org.junit.Assert.*;
     "classpath:config/server-supervision.xml",
     "classpath:test-config/server-test-properties.xml"
 })
-@TestPropertySource(value = "classpath:c2mon-server-default.properties")
-public class ConfigurationLoaderTest implements ApplicationContextAware {
+@TestPropertySource("classpath:c2mon-server-default.properties")
+public class ConfigurationLoaderTest {
 
   @Rule
   @Autowired
@@ -215,11 +201,6 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @Autowired
   private ClusterCache clusterCache;
 
-  /**
-   * Needs explicitly starting.
-   */
-  private ApplicationContext context;
-
   @Value("${c2mon.server.client.jms.topic.tag.trunk}")
   private String tagPublicationTrunk = "c2mon.client.tag.default";
 
@@ -229,6 +210,9 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @Value("${c2mon.server.daqcommunication.jms.queue.trunk}")
   private String jmsDaqQueueTrunk;
 
+  @Autowired
+  private JmsContainerManagerImpl jmsContainerManager;
+
   /**
    * Clears DB of failed previous tests and resets the mock before each test.
    *
@@ -236,13 +220,19 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
    */
   @Before
   public void beforeTest() throws IOException {
-    ((AbstractApplicationContext) context).start();
-
     // make sure Process is "running" (o.w. nothing is sent to DAQ)
     processFacade.start(50L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // reset mock
     reset(mockManager);
+  }
+
+  @After
+  public void cleanUp() {
+    // Make sure the JmsContainerManager is stopped, otherwise the
+    // DefaultMessageListenerContainers inside will keep trying to connect to
+    // a JMS broker (which will not be running)
+    jmsContainerManager.stop();
   }
 
   @Test
@@ -1208,11 +1198,6 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     verify(mockManager);
     verify(checker);
     ((AbstractCache) alarmCache).getCacheListeners().remove(checker);
-  }
-
-  @Override
-  public void setApplicationContext(ApplicationContext arg0) throws BeansException {
-    context = arg0;
   }
 
   @Test

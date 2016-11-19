@@ -33,6 +33,8 @@ import cern.c2mon.server.configuration.api.util.TestConfigurationProvider;
 import cern.c2mon.server.configuration.junit.ConfigurationCachePopulationRule;
 import cern.c2mon.server.configuration.parser.util.*;
 import cern.c2mon.server.configuraton.helper.ObjectEqualityComparison;
+import cern.c2mon.server.daqcommunication.in.JmsContainerManager;
+import cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl;
 import cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
@@ -53,9 +55,7 @@ import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 import junit.framework.Assert;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -79,19 +79,20 @@ import static org.junit.Assert.*;
  * @author Franz Ritter
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({
-    "classpath:test-config/process-communication-manager-mock.xml",
-    "classpath:config/server-configuration.xml",
-    "classpath:config/server-cache.xml",
-    "classpath:config/server-cachedbaccess.xml",
-    "classpath:config/server-cacheloading.xml",
-    "classpath:config/server-daqcommunication-in.xml",
-    "classpath:config/server-daqcommunication-out.xml",
-    "classpath:config/server-rule.xml",
-    "classpath:config/server-configuration.xml",
-    "classpath:config/server-supervision.xml",
-    "classpath:test-config/server-test-properties.xml"
-})
+@ContextConfiguration(
+    locations = {
+        "classpath:test-config/process-communication-manager-mock.xml",
+        "classpath:config/server-configuration.xml",
+        "classpath:config/server-cache.xml",
+        "classpath:config/server-cachedbaccess.xml",
+        "classpath:config/server-cacheloading.xml",
+        "classpath:config/server-daqcommunication-in.xml",
+        "classpath:config/server-daqcommunication-out.xml",
+        "classpath:config/server-rule.xml",
+        "classpath:config/server-configuration.xml",
+        "classpath:config/server-supervision.xml",
+        "classpath:test-config/server-test-properties.xml"
+    })
 @TestPropertySource("classpath:c2mon-server-default.properties")
 public class ConfigurationLoaderTest {
 
@@ -100,7 +101,7 @@ public class ConfigurationLoaderTest {
   public ConfigurationCachePopulationRule configurationCachePopulationRule;
 
   @Autowired
-  CacheObjectFactory cacheObjectFactory;
+  private CacheObjectFactory cacheObjectFactory;
 
   @Autowired
   private ProcessCommunicationManager mockManager;
@@ -177,10 +178,21 @@ public class ConfigurationLoaderTest {
   @Value("${c2mon.server.client.jms.topic.tag.trunk}")
   private String tagPublicationTrunk = "c2mon.client.tag.default";
 
+  @Autowired
+  private JmsContainerManagerImpl jmsContainerManager;
+
   @Before
   public void beforeTest() throws IOException {
     // reset mock
     reset(mockManager);
+  }
+
+  @After
+  public void cleanUp() {
+    // Make sure the JmsContainerManager is stopped, otherwise the
+    // DefaultMessageListenerContainers inside will keep trying to connect to
+    // a JMS broker (which will not be running)
+    jmsContainerManager.stop();
   }
 
   @Test
