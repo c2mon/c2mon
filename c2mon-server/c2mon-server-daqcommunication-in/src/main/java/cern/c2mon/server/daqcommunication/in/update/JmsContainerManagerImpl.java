@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.context.annotation.Bean;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -298,7 +297,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
   @Override
   public synchronized void start() {
     if (!running) {
-      running = true;       
+      running = true;
       //start JMS containers (not in Spring context!)
       LOGGER.info("Starting Process JMS listeners...");
       for (Map.Entry<Long, DefaultMessageListenerContainer> entry : jmsContainers.entrySet()) {
@@ -368,7 +367,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
 
   @Override
   public boolean isAutoStartup() {  
-    return false;
+    return true;
   }
 
   @Override
