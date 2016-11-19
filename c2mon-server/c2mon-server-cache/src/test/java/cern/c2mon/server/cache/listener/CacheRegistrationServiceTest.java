@@ -51,13 +51,8 @@ import static org.junit.Assert.*;
  * @author Mark Brightwell
  *
  */
-public class CacheRegistrationServiceTest extends AbstractCacheIntegrationTest implements ApplicationContextAware {
-  
-  /**
-   * Spring context, that needs starting manually.
-   */
-  private ApplicationContext context;
-  
+public class CacheRegistrationServiceTest extends AbstractCacheIntegrationTest {
+
   @Resource
   private CacheRegistrationService cacheRegistrationService;
   
@@ -86,12 +81,7 @@ public class CacheRegistrationServiceTest extends AbstractCacheIntegrationTest i
     dataTagCache.put(dataTag.getId(), dataTag);
     controlTagCache.put(controlTag.getId(), controlTag);    
   }
-  
-  @Before
-  public void startContext() {
-    ((AbstractApplicationContext) context).start();
-  }
-  
+
   /**
    * Tests that an update in the Datatag, Controltag or RuleTag cache (TODO ruletag cache)
    * is picked up by a registered listener (asynchronous listener using ThreadHandler class).
@@ -203,19 +193,6 @@ public class CacheRegistrationServiceTest extends AbstractCacheIntegrationTest i
     }
 
     @Override
-    public void confirmStatus(Tag cacheable) {
-      // TODO Auto-generated method stub
-      
-    }
-    
+    public void confirmStatus(Tag cacheable) {}
   }
-  
-  /**
-   * Set the application context (used for explicit start).
-   */
-  @Override
-  public void setApplicationContext(ApplicationContext arg0) throws BeansException {
-    context = arg0;
-  }
-  
 }

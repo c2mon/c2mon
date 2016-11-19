@@ -116,7 +116,7 @@ public class PersistenceSynchroListener implements C2monBufferedCacheListener<Lo
   
   @Override
   public boolean isAutoStartup() {   
-    return false;
+    return true;
   }
 
   @Override
