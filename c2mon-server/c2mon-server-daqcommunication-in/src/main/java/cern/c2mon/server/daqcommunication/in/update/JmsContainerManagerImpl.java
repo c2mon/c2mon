@@ -232,8 +232,11 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
   private void unsubscribe(final Long processId) {
     LOGGER.trace("Unsubscribing from updates for Process " + processId);
     if (jmsContainers.containsKey(processId)) {
-      DefaultMessageListenerContainer container = jmsContainers.get(processId);      
-      container.shutdown();      
+      DefaultMessageListenerContainer container = jmsContainers.get(processId);
+
+      // Shut down the container in another thread to avoid blocking
+      Executors.newFixedThreadPool(1).submit(new ContainerShutdownTask(container));
+
       jmsContainers.remove(processId);
     } else {
       LOGGER.warn("Attempt to remove an unrecognized JMS listener container.");
