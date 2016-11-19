@@ -47,4 +47,4 @@ C2MON is released under the [GNU LGPLv3 License][].
 [JDK8 build]: http://www.oracle.com/technetwork/java/javase/downloads
 [Pull requests]: http://help.github.com/send-pull-requests
 [contributor guidelines]: /CONTRIBUTING.md
-[GNU LGPLv3 License]: /LICENSE.MD
+[GNU LGPLv3 License]: /LICENSE
