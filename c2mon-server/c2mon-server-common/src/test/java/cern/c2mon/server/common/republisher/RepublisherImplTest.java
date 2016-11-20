@@ -16,7 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.common.republisher;
 
-import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import org.easymock.EasyMock;
@@ -42,7 +41,7 @@ import java.util.concurrent.CountDownLatch;
  */
 public class RepublisherImplTest {
 
-  private IMocksControl control = createNiceControl();
+  private IMocksControl control = EasyMock.createNiceControl();
 
   //mocks
   private Publisher<Object> publisher;
@@ -104,21 +103,19 @@ public class RepublisherImplTest {
     republisher.start();
 
     Object publishedObject = new Object();
-    CountDownLatch latch = new CountDownLatch(2);
 
     //re-publication fails
     publisher.publish(publishedObject);
-    expectLastCall().andAnswer(() -> { latch.countDown(); throw new UncategorizedJmsException(""); });
+    EasyMock.expectLastCall().andThrow(new UncategorizedJmsException(""));
 
     //second succeeds
     publisher.publish(publishedObject);
-    expectLastCall().andAnswer(() -> { latch.countDown(); return null; });
 
     control.replay();
 
     republisher.publicationFailed(publishedObject);
 
-    latch.await();
+    Thread.sleep(500);
 
     assertEquals(2, republisher.getNumberFailedPublications()); //manual call + automatic publication
     assertEquals(0, republisher.getSizeUnpublishedList());
@@ -133,13 +130,11 @@ public class RepublisherImplTest {
     Object publishedObject1 = new Object();
     Object publishedObject2 = new Object();
     Object publishedObject3 = new Object();
-    CountDownLatch latch = new CountDownLatch(1);
 
     //republication succeeds
     publisher.publish(publishedObject1);
     publisher.publish(publishedObject2);
     publisher.publish(publishedObject3);
-    expectLastCall().andAnswer(() -> { latch.countDown(); return null; });
 
     control.replay();
 
@@ -147,7 +142,7 @@ public class RepublisherImplTest {
     republisher.publicationFailed(publishedObject2);
     republisher.publicationFailed(publishedObject3);
 
-    latch.await();
+    Thread.sleep(500);
 
     assertEquals(3, republisher.getNumberFailedPublications()); //the manual publicationFailed calls
     assertEquals(0, republisher.getSizeUnpublishedList());
@@ -160,23 +155,24 @@ public class RepublisherImplTest {
     republisher.start();
 
     Object publishedObject1 = new Object();
-    CountDownLatch latch = new CountDownLatch(4);
+    CountDownLatch latch = new CountDownLatch(11);
 
     //republication succeeds
     publisher.publish(publishedObject1); // failure
     // should re-attempt publication every 100ms
-    expectLastCall().andAnswer(() -> { latch.countDown(); throw new UncategorizedJmsException(""); }).times(3);
+    EasyMock.expectLastCall().andAnswer(() -> { latch.countDown(); throw new UncategorizedJmsException(""); }).times(10);
 
     publisher.publish(publishedObject1); // success
-    expectLastCall().andAnswer(() -> { latch.countDown(); return null; });
+    EasyMock.expectLastCall().andAnswer(() -> { latch.countDown(); return null; });
 
     control.replay();
 
     republisher.publicationFailed(publishedObject1);
 
+    //Thread.sleep(2000);
     latch.await();
 
-    assertEquals(4, republisher.getNumberFailedPublications());
+    assertEquals(11, republisher.getNumberFailedPublications());
     assertEquals(0, republisher.getSizeUnpublishedList());
 
     control.verify();
@@ -189,24 +185,24 @@ public class RepublisherImplTest {
     Object publishedObject1 = new Object();
     Object publishedObject2 = new Object();
     Object publishedObject3 = new Object();
-    CountDownLatch latch = new CountDownLatch(8);
+    CountDownLatch latch = new CountDownLatch(18);
 
     //republication succeeds
     publisher.publish(publishedObject1); // failure
     // should re-attempt publication every 100ms
-    expectLastCall().andAnswer(() -> { latch.countDown(); throw new UncategorizedJmsException(""); }).times(3);
+    EasyMock.expectLastCall().andAnswer(() -> { latch.countDown(); throw new UncategorizedJmsException(""); }).times(10);
 
     publisher.publish(publishedObject1); //success
-    expectLastCall().andAnswer(() -> { latch.countDown(); return null; });
+    EasyMock.expectLastCall().andAnswer(() -> { latch.countDown(); return null; });
 
     publisher.publish(publishedObject2); //failure
     // should re-attempt publication every 100ms
-    expectLastCall().andAnswer(() -> { latch.countDown(); throw new UncategorizedJmsException(""); }).times(2);
+    EasyMock.expectLastCall().andAnswer(() -> { latch.countDown(); throw new UncategorizedJmsException(""); }).times(5);
 
     publisher.publish(publishedObject2); //success
-    expectLastCall().andAnswer(() -> { latch.countDown(); return null; });
+    EasyMock.expectLastCall().andAnswer(() -> { latch.countDown(); return null; });
     publisher.publish(publishedObject3); //success
-    expectLastCall().andAnswer(() -> { latch.countDown(); return null; });
+    EasyMock.expectLastCall().andAnswer(() -> { latch.countDown(); return null; });
 
     control.replay();
 
@@ -217,7 +213,7 @@ public class RepublisherImplTest {
     // Thread.sleep(2000);
     latch.await();
 
-    assertEquals(4 + 3 + 1, republisher.getNumberFailedPublications());
+    assertEquals(11 + 6 + 1, republisher.getNumberFailedPublications());
     assertEquals(0, republisher.getSizeUnpublishedList());
 
     control.verify();
@@ -230,14 +226,13 @@ public class RepublisherImplTest {
     Object publishedObject1 = new Object();
     Object publishedObject2 = new Object();
     Object publishedObject3 = new Object();
-    CountDownLatch latch = new CountDownLatch(3);
 
     publisher.publish(publishedObject1); //failure
-    expectLastCall().andAnswer(() -> { latch.countDown(); throw new UncategorizedJmsException(""); }).anyTimes();
+    EasyMock.expectLastCall().andThrow(new UncategorizedJmsException("")).anyTimes();
     publisher.publish(publishedObject2); //failure
-    expectLastCall().andAnswer(() -> { latch.countDown(); throw new UncategorizedJmsException(""); }).anyTimes();
+    EasyMock.expectLastCall().andThrow(new UncategorizedJmsException("")).anyTimes();
     publisher.publish(publishedObject3); //failure
-    expectLastCall().andAnswer(() -> { latch.countDown(); throw new UncategorizedJmsException(""); }).anyTimes();
+    EasyMock.expectLastCall().andThrow(new UncategorizedJmsException("")).anyTimes();
 
     control.replay();
 
@@ -245,7 +240,7 @@ public class RepublisherImplTest {
     republisher.publicationFailed(publishedObject2);
     republisher.publicationFailed(publishedObject3);
 
-    latch.await();
+    Thread.sleep(1000);
 
     assertTrue(republisher.getNumberFailedPublications() > 0);
     assertEquals(3, republisher.getSizeUnpublishedList());
@@ -262,20 +257,16 @@ public class RepublisherImplTest {
     republisher.start();
 
     Object publishedObject = new Object();
-    CountDownLatch latch1 = new CountDownLatch(1);
-    CountDownLatch latch2 = new CountDownLatch(1);
 
     //2 republications
     publisher.publish(publishedObject);
-    expectLastCall().andAnswer(() -> { latch1.countDown(); return null; });
     publisher.publish(publishedObject);
-    expectLastCall().andAnswer(() -> { latch2.countDown(); return null; });
 
     control.replay();
 
     republisher.publicationFailed(publishedObject);
 
-    latch1.await();
+    Thread.sleep(1000);
 
     //first re-publication has succeeded and task has been cancelled
     assertEquals(1, republisher.getNumberFailedPublications()); //the manual publicationFailed call
@@ -283,7 +274,7 @@ public class RepublisherImplTest {
 
     //second failure starts new task
     republisher.publicationFailed(publishedObject);
-    latch2.await();
+    Thread.sleep(500);
 
     //second re-publication has succeeded
     assertEquals(2, republisher.getNumberFailedPublications()); //successive failed attempts
@@ -301,11 +292,10 @@ public class RepublisherImplTest {
     republisher.start();
 
     Object publishedObject = new Object();
-    CountDownLatch latch = new CountDownLatch(1);
 
     //re-publication fails
     publisher.publish(publishedObject);
-    expectLastCall().andAnswer(() -> { latch.countDown(); throw new RuntimeException(); });
+    EasyMock.expectLastCall().andThrow(new RuntimeException());
 
     //second publication is not attempted as not JMS exception
 
@@ -313,8 +303,7 @@ public class RepublisherImplTest {
 
     republisher.publicationFailed(publishedObject);
 
-    latch.await();
-    Thread.sleep(100);
+    Thread.sleep(500);
 
     assertEquals(2, republisher.getNumberFailedPublications()); //manual call + exception in re-publication thread
     assertEquals(0, republisher.getSizeUnpublishedList()); //removed from list when exception occurs
