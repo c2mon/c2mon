@@ -23,6 +23,7 @@ import java.util.Collections;
 
 import javax.jms.JMSException;
 
+import cern.c2mon.client.core.config.C2monClientProperties;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.tag.TagConfigImpl;
 import org.apache.commons.lang.ArrayUtils;
@@ -67,7 +68,7 @@ public class RequestHandlerImplTest {
   @Before
   public void setUp() {
     jmsProxy = EasyMock.createMock(JmsProxy.class);    
-    requestHandlerImpl = new RequestHandlerImpl(jmsProxy, "request queue", "admin queue");
+    requestHandlerImpl = new RequestHandlerImpl(jmsProxy, new C2monClientProperties());
   }
 
   /**
@@ -76,7 +77,7 @@ public class RequestHandlerImplTest {
    */
   @Test
   public void getCurrentSupervisionStatus() throws JMSException {
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10000))).andReturn(null);
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("c2mon.client.request"), EasyMock.eq(10000))).andReturn(null);
 
     EasyMock.replay(jmsProxy);
 
@@ -94,7 +95,7 @@ public class RequestHandlerImplTest {
   public void getTagValues() throws JMSException, InterruptedException {
     Collection<ClientRequestResult> returnCollection = Arrays.asList(new TagConfigImpl(1));
     EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), 
-        EasyMock.eq("request queue"), EasyMock.eq(10000),
+        EasyMock.eq("c2mon.client.request"), EasyMock.eq(10000),
           (ClientRequestReportListener) EasyMock.isNull()
             )).andReturn(returnCollection);
 
@@ -128,7 +129,7 @@ public class RequestHandlerImplTest {
   public void getTags() throws JMSException, InterruptedException {
     Collection<ClientRequestResult> returnCollection = Arrays.asList(new TagConfigImpl(1));
     EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class),
-        EasyMock.eq("request queue"), EasyMock.eq(10000),
+        EasyMock.eq("c2mon.client.request"), EasyMock.eq(10000),
         EasyMock.isNull()
     )).andReturn(returnCollection);
 
@@ -147,7 +148,7 @@ public class RequestHandlerImplTest {
   public void getManyTags() throws JMSException {
     Collection<ClientRequestResult> returnCollection = Arrays.asList(new TagConfigImpl(1), new TagConfigImpl(1));
     EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), 
-        EasyMock.eq("request queue"), EasyMock.eq(10000), //10000 is timeout
+        EasyMock.eq("c2mon.client.request"), EasyMock.eq(10000), //10000 is timeout
         (ClientRequestReportListener) EasyMock.isNull()
             )).andReturn(returnCollection).times(20);
 
@@ -199,7 +200,7 @@ public class RequestHandlerImplTest {
         return null;
       }
     });
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(120000))).andReturn(response);
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("c2mon.client.request"), EasyMock.eq(120000))).andReturn(response);
 
     EasyMock.replay(jmsProxy);
 
@@ -229,7 +230,7 @@ public class RequestHandlerImplTest {
         return "name";
       }
     });
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10000))).andReturn(response);
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("c2mon.client.request"), EasyMock.eq(10000))).andReturn(response);
 
     EasyMock.replay(jmsProxy);
 
@@ -256,7 +257,7 @@ public class RequestHandlerImplTest {
     Collection<ClientRequestResult> response = new ArrayList<>();
     response.add(createCommandReport(executeCommandRequest));
     
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(1000))
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("c2mon.client.request"), EasyMock.eq(1000))
         ).andReturn(response);
 
     EasyMock.replay(jmsProxy);
@@ -310,7 +311,7 @@ public class RequestHandlerImplTest {
         return "Error message";
       }
     });
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(120000))).andReturn(response);
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("c2mon.client.request"), EasyMock.eq(120000))).andReturn(response);
 
     EasyMock.replay(jmsProxy);
 

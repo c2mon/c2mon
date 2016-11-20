@@ -31,15 +31,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.jms.*;
 
+import cern.c2mon.client.core.config.C2monClientProperties;
 import com.google.gson.JsonSyntaxException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
@@ -235,25 +236,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    */
   private ExecutorService topicPollingExecutor;
 
-  /**
-   * Constructor.
-   *
-   * @param connectionFactory
-   *          the JMS connection factory
-   * @param supervisionTopic
-   *          topic on which supervision events arrive from server
-   * @param alarmTopic
-   *          topic on which alarm messages arrive from server
-   * @param heartbeatTopic
-   *          topic on which heartbeat messages arrive from server
-   */
-  public JmsProxyImpl(final ConnectionFactory connectionFactory, final Destination supervisionTopic,
-                      final Destination alarmTopic, final Destination heartbeatTopic,
-                      final SlowConsumerListener slowConsumerListener) {
+  @Autowired
+  public JmsProxyImpl(final ConnectionFactory connectionFactory, final SlowConsumerListener slowConsumerListener, C2monClientProperties properties) {
     this.jmsConnectionFactory = connectionFactory;
-    this.supervisionTopic = supervisionTopic;
-    this.heartbeatTopic = heartbeatTopic;
-    this.alarmTopic = alarmTopic;
+    this.supervisionTopic = new ActiveMQTopic(properties.getJms().getSupervisionTopic());;
+    this.heartbeatTopic = new ActiveMQTopic(properties.getJms().getHeartbeatTopic());;
+    this.alarmTopic = new ActiveMQTopic(properties.getJms().getAlarmTopic());;
     this.adminMessageTopic = null;
     this.slowConsumerListener = slowConsumerListener;
 

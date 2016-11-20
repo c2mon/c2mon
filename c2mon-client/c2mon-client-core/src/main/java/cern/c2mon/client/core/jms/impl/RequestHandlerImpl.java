@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.jms.JMSException;
 
+import cern.c2mon.client.core.config.C2monClientProperties;
 import cern.c2mon.client.core.jms.JmsProxy;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -114,10 +115,12 @@ public class RequestHandlerImpl implements RequestHandler {
    *          the proxy bean
    */
   @Autowired
-  public RequestHandlerImpl(final JmsProxy jmsProxy, final String defaultRequestQueue, String adminRequestQueue) {
+  public RequestHandlerImpl(final JmsProxy jmsProxy, final C2monClientProperties properties) {
     this.jmsProxy = jmsProxy;
-    this.defaultRequestQueue = defaultRequestQueue;
-    this.adminRequestQueue = adminRequestQueue;
+    this.defaultRequestQueue = properties.getJms().getRequestQueue();
+    this.adminRequestQueue = properties.getJms().getAdminQueue();
+    this.maxRequestSize = properties.getMaxTagsPerRequest();
+    this.corePoolSize = properties.getMaxRequestThreads();
     executor.allowCoreThreadTimeOut(true);
   }
 
