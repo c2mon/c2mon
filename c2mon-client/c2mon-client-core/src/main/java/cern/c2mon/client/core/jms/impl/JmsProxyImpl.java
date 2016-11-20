@@ -50,6 +50,7 @@ import cern.c2mon.client.core.jms.*;
 import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
+import org.springframework.stereotype.Component;
 
 /**
  * Implementation of the JmsProxy singleton bean. Also see the interface for
@@ -74,6 +75,7 @@ import cern.c2mon.shared.client.request.JsonRequest;
  * @author Mark Brightwell
  */
 @Slf4j
+@Component("jmsProxy")
 @ManagedResource(objectName = "cern.c2mon:type=JMS,name=JmsProxy")
 public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
 
@@ -517,11 +519,20 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
 
   @Override
   public void registerUpdateListener(final TagUpdateListener serverUpdateListener, final TopicRegistrationDetails topicRegistrationDetails) throws JMSException {
+    if (topicRegistrationDetails == null) {
+      throw new NullPointerException("Trying to register a TagUpdateListener with null RegistrationDetails!");
+    }
+
+    if (serverUpdateListener == null) {
+      throw new NullPointerException("TagUpdateListener must not be null!");
+    }
+
+    if (!running) {
+      init();
+    }
+
     refreshLock.readLock().lock();
     try {
-      if (topicRegistrationDetails == null) {
-        throw new NullPointerException("Trying to register a TagUpdateListener with null RegistrationDetails!");
-      }
       listenerLock.lock();
       try {
         boolean refreshSubscriptions = refreshLock.isWriteLocked();
@@ -626,6 +637,11 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     if (jsonRequest == null) {
       throw new NullPointerException("sendRequest(..) method called with null request argument");
     }
+
+    if (!running) {
+      init();
+    }
+
     if (connected) {
       Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
       try {
@@ -935,11 +951,11 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     }
   }
 
-  @PostConstruct
   public void init() {
+    running = true;
+    shutdownRequested = false;
     setActiveMQConnectionPrefix();
     connect();
-    running = true;
   }
 
   /**
