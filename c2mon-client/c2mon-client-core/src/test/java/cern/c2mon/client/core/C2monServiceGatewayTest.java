@@ -19,10 +19,8 @@ package cern.c2mon.client.core;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MalformedObjectNameException;
-
+import cern.c2mon.client.core.config.C2monAutoConfiguration;
+import cern.c2mon.client.core.config.MockServerConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,7 +41,12 @@ import static org.junit.Assert.assertNotNull;
  */
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:test-config/server-client-test.xml" })
+@ContextConfiguration(
+    classes = {
+        C2monAutoConfiguration.class,
+        MockServerConfig.class
+    } 
+)
 public class C2monServiceGatewayTest {
 
   @BeforeClass
@@ -52,8 +55,7 @@ public class C2monServiceGatewayTest {
   }
 
   @Test
-  public void startClient() throws InterruptedException, MBeanRegistrationException, InstanceNotFoundException, MalformedObjectNameException,
-      NullPointerException {
+  public void startClient() throws Exception {
     C2monServiceGateway.startC2monClient();
     assertNotNull(C2monServiceGateway.getCommandManager());
     assertNotNull(C2monServiceGateway.getCommandService());
