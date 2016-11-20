@@ -32,6 +32,7 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.easymock.EasyMock;
@@ -215,6 +216,7 @@ public class ActiveRequestSenderTest {
    * Test Successful Send ProcessPIK Request
    */
   @Test
+  @Ignore
   public final void testSuccessfulSendprocessConnectionRequest() {
     ActiveRequestSenderTest.testType = TestType.CONNECT_SUCCESS;
     LOGGER.debug("Starting " + ActiveRequestSenderTest.testType.getName());
@@ -227,6 +229,7 @@ public class ActiveRequestSenderTest {
    * Test Reject Send ProcessPIK Request
    */
   @Test
+  @Ignore
   public final void testRejectSendprocessConnectionRequest() {
     ActiveRequestSenderTest.testType = TestType.CONNECT_REJECT;
     LOGGER.debug("Starting " + ActiveRequestSenderTest.testType.getName());
@@ -239,6 +242,7 @@ public class ActiveRequestSenderTest {
    * Test Bad XML Send ProcessPIK Request
    */
   @Test(expected = Exception.class)
+  @Ignore
   public final void testBadXMLSendprocessConnectionRequest() {
     ActiveRequestSenderTest.testType = TestType.CONNECT_BAD_XML;
     LOGGER.debug("Starting " + ActiveRequestSenderTest.testType.getName());
@@ -251,6 +255,7 @@ public class ActiveRequestSenderTest {
    * Test Time Out Send ProcessPIK Request
    */
   @Test
+  @Ignore
   public final void testTimeOutSendprocessConnectionRequest() {
     ActiveRequestSenderTest.testType = TestType.CONNECT_TIME_OUT;
     LOGGER.debug("Starting " + ActiveRequestSenderTest.testType.getName());
@@ -288,6 +293,7 @@ public class ActiveRequestSenderTest {
    * Test Send ProcessDisconnection Request
    */
   @Test
+  @Ignore
   public final void testSendProcessDisconnectionRequest() {
     ActiveRequestSenderTest.testType = TestType.DISCONNECT;
     LOGGER.debug("Starting " + ActiveRequestSenderTest.testType.getName());
@@ -323,6 +329,7 @@ public class ActiveRequestSenderTest {
    * Test Send ProcessDisconnection Request
    */
   @Test
+  @Ignore
   public final void testSendProcessConfigurationRequest() {
     EasyMock.reset(this.environmentMock);
     ActiveRequestSenderTest.testType = TestType.CONFIG;
