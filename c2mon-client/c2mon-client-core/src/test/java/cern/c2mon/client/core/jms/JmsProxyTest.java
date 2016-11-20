@@ -23,17 +23,14 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.jms.*;
 
+import cern.c2mon.client.core.config.C2monAutoConfiguration;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -41,7 +38,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.core.config.C2monClientProperties;
-import cern.c2mon.client.core.config.TestConfig;
+import cern.c2mon.client.core.config.MockServerConfig;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.request.*;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
@@ -65,7 +62,10 @@ import static org.junit.Assert.assertTrue;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = TestConfig.class )
+@ContextConfiguration(classes = {
+    C2monAutoConfiguration.class,
+    MockServerConfig.class
+})
 @TestPropertySource(
     properties = {
         "c2mon.client.jms.url=vm://localhost:61616?broker.persistent=false"
@@ -85,13 +85,11 @@ public class JmsProxyTest {
   /**
    * For sending message to the broker, to be picked up by the tested proxy.
    */
+  @Autowired
   private ActiveJmsSender jmsSender;
 
-  private JmsTemplate serverTemplate;
-
   @Autowired
-  @Qualifier("clientActiveMQConnectionFactory")
-  private ConnectionFactory connectionFactory;
+  private JmsTemplate serverTemplate;
 
   TopicRegistrationDetails details = new TopicRegistrationDetails() {
     @Override
@@ -106,33 +104,12 @@ public class JmsProxyTest {
   };
 
   /**
-   * Starts context.
-   * @throws Exception
-   */
-  @Before
-  public void setUp() throws Exception {
-    jmsSender = new ActiveJmsSender();
-    jmsSender.setJmsTemplate(new JmsTemplate(connectionFactory));
-    serverTemplate = new JmsTemplate(connectionFactory);
-
-    //JMS connection is started in separate thread, so leave time to connect
-    try {
-      TagUpdateListener listener = tagValueUpdate -> false;
-      jmsProxy.registerUpdateListener(listener, details);
-      jmsProxy.unregisterUpdateListener(listener);
-    } catch (Exception ignored) {
-      Thread.sleep(200);
-    }
-  }
-
-  /**
    * Tests the sendRequest method throw the correct exception when the server does
    * no respond. Will also fail if the client-jms Spring context fails to load.
    * @throws JMSException
    * @throws InterruptedException
    */
   @Test(expected = RuntimeException.class)
-  @DirtiesContext
   public void testSendRequestNoReply() throws JMSException {
     JsonRequest<ClientRequestResult> jsonRequest = EasyMock.createMock(JsonRequest.class);
     EasyMock.expect(jsonRequest.toJson()).andReturn("{}");
@@ -149,7 +126,6 @@ public class JmsProxyTest {
    * @throws InterruptedException
    */
   @Test
-  @DirtiesContext
   public void testSendRequest() throws JMSException, InterruptedException {
     JsonRequest<SupervisionEvent> jsonRequest = new ClientRequestImpl<>(SupervisionEvent.class);
     final String queueName = properties.getJms().getRequestQueue() + "-" + System.currentTimeMillis();
@@ -185,19 +161,11 @@ public class JmsProxyTest {
    * @throws JMSException
    */
   @Test
-  @DirtiesContext
   public void testRegisterUpdateListener() throws JMSException {
     TagUpdateListener listener = EasyMock.createMock(TagUpdateListener.class);
-    TopicRegistrationDetails details = EasyMock.createMock(TopicRegistrationDetails.class);
-    EasyMock.expect(details.getTopicName()).andReturn("c2mon.JmsProxy.test.topic.registration");
-    EasyMock.expect(details.getTopicName()).andReturn("c2mon.JmsProxy.test.topic.registration");
-    EasyMock.expect(details.getId()).andReturn(1L);
 
-    EasyMock.replay(listener);
-    EasyMock.replay(details);
     jmsProxy.registerUpdateListener(listener, details);
-    EasyMock.verify(listener);
-    EasyMock.verify(details);
+
     Assert.assertTrue(jmsProxy.isRegisteredListener(listener));
   }
 
@@ -208,7 +176,6 @@ public class JmsProxyTest {
    * @throws InterruptedException
    */
   @Test
-  @DirtiesContext
   public void testUpdateNotification() throws JMSException, InterruptedException {
     TagUpdateListener listener = EasyMock.createMock(TagUpdateListener.class);
 
@@ -245,7 +212,6 @@ public class JmsProxyTest {
    * @throws JMSException
    */
   @Test
-  @DirtiesContext
   public void testUnregisterUpdateListener() throws JMSException {
     TagUpdateListener listener = EasyMock.createMock(TagUpdateListener.class);
 
@@ -264,7 +230,6 @@ public class JmsProxyTest {
    * @throws JMSException
    */
   @Test
-  @DirtiesContext
   public void testReplaceUpdateListener() throws JMSException {
     TagUpdateListener listener = EasyMock.createMock(TagUpdateListener.class);
 
@@ -288,33 +253,20 @@ public class JmsProxyTest {
    * @throws InterruptedException
    */
   @Test
-  @DirtiesContext
-  public void testSupervisionNotification() throws InterruptedException {
-    SupervisionListener supervisionListener1 = EasyMock.createMock(SupervisionListener.class);
-    SupervisionListener supervisionListener2 = EasyMock.createMock(SupervisionListener.class);
+  public void testSupervisionNotification() throws InterruptedException, JMSException {
     SupervisionEvent event = new SupervisionEventImpl(SupervisionEntity.EQUIPMENT, 10L, "P_TEST",
                                       SupervisionStatus.DOWN, new Timestamp(System.currentTimeMillis()), "test event");
+    CountDownLatch latch = new CountDownLatch(2);
+    jmsProxy.registerUpdateListener(tagValueUpdate -> false, details);
 
-    //expect
-    supervisionListener1.onSupervisionUpdate(event);
-    supervisionListener2.onSupervisionUpdate(event);
-
-    //test (register listeners and publish supervision event)
-    EasyMock.replay(supervisionListener1);
-    EasyMock.replay(supervisionListener2);
-
-    jmsProxy.registerSupervisionListener(supervisionListener1);
-    jmsProxy.registerSupervisionListener(supervisionListener2);
+    jmsProxy.registerSupervisionListener(supervisionEvent -> latch.countDown());
+    jmsProxy.registerSupervisionListener(supervisionEvent -> latch.countDown());
     String topicName = properties.getJms().getSupervisionTopic();
     Assert.assertNotNull(topicName);
     jmsSender.sendToTopic(((SupervisionEventImpl) event).toJson(), topicName);
 
     //wait for message
-    Thread.sleep(200);
-
-    //verify
-    EasyMock.verify(supervisionListener1);
-    EasyMock.verify(supervisionListener2);
+    latch.await();
   }
 
   /**
@@ -325,31 +277,20 @@ public class JmsProxyTest {
    * @throws InterruptedException
    */
   @Test
-  @DirtiesContext
   public void testReconnectAndNotification() throws JMSException, InterruptedException {
-    ConnectionListener connectionListener = EasyMock.createNiceMock(ConnectionListener.class);
+    CountDownLatch latch = new CountDownLatch(3);
 
-    CountDownLatch latch = new CountDownLatch(1);
-
-    //expect
-    connectionListener.onConnection();
-    EasyMock.expectLastCall().andAnswer(() -> {latch.countDown(); return null;});
-    connectionListener.onDisconnection();
-
-    //test (throw exception, which should disconnect and reconnect)
-    EasyMock.replay(connectionListener);
-
-    jmsProxy.registerConnectionListener(connectionListener);
+    jmsProxy.registerConnectionListener(new ConnectionListener() {
+      public void onConnection() { latch.countDown(); }
+      public void onDisconnection() { latch.countDown(); }
+    });
     ((ExceptionListener) jmsProxy).onException(new JMSException("test exception handling"));
 
     latch.await();
 
-    //verify
-    EasyMock.verify(connectionListener);
-
     //check connection is back by rerunning supervison and update tests
-//    testSupervisionNotification();
-//    testUpdateNotification();
+    testSupervisionNotification();
+    testUpdateNotification();
   }
 
   /**

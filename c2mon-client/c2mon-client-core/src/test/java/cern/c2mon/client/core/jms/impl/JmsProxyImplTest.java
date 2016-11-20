@@ -25,6 +25,7 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Session;
 
+import cern.c2mon.client.core.config.C2monClientProperties;
 import cern.c2mon.client.core.jms.JmsProxy;
 import cern.c2mon.client.core.jms.TopicRegistrationDetails;
 import org.easymock.EasyMock;
@@ -61,12 +62,8 @@ public class JmsProxyImplTest {
     connectionFactory = EasyMock.createNiceMock(ConnectionFactory.class);
     connection = EasyMock.createNiceMock(Connection.class);
     session = EasyMock.createNiceMock(Session.class);
-    Destination supervisionTopic = EasyMock.createNiceMock(Destination.class);
-    Destination heartbeatTopic = EasyMock.createNiceMock(Destination.class);
-    Destination alarmTopic = EasyMock.createNiceMock(Destination.class);
     SlowConsumerListener slowConsumerListener = EasyMock.createNiceMock(SlowConsumerListener.class);
-    jmsProxy = new JmsProxyImpl(connectionFactory, supervisionTopic,
-        alarmTopic, heartbeatTopic, slowConsumerListener);
+    jmsProxy = new JmsProxyImpl(connectionFactory, slowConsumerListener, new C2monClientProperties());
   }
   
   /**
