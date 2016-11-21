@@ -285,7 +285,7 @@ class EquipmentSenderValid {
         log.debug("isFilterOk - sending value to statistics module: Value Deadband Filter");
         // REPEATED_VALUE filter on
       } else if ((filterType == FilterType.REPEATED_VALUE)) {
-        log.debug(format("trying to send twice the same tag #{} update (with exactly the same value and value description).", tagId);
+        log.debug("trying to send twice the same tag #{} update (with exactly the same value and value description).", tagId);
 
         log.debug("sendTagFiltered - sending value to statistics module: Same Value Filter");
         log.debug("isFilterOk - sending value to statistics module: Same Value Filter");
