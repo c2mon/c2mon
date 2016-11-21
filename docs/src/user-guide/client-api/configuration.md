@@ -3,7 +3,7 @@
 C2MON centrally manages the configuration of data acquisition (DAQ) processes.
 A DAQ receives its configuration from the server at startup, which has two main advantages:
 
-* A DAQ needs only to know its unique name to request the configuration.
+* A DAQ only needs to know its unique name to request the configuration.
   No local configuration file or database access is required.
   This makes the deployment very lightweight and simplifies the setup of a cold standby.
 * Since the server is orchestrating all DAQs it should never receive updates for unknown tags.
@@ -129,7 +129,7 @@ configurationService.createDatatag("E_EXAMPLE", tagToCreate);
 
 ## Configuring Alarms
 
-The following code shows the simplest way to create a `Alarm`:
+The following code shows the simplest way to create an `Alarm`:
 
 ```java
 configurationService.createAlarm("TAG_EXAMPLE", new ValueCondition(Integer.class, 1), "faultFamily", "faultMember", 0);
