@@ -35,7 +35,7 @@
         <prop key="c2mon.jms.filter.queue">nacho</prop>
 
         <!-- Broker Propertie -->
-        <prop key="jms.broker.url">vm://localhost</prop>
+        <prop key="jms.broker.url">vm://localhost:61616?broker.persistent=false&amp;broker.useShutdownHook=false&amp;broker.useJmx=false</prop>
 
       </props>
     </property>

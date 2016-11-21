@@ -68,7 +68,7 @@ import static org.junit.Assert.assertTrue;
 })
 @TestPropertySource(
     properties = {
-        "c2mon.client.jms.url=vm://localhost:61616?broker.persistent=false"
+        "c2mon.client.jms.url=vm://localhost:61616?broker.persistent=false&broker.useShutdownHook=false&broker.useJmx=false"
     }
 )
 public class JmsProxyTest {
