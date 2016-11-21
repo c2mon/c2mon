@@ -18,6 +18,7 @@ package cern.c2mon.server.daqcommunication.out;
 
 
 import cern.c2mon.server.cache.ProcessCache;
+import cern.c2mon.server.daqcommunication.out.config.DaqOutJmsConfig;
 import cern.c2mon.server.daqcommunication.out.junit.DaqOutCachePopulationRule;
 import cern.c2mon.server.test.broker.EmbeddedBrokerRule;
 import cern.c2mon.server.test.config.TestConfig;
@@ -56,7 +57,8 @@ import static org.junit.Assert.assertNotNull;
         "classpath:test-config/server-test-properties.xml"
     },
     classes = {
-        TestConfig.class
+        TestConfig.class,
+        DaqOutJmsConfig.class
     })
 @TestPropertySource(value = "classpath:c2mon-server-default.properties", properties = "spring.main.show_banner=false")
 public class ProcessCommunicationManagerTest {
