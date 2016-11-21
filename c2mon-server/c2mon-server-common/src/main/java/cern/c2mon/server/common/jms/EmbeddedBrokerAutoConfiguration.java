@@ -21,6 +21,8 @@ public class EmbeddedBrokerAutoConfiguration {
   public BrokerService brokerService() throws Exception {
     BrokerService brokerService = new BrokerService();
     brokerService.setPersistent(false);
+    brokerService.setUseShutdownHook(false);
+    brokerService.setUseJmx(false);
     brokerService.addConnector(environment.getRequiredProperty("c2mon.server.jms.url"));
     return brokerService;
   }
