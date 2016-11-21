@@ -17,10 +17,12 @@
 package cern.c2mon.server.configuration.mybatis;
 
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
+import cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,6 +63,14 @@ public class ConfigurationMapperTest {
 
   @Autowired
   private ConfigurationMapper configurationMapper;
+
+  @Autowired
+  private JmsContainerManagerImpl jmsContainerManager;
+
+  @After
+  public void cleanUp() {
+    jmsContainerManager.stop();
+  }
 
   @Test
   public void testGetConfigName() {

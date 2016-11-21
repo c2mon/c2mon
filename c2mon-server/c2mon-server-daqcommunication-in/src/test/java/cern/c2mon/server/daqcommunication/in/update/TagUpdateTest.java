@@ -24,6 +24,7 @@ import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.daqcommunication.in.junit.DaqInCachePopulationRule;
 import cern.c2mon.shared.common.datatag.*;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -86,6 +87,8 @@ public class TagUpdateTest {
   @Autowired
   private ControlTagMapper controlTagMapper;
 
+  @Autowired
+  private JmsContainerManagerImpl jmsContainerManager;
 
   private DataTag dataTag;
 
@@ -95,7 +98,11 @@ public class TagUpdateTest {
   public void setUp() throws Exception {
     dataTag = dataTagMapper.getItem(200000L);
     controlTag = controlTagMapper.getItem(1221L);
+  }
 
+  @After
+  public void tearDown() {
+    jmsContainerManager.stop();
   }
 
   /**

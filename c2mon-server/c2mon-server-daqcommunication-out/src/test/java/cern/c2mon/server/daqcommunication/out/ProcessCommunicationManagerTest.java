@@ -48,7 +48,6 @@ import static org.junit.Assert.assertNotNull;
  * @author Mark Brightwell
  *
  */
-@Ignore("This test leaves MessageListenerContainers hanging somewhere which screws up the build")
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(
     locations = {
