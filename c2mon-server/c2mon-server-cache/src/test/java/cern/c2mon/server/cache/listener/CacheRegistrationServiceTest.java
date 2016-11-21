@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -41,13 +41,13 @@ import static org.junit.Assert.*;
  * Integration test that checks that registered listeners
  * are indeed notified of the cache updates (the cache module
  * is started without mocks).
- * 
+ *
  * <p>Does the check both for single and multi-threaded
  * registrations.
- * 
+ *
  * <p>Currently only check for Tag caches (the only ones updated
  * in the server so far).
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -55,31 +55,31 @@ public class CacheRegistrationServiceTest extends AbstractCacheIntegrationTest {
 
   @Resource
   private CacheRegistrationService cacheRegistrationService;
-  
+
   @Resource
   private DataTagCache dataTagCache;
-  
+
   @Resource
   private ControlTagCache controlTagCache;
-  
+
   @Resource
   private ControlTagFacade controlTagFacade;
-  
+
   @Resource
   private DataTagFacade dataTagFacade;
 
   private DataTag dataTag;
-  
+
   private ControlTag controlTag;
-  
+
   @Before
   public void insertTestTag() throws IOException {
     dataTag = CacheObjectCreation.createTestDataTag();
     controlTag = CacheObjectCreation.createTestProcessAlive();
-    
+
     //for this test put in cache
-    dataTagCache.put(dataTag.getId(), dataTag);
-    controlTagCache.put(controlTag.getId(), controlTag);    
+    dataTagCache.putQuiet(dataTag);
+    controlTagCache.putQuiet(controlTag);
   }
 
   /**
@@ -93,7 +93,7 @@ public class CacheRegistrationServiceTest extends AbstractCacheIntegrationTest {
    */
   //@Test //remove for now - using test below instead
   public void testRegisterToAllTags() throws SecurityException, NoSuchMethodException, CloneNotSupportedException {
-        
+
     //check equals() method is working as expected on the datatag
     //(since a cloned datatag is passed to the listener module)
 //    assertTrue(dataTag.clone().equals(dataTag));
@@ -114,16 +114,15 @@ public class CacheRegistrationServiceTest extends AbstractCacheIntegrationTest {
 //    dataTagCache.notifyListenersOfUpdate(dataTag);
 //    listenerContainer.stop();
 //    verify(mockCacheListener);
-    
   }
-  
+
   /**
    * New test of listener registration without using mocks (above test fails for some reason).
-   * 
+   *
    * <p>Registers on single thread.
-   * 
+   *
    * Removed as fails if run together with next test (reason unknown...).
-   * 
+   *
    * @throws InterruptedException if wait is interrupted
    */
   @Test
@@ -131,10 +130,10 @@ public class CacheRegistrationServiceTest extends AbstractCacheIntegrationTest {
   public void testRegisterToAllTagsOutput() throws InterruptedException {
     commonRegisterTest(1);
   }
-  
+
   /**
    * Same as testRegisterToAllTagsOutput() but on multiple threads (3).
-   * 
+   *
    * @throws InterruptedException
    */
   @Test
@@ -142,21 +141,21 @@ public class CacheRegistrationServiceTest extends AbstractCacheIntegrationTest {
   public void testRegisterOnMultipleThreads() throws InterruptedException {
     commonRegisterTest(3);
   }
-  
+
   private void commonRegisterTest(int threads) throws InterruptedException {
   //set up listener
     OutputTestListener testListener = new OutputTestListener();
     Lifecycle listenerContainer = cacheRegistrationService.registerToAllTags(testListener, threads);
     listenerContainer.start(); //does nothing
     assertNotNull(listenerContainer);
-    
+
     //update tag in cache and notify listeners
     dataTagFacade.updateAndValidate(dataTag.getId(), Boolean.FALSE, "listener test value", new Timestamp(System.currentTimeMillis()));
-    
+
     //sleep to allow separate thread to process
-   
+
     Thread.sleep(200);
-   
+
     DataTag cacheCopy = dataTagCache.getCopy(dataTag.getId());
     //check listener received the value
     assertNotNull(testListener.receivedValue);
@@ -164,28 +163,28 @@ public class CacheRegistrationServiceTest extends AbstractCacheIntegrationTest {
     assertEquals(cacheCopy.getValue(), testListener.receivedValue);
     assertEquals(cacheCopy.getValue(), Boolean.FALSE); //check is indeed false
     assertEquals(cacheCopy.getId(), testListener.receivedId);
-    
+
     //do the same for control tags
     controlTagFacade.updateAndValidate(controlTag.getId(), Long.valueOf(100L), "listener test control tag value", new Timestamp(System.currentTimeMillis()));
-    ControlTag controlTagFromCache = controlTagCache.getCopy(controlTag.getId());   
+    ControlTag controlTagFromCache = controlTagCache.getCopy(controlTag.getId());
     //sleep to allow separate thread to process
-    
-    Thread.sleep(100);    
-    
+
+    Thread.sleep(100);
+
     //check listener notified
     assertEquals(controlTagFromCache.getValue(), testListener.receivedValue);
     assertEquals(controlTagFromCache.getValue(), Long.valueOf(100)); //check is indeed 100
     assertEquals(controlTag.getId(), testListener.receivedId);
     listenerContainer.stop();
-    
+
   }
-  
+
   public class OutputTestListener implements C2monCacheListener<Tag> {
 
     public Object receivedId;
-    
+
     public Object receivedValue;
-    
+
     @Override
     public void notifyElementUpdated(Tag tag) {
       receivedValue = tag.getValue();
