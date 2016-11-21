@@ -378,9 +378,7 @@ public class DriverKernel implements ApplicationContextAware {
   private void validateDataTags(final EquipmentConfiguration conf, final EquipmentMessageSender equipmentMessageSender) {
     for (SourceDataTag sourceDataTag : conf.getDataTags().values()) {
       try {
-        if (log.isDebugEnabled()) {
-          log.debug("validateDataTags - validate DataTag " + sourceDataTag.getId());
-        }
+        log.debug("Validating data tag #{}", sourceDataTag.getId());
         sourceDataTag.validate();
       } catch (ConfigurationException e) {
         log.error("Error validating configuration for DataTag " + sourceDataTag.getId(), e);
@@ -401,14 +399,12 @@ public class DriverKernel implements ApplicationContextAware {
   private void validateCommandTags(final EquipmentConfiguration equipmentConfiguration, final EquipmentMessageSender equipmentMessageSender) {
     Iterator<SourceCommandTag> commandTagIterator = equipmentConfiguration.getCommandTags().values().iterator();
     while (commandTagIterator.hasNext()) {
-      SourceCommandTag sourceDataTag = commandTagIterator.next();
+      SourceCommandTag sourceCommandTag = commandTagIterator.next();
       try {
-        if (log.isDebugEnabled()) {
-          log.debug("validateCommandTags - validate DataTag " + sourceDataTag.getId());
-        }
-        sourceDataTag.validate();
+        log.debug("Validating command tag #{}", sourceCommandTag.getId());
+        sourceCommandTag.validate();
       } catch (ConfigurationException e) {
-        log.error("Error validating configuration for CommandTag " + sourceDataTag.getId(), e);
+        log.error("Error validating configuration for CommandTag " + sourceCommandTag.getId(), e);
         commandTagIterator.remove();
       }
     }

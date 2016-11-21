@@ -97,7 +97,6 @@ class EquipmentSenderInvalid {
   public void invalidate(final SourceDataTag sourceDataTag, final ValueUpdate update, final SourceDataTagQuality newSDQuality) {
 
     try {
-
       // We check first is the new value has to be filtered out or not
       FilterType filterType;
 
@@ -110,9 +109,7 @@ class EquipmentSenderInvalid {
       // We check first is the new value has to be filtered out or not
       filterType = this.dataTagValueFilter.isCandidateForFiltering(sourceDataTag, update, newSDQuality);
 
-      if (log.isDebugEnabled()) {
-        log.debug("sendInvalidTag - Filter Type: " + filterType);
-      }
+      log.debug("Filter type: " + filterType);
 
       // The new value will not be filtered out
       if (filterType == FilterType.NO_FILTERING) {
@@ -121,15 +118,13 @@ class EquipmentSenderInvalid {
       }
       // The new value will be filtered out
       else {
-        // If we are here the new Value will be filtered out
-        if (log.isDebugEnabled()) {
-          StringBuilder msgBuf = new StringBuilder();
-          msgBuf.append("\tthe tag [" + sourceDataTag.getId() + "] has already been invalidated with quality code : " + newSDQuality.getQualityCode());
-          msgBuf.append(" at " + sourceDataTag.getCurrentValue().getTimestamp());
-          msgBuf.append(" The DAQ has not received any values with different quality since then, Hence, the");
-          msgBuf.append(" invalidation procedure will be canceled this time");
-          log.debug(msgBuf.toString());
-        }
+        // If we are here the new value will be filtered out
+        StringBuilder msgBuf = new StringBuilder();
+        msgBuf.append("\tthe tag [" + sourceDataTag.getId() + "] has already been invalidated with quality code : " + newSDQuality.getQualityCode());
+        msgBuf.append(" at " + sourceDataTag.getCurrentValue().getTimestamp());
+        msgBuf.append(" The DAQ has not received any values with different quality since then, Hence, the");
+        msgBuf.append(" invalidation procedure will be canceled this time");
+        log.debug(msgBuf.toString());
 
         /*
          * the value object can be null if several invalid data tags are sent
@@ -139,23 +134,19 @@ class EquipmentSenderInvalid {
          */
         if (newValueCasted != null) {
           // send a corresponding INVALID tag to the statistics module
-          if (log.isDebugEnabled()) {
-            log.debug("sendInvalidTag - sending an invalid tag [" + sourceDataTag.getId() + "] to the statistics module");
-          }
+          log.debug("Sending an invalid tag #{} to the statistics module", sourceDataTag.getId());
 
           // send filtered message to statistics module
           this.equipmentSenderFilterModule.sendToFilterModule(sourceDataTag, update, newSDQuality, filterType.getNumber());
 
-        } else if (log.isDebugEnabled()) {
-          log.debug(
-              "sendInvalidTag - value has still not been initialised: not sending the invalid tag [" + sourceDataTag.getId() + "] to the statistics module");
+        } else {
+          log.debug("Value has still not been initialised: not sending the invalid tag #{} to the statistics module", sourceDataTag.getId());
         }
       }
     } catch (Exception ex) {
-      log.error("sendInvalidTag - Unexpected exception caught for tag " + sourceDataTag.getId() + ", " + ex.getStackTrace(), ex);
+      log.error("Unexpected exception caught for tag {}", sourceDataTag.getId(), ex);
 
     }
-    log.debug("sendInvalidTag - leaving sendInvalidTag()");
   }
 
   /**
@@ -168,29 +159,23 @@ class EquipmentSenderInvalid {
     // variable can be enabled at runtime when the Dynamic
     // filter gets enabled)
     if (sourceDataTag.getAddress().isTimeDeadbandEnabled()) {
-      if (log.isDebugEnabled()) {
-        log.debug("sendInvalidTag - passing update to time-deadband scheduler for tag " + sourceDataTag.getId());
-      }
+      log.debug("Passing update to time-deadband scheduler for tag #{}", sourceDataTag.getId());
       this.equipmentTimeDeadband.addToTimeDeadband(sourceDataTag, castedUpdate, newSDQuality);
     } else {
       if (this.equipmentTimeDeadband.getSdtTimeDeadbandSchedulers().containsKey(sourceDataTag.getId())) {
-        if (log.isDebugEnabled()) {
-          log.debug("sendInvalidTag - remove time-deadband scheduler for tag " + sourceDataTag.getId());
-        }
+        log.debug("Removeing time-deadband scheduler for tag #{}", sourceDataTag.getId());
         this.equipmentTimeDeadband.removeFromTimeDeadband(sourceDataTag);
       }
 
       // All checks and filters are done
-      if (log.isDebugEnabled()) {
-        log.debug(format("sendInvalidTag - invalidating and sending invalid tag (%d) update to the server", sourceDataTag.getId()));
-      }
+      log.debug("Invalidating and sending invalid tag #{} update to the server", sourceDataTag.getId());
 
       SourceDataTagValue newSDValue = sourceDataTag.update(castedUpdate, newSDQuality);
       // Special case Quality OK
       if (newSDValue == null) {
         // this means we have a valid quality code 0 (OK)
-        log.warn("sendInvalidTag - method called with 0(OK) quality code for tag " + sourceDataTag.getId()
-            + ". This should normally not happen! sendTagFiltered() method should have been called before.");
+        log.warn("Method called with 0(OK) quality code for tag #{}. This should normally not happen! " +
+            "sendTagFiltered() method should have been called before.", sourceDataTag.getId());
       } else {
         this.processMessageSender.addValue(newSDValue);
 

@@ -168,9 +168,7 @@ public class DataTagValueFilter {
    *         <code>FilterType.NO_FILTERING</code>
    */
   public FilterType isCandidateForFiltering(final SourceDataTag currentTag, final ValueUpdate castedUpdate, final SourceDataTagQuality newSDQuality) {
-    if(log.isDebugEnabled()) {
-      log.debug("isCandidateForFiltering - entering isCandidateForFiltering() for tag #" + currentTag.getId());
-    }
+    log.debug("isCandidateForFiltering - entering isCandidateForFiltering() for tag #" + currentTag.getId());
 
     SourceDataTagValue currentSDValue = currentTag.getCurrentValue();
 

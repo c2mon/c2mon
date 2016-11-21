@@ -133,9 +133,7 @@ class EquipmentAliveSender {
           "Alive tag for Equipment " + confName, ttl);
     }
 
-    if (log.isDebugEnabled()) {
-      log.debug("sendEquipmentAlive() - Sending equipment alive message with timestamp " + currentTimestamp);
-    }
+    log.debug("Sending equipment alive message with timestamp {}", currentTimestamp);
     return sendEquipmentAliveFiltered(aliveTagValue, currentTimestamp);
   }
 
@@ -155,15 +153,12 @@ class EquipmentAliveSender {
       update.setValue(convertedTagValue);
 
       SourceDataTagValue aliveTagValue = aliveTag.update(update);
-      if (log.isDebugEnabled()) {
-        log.debug("sendEquipmentAlive() - Sending equipment alive message with source timestamp " + update.getSourceTimestamp());
-      }
+      log.debug("Sending equipment alive message with source timestamp {}", update.getSourceTimestamp());
+
       return sendEquipmentAliveFiltered(aliveTagValue, update.getSourceTimestamp());
     } else {
-      log.warn("sendEquipmentAlive() - Value ["
-          + update.getValue() + "] received for alive tag #" + aliveTag.getId()
-          + " is not convertible to data type "
-          + aliveTag.getDataType() + ". Trying to send the current timestamp as number instead.");
+      log.warn("Value [{}] received for alive tag #{} is not convertible to data type {}. Trying to send the current timestamp as number instead.",
+          update.getValue(), aliveTag.getId(), aliveTag.getDataType());
       return sendEquipmentAlive(aliveTag);
     }
   }
@@ -188,11 +183,7 @@ class EquipmentAliveSender {
         long halfTime = Math.round(this.aliveTagInterval / 2.0);
 
         if (diff < halfTime) {
-          if (log.isDebugEnabled()) {
-            log.debug(format("this EquipmentAlive of equipment %s will be skipped "
-                + "and will not be sent the server due to enabled equipment alive filtering policy", this.confName));
-          }
-
+          log.debug("Not sending alive for equipment #{} due to filtering policy", this.confName);
           isSendEquipmentAlive = false;
         }
       }

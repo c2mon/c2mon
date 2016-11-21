@@ -302,7 +302,7 @@ public class ConfigurationController {
    */
   public synchronized ChangeReport onDataTagAdd(final DataTagAdd dataTagAddChange) {
     log.debug("onDataTagAdd - entering onDataTagAdd()");
-    if (log.isDebugEnabled()) log.debug("changeId: " + dataTagAddChange.getChangeId());
+    log.debug("changeId: " + dataTagAddChange.getChangeId());
 
     ChangeReport changeReport = new ChangeReport(dataTagAddChange);
     Long equipmentId = dataTagAddChange.getEquipmentId();
@@ -373,7 +373,7 @@ public class ConfigurationController {
    */
   public synchronized ChangeReport onCommandTagAdd(final CommandTagAdd commandTagAddChange) {
     log.debug("entering onCommandTagAdd()");
-    if (log.isDebugEnabled()) log.debug("changeId: " + commandTagAddChange.getChangeId());
+    log.debug("changeId: " + commandTagAddChange.getChangeId());
 
     ChangeReport changeReport = new ChangeReport(commandTagAddChange);
     Long equipmentId = commandTagAddChange.getEquipmentId();

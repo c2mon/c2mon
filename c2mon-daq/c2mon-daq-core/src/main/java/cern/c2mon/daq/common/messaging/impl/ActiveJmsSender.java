@@ -21,6 +21,7 @@ import cern.c2mon.daq.common.messaging.JmsSender;
 import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,12 +36,8 @@ import javax.jms.JMSException;
  *
  * @author mbrightw
  */
+@Slf4j
 public class ActiveJmsSender implements JmsSender {
-
-  /**
-   * The class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ActiveJmsSender.class);
 
   /**
    * The Spring JmsTemplate managing the calls to JMS.
@@ -98,7 +95,7 @@ public class ActiveJmsSender implements JmsSender {
    */
   @Override
   public final void processValue(final SourceDataTagValue sourceDataTagValue) {
-    LOGGER.debug("entering processValue()..");
+    log.debug("entering processValue()..");
     ProcessConfiguration processConfiguration = configurationController.getProcessConfiguration();
 
     // The PIK is also check before building the XML in DataTagValueUpdate class
@@ -106,12 +103,12 @@ public class ActiveJmsSender implements JmsSender {
     dataTagValueUpdate = new DataTagValueUpdate(processConfiguration.getProcessID(), processConfiguration.getprocessPIK());
 
     dataTagValueUpdate.addValue(sourceDataTagValue);
-    LOGGER.trace("value added to value update message");
+    log.trace("value added to value update message");
 
     // If the sending action is Enabled
     if (this.isEnabled) {
 
-      LOGGER.trace("not in test mode.");
+      log.trace("not in test mode.");
 
       // set message properties
       jmsTemplate.setPriority(sourceDataTagValue.getPriority());
@@ -119,15 +116,11 @@ public class ActiveJmsSender implements JmsSender {
 
       // set appropriate priority
       if (sourceDataTagValue.isGuaranteedDelivery()) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("\t sending PERSISTENT message");
-        }
+        log.debug("\t sending PERSISTENT message");
         // set message delivery mode
         jmsTemplate.setDeliveryMode(javax.jms.DeliveryMode.PERSISTENT);
       } else {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("\t sending NON-PERSISTENT message");
-        }
+        log.debug("\t sending NON-PERSISTENT message");
         // send the message (put it into the queue)
         jmsTemplate.setDeliveryMode(javax.jms.DeliveryMode.NON_PERSISTENT);
       } // else
@@ -135,9 +128,7 @@ public class ActiveJmsSender implements JmsSender {
       // send the message
       jmsTemplate.convertAndSend(dataTagValueUpdate);
     }
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("leaving processValue()");
-    }
+    log.debug("leaving processValue()");
   }
 
   /**
@@ -149,8 +140,8 @@ public class ActiveJmsSender implements JmsSender {
    */
   @Override
   public final void processValues(final DataTagValueUpdate dataTagValueUpdate) throws JMSException {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("entering processValues()...");
+    if (log.isDebugEnabled()) {
+      log.debug("entering processValues()...");
     }
 
     // If the sending action is Enabled
@@ -169,13 +160,13 @@ public class ActiveJmsSender implements JmsSender {
       jmsTemplate.setTimeToLive(sdtValue.getTimeToLive());
 
       if (sdtValue.isGuaranteedDelivery()) {
-        LOGGER.debug("\t sending PERSISTENT message");
+        log.debug("\t sending PERSISTENT message");
 
         // set message delivery mode
         jmsTemplate.setDeliveryMode(javax.jms.DeliveryMode.PERSISTENT);
 
       } else {
-        LOGGER.debug("\t sending NON-PERSISTENT message");
+        log.debug("\t sending NON-PERSISTENT message");
 
         // set message delivery NON-PERSISTENT
         jmsTemplate.setDeliveryMode(javax.jms.DeliveryMode.NON_PERSISTENT);
@@ -185,10 +176,10 @@ public class ActiveJmsSender implements JmsSender {
       jmsTemplate.convertAndSend(dataTagValueUpdate);
 
     } else {
-      LOGGER.debug("DAQ in test mode; not sending the value to JMS");
+      log.debug("DAQ in test mode; not sending the value to JMS");
     }
 
-    LOGGER.debug("leaving processValues()");
+    log.debug("leaving processValues()");
   }
 
   /**

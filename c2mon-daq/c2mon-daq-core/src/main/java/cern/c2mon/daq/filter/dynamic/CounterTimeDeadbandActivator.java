@@ -22,12 +22,12 @@ import java.util.TimerTask;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
-import org.springframework.stereotype.Service;
 
 /**
  * Counter deadband activator which counts the tags in a provided time and
@@ -35,12 +35,8 @@ import org.springframework.stereotype.Service;
  *
  * @author alang
  */
+@Slf4j
 public class CounterTimeDeadbandActivator extends TimerTask implements IDynamicTimeDeadbandFilterActivator {
-
-  /**
-   * The logger of this class.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(CounterTimeDeadbandActivator.class);
 
   /**
    * Table with the source data tags managed by this class.
@@ -124,10 +120,10 @@ public class CounterTimeDeadbandActivator extends TimerTask implements IDynamicT
   @Override
   public void run() {
     if (sourceDataTags == null) {
-      LOGGER.error("Tried to add a new tag while field dataTagTable was null.");
+      log.error("Tried to add a new tag while field dataTagTable was null.");
       return;
     }
-    LOGGER.debug("Printing current Tag stats.");
+    log.debug("Printing current Tag stats.");
     for (Entry<Long, SourceDataTag> entry : getDataTagMap().entrySet()) {
       SourceDataTag tag = entry.getValue();
       DataTagAddress address = tag.getAddress();
@@ -139,25 +135,23 @@ public class CounterTimeDeadbandActivator extends TimerTask implements IDynamicT
         movingAverages.put(tagID, counterMovingAverage);
       }
 
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Tag '" + tag.getId() + "' average incoming tags: " + counterMovingAverage.getCurrentAverage() + " - Array: " + counterMovingAverage);
-      }
+      log.debug("Tag '" + tag.getId() + "' average incoming tags: " + counterMovingAverage.getCurrentAverage() + " - Array: " + counterMovingAverage);
 
       if (address.isTimeDeadbandEnabled()) {
         if (counterMovingAverage.getCurrentAverage() < deactivationNumberOfTags) {
           address.setTimeDeadband(0);
-          LOGGER.info("Tag '" + tag.getId() + "' removed from dynamic timedeadband filter.");
+          log.info("Tag '" + tag.getId() + "' removed from dynamic timedeadband filter.");
         }
       } else {
         if (counterMovingAverage.getCurrentAverage() > maxTagsPerTime) {
-          LOGGER.info("Tag '" + tag.getId() + "' added to dynamic timedeadband filter.");
+          log.info("Tag '" + tag.getId() + "' added to dynamic timedeadband filter.");
           tag.getAddress().setTimeDeadband(timeDeadbandTime);
         }
       }
 
       counterMovingAverage.switchCurrentCounter();
     }
-    LOGGER.debug("Finished printing current Tag stats.\n");
+    log.debug("Finished printing current Tag stats.\n");
   }
 
   /**
@@ -169,12 +163,12 @@ public class CounterTimeDeadbandActivator extends TimerTask implements IDynamicT
   @Override
   public void newTagValueSent(final long tagID) {
     if (sourceDataTags == null) {
-      LOGGER.error("Tried to add a new tag while field sourceDataTags was null.");
+      log.error("Tried to add a new tag while field sourceDataTags was null.");
       return;
     }
     SourceDataTag tag = sourceDataTags.get(tagID);
     if (tag == null) {
-      LOGGER.warn("Tried to count a tag not controlled by this class. (Tag-ID: '" + tagID + "')");
+      log.warn("Tried to count a tag not controlled by this class. (Tag-ID: '" + tagID + "')");
     } else {
       CounterMovingAverage average = movingAverages.get(tagID);
       if (average == null) {

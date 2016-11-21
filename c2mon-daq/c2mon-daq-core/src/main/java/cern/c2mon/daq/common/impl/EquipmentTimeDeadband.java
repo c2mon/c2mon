@@ -93,9 +93,7 @@ class EquipmentTimeDeadband {
   private void createSDTtimeDeadbandScheduler(final SourceDataTag currentTag) {
     if (currentTag.getAddress().isTimeDeadbandEnabled()) {
       if (currentTag.getAddress().getTimeDeadband() > 0) {
-        if (log.isDebugEnabled()) {
-          log.debug("createSDTtimeDeadbandScheduler - creating time-deadband scheduler for tag " + currentTag.getId());
-        }
+        log.debug("createSDTtimeDeadbandScheduler - creating time-deadband scheduler for tag " + currentTag.getId());
         this.sdtTimeDeadbandSchedulers.put(currentTag.getId(), new SDTTimeDeadbandScheduler(currentTag, this.processMessageSender,
             this.equipmentSenderFilterModule, timeDeadbandTimer, this.dataTagValueFilter, this.dynamicTimeDeadbandFilterer));
       }
@@ -124,9 +122,7 @@ class EquipmentTimeDeadband {
    * @param newSDQuality     the new tag quality
    */
   public void addToTimeDeadband(final SourceDataTag currentTag, final ValueUpdate update, final SourceDataTagQuality newSDQuality) {
-    if (log.isDebugEnabled()) {
-      log.debug(format("addToTimeDeadband - entering addToTimeDeadband(%d)..", currentTag.getId()));
-    }
+    log.debug(format("addToTimeDeadband - entering addToTimeDeadband(%d)..", currentTag.getId()));
 
     synchronized (currentTag) { // Synchronizing here, since the scheduler runs on a different thread
       long tagID = currentTag.getId();
@@ -153,9 +149,7 @@ class EquipmentTimeDeadband {
       // then we need to send it
       // to the statistics module before updating the tag:
       if (tagScheduler.isScheduledForSending()) {
-        if (log.isDebugEnabled()) {
-          log.debug("addToTimeDeadband - Sending time deadband filtered value to statistics module " + tagID);
-        }
+        log.debug("addToTimeDeadband - Sending time deadband filtered value to statistics module " + tagID);
 
         ValueUpdate currentValue = new ValueUpdate(
             currentTag.getCurrentValue().getValue(),
@@ -164,15 +158,11 @@ class EquipmentTimeDeadband {
 
         // Send to filter module (Dynamic or Static information added)
         if (this.dynamicTimeDeadbandFilterer.isDynamicTimeDeadband(currentTag)) {
-          if (log.isDebugEnabled()) {
-            log.debug("Tag filtered through Dynamic time deadband filtering: '" + tagID + "'");
-          }
+          log.debug("Tag filtered through Dynamic time deadband filtering: '" + tagID + "'");
 
           this.equipmentSenderFilterModule.sendToFilterModuleByDynamicTimedeadbandFilterer(currentTag, currentValue, FilterType.TIME_DEADBAND.getNumber());
         } else {
-          if (log.isDebugEnabled()) {
-            log.debug("Tag filtered through Static time deadband filtering: '" + tagID + "'");
-          }
+          log.debug("Tag filtered through Static time deadband filtering: '" + tagID + "'");
 
           this.equipmentSenderFilterModule.sendToFilterModule(currentTag, currentValue, FilterType.TIME_DEADBAND.getNumber());
         }
@@ -186,9 +176,7 @@ class EquipmentTimeDeadband {
       tagScheduler.scheduleValueForSending();
     }
 
-    if (log.isDebugEnabled()) {
-      log.debug(format("addToTimeDeadband - leaving addToTimeDeadband(%d)", currentTag.getId()));
-    }
+    log.debug(format("addToTimeDeadband - leaving addToTimeDeadband(%d)", currentTag.getId()));
   }
 
   /**
@@ -215,9 +203,7 @@ class EquipmentTimeDeadband {
    * @param currentTag The tag to remove.
    */
   public void removeFromTimeDeadband(final SourceDataTag currentTag) {
-    if (log.isDebugEnabled()) {
-      log.debug(format("removeFromTimeDeadband - entering removeFromTimeDeadband(%d)..", currentTag.getId()));
-    }
+    log.debug(format("removeFromTimeDeadband - entering removeFromTimeDeadband(%d)..", currentTag.getId()));
 
     SDTTimeDeadbandScheduler tagScheduler = this.sdtTimeDeadbandSchedulers.remove(currentTag.getId());
     if (tagScheduler != null) {
@@ -231,9 +217,7 @@ class EquipmentTimeDeadband {
       }
     }
 
-    if (log.isDebugEnabled()) {
-      log.debug(format("removeFromTimeDeadband - leaving removeFromTimeDeadband(%d)", currentTag.getId()));
-    }
+    log.debug(format("removeFromTimeDeadband - leaving removeFromTimeDeadband(%d)", currentTag.getId()));
   }
 
   /**

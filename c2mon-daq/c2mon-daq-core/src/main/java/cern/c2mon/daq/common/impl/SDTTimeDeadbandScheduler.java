@@ -110,9 +110,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
 
     this.timeDeadbandTimer = timeDeadbandTimer;
 
-    if (log.isDebugEnabled()) {
-      log.debug("creating time-deadband scheduler for tag : " + sourceDataTag.getId());
-    }
+    log.debug("creating time-deadband scheduler for tag : " + sourceDataTag.getId());
 
     this.sourceDataTag = sourceDataTag;
   }
@@ -124,17 +122,13 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
     // create timers
     if (sourceDataTag.getAddress().isTimeDeadbandEnabled()) {
       if (sourceDataTag.getAddress().getTimeDeadband() > 0) {
-        if (log.isDebugEnabled()) {
-          log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : setting scheduling interval to : "
+        log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : setting scheduling interval to : "
               + this.sourceDataTag.getAddress().getTimeDeadband() + " miliseconds");
-        }
       }
 
       this.timeDeadbandTimer.scheduleAtFixedRate(this, 0, this.sourceDataTag.getAddress().getTimeDeadband());
 
-      if (log.isDebugEnabled()) {
-        log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : setting scheduled");
-      }
+      log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : setting scheduled");
     }
   }
 
@@ -143,9 +137,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
    */
   public void flushAndCancel() {
     synchronized (this.sourceDataTag) {
-      if (log.isDebugEnabled()) {
-        log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : flush and reset");
-      }
+      log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : flush and reset");
 
       // Execute the run method to empty the scheduler
       this.cancel();
@@ -167,9 +159,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
    */
   @Override
   public void run() {
-    if (log.isDebugEnabled()) {
-      log.debug("scheduler[" + this.sourceDataTag.getId() + "] : entering run()..");
-    }
+    log.debug("scheduler[" + this.sourceDataTag.getId() + "] : entering run()..");
 
     try {
       synchronized (this.sourceDataTag) {
@@ -181,9 +171,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
           // The first time the lastSentSDTagValue is empty
           if (this.lastSourceDataTag == null) {
             filterType = FilterType.NO_FILTERING;
-            if (log.isDebugEnabled()) {
-              log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : first time running scheduler");
-            }
+            log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : first time running scheduler");
           } else {
             // Check the current Source Data tag against the last one sent since
             // they have never been compared
@@ -194,9 +182,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
             ValueUpdate update = new ValueUpdate(newValueCasted, currentSDValue.getValueDescription(), currentSDValue.getTimestamp().getTime());
             filterType = this.dataTagValueFilter.isCandidateForFiltering(this.lastSourceDataTag, update, currentSDValue.getQuality());
 
-            if (log.isDebugEnabled()) {
-              log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : Filter type: " + filterType);
-            }
+            log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : Filter type: " + filterType);
           }
 
           // The new value is not filtered out
@@ -208,9 +194,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
             // Add the value sent
             this.processMessageSender.addValue(currentSDValue);
 
-            if (log.isDebugEnabled()) {
-              log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : sending value: " + currentSDValue.getValue());
-            }
+            log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : sending value: " + currentSDValue.getValue());
           }
           // The new value is filtered out
           else {
@@ -218,17 +202,13 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
 
             // Send to filter module (Dynamic or Static information added)
             if (this.dynamicTimeDeadbandFilterer.isDynamicTimeDeadband(this.sourceDataTag)) {
-              if (log.isDebugEnabled()) {
-                log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : value filtered with Dynamic TimeDeadband : "
+              log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : value filtered with Dynamic TimeDeadband : "
                     + currentSDValue.getValue());
-              }
 
               this.equipmentSenderFilterModule.sendToFilterModuleByDynamicTimedeadbandFilterer(this.sourceDataTag, update, filterType.getNumber());
             } else {
-              if (log.isDebugEnabled()) {
-                log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : value filtered with Static TimeDeadband: "
+              log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : value filtered with Static TimeDeadband: "
                     + currentSDValue.getValue());
-              }
 
               this.equipmentSenderFilterModule.sendToFilterModule(this.sourceDataTag, update, filterType.getNumber());
             }
@@ -237,17 +217,13 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
           // Reset the sendValue variable
           this.sendValue = false;
         } else {
-          if (log.isDebugEnabled()) {
-            log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : no new value to be sent");
-          }
+          log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : no new value to be sent");
         }
       } // synchronized
     } catch (Exception exception) {
       log.error("Critical error in scheduler for tag " + this.sourceDataTag.getId(), exception);
     }
-    if (log.isDebugEnabled()) {
-      log.debug("scheduler[" + this.sourceDataTag.getId() + "] : leaving run()");
-    }
+    log.debug("scheduler[" + this.sourceDataTag.getId() + "] : leaving run()");
   }
 
   /**
@@ -265,10 +241,8 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
       SourceDataTagValue lastSentSDTagValue = this.lastSourceDataTag.getCurrentValue();
       if ((lastSentSDTagValue.getValue() != null)
           && (lastSentSDTagValue.getQuality().getQualityCode() != newSDQuality.getQualityCode())) {
-        if (log.isDebugEnabled()) {
-          log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : New Quality status. Last Sent Quality [ "
+        log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : New Quality status. Last Sent Quality [ "
               + lastSentSDTagValue.getQuality() + "] vs New Quality [" + newSDQuality + "]");
-        }
 
         return true;
       }
@@ -279,18 +253,14 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
 
       if ((scheduledValue != null)
           && (scheduledValue.getQuality().getQualityCode() != newSDQuality.getQualityCode())) {
-        if (log.isDebugEnabled()) {
           log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : New Quality status. Scheduled Quality ["
               + scheduledValue.getQuality() + "] vs New Quality [" + newSDQuality + "]");
-        }
 
         return true;
       }
     }
 
-    if (log.isDebugEnabled()) {
-      log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : No new Quality status ");
-    }
+    log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : No new Quality status ");
 
     return false;
   }
