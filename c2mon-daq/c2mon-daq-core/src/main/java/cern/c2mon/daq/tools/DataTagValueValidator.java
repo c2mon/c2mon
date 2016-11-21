@@ -16,10 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.daq.tools;
 
-import lombok.extern.slf4j.Slf4j;
-
 import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.type.TypeConverter;
+import lombok.extern.slf4j.Slf4j;
 
 import static cern.c2mon.shared.common.type.TypeConverter.getType;
 
@@ -48,10 +47,8 @@ public class DataTagValueValidator {
    * This method is responsible for checking if new value received from data
    * source fits in a proper range
    *
-   * @param sdt
-   *          the source data tag object
-   * @param value
-   *          new value of SourceDataTag to be checked
+   * @param sdt   the source data tag object
+   * @param value new value of SourceDataTag to be checked
    * @return True if the value is in range else false.
    */
   @SuppressWarnings("unchecked")
@@ -111,10 +108,9 @@ public class DataTagValueValidator {
    * This method checks whether the equipment's time is too far in the future or
    * not. For doing that, the equipment's time is compared to the system's time
    *
-   * @param timestamp
-   *          Time sent from the equipment in ms.
+   * @param timestamp Time sent from the equipment in ms.
    * @return Whether the equipment's timestamp is inside the indicated time
-   *         range or not
+   * range or not
    */
   public boolean isTimestampValid(final long timestamp) {
     log.trace("entering isTimestampValid()..");
@@ -130,12 +126,10 @@ public class DataTagValueValidator {
   /**
    * Checks if the tagValue is convertible to the value of the current tag.
    *
-   * @param tag
-   *          The tag to check.
-   * @param tagValue
-   *          The value to check.
+   * @param tag      The tag to check.
+   * @param tagValue The value to check.
    * @return <code>true</code> if the value is convertible else
-   *         <code>false</code>.
+   * <code>false</code>.
    */
   public boolean isConvertible(final SourceDataTag tag, final Object tagValue) {
     log.trace("isConvertible - Tag #" + tag.getId() + " casting " + tagValue + " to " + tag.getDataType());

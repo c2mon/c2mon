@@ -16,11 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.impl;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
-import lombok.extern.slf4j.Slf4j;
-
 import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.tools.DataTagValueFilter;
@@ -30,6 +25,10 @@ import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.datatag.ValueUpdate;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue.FilterType;
 import cern.c2mon.shared.common.type.TypeConverter;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * The SourceDataTagTimeDeadbandScheduler class models threads responsible for
@@ -91,18 +90,12 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
   /**
    * Creates a new SDTTimeDeadbandscheduler
    *
-   * @param sourceDataTag
-   *          The source data tag controlled by this object.
-   * @param processMessageSender
-   *          Takes the messages sent to the server
-   * @param equipmentSenderValid
-   *          Used to send messages to the server.
-   * @param timeDeadbandTimer
-   *          The timer to schedule this task on.
-   * @param valueChecker
-   *          Value checker object to avoid repeated values.
-   * @param dynamicTimeDeadbandFilterer
-   *          The dynamic time dead band filterer for recording the current source data tag
+   * @param sourceDataTag               The source data tag controlled by this object.
+   * @param processMessageSender        Takes the messages sent to the server
+   * @param equipmentSenderValid        Used to send messages to the server.
+   * @param timeDeadbandTimer           The timer to schedule this task on.
+   * @param valueChecker                Value checker object to avoid repeated values.
+   * @param dynamicTimeDeadbandFilterer The dynamic time dead band filterer for recording the current source data tag
    */
   public SDTTimeDeadbandScheduler(final SourceDataTag sourceDataTag,
                                   final IProcessMessageSender processMessageSender,
@@ -133,7 +126,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
       if (sourceDataTag.getAddress().getTimeDeadband() > 0) {
         if (log.isDebugEnabled()) {
           log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : setting scheduling interval to : "
-                  + this.sourceDataTag.getAddress().getTimeDeadband() + " miliseconds");
+              + this.sourceDataTag.getAddress().getTimeDeadband() + " miliseconds");
         }
       }
 
@@ -191,8 +184,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
             if (log.isDebugEnabled()) {
               log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : first time running scheduler");
             }
-          }
-          else {
+          } else {
             // Check the current Source Data tag against the last one sent since
             // they have never been compared
 
@@ -225,7 +217,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
             ValueUpdate update = new ValueUpdate(currentSDValue.getValue(), currentSDValue.getValueDescription(), currentSDValue.getTimestamp().getTime());
 
             // Send to filter module (Dynamic or Static information added)
-            if(this.dynamicTimeDeadbandFilterer.isDynamicTimeDeadband(this.sourceDataTag)) {
+            if (this.dynamicTimeDeadbandFilterer.isDynamicTimeDeadband(this.sourceDataTag)) {
               if (log.isDebugEnabled()) {
                 log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : value filtered with Dynamic TimeDeadband : "
                     + currentSDValue.getValue());
@@ -244,15 +236,13 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
 
           // Reset the sendValue variable
           this.sendValue = false;
-        }
-        else {
+        } else {
           if (log.isDebugEnabled()) {
             log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : no new value to be sent");
           }
         }
       } // synchronized
-    }
-    catch (Exception exception) {
+    } catch (Exception exception) {
       log.error("Critical error in scheduler for tag " + this.sourceDataTag.getId(), exception);
     }
     if (log.isDebugEnabled()) {
@@ -264,8 +254,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
    * If the quality has changed it means the data tag is swapping from valid to
    * invalid or the other way round
    *
-   * @param newSDQuality
-   *          The new tag quality
+   * @param newSDQuality The new tag quality
    * @return <code>true</code> if the quality of the last sent Data Tag Value is
    * not the same as the new one and <code>false</code> in any other
    * case

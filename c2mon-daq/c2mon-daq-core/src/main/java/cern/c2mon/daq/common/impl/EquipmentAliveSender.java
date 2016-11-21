@@ -16,18 +16,16 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.impl;
 
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
-
-import lombok.extern.slf4j.Slf4j;
-
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.datatag.ValueUpdate;
 import cern.c2mon.shared.common.type.TypeConverter;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.lang.String.format;
 
@@ -101,7 +99,6 @@ class EquipmentAliveSender {
    * Sends an equipment alive tag with the value set as the current timestamp.
    *
    * @param aliveTag the alive tag to send
-   *
    * @return
    */
   public boolean sendEquipmentAlive(final SourceDataTag aliveTag) {
@@ -114,14 +111,13 @@ class EquipmentAliveSender {
 
       if (aliveTag.getDataType().equalsIgnoreCase("Integer")) {
         value = TypeConverter.cast(Long.valueOf(currentTimestamp % Integer.MAX_VALUE).toString(), aliveTag.getDataType());
-      }
-      else {
+      } else {
         value = TypeConverter.cast(currentTimestamp, aliveTag.getDataType());
       }
 
       if (value == null) {
         log.warn("sendEquipmentAlive() - Could not cast current timestamp to value type "
-                + aliveTag.getDataType() + " of alive tag #" + aliveTag.getId() + " => value set to null!");
+            + aliveTag.getDataType() + " of alive tag #" + aliveTag.getId() + " => value set to null!");
       }
 
       ValueUpdate update = new ValueUpdate(value, "Auto-generated alive value of Equipment " + confName, currentTimestamp);
@@ -151,7 +147,6 @@ class EquipmentAliveSender {
    * @param tagValue         the tag value
    * @param sourceTimestamp  the source timestamp (in milliseconds)
    * @param valueDescription the description of the value
-   *
    * @return true if the alive was sent, false otherwise
    */
   public boolean sendEquipmentAlive(final SourceDataTag aliveTag, ValueUpdate update) {
@@ -160,16 +155,15 @@ class EquipmentAliveSender {
       update.setValue(convertedTagValue);
 
       SourceDataTagValue aliveTagValue = aliveTag.update(update);
-      if(log.isDebugEnabled()) {
+      if (log.isDebugEnabled()) {
         log.debug("sendEquipmentAlive() - Sending equipment alive message with source timestamp " + update.getSourceTimestamp());
       }
       return sendEquipmentAliveFiltered(aliveTagValue, update.getSourceTimestamp());
-    }
-    else {
+    } else {
       log.warn("sendEquipmentAlive() - Value ["
-        + update.getValue() + "] received for alive tag #" + aliveTag.getId()
-        + " is not convertible to data type "
-        + aliveTag.getDataType() + ". Trying to send the current timestamp as number instead.");
+          + update.getValue() + "] received for alive tag #" + aliveTag.getId()
+          + " is not convertible to data type "
+          + aliveTag.getDataType() + ". Trying to send the current timestamp as number instead.");
       return sendEquipmentAlive(aliveTag);
     }
   }
@@ -179,7 +173,6 @@ class EquipmentAliveSender {
    * frequent updates.
    *
    * @param aliveTagValue the equipment alive tag value
-   *
    * @return true, if the alive is sent, false otherwise.
    */
   private boolean sendEquipmentAliveFiltered(final SourceDataTagValue aliveTagValue, final long timestamp) {
@@ -197,7 +190,7 @@ class EquipmentAliveSender {
         if (diff < halfTime) {
           if (log.isDebugEnabled()) {
             log.debug(format("this EquipmentAlive of equipment %s will be skipped "
-                    + "and will not be sent the server due to enabled equipment alive filtering policy", this.confName));
+                + "and will not be sent the server due to enabled equipment alive filtering policy", this.confName));
           }
 
           isSendEquipmentAlive = false;
@@ -208,8 +201,7 @@ class EquipmentAliveSender {
         doSendEquipmentAlive(aliveTagValue);
         this.lastEquipmentAlives.put(aliveTagValue.getId(), timestamp);
         return true;
-      }
-      else {
+      } else {
         return false;
       }
     }

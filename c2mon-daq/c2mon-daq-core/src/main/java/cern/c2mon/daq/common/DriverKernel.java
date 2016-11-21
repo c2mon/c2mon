@@ -16,21 +16,6 @@
  ******************************************************************************/
 package cern.c2mon.daq.common;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import javax.annotation.PostConstruct;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
-
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationFactory;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationHandler;
@@ -59,6 +44,19 @@ import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
 import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * This Kernel is the main class of the daq. It aggregates other classes
@@ -204,10 +202,9 @@ public class DriverKernel implements ApplicationContextAware {
         EquipmentMessageHandler emhandler = eqIt.next();
         try {
           emhandler.shutdown();
-        }
-        catch (EqIOException ex) {
+        } catch (EqIOException ex) {
           log.warn("a problem occured while calling disconnectFromDataSourc() of EquipmentMessageHandler id :" + emhandler.getEquipmentConfiguration()
-                  .getId() + ", name :" + emhandler.getEquipmentConfiguration().getName());
+              .getId() + ", name :" + emhandler.getEquipmentConfiguration().getName());
         }
       }
 
@@ -329,13 +326,11 @@ public class DriverKernel implements ApplicationContextAware {
         String msg = "Error while instantiating " + conf.getHandlerClassName();
         equipmentMessageSender.confirmEquipmentStateIncorrect(msg + ": " + e.getMessage());
         log.error(msg, e);
-      }
-      catch (IllegalAccessException e) {
+      } catch (IllegalAccessException e) {
         String msg = "Access error while calling constructor of " + conf.getHandlerClassName();
         equipmentMessageSender.confirmEquipmentStateIncorrect("Error in code: " + msg);
         log.error(msg, e);
-      }
-      catch (ClassNotFoundException e) {
+      } catch (ClassNotFoundException e) {
         String msg = "Handler class not found: " + conf.getHandlerClassName();
         equipmentMessageSender.confirmEquipmentStateIncorrect("Error during configuration: " + msg);
         log.error(msg, e);
@@ -381,14 +376,13 @@ public class DriverKernel implements ApplicationContextAware {
    * @param equipmentMessageSender The sender to use.
    */
   private void validateDataTags(final EquipmentConfiguration conf, final EquipmentMessageSender equipmentMessageSender) {
-    for (SourceDataTag sourceDataTag: conf.getDataTags().values()) {
+    for (SourceDataTag sourceDataTag : conf.getDataTags().values()) {
       try {
         if (log.isDebugEnabled()) {
           log.debug("validateDataTags - validate DataTag " + sourceDataTag.getId());
         }
         sourceDataTag.validate();
-      }
-      catch (ConfigurationException e) {
+      } catch (ConfigurationException e) {
         log.error("Error validating configuration for DataTag " + sourceDataTag.getId(), e);
         SourceDataTagQuality quality = new SourceDataTagQuality(SourceDataTagQualityCode.INCORRECT_NATIVE_ADDRESS, e.getMessage());
         equipmentMessageSender.update(sourceDataTag.getId(), quality);
@@ -413,8 +407,7 @@ public class DriverKernel implements ApplicationContextAware {
           log.debug("validateCommandTags - validate DataTag " + sourceDataTag.getId());
         }
         sourceDataTag.validate();
-      }
-      catch (ConfigurationException e) {
+      } catch (ConfigurationException e) {
         log.error("Error validating configuration for CommandTag " + sourceDataTag.getId(), e);
         commandTagIterator.remove();
       }
@@ -426,7 +419,6 @@ public class DriverKernel implements ApplicationContextAware {
    * refreshing data tags).
    *
    * @param equipmentMessageHandler The equipment message handler to start.
-   *
    * @return True if the start was successful else false.
    */
   private boolean startEquipmentMessageHandler(final EquipmentMessageHandler equipmentMessageHandler) {
@@ -435,18 +427,16 @@ public class DriverKernel implements ApplicationContextAware {
     try {
       equipmentMessageHandler.connectToDataSource();
       equipmentMessageHandler.refreshAllDataTags();
-    }
-    catch (EqIOException ex) {
+    } catch (EqIOException ex) {
       log.error("startEquipmentMessageHandler - Could not connect EquipmentUnit to its data source. EquipmentMessageHandler name :" +
-              equipmentConfiguration.getName() + " id :" + equipmentConfiguration.getId());
+          equipmentConfiguration.getName() + " id :" + equipmentConfiguration.getId());
       String errMsg = "EqIOException : code = " + ex.getErrorCode() + " message = " + ex.getErrorDescription();
       log.error(errMsg);
       equipmentMessageHandler.getEquipmentMessageSender().confirmEquipmentStateIncorrect(errMsg);
       success = false;
-    }
-    catch (Exception ex) {
+    } catch (Exception ex) {
       log.error("startEquipmentMessageHandler - Could not connect EquipmentUnit to its data source. EquipmentMessageHandler name :" +
-              equipmentMessageHandler.getEquipmentConfiguration().getName() + " id :" + equipmentMessageHandler.getEquipmentConfiguration().getId());
+          equipmentMessageHandler.getEquipmentConfiguration().getName() + " id :" + equipmentMessageHandler.getEquipmentConfiguration().getId());
       String errMsg = "Unexpected exception caught whilst connecting to equipment: ";
       log.error(errMsg, ex);
       equipmentMessageHandler.getEquipmentMessageSender().confirmEquipmentStateIncorrect(errMsg + ex.getMessage());
@@ -461,17 +451,15 @@ public class DriverKernel implements ApplicationContextAware {
     EquipmentMessageHandler handler = this.eqLookupTable.get(eqId);
     if (handler == null) {
       success = false;
-    }
-    else {
+    } else {
       IEquipmentConfiguration conf = handler.getEquipmentConfiguration();
       try {
         handler.disconnectFromDataSource();
         // send commfault tag
         handler.getEquipmentMessageSender().confirmEquipmentStateIncorrect("Equipment has been been stopped");
-      }
-      catch (Exception ex) {
+      } catch (Exception ex) {
         log.warn("stopEquipmentMessageHandler - Could not discconnect EquipmentUnit from its data source. EquipmentMessageHandler name :" + conf.getName()
-                + " id :" + eqId);
+            + " id :" + eqId);
       }
     }
 
@@ -521,7 +509,6 @@ public class DriverKernel implements ApplicationContextAware {
    * Updates the DAQ by injecting new Equipment Unit
    *
    * @param equipmentUnitAdd The newly injected equipment unit
-   *
    * @return A change report with information about the success of the update.
    */
   public ChangeReport onEquipmentUnitAdd(final EquipmentUnitAdd equipmentUnitAdd) {
@@ -542,8 +529,7 @@ public class DriverKernel implements ApplicationContextAware {
     EquipmentConfiguration conf = null;
     try {
       conf = equipmentConfigurationFactory.createEquipmentConfiguration(equipmentUnitAdd.getEquipmentUnitXml());
-    }
-    catch (Exception ex) {
+    } catch (Exception ex) {
       changeReport.setState(CHANGE_STATE.FAIL);
       changeReport.appendError(StackTraceHelper.getStackTrace(ex));
       return changeReport;
@@ -570,18 +556,15 @@ public class DriverKernel implements ApplicationContextAware {
 
       // put the equipment configuration into the process configuration's map
       processConfiguration.addEquipmentConfiguration(conf);
-    }
-    catch (InstantiationException e) {
+    } catch (InstantiationException e) {
       String msg = "Error while instantiating " + conf.getHandlerClassName();
       equipmentMessageSender.confirmEquipmentStateIncorrect(msg + ": " + e.getMessage());
       log.error(msg, e);
-    }
-    catch (IllegalAccessException e) {
+    } catch (IllegalAccessException e) {
       String msg = "Access error while calling constructor of " + conf.getHandlerClassName();
       equipmentMessageSender.confirmEquipmentStateIncorrect("Error in code: " + msg);
       log.error(msg, e);
-    }
-    catch (ClassNotFoundException e) {
+    } catch (ClassNotFoundException e) {
       String msg = "Handler class not found: " + conf.getHandlerClassName();
       equipmentMessageSender.confirmEquipmentStateIncorrect("Error during configuration: " + msg);
       log.error(msg, e);
@@ -601,7 +584,6 @@ public class DriverKernel implements ApplicationContextAware {
    * Updates the DAQ by removing a whole EquipmentUnit
    *
    * @param equipmentUnitRemove The equipment unit to be removed
-   *
    * @return A change report with information about the success of the update.
    */
   public ChangeReport onEquipmentUnitRemove(final EquipmentUnitRemove equipmentUnitRemove) {

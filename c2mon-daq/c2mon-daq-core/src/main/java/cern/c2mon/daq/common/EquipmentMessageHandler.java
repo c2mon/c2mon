@@ -33,24 +33,29 @@ import org.springframework.context.ApplicationContext;
  */
 @Slf4j
 public abstract class EquipmentMessageHandler {
+
   /**
    * The equipment message sender to send and filter data tags which should be
    * send to the server.
    */
   @Setter
   private EquipmentMessageSender equipmentMessageSender;
+
   /**
    * The Equipment configuration object.
    */
   @Getter
   private IEquipmentConfigurationHandler equipmentConfigurationHandler;
+
   /**
    * The command handler to register the command runner.
    */
-  @Setter @Getter
+  @Setter
+  @Getter
   private IEquipmentCommandHandler equipmentCommandHandler;
 
-  @Setter @Getter
+  @Setter
+  @Getter
   ApplicationContext context;
 
 

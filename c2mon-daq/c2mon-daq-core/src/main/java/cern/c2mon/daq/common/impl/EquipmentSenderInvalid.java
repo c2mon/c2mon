@@ -16,9 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.impl;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.tools.DataTagValueFilter;
@@ -28,6 +25,8 @@ import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.datatag.ValueUpdate;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue.FilterType;
 import cern.c2mon.shared.common.type.TypeConverter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static java.lang.String.format;
 
@@ -68,8 +67,8 @@ class EquipmentSenderInvalid {
   /**
    * Creates a new EquipmentInvalidSender.
    *
-   * @param processMessageSender The process message sender to send tags to the
-   *          server.
+   * @param processMessageSender  The process message sender to send tags to the
+   *                              server.
    * @param equipmentSenderHelper
    */
   @Autowired
@@ -89,11 +88,11 @@ class EquipmentSenderInvalid {
    * This method sends both an invalid and updated SourceDataTagValue to the
    * server.
    *
-   * @param sourceDataTag SourceDataTag object
-   * @param newValue The new update value that we want set to the tag
+   * @param sourceDataTag   SourceDataTag object
+   * @param newValue        The new update value that we want set to the tag
    * @param newTagValueDesc The new value description
-   * @param newSDQuality the new SourceDataTag see {@link SourceDataTagQuality}
-   * @param timestamp time when the SourceDataTag's value has become invalid;
+   * @param newSDQuality    the new SourceDataTag see {@link SourceDataTagQuality}
+   * @param timestamp       time when the SourceDataTag's value has become invalid;
    */
   public void invalidate(final SourceDataTag sourceDataTag, final ValueUpdate update, final SourceDataTagQuality newSDQuality) {
 
@@ -147,14 +146,12 @@ class EquipmentSenderInvalid {
           // send filtered message to statistics module
           this.equipmentSenderFilterModule.sendToFilterModule(sourceDataTag, update, newSDQuality, filterType.getNumber());
 
-        }
-        else if (log.isDebugEnabled()) {
+        } else if (log.isDebugEnabled()) {
           log.debug(
               "sendInvalidTag - value has still not been initialised: not sending the invalid tag [" + sourceDataTag.getId() + "] to the statistics module");
         }
       }
-    }
-    catch (Exception ex) {
+    } catch (Exception ex) {
       log.error("sendInvalidTag - Unexpected exception caught for tag " + sourceDataTag.getId() + ", " + ex.getStackTrace(), ex);
 
     }
@@ -171,12 +168,11 @@ class EquipmentSenderInvalid {
     // variable can be enabled at runtime when the Dynamic
     // filter gets enabled)
     if (sourceDataTag.getAddress().isTimeDeadbandEnabled()) {
-      if(log.isDebugEnabled()) {
+      if (log.isDebugEnabled()) {
         log.debug("sendInvalidTag - passing update to time-deadband scheduler for tag " + sourceDataTag.getId());
       }
       this.equipmentTimeDeadband.addToTimeDeadband(sourceDataTag, castedUpdate, newSDQuality);
-    }
-    else {
+    } else {
       if (this.equipmentTimeDeadband.getSdtTimeDeadbandSchedulers().containsKey(sourceDataTag.getId())) {
         if (log.isDebugEnabled()) {
           log.debug("sendInvalidTag - remove time-deadband scheduler for tag " + sourceDataTag.getId());
@@ -195,8 +191,7 @@ class EquipmentSenderInvalid {
         // this means we have a valid quality code 0 (OK)
         log.warn("sendInvalidTag - method called with 0(OK) quality code for tag " + sourceDataTag.getId()
             + ". This should normally not happen! sendTagFiltered() method should have been called before.");
-      }
-      else {
+      } else {
         this.processMessageSender.addValue(newSDValue);
 
         // Checks if the dynamic TimeDeadband filter is enabled, Static disable
