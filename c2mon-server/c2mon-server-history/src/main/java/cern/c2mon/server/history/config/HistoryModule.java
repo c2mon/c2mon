@@ -10,7 +10,7 @@ import org.springframework.context.annotation.ImportResource;
  */
 @Configuration
 @Import({
-
+    HistoryDataSourceConfig.class
 })
 @ComponentScan("cern.c2mon.server.history")
 public class HistoryModule {}

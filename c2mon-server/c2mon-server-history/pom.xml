@@ -11,8 +11,6 @@
   <artifactId>c2mon-server-history</artifactId>
   <packaging>jar</packaging>
 
-  <description>C2MON server module for short-term logging to the DB (of Tag updates, Commands and Supervision events)</description>
-
   <dependencies>
     <!-- Internal C2MON dependencies -->
     <dependency>

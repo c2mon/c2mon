@@ -22,13 +22,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cern.c2mon.pmanager.IAlarmListener;
+import org.springframework.stereotype.Component;
 
 /**
  * Fallback alarm listener that send emails/SMS via log4j.
  *
  * @author Mark Brightwell
- *
  */
+@Component
 public class AlarmListener implements IAlarmListener {
 
   /**

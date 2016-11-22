@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -30,21 +30,21 @@ import cern.c2mon.shared.common.rule.RuleInputValue;
 /**
  * The Tag interface is the common interface for all tag objects within the TIM system:
  * data, control and rule tags.
- * 
+ *
  * <p>It only provides read methods as in general this object should only be modified
  * by the cache modules (with the object residing in the cache).
- * 
+ *
  * @author Mark Brightwell
  *
  */
 public interface Tag extends RuleInputValue, Cacheable {
-  
-  /** 
-   * Get the unique numeric identifier 
+
+  /**
+   * Get the unique numeric identifier
    * @return returns the id
    **/
   Long getId();
-  
+
   /**
    * Get the unique tag name
    * @return the name of the cache object
@@ -54,13 +54,13 @@ public interface Tag extends RuleInputValue, Cacheable {
   Object clone() throws CloneNotSupportedException;
 
   /** Get a free-text description of the tag */
-  String getDescription();  
+  String getDescription();
 
   /**
    * Get the data type of the tag's current value.
    */
   String getDataType();
-  
+
   /**
    * @return the JAPC address on which the data tag is published,
    *         or <code>null</code> if not.
@@ -85,7 +85,7 @@ public interface Tag extends RuleInputValue, Cacheable {
 
   /** Returns true if the mode is MODE_TEST */
   boolean isInTest();
-  
+
   /**
    * The cache sets the mode to "UNCONFIGURED" when it first receives and unknown
    * datatag. A datatag in UNCONFIGURED mode will stay in UNCONFIGURED mode until
@@ -100,14 +100,14 @@ public interface Tag extends RuleInputValue, Cacheable {
   /** Returns a textual description of the tag's current value, if available */
   String getValueDescription();
 
-  /** 
+  /**
    * Returns the tag's data quality
    * @return the quality object
    **/
   DataTagQuality getDataTagQuality();
 
-  /** 
-   * Returns the tag's unit, if available 
+  /**
+   * Returns the tag's unit, if available
    * @return the unit as String
    **/
   String getUnit();
@@ -123,15 +123,15 @@ public interface Tag extends RuleInputValue, Cacheable {
    * @return the topic as a String
    */
   String getTopic();
-  
+
   /** Returns the tag's value dictionary */
   DataTagValueDictionary getValueDictionary();
-  
+
   /** Returns true if the tag's value is valid */
   boolean isValid();
 
   /**
-   * Returns true if the tag is a regular tag, not a "fake" tag created on a 
+   * Returns true if the tag is a regular tag, not a "fake" tag created on a
    * client's request.
    */
   boolean isExistingTag();
@@ -146,7 +146,7 @@ public interface Tag extends RuleInputValue, Cacheable {
    * @return the collection of Ids
    */
   Collection<Long> getRuleIds();
-  
+
   /**
    * Returns an own copy of the list of rules that need evaluating when
    * this tag changes.
@@ -159,7 +159,7 @@ public interface Tag extends RuleInputValue, Cacheable {
    * @return The server cache timestamp
    */
   Timestamp getCacheTimestamp();
-  
+
   /**
    * Current implementation returns the "lowest" level timestamp that
    * is set in this Tag object (from lowest: source, daq, cache timestamp).
@@ -173,45 +173,45 @@ public interface Tag extends RuleInputValue, Cacheable {
    * this includes all "parent" equipments). If the Tag has no
    * associated Equipment, the returned list will be empty.
    * Should never return a null list.
-   * 
+   *
    * @return list of Equipment ids; can be empty; never null
    */
   Set<Long> getEquipmentIds();
-  
+
   /**
    * Returns the Processes this Tag depends on (for rules
    * this includes all "parent" processes). If the Tag has no
    * associated Equipment, the returned list will be empty.
    * Should never return a null list.
-   * 
+   *
    * @return list of Process ids; can be empty; never null
    */
   Set<Long> getProcessIds();
-  
+
   /**
    * Returns the SubEquipments this Tag depends on (for rules
    * this includes all "parent" equipments). If the Tag has no
    * associated SubEquipment, the returned list will be empty.
    * Should never return a null list.
-   * 
+   *
    * @return list of SubEquipment ids; can be empty; never null
    */
   Set<Long> getSubEquipmentIds();
-  
+
   /**
    * Returns the ids of the alarms set on this Tag.
    * Never returns null.
-   * 
+   *
    * <p>Modifications to the Collection during reconfiguration
    * need locking on the Tag writeLock.
-   * 
+   *
    * @return a collection of Ids
    */
   Collection<Long> getAlarmIds();
-  
+
   /**
    * Returns an own copy of the list of alarm set on this Tag.
-   * 
+   *
    * <p>Never returns null
    * @return copy of list of alarm ids
    */
@@ -222,16 +222,16 @@ public interface Tag extends RuleInputValue, Cacheable {
    * Can be null.
    * @return the DIP address as String; can return null!
    */
-  String getDipAddress();   
-  
+  String getDipAddress();
+
   /**
-   * Returns true if the tag should be saved in the short-term-log.
+   * Returns true if the tag should be saved in the history.
    * @return true if needs logging
    */
   boolean isLogged();
 
   /**
-   * Set the JMS topic on which this tag will be published 
+   * Set the JMS topic on which this tag will be published
    * @param topic topic name
    */
   void setTopic(String topic);

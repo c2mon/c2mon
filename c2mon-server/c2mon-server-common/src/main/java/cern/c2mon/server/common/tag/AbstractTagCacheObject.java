@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -33,7 +33,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 /**
- * Abstract tag used as basis for all tag objects in the server: 
+ * Abstract tag used as basis for all tag objects in the server:
  * DataTag, ControlTag and RuleTag.
  *
  * @author Mark Brightwell
@@ -103,7 +103,7 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
 
   /**
    * Indicates whether this tag's value changes shall be logged to the
-   * short-term log.
+   * history.
    */
   private boolean logged;
 
@@ -436,7 +436,7 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
       this.name = name;
 //       StringBuffer str = new StringBuffer("tim.datatag.");
 //       char[] topicName = null;
-//       
+//
 //       topicName = name.toCharArray();
 //       for (int i=0; i != topicName.length; i++) {
 //         if (topicName[i] == '$' || topicName[i]=='*' || topicName[i] =='#') {

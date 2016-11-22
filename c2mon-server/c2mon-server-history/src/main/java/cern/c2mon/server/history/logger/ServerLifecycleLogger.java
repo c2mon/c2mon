@@ -20,17 +20,18 @@ import java.sql.Timestamp;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import cern.c2mon.server.history.mapper.ServerLifecycleEventMapper;
+import cern.c2mon.shared.client.lifecycle.ServerLifecycleEvent;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.SmartLifecycle;
 
 import cern.c2mon.shared.client.lifecycle.LifecycleEventType;
-import cern.c2mon.shared.client.lifecycle.ServerLifecycleEvent;
-import cern.c2mon.shared.client.lifecycle.ServerLifecycleMapper;
 import cern.c2mon.server.common.config.ServerConstants;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 /**
  * Bean listening for server stops/starts and logging
@@ -45,6 +46,7 @@ import cern.c2mon.server.common.config.ServerConstants;
  * @author Mark Brightwell
  *
  */
+@Component
 public class ServerLifecycleLogger implements SmartLifecycle {
 
   /**
@@ -65,7 +67,7 @@ public class ServerLifecycleLogger implements SmartLifecycle {
   /**
    * Mapper bean for logging events.
    */
-  private ServerLifecycleMapper serverLifecycleMapper;
+  private ServerLifecycleEventMapper serverLifecycleEventMapper;
 
   /**
    * Timer for retrying the start log if unsuccessful.
@@ -79,12 +81,12 @@ public class ServerLifecycleLogger implements SmartLifecycle {
 
   /**
    * Constructor.
-   * @param serverLifecycleMapper the mapper bean used for writing to the DB
+   * @param serverLifecycleEventMapper the mapper bean used for writing to the DB
    */
   @Autowired
-  public ServerLifecycleLogger(final ServerLifecycleMapper serverLifecycleMapper) {
-    super();
-    this.serverLifecycleMapper = serverLifecycleMapper;
+  public ServerLifecycleLogger(final ServerLifecycleEventMapper serverLifecycleEventMapper, Environment environment) {
+    this.serverLifecycleEventMapper = serverLifecycleEventMapper;
+    this.serverName = environment.getRequiredProperty("c2mon.server.name");
   }
 
   private void logStartEvent() {
@@ -94,7 +96,7 @@ public class ServerLifecycleLogger implements SmartLifecycle {
 
   private synchronized void logStartEvent(final ServerLifecycleEvent event) {
     try {
-      serverLifecycleMapper.logEvent(event);
+      serverLifecycleEventMapper.logEvent(event);
       if (relogTimer != null){
         relogTimer.cancel();
       }
@@ -116,7 +118,7 @@ public class ServerLifecycleLogger implements SmartLifecycle {
 
   private void logStopEvent() {
     try {
-      serverLifecycleMapper.logEvent(new ServerLifecycleEvent(new Timestamp(System.currentTimeMillis()), serverName, LifecycleEventType.STOP));
+      serverLifecycleEventMapper.logEvent(new ServerLifecycleEvent(new Timestamp(System.currentTimeMillis()), serverName, LifecycleEventType.STOP));
     } catch (PersistenceException e) {
       LOGGER.error("Exception caught when logging server stop event: {}", e.getMessage());
     }
@@ -159,18 +161,10 @@ public class ServerLifecycleLogger implements SmartLifecycle {
   }
 
   /**
-   * @param serverName the serverName to set
+   * @param serverLifecycleEventMapper the serverLifecycleEventMapper to set
    */
-  @Required
-  public void setServerName(String serverName) {
-    this.serverName = serverName;
-  }
-
-  /**
-   * @param serverLifecycleMapper the serverLifecycleMapper to set
-   */
-  public void setServerLifecycleMapper(ServerLifecycleMapper serverLifecycleMapper) {
-    this.serverLifecycleMapper = serverLifecycleMapper;
+  public void setServerLifecycleEventMapper(ServerLifecycleEventMapper serverLifecycleEventMapper) {
+    this.serverLifecycleEventMapper = serverLifecycleEventMapper;
   }
 
   /**

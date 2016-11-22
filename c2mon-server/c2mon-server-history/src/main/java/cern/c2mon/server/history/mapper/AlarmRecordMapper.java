@@ -14,24 +14,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.elasticsearch.config;
+package cern.c2mon.server.history.mapper;
 
-import cern.c2mon.server.cache.config.CacheModule;
-import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
-import cern.c2mon.server.supervision.config.SupervisionModule;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import cern.c2mon.server.history.structure.AlarmRecord;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {
-    CacheModule.class,
-    CacheDbAccessModule.class,
-    CacheLoadingModule.class,
-    SupervisionModule.class,
-    ElasticsearchModule.class
-})
-@TestPropertySource(value = "classpath:c2mon-server-default.properties", properties = "spring.main.show_banner=false")
-public abstract class BaseElasticsearchIntegrationTest {}
+/**
+ * @author Felix Ehm
+ */
+public interface AlarmRecordMapper extends LoggerMapper<AlarmRecord> {
+
+  /**
+   * @param id the alarm id
+   */
+  void deleteAlarmLog(Long id);
+}

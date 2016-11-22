@@ -23,21 +23,30 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.TimeZone;
 
+import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
+import cern.c2mon.server.command.config.CommandModule;
+import cern.c2mon.server.daqcommunication.out.config.DaqCommunicationOutModule;
+import cern.c2mon.server.history.config.HistoryModule;
+import cern.c2mon.server.supervision.config.SupervisionModule;
+import cern.c2mon.shared.client.command.CommandRecord;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.history.listener.LogCommandListener;
-import cern.c2mon.server.history.mapper.CommandTagLogMapper;
+import cern.c2mon.server.history.listener.CommandRecordListener;
+import cern.c2mon.server.history.mapper.CommandRecordMapper;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.client.command.CommandExecutionStatus;
 import cern.c2mon.shared.client.command.CommandReport;
 import cern.c2mon.shared.client.command.CommandReportImpl;
-import cern.c2mon.shared.client.command.CommandTagLog;
 import cern.c2mon.shared.common.command.CommandTag;
 
 /**
@@ -45,17 +54,28 @@ import cern.c2mon.shared.common.command.CommandTag;
  * server modules.
  *
  * @author Mark Brightwell
- *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:config/server-history-module-test.xml"})
+@ContextConfiguration(classes = {
+    CacheModule.class,
+    CacheDbAccessModule.class,
+    CacheLoadingModule.class,
+    SupervisionModule.class,
+    CommandModule.class,
+    DaqCommunicationOutModule.class,
+    HistoryModule.class
+})
+@TestPropertySource("classpath:c2mon-server-default.properties")
 public class HistoryModuleTest {
 
   @Autowired
-  private LogCommandListener logCommandListener;
+  private CommandRecordListener commandRecordListener;
 
   @Autowired
-  private CommandTagLogMapper commandTagMapper;
+  private CommandRecordMapper commandTagMapper;
+
+  @Autowired
+  private Environment environment;
 
   @Before
   public void setUp() {
@@ -73,15 +93,16 @@ public class HistoryModuleTest {
   @Test
   public void testCommandLogging() {
     CommandTag commandTag = CacheObjectCreation.createTestCommandTag();
-    CommandReport report = new CommandReportImpl(commandTag.getId(), CommandExecutionStatus.STATUS_AUTHORISATION_FAILED, "report text", new Timestamp(System.currentTimeMillis()), new Short((short) 2));
-    logCommandListener.log(commandTag, report);
+    CommandReport report = new CommandReportImpl(commandTag.getId(), CommandExecutionStatus.STATUS_AUTHORISATION_FAILED,
+        "report text", new Timestamp(System.currentTimeMillis()), new Short((short) 2));
+    commandRecordListener.log(commandTag, report);
 
-    List<CommandTagLog> retrievedLogList = commandTagMapper.getCommandTagLog(commandTag.getId());
+    List<CommandRecord> retrievedLogList = commandTagMapper.getCommandTagLog(commandTag.getId());
 
     assertNotNull(retrievedLogList);
     assertEquals(1, retrievedLogList.size());
 
-    CommandTagLog retrievedLog = retrievedLogList.get(0);
+    CommandRecord retrievedLog = retrievedLogList.get(0);
 
     assertEquals(commandTag.getId(), retrievedLog.getTagId());
     assertEquals(commandTag.getId().toString(), retrievedLog.getId());

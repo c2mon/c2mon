@@ -27,6 +27,7 @@ import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.daqcommunication.in.config.DaqCommunicationInModule;
 import cern.c2mon.server.daqcommunication.in.junit.DaqInCachePopulationRule;
+import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.shared.common.datatag.*;
 import org.junit.After;
 import org.junit.Before;
@@ -50,23 +51,17 @@ import static org.junit.Assert.*;
  * @author Mark Brightwell
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(
-    locations = {
-        "classpath:config/server-supervision.xml",
-        "classpath:test-config/server-test-properties.xml"
-    },
-    classes = {
-        CacheModule.class,
-        CacheDbAccessModule.class,
-        CacheLoadingModule.class,
-        DaqCommunicationInModule.class,
-    }
-)
+@ContextConfiguration(classes = {
+    CacheModule.class,
+    CacheDbAccessModule.class,
+    CacheLoadingModule.class,
+    SupervisionModule.class,
+    DaqCommunicationInModule.class,
+})
 @TestPropertySource(
     locations = "classpath:c2mon-server-default.properties",
     properties = {
-        "c2mon.server.cache.bufferedListenerPullFrequency=1",
-        "spring.main.show_banner=false"
+        "c2mon.server.cache.bufferedListenerPullFrequency=1"
     }
 )
 public class TagUpdateTest {

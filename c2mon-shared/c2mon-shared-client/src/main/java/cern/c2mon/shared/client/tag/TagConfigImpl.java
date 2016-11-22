@@ -145,7 +145,7 @@ public class TagConfigImpl extends ClientRequestReport implements TagConfig {
   @ElementMap
   private Map<Publisher, String> publications = new HashMap<Publisher, String>();
 
-  /** Is this Tag logged to the short-term-log */
+  /** Is this Tag logged to the history */
   @Element(required = false)
   private Boolean logged;
 

@@ -26,7 +26,7 @@ import cern.c2mon.shared.client.command.CommandTagHandle;
  * The Command module is responsible for authorising and executing
  * commands. It is called on an incoming client request to provide
  * the client with the CommandHandle, which can then be used to
- * execute commands. It also logs executed commands to the CommandTagLog
+ * execute commands. It also logs executed commands to the CommandRecord
  * table.
  *
  * <p>This is the interface that should be used by client modules to
@@ -58,7 +58,7 @@ public interface CommandExecutionManager {
   /**
    * Executes a command.
    *
-   * <p>Logs the command (including report) to the CommandTagLog table in
+   * <p>Logs the command (including report) to the CommandRecord table in
    * the history database.
    *
    * @param commandExecuteRequest the request to execute a command

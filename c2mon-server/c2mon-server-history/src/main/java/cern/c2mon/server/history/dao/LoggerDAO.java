@@ -39,7 +39,7 @@ import cern.c2mon.server.history.mapper.LoggerMapper;
  * @param <T>
  *          the object that is being logged in the history table
  */
-public class LoggerDAO<T extends IFallback> implements IDBPersistenceHandler {
+public class LoggerDAO<T extends IFallback> implements IDBPersistenceHandler<T> {
 
   /**
    * Private class logger.
@@ -180,7 +180,7 @@ public class LoggerDAO<T extends IFallback> implements IDBPersistenceHandler {
       loggerMapper.insertLog((T) object);
       session.commit();
     } catch (PersistenceException ex1) {
-      String message = "Exception caught while persisting an object to the short-term-log";
+      String message = "Exception caught while persisting an object to the history";
       LOGGER.error(message, ex1);
       if (session != null)
         session.rollback();

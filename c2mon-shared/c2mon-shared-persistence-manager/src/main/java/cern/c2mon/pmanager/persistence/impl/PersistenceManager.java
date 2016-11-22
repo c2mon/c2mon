@@ -167,7 +167,7 @@ public class PersistenceManager<T extends IFallback> implements IPersistenceMana
     }
 
     /**
-     * Write a collection of IFallback objects to the short-term log DB table.
+     * Write a collection of IFallback objects to the history.
      * In case that it detects that the DB is unavailable the incoming data will
      * be temporarily stored into a fallback file, from which the data will be
      * read and committed back to the DB as soon as it detects that the DB
@@ -189,7 +189,7 @@ public class PersistenceManager<T extends IFallback> implements IPersistenceMana
     }
 
     /**
-     * Write an IFallback object to the short-term log DB table. It relies on
+     * Write an IFallback object to the history. It relies on
      * the fallback mechanism for those cases in which the DB becomes
      * unavailable. If there is data temporarily stored in the fallback file it
      * will start a new thread which will independently deal with the task of

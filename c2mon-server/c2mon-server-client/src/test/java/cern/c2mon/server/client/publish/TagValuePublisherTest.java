@@ -23,6 +23,7 @@ import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.client.config.ClientModule;
 import cern.c2mon.server.client.junit.ClientCachePopulationRule;
+import cern.c2mon.server.command.config.CommandModule;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
@@ -33,6 +34,7 @@ import cern.c2mon.server.daqcommunication.in.config.DaqCommunicationInModule;
 import cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl;
 import cern.c2mon.server.daqcommunication.out.config.DaqCommunicationOutModule;
 import cern.c2mon.server.rule.config.RuleModule;
+import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.server.test.broker.EmbeddedBrokerRule;
 import cern.c2mon.server.test.config.TestConfig;
@@ -49,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -69,25 +72,20 @@ import static org.junit.Assert.*;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(
-    locations = {
-        "classpath:config/server-supervision.xml",
-        "classpath:config/server-command.xml",
-        "classpath:test-config/server-test-properties.xml"
-    },
-    classes = {
-        CacheModule.class,
-        CacheDbAccessModule.class,
-        ConfigurationModule.class,
-        DaqCommunicationInModule.class,
-        DaqCommunicationOutModule.class,
-        RuleModule.class,
-        ClientModule.class,
-        AlarmModule.class,
-        TestConfig.class
-    }
-)
-@TestPropertySource(value = "classpath:c2mon-server-default.properties", properties = "spring.main.show_banner=false")
+@ContextConfiguration(classes = {
+    CacheModule.class,
+    CacheDbAccessModule.class,
+    SupervisionModule.class,
+    ConfigurationModule.class,
+    DaqCommunicationInModule.class,
+    DaqCommunicationOutModule.class,
+    RuleModule.class,
+    ClientModule.class,
+    AlarmModule.class,
+    CommandModule.class,
+    TestConfig.class
+})
+@TestPropertySource(value = "classpath:c2mon-server-default.properties")
 public class TagValuePublisherTest {
 
   @Rule

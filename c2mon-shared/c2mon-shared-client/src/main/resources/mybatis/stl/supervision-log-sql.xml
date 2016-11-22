@@ -7,7 +7,7 @@
     take "namespace=Mapper interface" for the mapper SQL statements to
     be picked up automatically
   -->
-<mapper namespace="cern.c2mon.server.history.mapper.SupervisionMapper">
+<mapper namespace="cern.c2mon.server.history.mapper.SupervisionEventMapper">
 
   <resultMap id="supervisionEntityResultMap" type="SupervisionEvent">
       <result property="entity" column="sul_entity"/>

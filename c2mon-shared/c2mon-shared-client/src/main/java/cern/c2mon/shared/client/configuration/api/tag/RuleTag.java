@@ -70,7 +70,7 @@ public class RuleTag extends Tag {
 
   /**
    * Indicates whether this tag's value changes shall be logged to the
-   * short-term log.
+   * history.
    */
   @DefaultValue("true")
   private Boolean isLogged;

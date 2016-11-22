@@ -66,7 +66,7 @@ public class DefaultLogger<T extends Cacheable> implements BatchLogger<T> {
   public void log(final Collection<T> tags) {
     ArrayList<Loggable> loggables = new ArrayList<Loggable>();
 
-    // Convert the list of DataTagCacheObjects to HistoricTag objects (IFallback objects)
+    // Convert the list of DataTagCacheObjects to TagRecord objects (IFallback objects)
     for (T tag : tags) {
         if (tag != null && tag.getId() != null) {
           loggables.add(converter.convertToLogged(tag));
