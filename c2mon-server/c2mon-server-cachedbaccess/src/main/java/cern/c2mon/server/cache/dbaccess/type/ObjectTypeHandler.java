@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.MappedTypes;
 import org.apache.ibatis.type.TypeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,10 @@ import static cern.c2mon.shared.common.type.TypeConverter.isKnownClass;
  * @author Franz Ritter
  *
  */
+@MappedTypes({
+    Object.class,
+    Comparable.class
+})
 public class ObjectTypeHandler implements TypeHandler {
 
   /**

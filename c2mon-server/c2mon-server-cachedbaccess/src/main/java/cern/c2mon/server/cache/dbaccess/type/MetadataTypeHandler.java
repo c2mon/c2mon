@@ -18,6 +18,7 @@ package cern.c2mon.server.cache.dbaccess.type;
 
 import cern.c2mon.shared.common.metadata.Metadata;
 import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.MappedTypes;
 import org.apache.ibatis.type.TypeHandler;
 
 import java.sql.CallableStatement;
@@ -26,6 +27,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+@MappedTypes(Metadata.class)
 public class MetadataTypeHandler implements TypeHandler {
 
   @Override

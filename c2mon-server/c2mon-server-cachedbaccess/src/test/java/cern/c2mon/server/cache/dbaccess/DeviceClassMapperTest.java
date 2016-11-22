@@ -22,10 +22,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.test.DatabasePopulationRule;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -39,14 +41,15 @@ import cern.c2mon.server.common.device.Property;
  * @author Justin Lewis Salmon
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({
-    "classpath:config/server-cachedbaccess.xml",
-    "classpath:test-config/database-population-rule.xml"
-})
+@SpringApplicationConfiguration(
+    locations = {
+        "classpath:test-config/database-population-rule.xml"
+    },
+    classes = {
+        CacheDbAccessModule.class
+    }
+)
 @TestPropertySource("classpath:c2mon-server-default.properties")
-//@ContextConfiguration({ "classpath:config/server-cachedbaccess-test.xml" })
-//@TransactionConfiguration(transactionManager = "cacheTransactionManager", defaultRollback = true)
-//@Transactional
 public class DeviceClassMapperTest {
 
   @Rule
