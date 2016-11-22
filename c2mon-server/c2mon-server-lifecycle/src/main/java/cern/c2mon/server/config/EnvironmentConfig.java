@@ -35,6 +35,8 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
     DaqCommunicationOutModule.class,
 //    RuleModule.class,
     ConfigurationModule.class,
+//    ElasticsearchModule.class,
+//    ShortTermLogModule.class,
     ClientModule.class,
     AlarmModule.class,
     CommandModule.class

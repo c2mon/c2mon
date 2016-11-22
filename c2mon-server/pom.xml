@@ -25,7 +25,7 @@
     <module>c2mon-server-configuration</module>
     <module>c2mon-server-daqcommunication-in</module>
     <module>c2mon-server-daqcommunication-out</module>
-    <module>c2mon-server-eslog</module>
+    <module>c2mon-server-elasticsearch</module>
     <module>c2mon-server-lifecycle</module>
     <module>c2mon-server-rule</module>
     <module>c2mon-server-shorttermlog</module>
@@ -121,7 +121,7 @@
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
-        <artifactId>c2mon-server-eslog</artifactId>
+        <artifactId>c2mon-server-elasticsearch</artifactId>
         <version>${project.parent.version}</version>
       </dependency>
       <dependency>

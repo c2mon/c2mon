@@ -80,7 +80,7 @@
           <workdir>/c2mon-server</workdir>
           <cmd>["bin/c2mon.sh","run"]</cmd>
           <env>
-            <JAVA_OPTS>-Dc2mon.server.eslog.home=/c2mon-server/elasticsearch</JAVA_OPTS>
+            <JAVA_OPTS>-Dc2mon.server.elasticsearch.home=/c2mon-server/elasticsearch</JAVA_OPTS>
           </env>
           <exposes>
             <expose>61616</expose>
