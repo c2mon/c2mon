@@ -18,7 +18,7 @@ package cern.c2mon.server.elasticsearch.connector;
 
 import java.sql.Timestamp;
 
-import cern.c2mon.server.elasticsearch.config.EsLogIntegrationConfiguration;
+import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
 import cern.c2mon.server.elasticsearch.structure.converter.EsAlarmLogConverter;
 import cern.c2mon.server.elasticsearch.structure.converter.EsSupervisionEventConverter;
 import cern.c2mon.server.elasticsearch.structure.mappings.EsAlarmMapping;
@@ -52,19 +52,14 @@ import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-
 /**
  * Test the entire functionality of the node.
- * Build the Spring environment.
- * @author Alban Marguet.
+ *
+ * @author Alban Marguet
  */
 @Slf4j
-@ContextConfiguration(classes = {
-    EsLogIntegrationConfiguration.class
-})
-@TestPropertySource("classpath:c2mon-server-default.properties")
-@RunWith(SpringJUnit4ClassRunner.class)
-public class TransportConnectorTest {
+public class TransportConnectorTest extends BaseElasticsearchIntegrationTest {
+
   private int localPort = 1;
   private String isLocal = "true";
 

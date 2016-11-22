@@ -40,7 +40,7 @@ import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
  * Used to write (a.k.a. index) the data to Elasticsearch.
  * Makes use of the {@link Connector} connection to an Elasticsearch cluster.
  *
- * @author Alban Marguet.
+ * @author Alban Marguet
  */
 @Slf4j
 @Data

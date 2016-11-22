@@ -56,10 +56,10 @@ import static org.mockito.Mockito.when;
  * @author Alban Marguet, Matthias Braeger
  */
 @RunWith(MockitoJUnitRunner.class)
-public class EsTagLogConverterTest {
+public class ElasticsearchTagConverterTest {
 
   @InjectMocks
-  private EsTagLogConverter esLogConverter;
+  private ElasticsearchTagConverter tagConverter;
 
   @Mock
   private ProcessCache processCache;
@@ -170,7 +170,7 @@ public class EsTagLogConverterTest {
     when(subEquipmentCache.get(subEquipment.getId())).thenReturn(subEquipment);
     when(tag.getSubEquipmentIds()).thenReturn(Collections.singleton(subEquipment.getId()));
 
-    Map<String, String> result = esLogConverter.retrieveTagProcessMetadata(tag);
+    Map<String, String> result = tagConverter.retrieveTagProcessMetadata(tag);
 
     assertEquals(expected, result);
   }
@@ -193,7 +193,7 @@ public class EsTagLogConverterTest {
     when(equipmentCache.get(equipment.getId())).thenReturn(equipment);
     when(tag.getEquipmentIds()).thenReturn(Collections.singleton(equipment.getId()));
 
-    Map<String, String> result = esLogConverter.retrieveTagProcessMetadata(tag);
+    Map<String, String> result = tagConverter.retrieveTagProcessMetadata(tag);
 
     assertEquals(expected, result);
   }
@@ -210,7 +210,7 @@ public class EsTagLogConverterTest {
     when(processCache.get(process.getId())).thenReturn(process);
     when(tag.getProcessIds()).thenReturn(Collections.singleton(process.getId()));
 
-    Map<String, String> result = esLogConverter.retrieveTagProcessMetadata(tag);
+    Map<String, String> result = tagConverter.retrieveTagProcessMetadata(tag);
     assertEquals(expected, result);
   }
 
@@ -218,7 +218,7 @@ public class EsTagLogConverterTest {
   public void testGetMetadataProcessWithNull() {
     HashMap<String, String> expected = new HashMap<>();
 
-    Map<String, String> result = esLogConverter.retrieveTagProcessMetadata(tag);
+    Map<String, String> result = tagConverter.retrieveTagProcessMetadata(tag);
     assertEquals(expected, result);
   }
 
@@ -229,7 +229,7 @@ public class EsTagLogConverterTest {
     tag.setEquipmentId(null);
     tag.setSubEquipmentId(null);
     tag.setProcessId(null);
-    assertEquals(expected, esLogConverter.retrieveTagProcessMetadata(tag));
+    assertEquals(expected, tagConverter.retrieveTagProcessMetadata(tag));
   }
 
   @Test
@@ -277,7 +277,7 @@ public class EsTagLogConverterTest {
     when(tagC2MON.getValueDescription()).thenReturn(valueDesc);
     when(tagC2MON.getUnit()).thenReturn("km");
 
-    EsTag esTag = esLogConverter.convert(tagC2MON);
+    EsTag esTag = tagConverter.convert(tagC2MON);
     assertEquals(id, esTag.getIdAsLong());
     assertEquals(name, esTag.getName());
     assertEquals(type, esTag.getType());
@@ -291,7 +291,7 @@ public class EsTagLogConverterTest {
     assertEquals("km", esTag.getUnit());
 
     when(tagC2MON.getDataTagQuality()).thenReturn(new DataTagQualityImpl(TagQualityStatus.EQUIPMENT_DOWN));
-    esTag = esLogConverter.convert(tagC2MON);
+    esTag = tagConverter.convert(tagC2MON);
     assertNotNull(esTag.getQuality());
     assertFalse(esTag.getQuality().isValid());
   }
@@ -302,7 +302,7 @@ public class EsTagLogConverterTest {
     tag.setDaqTimestamp(null);
     tag.setSourceTimestamp(null);
 
-    EsTag esTag = esLogConverter.convert(tag);
+    EsTag esTag = tagConverter.convert(tag);
     assertEquals(esTag.getType(), EsTag.TYPE_BOOLEAN);
     assertNotNull(esTag.getTimestamp());
     assertNotNull(esTag.getC2mon());
@@ -315,7 +315,7 @@ public class EsTagLogConverterTest {
     tag.setDataType("Boolean");
     tag.setLogged(true);
 
-    EsTag esTag = esLogConverter.convert(tag);
+    EsTag esTag = tagConverter.convert(tag);
 
     assertEquals(EsTag.TYPE_BOOLEAN, esTag.getType());
     assertTrue(esTag.getValueBoolean());
@@ -331,7 +331,7 @@ public class EsTagLogConverterTest {
     tagNumeric.setDataType("Integer");
     tagNumeric.setValue(126387213);
 
-    esTag = esLogConverter.convert(tagNumeric);
+    esTag = tagConverter.convert(tagNumeric);
 
     assertEquals(esTag.getType(), EsTag.TYPE_NUMBER);
     assertNull(esTag.getValueBoolean());
@@ -356,7 +356,7 @@ public class EsTagLogConverterTest {
 
     tag.setMetadata(metadata);
 
-    EsTag esTag = esLogConverter.convert(tag);
+    EsTag esTag = tagConverter.convert(tag);
     assertNotNull(esTag.getMetadata());
     assertEquals("1", esTag.getMetadata().get("building"));
     assertEquals("2", esTag.getMetadata().get("intShouldGoToStringMetadata"));
@@ -367,7 +367,7 @@ public class EsTagLogConverterTest {
   public void testConvert_WhenValueTypeIsBoolean_ConvertsToEsTagAndAssignsType() {
     DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
 
-    EsTag esTag = esLogConverter.convert(tag);
+    EsTag esTag = tagConverter.convert(tag);
 
     assertNotNull(esTag);
     assertEquals(EsTag.TYPE_BOOLEAN, esTag.getType());

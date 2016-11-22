@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
  * Tests the good behaviour of the EsTagNumeric class. verify that it builds
  * correctly in JSON and accept/reject good/bad types of value.
  *
- * @author Alban Marguet.
+ * @author Alban Marguet
  */
 @RunWith(MockitoJUnitRunner.class)
 public class TagNumericTest {

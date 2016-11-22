@@ -10,6 +10,7 @@ import cern.c2mon.server.command.config.CommandModule;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
 import cern.c2mon.server.daqcommunication.in.config.DaqCommunicationInModule;
 import cern.c2mon.server.daqcommunication.out.config.DaqCommunicationOutModule;
+import cern.c2mon.server.elasticsearch.config.ElasticsearchModule;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.DefaultLifecycleProcessor;
 
@@ -35,7 +36,7 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
     DaqCommunicationOutModule.class,
 //    RuleModule.class,
     ConfigurationModule.class,
-//    ElasticsearchModule.class,
+    ElasticsearchModule.class,
 //    ShortTermLogModule.class,
     ClientModule.class,
     AlarmModule.class,

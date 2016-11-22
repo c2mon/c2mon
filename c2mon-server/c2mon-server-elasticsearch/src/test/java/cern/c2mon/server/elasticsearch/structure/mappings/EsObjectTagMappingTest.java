@@ -28,7 +28,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Tests the good behaviour of the class EsStringTagMapping.
  * Needed to do a good indexing in Elasticsearch.
- * @author Alban Marguet.
+ * @author Alban Marguet
  */
 @RunWith(MockitoJUnitRunner.class)
 @Slf4j

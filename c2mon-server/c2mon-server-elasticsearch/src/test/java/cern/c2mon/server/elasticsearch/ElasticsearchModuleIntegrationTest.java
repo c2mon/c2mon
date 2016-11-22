@@ -16,34 +16,22 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch;
 
-import cern.c2mon.server.elasticsearch.config.EsLogIntegrationConfiguration;
+import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
 import cern.c2mon.server.elasticsearch.connector.Connector;
 import cern.c2mon.server.elasticsearch.listener.EsAlarmLogListener;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.*;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 /**
  * Integration test with the core modules.
- * @author Alban Marguet.
+ *
+ * @author Alban Marguet
  */
 @Slf4j
-@ContextConfiguration(classes = {
-    EsLogIntegrationConfiguration.class
-})
-@TestPropertySource("classpath:c2mon-server-default.properties")
-@RunWith(SpringJUnit4ClassRunner.class)
-public class ESLogModuleIntegrationTest {
+public class ElasticsearchModuleIntegrationTest extends BaseElasticsearchIntegrationTest {
 
   @Autowired
   private Connector connector;
-
-  @Autowired
-  private EsAlarmLogListener esAlarmLogListener;
 
   @Before
   public void setup() {

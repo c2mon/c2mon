@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import cern.c2mon.server.elasticsearch.indexer.EsTagIndexer;
-import cern.c2mon.server.elasticsearch.structure.converter.EsTagLogConverter;
+import cern.c2mon.server.elasticsearch.structure.converter.ElasticsearchTagConverter;
 import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,7 @@ import cern.c2mon.server.common.tag.Tag;
  */
 @Service
 @Slf4j
-public class EsTagLogListener implements C2monBufferedCacheListener<Tag>, SmartLifecycle {
+public class ElasticsearchTagListener implements C2monBufferedCacheListener<Tag>, SmartLifecycle {
 
   /**
    * Reference to registration service.
@@ -58,7 +58,7 @@ public class EsTagLogListener implements C2monBufferedCacheListener<Tag>, SmartL
   /**
    * Allows to convert from Tag to {@link EsTag}.
    */
-  private final EsTagLogConverter esTagLogConverter;
+  private final ElasticsearchTagConverter elasticsearchTagConverter;
 
   private final IPersistenceManager<EsTag> esTagPersistenceManager;
 
@@ -73,10 +73,10 @@ public class EsTagLogListener implements C2monBufferedCacheListener<Tag>, SmartL
   private volatile boolean running = false;
 
   @Autowired
-  public EsTagLogListener(final EsTagLogConverter esTagLogConverter,
-                          final CacheRegistrationService cacheRegistrationService,
-                          @Qualifier("esTagPersistenceManager") final IPersistenceManager<EsTag> esTagPersistenceManager) {
-    this.esTagLogConverter = esTagLogConverter;
+  public ElasticsearchTagListener(final ElasticsearchTagConverter elasticsearchTagConverter,
+                                  final CacheRegistrationService cacheRegistrationService,
+                                  @Qualifier("esTagPersistenceManager") final IPersistenceManager<EsTag> esTagPersistenceManager) {
+    this.elasticsearchTagConverter = elasticsearchTagConverter;
     this.cacheRegistrationService = cacheRegistrationService;
     this.esTagPersistenceManager = esTagPersistenceManager;
   }
@@ -96,7 +96,7 @@ public class EsTagLogListener implements C2monBufferedCacheListener<Tag>, SmartL
 
   @Override
   public String getThreadName() {
-    return "EsPersister";
+    return "ElasticsearchPersister";
   }
 
   /**
@@ -133,7 +133,7 @@ public class EsTagLogListener implements C2monBufferedCacheListener<Tag>, SmartL
       return esTagList;
     }
 
-    tagsToLog.forEach(tag -> esTagList.add(esTagLogConverter.convert(tag)));
+    tagsToLog.forEach(tag -> esTagList.add(elasticsearchTagConverter.convert(tag)));
 
     return esTagList;
   }

@@ -26,7 +26,7 @@ import cern.c2mon.server.elasticsearch.structure.types.EsSupervisionEvent;
 /**
  * Handle the connection/querying data to Elasticsearch cluster.
  *
- * @author Alban Marguet.
+ * @author Alban Marguet
  */
 public interface Connector {
 

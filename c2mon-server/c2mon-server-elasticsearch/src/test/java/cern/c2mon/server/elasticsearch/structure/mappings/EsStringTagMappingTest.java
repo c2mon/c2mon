@@ -27,7 +27,7 @@ import static junit.framework.TestCase.assertEquals;
 /**
  * Tests the good behaviour of the class EsStringTagMapping.
  * Needed to do a good indexing in Elasticsearch.
- * @author Alban Marguet.
+ * @author Alban Marguet
  */
 @RunWith(MockitoJUnitRunner.class)
 @Slf4j

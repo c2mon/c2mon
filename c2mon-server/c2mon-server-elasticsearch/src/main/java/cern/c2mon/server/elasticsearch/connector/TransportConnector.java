@@ -68,7 +68,7 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
  * or 1 by 1 for  {@link EsAlarm} and {@link EsSupervisionEvent} to the Elasticsearch cluster.
  * This is very light for the cluster to be connected this way.
  *
- * @author Alban Marguet.
+ * @author Alban Marguet
  */
 @Service
 @Slf4j

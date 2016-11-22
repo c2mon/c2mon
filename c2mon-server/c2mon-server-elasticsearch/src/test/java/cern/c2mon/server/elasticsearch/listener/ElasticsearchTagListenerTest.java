@@ -36,7 +36,7 @@ import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.elasticsearch.structure.converter.EsTagLogConverter;
+import cern.c2mon.server.elasticsearch.structure.converter.ElasticsearchTagConverter;
 import cern.c2mon.server.test.CacheObjectCreation;
 
 import static org.mockito.Matchers.anyList;
@@ -49,14 +49,14 @@ import static org.mockito.Mockito.*;
  * @author Alban Marguet
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = EsTagLogListenerTest.TagLogListenerTestConfiguration.class)
-public class EsTagLogListenerTest {
+@ContextConfiguration(classes = ElasticsearchTagListenerTest.TestConfiguration.class)
+public class ElasticsearchTagListenerTest {
 
   @Configuration
-  public static class TagLogListenerTestConfiguration {
+  public static class TestConfiguration {
     @Bean
-    public EsTagLogConverter esTagLogConverter() {
-      return mock(EsTagLogConverter.class);
+    public ElasticsearchTagConverter elasticsearchTagConverter() {
+      return mock(ElasticsearchTagConverter.class);
     }
 
     @Bean
@@ -70,9 +70,9 @@ public class EsTagLogListenerTest {
     }
 
     @Bean
-    public EsTagLogListener esTagLogListener() {
-      return new EsTagLogListener(
-          esTagLogConverter(),
+    public ElasticsearchTagListener elasticsearchTagListener() {
+      return new ElasticsearchTagListener(
+          elasticsearchTagConverter(),
           cacheRegistrationService(),
           esTagPersistenceManager());
     }
@@ -81,14 +81,14 @@ public class EsTagLogListenerTest {
 
   @Before
   public void setUp() throws Exception {
-    reset(esLogConverter,
+    reset(tagConverter,
         cacheRegistrationService,
         tagPersistenceManager);
   }
 
   @After
   public void tearDown() throws Exception {
-//    verifyNoMoreInteractions(esLogConverter,
+//    verifyNoMoreInteractions(tagConverter,
 //        cacheRegistrationService,
 //        tagNumericPersistenceManager,
 //        tagStringPersistenceManager,
@@ -100,7 +100,7 @@ public class EsTagLogListenerTest {
   private boolean notLogged = false;
 
   @Autowired
-  private EsTagLogConverter esLogConverter;
+  private ElasticsearchTagConverter tagConverter;
 
   @Autowired
   private CacheRegistrationService cacheRegistrationService;
@@ -112,7 +112,7 @@ public class EsTagLogListenerTest {
 
 
   @Autowired
-  private EsTagLogListener tagLogListener;
+  private ElasticsearchTagListener tagLogListener;
 
   @Test
   public void testTagIsLoggedToES() throws IDBPersistenceException {
@@ -120,7 +120,7 @@ public class EsTagLogListenerTest {
     tag.setLogged(logged);
     tagLogListener.notifyElementUpdated(Collections.<Tag>singletonList(tag));
 
-    verify(esLogConverter).convert(eq(tag));
+    verify(tagConverter).convert(eq(tag));
   }
 
   @Test
@@ -129,7 +129,7 @@ public class EsTagLogListenerTest {
     tag.setLogged(notLogged);
     tagLogListener.notifyElementUpdated(Collections.<Tag>singletonList(tag));
 
-    verify(esLogConverter, never()).convert(tag);
+    verify(tagConverter, never()).convert(tag);
   }
 
   @Test
@@ -155,14 +155,14 @@ public class EsTagLogListenerTest {
     EsTag convertedTag2 = new EsTag(2L, Boolean.class.getName());
     convertedTag2.setValueBoolean((Boolean) tag2.getValue());
 
-    when(esLogConverter.convert(tag1)).thenReturn(convertedTag1);
-    when(esLogConverter.convert(tag2)).thenReturn(convertedTag2);
+    when(tagConverter.convert(tag1)).thenReturn(convertedTag1);
+    when(tagConverter.convert(tag2)).thenReturn(convertedTag2);
 
     tagLogListener.notifyElementUpdated(list);
 
-    verify(esLogConverter).convert(eq(tag1));
-    verify(esLogConverter).convert(eq(tag2));
-    verify(esLogConverter, atMost(2)).convert(eq(tag3));
+    verify(tagConverter).convert(eq(tag1));
+    verify(tagConverter).convert(eq(tag2));
+    verify(tagConverter, atMost(2)).convert(eq(tag3));
 
     verify(tagPersistenceManager, times(1)).storeData(anyList());
   }

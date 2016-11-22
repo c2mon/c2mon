@@ -34,7 +34,7 @@ import cern.c2mon.shared.common.type.TypeConverter;
  * Class that represents a Tag for Elasticsearch.
  * Used as "type" in Elasticsearch.
  *
- * @author Alban Marguet.
+ * @author Alban Marguet
  */
 @Slf4j
 @Data

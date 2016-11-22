@@ -43,13 +43,14 @@ import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
 /**
- * Converts the dataTags from the server to the Elasticsearch format {@link EsTag}.
+ * Converts {@link DataTag} instances to {@link EsTag} instances.
  *
- * @author Alban Marguet.
+ * @author Alban Marguet
  */
 @Slf4j
 @Component
-public class EsTagLogConverter implements Converter<Tag, EsTag> {
+public class ElasticsearchTagConverter implements Converter<Tag, EsTag> {
+
   /**
    * Default ID to return if nothing is found in cache.
    */
@@ -60,9 +61,9 @@ public class EsTagLogConverter implements Converter<Tag, EsTag> {
   private final SubEquipmentCache subEquipmentCache;
 
   @Autowired
-  public EsTagLogConverter(final ProcessCache processCache,
-                           final EquipmentCache equipmentCache,
-                           final SubEquipmentCache subEquipmentCache) {
+  public ElasticsearchTagConverter(final ProcessCache processCache,
+                                   final EquipmentCache equipmentCache,
+                                   final SubEquipmentCache subEquipmentCache) {
     this.processCache = processCache;
     this.equipmentCache = equipmentCache;
     this.subEquipmentCache = subEquipmentCache;

@@ -26,7 +26,7 @@ import static junit.framework.TestCase.assertEquals;
 /**
  * Test the good behaviour of the EsNumericTagMapping class.
  * We need a good mapping to index correctly the data in Elasticsearch.
- * @author Alban Marguet.
+ * @author Alban Marguet
  */
 @RunWith(MockitoJUnitRunner.class)
 public class EsLongTagMappingTest {

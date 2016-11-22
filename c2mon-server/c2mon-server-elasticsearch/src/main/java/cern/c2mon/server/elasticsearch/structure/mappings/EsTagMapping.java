@@ -31,7 +31,7 @@ import cern.c2mon.shared.common.type.TypeConverter;
  * Allows to create dynamic mappings for the different types that exist in Elasticsearch.
  * Take care of the basic structure requiring the routing for faster retrieval and the body of the properties.
  *
- * @author Alban Marguet.
+ * @author Alban Marguet
  */
 @Slf4j
 @Getter

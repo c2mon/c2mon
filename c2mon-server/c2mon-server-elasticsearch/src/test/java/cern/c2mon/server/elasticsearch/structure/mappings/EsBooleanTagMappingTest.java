@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * Verify the good behaviour of the EsBooleanTagMapping class.
- * @author Alban Marguet.
+ * @author Alban Marguet
  */
 @RunWith(MockitoJUnitRunner.class)
 public class EsBooleanTagMappingTest {

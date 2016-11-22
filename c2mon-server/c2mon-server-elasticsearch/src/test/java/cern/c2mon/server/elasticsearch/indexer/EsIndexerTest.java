@@ -20,7 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import cern.c2mon.server.elasticsearch.config.EsLogIntegrationConfiguration;
+import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
 import cern.c2mon.server.elasticsearch.connector.TransportConnector;
 import cern.c2mon.server.elasticsearch.structure.mappings.EsTagMapping;
 import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
@@ -48,15 +48,11 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Test the EsIndexer methods for sending the right data to the Connector.
- * @author Alban Marguet.
+ *
+ * @author Alban Marguet
  */
 @Slf4j
-@ContextConfiguration(classes = {
-    EsLogIntegrationConfiguration.class
-})
-@TestPropertySource("classpath:c2mon-server-default.properties")
-@RunWith(SpringJUnit4ClassRunner.class)
-public class EsIndexerTest {
+public class EsIndexerTest extends BaseElasticsearchIntegrationTest {
   private static String clusterName;
   private static String nodeName;
   private static String host;

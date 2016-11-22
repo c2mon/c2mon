@@ -14,44 +14,22 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.elasticsearch.structure.mappings;
+package cern.c2mon.server.elasticsearch.config;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
- * Defines the Elasticsearch arguments for the types and the indices.
- * Permits to have mappings according to what we want to insert. (dataType)
- * Also contains the Mapping for routing, tags, alarms and supervisionevents.
+ * This class is responsible for configuring the Spring context for
+ * the elasticsearch module.
  *
+ * @author Justin Lewis Salmon
  * @author Alban Marguet
  */
-public interface EsMapping {
-
-  @RequiredArgsConstructor
-  enum ValueType {
-    STRING("string"),
-    LONG("long"),
-    INTEGER("integer"),
-    DOUBLE("double"),
-    BOOLEAN("boolean"),
-    DATE("date"),
-    OBJECT("object"),
-    NESTED("nested");
-
-    private final String type;
-
-    @Override
-    public String toString() {
-      return this.type;
-    }
-  }
-
-  String indexNotAnalyzed = "not_analyzed";
-  String indexAnalyzed = "analyzed";
-  String epochMillisFormat = "epoch_millis";
-
-  /**
-   * @return A JSON representation of the mapping object
-   */
-  String getMapping();
-}
+@Configuration
+@Import({
+    ElasticsearchPersistenceConfig.class
+})
+@ComponentScan(basePackages = "cern.c2mon.server.elasticsearch")
+public class ElasticsearchModule {}
