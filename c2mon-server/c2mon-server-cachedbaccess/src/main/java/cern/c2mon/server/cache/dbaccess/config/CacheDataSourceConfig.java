@@ -58,6 +58,7 @@ public class CacheDataSourceConfig implements EnvironmentAware {
   public SqlSessionFactoryBean cacheSqlSessionFactory(DataSource cacheDataSource) throws Exception {
     SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
     sessionFactory.setDataSource(cacheDataSource);
+    sessionFactory.setDatabaseIdProvider(databaseIdProvider());
     sessionFactory.setTypeHandlersPackage("cern.c2mon.server.cache.dbaccess.type");
     return sessionFactory;
   }
