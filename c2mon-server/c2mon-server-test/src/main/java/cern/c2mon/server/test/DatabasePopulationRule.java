@@ -12,7 +12,6 @@ import javax.sql.DataSource;
 /**
  * @author Justin Lewis Salmon
  */
-@Service
 public class DatabasePopulationRule extends ExternalResource {
 
   @Autowired
