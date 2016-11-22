@@ -8,6 +8,7 @@ import cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl;
 import cern.c2mon.server.cachepersistence.impl.CachePersistenceDAOImpl;
 import cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener;
 import cern.c2mon.server.common.alarm.Alarm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 
@@ -16,25 +17,30 @@ import org.springframework.core.env.Environment;
  */
 public class AlarmPersistenceConfig {
 
+  @Autowired
+  private Environment environment;
+
+  @Autowired
+  private AlarmMapper alarmMapper;
+
+  @Autowired
+  private AlarmCache alarmCache;
+
   @Bean
-  public CachePersistenceDAO alarmPersistenceDAO(AlarmMapper alarmMapper, AlarmCache alarmCache) {
+  public CachePersistenceDAO<Alarm> alarmPersistenceDAO() {
     return new CachePersistenceDAOImpl<>(alarmMapper, alarmCache);
   }
 
   @Bean
-  public BatchPersistenceManager alarmPersistenceManager(CachePersistenceDAO<Alarm> alarmPersistenceDAO,
-                                                         AlarmCache alarmCache,
-                                                         Environment environment) {
-    BatchPersistenceManagerImpl manager = new BatchPersistenceManagerImpl<>(alarmPersistenceDAO, alarmCache);
+  public BatchPersistenceManager alarmPersistenceManager() {
+    BatchPersistenceManagerImpl<Alarm> manager = new BatchPersistenceManagerImpl<>(alarmPersistenceDAO(), alarmCache);
     manager.setTimeoutPerBatch(environment.getRequiredProperty("c2mon.server.cachepersistence.timeoutPerBatch", Integer.class));
     return manager;
   }
 
   @Bean
-  public PersistenceSynchroListener alarmPersistenceSynchroListener(BatchPersistenceManager alarmPersistenceManager,
-                                                                    AlarmCache alarmCache,
-                                                                    Environment environment) {
+  public PersistenceSynchroListener alarmPersistenceSynchroListener() {
     Integer pullFrequency = environment.getRequiredProperty("c2mon.server.cache.bufferedListenerPullFrequency", Integer.class);
-    return new PersistenceSynchroListener(alarmCache, alarmPersistenceManager, pullFrequency);
+    return new PersistenceSynchroListener(alarmCache, alarmPersistenceManager(), pullFrequency);
   }
 }

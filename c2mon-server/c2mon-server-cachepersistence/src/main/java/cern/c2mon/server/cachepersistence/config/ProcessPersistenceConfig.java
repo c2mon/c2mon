@@ -8,6 +8,7 @@ import cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl;
 import cern.c2mon.server.cachepersistence.impl.CachePersistenceDAOImpl;
 import cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener;
 import cern.c2mon.server.common.process.Process;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 
@@ -16,25 +17,30 @@ import org.springframework.core.env.Environment;
  */
 public class ProcessPersistenceConfig {
 
+  @Autowired
+  private Environment environment;
+
+  @Autowired
+  private ProcessMapper processMapper;
+
+  @Autowired
+  private ProcessCache processCache;
+
   @Bean
-  public CachePersistenceDAO processPersistenceDAO(ProcessMapper processMapper, ProcessCache processCache) {
+  public CachePersistenceDAO<Process> processPersistenceDAO() {
     return new CachePersistenceDAOImpl<>(processMapper, processCache);
   }
 
   @Bean
-  public BatchPersistenceManager processPersistenceManager(CachePersistenceDAO<Process> processPersistenceDAO,
-                                                           ProcessCache processCache,
-                                                           Environment environment) {
-    BatchPersistenceManagerImpl manager = new BatchPersistenceManagerImpl<>(processPersistenceDAO, processCache);
+  public BatchPersistenceManager processPersistenceManager() {
+    BatchPersistenceManagerImpl manager = new BatchPersistenceManagerImpl<>(processPersistenceDAO(), processCache);
     manager.setTimeoutPerBatch(environment.getRequiredProperty("c2mon.server.cachepersistence.timeoutPerBatch", Integer.class));
     return manager;
   }
 
   @Bean
-  public PersistenceSynchroListener processPersistenceSynchroListener(BatchPersistenceManager processPersistenceManager,
-                                                                      ProcessCache processCache,
-                                                                      Environment environment) {
+  public PersistenceSynchroListener processPersistenceSynchroListener() {
     Integer pullFrequency = environment.getRequiredProperty("c2mon.server.cache.bufferedListenerPullFrequency", Integer.class);
-    return new PersistenceSynchroListener(processCache, processPersistenceManager, pullFrequency);
+    return new PersistenceSynchroListener(processCache, processPersistenceManager(), pullFrequency);
   }
 }

@@ -8,6 +8,7 @@ import cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl;
 import cern.c2mon.server.cachepersistence.impl.CachePersistenceDAOImpl;
 import cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener;
 import cern.c2mon.server.common.control.ControlTag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 
@@ -16,22 +17,28 @@ import org.springframework.core.env.Environment;
  */
 public class ControlTagPersistenceConfig {
 
+  @Autowired
+  private Environment environment;
+
+  @Autowired
+  private ControlTagMapper controlTagMapper;
+
+  @Autowired
+  private ControlTagCache controlTagCache;
+
   @Bean
-  public CachePersistenceDAO controlTagPersistenceDAO(ControlTagMapper controlTagMapper, ControlTagCache controlTagCache) {
+  public CachePersistenceDAO<ControlTag> controlTagPersistenceDAO() {
     return new CachePersistenceDAOImpl<>(controlTagMapper, controlTagCache);
   }
 
   @Bean
-  public BatchPersistenceManager controlTagPersistenceManager(CachePersistenceDAO<ControlTag> controlTagPersistenceDAO,
-                                                              ControlTagCache controlTagCache) {
-    return new BatchPersistenceManagerImpl<>(controlTagPersistenceDAO, controlTagCache);
+  public BatchPersistenceManager controlTagPersistenceManager() {
+    return new BatchPersistenceManagerImpl<>(controlTagPersistenceDAO(), controlTagCache);
   }
 
   @Bean
-  public PersistenceSynchroListener controlTagPersistenceSynchroListener(BatchPersistenceManager controlTagPersistenceManager,
-                                                                         ControlTagCache controlTagCache,
-                                                                         Environment environment) {
+  public PersistenceSynchroListener controlTagPersistenceSynchroListener() {
     Integer pullFrequency = environment.getRequiredProperty("c2mon.server.cache.bufferedListenerPullFrequency", Integer.class);
-    return new PersistenceSynchroListener(controlTagCache, controlTagPersistenceManager, pullFrequency);
+    return new PersistenceSynchroListener(controlTagCache, controlTagPersistenceManager(), pullFrequency);
   }
 }
