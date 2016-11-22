@@ -19,8 +19,12 @@ package cern.c2mon.server.rule.listener;
 import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.DataTagFacade;
 import cern.c2mon.server.cache.RuleTagCache;
+import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.rule.junit.RuleCachePopulationRule;
 import cern.c2mon.server.test.CacheObjectCreation;
 import org.junit.Before;
@@ -52,12 +56,11 @@ import static org.junit.Assert.assertTrue;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({
-    "classpath:config/server-cache.xml",
-    "classpath:config/server-cachedbaccess.xml",
-    "classpath:config/server-cacheloading.xml",
-    "classpath:config/server-rule.xml",
-    "classpath:test-config/server-test-properties.xml"
+@ContextConfiguration(classes = {
+    CacheModule.class,
+    CacheDbAccessModule.class,
+    CacheLoadingModule.class,
+    RuleModule.class
 })
 @TestPropertySource("classpath:c2mon-server-default.properties")
 public class RuleListenerTest {
