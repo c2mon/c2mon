@@ -16,9 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.client.publish;
 
+import cern.c2mon.server.alarm.config.AlarmModule;
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.TagLocationService;
-import cern.c2mon.server.client.config.ClientConfig;
+import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.client.config.ClientModule;
 import cern.c2mon.server.client.junit.ClientCachePopulationRule;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
@@ -65,20 +68,23 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(
     locations = {
-        "classpath:config/server-cache.xml",
-        "classpath:config/server-cachedbaccess.xml",
+//        "classpath:config/server-cache.xml",
+//        "classpath:config/server-cachedbaccess.xml",
         "classpath:config/server-configuration.xml",
         "classpath:config/server-daqcommunication-in.xml",
         "classpath:config/server-daqcommunication-out.xml",
         "classpath:config/server-rule.xml",
         "classpath:config/server-supervision.xml",
-        "classpath:config/server-alarm.xml",
+//        "classpath:config/server-alarm.xml",
         "classpath:config/server-command.xml",
         "classpath:test-config/server-test-properties.xml"
     },
     classes = {
-        ClientConfig.class,
+        CacheModule.class,
+        CacheDbAccessModule.class,
+        ClientModule.class,
         DaqCommunicationInConfiguration.class,
+        AlarmModule.class,
         TestConfig.class
     }
 )
@@ -132,7 +138,7 @@ public class TagValuePublisherTest {
    * @throws InterruptedException
    */
   @Test
-  @Ignore("This test is flaky, maybe due to all the sleep() calls")
+  //@Ignore("This test is flaky, maybe due to all the sleep() calls")
   public void testPublication() throws JMSException, InterruptedException {
     EasyMock.reset();
     synchronized (updateLock) {

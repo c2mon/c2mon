@@ -5,8 +5,7 @@ import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.cachepersistence.config.CachePersistenceModule;
-import cern.c2mon.server.client.config.ClientConfig;
-import cern.c2mon.server.client.config.ClientJmsConfig;
+import cern.c2mon.server.client.config.ClientModule;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.DefaultLifecycleProcessor;
 
@@ -42,7 +41,7 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
 //    DaqCommunicationOutModule.class,
 //    RuleModule.class,
 //    ConfigurationModule.class,
-    ClientConfig.class,
+    ClientModule.class,
     AlarmModule.class,
 //    CommandModule.class
 })

@@ -16,4 +16,4 @@ import org.springframework.context.annotation.Import;
     AdminJmsConfig.class
 })
 @ComponentScan("cern.c2mon.server.client")
-public class ClientConfig {}
+public class ClientModule {}
