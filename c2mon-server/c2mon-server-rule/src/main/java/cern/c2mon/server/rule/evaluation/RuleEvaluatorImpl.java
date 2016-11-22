@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.C2monCacheListener;
@@ -70,8 +71,7 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
 
   private final CacheRegistrationService cacheRegistrationService;
 
-  @Value("${c2mon.server.rule.numEvaluationThreads}")
-  protected int numEvaluationThreads = 1;
+  private int numEvaluationThreads;
 
   /**
    * Listener container lifecycle hook.
@@ -83,20 +83,18 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
    */
   private volatile boolean running = false;
 
-  /**
-   * Constructor.
-   * @param ruleTagCache
-   * @param ruleTagFacade
-   * @param ruleUpdateBuffer
-   * @param tagLocationService
-   */
   @Autowired
-  public RuleEvaluatorImpl(RuleTagCache ruleTagCache, RuleUpdateBuffer ruleUpdateBuffer, TagLocationService tagLocationService, CacheRegistrationService cacheRegistrationService) {
+  public RuleEvaluatorImpl(RuleTagCache ruleTagCache,
+                           RuleUpdateBuffer ruleUpdateBuffer,
+                           TagLocationService tagLocationService,
+                           CacheRegistrationService cacheRegistrationService,
+                           Environment environment) {
     super();
     this.ruleTagCache = ruleTagCache;
     this.ruleUpdateBuffer = ruleUpdateBuffer;
     this.tagLocationService = tagLocationService;
     this.cacheRegistrationService = cacheRegistrationService;
+    this.numEvaluationThreads = environment.getRequiredProperty("c2mon.server.rule.numEvaluationThreads", Integer.class);
   }
 
   /**
