@@ -19,6 +19,9 @@ package cern.c2mon.server.supervision.impl;
 import java.sql.Timestamp;
 import java.util.*;
 
+import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.supervision.config.SupervisionModule;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
@@ -51,11 +54,10 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStat
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({
-    "classpath:config/server-cache.xml",
-    "classpath:config/server-cachedbaccess.xml",
-    "classpath:config/server-supervision.xml",
-    "classpath:test-config/server-test-properties.xml"
+@ContextConfiguration(classes = {
+    CacheModule.class,
+    CacheDbAccessModule.class,
+    SupervisionModule.class
 })
 @TestPropertySource("classpath:c2mon-server-default.properties")
 public class SupervisionTagNotifierTest {

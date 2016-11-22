@@ -43,6 +43,7 @@ import cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl;
 import cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager;
 import cern.c2mon.server.daqcommunication.out.config.DaqCommunicationOutModule;
 import cern.c2mon.server.rule.config.RuleModule;
+import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
@@ -67,6 +68,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -86,23 +88,18 @@ import static org.junit.Assert.*;
  * @author Franz Ritter
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(
-    locations = {
-        "classpath:config/server-supervision.xml",
-        "classpath:test-config/server-test-properties.xml"
-    },
-    classes = {
-        CacheModule.class,
-        CacheDbAccessModule.class,
-        CacheLoadingModule.class,
-        ConfigurationModule.class,
-        DaqCommunicationInModule.class,
-        DaqCommunicationOutModule.class,
-        RuleModule.class,
-        ProcessCommunicationManagerMock.class
-    }
-)
-@TestPropertySource(value = "classpath:c2mon-server-default.properties", properties = "spring.main.show_banner=false")
+@ContextConfiguration(classes = {
+    CacheModule.class,
+    CacheDbAccessModule.class,
+    CacheLoadingModule.class,
+    SupervisionModule.class,
+    ConfigurationModule.class,
+    DaqCommunicationInModule.class,
+    DaqCommunicationOutModule.class,
+    RuleModule.class,
+    ProcessCommunicationManagerMock.class
+})
+@TestPropertySource(value = "classpath:c2mon-server-default.properties")
 public class ConfigurationLoaderTest {
 
   @Rule

@@ -13,6 +13,7 @@ import cern.c2mon.server.daqcommunication.out.config.DaqCommunicationOutModule;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchModule;
 import cern.c2mon.server.history.config.HistoryModule;
 import cern.c2mon.server.rule.config.RuleModule;
+import cern.c2mon.server.supervision.config.SupervisionModule;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.DefaultLifecycleProcessor;
 
@@ -24,15 +25,12 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
  * @author Justin Lewis Salmon
  */
 @Configuration
-@ImportResource({
-    "classpath:config/server-supervision.xml",
-})
 @Import({
     CacheModule.class,
     CacheDbAccessModule.class,
     CacheLoadingModule.class,
     CachePersistenceModule.class,
-//    SupervisionModule.class,
+    SupervisionModule.class,
     DaqCommunicationInModule.class,
     DaqCommunicationOutModule.class,
     RuleModule.class,
@@ -45,8 +43,8 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
 })
 @PropertySources({
     @PropertySource("classpath:c2mon-server-default.properties"),
-    @PropertySource(value = "${c2mon.server.properties}", ignoreResourceNotFound = true)}
-)
+    @PropertySource(value = "${c2mon.server.properties}", ignoreResourceNotFound = true)
+})
 public class EnvironmentConfig {
 
   @Bean

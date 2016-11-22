@@ -22,6 +22,9 @@ import static org.junit.Assert.assertNotNull;
 
 import java.sql.Timestamp;
 
+import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.server.supervision.junit.SupervisionCachePopulationRule;
 import org.junit.Rule;
 import org.slf4j.Logger;
@@ -50,13 +53,11 @@ import cern.c2mon.shared.daq.process.XMLConverter;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({
-    "classpath:config/server-cache.xml",
-    "classpath:config/server-cachedbaccess.xml",
-    "classpath:config/server-supervision.xml",
-    "classpath:test-config/server-test-properties.xml"
+@ContextConfiguration(classes = {
+    CacheModule.class,
+    CacheDbAccessModule.class,
+    SupervisionModule.class
 })
-@DirtiesContext(classMode= DirtiesContext.ClassMode.AFTER_CLASS)
 @TestPropertySource("classpath:c2mon-server-default.properties")
 public class SupervisionManagerProcessTest {
 
