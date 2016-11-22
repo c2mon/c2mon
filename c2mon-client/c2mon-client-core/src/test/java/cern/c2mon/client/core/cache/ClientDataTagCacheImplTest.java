@@ -16,35 +16,16 @@
  *****************************************************************************/
 package cern.c2mon.client.core.cache;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.jms.JMSException;
-
-import cern.c2mon.client.core.config.C2monClientProperties;
-import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.Tag;
-import cern.c2mon.client.core.manager.CoreSupervisionManager;
-import cern.c2mon.client.core.tag.ClientDataTagImpl;
+import cern.c2mon.client.core.config.C2monAutoConfiguration;
+import cern.c2mon.client.core.config.mock.CoreSupervisionManagerMock;
+import cern.c2mon.client.core.config.mock.JmsProxyMock;
+import cern.c2mon.client.core.config.mock.RequestHandlerMock;
 import cern.c2mon.client.core.jms.JmsProxy;
 import cern.c2mon.client.core.jms.RequestHandler;
+import cern.c2mon.client.core.manager.CoreSupervisionManager;
+import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
@@ -52,32 +33,56 @@ import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.rule.RuleFormatException;
+import org.easymock.EasyMock;
+import org.easymock.EasyMockRule;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.jms.JMSException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import static junit.framework.Assert.*;
 
 /**
  * @author Matthias Braeger
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:test-config/c2mon-cache-test.xml" })
+@ContextConfiguration(classes = {
+    C2monAutoConfiguration.class,
+    JmsProxyMock.class,
+    RequestHandlerMock.class,
+    CoreSupervisionManagerMock.class
+})
 @DirtiesContext
 public class ClientDataTagCacheImplTest {
+
   /**
    * Component to test
    */
   @Autowired
   private ClientDataTagCacheImpl cache;
+
   @Autowired
   private JmsProxy jmsProxyMock;
+
   @Autowired
-  @Qualifier("coreRequestHandler")
   private RequestHandler requestHandlerMock;
+
   @Autowired
   private CoreSupervisionManager supervisionManagerMock;
-  @Autowired
-  private CacheSynchronizer cacheSynchronizer;
+
   @Autowired
   private CacheController cacheController;
-  @Autowired
-  private C2monClientProperties properties;
 
   @Before
   public void init() {
@@ -90,7 +95,6 @@ public class ClientDataTagCacheImplTest {
   public void testEmptyCache() {
     assertEquals(0, cache.getAllSubscribedDataTags().size());
   }
-
 
   /**
    * Adds two tags into the cache and subscribes them to a <code>DataTagUpdateListener</code>.

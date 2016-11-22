@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import cern.c2mon.client.core.config.C2monAutoConfiguration;
-import cern.c2mon.client.core.config.MockServerConfig;
+import cern.c2mon.client.core.config.mock.MockServerConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.BeforeClass;
 import org.junit.Test;
