@@ -116,16 +116,9 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
     this.clientRequestHandler = coreRequestHandler;
     this.heartbeatManager = heartbeatManager;
     this.jmsHealthMonitor = clientHealthMonitor;
-  }
-
-  /**
-   * Called by Spring to initialize this service.
-   */
-  @PostConstruct
-  private void init() {
-    jmsProxy.registerConnectionListener(this);
-    jmsProxy.registerSupervisionListener(this);
-    heartbeatManager.addHeartbeatListener(this);
+    this.jmsProxy.registerConnectionListener(this);
+    this.jmsProxy.registerSupervisionListener(this);
+    this.heartbeatManager.addHeartbeatListener(this);
   }
 
   @Override
