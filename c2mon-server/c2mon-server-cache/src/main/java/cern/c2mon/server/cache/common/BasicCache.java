@@ -21,6 +21,7 @@ import java.util.List;
 
 import javax.annotation.PreDestroy;
 
+import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
@@ -37,17 +38,14 @@ import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
  * Provides all core functionalities that are required to manage a cache. This
  * class uses internally Ehcache.
  *
- * @author Mark Brightwell, Justin Lewis Salmon
+ * @author Mark Brightwell
+ * @author Justin Lewis Salmon
  *
  * @param <K> The key class type
  * @param <T> The value class type
  */
+@Slf4j
 public abstract class BasicCache<K, T extends Serializable> extends ApplicationObjectSupport {
-
-  /**
-   * Private class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(BasicCache.class);
 
   /**
    * Reference to the wrapped Ehcache.
@@ -59,15 +57,15 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
    * preloaded from the database, instead ehcache will initialize it from a
    * local cache storage (if available)
    */
-  @Value("${c2mon.server.cache.skipPreloading}")
-  protected boolean skipCachePreloading = false;
+//  @Value("${c2mon.server.cache.skipPreloading}")
+//  protected boolean skipCachePreloading = false;
 
   /**
    * The cache mode is either set to "multi", "single" or "single-nonpersistent", depending on whether
    * the server is running with a distributed or single cache.
    */
-  @Value("${c2mon.server.cache.mode}")
-  protected String cacheMode;
+//  @Value("${c2mon.server.cache.mode}")
+//  protected String cacheMode;
 
   /**
    * Length of time (in milliseconds) to wait for a lock to be acquired.
@@ -100,40 +98,6 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
     }
 
     return cache.isKeyInCache(id);
-
-//    boolean locked = false;
-//    int tries = 0;
-//
-//    while (true) {
-//      try {
-//        // Check if the key is locked before calling isKeyInCache()
-//        locked = cache.tryReadLockOnKey(id, lockTimeout);
-//
-//        if (locked) {
-//          return cache.isKeyInCache(id);
-//        }
-//
-//        if (LOGGER.isTraceEnabled()) {
-//          LOGGER.trace("Key " + id + " was locked. Couldn't call isKeyInCache(). Trying again...");
-//        }
-//
-//        // If we tried to acquire the lock more than lockAttemptThreshold times,
-//        // we may have a deadlock situation.
-//        tries++;
-//
-//        if (tries > lockAttemptThreshold) {
-//          LOGGER.warn("hasKey(): Thread " + Thread.currentThread().getName() + " was waiting for " + (lockTimeout * lockAttemptThreshold) + "ms on key " + id
-//              + ". Possible deadlock detected.");
-//          tries = 0;
-//        }
-//
-//      } catch (InterruptedException e) {
-//        LOGGER.debug("Thread interrupted waiting for read lock on key=" + id);
-//
-//      } finally {
-//        cache.releaseReadLockOnKey(id);
-//      }
-//    }
   }
 
   /**
@@ -182,13 +146,13 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
           throw new CacheElementNotFoundException("Failed to locate cache element with id " + id + " (Cache is " + this.getClass() + ")");
         }
       } catch (CacheException cacheException) {
-        LOGGER.error("getReference() - Caught cache exception thrown by Ehcache while accessing object with id " + id, cacheException);
+        log.error("getReference() - Caught cache exception thrown by Ehcache while accessing object with id " + id, cacheException);
         throw new RuntimeException("An error occured when accessing the cache object with id " + id, cacheException);
       } finally {
         releaseReadLockOnKey(id);
       }
     } else {
-      LOGGER.error("getReference() - Trying to access cache with a NULL key - throwing an exception!");
+      log.error("getReference() - Trying to access cache with a NULL key - throwing an exception!");
       // TODO throw runtime exception here or not?
       throw new IllegalArgumentException("Accessing cache with null key!");
     }
@@ -231,74 +195,36 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
 
   @PreDestroy
   public void shutdown() {
-    LOGGER.debug("Closing cache (" + this.getClass() + ")");
+    log.debug("Closing cache (" + this.getClass() + ")");
   }
 
   public void acquireReadLockOnKey(K id) {
     if (id == null) {
-      LOGGER.error("Trying to acquire read lock with a NULL key - throwing an exception!");
+      log.error("Trying to acquire read lock with a NULL key - throwing an exception!");
       throw new IllegalArgumentException("Acquiring read lock with null key!");
     }
 
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace(cache.getName() + " Acquiring READ lock for id=" + String.valueOf(id));
+    if (log.isTraceEnabled()) {
+      log.trace(cache.getName() + " Acquiring READ lock for id=" + String.valueOf(id));
     }
 
     cache.acquireReadLockOnKey(id);
 
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace(cache.getName() + " Got READ lock for id=" + String.valueOf(id));
+    if (log.isTraceEnabled()) {
+      log.trace(cache.getName() + " Got READ lock for id=" + String.valueOf(id));
     }
-
-//    boolean locked = false;
-//    int tries = 0;
-//
-//    while (true) {
-//      try {
-//        if (LOGGER.isTraceEnabled()) {
-//          LOGGER.trace(cache.getName() + " Acquiring READ lock for id=" + String.valueOf(id));
-//        }
-//
-//        locked = cache.tryReadLockOnKey(id, 1000);
-//
-//        if (locked) {
-//          if (LOGGER.isTraceEnabled()) {
-//            LOGGER.trace(cache.getName() + " Got READ lock for id=" + String.valueOf(id));
-//          }
-//
-//          return;
-//        }
-//
-//        if (LOGGER.isTraceEnabled()) {
-//          LOGGER.trace("Key " + id + " was read locked. Trying again...");
-//        }
-//
-//        // If we tried to acquire the lock more than lockAttemptThreshold times,
-//        // we may have a deadlock situation.
-//        tries++;
-//
-//        if (tries > lockAttemptThreshold) {
-//          LOGGER.warn("acquireReadLockOnKey: Thread " + Thread.currentThread().getName() + " was waiting for " + (lockTimeout * lockAttemptThreshold)
-//              + "ms on key " + id + ". Possible deadlock detected.");
-//          tries = 0;
-//        }
-//
-//      } catch (InterruptedException e) {
-//        LOGGER.debug("Thread interrupted for id=" + String.valueOf(id) + " (" + this.getClass() + ")");
-//      }
-//    }
   }
 
   public void releaseReadLockOnKey(K id) {
     if (id != null) {
       cache.releaseReadLockOnKey(id);
 
-      if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace(cache.getName() + " Released READ lock for id=" + String.valueOf(id));
+      if (log.isTraceEnabled()) {
+        log.trace(cache.getName() + " Released READ lock for id=" + String.valueOf(id));
       }
 
     } else {
-      LOGGER.error("Trying to release read lock with a NULL key - throwing an exception!");
+      log.error("Trying to release read lock with a NULL key - throwing an exception!");
       throw new IllegalArgumentException("Trying to release read lock with null key!");
     }
   }
@@ -309,57 +235,19 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
    */
   public void acquireWriteLockOnKey(K id) {
     if (id == null) {
-      LOGGER.error("Trying to acquire write lock with a NULL key - throwing an exception!");
+      log.error("Trying to acquire write lock with a NULL key - throwing an exception!");
       throw new IllegalArgumentException("Acquiring write lock with null key!");
     }
 
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace(cache.getName() + " Acquiring WRITE lock for id=" + String.valueOf(id));
+    if (log.isTraceEnabled()) {
+      log.trace(cache.getName() + " Acquiring WRITE lock for id=" + String.valueOf(id));
     }
 
     cache.acquireWriteLockOnKey(id);
 
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace(cache.getName() + " Got WRITE lock for id=" + String.valueOf(id));
+    if (log.isTraceEnabled()) {
+      log.trace(cache.getName() + " Got WRITE lock for id=" + String.valueOf(id));
     }
-
-//    boolean locked = false;
-//    int tries = 0;
-//
-//    while (true) {
-//      try {
-//        if (LOGGER.isTraceEnabled()) {
-//          LOGGER.trace(cache.getName() + " Acquiring WRITE lock for id=" + String.valueOf(id));
-//        }
-//
-//        locked = cache.tryWriteLockOnKey(id, 1000);
-//
-//        if (locked) {
-//          if (LOGGER.isTraceEnabled()) {
-//            LOGGER.trace(cache.getName() + " Got WRITE lock for id=" + String.valueOf(id));
-//          }
-//
-//          return;
-//        }
-//
-//        if (LOGGER.isTraceEnabled()) {
-//          LOGGER.trace("Key " + id + " was write locked. Trying again...");
-//        }
-//
-//        // If we tried to acquire the lock more than lockAttemptThreshold times,
-//        // we may have a deadlock situation.
-//        tries++;
-//
-//        if (tries > lockAttemptThreshold) {
-//          LOGGER.warn("acquireWriteLockOnKey(): Thread " + Thread.currentThread().getName() + " was waiting for " + (lockTimeout * lockAttemptThreshold)
-//              + "ms on key " + id + ". Possible deadlock detected.");
-//          tries = 0;
-//        }
-//
-//      } catch (InterruptedException e) {
-//        LOGGER.debug("Thread interrupted for id=" + String.valueOf(id) + " (" + this.getClass() + ")");
-//      }
-//    }
   }
 
   /**
@@ -370,12 +258,12 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
     if (id != null) {
       cache.releaseWriteLockOnKey(id);
 
-      if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace(cache.getName() + " Released WRITE lock for id=" + String.valueOf(id));
+      if (log.isTraceEnabled()) {
+        log.trace(cache.getName() + " Released WRITE lock for id=" + String.valueOf(id));
       }
 
     } else {
-      LOGGER.error("Trying to release write lock with a NULL key - throwing an exception!");
+      log.error("Trying to release write lock with a NULL key - throwing an exception!");
       throw new IllegalArgumentException("Trying to release write lock with null key!");
     }
   }
@@ -400,7 +288,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
     try {
       return cache.tryReadLockOnKey(id, timeout);
     } catch (InterruptedException e) {
-      LOGGER.debug("Thread interrupted for id=" + String.valueOf(id) + " (" + this.getClass() + ")");
+      log.debug("Thread interrupted for id=" + String.valueOf(id) + " (" + this.getClass() + ")");
       return false;
     }
   }
@@ -416,7 +304,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
     try {
       return cache.tryWriteLockOnKey(id, timeout);
     } catch (InterruptedException e) {
-      LOGGER.debug("Thread interrupted for id=" + String.valueOf(id) + " (" + this.getClass() + ")");
+      log.debug("Thread interrupted for id=" + String.valueOf(id) + " (" + this.getClass() + ")");
       return false;
     }
   }

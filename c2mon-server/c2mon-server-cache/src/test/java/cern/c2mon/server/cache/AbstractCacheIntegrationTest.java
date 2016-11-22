@@ -1,9 +1,13 @@
 package cern.c2mon.server.cache;
 
+import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.junit.CachePopulationRule;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -12,11 +16,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Justin Lewis Salmon
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({
-    "classpath:config/server-cache.xml",
-    "classpath:config/server-cachedbaccess.xml",
-    "classpath:config/server-cacheloading.xml",
-    "classpath:test-config/server-test-properties.xml"
+@ContextConfiguration(classes = {
+    CacheModule.class,
+    CacheDbAccessModule.class,
+    CacheLoadingModule.class,
+    CachePopulationRule.class
 })
 @TestPropertySource("classpath:c2mon-server-default.properties")
 public abstract class AbstractCacheIntegrationTest {

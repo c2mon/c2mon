@@ -16,13 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.process;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -32,17 +30,13 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
+import cern.c2mon.server.cache.AbstractCacheIntegrationTest;
 import cern.c2mon.server.cache.junit.CachePopulationRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -56,14 +50,7 @@ import cern.c2mon.server.cache.ProcessXMLProvider;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({
-    "classpath:config/server-cache.xml",
-    "classpath:config/server-cachedbaccess.xml",
-    "classpath:config/server-cacheloading.xml",
-    "classpath:test-config/server-test-properties.xml"
-})
-@TestPropertySource("classpath:c2mon-server-default.properties")
-public class ProcessXMLProviderTest {
+public class ProcessXMLProviderTest extends AbstractCacheIntegrationTest {
 
   @Autowired
   private ProcessXMLProvider processXMLProvider;

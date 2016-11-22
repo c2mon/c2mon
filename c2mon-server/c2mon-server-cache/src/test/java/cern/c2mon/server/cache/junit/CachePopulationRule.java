@@ -28,7 +28,6 @@ import javax.sql.DataSource;
  *
  * @author Justin Lewis Salmon
  */
-@Service
 public class CachePopulationRule extends ExternalResource {
 
   @Autowired

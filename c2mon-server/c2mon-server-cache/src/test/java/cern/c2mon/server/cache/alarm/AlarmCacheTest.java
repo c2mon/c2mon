@@ -13,24 +13,17 @@
  * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
- *****************************************************************************///  @RequestMapping(value = "/{path:[^\\.]*}")
-//  public String redirect() {
-//    // Forward to home page so that route is preserved.
-//    return "forward:/";
-//  }
+ *****************************************************************************/
 package cern.c2mon.server.cache.alarm;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import cern.c2mon.server.cache.AbstractCacheIntegrationTest;
-import cern.c2mon.server.cache.junit.CachePopulationRule;
-import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -74,7 +67,7 @@ public class AlarmCacheTest extends AbstractCacheIntegrationTest {
   }
 
   /**
-   * If null is used as  a key, an exception should be thrown. 
+   * If null is used as  a key, an exception should be thrown.
    */
   @Test(expected = IllegalArgumentException.class)
   public void testGetWithNull() {
@@ -83,7 +76,7 @@ public class AlarmCacheTest extends AbstractCacheIntegrationTest {
   }
 
   /**
-   * Tests the getCopy method retrieves an existing Alarm correctly. 
+   * Tests the getCopy method retrieves an existing Alarm correctly.
    */
   @Test
   public void testGet() {

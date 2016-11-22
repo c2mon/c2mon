@@ -144,6 +144,11 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
    * Common cache initialization procedure.
    */
   protected void commonInit() {
+
+    // TODO: FIXME: Remove this
+    boolean skipCachePreloading = false;
+    String cacheMode = "single-nonpersistent";
+
     //register the cache loader with the Ehcache
     cache.registerCacheLoader(cacheLoader);
     registeredEventListeners = cache.getCacheEventNotificationService();

@@ -18,8 +18,7 @@ package cern.c2mon.server.cache.process;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -49,14 +48,10 @@ import net.sf.ehcache.search.Results;
  *
  * @author Mark Brightwell
  */
+@Slf4j
 @Service("processCache")
 @ManagedResource(objectName = "cern.c2mon:type=cache,name=processTagCache")
 public class ProcessCacheImpl extends AbstractCache<Long, Process>implements ProcessCache {
-
-  /**
-   * Private class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessCacheImpl.class);
 
   /**
    * Reference to the {@link ProcessDAO} bean.
@@ -67,9 +62,12 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process>implements Pro
   private final ControlTagCache controlCache;
 
   @Autowired
-  public ProcessCacheImpl(final ClusterCache clusterCache, @Qualifier("processEhcache") final Ehcache ehcache,
-      @Qualifier("processEhcacheLoader") final CacheLoader cacheLoader, @Qualifier("processCacheLoader") final C2monCacheLoader c2monCacheLoader,
-      @Qualifier("processDAO") final SimpleCacheLoaderDAO<Process> cacheLoaderDAO, @Qualifier("controlTagCache") final ControlTagCache controlCache) {
+  public ProcessCacheImpl(final ClusterCache clusterCache,
+                          @Qualifier("processEhcache") final Ehcache ehcache,
+                          @Qualifier("processEhcacheLoader") final CacheLoader cacheLoader,
+                          @Qualifier("processCacheLoader") final C2monCacheLoader c2monCacheLoader,
+                          @Qualifier("processDAO") final SimpleCacheLoaderDAO<Process> cacheLoaderDAO, 
+                          @Qualifier("controlTagCache") final ControlTagCache controlCache) {
 
     super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
     this.processDAO = (ProcessDAO) cacheLoaderDAO;
@@ -82,10 +80,10 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process>implements Pro
    */
   @PostConstruct
   public void init() {
-    LOGGER.info("Initializing Process cache...");
+    log.info("Initializing Process cache...");
     commonInit();
     doPostConfigurationOfProcessControlTags();
-    LOGGER.info("... Process cache initialization complete.");
+    log.info("... Process cache initialization complete.");
   }
 
   /**
@@ -209,7 +207,7 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process>implements Pro
 
   private void setProcessId(ControlTagCacheObject copy, Long processId) {
     String logMsg = String.format("Adding process id #%s to control tag #%s", processId, copy.getId());
-    LOGGER.trace(logMsg);
+    log.trace(logMsg);
     copy.setProcessId(processId);
     controlCache.putQuiet(copy);
   }

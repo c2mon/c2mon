@@ -53,7 +53,10 @@ public class DefaultCacheImpl<K, V extends Serializable> extends BasicCache<K, V
    * Private class logger.
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCacheImpl.class);
-  
+
+  // TODO: FIXME: Remove this
+  public boolean skipCachePreloading = false;
+  public String cacheMode = "single-nonpersistent";
   
   public DefaultCacheImpl(final Ehcache ehcache) {
     this.cache = ehcache;
@@ -61,6 +64,7 @@ public class DefaultCacheImpl<K, V extends Serializable> extends BasicCache<K, V
   
   @PostConstruct
   protected void initCache() {
+
     // if in single cache mode, clear the disk cache before starting up 
     //(skipCacheLoading can be set to override this and use the disk store instead)
     if (!skipCachePreloading && cacheMode.equalsIgnoreCase("single")) {
