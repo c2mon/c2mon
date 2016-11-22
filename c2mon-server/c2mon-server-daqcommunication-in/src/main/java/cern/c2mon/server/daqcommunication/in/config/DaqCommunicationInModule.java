@@ -17,18 +17,25 @@
 package cern.c2mon.server.daqcommunication.in.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
- * This class is responsible for configuring the Spring Context and beans used by DAQ Communication
- * for daqcommunication-in module. It is automatically detected.
+ * This class is responsible for configuring the Spring context for the
+ * daqcommunication-in module.
  *
+ * @author Justin Lewis Salmon
  * @author Szymon Halastra
  */
 @Configuration
-public class DaqCommunicationInConfiguration {
+@Import({
+    DaqCommunicationInJmsConfig.class
+})
+@ComponentScan("cern.c2mon.server.daqcommunication.in")
+public class DaqCommunicationInModule {
 
   private static final String THREAD_NAME_PREFIX = "TagUpdater-";
 

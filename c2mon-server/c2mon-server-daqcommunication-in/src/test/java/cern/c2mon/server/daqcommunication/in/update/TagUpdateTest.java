@@ -18,10 +18,14 @@ package cern.c2mon.server.daqcommunication.in.update;
 
 import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.cache.DataTagCache;
+import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.ControlTagMapper;
 import cern.c2mon.server.cache.dbaccess.DataTagMapper;
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.daqcommunication.in.config.DaqCommunicationInModule;
 import cern.c2mon.server.daqcommunication.in.junit.DaqInCachePopulationRule;
 import cern.c2mon.shared.common.datatag.*;
 import org.junit.After;
@@ -30,6 +34,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -45,18 +50,23 @@ import static org.junit.Assert.*;
  * @author Mark Brightwell
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({
-    "classpath:config/server-cache.xml",
-    "classpath:config/server-cachedbaccess.xml",
-    "classpath:config/server-cacheloading.xml",
-    "classpath:config/server-daqcommunication-in.xml",
-    "classpath:config/server-supervision.xml",
-    "classpath:test-config/server-test-properties.xml"
-})
+@SpringApplicationConfiguration(
+    locations = {
+        "classpath:config/server-supervision.xml",
+        "classpath:test-config/server-test-properties.xml"
+    },
+    classes = {
+        CacheModule.class,
+        CacheDbAccessModule.class,
+        CacheLoadingModule.class,
+        DaqCommunicationInModule.class,
+    }
+)
 @TestPropertySource(
     locations = "classpath:c2mon-server-default.properties",
     properties = {
-        "c2mon.server.cache.bufferedListenerPullFrequency=1"
+        "c2mon.server.cache.bufferedListenerPullFrequency=1",
+        "spring.main.show_banner=false"
     }
 )
 public class TagUpdateTest {

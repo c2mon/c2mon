@@ -29,7 +29,7 @@ import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
-import cern.c2mon.server.daqcommunication.in.config.DaqCommunicationInConfiguration;
+import cern.c2mon.server.daqcommunication.in.config.DaqCommunicationInModule;
 import cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.server.test.broker.EmbeddedBrokerRule;
@@ -69,7 +69,6 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(
     locations = {
-        "classpath:config/server-daqcommunication-in.xml",
         "classpath:config/server-daqcommunication-out.xml",
         "classpath:config/server-rule.xml",
         "classpath:config/server-supervision.xml",
@@ -80,8 +79,9 @@ import static org.junit.Assert.*;
         CacheModule.class,
         CacheDbAccessModule.class,
         ConfigurationModule.class,
+        DaqCommunicationInModule.class,
         ClientModule.class,
-        DaqCommunicationInConfiguration.class,
+        DaqCommunicationInModule.class,
         AlarmModule.class,
         TestConfig.class
     }

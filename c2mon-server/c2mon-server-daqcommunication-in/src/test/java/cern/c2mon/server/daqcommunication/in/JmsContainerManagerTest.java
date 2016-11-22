@@ -18,7 +18,10 @@ package cern.c2mon.server.daqcommunication.in;
 
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.ProcessCache;
+import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.daqcommunication.in.config.DaqCommunicationInModule;
 import cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl;
 import cern.c2mon.shared.util.jms.ActiveJmsSender;
 import org.easymock.EasyMock;
@@ -29,6 +32,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.StandardEnvironment;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.test.annotation.DirtiesContext;
@@ -45,19 +50,17 @@ import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Integration test of JmsContainerManager component with ActiveMQ broker (rest
- * of server core dependencies are mocked).
- *
- * <p>Imports connection XML and properties import XML.
+ * Integration test of JmsContainerManager component with ActiveMQ broker.
  *
  * @author Mark Brightwell
- *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-@ContextConfiguration({
-    "classpath:config/server-daqcommunication-in-connection.xml",
-    "classpath:test-config/server-test-properties.xml"
+@ContextConfiguration(classes = {
+    CacheModule.class,
+    CacheDbAccessModule.class,
+    DaqCommunicationInModule.class,
+    DaqCommunicationInModule.class,
 })
 @TestPropertySource("classpath:c2mon-server-default.properties")
 public class JmsContainerManagerTest {
@@ -65,6 +68,7 @@ public class JmsContainerManagerTest {
   /**
    * Component to test.
    */
+  @Autowired
   private JmsContainerManagerImpl jmsContainerManager;
 
   /*
@@ -103,16 +107,16 @@ public class JmsContainerManagerTest {
     template.setTimeToLive(60000);
     jmsSender.setJmsTemplate(template);
 
-    jmsContainerManager = new JmsContainerManagerImpl(mockProcessCache, daqInConnectionFactory, mockListener, mockClusterCache);
-    jmsContainerManager.setConsumersInitial(1);
-    jmsContainerManager.setConsumersMax(1);
-    jmsContainerManager.setNbExecutorThreads(2);
-    jmsContainerManager.setIdleTaskExecutionLimit(1);
-    jmsContainerManager.setMaxMessages(1);
-    jmsContainerManager.setReceiveTimeout(100);
-    jmsContainerManager.setJmsUpdateQueueTrunk(testTrunkName);
-    jmsContainerManager.setSessionTransacted(true);
-    jmsContainerManager.setUpdateWarmUpSeconds(60);
+//    jmsContainerManager = new JmsContainerManagerImpl(mockProcessCache, daqInConnectionFactory, mockListener, mockClusterCache, new StandardEnvironment());
+//    jmsContainerManager.setConsumersInitial(1);
+//    jmsContainerManager.setConsumersMax(1);
+//    jmsContainerManager.setNbExecutorThreads(2);
+//    jmsContainerManager.setIdleTaskExecutionLimit(1);
+//    jmsContainerManager.setMaxMessages(1);
+//    jmsContainerManager.setReceiveTimeout(100);
+//    jmsContainerManager.setJmsUpdateQueueTrunk(testTrunkName);
+//    jmsContainerManager.setSessionTransacted(true);
+//    jmsContainerManager.setUpdateWarmUpSeconds(60);
   }
 
   /**
