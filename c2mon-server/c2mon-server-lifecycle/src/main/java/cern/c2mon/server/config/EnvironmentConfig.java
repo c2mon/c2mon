@@ -1,5 +1,6 @@
 package cern.c2mon.server.config;
 
+import cern.c2mon.server.alarm.config.AlarmModule;
 import cern.c2mon.server.client.config.ClientConfig;
 import cern.c2mon.server.client.config.ClientJmsConfig;
 import org.springframework.context.annotation.*;
@@ -28,7 +29,18 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
     "classpath:config/server-command.xml",
 })
 @Import({
-    ClientConfig.class
+//    CacheModule.class,
+//    CacheDbAccessModule.class,
+//    CacheLoadingModule.class,
+//    CachePersistenceModule.class,
+//    CacheSupervisionModule.class,
+//    DaqCommunicationInModule.class,
+//    DaqCommunicationOutModule.class,
+//    RuleModule.class,
+//    ConfigurationModule.class,
+    ClientConfig.class,
+    AlarmModule.class,
+//    CommandModule.class
 })
 @PropertySources({
     @PropertySource("classpath:c2mon-server-default.properties"),
