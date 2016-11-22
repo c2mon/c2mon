@@ -16,54 +16,45 @@
  *****************************************************************************/
 package cern.c2mon.server.cachepersistence.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
- * This class is responsible for configuring the Spring Context and beans used by CacheManager
- * for cache-persistence module. It is automatically detected.
+ * This class is responsible for configuring the Spring context and beans for
+ * the cachepersistence module.
  *
+ * @author Justin Lewis Salmon
  * @author Szymon Halastra
  */
 @Configuration
-public class CachePersistenceConfiguration {
-
-  @Value("${c2mon.server.cachepersistence.batchpersistence.numExecutorThreads}")
-  private int corePoolSize;
-
-  @Value("${c2mon.server.cachepersistence.batchpersistence.numExecutorThreads}")
-  private int maxPoolSize;
-
-  @Value("${c2mon.server.cachepersistence.batchpersistence.keepAliveSeconds}")
-  private int threadIdleLimit;
-
-  @Value("${c2mon.server.cachepersistence.batchpersistence.queueCapacity}")
-  private int queueCapacity;
+@Import({
+    ProcessPersistenceConfig.class,
+    EquipmentPersistenceConfig.class,
+    SubEquipmentPersistenceConfig.class,
+    DataTagPersistenceConfig.class,
+    ControlTagPersistenceConfig.class,
+    RuleTagPersistenceConfig.class,
+    AlarmPersistenceConfig.class
+})
+@ComponentScan("cern.c2mon.server.cachepersistence")
+public class CachePersistenceModule {
 
   private static final String THREAD_NAME_PREFIX = "BatchPersist-";
 
-  /**
-   * Bean responsible for creating custom ThreadPool with custom thread name prefix
-   *
-   * @return Spring ThreadPoolTaskExecutor with custom thread name prefix
-   */
   @Bean
-  public ThreadPoolTaskExecutor cachePersistenceThreadPoolTaskExecutor() {
+  public ThreadPoolTaskExecutor cachePersistenceThreadPoolTaskExecutor(Environment environment) {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-
-    executor.setCorePoolSize(corePoolSize);
-    executor.setMaxPoolSize(maxPoolSize);
-    executor.setKeepAliveSeconds(threadIdleLimit);
-    executor.setQueueCapacity(queueCapacity);
-
+    executor.setCorePoolSize(environment.getRequiredProperty("c2mon.server.cachepersistence.batchpersistence.numExecutorThreads", Integer.class));
+    executor.setMaxPoolSize(environment.getRequiredProperty("c2mon.server.cachepersistence.batchpersistence.numExecutorThreads", Integer.class));
+    executor.setKeepAliveSeconds(environment.getRequiredProperty("c2mon.server.cachepersistence.batchpersistence.keepAliveSeconds", Integer.class));
+    executor.setQueueCapacity(environment.getRequiredProperty("c2mon.server.cachepersistence.batchpersistence.queueCapacity", Integer.class));
     executor.setAllowCoreThreadTimeOut(true);
-
     executor.setThreadNamePrefix(THREAD_NAME_PREFIX);
-
     executor.initialize();
-
     return executor;
   }
 }

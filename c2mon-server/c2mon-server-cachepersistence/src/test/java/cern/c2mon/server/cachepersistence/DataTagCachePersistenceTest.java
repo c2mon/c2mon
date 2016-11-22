@@ -19,7 +19,11 @@ package cern.c2mon.server.cachepersistence;
 import java.io.IOException;
 import java.sql.Timestamp;
 
+import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.cachepersistence.config.CachePersistenceModule;
 import cern.c2mon.server.test.DatabasePopulationRule;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,12 +50,11 @@ import static org.junit.Assert.assertNotNull;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({
-    "classpath:config/server-cache.xml",
-    "classpath:config/server-cachedbaccess.xml",
-    "classpath:config/server-cachepersistence.xml",
-    "classpath:test-config/database-population-rule.xml",
-    "classpath:test-config/server-test-properties.xml"
+@ContextConfiguration(classes = {
+    CacheModule.class,
+    CacheDbAccessModule.class,
+    CachePersistenceModule.class,
+    DatabasePopulationRule.class
 })
 @TestPropertySource("classpath:c2mon-server-default.properties")
 public class DataTagCachePersistenceTest {
@@ -70,14 +73,14 @@ public class DataTagCachePersistenceTest {
   private BatchPersistenceManagerImpl dataTagPersistenceManager;
 
   @Autowired
-  private PersistenceSynchroListener datatagPersistenceSynchroListener;
+  private PersistenceSynchroListener dataTagPersistenceSynchroListener;
 
   private DataTagCacheObject originalObject;
 
   @Before
   public void setUpData() throws IOException {
     originalObject = (DataTagCacheObject) dataTagMapper.getItem(200000L);
-    datatagPersistenceSynchroListener.start();
+    dataTagPersistenceSynchroListener.start();
   }
 
   /**

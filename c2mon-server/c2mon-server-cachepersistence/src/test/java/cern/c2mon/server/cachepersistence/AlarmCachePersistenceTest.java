@@ -16,6 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.cachepersistence;
 
+import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.cachepersistence.config.CachePersistenceModule;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,12 +48,11 @@ import static org.junit.Assert.assertNotNull;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({
-    "classpath:config/server-cache.xml",
-    "classpath:config/server-cachedbaccess.xml",
-    "classpath:config/server-cachepersistence.xml",
-    "classpath:test-config/database-population-rule.xml",
-    "classpath:test-config/server-test-properties.xml"
+@ContextConfiguration(classes = {
+    CacheModule.class,
+    CacheDbAccessModule.class,
+    CachePersistenceModule.class,
+    DatabasePopulationRule.class
 })
 @TestPropertySource("classpath:c2mon-server-default.properties")
 public class AlarmCachePersistenceTest {
