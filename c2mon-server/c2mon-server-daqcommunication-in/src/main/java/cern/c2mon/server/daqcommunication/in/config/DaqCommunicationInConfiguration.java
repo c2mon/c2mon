@@ -16,9 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.daqcommunication.in.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
@@ -30,34 +30,16 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 public class DaqCommunicationInConfiguration {
 
-  @Value("${c2mon.server.daqcommunication.jms.update.numExecutorThreads}")
-  private int corePoolSize;
-
-  @Value("${c2mon.server.daqcommunication.jms.update.numExecutorThreads}")
-  private int maxPoolSize;
-
-  @Value("${c2mon.server.daqcommunication.jms.update.keepAliveSeconds}")
-  private int threadIdleLimit;
-
   private static final String THREAD_NAME_PREFIX = "TagUpdater-";
 
-  /**
-   * Bean responsible for creating custom ThreadPool with custom thread name prefix
-   *
-   * @return Spring ThreadPoolTaskExecutor with custom thread name prefix
-   */
   @Bean
-  public ThreadPoolTaskExecutor daqCommunicationThreadPoolTaskExecutor() {
+  public ThreadPoolTaskExecutor daqCommunicationThreadPoolTaskExecutor(Environment environment) {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-
-    executor.setCorePoolSize(corePoolSize);
-    executor.setMaxPoolSize(maxPoolSize);
-    executor.setKeepAliveSeconds(threadIdleLimit);
-
+    executor.setCorePoolSize(environment.getRequiredProperty("c2mon.server.daqcommunication.jms.update.numExecutorThreads", Integer.class));
+    executor.setMaxPoolSize(environment.getRequiredProperty("c2mon.server.daqcommunication.jms.update.numExecutorThreads", Integer.class));
+    executor.setKeepAliveSeconds(environment.getRequiredProperty("c2mon.server.daqcommunication.jms.update.keepAliveSeconds", Integer.class));
     executor.setAllowCoreThreadTimeOut(true);
-
     executor.setThreadNamePrefix(THREAD_NAME_PREFIX);
-
     return executor;
   }
 }
