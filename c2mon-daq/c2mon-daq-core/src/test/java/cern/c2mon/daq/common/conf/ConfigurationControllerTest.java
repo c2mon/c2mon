@@ -54,8 +54,6 @@ import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 
-// @RunWith(SpringJUnit4ClassRunner.class)
-// @ContextConfiguration(locations = { "classpath:resources/daq-core-service.xml" })
 public class ConfigurationControllerTest {
 
     private static final long TEST_COMMAND_TAG_ID = 2L;

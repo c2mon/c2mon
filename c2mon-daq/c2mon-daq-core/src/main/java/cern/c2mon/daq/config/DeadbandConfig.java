@@ -23,11 +23,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 /**
- * This configuration class is responsible for instantiating the various {@link CounterTimeDeadbandActivator} beans used within the DAQ core.
+ * This configuration class is responsible for instantiating the various
+ * {@link CounterTimeDeadbandActivator} beans used within the DAQ core.
  *
  * @author Justin Lewis Salmon
  */
-@Configuration
 public class DeadbandConfig {
 
   @Autowired

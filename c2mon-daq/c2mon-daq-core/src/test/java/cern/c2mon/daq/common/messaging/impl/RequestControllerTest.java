@@ -52,7 +52,7 @@ public class RequestControllerTest {
     @Before
     public void setUp() {
         Class<ConfigurationController> clazz = ConfigurationController.class;
-        configurationControllerMock = createMock(clazz, clazz.getMethods());
+        configurationControllerMock = createMock(clazz);
     }
 
     @Test

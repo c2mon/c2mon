@@ -47,7 +47,7 @@ public class DummyRequestSender implements ProcessRequestSender {
     
     @Override
     public ProcessConnectionResponse sendProcessConnectionRequest(String processName) {
-      return new ProcessConnectionResponse("P_NACHO", new Long(12345));
+      return new ProcessConnectionResponse("P_TEST", new Long(12345));
     }
 
     @Override

@@ -36,28 +36,23 @@ import cern.c2mon.daq.filter.impl.ActiveFilterSender;
 import cern.c2mon.daq.filter.impl.DummyFilterSender;
 
 /**
- * This configuration class is responsible for instantiating the various {@link ProcessMessageSender} beans used within the DAQ core. The {@link
- * ProcessMessageSender}s handle the actual sending of tags etc. to the JMS broker(s).
+ * This configuration class is responsible for instantiating the various
+ * {@link ProcessMessageSender} beans used within the DAQ core. These beans
+ * handle the actual sending of tags etc. to the JMS broker(s).
  *
- * There are three possible modes (specified by the c2mon.daq.mode, which is translated to a Spring {@link Profile}). The three modes are:
+ * There are three possible modes (specified by the c2mon.daq.mode, which is
+ * translated to a Spring {@link Profile}). The three modes are:
  *
- * "single" : a single {@link ProcessMessageSender} sending to a primary JMS broker
- * "double" : two {@link ProcessMessageSender}s, one sending to a primary JMS broker and one sending to a secondary broker (e.g. a test server)
- * "test"   : a single {@link ProcessMessageSender} which connects to a primary JMS broker but does not actually send anything.
+ * "single" : a single {@link ProcessMessageSender} sending to a primary
+ *            JMS broker
+ * "double" : two {@link ProcessMessageSender}s, one sending to a primary
+ *            JMS broker and one sending to a secondary broker (e.g. a test server)
+ * "test"   : a single {@link ProcessMessageSender} which connects to a primary
+ *            JMS broker but does not actually send anything.
  *
  * @author Justin Lewis Salmon
  */
-@Configuration
-@ImportResource({
-    "classpath:daq-activemq.xml",
-    "classpath:daq-activemq-second.xml"
-})
-@ComponentScan("cern.c2mon.daq.common.conf.core")
 public class ProcessMessageSenderConfig {
-
-  // Ensures that all configured properties are set before initialising the beans
-  @Autowired
-  private EnvironmentConfig config;
 
   @Autowired
   @Qualifier("configurationController")

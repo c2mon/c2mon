@@ -17,7 +17,9 @@
 package cern.c2mon.daq.common.conf;
 
 import cern.c2mon.daq.common.DriverKernel;
+import cern.c2mon.daq.common.ProcessMessageSenderMock;
 import cern.c2mon.daq.common.messaging.impl.DummyJmsSender;
+import cern.c2mon.daq.config.DaqCoreModule;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
 import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
@@ -34,9 +36,17 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:test-config/daq-core-service.xml"})
-@TestPropertySource(properties = {"c2mon.daq.name=P_TEST","c2mon.daq.deadband.dynamic.enabled=false"})
-public class EquipmentUnitAddRemoveTest {
+@ContextConfiguration(classes = {
+    DaqCoreModule.class,
+    ProcessMessageSenderMock.class
+})
+@TestPropertySource(
+    value = "classpath:c2mon-daq-default.properties",
+    properties = {
+        "c2mon.daq.name=P_TEST",
+        "jms.broker.url=vm://localhost:61616?broker.persistent=false&broker.useShutdownHook=false&broker.useJmx=false"
+    }
+)public class EquipmentUnitAddRemoveTest {
 
   @Autowired
   DriverKernel kernel;

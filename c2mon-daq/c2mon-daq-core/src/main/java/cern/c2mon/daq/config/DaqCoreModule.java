@@ -16,15 +16,10 @@
  ******************************************************************************/
 package cern.c2mon.daq.config;
 
-import javax.annotation.PostConstruct;
-
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
 
 /**
  * This configuration class is responsible for importing an externalised
@@ -34,23 +29,22 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
  * @author Justin Lewis Salmon
  */
 @Configuration
+@Import({
+    DeadbandConfig.class,
+    JmsConfig.class,
+    ProcessMessageSenderConfig.class,
+    ProcessRequestSenderConfig.class,
+})
+@ComponentScan("cern.c2mon.daq.common.conf.core")
 @PropertySources({
     @PropertySource(value = "classpath:c2mon-daq-default.properties"),
     @PropertySource(value = "${c2mon.daq.properties.location}", ignoreResourceNotFound = true)
 })
 @Slf4j
-public class EnvironmentConfig {
-
-  @Value("${c2mon.daq.jms.mode}")
-  private String mode;
-
-  @PostConstruct
-  public void showJmsMode() {
-    log.info("The following JMS mode is active: {}", mode);
-  }
+public class DaqCoreModule {
 
   @Bean
-  public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-    return new PropertySourcesPlaceholderConfigurer();
+  public InitializingBean showJmsMode(Environment environment) {
+    return () -> log.info("The following JMS mode is active: {}", environment.getProperty("c2mon.daq.jms.mode"));
   }
 }

@@ -38,23 +38,24 @@ import cern.c2mon.daq.common.messaging.impl.DummyMessageReceiver;
 import cern.c2mon.daq.common.messaging.impl.TestModeRequestSender;
 
 /**
- * This configuration class is responsible for instantiating the various {@link ProcessRequestSender} beans used within the DAQ core. The {@link
- * ProcessRequestSender}s are responsible for requesting the DAQ configuration from the server.
+ * This configuration class is responsible for instantiating the various
+ * {@link ProcessRequestSender} beans used within the DAQ core. These beans are
+ * responsible for requesting the DAQ configuration from the server.
  *
- * There are three possible modes (specified by the c2mon.daq.mode, which is translated to a Spring {@link Profile}). The three modes are:
+ * There are three possible modes (specified by the c2mon.daq.mode, which is
+ * translated to a Spring {@link Profile}). The three modes are:
  *
- * "single" : a single {@link ProcessRequestSender} requesting from a primary JMS broker
- * "double" : two {@link ProcessRequestSender}s, one requesting from a primary JMS broker and one talking to a secondary broker (e.g. a test server). The
- *            secondary connection is only used to notify the secondary server of disconnection events.
- * "test"   : a single {@link ProcessRequestSender} which requests from a primary JMS broker but does not send disconnection events.
+ * "single" : a single {@link ProcessRequestSender} requesting from a primary
+ *            JMS broker
+ * "double" : two {@link ProcessRequestSender}s, one requesting from a primary
+ *            JMS broker and one talking to a secondary broker (e.g. a test
+ *            server). The secondary connection is only used to notify the
+ *            secondary server of disconnection events.
+ * "test"   : a single {@link ProcessRequestSender} which requests from a
+ *            primary JMS broker but does not send disconnection events.
  *
  * @author Justin Lewis Salmon
  */
-@Configuration
-@ImportResource({
-    "classpath:daq-activemq.xml",
-    "classpath:daq-activemq-second.xml"
-})
 public class ProcessRequestSenderConfig {
 
   @Autowired
