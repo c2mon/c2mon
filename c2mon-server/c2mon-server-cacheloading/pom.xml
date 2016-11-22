@@ -11,8 +11,6 @@
   <artifactId>c2mon-server-cacheloading</artifactId>
   <packaging>jar</packaging>
 
-  <description>The C2MON server core module loading the caches from the database.</description>
-
   <dependencies>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
@@ -43,7 +41,7 @@
     </dependency>
 
     <!-- Test dependencies -->
-    
+
     <dependency>
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-test</artifactId>
