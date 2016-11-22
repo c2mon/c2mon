@@ -15,7 +15,6 @@
   <modules>
     <module>c2mon-client-common</module>
     <module>c2mon-client-core</module>
-    <module>c2mon-client-test</module>
   </modules>
 
   <dependencies>
@@ -37,11 +36,6 @@
       <dependency>
         <groupId>cern.c2mon.client</groupId>
         <artifactId>c2mon-client-core</artifactId>
-        <version>${project.parent.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>cern.c2mon.client</groupId>
-        <artifactId>c2mon-client-test</artifactId>
         <version>${project.parent.version}</version>
       </dependency>
 
