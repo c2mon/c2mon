@@ -20,7 +20,7 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
 @ImportResource({
     "classpath:config/server-cache.xml",
 //    "classpath:config/server-cachedbaccess.xml",
-    "classpath:config/server-cacheloading.xml",
+//    "classpath:config/server-cacheloading.xml",
     "classpath:config/server-cachepersistence.xml",
     "classpath:config/server-supervision.xml",
     "classpath:config/server-daqcommunication-in.xml",
@@ -34,7 +34,7 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
 @Import({
 //    CacheModule.class,
     CacheDbAccessModule.class,
-//    CacheLoadingModule.class,
+    CacheLoadingModule.class,
 //    CachePersistenceModule.class,
 //    CacheSupervisionModule.class,
 //    DaqCommunicationInModule.class,

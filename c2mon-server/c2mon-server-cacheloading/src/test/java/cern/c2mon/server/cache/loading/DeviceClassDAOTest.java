@@ -20,12 +20,15 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.test.DatabasePopulationRule;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -37,12 +40,15 @@ import cern.c2mon.server.common.device.DeviceClassCacheObject;
  * @author Justin Lewis Salmon
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({
-    "classpath:config/server-cachedbaccess.xml",
-    "classpath:config/server-cacheloading.xml",
-    "classpath:test-config/database-population-rule.xml",
-    "classpath:test-config/server-test-properties.xml"
-})
+@SpringApplicationConfiguration(
+    locations = {
+        "classpath:test-config/database-population-rule.xml"
+    },
+    classes = {
+        CacheDbAccessModule.class,
+        CacheLoadingModule.class
+    }
+)
 @TestPropertySource("classpath:c2mon-server-default.properties")
 public class DeviceClassDAOTest {
 
