@@ -5,8 +5,10 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
+import org.mybatis.spring.mapper.MapperScannerConfigurer;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
@@ -21,17 +23,9 @@ import java.util.Properties;
  * @author Justin Lewis Salmon
  */
 @EnableTransactionManagement
-@MapperScan({
-    "cern.c2mon.server.cache.dbaccess",
-    "cern.c2mon.server.common.process",
-    "cern.c2mon.server.common.equipment",
-    "cern.c2mon.shared.common.datatag",
-    "cern.c2mon.server.common.alarm",
-    "cern.c2mon.shared.common.metadata"
-})
-public class CacheDataSourceConfig {
+@MapperScan(value = "cern.c2mon.server.cache.dbaccess", sqlSessionFactoryRef = "cacheSqlSessionFactory")
+public class CacheDataSourceConfig implements EnvironmentAware {
 
-  @Resource
   private Environment environment;
 
   @Bean
@@ -61,7 +55,7 @@ public class CacheDataSourceConfig {
   }
 
   @Bean
-  public SqlSessionFactoryBean sqlSessionFactory(DataSource cacheDataSource) throws Exception {
+  public SqlSessionFactoryBean cacheSqlSessionFactory(DataSource cacheDataSource) throws Exception {
     SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
     sessionFactory.setDataSource(cacheDataSource);
     sessionFactory.setTypeHandlersPackage("cern.c2mon.server.cache.dbaccess.type");
@@ -79,5 +73,10 @@ public class CacheDataSourceConfig {
     ));
     databaseIdProvider.setProperties(properties);
     return databaseIdProvider;
+  }
+
+  @Override
+  public void setEnvironment(Environment environment) {
+    this.environment = environment;
   }
 }
