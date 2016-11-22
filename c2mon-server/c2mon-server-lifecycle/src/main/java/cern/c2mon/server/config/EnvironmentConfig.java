@@ -6,6 +6,7 @@ import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.cachepersistence.config.CachePersistenceModule;
 import cern.c2mon.server.client.config.ClientModule;
+import cern.c2mon.server.command.config.CommandModule;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.DefaultLifecycleProcessor;
 
@@ -29,7 +30,7 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
     "classpath:config/server-configuration.xml",
 //    "classpath:config/server-client.xml",
 //    "classpath:config/server-alarm.xml",
-    "classpath:config/server-command.xml",
+//    "classpath:config/server-command.xml",
 })
 @Import({
     CacheModule.class,
@@ -43,7 +44,7 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
 //    ConfigurationModule.class,
     ClientModule.class,
     AlarmModule.class,
-//    CommandModule.class
+    CommandModule.class
 })
 @PropertySources({
     @PropertySource("classpath:c2mon-server-default.properties"),
