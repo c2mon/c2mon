@@ -16,8 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.client.core;
 
-import java.util.HashSet;
-import java.util.Set;
 
 import cern.c2mon.client.core.config.C2monAutoConfiguration;
 import cern.c2mon.client.core.config.mock.MockServerConfig;
@@ -28,8 +26,6 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.client.common.listener.BaseTagListener;
-import cern.c2mon.client.common.tag.Tag;
 
 import static org.junit.Assert.assertNotNull;
 
