@@ -12,7 +12,7 @@ import org.springframework.jms.core.JmsTemplate;
  * @author Justin Lewis Salmon
  */
 @Configuration
-public class DaqOutJmsConfig {
+public class DaqCommunicationOutJmsConfig {
 
   @Autowired
   private Environment environment;

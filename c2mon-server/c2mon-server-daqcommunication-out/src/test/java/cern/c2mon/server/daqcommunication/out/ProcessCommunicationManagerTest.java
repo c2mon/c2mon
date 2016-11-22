@@ -18,14 +18,16 @@ package cern.c2mon.server.daqcommunication.out;
 
 
 import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.daqcommunication.out.config.DaqOutJmsConfig;
+import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
+import cern.c2mon.server.daqcommunication.out.config.DaqCommunicationOutModule;
 import cern.c2mon.server.daqcommunication.out.junit.DaqOutCachePopulationRule;
 import cern.c2mon.server.test.broker.EmbeddedBrokerRule;
 import cern.c2mon.server.test.config.TestConfig;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 import cern.c2mon.shared.daq.serialization.MessageConverter;
 import org.apache.activemq.command.ActiveMQQueue;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +36,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -49,18 +52,13 @@ import static org.junit.Assert.assertNotNull;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(
-    locations = {
-        "classpath:config/server-cache.xml",
-        "classpath:config/server-cachedbaccess.xml",
-        "classpath:config/server-cacheloading.xml",
-        "classpath:config/server-daqcommunication-out.xml",
-        "classpath:test-config/server-test-properties.xml"
-    },
-    classes = {
-        TestConfig.class,
-        DaqOutJmsConfig.class
-    })
+@ContextConfiguration(classes = {
+    CacheModule.class,
+    CacheDbAccessModule.class,
+    CacheLoadingModule.class,
+    DaqCommunicationOutModule.class,
+    TestConfig.class,
+})
 @TestPropertySource(value = "classpath:c2mon-server-default.properties", properties = "spring.main.show_banner=false")
 public class ProcessCommunicationManagerTest {
 
@@ -103,7 +101,7 @@ public class ProcessCommunicationManagerTest {
             @Override
             public Object doInJms(Session session) throws JMSException {
               MessageConsumer consumer = session.createConsumer(new ActiveMQQueue(processCache.get(50L).getJmsDaqCommandQueue()));
-              Message incomingMessage = consumer.receive(100000);
+              Message incomingMessage = consumer.receive(1000);
               MessageProducer messageProducer = session.createProducer(incomingMessage.getJMSReplyTo());
               TextMessage replyMessage = session.createTextMessage();
               replyMessage.setText(reportString);

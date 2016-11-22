@@ -9,6 +9,7 @@ import cern.c2mon.server.client.config.ClientModule;
 import cern.c2mon.server.command.config.CommandModule;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
 import cern.c2mon.server.daqcommunication.in.config.DaqCommunicationInModule;
+import cern.c2mon.server.daqcommunication.out.config.DaqCommunicationOutModule;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.DefaultLifecycleProcessor;
 
@@ -22,7 +23,6 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
 @Configuration
 @ImportResource({
     "classpath:config/server-supervision.xml",
-    "classpath:config/server-daqcommunication-out.xml",
     "classpath:config/server-rule.xml",
 })
 @Import({
@@ -32,7 +32,7 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
     CachePersistenceModule.class,
 //    SupervisionModule.class,
     DaqCommunicationInModule.class,
-//    DaqCommunicationOutModule.class,
+    DaqCommunicationOutModule.class,
 //    RuleModule.class,
     ConfigurationModule.class,
     ClientModule.class,

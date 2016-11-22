@@ -24,6 +24,7 @@ import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
 import cern.c2mon.server.daqcommunication.in.config.DaqCommunicationInModule;
 import cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl;
+import cern.c2mon.server.daqcommunication.out.config.DaqCommunicationOutModule;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
@@ -53,7 +54,6 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(
     locations = {
-        "classpath:config/server-daqcommunication-out.xml",
         "classpath:config/server-rule.xml",
         "classpath:config/server-supervision.xml",
         "classpath:test-config/server-test-properties.xml"
@@ -64,6 +64,7 @@ import static org.junit.Assert.assertEquals;
         CacheLoadingModule.class,
         ConfigurationModule.class,
         DaqCommunicationInModule.class,
+        DaqCommunicationOutModule.class,
         ProcessCommunicationManagerMock.class
     }
 )

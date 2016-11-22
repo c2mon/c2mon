@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.core.env.Environment;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -71,7 +72,6 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
   /**
    * Time spent waiting for a DAQ to send a response when reconfiguration.
    */
-  @Value("${c2mon.server.daqcommunication.jms.configurationTimeout}")
   private int configurationTimeout = 180000;
 
   /**
@@ -116,15 +116,18 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
    */
   @Autowired
   public ProcessCommunicationManagerImpl(EquipmentCache equipmentCache,
-                                         ProcessCache processCache, ProcessFacade processFacade,
+                                         ProcessCache processCache,
+                                         ProcessFacade processFacade,
                                          JmsProcessOut jmsProcessOut,
-                                         @Qualifier("processOutConnectionFactory") ConnectionFactory connectionFactory) {
+                                         @Qualifier("processOutConnectionFactory") ConnectionFactory connectionFactory,
+                                         Environment environment) {
     super();
     this.equipmentCache = equipmentCache;
     this.processCache = processCache;
     this.processFacade = processFacade;
     this.jmsProcessOut = jmsProcessOut;
     this.processOutConnectionFactory = connectionFactory;
+    this.configurationTimeout = environment.getRequiredProperty("c2mon.server.daqcommunication.jms.configurationTimeout", Integer.class);
   }
 
   @Override
