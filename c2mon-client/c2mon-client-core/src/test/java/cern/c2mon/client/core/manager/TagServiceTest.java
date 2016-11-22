@@ -26,8 +26,13 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.jms.JMSException;
 
+import cern.c2mon.client.core.config.C2monAutoConfiguration;
+import cern.c2mon.client.core.config.mock.CoreSupervisionManagerMock;
+import cern.c2mon.client.core.config.mock.JmsProxyMock;
+import cern.c2mon.client.core.config.mock.RequestHandlerMock;
 import org.easymock.EasyMock;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,7 +57,12 @@ import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:test-config/c2mon-tagservice-test.xml" })
+@ContextConfiguration(classes = {
+    C2monAutoConfiguration.class,
+    JmsProxyMock.class,
+    RequestHandlerMock.class,
+    CoreSupervisionManagerMock.class
+})
 public class TagServiceTest {
 
   /**
@@ -67,6 +77,11 @@ public class TagServiceTest {
 
   @Autowired
   private JmsProxy jmsProxyMock;
+
+  @Before
+  public void setUp() {
+    EasyMock.reset(requestHandlerMock, jmsProxyMock);
+  }
 
   @Test @DirtiesContext
   public void testSubscribeDataTags() throws Exception {
