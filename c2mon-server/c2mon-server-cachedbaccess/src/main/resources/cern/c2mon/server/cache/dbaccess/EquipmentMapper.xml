@@ -5,7 +5,7 @@
 
   <mapper namespace="cern.c2mon.server.cache.dbaccess.EquipmentMapper">
 
-    <resultMap id="abstractEquipmentResultMap" type="AbstractEquipment">
+    <resultMap id="abstractEquipmentResultMap" type="cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject">
       <id property="id" column="equipment_id" />
       <result property="name" column="equipment_name" />
       <result property="description" column="equipment_description"/>
@@ -19,7 +19,7 @@
       <result property="statusTime" column="equipment_status_time"/>
     </resultMap>
 
-    <resultMap id="equipmentResultMap" type="Equipment" extends="abstractEquipmentResultMap">
+    <resultMap id="equipmentResultMap" type="cern.c2mon.server.common.equipment.EquipmentCacheObject" extends="abstractEquipmentResultMap">
       <result property="address" column="equipment_address"/>
       <result property="processId" column="equipment_procid"/>
       <collection property="subEquipmentIds" ofType="Long" javaType="java.util.LinkedList" resultMap="subEquipmentIdsResultMap"/>
@@ -71,7 +71,7 @@
     </select>
 
     <!-- inserts the equipment (subequipments must be added separately) -->
-    <insert id="insertEquipment" parameterType="Equipment">
+    <insert id="insertEquipment" parameterType="cern.c2mon.server.common.equipment.EquipmentCacheObject">
       INSERT INTO EQUIPMENT (EQID, EQNAME, EQDESC,
                              EQHANDLERCLASS, EQSTATE_TAGID, EQALIVE_TAGID,
                              EQALIVEINTERVAL, EQCOMMFAULT_TAGID,
@@ -84,7 +84,7 @@
                              #{statusTime,jdbcType=TIMESTAMP}, #{statusDescription,jdbcType=VARCHAR})
     </insert>
 
-    <update id="updateEquipmentConfig" parameterType="Equipment">
+    <update id="updateEquipmentConfig" parameterType="cern.c2mon.server.common.equipment.EquipmentCacheObject">
       UPDATE EQUIPMENT
          SET EQNAME = #{name},
              EQDESC = #{description,jdbcType=VARCHAR},
@@ -109,7 +109,7 @@
             WHERE EQID = #{id}
     </delete>
 
-    <update id="updateCacheable" parameterType="Equipment">
+    <update id="updateCacheable" parameterType="cern.c2mon.server.common.equipment.EquipmentCacheObject">
       UPDATE EQUIPMENT
          SET EQSTATE = #{supervisionStatus,jdbcType=VARCHAR},
              EQSTATUSTIME = #{statusTime,jdbcType=TIMESTAMP},

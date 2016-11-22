@@ -5,7 +5,8 @@
 
   <mapper namespace="cern.c2mon.server.cache.dbaccess.SubEquipmentMapper">
 
-    <resultMap id="subEquipmentResultMap" type="SubEquipment" extends="cern.c2mon.server.cache.dbaccess.EquipmentMapper.abstractEquipmentResultMap">
+    <resultMap id="subEquipmentResultMap" type="cern.c2mon.server.common.subequipment.SubEquipmentCacheObject"
+               extends="cern.c2mon.server.cache.dbaccess.EquipmentMapper.abstractEquipmentResultMap">
       <result property="parentId" column="equipment_parentid" />
     </resultMap>
 
@@ -32,7 +33,7 @@
     </select>
 
     <!--  Inserts a new row into the equipment database table -->
-    <insert id="insertSubEquipment" parameterType="SubEquipment">
+    <insert id="insertSubEquipment" parameterType="cern.c2mon.server.common.subequipment.SubEquipmentCacheObject">
       INSERT INTO EQUIPMENT(EQID, EQNAME, EQDESC,
                             EQHANDLERCLASS, EQSTATE_TAGID, EQALIVE_TAGID,
                             EQALIVEINTERVAL, EQCOMMFAULT_TAGID,
@@ -44,7 +45,7 @@
               #{statusTime,jdbcType=TIMESTAMP}, #{statusDescription,jdbcType=VARCHAR})
     </insert>
 
-    <update id="updateSubEquipmentConfig" parameterType="SubEquipment">
+    <update id="updateSubEquipmentConfig" parameterType="cern.c2mon.server.common.subequipment.SubEquipmentCacheObject">
       UPDATE EQUIPMENT
          SET EQNAME = #{name},
              EQDESC = #{description,jdbcType=VARCHAR},
@@ -85,7 +86,7 @@
       DELETE FROM EQUIPMENT WHERE EQID=#{id} and EQ_PROCID IS NULL
     </delete>
 
-    <update id="updateCacheable" parameterType="SubEquipment">
+    <update id="updateCacheable" parameterType="cern.c2mon.server.common.subequipment.SubEquipmentCacheObject">
       UPDATE EQUIPMENT
          SET EQSTATE = #{supervisionStatus,jdbcType=VARCHAR},
              EQSTATUSTIME = #{statusTime,jdbcType=TIMESTAMP},

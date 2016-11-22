@@ -24,9 +24,9 @@
       <result property="maximum" column="CMDMAXVALUE" javaType="java.lang.Comparable" jdbcType="VARCHAR"/>
        <!-- commands belong to a single equipment (not subequipment so far! - would need to change this) -->
       <result property="processId" column="EQ_PROCID" jdbcType="NUMERIC"/>
-      <result property="metadata" column="CMDMETADATA" javaType="Metadata" jdbcType="VARCHAR"/>
+      <result property="metadata" column="CMDMETADATA" javaType="cern.c2mon.shared.common.metadata.Metadata" jdbcType="VARCHAR"/>
 
-      <association property="authorizationDetails" javaType="RbacAuthorizationDetails">
+      <association property="authorizationDetails" javaType="cern.c2mon.shared.client.command.RbacAuthorizationDetails">
         <result property="rbacClass" column="CMDRBACCLASS"/>
         <result property="rbacDevice" column="CMDRBACDEVICE"/>
         <result property="rbacProperty" column="CMDRBACPROPERTY"/>

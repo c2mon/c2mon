@@ -5,7 +5,7 @@
 
   <mapper namespace="cern.c2mon.server.cache.dbaccess.AlarmMapper">
 
-    <resultMap id="alarmResultMap" type="Alarm">
+    <resultMap id="alarmResultMap" type="cern.c2mon.server.common.alarm.AlarmCacheObject">
       <id property="id" column="ALARMID"/>
       <result property="faultFamily" column="ALARMFFAMILY" jdbcType="VARCHAR"/>
       <result property="faultMember" column="ALARMFMEMBER" jdbcType="VARCHAR"/>
@@ -14,10 +14,10 @@
       <result property="timestamp" column="ALARMTIME" jdbcType="TIMESTAMP"/>
       <result property="published" column="ALA_PUBLISHED" jdbcType="NUMERIC"/>
       <result property="info" column="ALARMINFO" jdbcType="VARCHAR"/>
-      <result property="condition" column="ALARMCONDITION" javaType="AlarmCondition" jdbcType="VARCHAR"/>
+      <result property="condition" column="ALARMCONDITION" javaType="cern.c2mon.server.common.alarm.AlarmCondition" jdbcType="VARCHAR"/>
       <result property="dataTagId" column="ALARM_TAGID" jdbcType="NUMERIC"/>
-      <result property="metadata" column="ALARMMETADATA" javaType="Metadata" jdbcType="VARCHAR"/>
-      <association property="lastPublication" javaType="LaserPublication">
+      <result property="metadata" column="ALARMMETADATA" javaType="cern.c2mon.shared.common.metadata.Metadata" jdbcType="VARCHAR"/>
+      <association property="lastPublication" javaType="cern.c2mon.server.common.alarm.AlarmPublication">
         <result property="state" column="ALA_PUB_STATE" jdbcType="VARCHAR"/>
         <result property="publicationTime" column="ALA_PUB_TIME" jdbcType="TIMESTAMP"/>
         <result property="info" column="ALA_PUB_INFO" jdbcType="VARCHAR"/>
@@ -62,7 +62,7 @@
        WHERE alarmid = #{id}
     </select>
 
-    <update id="updateCacheable" parameterType="Alarm">
+    <update id="updateCacheable" parameterType="cern.c2mon.server.common.alarm.AlarmCacheObject">
       UPDATE ALARM
          SET ALARMSTATE = #{state,jdbcType=VARCHAR},
              ALARMTIME = #{timestamp,jdbcType=TIMESTAMP},
@@ -74,18 +74,18 @@
        WHERE ALARMID = #{id}
     </update>
 
-    <update id="updateConfig" parameterType="Alarm">
+    <update id="updateConfig" parameterType="cern.c2mon.server.common.alarm.AlarmCacheObject">
       UPDATE ALARM
          SET ALARMFFAMILY = #{faultFamily},
              ALARMFMEMBER = #{faultMember},
              ALARMFCODE = #{faultCode},
-             ALARMCONDITION = #{condition,javaType=AlarmCondition,jdbcType=VARCHAR},
+             ALARMCONDITION = #{condition,javaType=cern.c2mon.server.common.alarm.AlarmCondition,jdbcType=VARCHAR},
              ALARMMETADATA = #{metadata,jdbcType=VARCHAR}
        WHERE ALARMID = #{id}
     </update>
 
     <!-- must specify jdbcType for parameters that can be null in DB  -->
-    <insert id="insertAlarm" parameterType="Alarm">
+    <insert id="insertAlarm" parameterType="cern.c2mon.server.common.alarm.AlarmCacheObject">
       INSERT INTO ALARM (ALARMID, ALARMFFAMILY, ALARMFMEMBER, ALARMFCODE,
                          ALARMSTATE, ALARMTIME, ALA_PUBLISHED, ALARMINFO,
                          ALARMCONDITION, ALARM_TAGID,
@@ -93,7 +93,7 @@
                 )
       VALUES (#{id},#{faultFamily},#{faultMember},#{faultCode},
               #{state,jdbcType=VARCHAR}, #{timestamp,jdbcType=TIMESTAMP}, #{published,jdbcType=NUMERIC}, #{info,jdbcType=VARCHAR},
-              #{condition,javaType=AlarmCondition,jdbcType=VARCHAR},
+              #{condition,javaType=cern.c2mon.server.common.alarm.AlarmCondition,jdbcType=VARCHAR},
               #{dataTagId,jdbcType=NUMERIC},
               #{lastPublication.state,jdbcType=VARCHAR}, #{lastPublication.publicationTime,jdbcType=TIMESTAMP}, #{lastPublication.info,jdbcType=VARCHAR},
               #{metadata, jdbcType=VARCHAR}

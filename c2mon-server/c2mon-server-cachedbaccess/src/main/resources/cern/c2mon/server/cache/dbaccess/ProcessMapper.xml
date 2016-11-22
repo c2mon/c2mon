@@ -76,7 +76,7 @@
                             #{processPIK,jdbcType=NUMERIC}, #{localConfig,jdbcType=VARCHAR})
     </insert>
 
-    <update id="updateCacheable" parameterType="Process">
+    <update id="updateCacheable" parameterType="cern.c2mon.server.common.process.ProcessCacheObject">
       UPDATE PROCESS
          SET PROCSTARTUPTIME = #{startupTime,jdbcType=TIMESTAMP},
              PROCSTATE = #{supervisionStatus,jdbcType=VARCHAR},
@@ -89,7 +89,7 @@
        WHERE PROCID = #{id}
     </update>
 
-    <update id="updateProcessConfig" parameterType="Process">
+    <update id="updateProcessConfig" parameterType="cern.c2mon.server.common.process.ProcessCacheObject">
       UPDATE PROCESS
          SET PROCNAME = #{name},
              PROCDESC = #{description,jdbcType=VARCHAR},

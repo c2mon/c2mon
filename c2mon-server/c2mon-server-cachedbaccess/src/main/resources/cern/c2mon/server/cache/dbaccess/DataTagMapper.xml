@@ -26,7 +26,7 @@
 
       <result property="cacheTimestamp" column="TAGSRVTIMESTAMP" jdbcType="TIMESTAMP"/>
 
-      <result property="dataTagQuality" column="TAGQUALITYDESC" javaType="DataTagQuality" jdbcType="VARCHAR"/>
+      <result property="dataTagQuality" column="TAGQUALITYDESC" javaType="cern.c2mon.shared.common.datatag.DataTagQuality" jdbcType="VARCHAR"/>
 
       <result property="unit" column="TAGUNIT" jdbcType="VARCHAR"/>
       <result property="simulated" column="TAGSIMULATED" jdbcType="NUMERIC"/>
@@ -40,7 +40,7 @@
 
       <result property="ruleIdsString" column="TAGRULEIDS" jdbcType="VARCHAR"/>
 
-      <result property="metadata" column="TAGMETADATA" javaType="Metadata" jdbcType="VARCHAR"/>
+      <result property="metadata" column="TAGMETADATA" javaType="cern.c2mon.shared.common.metadata.Metadata" jdbcType="VARCHAR"/>
 
       <collection property="alarmIds" ofType="Long" javaType="java.util.ArrayList" resultMap="tagAlarmIdsResultMap"/>
 
@@ -146,7 +146,7 @@
              TAGTIMESTAMP = #{sourceTimestamp, jdbcType=TIMESTAMP},
              TAGDAQTIMESTAMP = #{daqTimestamp, jdbcType=TIMESTAMP},
              TAGSRVTIMESTAMP = #{cacheTimestamp,jdbcType=TIMESTAMP},
-             TAGQUALITYDESC = SUBSTR(#{dataTagQuality,javaType=DataTagQuality,jdbcType=VARCHAR}, 1, 1000),
+             TAGQUALITYDESC = SUBSTR(#{dataTagQuality,javaType=cern.c2mon.shared.common.datatag.DataTagQuality,jdbcType=VARCHAR}, 1, 1000),
              TAGSIMULATED = #{simulated,jdbcType=NUMERIC}
        WHERE TAGID=#{id}
     </update>
@@ -191,7 +191,7 @@
       VALUES (#{id},#{name},SUBSTR(#{description, jdbcType=VARCHAR}, 1, 100),#{mode},#{dataType},
               #{value,javaType=java.lang.Object,jdbcType=VARCHAR},SUBSTR(#{valueDescription,jdbcType=VARCHAR}, 1, 2000),
               #{sourceTimestamp, jdbcType=TIMESTAMP},#{daqTimestamp,jdbcType=TIMESTAMP},#{cacheTimestamp,jdbcType=TIMESTAMP},
-              SUBSTR(#{dataTagQuality,javaType=DataTagQuality,jdbcType=VARCHAR}, 1, 1000),
+              SUBSTR(#{dataTagQuality,javaType=cern.c2mon.shared.common.datatag.DataTagQuality,jdbcType=VARCHAR}, 1, 1000),
 
               <if test="equipmentId != null">
                 #{equipmentId,jdbcType=NUMERIC},
