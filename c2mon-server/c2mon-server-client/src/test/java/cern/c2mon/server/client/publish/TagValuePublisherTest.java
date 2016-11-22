@@ -28,6 +28,7 @@ import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.configuration.config.ConfigurationModule;
 import cern.c2mon.server.daqcommunication.in.config.DaqCommunicationInConfiguration;
 import cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl;
 import cern.c2mon.server.test.CacheObjectCreation;
@@ -68,20 +69,17 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(
     locations = {
-//        "classpath:config/server-cache.xml",
-//        "classpath:config/server-cachedbaccess.xml",
-        "classpath:config/server-configuration.xml",
         "classpath:config/server-daqcommunication-in.xml",
         "classpath:config/server-daqcommunication-out.xml",
         "classpath:config/server-rule.xml",
         "classpath:config/server-supervision.xml",
-//        "classpath:config/server-alarm.xml",
         "classpath:config/server-command.xml",
         "classpath:test-config/server-test-properties.xml"
     },
     classes = {
         CacheModule.class,
         CacheDbAccessModule.class,
+        ConfigurationModule.class,
         ClientModule.class,
         DaqCommunicationInConfiguration.class,
         AlarmModule.class,

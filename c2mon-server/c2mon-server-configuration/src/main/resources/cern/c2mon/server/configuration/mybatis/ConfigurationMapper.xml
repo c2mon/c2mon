@@ -5,11 +5,11 @@
 
   <mapper namespace="cern.c2mon.server.configuration.mybatis.ConfigurationMapper">
 
-    <resultMap id="configElementResultMap" type="ConfigurationElement">
+    <resultMap id="configElementResultMap" type="cern.c2mon.shared.client.configuration.ConfigurationElement">
       <id property="sequenceId" column="elt_seqid"/>
       <result property="configId" column="elt_configid"/>
       <result property="action" column="elt_modetype" jdbcType="VARCHAR"/>
-      <result property="entity" column="elt_elementtype" jdbcType="VARCHAR" typeHandler="EntityTypeHandler"/>
+      <result property="entity" column="elt_elementtype" jdbcType="VARCHAR" typeHandler="cern.c2mon.server.configuration.mybatis.EntityTypeHandler"/>
       <result property="entityId" column="elt_elementpkey" jdbcType="VARCHAR"/>
       <association property="elementProperties" column="elt_seqid" javaType="java.util.Properties"
                                                                         select="propertiesSelect"/>
@@ -44,7 +44,7 @@
        ORDER BY E.SEQID
     </select>
 
-    <update id="saveStatusInfo" parameterType="ConfigurationElement">
+    <update id="saveStatusInfo" parameterType="cern.c2mon.shared.client.configuration.ConfigurationElement">
       UPDATE TIMCONFIGELT
          SET AS_STATUS = #{status,jdbcType=VARCHAR},
              DAQ_STATUS = #{daqStatus,jdbcType=VARCHAR}

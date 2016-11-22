@@ -17,7 +17,10 @@
 package cern.c2mon.server.configuration.api;
 
 import cern.c2mon.server.cache.*;
+import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.*;
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
@@ -30,10 +33,11 @@ import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.api.util.CacheObjectFactory;
 import cern.c2mon.server.configuration.api.util.TestConfigurationProvider;
+import cern.c2mon.server.configuration.config.ConfigurationModule;
+import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
 import cern.c2mon.server.configuration.junit.ConfigurationCachePopulationRule;
 import cern.c2mon.server.configuration.parser.util.*;
-import cern.c2mon.server.configuraton.helper.ObjectEqualityComparison;
-import cern.c2mon.server.daqcommunication.in.JmsContainerManager;
+import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
 import cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl;
 import cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
@@ -59,7 +63,7 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -79,21 +83,23 @@ import static org.junit.Assert.*;
  * @author Franz Ritter
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
+@SpringApplicationConfiguration(
     locations = {
-        "classpath:test-config/process-communication-manager-mock.xml",
-        "classpath:config/server-configuration.xml",
-        "classpath:config/server-cache.xml",
-        "classpath:config/server-cachedbaccess.xml",
-        "classpath:config/server-cacheloading.xml",
         "classpath:config/server-daqcommunication-in.xml",
         "classpath:config/server-daqcommunication-out.xml",
         "classpath:config/server-rule.xml",
-        "classpath:config/server-configuration.xml",
         "classpath:config/server-supervision.xml",
         "classpath:test-config/server-test-properties.xml"
-    })
-@TestPropertySource("classpath:c2mon-server-default.properties")
+    },
+    classes = {
+        CacheModule.class,
+        CacheDbAccessModule.class,
+        CacheLoadingModule.class,
+        ConfigurationModule.class,
+        ProcessCommunicationManagerMock.class
+    }
+)
+@TestPropertySource(value = "classpath:c2mon-server-default.properties", properties = "spring.main.show_banner=false")
 public class ConfigurationLoaderTest {
 
   @Rule

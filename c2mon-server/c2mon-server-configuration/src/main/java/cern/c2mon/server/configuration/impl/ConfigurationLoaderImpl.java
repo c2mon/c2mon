@@ -51,6 +51,8 @@ import cern.c2mon.shared.client.configuration.converter.DateFormatConverter;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 /**
  * Implementation of the server ConfigurationLoader bean.
@@ -69,6 +71,7 @@ import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
  *
  */
 @Slf4j
+@Component
 public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   //TODO element & element report status always both need updating - redesign this part
@@ -116,6 +119,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   private final DeviceConfigHandler deviceConfigHandler;
 
+  private Environment environment;
+
   /**
    * Flag recording if configuration events should be sent to the DAQ layer (set in XML).
    */
@@ -140,13 +145,23 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   @Autowired
   public ConfigurationLoaderImpl(ProcessCommunicationManager processCommunicationManager,
-      ConfigurationDAO configurationDAO, DataTagConfigHandler dataTagConfigHandler,
-      ControlTagConfigHandler controlTagConfigHandler, CommandTagConfigHandler commandTagConfigHandler,
-      AlarmConfigHandler alarmConfigHandler, RuleTagConfigHandler ruleTagConfigHandler,
-      EquipmentConfigHandler equipmentConfigHandler, SubEquipmentConfigHandler subEquipmentConfigHandler,
-      ProcessConfigHandler processConfigHandler, ProcessFacade processFacade, ClusterCache clusterCache,
-      ProcessCache processCache, DeviceClassConfigHandler deviceClassConfigHandler,
-      DeviceConfigHandler deviceConfigHandler, ConfigurationParser configParser, SequenceDAO sequenceDAO) {
+                                 ConfigurationDAO configurationDAO,
+                                 DataTagConfigHandler dataTagConfigHandler,
+                                 ControlTagConfigHandler controlTagConfigHandler,
+                                 CommandTagConfigHandler commandTagConfigHandler,
+                                 AlarmConfigHandler alarmConfigHandler,
+                                 RuleTagConfigHandler ruleTagConfigHandler,
+                                 EquipmentConfigHandler equipmentConfigHandler,
+                                 SubEquipmentConfigHandler subEquipmentConfigHandler,
+                                 ProcessConfigHandler processConfigHandler,
+                                 ProcessFacade processFacade,
+                                 ClusterCache clusterCache,
+                                 ProcessCache processCache,
+                                 DeviceClassConfigHandler deviceClassConfigHandler,
+                                 DeviceConfigHandler deviceConfigHandler,
+                                 ConfigurationParser configParser,
+                                 SequenceDAO sequenceDAO,
+                                 Environment environment) {
     super();
     this.processCommunicationManager = processCommunicationManager;
     this.configurationDAO = configurationDAO;
@@ -165,6 +180,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     this.deviceConfigHandler = deviceConfigHandler;
     this.configParser = configParser;
     this.sequenceDAO = sequenceDAO;
+    this.daqConfigEnabled = environment.getRequiredProperty("c2mon.server.configuration.daqConfigEnabled", Boolean.class);
+    this.reportDirectory = environment.getRequiredProperty("c2mon.server.home") + "/reports";
   }
 
   @Override

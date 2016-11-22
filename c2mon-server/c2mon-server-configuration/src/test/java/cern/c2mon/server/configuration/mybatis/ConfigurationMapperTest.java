@@ -16,6 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.mybatis;
 
+import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
+import cern.c2mon.server.configuration.config.ConfigurationModule;
+import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
 import cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
@@ -27,6 +32,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -44,17 +50,23 @@ import static org.junit.Assert.assertEquals;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({
-    "classpath:config/server-configuration.xml",
-    "classpath:config/server-daqcommunication-in.xml",
-    "classpath:config/server-daqcommunication-out.xml",
-    "classpath:config/server-cache.xml",
-    "classpath:config/server-cachedbaccess.xml",
-    "classpath:config/server-rule.xml",
-    "classpath:config/server-supervision.xml",
-    "classpath:test-config/server-test-properties.xml"
-})
-@TestPropertySource("classpath:c2mon-server-default.properties")
+@SpringApplicationConfiguration(
+    locations = {
+        "classpath:config/server-daqcommunication-in.xml",
+        "classpath:config/server-daqcommunication-out.xml",
+        "classpath:config/server-rule.xml",
+        "classpath:config/server-supervision.xml",
+        "classpath:test-config/server-test-properties.xml"
+    },
+    classes = {
+        CacheModule.class,
+        CacheDbAccessModule.class,
+        CacheLoadingModule.class,
+        ConfigurationModule.class,
+        ProcessCommunicationManagerMock.class
+    }
+)
+@TestPropertySource(value = "classpath:c2mon-server-default.properties", properties = "spring.main.show_banner=false")
 public class ConfigurationMapperTest {
 
   @Rule
