@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -35,14 +35,14 @@ import org.slf4j.LoggerFactory;
 /**
  * Abstract class that holds all the common functionality to the different
  * fallback files that may exists
- * 
+ *
  * @author mruizgar
- * 
+ *
  */
 public class FallbackFileController {
 
     /** Log4j Logger for tags that cannot be logged to the database */
-    public static final Logger LOG = LoggerFactory.getLogger("ShortTermLogFallbackLogger");
+    public static final Logger LOG = LoggerFactory.getLogger("HistoryFallbackLogger");
 
     /** The file storing the datatags */
     private File dataFile;
@@ -189,7 +189,7 @@ public class FallbackFileController {
     /**
      * Gets the absolute path of the counter file, given the absolute path of
      * its corresponding fallback file
-     * 
+     *
      * @param filePath
      *            The absolute path of its corresponding fallback file
      * @return The absolute path of the counter file
@@ -203,7 +203,7 @@ public class FallbackFileController {
 
     /**
      * Constructor for the class
-     * 
+     *
      * @param fallbackPath
      *            path of the fallback file
      */
@@ -256,7 +256,7 @@ public class FallbackFileController {
     /**
      * Reads the number that is stored in the counter file and which represents
      * the already committed data
-     * 
+     *
      * @return The counter stored in the counter file
      * @throws DataFallbackException
      *             An exception is thrown when the counter cannot be read from
@@ -291,7 +291,7 @@ public class FallbackFileController {
 
     /**
      * It prepares the file descriptor to read from a certain number of lines
-     * 
+     *
      * @param lineNumber
      *            The number of lines to be read to prepare the file descriptor
      * @throws DataFallbackException
@@ -319,7 +319,7 @@ public class FallbackFileController {
 
     /**
      * Create a stream to read from the counter file
-     * 
+     *
      * @throws DataFallbackException
      *             An exception is thrown when the input stream cannot be opened
      */
@@ -338,7 +338,7 @@ public class FallbackFileController {
 
     /**
      * Close the input stream opened for the counter file
-     * 
+     *
      * @throws DataFallbackException
      *             An exception is thrown if the stream could not be closed
      */
@@ -358,7 +358,7 @@ public class FallbackFileController {
 
     /**
      * It opens the counter binary file for writing
-     * 
+     *
      * @throws DataFallbackException
      *             An exception is thrown if the file can not be opened for
      *             wrtiting
@@ -378,7 +378,7 @@ public class FallbackFileController {
 
     /**
      * The output stream for the counter file is closed
-     * 
+     *
      * @throws DataFallbackException
      *             An exception is thrown if the descriptor cannot be closed
      */
@@ -398,7 +398,7 @@ public class FallbackFileController {
 
     /**
      * It opens a file output stream
-     * 
+     *
      * @throws DataFallbackException
      *             An exception is thrown if the output stream cannot be opened.
      */
@@ -417,7 +417,7 @@ public class FallbackFileController {
 
     /**
      * It opens a file input stream
-     * 
+     *
      * @throws DataFallbackException
      *             An exception is thrown if the input stream cannot be opened
      */
@@ -436,7 +436,7 @@ public class FallbackFileController {
 
     /**
      * It closes the input stream
-     * 
+     *
      * @throws DataFallbackException
      *             An exception is thrown if the input stream cannot be closed
      */
@@ -457,7 +457,7 @@ public class FallbackFileController {
 
     /**
      * It closes the output stream
-     * 
+     *
      * @throws DataFallbackException
      *             An exception is thrown if the output stream cannot be closed
      */
@@ -504,7 +504,7 @@ public class FallbackFileController {
 
     /**
      * It writes an object into one of the fallback files
-     * 
+     *
      * @param object
      *            The IFallback object to be written to the fallback file
      * @throws DataFallbackException
@@ -532,7 +532,7 @@ public class FallbackFileController {
 
     /**
      * It reads a list of objects from a fallback file
-     * 
+     *
      * @param numOfLines
      *            The number of lines to be read from the fallback file
      * @param fallbackObj
@@ -587,7 +587,7 @@ public class FallbackFileController {
 
     /**
      * Checks whether the fallback log file has any contents or not
-     * 
+     *
      * @return A boolean indicating whether the file is empty (true) or not
      *         (false)
      */
@@ -621,7 +621,7 @@ public class FallbackFileController {
 
     /**
      * It checks the number of lines that the fallback log file has
-     * 
+     *
      * @return Number of lines of the file
      * @throws DataFallbackException
      *             An exception is thrown if something wrong happens while
@@ -645,7 +645,7 @@ public class FallbackFileController {
     /**
      * It stores the current file counter (indicating the number of lines
      * already processed from the file), so they won't be treated next time
-     * 
+     *
      * @throws DataFallbackException
      *             An exception is thrown if the counter could not be written to
      *             the file
@@ -670,7 +670,7 @@ public class FallbackFileController {
      * Removes the contents of the fallback log file by deleting the file and
      * creating it again and it also updates the counter stored in the
      * counterfile
-     * 
+     *
      * @throws DataFallbackException
      *             An exception is thrown if the fallback file cannot be deleted
      */
@@ -704,7 +704,7 @@ public class FallbackFileController {
     /**
      * This method closes all the file descriptors that could be still opened
      * before destroying the object
-     * 
+     *
      */
     public final void finalize() {
         try {

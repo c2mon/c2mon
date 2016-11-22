@@ -63,7 +63,7 @@ import org.springframework.stereotype.Component;
  *
  * <p>Notice that creating a cache object will also notify any update
  * listeners. In particular, new datatags, rules and control tags will
- * be passed on to the client, STL module etc.
+ * be passed on to the client, history module etc.
  *
  * <p>Creations of processes and equipments require a DAQ restart.
  *

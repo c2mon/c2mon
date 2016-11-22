@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -26,77 +26,77 @@ import com.google.gson.Gson;
 
 /**
  * Object used by the C2MON persistence manager for logging objects to
- * the STL DB with fallback to file logging.
- * 
- * @author Mark Brightwell 
+ * the history database with fallback to file logging.
+ *
+ * @author Mark Brightwell
  *
  */
 public class CommandTagLog implements IFallback {
-  
+
   /**
    * Command id.
    */
   private Long tagId;
-  
+
   /**
    * Command name.
    */
   private String name;
-  
+
   /**
    * Operational mode.
    */
   private Short mode;
-  
+
   /**
    * Time this command was executed.
    */
   private Timestamp executionTime;
-  
+
   /**
    * Value of the command when executed.
    */
   private String value;
-  
+
   /**
    * Datatype of the command.
    */
   private String dataType;
-  
+
   /**
    * User executing it.
    */
   private String user;
-  
+
   /**
    * Host this command was executed on.
    */
   private String host;
-  
+
   /**
    * Time in the report.
    */
   private Timestamp reportTime;
-  
+
   /**
    * Report status.
    */
   private CommandExecutionStatus reportStatus;
-  
+
   /**
    * Report description.
    */
   private String reportDescription;
-  
+
   private transient static Gson gson = GsonFactory.createGson();
-   
+
   /**
    * @return the command id
    */
   public String getId() {
     return tagId.toString();
-  }  
-  
+  }
+
   /**
    * @return the value of the command when executed
    */
@@ -108,7 +108,7 @@ public class CommandTagLog implements IFallback {
   public String toString() {
     return gson.toJson(this);
   }
-  
+
   @Override
   public IFallback getObject(final String line) throws DataFallbackException {
     return gson.fromJson(line, this.getClass());

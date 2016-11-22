@@ -1,4 +1,4 @@
-.CounterShortTermLogFallback
+.CounterHistoryFallback
 .CounterDataTagFallback.log
 DataTagFallback.log
-ShortTermLogFallback
+HistoryFallback

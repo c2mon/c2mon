@@ -28,7 +28,7 @@
     <module>c2mon-server-elasticsearch</module>
     <module>c2mon-server-lifecycle</module>
     <module>c2mon-server-rule</module>
-    <module>c2mon-server-shorttermlog</module>
+    <module>c2mon-server-history</module>
     <module>c2mon-server-supervision</module>
     <module>c2mon-server-test</module>
     <module>distribution</module>
@@ -111,7 +111,7 @@
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
-        <artifactId>c2mon-server-shorttermlog</artifactId>
+        <artifactId>c2mon-server-history</artifactId>
         <version>${project.parent.version}</version>
       </dependency>
       <dependency>

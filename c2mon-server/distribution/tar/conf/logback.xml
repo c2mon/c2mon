@@ -82,18 +82,18 @@
   <logger name="SourceDataTagLogger" level="INFO" additivity="false">
     <appender-ref ref="TagAppender"/>
   </logger>
-  
+
   <logger name="RuleTagLogger" level="INFO" additivity="false">
     <appender-ref ref="RuleTagAppender"/>
   </logger>
-  
+
   <!-- Used within c2mon-shared-persistence-manager to trace activities of the history fallback mechanism -->
-  <logger name="ShortTermLogFallbackLogger" level="INFO" additivity="false">
+  <logger name="HistoryFallbackLogger" level="INFO" additivity="false">
     <appender-ref ref="FallbackLogAppender"/>
   </logger>
-  
+
   <logger name="cern.c2mon" level="DEBUG"/>
-  <logger name="cern.c2mon.server.shorttermlog" level="DEBUG"/>
+  <logger name="cern.c2mon.server.history" level="DEBUG"/>
   <logger name="cern.c2mon.pmanager" level="DEBUG"/>
   <logger name="org.apache.activemq" level="INFO"/>
   <logger name="org.springframework" level="INFO"/>

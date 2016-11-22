@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+<!--  <settings>-->
+<!--    <setting name="defaultExecutorType" value="BATCH"/>-->
+<!--  </settings>-->
+  <typeAliases>
+    <typeAlias alias="AlarmSTLog" type="cern.c2mon.server.history.structure.AlarmLog" />
+    <typeAlias alias="DataTagSTLog" type="cern.c2mon.server.history.structure.HistoricTag" />
+    <typeAlias alias="SupervisionEvent" type="cern.c2mon.shared.client.supervision.SupervisionEventImpl" />
+    <typeAlias alias="CommandTagLog" type="cern.c2mon.shared.client.command.CommandTagLog" />
+  </typeAliases>
+  <mappers>
+    <mapper resource="mybatis/history/alarm-log-sql.xml"/>
+    <mapper resource="mybatis/history/datatag-log-sql.xml"/>
+    <mapper resource="mybatis/history/supervision-log-sql.xml"/>
+    <mapper resource="mybatis/history/command-log-sql.xml"/>
+    <mapper resource="mybatis/history/server-lifecycle-log-sql.xml"/>
+  </mappers>
+</configuration>

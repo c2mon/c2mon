@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -31,9 +31,9 @@ import cern.c2mon.pmanager.persistence.impl.PersistenceManager;
  * This class implements the Runnable interface. It runs as a separate thread
  * that takes care of committing back to the DB that data stored in a fallback
  * file
- * 
+ *
  * @author mruizgar
- * 
+ *
  */
 public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
 
@@ -47,7 +47,7 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
     private static final Logger LOG = LoggerFactory.getLogger(DataRecoveryThread.class);
 
     /** Log4j logger for the fallback related debug and error messages */
-    private static final Logger FALLBACK_LOG = LoggerFactory.getLogger("ShortTermLogFallbackLogger");
+    private static final Logger FALLBACK_LOG = LoggerFactory.getLogger("HistoryFallbackLogger");
 
     /**
      * Number of miliseconds that the thread will sleep after each iteration by
@@ -68,13 +68,13 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
      */
     public final void setPersistenceManager(final PersistenceManager persistenceManager) {
          this.persistenceManager = persistenceManager;
-         
+
     }
 
     /**
      * Creates a new DataRecoveryThread object specifying the time it will sleep
      * between each commit to the DB
-     * 
+     *
      * @param persistence
      *            Indicates the number of miliseconds the thread has to sleep
      */
@@ -163,11 +163,11 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
 
     /**
      * Reads back data from a fallback file and commits it to the DB.
-     * 
+     *
      * @return An integer value indicating the number of fallback lines that
      *         were read from the fallback log file and successfully committed
      *         to the DB
-     * 
+     *
      */
     private int commitFallbackData() {
 
@@ -181,12 +181,12 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
             // Get all the datatags stored in the log file
             data = persistenceManager.getFallbackManager().readDataBack(
                     FallbackProperties.getInstance().getNumberLinesToReadFromFile());
-            // Insert the datatags into the database           
+            // Insert the datatags into the database
             if (LOG.isDebugEnabled()) {
                 LOG.debug("commitFallBackData() - Inserting " + data.size()
                         + " tags from the fallback file into the database");
             }
-            
+
             persistenceManager.getDbHandler().storeData(data);
             committed = data.size();
         } catch (IDBPersistenceException e) {
@@ -221,7 +221,7 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
 
     /**
      * Marks the indicated number of lines as removed in the fallback file
-     * 
+     *
      * @param size
      *            The number of lines we want to mark as removed from the
      *            fallback file

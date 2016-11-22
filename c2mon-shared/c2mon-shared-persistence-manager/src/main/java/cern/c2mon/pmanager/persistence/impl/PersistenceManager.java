@@ -95,7 +95,7 @@ public class PersistenceManager<T extends IFallback> implements IPersistenceMana
     private int minFreeDiscSpace = FallbackProperties.getInstance().getMinimunDiscFreeSpace();
 
     /** Log4j logger for the fallback related debug and error messages */
-    private static final Logger FALLBACK_LOG = LoggerFactory.getLogger("ShortTermLogFallbackLogger");
+    private static final Logger FALLBACK_LOG = LoggerFactory.getLogger("HistoryFallbackLogger");
 
     /**
      * @return the dbHandler
@@ -215,7 +215,7 @@ public class PersistenceManager<T extends IFallback> implements IPersistenceMana
      * avoid losing that data
      *
      * @param data
-     *            The list of IFallback objects to be logged in the shorttermlog
+     *            The list of IFallback objects to be logged in the history
      *            database
      * @return A boolean showing whether the database is up (true) or down
      *         (false)

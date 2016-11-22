@@ -69,7 +69,7 @@
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-shorttermlog</artifactId>
+      <artifactId>c2mon-server-history</artifactId>
     </dependency>
 
     <!-- 3rd-party dependencies -->

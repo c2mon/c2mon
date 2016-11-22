@@ -30,7 +30,8 @@ import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 
 /**
- * Note: does not keep the latest value of the command. Commands are logged in the STL account.
+ * Note: does not keep the latest value of the command. Commands are logged
+ * to the history database.
  *
  * @param <T> the type of the values that can be set for this command
  */

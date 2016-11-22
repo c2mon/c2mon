@@ -22,9 +22,10 @@ import java.util.Map;
 
 import cern.c2mon.shared.client.request.ClientRequestResult;
 
-public interface TagConfig extends ClientRequestResult{
+public interface TagConfig extends ClientRequestResult {
   /**
    * Returns the tag identifier
+   *
    * @return the tag identifier
    */
   Long getId();
@@ -114,23 +115,23 @@ public interface TagConfig extends ClientRequestResult{
 
   /**
    * @param processNames the processNames the names of all the processes this Tag is attached to
-   *                        (single one for DataTag or multiple for Rules)
+   *                     (single one for DataTag or multiple for Rules)
    */
   void setProcessNames(List<String> processNames);
 
   /**
    * @return the processNames the names of all the processes this Tag is attached to
-   *                         (single one for DataTag or multiple for Rules)
+   * (single one for DataTag or multiple for Rules)
    */
   List<String> getProcessNames();
 
   /**
-   * @param logged true if the Tag is logged to the STL
+   * @param logged true if the Tag is logged to the history
    */
   void setLogged(Boolean logged);
 
   /**
-   * @return true if this Tag is logged to the STL
+   * @return true if this Tag is logged to the history
    */
   boolean isLogged();
 }

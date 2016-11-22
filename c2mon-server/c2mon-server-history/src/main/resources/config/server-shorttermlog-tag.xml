@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <!-- LoggerDAOs contain the logic for storing data into the STL, including batch processing -->
+  <bean id="tagLoggerDAO" class="cern.c2mon.server.history.dao.LoggerDAO">
+    <constructor-arg ref="historySqlSessionFactory"/>
+    <constructor-arg value="cern.c2mon.server.history.mapper.DataTagLogMapper"/>
+    <constructor-arg value="${c2mon.server.history.jdbc.url}"/>
+  </bean>
+
+  <bean id="tagLogger" class="cern.c2mon.server.history.logger.DefaultLogger">
+    <constructor-arg>
+      <bean class="cern.c2mon.server.history.structure.HistoricTagConverter"/>
+    </constructor-arg>
+    <constructor-arg>
+      <bean class="cern.c2mon.pmanager.persistence.impl.PersistenceManager">
+        <constructor-arg ref="tagLoggerDAO"/>
+        <constructor-arg value="${c2mon.server.history.fallback.tag}"/>
+        <constructor-arg>
+          <bean class="cern.c2mon.server.history.alarm.AlarmListener"/>
+        </constructor-arg>
+        <constructor-arg><bean class="cern.c2mon.server.history.structure.HistoricTag"/></constructor-arg>
+      </bean>
+    </constructor-arg>
+  </bean>
+
+</beans>

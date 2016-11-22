@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -33,14 +33,14 @@ import cern.c2mon.pmanager.fallback.util.SystemResourcesParameters;
  * used as a fallback, in this case a logfile. It works as a facade, making
  * totally independent the application logic from the final log system that is
  * used.
- * 
+ *
  * @author mruizgar
- * 
+ *
  */
 public class FallbackFileManager {
 
     /** Log4j Logger for tags that cannot be logged to the database (emergency) */
-    public static final Logger LOG = LoggerFactory.getLogger("ShortTermLogFallbackLogger");
+    public static final Logger LOG = LoggerFactory.getLogger("HistoryFallbackLogger");
 
     /** FallbackFileController instance */
     private final FallbackFileController fFileController;
@@ -74,14 +74,14 @@ public class FallbackFileManager {
 
     /**
      * Public constructor
-     * 
+     *
      * @param fallbackFile
      *            The absolute path for the fallback file
      * @param fallbackObj
      *            IFallback object used for knowing with which concrete
      *            implementation of the interface deals each instance of this
      *            class
-     * 
+     *
      */
     public FallbackFileManager(final String fallbackFile, final IFallback fallbackObj) {
         this.fFileController = new FallbackFileController(fallbackFile);
@@ -90,7 +90,7 @@ public class FallbackFileManager {
 
     /**
      * Writes a set of DataCacheObjects into the fallback log mechanism
-     * 
+     *
      * @param data
      *            List of DataCacheObjects to be logged
      * @throws DataFallbackException
@@ -116,7 +116,7 @@ public class FallbackFileManager {
 
     /**
      * Stores a IFallback object in the fallback file
-     * 
+     *
      * @param fallbackObj
      *            The object whose information will be stored
      * @throws DataFallbackException
@@ -143,7 +143,7 @@ public class FallbackFileManager {
     /**
      * Checks the free disc space every time a determined number of lines are
      * written to the file
-     * 
+     *
      * @param minimumFreeSpace
      *            The minimum disk space that has to be free for continue
      *            writing data into the fallback file
@@ -185,7 +185,7 @@ public class FallbackFileManager {
     /**
      * It retrieves an instance of the object in charge of dealing with the
      * fallback mechanism
-     * 
+     *
      * @return A DataTagFallback object
      */
     public final FallbackFileController getFallbackFileController() {
@@ -194,7 +194,7 @@ public class FallbackFileManager {
 
     /**
      * Reads a number of lines from the fallback mechanism
-     * 
+     *
      * @param numberOfLines
      *            Number of lines to be read
      * @return Number of lines that have been read
@@ -218,13 +218,13 @@ public class FallbackFileManager {
      * processed from the file. When all the datatags contained in the file has
      * been committed to the DB all the contents of the fallback file are
      * completely removed
-     * 
+     *
      * @param numberOfLines
      *            Number of lines that has been already processed from the log
      *            file
      * @return A boolean that indicates whether the lines were successfully
      *         removed or not
-     * 
+     *
      */
     public final boolean removeReadData(final int numberOfLines) {
 
@@ -236,7 +236,7 @@ public class FallbackFileManager {
         try {
             fFileController.updateNumberOfProcessedLines();
         } catch (DataFallbackException e) {
-            removed = false;           
+            removed = false;
         }
         try {
             // Physically remove all the contents from the file once all the
@@ -273,7 +273,7 @@ public class FallbackFileManager {
 
     /**
      * Places the file descriptor in the line indicated as parameter
-     * 
+     *
      * @param lastCommited
      *            Number of lines already processed
      * @throws DataFallbackException
@@ -289,7 +289,7 @@ public class FallbackFileManager {
 
     /**
      * It checks whether the file is empty (true) or not (false)
-     * 
+     *
      * @return The value indicating the status of the log
      */
     public final boolean isFallbackFileEmpty() {

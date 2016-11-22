@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+  <!--
+    take "namespace=Mapper interface" for the mapper SQL statements to
+    be picked up automatically
+  -->
+<mapper namespace="cern.c2mon.server.history.mapper.AlarmLogMapper">
+
+  <!--
+    Inserts a new row in the alarm history table that represents some log
+    information for a given dataTag. The values for the inserted row are
+    stored in the HistoricTag object
+  -->
+  <insert id="insertLog" databaseId="oracle" parameterType="AlarmSTLog">
+    INSERT INTO ALARMLOG (LOGDATE, TAGID, ALARMID, ACTIVE, FAULTFAMILY, FAULTMEMBER, FAULTCODE, SERVERTIME, INFO)
+    VALUES (
+    <!-- The logDate is not null, because is a dataTag read from the fallback file -->
+    <if test="logDate != null">SYS_EXTRACT_UTC(#{logDate,jdbcType=TIMESTAMP})</if>
+    <!-- The logDate is null, what means that comes from a DAQ -->
+    <if test="logDate == null">SYS_EXTRACT_UTC(SYSTIMESTAMP)</if>
+
+    ,#{tagId,jdbcType=NUMERIC}
+    ,#{id,jdbcType=NUMERIC}
+    ,<if test="active == true">'Y'</if>
+     <if test="active == false">'N'</if>
+    ,#{faultFamily,jdbcType=VARCHAR}
+    ,#{faultMember,jdbcType=VARCHAR}
+    ,#{faultCode,jdbcType=NUMERIC}
+    ,SYS_EXTRACT_UTC(#{serverTimestamp,jdbcType=TIMESTAMP})
+    ,#{info,jdbcType=VARCHAR})
+  </insert>
+
+  <insert id="insertLog" databaseId="mysql" parameterType="AlarmSTLog">
+    INSERT INTO ALARMLOG (LOGDATE, TAGID, ALARMID, ACTIVE, FAULTFAMILY, FAULTMEMBER, FAULTCODE, SERVERTIME, INFO)
+    VALUES (
+    <!-- The logDate is not null, because is a dataTag read from the fallback file -->
+    <if test="logDate != null">CONVERT_TZ( #{logDate,jdbcType=TIMESTAMP}, @@session.time_zone, '+00:00' )</if>
+    <!-- The logDate is null, what means that comes from a DAQ -->
+    <if test="logDate == null">CONVERT_TZ( CURRENT_TIMESTAMP, @@session.time_zone, '+00:00' )</if>
+
+    ,#{tagId,jdbcType=NUMERIC}
+    ,#{id,jdbcType=NUMERIC}
+    ,<if test="active == true">'Y'</if>
+    <if test="active == false">'N'</if>
+    ,#{faultFamily,jdbcType=VARCHAR}
+    ,#{faultMember,jdbcType=VARCHAR}
+    ,#{faultCode,jdbcType=NUMERIC}
+    , CONVERT_TZ( #{serverTimestamp,jdbcType=TIMESTAMP}, @@session.time_zone, '+00:00' )
+    ,#{info,jdbcType=VARCHAR})
+  </insert>
+
+  <!-- only used to remove inserts done during testing -->
+  <delete id="deleteAlarmLog" parameterType="Long">
+    DELETE FROM ALARMLOG WHERE alarmid = #{id}
+  </delete>
+
+</mapper>

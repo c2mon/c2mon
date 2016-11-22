@@ -91,7 +91,7 @@ public class ElasticsearchTagListener implements C2monBufferedCacheListener<Tag>
 
   @Override
   public void confirmStatus(Collection<Tag> tagCollection) {
-    //do not log confirm callbacks (STL data not essential)
+    //do not log confirm callbacks
   }
 
   @Override
