@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -18,6 +18,7 @@ package cern.c2mon.shared.client.configuration;
 
 import java.io.StringWriter;
 
+import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
@@ -33,10 +34,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.jms.support.converter.MessageConverter;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -52,12 +53,9 @@ import cern.c2mon.shared.util.parser.SimpleXMLParser;
  * @author Mark Brightwell
  *
  */
+@Slf4j
+@Component
 public class ConfigurationRequestConverter implements MessageConverter {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationRequestConverter.class);
 
   /**
    * XML root element
@@ -78,6 +76,7 @@ public class ConfigurationRequestConverter implements MessageConverter {
    * Init method run on bean instantiation.
    * Initializes XML parser.
    */
+  @PostConstruct
   public void init() {
     try {
       this.parser = new SimpleXMLParser();
@@ -95,26 +94,26 @@ public class ConfigurationRequestConverter implements MessageConverter {
         Document doc = parser.parse(((TextMessage) message).getText());
         String docName = doc.getDocumentElement().getNodeName();
         if (docName.equals(CONFIGURATION_XML_ROOT)) {
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("fromMessage() : Reconfiguration request received.");
+          if (log.isDebugEnabled()) {
+            log.debug("fromMessage() : Reconfiguration request received.");
           }
           return fromXML(doc.getDocumentElement());
         } else {
-         LOGGER.error("Unrecognized XML message received on the reconfiguration request topic - is being ignored");
-         LOGGER.error("  (unrecognized document root element is " + docName + ")");
+         log.error("Unrecognized XML message received on the reconfiguration request topic - is being ignored");
+         log.error("  (unrecognized document root element is " + docName + ")");
          throw new MessageConversionException("Unrecognized XML message received.");
         }
       } catch (ParserException ex) {
-        LOGGER.error("Exception caught in DOM parsing of incoming message: ", ex);
+        log.error("Exception caught in DOM parsing of incoming message: ", ex);
         //TODO may need to adjust encoding in next line (UTF-8 or whatever used by ActiveMQ)?
-        LOGGER.error("Message was: " + ((TextMessage) message).getText());
+        log.error("Message was: " + ((TextMessage) message).getText());
         throw new MessageConversionException("Exception caught in DOM parsing on reconfiguration request message");
       }
     } else {
       StringBuffer str = new StringBuffer("fromMessage() : Unsupported message type(");
       str.append(message.getClass().getName());
       str.append(") : Message discarded.");
-      LOGGER.error(str.toString());
+      log.error(str.toString());
       throw new MessageConversionException("Unsupported JMS message type received on configuration request connection.");
     }
   }
@@ -129,16 +128,16 @@ public class ConfigurationRequestConverter implements MessageConverter {
         textMessage = session.createTextMessage(xmlString);
         return textMessage;
       } catch (ParserConfigurationException ex) {
-        LOGGER.error("Parser exception caught whilst encoding the ConfigurationRequest object; aborting request. ", ex);
+        log.error("Parser exception caught whilst encoding the ConfigurationRequest object; aborting request. ", ex);
         ex.printStackTrace();
         throw new MessageConversionException("ConfigurationRequest conversion failed.",  ex);
       } catch (TransformerException ex) {
-        LOGGER.error("Transformer exception caught whilst encoding the ConfigurationRequest object; aborting request. ", ex);
+        log.error("Transformer exception caught whilst encoding the ConfigurationRequest object; aborting request. ", ex);
         ex.printStackTrace();
         throw new MessageConversionException("ConfigurationRequest conversion failed.",  ex);
       }
     } else {
-      LOGGER.error("ConfigurationRequestConverter is being called on the following type that is not supported: " + configRequest.getClass());
+      log.error("ConfigurationRequestConverter is being called on the following type that is not supported: " + configRequest.getClass());
       throw new MessageConversionException("ConfigurationRequestConverter is being called on an unsupported type");
     }
   }
