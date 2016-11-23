@@ -6,10 +6,12 @@ import net.sf.ehcache.Ehcache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.ehcache.EhCacheFactoryBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Justin Lewis Salmon
  */
+@Configuration
 public class SupervisionCacheConfig {
 
   @Autowired

@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 public class ProcessCommunicationManagerMock {
 
   @Bean
-  public ProcessCommunicationManager processCommunicationManager() {
+  public ProcessCommunicationManager processCommunicationManagerImpl() {
     return EasyMock.createMock(ProcessCommunicationManager.class);
   }
 }

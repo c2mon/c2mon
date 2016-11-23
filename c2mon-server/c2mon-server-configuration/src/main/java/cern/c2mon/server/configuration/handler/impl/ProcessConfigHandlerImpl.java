@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.UnexpectedRollbackException;
 
@@ -77,7 +78,6 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
    * Flag indicating if Process removal is allowed when the Process
    * is running.
    */
-  @Value("${c2mon.server.configuration.allowRunningProcessRemoval}")
   private boolean allowRunningProcessRemoval;
 
   /**
@@ -85,16 +85,20 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
    */
   private JmsContainerManager jmsContainerManager;
 
-
   @Autowired
-  public ProcessConfigHandlerImpl(EquipmentConfigHandler equipmentConfigHandler, ControlTagConfigHandler controlTagConfigHandler, ProcessCache processCache,
-      ProcessFacade processFacade, JmsContainerManager jmsContainerManager) {
+  public ProcessConfigHandlerImpl(EquipmentConfigHandler equipmentConfigHandler,
+                                  ControlTagConfigHandler controlTagConfigHandler,
+                                  ProcessCache processCache,
+                                  ProcessFacade processFacade,
+                                  JmsContainerManager jmsContainerManager,
+                                  Environment environment) {
     super();
     this.equipmentConfigHandler = equipmentConfigHandler;
     this.controlTagConfigHandler = controlTagConfigHandler;
     this.processCache = processCache;
     this.processFacade = processFacade;
     this.jmsContainerManager = jmsContainerManager;
+    this.allowRunningProcessRemoval = environment.getRequiredProperty("c2mon.server.configuration.allowRunningProcessRemoval", Boolean.class);
   }
 
   @PostConstruct
