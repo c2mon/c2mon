@@ -19,6 +19,7 @@ package cern.c2mon.daq.common.messaging.impl;
 import javax.jms.*;
 import javax.xml.parsers.ParserConfigurationException;
 
+import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -58,24 +59,16 @@ public class ActiveMessageReceiver extends ProcessMessageReceiver implements Ses
   private DefaultMessageListenerContainer listenerContainer;
 
   /**
-   * The configuration controller which allows the ActiveMessageReceiver
-   * the configuration to know on which topic he has to listen.
-   */
-  private ConfigurationController configurationController;
-
-  /**
    * Unique constructor (uses Qualifier annotation for wiring the listener
    * container.
    *
-   * @param configurationController
-   *            the DAQ configuration
    * @param serverRequestJmsContainer
    *            the message listener
    */
-  public ActiveMessageReceiver(final ConfigurationController configurationController,
-      @Qualifier("serverRequestListenerContainer") final DefaultMessageListenerContainer serverRequestJmsContainer) throws ParserConfigurationException {
+  public ActiveMessageReceiver(@Qualifier("serverRequestListenerContainer") final DefaultMessageListenerContainer serverRequestJmsContainer)
+      throws ParserConfigurationException {
     super();
-    this.configurationController = configurationController;
+//    this.configurationController = configurationController;
     this.listenerContainer = serverRequestJmsContainer;
   }
 
@@ -84,7 +77,7 @@ public class ActiveMessageReceiver extends ProcessMessageReceiver implements Ses
    * in the Spring listener container.
    */
   public void init() {
-    ProcessConfiguration processConfiguration = configurationController.getProcessConfiguration();
+    ProcessConfiguration processConfiguration = ProcessConfigurationHolder.getInstance();
     log.debug("Setting ActiveMessageReceiver listener destination to {}", processConfiguration.getJmsDaqCommandQueue());
     listenerContainer.setMessageListener(this);
     listenerContainer.setDestination(new ActiveMQQueue(processConfiguration.getJmsDaqCommandQueue()));
@@ -106,7 +99,7 @@ public class ActiveMessageReceiver extends ProcessMessageReceiver implements Ses
    */
   @Override
   public void disconnect() {
-    ProcessConfiguration processConfiguration = configurationController.getProcessConfiguration();
+    ProcessConfiguration processConfiguration = ProcessConfigurationHolder.getInstance();
     log.debug("Disconnecting ActiveMessageReceiver listener with destination to {}", processConfiguration.getJmsDaqCommandQueue());
     listenerContainer.shutdown();
   }

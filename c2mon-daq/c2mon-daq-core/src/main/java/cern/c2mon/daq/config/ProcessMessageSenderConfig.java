@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
 
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
@@ -55,8 +56,7 @@ import cern.c2mon.daq.filter.impl.DummyFilterSender;
 public class ProcessMessageSenderConfig {
 
   @Autowired
-  @Qualifier("configurationController")
-  private ConfigurationController configurationController;
+  private Environment environment;
 
   @Autowired
   @Qualifier("sourceUpdateJmsTemplate")
@@ -70,13 +70,10 @@ public class ProcessMessageSenderConfig {
   @Qualifier("filterJmsTemplate")
   private JmsTemplate filterJmsTemplate;
 
-  @Value("${c2mon.daq.filter.enabled}")
-  private boolean sendFilteredData;
-
   @Bean
   @Profile("single")
   public ProcessMessageSender singleMessageSender() {
-    ProcessMessageSender processMessageSender = new ProcessMessageSender(configurationController);
+    ProcessMessageSender processMessageSender = new ProcessMessageSender();
     processMessageSender.setJmsSenders(Collections.singletonList(activeJmsSender()));
     return processMessageSender;
   }
@@ -84,7 +81,7 @@ public class ProcessMessageSenderConfig {
   @Bean
   @Profile("double")
   public ProcessMessageSender doubleMessageSender() {
-    ProcessMessageSender processMessageSender = new ProcessMessageSender(configurationController);
+    ProcessMessageSender processMessageSender = new ProcessMessageSender();
     processMessageSender.setJmsSenders(Arrays.asList(activeJmsSender(), proxyJmsSender()));
     return processMessageSender;
   }
@@ -92,19 +89,19 @@ public class ProcessMessageSenderConfig {
   @Bean
   @Profile("test")
   public ProcessMessageSender testMessageSender() {
-    ProcessMessageSender processMessageSender = new ProcessMessageSender(configurationController);
+    ProcessMessageSender processMessageSender = new ProcessMessageSender();
     processMessageSender.setJmsSenders(Collections.singletonList(dummyJmsSender()));
     return processMessageSender;
   }
 
   @Bean
   public JmsSender activeJmsSender() {
-    return new ActiveJmsSender(configurationController, sourceUpdateJmsTemplate);
+    return new ActiveJmsSender(sourceUpdateJmsTemplate);
   }
 
   @Bean
   public JmsSender secondActiveJmsSender() {
-    return new ActiveJmsSender(configurationController, secondSourceUpdateJmsTemplate);
+    return new ActiveJmsSender(secondSourceUpdateJmsTemplate);
   }
 
   @Bean
@@ -122,8 +119,8 @@ public class ProcessMessageSenderConfig {
   @Bean(name = "filterMessageSender")
   @Profile({ "single", "double" })
   public IFilterMessageSender filterMessageSender() {
-    if (sendFilteredData) {
-      return new ActiveFilterSender(configurationController, filterJmsTemplate);
+    if (environment.getRequiredProperty("c2mon.daq.filter.enabled", Boolean.class)) {
+      return new ActiveFilterSender(filterJmsTemplate, environment);
     } else {
       return new DummyFilterSender();
     }

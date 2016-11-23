@@ -70,9 +70,6 @@ public class ProcessRequestSenderConfig {
   JmsTemplate secondProcessRequestJmsTemplate;
 
   @Autowired
-  ConfigurationController configurationController;
-
-  @Autowired
   @Qualifier("serverRequestListenerContainer")
   DefaultMessageListenerContainer serverRequestJmsContainer;
 
@@ -100,8 +97,7 @@ public class ProcessRequestSenderConfig {
   @Bean
   @Profile({ "single", "double" })
   public ProcessMessageReceiver activeMessageReceiver() throws ParserConfigurationException {
-    ActiveMessageReceiver activeMessageReceiver = new ActiveMessageReceiver(configurationController, serverRequestJmsContainer);
-    activeMessageReceiver.init();
+    ActiveMessageReceiver activeMessageReceiver = new ActiveMessageReceiver(serverRequestJmsContainer);
     return activeMessageReceiver;
   }
 

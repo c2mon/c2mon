@@ -282,6 +282,7 @@ public class DriverKernel implements ApplicationContextAware {
     // processMessageSender = new ProcessMessageSender(processConfiguration,
     // jndiMonitor);
     // try to connect establish ProcessMessageSender's connection
+    processMessageSender.init();
     processMessageSender.connect();
 
     log.debug("configure - connecting to FilterMessageSender");
@@ -343,6 +344,7 @@ public class DriverKernel implements ApplicationContextAware {
     } // for
 
     // try to establish ProcessMessageReceiver's JMS topic connection
+    processMessageReceiver.init();
     processMessageReceiver.connect();
 
     // log.info("Number of supervised equipment units : " +

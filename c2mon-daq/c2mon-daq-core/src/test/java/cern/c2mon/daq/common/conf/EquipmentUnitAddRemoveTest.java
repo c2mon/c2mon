@@ -51,9 +51,9 @@ import static org.junit.Assert.*;
   @Autowired
   DriverKernel kernel;
 
-  @Autowired
-  @Qualifier("dummyJmsSender")
-  DummyJmsSender sender;
+//  @Autowired
+//  @Qualifier("dummyJmsSender")
+//  DummyJmsSender sender;
 
   @Before
   public void setUp() throws Exception {

@@ -107,6 +107,8 @@ public abstract class ProcessMessageReceiver {
    */
   public abstract void connect();
 
+  public abstract void init();
+
   /**
    * This method is called each time ProcessMessageReceiver receives
    * MSG_RECONFIGURE_PROCESS message

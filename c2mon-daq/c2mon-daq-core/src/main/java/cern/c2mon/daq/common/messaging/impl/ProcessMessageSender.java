@@ -22,6 +22,7 @@ import java.util.Iterator;
 import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 
+import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,30 +82,10 @@ public class ProcessMessageSender implements IProcessMessageSender {
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(ProcessMessageSender.class);
 
-  /**
-   * The reference for the ConfigurationController object.
-   */
-  private ConfigurationController configurationController;
-
-  /**
-   * Creates a new ProcessMessageSender.
-   *
-   * @param configurationController The configurationController to access all
-   *          configuration values.
-   */
-  @Autowired
-  public ProcessMessageSender(final ConfigurationController configurationController) {
-    this.configurationController = configurationController;
-  }
-
-  /**
-   * Init method called on bean initialization.
-   */
-  @PostConstruct
   public void init() {
     aliveTimer = new AliveTimer(this);
 
-    ProcessConfiguration processConfiguration = getConfigurationController().getProcessConfiguration();
+    ProcessConfiguration processConfiguration = ProcessConfigurationHolder.getInstance();
     // TODO move the min window size to properties or database
     // create and initialize dataTagsBuffer for non-persistent tags
     dataTagsBuffer = new SynchroBuffer(200, processConfiguration.getMaxMessageDelay(), 100, SynchroBuffer.DUPLICATE_OK);
@@ -124,7 +105,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
    * ProcessMessageSender's JMS queue connection)
    */
   public final void startAliveTimer() {
-    ProcessConfiguration processConfiguration = getConfigurationController().getProcessConfiguration();
+    ProcessConfiguration processConfiguration = ProcessConfigurationHolder.getInstance();
     aliveTimer.setInterval(processConfiguration.getAliveInterval());
   }
 
@@ -141,7 +122,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
    */
   @Override
   public final void sendAlive() {
-    ProcessConfiguration processConfiguration = getConfigurationController().getProcessConfiguration();
+    ProcessConfiguration processConfiguration = ProcessConfigurationHolder.getInstance();
     LOGGER.debug("sending AliveTag. tag id : " + processConfiguration.getAliveTagID());
 
     // Just to know what are the arguments :
@@ -312,14 +293,6 @@ public class ProcessMessageSender implements IProcessMessageSender {
     this.jmsSenders = jmsSenders;
   };
 
-  public void setConfigurationController(final ConfigurationController configurationController) {
-    this.configurationController = configurationController;
-  }
-
-  public ConfigurationController getConfigurationController() {
-    return configurationController;
-  }
-
   /**
    * This class implements SynchroBuffer's SychroBufferListener, so that both
    * ProcessMessageSender's tag buffers (for persistent and non-persistent) tags
@@ -333,12 +306,11 @@ public class ProcessMessageSender implements IProcessMessageSender {
      * @param event the pull event, containing the collection of objects to be
      *          sent
      * @throws cern.c2mon.shared.util.buffer.PullException
-     * @throws cern.laser.util.buffer.PullException
      */
     @SuppressWarnings("unchecked")
     @Override
     public void pull(PullEvent event) throws PullException {
-      ProcessConfiguration processConfiguration = getConfigurationController().getProcessConfiguration();
+      ProcessConfiguration processConfiguration = ProcessConfigurationHolder.getInstance();
       LOGGER.debug("entering pull()..");
       LOGGER.debug("\t Number of pulled objects : " + event.getPulled().size());
 

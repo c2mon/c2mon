@@ -21,6 +21,7 @@ import java.util.Collection;
 import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 
+import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
 import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
@@ -32,6 +33,7 @@ import cern.c2mon.shared.util.buffer.PullEvent;
 import cern.c2mon.shared.util.buffer.PullException;
 import cern.c2mon.shared.util.buffer.SynchroBuffer;
 import cern.c2mon.shared.util.buffer.SynchroBufferListener;
+import org.springframework.core.env.Environment;
 
 
 /**
@@ -44,7 +46,7 @@ import cern.c2mon.shared.util.buffer.SynchroBufferListener;
  * @author Mark Brightwell
  */
 @Slf4j
-public abstract class FilterMessageSender implements IFilterMessageSender{
+public abstract class FilterMessageSender implements IFilterMessageSender {
 
   /**
    * The SynchroBuffer minimum window size.
@@ -72,10 +74,11 @@ public abstract class FilterMessageSender implements IFilterMessageSender{
    */
   private SynchroBuffer tagBuffer;
 
-  /**
-   * The configuration controller to access all the configuration objects.
-   */
-  protected ConfigurationController configurationController;
+  private Environment environment;
+
+  public FilterMessageSender(Environment environment) {
+    this.environment = environment;
+  }
 
   /**
    * Sends the update collection to the filter queue.
@@ -85,22 +88,13 @@ public abstract class FilterMessageSender implements IFilterMessageSender{
    */
   protected abstract void processValues(final FilteredDataTagValueUpdate filteredDataTagValueUpdate) throws JMSException;
 
-  /**
-   * Constructor.
-   *
-   * @param configurationController for accessing the DAQ configuration
-   */
-  public FilterMessageSender(final ConfigurationController configurationController) {
-    super();
-    this.configurationController = configurationController;
-  }
 
   /**
    * Method run at bean initialization.
    */
   @PostConstruct
   public void init() {
-    Integer bufferCapacity = configurationController.getEnvironment().getRequiredProperty(Options.FILTER_BUFFER_CAPACITY, Integer.class);
+    Integer bufferCapacity = environment.getRequiredProperty(Options.FILTER_BUFFER_CAPACITY, Integer.class);
     // set up and enable the synchrobuffer for storing the tags
     log.debug("initializing filtering synchrobuffer with max delay :" + MAX_MESSAGE_DELAY + " and capacity : " + bufferCapacity);
 
@@ -172,7 +166,7 @@ public abstract class FilterMessageSender implements IFilterMessageSender{
     public void pull(final PullEvent event) throws PullException {
       log.trace("entering FilterMessageSender pull()...");
       log.debug("\t Number of pulled objects : " + event.getPulled().size());
-      ProcessConfiguration pconf = configurationController.getProcessConfiguration();
+      ProcessConfiguration pconf = ProcessConfigurationHolder.getInstance();
       FilteredDataTagValueUpdate dataTagValueUpdate = new FilteredDataTagValueUpdate(pconf.getProcessID());
 
       long currentMsgSize = 0;

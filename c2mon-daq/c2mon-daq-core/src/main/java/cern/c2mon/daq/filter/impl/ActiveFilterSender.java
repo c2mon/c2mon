@@ -20,6 +20,7 @@ import javax.jms.JMSException;
 import javax.jms.TextMessage;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
 
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
@@ -45,14 +46,8 @@ public class ActiveFilterSender extends FilterMessageSender implements IFilterMe
    */
   private JmsTemplate filterTemplate;
 
-  /**
-   * @param configurationController
-   *          to access the configuration (run options)
-   * @param filterTemplate
-   *          the Spring template to send the message (defined in XML)
-   */
-  public ActiveFilterSender(final ConfigurationController configurationController, final JmsTemplate filterTemplate) {
-    super(configurationController);
+  public ActiveFilterSender(final JmsTemplate filterTemplate, Environment environment) {
+    super(environment);
     this.filterTemplate = filterTemplate;
   }
 

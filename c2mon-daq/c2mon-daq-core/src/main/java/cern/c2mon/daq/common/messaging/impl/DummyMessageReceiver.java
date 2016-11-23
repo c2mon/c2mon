@@ -32,27 +32,17 @@ import cern.c2mon.shared.daq.messaging.DAQResponse;
 public class DummyMessageReceiver extends ProcessMessageReceiver {
 
   @Override
-  public void connect() {
-    // TODO Auto-generated method stub
-
-  }
+  public void connect() {}
 
   @Override
-  public void sendDAQResponse(DAQResponse response, Destination destination, Session session) throws JMSException {
-
-  }
+  public void sendDAQResponse(DAQResponse response, Destination destination, Session session) throws JMSException {}
 
   @Override
-  public void disconnect() {
-    // TODO Auto-generated method stub
-
-  }
-
+  public void disconnect() {}
 
   @Override
-  public void shutdown() {
-    // TODO Auto-generated method stub
+  public void shutdown() {}
 
-  }
-
+  @Override
+  public void init() {}
 }

@@ -17,6 +17,7 @@
 package cern.c2mon.daq.common.messaging.impl;
 
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
+import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
 import cern.c2mon.daq.common.messaging.JmsSender;
 import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
@@ -45,31 +46,19 @@ public class ActiveJmsSender implements JmsSender {
   private JmsTemplate jmsTemplate;
 
   /**
-   * Configuration controller to access the configuration data.
-   */
-  private ConfigurationController configurationController;
-
-  /**
    * Enabling/disabling the action of sending information to the brokers
    */
   private boolean isEnabled = true;
-
-  //    /**
-  //     * The Spring name for the ActiveJmsSender
-  //     */
-  //    private String beanName;
 
   /**
    * Unique constructor. Notice the JmsTemplate needs a Qualifier annotation
    * for correct autowiring as there are several JmsTemplate's in the
    * container.
    *
-   * @param configurationController Configuration controller to access the configuration data.
    * @param jmsTemplate             The JMS template.
    */
   @Autowired
-  public ActiveJmsSender(final ConfigurationController configurationController, @Qualifier("sourceUpdateJmsTemplate") final JmsTemplate jmsTemplate) {
-    this.configurationController = configurationController;
+  public ActiveJmsSender(@Qualifier("sourceUpdateJmsTemplate") final JmsTemplate jmsTemplate) {
     this.jmsTemplate = jmsTemplate;
   }
 
@@ -96,7 +85,7 @@ public class ActiveJmsSender implements JmsSender {
   @Override
   public final void processValue(final SourceDataTagValue sourceDataTagValue) {
     log.debug("entering processValue()..");
-    ProcessConfiguration processConfiguration = configurationController.getProcessConfiguration();
+    ProcessConfiguration processConfiguration = ProcessConfigurationHolder.getInstance();
 
     // The PIK is also check before building the XML in DataTagValueUpdate class
     DataTagValueUpdate dataTagValueUpdate;

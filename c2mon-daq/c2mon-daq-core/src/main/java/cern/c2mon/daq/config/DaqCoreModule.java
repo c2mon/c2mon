@@ -35,7 +35,7 @@ import org.springframework.core.env.Environment;
     ProcessMessageSenderConfig.class,
     ProcessRequestSenderConfig.class,
 })
-@ComponentScan("cern.c2mon.daq.common.conf.core")
+@ComponentScan("cern.c2mon.daq.common")
 @PropertySources({
     @PropertySource(value = "classpath:c2mon-daq-default.properties"),
     @PropertySource(value = "${c2mon.daq.properties.location}", ignoreResourceNotFound = true)
