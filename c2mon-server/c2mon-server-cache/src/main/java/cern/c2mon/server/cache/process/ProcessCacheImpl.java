@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -28,7 +28,7 @@ import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.common.AbstractCache;
-import cern.c2mon.server.cache.common.C2monCacheLoader;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.ProcessDAO;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
@@ -66,7 +66,7 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process>implements Pro
                           @Qualifier("processEhcache") final Ehcache ehcache,
                           @Qualifier("processEhcacheLoader") final CacheLoader cacheLoader,
                           @Qualifier("processCacheLoader") final C2monCacheLoader c2monCacheLoader,
-                          @Qualifier("processDAO") final SimpleCacheLoaderDAO<Process> cacheLoaderDAO, 
+                          @Qualifier("processDAO") final SimpleCacheLoaderDAO<Process> cacheLoaderDAO,
                           @Qualifier("controlTagCache") final ControlTagCache controlCache) {
 
     super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
@@ -105,7 +105,7 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process>implements Pro
   /**
    * Ensures that the Alive-, Status- and CommFault Tags have appropriately the
    * Process id set.
-   * 
+   *
    * @param process The equipment to which the control tags are assigned
    */
   @Override
@@ -114,7 +114,7 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process>implements Pro
 
     Long aliveTagId = process.getAliveTagId();
     if (aliveTagId != null) {
-      
+
       ControlTag aliveTagCopy = controlCache.getCopy(aliveTagId);
       if (aliveTagCopy != null) {
         setProcessId((ControlTagCacheObject) aliveTagCopy, processId);
@@ -123,7 +123,7 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process>implements Pro
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
             String.format("No Alive tag (%d) found for Process %s (#%d).", aliveTagId, process.getName(), process.getId()));
       }
-      
+
     }
     else {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
@@ -132,7 +132,7 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process>implements Pro
 
     Long statusTagId = process.getStateTagId();
     if (statusTagId != null) {
-      
+
       ControlTag statusTagCopy = controlCache.getCopy(statusTagId);
       if (statusTagCopy != null) {
         setProcessId((ControlTagCacheObject) statusTagCopy, processId);
@@ -141,7 +141,7 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process>implements Pro
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
             String.format("No Status tag (%d) found for Process %s (#%d).", statusTagId, process.getName(), process.getId()));
       }
-      
+
     }
     else {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,

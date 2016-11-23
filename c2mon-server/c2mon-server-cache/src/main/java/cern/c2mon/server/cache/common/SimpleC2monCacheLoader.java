@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -25,6 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import cern.c2mon.server.cache.loading.common.BatchCacheLoader;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
@@ -41,86 +43,83 @@ import cern.c2mon.shared.common.Cacheable;
  * the common logic for loading the cache from the database. It must be
  * provided with a reference to the Ehcache that needs loading and the DAO
  * that contains the required methods for fetching the objects from the DB.
- * 
+ *
  * <p>One of these classes is instantiated for every cache used by the
- * server (done in Spring XML file). 
- * 
+ * server (done in Spring XML file).
+ *
  * <p>Uses the Ehcache CacheLoader interface.
- * 
+ *
  * <p>TODO loading threads are hardcoded here; may wish to move these
  * to parameters, but better is to use BatchCacheLoader instead
- * 
+ *
  * @param <T> the cache object type
- * 
+ *
  * @author Mark Brightwell
  * @deprecated use {@link BatchCacheLoader} instead if starting from scratch
  *              as better performance for large caches
  */
 public class SimpleC2monCacheLoader<T extends Cacheable> implements C2monCacheLoader {
-  
+
   /**
    * Private logger.
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(SimpleC2monCacheLoader.class);
-  
+
   /**
    * Reference to the distributed parameters (used to lock server start up).
    * Use field autowiring to avoid use in all XML instantiation.
    */
   @Autowired
   private ClusterCache clusterCache;
- 
+
   /**
    * The map used to load objects into the cache from the DB at startup.
-   * Is loaded (by iBatis) and then accessed by loading mechanism - no 
+   * Is loaded (by iBatis) and then accessed by loading mechanism - no
    * synchronization necessary.
    */
-  private Map<Long, T> preloadBuffer = new ConcurrentHashMap<Long, T>(); 
-  
+  private Map<Long, T> preloadBuffer = new ConcurrentHashMap<Long, T>();
+
   /**
    * Reference to the cache that needs loading
    * (set in the constructor).
    */
   private Ehcache cache;
-  
+
   /**
    * Reference to the loader DAO for this cache
    * (set in constructor).
    */
   private CacheLoaderDAO<T> cacheLoaderDAO;
-  
-  
+
+
   /**
    * Constructor (used in Spring XML to instantiate the loaders
    * for the different caches).
-   * 
+   *
    * @param cache the cache to load from the DB
    * @param cacheLoaderDAO the DAO for accessing the DB
-   * @param batchSize the number of object loaded in a single task
-   * @param loaderThreads the number of threads processing the loading tasks (fixed)
-   * @param taskQueueSize the size of the executor's queue
    */
-  public SimpleC2monCacheLoader(final Ehcache cache, final CacheLoaderDAO<T> cacheLoaderDAO) {  
+  public SimpleC2monCacheLoader(final Ehcache cache, final CacheLoaderDAO<T> cacheLoaderDAO) {
     this.cache = cache;
     this.cacheLoaderDAO = cacheLoaderDAO;
   }
-  
+
   /**
    * Preload the cache from the database. First loads the objects from the DB
-   * into a map (on single threads so far) and then loads the cache from the 
+   * into a map (on single threads so far) and then loads the cache from the
    * map (on multiple threads).
    */
   @Override
   public void preload() {
-    
+
     //acquire read lock on start-up - this prevents the server from starting
     //until all caches are loaded (many can acquire read lock).
     clusterCache.acquireReadLockOnKey(aliveStatusInitialized);
-    try {      
-    
+    try {
+
       //fill buffer from DB (uses iBatis call)
       preloadBuffer = fillBufferFromDB();
-      
+
       //load the cache from the buffer
       if (preloadBuffer != null) {
         LOGGER.debug("Loading the cache from the buffer...");
@@ -129,34 +128,34 @@ public class SimpleC2monCacheLoader<T extends Cacheable> implements C2monCacheLo
       } else {
         LOGGER.error("Attempt to call loadCacheFromBuffer with null buffer: "
             + "this should not happen and needs investigating!");
-      }         
+      }
       //loading is done on one node only; if the design is switched to multiple nodes, then need to wait for
       //all nodes to be coherent here - NOW DONE IN SUPERVISION MANAGER by waiting for all nodes at that point
 
     } finally {
       clusterCache.releaseReadLockOnKey(aliveStatusInitialized);
     }
-   
+
 //    try {
 //      cache.setNodeCoherent(true);
 //    } catch (UnsupportedOperationException ex) {
 //      LOGGER.warn("setNodeCoherent() method threw an exception when "
 //          + "loading the cache (UnsupportedOperationException) - this is "
-//          + "normal behaviour in a single-server mode and can be ignored");      
+//          + "normal behaviour in a single-server mode and can be ignored");
 //    }
   }
-  
+
   /**
    * Loads all the values in the provided Map into the cache, using multiple threads.
    * @param preloadBuffer the Map key -> object to load into the cache
    */
   protected void loadCacheFromBuffer(final Map<Long, T> preloadBuffer) {
     //set the local Ehcache node to incoherent, which speeds up the loading process in the Terracotta setup
-    //(when in single server mode, will throw an exception which we catch and log)            
+    //(when in single server mode, will throw an exception which we catch and log)
     loadCache(preloadBuffer.keySet());
-    
+
   }
-  
+
   /**
    * Loads the cache objects from the TC server into the node memory.
    */
@@ -174,15 +173,15 @@ public class SimpleC2monCacheLoader<T extends Cacheable> implements C2monCacheLo
     } catch (UnsupportedOperationException ex) {
       LOGGER.warn("setNodeBulkLoadEnabled() method threw an exception when "
           + "loading the cache (UnsupportedOperationException) - this is "
-          + "normal behaviour in a single-server mode and can be ignored");      
+          + "normal behaviour in a single-server mode and can be ignored");
     }
   }
-  
-  private void loadCache(Collection<Long> keySet) {   
-    
+
+  private void loadCache(Collection<Long> keySet) {
+
     ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(4, 16, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1000));
     Iterator<Long> it = keySet.iterator();
-    
+
     CacheLoaderTask loaderTask = null;
     int counter = 0;
     boolean executeNecessary = false;
@@ -206,19 +205,19 @@ public class SimpleC2monCacheLoader<T extends Cacheable> implements C2monCacheLo
     try {
       threadPoolExecutor.awaitTermination(1200, TimeUnit.SECONDS); //TODO move to config?constant?
     } catch (InterruptedException e) {
-      LOGGER.warn("Exception caught while waiting for cache loading threads to complete (waited longer then timeout?): ", e);      
+      LOGGER.warn("Exception caught while waiting for cache loading threads to complete (waited longer then timeout?): ", e);
     }
-    
-    
+
+
   }
-  
+
   private Map<Long, T> fillBufferFromDB() {
     return cacheLoaderDAO.getAllAsMap();
   }
-  
+
   /**
    * Task of loading a list of objects into the cache.
-   * 
+   *
    * @author Mark Brightwell
    *
    */
@@ -228,7 +227,7 @@ public class SimpleC2monCacheLoader<T extends Cacheable> implements C2monCacheLo
      * List of keys of objects to load.
      */
     private LinkedList<Object> keyList = new LinkedList<Object>();
-    
+
     /**
      * Add a key to the list.
      * @param key the Id to add (Long)
@@ -236,7 +235,7 @@ public class SimpleC2monCacheLoader<T extends Cacheable> implements C2monCacheLo
     public void addToList(final Object key) {
       keyList.offer(key);
     }
-    
+
     /**
      * Loads the list of objects into the cache (single threaded here).
      * Uses <code>getWithLoader()</code> Ehcache method rather than
@@ -244,13 +243,13 @@ public class SimpleC2monCacheLoader<T extends Cacheable> implements C2monCacheLo
      */
     @Override
     public void run() {
-      while (!keyList.isEmpty()) {        
+      while (!keyList.isEmpty()) {
           Object key = keyList.pollFirst();
           cache.putQuiet(new Element(key, preloadBuffer.get(key)));
           cache.putQuiet(new Element(key, preloadBuffer.get(key)));
       }
     }
-    
+
   }
-  
+
 }

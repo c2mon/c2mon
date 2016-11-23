@@ -34,7 +34,7 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.common.C2monCacheLoader;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.cache.tag.AbstractTagCache;

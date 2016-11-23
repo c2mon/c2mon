@@ -1,8 +1,8 @@
 package cern.c2mon.server.cache.config;
 
-import cern.c2mon.server.cache.common.BatchCacheLoader;
-import cern.c2mon.server.cache.common.C2monCacheLoader;
-import cern.c2mon.server.cache.common.EhcacheLoaderImpl;
+import cern.c2mon.server.cache.loading.common.BatchCacheLoader;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
+import cern.c2mon.server.cache.loading.common.EhcacheLoaderImpl;
 import cern.c2mon.server.cache.loading.RuleTagLoaderDAO;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;

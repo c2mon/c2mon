@@ -19,7 +19,6 @@ package cern.c2mon.server.cache.equipment;
 import javax.annotation.PostConstruct;
 
 import cern.c2mon.server.cache.*;
-import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,7 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.common.AbstractCache;
-import cern.c2mon.server.cache.common.C2monCacheLoader;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.common.config.C2monCacheName;
 import cern.c2mon.server.common.control.ControlTag;
@@ -37,9 +36,6 @@ import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.shared.common.ConfigurationException;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Implementation of the Equipment cache.

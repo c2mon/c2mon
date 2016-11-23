@@ -1,14 +1,13 @@
 package cern.c2mon.server.cache.config;
 
-import cern.c2mon.server.cache.common.BatchCacheLoader;
-import cern.c2mon.server.cache.common.C2monCacheLoader;
-import cern.c2mon.server.cache.common.EhcacheLoaderImpl;
+import cern.c2mon.server.cache.loading.common.BatchCacheLoader;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
+import cern.c2mon.server.cache.loading.common.EhcacheLoaderImpl;
 import cern.c2mon.server.cache.loading.AlarmLoaderDAO;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import org.springframework.cache.ehcache.EhCacheFactoryBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
 
 /**

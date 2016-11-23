@@ -16,9 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.subequipment;
 
-import java.util.Collection;
-import java.util.List;
-
 import javax.annotation.PostConstruct;
 
 import net.sf.ehcache.Ehcache;
@@ -32,7 +29,7 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.common.AbstractCache;
-import cern.c2mon.server.cache.common.C2monCacheLoader;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.common.config.C2monCacheName;
 import cern.c2mon.server.common.control.ControlTag;

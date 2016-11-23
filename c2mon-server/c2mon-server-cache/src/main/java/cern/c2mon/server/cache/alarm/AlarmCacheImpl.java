@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -37,7 +37,7 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.common.AbstractCache;
-import cern.c2mon.server.cache.common.C2monCacheLoader;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.AlarmLoaderDAO;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.config.C2monCacheName;
@@ -45,7 +45,7 @@ import cern.c2mon.shared.client.alarm.AlarmQuery;
 
 /**
  * Implementation of the TIM Alarm cache.
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -59,24 +59,24 @@ public class AlarmCacheImpl extends AbstractCache<Long, Alarm> implements AlarmC
   private static final Logger LOGGER = LoggerFactory.getLogger(AlarmCacheImpl.class);
 
   @Autowired
-  public AlarmCacheImpl(@Qualifier("clusterCache") final ClusterCache clusterCache, 
+  public AlarmCacheImpl(@Qualifier("clusterCache") final ClusterCache clusterCache,
                         @Qualifier("alarmEhcache") final Ehcache ehcache,
-                        @Qualifier("alarmEhcacheLoader") final CacheLoader cacheLoader, 
+                        @Qualifier("alarmEhcacheLoader") final CacheLoader cacheLoader,
                         @Qualifier("alarmCacheLoader") final C2monCacheLoader c2monCacheLoader,
                         @Qualifier("alarmLoaderDAO") final AlarmLoaderDAO cacheLoaderDAO) {
-    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);    
-  } 
-  
+    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
+  }
+
   /**
    * Runs on start up.
    */
   @PostConstruct
-  public void init() {    
+  public void init() {
     LOGGER.info("Initializing Alarm cache...");
-    
+
     //common initialization (other than preload, which needs synch below)
     commonInit();
-    
+
     LOGGER.info("... Alarm cache initialization complete.");
   }
 
@@ -86,7 +86,7 @@ public class AlarmCacheImpl extends AbstractCache<Long, Alarm> implements AlarmC
   }
 
   @Override
-  protected C2monCacheName getCacheName() {    
+  protected C2monCacheName getCacheName() {
     return C2monCacheName.ALARM;
   }
 
@@ -100,9 +100,9 @@ public class AlarmCacheImpl extends AbstractCache<Long, Alarm> implements AlarmC
 
     Ehcache ehcache = getCache();
     ArrayList<Long> result = new ArrayList<Long>();
-    
+
     Query cacheQuery = ehcache.createQuery();
-    
+
     if (query.getFaultCode() != 0) {
         Attribute<Integer> fc = ehcache.getSearchAttribute("faultCode");
         cacheQuery.addCriteria(fc.eq(query.getFaultCode()));
@@ -123,11 +123,11 @@ public class AlarmCacheImpl extends AbstractCache<Long, Alarm> implements AlarmC
       Attribute<Boolean> active = ehcache.getSearchAttribute("isActive");
       cacheQuery.addCriteria(active.eq(query.getActive()));
     }
-    
+
     for (Result res: cacheQuery.maxResults(query.getMaxResultSize()).includeKeys().execute().all()) {
         result.add((Long) res.getKey());
     }
-      
+
     return result;
   }
 

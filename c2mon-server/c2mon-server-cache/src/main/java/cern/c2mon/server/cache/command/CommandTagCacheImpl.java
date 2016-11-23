@@ -18,7 +18,6 @@ package cern.c2mon.server.cache.command;
 
 import javax.annotation.PostConstruct;
 
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 
@@ -34,7 +33,7 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.CommandTagCache;
 import cern.c2mon.server.cache.common.AbstractCache;
-import cern.c2mon.server.cache.common.C2monCacheLoader;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.common.config.C2monCacheName;
 import cern.c2mon.shared.common.command.CommandTag;
