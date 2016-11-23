@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -51,8 +51,7 @@ public class RuleTagPostLoaderProcessor {
 
   private ClusterCache clusterCache;
 
-  @Autowired
-  private ThreadPoolTaskExecutor cacheThreadPoolTaskExecutor;
+  private ThreadPoolTaskExecutor executor;
 
   /**
    * Thread pool settings.
@@ -100,15 +99,15 @@ public class RuleTagPostLoaderProcessor {
           task.addKey(key);
           counter++;
           if (counter == 500) {
-            cacheThreadPoolTaskExecutor.execute(task);
+            executor.execute(task);
             task = new LoaderTask();
             counter = 0;
           }
         }
-        cacheThreadPoolTaskExecutor.execute(task);
-        cacheThreadPoolTaskExecutor.shutdown();
+        executor.execute(task);
+        executor.shutdown();
         try {
-          cacheThreadPoolTaskExecutor.getThreadPoolExecutor().awaitTermination(1200, TimeUnit.SECONDS);
+          executor.getThreadPoolExecutor().awaitTermination(1200, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
           LOGGER.warn("Exception caught while waiting for rule parent id loading threads to complete (waited longer then timeout?): ", e);
         }
@@ -126,12 +125,12 @@ public class RuleTagPostLoaderProcessor {
   }
 
   private void initializeThreadPool() {
-    cacheThreadPoolTaskExecutor.setCorePoolSize(threadPoolMin);
-    cacheThreadPoolTaskExecutor.setMaxPoolSize(threadPoolMax);
-    cacheThreadPoolTaskExecutor.setKeepAliveSeconds(THREAD_IDLE_LIMIT);
-
-    cacheThreadPoolTaskExecutor.setThreadNamePrefix(THREAD_NAME_PREFIX);
-    cacheThreadPoolTaskExecutor.initialize();
+    executor = new ThreadPoolTaskExecutor();
+    executor.setCorePoolSize(threadPoolMin);
+    executor.setMaxPoolSize(threadPoolMax);
+    executor.setKeepAliveSeconds(THREAD_IDLE_LIMIT);
+    executor.setThreadNamePrefix(THREAD_NAME_PREFIX);
+    executor.initialize();
   }
 
   private class LoaderTask implements Runnable {
