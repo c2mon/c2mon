@@ -1,6 +1,7 @@
 package cern.c2mon.server.cachepersistence.config;
 
 import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.dbaccess.AlarmMapper;
 import cern.c2mon.server.cachepersistence.CachePersistenceDAO;
 import cern.c2mon.server.cachepersistence.common.BatchPersistenceManager;
@@ -11,6 +12,7 @@ import cern.c2mon.server.common.alarm.Alarm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * @author Justin Lewis Salmon
@@ -19,6 +21,12 @@ public class AlarmPersistenceConfig {
 
   @Autowired
   private Environment environment;
+
+  @Autowired
+  private ClusterCache clusterCache;
+
+  @Autowired
+  private ThreadPoolTaskExecutor cachePersistenceThreadPoolTaskExecutor;
 
   @Autowired
   private AlarmMapper alarmMapper;
@@ -33,7 +41,8 @@ public class AlarmPersistenceConfig {
 
   @Bean
   public BatchPersistenceManager alarmPersistenceManager() {
-    BatchPersistenceManagerImpl<Alarm> manager = new BatchPersistenceManagerImpl<>(alarmPersistenceDAO(), alarmCache);
+    BatchPersistenceManagerImpl<Alarm> manager = new BatchPersistenceManagerImpl<>(alarmPersistenceDAO(), alarmCache,
+        clusterCache, cachePersistenceThreadPoolTaskExecutor);
     manager.setTimeoutPerBatch(environment.getRequiredProperty("c2mon.server.cachepersistence.timeoutPerBatch", Integer.class));
     return manager;
   }
