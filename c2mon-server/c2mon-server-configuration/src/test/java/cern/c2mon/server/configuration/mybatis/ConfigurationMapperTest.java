@@ -21,6 +21,7 @@ import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
 import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
+import cern.c2mon.server.configuration.dao.ConfigurationDAO;
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
 import cern.c2mon.server.daqcommunication.in.config.DaqCommunicationInModule;
 import cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl;
@@ -36,7 +37,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -73,7 +73,7 @@ public class ConfigurationMapperTest {
   public ConfigurationDatabasePopulationRule populationRule;
 
   @Autowired
-  private ConfigurationMapper configurationMapper;
+  private ConfigurationDAO configurationDAO;
 
   @Autowired
   private JmsContainerManagerImpl jmsContainerManager;
@@ -85,12 +85,12 @@ public class ConfigurationMapperTest {
 
   @Test
   public void testGetConfigName() {
-    assertEquals("create subequipment", configurationMapper.getConfigName(19));
+    assertEquals("create subequipment", configurationDAO.getConfigName(19));
   }
 
   @Test
   public void testGetConfigElements() {
-    List<ConfigurationElement> configElements = configurationMapper.getConfigElements(25);
+    List<ConfigurationElement> configElements = configurationDAO.getConfigElements(25);
 
     //retrieved all
     assertEquals(2, configElements.size());
@@ -139,11 +139,11 @@ public class ConfigurationMapperTest {
    */
   @Test
   public void testSaveStatusInfo() {
-    List<ConfigurationElement> elements = configurationMapper.getConfigElements(1);
+    List<ConfigurationElement> elements = configurationDAO.getConfigElements(1);
     ConfigurationElement element = elements.iterator().next();
     element.setStatus(Status.OK);
     element.setDaqStatus(Status.RESTART);
-    configurationMapper.saveStatusInfo(element);
+    configurationDAO.saveStatusInfo(element);
   }
 
   /**
@@ -151,7 +151,7 @@ public class ConfigurationMapperTest {
    */
   @Test
   public void testMarkAsApplied() {
-    configurationMapper.markAsApplied(1);
+    configurationDAO.markAsApplied(1);
   }
 
 }

@@ -17,14 +17,19 @@
 package cern.c2mon.server.configuration.mybatis;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
-import org.apache.ibatis.exceptions.PersistenceException;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.configuration.dao.ConfigurationDAO;
 import cern.c2mon.shared.client.configuration.ConfigurationDescriptor;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
+
+import javax.sql.DataSource;
 
 /**
  * Mybatis implementation of the ConfigurationDAO for the server
@@ -41,6 +46,9 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
    */
   @Autowired
   private ConfigurationMapper configurationMapper;
+
+  @Autowired
+  private DataSource configurationDataSource;
 
   @Override
   public String getConfigName(int configId) {
@@ -61,16 +69,32 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
 
   @Override
   public List<ConfigurationElement> getConfigElements(int configId) {
-    try {
-      return configurationMapper.getConfigElements(configId);
-    } catch (PersistenceException e) {
-      if (e.getCause() instanceof NullPointerException) {
-        throw new PersistenceException("Nullpointer exception caught while loading configuration elements: "
-            + "please check none of the element key-value pairs you are trying to load are null!", e);
-      } else {
-        throw e;
-      }
-    }
+    JdbcTemplate template = new JdbcTemplate(configurationDataSource);
+
+    // This was rewritten because the MyBatis mapper query wasn't working,
+    // and this method is actually much simpler.
+    String sql = "SELECT SEQID, CONFIGID, MODETYPE, ELEMENTTYPE, ELEMENTPKEY " +
+                 "FROM TIMCONFIGELT WHERE CONFIGID = ? ORDER BY SEQID";
+
+    List<ConfigurationElement> elements = template.query(sql, (rs, rowNum) -> {
+      ConfigurationElement element = new ConfigurationElement();
+      element.setSequenceId(rs.getLong(1));
+      element.setConfigId(rs.getLong(2));
+      element.setAction(ConfigConstants.Action.valueOf(rs.getString(3)));
+      element.setEntity(ConfigConstants.Entity.valueOf(rs.getString(4).toUpperCase()));
+      element.setEntityId(rs.getLong(5));
+
+      String select = "SELECT ELEMENTFIELD, ELEMENTVALUE FROM TIMCONFIGVAL WHERE SEQID = ?";
+      List<Map<String, Object>> propertiesMap = template.queryForList(select, element.getSequenceId());
+
+      Properties properties = new Properties();
+      propertiesMap.forEach(map -> properties.put(map.get("ELEMENTFIELD"), map.get("ELEMENTVALUE")));
+      element.setElementProperties(properties);
+
+      return element;
+    }, configId);
+
+    return elements;
   }
 
   @Override
