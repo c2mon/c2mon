@@ -86,7 +86,9 @@ public final class CacheObjectCreation {
     alarm3.setState(AlarmCondition.TERMINATE);
     alarm3.setTimestamp(new Timestamp(System.currentTimeMillis() - 2000));
     alarm3.setDataTagId(100003L);
-    alarm3.setMetadata(Metadata.builder().addMetadata("testMetadata",11).build());
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("testMetadata",11);
+    alarm3.setMetadata(metadata);
     alarm3.hasBeenPublished(new Timestamp(System.currentTimeMillis()));
     return alarm3;
   }

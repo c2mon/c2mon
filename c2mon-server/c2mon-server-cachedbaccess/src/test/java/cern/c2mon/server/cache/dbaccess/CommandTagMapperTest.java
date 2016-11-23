@@ -78,7 +78,7 @@ public class CommandTagMapperTest extends AbstractMapperTest {
     cacheObject.setEquipmentId(150L); //need test equipment inserted - use EquipmentMapperTest
     cacheObject.setMaximum(23);
     cacheObject.setMinimum(10);
-    cacheObject.setMetadata(Metadata.builder().addMetadata("String",11).build());
+    cacheObject.setMetadata(Metadata.builder().setNewMetadata("String",11).build());
     cacheObject.setProcessId(50L); //need test process also (P_JAPC01)
     cacheObject.setSourceTimeout(10);
     cacheObject.setSourceRetries(2);
@@ -121,7 +121,7 @@ public class CommandTagMapperTest extends AbstractMapperTest {
     modifiedCommand.setClientTimeout(3);
     modifiedCommand.setMinimum(Integer.valueOf(30));
     modifiedCommand.setMaximum(Integer.valueOf(60));
-    modifiedCommand.setMetadata(Metadata.builder().addMetadata("metadata",11).build());
+    modifiedCommand.setMetadata(Metadata.builder().setNewMetadata("metadata",11).build());
 
     //update
     commandTagMapper.updateCommandTag(modifiedCommand);

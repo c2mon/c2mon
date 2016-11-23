@@ -62,7 +62,7 @@ public class Metadata implements Serializable, Cloneable {
   }
 
   @Builder
-  public Metadata(@Singular("addMetadata") Map<String, Object> metadata) {
+  public Metadata(@Singular("setNewMetadata") Map<String, Object> metadata) {
     this.metadata = metadata;
   }
 

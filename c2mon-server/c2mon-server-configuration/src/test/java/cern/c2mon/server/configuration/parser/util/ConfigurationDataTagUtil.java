@@ -65,7 +65,7 @@ public class ConfigurationDataTagUtil {
         .minValue(0)
         .maxValue(10)
         .unit("testUnit")
-        .metadata(Metadata.builder().addMetadata("testMetadata", 11).build())
+        .metadata(Metadata.builder().setNewMetadata("testMetadata", 11).build())
         .build();
     dataTag.setEquipmentId(10L);
 
@@ -78,7 +78,9 @@ public class ConfigurationDataTagUtil {
     properties.setProperty("maxValue", String.valueOf(10));
     properties.setProperty("address", new DataTagAddress().toConfigXML());
     properties.setProperty("equipmentId", String.valueOf(10l));
-    properties.setProperty("metadata", Metadata.toJSON(Metadata.builder().addMetadata("testMetadata", 11).build()));
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("testMetadata", 11);
+    properties.setProperty("metadata", Metadata.toJSON(metadata));
     properties.setProperty("unit", "testUnit");
 
     return dataTag;
