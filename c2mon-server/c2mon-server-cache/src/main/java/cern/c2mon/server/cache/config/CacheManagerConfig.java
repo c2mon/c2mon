@@ -18,8 +18,6 @@ import static java.lang.String.format;
 @Configuration
 public class CacheManagerConfig {
 
-  private static final int THREAD_TIMEOUT = 5;
-
   @Resource
   private Environment environment;
 
@@ -44,15 +42,5 @@ public class CacheManagerConfig {
     bean.setConfigLocation(new ClassPathResource(configLocation));
     bean.setShared(true);
     return bean;
-  }
-
-  @Bean
-  public ThreadPoolTaskExecutor cacheThreadPoolTaskExecutor() {
-    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-    executor.setCorePoolSize(environment.getRequiredProperty("c2mon.server.cacheloading.maxThreads", Integer.class));
-    executor.setMaxPoolSize(environment.getRequiredProperty("c2mon.server.cacheloading.maxThreads", Integer.class));
-    executor.setKeepAliveSeconds(THREAD_TIMEOUT);
-    executor.setQueueCapacity(environment.getRequiredProperty("c2mon.server.cacheloading.queueSize", Integer.class));
-    return executor;
   }
 }

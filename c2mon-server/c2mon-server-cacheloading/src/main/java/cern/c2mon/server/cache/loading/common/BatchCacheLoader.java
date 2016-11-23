@@ -36,7 +36,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  * @param <T> the cache object type
  *
  * @author Mark Brightwell
- *
  */
 @Slf4j
 public class BatchCacheLoader<T extends Cacheable> implements C2monCacheLoader {
@@ -45,7 +44,7 @@ public class BatchCacheLoader<T extends Cacheable> implements C2monCacheLoader {
    * Executor for loading the cache using multiple threads.
    */
   @Autowired
-  private ThreadPoolTaskExecutor cacheThreadPoolTaskExecutor;
+  private ThreadPoolTaskExecutor cacheLoadingThreadPoolTaskExecutor;
 
   /**
    * Timeout before an inactive thread is returned to the pool
@@ -97,8 +96,8 @@ public class BatchCacheLoader<T extends Cacheable> implements C2monCacheLoader {
     log.debug("preload() - Start preloading data for cache " + cache.getName());
     Integer lastRow = batchCacheLoaderDAO.getMaxRow(); // 0 if no cache objects!
 
-    cacheThreadPoolTaskExecutor.setThreadNamePrefix(this.threadNamePrefix);
-    cacheThreadPoolTaskExecutor.initialize();
+    cacheLoadingThreadPoolTaskExecutor.setThreadNamePrefix(this.threadNamePrefix);
+    cacheLoadingThreadPoolTaskExecutor.initialize();
 
     Integer firstRow = 0;
     LinkedList<Callable<Object>> tasks = new LinkedList<Callable<Object>>();
@@ -108,7 +107,7 @@ public class BatchCacheLoader<T extends Cacheable> implements C2monCacheLoader {
       firstRow += batchSize;
     }
     try {
-      cacheThreadPoolTaskExecutor.getThreadPoolExecutor().invokeAll(tasks, 1800, TimeUnit.SECONDS);
+      cacheLoadingThreadPoolTaskExecutor.getThreadPoolExecutor().invokeAll(tasks, 1800, TimeUnit.SECONDS);
     } catch (RejectedExecutionException e) {
       log.error("Exception caught while loading a server cache from the database. This is probably due to the cache.loader.queue.size being"
           + "too small. Increase this to at least 'id range'/'cache loader batch size', or alternatively increase the"
@@ -117,7 +116,7 @@ public class BatchCacheLoader<T extends Cacheable> implements C2monCacheLoader {
     } catch (InterruptedException e) {
       log.error("Interrupted while waiting for cache loading threads to terminate.", e);
     }
-    cacheThreadPoolTaskExecutor.shutdown();
+    cacheLoadingThreadPoolTaskExecutor.shutdown();
     log.debug("preload() - Finished preload for cache " + cache.getName());
   }
 
