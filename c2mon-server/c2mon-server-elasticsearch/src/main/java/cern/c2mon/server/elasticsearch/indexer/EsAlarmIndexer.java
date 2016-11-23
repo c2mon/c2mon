@@ -26,6 +26,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
@@ -51,8 +52,8 @@ public class EsAlarmIndexer<T extends EsAlarm> extends EsIndexer<T> {
    *          handling the connection with Elasticsearch.
    */
   @Autowired
-  public EsAlarmIndexer(final Connector connector) {
-    super(connector);
+  public EsAlarmIndexer(final Connector connector, Environment environment) {
+    super(connector, environment);
   }
 
   /**

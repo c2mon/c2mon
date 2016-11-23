@@ -28,6 +28,7 @@ import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.pmanager.IDBPersistenceHandler;
@@ -44,19 +45,17 @@ import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 @Component
 @Data
 public abstract class EsIndexer<T extends IFallback> implements IDBPersistenceHandler<T> {
+
   /**
    * Prefix used for every index in the Elasticsearch cluster, e.g., c2mon_2015-11 is a valid index.
    */
-  @Value("${c2mon.server.elasticsearch.index.prefix}")
   protected String indexPrefix;
 
-  @Value("${c2mon.server.elasticsearch.config.index.format}")
   protected String indexFormat;
 
   /**
    * Every tag must begin with the same prefix, e.g., tag_string is a good type.
    */
-  @Value("${c2mon.server.elasticsearch.type.prefix}")
   protected String typePrefix;
 
   /**
@@ -75,8 +74,11 @@ public abstract class EsIndexer<T extends IFallback> implements IDBPersistenceHa
    * @param connector handling the connection to Elasticsearch.
    */
   @Autowired
-  public EsIndexer(final Connector connector) {
+  public EsIndexer(final Connector connector, Environment environment) {
     this.connector = connector;
+    this.indexPrefix = environment.getRequiredProperty("c2mon.server.elasticsearch.index.prefix");
+    this.indexFormat = environment.getRequiredProperty("c2mon.server.elasticsearch.config.index.format");
+    this.typePrefix = environment.getRequiredProperty("c2mon.server.elasticsearch.type.prefix");
   }
 
   /**

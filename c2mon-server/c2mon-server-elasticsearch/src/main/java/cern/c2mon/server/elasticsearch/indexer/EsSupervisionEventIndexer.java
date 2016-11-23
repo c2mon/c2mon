@@ -25,6 +25,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
@@ -50,8 +51,8 @@ public class EsSupervisionEventIndexer<T extends EsSupervisionEvent> extends EsI
    * @param connector handling the connection to Elasticsearch.
    */
   @Autowired
-  public EsSupervisionEventIndexer(final Connector connector) {
-    super(connector);
+  public EsSupervisionEventIndexer(final Connector connector, Environment environment) {
+    super(connector, environment);
   }
 
   /**

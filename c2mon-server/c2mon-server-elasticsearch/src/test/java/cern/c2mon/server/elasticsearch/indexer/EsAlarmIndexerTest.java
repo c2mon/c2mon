@@ -32,6 +32,7 @@ import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.elasticsearch.structure.converter.EsAlarmLogConverter;
 import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
 import cern.c2mon.server.test.CacheObjectCreation;
+import org.springframework.core.env.Environment;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.anyString;
@@ -55,6 +56,10 @@ public class EsAlarmIndexerTest {
 
   @Mock
   private TransportConnector connector;
+
+  @Mock
+  private Environment environment;
+
   private EsAlarmLogConverter esAlarmLogConverter = new EsAlarmLogConverter();
 
   @Before

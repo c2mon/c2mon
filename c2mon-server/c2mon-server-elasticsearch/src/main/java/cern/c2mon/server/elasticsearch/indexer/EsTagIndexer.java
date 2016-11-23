@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.index.IndexRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -56,8 +57,8 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
    * @param connector handling the connection to Elasticsearch.
    */
   @Autowired
-  public EsTagIndexer(final Connector connector) {
-    super(connector);
+  public EsTagIndexer(final Connector connector, Environment environment) {
+    super(connector, environment);
   }
 
   /**

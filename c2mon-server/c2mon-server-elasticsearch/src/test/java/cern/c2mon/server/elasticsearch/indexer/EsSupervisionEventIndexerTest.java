@@ -33,6 +33,7 @@ import cern.c2mon.server.elasticsearch.structure.types.EsSupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import org.springframework.core.env.Environment;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.anyString;
@@ -64,6 +65,9 @@ public class EsSupervisionEventIndexerTest {
 
   @Mock
   private EsSupervisionEventConverter esSupervisionEventConverter;
+
+  @Mock
+  private Environment environment;
 
   @Before
   public void setup() throws IDBPersistenceException {

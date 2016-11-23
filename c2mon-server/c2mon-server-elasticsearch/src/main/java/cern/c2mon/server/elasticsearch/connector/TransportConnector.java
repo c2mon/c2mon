@@ -96,57 +96,45 @@ public class TransportConnector implements Connector {
   /**
    * Port to which to connect when using a client that is not local. By default 9300 should be used.
    */
-  @Value("${c2mon.server.elasticsearch.port}")
   private int port;
 
   /**
    * Name of the host holding the Elasticsearch cluster.
    */
-  @Value("${c2mon.server.elasticsearch.host}")
   private String host;
 
   /**
    * Name of the cluster. Must be set in order to connect to the right one in case there are several clusters running at the host.
    */
-  @Value("${c2mon.server.elasticsearch.cluster}")
   private String cluster;
 
   /** Number of shards per index. Default is 10 */
-  @Value("${c2mon.server.elasticsearch.shards}")
   private int shards;
 
   /** Number of replicas for each primary shard. Default is 1 */
-  @Value("${c2mon.server.elasticsearch.replicas}")
   private int replicas;
 
   /**
    * Name of the node in the cluster (more useful for debugging and to know which one is connected to the cluster).
    */
-  @Value("${c2mon.server.elasticsearch.node}")
   private String node;
 
   /**
    * Setting this to true will make the connector connect to a cluster inside the JVM. To false to a real cluster.
    */
-  @Value("${c2mon.server.elasticsearch.local}")
   private boolean isLocal;
 
-  @Value("${c2mon.server.elasticsearch.httpEnabled:false}")
   private boolean httpEnabled;
 
   /**
    * BulkSettings
    */
-  @Value("${c2mon.server.elasticsearch.config.bulk.actions}")
   private int bulkActions;
 
-  @Value("${c2mon.server.elasticsearch.config.bulk.size}")
   private int bulkSize;
 
-  @Value("${c2mon.server.elasticsearch.config.bulk.flush}")
   private int flushInterval;
 
-  @Value("${c2mon.server.elasticsearch.config.bulk.concurrent}")
   private int concurrent;
 
   @Autowired
@@ -177,13 +165,25 @@ public class TransportConnector implements Connector {
    */
   private boolean isConnected;
 
-
   /**
    * Instantiate the Client to communicate with the Elasticsearch cluster. If it
    * is well instantiated, retrieve the indices and and create a bulkProcessor for batch writes.
    */
   @PostConstruct
   public void init() {
+    port = environment.getRequiredProperty("c2mon.server.elasticsearch.port", Integer.class);
+    host = environment.getRequiredProperty("c2mon.server.elasticsearch.host");
+    cluster = environment.getRequiredProperty("c2mon.server.elasticsearch.cluster");
+    shards = environment.getRequiredProperty("c2mon.server.elasticsearch.shards", Integer.class);
+    replicas = environment.getRequiredProperty("c2mon.server.elasticsearch.replicas", Integer.class);
+    node = environment.getRequiredProperty("c2mon.server.elasticsearch.node");
+    isLocal = environment.getRequiredProperty("c2mon.server.elasticsearch.local", Boolean.class);
+    httpEnabled = environment.getRequiredProperty("c2mon.server.elasticsearch.httpEnabled", Boolean.class);
+    bulkActions = environment.getRequiredProperty("c2mon.server.elasticsearch.config.bulk.actions", Integer.class);
+    bulkSize = environment.getRequiredProperty("c2mon.server.elasticsearch.config.bulk.size", Integer.class);
+    flushInterval = environment.getRequiredProperty("c2mon.server.elasticsearch.config.bulk.flush", Integer.class);
+    concurrent = environment.getRequiredProperty("c2mon.server.elasticsearch.config.bulk.concurrent", Integer.class);
+
     if (!host.equalsIgnoreCase("localhost") && !host.equalsIgnoreCase("local")) {
       setLocal(false);
     }

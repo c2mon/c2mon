@@ -26,6 +26,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.core.env.Environment;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -36,17 +37,21 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class FallBackTest {
+
   @InjectMocks
   private EsAlarmIndexer esAlarmIndexer;
+
   @Mock
   private Connector connector;
+
+  @Mock
+  private Environment environment;
 
   @Before
   public void setup() {
     esAlarmIndexer.setIndexFormat("M");
     when(connector.logAlarmEvent(anyString(), anyString(), any(EsAlarm.class))).thenThrow(new ElasticsearchException("testException"));
   }
-
 
   @Test(expected = IDBPersistenceException.class)
   public void ElasticsearchExceptionTriggersIDBPersistenceException() throws IDBPersistenceException {
