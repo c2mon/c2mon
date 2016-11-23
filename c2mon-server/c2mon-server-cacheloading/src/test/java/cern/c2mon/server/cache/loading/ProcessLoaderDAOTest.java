@@ -39,16 +39,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import cern.c2mon.server.common.process.Process;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(
-    locations = {
-        "classpath:test-config/database-population-rule.xml"
-    },
-    classes = {
-        CacheDbAccessModule.class,
-        CacheLoadingModule.class
-    }
-)
-@TestPropertySource("classpath:c2mon-server-default.properties")
+@ContextConfiguration(classes = {
+    CacheDbAccessModule.class,
+    CacheLoadingModule.class,
+    DatabasePopulationRule.class
+})
+@TestPropertySource(properties = {
+    // TODO: remove these
+    "c2mon.server.client.jms.topic.tag.trunk=c2mon.client.tag",
+    "c2mon.server.client.jms.topic.controltag=c2mon.client.controltag"
+})
 public class ProcessLoaderDAOTest {
 
   @Rule

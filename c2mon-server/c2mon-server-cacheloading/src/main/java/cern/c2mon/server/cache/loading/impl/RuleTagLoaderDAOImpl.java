@@ -43,6 +43,8 @@ public class RuleTagLoaderDAOImpl extends AbstractBatchLoaderDAO<RuleTag> implem
   public RuleTagLoaderDAOImpl(RuleTagMapper ruleTagMapper, Environment environment) {
     super(ruleTagMapper); //initial buffer size
     this.ruleTagMapper = ruleTagMapper;
+
+    // TODO: fix this somehow (why do we need to do this anyway?)
     this.publicationTrunk = environment.getRequiredProperty("c2mon.server.client.jms.topic.tag.trunk");
   }
 

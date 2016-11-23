@@ -12,6 +12,27 @@ import org.springframework.stereotype.Service;
 import javax.sql.DataSource;
 
 /**
+ * Use this class if you need a cleanly populated backup database at the
+ * start of your tests.
+ *
+ * Example:
+ *
+ * @RunWith(SpringJUnit4ClassRunner.class)
+ * @ContextConfiguration(classes = {
+ *    CacheDbAccessModule.class,
+ *    CacheLoadingModule.class,
+ *    DatabasePopulationRule.class
+ * })
+ * public class ControlTagLoaderDAOTest {
+ *
+ *    @Rule
+ *    @Autowired
+ *    public DatabasePopulationRule databasePopulationRule;
+ *
+ *    @Test
+ *    ...
+ * }
+ *
  * @author Justin Lewis Salmon
  */
 @Configuration

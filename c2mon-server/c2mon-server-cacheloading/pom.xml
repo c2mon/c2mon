@@ -21,8 +21,7 @@
       <artifactId>c2mon-shared-common</artifactId>
     </dependency>
 
-    <!--3rd party dependencies-->
-
+    <!-- 3rd-party dependencies -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-tx</artifactId>
@@ -45,7 +44,6 @@
     </dependency>
 
     <!-- Test dependencies -->
-
     <dependency>
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-test</artifactId>

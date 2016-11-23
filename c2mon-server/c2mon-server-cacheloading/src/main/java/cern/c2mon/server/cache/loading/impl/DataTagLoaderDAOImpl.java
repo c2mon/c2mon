@@ -44,6 +44,8 @@ public class DataTagLoaderDAOImpl extends AbstractBatchLoaderDAO<DataTag> implem
   public DataTagLoaderDAOImpl(final DataTagMapper dataTagMapper, Environment environment) {
     super(dataTagMapper);
     this.dataTagMapper = dataTagMapper;
+
+    // TODO: fix this somehow (why do we need to do this anyway?)
     this.publicationTrunk = environment.getRequiredProperty("c2mon.server.client.jms.topic.tag.trunk");
   }
 

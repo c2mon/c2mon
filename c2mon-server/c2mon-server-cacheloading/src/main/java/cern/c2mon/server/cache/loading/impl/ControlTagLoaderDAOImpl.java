@@ -49,6 +49,8 @@ public class ControlTagLoaderDAOImpl extends AbstractDefaultLoaderDAO<ControlTag
     super(10000, controlTagMapper);
     this.controlTagMapper = controlTagMapper;
     this.dataTagMapper = dataTagMapper;
+
+    // TODO: fix this somehow (why do we need to do this anyway?)
     this.publicationTopic = environment.getRequiredProperty("c2mon.server.client.jms.topic.controltag");
   }
 
