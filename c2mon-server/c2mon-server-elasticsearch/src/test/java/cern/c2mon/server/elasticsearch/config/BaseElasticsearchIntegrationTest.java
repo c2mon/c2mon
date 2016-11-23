@@ -33,5 +33,5 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
     SupervisionModule.class,
     ElasticsearchModule.class
 })
-@TestPropertySource(value = "classpath:c2mon-server-default.properties", properties = "spring.main.show_banner=false")
+@TestPropertySource("classpath:c2mon-server-default.properties")
 public abstract class BaseElasticsearchIntegrationTest {}
