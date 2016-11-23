@@ -69,4 +69,12 @@ public class Metadata implements Serializable, Cloneable {
   public Metadata() {
   }
 
+  public void addMetadata(String key, Object value) {
+    metadata.put(key, value);
+  }
+
+  public void removeMetadata(String key, Object value) {
+    metadata.remove(key, value);
+  }
+
 }
