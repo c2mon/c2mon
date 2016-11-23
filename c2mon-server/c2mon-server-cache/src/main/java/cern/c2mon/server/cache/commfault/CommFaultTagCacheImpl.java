@@ -18,6 +18,8 @@ package cern.c2mon.server.cache.commfault;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.cache.config.CacheProperties;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 
@@ -41,28 +43,25 @@ import cern.c2mon.server.common.config.C2monCacheName;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service("commFaultTagCache")
 public class CommFaultTagCacheImpl extends AbstractCache<Long, CommFaultTag> implements CommFaultTagCache {
 
-  /**
-   * Private class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(CommFaultTagCacheImpl.class);
-
   @Autowired
   public CommFaultTagCacheImpl(final ClusterCache clusterCache,
-                          @Qualifier("commFaultTagEhcache") final Ehcache ehcache,
-                          @Qualifier("commFaultTagEhcacheLoader") final CacheLoader cacheLoader,
-                          @Qualifier("commFaultTagCacheLoader") final C2monCacheLoader c2monCacheLoader,
-                          @Qualifier("commFaultTagDAO") final SimpleCacheLoaderDAO<CommFaultTag> cacheLoaderDAO) {
-    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
+                               @Qualifier("commFaultTagEhcache") final Ehcache ehcache,
+                               @Qualifier("commFaultTagEhcacheLoader") final CacheLoader cacheLoader,
+                               @Qualifier("commFaultTagCacheLoader") final C2monCacheLoader c2monCacheLoader,
+                               @Qualifier("commFaultTagDAO") final SimpleCacheLoaderDAO<CommFaultTag> cacheLoaderDAO,
+                               final CacheProperties properties) {
+    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
   }
 
   @PostConstruct
   public void init() {
-    LOGGER.info("Initializing the CommFaultTag cache...");
+    log.info("Initializing the CommFaultTag cache...");
     commonInit();
-    LOGGER.info("... CommFaultTag cache initialization complete.");
+    log.info("... CommFaultTag cache initialization complete.");
   }
 
   @Override

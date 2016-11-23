@@ -18,6 +18,8 @@ package cern.c2mon.server.cache.command;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.cache.config.CacheProperties;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 
@@ -44,28 +46,25 @@ import cern.c2mon.shared.common.command.CommandTag;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service
 public class CommandTagCacheImpl extends AbstractCache<Long, CommandTag> implements CommandTagCache {
 
-  /**
-   * Private class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(CommandTagCacheImpl.class);
-
   @Autowired
   public CommandTagCacheImpl(final ClusterCache clusterCache,
-                          @Qualifier("commandTagEhcache") final Ehcache ehcache,
-                          @Qualifier("commandTagEhcacheLoader") final CacheLoader cacheLoader,
-                          @Qualifier("commandTagCacheLoader") final C2monCacheLoader c2monCacheLoader,
-                          @Qualifier("commandTagDAO") final SimpleCacheLoaderDAO<CommandTag> cacheLoaderDAO) {
-    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
+                             @Qualifier("commandTagEhcache") final Ehcache ehcache,
+                             @Qualifier("commandTagEhcacheLoader") final CacheLoader cacheLoader,
+                             @Qualifier("commandTagCacheLoader") final C2monCacheLoader c2monCacheLoader,
+                             @Qualifier("commandTagDAO") final SimpleCacheLoaderDAO<CommandTag> cacheLoaderDAO,
+                             final CacheProperties properties) {
+    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
   }
 
   @PostConstruct
   public void init() {
-    LOGGER.info("Initializing the CommandTag cache...");
+    log.info("Initializing the CommandTag cache...");
     commonInit();
-    LOGGER.info("... CommandTag cache initialization complete.");
+    log.info("... CommandTag cache initialization complete.");
   }
 
   @Override
@@ -95,7 +94,7 @@ public class CommandTagCacheImpl extends AbstractCache<Long, CommandTag> impleme
       // Find the number of results -- the number of hits.
       int size = results.size();
       if (size == 0) {
-        LOGGER.info("Failed to find a command tag with name " + name + " in the cache.");
+        log.info("Failed to find a command tag with name " + name + " in the cache.");
       }
 
       commandTagKey = results.all().size() > 0 ? (Long) results.all().get(0).getKey() : null;

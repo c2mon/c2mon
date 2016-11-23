@@ -18,6 +18,8 @@ package cern.c2mon.server.cache.alive;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.cache.config.CacheProperties;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 
@@ -40,22 +42,18 @@ import cern.c2mon.server.common.config.C2monCacheName;
  *
  * @author Mark Brightwell
  */
+@Slf4j
 @Service("aliveTimerCache")
 public class AliveTimerCacheImpl extends AbstractCache<Long, AliveTimer> implements AliveTimerCache {
 
-    /**
-     * Private class logger.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(AliveTimerCacheImpl.class);
-
-
     @Autowired
     public AliveTimerCacheImpl(final ClusterCache clusterCache,
-            @Qualifier("aliveTimerEhcache") final Ehcache ehcache,
-            @Qualifier("aliveTimerEhcacheLoader") final CacheLoader cacheLoader,
-            @Qualifier("aliveTimerCacheLoader") final C2monCacheLoader c2monCacheLoader,
-            @Qualifier("aliveTimerDAO") final SimpleCacheLoaderDAO<AliveTimer> cacheLoaderDAO) {
-        super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
+                               @Qualifier("aliveTimerEhcache") final Ehcache ehcache,
+                               @Qualifier("aliveTimerEhcacheLoader") final CacheLoader cacheLoader,
+                               @Qualifier("aliveTimerCacheLoader") final C2monCacheLoader c2monCacheLoader,
+                               @Qualifier("aliveTimerDAO") final SimpleCacheLoaderDAO<AliveTimer> cacheLoaderDAO,
+                               final CacheProperties properties) {
+        super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
     }
 
     /**
@@ -63,11 +61,11 @@ public class AliveTimerCacheImpl extends AbstractCache<Long, AliveTimer> impleme
      */
     @PostConstruct
     public void init() {
-        LOGGER.debug("Initializing AliveTimer cache...");
+        log.debug("Initializing AliveTimer cache...");
 
         commonInit();
 
-        LOGGER.info("... AliveTimer cache initialization complete.");
+        log.info("... AliveTimer cache initialization complete.");
     }
 
     @Override

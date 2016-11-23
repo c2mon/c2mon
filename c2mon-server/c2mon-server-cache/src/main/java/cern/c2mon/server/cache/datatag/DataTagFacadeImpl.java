@@ -23,10 +23,11 @@ import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -50,13 +51,9 @@ import static cern.c2mon.shared.common.type.TypeConverter.getType;
  *
  * @author Mark Brightwell
  */
+@Slf4j
 @Service
 public class DataTagFacadeImpl extends AbstractDataTagFacade<DataTag> implements DataTagFacade {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(DataTagFacadeImpl.class);
 
   /**
    * Logger for logging updates to tags.
@@ -72,8 +69,7 @@ public class DataTagFacadeImpl extends AbstractDataTagFacade<DataTag> implements
    * Property that will by used as trunk. Should
    * always be overridden by server default property.
    */
-  @Value("${c2mon.server.client.jms.topic.tag.trunk}")
-  private String tagPublicationTrunk = "c2mon.client.tag.default";
+  private String tagPublicationTrunk;
 
   /**
    * Constructor.
@@ -92,11 +88,15 @@ public class DataTagFacadeImpl extends AbstractDataTagFacade<DataTag> implements
                            final AlarmFacade alarmFacade,
                            final AlarmCache alarmCache,
                            final EquipmentFacade equipmentFacade,
-                           final SubEquipmentFacade subEquipmentFacade) {
+                           final SubEquipmentFacade subEquipmentFacade,
+                           final Environment environment) {
     super(dataTagCache, alarmFacade, alarmCache, dataTagCacheObjectFacade, dataTagCacheObjectFacade, qualityConverter);
     super.setEquipmentFacade(equipmentFacade);
     super.setSubEquipmentFacade(subEquipmentFacade);
     this.dataTagCacheObjectFacade = dataTagCacheObjectFacade;
+
+    // TODO: remove this...
+    this.tagPublicationTrunk = environment.getRequiredProperty("c2mon.server.client.jms.topic.tag.trunk");
   }
 
   /**
@@ -127,7 +127,7 @@ public class DataTagFacadeImpl extends AbstractDataTagFacade<DataTag> implements
       DataTag dataTag = tagCache.get(id);
       returnValue = generateSourceXML((DataTagCacheObject) dataTag);//old version: SourceDataTag.toConfigXML(tag);
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.error("getConfigXML(): failed to retrieve data tag with id " + id + " from the cache (returning empty String config).", cacheEx);
+      log.error("getConfigXML(): failed to retrieve data tag with id " + id + " from the cache (returning empty String config).", cacheEx);
     } finally {
       tagCache.releaseReadLockOnKey(id);
     }

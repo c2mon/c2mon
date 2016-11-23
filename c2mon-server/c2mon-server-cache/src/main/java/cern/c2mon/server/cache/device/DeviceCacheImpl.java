@@ -18,6 +18,8 @@ package cern.c2mon.server.cache.device;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.cache.config.CacheProperties;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 
@@ -41,22 +43,19 @@ import cern.c2mon.server.common.device.Device;
  *
  * @author Justin Lewis Salmon
  */
+@Slf4j
 @Service("deviceCache")
 @ManagedResource(objectName="cern.c2mon:type=cache,name=deviceCache")
 public class DeviceCacheImpl extends AbstractCache<Long, Device> implements DeviceCache {
-
-  /**
-   * Static class logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(DeviceCacheImpl.class);
 
   @Autowired
   public DeviceCacheImpl(@Qualifier("clusterCache") final ClusterCache clusterCache,
                          @Qualifier("deviceEhcache") final Ehcache ehcache,
                          @Qualifier("deviceEhcacheLoader") final CacheLoader cacheLoader,
                          @Qualifier("deviceCacheLoader") final C2monCacheLoader c2monCacheLoader,
-                         @Qualifier("deviceDAO") final SimpleCacheLoaderDAO<Device> cacheLoaderDAO) {
-    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
+                         @Qualifier("deviceDAO") final SimpleCacheLoaderDAO<Device> cacheLoaderDAO,
+                         final CacheProperties properties) {
+    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
   }
 
   /**
@@ -65,11 +64,9 @@ public class DeviceCacheImpl extends AbstractCache<Long, Device> implements Devi
    */
   @PostConstruct
   public void init() {
-    LOG.info("Initializing Device cache...");
-
+    log.info("Initializing Device cache...");
     commonInit();
-
-    LOG.info("Device cache initialization complete.");
+    log.info("Device cache initialization complete.");
   }
 
   @Override

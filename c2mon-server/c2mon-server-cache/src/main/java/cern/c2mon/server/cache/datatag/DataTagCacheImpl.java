@@ -21,6 +21,8 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.cache.config.CacheProperties;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 import net.sf.ehcache.search.Attribute;
@@ -47,22 +49,19 @@ import cern.c2mon.server.common.datatag.DataTag;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service("dataTagCache")
 @ManagedResource(objectName="cern.c2mon:type=cache,name=dataTagCache")
 public class DataTagCacheImpl extends AbstractTagCache<DataTag> implements DataTagCache {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(DataTagCacheImpl.class);
 
   @Autowired
   public DataTagCacheImpl(@Qualifier("clusterCache") final ClusterCache clusterCache,
                           @Qualifier("dataTagEhcache") final Ehcache ehcache,
                           @Qualifier("dataTagEhcacheLoader") final CacheLoader cacheLoader,
                           @Qualifier("dataTagCacheLoader") final C2monCacheLoader c2monCacheLoader,
-                          @Qualifier("dataTagLoaderDAO") final SimpleCacheLoaderDAO<DataTag> cacheLoaderDAO) {
-    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
+                          @Qualifier("dataTagLoaderDAO") final SimpleCacheLoaderDAO<DataTag> cacheLoaderDAO,
+                          final CacheProperties properties) {
+    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
   }
 
   /**
@@ -71,12 +70,12 @@ public class DataTagCacheImpl extends AbstractTagCache<DataTag> implements DataT
    */
   @PostConstruct
   public void init() {
-    LOGGER.info("Initializing the DataTag cache...");
+    log.info("Initializing the DataTag cache...");
 
     try {
       getCache().setNodeBulkLoadEnabled(true);
     } catch (UnsupportedOperationException ex) {
-      LOGGER.warn("setNodeBulkLoadEnabled() method threw an exception when "
+      log.warn("setNodeBulkLoadEnabled() method threw an exception when "
           + "loading the cache (UnsupportedOperationException) - this is "
           + "normal behaviour in a single-server mode and can be ignored");
     }
@@ -87,12 +86,12 @@ public class DataTagCacheImpl extends AbstractTagCache<DataTag> implements DataT
     try {
       getCache().setNodeBulkLoadEnabled(false);
     } catch (UnsupportedOperationException ex) {
-      LOGGER.warn("setNodeBulkLoadEnabled() method threw an exception when "
+      log.warn("setNodeBulkLoadEnabled() method threw an exception when "
           + "loading the cache (UnsupportedOperationException) - this is "
           + "normal behaviour in a single-server mode and can be ignored");
     }
 
-    LOGGER.info("... DataTag cache initialization complete.");
+    log.info("... DataTag cache initialization complete.");
   }
 
   @Override

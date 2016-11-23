@@ -19,6 +19,8 @@ package cern.c2mon.server.cache.equipment;
 import javax.annotation.PostConstruct;
 
 import cern.c2mon.server.cache.*;
+import cern.c2mon.server.cache.config.CacheProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,19 +48,13 @@ import net.sf.ehcache.loader.CacheLoader;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service("equipmentCache")
 @ManagedResource(objectName = "cern.c2mon:type=cache,name=equipmentCache")
 public class EquipmentCacheImpl extends AbstractCache<Long, Equipment>implements EquipmentCache {
 
-  /**
-   * Static class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(EquipmentCacheImpl.class);
-
   /** Used to post configure the associated control tags */
   private final ControlTagCache controlCache;
-
-  private final DataTagCache dataTagCache;
 
   @Autowired
   public EquipmentCacheImpl(final ClusterCache clusterCache,
@@ -67,11 +63,10 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment>implements
                             @Qualifier("equipmentCacheLoader") final C2monCacheLoader c2monCacheLoader,
                             @Qualifier("equipmentDAO") final SimpleCacheLoaderDAO<Equipment> cacheLoaderDAO,
                             final ControlTagCache controlCache,
-                            final DataTagCache dataTagCache) {
+                            final CacheProperties properties) {
 
-    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
+    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
     this.controlCache = controlCache;
-    this.dataTagCache = dataTagCache;
   }
 
   /**
@@ -79,11 +74,11 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment>implements
    */
   @PostConstruct
   public void init() {
-    LOGGER.info("Initializing Equipment cache...");
+    log.info("Initializing Equipment cache...");
     // common initialization (other than preload, which needs synch below)
     commonInit();
     doPostConfigurationOfEquipmentControlTags();
-    LOGGER.info("Equipment cache initialization complete.");
+    log.info("Equipment cache initialization complete.");
   }
 
   /**
@@ -162,7 +157,7 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment>implements
 
   private void setEquipmentId(ControlTagCacheObject copy, Long equipmentId, Long processId) {
     String logMsg = String.format("Adding equipment id #%s to control tag #%s", equipmentId, copy.getId());
-    LOGGER.trace(logMsg);
+    log.trace(logMsg);
     copy.setEquipmentId(equipmentId);
     copy.setProcessId(processId);
     controlCache.putQuiet(copy);

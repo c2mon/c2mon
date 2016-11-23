@@ -19,6 +19,7 @@ package cern.c2mon.server.cache.datatag;
 import java.sql.Timestamp;
 import java.util.Properties;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,10 +57,8 @@ import static cern.c2mon.shared.common.type.TypeConverter.isKnownClass;
  *
  * @param <T> Class extending the {@link DataTag} interface
  */
+@Slf4j
 public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractTagFacade<T> {
-
-  /** Class logger. */
-  private static final Logger LOGGER = LoggerFactory.getLogger(DataTagFacadeImpl.class);
 
   /**
    * Interface to cache module.
@@ -227,7 +226,7 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
     //NOW checked in SourceUpdateManager; source values are NOT filtered out now, but tag is invalidated (unless filtered out for timestamp
     //reasons).
 //    if (sourceDataTagValue.getValue() == null) {
-//      LOGGER.warn("Attempted to update DataTag " + sourceDataTagValue.getId() + " with a null value.");
+//      log.warn("Attempted to update DataTag " + sourceDataTagValue.getId() + " with a null value.");
 //      return true;
 //    }
 
@@ -269,12 +268,12 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
 
       if (dataTag.getDataTagQuality() == null || dataTag.getDataTagQuality().isAccessible()) {
 
-        LOGGER.debug("update() : older timestamp and not inaccessible -> reject update");
+        log.debug("update() : older timestamp and not inaccessible -> reject update");
         return true;
 
       }
       else {
-        LOGGER.debug("update() : older timestamp but tag currently inaccessible -> update with older timestamp");
+        log.debug("update() : older timestamp but tag currently inaccessible -> update with older timestamp");
       }
     }
 
@@ -290,7 +289,7 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
         && sourceDataTagValue.getValue().equals(dataTag.getValue()) && dataTag.getDataTagQuality().isValid()
         && sourceDataTagValue.getQuality() != null  && sourceDataTagValue.getQuality().isValid()) {
 
-      LOGGER.debug("update() : values and timestamps are equal, so nothing to update -> reject update");
+      log.debug("update() : values and timestamps are equal, so nothing to update -> reject update");
       return true;
     }
 
@@ -339,8 +338,8 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
         if (sourceDataTagValue.getValue() == null) {
 
           if (sourceDataTagValue.isValid()) {
-            if (LOGGER.isDebugEnabled()) {
-              LOGGER.debug("Null value received from source for datatag " + sourceDataTagValue.getId() + " - invalidating with quality UNKNOWN_REASON");
+            if (log.isDebugEnabled()) {
+              log.debug("Null value received from source for datatag " + sourceDataTagValue.getId() + " - invalidating with quality UNKNOWN_REASON");
             }
             invalidateQuietly(dataTag, TagQualityStatus.UNKNOWN_REASON,
                                 "Null value received from DAQ",
@@ -368,12 +367,12 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
         }
         updated = true;
       } else {
-        if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace("Filtering out source update for tag " + dataTag.getId());
+        if (log.isTraceEnabled()) {
+          log.trace("Filtering out source update for tag " + dataTag.getId());
         }
       }
     } else {
-      LOGGER.error("Attempting to update a dataTag with a null source value - ignoring update.");
+      log.error("Attempting to update a dataTag with a null source value - ignoring update.");
     }
 
     eventTime = dataTag.getCacheTimestamp().getTime();
@@ -426,8 +425,8 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
     if (!filteroutValid(dataTag, value, valueDescription, timestamp)) {
       updateAndValidateQuietly(dataTag, value, valueDescription, null, null, timestamp);
     } else {
-      if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace("Filtering out repeated update for datatag " + dataTag.getId());
+      if (log.isTraceEnabled()) {
+        log.trace("Filtering out repeated update for datatag " + dataTag.getId());
       }
     }
   }
@@ -471,13 +470,13 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
         updateAndValidate(dataTag, value, valueDescription, timestamp);
         tagCache.put(dataTag.getId(), dataTag);
       } catch (CacheElementNotFoundException cacheEx) {
-        LOGGER.error("Unable to locate tag in cache (id " + dataTagId + ") - no update performed.", cacheEx);
+        log.error("Unable to locate tag in cache (id " + dataTagId + ") - no update performed.", cacheEx);
       } finally {
         tagCache.releaseWriteLockOnKey(dataTagId);
       }
     }
     else {
-      LOGGER.error("Unable to locate tag in conrolTag and dataTag cache (id " + dataTagId + ") - no update performed.");
+      log.error("Unable to locate tag in conrolTag and dataTag cache (id " + dataTagId + ") - no update performed.");
     }
   }
 

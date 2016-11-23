@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -51,21 +51,6 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
    * Reference to the wrapped Ehcache.
    */
   protected Ehcache cache;
-
-  /**
-   * if c2mon.cache.skippreloading is set to true, the cache will not be
-   * preloaded from the database, instead ehcache will initialize it from a
-   * local cache storage (if available)
-   */
-//  @Value("${c2mon.server.cache.skipPreloading}")
-//  protected boolean skipCachePreloading = false;
-
-  /**
-   * The cache mode is either set to "multi", "single" or "single-nonpersistent", depending on whether
-   * the server is running with a distributed or single cache.
-   */
-//  @Value("${c2mon.server.cache.mode}")
-//  protected String cacheMode;
 
   /**
    * Length of time (in milliseconds) to wait for a lock to be acquired.
@@ -279,7 +264,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
   /**
    * Try to get a read lock on a given key.
    * If can't get it in timeout millis then return a boolean telling that it didn't get the lock
-   * 
+   *
    * @param id The key that retrieves a value that you want to protect via locking
    * @param timeout millis until giveup on getting the lock
    * @return whether the lock was awarded

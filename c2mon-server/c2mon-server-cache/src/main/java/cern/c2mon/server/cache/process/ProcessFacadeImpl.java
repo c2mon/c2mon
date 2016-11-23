@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.AliveTimerCache;
@@ -52,56 +53,61 @@ import cern.c2mon.shared.daq.config.ProcessConfigurationUpdate;
  */
 @Service
 public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> implements ProcessFacade {
- 
+
   /**
    * Class logger.
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(ProcessFacadeImpl.class);
-  
+
   /** PIK numbers limit (max) */
   private static final int PIK_MAX = 999999;
   /** PIK numbers limit (min) */
   private static final int PIK_MIN = 100000;
-    
-  @Value("${c2mon.server.daqcommunication.jms.queue.trunk}")
+
   private String jmsDaqQueueTrunk;
-  
+
   private EquipmentFacade equipmentFacade;
-  
+
   private SubEquipmentFacade subEquipmentFacade;
-  
+
   private ProcessCache processCache;
-  
+
   private AliveTimerCache aliveTimerCache;
-  
+
   @Autowired
-  public ProcessFacadeImpl(final EquipmentFacade equipmentFacade, final ProcessCache processCache,                            
+  public ProcessFacadeImpl(final EquipmentFacade equipmentFacade,
+                           final ProcessCache processCache,
                            final SubEquipmentFacade subEquipmentFacade,
-                           final AliveTimerCache aliveTimerCache, final AliveTimerFacade aliveTimerFacade) {
+                           final AliveTimerCache aliveTimerCache,
+                           final AliveTimerFacade aliveTimerFacade,
+                           final Environment environment) {
     super(processCache, aliveTimerCache, aliveTimerFacade);
     this.equipmentFacade = equipmentFacade;
     this.processCache = processCache;
     this.subEquipmentFacade = subEquipmentFacade;
     this.aliveTimerCache = aliveTimerCache;
+
+    // TODO: remove this...
+    this.jmsDaqQueueTrunk = environment.getRequiredProperty("c2mon.server.daqcommunication.jms.queue.trunk");
   }
 
   @Override
   public Process createCacheObject(final Long id, final Properties properties) {
     ProcessCacheObject process = new ProcessCacheObject(id);
     configureCacheObject(process, properties);
-    process.setSupervisionStatus(SupervisionStatus.DOWN);    
+    process.setSupervisionStatus(SupervisionStatus.DOWN);
     validateConfig(process);
-    return process;    
+    return process;
   }
 
   protected ProcessConfigurationUpdate configureCacheObject(final Process process, final Properties properties) {
     ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
     ProcessConfigurationUpdate configurationUpdate = new ProcessConfigurationUpdate();
     configurationUpdate.setProcessId(process.getId());
-    String tmpStr = null;       
+    String tmpStr = null;
     if (properties.getProperty("name") != null) {
       processCacheObject.setName(properties.getProperty("name"));
-    }    
+    }
     if (properties.getProperty("description") != null) {
       processCacheObject.setDescription(properties.getProperty("description"));
     }
@@ -112,7 +118,7 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"aliveInterval\" to Integer: " + tmpStr);
       }
-    }     
+    }
     if ((tmpStr = properties.getProperty("aliveTagId")) != null) {
       try {
         processCacheObject.setAliveTagId(Long.valueOf(tmpStr));
@@ -120,7 +126,7 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"aliveTagId\" to Long: " + tmpStr);
       }
-    }  
+    }
     if ((tmpStr = properties.getProperty("stateTagId")) != null || (tmpStr = properties.getProperty("statusTagId")) != null ) {
       try {
         processCacheObject.setStateTagId(Long.valueOf(tmpStr));
@@ -128,16 +134,16 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"stateTagId\" to Long: " + tmpStr);
       }
-    }    
+    }
     if ((tmpStr = properties.getProperty("maxMessageSize")) != null) {
-      try {        
+      try {
         processCacheObject.setMaxMessageSize(Integer.parseInt(tmpStr));
       }
       catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"maxMessageSize\" to int: " + tmpStr);
       }
     }
-    
+
     if ((tmpStr = properties.getProperty("maxMessageDelay")) != null) {
       try {
         processCacheObject.setMaxMessageDelay(Integer.parseInt(tmpStr));
@@ -146,12 +152,12 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"maxMessageDelay\" to int: " + tmpStr);
       }
     }
-    
-    processCacheObject.setJmsDaqCommandQueue(jmsDaqQueueTrunk + ".command." + processCacheObject.getCurrentHost() + "." 
+
+    processCacheObject.setJmsDaqCommandQueue(jmsDaqQueueTrunk + ".command." + processCacheObject.getCurrentHost() + "."
         + processCacheObject.getName() + "." + processCacheObject.getProcessPIK());
     return configurationUpdate;
-  }  
-  
+  }
+
   /**
    * Adds an Equipment to the list of Equipments under this Process.
    * @param processCacheObject the Process
@@ -178,55 +184,55 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
   protected final void stop(final Process process, Timestamp timestamp) {
     processCache.acquireWriteLockOnKey(process.getId());
     try {
-      ProcessCacheObject processCacheObject = (ProcessCacheObject) process;      
+      ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
       processCacheObject.setCurrentHost(null);
       processCacheObject.setStartupTime(null);
       processCacheObject.setRequiresReboot(Boolean.FALSE);
       processCacheObject.setProcessPIK(null);
       processCacheObject.setLocalConfig(null);
-      super.stop(process, timestamp);      
+      super.stop(process, timestamp);
     } finally {
       processCache.releaseWriteLockOnKey(process.getId());
     }
-  } 
-  
+  }
+
   @Override
   public Process start(final Long processId, final String pHostName, final Timestamp pStartupTime) {
     Process process = null;
     processCache.acquireWriteLockOnKey(processId);
     try {
       process = processCache.get(processId);
-      
+
       if (isTestMode()) {
         // If the TEST Mode is on
         startLocal(process, pHostName, pStartupTime);
-        LOGGER.trace("start - TEST Mode - Process " + process.getName() 
+        LOGGER.trace("start - TEST Mode - Process " + process.getName()
             + ", PIK " + process.getProcessPIK());
       } else {
         // If the TEST Mode is off
         start(process, pHostName, pStartupTime);
-        LOGGER.trace("start - Process " + process.getName() 
+        LOGGER.trace("start - Process " + process.getName()
             + ", PIK " + process.getProcessPIK());
       }
       processCache.put(processId, process);
     } finally {
       processCache.releaseWriteLockOnKey(processId);
     }
-    
+
     return process;
   }
-  
+
   /**
    * Records the start up time of the process and the host it is running on,
    * (and sets it's status to STARTUP - may remove this in the future as duplicate
    * of state tag of the DAQ)
-   * 
+   *
    * <p>Also starts the alive timer.
-   * 
+   *
    * <p>Please note, that in case of a cache reference to the process it is up to the calling
    * method to acquire a write lock. In case of a copy it is the calling method that has
-   * to take care of committing the changes made to the process object back to the cache. 
-   * 
+   * to take care of committing the changes made to the process object back to the cache.
+   *
    * @param process the Process that is starting
    * @param pHostName the hostname of the Process
    * @param pStartupTime the start up time
@@ -240,26 +246,26 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       processCacheObject.setRequiresReboot(Boolean.FALSE);
       processCacheObject.setProcessPIK(newPIK);
       processCacheObject.setLocalConfig(LocalConfig.Y);
-      processCacheObject.setJmsDaqCommandQueue(jmsDaqQueueTrunk + ".command." + processCacheObject.getCurrentHost() + "." 
+      processCacheObject.setJmsDaqCommandQueue(jmsDaqQueueTrunk + ".command." + processCacheObject.getCurrentHost() + "."
           + processCacheObject.getName() + "." + newPIK.toString());
       super.start(processCacheObject, pStartupTime);
     }
   }
-  
+
   /**
    * Records the start up time of the process and the host it is running on,
    * (and sets it's status to STARTUP - may remove this in the future as duplicate
    * of state tag of the DAQ)
-   * 
+   *
    * <p>Also starts the alive timer.
-   * 
+   *
    * <p>Please note, that in case of a cache reference to the process it is up to the calling
    * method to acquire a write lock. In case of a copy it is the calling method that has
-   * to take care of committing the changes made to the process object back to the cache. 
-   * 
+   * to take care of committing the changes made to the process object back to the cache.
+   *
    * <p>This function does not check if the process is Running and use to be called by the TEST mode
    * since it will force the DAQ to start
-   * 
+   *
    * @param process the Process that is starting
    * @param pHostName the hostname of the Process
    * @param pStartupTime the start up time
@@ -272,7 +278,7 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
     processCacheObject.setRequiresReboot(Boolean.FALSE);
     processCacheObject.setProcessPIK(newPIK);
     processCacheObject.setLocalConfig(LocalConfig.Y);
-    processCacheObject.setJmsDaqCommandQueue(jmsDaqQueueTrunk + ".command." + processCacheObject.getCurrentHost() + "." 
+    processCacheObject.setJmsDaqCommandQueue(jmsDaqQueueTrunk + ".command." + processCacheObject.getCurrentHost() + "."
         + processCacheObject.getName() + "." + newPIK.toString());
     super.start(processCacheObject, pStartupTime);
   }
@@ -290,17 +296,17 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
   }
 
   private void errorStatus(final Process process, final String errorMessage) {
-      ProcessCacheObject processCacheObject = (ProcessCacheObject) process;      
+      ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
       processCacheObject.setSupervisionStatus(SupervisionStatus.DOWN);
   }
-  
+
   /**
-   * Validate the configuration of the Process object. 
+   * Validate the configuration of the Process object.
    * If the configuration information contained in the object
-   * is inconsistent or doesn't meet a set of predefined 
+   * is inconsistent or doesn't meet a set of predefined
    * constraints, a ConfigurationException will be thrown.
    * The ConfigurationException will contain more information
-   * about the source of the problem. 
+   * about the source of the problem.
    * @throws ConfigurationException
    */
   protected void validateConfig(final Process process) throws ConfigurationException {
@@ -310,7 +316,7 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       if (processCacheObject.getId() == null) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"id\" cannot be null");
       }
-      if (processCacheObject.getName() == null) { 
+      if (processCacheObject.getName() == null) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"name\" cannot be null");
       }
       if (processCacheObject.getName().length() == 0 || processCacheObject.getName().length() > 60) {
@@ -319,7 +325,7 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       if (!ProcessCacheObject.PROCESS_NAME_PATTERN.matcher(processCacheObject.getName()).matches()) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"name\" must match the following pattern: " + ProcessCacheObject.PROCESS_NAME_PATTERN.toString());
       }
-      if (processCacheObject.getDescription() == null) { 
+      if (processCacheObject.getDescription() == null) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"description\" cannot be null");
       }
       if (processCacheObject.getDescription().length() == 0 || processCacheObject.getDescription().length() > 100) {
@@ -348,9 +354,9 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       }
     } finally {
       processCache.releaseReadLockOnKey(process.getId());
-    }    
+    }
   }
- 
+
   @Override
   public Collection<Long> getDataTagIds(final Long processId) {
     processCache.acquireReadLockOnKey(processId);
@@ -363,29 +369,29 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       return dataTagIds;
     } finally {
       processCache.releaseReadLockOnKey(processId);
-    }    
+    }
   }
-  
+
   @Override
   public Long getProcessIdFromAlive(final Long aliveTimerId) {
-    AliveTimer aliveTimer = aliveTimerCache.getCopy(aliveTimerId);   
-    if (aliveTimer.isProcessAliveType()) {               
+    AliveTimer aliveTimer = aliveTimerCache.getCopy(aliveTimerId);
+    if (aliveTimer.isProcessAliveType()) {
       return aliveTimer.getRelatedId();
-    } else if (aliveTimer.isEquipmentAliveType()) {      
+    } else if (aliveTimer.isEquipmentAliveType()) {
       return equipmentFacade.getProcessIdForAbstractEquipment(aliveTimer.getRelatedId());
     } else {
       Long equipmentId = subEquipmentFacade.getEquipmentIdForSubEquipment(aliveTimer.getRelatedId());
       return equipmentFacade.getProcessIdForAbstractEquipment(equipmentId);
-    }      
+    }
   }
-  
+
   @Override
-  public Long getProcessIdFromControlTag(final Long controlTagId) {    
+  public Long getProcessIdFromControlTag(final Long controlTagId) {
     Map<Long, Long> equipmentControlTags = equipmentFacade.getAbstractEquipmentControlTags();
-    Map<Long, Long> subEquipmentControlTags = subEquipmentFacade.getAbstractEquipmentControlTags(); 
+    Map<Long, Long> subEquipmentControlTags = subEquipmentFacade.getAbstractEquipmentControlTags();
     if (equipmentControlTags.containsKey(controlTagId)) {
       Long equipmentId = equipmentControlTags.get(controlTagId);
-      return equipmentFacade.getProcessIdForAbstractEquipment(equipmentId);            
+      return equipmentFacade.getProcessIdForAbstractEquipment(equipmentId);
     } else if (subEquipmentControlTags.containsKey(controlTagId)) {
       Long subEquipmentId = subEquipmentControlTags.get(controlTagId);
       return subEquipmentFacade.getEquipmentIdForSubEquipment(subEquipmentId);
@@ -419,13 +425,13 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       processCache.releaseWriteLockOnKey(processId);
     }
   }
-  
+
   /**
    * Creation of the random PIK (between PIK_MIN and PIK_MAX)
    */
   private Long createProcessPIK() {
     Random r = new Random();
-    
+
     int pik = r.nextInt(PIK_MAX + 1);
     if (pik < PIK_MIN) {
       pik += PIK_MIN;
@@ -442,7 +448,7 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       // Set the PIK
       processCacheObject.setProcessPIK(processPIK);
       // update the JMS Daq command queue
-      processCacheObject.setJmsDaqCommandQueue(jmsDaqQueueTrunk + ".command." + processCacheObject.getCurrentHost() + "." 
+      processCacheObject.setJmsDaqCommandQueue(jmsDaqQueueTrunk + ".command." + processCacheObject.getCurrentHost() + "."
           + processCacheObject.getName() + "." + processPIK);
       processCache.put(processId, processCacheObject);
     } finally {
@@ -461,10 +467,10 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       processCache.releaseWriteLockOnKey(processId);
     }
   }
-  
+
   /**
    * Checks if the TEST mode is on
-   * 
+   *
    * @return True if the TEST mode is on and False in any other case
    */
   private boolean isTestMode() {

@@ -1,5 +1,6 @@
 package cern.c2mon.server.cache.config;
 
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -24,5 +25,6 @@ import org.springframework.context.annotation.Import;
     DeviceClassCacheConfig.class,
     DeviceCacheConfig.class
 })
+@EnableConfigurationProperties(CacheProperties.class)
 @ComponentScan("cern.c2mon.server.cache")
 public class CacheModule {}

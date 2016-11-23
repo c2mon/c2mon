@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.AlarmCache;
@@ -69,7 +70,6 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
    * Property that will by used as trunk. Should
    * always be overriden by server default property.
    */
-  @Value("${c2mon.server.client.jms.topic.tag.trunk}")
   private String tagPublicationTrunk = "c2mon.client.tag.default";
 
   /**
@@ -92,11 +92,18 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
    * @param dataTagCache the DataTag cache
    */
   @Autowired
-  public RuleTagFacadeImpl(final RuleTagCache ruleTagCache, final RuleTagCacheObjectFacade ruleTagCacheObjectFacade,
-                           final AlarmFacade alarmFacade, final AlarmCache alarmCache, final DataTagCache dataTagCache) {
+  public RuleTagFacadeImpl(final RuleTagCache ruleTagCache,
+                           final RuleTagCacheObjectFacade ruleTagCacheObjectFacade,
+                           final AlarmFacade alarmFacade,
+                           final AlarmCache alarmCache,
+                           final DataTagCache dataTagCache,
+                           final Environment environment) {
     super(ruleTagCache, alarmFacade, alarmCache);
     this.ruleTagCacheObjectFacade = ruleTagCacheObjectFacade;
     this.dataTagCache = dataTagCache;
+
+    // TODO: remove this...
+    this.tagPublicationTrunk = environment.getRequiredProperty("c2mon.server.client.jms.topic.tag.trunk");
   }
 
   @Override

@@ -18,6 +18,8 @@ package cern.c2mon.server.cache.control;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.cache.config.CacheProperties;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 
@@ -43,22 +45,19 @@ import cern.c2mon.server.common.control.ControlTag;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service("controlTagCache")
 @ManagedResource(objectName="cern.c2mon:type=cache,name=controlTagCache")
 public class ControlTagCacheImpl extends AbstractTagCache<ControlTag> implements ControlTagCache {
-
-  /**
-   * Private class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ControlTagCacheImpl.class);
 
   @Autowired
   public ControlTagCacheImpl(@Qualifier("clusterCache") final ClusterCache clusterCache,
                              @Qualifier("controlTagEhcache") final Ehcache ehcache,
                              @Qualifier("controlTagEhcacheLoader") final CacheLoader cacheLoader,
                              @Qualifier("controlTagCacheLoader") final C2monCacheLoader c2monCacheLoader,
-                             @Qualifier("controlTagLoaderDAO") final SimpleCacheLoaderDAO<ControlTag> cacheLoaderDAO) {
-    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
+                             @Qualifier("controlTagLoaderDAO") final SimpleCacheLoaderDAO<ControlTag> cacheLoaderDAO,
+                             final CacheProperties properties) {
+    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
   }
 
   /**
@@ -67,9 +66,9 @@ public class ControlTagCacheImpl extends AbstractTagCache<ControlTag> implements
    */
   @PostConstruct
   public void init() {
-    LOGGER.info("Initializing ControlTag cache...");
+    log.info("Initializing ControlTag cache...");
     commonInit();
-    LOGGER.info("... ControlTag cache initialization complete.");
+    log.info("... ControlTag cache initialization complete.");
   }
 
   @Override

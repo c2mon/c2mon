@@ -62,7 +62,12 @@ import cern.c2mon.shared.common.ConfigurationException;
     DeviceClassCacheMock.class,
     DeviceCacheMock.class
 })
-@TestPropertySource("classpath:c2mon-server-default.properties")
+@TestPropertySource(properties = {
+    // TODO: remove these
+    "c2mon.server.client.jms.topic.tag.trunk=c2mon.client.tag",
+    "c2mon.server.client.jms.topic.controltag=c2mon.client.controltag",
+    "c2mon.server.daqcommunication.jms.queue.trunk=c2mon.process"
+})
 public class DeviceFacadeImplTest {
 
   /** Component to test */

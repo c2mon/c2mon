@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import cern.c2mon.server.cache.config.CacheProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,12 +53,8 @@ import net.sf.ehcache.search.Results;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long, T> implements C2monCacheWithSupervision<Long, T> {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTagCache.class);
 
   /** The max result size should avoid to run into an OutOfMemory Exception when doing a wildcard search */
   private static final int MAX_RESULT_SIZE = 100000;
@@ -74,9 +72,10 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
                           final Ehcache ehcache,
                           final CacheLoader cacheLoader,
                           final C2monCacheLoader c2monCacheLoader,
-                          final SimpleCacheLoaderDAO<T> cacheLoaderDAO) {
-    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
-    listenersWithSupervision = new ArrayList<CacheSupervisionListener< ? super T>>();
+                          final SimpleCacheLoaderDAO<T> cacheLoaderDAO,
+                          final CacheProperties properties) {
+    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
+    listenersWithSupervision = new ArrayList<>();
     listenerLock = new ReentrantReadWriteLock();
   }
 
@@ -87,7 +86,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
     if (!this.getCopy(tag.getId()).getCacheTimestamp().after(tag.getCacheTimestamp())) {
       notifyListenersWithSupervision(tag);
     } else {
-      LOGGER.info("Filtering out Tag supervison notification as newer value in cache - tag id is " + tag.getId());
+      log.info("Filtering out Tag supervison notification as newer value in cache - tag id is " + tag.getId());
     }
   }
 
@@ -212,7 +211,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
 
         counter++;
         if (counter >= maxResults) {
-          LOGGER.warn(String.format("findByNameWildcard() - Reached maximum result size %d when retrieving all (*) entries of cache %s", maxResults, getCacheName()));
+          log.warn(String.format("findByNameWildcard() - Reached maximum result size %d when retrieving all (*) entries of cache %s", maxResults, getCacheName()));
           break;
         }
       }
@@ -225,7 +224,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
         Query query = ehcache.createQuery();
         results = query.includeKeys().addCriteria(tagName.ilike(regex)).maxResults(maxResults).execute();
 
-        LOGGER.debug(String.format("findByNameWildcard() - Got %d results for regex \"%s\"", results.size(), regex));
+        log.debug(String.format("findByNameWildcard() - Got %d results for regex \"%s\"", results.size(), regex));
 
         Long key;
         for (Result result : results.all()) {
@@ -234,7 +233,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
             resultList.add(get(key));
           }
           else {
-            LOGGER.warn(String.format("findByNameWildcard() - Regex \"%s\" returned a null key for cache %s", regex, getCacheName()));
+            log.warn(String.format("findByNameWildcard() - Regex \"%s\" returned a null key for cache %s", regex, getCacheName()));
           }
         }
       }
@@ -246,7 +245,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
       }
     }
 
-    LOGGER.debug(String.format("findByNameWildcard() - Found %d (maxResultSize = %d) tags in %s cache where tag names are matching wildcard \"%s\"", resultList.size(), maxResults, getCacheName(), regex));
+    log.debug(String.format("findByNameWildcard() - Found %d (maxResultSize = %d) tags in %s cache where tag names are matching wildcard \"%s\"", resultList.size(), maxResults, getCacheName(), regex));
 
     return resultList;
   }

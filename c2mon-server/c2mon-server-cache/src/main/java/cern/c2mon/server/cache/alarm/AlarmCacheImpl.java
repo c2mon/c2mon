@@ -21,6 +21,8 @@ import java.util.Collection;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.cache.config.CacheProperties;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 import net.sf.ehcache.search.Attribute;
@@ -49,22 +51,19 @@ import cern.c2mon.shared.client.alarm.AlarmQuery;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service("alarmCache")
 @ManagedResource(objectName="cern.c2mon:type=cache,name=alarmCache")
 public class AlarmCacheImpl extends AbstractCache<Long, Alarm> implements AlarmCache {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(AlarmCacheImpl.class);
 
   @Autowired
   public AlarmCacheImpl(@Qualifier("clusterCache") final ClusterCache clusterCache,
                         @Qualifier("alarmEhcache") final Ehcache ehcache,
                         @Qualifier("alarmEhcacheLoader") final CacheLoader cacheLoader,
                         @Qualifier("alarmCacheLoader") final C2monCacheLoader c2monCacheLoader,
-                        @Qualifier("alarmLoaderDAO") final AlarmLoaderDAO cacheLoaderDAO) {
-    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
+                        @Qualifier("alarmLoaderDAO") final AlarmLoaderDAO cacheLoaderDAO,
+                        final CacheProperties properties) {
+    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
   }
 
   /**
@@ -72,12 +71,12 @@ public class AlarmCacheImpl extends AbstractCache<Long, Alarm> implements AlarmC
    */
   @PostConstruct
   public void init() {
-    LOGGER.info("Initializing Alarm cache...");
+    log.info("Initializing Alarm cache...");
 
     //common initialization (other than preload, which needs synch below)
     commonInit();
 
-    LOGGER.info("... Alarm cache initialization complete.");
+    log.info("... Alarm cache initialization complete.");
   }
 
   @Override

@@ -18,6 +18,8 @@ package cern.c2mon.server.cache.subequipment;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.cache.config.CacheProperties;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 import org.slf4j.Logger;
@@ -44,21 +46,15 @@ import cern.c2mon.shared.common.ConfigurationException;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service("subEquipmentCache")
 @ManagedResource(objectName="cern.c2mon:type=cache,name=subEquipmentCache")
 public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> implements SubEquipmentCache {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(SubEquipmentCacheImpl.class);
 
   /** Used to post configure the associated control tags */
   private final ControlTagCache controlCache;
 
   private final EquipmentCache equipmentCache;
-
-  private final DataTagCache dataTagCache;
 
   @Autowired
   public SubEquipmentCacheImpl(final ClusterCache clusterCache,
@@ -67,13 +63,12 @@ public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> imp
                                @Qualifier("subEquipmentCacheLoader") final C2monCacheLoader c2monCacheLoader,
                                @Qualifier("subEquipmentDAO") final SimpleCacheLoaderDAO<SubEquipment> cacheLoaderDAO,
                                final ControlTagCache controlCache,
-                               final DataTagCache dataTagCache,
-                               final EquipmentCache equipmentCache) {
+                               final EquipmentCache equipmentCache,
+                               final CacheProperties properties) {
 
-    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
+    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
     this.controlCache = controlCache;
     this.equipmentCache = equipmentCache;
-    this.dataTagCache= dataTagCache;
   }
 
   /**
@@ -81,10 +76,10 @@ public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> imp
    */
   @PostConstruct
   public void init() {
-    LOGGER.info("Initializing SubEquipment cache...");
+    log.info("Initializing SubEquipment cache...");
     commonInit();
     doPostConfigurationOfSubEquipmentControlTags();
-    LOGGER.info("... SubEquipment cache initialization complete.");
+    log.info("... SubEquipment cache initialization complete.");
   }
 
   /**
@@ -167,7 +162,7 @@ public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> imp
 
   private void setSubEquipmentId(ControlTagCacheObject copy, Long subEquipmentId, Long processId) {
     String logMsg = String.format("Adding sub-equipment id #%s to control tag #%s", subEquipmentId, copy.getId());
-    LOGGER.trace(logMsg);
+    log.trace(logMsg);
     copy.setSubEquipmentId(subEquipmentId);
     copy.setProcessId(processId);
     controlCache.putQuiet(copy);

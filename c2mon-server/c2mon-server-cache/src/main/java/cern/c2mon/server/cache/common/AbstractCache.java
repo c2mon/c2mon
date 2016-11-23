@@ -24,7 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
 
+import cern.c2mon.server.cache.config.CacheProperties;
 import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.event.RegisteredEventListeners;
@@ -63,13 +65,10 @@ import cern.c2mon.shared.common.Cacheable;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K, T> {
 
-
-  /**
-   * Private class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCache.class);
+  private final CacheProperties properties;
 
   /**
    * Contains properties distributed across the server cluster.
@@ -106,13 +105,15 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
                        final Ehcache cache,
                        final CacheLoader cacheLoader,
                        final C2monCacheLoader c2monCacheLoader,
-                       final SimpleCacheLoaderDAO<T> cacheLoaderDAO) {
+                       final SimpleCacheLoaderDAO<T> cacheLoaderDAO,
+                       final CacheProperties properties) {
     super();
     this.clusterCache = clusterCache;
     this.cache = cache;
     this.cacheLoader = cacheLoader;
     this.c2monCacheLoader = c2monCacheLoader;
     this.cacheLoaderDAO = cacheLoaderDAO;
+    this.properties = properties;
   }
 
   /**
@@ -146,17 +147,13 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
    */
   protected void commonInit() {
 
-    // TODO: FIXME: Remove this
-    boolean skipCachePreloading = false;
-    String cacheMode = "single-nonpersistent";
-
     //register the cache loader with the Ehcache
     cache.registerCacheLoader(cacheLoader);
     registeredEventListeners = cache.getCacheEventNotificationService();
 
     //if in single cache mode, clear the disk cache before reloading
     //(skipCacheLoading can be set to override this and use the disk store instead of DB loading)
-    if (!skipCachePreloading && cacheMode.equalsIgnoreCase("single")) {
+    if (!properties.isSkipPreloading() && properties.getMode().equalsIgnoreCase("single")) {
         cache.removeAll();
     }
 
@@ -167,7 +164,7 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
     //lock cacheStatus while setting that this server will perform the preload
     getClusterCache().acquireWriteLockOnKey(getCacheInitializedKey());
     try {
-      if (!skipCachePreloading
+      if (!properties.isSkipPreloading()
           && (!getClusterCache().hasKey(getCacheInitializedKey()) || getClusterCache().getCopy(getCacheInitializedKey()).equals(Boolean.FALSE))) {
         //record that the preload will be done by this server and set loading flag to TRUE
         loadCache = true;
@@ -178,10 +175,10 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
     }
 
     if (loadCache) {
-      LOGGER.info("Preloading cache from DB: " + getCacheName());
+      log.info("Preloading cache from DB: " + getCacheName());
       getC2monCacheLoader().preload();
     } else {
-      LOGGER.info("No preloading necessary: " + getCacheName());
+      log.info("No preloading necessary: " + getCacheName());
     }
   }
 
@@ -214,14 +211,14 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
         throw cenfe;
       }
       catch (Exception ex) {
-        LOGGER.error("Unable to get a serialized copy of the cache element as serialization is not supported for this object.", ex);
+        log.error("Unable to get a serialized copy of the cache element as serialization is not supported for this object.", ex);
         throw new UnsupportedOperationException("The getCopy() method is not supported for this cache element since the cache object is not entirely serializable. Please revisit your object.", ex);
       } finally {
         cache.releaseReadLockOnKey(id);
       }
     }
     else {
-      LOGGER.error("getCopy() - Trying to access cache with a NULL key - throwing an exception!");
+      log.error("getCopy() - Trying to access cache with a NULL key - throwing an exception!");
       //TODO throw runtime exception here or not?
       throw new IllegalArgumentException("Accessing cache with null key!");
     }
@@ -270,7 +267,7 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
         listener.notifyElementUpdated(cloned);
       }
     } catch (CloneNotSupportedException e) {
-      LOGGER.error("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
+      log.error("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
       throw new RuntimeException("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
     }
   }
@@ -283,7 +280,7 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
         listener.confirmStatus(cloned);
       }
     } catch (CloneNotSupportedException e) {
-      LOGGER.error("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
+      log.error("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
       throw new RuntimeException("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
     }
   }
@@ -354,7 +351,7 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
         try {
           result = getFromDb(id);
         } catch (Exception e) {
-          LOGGER.error("Exception caught while loading cache element from DB", e);
+          log.error("Exception caught while loading cache element from DB", e);
           result = null;
         }
         //if unable to find in DB
@@ -398,8 +395,8 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
    *          if not found
    */
   private T getFromDb(final K key) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.trace("Fetching cache object with Id " + key + " from database.");
+    if (log.isDebugEnabled()) {
+      log.trace("Fetching cache object with Id " + key + " from database.");
     }
     return cacheLoaderDAO.getItem(key);
   }

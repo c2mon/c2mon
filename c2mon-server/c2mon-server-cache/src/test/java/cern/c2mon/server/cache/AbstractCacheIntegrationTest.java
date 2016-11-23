@@ -21,7 +21,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
     CacheLoadingModule.class,
     CachePopulationRule.class
 })
-@TestPropertySource("classpath:c2mon-server-default.properties")
+@TestPropertySource(properties = {
+    // TODO: remove these
+    "c2mon.server.client.jms.topic.tag.trunk=c2mon.client.tag",
+    "c2mon.server.client.jms.topic.controltag=c2mon.client.controltag",
+    "c2mon.server.daqcommunication.jms.queue.trunk=c2mon.process"
+})
 public abstract class AbstractCacheIntegrationTest {
 
   @Rule

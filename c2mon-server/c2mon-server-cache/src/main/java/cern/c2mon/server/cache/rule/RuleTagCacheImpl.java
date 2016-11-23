@@ -20,6 +20,8 @@ import java.util.HashSet;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.cache.config.CacheProperties;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 
@@ -47,14 +49,10 @@ import cern.c2mon.server.common.rule.RuleTag;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service("ruleTagCache")
 @ManagedResource(objectName="cern.c2mon:type=cache,name=ruleTagCache")
 public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleTagCache {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(RuleTagCacheImpl.class);
 
   /**
    * DataTagCache for rule parent id loading.
@@ -67,23 +65,24 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
                           @Qualifier("ruleTagEhcacheLoader") final CacheLoader cacheLoader,
                           @Qualifier("ruleTagCacheLoader") final C2monCacheLoader c2monCacheLoader,
                           @Qualifier("ruleTagLoaderDAO") final SimpleCacheLoaderDAO<RuleTag> cacheLoaderDAO,
-                          @Qualifier("dataTagCache") final DataTagCache dataTagCache) {
-    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
+                          @Qualifier("dataTagCache") final DataTagCache dataTagCache,
+                          final CacheProperties properties) {
+    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
     this.dataTagCache = dataTagCache;
   }
 
   @PostConstruct
   public void init() {
-    LOGGER.info("Initializing RuleTag cache...");
+    log.info("Initializing RuleTag cache...");
     commonInit();
-    LOGGER.info("... RuleTag cache initialization complete.");
+    log.info("... RuleTag cache initialization complete.");
   }
 
   @Override
   protected void doPostDbLoading(RuleTag ruleTag) {
-    LOGGER.trace("doPostDbLoading() - Post processing RuleTag " + ruleTag.getId() + " ...");
+    log.trace("doPostDbLoading() - Post processing RuleTag " + ruleTag.getId() + " ...");
     setParentSupervisionIds(ruleTag);
-    LOGGER.trace("doPostDbLoading() - ... RuleTag " + ruleTag.getId() + " done!");
+    log.trace("doPostDbLoading() - ... RuleTag " + ruleTag.getId() + " done!");
   }
 
   @Override
@@ -105,18 +104,18 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
    */
   @Override
   public void setParentSupervisionIds(final RuleTag ruleTag) {
-    LOGGER.trace("setParentSupervisionIds() - Setting supervision ids for rule " + ruleTag.getId() + " ...");
+    log.trace("setParentSupervisionIds() - Setting supervision ids for rule " + ruleTag.getId() + " ...");
     //sets for this ruleTag
     HashSet<Long> processIds = new HashSet<Long>();
     HashSet<Long> equipmentIds = new HashSet<Long>();
     HashSet<Long> subEquipmentIds = new HashSet<Long>();
     int cnt = 0;
 
-    LOGGER.trace(ruleTag.getId() + " Has "+ ruleTag.getRuleInputTagIds().size() + " input rule tags");
+    log.trace(ruleTag.getId() + " Has "+ ruleTag.getRuleInputTagIds().size() + " input rule tags");
     for (Long tagKey : ruleTag.getRuleInputTagIds()) {
 
       cnt++;
-      LOGGER.trace(ruleTag.getId() + " Trying to find rule input tag No#" + cnt + " with id=" + tagKey + " in caches.. ");
+      log.trace(ruleTag.getId() + " Trying to find rule input tag No#" + cnt + " with id=" + tagKey + " in caches.. ");
       if (dataTagCache.hasKey(tagKey)) {
         DataTag dataTag = dataTagCache.getCopy(tagKey);
         processIds.add(dataTag.getProcessId());
@@ -145,7 +144,7 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
       }
 
     }
-    LOGGER.debug("setParentSupervisionIds() - Setting parent ids for rule " + ruleTag.getId() + "; process ids: " + processIds + "; equipment ids: " + equipmentIds
+    log.debug("setParentSupervisionIds() - Setting parent ids for rule " + ruleTag.getId() + "; process ids: " + processIds + "; equipment ids: " + equipmentIds
         + "; subequipmnet ids: " + subEquipmentIds);
     ruleTag.setProcessIds(processIds);
     ruleTag.setEquipmentIds(equipmentIds);

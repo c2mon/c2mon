@@ -18,6 +18,7 @@ package cern.c2mon.server.cache.process;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.cache.config.CacheProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -67,9 +68,10 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process>implements Pro
                           @Qualifier("processEhcacheLoader") final CacheLoader cacheLoader,
                           @Qualifier("processCacheLoader") final C2monCacheLoader c2monCacheLoader,
                           @Qualifier("processDAO") final SimpleCacheLoaderDAO<Process> cacheLoaderDAO,
-                          @Qualifier("controlTagCache") final ControlTagCache controlCache) {
+                          @Qualifier("controlTagCache") final ControlTagCache controlCache,
+                          final CacheProperties properties) {
 
-    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
+    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
     this.processDAO = (ProcessDAO) cacheLoaderDAO;
     this.controlCache = controlCache;
   }

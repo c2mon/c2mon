@@ -18,6 +18,8 @@ package cern.c2mon.server.cache.device;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.cache.config.CacheProperties;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 import net.sf.ehcache.search.Attribute;
@@ -45,22 +47,19 @@ import cern.c2mon.server.common.device.DeviceClass;
  *
  * @author Justin Lewis Salmon
  */
+@Slf4j
 @Service("deviceClassCache")
 @ManagedResource(objectName = "cern.c2mon:type=cache,name=deviceClassCache")
 public class DeviceClassCacheImpl extends AbstractCache<Long, DeviceClass> implements DeviceClassCache {
-
-  /**
-   * Static class logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(DeviceCacheImpl.class);
 
   @Autowired
   public DeviceClassCacheImpl(final ClusterCache clusterCache,
                               @Qualifier("deviceClassEhcache") final Ehcache ehcache,
                               @Qualifier("deviceClassEhcacheLoader") final CacheLoader cacheLoader,
                               @Qualifier("deviceClassCacheLoader") final C2monCacheLoader c2monCacheLoader,
-                              @Qualifier("deviceClassDAO") final SimpleCacheLoaderDAO<DeviceClass> cacheLoaderDAO) {
-    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
+                              @Qualifier("deviceClassDAO") final SimpleCacheLoaderDAO<DeviceClass> cacheLoaderDAO,
+                              final CacheProperties properties) {
+    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
   }
 
   /**
@@ -69,9 +68,9 @@ public class DeviceClassCacheImpl extends AbstractCache<Long, DeviceClass> imple
    */
   @PostConstruct
   public void init() {
-    LOG.info("Initializing Device class cache...");
+    log.info("Initializing Device class cache...");
     commonInit();
-    LOG.info("Device class cache initialization complete.");
+    log.info("Device class cache initialization complete.");
   }
 
   @Override

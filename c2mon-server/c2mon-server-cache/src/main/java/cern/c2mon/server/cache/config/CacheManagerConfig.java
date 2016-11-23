@@ -3,9 +3,7 @@ package cern.c2mon.server.cache.config;
 import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -19,11 +17,11 @@ import static java.lang.String.format;
 public class CacheManagerConfig {
 
   @Resource
-  private Environment environment;
+  private CacheProperties properties;
 
   @Bean
   public EhCacheManagerFactoryBean ehCacheManagerFactoryBean() throws IOException {
-    String cacheMode = environment.getRequiredProperty("c2mon.server.cache.mode");
+    String cacheMode = properties.getMode();
 
     switch (cacheMode) {
       case "single-nonpersistent":
