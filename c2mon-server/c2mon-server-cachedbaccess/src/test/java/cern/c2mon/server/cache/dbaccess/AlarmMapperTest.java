@@ -16,21 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.test.DatabasePopulationRule;
 import cern.c2mon.server.cache.dbaccess.structure.DBBatch;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.test.CacheObjectComparison;
-import cern.c2mon.server.test.CacheObjectCreation;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 import java.sql.Timestamp;
@@ -44,21 +34,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Mark Brightwell
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(
-    locations = {
-        "classpath:test-config/database-population-rule.xml"
-    },
-    classes = {
-        CacheDbAccessModule.class
-    }
-)
-@TestPropertySource("classpath:c2mon-server-default.properties")
-public class AlarmMapperTest {
-
-  @Rule
-  @Autowired
-  public DatabasePopulationRule databasePopulationRule;
+public class AlarmMapperTest extends AbstractMapperTest {
 
   @Resource
   private AlarmMapper alarmMapper;

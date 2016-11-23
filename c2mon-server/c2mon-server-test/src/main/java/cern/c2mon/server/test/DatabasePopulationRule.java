@@ -2,6 +2,8 @@ package cern.c2mon.server.test;
 
 import org.junit.rules.ExternalResource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -12,6 +14,7 @@ import javax.sql.DataSource;
 /**
  * @author Justin Lewis Salmon
  */
+@Configuration
 public class DatabasePopulationRule extends ExternalResource {
 
   @Autowired

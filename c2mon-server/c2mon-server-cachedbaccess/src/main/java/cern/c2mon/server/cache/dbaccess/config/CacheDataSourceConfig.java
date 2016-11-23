@@ -6,6 +6,7 @@ import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
 import org.mybatis.spring.mapper.MapperScannerConfigurer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.EnvironmentAware;
@@ -26,12 +27,17 @@ import java.util.Properties;
 @MapperScan(value = "cern.c2mon.server.cache.dbaccess", sqlSessionFactoryRef = "cacheSqlSessionFactory")
 public class CacheDataSourceConfig implements EnvironmentAware {
 
+  // We use {@link EnvironmentAware} here to ensure that Mybatis doesn't
+  // start scanning for mappers too early.
   private Environment environment;
+
+  @Autowired
+  private CacheDbAccessProperties properties;
 
   @Bean
   @ConfigurationProperties(prefix = "c2mon.server.cachedbaccess.jdbc")
   public DataSource cacheDataSource() {
-    String url = environment.getProperty("c2mon.server.cachedbaccess.jdbc.url");
+    String url = properties.getJdbc().getUrl();
 
     // A simple inspection is done on the JDBC URL to deduce whether to create an in-memory
     // in-process database, start a file-based externally visible database or connect to
@@ -39,7 +45,7 @@ public class CacheDataSourceConfig implements EnvironmentAware {
     if (url.contains("hsql")) {
       HsqlDatabaseBuilder builder = new HsqlDatabaseBuilder().setUrl(url).addScript(new ClassPathResource("sql/cache-schema-hsqldb.sql"));
 
-      if (environment.getProperty("c2mon.server.cachedbaccess.insertTestData", Boolean.class)) {
+      if (properties.isInsertTestData()) {
         builder.addScript(new ClassPathResource("sql/demo/cache-data-demo.sql"));
       }
 

@@ -15,46 +15,26 @@
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
-import static cern.c2mon.server.test.device.ObjectComparison.assertCommandListContains;
-import static cern.c2mon.server.test.device.ObjectComparison.assertPropertyListContains;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.test.DatabasePopulationRule;
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import cern.c2mon.server.common.device.Property;
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static cern.c2mon.server.test.device.ObjectComparison.assertCommandListContains;
+import static cern.c2mon.server.test.device.ObjectComparison.assertPropertyListContains;
 
 /**
  * @author Justin Lewis Salmon
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(
-    locations = {
-        "classpath:test-config/database-population-rule.xml"
-    },
-    classes = {
-        CacheDbAccessModule.class
-    }
-)
-@TestPropertySource("classpath:c2mon-server-default.properties")
-public class DeviceClassMapperTest {
-
-  @Rule
-  @Autowired
-  public DatabasePopulationRule databasePopulationRule;
+public class DeviceClassMapperTest extends AbstractMapperTest {
 
   /** Component to test */
   @Autowired

@@ -16,12 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.test.DatabasePopulationRule;
 import cern.c2mon.server.cache.dbaccess.structure.DBBatch;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.datatag.*;
 import cern.c2mon.shared.common.metadata.Metadata;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -29,14 +26,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
 import lombok.Data;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -47,21 +38,7 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(
-    locations = {
-        "classpath:test-config/database-population-rule.xml"
-    },
-    classes = {
-        CacheDbAccessModule.class
-    }
-)
-@TestPropertySource("classpath:c2mon-server-default.properties")
-public class DataTagMapperTest {
-
-  @Rule
-  @Autowired
-  public DatabasePopulationRule databasePopulationRule;
+public class DataTagMapperTest extends AbstractMapperTest {
 
   @Autowired
   private DataTagMapper dataTagMapper;

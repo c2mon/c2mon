@@ -43,21 +43,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStat
 
 import static org.junit.Assert.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(
-    locations = {
-        "classpath:test-config/database-population-rule.xml"
-    },
-    classes = {
-        CacheDbAccessModule.class
-    }
-)
-@TestPropertySource("classpath:c2mon-server-default.properties")
-public class EquipmentMapperTest {
-
-  @Rule
-  @Autowired
-  public DatabasePopulationRule databasePopulationRule;
+public class EquipmentMapperTest extends AbstractMapperTest {
 
   /**
    * Class to test

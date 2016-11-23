@@ -46,28 +46,13 @@ import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(
-    locations = {
-        "classpath:test-config/database-population-rule.xml"
-    },
-    classes = {
-        CacheDbAccessModule.class
-    }
-)
-@TestPropertySource("classpath:c2mon-server-default.properties")
-public class ControlTagMapperTest {
+public class ControlTagMapperTest extends AbstractMapperTest {
 
   /**
    * The class to test.
    */
   @Autowired
   private ControlTagMapper controlTagMapper;
-
-  @Rule
-  @Autowired
-  public DatabasePopulationRule databasePopulationRule;
-
 
   @After
   public void deleteTestTag() {

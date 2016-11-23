@@ -16,43 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.test.DatabasePopulationRule;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
-import cern.c2mon.server.common.control.ControlTag;
-import cern.c2mon.server.common.equipment.Equipment;
-import cern.c2mon.server.common.process.Process;
-import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.Cacheable;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
 import static org.junit.Assert.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(
-    locations = {
-        "classpath:test-config/database-population-rule.xml"
-    },
-    classes = {
-        CacheDbAccessModule.class
-    }
-)
-@TestPropertySource("classpath:c2mon-server-default.properties")
-public class AliveTimerMapperTest {
-
-  @Rule
-  @Autowired
-  public DatabasePopulationRule databasePopulationRule;
+public class AliveTimerMapperTest extends AbstractMapperTest {
 
   private static final Long TEST_ALIVE_ID = new Long(500000);
 

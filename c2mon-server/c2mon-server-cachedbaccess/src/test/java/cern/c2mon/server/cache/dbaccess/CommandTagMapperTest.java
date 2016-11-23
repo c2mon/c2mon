@@ -16,11 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.test.DatabasePopulationRule;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.test.CacheObjectComparison;
-import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.command.CommandTag;
@@ -29,34 +26,14 @@ import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 import cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl;
 import cern.c2mon.shared.common.metadata.Metadata;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
 import static org.junit.Assert.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(
-    locations = {
-        "classpath:test-config/database-population-rule.xml"
-    },
-    classes = {
-        CacheDbAccessModule.class
-    }
-)
-@TestPropertySource("classpath:c2mon-server-default.properties")
-public class CommandTagMapperTest {
-
-  @Rule
-  @Autowired
-  public DatabasePopulationRule databasePopulationRule;
+public class CommandTagMapperTest extends AbstractMapperTest {
 
   @Autowired
   private CommandTagMapper commandTagMapper;
