@@ -51,9 +51,13 @@ public class TagImplTest {
   private TagUpdate createValidTransferTag(final Long tagId, Object value) {
     DataTagQuality tagQuality = new DataTagQualityImpl(
         TagQualityStatus.EQUIPMENT_DOWN, "its down!");
-    Metadata metadata = Metadata.builder().addMetadata("testString", "hello").addMetadata("tesInt", 1)
-            .addMetadata("booleanFoo", true).addMetadata("tesLong", 1L).addMetadata("tesFloat", 1.0f)
-            .addMetadata("tesDouble", 1.0).build();
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("testString", "hello");
+    metadata.addMetadata("tesInt", 1);
+    metadata.addMetadata("booleanFoo", true);
+    metadata.addMetadata("tesLong", 1L);
+    metadata.addMetadata("tesFloat", 1.0f);
+    metadata.addMetadata("tesDouble", 1.0);
 
     tagQuality.addInvalidStatus(TagQualityStatus.EQUIPMENT_DOWN, "its down!");
     tagQuality.validate();
@@ -82,9 +86,13 @@ public class TagImplTest {
    *
    */
   private static AlarmValueImpl createAlarmValue(Long tagId) {
-    Metadata metadata = Metadata.builder().addMetadata("testString", "hello").addMetadata("tesInt", 1)
-            .addMetadata("booleanFoo", true).addMetadata("tesLong", 1L).addMetadata("tesFloat", 1.0f)
-            .addMetadata("tesDouble", 1.0).build();
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("testString", "hello");
+    metadata.addMetadata("tesInt", 1);
+    metadata.addMetadata("booleanFoo", true);
+    metadata.addMetadata("tesLong", 1L);
+    metadata.addMetadata("tesFloat", 1.0f);
+    metadata.addMetadata("tesDouble", 1.0);
 
     AlarmValueImpl alarmValue =
         new AlarmValueImpl(
