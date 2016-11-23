@@ -1,8 +1,5 @@
 package cern.c2mon.server.cache.config;
 
-import java.io.IOException;
-
-import net.sf.ehcache.CacheManager;
 import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +8,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 
 import static java.lang.String.format;
 
@@ -24,11 +22,6 @@ public class CacheManagerConfig {
 
   @Resource
   private Environment environment;
-
-  @Bean
-  public CacheManager cacheManager() throws IOException {
-    return ehCacheManagerFactoryBean().getObject();
-  }
 
   @Bean
   public EhCacheManagerFactoryBean ehCacheManagerFactoryBean() throws IOException {
