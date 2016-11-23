@@ -177,6 +177,19 @@ public class DataTag extends Tag {
       return this;
     }
 
+    public DataTag.CreateBuilder addMetadata(String key, Object value) {
+      if (this.tagToBuild.getMetadata() != null) {
+        this.tagToBuild.getMetadata().addMetadata(key, value);
+      }
+      else {
+        Metadata meta = new Metadata();
+        meta.addMetadata(key, value);
+        this.tagToBuild.setMetadata(meta);
+      }
+
+      return this;
+    }
+
     public DataTag build() {
 
       tagToBuild.setCreated(true);
@@ -239,6 +252,24 @@ public class DataTag extends Tag {
 
     public DataTag.UpdateBuilder metadata(Metadata metadata) {
       this.tagToBuild.setMetadata(metadata);
+      return this;
+    }
+
+    public DataTag.UpdateBuilder addMetadata(String key, Object value) {
+      if (this.tagToBuild.getMetadata() != null) {
+        this.tagToBuild.getMetadata().addMetadata(key, value);
+      } else {
+        Metadata meta = new Metadata();
+        meta.addMetadata(key, value);
+        this.tagToBuild.setMetadata(meta);
+      }
+      return this;
+    }
+
+    public DataTag.UpdateBuilder removeMetadata(String key, Object value) {
+      if (this.tagToBuild.getMetadata() != null) {
+        this.tagToBuild.getMetadata().removeMetadata(key, value);
+      }
       return this;
     }
 
