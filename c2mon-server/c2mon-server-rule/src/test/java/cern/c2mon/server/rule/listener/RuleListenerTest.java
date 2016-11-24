@@ -62,7 +62,6 @@ import static org.junit.Assert.assertTrue;
     CacheLoadingModule.class,
     RuleModule.class
 })
-@TestPropertySource("classpath:c2mon-server-default.properties")
 public class RuleListenerTest {
 
   @Rule
