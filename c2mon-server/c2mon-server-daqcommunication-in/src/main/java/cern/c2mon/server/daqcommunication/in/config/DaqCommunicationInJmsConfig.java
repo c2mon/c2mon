@@ -16,11 +16,11 @@ import org.springframework.jms.listener.DefaultMessageListenerContainer;
 public class DaqCommunicationInJmsConfig {
 
   @Autowired
-  private Environment environment;
+  private DaqCommunicationInProperties properties;
 
   @Bean
   public ActiveMQConnectionFactory daqInConnectionFactory() {
-    String url = environment.getRequiredProperty("c2mon.server.daqcommunication.jms.url");
+    String url = properties.getJms().getUrl();
     ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
     connectionFactory.setClientIDPrefix("C2MON-SERVER-DAQ-IN");
     connectionFactory.setWatchTopicAdvisories(false);
@@ -31,11 +31,11 @@ public class DaqCommunicationInJmsConfig {
   public DefaultMessageListenerContainer requestJmsContainer(ProcessRequestHandlerImpl processRequestHandler) {
     DefaultMessageListenerContainer container = new DefaultMessageListenerContainer();
     container.setConnectionFactory(daqInConnectionFactory());
-    container.setDestination(new ActiveMQQueue(environment.getRequiredProperty("c2mon.server.daqcommunication.jms.queue.trunk") + ".request"));
+    container.setDestination(new ActiveMQQueue(properties.getJms().getQueuePrefix() + ".request"));
     container.setMessageListener(processRequestHandler);
-    container.setConcurrentConsumers(environment.getRequiredProperty("c2mon.server.daqcommunication.jms.request.consumers.initial", Integer.class));
-    container.setMaxConcurrentConsumers(environment.getRequiredProperty("c2mon.server.daqcommunication.jms.request.consumers.max", Integer.class));
-    container.setSessionTransacted(environment.getRequiredProperty("c2mon.server.daqcommunication.jms.request.transacted", Boolean.class));
+    container.setConcurrentConsumers(properties.getJms().getRequest().getInitialConsumers());
+    container.setMaxConcurrentConsumers(properties.getJms().getRequest().getMaxConsumers());
+    container.setSessionTransacted(properties.getJms().getRequest().isTransacted());
     container.setAutoStartup(false);
     container.setPhase(ServerConstants.PHASE_START_LAST);
     container.setBeanName("Process request JMS container");

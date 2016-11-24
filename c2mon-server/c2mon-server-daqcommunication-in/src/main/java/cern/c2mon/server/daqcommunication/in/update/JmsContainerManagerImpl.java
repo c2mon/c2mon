@@ -23,6 +23,7 @@ import javax.annotation.PostConstruct;
 import javax.jms.ConnectionFactory;
 import javax.jms.Message;
 
+import cern.c2mon.server.daqcommunication.in.config.DaqCommunicationInProperties;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,52 +97,6 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
   private SessionAwareMessageListener<Message> listener;
 
   /**
-   * The number of initial consumer threads.
-   */
-  private int consumersInitial = 1;
-
-  /**
-   * The number of initial consumer threads.
-   */
-  private int consumersMax = 1;
-
-  /**
-   * The max number of consumer threads.
-   */
-  private boolean sessionTransacted = false;
-
-  /**
-   * The trunk of the queue name used for all Processes.
-   */
-  private String jmsUpdateQueueTrunk = "default.update.trunk";
-
-  /**
-   * Warm up time, after which multiple threads are allowed for single Process
-   * (introduced to improve performance when multiple servers available).
-   */
-  private int updateWarmUpSeconds = 10;
-
-  /**
-   * Container listener max messages per task.
-   */
-  private int maxMessages;
-
-  /**
-   * Container listener receive timeout.
-   */
-  private long receiveTimeout;
-
-  /**
-   * Container listener idle task execution limit.
-   */
-  private int idleTaskExecutionLimit;
-
-  /**
-   * Number of threads executing receive calls.
-   */
-  private int nbExecutorThreads;
-
-  /**
    * Timer for checking if subscription to JMS have been modified by
    * another cluster member.
    */
@@ -157,6 +112,8 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
    */
   private static final long SUBSCRIPTION_CHECK_INTERVAL = 120000L;
 
+  private DaqCommunicationInProperties properties;
+
   /**
    * Constructor.
    */
@@ -166,23 +123,14 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
                                  final @Qualifier("sourceUpdateManager") SessionAwareMessageListener<Message> listener,
                                  final @Qualifier("clusterCache") ClusterCache clusterCache,
                                  final ThreadPoolTaskExecutor daqCommunicationThreadPoolTaskExecutor,
-                                 Environment environment) {
+                                 final DaqCommunicationInProperties properties) {
     super();
     this.processCache = processCache;
     this.updateConnectionFactory = updateConnectionFactory;
     this.listener = listener;
     this.clusterCache = clusterCache;
     this.daqCommunicationThreadPoolTaskExecutor = daqCommunicationThreadPoolTaskExecutor;
-
-    this.jmsUpdateQueueTrunk = environment.getRequiredProperty("c2mon.server.daqcommunication.jms.queue.trunk") + ".update";
-    this.sessionTransacted = environment.getRequiredProperty("c2mon.server.daqcommunication.jms.update.transacted", Boolean.class);
-    this.consumersInitial = environment.getRequiredProperty("c2mon.server.daqcommunication.jms.update.consumers.initial", Integer.class);
-    this.consumersMax = environment.getRequiredProperty("c2mon.server.daqcommunication.jms.update.consumers.max", Integer.class);
-    this.updateWarmUpSeconds = environment.getRequiredProperty("c2mon.server.daqcommunication.jms.update.consumers.warmuptime", Integer.class);
-    this.idleTaskExecutionLimit = environment.getRequiredProperty("c2mon.server.daqcommunication.jms.update.idleTaskExecutionLimit", Integer.class);
-    this.maxMessages = environment.getRequiredProperty("c2mon.server.daqcommunication.jms.update.maxMessagesPerTask", Integer.class);
-    this.receiveTimeout = environment.getRequiredProperty("c2mon.server.daqcommunication.jms.update.receiveTimeout", Integer.class);
-    this.nbExecutorThreads = environment.getRequiredProperty("c2mon.server.daqcommunication.jms.update.numExecutorThreads", Integer.class);
+    this.properties = properties;
   }
 
 
@@ -190,7 +138,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
   public void init() {
     daqCommunicationThreadPoolTaskExecutor.initialize();
     for (Long id : processCache.getKeys()) {
-      subscribe(processCache.get(id), consumersInitial);
+      subscribe(processCache.get(id), properties.getJms().getUpdate().getInitialConsumers());
     }
   }
 
@@ -198,7 +146,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
   public void subscribe(final Process process) {
     LOGGER.trace("Subscribing to updates from Process " + process.getId());
     if (!jmsContainers.containsKey(process.getId())) {
-      DefaultMessageListenerContainer container = subscribe(process, this.consumersMax);
+      DefaultMessageListenerContainer container = subscribe(process, properties.getJms().getUpdate().getMaxConsumers());
       container.start();
     } else {
       LOGGER.warn("Attempt at creating a JMS listener container for a Process that already has one.");
@@ -215,17 +163,17 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
   private DefaultMessageListenerContainer subscribe(final Process process, final int consumersMax) {
     DefaultMessageListenerContainer container = new DefaultMessageListenerContainer();
     container.setConnectionFactory(updateConnectionFactory);
-    container.setDestination(new ActiveMQQueue(jmsUpdateQueueTrunk + "." + process.getName()));
+    container.setDestination(new ActiveMQQueue(properties.getJms().getQueuePrefix() + "." + process.getName()));
     container.setMessageListener(listener);
-    container.setConcurrentConsumers(consumersInitial);
+    container.setConcurrentConsumers(properties.getJms().getUpdate().getInitialConsumers());
     container.setMaxConcurrentConsumers(consumersMax);
-    container.setSessionTransacted(sessionTransacted);
+    container.setSessionTransacted(properties.getJms().getUpdate().isTransacted());
     container.setCacheLevel(DefaultMessageListenerContainer.CACHE_CONSUMER);
     container.setAutoStartup(false);
     container.setPhase(ServerConstants.PHASE_START_LAST);
-    container.setMaxMessagesPerTask(maxMessages);
-    container.setReceiveTimeout(receiveTimeout);
-    container.setIdleTaskExecutionLimit(idleTaskExecutionLimit);
+    container.setMaxMessagesPerTask(properties.getJms().getUpdate().getMaxMessagesPerTask());
+    container.setReceiveTimeout(properties.getJms().getUpdate().getReceiveTimeout());
+    container.setIdleTaskExecutionLimit(properties.getJms().getUpdate().getIdleTaskExecutionLimit());
     container.setBeanName(process.getName() + " update JMS container");
     container.setTaskExecutor(daqCommunicationThreadPoolTaskExecutor);
     container.setAcceptMessagesWhileStopping(false);
@@ -331,7 +279,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
         public void run() {
           int counter = 0;
           try {
-            while (counter < updateWarmUpSeconds && running) {
+            while (counter < properties.getJms().getUpdate().getConsumerWarmupTime() && running) {
               Thread.sleep(1000);
               counter++;
             }
@@ -341,7 +289,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
           if (running) {
             LOGGER.info("Increasing max concurrent update consumers to operational value.");
             for (Map.Entry<Long, DefaultMessageListenerContainer> entry : jmsContainers.entrySet()) {
-              entry.getValue().setMaxConcurrentConsumers(consumersMax);
+              entry.getValue().setMaxConcurrentConsumers(properties.getJms().getUpdate().getMaxConsumers());
             }
           }
         }

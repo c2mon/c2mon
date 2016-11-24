@@ -58,12 +58,6 @@ import static org.junit.Assert.*;
     SupervisionModule.class,
     DaqCommunicationInModule.class,
 })
-@TestPropertySource(
-    locations = "classpath:c2mon-server-default.properties",
-    properties = {
-        "c2mon.server.cache.bufferedListenerPullFrequency=1"
-    }
-)
 public class TagUpdateTest {
 
   @Rule
