@@ -7,6 +7,7 @@ import cern.c2mon.pmanager.persistence.impl.PersistenceManager;
 import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
 import cern.c2mon.server.elasticsearch.structure.types.EsSupervisionEvent;
 import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -16,31 +17,27 @@ import org.springframework.context.annotation.Bean;
  */
 public class ElasticsearchPersistenceConfig {
 
+  @Autowired
+  private ElasticsearchProperties properties;
+
+  @Bean
+  public IPersistenceManager<EsTag> esTagPersistenceManager(final IDBPersistenceHandler<EsTag> esTagIndexer,
+      final IAlarmListener esAlarmListener) {
+    String fallbackFile = properties.getTagFallbackFile();
+    return new PersistenceManager<>(esTagIndexer, fallbackFile, esAlarmListener, new EsTag());
+  }
+
+  @Bean
+  public IPersistenceManager<EsAlarm> esAlarmPersistenceManager(final IDBPersistenceHandler<EsAlarm> esAlarmIndexer,
+      final IAlarmListener esAlarmListener) {
+    String fallbackFile = properties.getAlarmFallbackFile();
+    return new PersistenceManager<>(esAlarmIndexer, fallbackFile, esAlarmListener, new EsAlarm());
+  }
+
   @Bean
   public IPersistenceManager<EsSupervisionEvent> esSupervisionEventPersistenceManager(
-      @Qualifier("esSupervisionEventIndexer") final IDBPersistenceHandler<EsSupervisionEvent> persistenceHandler,
-      @Value("/tmp/supervisionESfallback.txt") final String fallbackFile,
-      @Qualifier("esAlarmListener") final IAlarmListener alarmListener) {
-
-    return new PersistenceManager<>(persistenceHandler, fallbackFile, alarmListener, new EsSupervisionEvent());
-  }
-
-  @Bean
-  public IPersistenceManager<EsAlarm> esAlarmPersistenceManager(
-      @Qualifier("esAlarmIndexer") final IDBPersistenceHandler<EsAlarm> persistenceHandler,
-      @Value("/tmp/alarmESfallback.txt") final String fallbackFile,
-      @Qualifier("esAlarmListener") final IAlarmListener alarmListener) {
-
-    return new PersistenceManager<>(persistenceHandler, fallbackFile, alarmListener, new EsAlarm());
-  }
-
-
-  @Bean
-  public IPersistenceManager<EsTag> esTagPersistenceManager(
-      @Qualifier("esTagIndexer") final IDBPersistenceHandler<EsTag> persistenceHandler,
-      @Value("/tmp/tagESfallback.txt") final String fallbackFile,
-      @Qualifier("esAlarmListener") final IAlarmListener alarmListener) {
-
-    return new PersistenceManager<>(persistenceHandler, fallbackFile, alarmListener, new EsTag());
+      final IDBPersistenceHandler<EsSupervisionEvent> esSupervisionEventIndexer, final IAlarmListener esAlarmListener) {
+    String fallbackFile = properties.getSupervisionFallbackFile();
+    return new PersistenceManager<>(esSupervisionEventIndexer, fallbackFile, esAlarmListener, new EsSupervisionEvent());
   }
 }

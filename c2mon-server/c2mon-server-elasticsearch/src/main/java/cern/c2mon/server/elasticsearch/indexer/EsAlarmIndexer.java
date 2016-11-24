@@ -20,45 +20,32 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.connector.Connector;
 import cern.c2mon.server.elasticsearch.structure.mappings.EsAlarmMapping;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
 
 /**
- * Allows to send the data to Elasticsearch through {@link Connector}.
- *
  * @author Alban Marguet
  */
 @Slf4j
 @Data
-@EqualsAndHashCode(callSuper = false)
 @Component("esAlarmIndexer")
 public class EsAlarmIndexer<T extends EsAlarm> extends EsIndexer<T> {
 
   private final String alarmMapping = new EsAlarmMapping().getMapping();
 
-  /**
-   * Autowired constructor.
-   *
-   * @param connector
-   *          handling the connection with Elasticsearch.
-   */
   @Autowired
-  public EsAlarmIndexer(final Connector connector, Environment environment) {
-    super(connector, environment);
+  public EsAlarmIndexer(final Connector connector, ElasticsearchProperties properties) {
+    super(connector, properties);
   }
 
-  /**
-   * Make sure the connection is alive.
-   */
   @Override
   @PostConstruct
   public void init() throws IDBPersistenceException {
@@ -76,7 +63,7 @@ public class EsAlarmIndexer<T extends EsAlarm> extends EsIndexer<T> {
         String indexName = generateAlarmIndex(esAlarm.getTimestamp());
         logged = connector.logAlarmEvent(indexName, alarmMapping, esAlarm);
     } catch (Exception e) {
-      log.debug("storeData() - Cluster is not reachable");
+      log.debug("Cluster is not reachable!");
       throw new IDBPersistenceException(e);
     }
 
@@ -92,15 +79,12 @@ public class EsAlarmIndexer<T extends EsAlarm> extends EsIndexer<T> {
         storeData(esAlarm);
       }
     } catch (Exception e) {
-      log.debug("storeData() - Cluster is not reachable");
+      log.debug("Cluster is not reachable!");
       throw new IDBPersistenceException(e);
     }
   }
 
-  /**
-   * Format: "alarmPrefix_indexSettings".
-   */
   private String generateAlarmIndex(long time) {
-    return retrieveIndexFormat(indexPrefix + "-alarm_", time);
+    return retrieveIndexFormat(properties.getIndexPrefix() + "-alarm_", time);
   }
 }

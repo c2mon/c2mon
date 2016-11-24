@@ -48,11 +48,6 @@ public interface Connector {
   Client getClient();
 
   /**
-   * The name of the Elasticsearch cluster.
-   */
-  String getCluster();
-
-  /**
    * @return the {@link BulkProcessor} instance
    */
   BulkProcessor getBulkProcessor();

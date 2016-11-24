@@ -20,6 +20,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.connector.Connector;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,31 +34,19 @@ import cern.c2mon.server.elasticsearch.structure.mappings.EsSupervisionMapping;
 import cern.c2mon.server.elasticsearch.structure.types.EsSupervisionEvent;
 
 /**
- * Allows to write a {@link EsSupervisionEvent} to Elasticsearch through the {@link Connector}.
- *
  * @author Alban Marguet
  */
 @Slf4j
-@Data
-@EqualsAndHashCode(callSuper = false)
 @Component("esSupervisionEventIndexer")
 public class EsSupervisionEventIndexer<T extends EsSupervisionEvent> extends EsIndexer<T> {
 
   private final String supervisionMapping = new EsSupervisionMapping().getMapping();
 
-  /**
-   * Autowired constructor.
-   *
-   * @param connector handling the connection to Elasticsearch.
-   */
   @Autowired
-  public EsSupervisionEventIndexer(final Connector connector, Environment environment) {
-    super(connector, environment);
+  public EsSupervisionEventIndexer(final Connector connector, final ElasticsearchProperties properties) {
+    super(connector, properties);
   }
 
-  /**
-   * Wait for the connection with Elasticsearch to be alive.
-   */
   @Override
   @PostConstruct
   public void init() throws IDBPersistenceException {
@@ -66,7 +55,7 @@ public class EsSupervisionEventIndexer<T extends EsSupervisionEvent> extends EsI
 
   @Override
   public void storeData(T esSupervisionEvent) throws IDBPersistenceException {
-    if(esSupervisionEvent == null) {
+    if (esSupervisionEvent == null) {
       return;
     }
 
@@ -75,12 +64,12 @@ public class EsSupervisionEventIndexer<T extends EsSupervisionEvent> extends EsI
       String indexName = generateSupervisionIndex(esSupervisionEvent.getTimestamp());
       logged = connector.logSupervisionEvent(indexName, supervisionMapping, esSupervisionEvent);
     } catch (Exception e) {
-      log.debug("storeData() - Cluster is not reachable");
+      log.debug("Cluster is not reachable!");
       throw new IDBPersistenceException(e);
     }
 
     if (!logged) {
-      throw new IDBPersistenceException("Supervision could not be stored in Elasticsearch");
+      throw new IDBPersistenceException("Supervision event could not be stored in Elasticsearch");
     }
   }
 
@@ -91,15 +80,12 @@ public class EsSupervisionEventIndexer<T extends EsSupervisionEvent> extends EsI
           storeData(esSupervisionEvent);
       }
     } catch(Exception e) {
-      log.debug("storeData() - Cluster is not reachable");
+      log.debug("Cluster is not reachable!");
       throw new IDBPersistenceException(e);
     }
   }
 
-  /**
-   * Format: "supervisionPrefix_index-format".
-   */
   private String generateSupervisionIndex(long time) {
-    return retrieveIndexFormat(indexPrefix + "-supervision_", time);
+    return retrieveIndexFormat(properties.getIndexPrefix() + "-supervision_", time);
   }
 }

@@ -18,6 +18,7 @@ package cern.c2mon.server.elasticsearch.indexer;
 
 import java.sql.Timestamp;
 
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.connector.TransportConnector;
 import cern.c2mon.server.elasticsearch.structure.mappings.EsAlarmMapping;
 import org.junit.Before;
@@ -62,13 +63,15 @@ public class EsAlarmIndexerTest {
 
   private EsAlarmLogConverter esAlarmLogConverter = new EsAlarmLogConverter();
 
+  private ElasticsearchProperties properties = new ElasticsearchProperties();
+
   @Before
   public void setup() throws IDBPersistenceException {
     alarm = CacheObjectCreation.createTestAlarm1();
     esAlarm = esAlarmLogConverter.convert(alarm);
     timestamp = alarm.getTimestamp();
     when(connector.logAlarmEvent(anyString(), anyString(), eq(esAlarm))).thenReturn(true);
-    indexer.setIndexFormat("M");
+    properties.setIndexType("M");
     esAlarmMapping = new EsAlarmMapping();
   }
 
@@ -84,7 +87,8 @@ public class EsAlarmIndexerTest {
     String expectedMapping = esAlarmMapping.getMapping();
 
     indexer.storeData(esAlarm);
-    verify(connector).logAlarmEvent(eq(indexer.getIndexPrefix() + "-alarm_" + indexer.millisecondsToYearMonth(timestamp.getTime())), eq(expectedMapping), eq(esAlarm));
+    verify(connector).logAlarmEvent(eq(properties.getIndexPrefix() + "-alarm_"
+        + indexer.millisecondsToYearMonth(timestamp.getTime())), eq(expectedMapping), eq(esAlarm));
   }
 
 }

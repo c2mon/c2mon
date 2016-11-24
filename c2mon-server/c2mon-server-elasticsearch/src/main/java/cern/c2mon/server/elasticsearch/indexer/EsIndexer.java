@@ -21,8 +21,10 @@ import java.util.Date;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.connector.Connector;
 import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
@@ -43,20 +45,10 @@ import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
  */
 @Slf4j
 @Component
-@Data
 public abstract class EsIndexer<T extends IFallback> implements IDBPersistenceHandler<T> {
 
-  /**
-   * Prefix used for every index in the Elasticsearch cluster, e.g., c2mon_2015-11 is a valid index.
-   */
-  protected String indexPrefix;
-
-  protected String indexFormat;
-
-  /**
-   * Every tag must begin with the same prefix, e.g., tag_string is a good type.
-   */
-  protected String typePrefix;
+  @Autowired
+  protected ElasticsearchProperties properties;
 
   /**
    * Handles the connection with the Elasticsearch cluster.
@@ -66,19 +58,13 @@ public abstract class EsIndexer<T extends IFallback> implements IDBPersistenceHa
   /**
    * Is available if the Connector has found a connection.
    */
+  @Getter
   protected boolean isAvailable = false;
 
-  /**
-   * Autowired constructor.
-   *
-   * @param connector handling the connection to Elasticsearch.
-   */
   @Autowired
-  public EsIndexer(final Connector connector, Environment environment) {
+  public EsIndexer(final Connector connector, ElasticsearchProperties properties) {
     this.connector = connector;
-    this.indexPrefix = environment.getRequiredProperty("c2mon.server.elasticsearch.index.prefix");
-    this.indexFormat = environment.getRequiredProperty("c2mon.server.elasticsearch.config.index.format");
-    this.typePrefix = environment.getRequiredProperty("c2mon.server.elasticsearch.type.prefix");
+    this.properties = properties;
   }
 
   /**
@@ -95,7 +81,7 @@ public abstract class EsIndexer<T extends IFallback> implements IDBPersistenceHa
 
     while(!isAvailable) {
       try {
-        log.trace("waitForConnection() is sleepging for 1s before checking again for valid ES connection");
+        log.trace("waitForConnection() is sleeping for 1s before checking again for valid ES connection");
         Thread.sleep(1000L);
 
         isAvailable = connector.isConnected();
@@ -110,13 +96,13 @@ public abstract class EsIndexer<T extends IFallback> implements IDBPersistenceHa
     }
 
     if (!isAvailable) {
-      log.info("init() - EsIndexer is ready to write data to Elasticsearch.");
+      log.info("EsIndexer is ready to write data to Elasticsearch");
     }
   }
 
   @Override
   public String getDBInfo() {
-    return connector.getCluster();
+    return properties.getClusterName();
   }
 
   /**
@@ -128,7 +114,7 @@ public abstract class EsIndexer<T extends IFallback> implements IDBPersistenceHa
    */
   protected String retrieveIndexFormat(String prefix, long millis) {
     String result;
-    switch(indexFormat) {
+    switch (properties.getIndexType()) {
       case "D":
       case "d":
         result = prefix + millisecondsToYearMonthDay(millis);
@@ -146,21 +132,21 @@ public abstract class EsIndexer<T extends IFallback> implements IDBPersistenceHa
   }
 
   /**
-   * Milliseconds since Epoch time to YYYY-MM.
+   * @return milliseconds since Epoch time to YYYY-MM.
    */
   protected String millisecondsToYearMonth(long millis) {
     return getSimpleDateFormatForMilliseconds("yyyy-MM", millis);
   }
 
   /**
-   * Milliseconds since Epoch time to YYYY-ww.
+   * @return milliseconds since Epoch time to YYYY-ww.
    */
   protected String millisecondsToYearWeek(long millis) {
     return getSimpleDateFormatForMilliseconds("yyyy-'W'ww", millis);
   }
 
   /**
-   * Milliseconds since Epoch time to YYYY-MM-DD.
+   * @return milliseconds since Epoch time to YYYY-MM-DD.
    */
   protected String millisecondsToYearMonthDay(long millis) {
     return getSimpleDateFormatForMilliseconds("yyyy-MM-dd", millis);
@@ -169,17 +155,5 @@ public abstract class EsIndexer<T extends IFallback> implements IDBPersistenceHa
   private String getSimpleDateFormatForMilliseconds(String wantedPattern, long millis) {
     Date date = new Date(millis);
     return new SimpleDateFormat(wantedPattern).format(date);
-  }
-
-  /**
-   * @return the Elasticsearch mapping of @param index with {@param type}.
-   */
-  protected MappingMetaData retrieveMappingES(String index, String type) throws IDBPersistenceException {
-    try {
-      return connector.getClient().admin().cluster().prepareState().get()
-              .getState().getMetaData().index(index).mapping(type);
-    } catch(ElasticsearchException e) {
-      throw new IDBPersistenceException();
-    }
   }
 }

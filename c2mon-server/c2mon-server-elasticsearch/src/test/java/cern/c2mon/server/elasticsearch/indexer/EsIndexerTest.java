@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.*;
 
 import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.connector.TransportConnector;
 import cern.c2mon.server.elasticsearch.structure.mappings.EsTagMapping;
 import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
@@ -33,11 +34,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 
@@ -53,10 +50,6 @@ import static org.junit.Assert.assertTrue;
  */
 @Slf4j
 public class EsIndexerTest extends BaseElasticsearchIntegrationTest {
-  private static String clusterName;
-  private static String nodeName;
-  private static String host;
-  private static String home;
   private static Client clusterClient;
   private static Client initClient;
 
@@ -68,19 +61,16 @@ public class EsIndexerTest extends BaseElasticsearchIntegrationTest {
   @Autowired
   private TransportConnector connector;
 
+  @Autowired
+  private ElasticsearchProperties properties;
+
   @Before
   public void clientSetup() throws IOException {
-    log.info("@Before");
-
     delete();
 
     if (connector.getClient() != null) {
       initClient = connector.getClient();
     }
-
-    nodeName = connector.getNode();
-    clusterName = connector.getCluster();
-    host = connector.getHost();
 
     connector.setClient(initClient);
     clusterClient = connector.getClient();
@@ -88,18 +78,17 @@ public class EsIndexerTest extends BaseElasticsearchIntegrationTest {
 
   @After
   public void tidyUp() {
-    log.info("@After");
     connector.getClient().admin().indices().delete(new DeleteIndexRequest("*")).actionGet();
     connector.getClient().admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
     connector.getClient().admin().indices().prepareRefresh().execute().actionGet();
-    indexer.getCacheIndicesTypes().clear();
+    indexer.clearCache();
 //    connector.closeBulk();
   }
 
   private void delete() {
     log.info("begin delete directory");
 
-    File dataDir = new File(home + "/data");
+    File dataDir = new File(properties.getEmbeddedStoragePath() + "/data");
     File[] data = dataDir.listFiles();
 
     if (data != null) {
@@ -211,8 +200,8 @@ public class EsIndexerTest extends BaseElasticsearchIntegrationTest {
 
     tag.getC2mon().setServerTimestamp(123456789000L);
     tag.setRawValue(true);
-    String indexName = indexer.indexPrefix + TAG_INDEX_SUFFIX +indexer.millisecondsToYearMonth(tag.getC2mon().getServerTimestamp());
-    String typeName = indexer.typePrefix + "_" + EsTagIndexer.getSimpleTypeName(tag.getC2mon().getDataType());
+    String indexName = properties.getIndexPrefix() + TAG_INDEX_SUFFIX +indexer.millisecondsToYearMonth(tag.getC2mon().getServerTimestamp());
+    String typeName = "tag_" + EsTagIndexer.getSimpleTypeName(tag.getC2mon().getDataType());
 
     list.add(tag);
 
@@ -248,7 +237,7 @@ public class EsIndexerTest extends BaseElasticsearchIntegrationTest {
 
       tag.getC2mon().setServerTimestamp(tagServerTime);
       list.add(tag);
-      listIndices.add(indexer.indexPrefix + TAG_INDEX_SUFFIX + indexer.millisecondsToYearMonth(tag.getC2mon().getServerTimestamp()));
+      listIndices.add(properties.getIndexPrefix() + TAG_INDEX_SUFFIX + indexer.millisecondsToYearMonth(tag.getC2mon().getServerTimestamp()));
 
       if (id == size) {
         log.debug("list of tags realized");
@@ -259,7 +248,7 @@ public class EsIndexerTest extends BaseElasticsearchIntegrationTest {
       }
     }
 
-    indexName = indexer.indexPrefix + TAG_INDEX_SUFFIX + indexer.millisecondsToYearMonth(tagServerTime);
+    indexName = properties.getIndexPrefix() + TAG_INDEX_SUFFIX + indexer.millisecondsToYearMonth(tagServerTime);
     indexer.indexTags(list);
     sleep();
     assertTrue(connector.waitForYellowStatus());
@@ -298,17 +287,17 @@ public class EsIndexerTest extends BaseElasticsearchIntegrationTest {
     String expectedWeek = indexer.millisecondsToYearWeek(millis).toLowerCase();
     String expectedDay = indexer.millisecondsToYearMonthDay(millis).toLowerCase();
 
-    indexer.setIndexFormat("M");
+    properties.setIndexType("M");
     String monthIndex = indexer.generateTagIndex(millis);
-    assertEquals(indexer.indexPrefix + "-tag_" + expectedMonth, monthIndex);
+    assertEquals(properties.getIndexPrefix() + "-tag_" + expectedMonth, monthIndex);
 
-    indexer.setIndexFormat("W");
+    properties.setIndexType("W");
     String weekIndex = indexer.generateTagIndex(millis);
-    assertEquals(indexer.indexPrefix + "-tag_" + expectedWeek, weekIndex);
+    assertEquals(properties.getIndexPrefix() + "-tag_" + expectedWeek, weekIndex);
 
-    indexer.setIndexFormat("D");
+    properties.setIndexType("D");
     String dayIndex = indexer.generateTagIndex(millis);
-    assertEquals(indexer.indexPrefix + "-tag_" + expectedDay, dayIndex);
+    assertEquals(properties.getIndexPrefix() + "-tag_" + expectedDay, dayIndex);
   }
 
   private SearchResponse getResponse(Client client, String[] indices) {

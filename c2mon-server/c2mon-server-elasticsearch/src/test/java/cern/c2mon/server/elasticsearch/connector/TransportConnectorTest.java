@@ -19,6 +19,7 @@ package cern.c2mon.server.elasticsearch.connector;
 import java.sql.Timestamp;
 
 import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.structure.converter.EsAlarmLogConverter;
 import cern.c2mon.server.elasticsearch.structure.converter.EsSupervisionEventConverter;
 import cern.c2mon.server.elasticsearch.structure.mappings.EsAlarmMapping;
@@ -35,11 +36,7 @@ import org.elasticsearch.common.settings.Settings;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.elasticsearch.structure.types.EsSupervisionEvent;
 import cern.c2mon.server.test.CacheObjectCreation;
@@ -60,18 +57,18 @@ import static org.junit.Assert.assertTrue;
 @Slf4j
 public class TransportConnectorTest extends BaseElasticsearchIntegrationTest {
 
-  private int localPort = 1;
-  private String isLocal = "true";
-
   @Autowired
   private TransportConnector connector;
+
+  @Autowired
+  private ElasticsearchProperties properties;
 
   @Before
   public void clientSetup() {
     while(!connector.isConnected()) {
       sleep();
     }
-    log.debug("Connected to the cluster " + connector.getCluster());
+    log.debug("Connected to the cluster " + properties.getClusterName());
   }
 
   @After
@@ -85,16 +82,16 @@ public class TransportConnectorTest extends BaseElasticsearchIntegrationTest {
     Settings expectedSettings = Settings.settingsBuilder()
             .put("node.local", true)
             .put("http.enabled", false)
-            .put("node.name", connector.getNode())
-            .put("cluster.name", connector.getCluster())
+            .put("node.name", properties.getNodeName())
+            .put("cluster.name", properties.getClusterName())
             .build();
 
     assertTrue(connector.isConnected());
     assertNotNull(connector.getClient());
-    assertTrue(connector.isLocal());
-    assertEquals(expectedSettings, connector.getSettings());
-    assertEquals(isLocal, connector.getSettings().get("node.local"));
-    assertEquals(connector.getNode(), connector.getSettings().get("node.name"));
+    assertTrue(properties.isEmbedded());
+//    assertEquals(expectedSettings, connector.getSettings());
+//    assertEquals(isLocal, connector.getSettings().get("node.local"));
+//    assertEquals(connector.getNode(), connector.getSettings().get("node.name"));
     assertNotNull(connector.getBulkProcessor());
   }
 
@@ -114,8 +111,8 @@ public class TransportConnectorTest extends BaseElasticsearchIntegrationTest {
   @Test
   public void testCreateLocalClient() {
     assertNotNull(connector.getClient());
-    assertEquals(localPort, connector.getPort());
-    assertEquals(isLocal, connector.getSettings().get("node.local"));
+    assertEquals(1, properties.getPort());
+//    assertEquals(isLocal, connector.getSettings().get("node.local"));
   }
 
   @Test
