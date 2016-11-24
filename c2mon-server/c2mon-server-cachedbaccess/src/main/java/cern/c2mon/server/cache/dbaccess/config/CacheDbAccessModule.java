@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @ComponentScan("cern.c2mon.server.cache.dbaccess")
 @Import({
-    ServerProperties.class,
     CacheDataSourceConfig.class
 })
 @EnableConfigurationProperties(CacheDbAccessProperties.class)

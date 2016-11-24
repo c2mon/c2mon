@@ -18,10 +18,9 @@ public class DaqProperties {
   @Data
   public class Jms {
 
-    // TODO: somehow allow using ${c2mon.server.jms.url} here
     private String url = "tcp://localhost:61616";
 
-    private String queuePrefix = "${c2mon.domain}.process";
+    private String queuePrefix = "c2mon.process";
 
     private int configurationTimeout = 60000;
 

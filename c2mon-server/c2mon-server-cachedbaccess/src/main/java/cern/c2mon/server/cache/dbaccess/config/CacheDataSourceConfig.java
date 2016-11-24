@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -25,11 +26,7 @@ import java.util.Properties;
  */
 @EnableTransactionManagement
 @MapperScan(value = "cern.c2mon.server.cache.dbaccess", sqlSessionFactoryRef = "cacheSqlSessionFactory")
-public class CacheDataSourceConfig implements EnvironmentAware {
-
-  // We use {@link EnvironmentAware} here to ensure that Mybatis doesn't
-  // start scanning for mappers too early.
-  private Environment environment;
+public class CacheDataSourceConfig {
 
   @Autowired
   private CacheDbAccessProperties properties;
@@ -61,7 +58,7 @@ public class CacheDataSourceConfig implements EnvironmentAware {
   }
 
   @Bean
-  public SqlSessionFactoryBean cacheSqlSessionFactory(DataSource cacheDataSource) throws Exception {
+  public static SqlSessionFactoryBean cacheSqlSessionFactory(DataSource cacheDataSource) throws Exception {
     SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
     sessionFactory.setDataSource(cacheDataSource);
     sessionFactory.setDatabaseIdProvider(databaseIdProvider());
@@ -70,7 +67,7 @@ public class CacheDataSourceConfig implements EnvironmentAware {
   }
 
   @Bean
-  public VendorDatabaseIdProvider databaseIdProvider() {
+  public static VendorDatabaseIdProvider databaseIdProvider() {
     VendorDatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
     Properties properties = new Properties();
     properties.putAll(ImmutableMap.of(
@@ -80,10 +77,5 @@ public class CacheDataSourceConfig implements EnvironmentAware {
     ));
     databaseIdProvider.setProperties(properties);
     return databaseIdProvider;
-  }
-
-  @Override
-  public void setEnvironment(Environment environment) {
-    this.environment = environment;
   }
 }

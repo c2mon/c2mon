@@ -16,7 +16,7 @@ public class ConfigurationProperties {
   /**
    * The queue on which the server will listen for configuration requests
    */
-  private String jmsQueue = "${c2mon.domain}.config";
+  private String jmsQueue = "c2mon.config";
 
   /**
    * JDBC properties

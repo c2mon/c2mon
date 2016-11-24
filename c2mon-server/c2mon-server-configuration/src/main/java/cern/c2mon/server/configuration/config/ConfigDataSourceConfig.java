@@ -20,11 +20,7 @@ import javax.sql.DataSource;
  */
 @EnableTransactionManagement
 @MapperScan(value = "cern.c2mon.server.configuration.mybatis", sqlSessionFactoryRef = "configSqlSessionFactory")
-public class ConfigDataSourceConfig implements EnvironmentAware {
-
-  // We use {@link EnvironmentAware} here to ensure that Mybatis doesn't
-  // start scanning for mappers too early.
-  private Environment environment;
+public class ConfigDataSourceConfig {
 
   @Autowired
   private ConfigurationProperties properties;
@@ -50,16 +46,12 @@ public class ConfigDataSourceConfig implements EnvironmentAware {
   }
 
   @Bean
-  public SqlSessionFactoryBean configSqlSessionFactory(DataSource configurationDataSource, VendorDatabaseIdProvider databaseIdProvider) throws Exception {
+  public static SqlSessionFactoryBean configSqlSessionFactory(DataSource configurationDataSource,
+                                                              VendorDatabaseIdProvider databaseIdProvider) throws Exception {
     SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
     sessionFactory.setDataSource(configurationDataSource);
     sessionFactory.setTypeHandlersPackage("cern.c2mon.server.configuration.mybatis");
     sessionFactory.setDatabaseIdProvider(databaseIdProvider);
     return sessionFactory;
-  }
-
-  @Override
-  public void setEnvironment(Environment environment) {
-    this.environment = environment;
   }
 }

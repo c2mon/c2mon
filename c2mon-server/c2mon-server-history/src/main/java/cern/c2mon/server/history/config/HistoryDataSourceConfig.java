@@ -32,11 +32,7 @@ import java.util.Properties;
     AlarmHistoryConfig.class,
     CommandHistoryConfig.class
 })
-public class HistoryDataSourceConfig implements EnvironmentAware {
-
-  // We use {@link EnvironmentAware} here to ensure that Mybatis doesn't
-  // start scanning for mappers too early.
-  private Environment environment;
+public class HistoryDataSourceConfig {
 
   @Autowired
   private HistoryProperties properties;
@@ -59,7 +55,7 @@ public class HistoryDataSourceConfig implements EnvironmentAware {
   }
 
   @Bean
-  public SqlSessionFactoryBean historySqlSessionFactory(DataSource historyDataSource) throws Exception {
+  public static SqlSessionFactoryBean historySqlSessionFactory(DataSource historyDataSource) throws Exception {
     SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
     sessionFactory.setDataSource(historyDataSource);
     sessionFactory.setTypeHandlersPackage("cern.c2mon.server.history.mapper");
@@ -75,10 +71,5 @@ public class HistoryDataSourceConfig implements EnvironmentAware {
 
     sessionFactory.setDatabaseIdProvider(databaseIdProvider);
     return sessionFactory;
-  }
-
-  @Override
-  public void setEnvironment(Environment environment) {
-    this.environment = environment;
   }
 }
