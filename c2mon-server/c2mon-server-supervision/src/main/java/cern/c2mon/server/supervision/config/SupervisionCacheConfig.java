@@ -1,6 +1,7 @@
 package cern.c2mon.server.supervision.config;
 
 import cern.c2mon.server.cache.common.DefaultCacheImpl;
+import cern.c2mon.server.cache.config.CacheProperties;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,9 @@ import org.springframework.context.annotation.Configuration;
 public class SupervisionCacheConfig {
 
   @Autowired
+  private CacheProperties properties;
+
+  @Autowired
   private CacheManager cacheManager;
 
   @Bean
@@ -27,7 +31,7 @@ public class SupervisionCacheConfig {
 
   @Bean
   public DefaultCacheImpl processEventCache(Ehcache processEventEhcache) {
-    return new DefaultCacheImpl(processEventEhcache);
+    return new DefaultCacheImpl(processEventEhcache, properties);
   }
 
   @Bean
@@ -40,7 +44,7 @@ public class SupervisionCacheConfig {
 
   @Bean
   public DefaultCacheImpl equipmentEventCache(Ehcache equipmentEventEhcache) {
-    return new DefaultCacheImpl(equipmentEventEhcache);
+    return new DefaultCacheImpl(equipmentEventEhcache, properties);
   }
 
   @Bean
@@ -53,6 +57,6 @@ public class SupervisionCacheConfig {
 
   @Bean
   public DefaultCacheImpl subEquipmentEventCache(Ehcache subEquipmentEventEhcache) {
-    return new DefaultCacheImpl(subEquipmentEventEhcache);
+    return new DefaultCacheImpl(subEquipmentEventEhcache, properties);
   }
 }

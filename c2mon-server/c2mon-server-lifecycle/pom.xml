@@ -21,11 +21,7 @@
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-daqcommunication-in</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-daqcommunication-out</artifactId>
+      <artifactId>c2mon-server-daq</artifactId>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
@@ -92,10 +88,6 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-validator</artifactId>
     </dependency>
     <dependency>
       <groupId>org.aspectj</groupId>

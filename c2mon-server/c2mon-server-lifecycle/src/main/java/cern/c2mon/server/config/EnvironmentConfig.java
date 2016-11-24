@@ -7,13 +7,14 @@ import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.cachepersistence.config.CachePersistenceModule;
 import cern.c2mon.server.client.config.ClientModule;
 import cern.c2mon.server.command.config.CommandModule;
+import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
-import cern.c2mon.server.daqcommunication.in.config.DaqCommunicationInModule;
-import cern.c2mon.server.daqcommunication.out.config.DaqCommunicationOutModule;
+import cern.c2mon.server.daq.config.DaqModule;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchModule;
 import cern.c2mon.server.history.config.HistoryModule;
 import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.DefaultLifecycleProcessor;
 
@@ -31,8 +32,7 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
     CacheLoadingModule.class,
     CachePersistenceModule.class,
     SupervisionModule.class,
-    DaqCommunicationInModule.class,
-    DaqCommunicationOutModule.class,
+    DaqModule.class,
     RuleModule.class,
     ConfigurationModule.class,
     ElasticsearchModule.class,
@@ -41,8 +41,9 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
     AlarmModule.class,
     CommandModule.class
 })
+@EnableConfigurationProperties(ServerProperties.class)
 @PropertySources({
-    @PropertySource("classpath:c2mon-server-default.properties"),
+//    @PropertySource("classpath:c2mon-server-default.properties"),
     @PropertySource(value = "${c2mon.server.properties}", ignoreResourceNotFound = true)
 })
 public class EnvironmentConfig {

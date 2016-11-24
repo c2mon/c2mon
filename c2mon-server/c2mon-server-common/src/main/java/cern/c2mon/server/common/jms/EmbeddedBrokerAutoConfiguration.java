@@ -1,11 +1,11 @@
 package cern.c2mon.server.common.jms;
 
+import cern.c2mon.server.common.config.ServerProperties;
 import org.apache.activemq.broker.BrokerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 
 /**
  * @author Justin Lewis Salmon
@@ -15,7 +15,7 @@ import org.springframework.core.env.Environment;
 public class EmbeddedBrokerAutoConfiguration {
 
   @Autowired
-  private Environment environment;
+  private ServerProperties properties;
 
   @Bean(initMethod = "start", destroyMethod = "stop")
   public BrokerService brokerService() throws Exception {
@@ -23,7 +23,7 @@ public class EmbeddedBrokerAutoConfiguration {
     brokerService.setPersistent(false);
     brokerService.setUseShutdownHook(false);
     brokerService.setUseJmx(false);
-    brokerService.addConnector(environment.getRequiredProperty("c2mon.server.jms.url"));
+    brokerService.addConnector(properties.getJms().getUrl());
     return brokerService;
   }
 }

@@ -20,7 +20,6 @@ import cern.c2mon.server.alarm.config.AlarmModule;
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.config.CacheModule;
-import cern.c2mon.server.cache.config.CacheProperties;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.client.config.ClientModule;
 import cern.c2mon.server.client.junit.ClientCachePopulationRule;
@@ -28,13 +27,11 @@ import cern.c2mon.server.command.config.CommandModule;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
-import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
-import cern.c2mon.server.daqcommunication.in.config.DaqCommunicationInModule;
-import cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl;
-import cern.c2mon.server.daqcommunication.out.config.DaqCommunicationOutModule;
+import cern.c2mon.server.daq.config.DaqModule;
+import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
 import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.server.test.CacheObjectCreation;
@@ -51,11 +48,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.jms.ConnectionFactory;
@@ -80,8 +74,7 @@ import static org.junit.Assert.*;
     CacheDbAccessModule.class,
     SupervisionModule.class,
     ConfigurationModule.class,
-    DaqCommunicationInModule.class,
-    DaqCommunicationOutModule.class,
+    DaqModule.class,
     RuleModule.class,
     ClientModule.class,
     AlarmModule.class,

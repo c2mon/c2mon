@@ -28,9 +28,8 @@ import cern.c2mon.server.configuration.handler.impl.ProcessConfigHandlerImpl;
 import cern.c2mon.server.configuration.handler.transacted.ProcessConfigTransacted;
 import cern.c2mon.server.configuration.junit.ConfigurationCachePopulationRule;
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
-import cern.c2mon.server.daqcommunication.in.config.DaqCommunicationInModule;
-import cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl;
-import cern.c2mon.server.daqcommunication.out.config.DaqCommunicationOutModule;
+import cern.c2mon.server.daq.config.DaqModule;
+import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
 import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
@@ -44,7 +43,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -66,8 +64,7 @@ import static org.junit.Assert.*;
     CacheLoadingModule.class,
     SupervisionModule.class,
     ConfigurationModule.class,
-    DaqCommunicationInModule.class,
-    DaqCommunicationOutModule.class,
+    DaqModule.class,
     RuleModule.class,
     ProcessCommunicationManagerMock.class
 })

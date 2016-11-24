@@ -1,5 +1,6 @@
 package cern.c2mon.server.test.config;
 
+import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.jms.EmbeddedBrokerAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @ComponentScan("cern.c2mon.server.test")
 @Import({
+    ServerProperties.class,
     EmbeddedBrokerAutoConfiguration.class
 })
 public class TestConfig {}

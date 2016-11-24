@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import cern.c2mon.server.daq.out.ProcessCommunicationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,6 @@ import cern.c2mon.server.cache.CommandTagCache;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.command.CommandExecutionManager;
 import cern.c2mon.server.command.CommandPersistenceListener;
-import cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager;
 import cern.c2mon.shared.client.command.CommandExecuteRequest;
 import cern.c2mon.shared.client.command.CommandExecutionStatus;
 import cern.c2mon.shared.client.command.CommandReport;
@@ -44,7 +44,7 @@ import cern.c2mon.shared.common.command.CommandTag;
 
 /**
  * Implementation of the CommandExecutionManager for TIM.
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -55,31 +55,31 @@ public class CommandExecutionManagerImpl implements CommandExecutionManager {
    * Private class logger.
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutionManagerImpl.class);
-  
+
   /**
    * Reference to the bean for sending to the DAQ layer.
    */
   private ProcessCommunicationManager processCommunicationManager;
-  
+
   /**
    * Reference to the CommandTag cache.
    */
   private CommandTagCache commandTagCache;
-  
+
   /**
    * Reference to a listener responsible for persisting the command
    * tags to the DB. Must be registered using the provided
    * registration method (<code>registerAsPersistenceListener()</code>).
    */
-  private CommandPersistenceListener commandPersistenceListener;  
-  
+  private CommandPersistenceListener commandPersistenceListener;
+
   /**
    * Autowired constructor.
    * @param processCommunicationManager the singleton ProcessCommunicationManager
    * @param commandTagCache the singleton Command cache
-   */    
+   */
   @Autowired
-  public CommandExecutionManagerImpl(final ProcessCommunicationManager processCommunicationManager, 
+  public CommandExecutionManagerImpl(final ProcessCommunicationManager processCommunicationManager,
                                      final CommandTagCache commandTagCache) {
     super();
     this.processCommunicationManager = processCommunicationManager;
@@ -95,10 +95,10 @@ public class CommandExecutionManagerImpl implements CommandExecutionManager {
       LOGGER.error(message);
       throw new NullPointerException(message);
     }
-    
-    // TODO add RBAC check once token is passed with JMS call      
 
-    /* Try to execute the command */       
+    // TODO add RBAC check once token is passed with JMS call
+
+    /* Try to execute the command */
     try {
       CommandTag<T> commandTag = commandTagCache.getCopy(request.getId());
       CommandExecutionDetails<T> details = new CommandExecutionDetails<T>();
@@ -113,47 +113,47 @@ public class CommandExecutionManagerImpl implements CommandExecutionManager {
       if (commandPersistenceListener != null) {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("execute() : logging command tag.");
-        }            
+        }
         try {
-          commandPersistenceListener.log(commandTag, report);                
+          commandPersistenceListener.log(commandTag, report);
         } catch (Exception e) {
-          LOGGER.error("Error while logging commands to DB", e);          
-        }        
+          LOGGER.error("Error while logging commands to DB", e);
+        }
       }
 
     } catch (CacheElementNotFoundException cacheEx) {
       LOGGER.error("Unable to locate CommandTag with id " + request.getId() + " in the cache.", cacheEx);
-      report = new CommandReportImpl(request.getId(), 
-                                  CommandExecutionStatus.STATUS_EXECUTION_FAILED, 
+      report = new CommandReportImpl(request.getId(),
+                                  CommandExecutionStatus.STATUS_EXECUTION_FAILED,
                                    "Unable to locate the Command tag in the server cache.");
     } catch (Exception e) {
       LOGGER.error("Exception caught while executing command", e);
-      report = new CommandReportImpl(request.getId(), 
-                                  CommandExecutionStatus.STATUS_EXECUTION_FAILED, 
+      report = new CommandReportImpl(request.getId(),
+                                  CommandExecutionStatus.STATUS_EXECUTION_FAILED,
                                    e.getMessage());
     }
-        
-//TODO re-enable once RBAC check is done on server        
+
+//TODO re-enable once RBAC check is done on server
 //      } else {
 //        if (LOGGER.isDebugEnabled()) {
 //          LOGGER.debug("execute() : not authorized.");
 //        }
-//        report = 
-//            new CommandReport(handle.getId(), 
-//                              CommandReport.STATUS_AUTHORISATION_FAILED, 
+//        report =
+//            new CommandReport(handle.getId(),
+//                              CommandReport.STATUS_AUTHORISATION_FAILED,
 //                              "This CommandTagHandle has not been authorised by the server");
-//      }      
-     
+//      }
+
     return report;
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> Collection<CommandTagHandle<T>> processRequest(final Collection<Long> commandIds) {     
-    //String hostname = request.getHostName();    
+  public <T> Collection<CommandTagHandle<T>> processRequest(final Collection<Long> commandIds) {
+    //String hostname = request.getHostName();
     CommandTag<T> commandTagCopy = null;
     Collection<CommandTagHandle<T>> commandTagHandles = new ArrayList<CommandTagHandle<T>>();
-    
+
     if (commandIds.isEmpty()) {
       LOGGER.warn("processRequest(Collection<Long> commandIds) method called with an empty collection argument - returning empty result");
       return commandTagHandles;
@@ -183,9 +183,9 @@ public class CommandExecutionManagerImpl implements CommandExecutionManager {
         } catch (CacheElementNotFoundException cacheEx) {
           /* The specified CommandTag is not defined in the system. */
           commandTagHandles.add(new CommandTagHandleImpl<T>(id, null));
-          LOGGER.warn("Unable to locate requested command in the cache (Id is " + id + ") - will not be returned to client. ", cacheEx);      
+          LOGGER.warn("Unable to locate requested command in the cache (Id is " + id + ") - will not be returned to client. ", cacheEx);
         }
-      }      
+      }
     }
     return commandTagHandles;
   }
@@ -195,7 +195,7 @@ public class CommandExecutionManagerImpl implements CommandExecutionManager {
     if (commandPersistenceListener == null) {
       throw new NullPointerException("Attempt at registering a null CommandPersistenceListener with the CommandExecutionManager.");
     }
-    this.commandPersistenceListener = commandPersistenceListener;    
+    this.commandPersistenceListener = commandPersistenceListener;
   }
 
 }

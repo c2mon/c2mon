@@ -42,11 +42,10 @@ import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
 import cern.c2mon.server.configuration.junit.ConfigurationCachePopulationRule;
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
 import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
-import cern.c2mon.server.daqcommunication.in.JmsContainerManager;
-import cern.c2mon.server.daqcommunication.in.config.DaqCommunicationInModule;
-import cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl;
-import cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager;
-import cern.c2mon.server.daqcommunication.out.config.DaqCommunicationOutModule;
+import cern.c2mon.server.daq.JmsContainerManager;
+import cern.c2mon.server.daq.config.DaqModule;
+import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
+import cern.c2mon.server.daq.out.ProcessCommunicationManager;
 import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
@@ -76,7 +75,6 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -92,7 +90,7 @@ import static org.junit.Assert.*;
 
 /**
  * Component/integration tests of the configuration module (integrates the cache
- * modules, but mocks the daqcommunication-out module).
+ * modules, but mocks the daq module).
  *
  * @author Mark Brightwell
  */
@@ -103,8 +101,7 @@ import static org.junit.Assert.*;
     CacheLoadingModule.class,
     SupervisionModule.class,
     ConfigurationModule.class,
-    DaqCommunicationInModule.class,
-    DaqCommunicationOutModule.class,
+    DaqModule.class,
     RuleModule.class,
     ProcessCommunicationManagerMock.class
 })

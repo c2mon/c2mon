@@ -23,8 +23,7 @@
     <module>c2mon-server-command</module>
     <module>c2mon-server-common</module>
     <module>c2mon-server-configuration</module>
-    <module>c2mon-server-daqcommunication-in</module>
-    <module>c2mon-server-daqcommunication-out</module>
+    <module>c2mon-server-daq</module>
     <module>c2mon-server-elasticsearch</module>
     <module>c2mon-server-lifecycle</module>
     <module>c2mon-server-rule</module>
@@ -91,12 +90,7 @@
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
-        <artifactId>c2mon-server-daqcommunication-in</artifactId>
-        <version>${project.parent.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>cern.c2mon.server</groupId>
-        <artifactId>c2mon-server-daqcommunication-out</artifactId>
+        <artifactId>c2mon-server-daq</artifactId>
         <version>${project.parent.version}</version>
       </dependency>
       <dependency>

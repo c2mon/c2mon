@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-daqcommunication-out</artifactId>
+      <artifactId>c2mon-server-daq</artifactId>
     </dependency>
 
     <!-- 3rd party dependencies -->

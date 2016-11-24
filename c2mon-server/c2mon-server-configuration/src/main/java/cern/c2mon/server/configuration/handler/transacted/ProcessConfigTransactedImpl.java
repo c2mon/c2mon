@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -38,11 +38,10 @@ import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.c2mon.server.daqcommunication.in.JmsContainerManager;
+import cern.c2mon.server.daq.JmsContainerManager;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.common.ConfigurationException;
-import cern.c2mon.shared.daq.config.Change;
 
 /**
  * See interface docs.
@@ -72,7 +71,7 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
    * Reference to DAO.
    */
   private final ProcessDAO processDAO;
-  
+
   private final ControlTagCache controlCache;
 
   /**
@@ -114,9 +113,9 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
       Process process = (Process) processFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
       processDAO.insert(process);
       processCache.putQuiet(process);
-      
+
       updateControlTagInformation(element, process);
-      
+
       return new ProcessChange(process.getId());
     } finally {
       processCache.releaseWriteLockOnKey(element.getEntityId());
@@ -141,7 +140,7 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
     processCache.acquireWriteLockOnKey(id);
     try {
       Process processCopy = processCache.getCopy(id);
-  
+
       processFacade.updateConfig(processCopy, properties);
       processDAO.updateConfig(processCopy);
       processCache.put(id, processCopy);
@@ -175,37 +174,37 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
       throw new UnexpectedRollbackException("Unable to remove equipment reference in process.", e);
     }
   }
-  
+
   /**
    * Ensures that the Alive-, Status- and CommFault Tags have appropriately the Process id set.
    * @param process The equipment to which the control tags are assigned
    */
   private List<ProcessChange> updateControlTagInformation(final ConfigurationElement element, final Process process) {
-      
+
       List<ProcessChange> changes = new ArrayList<ProcessChange>(3);
       Long processId = process.getId();
-      
+
       ControlTag aliveTagCopy = controlCache.getCopy(process.getAliveTagId());
       if (aliveTagCopy != null) {
         setProcessId((ControlTagCacheObject) aliveTagCopy, processId);
       } else {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
             String.format("No Alive tag (%s) found for process #%d (%s).", process.getAliveTagId(), process.getId(), process.getName()));
       }
-      
+
       ControlTag statusTagCopy = controlCache.getCopy(process.getStateTagId());
       if (statusTagCopy != null) {
         setProcessId((ControlTagCacheObject) statusTagCopy, processId);
       } else {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, 
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
             String.format("No Status tag (%s) found for process #%d (%s).", process.getStateTagId(), process.getId(), process.getName()));
       }
-      
+
       return changes;
   }
-  
+
   private void setProcessId(ControlTagCacheObject copy, Long processId) {
-    String logMsg = String.format("Adding process id #%s to control tag #%s", processId, copy.getId()); 
+    String logMsg = String.format("Adding process id #%s to control tag #%s", processId, copy.getId());
     LOGGER.trace(logMsg);
     copy.setProcessId(processId);
     controlCache.putQuiet(copy);

@@ -1,6 +1,6 @@
 package cern.c2mon.server.configuration.config;
 
-import cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager;
+import cern.c2mon.server.daq.out.ProcessCommunicationManager;
 import org.easymock.EasyMock;
 import org.springframework.context.annotation.Bean;
 

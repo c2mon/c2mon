@@ -27,7 +27,7 @@ import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.command.config.CommandModule;
-import cern.c2mon.server.daqcommunication.out.config.DaqCommunicationOutModule;
+import cern.c2mon.server.daq.config.DaqModule;
 import cern.c2mon.server.history.config.HistoryModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.shared.client.command.CommandRecord;
@@ -62,7 +62,7 @@ import cern.c2mon.shared.common.command.CommandTag;
     CacheLoadingModule.class,
     SupervisionModule.class,
     CommandModule.class,
-    DaqCommunicationOutModule.class,
+    DaqModule.class,
     HistoryModule.class
 })
 @TestPropertySource("classpath:c2mon-server-default.properties")
