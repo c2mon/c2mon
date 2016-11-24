@@ -12,7 +12,7 @@ See the current [reference docs][].
 Please report issues on GitLab via the [issue tracker][].
 
 ## Milestone planning
-[Find here][] the complete list of all existing version milestones.
+[Find here][] the complete list of all existing version milestones including release notes.
 
 ## Building from Source
 C2MON uses a [Maven][]-based build system. In the instructions
