@@ -62,9 +62,9 @@ public class CommandTagCacheImpl extends AbstractCache<Long, CommandTag> impleme
 
   @PostConstruct
   public void init() {
-    log.info("Initializing the CommandTag cache...");
+    log.debug("Initializing the CommandTag cache...");
     commonInit();
-    log.info("... CommandTag cache initialization complete.");
+    log.info("CommandTag cache initialization complete");
   }
 
   @Override

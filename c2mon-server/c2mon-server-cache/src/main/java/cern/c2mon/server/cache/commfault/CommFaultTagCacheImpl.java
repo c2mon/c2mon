@@ -59,9 +59,9 @@ public class CommFaultTagCacheImpl extends AbstractCache<Long, CommFaultTag> imp
 
   @PostConstruct
   public void init() {
-    log.info("Initializing the CommFaultTag cache...");
+    log.debug("Initializing the CommFaultTag cache...");
     commonInit();
-    log.info("... CommFaultTag cache initialization complete.");
+    log.info("CommFaultTag cache initialization complete");
   }
 
   @Override

@@ -66,9 +66,9 @@ public class ControlTagCacheImpl extends AbstractTagCache<ControlTag> implements
    */
   @PostConstruct
   public void init() {
-    log.info("Initializing ControlTag cache...");
+    log.debug("Initializing ControlTag cache...");
     commonInit();
-    log.info("... ControlTag cache initialization complete.");
+    log.info("ControlTag cache initialization complete");
   }
 
   @Override

@@ -89,7 +89,7 @@ public class RuleTagPostLoaderProcessor {
         isRuleCachePostProcessed = (Boolean) clusterCache.getCopy(ruleCachePostProcessedKey);
       }
       if (!isRuleCachePostProcessed.booleanValue()) {
-        LOGGER.info("Setting parent ids for rules...");
+        LOGGER.debug("Setting parent ids for rules...");
 
         initializeThreadPool();
 
@@ -111,10 +111,10 @@ public class RuleTagPostLoaderProcessor {
         } catch (InterruptedException e) {
           LOGGER.warn("Exception caught while waiting for rule parent id loading threads to complete (waited longer then timeout?): ", e);
         }
-        LOGGER.info("... rule parent ids set.");
+        LOGGER.debug("Rule parent ids set.");
         clusterCache.put(ruleCachePostProcessedKey, Boolean.TRUE);
       } else {
-        LOGGER.info("Cache " + RuleTagCache.cacheInitializedKey + " was already initialized. No need for action..");
+        LOGGER.info("Cache " + RuleTagCache.cacheInitializedKey + " was already initialized");
       }
     } finally {
       clusterCache.releaseWriteLockOnKey(RuleTagCache.cacheInitializedKey);

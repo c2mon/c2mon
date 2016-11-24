@@ -76,10 +76,10 @@ public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> imp
    */
   @PostConstruct
   public void init() {
-    log.info("Initializing SubEquipment cache...");
+    log.debug("Initializing SubEquipment cache...");
     commonInit();
     doPostConfigurationOfSubEquipmentControlTags();
-    log.info("... SubEquipment cache initialization complete.");
+    log.info("SubEquipment cache initialization complete");
   }
 
   /**

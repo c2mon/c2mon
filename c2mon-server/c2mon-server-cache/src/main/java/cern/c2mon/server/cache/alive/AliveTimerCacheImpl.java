@@ -23,8 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -46,41 +44,41 @@ import cern.c2mon.server.common.config.C2monCacheName;
 @Service("aliveTimerCache")
 public class AliveTimerCacheImpl extends AbstractCache<Long, AliveTimer> implements AliveTimerCache {
 
-    @Autowired
-    public AliveTimerCacheImpl(final ClusterCache clusterCache,
-                               @Qualifier("aliveTimerEhcache") final Ehcache ehcache,
-                               @Qualifier("aliveTimerEhcacheLoader") final CacheLoader cacheLoader,
-                               @Qualifier("aliveTimerCacheLoader") final C2monCacheLoader c2monCacheLoader,
-                               @Qualifier("aliveTimerDAO") final SimpleCacheLoaderDAO<AliveTimer> cacheLoaderDAO,
-                               final CacheProperties properties) {
-        super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
-    }
+  @Autowired
+  public AliveTimerCacheImpl(final ClusterCache clusterCache,
+                             @Qualifier("aliveTimerEhcache") final Ehcache ehcache,
+                             @Qualifier("aliveTimerEhcacheLoader") final CacheLoader cacheLoader,
+                             @Qualifier("aliveTimerCacheLoader") final C2monCacheLoader c2monCacheLoader,
+                             @Qualifier("aliveTimerDAO") final SimpleCacheLoaderDAO<AliveTimer> cacheLoaderDAO,
+                             final CacheProperties properties) {
+    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
+  }
 
-    /**
-     * Init method called on bean creation. Calls the cache loading procedure (loading from DB).
-     */
-    @PostConstruct
-    public void init() {
-        log.debug("Initializing AliveTimer cache...");
+  /**
+   * Init method called on bean creation. Calls the cache loading procedure (loading from DB).
+   */
+  @PostConstruct
+  public void init() {
+    log.debug("Initializing AliveTimer cache...");
 
-        commonInit();
+    commonInit();
 
-        log.info("... AliveTimer cache initialization complete.");
-    }
+    log.info("AliveTimer cache initialization complete");
+  }
 
-    @Override
-    protected void doPostDbLoading(AliveTimer cacheObject) {
-        // do nothing
-    }
+  @Override
+  protected void doPostDbLoading(AliveTimer cacheObject) {
+    // do nothing
+  }
 
-    @Override
-    protected C2monCacheName getCacheName() {
-        return C2monCacheName.ALIVETIMER;
-    }
+  @Override
+  protected C2monCacheName getCacheName() {
+    return C2monCacheName.ALIVETIMER;
+  }
 
-    @Override
-    protected String getCacheInitializedKey() {
-      return cacheInitializedKey;
-    }
+  @Override
+  protected String getCacheInitializedKey() {
+    return cacheInitializedKey;
+  }
 
 }

@@ -73,9 +73,9 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
 
   @PostConstruct
   public void init() {
-    log.info("Initializing RuleTag cache...");
+    log.debug("Initializing RuleTag cache...");
     commonInit();
-    log.info("... RuleTag cache initialization complete.");
+    log.info("RuleTag cache initialization complete");
   }
 
   @Override

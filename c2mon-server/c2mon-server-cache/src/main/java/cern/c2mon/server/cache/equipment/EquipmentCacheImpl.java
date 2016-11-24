@@ -74,11 +74,11 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment>implements
    */
   @PostConstruct
   public void init() {
-    log.info("Initializing Equipment cache...");
+    log.debug("Initializing Equipment cache...");
     // common initialization (other than preload, which needs synch below)
     commonInit();
     doPostConfigurationOfEquipmentControlTags();
-    log.info("Equipment cache initialization complete.");
+    log.info("Equipment cache initialization complete");
   }
 
   /**

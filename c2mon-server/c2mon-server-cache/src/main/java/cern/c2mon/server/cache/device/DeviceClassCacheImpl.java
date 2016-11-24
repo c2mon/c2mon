@@ -68,9 +68,9 @@ public class DeviceClassCacheImpl extends AbstractCache<Long, DeviceClass> imple
    */
   @PostConstruct
   public void init() {
-    log.info("Initializing Device class cache...");
+    log.debug("Initializing Device class cache...");
     commonInit();
-    log.info("Device class cache initialization complete.");
+    log.info("Device class cache initialization complete");
   }
 
   @Override

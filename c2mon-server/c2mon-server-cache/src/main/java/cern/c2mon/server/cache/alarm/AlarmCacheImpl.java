@@ -71,12 +71,12 @@ public class AlarmCacheImpl extends AbstractCache<Long, Alarm> implements AlarmC
    */
   @PostConstruct
   public void init() {
-    log.info("Initializing Alarm cache...");
+    log.debug("Initializing Alarm cache...");
 
     //common initialization (other than preload, which needs synch below)
     commonInit();
 
-    log.info("... Alarm cache initialization complete.");
+    log.info("Alarm cache initialization complete");
   }
 
   @Override

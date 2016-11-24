@@ -82,10 +82,10 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process>implements Pro
    */
   @PostConstruct
   public void init() {
-    log.info("Initializing Process cache...");
+    log.debug("Initializing Process cache...");
     commonInit();
     doPostConfigurationOfProcessControlTags();
-    log.info("... Process cache initialization complete.");
+    log.info("Process cache initialization complete");
   }
 
   /**

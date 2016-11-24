@@ -64,9 +64,9 @@ public class DeviceCacheImpl extends AbstractCache<Long, Device> implements Devi
    */
   @PostConstruct
   public void init() {
-    log.info("Initializing Device cache...");
+    log.debug("Initializing Device cache...");
     commonInit();
-    log.info("Device cache initialization complete.");
+    log.info("Device cache initialization complete");
   }
 
   @Override

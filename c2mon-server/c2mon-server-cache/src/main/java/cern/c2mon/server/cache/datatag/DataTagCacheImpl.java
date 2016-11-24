@@ -70,7 +70,7 @@ public class DataTagCacheImpl extends AbstractTagCache<DataTag> implements DataT
    */
   @PostConstruct
   public void init() {
-    log.info("Initializing the DataTag cache...");
+    log.debug("Initializing the DataTag cache...");
 
     try {
       getCache().setNodeBulkLoadEnabled(true);
@@ -91,7 +91,7 @@ public class DataTagCacheImpl extends AbstractTagCache<DataTag> implements DataT
           + "normal behaviour in a single-server mode and can be ignored");
     }
 
-    log.info("... DataTag cache initialization complete.");
+    log.info("DataTag cache initialization complete");
   }
 
   @Override
