@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cachepersistence.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -45,13 +46,16 @@ public class CachePersistenceModule {
 
   private static final String THREAD_NAME_PREFIX = "BatchPersist-";
 
+  @Autowired
+  private CachePersistenceProperties properties;
+
   @Bean
-  public ThreadPoolTaskExecutor cachePersistenceThreadPoolTaskExecutor(Environment environment) {
+  public ThreadPoolTaskExecutor cachePersistenceThreadPoolTaskExecutor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-    executor.setCorePoolSize(environment.getRequiredProperty("c2mon.server.cachepersistence.batchpersistence.numExecutorThreads", Integer.class));
-    executor.setMaxPoolSize(environment.getRequiredProperty("c2mon.server.cachepersistence.batchpersistence.numExecutorThreads", Integer.class));
-    executor.setKeepAliveSeconds(environment.getRequiredProperty("c2mon.server.cachepersistence.batchpersistence.keepAliveSeconds", Integer.class));
-    executor.setQueueCapacity(environment.getRequiredProperty("c2mon.server.cachepersistence.batchpersistence.queueCapacity", Integer.class));
+    executor.setCorePoolSize(properties.getNumExecutorThreads());
+    executor.setMaxPoolSize(properties.getNumExecutorThreads());
+    executor.setKeepAliveSeconds(properties.getKeepAliveSeconds());
+    executor.setQueueCapacity(properties.getQueueCapacity());
     executor.setAllowCoreThreadTimeOut(true);
     executor.setThreadNamePrefix(THREAD_NAME_PREFIX);
     executor.initialize();

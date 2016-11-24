@@ -17,16 +17,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 /**
  * @author Justin Lewis Salmon
  */
-public class AlarmPersistenceConfig {
-
-  @Autowired
-  private Environment environment;
-
-  @Autowired
-  private ClusterCache clusterCache;
-
-  @Autowired
-  private ThreadPoolTaskExecutor cachePersistenceThreadPoolTaskExecutor;
+public class AlarmPersistenceConfig extends AbstractPersistenceConfig {
 
   @Autowired
   private AlarmMapper alarmMapper;
@@ -43,13 +34,13 @@ public class AlarmPersistenceConfig {
   public BatchPersistenceManager alarmPersistenceManager() {
     BatchPersistenceManagerImpl<Alarm> manager = new BatchPersistenceManagerImpl<>(alarmPersistenceDAO(), alarmCache,
         clusterCache, cachePersistenceThreadPoolTaskExecutor);
-    manager.setTimeoutPerBatch(environment.getRequiredProperty("c2mon.server.cachepersistence.timeoutPerBatch", Integer.class));
+    manager.setTimeoutPerBatch(properties.getTimeoutPerBatch());
     return manager;
   }
 
   @Bean
   public PersistenceSynchroListener alarmPersistenceSynchroListener() {
-    Integer pullFrequency = environment.getRequiredProperty("c2mon.server.cache.bufferedListenerPullFrequency", Integer.class);
+    Integer pullFrequency = cacheProperties.getBufferedListenerPullFrequency();
     return new PersistenceSynchroListener(alarmCache, alarmPersistenceManager(), pullFrequency);
   }
 }

@@ -1,6 +1,5 @@
 package cern.c2mon.server.cachepersistence.config;
 
-import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.dbaccess.EquipmentMapper;
 import cern.c2mon.server.cachepersistence.CachePersistenceDAO;
@@ -11,22 +10,11 @@ import cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener;
 import cern.c2mon.server.common.equipment.Equipment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * @author Justin Lewis Salmon
  */
-public class EquipmentPersistenceConfig {
-
-  @Autowired
-  private Environment environment;
-
-  @Autowired
-  private ClusterCache clusterCache;
-
-  @Autowired
-  private ThreadPoolTaskExecutor cachePersistenceThreadPoolTaskExecutor;
+public class EquipmentPersistenceConfig extends AbstractPersistenceConfig {
 
   @Autowired
   private EquipmentMapper equipmentMapper;
@@ -43,13 +31,13 @@ public class EquipmentPersistenceConfig {
   public BatchPersistenceManager equipmentPersistenceManager() {
     BatchPersistenceManagerImpl manager = new BatchPersistenceManagerImpl<>(equipmentPersistenceDAO(), equipmentCache,
         clusterCache, cachePersistenceThreadPoolTaskExecutor);
-    manager.setTimeoutPerBatch(environment.getRequiredProperty("c2mon.server.cachepersistence.timeoutPerBatch", Integer.class));
+    manager.setTimeoutPerBatch(properties.getTimeoutPerBatch());
     return manager;
   }
 
   @Bean
   public PersistenceSynchroListener equipmentPersistenceSynchroListener() {
-    Integer pullFrequency = environment.getRequiredProperty("c2mon.server.cache.bufferedListenerPullFrequency", Integer.class);
+    Integer pullFrequency = cacheProperties.getBufferedListenerPullFrequency();
     return new PersistenceSynchroListener(equipmentCache, equipmentPersistenceManager(), pullFrequency);
   }
 }

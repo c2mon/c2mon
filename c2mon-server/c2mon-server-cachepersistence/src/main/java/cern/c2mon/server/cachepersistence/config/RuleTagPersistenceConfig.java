@@ -1,6 +1,5 @@
 package cern.c2mon.server.cachepersistence.config;
 
-import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
 import cern.c2mon.server.cachepersistence.CachePersistenceDAO;
@@ -11,22 +10,11 @@ import cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener;
 import cern.c2mon.server.common.rule.RuleTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * @author Justin Lewis Salmon
  */
-public class RuleTagPersistenceConfig {
-
-  @Autowired
-  private Environment environment;
-
-  @Autowired
-  private ClusterCache clusterCache;
-
-  @Autowired
-  private ThreadPoolTaskExecutor cachePersistenceThreadPoolTaskExecutor;
+public class RuleTagPersistenceConfig extends AbstractPersistenceConfig {
 
   @Autowired
   private RuleTagMapper ruleTagMapper;
@@ -46,7 +34,7 @@ public class RuleTagPersistenceConfig {
 
   @Bean
   public PersistenceSynchroListener ruleTagPersistenceSynchroListener() {
-    Integer pullFrequency = environment.getRequiredProperty("c2mon.server.cache.bufferedListenerPullFrequency", Integer.class);
+    Integer pullFrequency = cacheProperties.getBufferedListenerPullFrequency();
     return new PersistenceSynchroListener(ruleTagCache, ruleTagPersistenceManager(), pullFrequency);
   }
 }

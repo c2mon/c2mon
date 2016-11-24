@@ -54,7 +54,6 @@ import static org.junit.Assert.assertNotNull;
     CachePersistenceModule.class,
     DatabasePopulationRule.class
 })
-@TestPropertySource("classpath:c2mon-server-default.properties")
 public class AlarmCachePersistenceTest {
 
   @Rule

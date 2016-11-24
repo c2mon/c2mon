@@ -1,6 +1,5 @@
 package cern.c2mon.server.cachepersistence.config;
 
-import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
 import cern.c2mon.server.cache.dbaccess.SubEquipmentMapper;
 import cern.c2mon.server.cachepersistence.CachePersistenceDAO;
@@ -11,22 +10,11 @@ import cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * @author Justin Lewis Salmon
  */
-public class SubEquipmentPersistenceConfig {
-
-  @Autowired
-  private Environment environment;
-
-  @Autowired
-  private ClusterCache clusterCache;
-
-  @Autowired
-  private ThreadPoolTaskExecutor cachePersistenceThreadPoolTaskExecutor;
+public class SubEquipmentPersistenceConfig extends AbstractPersistenceConfig {
 
   @Autowired
   private SubEquipmentMapper subEquipmentMapper;
@@ -43,13 +31,13 @@ public class SubEquipmentPersistenceConfig {
   public BatchPersistenceManager subEquipmentPersistenceManager() {
     BatchPersistenceManagerImpl manager = new BatchPersistenceManagerImpl<>(subEquipmentPersistenceDAO(), subEquipmentCache,
         clusterCache, cachePersistenceThreadPoolTaskExecutor);
-    manager.setTimeoutPerBatch(environment.getRequiredProperty("c2mon.server.cachepersistence.timeoutPerBatch", Integer.class));
+    manager.setTimeoutPerBatch(properties.getTimeoutPerBatch());
     return manager;
   }
 
   @Bean
   public PersistenceSynchroListener subEquipmentPersistenceSynchroListener() {
-    Integer pullFrequency = environment.getRequiredProperty("c2mon.server.cache.bufferedListenerPullFrequency", Integer.class);
+    Integer pullFrequency = cacheProperties.getBufferedListenerPullFrequency();
     return new PersistenceSynchroListener(subEquipmentCache, subEquipmentPersistenceManager(), pullFrequency);
   }
 }
