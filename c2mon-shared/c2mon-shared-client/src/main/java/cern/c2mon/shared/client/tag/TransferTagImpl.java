@@ -69,7 +69,7 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
    * <code>TransferTagValue</code> is published on change.
    */
   @NotNull
-  private final String topicName;
+  private String topicName;
 
   /** The unique name of the tag */
   @NotNull
@@ -264,5 +264,9 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
     if (aliveTag) {
       this.controlTag = true;
     }
+  }
+
+  public void setTopicName(String topicName) {
+    this.topicName = topicName;
   }
 }

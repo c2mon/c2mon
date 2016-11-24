@@ -21,7 +21,7 @@ public class CacheLoadingProperties {
    * Number of cache objects to be loaded in a single task. This results in
    * one DB query in single thread.
    */
-  private int batchSize;
+  private int batchSize = 1000;
 
   /**
    * Size of the loader task queue. This should be large enough to contain all
@@ -29,5 +29,5 @@ public class CacheLoadingProperties {
    * queueSize > #(cache id range) / batchSize (otherwise exceptions will be
    * thrown at startup)
    */
-  private int queueSize;
+  private int queueSize = 1000;
 }

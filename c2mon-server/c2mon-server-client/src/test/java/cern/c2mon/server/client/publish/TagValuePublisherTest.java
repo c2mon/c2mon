@@ -20,6 +20,7 @@ import cern.c2mon.server.alarm.config.AlarmModule;
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.config.CacheProperties;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.client.config.ClientModule;
 import cern.c2mon.server.client.junit.ClientCachePopulationRule;
@@ -27,6 +28,7 @@ import cern.c2mon.server.command.config.CommandModule;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
+import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
@@ -49,6 +51,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -85,7 +88,10 @@ import static org.junit.Assert.*;
     CommandModule.class,
     TestConfig.class
 })
-@TestPropertySource(value = "classpath:c2mon-server-default.properties")
+//@TestPropertySource( = "classpath:c2mon-server-default.properties")
+//@EnableConfigurationProperties({
+//    ServerProperties.class
+//})
 public class TagValuePublisherTest {
 
   @Rule

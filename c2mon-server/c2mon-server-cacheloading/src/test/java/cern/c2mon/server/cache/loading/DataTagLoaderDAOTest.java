@@ -39,11 +39,6 @@ import static org.junit.Assert.*;
     CacheLoadingModule.class,
     DatabasePopulationRule.class
 })
-@TestPropertySource(properties = {
-    // TODO: remove these
-    "c2mon.server.client.jms.topic.tag.trunk=c2mon.client.tag",
-    "c2mon.server.client.jms.topic.controltag=c2mon.client.controltag"
-})
 public class DataTagLoaderDAOTest {
 
   @Rule
@@ -66,7 +61,6 @@ public class DataTagLoaderDAOTest {
   public void testGetItemDoPostDbLoading() {
     DataTag tag = dataTagLoaderDAO.getItem(200010L);
     assertNotNull(tag);
-    assertTopicSetCorrectly(tag);
   }
 
   @Test
@@ -75,16 +69,4 @@ public class DataTagLoaderDAOTest {
     assertTrue(dataTagLoaderDAO.getBatchAsMap(1L, 10L).size() == 10);
     assertTrue(dataTagLoaderDAO.getBatchAsMap(11L, 16L).size() == 6);
   }
-
-  @Test
-  public void testGetBatchDoPostDbLoading() {
-    for (Map.Entry<Object, DataTag> entry : dataTagLoaderDAO.getBatchAsMap(0L, 500000L).entrySet()) {
-      assertTopicSetCorrectly(entry.getValue());
-    }
-  }
-
-  private void assertTopicSetCorrectly(DataTag tag) {
-    assertEquals("c2mon.client.tag" + "." + tag.getProcessId(), tag.getTopic());
-  }
-
 }

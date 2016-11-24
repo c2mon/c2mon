@@ -67,12 +67,6 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
   private static final Logger LOGGER = LoggerFactory.getLogger(RuleTagFacadeImpl.class);
 
   /**
-   * Property that will by used as trunk. Should
-   * always be overriden by server default property.
-   */
-  private String tagPublicationTrunk = "c2mon.client.tag.default";
-
-  /**
    * Reference to the low level Rule Facade bean.
    */
   private RuleTagCacheObjectFacade ruleTagCacheObjectFacade;
@@ -96,14 +90,10 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
                            final RuleTagCacheObjectFacade ruleTagCacheObjectFacade,
                            final AlarmFacade alarmFacade,
                            final AlarmCache alarmCache,
-                           final DataTagCache dataTagCache,
-                           final Environment environment) {
+                           final DataTagCache dataTagCache) {
     super(ruleTagCache, alarmFacade, alarmCache);
     this.ruleTagCacheObjectFacade = ruleTagCacheObjectFacade;
     this.dataTagCache = dataTagCache;
-
-    // TODO: remove this...
-    this.tagPublicationTrunk = environment.getRequiredProperty("c2mon.server.client.jms.topic.tag.trunk");
   }
 
   @Override
@@ -204,8 +194,7 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
       ((RuleTagCacheObject) ruleTag).setRuleText(tmpStr); //also sets rule expression
       setParentSupervisionIds(ruleTag);
     }
-    //topic is set from property
-    ruleTag.setTopic(tagPublicationTrunk + "." + ruleTag.getLowestProcessId());
+
     return null;
   }
 

@@ -42,7 +42,6 @@ public abstract class CompareClientRequestResult {
     assertEquals(valueClient.getServerTimestamp(), valueServer.getCacheTimestamp());
     assertEquals(valueClient.getDescription(), valueServer.getDescription());
     assertEquals(valueClient.getName(), valueServer.getName());
-    assertEquals(valueClient.getTopicName(), valueServer.getTopic());
     assertEquals(valueClient.getMetadata(), valueServer.getMetadata().getMetadata());
   }
 

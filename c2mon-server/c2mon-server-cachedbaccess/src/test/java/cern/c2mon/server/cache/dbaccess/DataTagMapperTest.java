@@ -206,7 +206,6 @@ public class DataTagMapperTest extends AbstractMapperTest {
     cacheObject.setDescription("test description");
     cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
     cacheObject.setDataType("Boolean"); // non null
-    cacheObject.setTopic("c2mon.tag." + 50);
     cacheObject.setLogged(false); //null allowed
     cacheObject.setUnit("test unit m/sec");
     cacheObject.setDipAddress("testDIPaddress");
@@ -238,7 +237,6 @@ public class DataTagMapperTest extends AbstractMapperTest {
     assertEquals(cacheObject.getDescription(), retrievedObject.getDescription());
     assertEquals(cacheObject.getMode(), retrievedObject.getMode());
     assertEquals(cacheObject.getDataType(), retrievedObject.getDataType());
-    assertEquals("c2mon.tag.default.publication", retrievedObject.getTopic()); //at loading, should be set to default
     assertEquals(cacheObject.isLogged(), retrievedObject.isLogged());
     assertEquals(cacheObject.getUnit(), retrievedObject.getUnit());
     assertEquals(cacheObject.getDipAddress(), retrievedObject.getDipAddress());
@@ -286,7 +284,6 @@ public class DataTagMapperTest extends AbstractMapperTest {
     cacheObject.setDescription("test description");
     cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
     cacheObject.setDataType("Boolean"); // non null
-    cacheObject.setTopic("c2mon.tag." + 50);
     cacheObject.setLogged(false); //null allowed
     cacheObject.setUnit("test unit m/sec");
     cacheObject.setDipAddress("testDIPaddress");
@@ -319,7 +316,6 @@ public class DataTagMapperTest extends AbstractMapperTest {
     assertEquals(cacheObject.getDescription(), retrievedObject.getDescription());
     assertEquals(cacheObject.getMode(), retrievedObject.getMode());
     assertEquals(cacheObject.getDataType(), retrievedObject.getDataType());
-    assertEquals("c2mon.tag.default.publication", retrievedObject.getTopic()); //at loading, should be set to default
     assertEquals(cacheObject.isLogged(), retrievedObject.isLogged());
     assertEquals(cacheObject.getUnit(), retrievedObject.getUnit());
     assertEquals(cacheObject.getDipAddress(), retrievedObject.getDipAddress());

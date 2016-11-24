@@ -66,12 +66,6 @@ public class DataTagFacadeImpl extends AbstractDataTagFacade<DataTag> implements
   private final DataTagCacheObjectFacade dataTagCacheObjectFacade;
 
   /**
-   * Property that will by used as trunk. Should
-   * always be overridden by server default property.
-   */
-  private String tagPublicationTrunk;
-
-  /**
    * Constructor.
    * @param dataTagCacheObjectFacade the object that acts directly on the cache object
    * @param dataTagCache the cache containing the DataTags
@@ -88,15 +82,11 @@ public class DataTagFacadeImpl extends AbstractDataTagFacade<DataTag> implements
                            final AlarmFacade alarmFacade,
                            final AlarmCache alarmCache,
                            final EquipmentFacade equipmentFacade,
-                           final SubEquipmentFacade subEquipmentFacade,
-                           final Environment environment) {
+                           final SubEquipmentFacade subEquipmentFacade) {
     super(dataTagCache, alarmFacade, alarmCache, dataTagCacheObjectFacade, dataTagCacheObjectFacade, qualityConverter);
     super.setEquipmentFacade(equipmentFacade);
     super.setSubEquipmentFacade(subEquipmentFacade);
     this.dataTagCacheObjectFacade = dataTagCacheObjectFacade;
-
-    // TODO: remove this...
-    this.tagPublicationTrunk = environment.getRequiredProperty("c2mon.server.client.jms.topic.tag.trunk");
   }
 
   /**
@@ -226,9 +216,6 @@ public class DataTagFacadeImpl extends AbstractDataTagFacade<DataTag> implements
   public DataTag createCacheObject(Long id, Properties properties) throws IllegalAccessException {
     DataTag dataTag = new DataTagCacheObject(id);
     configureCacheObject(dataTag, properties);
-
-    // topic is set from property
-    dataTag.setTopic(tagPublicationTrunk + "." + dataTag.getProcessId());
 
     validateConfig(dataTag);
     return dataTag;

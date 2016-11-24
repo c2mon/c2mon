@@ -38,15 +38,10 @@ public class DataTagLoaderDAOImpl extends AbstractBatchLoaderDAO<DataTag> implem
 
   private DataTagMapper dataTagMapper;
 
-  private String publicationTrunk;
-
   @Autowired
-  public DataTagLoaderDAOImpl(final DataTagMapper dataTagMapper, Environment environment) {
+  public DataTagLoaderDAOImpl(final DataTagMapper dataTagMapper) {
     super(dataTagMapper);
     this.dataTagMapper = dataTagMapper;
-
-    // TODO: fix this somehow (why do we need to do this anyway?)
-    this.publicationTrunk = environment.getRequiredProperty("c2mon.server.client.jms.topic.tag.trunk");
   }
 
   @Override
@@ -66,7 +61,6 @@ public class DataTagLoaderDAOImpl extends AbstractBatchLoaderDAO<DataTag> implem
 
   @Override
   protected DataTag doPostDbLoading(final DataTag item) {
-    item.setTopic(publicationTrunk + "." + item.getProcessId());
     return item;
   }
 }

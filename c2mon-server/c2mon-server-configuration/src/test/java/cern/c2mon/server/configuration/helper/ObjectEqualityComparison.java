@@ -88,7 +88,6 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getDescription(), object.getDescription());
     assertEquals(expectedObject.getMode(), object.getMode());
     assertEquals(expectedObject.getDataType(), object.getDataType());
-    assertEquals(expectedObject.getTopic(), object.getTopic());
     assertEquals(expectedObject.isLogged(), object.isLogged());
     assertEquals(expectedObject.getUnit(), object.getUnit());
     assertEquals(expectedObject.getDipAddress(), object.getDipAddress());

@@ -118,12 +118,6 @@ public interface Tag extends RuleInputValue, Cacheable {
    */
   Metadata getMetadata();
 
-  /**
-   * Name of the JMS topic on which the tag will be distributed to clients.
-   * @return the topic as a String
-   */
-  String getTopic();
-
   /** Returns the tag's value dictionary */
   DataTagValueDictionary getValueDictionary();
 
@@ -229,11 +223,5 @@ public interface Tag extends RuleInputValue, Cacheable {
    * @return true if needs logging
    */
   boolean isLogged();
-
-  /**
-   * Set the JMS topic on which this tag will be published
-   * @param topic topic name
-   */
-  void setTopic(String topic);
 
 }

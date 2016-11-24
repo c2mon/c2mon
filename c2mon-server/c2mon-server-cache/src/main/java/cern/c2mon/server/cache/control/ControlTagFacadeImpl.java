@@ -47,33 +47,20 @@ import cern.c2mon.shared.common.ConfigurationException;
 @Service
 public class ControlTagFacadeImpl extends AbstractDataTagFacade<ControlTag> implements ControlTagFacade {
 
-  /**
-   * Property that will by used as trunk. Should
-   * always be overriden by server default property.
-   */
-  private String controlTagPublicationTopic;
-
   @Autowired
   public ControlTagFacadeImpl(final DataTagCacheObjectFacade dataTagCacheObjectFacade,
                               final ControlTagCache controlTagCache,
                               final AlarmFacade alarmFacade,
                               final AlarmCache alarmCache,
                               final ControlTagCacheObjectFacade controlTagCacheObjectFacade,
-                              final QualityConverter qualityConverter,
-                              final Environment environment) {
+                              final QualityConverter qualityConverter) {
     super(controlTagCache, alarmFacade, alarmCache, controlTagCacheObjectFacade, dataTagCacheObjectFacade, qualityConverter);
-
-    // TODO: remove this...
-    this.controlTagPublicationTopic = environment.getRequiredProperty("c2mon.server.client.jms.topic.controltag");
   }
 
   @Override
   public ControlTagCacheObject createCacheObject(final Long id, final Properties properties) throws IllegalAccessException {
     ControlTagCacheObject controlTag = new ControlTagCacheObject(id);
     configureCacheObject(controlTag, properties);
-
-    //topic is set from property
-    controlTag.setTopic(controlTagPublicationTopic);
 
     validateConfig(controlTag);
     return controlTag;

@@ -81,7 +81,6 @@ public class ControlTagMapperTest extends AbstractMapperTest {
     assertEquals(cacheObject.getDescription(), retrievedObject.getDescription());
     assertEquals(cacheObject.getMode(), retrievedObject.getMode());
     assertEquals(cacheObject.getDataType(), retrievedObject.getDataType());
-    assertEquals("c2mon.tag.default.publication", retrievedObject.getTopic()); //should be set to default by mapper (later set by loader DAO)
     assertEquals(cacheObject.isLogged(), retrievedObject.isLogged());
     assertEquals(cacheObject.getUnit(), retrievedObject.getUnit());
     assertEquals(cacheObject.getDipAddress(), retrievedObject.getDipAddress());

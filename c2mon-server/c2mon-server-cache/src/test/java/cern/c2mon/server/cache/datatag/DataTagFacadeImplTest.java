@@ -75,15 +75,8 @@ public class DataTagFacadeImplTest {
     subEquipmentFacade = control.createMock(SubEquipmentFacade.class);
     dataTagCacheObjectFacade = new DataTagCacheObjectFacadeImpl();
     qualityConverter = new QualityConverterImpl();
-
-    // TODO: remove these
-    MockEnvironment environment = new MockEnvironment();
-    environment.setProperty("c2mon.server.client.jms.topic.tag.trunk", "c2mon.client.tag");
-    environment.setProperty("c2mon.server.client.jms.topic.controltag", "c2mon.client.controltag");
-    environment.setProperty("c2mon.server.daqcommunication.jms.queue.trunk", "c2mon.process");
-
     dataTagFacade = new DataTagFacadeImpl(dataTagCacheObjectFacade, dataTagCache, qualityConverter,
-        alarmFacade, alarmCache, equipmentFacade, subEquipmentFacade, environment);
+        alarmFacade, alarmCache, equipmentFacade, subEquipmentFacade);
   }
 
   /**
@@ -389,8 +382,6 @@ public class DataTagFacadeImplTest {
     EasyMock.replay(equipmentFacade);
 
     DataTag tag = dataTagFacade.createCacheObject(10L, properties);
-    //is default as not in Spring context
-    assertEquals("c2mon.client.tag." + tag.getProcessId(), tag.getTopic());
     EasyMock.verify(equipmentFacade);
   }
 
@@ -418,8 +409,6 @@ public class DataTagFacadeImplTest {
     EasyMock.replay(subEquipmentFacade);
 
     DataTag tag = dataTagFacade.createCacheObject(11L, properties);
-    //is default as not in Spring context
-    assertEquals("c2mon.client.tag." + tag.getProcessId(), tag.getTopic());
     EasyMock.verify(subEquipmentFacade);
   }
 

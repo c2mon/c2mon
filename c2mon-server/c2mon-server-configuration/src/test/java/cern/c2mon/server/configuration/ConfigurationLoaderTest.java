@@ -266,7 +266,6 @@ public class ConfigurationLoaderTest {
     expectedObject.setDescription("test");
     expectedObject.setMinValue(new Integer(12));
     expectedObject.setMaxValue(new Integer(22));
-    expectedObject.setTopic(controlTagPublicationTopic);
     expectedObject.setLogged(false); // null allowed
 
     expectedObject.setDataTagQuality(new DataTagQualityImpl());
@@ -405,7 +404,6 @@ public class ConfigurationLoaderTest {
     expectedObject.setDescription("test description config datatag");
     expectedObject.setMode(DataTagConstants.MODE_TEST); // non null
     expectedObject.setDataType("Float"); // non null
-    expectedObject.setTopic(tagPublicationTrunk + "." + 50L);
     expectedObject.setLogged(false); // null allowed
     expectedObject.setUnit("config unit m/sec");
     expectedObject.setDipAddress("testConfigDIPaddress");
@@ -520,7 +518,6 @@ public class ConfigurationLoaderTest {
     expectedObject.setUnit("config unit m/sec");
     expectedObject.setDipAddress("testConfigDIPaddress");
     expectedObject.setJapcAddress("testConfigJAPCaddress");
-    expectedObject.setTopic(tagPublicationTrunk + "." + 50L);
     expectedObject.setRuleText("(#5000000 < 0)|(#5000000 > 200)[1],true[0]");
     Set<Long> eqIds = new HashSet<Long>();
     eqIds.add(150L);
@@ -537,7 +534,6 @@ public class ConfigurationLoaderTest {
     expectedObject.setProcessIds(Collections.EMPTY_SET);
     expectedObject.setEquipmentIds(Collections.EMPTY_SET);
     expectedObject.getDataTagQuality().validate();
-    expectedObject.setTopic(tagPublicationTrunk + "." + 0L);
     report = configurationLoader.applyConfiguration(11);
     Thread.sleep(1000); // sleep 1s to allow for rule evaluation on separate
                         // thread

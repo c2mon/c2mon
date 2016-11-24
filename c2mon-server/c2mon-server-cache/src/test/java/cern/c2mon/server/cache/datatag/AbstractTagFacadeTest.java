@@ -43,13 +43,7 @@ public class AbstractTagFacadeTest {
 
   @Before
   public void init() {
-    // TODO: remove these
-    MockEnvironment environment = new MockEnvironment();
-    environment.setProperty("c2mon.server.client.jms.topic.tag.trunk", "c2mon.client.tag");
-    environment.setProperty("c2mon.server.client.jms.topic.controltag", "c2mon.client.controltag");
-    environment.setProperty("c2mon.server.daqcommunication.jms.queue.trunk", "c2mon.process");
-
-    ruleTagFacade = new RuleTagFacadeImpl(null, null, null, null, null, environment);
+    ruleTagFacade = new RuleTagFacadeImpl(null, null, null, null, null);
   }
 
   /**

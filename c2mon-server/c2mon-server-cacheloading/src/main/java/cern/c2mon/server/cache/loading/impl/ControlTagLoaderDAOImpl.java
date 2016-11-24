@@ -42,16 +42,11 @@ public class ControlTagLoaderDAOImpl extends AbstractDefaultLoaderDAO<ControlTag
 
   private DataTagMapper dataTagMapper;
 
-  private String publicationTopic;
-
   @Autowired
-  public ControlTagLoaderDAOImpl(ControlTagMapper controlTagMapper, DataTagMapper dataTagMapper, Environment environment) {
+  public ControlTagLoaderDAOImpl(ControlTagMapper controlTagMapper, DataTagMapper dataTagMapper) {
     super(10000, controlTagMapper);
     this.controlTagMapper = controlTagMapper;
     this.dataTagMapper = dataTagMapper;
-
-    // TODO: fix this somehow (why do we need to do this anyway?)
-    this.publicationTopic = environment.getRequiredProperty("c2mon.server.client.jms.topic.controltag");
   }
 
   @Override
@@ -71,7 +66,6 @@ public class ControlTagLoaderDAOImpl extends AbstractDefaultLoaderDAO<ControlTag
 
   @Override
   protected ControlTag doPostDbLoading(ControlTag item) {
-    item.setTopic(publicationTopic);
     return item;
   }
 }

@@ -51,28 +51,12 @@ public interface Process extends Supervised, Cacheable {
   Collection<Long> getEquipmentIds();
 
   /**
-   * Returns the name of the JMS command queue on which the Process (DAQ) is
-   * listening for commands during the current Process lifecycle.
-   *
-   * @return the command queue name as String
-   */
-  String getJmsDaqCommandQueue();
-
-  /**
    * Returns true if the DAQ requires a reboot to obtain the latest
    * configuration from the server.
    *
    * @return true if restart required
    */
   Boolean getRequiresReboot();
-
-  /**
-   * Sets the command queue on which this process will listen for server
-   * request.
-   *
-   * @param jmsDaqCommandQueue the command queue name
-   */
-  void setJmsDaqCommandQueue(String jmsDaqCommandQueue);
 
   /**
    * Returns the process PIK

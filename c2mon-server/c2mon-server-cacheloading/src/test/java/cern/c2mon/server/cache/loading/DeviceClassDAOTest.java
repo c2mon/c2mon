@@ -45,11 +45,6 @@ import cern.c2mon.server.common.device.DeviceClassCacheObject;
     CacheLoadingModule.class,
     DatabasePopulationRule.class
 })
-@TestPropertySource(properties = {
-    // TODO: remove these
-    "c2mon.server.client.jms.topic.tag.trunk=c2mon.client.tag",
-    "c2mon.server.client.jms.topic.controltag=c2mon.client.controltag"
-})
 public class DeviceClassDAOTest {
 
   @Rule

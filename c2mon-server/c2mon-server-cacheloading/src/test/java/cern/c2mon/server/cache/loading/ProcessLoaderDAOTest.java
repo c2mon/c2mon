@@ -44,11 +44,6 @@ import cern.c2mon.server.common.process.Process;
     CacheLoadingModule.class,
     DatabasePopulationRule.class
 })
-@TestPropertySource(properties = {
-    // TODO: remove these
-    "c2mon.server.client.jms.topic.tag.trunk=c2mon.client.tag",
-    "c2mon.server.client.jms.topic.controltag=c2mon.client.controltag"
-})
 public class ProcessLoaderDAOTest {
 
   @Rule
@@ -74,7 +69,6 @@ public class ProcessLoaderDAOTest {
   public void testGetItemDoPostDbLoading() {
     Process process = processDAO.getItem(51L);
     assertNotNull(process);
-    assertTopicSetCorrectly(process);
   }
 
   @Test
@@ -84,19 +78,7 @@ public class ProcessLoaderDAOTest {
   }
 
   @Test
-  public void testGetAllDoPostDbLoading() {
-    for (Map.Entry<Long, Process> entry : processDAO.getAllAsMap().entrySet()) {
-      assertTopicSetCorrectly(entry.getValue());
-    }
-  }
-
-  @Test
   public void testGetNumTags() {
     assertTrue(processDAO.getNumTags(50L).equals(6));
   }
-
-  private void assertTopicSetCorrectly(Process process) {
-    assertEquals(this.jmsDaqQueueTrunk + ".command." + process.getCurrentHost() + "." + process.getName() + "." + process.getProcessPIK(), process.getJmsDaqCommandQueue());
-  }
-
 }

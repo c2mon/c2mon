@@ -37,15 +37,10 @@ public class RuleTagLoaderDAOImpl extends AbstractBatchLoaderDAO<RuleTag> implem
 
   private RuleTagMapper ruleTagMapper;
 
-  private String publicationTrunk;
-
   @Autowired
-  public RuleTagLoaderDAOImpl(RuleTagMapper ruleTagMapper, Environment environment) {
+  public RuleTagLoaderDAOImpl(RuleTagMapper ruleTagMapper) {
     super(ruleTagMapper); //initial buffer size
     this.ruleTagMapper = ruleTagMapper;
-
-    // TODO: fix this somehow (why do we need to do this anyway?)
-    this.publicationTrunk = environment.getRequiredProperty("c2mon.server.client.jms.topic.tag.trunk");
   }
 
   @Override
@@ -65,7 +60,6 @@ public class RuleTagLoaderDAOImpl extends AbstractBatchLoaderDAO<RuleTag> implem
 
   @Override
   protected RuleTag doPostDbLoading(RuleTag item) {
-    item.setTopic(publicationTrunk + "." + item.getLowestProcessId());
     return item;
   }
 }

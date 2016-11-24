@@ -99,11 +99,6 @@ public interface Alarm extends Cacheable {
    * @return true if the alarm is currently active.
    */
   boolean isActive();
-  
-  /** 
-   * @return the JMS topic on which the alarm is to be distributed
-   */
-  String getTopic();
 
   Metadata getMetadata();
 

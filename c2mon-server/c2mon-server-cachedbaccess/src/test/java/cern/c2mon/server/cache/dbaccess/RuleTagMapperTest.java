@@ -77,8 +77,6 @@ public class RuleTagMapperTest extends AbstractMapperTest {
   @Test
   public void testInsertAndRetrieve() {
     RuleTagCacheObject ruleTag = CacheObjectCreation.createTestRuleTag();
-    //topic is set when process ids are set so is set to default here
-    ruleTag.setTopic("c2mon.tag.default.publication");
     ruleTagMapper.insertRuleTag(ruleTag);
     RuleTagCacheObject retrievedObject = (RuleTagCacheObject) ruleTagMapper.getItem(ruleTag.getId());
 
@@ -95,7 +93,6 @@ public class RuleTagMapperTest extends AbstractMapperTest {
     assertEquals(ruleTag.getDipAddress(), retrievedObject.getDipAddress());
     assertEquals(ruleTag.getJapcAddress(), retrievedObject.getJapcAddress());
     assertEquals(ruleTag.getValue(), retrievedObject.getValue());
-    assertEquals(ruleTag.getTopic(), retrievedObject.getTopic());
     assertEquals(ruleTag.getValueDescription(), retrievedObject.getValueDescription());
     assertEquals(ruleTag.isSimulated(), retrievedObject.isSimulated());
     assertEquals(ruleTag.getValueDictionary().toXML(), retrievedObject.getValueDictionary().toXML()); //compare XML of value dictionary

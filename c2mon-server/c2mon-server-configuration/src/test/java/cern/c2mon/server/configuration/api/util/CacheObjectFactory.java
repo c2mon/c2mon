@@ -199,7 +199,6 @@ public class CacheObjectFactory {
   public DataTagCacheObject buildDataTagCacheObject(Long id, DataTag configEquipment) {
     DataTagCacheObject expectedObject = new DataTagCacheObject(id);
     expectedObject = setCacheDataTagCacheObjectFields(expectedObject, configEquipment);
-    expectedObject.setTopic(tagPublicationTrunk + "." + 5);
     expectedObject.setProcessId(5L);
     expectedObject.setDataTagQuality(new DataTagQualityImpl());
 
@@ -269,7 +268,6 @@ public class CacheObjectFactory {
   public RuleTagCacheObject buildRuleTagCacheObject(Long id, RuleTag configEquipment) {
     RuleTagCacheObject expectedObject = new RuleTagCacheObject(id);
     expectedObject = setCacheRuleTagCacheObjectFields(expectedObject, configEquipment);
-    expectedObject.setTopic(tagPublicationTrunk + "." + 5);
 
     Set<Long> eqIds = new HashSet<>();
     eqIds.add(15L);

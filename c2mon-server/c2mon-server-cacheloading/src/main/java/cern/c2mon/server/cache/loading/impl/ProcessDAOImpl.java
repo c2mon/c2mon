@@ -73,14 +73,6 @@ public class ProcessDAOImpl extends AbstractDefaultLoaderDAO<Process> implements
 
   @Override
   protected Process doPostDbLoading(Process process) {
-    process.setJmsDaqCommandQueue(jmsDaqQueueTrunk + ".command." + process.getCurrentHost() + "." + process.getName() + "." + process.getProcessPIK());
-
-    if (process.getProcessPIK() != null) {
-      LOGGER.debug("doPostDbLoading - jmsDaqCommandQueue: " + process.getJmsDaqCommandQueue());
-    } else {
-      LOGGER.info("doPostDbLoading - Null PIK registered. Probably empty database info. Waiting to fill it up through the cache persistence");
-    }
-
     return process;
   }
 

@@ -69,14 +69,7 @@ public class ProcessFacadeImplTest {
     subEquipmentFacade = control.createMock(SubEquipmentFacade.class);
     aliveTimerFacade = control.createMock(AliveTimerFacade.class);
     aliveTimerCache = control.createMock(AliveTimerCache.class);
-
-    // TODO: remove these
-    MockEnvironment environment = new MockEnvironment();
-    environment.setProperty("c2mon.server.client.jms.topic.tag.trunk", "c2mon.client.tag");
-    environment.setProperty("c2mon.server.client.jms.topic.controltag", "c2mon.client.controltag");
-    environment.setProperty("c2mon.server.daqcommunication.jms.queue.trunk", "c2mon.process");
-
-    processFacade = new ProcessFacadeImpl(equipmentFacade, processCache, subEquipmentFacade, aliveTimerCache, aliveTimerFacade, environment);
+    processFacade = new ProcessFacadeImpl(equipmentFacade, processCache, subEquipmentFacade, aliveTimerCache, aliveTimerFacade);
   }
 
   @Test(expected=ConfigurationException.class)

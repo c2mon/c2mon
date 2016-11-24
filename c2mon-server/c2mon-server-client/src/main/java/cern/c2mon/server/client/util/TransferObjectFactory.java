@@ -60,10 +60,10 @@ public abstract class TransferObjectFactory {
    * Creates a <code>TransferTagImpl</code> object for the given parameters
    *
    * @param tagWithAlarms A tag from the cache
-   * @param Set           to <code>true</code>, if tag is an Alive tag
+   * @param aliveTag set to <code>true</code>, if tag is an Alive tag
    * @return The resulting <code>TransferTagImpl</code>
    */
-  public static TransferTagImpl createTransferTag(final TagWithAlarms tagWithAlarms, boolean aliveTag) {
+  public static TransferTagImpl createTransferTag(final TagWithAlarms tagWithAlarms, boolean aliveTag, String topic) {
     Tag tag = tagWithAlarms.getTag();
     TransferTagImpl transferTag = null;
     if (tag != null) {
@@ -79,7 +79,7 @@ public abstract class TransferObjectFactory {
               tag.getCacheTimestamp(),
               tag.getDescription(),
               tag.getName(),
-              tag.getTopic());
+              topic);
 
       String dataType = isKnownClass(tag.getDataType()) ? getType(tag.getDataType()).getName() : tag.getDataType();
       transferTag.setValueClassName(dataType);

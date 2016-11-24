@@ -64,8 +64,6 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
   /** PIK numbers limit (min) */
   private static final int PIK_MIN = 100000;
 
-  private String jmsDaqQueueTrunk;
-
   private EquipmentFacade equipmentFacade;
 
   private SubEquipmentFacade subEquipmentFacade;
@@ -79,16 +77,12 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
                            final ProcessCache processCache,
                            final SubEquipmentFacade subEquipmentFacade,
                            final AliveTimerCache aliveTimerCache,
-                           final AliveTimerFacade aliveTimerFacade,
-                           final Environment environment) {
+                           final AliveTimerFacade aliveTimerFacade) {
     super(processCache, aliveTimerCache, aliveTimerFacade);
     this.equipmentFacade = equipmentFacade;
     this.processCache = processCache;
     this.subEquipmentFacade = subEquipmentFacade;
     this.aliveTimerCache = aliveTimerCache;
-
-    // TODO: remove this...
-    this.jmsDaqQueueTrunk = environment.getRequiredProperty("c2mon.server.daqcommunication.jms.queue.trunk");
   }
 
   @Override
@@ -153,8 +147,6 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       }
     }
 
-    processCacheObject.setJmsDaqCommandQueue(jmsDaqQueueTrunk + ".command." + processCacheObject.getCurrentHost() + "."
-        + processCacheObject.getName() + "." + processCacheObject.getProcessPIK());
     return configurationUpdate;
   }
 
@@ -246,8 +238,6 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       processCacheObject.setRequiresReboot(Boolean.FALSE);
       processCacheObject.setProcessPIK(newPIK);
       processCacheObject.setLocalConfig(LocalConfig.Y);
-      processCacheObject.setJmsDaqCommandQueue(jmsDaqQueueTrunk + ".command." + processCacheObject.getCurrentHost() + "."
-          + processCacheObject.getName() + "." + newPIK.toString());
       super.start(processCacheObject, pStartupTime);
     }
   }
@@ -278,8 +268,6 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
     processCacheObject.setRequiresReboot(Boolean.FALSE);
     processCacheObject.setProcessPIK(newPIK);
     processCacheObject.setLocalConfig(LocalConfig.Y);
-    processCacheObject.setJmsDaqCommandQueue(jmsDaqQueueTrunk + ".command." + processCacheObject.getCurrentHost() + "."
-        + processCacheObject.getName() + "." + newPIK.toString());
     super.start(processCacheObject, pStartupTime);
   }
 
@@ -339,9 +327,6 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       }
       if (processCacheObject.getAliveInterval() < 10000) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"aliveInterval\" must be >= 10000 milliseconds");
-      }
-      if (processCacheObject.getJmsDaqCommandQueue() == null) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "JMS DAQ command queue cannot be null");
       }
       if (processCacheObject.getMaxMessageSize() < 1) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"maxMessageSize\" must be >= 1");
@@ -447,9 +432,6 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       final ProcessCacheObject processCacheObject = (ProcessCacheObject) processCache.getCopy(processId);
       // Set the PIK
       processCacheObject.setProcessPIK(processPIK);
-      // update the JMS Daq command queue
-      processCacheObject.setJmsDaqCommandQueue(jmsDaqQueueTrunk + ".command." + processCacheObject.getCurrentHost() + "."
-          + processCacheObject.getName() + "." + processPIK);
       processCache.put(processId, processCacheObject);
     } finally {
       processCache.releaseWriteLockOnKey(processId);

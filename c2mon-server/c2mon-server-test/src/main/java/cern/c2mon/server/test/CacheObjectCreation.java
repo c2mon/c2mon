@@ -125,7 +125,6 @@ public final class CacheObjectCreation {
     cacheObject.setDescription("test description");
     cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
     cacheObject.setDataType("Float"); // non null
-    cacheObject.setTopic("controltag-publication-topic");
     cacheObject.setLogged(false); //null allowed
     cacheObject.setUnit("test unit m/sec");
     cacheObject.setDipAddress("testDIPaddress");

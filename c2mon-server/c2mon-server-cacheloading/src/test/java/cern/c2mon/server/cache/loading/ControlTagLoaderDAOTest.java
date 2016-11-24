@@ -39,11 +39,6 @@ import static org.junit.Assert.*;
     CacheLoadingModule.class,
     DatabasePopulationRule.class
 })
-@TestPropertySource(properties = {
-    // TODO: remove these
-    "c2mon.server.client.jms.topic.tag.trunk=c2mon.client.tag",
-    "c2mon.server.client.jms.topic.controltag=c2mon.client.controltag"
-})
 public class ControlTagLoaderDAOTest {
 
   @Rule
@@ -66,23 +61,11 @@ public class ControlTagLoaderDAOTest {
   public void testGetItemDoPostDbLoading() {
     ControlTag tag = controlTagLoaderDAO.getItem(1261L);
     assertNotNull(tag);
-    assertTopicSetCorrectly(tag);
   }
 
   @Test
   public void testGetAll() {
     assertNotNull(controlTagLoaderDAO.getAllAsMap());
     assertTrue(controlTagLoaderDAO.getAllAsMap().size() > 10);
-  }
-
-  @Test
-  public void testGetAllDoPostDbLoading() {
-    for (Map.Entry<Long, ControlTag> entry : controlTagLoaderDAO.getAllAsMap().entrySet()) {
-      assertTopicSetCorrectly(entry.getValue());
-    }
-  }
-
-  private void assertTopicSetCorrectly(ControlTag tag) {
-    assertEquals("c2mon.client.controltag", tag.getTopic());
   }
 }

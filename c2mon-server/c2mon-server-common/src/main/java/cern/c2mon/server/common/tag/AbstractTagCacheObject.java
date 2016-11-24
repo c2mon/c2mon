@@ -95,13 +95,6 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
   private DataTagConstants.Status status;
 
   /**
-   * Name of the JMS topic on which the tag will be distributed to clients.
-   * Set at start up to "c2mon.tag.default.publication" but should be overwritten
-   * at runtime (no client listens to this topic).
-   */
-  private String topic = "c2mon.tag.default.publication";
-
-  /**
    * Indicates whether this tag's value changes shall be logged to the
    * history.
    */
@@ -529,10 +522,6 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
     return (mode == MODE_NOTCONFIGURED);
   }
 
-  public final String getTopic() {
-    return this.topic;
-  }
-
   public final boolean isLogged() {
     return this.logged;
   }
@@ -568,10 +557,6 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
    */
   public void setSimulated(boolean simulated) {
     this.simulated = simulated;
-  }
-
-  public void setTopic(final String topic) {
-    this.topic = topic;
   }
 
   // ----------------------------------------------------------------------------

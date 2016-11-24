@@ -39,11 +39,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
     CacheLoadingModule.class,
     DatabasePopulationRule.class
 })
-@TestPropertySource(properties = {
-    // TODO: remove these
-    "c2mon.server.client.jms.topic.tag.trunk=c2mon.client.tag",
-    "c2mon.server.client.jms.topic.controltag=c2mon.client.controltag"
-})
 public class DeviceDAOTest {
 
   @Rule

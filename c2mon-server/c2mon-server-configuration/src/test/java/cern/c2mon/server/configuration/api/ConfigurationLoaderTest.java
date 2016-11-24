@@ -1206,7 +1206,6 @@ public class ConfigurationLoaderTest {
     expectedCacheObjectRule.setProcessIds(Collections.EMPTY_SET);
     expectedCacheObjectRule.setEquipmentIds(Collections.EMPTY_SET);
     expectedCacheObjectRule.getDataTagQuality().validate();
-    expectedCacheObjectRule.setTopic(tagPublicationTrunk + "." + 0L);
     Thread.sleep(1000); // sleep 1s to allow for rule evaluation on separate thread
 
     ObjectEqualityComparison.assertRuleTagConfigEquals(expectedCacheObjectRule, cacheObjectData);

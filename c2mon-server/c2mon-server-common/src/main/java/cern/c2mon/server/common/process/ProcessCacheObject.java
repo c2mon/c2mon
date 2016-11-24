@@ -28,8 +28,6 @@ import cern.c2mon.server.common.equipment.AbstractSupervisedCacheObject;
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 
-// imported many methods from TIM1
-
 /**
  * Cache object representing the C2MON DAQ processes. This object usually
  * resides in the cache when accessed, in which case care must be taken with
@@ -78,14 +76,6 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
    * Equipments under this Process.
    */
   private ArrayList<Long> equipmentIds = new ArrayList<Long>();
-
-  /**
-   * Name of the temporary queue on which the process (daq) listens for server
-   * requests. Currently set after loading or in facade creation.
-   */
-  // TODO: to be change in next major revision
-  // private String jmsDaqCommandQueue;
-  private String jmsListenerTopic;
 
   /**
    * Host the DAQ process is running on.
@@ -309,11 +299,6 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
     this.equipmentIds = equipmentIds;
   }
 
-  @Override
-  public String getJmsDaqCommandQueue() {
-    return this.jmsListenerTopic;
-  }
-
   /**
    * Setter method.
    *
@@ -344,10 +329,4 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
   public SupervisionEntity getSupervisionEntity() {
     return SupervisionEntity.PROCESS;
   }
-
-  @Override
-  public void setJmsDaqCommandQueue(String jmsListenerTopic) {
-    this.jmsListenerTopic = jmsListenerTopic;
-  }
-
 }
