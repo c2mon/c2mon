@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import cern.c2mon.server.client.config.ClientProperties;
 import cern.c2mon.server.client.publish.TopicProvider;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import org.slf4j.Logger;
@@ -76,7 +77,7 @@ class ClientTagRequestHelper {
    */
   private final ProcessCache processCache;
 
-  private final Environment environment;
+  private final ClientProperties properties;
 
   /**
    * Default Constructor
@@ -91,12 +92,12 @@ class ClientTagRequestHelper {
                                 final TagLocationService tagLocationService,
                                 final TagFacadeGateway tagFacadeGateway,
                                 final ProcessCache processCache,
-                                final Environment environment) {
+                                final ClientProperties properties) {
     this.aliveTimerFacade = aliveTimerFacade;
     this.tagLocationService = tagLocationService;
     this.tagFacadeGateway = tagFacadeGateway;
     this.processCache = processCache;
-    this.environment = environment;
+    this.properties = properties;
   }
   
   /**
@@ -134,7 +135,7 @@ class ClientTagRequestHelper {
         switch (tagRequest.getResultType()) {
         case TRANSFER_TAG_LIST:
           TransferTagImpl transferTag = TransferObjectFactory.createTransferTag(tagWithAlarms,
-              aliveTimerFacade.isRegisteredAliveTimer(tagId), TopicProvider.topicFor(tagWithAlarms.getTag(), environment));
+              aliveTimerFacade.isRegisteredAliveTimer(tagId), TopicProvider.topicFor(tagWithAlarms.getTag(), properties));
           transferTags.add(transferTag);
           break;
         case TRANSFER_TAG_VALUE_LIST:
@@ -169,7 +170,7 @@ class ClientTagRequestHelper {
           case TRANSFER_TAG_LIST:
             transferTags.add(TransferObjectFactory.createTransferTag(tagWithAlarms,
                 aliveTimerFacade.isRegisteredAliveTimer(tagWithAlarms.getTag().getId()),
-                TopicProvider.topicFor(tagWithAlarms.getTag(), environment)));
+                TopicProvider.topicFor(tagWithAlarms.getTag(), properties)));
             break;
           case TRANSFER_TAG_VALUE_LIST:
             transferTags.add(TransferObjectFactory.createTransferTagValue(tagWithAlarms));

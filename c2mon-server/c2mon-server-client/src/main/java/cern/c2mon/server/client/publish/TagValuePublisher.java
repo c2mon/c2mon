@@ -21,6 +21,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import cern.c2mon.server.client.config.ClientProperties;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
@@ -105,7 +106,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
   /** Used to determine, whether a given tag is an AliveTag */
   private AliveTimerFacade aliveTimerFacade;
 
-  private Environment environment;
+  private ClientProperties properties;
 
   /**
    * Default Constructor
@@ -123,7 +124,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
                            final ConfigurationUpdate configurationUpdate,
                            final TagFacadeGateway pTagFacadeGateway,
                            final TagLocationService tagLocationService,
-                           final Environment environment) {
+                           final ClientProperties properties) {
     this.aliveTimerFacade = aliveTimerFacade;
     this.jmsSender = jmsSender;
     this.alarmAggregator = alarmAggregator;
@@ -131,7 +132,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
     this.tagFacadeGateway = pTagFacadeGateway;
     this.tagLocationService = tagLocationService;
     this.republisher = RepublisherFactory.createRepublisher(this, "Tag");
-    this.environment = environment;
+    this.properties = properties;
   }
 
   /**
@@ -189,7 +190,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace("publish - Publishing tag update to client: " + TransferTagSerializer.toJson(tagValue));
     }
-    jmsSender.sendToTopic(TransferTagSerializer.toJson(tagValue), TopicProvider.topicFor(tagWithAlarms.getTag(), environment));
+    jmsSender.sendToTopic(TransferTagSerializer.toJson(tagValue), TopicProvider.topicFor(tagWithAlarms.getTag(), properties));
   }
 
   @Override
@@ -198,7 +199,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
     try {
       TagWithAlarms tagWithAlarms = this.tagFacadeGateway.getTagWithAlarms(tagId);
       try {
-        String topic = TopicProvider.topicFor(tagWithAlarms.getTag(), environment);
+        String topic = TopicProvider.topicFor(tagWithAlarms.getTag(), properties);
         TransferTagImpl tag = TransferObjectFactory.createTransferTag(tagWithAlarms, aliveTimerFacade.isRegisteredAliveTimer(tagId), topic);
         if (LOGGER.isTraceEnabled()) {
           LOGGER.trace("notifyOnConfigurationUpdate - Publishing configuration update to client: " + TransferTagSerializer.toJson(tag));
