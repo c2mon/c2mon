@@ -14,13 +14,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.supervision.heartbeat;
+package cern.c2mon.server.client.heartbeat.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import cern.c2mon.server.client.heartbeat.HeartbeatListener;
+import cern.c2mon.server.client.heartbeat.HeartbeatManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +32,12 @@ import org.springframework.context.SmartLifecycle;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.supervision.HeartbeatListener;
-import cern.c2mon.server.supervision.HeartbeatManager;
 import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.util.jms.JmsSender;
 import cern.c2mon.shared.util.json.GsonFactory;
 
 import com.google.gson.Gson;
+import org.springframework.stereotype.Component;
 
 /**
  * The HeartbeatManager bean generates regular server heartbeats, which
@@ -44,11 +45,11 @@ import com.google.gson.Gson;
  * server.
  *
  * <p>The heartbeat is published directly on a JMS topic. Server modules can
- * also register as listeners for internal heatbeat notifications.
+ * also register as listeners for internal heartbeat notifications.
  *
  * @author Mark Brightwell
- *
  */
+@Component
 public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
 
   /**

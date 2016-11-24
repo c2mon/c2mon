@@ -14,15 +14,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.supervision.heartbeat;
+package cern.c2mon.server.client.heartbeat;
 
+import cern.c2mon.server.client.heartbeat.impl.HeartbeatManagerImpl;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.server.cache.ClusterCache;
-import cern.c2mon.server.supervision.HeartbeatListener;
 import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.util.jms.JmsSender;
 

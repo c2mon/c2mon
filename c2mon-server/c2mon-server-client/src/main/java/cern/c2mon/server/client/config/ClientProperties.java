@@ -46,6 +46,11 @@ public class ClientProperties {
     private String supervisionTopic = "c2mon.client.supervision";
 
     /**
+     * Topic on which heartbeats are sent
+     */
+    private String heartbeatTopic = "c2mon.client.heartbeat";
+
+    /**
      * Requests from client to server
      */
     private String requestQueue = "c2mon.client.request";

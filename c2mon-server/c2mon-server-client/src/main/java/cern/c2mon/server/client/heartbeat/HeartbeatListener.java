@@ -14,27 +14,28 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.supervision;
+package cern.c2mon.server.client.heartbeat;
+
+import cern.c2mon.shared.client.supervision.Heartbeat;
 
 /**
- * The HeartbeatManager bean generates regular server heartbeats, which
- * can then be used by clients for monitoring the alive status of the
- * server.
- * 
- * <p>The heartbeat is published directly on a JMS topic. Server modules can
- * also register as listeners for internal heatbeat notifications.
+ * Interface that should be implemented by any bean wishing
+ * to register for server heartbeats.
  * 
  * @author Mark Brightwell
  *
  */
-public interface HeartbeatManager {
+public interface HeartbeatListener {
 
   /**
-   * Register to be notified of heartbeats (all notifications are
-   * on the same thread!)
+   * Called at each server heartbeat. 
    * 
-   * @param heartbeatListener the listener that will be called
+   * <p>The call is made on a single thread for all listeners, so the listening
+   * module should not hug this thread for ever!
+   * 
+   * @param heartbeat the Heartbeat object with details about the host and timestamp
+   *                    (beware of unsynchronized processes running elsewhere if using this!)
    */
-  void registerToHeartbeat(HeartbeatListener heartbeatListener);
+  void notifyHeartbeat(Heartbeat heartbeat);
   
 }

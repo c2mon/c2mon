@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Import;
     ClientJmsConfig.class,
     AlarmJmsConfig.class,
     SupervisionJmsConfig.class,
+    HeartbeatJmsConfig.class,
     ConfigRequestJmsConfig.class,
     AdminJmsConfig.class
 })
