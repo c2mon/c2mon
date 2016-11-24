@@ -81,10 +81,6 @@ import static org.junit.Assert.*;
     CommandModule.class,
     TestConfig.class
 })
-//@TestPropertySource( = "classpath:c2mon-server-default.properties")
-//@EnableConfigurationProperties({
-//    ServerProperties.class
-//})
 public class TagValuePublisherTest {
 
   @Rule

@@ -16,7 +16,7 @@ import org.springframework.jms.core.JmsTemplate;
 public class AlarmJmsConfig {
 
   @Autowired
-  private Environment environment;
+  private ClientProperties properties;
 
   @Autowired
   private SingleConnectionFactory clientSingleConnectionFactory;
@@ -25,7 +25,7 @@ public class AlarmJmsConfig {
   public JmsTemplate alarmTopicPublisherJmsTemplate() {
     JmsTemplate jmsTemplate = new JmsTemplate(clientSingleConnectionFactory);
 
-    String alarmTopic = environment.getRequiredProperty("c2mon.server.client.jms.topic.alarm");
+    String alarmTopic = properties.getJms().getAlarmTopic();
     jmsTemplate.setDefaultDestination(new ActiveMQTopic(alarmTopic));
 
     jmsTemplate.setExplicitQosEnabled(true);

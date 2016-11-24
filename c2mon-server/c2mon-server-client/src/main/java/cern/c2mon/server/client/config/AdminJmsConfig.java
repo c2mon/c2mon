@@ -9,7 +9,6 @@ import org.apache.activemq.command.ActiveMQQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
@@ -22,14 +21,14 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class AdminJmsConfig {
 
   @Autowired
-  private Environment environment;
+  private ClientProperties properties;
 
   @Autowired
   private ThreadPoolExecutor clientExecutor;
 
   @Bean
   public ActiveMQConnectionFactory adminActiveMQConnectionFactory() {
-    String url = environment.getRequiredProperty("c2mon.server.client.jms.url");
+    String url = properties.getJms().getUrl();
 
     ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
     connectionFactory.setClientIDPrefix("C2MON-SERVER-CLIENT");
@@ -50,7 +49,7 @@ public class AdminJmsConfig {
   public DefaultMessageListenerContainer adminRequestJmsContainer(ClientRequestDelegator delegator, ClientRequestErrorHandler errorHandler) {
     DefaultMessageListenerContainer container = new DefaultMessageListenerContainer();
 
-    String adminRequestQueue = environment.getRequiredProperty("c2mon.server.client.jms.queue.admin");
+    String adminRequestQueue = properties.getJms().getAdminRequestQueue();
     container.setDestination(new ActiveMQQueue(adminRequestQueue));
 
     container.setConnectionFactory(adminSingleConnectionFactory());

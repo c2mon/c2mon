@@ -1,5 +1,6 @@
 package cern.c2mon.server.client.publish;
 
+import cern.c2mon.server.client.config.ClientProperties;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
@@ -11,11 +12,11 @@ import org.springframework.core.env.Environment;
  */
 public class TopicProvider {
 
-  public static String topicFor(Tag tag, Environment environment) {
-    String trunk = environment.getRequiredProperty("c2mon.server.client.jms.topic.tag.trunk");
+  public static String topicFor(Tag tag, ClientProperties properties) {
+    String trunk = properties.getJms().getTagTopicPrefix();
 
     if (tag instanceof ControlTag) {
-      return environment.getRequiredProperty("c2mon.server.client.jms.topic.controltag");
+      return properties.getJms().getControlTagTopic();
     } else if (tag instanceof RuleTag) {
       return trunk + "." + ((RuleTag) tag).getLowestProcessId();
     } else {

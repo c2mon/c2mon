@@ -16,7 +16,7 @@ import org.springframework.jms.core.JmsTemplate;
 public class SupervisionJmsConfig {
 
   @Autowired
-  private Environment environment;
+  private ClientProperties properties;
 
   @Autowired
   private SingleConnectionFactory clientSingleConnectionFactory;
@@ -25,7 +25,7 @@ public class SupervisionJmsConfig {
   public JmsTemplate supervisionTopicPublisherJmsTemplate() {
     JmsTemplate jmsTemplate = new JmsTemplate(clientSingleConnectionFactory);
 
-    String supervisionTopic = environment.getRequiredProperty("c2mon.server.client.jms.topic.supervision");
+    String supervisionTopic = properties.getJms().getSupervisionTopic();
     jmsTemplate.setDefaultDestination(new ActiveMQTopic(supervisionTopic));
 
     jmsTemplate.setExplicitQosEnabled(true);

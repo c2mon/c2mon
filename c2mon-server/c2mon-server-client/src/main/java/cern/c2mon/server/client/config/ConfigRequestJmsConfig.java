@@ -17,7 +17,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class ConfigRequestJmsConfig {
 
   @Autowired
-  private Environment environment;
+  private ClientProperties properties;
 
   @Autowired
   private SingleConnectionFactory clientSingleConnectionFactory;
@@ -25,12 +25,11 @@ public class ConfigRequestJmsConfig {
   @Autowired
   private ThreadPoolExecutor clientExecutor;
 
-  // TODO: move this into server-client module
   @Bean
   public DefaultMessageListenerContainer configRequestJmsContainer(ConfigurationRequestHandler requestHandler) {
     DefaultMessageListenerContainer container = new DefaultMessageListenerContainer();
 
-    String configRequestQueue = environment.getRequiredProperty("c2mon.server.configuration.jms.queue");
+    String configRequestQueue = properties.getJms().getConfigRequestQueue();
     container.setDestination(new ActiveMQQueue(configRequestQueue));
 
     container.setConnectionFactory(clientSingleConnectionFactory);

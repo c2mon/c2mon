@@ -25,11 +25,11 @@ import java.util.concurrent.TimeUnit;
 public class ClientJmsConfig {
 
   @Autowired
-  private Environment environment;
+  private ClientProperties properties;
 
   @Bean
   public ActiveMQConnectionFactory clientActiveMQConnectionFactory() {
-    String url = environment.getRequiredProperty("c2mon.server.client.jms.url");
+    String url = properties.getJms().getUrl();
     ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
     connectionFactory.setClientIDPrefix("C2MON-SERVER-CLIENT");
     connectionFactory.setWatchTopicAdvisories(false);
@@ -62,13 +62,13 @@ public class ClientJmsConfig {
   public DefaultMessageListenerContainer clientRequestJmsContainer(ClientRequestDelegator delegator, ClientRequestErrorHandler errorHandler) {
     DefaultMessageListenerContainer container = new DefaultMessageListenerContainer();
 
-    String clientRequestQueue = environment.getRequiredProperty("c2mon.server.client.jms.queue.request");
+    String clientRequestQueue = properties.getJms().getRequestQueue();
     container.setDestination(new ActiveMQQueue(clientRequestQueue));
 
     container.setConnectionFactory(clientSingleConnectionFactory());
     container.setMessageListener(delegator);
-    container.setConcurrentConsumers(environment.getRequiredProperty("c2mon.server.client.jms.consumers.initial", Integer.class));
-    container.setMaxConcurrentConsumers(environment.getRequiredProperty("c2mon.server.client.jms.consumers.max", Integer.class));
+    container.setConcurrentConsumers(properties.getJms().getInitialConsumers());
+    container.setMaxConcurrentConsumers(properties.getJms().getMaxConsumers());
     container.setMaxMessagesPerTask(1);
     container.setReceiveTimeout(1000);
     container.setIdleTaskExecutionLimit(600);
