@@ -27,6 +27,7 @@ import cern.c2mon.server.test.broker.EmbeddedBrokerRule;
 import cern.c2mon.server.test.config.TestConfig;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 import cern.c2mon.shared.daq.serialization.MessageConverter;
+import cern.c2mon.server.common.process.Process;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -34,7 +35,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;
 import org.springframework.test.context.ContextConfiguration;
@@ -52,7 +52,7 @@ import static org.junit.Assert.assertNotNull;
  * @author Mark Brightwell
  *
  */
-@Ignore("This test is flaky")
+//@Ignore("This test is flaky")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
     CacheModule.class,
@@ -102,7 +102,9 @@ public class ProcessCommunicationManagerTest {
             String reportString = MessageConverter.responseToJson(new ConfigurationChangeEventReport());
             @Override
             public Object doInJms(Session session) throws JMSException {
-              MessageConsumer consumer = session.createConsumer(new ActiveMQQueue(processCache.get(50L).getJmsDaqCommandQueue()));
+              Process process = processCache.get(50L);
+              String jmsDaqQueue = "c2mon.process" + ".command." + process.getCurrentHost() + "." + process.getName() + "." + process.getProcessPIK();
+              MessageConsumer consumer = session.createConsumer(new ActiveMQQueue(jmsDaqQueue));
               Message incomingMessage = consumer.receive(1000);
               MessageProducer messageProducer = session.createProducer(incomingMessage.getJMSReplyTo());
               TextMessage replyMessage = session.createTextMessage();

@@ -285,7 +285,6 @@ public class ConfigurationLoaderTest {
     ProcessCacheObject cacheObjectProcess = (ProcessCacheObject) processCache.get(5L);
     ProcessCacheObject expectedCacheObjectProcess = cacheObjectFactory.buildProcessUpdateCacheObject(cacheObjectProcess, process);
 
-    expectedCacheObjectProcess.setJmsDaqCommandQueue(cacheObjectProcess.getJmsDaqCommandQueue());
     ObjectEqualityComparison.assertProcessEquals(expectedCacheObjectProcess, cacheObjectProcess);
 
     verify(mockManager);

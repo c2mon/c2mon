@@ -155,10 +155,7 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getStateTagId(), actualObject.getStateTagId());
     assertEquals(expectedObject.getAliveTagId(), actualObject.getAliveTagId());
     assertEquals(expectedObject.getCommFaultTagId(), actualObject.getCommFaultTagId());
-    assertEquals(expectedObject.getCommFaultTagValue(), actualObject.getCommFaultTagValue()); // constant
-                                                                                              // at
-                                                                                              // the
-                                                                                              // moment
+    assertEquals(expectedObject.getCommFaultTagValue(), actualObject.getCommFaultTagValue());
   }
 
   public static void assertProcessEquals(ProcessCacheObject expectedObject, ProcessCacheObject cacheObject) {
@@ -171,7 +168,6 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getMaxMessageSize(), cacheObject.getMaxMessageSize());
     assertEquals(expectedObject.getStateTagId(), cacheObject.getStateTagId());
     assertEquals(expectedObject.getEquipmentIds(), cacheObject.getEquipmentIds());
-    assertEquals(expectedObject.getJmsDaqCommandQueue(), cacheObject.getJmsDaqCommandQueue());
   }
 
   public static void assertAlarmEquals(AlarmCacheObject expectedObject, AlarmCacheObject cacheObject) {

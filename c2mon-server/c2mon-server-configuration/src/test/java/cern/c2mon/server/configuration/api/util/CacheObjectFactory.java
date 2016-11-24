@@ -58,9 +58,6 @@ public class CacheObjectFactory {
     ProcessCacheObject expectedObject = new ProcessCacheObject(id);
     expectedObject = setCacheProcessCacheObjectFields(expectedObject, configProcess);
 
-    // Current host and PIK will be null
-    expectedObject.setJmsDaqCommandQueue(this.jmsDaqQueueTrunk + ".command.null." + expectedObject.getName() + ".null");
-
     return expectedObject;
   }
 

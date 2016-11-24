@@ -798,8 +798,6 @@ public class ConfigurationLoaderTest {
     expectedObject.setMaxMessageSize(200);
     expectedObject.setMaxMessageDelay(1000);
     expectedObject.setDescription("test description");
-    // Current host and PIK will be null
-    expectedObject.setJmsDaqCommandQueue(this.jmsDaqQueueTrunk + ".command.null." + expectedObject.getName() + ".null");
 
     ObjectEqualityComparison.assertProcessEquals(expectedObject, cacheObject);
 

@@ -105,6 +105,7 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
    */
   private ConnectionFactory processOutConnectionFactory;
 
+  private Environment environment;
 
   /**
    * Autowired constructor.
@@ -127,6 +128,7 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
     this.processFacade = processFacade;
     this.jmsProcessOut = jmsProcessOut;
     this.processOutConnectionFactory = connectionFactory;
+    this.environment = environment;
     this.configurationTimeout = environment.getRequiredProperty("c2mon.server.daqcommunication.jms.configurationTimeout", Integer.class);
   }
 
@@ -176,7 +178,7 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
           Process process = processCache.get(processId);
           if (processFacade.isRunning(process)) {
             LOGGER.debug("requestDataTagValues() : associated process is running.");
-            String reply = jmsProcessOut.sendTextMessage(MessageConverter.requestToJson(pRequest), process.getJmsDaqCommandQueue(), 10000);
+            String reply = jmsProcessOut.sendTextMessage(MessageConverter.requestToJson(pRequest), getJmsDaqCommandQueue(process), 10000);
 
             if (reply != null) {
               LOGGER.debug("requestDataTagValues() : reply received: " + reply);
@@ -226,7 +228,7 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
         // treat command
         SourceCommandTagValue val = new SourceCommandTagValue(commandTag.getId(), commandTag.getName(), commandTag.getEquipmentId(), commandTag.getMode(),
             value, commandTag.getDataType());
-        String reply = jmsProcessOut.sendTextMessage(MessageConverter.requestToJson(val), process.getJmsDaqCommandQueue(), commandTag.getExecTimeout());
+        String reply = jmsProcessOut.sendTextMessage(MessageConverter.requestToJson(val), getJmsDaqCommandQueue(process), commandTag.getExecTimeout());
         LOGGER.debug("executeCommand() : reply received: " + reply);
         if (reply != null) {
           try {
@@ -271,7 +273,7 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
 
     ChangeRequest request = new ChangeRequest(changeList);
     String configString = MessageConverter.requestToJson(request);
-    String reply = jmsProcessOut.sendTextMessage(configString, processCache.get(processId).getJmsDaqCommandQueue(), configurationTimeout);
+    String reply = jmsProcessOut.sendTextMessage(configString, getJmsDaqCommandQueue(processCache.get(processId)), configurationTimeout);
 
     if (reply != null) {
 
@@ -282,6 +284,11 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
       //TODO create new default failure report for all changes in changeList... and return (changes only applied on server then)
       throw new RuntimeException("Null reconfiguration reply received from DAQ - probably due to timeout, current set at " + configurationTimeout);
     }
+  }
+
+  private String getJmsDaqCommandQueue(Process process) {
+    String jmsDaqQueueTrunk = environment.getRequiredProperty("c2mon.server.daqcommunication.jms.queue.trunk");
+    return jmsDaqQueueTrunk + ".command." + process.getCurrentHost() + "." + process.getName() + "." + process.getProcessPIK();
   }
 
   @Override

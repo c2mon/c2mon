@@ -229,7 +229,7 @@ public class TagValuePublisherTest {
           JmsTemplate template = new JmsTemplate(connectionFactory);
           template.setReceiveTimeout(1000);
           synchronized (updateLock) {
-            Message message = template.receive(new ActiveMQTopic(tag.getTopic()));
+            Message message = template.receive(new ActiveMQTopic("c2mon.client.tag." + ((DataTag) tag).getProcessId()));
             update = TransferTagSerializer.fromJson(((TextMessage) message).getText(), TransferTagValueImpl.class);
           }
         } catch (Exception e) {
@@ -256,7 +256,7 @@ public class TagValuePublisherTest {
           JmsTemplate template = new JmsTemplate(connectionFactory);
           template.setReceiveTimeout(5000);
           synchronized (updateLock) {
-            Message message = template.receive(new ActiveMQTopic(tag.getTopic()));
+            Message message = template.receive(new ActiveMQTopic("c2mon.client.tag." + ((DataTag) tag).getProcessId()));
             updateFromConfig = TransferTagSerializer.fromJson(((TextMessage) message).getText(), TransferTagImpl.class);
           }
         } catch (Exception e) {
