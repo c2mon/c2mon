@@ -24,6 +24,7 @@ import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
+import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
@@ -87,6 +88,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
+    CommonModule.class,
     CacheModule.class,
     CacheDbAccessModule.class,
     CacheLoadingModule.class,

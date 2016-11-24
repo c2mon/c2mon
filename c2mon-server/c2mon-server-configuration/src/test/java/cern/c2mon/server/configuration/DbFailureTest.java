@@ -21,6 +21,7 @@ import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.*;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
+import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
 import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
@@ -59,6 +60,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
+    CommonModule.class,
     CacheModule.class,
     CacheDbAccessModule.class,
     CacheLoadingModule.class,
