@@ -13,7 +13,6 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
 
 /**
  * @author Justin Lewis Salmon
@@ -21,7 +20,7 @@ import org.springframework.core.env.Environment;
 public class TagHistoryConfig {
 
   @Autowired
-  private Environment environment;
+  private HistoryProperties properties;
 
   @Autowired
   @Qualifier("historySqlSessionFactory")
@@ -34,13 +33,13 @@ public class TagHistoryConfig {
 
   @Bean
   public PersistenceManager<TagRecord> tagPersistenceManager(AlarmListener alarmListener) throws Exception {
-    String fallbackFile = environment.getRequiredProperty("c2mon.server.history.fallback.tag");
+    String fallbackFile = properties.getTagFallbackFile();
     return new PersistenceManager<>(tagLoggerDAO(), fallbackFile, alarmListener, new TagRecord());
   }
 
   @Bean
   public LoggerDAO<TagRecord> tagLoggerDAO() throws Exception {
     return new LoggerDAO<>(historySqlSessionFactory.getObject(), TagRecordMapper.class.getCanonicalName(),
-        environment.getRequiredProperty("c2mon.server.history.jdbc.url"));
+        properties.getJdbc().getUrl());
   }
 }

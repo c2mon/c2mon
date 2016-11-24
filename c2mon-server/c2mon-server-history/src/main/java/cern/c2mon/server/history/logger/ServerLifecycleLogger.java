@@ -20,6 +20,7 @@ import java.sql.Timestamp;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.history.mapper.ServerLifecycleEventMapper;
 import cern.c2mon.shared.client.lifecycle.ServerLifecycleEvent;
 import org.apache.ibatis.exceptions.PersistenceException;
@@ -84,9 +85,9 @@ public class ServerLifecycleLogger implements SmartLifecycle {
    * @param serverLifecycleEventMapper the mapper bean used for writing to the DB
    */
   @Autowired
-  public ServerLifecycleLogger(final ServerLifecycleEventMapper serverLifecycleEventMapper, Environment environment) {
+  public ServerLifecycleLogger(final ServerLifecycleEventMapper serverLifecycleEventMapper, ServerProperties properties) {
     this.serverLifecycleEventMapper = serverLifecycleEventMapper;
-    this.serverName = environment.getRequiredProperty("c2mon.server.name");
+    this.serverName = properties.getName();
   }
 
   private void logStartEvent() {

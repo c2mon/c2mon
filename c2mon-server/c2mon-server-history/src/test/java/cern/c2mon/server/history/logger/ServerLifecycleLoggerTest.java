@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.history.logger;
 
+import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.history.mapper.ServerLifecycleEventMapper;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.easymock.EasyMock;
@@ -46,9 +47,7 @@ public class ServerLifecycleLoggerTest {
   public void init() {
     control = EasyMock.createNiceControl();
     lifecycleMapper = control.createMock(ServerLifecycleEventMapper.class);
-    MockEnvironment environment = new MockEnvironment();
-    environment.setProperty("c2mon.server.name", "test");
-    serverLifecycleLogger = new ServerLifecycleLogger(lifecycleMapper, environment);
+    serverLifecycleLogger = new ServerLifecycleLogger(lifecycleMapper, new ServerProperties());
     serverLifecycleLogger.setTimeBetweenRelogs(1000);
   }
 

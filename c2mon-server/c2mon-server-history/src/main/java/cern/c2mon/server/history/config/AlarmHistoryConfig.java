@@ -14,7 +14,6 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
 
 /**
  * @author Justin Lewis Salmon
@@ -22,7 +21,7 @@ import org.springframework.core.env.Environment;
 public class AlarmHistoryConfig {
 
   @Autowired
-  private Environment environment;
+  private HistoryProperties properties;
 
   @Autowired
   @Qualifier("historySqlSessionFactory")
@@ -35,13 +34,13 @@ public class AlarmHistoryConfig {
 
   @Bean
   public PersistenceManager<AlarmRecord> alarmPersistenceManager(AlarmListener alarmListener) throws Exception {
-    String fallbackFile = environment.getRequiredProperty("c2mon.server.history.fallback.alarm");
+    String fallbackFile = properties.getAlarmFallbackFile();
     return new PersistenceManager<>(alarmLoggerDAO(), fallbackFile, alarmListener, new AlarmRecord());
   }
 
   @Bean
   public LoggerDAO<AlarmRecord> alarmLoggerDAO() throws Exception {
     return new LoggerDAO<>(historySqlSessionFactory.getObject(), AlarmRecordMapper.class.getCanonicalName(),
-        environment.getRequiredProperty("c2mon.server.history.jdbc.url"));
+        properties.getJdbc().getUrl());
   }
 }

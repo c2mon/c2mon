@@ -65,7 +65,6 @@ import cern.c2mon.shared.common.command.CommandTag;
     DaqModule.class,
     HistoryModule.class
 })
-@TestPropertySource("classpath:c2mon-server-default.properties")
 public class HistoryModuleTest {
 
   @Autowired
@@ -73,9 +72,6 @@ public class HistoryModuleTest {
 
   @Autowired
   private CommandRecordMapper commandTagMapper;
-
-  @Autowired
-  private Environment environment;
 
   @Before
   public void setUp() {

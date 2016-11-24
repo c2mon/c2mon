@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.EnvironmentAware;
@@ -33,12 +34,17 @@ import java.util.Properties;
 })
 public class HistoryDataSourceConfig implements EnvironmentAware {
 
+  // We use {@link EnvironmentAware} here to ensure that Mybatis doesn't
+  // start scanning for mappers too early.
   private Environment environment;
+
+  @Autowired
+  private HistoryProperties properties;
 
   @Bean
   @ConfigurationProperties("c2mon.server.history.jdbc")
   public DataSource historyDataSource() {
-    String url = environment.getProperty("c2mon.server.history.jdbc.url");
+    String url = properties.getJdbc().getUrl();
 
     if (url.contains("hsql")) {
       return new HsqlDatabaseBuilder().setUrl(url).addScript(new ClassPathResource("sql/history-schema-hsqldb.sql")).build();
