@@ -1,5 +1,6 @@
 package cern.c2mon.server.cache.dbaccess.config;
 
+import cern.c2mon.server.common.config.ServerProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @ComponentScan("cern.c2mon.server.cache.dbaccess")
 @Import({
+    ServerProperties.class,
     CacheDataSourceConfig.class
 })
 @EnableConfigurationProperties(CacheDbAccessProperties.class)

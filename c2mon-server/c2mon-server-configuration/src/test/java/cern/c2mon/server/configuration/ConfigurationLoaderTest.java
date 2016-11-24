@@ -26,6 +26,7 @@ import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
+import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.device.*;
@@ -105,7 +106,6 @@ import static org.junit.Assert.*;
     RuleModule.class,
     ProcessCommunicationManagerMock.class
 })
-@TestPropertySource(value = "classpath:c2mon-server-default.properties")
 public class ConfigurationLoaderTest {
 
   @Rule

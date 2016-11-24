@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
+import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import cern.c2mon.server.daq.JmsContainerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,14 +91,14 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
                                   ProcessCache processCache,
                                   ProcessFacade processFacade,
                                   JmsContainerManager jmsContainerManager,
-                                  Environment environment) {
+                                  ConfigurationProperties properties) {
     super();
     this.equipmentConfigHandler = equipmentConfigHandler;
     this.controlTagConfigHandler = controlTagConfigHandler;
     this.processCache = processCache;
     this.processFacade = processFacade;
     this.jmsContainerManager = jmsContainerManager;
-    this.allowRunningProcessRemoval = environment.getRequiredProperty("c2mon.server.configuration.allowRunningProcessRemoval", Boolean.class);
+    this.allowRunningProcessRemoval = properties.isAllowRunningProcessRemoval();
   }
 
   @PostConstruct

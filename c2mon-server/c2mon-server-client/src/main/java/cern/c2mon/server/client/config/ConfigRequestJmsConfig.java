@@ -25,6 +25,7 @@ public class ConfigRequestJmsConfig {
   @Autowired
   private ThreadPoolExecutor clientExecutor;
 
+  // TODO: move this into server-client module
   @Bean
   public DefaultMessageListenerContainer configRequestJmsContainer(ConfigurationRequestHandler requestHandler) {
     DefaultMessageListenerContainer container = new DefaultMessageListenerContainer();

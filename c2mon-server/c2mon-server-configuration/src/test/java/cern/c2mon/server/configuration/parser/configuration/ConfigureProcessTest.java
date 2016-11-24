@@ -51,7 +51,7 @@ import static org.junit.Assert.assertTrue;
  * @author Franz Ritter
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:test-config/server-configuration-parser-test.xml"})
+@ContextConfiguration(classes = ConfigurationParserTestMocks.class)
 public class ConfigureProcessTest {
 
   @Autowired

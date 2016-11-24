@@ -1,26 +1,19 @@
 package cern.c2mon.server.configuration.config;
 
 import cern.c2mon.server.common.util.HsqlDatabaseBuilder;
-import cern.c2mon.server.configuration.mybatis.ConfigurationMapper;
-import com.google.common.collect.ImmutableMap;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.mybatis.spring.SqlSessionFactoryBean;
-import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
-import org.mybatis.spring.mapper.MapperFactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.annotation.Resource;
 import javax.sql.DataSource;
-import java.util.Properties;
 
 /**
  * @author Justin Lewis Salmon
@@ -29,12 +22,17 @@ import java.util.Properties;
 @MapperScan(value = "cern.c2mon.server.configuration.mybatis", sqlSessionFactoryRef = "configSqlSessionFactory")
 public class ConfigDataSourceConfig implements EnvironmentAware {
 
+  // We use {@link EnvironmentAware} here to ensure that Mybatis doesn't
+  // start scanning for mappers too early.
   private Environment environment;
 
+  @Autowired
+  private ConfigurationProperties properties;
+
   @Bean
-  @ConfigurationProperties(prefix = "c2mon.server.configuration.jdbc")
+  @org.springframework.boot.context.properties.ConfigurationProperties(prefix = "c2mon.server.configuration.jdbc")
   public DataSource configurationDataSource() {
-    String url = environment.getProperty("c2mon.server.configuration.jdbc.url");
+    String url = properties.getJdbc().getUrl();
 
     // A simple inspection is done on the JDBC URL to deduce whether to create an in-memory
     // in-process database, start a file-based externally visible database or connect to

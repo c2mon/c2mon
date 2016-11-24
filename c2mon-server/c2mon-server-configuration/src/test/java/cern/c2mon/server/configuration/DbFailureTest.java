@@ -68,7 +68,6 @@ import static org.junit.Assert.*;
     RuleModule.class,
     ProcessCommunicationManagerMock.class
 })
-@TestPropertySource(value = "classpath:c2mon-server-default.properties")
 public class DbFailureTest {
 
   @Rule

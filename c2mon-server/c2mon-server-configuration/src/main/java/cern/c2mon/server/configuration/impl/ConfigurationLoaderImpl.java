@@ -24,6 +24,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import cern.c2mon.server.common.config.ServerProperties;
+import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.AnnotationStrategy;
@@ -161,7 +163,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                                  DeviceConfigHandler deviceConfigHandler,
                                  ConfigurationParser configParser,
                                  SequenceDAO sequenceDAO,
-                                 Environment environment) {
+                                 ConfigurationProperties properties,
+                                 ServerProperties serverProperties) {
     super();
     this.processCommunicationManager = processCommunicationManager;
     this.configurationDAO = configurationDAO;
@@ -180,8 +183,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     this.deviceConfigHandler = deviceConfigHandler;
     this.configParser = configParser;
     this.sequenceDAO = sequenceDAO;
-    this.daqConfigEnabled = environment.getRequiredProperty("c2mon.server.configuration.daqConfigEnabled", Boolean.class);
-    this.reportDirectory = environment.getRequiredProperty("c2mon.server.home") + "/reports";
+    this.daqConfigEnabled = properties.isDaqConfigEnabled();
+    this.reportDirectory = serverProperties.getHome() + "/reports";
   }
 
   @Override
