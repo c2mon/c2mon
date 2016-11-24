@@ -216,20 +216,6 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
   }
 
   /**
-   * @return the republicationDelay
-   */
-  public int getRepublicationDelay() {
-    return republicationDelay;
-  }
-
-  /**
-   * @param republicationDelay the republicationDelay to set
-   */
-  public void setRepublicationDelay(final int republicationDelay) {
-    this.republicationDelay = republicationDelay;
-  }
-
-  /**
    * @return the total number of failed publications since the publisher start
    */
   @ManagedOperation(description = "Returns the total number of failed publication attempts since the application started")
