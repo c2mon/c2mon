@@ -60,7 +60,6 @@ import java.util.concurrent.CountDownLatch;
     DaqModule.class,
     DaqModule.class,
 })
-@TestPropertySource("classpath:c2mon-server-default.properties")
 public class JmsContainerManagerTest {
 
   /**

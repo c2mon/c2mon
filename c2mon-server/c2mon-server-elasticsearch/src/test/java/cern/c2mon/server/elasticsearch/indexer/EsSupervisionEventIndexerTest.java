@@ -18,6 +18,7 @@ package cern.c2mon.server.elasticsearch.indexer;
 
 import java.sql.Timestamp;
 
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.connector.TransportConnector;
 import cern.c2mon.server.elasticsearch.structure.converter.EsSupervisionEventConverter;
 import org.junit.Before;
@@ -81,6 +82,7 @@ public class EsSupervisionEventIndexerTest {
     when(esSupervisionEventConverter.convert(eq(event))).thenReturn(esSupervisionEvent);
     when(connector.logSupervisionEvent(anyString(), anyString(), eq(esSupervisionEvent))).thenReturn(true);
 //    indexer.setIndexFormat("M");
+    indexer.setProperties(new ElasticsearchProperties());
     mapping = new EsSupervisionMapping();
   }
 

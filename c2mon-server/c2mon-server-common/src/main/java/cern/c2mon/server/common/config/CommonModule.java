@@ -1,4 +1,4 @@
-package cern.c2mon.server.client.config;
+package cern.c2mon.server.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;

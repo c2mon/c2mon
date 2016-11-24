@@ -53,7 +53,6 @@ import cern.c2mon.server.history.structure.AlarmRecord;
     DaqModule.class,
     HistoryModule.class
 })
-@TestPropertySource("classpath:c2mon-server-default.properties")
 public class AlarmRecordMapperTest {
 
   /**

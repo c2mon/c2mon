@@ -51,7 +51,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
     DaqModule.class,
     HistoryModule.class
 })
-@TestPropertySource("classpath:c2mon-server-default.properties")
 public class TagRecordMapperTest {
 
   /**

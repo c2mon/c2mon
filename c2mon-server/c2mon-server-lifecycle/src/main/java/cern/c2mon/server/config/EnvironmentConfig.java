@@ -6,7 +6,7 @@ import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.cachepersistence.config.CachePersistenceModule;
 import cern.c2mon.server.client.config.ClientModule;
-import cern.c2mon.server.client.config.CommonModule;
+import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.command.config.CommandModule;
 import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.configuration.config.ConfigurationModule;

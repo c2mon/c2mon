@@ -28,9 +28,11 @@ import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
 import com.carrotsearch.hppc.cursors.ObjectCursor;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.ActionFuture;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
@@ -42,12 +44,12 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.common.transport.LocalTransportAddress;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
@@ -70,19 +72,14 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
  *
  * @author Alban Marguet
  */
-@Service
 @Slf4j
-@Data
-public class TransportConnector implements Connector {
+@Service
+public class TransportConnector {
 
   /**
-   * Only used if Elasticsearch is started inside this JVM
+   * Name of the BulkProcessor.
    */
-  private final static int LOCAL_PORT = 1;
-  private final static String LOCAL_HOST = "local";
-
-  public final static String TYPE_ALARM = "alarm";
-  public final static String TYPE_SUPERVISION = "supervision";
+  private final static String bulkProcessorName = "ES-BulkProcessor";
 
   @Autowired
   private ElasticsearchProperties properties;
@@ -90,32 +87,29 @@ public class TransportConnector implements Connector {
   /**
    * The Client communicates with the Node inside the Elasticsearch cluster.
    */
+  @Getter @Setter
   private Client client;
 
   /**
    * Allows to send the data by batch.
    */
+  @Getter @Setter
   private BulkProcessor bulkProcessor;
-
-  /**
-   * Name of the BulkProcessor (more for debugging).
-   */
-  private final String bulkProcessorName = "ES-BulkProcessor";
 
   /**
    * True if connected to Elasticsearch
    */
+  @Getter
   private boolean isConnected;
 
   @PostConstruct
   public void init() {
-    String host = properties.getHost();
+    client = createClient();
 
-    if (!host.equalsIgnoreCase("localhost") && !host.equalsIgnoreCase("local")) {
+    if (properties.isEmbedded()) {
       launchLocalCluster();
     }
 
-    client = createClient();
     connectAsynchronously();
   }
 
@@ -131,23 +125,15 @@ public class TransportConnector implements Connector {
             .put("cluster.name", properties.getClusterName())
             .put("http.enabled", properties.isHttpEnabled());
 
-    if (properties.isEmbedded()) {
-      settingsBuilder.put("node.local", true).build();
-    }
-
     log.debug("Creating client {} at {}:{} in cluster {}",
         properties.getNodeName(), properties.getHost(), properties.getPort(), properties.getClusterName());
     TransportClient client = TransportClient.builder().settings(settingsBuilder.build()).build();
 
-    if (properties.isEmbedded()) {
-      client.addTransportAddress(new LocalTransportAddress(String.valueOf(properties.getPort())));
-    } else {
-      try {
-        client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(properties.getHost()), properties.getPort()));
-      } catch(UnknownHostException e) {
-        log.error("Error connecting to the Elasticsearch cluster at {}:{}", properties.getHost(), properties.getPort(), e);
-        return null;
-      }
+    try {
+      client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(properties.getHost()), properties.getPort()));
+    } catch(UnknownHostException e) {
+      log.error("Error connecting to the Elasticsearch cluster at {}:{}", properties.getHost(), properties.getPort(), e);
+      return null;
     }
 
     return client;
@@ -157,40 +143,55 @@ public class TransportConnector implements Connector {
    * Connect to the cluster in a separate thread.
    */
   private void connectAsynchronously() {
-    Thread clusterFinder = new Thread(() -> {
-      while (!isConnected) {
-        log.debug("Waiting for yellow status of Elasticsearch cluster...");
+    log.info("Trying to connect to Elasticsearch cluster {} at {}:{}",
+        properties.getClusterName(), properties.getHost(), properties.getPort());
 
-        try {
-          isConnected = waitForYellowStatus();
+    new Thread(() -> {
+      waitForYellowStatus();
 
-          if (!isConnected) {
-            log.info("Did not receive yellow status from Elasticsearch!");
-          }
-        } catch(Exception ex) {
-          log.warn("Failed receiving yellow status from Elasticsearch: {}", ex.getMessage());
+      log.info("Connected to Elasticsearch cluster {}", properties.getClusterName());
+      initBulkProcessor();
+
+    }, "EsClusterFinder").start();
+  }
+
+  /**
+   * Block and wait for the cluster to become yellow.
+   */
+  public void waitForYellowStatus() {
+    while (!isConnected) {
+      log.debug("Waiting for yellow status of Elasticsearch cluster...");
+
+      try {
+        ClusterHealthStatus status = getClusterHealth().getStatus();
+        if (status.equals(ClusterHealthStatus.YELLOW) || status.equals(ClusterHealthStatus.GREEN)) {
+          isConnected = true;
+          break;
         }
-
-        if (!isConnected) {
-          try {
-            Thread.sleep(5000L);
-          } catch (InterruptedException ignored) {}
-        }
+      } catch(Exception e) {
+        log.warn("Failed receiving yellow status from Elasticsearch: {}", e.getMessage());
       }
 
-      initBulkProcessor();
-      log.info("Connected to Elasticsearch cluster {}", properties.getClusterName());
+      try {
+        Thread.sleep(100L);
+      } catch (InterruptedException ignored) {}
+    }
 
-    }, "EsClusterFinder");
+    log.debug("Elasticsearch cluster is yellow");
+  }
 
-    log.info("Trying to connect to Elasticsearch cluster {} at {}:{}", properties.getClusterName(), properties.getHost(), properties.getPort());
-    clusterFinder.start();
+  private ClusterHealthResponse getClusterHealth() {
+    return client.admin().cluster().prepareHealth()
+        .setWaitForYellowStatus()
+        .setTimeout(TimeValue.timeValueMillis(100))
+        .get();
   }
 
   /**
    * Instantiate a BulkProcessor for batch operations.
    */
   private void initBulkProcessor() {
+    log.debug("Creating BulkProcessor");
     this.bulkProcessor = BulkProcessor.builder(client, createBulkProcessorListener())
             .setName(bulkProcessorName)
             .setBulkActions(properties.getBulkActions())
@@ -198,8 +199,6 @@ public class TransportConnector implements Connector {
             .setFlushInterval(TimeValue.timeValueSeconds(properties.getBulkFlushInterval()))
             .setConcurrentRequests(properties.getConcurrentRequests())
             .build();
-
-    log.debug("BulkProcessor created");
   }
 
   /**
@@ -218,7 +217,7 @@ public class TransportConnector implements Connector {
       public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
         log.debug("Executed bulk operation composed of {} actions", request.numberOfActions());
         waitForYellowStatus();
-        refreshClusterStats();
+        refreshIndices();
       }
 
       @Override
@@ -230,26 +229,8 @@ public class TransportConnector implements Connector {
   }
 
   /**
-   * Allows to check if the cluster is properly initialized.
-   *
-   * @return if the query has been acknowledged or not.
-   */
-  @Override
-  public boolean waitForYellowStatus() {
-    if (client == null) {
-      log.warn("Elasticsearch client is null");
-      return false;
-    }
-
-    checkYellowStatus();
-    log.debug("Elasticsearch cluster is yellow");
-    return true;
-  }
-
-  /**
    * Add an indexRequest to the BulkProcessor in order to write data to Elasticsearch.
    */
-  @Override
   public boolean bulkAdd(IndexRequest request) {
     Assert.notNull(bulkProcessor, "BulkProcessor must not be null!");
     Assert.notNull(request, "IndexRequest must not be null!");
@@ -258,7 +239,6 @@ public class TransportConnector implements Connector {
     return true;
   }
 
-  @Override
   public boolean createIndexTypeMapping(String index, String type, String mapping) {
     if (client == null) {
       log.error("Elasticsearch connection not yet initialized");
@@ -276,9 +256,9 @@ public class TransportConnector implements Connector {
   }
 
   /**
-   * @return the set of indices present in Elasticsearch.
+   * @return the set of indices present in Elasticsearch
    */
-  public Set<String> retrieveIndicesFromES() {
+  public Set<String> retrieveIndices() {
     if (client == null) {
       return Collections.emptySet();
     }
@@ -290,9 +270,9 @@ public class TransportConnector implements Connector {
   }
 
   /**
-   * @return the set of types associated to the index {@param index} in Elasticsearch.
+   * @return the set of types associated to the index {@param index} in Elasticsearch
    */
-  public Set<String> retrieveTypesFromES(String index) {
+  public Set<String> retrieveTypes(String index) {
     if (client == null) {
       return Collections.emptySet();
     }
@@ -303,36 +283,30 @@ public class TransportConnector implements Connector {
             .collect(Collectors.toSet());
   }
 
-  /**
-   * For near real-time retrieval.
-   */
-  @Override
-  public void refreshClusterStats() {
+  public void refreshIndices() {
     client.admin().indices().prepareRefresh().execute().actionGet();
-    checkYellowStatus();
   }
 
   /**
    * Launch a local (to the JVM) Elasticsearch cluster that will answer to the Queries.
    *
-   * @return Node with which we can communicate.
+   * @return Node with which we can communicate
    */
   private Node launchLocalCluster() {
     log.info("Launching an embedded Elasticsearch cluster: {}", properties.getClusterName());
 
     return nodeBuilder().settings(Settings.settingsBuilder()
-            .put("path.home", properties.getEmbeddedStoragePath())
-            .put("cluster.name", properties.getClusterName())
-            .put("node.local", true)
-            .put("node.name", properties.getNodeName())
-            .put("node.data", true)
-            .put("node.master", true)
-            .put("network.host", "0.0.0.0")
-            .put("http.enabled", true)
-            .put("http.cors.enabled", true)
-            .put("http.cors.allow-origin", "/.*/")
-            .build())
-            .node();
+        .put("path.home", properties.getEmbeddedStoragePath())
+        .put("cluster.name", properties.getClusterName())
+        .put("node.local", false)
+        .put("node.name", properties.getNodeName())
+        .put("node.data", true)
+        .put("node.master", true)
+        .put("network.host", "0.0.0.0")
+        .put("http.enabled", true)
+        .put("http.cors.enabled", true)
+        .put("http.cors.allow-origin", "/.*/")
+        .build()).node();
   }
 
   /**
@@ -340,19 +314,11 @@ public class TransportConnector implements Connector {
    *
    * @param client {@link Client} for the cluster.
    */
-  @Override
   public void close(Client client) {
     if (client != null) {
       client.close();
       log.info("Closed client {}", client.settings().get("node.name"));
     }
-  }
-
-  /**
-   * Yellow status means the Elasticsearch is queryable.
-   */
-  private void checkYellowStatus() {
-    client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
   }
 
   /**
@@ -421,7 +387,6 @@ public class TransportConnector implements Connector {
    * @param esAlarm   to be written.
    * @return true if the cluster has acknowledged the query.
    */
-  @Override
   public boolean logAlarmEvent(String indexName, String mapping, EsAlarm esAlarm) {
     if (client == null) {
       log.error("Elasticsearch connection not yet initialized");
@@ -442,7 +407,7 @@ public class TransportConnector implements Connector {
     if (indexExists) {
       log.debug("Adding new alarm event to index {}", indexName);
       return client.prepareIndex().setIndex(indexName)
-                   .setType(TYPE_ALARM)
+                   .setType("alarm")
                    .setSource(jsonSource)
                    .setRouting(routing)
                    .get().isCreated();
@@ -459,7 +424,6 @@ public class TransportConnector implements Connector {
    * @param esSupervisionEvent to be written.
    * @return true if the cluster has acknowledged the query.
    */
-  @Override
   public boolean logSupervisionEvent(String indexName, String mapping, EsSupervisionEvent esSupervisionEvent) {
     if (client == null) {
       log.error("Elasticsearch connection not yet initialized");
@@ -480,7 +444,7 @@ public class TransportConnector implements Connector {
     if (indexExists) {
       log.debug("Adding new supervision event to index {}", indexName);
       return client.prepareIndex().setIndex(indexName)
-                   .setType(TYPE_SUPERVISION)
+                   .setType("supervision")
                    .setSource(jsonSource)
                    .setRouting(routing)
                    .get().isCreated();
@@ -519,7 +483,6 @@ public class TransportConnector implements Connector {
     return types;
   }
 
-  @Override
   public boolean createIndex(String indexName) {
     if (client == null) {
       log.error("Elasticsearch connection not yet initialized");

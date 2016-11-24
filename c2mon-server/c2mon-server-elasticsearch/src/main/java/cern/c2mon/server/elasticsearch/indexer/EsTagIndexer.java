@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
-import cern.c2mon.server.elasticsearch.connector.Connector;
+import cern.c2mon.server.elasticsearch.connector.TransportConnector;
 import cern.c2mon.server.elasticsearch.structure.mappings.EsTagMapping;
 import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
 import lombok.Getter;
@@ -49,7 +49,7 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
   private final Map<String, Set<String>> cacheIndicesTypes = new ConcurrentHashMap<>();
 
   @Autowired
-  public EsTagIndexer(final Connector connector, ElasticsearchProperties properties) {
+  public EsTagIndexer(final TransportConnector connector, ElasticsearchProperties properties) {
     super(connector, properties);
   }
 
@@ -104,7 +104,7 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
    * @throws IDBPersistenceException in case the list could not be saved to Elasticsearch
    */
   public synchronized void indexTags(Collection<T> tags) throws IDBPersistenceException {
-    if(tags == null) {
+    if (tags == null) {
       return;
     }
 
@@ -132,7 +132,7 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
     connector.getBulkProcessor().flush();
 
     // TODO: Should be removed, but then test needs fixing
-    connector.refreshClusterStats();
+    connector.refreshIndices();
   }
 
   /**
@@ -263,7 +263,7 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
   public synchronized void addIndex(String indexName) {
     if (checkIndex(indexName)) {
       cacheIndicesTypes.put(indexName, new HashSet<>());
-      log.debug("Added index {}", indexName);
+      log.info("Added index {}", indexName);
     } else {
       throw new IllegalArgumentException("Invalid index format: " + indexName);
     }
@@ -272,7 +272,7 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
   protected synchronized void addType(String index, String typeName) {
     if (cacheIndicesTypes.containsKey(index)) {
       cacheIndicesTypes.get(index).add(typeName);
-      log.debug("Added type {}", typeName);
+      log.info("Added type {}", typeName);
     } else {
       throw new IllegalArgumentException("Invalid type format: " + typeName);
     }

@@ -58,7 +58,6 @@ import cern.c2mon.shared.client.command.CommandExecutionStatus;
     DaqModule.class,
     HistoryModule.class
 })
-@TestPropertySource("classpath:c2mon-server-default.properties")
 public class CommandRecordMapperTest {
 
   private static final Long COMMAND_ID = 1111L;

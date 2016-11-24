@@ -59,7 +59,6 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStat
     CacheDbAccessModule.class,
     SupervisionModule.class
 })
-@TestPropertySource("classpath:c2mon-server-default.properties")
 public class SupervisionTagNotifierTest {
 
   /**

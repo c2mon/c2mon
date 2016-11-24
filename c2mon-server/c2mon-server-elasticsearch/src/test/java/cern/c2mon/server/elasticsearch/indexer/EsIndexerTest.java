@@ -44,7 +44,7 @@ import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Test the EsIndexer methods for sending the right data to the Connector.
+ * Test the EsIndexer methods for sending the right data to the TransportConnector.
  *
  * @author Alban Marguet
  */
@@ -201,7 +201,7 @@ public class EsIndexerTest extends BaseElasticsearchIntegrationTest {
     tag.getC2mon().setServerTimestamp(123456789000L);
     tag.setRawValue(true);
     String indexName = properties.getIndexPrefix() + TAG_INDEX_SUFFIX +indexer.millisecondsToYearMonth(tag.getC2mon().getServerTimestamp());
-    String typeName = "tag_" + EsTagIndexer.getSimpleTypeName(tag.getC2mon().getDataType());
+    String typeName = "type_" + EsTagIndexer.getSimpleTypeName(tag.getC2mon().getDataType());
 
     list.add(tag);
 
@@ -214,8 +214,8 @@ public class EsIndexerTest extends BaseElasticsearchIntegrationTest {
     assertTrue(indexer.getCacheIndicesTypes().keySet().contains(indexName));
     assertTrue(indexer.getCacheIndicesTypes().get(indexName).contains(typeName));
 
-    assertTrue(connector.retrieveIndicesFromES().contains(indexName));
-    assertTrue(connector.retrieveTypesFromES(indexName).contains(typeName));
+    assertTrue(connector.retrieveIndices().contains(indexName));
+    assertTrue(connector.retrieveTypes(indexName).contains(typeName));
 
     list.clear();
     connector.getClient().admin().indices().delete(new DeleteIndexRequest("*")).actionGet();
@@ -251,7 +251,7 @@ public class EsIndexerTest extends BaseElasticsearchIntegrationTest {
     indexName = properties.getIndexPrefix() + TAG_INDEX_SUFFIX + indexer.millisecondsToYearMonth(tagServerTime);
     indexer.indexTags(list);
     sleep();
-    assertTrue(connector.waitForYellowStatus());
+    connector.waitForYellowStatus();
 
     Set<String> resultIndices = indexer.getCacheIndicesTypes().keySet();
     Set<String> resultTypes = indexer.getCacheIndicesTypes().get(indexName);

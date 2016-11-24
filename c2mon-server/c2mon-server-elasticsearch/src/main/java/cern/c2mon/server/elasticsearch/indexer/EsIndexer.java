@@ -23,8 +23,10 @@ import javax.annotation.PostConstruct;
 
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.connector.Connector;
+import cern.c2mon.server.elasticsearch.connector.TransportConnector;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
@@ -39,7 +41,7 @@ import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 
 /**
  * Used to write (a.k.a. to index) the data to Elasticsearch.
- * Makes use of the {@link Connector} connection to an Elasticsearch cluster.
+ * Makes use of the {@link TransportConnector} connection to an Elasticsearch cluster.
  *
  * @author Alban Marguet
  */
@@ -48,21 +50,22 @@ import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 public abstract class EsIndexer<T extends IFallback> implements IDBPersistenceHandler<T> {
 
   @Autowired
+  @Setter
   protected ElasticsearchProperties properties;
 
   /**
    * Handles the connection with the Elasticsearch cluster.
    */
-  protected Connector connector;
+  protected TransportConnector connector;
 
   /**
-   * Is available if the Connector has found a connection.
+   * Is available if the TransportConnector has found a connection.
    */
   @Getter
   protected boolean isAvailable = false;
 
   @Autowired
-  public EsIndexer(final Connector connector, ElasticsearchProperties properties) {
+  public EsIndexer(final TransportConnector connector, ElasticsearchProperties properties) {
     this.connector = connector;
     this.properties = properties;
   }

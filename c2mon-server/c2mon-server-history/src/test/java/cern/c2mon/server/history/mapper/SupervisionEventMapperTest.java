@@ -59,7 +59,6 @@ import static org.junit.Assert.assertNotNull;
     CommandModule.class,
     HistoryModule.class
 })
-@TestPropertySource("classpath:c2mon-server-default.properties")
 public class SupervisionEventMapperTest {
 
   /**

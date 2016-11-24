@@ -58,7 +58,6 @@ import cern.c2mon.shared.daq.process.XMLConverter;
     CacheDbAccessModule.class,
     SupervisionModule.class
 })
-@TestPropertySource("classpath:c2mon-server-default.properties")
 public class SupervisionManagerProcessTest {
 
   @Rule

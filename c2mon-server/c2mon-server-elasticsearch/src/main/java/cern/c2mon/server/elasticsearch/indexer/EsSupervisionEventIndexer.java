@@ -22,6 +22,7 @@ import javax.annotation.PostConstruct;
 
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.connector.Connector;
+import cern.c2mon.server.elasticsearch.connector.TransportConnector;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +44,7 @@ public class EsSupervisionEventIndexer<T extends EsSupervisionEvent> extends EsI
   private final String supervisionMapping = new EsSupervisionMapping().getMapping();
 
   @Autowired
-  public EsSupervisionEventIndexer(final Connector connector, final ElasticsearchProperties properties) {
+  public EsSupervisionEventIndexer(final TransportConnector connector, final ElasticsearchProperties properties) {
     super(connector, properties);
   }
 

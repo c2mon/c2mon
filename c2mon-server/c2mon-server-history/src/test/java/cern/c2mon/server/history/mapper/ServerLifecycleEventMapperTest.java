@@ -56,7 +56,6 @@ import cern.c2mon.shared.client.lifecycle.ServerLifecycleEvent;
     DaqModule.class,
     HistoryModule.class
 })
-@TestPropertySource("classpath:c2mon-server-default.properties")
 public class ServerLifecycleEventMapperTest {
 
   private ServerLifecycleEvent testEvent = new ServerLifecycleEvent(new Timestamp(System.currentTimeMillis()), "testServer", LifecycleEventType.START);

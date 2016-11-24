@@ -22,6 +22,7 @@ import javax.annotation.PostConstruct;
 
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.connector.Connector;
+import cern.c2mon.server.elasticsearch.connector.TransportConnector;
 import cern.c2mon.server.elasticsearch.structure.mappings.EsAlarmMapping;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +43,7 @@ public class EsAlarmIndexer<T extends EsAlarm> extends EsIndexer<T> {
   private final String alarmMapping = new EsAlarmMapping().getMapping();
 
   @Autowired
-  public EsAlarmIndexer(final Connector connector, ElasticsearchProperties properties) {
+  public EsAlarmIndexer(final TransportConnector connector, ElasticsearchProperties properties) {
     super(connector, properties);
   }
 

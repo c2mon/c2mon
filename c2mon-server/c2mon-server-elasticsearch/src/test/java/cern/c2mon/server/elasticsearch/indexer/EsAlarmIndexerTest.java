@@ -58,9 +58,6 @@ public class EsAlarmIndexerTest {
   @Mock
   private TransportConnector connector;
 
-  @Mock
-  private Environment environment;
-
   private EsAlarmLogConverter esAlarmLogConverter = new EsAlarmLogConverter();
 
   private ElasticsearchProperties properties = new ElasticsearchProperties();
@@ -73,6 +70,7 @@ public class EsAlarmIndexerTest {
     when(connector.logAlarmEvent(anyString(), anyString(), eq(esAlarm))).thenReturn(true);
     properties.setIndexType("M");
     esAlarmMapping = new EsAlarmMapping();
+    indexer.setProperties(properties);
   }
 
   @Test

@@ -16,13 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.config;
 
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
  * This class is responsible for configuring the Spring context for
- * the elasticsearch module.
+ * the Elasticsearch module.
  *
  * @author Justin Lewis Salmon
  * @author Alban Marguet
@@ -31,5 +32,6 @@ import org.springframework.context.annotation.Import;
 @Import({
     ElasticsearchPersistenceConfig.class
 })
-@ComponentScan(basePackages = "cern.c2mon.server.elasticsearch")
+@EnableConfigurationProperties(ElasticsearchProperties.class)
+@ComponentScan("cern.c2mon.server.elasticsearch")
 public class ElasticsearchModule {}

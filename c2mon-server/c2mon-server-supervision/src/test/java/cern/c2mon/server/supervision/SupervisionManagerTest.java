@@ -64,7 +64,6 @@ import static org.junit.Assert.assertTrue;
     CacheDbAccessModule.class,
     SupervisionModule.class
 })
-@TestPropertySource("classpath:c2mon-server-default.properties")
 public class SupervisionManagerTest {
 
   @Rule
