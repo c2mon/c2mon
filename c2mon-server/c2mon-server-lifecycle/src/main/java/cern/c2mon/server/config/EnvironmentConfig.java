@@ -6,6 +6,7 @@ import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.cachepersistence.config.CachePersistenceModule;
 import cern.c2mon.server.client.config.ClientModule;
+import cern.c2mon.server.client.config.CommonModule;
 import cern.c2mon.server.command.config.CommandModule;
 import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
@@ -27,6 +28,7 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
  */
 @Configuration
 @Import({
+    CommonModule.class,
     CacheModule.class,
     CacheDbAccessModule.class,
     CacheLoadingModule.class,
@@ -42,10 +44,7 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
     CommandModule.class
 })
 @EnableConfigurationProperties(ServerProperties.class)
-@PropertySources({
-//    @PropertySource("classpath:c2mon-server-default.properties"),
-    @PropertySource(value = "${c2mon.server.properties}", ignoreResourceNotFound = true)
-})
+@PropertySource(value = "${c2mon.server.properties}", ignoreResourceNotFound = true)
 public class EnvironmentConfig {
 
   @Bean

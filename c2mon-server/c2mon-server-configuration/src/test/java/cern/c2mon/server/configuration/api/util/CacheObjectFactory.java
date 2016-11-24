@@ -45,15 +45,6 @@ import java.util.Set;
 @Service
 public class CacheObjectFactory {
 
-  @Value("${c2mon.server.daqcommunication.jms.queue.trunk}")
-  private String jmsDaqQueueTrunk;
-
-  @Value("${c2mon.server.client.jms.topic.tag.trunk}")
-  private String tagPublicationTrunk = "c2mon.client.tag.default";
-
-  @Value("${c2mon.server.client.jms.topic.controltag}")
-  private String controlTagPublicationTopic;
-
   public ProcessCacheObject buildProcessCacheObject(Long id, Process configProcess) {
     ProcessCacheObject expectedObject = new ProcessCacheObject(id);
     expectedObject = setCacheProcessCacheObjectFields(expectedObject, configProcess);

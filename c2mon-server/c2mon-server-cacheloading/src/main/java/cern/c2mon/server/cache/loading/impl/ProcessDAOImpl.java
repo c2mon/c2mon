@@ -35,15 +35,8 @@ import cern.c2mon.server.common.process.Process;
  */
 @Service("processDAO")
 public class ProcessDAOImpl extends AbstractDefaultLoaderDAO<Process> implements ProcessDAO {
-  /**
-   * LOG4J Logger for this class.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessDAOImpl.class);
 
   private ProcessMapper processMapper;
-
-  @Value("${c2mon.server.daqcommunication.jms.queue.trunk}")
-  private String jmsDaqQueueTrunk;
 
   @Autowired
   public ProcessDAOImpl(ProcessMapper processMapper) {

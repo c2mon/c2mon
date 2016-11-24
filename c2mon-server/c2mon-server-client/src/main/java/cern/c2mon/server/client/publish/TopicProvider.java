@@ -5,7 +5,6 @@ import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
-import org.springframework.core.env.Environment;
 
 /**
  * @author Justin Lewis Salmon

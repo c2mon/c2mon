@@ -29,7 +29,7 @@ public class ServerProperties {
   /**
    * JMS properties
    */
-  private Jms jms = new Jms();
+  private final Jms jms = new Jms();
 
   @Data
   public static class Jms {

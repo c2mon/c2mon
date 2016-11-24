@@ -22,6 +22,7 @@ import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.client.config.ClientModule;
+import cern.c2mon.server.client.config.CommonModule;
 import cern.c2mon.server.client.junit.ClientCachePopulationRule;
 import cern.c2mon.server.command.config.CommandModule;
 import cern.c2mon.server.common.alarm.Alarm;
@@ -50,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.jms.ConnectionFactory;
@@ -70,6 +72,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
+    CommonModule.class,
     CacheModule.class,
     CacheDbAccessModule.class,
     SupervisionModule.class,
@@ -130,7 +133,7 @@ public class TagValuePublisherTest {
    * @throws InterruptedException
    */
   @Test
-  //@Ignore("This test is flaky, maybe due to all the sleep() calls")
+  @Ignore("This test is flaky, maybe due to all the sleep() calls")
   public void testPublication() throws JMSException, InterruptedException {
     EasyMock.reset();
     synchronized (updateLock) {

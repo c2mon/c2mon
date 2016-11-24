@@ -174,12 +174,6 @@ public class ConfigurationLoaderTest {
   @Autowired
   private ProcessFacade processFacade;
 
-  @Value("${c2mon.server.daqcommunication.jms.queue.trunk}")
-  private String jmsDaqQueueTrunk;
-
-  @Value("${c2mon.server.client.jms.topic.tag.trunk}")
-  private String tagPublicationTrunk = "c2mon.client.tag.default";
-
   @Autowired
   private JmsContainerManagerImpl jmsContainerManager;
 

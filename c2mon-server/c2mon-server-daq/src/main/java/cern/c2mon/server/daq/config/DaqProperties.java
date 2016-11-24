@@ -15,33 +15,6 @@ public class DaqProperties {
    */
   private Jms jms = new Jms();
 
-
-
-  /**
-   c2mon.server.daqcommunication.jms.url=${c2mon.server.jms.url}
-   c2mon.server.daqcommunication.jms.queue.trunk = ${c2mon.domain}.process
-   c2mon.server.daqcommunication.jms.configurationTimeout = 60000
-
-   # JMS properties for tag update messages
-   c2mon.server.daqcommunication.jms.update.consumers.initial = 1
-   c2mon.server.daqcommunication.jms.update.consumers.max = 50
-   # time before all consumers become active (in seconds)
-   c2mon.server.daqcommunication.jms.update.consumers.warmuptime = 120
-   # should broker wait for server to finish message processing call (i.e. put in
-   # cache and notify listeners)
-   c2mon.server.daqcommunication.jms.update.transacted = true
-   c2mon.server.daqcommunication.jms.update.idleTaskExecutionLimit = 5
-   c2mon.server.daqcommunication.jms.update.maxMessagesPerTask = 1
-   c2mon.server.daqcommunication.jms.update.receiveTimeout = 1000
-   c2mon.server.daqcommunication.jms.update.numExecutorThreads = 250
-   c2mon.server.daqcommunication.jms.update.keepAliveSeconds = 60
-
-   # JMS properties for DAQ requests to the server
-   c2mon.server.daqcommunication.jms.request.transacted = true
-   c2mon.server.daqcommunication.jms.request.consumers.initial = 1
-   c2mon.server.daqcommunication.jms.request.consumers.max = 5
-   */
-
   @Data
   public class Jms {
 
