@@ -154,8 +154,6 @@ public class ProcessConfigurationLoaderTest {
   private ProcessConfiguration getProcessConfiguration(String name) throws ConfUnknownTypeException, ConfRejectedTypeException, IOException {
     String path = new ClassPathResource(name).getFile().getAbsolutePath();
     Document pconfDocument = processConfigurationLoader.fromFiletoDOC(path);
-//    DaqProperties properties = new DaqProperties();
-//    properties.setLocalConfigFile("/tmp/");
     processConfigurationLoader.setProperties(new DaqProperties());
     ProcessConfiguration processConfiguration = processConfigurationLoader.createProcessConfiguration(PROCESS_NAME, PROCESS_PIK, pconfDocument);
     return processConfiguration;
