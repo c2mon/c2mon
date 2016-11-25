@@ -7,12 +7,12 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import cern.c2mon.daq.common.IEquipmentMessageSender;
+import cern.c2mon.daq.config.DaqProperties;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTagQualityCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 public class FreshnessMonitor {
 
   @Autowired
-  private Environment environment;
+  private DaqProperties properties;
 
   private Map<Long, Runnable> freshnessTasks;
 
@@ -60,7 +60,7 @@ public class FreshnessMonitor {
         freshnessTasks.put(tagId, task);
       }
 
-      Double freshnessTolerance = environment.getRequiredProperty("c2mon.daq.freshness.tolerance", Double.class);
+      Double freshnessTolerance = properties.getFreshnessTolerance();
       timer.schedule(task, (long) (sourceDataTag.getAddress().getFreshnessInterval() * freshnessTolerance), TimeUnit.SECONDS);
     }
   }

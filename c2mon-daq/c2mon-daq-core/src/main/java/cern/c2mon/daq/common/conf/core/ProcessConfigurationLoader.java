@@ -21,12 +21,12 @@ import java.net.UnknownHostException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import cern.c2mon.daq.config.DaqProperties;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.xerces.parsers.DOMParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -34,7 +34,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
-import cern.c2mon.daq.config.Options;
 import cern.c2mon.daq.tools.processexceptions.ConfRejectedTypeException;
 import cern.c2mon.daq.tools.processexceptions.ConfUnknownTypeException;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
@@ -55,11 +54,9 @@ import cern.c2mon.shared.util.parser.SimpleXMLParser;
 @Slf4j
 public class ProcessConfigurationLoader extends XMLTagValueExtractor implements ConfigurationXMLConstants {
 
-  /**
-   * JMS DAq queue trunk
-   */
-  @Value("${c2mon.jms.daq.queue.trunk}")
-  private String jmsDaqQueueTrunk;
+  @Autowired
+  @Setter
+  private DaqProperties properties;
 
   /**
    * Reference to the ProcessRequestSender (for requesting the XML config document). This reference is injected in the
@@ -68,9 +65,6 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
   @Autowired
   @Qualifier("primaryRequestSender")
   private ProcessRequestSender processRequestSender;
-
-  @Autowired
-  private Environment environment;
 
   private EquipmentConfigurationFactory equipmentConfigurationFactory;
 
@@ -89,7 +83,7 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
     ProcessConfigurationResponse processConfigurationResponse;
     log.trace("getProcessConfiguration - getting Process Configuration");
 
-    processConfigurationResponse = processRequestSender.sendProcessConfigurationRequest(environment.getRequiredProperty(Options.C2MON_DAQ_NAME));
+    processConfigurationResponse = processRequestSender.sendProcessConfigurationRequest(properties.getName());
 
     if (processConfigurationResponse == null) {
       throw new RuntimeException("Configuration request to server: timeout waiting for server response");
@@ -109,7 +103,7 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
     log.trace("getting Process Connection");
 
     // Ask for XML file to the server
-    processConnectionResponse = processRequestSender.sendProcessConnectionRequest(environment.getRequiredProperty(Options.C2MON_DAQ_NAME));
+    processConnectionResponse = processRequestSender.sendProcessConnectionRequest(properties.getName());
 
     if (processConnectionResponse == null) {
       throw new RuntimeException("Connection request to server: timeout waiting for server response");
@@ -178,31 +172,12 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
    * @param processName The name of the process.
    * @param processPIK The process PIK.
    * @param confXMLDoc the configuration XML document
-   * @param localConfiguration flag indicating if the configuration is locally or from the server
-   * @param jmsDaqQueueTrunk
    * @return The ProcessConfiguration object.
    * @throws ConfUnknownTypeException Thrown if the configuration has the type 'unknown'.
    * @throws ConfRejectedTypeException Thrown if the configuration has the type 'rejected'.
    */
   public ProcessConfiguration createProcessConfiguration(final String processName, final Long processPIK,
-      final Document confXMLDoc, final boolean localConfiguration, String jmsDaqQueueTrunk) throws ConfUnknownTypeException, ConfRejectedTypeException {
-    this.jmsDaqQueueTrunk = jmsDaqQueueTrunk;
-    return createProcessConfiguration(processName, processPIK, confXMLDoc, localConfiguration);
-  }
-
-  /**
-   * Takes the configuration DOM document and returns an ProcessConfiguration.
-   *
-   * @param processName The name of the process.
-   * @param processPIK The process PIK.
-   * @param confXMLDoc the configuration XML document
-   * @param localConfiguration flag indicating if the configuration is locally or from the server
-   * @return The ProcessConfiguration object.
-   * @throws ConfUnknownTypeException Thrown if the configuration has the type 'unknown'.
-   * @throws ConfRejectedTypeException Thrown if the configuration has the type 'rejected'.
-   */
-  public ProcessConfiguration createProcessConfiguration(final String processName, final Long processPIK,
-      final Document confXMLDoc, final boolean localConfiguration) throws ConfUnknownTypeException, ConfRejectedTypeException {
+      final Document confXMLDoc) throws ConfUnknownTypeException, ConfRejectedTypeException {
     ProcessConfiguration processConfiguration = new ProcessConfiguration();
     // get the root element of the document
     Element rootElem = confXMLDoc.getDocumentElement();
@@ -239,7 +214,7 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
         pik = processConfiguration.getprocessPIK().toString();
       }
 
-      String jmsDaqQueue = this.jmsDaqQueueTrunk + ".command." + processConfiguration.getHostName() + "."
+      String jmsDaqQueue = properties.getJms().getQueuePrefix() + ".command." + processConfiguration.getHostName() + "."
           + processConfiguration.getProcessName() + "." + pik;
       processConfiguration.setJmsDaqCommandQueue(jmsDaqQueue);
       log.trace("createProcessConfiguration - jms Daq Queue: " + jmsDaqQueue);

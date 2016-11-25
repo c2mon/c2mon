@@ -113,7 +113,9 @@ public class ProcessMessageSender implements IProcessMessageSender {
    * Stops the Process alive timer. Used at final DAQ shutdown.
    */
   public final void stopAliveTimer() {
-    aliveTimer.terminateTimer();
+    if (aliveTimer != null) {
+      aliveTimer.terminateTimer();
+    }
   }
 
   /**

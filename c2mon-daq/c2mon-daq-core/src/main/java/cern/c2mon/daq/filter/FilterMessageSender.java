@@ -22,10 +22,9 @@ import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 
 import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
+import cern.c2mon.daq.config.DaqProperties;
 import lombok.extern.slf4j.Slf4j;
 
-import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.config.Options;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.filter.FilteredDataTagValueUpdate;
@@ -33,7 +32,6 @@ import cern.c2mon.shared.util.buffer.PullEvent;
 import cern.c2mon.shared.util.buffer.PullException;
 import cern.c2mon.shared.util.buffer.SynchroBuffer;
 import cern.c2mon.shared.util.buffer.SynchroBufferListener;
-import org.springframework.core.env.Environment;
 
 
 /**
@@ -74,10 +72,10 @@ public abstract class FilterMessageSender implements IFilterMessageSender {
    */
   private SynchroBuffer tagBuffer;
 
-  private Environment environment;
+  private DaqProperties properties;
 
-  public FilterMessageSender(Environment environment) {
-    this.environment = environment;
+  public FilterMessageSender(DaqProperties properties) {
+    this.properties = properties;
   }
 
   /**
@@ -94,7 +92,7 @@ public abstract class FilterMessageSender implements IFilterMessageSender {
    */
   @PostConstruct
   public void init() {
-    Integer bufferCapacity = environment.getRequiredProperty(Options.FILTER_BUFFER_CAPACITY, Integer.class);
+    Integer bufferCapacity = properties.getFilter().getBufferCapacity();
     // set up and enable the synchrobuffer for storing the tags
     log.debug("initializing filtering synchrobuffer with max delay :" + MAX_MESSAGE_DELAY + " and capacity : " + bufferCapacity);
 

@@ -26,11 +26,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 
 import cern.c2mon.daq.common.timer.FreshnessMonitor;
+import cern.c2mon.daq.config.DaqProperties;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -38,7 +38,6 @@ import org.w3c.dom.ls.LSSerializer;
 
 import cern.c2mon.daq.common.conf.equipment.*;
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
-import cern.c2mon.daq.config.Options;
 import cern.c2mon.daq.tools.StackTraceHelper;
 import cern.c2mon.daq.tools.processexceptions.ConfUnknownTypeException;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -66,7 +65,7 @@ import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
 public class ConfigurationController {
 
   @Autowired
-  private Environment environment;
+  private DaqProperties properties;
 
   @Setter
   @Autowired
@@ -136,17 +135,6 @@ public class ConfigurationController {
   public void initProcess() {
     this.startUp = System.currentTimeMillis();
 
-    // check if the filtering should be turned off (default is on)
-//    setFilterMode(optionsManager.getOption(Options.NO_FILTER, Boolean.class));
-//    if (!isFilterMode()) {
-//      LOGGER.info("The DAQ process is starting without filtering (no JMS connections will be opened with Filter module)");
-//    }
-
-//    setUseEquipmentLoggers(environment.getProperty(USE_EQUIPMENT_LOGGERS, Boolean.class, false));
-//    if (useEquipmentLoggers()) {
-//      setUseEquipmentAppendersOnly(environment.getProperty(USE_EQUIPMENT_APPENDERS_ONLY, Boolean.class, false));
-//    }
-
     try {
       // Get the PIK from the server
       log.trace("initProcess - Process Connection called.");
@@ -193,15 +181,14 @@ public class ConfigurationController {
     ProcessConfigurationResponse processConfigurationResponse = null;
     log.trace("Configuration process started");
 
+    String localConfigFile = properties.getLocalConfigFile();
     boolean localConfiguration = false;
 
-    if (environment.containsProperty(Options.LOCAL_CONFIG_FILE)) {
+    if (localConfigFile != null) {
       localConfiguration = true;
-      String fileSystemLocation = environment.getProperty(Options.LOCAL_CONFIG_FILE);
 
-      log.info("Loading configuration from file: {}", fileSystemLocation);
-
-      xmlConfiguration = this.processConfigurationLoader.fromFiletoDOC(fileSystemLocation);
+      log.info("Loading configuration from file: {}", localConfigFile);
+      xmlConfiguration = this.processConfigurationLoader.fromFiletoDOC(localConfigFile);
     }
     else {
       log.info("Loading configuration from server");
@@ -224,7 +211,7 @@ public class ConfigurationController {
     }
 
     // Save config if it was the option and it is not local config (pointless)
-    if (environment.containsProperty(Options.REMOTE_CONFIG_FILE)) {
+    if (properties.getSaveRemoteConfig() != null) {
       if (!localConfiguration) {
         saveConfiguration(xmlConfiguration);
       } else {
@@ -239,7 +226,7 @@ public class ConfigurationController {
     try {
       ProcessConfiguration configuration = ProcessConfigurationHolder.getInstance();
       configuration = this.processConfigurationLoader.createProcessConfiguration(configuration.getProcessName(),
-          configuration.getprocessPIK(), xmlConfiguration, localConfiguration);
+          configuration.getprocessPIK(), xmlConfiguration);
       ProcessConfigurationHolder.setInstance(configuration);
 
       log.debug("Process configuration successfully loaded");
@@ -257,13 +244,13 @@ public class ConfigurationController {
    * Saves the process configuration.
    */
   private void saveConfiguration(Document docXMLConfig) {
-    String fileToSaveConf = environment.getProperty(Options.REMOTE_CONFIG_FILE);
+    String fileToSaveConf = properties.getSaveRemoteConfig();
     if (fileToSaveConf.length() > 0 && docXMLConfig != null) {
       log.info("saveConfiguration - saving the process configuration XML in a file " + fileToSaveConf + " due to user request");
 
       File file = new File(fileToSaveConf);
       if (file.isDirectory() || !fileToSaveConf.endsWith(".xml")) {
-        throw new RuntimeException("File name provided by '" + Options.REMOTE_CONFIG_FILE +"' option must end with '.xml'");
+        throw new RuntimeException("Path to which to save remote config must end with '.xml'");
       }
 
       try {
@@ -1063,9 +1050,5 @@ public class ConfigurationController {
    */
   public long getStartUp() {
     return startUp;
-  }
-
-  public Environment getEnvironment() {
-    return environment;
   }
 }

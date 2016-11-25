@@ -5,7 +5,6 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
@@ -16,12 +15,12 @@ import org.springframework.jms.listener.DefaultMessageListenerContainer;
 public class JmsConfig {
 
   @Autowired
-  private Environment environment;
+  private DaqProperties properties;
 
   @Bean
   public ActiveMQConnectionFactory activeMQConnectionFactory() {
-    ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(environment.getRequiredProperty("jms.broker.url"));
-    factory.setClientIDPrefix("C2MON-DAQ-" + environment.getRequiredProperty("c2mon.daq.name"));
+    ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(properties.getJms().getUrl());
+    factory.setClientIDPrefix("C2MON-DAQ-" + properties.getName());
     factory.setWatchTopicAdvisories(false);
     return factory;
   }
@@ -33,10 +32,8 @@ public class JmsConfig {
 
   @Bean
   public JmsTemplate sourceUpdateJmsTemplate() {
-    String daqName = environment.getRequiredProperty("c2mon.daq.name");
-    String queueTrunk = environment.getRequiredProperty("c2mon.jms.daq.queue.trunk");
     JmsTemplate template = new JmsTemplate(singleConnectionFactory());
-    template.setDefaultDestination(new ActiveMQQueue(queueTrunk + ".update." + daqName));
+    template.setDefaultDestination(new ActiveMQQueue(properties.getJms().getQueuePrefix() + ".update." + properties.getName()));
     template.setMessageConverter(dataTagValueUpdateConverter());
     return template;
   }
@@ -48,7 +45,7 @@ public class JmsConfig {
 
   @Bean
   public JmsTemplate processRequestJmsTemplate() {
-    String queueTrunk = environment.getRequiredProperty("c2mon.jms.daq.queue.trunk");
+    String queueTrunk = properties.getJms().getQueuePrefix();
     JmsTemplate template = new JmsTemplate(singleConnectionFactory());
     template.setDefaultDestination(new ActiveMQQueue(queueTrunk + ".request"));
     return template;
@@ -69,7 +66,7 @@ public class JmsConfig {
 
   @Bean
   public ActiveMQConnectionFactory filterActiveMQConnectionFactory() {
-    ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(environment.getRequiredProperty("jms.broker.url"));
+    ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(properties.getFilter().getJms().getUrl());
     factory.setClientIDPrefix("C2MON_DAQ_FILTER");
     factory.setWatchTopicAdvisories(false);
     return factory;
@@ -82,7 +79,7 @@ public class JmsConfig {
 
   @Bean
   public JmsTemplate filterJmsTemplate() {
-    String queueTrunk = environment.getRequiredProperty("c2mon.jms.daq.queue.trunk");
+    String queueTrunk = properties.getJms().getQueuePrefix();
     JmsTemplate template = new JmsTemplate(filterConnectionFactory());
     template.setDefaultDestination(new ActiveMQQueue(queueTrunk + ".filter"));
     template.setDeliveryPersistent(false);
@@ -93,8 +90,8 @@ public class JmsConfig {
 
   @Bean
   public ActiveMQConnectionFactory secondActiveMQConnectionFactory() {
-    ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(environment.getRequiredProperty("jms.broker.url.2"));
-    factory.setClientIDPrefix("C2MON-DAQ-" + environment.getRequiredProperty("c2mon.daq.name"));
+    ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(properties.getJms().getSecondaryUrl());
+    factory.setClientIDPrefix("C2MON-DAQ-" + properties.getName());
     factory.setWatchTopicAdvisories(false);
     return factory;
   }
@@ -106,17 +103,15 @@ public class JmsConfig {
 
   @Bean
   public JmsTemplate secondSourceUpdateJmsTemplate() {
-    String daqName = environment.getRequiredProperty("c2mon.daq.name");
-    String queueTrunk = environment.getRequiredProperty("c2mon.jms.daq.queue.trunk");
     JmsTemplate template = new JmsTemplate(secondSingleConnectionFactory());
-    template.setDefaultDestination(new ActiveMQQueue(queueTrunk + ".update." + daqName));
+    template.setDefaultDestination(new ActiveMQQueue(properties.getJms().getQueuePrefix() + ".update." + properties.getName()));
     template.setMessageConverter(dataTagValueUpdateConverter());
     return template;
   }
 
   @Bean
   public JmsTemplate secondProcessRequestJmsTemplate() {
-    String queueTrunk = environment.getRequiredProperty("c2mon.jms.daq.queue.trunk");
+    String queueTrunk = properties.getJms().getQueuePrefix();
     JmsTemplate template = new JmsTemplate(secondSingleConnectionFactory());
     template.setDefaultDestination(new ActiveMQQueue(queueTrunk + ".request"));
     return template;

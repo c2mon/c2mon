@@ -78,22 +78,6 @@ public class CounterTimeDeadbandActivator extends TimerTask implements IDynamicT
   /**
    * Creates a new CounterMovingAverage.
    *
-   * @param numberOfCounters The number of counters used per tag.
-   * @param checkInterval    The time in which the average number of tasks is checked and
-   *                         the next counter is used. [ms]
-   * @param maxTagsPerTime   The maximum number of tags per check interval averaged
-   *                         over the counters. If there are more tags time deadband filtering is enabled
-   *                         for this tag. The value to deactivate time deadband filtering is 0.5 times
-   *                         this value.
-   * @param timeDeadbandTime The time deadband which is set if a timedeadband is activated.
-   */
-  public CounterTimeDeadbandActivator(final int numberOfCounters, final long checkInterval, final int maxTagsPerTime, final int timeDeadbandTime) {
-    this(numberOfCounters, checkInterval, maxTagsPerTime, maxTagsPerTime / 2, timeDeadbandTime);
-  }
-
-  /**
-   * Creates a new CounterMovingAverage.
-   *
    * @param numberOfCounters         The number of counters used per tag.
    * @param checkInterval            The time in which the average number of tasks is checked and
    *                                 the next counter is used. [ms]

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import cern.c2mon.daq.config.DaqProperties;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,8 +64,7 @@ public class ProcessConfigurationLoaderTest {
 
   private String processHostName;
 
-  @Value("${c2mon.jms.daq.queue.trunk}")
-  private String jmsDaqQueueTrunk;
+  private DaqProperties properties = new DaqProperties();
 
   @Before
   public void setUp() {
@@ -83,7 +83,7 @@ public class ProcessConfigurationLoaderTest {
     ProcessConfiguration processConfiguration = getProcessConfiguration(PROCESS_CONFIGURATION_XML);
 
     assertEquals(4092L, processConfiguration.getProcessID().longValue());
-    assertEquals(this.jmsDaqQueueTrunk + ".command." + this.processHostName + "." + PROCESS_NAME + "." + PROCESS_PIK, processConfiguration
+    assertEquals(properties.getJms().getQueuePrefix() + ".command." + this.processHostName + "." + PROCESS_NAME + "." + PROCESS_PIK, processConfiguration
         .getJmsDaqCommandQueue());
     assertEquals(100730, processConfiguration.getAliveTagID());
     assertEquals(60000, processConfiguration.getAliveInterval());
@@ -154,7 +154,10 @@ public class ProcessConfigurationLoaderTest {
   private ProcessConfiguration getProcessConfiguration(String name) throws ConfUnknownTypeException, ConfRejectedTypeException, IOException {
     String path = new ClassPathResource(name).getFile().getAbsolutePath();
     Document pconfDocument = processConfigurationLoader.fromFiletoDOC(path);
-    ProcessConfiguration processConfiguration = processConfigurationLoader.createProcessConfiguration(PROCESS_NAME, PROCESS_PIK, pconfDocument, true);
+//    DaqProperties properties = new DaqProperties();
+//    properties.setLocalConfigFile("/tmp/");
+    processConfigurationLoader.setProperties(new DaqProperties());
+    ProcessConfiguration processConfiguration = processConfigurationLoader.createProcessConfiguration(PROCESS_NAME, PROCESS_PIK, pconfDocument);
     return processConfiguration;
   }
 }

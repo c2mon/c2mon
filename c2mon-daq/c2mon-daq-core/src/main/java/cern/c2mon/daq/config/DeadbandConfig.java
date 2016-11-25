@@ -19,8 +19,6 @@ package cern.c2mon.daq.config;
 import cern.c2mon.daq.filter.dynamic.CounterTimeDeadbandActivator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 
 /**
  * This configuration class is responsible for instantiating the various
@@ -31,25 +29,19 @@ import org.springframework.core.env.Environment;
 public class DeadbandConfig {
 
   @Autowired
-  Environment environment;
+  private DaqProperties properties;
 
   @Bean
   public CounterTimeDeadbandActivator lowDynamicTimeDeadbandFilterActivator() {
-    return new CounterTimeDeadbandActivator(
-        environment.getRequiredProperty("deadband.counter.low.nbIntervals", Integer.class),
-        environment.getRequiredProperty("deadband.counter.low.interval", Long.class),
-        environment.getRequiredProperty("deadband.counter.low.activate", Integer.class),
-        environment.getRequiredProperty("deadband.counter.low.deactivate", Integer.class),
-        environment.getRequiredProperty("deadband.counter.low.deadband", Integer.class));
+    DaqProperties.Filter.DynamicDeadband deadband = properties.getFilter().getDynamicDeadband();
+    return new CounterTimeDeadbandActivator(deadband.getWindowSize(), deadband.getCheckInterval(),
+        deadband.getActivationThreshold(), deadband.getDeactivationThreshold(), deadband.getForcedDeadbandInterval());
   }
 
   @Bean
   public CounterTimeDeadbandActivator medDynamicTimeDeadbandFilterActivator() {
-    return new CounterTimeDeadbandActivator(
-        environment.getRequiredProperty("deadband.counter.medium.nbIntervals", Integer.class),
-        environment.getRequiredProperty("deadband.counter.medium.interval", Long.class),
-        environment.getRequiredProperty("deadband.counter.medium.activate", Integer.class),
-        environment.getRequiredProperty("deadband.counter.medium.deactivate", Integer.class),
-        environment.getRequiredProperty("deadband.counter.medium.deadband", Integer.class));
+    DaqProperties.Filter.DynamicDeadband deadband = properties.getFilter().getDynamicDeadband();
+    return new CounterTimeDeadbandActivator(deadband.getWindowSize(), deadband.getCheckInterval(),
+        deadband.getActivationThreshold(), deadband.getDeactivationThreshold(), deadband.getForcedDeadbandInterval());
   }
 }

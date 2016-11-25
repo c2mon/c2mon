@@ -18,6 +18,7 @@ package cern.c2mon.daq;
 
 import java.io.IOException;
 
+import cern.c2mon.daq.config.DaqCoreModule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.Banner;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -26,9 +27,8 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
 import org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.env.AbstractEnvironment;
-
-import cern.c2mon.daq.config.Options;
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
@@ -40,23 +40,26 @@ import static java.lang.System.getProperty;
  */
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = {JmsAutoConfiguration.class, ActiveMQAutoConfiguration.class, DataSourceAutoConfiguration.class})
+@Import({
+    DaqCoreModule.class
+})
 @Slf4j
 public class DaqStartup {
 
   public static void main(String[] args) throws IOException {
-    String daqName = getProperty(Options.C2MON_DAQ_NAME);
+    String daqName = getProperty("c2mon.daq.name");
     if (daqName == null) {
-      throw new RuntimeException(format("Please specify the DAQ process name using '%s'.", Options.C2MON_DAQ_NAME));
+      throw new RuntimeException("Please specify the DAQ process name using 'c2mon.daq.name'");
     }
 
     // The JMS mode (single, double, test) is controlled via Spring profiles
-    String mode = getProperty(Options.JMS_MODE);
+    String mode = getProperty("c2mon.daq.jms.mode");
     if (mode != null) {
       System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, mode);
     }
 
     new SpringApplicationBuilder(DaqStartup.class).bannerMode(Banner.Mode.OFF).build().run(args);
-    
+
     log.info("DAQ core is now initialized");
   }
 }

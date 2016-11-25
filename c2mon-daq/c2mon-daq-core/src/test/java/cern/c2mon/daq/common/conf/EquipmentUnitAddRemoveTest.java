@@ -18,18 +18,17 @@ package cern.c2mon.daq.common.conf;
 
 import cern.c2mon.daq.common.DriverKernel;
 import cern.c2mon.daq.common.ProcessMessageSenderMock;
-import cern.c2mon.daq.common.messaging.impl.DummyJmsSender;
+import cern.c2mon.daq.common.messaging.impl.ProcessMessageSender;
 import cern.c2mon.daq.config.DaqCoreModule;
 import cern.c2mon.daq.common.timer.FreshnessMonitor;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
 import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -46,7 +45,7 @@ import static org.junit.Assert.*;
     value = "classpath:c2mon-daq-default.properties",
     properties = {
         "c2mon.daq.name=P_TEST",
-        "jms.broker.url=vm://localhost:61616?broker.persistent=false&broker.useShutdownHook=false&broker.useJmx=false"
+        "c2mon.daq.jms.url=vm://localhost:61616?broker.persistent=false&broker.useShutdownHook=false&broker.useJmx=false"
     }
 )
 public class EquipmentUnitAddRemoveTest {
@@ -54,16 +53,9 @@ public class EquipmentUnitAddRemoveTest {
   @Autowired
   DriverKernel kernel;
 
-//  @Autowired
-//  @Qualifier("dummyJmsSender")
-//  DummyJmsSender sender;
-
-  @Autowired
-  FreshnessMonitor monitor;
-
   @Before
   public void setUp() throws Exception {
-
+    kernel.setProcessMessageSender(EasyMock.createMock(ProcessMessageSender.class));
   }
 
   @DirtiesContext

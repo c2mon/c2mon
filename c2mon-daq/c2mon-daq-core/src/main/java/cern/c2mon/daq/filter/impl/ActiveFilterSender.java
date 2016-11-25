@@ -19,11 +19,10 @@ package cern.c2mon.daq.filter.impl;
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
 
+import cern.c2mon.daq.config.DaqProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
 
-import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.config.ProcessMessageSenderConfig;
 import cern.c2mon.daq.filter.FilterMessageSender;
 import cern.c2mon.daq.filter.IFilterMessageSender;
@@ -46,8 +45,8 @@ public class ActiveFilterSender extends FilterMessageSender implements IFilterMe
    */
   private JmsTemplate filterTemplate;
 
-  public ActiveFilterSender(final JmsTemplate filterTemplate, Environment environment) {
-    super(environment);
+  public ActiveFilterSender(final JmsTemplate filterTemplate, DaqProperties properties) {
+    super(properties);
     this.filterTemplate = filterTemplate;
   }
 

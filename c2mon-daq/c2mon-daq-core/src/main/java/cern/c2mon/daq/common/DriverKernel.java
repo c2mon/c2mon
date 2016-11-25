@@ -25,7 +25,7 @@ import cern.c2mon.daq.common.messaging.ProcessMessageReceiver;
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
 import cern.c2mon.daq.common.messaging.impl.ProcessMessageSender;
 import cern.c2mon.daq.common.messaging.impl.RequestController;
-import cern.c2mon.daq.config.Options;
+import cern.c2mon.daq.config.DaqProperties;
 import cern.c2mon.daq.filter.FilterConnectorThread;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.tools.StackTraceHelper;
@@ -44,12 +44,12 @@ import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
 import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -74,12 +74,13 @@ public class DriverKernel implements ApplicationContextAware {
   public static final String EQUIPMENT_MESSAGE_SENDER = "equipmentMessageSender";
 
   @Autowired
-  private Environment environment;
+  private DaqProperties properties;
 
   /**
    * The reference to the static ProcessMessageSender object
    */
   @Autowired
+  @Setter
   private ProcessMessageSender processMessageSender;
 
   /**
@@ -303,7 +304,7 @@ public class DriverKernel implements ApplicationContextAware {
 
     EquipmentMessageHandler equnit = null;
     ProcessConfiguration processConfiguration = configurationController.getProcessConfiguration();
-    boolean dynamicTimeDeadbandEnabled = environment.getRequiredProperty(Options.DYNAMIC_TIME_DEADBAND_ENABLED, Boolean.class);
+    boolean dynamicTimeDeadbandEnabled = properties.getFilter().getDynamicDeadband().isEnabled();
 
     int eqUnitsConnectedProperly = 0;
     // for each equipment unit defined in the ProcessConfiguration XML
@@ -535,7 +536,7 @@ public class DriverKernel implements ApplicationContextAware {
 
     EquipmentMessageHandler equnit = null;
 
-    boolean dynamicTimeDeadbandEnabled = environment.getRequiredProperty(Options.DYNAMIC_TIME_DEADBAND_ENABLED, Boolean.class);
+    boolean dynamicTimeDeadbandEnabled = properties.getFilter().getDynamicDeadband().isEnabled();
     conf.setDynamicTimeDeadbandEnabled(dynamicTimeDeadbandEnabled);
 
     log.info("onEquipmentUnitAdd - Dynamic timedeadband enabled for equipment id: " + conf.getId() + " enabled: " + dynamicTimeDeadbandEnabled);

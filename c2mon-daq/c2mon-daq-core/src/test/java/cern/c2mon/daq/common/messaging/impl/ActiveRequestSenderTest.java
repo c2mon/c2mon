@@ -32,6 +32,7 @@ import javax.jms.TextMessage;
 
 import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
 import cern.c2mon.daq.config.DaqCoreModule;
+import cern.c2mon.daq.config.DaqProperties;
 import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,13 +43,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.jms.support.converter.MessageConversionException;
-import org.springframework.mock.env.MockEnvironment;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -168,7 +167,7 @@ public class ActiveRequestSenderTest {
   @Autowired
   private DefaultMessageListenerContainer testMessageListenerContainer;
 
-  private MockEnvironment environment = null;
+  private DaqProperties properties = new DaqProperties();
 
   /**
    * Mock
@@ -194,8 +193,7 @@ public class ActiveRequestSenderTest {
 
     // Use of org.easymock.classextension.EasyMoc to mock classes
 
-    this.environment = new MockEnvironment();
-    environment.setProperty("c2mon.daq.name", PROCESS_NAME);
+    properties.setName(PROCESS_NAME);
 
     this.configurationControllerMock = EasyMock.createMockBuilder(ConfigurationController.class).
         addMockedMethod("getProcessConfiguration").
@@ -208,7 +206,7 @@ public class ActiveRequestSenderTest {
         createMock();
 
     // Class to test ActiveRequestSender
-    this.activeRequestSender = new ActiveRequestSender(this.environment, this.jmsTemplate);
+    this.activeRequestSender = new ActiveRequestSender(this.properties, this.jmsTemplate);
   }
 
   /**
@@ -336,7 +334,6 @@ public class ActiveRequestSenderTest {
   @Test
   @Ignore
   public final void testSendProcessConfigurationRequest() {
-    EasyMock.reset(this.environment);
     ActiveRequestSenderTest.testType = TestType.CONFIG;
     LOGGER.debug("Starting " + ActiveRequestSenderTest.testType.getName());
 
@@ -345,20 +342,11 @@ public class ActiveRequestSenderTest {
     processConfiguration.setprocessPIK(PROCESS_PIK);
     ProcessConfigurationHolder.setInstance(processConfiguration);
 
-    // Expectations.
-    EasyMock.expect(this.environment.getRequiredProperty(EasyMock.<String>anyObject(), eq(Long.class))).andReturn(TEST_RESULTS_TIMEOUT).times(1);
-
-    // Start mock replay
-    EasyMock.replay(this.environment);
-
     // Here, the real test starts
     ProcessConfigurationResponse processConfigurationResponse = this.activeRequestSender.sendProcessConfigurationRequest(PROCESS_NAME);
 
     // Check return result of sendProcessConfigurationRequest() and compare it against your emulated server answer.
     compareConfiguration(processConfigurationResponse);
-
-    // Verify configurationController Mock to check that sendprocessConnectionRequest() called what we expected
-    EasyMock.verify(this.environment);
   }
 
 

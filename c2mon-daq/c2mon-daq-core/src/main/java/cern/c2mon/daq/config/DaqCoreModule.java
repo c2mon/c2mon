@@ -18,8 +18,8 @@ package cern.c2mon.daq.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.*;
-import org.springframework.core.env.Environment;
 
 /**
  * This configuration class is responsible for importing an externalised
@@ -30,21 +30,19 @@ import org.springframework.core.env.Environment;
  */
 @Configuration
 @Import({
-    DeadbandConfig.class,
     JmsConfig.class,
     ProcessMessageSenderConfig.class,
     ProcessRequestSenderConfig.class,
+    DeadbandConfig.class,
 })
 @ComponentScan("cern.c2mon.daq.common")
-@PropertySources({
-    @PropertySource(value = "classpath:c2mon-daq-default.properties"),
-    @PropertySource(value = "${c2mon.daq.properties.location}", ignoreResourceNotFound = true)
-})
+@EnableConfigurationProperties(DaqProperties.class)
+@PropertySource(value = "${c2mon.daq.properties}", ignoreResourceNotFound = true)
 @Slf4j
 public class DaqCoreModule {
 
   @Bean
-  public InitializingBean showJmsMode(Environment environment) {
-    return () -> log.info("The following JMS mode is active: {}", environment.getProperty("c2mon.daq.jms.mode"));
+  public InitializingBean showJmsMode(DaqProperties properties) {
+    return () -> log.info("The following JMS mode is active: {}", properties.getJms().getMode());
   }
 }

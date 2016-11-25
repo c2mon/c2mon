@@ -1,6 +1,5 @@
 package cern.c2mon.daq.common;
 
-import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.messaging.JmsSender;
 import cern.c2mon.daq.common.messaging.ProcessMessageReceiver;
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
@@ -8,13 +7,8 @@ import cern.c2mon.daq.common.messaging.impl.DummyRequestSender;
 import cern.c2mon.daq.common.messaging.impl.ProcessMessageSender;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import org.easymock.EasyMock;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Collections;
-
-import static java.util.Collections.singletonList;
 
 /**
  * @author Justin Lewis Salmon
@@ -42,12 +36,7 @@ public class ProcessMessageSenderMock {
   }
 
   @Bean
-  public JmsSender jmsSender() {
+  public JmsSender activeJmsSender() {
     return EasyMock.createMock(JmsSender.class);
   }
-
-//  @Bean
-//  public ConfigurationController configurationController() {
-//    return EasyMock.createMock(ConfigurationController.class);
-//  }
 }

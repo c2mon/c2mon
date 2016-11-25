@@ -21,15 +21,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
 import cern.c2mon.daq.common.DriverKernel;
-import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.messaging.ProcessMessageReceiver;
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
 import cern.c2mon.daq.common.messaging.impl.ActiveMessageReceiver;
@@ -59,36 +55,36 @@ import cern.c2mon.daq.common.messaging.impl.TestModeRequestSender;
 public class ProcessRequestSenderConfig {
 
   @Autowired
-  Environment environment;
+  private DaqProperties properties;
 
   @Autowired
   @Qualifier("processRequestJmsTemplate")
-  JmsTemplate processRequestJmsTemplate;
+  private JmsTemplate processRequestJmsTemplate;
 
   @Autowired
   @Qualifier("secondProcessRequestJmsTemplate")
-  JmsTemplate secondProcessRequestJmsTemplate;
+  private JmsTemplate secondProcessRequestJmsTemplate;
 
   @Autowired
   @Qualifier("serverRequestListenerContainer")
-  DefaultMessageListenerContainer serverRequestJmsContainer;
+  private DefaultMessageListenerContainer serverRequestJmsContainer;
 
   @Bean(name = "primaryRequestSender")
   @Profile({ "single", "double" })
   public ProcessRequestSender primaryRequestSender() {
-    return new ActiveRequestSender(environment, processRequestJmsTemplate);
+    return new ActiveRequestSender(properties, processRequestJmsTemplate);
   }
 
   @Bean(name = "primaryRequestSender")
   @Profile("test")
   public ProcessRequestSender testRequestSender() {
-    return new TestModeRequestSender(new ActiveRequestSender(environment, processRequestJmsTemplate));
+    return new TestModeRequestSender(new ActiveRequestSender(properties, processRequestJmsTemplate));
   }
 
   @Bean
   @Profile("double")
   public ProcessRequestSender secondaryRequestSender() {
-    return new ActiveRequestSender(environment, secondProcessRequestJmsTemplate);
+    return new ActiveRequestSender(properties, secondProcessRequestJmsTemplate);
   }
 
   /**
@@ -97,8 +93,7 @@ public class ProcessRequestSenderConfig {
   @Bean
   @Profile({ "single", "double" })
   public ProcessMessageReceiver activeMessageReceiver() throws ParserConfigurationException {
-    ActiveMessageReceiver activeMessageReceiver = new ActiveMessageReceiver(serverRequestJmsContainer);
-    return activeMessageReceiver;
+    return new ActiveMessageReceiver(serverRequestJmsContainer);
   }
 
   /**

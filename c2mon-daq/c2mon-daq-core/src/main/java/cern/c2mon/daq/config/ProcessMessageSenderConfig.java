@@ -21,12 +21,9 @@ import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
-import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
 
-import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.messaging.JmsSender;
 import cern.c2mon.daq.common.messaging.impl.ActiveJmsSender;
 import cern.c2mon.daq.common.messaging.impl.DummyJmsSender;
@@ -56,7 +53,7 @@ import cern.c2mon.daq.filter.impl.DummyFilterSender;
 public class ProcessMessageSenderConfig {
 
   @Autowired
-  private Environment environment;
+  private DaqProperties properties;
 
   @Autowired
   @Qualifier("sourceUpdateJmsTemplate")
@@ -119,8 +116,8 @@ public class ProcessMessageSenderConfig {
   @Bean(name = "filterMessageSender")
   @Profile({ "single", "double" })
   public IFilterMessageSender filterMessageSender() {
-    if (environment.getRequiredProperty("c2mon.daq.filter.enabled", Boolean.class)) {
-      return new ActiveFilterSender(filterJmsTemplate, environment);
+    if (properties.getFilter().isPublishFilteredValues()) {
+      return new ActiveFilterSender(filterJmsTemplate, properties);
     } else {
       return new DummyFilterSender();
     }

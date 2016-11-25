@@ -18,14 +18,12 @@ package cern.c2mon.daq.common.messaging.impl;
 
 import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
-import cern.c2mon.daq.config.Options;
+import cern.c2mon.daq.config.DaqProperties;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.process.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;
 
@@ -60,22 +58,12 @@ public class ActiveRequestSender implements ProcessRequestSender {
    */
   private ProcessMessageConverter processMessageConverter;
 
-  /**
-   * Reference to the Spring environment
-   */
-  private Environment environment;
+  private DaqProperties properties;
 
-  /**
-   * Unique constructor used by Spring to instantiate the bean.
-   *
-   * @param environment             the Spring environment
-   * @param jmsTemplate             the JmsTemplate is wired using a Qualifier annotation to
-   *                                distinguish it from the others: can be overwritten using the setter
-   */
   @Autowired
-  public ActiveRequestSender(final Environment environment, @Qualifier("processRequestJmsTemplate") final JmsTemplate jmsTemplate) {
-    this.environment = environment;
-    this.jmsTemplate = jmsTemplate;
+  public ActiveRequestSender(final DaqProperties properties, final JmsTemplate processRequestJmsTemplate) {
+    this.properties = properties;
+    this.jmsTemplate = processRequestJmsTemplate;
     this.processMessageConverter = new ProcessMessageConverter();
   }
 
@@ -99,7 +87,7 @@ public class ActiveRequestSender implements ProcessRequestSender {
         message.setJMSReplyTo(replyQueue);
         MessageProducer messageProducer = session.createProducer(requestDestination);
         try {
-          Long requestTimeout = environment.getRequiredProperty(Options.SERVER_REQUEST_TIMEOUT, Long.class);
+          Long requestTimeout = properties.getServerRequestTimeout();
           messageProducer.setTimeToLive(requestTimeout);
           messageProducer.send(message);
 
