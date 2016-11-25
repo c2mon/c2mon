@@ -4,6 +4,7 @@ import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.junit.CachePopulationRule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
+import cern.c2mon.server.common.config.CommonModule;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
+    CommonModule.class,
     CacheModule.class,
     CacheDbAccessModule.class,
     CacheLoadingModule.class,

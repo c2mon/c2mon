@@ -24,6 +24,7 @@ import java.sql.Timestamp;
 
 import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.server.supervision.junit.SupervisionCachePopulationRule;
 import org.junit.Rule;
@@ -54,6 +55,7 @@ import cern.c2mon.shared.daq.process.XMLConverter;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
+    CommonModule.class,
     CacheModule.class,
     CacheDbAccessModule.class,
     SupervisionModule.class

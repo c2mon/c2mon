@@ -19,6 +19,7 @@ import javax.sql.DataSource;
  *
  * @RunWith(SpringJUnit4ClassRunner.class)
  * @ContextConfiguration(classes = {
+ *    CommonModule.class,
  *    CacheDbAccessModule.class,
  *    CacheLoadingModule.class,
  *    DatabasePopulationRule.class

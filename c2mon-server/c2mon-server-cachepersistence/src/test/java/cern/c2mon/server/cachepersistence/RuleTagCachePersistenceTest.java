@@ -21,6 +21,7 @@ import java.io.IOException;
 import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cachepersistence.config.CachePersistenceModule;
+import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.test.DatabasePopulationRule;
 import org.junit.After;
 import org.junit.Before;
@@ -53,6 +54,7 @@ import static org.junit.Assert.assertNotNull;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
+    CommonModule.class,
     CacheModule.class,
     CacheDbAccessModule.class,
     CachePersistenceModule.class,

@@ -19,6 +19,7 @@ package cern.c2mon.server.cachepersistence;
 import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cachepersistence.config.CachePersistenceModule;
+import cern.c2mon.server.common.config.CommonModule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -49,6 +50,7 @@ import static org.junit.Assert.assertNotNull;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
+    CommonModule.class,
     CacheModule.class,
     CacheDbAccessModule.class,
     CachePersistenceModule.class,

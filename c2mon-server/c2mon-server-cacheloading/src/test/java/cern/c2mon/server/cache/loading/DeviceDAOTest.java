@@ -18,6 +18,7 @@ package cern.c2mon.server.cache.loading;
 
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
+import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.test.DatabasePopulationRule;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -32,6 +33,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
+    CommonModule.class,
     CacheDbAccessModule.class,
     CacheLoadingModule.class,
     DatabasePopulationRule.class

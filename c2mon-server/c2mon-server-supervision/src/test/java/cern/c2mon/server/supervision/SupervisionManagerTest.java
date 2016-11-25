@@ -21,6 +21,7 @@ import java.util.concurrent.CountDownLatch;
 
 import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -60,6 +61,7 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
+    CommonModule.class,
     CacheModule.class,
     CacheDbAccessModule.class,
     SupervisionModule.class

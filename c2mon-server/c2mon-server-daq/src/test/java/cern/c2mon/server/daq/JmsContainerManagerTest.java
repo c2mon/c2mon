@@ -20,6 +20,7 @@ import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.daq.config.DaqModule;
 import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
@@ -55,6 +56,7 @@ import java.util.concurrent.CountDownLatch;
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
 @ContextConfiguration(classes = {
+    CommonModule.class,
     CacheModule.class,
     CacheDbAccessModule.class,
     DaqModule.class,
