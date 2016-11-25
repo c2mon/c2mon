@@ -19,11 +19,8 @@ package cern.c2mon.daq.common.conf;
 import cern.c2mon.daq.common.DriverKernel;
 import cern.c2mon.daq.common.ProcessMessageSenderMock;
 import cern.c2mon.daq.common.messaging.impl.DummyJmsSender;
-<<<<<<< 5f4d178256ae4d90ff2fd731d7f78ff3f8650a87
 import cern.c2mon.daq.config.DaqCoreModule;
-=======
 import cern.c2mon.daq.common.timer.FreshnessMonitor;
->>>>>>> #63: Update tests
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
 import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
