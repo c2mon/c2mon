@@ -169,7 +169,7 @@ public class TransportConnector {
           break;
         }
       } catch(Exception e) {
-        log.warn("Failed receiving yellow status from Elasticsearch: {}", e.getMessage());
+        log.warn("Elasticsearch cluster not yet ready: {}", e.getMessage());
       }
 
       try {

@@ -42,7 +42,6 @@ public class ElasticsearchProperties {
    */
   private String embeddedStoragePath = "/tmp/elasticsearch-node/";
 
-
   /**
    * Enable/disable HTTP transport (only relevant when running an embedded
    * node)

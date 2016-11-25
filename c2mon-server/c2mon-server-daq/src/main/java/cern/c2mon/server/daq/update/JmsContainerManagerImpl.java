@@ -162,7 +162,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
   private DefaultMessageListenerContainer subscribe(final Process process, final int consumersMax) {
     DefaultMessageListenerContainer container = new DefaultMessageListenerContainer();
     container.setConnectionFactory(updateConnectionFactory);
-    container.setDestination(new ActiveMQQueue(properties.getJms().getQueuePrefix() + "." + process.getName()));
+    container.setDestination(new ActiveMQQueue(properties.getJms().getQueuePrefix() + ".update." + process.getName()));
     container.setMessageListener(listener);
     container.setConcurrentConsumers(properties.getJms().getUpdate().getInitialConsumers());
     container.setMaxConcurrentConsumers(consumersMax);
