@@ -68,7 +68,7 @@ public class RuleTagMapperTest extends AbstractMapperTest {
     assertNotNull(ruletags);
     assertEquals(7, ruletags.size());
 
-    DBBatch dbBatch2 = new DBBatch(60000L, 60000L);
+    DBBatch dbBatch2 = new DBBatch(1L, 1L);
     List<RuleTag> ruletags2 = ruleTagMapper.getRowBatch(dbBatch2);
     assertNotNull(ruletags2);
     assertEquals(1, ruletags2.size());
