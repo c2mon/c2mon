@@ -2,7 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-  <!-- take "namespace=Mapper interface" for the mapper SQL statements to be picked up automatically -->
   <mapper namespace="cern.c2mon.server.cache.dbaccess.DataTagMapper">
 
     <!-- result map below corresponds to the abstract AbstractTagCacheObject -->
@@ -33,9 +32,8 @@
 
       <result property="metadata" column="TAGMETADATA" javaType="cern.c2mon.server.common.metadata.Metadata" jdbcType="VARCHAR"/>
 
-      <!--<result property="expressions" column="TAGEXPRESSIONS" javaType="Collection" jdbcType="VARCHAR"/>-->
-      <collection property="expressions" ofType="cern.c2mon.shared.client.expression.Expression" javaType="java.util.ArrayList" column="TAGID"
-                  select="selectExpressions"/>
+      <collection property="expressions" ofType="cern.c2mon.shared.client.expression.Expression" javaType="java.util.ArrayList" 
+                  column="TAGID" select="selectExpressions"/>
 
       <collection property="alarmIds" ofType="Long" javaType="java.util.ArrayList" resultMap="tagAlarmIdsResultMap"/>
 
@@ -45,15 +43,15 @@
       <id column="ALARMID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
     </resultMap>
 
-  <resultMap id="expressionResultMap" type="cern.c2mon.shared.client.expression.Expression">
-    <id column="TAGID"/>
-    <result property="name" column="EXPRESSIONNAME"/>
-    <result property="alarm" column="EXPRESSIONALARM" javaType="java.lang.Boolean" jdbcType="NUMERIC"/>
-    <result property="expression" column="EXPRESSION" jdbcType="VARCHAR"/>
-    <result property="result" column="EXPRESSIONVALUE" javaType="java.lang.Object" jdbcType="VARCHAR"/>
-    <result property="metadata" column="EXPRESSIONMETADATA" jdbcType="VARCHAR"/>
-    <result property="dataType" column="EXPRESSIONDATATYPE" jdbcType="VARCHAR"/>
-  </resultMap>
+    <resultMap id="expressionResultMap" type="cern.c2mon.shared.client.expression.Expression">
+      <id column="EXPR_TAGID"/>
+      <result property="name" column="EXPR_NAME"/>
+      <result property="alarm" column="EXPR_ALARM" javaType="java.lang.Boolean" jdbcType="NUMERIC"/>
+      <result property="expression" column="EXPR_TEXT" jdbcType="VARCHAR"/>
+      <result property="result" column="EXPR_VALUE" javaType="java.lang.Object" jdbcType="VARCHAR"/>
+      <result property="metadata" column="EXPR_NMETADATA" jdbcType="VARCHAR"/>
+      <result property="dataType" column="EXPR_DATATYPE" jdbcType="VARCHAR"/>
+    </resultMap>
 
 <!--      <result property="" column="TAGCONTROLTAG"/>-->
 
@@ -76,7 +74,7 @@
     </resultMap>
 
   <select id="selectExpressions" resultMap="expressionResultMap">
-    SELECT * FROM EXPRESSION WHERE TAGID = #{id}
+    SELECT * FROM EXPRESSION WHERE EXPR_TAGID = #{id}
   </select>
 
     <select id="getAll" resultMap="dataTagResultMap">
@@ -218,8 +216,8 @@
     </insert>
 
   <insert id="insertExpressions" parameterType="cern.c2mon.server.common.datatag.DataTagCacheObject">
-    INSERT INTO EXPRESSION (TAGID, EXPRESSIONNAME, EXPRESSIONVALUE, EXPRESSION, EXPRESSIONDATATYPE,
-                            EXPRESSIONALARM, EXPRESSIONMETADATA)
+    INSERT INTO EXPRESSION (EXPR_TAGID, EXP_NNAME, EXPR_VALUE, EXPR_TEXT, EXPR_DATATYPE,
+                            EXPR_ALARM, EXPR_METADATA)
     VALUES
     <foreach item="expression" index="index" collection="expressions" open="(" separator="),(" close=")">
       #{id}, #{expression.name}, #{expression.result}, #{expression.expression}, #{expression.dataType},

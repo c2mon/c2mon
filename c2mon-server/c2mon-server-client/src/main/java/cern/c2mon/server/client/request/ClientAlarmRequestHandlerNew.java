@@ -52,7 +52,7 @@ class ClientAlarmRequestHandlerNew {
   /**
    * Inner method which handles the active alarm request.
    *
-   * @return Collection of all tags with active alarms
+   * @return of all tags with active alarms
    */
   Collection<? extends ClientRequestResult> handleActiveAlarmRequest() {
 
@@ -77,7 +77,7 @@ class ClientAlarmRequestHandlerNew {
 
     for (Long tagId : alarmRequest.getIds()) {
       if (!alarmRequest.getResultType().equals(ClientRequest.ResultType.TRANSFER_ALARM_LIST)) {
-        log.error("handleAlarmRequest() - Could not generate response message. Unknown enum ResultType {}",
+        log.error("Could not generate response message. Unknown enum ResultType {}",
             alarmRequest.getResultType());
 
       } else {
@@ -85,11 +85,12 @@ class ClientAlarmRequestHandlerNew {
           Tag tag = tagLocationService.getCopy(tagId);
           alarms.add(TransferObjectFactory.createTransferTagValue(tag));
         } else {
-          log.warn("handleAlarmRequest() - unrecognized Tag with id {}", tagId);
+          log.warn("Unrecognized tag with id {}", tagId);
         }
       }
     }
-    log.debug("Finished processing Alarm request: returning {} Alarms", alarms.size());
+
+    log.debug("Finished processing alarm request: returning {} alarms", alarms.size());
     return alarms;
   }
 }

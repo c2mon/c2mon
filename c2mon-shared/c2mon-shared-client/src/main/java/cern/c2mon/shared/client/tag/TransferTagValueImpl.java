@@ -167,7 +167,7 @@ public class TransferTagValueImpl extends ClientRequestReport implements TagValu
     return this.tagQuality;
   }
 
-  public void addExpressions(Collection<Expression> expressions){
+  public void addExpressions(Collection<Expression> expressions) {
     this.expressions.addAll(expressions);
   }
 
@@ -231,6 +231,6 @@ public class TransferTagValueImpl extends ClientRequestReport implements TagValu
   @Override
   @JsonIgnore
   public final Collection<AlarmValue> getAlarms() {
-    return new ArrayList<AlarmValue>(alarmValues);
+    return new ArrayList<>(alarmValues);
   }
 }

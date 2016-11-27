@@ -12,13 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 public class Evaluator {
 
   /**
-   * Evaluates all expressions of an given tag.
+   * Evaluates all expressions of a given tag.
    *
-   * The result of the expression will directly written to the given tag as a
-   * side effect.
+   * Note that this method modifies the tag object directly, it does not make
+   * a copy.
    *
    * @param tag the tag with the expressions which needs to be evaluated
-   * @return
+   * @return reference to the given (potentially modified) tag
    */
   public static <T extends Tag> T evaluate(T tag) {
     if (tag.getExpressions().isEmpty()) {

@@ -74,7 +74,7 @@ public class C2monServiceGateway implements ApplicationContextAware {
   /** Static reference to the <code>AlarmService</code> singleton instance */
   private static AlarmService alarmService = null;
 
-  private static AlarmExpressionService alarmExpressionService = null;
+  private static AlarmServiceNew alarmServiceNew = null;
 
   /** Static reference to the <code>StatisticsService</code> singleton instance */
   private static StatisticsService statisticsService = null;
@@ -121,10 +121,10 @@ public class C2monServiceGateway implements ApplicationContextAware {
    * @return The C2MON alarm service, which provides
    *         methods for alarm subscription and unsubscription.
    */
-  public static AlarmExpressionService getAlarmExpressionService() {
+  public static AlarmServiceNew getAlarmServiceNew() {
     startC2monClientSynchronous();
 
-    return alarmExpressionService;
+    return alarmServiceNew;
   }
 
   /**
@@ -249,7 +249,7 @@ public class C2monServiceGateway implements ApplicationContextAware {
     commandServiceImpl = context.getBean(CommandServiceImpl.class);
 
     alarmService = context.getBean(AlarmService.class);
-    alarmExpressionService = context.getBean(AlarmExpressionService.class);
+    alarmServiceNew = context.getBean(AlarmServiceNew.class);
     configurationService = context.getBean(ConfigurationService.class);
     statisticsService = context.getBean(StatisticsService.class);
     tagService = context.getBean(TagService.class);

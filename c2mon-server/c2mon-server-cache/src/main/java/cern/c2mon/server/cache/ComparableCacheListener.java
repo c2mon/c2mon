@@ -27,7 +27,6 @@ import cern.c2mon.shared.common.Cacheable;
  * @author Mark Brightwell
  * @param <T> the type the listener expects
  */
-//TODO: check if 'void confirmStatus(T cacheable);' is needed. See 'C2monCacheListener'
 public interface ComparableCacheListener<T extends Cacheable> {
 
   /**
@@ -39,8 +38,4 @@ public interface ComparableCacheListener<T extends Cacheable> {
    *
    */
   void notifyElementUpdated(T original, T updated);
-
-
-
-
 }

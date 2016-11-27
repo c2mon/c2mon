@@ -237,12 +237,10 @@ public class TagValuePublisher implements C2monCacheListener<Tag>, Configuration
       log.error("notifyOnUpdate - Error publishing tag update to topic for tag " + tag.getId() + " - submitting for republication", e);
       republisher.publicationFailed(tag);
     }
-
   }
 
   @Override
-  // TODO implement
   public void confirmStatus(Tag cacheable) {
-
+    // TODO implement this
   }
 }

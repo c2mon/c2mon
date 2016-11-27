@@ -14,15 +14,6 @@ public class ExpressionFactory {
 
   private static GroovyClassLoader classLoader = new GroovyClassLoader();
 
-  private static String buildGroovyClass(String expression) {
-    return "class Foo implements Serializable {" +
-        "" +
-        " Object run(Object arg) { " +
-        expression.replace("$value", "arg") +
-        "}" +
-        "}";
-  }
-
   /**
    * Compile an invokable {@link GroovyObject} object from a given expression.
    *
@@ -38,5 +29,13 @@ public class ExpressionFactory {
     } catch (InstantiationException | IllegalAccessException e) {
       throw new RuntimeException("Error creating script", e);
     }
+  }
+
+  private static String buildGroovyClass(String expression) {
+    return "class Foo implements Serializable {" +
+        "  Object run(Object arg) { " +
+        expression.replace("$value", "arg") +
+        "  }" +
+        "}";
   }
 }

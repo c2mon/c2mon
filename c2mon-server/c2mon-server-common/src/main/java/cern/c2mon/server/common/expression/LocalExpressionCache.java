@@ -10,9 +10,9 @@ import groovy.lang.GroovyObject;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Stores all relevant information of a compiled expression.
- * Because the time to compile an expression is to high we need to
- * store a compiled expression on a local node.
+ * Node-local cache of compiled expressions. This cache is kept to avoid
+ * the overhead of recompiling. Versioning is used to know when to recompile
+ * in case expressions are changed.
  *
  * @author Franz Ritter
  */
@@ -29,9 +29,7 @@ public class LocalExpressionCache {
    */
   private static Map<Long, Map<String, GroovyObject>> tagIdToLocalScripts = new ConcurrentHashMap<>();
 
-
-  private LocalExpressionCache() {
-  }
+  private LocalExpressionCache() {}
 
   /**
    * Get all tag ids with locally stored expressions.
@@ -45,7 +43,7 @@ public class LocalExpressionCache {
   /**
    * Removes all local expression information of the tag to the given id.
    *
-   * @param id The id of the tag which expression information needs to be deleted
+   * @param id the id of the tag which expression information needs to be deleted
    */
   public static void removeTag(Long id) {
     tagIdToLocalScripts.remove(id);
@@ -55,7 +53,7 @@ public class LocalExpressionCache {
   /**
    * Removes all local expression information of the tags to the given ids.
    *
-   * @param tagIds The ids of the tags which expression information needs to be deleted
+   * @param tagIds the ids of the tags which expression information needs to be deleted
    */
   public static void removeTags(List<Long> tagIds) {
     tagIds.stream().forEach(LocalExpressionCache::removeTag);
@@ -68,12 +66,9 @@ public class LocalExpressionCache {
   protected static <T extends Tag> void initializeTag(T tag) {
     Long tagId = tag.getId();
 
-    if (tagIdToVersion.get(tagId) == null) {
-      tagIdToVersion.put(tagId, new ConcurrentHashMap<>());
-    }
-    if (tagIdToLocalScripts.get(tagId) == null) {
-      tagIdToLocalScripts.put(tagId, new ConcurrentHashMap<>());
-    }
+    tagIdToVersion.putIfAbsent(tagId, new ConcurrentHashMap<>());
+    tagIdToLocalScripts.putIfAbsent(tagId, new ConcurrentHashMap<>());
+
     purgeRemovedExpressions(tag);
   }
 
@@ -97,7 +92,7 @@ public class LocalExpressionCache {
       List<String> expressionsToPurge = getExpressionsToPurge(tagId, tag.getExpressions());
 
       for (String expression : expressionsToPurge) {
-        log.debug("Remove the script {} of the tag {} from the local cache", expression, tagId);
+        log.debug("Removing script {} of tag {} from local cache", expression, tagId);
         tagIdToLocalScripts.get(tagId).remove(expression);
         tagIdToVersion.get(tagId).remove(expression);
       }
@@ -111,11 +106,9 @@ public class LocalExpressionCache {
         .map(Expression::getName)
         .collect(Collectors.toList());
 
-    List<String> expressionsToPurge = localExpressions
+    return localExpressions
         .stream()
         .filter(exp -> !cacheExpressions.contains(exp))
         .collect(Collectors.toList());
-
-    return expressionsToPurge;
   }
 }

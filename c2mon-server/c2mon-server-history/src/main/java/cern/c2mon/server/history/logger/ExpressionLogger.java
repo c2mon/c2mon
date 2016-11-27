@@ -37,17 +37,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class ExpressionLogger  {
 
-  private IPersistenceManager persistenceManager;
+  private IPersistenceManager<ExpressionLog> persistenceManager;
 
   @Autowired
-  public ExpressionLogger(final IPersistenceManager expressionPersistenceManager) {
+  public ExpressionLogger(final IPersistenceManager<ExpressionLog> expressionPersistenceManager) {
     this.persistenceManager = expressionPersistenceManager;
   }
 
   public void log(final Collection<Expression> expressions, Long tagId, Timestamp serverTimestamp) {
-    ArrayList<IFallback> items = new ArrayList<>();
+    ArrayList<ExpressionLog> items = new ArrayList<>();
 
-    // Convert the list of DataTagCacheObjects to DataTagShortTermLog objects (IFallback objects)
     for (Expression expression : expressions) {
         if (expression != null && expression.getName() != null) {
           items.add(new ExpressionLog(expression, tagId, serverTimestamp));

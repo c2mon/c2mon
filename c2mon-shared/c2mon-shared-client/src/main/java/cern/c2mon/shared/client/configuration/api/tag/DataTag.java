@@ -26,15 +26,6 @@ import lombok.*;
 import org.springframework.util.Assert;
 
 /**
- * Configuration object for a DataTag.
- * Holds the information to create a {@link cern.c2mon.shared.client.configuration.ConfigurationElement}
- * related to a DataTag.
- * <p/>
- * For further information how to use instances of this for server configurations read <a
- * href="http://c2mon.web.cern.ch/c2mon/docs/#_offline_configuration_via_c2mon_database_test_purpose_only">this</a>
- * documentation.
- * <p/>
- *
  * @author Franz Ritter
  */
 @Data

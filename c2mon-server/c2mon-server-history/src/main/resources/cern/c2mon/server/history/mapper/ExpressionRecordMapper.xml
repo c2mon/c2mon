@@ -3,32 +3,22 @@
   PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
   "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
 
-  <!--
-    take "namespace=Mapper interface" for the mapper SQL statements to
-    be picked up automatically
-  -->
 <mapper namespace="cern.c2mon.server.history.mapper.ExpressionLogMapper">
 
-  <!--
-    Inserts a new row in the EXPRESSION_LOG table that represents some log
-    information for a given dataTag. The values for the inserted row are
-    stored in the ExpressionLog object
-  -->
   <insert id="insertLog" databaseId="oracle" parameterType="cern.c2mon.server.history.structure.ExpressionLog">
-    INSERT INTO EXPRESSION_LOG (TAGID, EXPRNAME, EXPRVALUE, EXPRDATATYPE, EXPRTIMESTAMP, EXPRINFO)
+    INSERT INTO EXPRESSION_LOG (EXPR_TAGID, EXPR_NAME, EXPR_VALUE, EXPR_DATATYPE, EXPR_TIMESTAMP, EXPR_INFO)
     VALUES (
-    #{tagId,jdbcType=NUMERIC}, #{exprName,jdbcType=VARCHAR}, #{exprValue,jdbcType=VARCHAR},
-    #{exprDataType,jdbcType=VARCHAR}, #{exprTimestamp,jdbcType=TIMESTAMP}, #{exprInfo,jdbcType=VARCHAR})
+    #{tagId,jdbcType=NUMERIC}, #{name,jdbcType=VARCHAR}, #{value,jdbcType=VARCHAR},
+    #{dataType,jdbcType=VARCHAR}, #{timestamp,jdbcType=TIMESTAMP}, #{info,jdbcType=VARCHAR})
   </insert>
 
   <insert id="insertLog" databaseId="mysql" parameterType="cern.c2mon.server.history.structure.ExpressionLog">
     INSERT INTO EXPRESSION_LOG (TAGID, EXPRNAME, EXPRVALUE, EXPRDATATYPE, EXPRTIMESTAMP, EXPRINFO)
     VALUES (
-    #{tagId,jdbcType=NUMERIC}, #{exprName,jdbcType=VARCHAR}, #{exprValue,jdbcType=VARCHAR},
-    #{exprDataType,jdbcType=VARCHAR}, #{exprTimestamp,jdbcType=TIMESTAMP}, #{exprInfo,jdbcType=VARCHAR})
+    #{tagId,jdbcType=NUMERIC}, #{name,jdbcType=VARCHAR}, #{value,jdbcType=VARCHAR},
+    #{dataType,jdbcType=VARCHAR}, #{timestamp,jdbcType=TIMESTAMP}, #{info,jdbcType=VARCHAR})
   </insert>
 
-  <!-- only used to remove inserts done during testing -->
   <delete id="deleteExpressionLog" parameterType="Long">
     DELETE FROM EXPRESSION_LOG WHERE tagid = #{id}
   </delete>

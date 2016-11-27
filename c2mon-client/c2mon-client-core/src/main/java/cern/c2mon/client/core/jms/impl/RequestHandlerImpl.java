@@ -56,6 +56,7 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
+import org.springframework.util.Assert;
 
 /**
  * Implementation of the RequestHandler bean.
@@ -106,7 +107,7 @@ public class RequestHandlerImpl implements RequestHandler {
    * Executor for submitting requests to the server.
    */
   private ThreadPoolExecutor executor = new ThreadPoolExecutor(corePoolSize, corePoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-      new LinkedBlockingDeque<Runnable>(), new ThreadPoolExecutor.CallerRunsPolicy());
+      new LinkedBlockingDeque<>(), new ThreadPoolExecutor.CallerRunsPolicy());
 
   /**
    * Constructor.
@@ -127,7 +128,7 @@ public class RequestHandlerImpl implements RequestHandler {
 
   @Override
   public Collection<SupervisionEvent> getCurrentSupervisionStatus() throws JMSException {
-    ClientRequestImpl<SupervisionEvent> clientRequest = new ClientRequestImpl<SupervisionEvent>(SupervisionEvent.class);
+    ClientRequestImpl<SupervisionEvent> clientRequest = new ClientRequestImpl<>(SupervisionEvent.class);
     return jmsProxy.sendRequest(clientRequest, defaultRequestQueue, clientRequest.getTimeout());
   }
 
@@ -158,7 +159,7 @@ public class RequestHandlerImpl implements RequestHandler {
   @Override
   public Collection<AlarmValue> requestAllActiveAlarms() throws JMSException {
 
-    ClientRequestImpl<AlarmValue> activeAlarmsRequest = new ClientRequestImpl<AlarmValue>(
+    ClientRequestImpl<AlarmValue> activeAlarmsRequest = new ClientRequestImpl<>(
         ClientRequest.ResultType.TRANSFER_ACTIVE_ALARM_LIST,
           ClientRequest.RequestType.ACTIVE_ALARMS_REQUEST,
           60000); // == timeout
@@ -171,24 +172,21 @@ public class RequestHandlerImpl implements RequestHandler {
 
   @Override
   public Collection<TagValueUpdate> requestAlarmsNew(final Collection<Long> tagIds) throws JMSException {
-    if (tagIds == null) {
-      throw new NullPointerException("requestAlarmsNew(..) method called with null parameter.");
-    }
+    Assert.notNull(tagIds, "tagIds must not be null!");
+
     return executeRequest(tagIds, TagValueUpdate.class, null, defaultRequestQueue);
   }
 
   @Override
-  public Collection<TagValueUpdate> requestAllActiveAlarmExpressions() throws JMSException {
+  public Collection<TagValueUpdate> requestAllActiveAlarmsNew() throws JMSException {
 
     ClientRequestImpl<TagValueUpdate> activeAlarmsRequest = new ClientRequestImpl<>(
         ClientRequest.ResultType.TRANSFER_TAG_VALUE_LIST,
         RequestType.ACTIVE_ALARMS_REQUEST_NEW,
         60000); // == timeout
 
-    Collection<TagValueUpdate> result = jmsProxy.sendRequest(activeAlarmsRequest, defaultRequestQueue,
+    return jmsProxy.sendRequest(activeAlarmsRequest, defaultRequestQueue,
         activeAlarmsRequest.getTimeout());
-
-    return result;
   }
 
   @Override

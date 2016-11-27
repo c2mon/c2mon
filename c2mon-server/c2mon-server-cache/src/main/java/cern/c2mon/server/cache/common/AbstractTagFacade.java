@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.server.cache.AlarmCache;
@@ -41,7 +42,6 @@ import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.expression.Expression;
 import cern.c2mon.shared.client.metadata.Metadata;
-import cern.c2mon.shared.client.serializer.JacksonSerializer;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.SimpleTypeReflectionHandler;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
@@ -88,6 +88,8 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
    */
   private AlarmCache alarmCache;
 
+  private ObjectMapper mapper = new ObjectMapper();
+
   /**
    * Unique constructor.
    * @param tagCache the particular tag cache needs passing in from the facade implementation
@@ -119,8 +121,6 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
 
 
   /**
-   * TODO set JMS client topic still needs doing
-   *
    * Sets the fields of the AbstractTagCacheObject from the Properties object.
    * Notice only non-null properties are set, the others staying unaffected
    * by this method.
@@ -134,7 +134,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
    * @throws ConfigurationException
    */
   protected DataTagUpdate setCommonProperties(AbstractTagCacheObject tag, Properties properties)
-                                                                             throws ConfigurationException {
+      throws ConfigurationException {
     DataTagUpdate dataTagUpdate = new DataTagUpdate();
     dataTagUpdate.setDataTagId(tag.getId());
     tagCache.acquireWriteLockOnKey(tag.getId());
@@ -160,7 +160,6 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
         tag.setDataType(tmpStr);
         dataTagUpdate.setDataType(tmpStr);
       }
-
 
       // TAG mode
       if ((tmpStr = properties.getProperty("mode")) != null) {
@@ -204,12 +203,12 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
         TypeReference typeReference = new TypeReference<List<Expression>>() {};
         ArrayList<Expression> expressions = null;
         try {
-          expressions = JacksonSerializer.mapper.readValue(tmpStr, typeReference);
-          if(expressions != null ) {
-            expressions.stream().forEach(exp -> exp.setVersion(System.currentTimeMillis()));
+          expressions = mapper.readValue(tmpStr, typeReference);
+          if (expressions != null) {
+            expressions.forEach(exp -> exp.setVersion(System.currentTimeMillis()));
           }
         } catch (IOException e) {
-          e.printStackTrace();
+          throw new RuntimeException("Error setting expressions", e);
         }
         tag.setExpressions(expressions);
       }

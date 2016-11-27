@@ -45,12 +45,12 @@ public interface CacheRegistrationService {
 
   /**
    * Register for all updates to data tags, control tags and rules (default registration on separate thread)
-   * @param tagCacheListener the listener to notify of the updates
+   * @param listener the listener to notify of the updates
    * @return a Lifecycle object to allow the registered listener to stop/start its thread as required;
    *          in general, the start() method should be called at the end of its own lifecycle start method,
    *          and the stop() at the beginning of its own stop method
    */
-  Lifecycle registerToAllTags(C2monCacheListener<Tag> tagCacheListener);
+  Lifecycle registerToAllTags(C2monCacheListener<Tag> listener);
 
   /**
    * Registers this listener to receive invalidation/validation
@@ -62,63 +62,63 @@ public interface CacheRegistrationService {
    * <p>Consider registering for updates and supervision events
    * separately using the SupervisionNotifier service.
    *
-   * @param cacheSupervisionListener listener that should be notified
+   * @param listener listener that should be notified
    */
-  void registerForSupervisionChanges(CacheSupervisionListener<Tag> cacheSupervisionListener);
+  void registerForSupervisionChanges(CacheSupervisionListener<Tag> listener);
 
   /**
    * Register for all updates to data tags, control tags and rules
    * (default registration on separate thread).
-   * @param tagCacheListener the listener to notify of the updates
+   * @param listener the listener to notify of the updates
    * @param nbThreads the number of threads used to call the listener
    * @return a Lifecycle object to allow the registered listener to stop/start its thread as required;
    *          in general, the start() method should be called at the end of its own lifecycle start method,
    *          and the stop() at the beginning of its own stop method
    */
-  Lifecycle registerToAllTags(C2monCacheListener<Tag> tagCacheListener, int nbThreads);
+  Lifecycle registerToAllTags(C2monCacheListener<Tag> listener, int nbThreads);
 
   /**
    * Register to be notified of updates to the DataTag cache only.
-   * @param dataTagCacheListener an implementation of the {@link DataTagCacheListener} abstract class
+   * @param listener an implementation of the {@link C2monCacheListener} abstract class
    * @return a Lifecycle object to allow the registered listener to stop/start its thread as required;
    *          in general, the start() method should be called at the end of its own lifecycle start method,
    *          and the stop() at the beginning of its own stop method
    */
-  Lifecycle registerToDataTags(C2monCacheListener<DataTag> dataTagCacheListener);
+  Lifecycle registerToDataTags(C2monCacheListener<DataTag> listener);
 
   /**
    * Register to be notified of updates to the RuleTag cache (single threaded notification).
    *
-   * @param ruleTagCacheListener an implementation of the {@link RuleTagCacheListener} abstract class
+   * @param listener an implementation of the {@link C2monCacheListener} abstract class
    * @return a Lifecycle object to allow the registered listener to stop/start its thread as required;
    *          in general, the start() method should be called at the end of its own lifecycle start method,
    *          and the stop() at the beginning of its own stop method
    */
-  Lifecycle registerToRuleTags(C2monCacheListener<RuleTag> ruleTagCacheListener);
+  Lifecycle registerToRuleTags(C2monCacheListener<RuleTag> listener);
 
   /**
    * Register to received updates to the RuleTag cache on multiple threads.
    * Only thread-safe listeners should be used here.
    *
-   * @param ruleTagCacheListener an implementation of the {@link RuleTagCacheListener} abstract class
+   * @param listener an implementation of the {@link C2monCacheListener} abstract class
    * @param nbThreads the number of threads on which the listener will be called
    * @return a Lifecycle object to allow the registered listener to stop/start its thread as required;
    *          in general, the start() method should be called at the end of its own lifecycle start method,
    *          and the stop() at the beginning of its own stop method
    */
-  Lifecycle registerToRuleTags(C2monCacheListener<RuleTag> ruleTagCacheListener, int nbThreads);
+  Lifecycle registerToRuleTags(C2monCacheListener<RuleTag> listener, int nbThreads);
 
   /**
    * Register to received updates to the DataTag cache on multiple threads.
    * Only thread-safe listeners should be used here.
    *
-   * @param dataTagCacheListener an implementation of the {@link DataTagCacheListener} abstract class
+   * @param listener an implementation of the {@link C2monCacheListener} abstract class
    * @param nbThreads the number of threads on which the listener will be called
    * @return a Lifecycle object to allow the registered listener to stop/start its thread as required;
    *          in general, the start() method should be called at the end of its own lifecycle start method,
    *          and the stop() at the beginning of its own stop method
    */
-  Lifecycle registerToDataTags(C2monCacheListener<DataTag> dataTagCacheListener, int nbThreads);
+  Lifecycle registerToDataTags(C2monCacheListener<DataTag> listener, int nbThreads);
 
   /**
    * Registers to all Tag caches. The notification method is called on the same thread, so
@@ -127,38 +127,38 @@ public interface CacheRegistrationService {
    * failure, the message will be re-delivered. If the actions of the listener must be
    * guaranteed, consider this option (the number of JMS listener threads may need increasing
    * accordingly).
-   * @param tagCacheListener the listener to register
+   * @param listener the listener to register
    */
-  void registerSynchronousToAllTags(C2monCacheListener<Tag> tagCacheListener);
+  void registerSynchronousToAllTags(C2monCacheListener<Tag> listener);
 
   /**
    * Registers the listener to all Tag caches (listener is called on separate threads for each cache;
    * a single thread per listener; no order guaranteed).
    *
-   * @param bufferedTimCacheListener the listener to register (called on single thread)
+   * @param listener the listener to register (called on single thread)
    * @return a Lifecycle object to allow the registered listener to stop/start its thread as required;
    *          in general, the start() method should be called at the end of its own lifecycle start method,
    *          and the stop() at the beginning of its own stop method
    */
-  Lifecycle registerBufferedListenerToTags(C2monBufferedCacheListener<Tag> bufferedTimCacheListener);
+  Lifecycle registerBufferedListenerToTags(C2monBufferedCacheListener<Tag> listener);
 
   /**
    * Registers for all updates to C2MON alarms. Notice this includes all invalidations
    * of alarms due to DAQ/Equipment supervision events. This listener is called on it's
    * own thread.
    *
-   * @param timCacheListener the listener
+   * @param listener the listener
    * @return a Lifecycle object to allow the registered listener to stop/start its thread as required;
    *          in general, the start() method should be called at the end of its own lifecycle start method,
    *          and the stop() at the beginning of its own stop method
    */
-  Lifecycle registerToAlarms(C2monCacheListener<Alarm> timCacheListener);
+  Lifecycle registerToAlarms(C2monCacheListener<Alarm> listener);
 
   /**
    * Registers a comparable listener to all tag caches. This listener is called
    * on its own thread.
    *
-   * @param compareCacheListener the listener
+   * @param listener the listener
    */
-  void registerToAlarmExpressions(final ComparableCacheListener<Tag> compareCacheListener);
+  void registerToAlarms(final ComparableCacheListener<Tag> listener);
 }

@@ -59,7 +59,7 @@ public interface C2monCacheWithListeners<K, T extends Cacheable> extends C2monCa
   Lifecycle registerListener(C2monCacheListener<? super T> cacheListener);
 
   /**
-   * Registers the C2monCompareCacheListener as listener to this cache.
+   * Registers the ComparableCacheListener as listener to this cache.
    * The listener is notified when an element is updated in the cache. A copy
    * of the new cache object and the former cache object is passed and can be
    * accessed to get details of the object. However, the objects should not be

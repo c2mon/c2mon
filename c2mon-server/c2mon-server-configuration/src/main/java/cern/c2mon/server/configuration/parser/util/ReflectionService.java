@@ -17,29 +17,34 @@
 
 package cern.c2mon.server.configuration.parser.util;
 
-import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
-import cern.c2mon.shared.client.configuration.api.alarm.AlarmCondition;
-import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
-import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
-import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
-import cern.c2mon.shared.client.serializer.JacksonSerializer;
-import cern.c2mon.shared.client.tag.TagMode;
-import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import cern.c2mon.shared.client.metadata.Metadata;
-
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
+import cern.c2mon.shared.client.configuration.api.alarm.AlarmCondition;
+import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
+import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
+import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
+import cern.c2mon.shared.client.metadata.Metadata;
+import cern.c2mon.shared.client.tag.TagMode;
+import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+
 /**
- * Created by fritter on 31/05/16.
+ * @author Franz Ritter
  */
 public class ReflectionService {
+
+  private static ObjectMapper mapper = new ObjectMapper();
 
   /**
    * Extract all data from the given POJO {@link ConfigurationEntity} to a {@link Properties} object.
@@ -76,34 +81,30 @@ public class ReflectionService {
             String tempProp;
 
             // check if the property is a TagMode. If so we have to call the ordinal() method manual because the enum
-            // toString method don't return the needed
-            // number.
+            // toString method don't return the needed number.
             if (pd.getPropertyType().equals(TagMode.class)) {
               tempProp = String.valueOf(((TagMode) pd.getReadMethod().invoke(obj)).ordinal());
 
             } else if (pd.getPropertyType().equals(DataTagAddress.class)) {
               // check if the property is a DataTagAddress. If so we have to call the toConfigXML() method because
-              // the server expect the xml string of a
-              // DataTagAddress.
+              // the server expect the xml string of a DataTagAddress.
               tempProp = String.valueOf(((DataTagAddress) pd.getReadMethod().invoke(obj)).toConfigXML());
 
             } else if (pd.getPropertyType().equals(HardwareAddress.class)) {
               // check if the property is a HardWareAddress. If so we have to call the toConfigXML() method because
-              // the server expect the xml string of a
-              // DataTagAddress.
+              // the server expect the xml string of a DataTagAddress.
               tempProp = String.valueOf(((HardwareAddress) pd.getReadMethod().invoke(obj)).toConfigXML());
 
             } else if (pd.getPropertyType().equals(AlarmCondition.class)) {
-              // check if the property is a AlarmCondition. If so we have to call the getXMLCondition() method
-              // because the server expect the xml string of an
-              // AlarmCondition.
+              // check if the property is an AlarmCondition. If so we have to call the getXMLCondition() method
+              // because the server expect the xml string of an AlarmCondition.
               tempProp = String.valueOf(((AlarmCondition) pd.getReadMethod().invoke(obj)).getXMLCondition());
 
             } else if (pd.getPropertyType().equals(Metadata.class)) {
               tempProp = String.valueOf(Metadata.toJSON((Metadata) pd.getReadMethod().invoke(obj)));
 
             } else if (pd.getName().equals("expressions")) {
-              tempProp = JacksonSerializer.mapper.writeValueAsString(pd.getReadMethod().invoke(obj));
+              tempProp = mapper.writeValueAsString(pd.getReadMethod().invoke(obj));
 
             } else {
               // default call of all properties. Returns the standard toStringValue of the given Type
