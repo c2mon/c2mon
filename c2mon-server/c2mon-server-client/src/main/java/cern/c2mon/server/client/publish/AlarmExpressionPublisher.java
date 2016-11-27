@@ -23,6 +23,7 @@ import javax.annotation.PreDestroy;
 
 import cern.c2mon.server.cache.ComparableCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
+import cern.c2mon.server.client.config.ClientProperties;
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.common.republisher.Publisher;
 import cern.c2mon.server.common.republisher.Republisher;
@@ -54,6 +55,8 @@ import org.springframework.stereotype.Service;
 @ManagedResource(description = "Bean publishing tag updates with an alarm to the clients")
 public class AlarmExpressionPublisher implements ComparableCacheListener<Tag>, Publisher<Tag> {
 
+  private ClientProperties properties;
+
   /** Bean providing for sending JMS messages and waiting for a response */
   private final JmsSender jmsSender;
 
@@ -63,19 +66,14 @@ public class AlarmExpressionPublisher implements ComparableCacheListener<Tag>, P
   /** Contains re-publication logic */
   private Republisher<Tag> republisher;
 
-
-  /**
-   * Default Constructor
-   *
-   * @param jmsSender                Used for sending JMS messages and waiting for a response.
-   * @param cacheRegistrationService Used ro register tags with alarm updated
-   */
   @Autowired
   public AlarmExpressionPublisher(@Qualifier("alarmTopicPublisher") final JmsSender jmsSender,
-                                  final CacheRegistrationService cacheRegistrationService) {
+                                  final CacheRegistrationService cacheRegistrationService,
+                                  final ClientProperties properties) {
     this.jmsSender = jmsSender;
     this.cacheRegistrationService = cacheRegistrationService;
-    republisher = RepublisherFactory.createRepublisher(this, "Alarm expression");
+    this.properties = properties;
+    this.republisher = RepublisherFactory.createRepublisher(this, "Alarm expression");
   }
 
   /**
@@ -117,7 +115,7 @@ public class AlarmExpressionPublisher implements ComparableCacheListener<Tag>, P
 
   @Override
   public void publish(final Tag tag) {
-    TransferTagImpl tagValue = TransferObjectFactory.createTransferTag(tag, false);
+    TransferTagImpl tagValue = TransferObjectFactory.createTransferTag(tag, false, TopicProvider.topicFor(tag, properties));
     log.trace("publish - Publishing tag with alarm change to client: " + TransferTagSerializer.toJson(tagValue));
     jmsSender.send(TransferTagSerializer.toJson(tagValue));
   }

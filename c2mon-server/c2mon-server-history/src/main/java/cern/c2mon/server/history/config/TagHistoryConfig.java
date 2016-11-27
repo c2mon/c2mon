@@ -6,14 +6,15 @@ import cern.c2mon.server.history.alarm.AlarmListener;
 import cern.c2mon.server.history.dao.LoggerDAO;
 import cern.c2mon.server.history.logger.BatchLogger;
 import cern.c2mon.server.history.logger.DefaultLogger;
+import cern.c2mon.server.history.mapper.ExpressionLogMapper;
 import cern.c2mon.server.history.mapper.TagRecordMapper;
+import cern.c2mon.server.history.structure.ExpressionLog;
 import cern.c2mon.server.history.structure.TagRecord;
 import cern.c2mon.server.history.structure.TagRecordConverter;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
 
 /**
  * @author Justin Lewis Salmon
@@ -44,22 +45,13 @@ public class TagHistoryConfig {
         properties.getJdbc().getUrl());
   }
 
-  @Autowired
-  Environment environment;
-
-  @Bean(name = "expressionLoggerDAO")
-  public LoggerDAO<ExpressionLog> expressionLoggerDAO() throws ClassNotFoundException {
-
-    return new LoggerDAO<>(historySqlSessionFactory,
-        "cern.c2mon.server.history.mapper.ExpressionLogMapper",
-        environment.getRequiredProperty("c2mon.server.history.jdbc.url"));
+  @Bean
+  public PersistenceManager<ExpressionLog> expressionPersistenceManager(AlarmListener alarmListener) throws Exception {
+    return new PersistenceManager<>(expressionLoggerDAO(), properties.getExpressionFallbackFile(), alarmListener, new ExpressionLog());
   }
 
-  @Bean(name = "stlExpressionPersistenceManager")
-  public IPersistenceManager<ExpressionLog> stlExpressionPersistenceManager() {
-
-    return new PersistenceManager<>(expressionLoggerDAO(),
-        environment.getRequiredProperty("c2mon.server.shorttermlog.fallback.expression"),
-        new AlarmListener(), new ExpressionLog());
+  @Bean
+  public LoggerDAO<ExpressionLog> expressionLoggerDAO() throws Exception {
+    return new LoggerDAO<>(historySqlSessionFactory.getObject(), ExpressionLogMapper.class.getCanonicalName(), properties.getJdbc().getUrl());
   }
 }

@@ -15,7 +15,7 @@
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-package cern.c2mon.server.shorttermlog.structure;
+package cern.c2mon.server.history.structure;
 
 import java.sql.Timestamp;
 
@@ -27,7 +27,7 @@ import com.google.gson.Gson;
 import lombok.Data;
 
 /**
- * Bean which represents a Loggable {@link cern.c2mon.shared.client.expression.Expression}.
+ * Bean which represents a Loggable {@link Expression}.
  *
  * @author Franz Ritter
  */

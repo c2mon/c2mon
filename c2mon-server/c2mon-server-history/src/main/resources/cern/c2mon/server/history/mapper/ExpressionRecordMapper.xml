@@ -7,21 +7,21 @@
     take "namespace=Mapper interface" for the mapper SQL statements to
     be picked up automatically
   -->
-<mapper namespace="cern.c2mon.server.shorttermlog.mapper.ExpressionLogMapper">
+<mapper namespace="cern.c2mon.server.history.mapper.ExpressionLogMapper">
 
   <!--
     Inserts a new row in the EXPRESSION_LOG table that represents some log
     information for a given dataTag. The values for the inserted row are
     stored in the ExpressionLog object
   -->
-  <insert id="insertLog" databaseId="oracle" parameterType="ExpressionSTLog">
+  <insert id="insertLog" databaseId="oracle" parameterType="cern.c2mon.server.history.structure.ExpressionLog">
     INSERT INTO EXPRESSION_LOG (TAGID, EXPRNAME, EXPRVALUE, EXPRDATATYPE, EXPRTIMESTAMP, EXPRINFO)
     VALUES (
     #{tagId,jdbcType=NUMERIC}, #{exprName,jdbcType=VARCHAR}, #{exprValue,jdbcType=VARCHAR},
     #{exprDataType,jdbcType=VARCHAR}, #{exprTimestamp,jdbcType=TIMESTAMP}, #{exprInfo,jdbcType=VARCHAR})
   </insert>
 
-  <insert id="insertLog" databaseId="mysql" parameterType="ExpressionSTLog">
+  <insert id="insertLog" databaseId="mysql" parameterType="cern.c2mon.server.history.structure.ExpressionLog">
     INSERT INTO EXPRESSION_LOG (TAGID, EXPRNAME, EXPRVALUE, EXPRDATATYPE, EXPRTIMESTAMP, EXPRINFO)
     VALUES (
     #{tagId,jdbcType=NUMERIC}, #{exprName,jdbcType=VARCHAR}, #{exprValue,jdbcType=VARCHAR},

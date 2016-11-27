@@ -14,26 +14,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.shorttermlog.mapper;
+package cern.c2mon.server.history.mapper;
 
-import cern.c2mon.server.shorttermlog.structure.ExpressionLog;
+import cern.c2mon.server.history.structure.ExpressionLog;
 
 /**
- * Mapper interface for writing to and querying the
- * history of Tags in the ShortTermLog DB account.
- *
  * @author Franz Ritter
- *
  */
 public interface ExpressionLogMapper extends LoggerMapper<ExpressionLog> {
 
-  /**
-   * Removes all rows for a given expression from the STL table.
-   * Only used for removing data inserted during testing on
-   * the Oracle database.
-   *
-   * @param tagId remove all logs for a tag with this id
-   */
   void deleteExpressionLog(Long tagId);
-
 }

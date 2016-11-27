@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.shorttermlog.logger;
+package cern.c2mon.server.history.logger;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -22,9 +22,9 @@ import java.util.Collection;
 
 import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
-import cern.c2mon.server.shorttermlog.structure.ExpressionLog;
-import cern.c2mon.server.shorttermlog.structure.Loggable;
-import cern.c2mon.server.shorttermlog.structure.LoggerConverter;
+import cern.c2mon.server.history.structure.ExpressionLog;
+import cern.c2mon.server.history.structure.Loggable;
+import cern.c2mon.server.history.structure.LoggerConverter;
 import cern.c2mon.shared.client.expression.Expression;
 import cern.c2mon.shared.common.Cacheable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,32 +37,23 @@ import org.springframework.stereotype.Service;
 @Service
 public class ExpressionLogger  {
 
-  /**
-   * The fallback persistence manager.
-   */
   private IPersistenceManager persistenceManager;
 
-  /**
-   * Unique constructor.
-   *
-   * @param persistenceManager the persistence manager
-   */
   @Autowired
-  public ExpressionLogger(@Qualifier("stlExpressionPersistenceManager") final IPersistenceManager persistenceManager) {
-    super();
-    this.persistenceManager = persistenceManager;
+  public ExpressionLogger(final IPersistenceManager expressionPersistenceManager) {
+    this.persistenceManager = expressionPersistenceManager;
   }
 
-  public void log(final Collection<Expression> cacheExpressions, Long tagId, Timestamp serverTimestamp) {
-    ArrayList<IFallback> shortTermLogObjects = new ArrayList<>();
+  public void log(final Collection<Expression> expressions, Long tagId, Timestamp serverTimestamp) {
+    ArrayList<IFallback> items = new ArrayList<>();
 
     // Convert the list of DataTagCacheObjects to DataTagShortTermLog objects (IFallback objects)
-    for (Expression expression : cacheExpressions) {
-        if (expression!= null && expression.getName() != null) {
-          shortTermLogObjects.add(new ExpressionLog(expression, tagId, serverTimestamp));
+    for (Expression expression : expressions) {
+        if (expression != null && expression.getName() != null) {
+          items.add(new ExpressionLog(expression, tagId, serverTimestamp));
         }
     }
-    persistenceManager.storeData(shortTermLogObjects);
-  }
 
+    persistenceManager.storeData(items);
+  }
 }
