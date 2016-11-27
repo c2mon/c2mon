@@ -44,18 +44,14 @@ import cern.c2mon.shared.common.ConfigurationException;
 @Service
 public class ControlTagFacadeImpl extends AbstractDataTagFacade<ControlTag> implements ControlTagFacade {
 
-  private AliveTimerCache aliveTimerCache;
-
   @Autowired
   public ControlTagFacadeImpl(final DataTagCacheObjectFacade dataTagCacheObjectFacade,
                               final ControlTagCache controlTagCache,
                               final AlarmFacade alarmFacade,
                               final AlarmCache alarmCache,
                               final ControlTagCacheObjectFacade controlTagCacheObjectFacade,
-                              final QualityConverter qualityConverter,
-                              final Evaluator evaluator) {
-    super(controlTagCache, alarmFacade, alarmCache, controlTagCacheObjectFacade, dataTagCacheObjectFacade, qualityConverter, evaluator);
-    this.aliveTimerCache = aliveTimerCache;
+                              final QualityConverter qualityConverter) {
+    super(controlTagCache, alarmFacade, alarmCache, controlTagCacheObjectFacade, dataTagCacheObjectFacade, qualityConverter);
   }
 
   @Override

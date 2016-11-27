@@ -21,8 +21,7 @@ import java.util.Collection;
 
 import javax.annotation.PostConstruct;
 
-import cern.c2mon.server.shorttermlog.logger.ExpressionLogger;
-import cern.c2mon.shared.client.expression.Expression;
+import cern.c2mon.server.history.logger.ExpressionLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +83,7 @@ public class TagRecordListener implements C2monBufferedCacheListener<Tag>, Smart
    * @param tagLogger for logging cache objects to the STL
    */
   @Autowired
-  public TagLogCacheListener(final CacheRegistrationService cacheRegistrationService,
+  public TagRecordListener(final CacheRegistrationService cacheRegistrationService,
                              @Qualifier("tagLogger") final BatchLogger<Tag> tagLogger,
                              ExpressionLogger expressionLogger) {
     super();
