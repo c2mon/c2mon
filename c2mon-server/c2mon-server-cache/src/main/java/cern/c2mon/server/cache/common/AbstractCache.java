@@ -29,7 +29,6 @@ import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import lombok.extern.slf4j.Slf4j;
 import cern.c2mon.server.cache.ComparableCacheListener;
 import cern.c2mon.server.cache.listener.*;
-import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.event.RegisteredEventListeners;
@@ -90,9 +89,9 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
   /**
    * Reference to the Ehcache event listeners
    */
-  private LinkedBlockingDeque<C2monCacheListener< ? super T>> cacheListeners = new LinkedBlockingDeque<>();
+  private LinkedBlockingDeque<C2monCacheListener<? super T>> cacheListeners = new LinkedBlockingDeque<>();
 
-  private LinkedBlockingDeque<ComparableCacheListener< ? super T>> compareCacheListeners = new LinkedBlockingDeque<>();
+  private LinkedBlockingDeque<ComparableCacheListener<? super T>> comparableCacheListeners = new LinkedBlockingDeque<>();
 
   /**
    * the RegisteredEventListeners instance for this cache which is used
@@ -235,7 +234,7 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
    * Put a new object in the cache, notifying the listeners.
    * The value object itself is put into the cache (not a copy).
    *
-   * <p> Call this method only if the the value was already insert with the
+   * <p> Call this method only if the the value was already inserted with the
    * {@link #putQuiet(Cacheable)} method.
    * @param key
    * @param value
@@ -244,7 +243,7 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
   public void put(K key, T value) {
     T originalValue = getCopy(key);
     super.put(key, value);
-    notifyCompareListenersOfUpdate(originalValue, value);
+    notifyListenersOfUpdate(originalValue, value);
     notifyListenersOfUpdate(value);
   }
 
@@ -271,8 +270,8 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
         listener.notifyElementUpdated(cloned);
       }
     } catch (CloneNotSupportedException e) {
-      log.error("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
-      throw new RuntimeException("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
+      log.error("Error cloning a cache element - this should never happen!", e);
+      throw new RuntimeException("Error cloning a cache element - this should never happen!", e);
     }
   }
 
@@ -286,17 +285,17 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
    * @param original the cache object which was in the cache before the new one
    * @param updated the cache object which was put into the cache
    */
-  public void notifyCompareListenersOfUpdate(final T original, final T updated) {
+  public void notifyListenersOfUpdate(final T original, final T updated) {
     try {
       T clonedUpdated = (T) updated.clone();
       if (original != null) {
-        for (ComparableCacheListener<? super T> listener : compareCacheListeners) {
+        for (ComparableCacheListener<? super T> listener : comparableCacheListeners) {
           listener.notifyElementUpdated(original, clonedUpdated);
         }
       }
     } catch (CloneNotSupportedException e) {
-      log.error("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
-      throw new RuntimeException("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
+      log.error("Error cloning a cache element - this should never happen!", e);
+      throw new RuntimeException("Error cloning a cache element - this should never happen!", e);
     }
   }
 
@@ -308,8 +307,8 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
         listener.confirmStatus(cloned);
       }
     } catch (CloneNotSupportedException e) {
-      log.error("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
-      throw new RuntimeException("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
+      log.error("Error cloning a cache element - this should never happen!", e);
+      throw new RuntimeException("Error cloning a cache element - this should never happen!", e);
     }
   }
 
@@ -325,7 +324,7 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
 
   public void registerComparableListener(ComparableCacheListener<? super T> cacheListener) {
     AsynchronousComparableCacheListener<? super T> wrappedCacheListener = new AsynchronousComparableCacheListener<>(cacheListener);
-    compareCacheListeners.add(wrappedCacheListener);
+    comparableCacheListeners.add(wrappedCacheListener);
   }
 
   public Lifecycle registerThreadedListener(C2monCacheListener<? super T> cacheListener, int queueCapacity, int threadPoolSize) {

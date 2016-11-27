@@ -118,7 +118,7 @@ public interface RequestHandler {
    * @return a collection of {@link TagValueUpdate} with active alarm expressions
    * @throws JMSException
    */
-  Collection<TagValueUpdate> requestAllActiveAlarmExpressions() throws JMSException;
+  Collection<TagValueUpdate> requestAllActiveAlarmsNew() throws JMSException;
 
     /**
      * Queries the server for the latest values and configuration

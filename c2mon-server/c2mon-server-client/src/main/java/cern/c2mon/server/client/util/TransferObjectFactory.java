@@ -57,11 +57,11 @@ public abstract class TransferObjectFactory {
   }
 
   /**
-   * Creates a <code>TransferTagImpl</code> object for the given parameters
+   * Creates a {@link TransferTagImpl} object from the given parameters
    *
-   * @param tagWithAlarms A tag from the cache
-   * @param aliveTag set to <code>true</code>, if tag is an Alive tag
-   * @return The resulting <code>TransferTagImpl</code>
+   * @param tagWithAlarms a tag from the cache
+   * @param aliveTag set to {@literal true}, if tag is an Alive tag
+   * @return the resulting {@link TransferTagImpl}
    */
   @Deprecated
   public static TransferTagImpl createTransferTag(final TagWithAlarms tagWithAlarms, boolean aliveTag, String topic) {

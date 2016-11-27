@@ -33,26 +33,17 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Wrapper JMS listener to register to the alarm messages topic. This
- * class then notifies all registered listeners.<br/>
- * <br/>
+ * class then notifies all registered listeners.
  */
 @Slf4j
-class AlarmExpressionListenerWrapper extends AbstractListenerWrapper<BaseTagListener, TagUpdate> {
+class AlarmListenerWrapperNew extends AbstractListenerWrapper<BaseTagListener, TagUpdate> {
 
   /**
    * Timestamps of events to filter out older events.
    */
   private ConcurrentHashMap<Long, Long> eventTimes = new ConcurrentHashMap<Long, Long>();
 
-  /**
-   * Constructor.
-   *
-   * @param queueCapacity        size of event queue
-   * @param slowConsumerListener listener registered for JMS problem callbacks
-   * @param executorService      threads pooling queue
-   */
-  public AlarmExpressionListenerWrapper(int queueCapacity, SlowConsumerListener slowConsumerListener,
-                                        final ExecutorService executorService) {
+  public AlarmListenerWrapperNew(int queueCapacity, SlowConsumerListener slowConsumerListener, final ExecutorService executorService) {
     super(queueCapacity, slowConsumerListener, executorService);
   }
 
@@ -71,7 +62,7 @@ class AlarmExpressionListenerWrapper extends AbstractListenerWrapper<BaseTagList
       listener.onUpdate(tagWithAlarm);
 
     } catch (RuleFormatException e) {
-      log.error("Received a tag on the alarm topic which triggered an RuleFormatException", e);
+      log.error("Received a tag on the alarm topic which triggered a RuleFormatException", e);
     }
   }
 

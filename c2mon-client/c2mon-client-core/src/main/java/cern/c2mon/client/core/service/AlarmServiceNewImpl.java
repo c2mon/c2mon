@@ -18,7 +18,6 @@ package cern.c2mon.client.core.service;
 
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.stream.Collectors;
 
 import javax.jms.JMSException;
 
@@ -26,7 +25,7 @@ import cern.c2mon.client.common.listener.BaseTagListener;
 
 // TODO: use SourceDataTag or some basic tag from the client side client
 import cern.c2mon.client.common.tag.Tag;
-import cern.c2mon.client.core.AlarmExpressionService;
+import cern.c2mon.client.core.AlarmServiceNew;
 import cern.c2mon.client.core.jms.JmsProxy;
 import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
@@ -38,9 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-@Service("alarmExpressionService")
+@Service("alarmServiceNew")
 @Slf4j
-public class AlarmExpressionServiceImpl implements AlarmExpressionService, BaseTagListener {
+public class AlarmServiceNewImpl implements AlarmServiceNew, BaseTagListener {
 
   /** Lock for accessing the <code>listeners</code> variable */
   private ReentrantReadWriteLock alarmListenersLock = new ReentrantReadWriteLock();
@@ -54,22 +53,15 @@ public class AlarmExpressionServiceImpl implements AlarmExpressionService, BaseT
   /** Provides methods for requesting tag information from the C2MON server */
   private final RequestHandler clientRequestHandler;
 
-  /**
-   * Default Constructor, used by Spring to instantiate the Singleton service
-   *
-   * @param jmsProxy       Used to register to the active alarm topic
-   * @param requestHandler Provides methods for requesting tag information from the C2MON server
-   */
   @Autowired
-  protected AlarmExpressionServiceImpl(final JmsProxy jmsProxy,
-                                       @Qualifier("coreRequestHandler") final RequestHandler requestHandler) {
+  protected AlarmServiceNewImpl(final JmsProxy jmsProxy, final RequestHandler coreRequestHandler) {
 
     this.jmsProxy = jmsProxy;
-    this.clientRequestHandler = requestHandler;
+    this.clientRequestHandler = coreRequestHandler;
   }
 
   @Override
-  public void addAlarmExpressionListener(final BaseTagListener listener) throws JMSException {
+  public void addAlarmListener(final BaseTagListener listener) throws JMSException {
     alarmListenersLock.writeLock().lock();
 
     try {
@@ -77,7 +69,7 @@ public class AlarmExpressionServiceImpl implements AlarmExpressionService, BaseT
         jmsProxy.registerAlarmExpressionListener(this);
       }
 
-      log.debug("addAlarmListener() : adding alarm listener " + listener.getClass());
+      log.debug("Adding alarm listener " + listener.getClass());
       alarmListeners.add(listener);
     } finally {
       alarmListenersLock.writeLock().unlock();
@@ -88,7 +80,7 @@ public class AlarmExpressionServiceImpl implements AlarmExpressionService, BaseT
   public void removeAlarmListener(final BaseTagListener listener) throws JMSException {
     alarmListenersLock.writeLock().lock();
     try {
-      log.debug("removeAlarmListener() : removing alarm listener");
+      log.debug("Removing alarm listener");
 
       if (alarmListeners.size() == 1) {
         jmsProxy.unregisterAlarmExpressionListener(this);
@@ -111,10 +103,9 @@ public class AlarmExpressionServiceImpl implements AlarmExpressionService, BaseT
         cdt.update(tagUpdate);
       }
     } catch (JMSException e) {
-      log.error("getAlarms() - JMS connection lost -> Could not retrieve missing tags from the C2MON server.", e);
+      log.error("JMS connection lost -> Could not retrieve tags from the C2MON server", e);
     } catch (RuleFormatException e) {
-      log.error("Failing to update a ClientDataTag", e);
-      e.printStackTrace();
+      log.error("Failed to update a ClientDataTag", e);
     }
     return result;
   }
@@ -125,8 +116,7 @@ public class AlarmExpressionServiceImpl implements AlarmExpressionService, BaseT
     try {
       return clientRequestHandler.requestAllActiveAlarms();
     } catch (JMSException e) {
-      log.error("getAllActiveAlarms() - JMS connection lost -> Could not retrieve missing tags from the C2MON server" +
-          ".", e);
+      log.error("JMS connection lost -> Could not retrieve tags from the C2MON server", e);
     }
     return new ArrayList<>();
   }
@@ -136,20 +126,15 @@ public class AlarmExpressionServiceImpl implements AlarmExpressionService, BaseT
     alarmListenersLock.readLock().lock();
 
     try {
-      log.debug("onAlarmUpdate() -  received tag with an alarm update for tagId:" + tag.getId());
+      log.debug("Received tag with an alarm update for tag #{}", tag.getId());
       notifyAlarmListeners(tag);
     } finally {
       alarmListenersLock.readLock().unlock();
     }
   }
 
-  /**
-   * Private method, notifies all listeners for a update.
-   *
-   * @param tag the updated Alarm
-   */
   private void notifyAlarmListeners(final Tag tag) {
-    log.debug("onAlarmUpdate() -  there is:" + alarmListeners.size() + " listeners waiting to be notified!");
-    alarmListeners.stream().forEach(listener -> listener.onUpdate(tag));
+    log.debug("There are {} listeners waiting to be notified", alarmListeners.size());
+    alarmListeners.forEach(listener -> listener.onUpdate(tag));
   }
 }

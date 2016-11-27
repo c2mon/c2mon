@@ -120,10 +120,7 @@ public interface TagValueUpdate extends ClientRequestResult {
   /**
    * Set the tag value;
    */
-  Collection<Expression> getExpressions();
-
-  /**
-   * Set the tag value;
-   */
   void setValue(Object arg);
+
+  Collection<Expression> getExpressions();
 }

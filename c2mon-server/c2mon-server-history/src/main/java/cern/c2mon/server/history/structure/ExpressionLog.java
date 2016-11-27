@@ -38,27 +38,27 @@ public class ExpressionLog implements IFallback {
 
   private long tagId;
 
-  private Timestamp exprTimestamp;
+  private Timestamp timestamp;
 
-  private String exprName;
+  private String name;
 
-  private String exprValue;
+  private String value;
 
-  private String exprDataType;
+  private String dataType;
 
-  private String exprInfo;
+  private String info;
 
   public ExpressionLog() {
   }
 
   public ExpressionLog(Expression expression, Long tagId, Timestamp serverTimestamp) {
     this.tagId = tagId;
-    this.exprTimestamp = serverTimestamp;
-    this.exprName = expression.getName();
-    this.exprValue = expression.getResult() != null ? expression.getResult().toString() : "";
-    this.exprDataType = expression.getDataType();
+    this.timestamp = serverTimestamp;
+    this.name = expression.getName();
+    this.value = expression.getResult() != null ? expression.getResult().toString() : "";
+    this.dataType = expression.getDataType();
     if (expression.getMetadata() != null && expression.getMetadata().getMetadata() != null) {
-      this.exprInfo = expression.getMetadata().getMetadata().get("info") != null ?
+      this.info = expression.getMetadata().getMetadata().get("info") != null ?
           expression.getMetadata().getMetadata().get("info").toString() : "";
     }
   }
@@ -74,7 +74,6 @@ public class ExpressionLog implements IFallback {
   }
 
   public String getId() {
-    return exprName;
+    return name;
   }
-
 }

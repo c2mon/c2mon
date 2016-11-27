@@ -455,15 +455,13 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
   }
 
   /**
-   * Checks if this tag has an active alarm attached.
-   * Currently used form the eh cache searchable query.
-   *
-   * @return ture if this tag has an active alarm attached.
+   * @return true if this tag has any expression that are marked as alarms and
+   * have a value of {@value true}.
    */
   public boolean isActiveAlarm() {
-    for (Expression expr : expressions) {
-      if (expr.getAlarm() && expr.getResult() != null) {
-        return Boolean.valueOf(expr.getResult().toString());
+    for (Expression expression : expressions) {
+      if (expression.getAlarm() && expression.getResult() != null) {
+        return Boolean.valueOf(expression.getResult().toString());
       }
     }
     return false;

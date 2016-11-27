@@ -157,7 +157,7 @@ public class TagValuePublisher implements C2monCacheListener<Tag>, Configuration
    */
   @PreDestroy
   public void shutdown() {
-    LOGGER.info("shutdown - Stopping tag publisher.");
+    LOGGER.info("Stopping tag publisher");
     republisher.stop();
   }
 
@@ -184,7 +184,7 @@ public class TagValuePublisher implements C2monCacheListener<Tag>, Configuration
   public void publish(final Tag tag) {
     TransferTagValueImpl tagValue = TransferObjectFactory.createTransferTagValue(tag);
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("publish - Publishing tag update to client: " + TransferTagSerializer.toJson(tagValue));
+      LOGGER.trace("Publishing tag update to client: " + TransferTagSerializer.toJson(tagValue));
     }
     jmsSender.sendToTopic(TransferTagSerializer.toJson(tagValue), TopicProvider.topicFor(tag, properties));
   }
@@ -199,11 +199,11 @@ public class TagValuePublisher implements C2monCacheListener<Tag>, Configuration
         String topic = TopicProvider.topicFor(tag, properties);
         TransferTagImpl transferTag = TransferObjectFactory.createTransferTag(tag, aliveTimerFacade.isRegisteredAliveTimer(tagId), topic);
         if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace("notifyOnConfigurationUpdate - Publishing configuration update to client: " + TransferTagSerializer.toJson(transferTag));
+          LOGGER.trace("Publishing configuration update to client: " + TransferTagSerializer.toJson(transferTag));
         }
         jmsSender.sendToTopic(TransferTagSerializer.toJson(transferTag), topic);
       } catch (JmsException e) {
-        LOGGER.error("notifyOnConfigurationUpdate - Error publishing configuration update to topic for tag " + tagId
+        LOGGER.error("Error publishing configuration update to topic for tag " + tagId
             + " - submitting for republication", e);
         republisher.publicationFailed(tag);
       }
@@ -234,15 +234,14 @@ public class TagValuePublisher implements C2monCacheListener<Tag>, Configuration
     try {
       publish(tag);
     } catch (JmsException e) {
-      LOGGER.error("notifyOnUpdate - Error publishing tag update to topic for tag " + tag.getId() + " - submitting for republication", e);
+      LOGGER.error("Error publishing tag update to topic for tag " + tag.getId() + " - submitting for republication", e);
       republisher.publicationFailed(tag);
     }
 
   }
 
   @Override
-  // TODO implement
   public void confirmStatus(Tag cacheable) {
-
+    // TODO implement this
   }
 }

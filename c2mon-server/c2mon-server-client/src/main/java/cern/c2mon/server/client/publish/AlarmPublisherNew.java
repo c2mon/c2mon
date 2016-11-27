@@ -42,8 +42,7 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 /**
- * Publishes active tags with alarm expressions to the C2MON client
- * applications on the alarm publication topic.
+ * Publishes tags with active alarm expressions on the alarm publication topic.
  *
  * <p>Will attempt re-publication of tags with alarm expressions if JMS
  * connection fails.
@@ -52,8 +51,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
-@ManagedResource(description = "Bean publishing tag updates with an alarm to the clients")
-public class AlarmExpressionPublisher implements ComparableCacheListener<Tag>, Publisher<Tag> {
+@ManagedResource(description = "Publisher for tags with active alarms")
+public class AlarmPublisherNew implements ComparableCacheListener<Tag>, Publisher<Tag> {
 
   private ClientProperties properties;
 
@@ -67,22 +66,19 @@ public class AlarmExpressionPublisher implements ComparableCacheListener<Tag>, P
   private Republisher<Tag> republisher;
 
   @Autowired
-  public AlarmExpressionPublisher(@Qualifier("alarmTopicPublisher") final JmsSender jmsSender,
-                                  final CacheRegistrationService cacheRegistrationService,
-                                  final ClientProperties properties) {
+  public AlarmPublisherNew(@Qualifier("alarmTopicPublisher") final JmsSender jmsSender,
+                           final CacheRegistrationService cacheRegistrationService,
+                           final ClientProperties properties) {
     this.jmsSender = jmsSender;
     this.cacheRegistrationService = cacheRegistrationService;
     this.properties = properties;
-    this.republisher = RepublisherFactory.createRepublisher(this, "Alarm expression");
+    this.republisher = RepublisherFactory.createRepublisher(this, "Alarm");
   }
 
-  /**
-   * Register this listener to alarm expressions.
-   */
   @PostConstruct
   void init() {
-    log.info("init - Starting alarm expression publisher");
-    cacheRegistrationService.registerToAlarmExpressions(this);
+    log.info("Starting alarm publisher");
+    cacheRegistrationService.registerToAlarms(this);
     republisher.start();
   }
 
@@ -105,8 +101,7 @@ public class AlarmExpressionPublisher implements ComparableCacheListener<Tag>, P
         try {
           publish(updated);
         } catch (JmsException e) {
-          log.error("Error publishing tag with a changed alarm to clients - submitting for republication." +
-              " Tag id is " + updated.getId(), e);
+          log.error("Error publishing tag {} with a changed alarm: submitting for republication.", updated.getId(), e);
           republisher.publicationFailed(updated);
         }
       }
@@ -116,15 +111,14 @@ public class AlarmExpressionPublisher implements ComparableCacheListener<Tag>, P
   @Override
   public void publish(final Tag tag) {
     TransferTagImpl tagValue = TransferObjectFactory.createTransferTag(tag, false, TopicProvider.topicFor(tag, properties));
-    log.trace("publish - Publishing tag with alarm change to client: " + TransferTagSerializer.toJson(tagValue));
+    log.trace("Publishing tag {} which has a changed alarm state", tag.getId());
     jmsSender.send(TransferTagSerializer.toJson(tagValue));
   }
 
   /**
    * @return the total number of failed publications since the publisher start
    */
-  @ManagedOperation(description = "Returns the total number of failed alarm publication attempts since the " +
-      "application started")
+  @ManagedOperation(description = "Returns the total number of failed alarm publication attempts since the application started")
   public long getNumberFailedPublications() {
     return republisher.getNumberFailedPublications();
   }
@@ -132,8 +126,7 @@ public class AlarmExpressionPublisher implements ComparableCacheListener<Tag>, P
   /**
    * @return the number of current tag updates awaiting publication to the clients
    */
-  @ManagedOperation(description = "Returns the current number of alarms awaiting re-publication (should be 0 in " +
-      "normal operation)")
+  @ManagedOperation(description = "Returns the current number of alarms awaiting re-publication (should be 0 in normal operation)")
   public int getSizeUnpublishedList() {
     return republisher.getSizeUnpublishedList();
   }

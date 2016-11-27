@@ -25,16 +25,15 @@ import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 
-// TODO write a new documentation
-public interface AlarmExpressionService {
+public interface AlarmServiceNew {
 
   /**
    * Registers a listener.
    *
-   * @param listener The listener to be registered
+   * @param listener the listener to be registered
    * @throws JMSException
    */
-  void addAlarmExpressionListener(BaseTagListener listener) throws JMSException;
+  void addAlarmListener(BaseTagListener listener) throws JMSException;
 
   /**
    * Returns an {@link Tag} object with alarm expressions for every valid id on

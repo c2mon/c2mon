@@ -36,7 +36,4 @@ public class RepublisherFactory {
   public static <T> Republisher<T> createRepublisher(Publisher<T> publisher, String eventName) {
     return new RepublisherImpl<>(publisher, eventName);
   }
-
-
-
 }

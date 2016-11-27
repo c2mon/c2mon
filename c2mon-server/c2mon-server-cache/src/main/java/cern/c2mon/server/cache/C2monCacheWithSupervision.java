@@ -110,8 +110,8 @@ public interface C2monCacheWithSupervision<K, T extends Tag> extends C2monCacheW
   Collection<T> findByNameWildcard(String regex);
 
   /**
-   * Checks the cache for all expressions which are alarms and true.
-   * @return The list of tags with active alarms.
+   * @return list of tags with expressions that are currently {@literal true}
+   * and are marked as alarms
    */
   List<T> getActiveAlarms();
 }

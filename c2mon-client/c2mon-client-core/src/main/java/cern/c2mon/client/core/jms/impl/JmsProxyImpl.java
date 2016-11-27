@@ -197,7 +197,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    * Incoming alarms through the topic should be represented as tag with expressions.
    * Thread start once and lives until final stop.
    */
-  private final AlarmExpressionListenerWrapper alarmExpressionListenerWrapper;
+  private final AlarmListenerWrapperNew alarmListenerWrapperNew;
 
   /**
    * Notified on slow consumer detection.
@@ -310,8 +310,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     heartbeatListenerWrapper.start();
     alarmListenerWrapper = new AlarmListenerWrapper(HIGH_LISTENER_QUEUE_SIZE, slowConsumerListener, topicPollingExecutor);
     alarmListenerWrapper.start();
-    alarmExpressionListenerWrapper = new AlarmExpressionListenerWrapper(HIGH_LISTENER_QUEUE_SIZE, slowConsumerListener, topicPollingExecutor);
-    alarmExpressionListenerWrapper.start();
+    alarmListenerWrapperNew = new AlarmListenerWrapperNew(HIGH_LISTENER_QUEUE_SIZE, slowConsumerListener, topicPollingExecutor);
+    alarmListenerWrapperNew.start();
   }
 
   /**
@@ -474,8 +474,9 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       if (alarmListenerWrapper.getListenerCount() > 0) {
         subscribeToAlarmTopic();
       }
-      if (alarmExpressionListenerWrapper.getListenerCount() > 0) {
-        subscribeToAlarNewTopic();
+
+      if (alarmListenerWrapperNew.getListenerCount() > 0) {
+        subscribeToAlarmTopicNew();
       }
 
       // refresh supervision subscription
@@ -505,10 +506,10 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    * Subscribes to the alarm topic.
    * @throws JMSException if problem subscribing
    */
-  private void subscribeToAlarNewTopic() throws JMSException {
+  private void subscribeToAlarmTopicNew() throws JMSException {
     alarmSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
     alarmConsumer = alarmSession.createConsumer(alarmTopic);
-    alarmConsumer.setMessageListener(alarmExpressionListenerWrapper);
+    alarmConsumer.setMessageListener(alarmListenerWrapperNew);
     log.debug("Successfully subscribed to alarm topic");
   }
 
@@ -967,15 +968,15 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       throw new NullPointerException("Trying to register null alarm expression listener with JmsProxy.");
     }
     // this is our first listener! -> it's time to subscribe to the alarm topic
-    if (alarmExpressionListenerWrapper.getListenerCount() == 0) {
+    if (alarmListenerWrapperNew.getListenerCount() == 0) {
       try {
-        subscribeToAlarNewTopic();
+        subscribeToAlarmTopicNew();
       } catch (JMSException e) {
         log.error("Did not manage to subscribe To Alarm Topic.", e);
         throw e;
       }
     }
-    alarmExpressionListenerWrapper.addListener(alarmExpressionListener);
+    alarmListenerWrapperNew.addListener(alarmExpressionListener);
 
   }
 
@@ -1004,7 +1005,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     if (alarmExpressionListener == null) {
       throw new NullPointerException("Trying to unregister null alarm listener from JmsProxy.");
     }
-    if (alarmExpressionListenerWrapper.getListenerCount() == 1) { // this is our last
+    if (alarmListenerWrapperNew.getListenerCount() == 1) { // this is our last
       // listener!
       // -> it's time to unsubscribe from the topic
       try {
@@ -1014,7 +1015,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
         throw e;
       }
     }
-    alarmExpressionListenerWrapper.removeListener(alarmExpressionListener);
+    alarmListenerWrapperNew.removeListener(alarmExpressionListener);
   }
 
   @Override
@@ -1066,7 +1067,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     shutdownRequested = true;
     supervisionListenerWrapper.stop();
     alarmListenerWrapper.stop();
-    alarmExpressionListenerWrapper.stop();
+    alarmListenerWrapperNew.stop();
     broadcastMessageListenerWrapper.stop();
     heartbeatListenerWrapper.stop();
     topicPollingExecutor.shutdown();

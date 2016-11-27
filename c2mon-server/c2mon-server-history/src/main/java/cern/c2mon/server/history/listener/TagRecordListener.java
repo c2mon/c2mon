@@ -22,6 +22,7 @@ import java.util.Collection;
 import javax.annotation.PostConstruct;
 
 import cern.c2mon.server.history.logger.ExpressionLogger;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,68 +42,40 @@ import cern.c2mon.server.common.tag.Tag;
  * for logging these to the history database.
  *
  * @author Mark Brightwell
- *
  */
 @Service
+@Slf4j
 public class TagRecordListener implements C2monBufferedCacheListener<Tag>, SmartLifecycle {
 
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(TagRecordListener.class);
-
-  /**
-   * Reference to registration service.
-   */
   private CacheRegistrationService cacheRegistrationService;
 
-  /**
-   * Bean that logs Tags into the history.
-   */
   private BatchLogger<Tag> tagLogger;
 
-  /**
-   * Bean that logs expressions into the STL.
-   */
   private ExpressionLogger expressionLogger;
 
-  /**
-   * Listener container lifecycle hook.
-   */
   private Lifecycle listenerContainer;
 
-  /**
-   * Lifecycle flag.
-   */
   private volatile boolean running = false;
 
-  /**
-   * Autowired constructor.
-   *
-   * @param cacheRegistrationService for registering cache listeners
-   * @param tagLogger for logging cache objects to the STL
-   */
   @Autowired
   public TagRecordListener(final CacheRegistrationService cacheRegistrationService,
-                             @Qualifier("tagLogger") final BatchLogger<Tag> tagLogger,
-                             ExpressionLogger expressionLogger) {
+                           @Qualifier("tagLogger") final BatchLogger<Tag> tagLogger,
+                           ExpressionLogger expressionLogger) {
     super();
     this.cacheRegistrationService = cacheRegistrationService;
     this.tagLogger = tagLogger;
     this.expressionLogger = expressionLogger;
   }
 
-  /**
-   * Registers to be notified of all Tag updates (data, rule and control tags).
-   */
   @PostConstruct
   public void init() {
+    // Register to be notified of all Tag updates (data, rule and control tags).
     listenerContainer = cacheRegistrationService.registerBufferedListenerToTags(this);
   }
 
   @Override
   public void confirmStatus(Collection<Tag> tagCollection) {
-    //do not log confirm callbacks (STL data not essential)
+    // do not log confirm callbacks
   }
 
   @Override
@@ -118,8 +91,7 @@ public class TagRecordListener implements C2monBufferedCacheListener<Tag>, Smart
         tagsToLog.add(tag);
     }
     tagLogger.log(tagsToLog);
-    tagsToLog.stream()
-        .forEach(tag -> expressionLogger.log(tag.getExpressions(), tag.getId(), tag.getTimestamp()));
+    tagsToLog.forEach(tag -> expressionLogger.log(tag.getExpressions(), tag.getId(), tag.getTimestamp()));
   }
 
   @Override
@@ -140,14 +112,14 @@ public class TagRecordListener implements C2monBufferedCacheListener<Tag>, Smart
 
   @Override
   public void start() {
-    LOGGER.debug("Starting Tag logger (history)");
+    log.debug("Starting Tag logger (history)");
     running = true;
     listenerContainer.start();
   }
 
   @Override
   public void stop() {
-    LOGGER.debug("Stopping Tag logger (history)");
+    log.debug("Stopping Tag logger (history)");
     listenerContainer.stop();
     running = false;
   }
@@ -156,6 +128,4 @@ public class TagRecordListener implements C2monBufferedCacheListener<Tag>, Smart
   public int getPhase() {
     return ServerConstants.PHASE_STOP_LAST - 1;
   }
-
-
 }

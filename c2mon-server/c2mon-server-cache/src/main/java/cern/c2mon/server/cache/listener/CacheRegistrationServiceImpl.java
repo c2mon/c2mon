@@ -98,85 +98,85 @@ public class CacheRegistrationServiceImpl implements CacheRegistrationService {
   }
 
   @Override
-  public Lifecycle registerToAllTags(final C2monCacheListener<Tag> tagCacheListener, final int threads) {
+  public Lifecycle registerToAllTags(final C2monCacheListener<Tag> listener, final int threads) {
     if (threads == 1) {
-      return registerToAllTags(tagCacheListener);
+      return registerToAllTags(listener);
     } else {
-      MultiThreadedCacheListener<Tag> threadedCacheListener = new MultiThreadedCacheListener<>(tagCacheListener, QUEUE_SIZE_DEFAULT, threads);
+      MultiThreadedCacheListener<Tag> threadedCacheListener = new MultiThreadedCacheListener<>(listener, QUEUE_SIZE_DEFAULT, threads);
       registerListenerToTags(threadedCacheListener);
       return threadedCacheListener;
     }
   }
 
   @Override
-  public void registerForSupervisionChanges(CacheSupervisionListener<Tag> cacheSupervisionListener) {
-    dataTagCache.registerListenerWithSupervision(cacheSupervisionListener);
+  public void registerForSupervisionChanges(CacheSupervisionListener<Tag> listener) {
+    dataTagCache.registerListenerWithSupervision(listener);
     //controlTagCache.registerSynchronousListener(tagCacheListener);
-    ruleTagCache.registerListenerWithSupervision(cacheSupervisionListener);
+    ruleTagCache.registerListenerWithSupervision(listener);
   }
 
 
   @Override
-  public Lifecycle registerToAllTags(final C2monCacheListener<Tag> tagCacheListener) {
-    CacheListener<Tag> wrappedCacheListener = new CacheListener<Tag>(tagCacheListener);
+  public Lifecycle registerToAllTags(final C2monCacheListener<Tag> listener) {
+    CacheListener<Tag> wrappedCacheListener = new CacheListener<Tag>(listener);
     registerListenerToTags(wrappedCacheListener);
     return wrappedCacheListener;
   }
 
   @Override
-  public void registerSynchronousToAllTags(final C2monCacheListener<Tag> tagCacheListener) {
-    registerListenerToTags(tagCacheListener);
+  public void registerSynchronousToAllTags(final C2monCacheListener<Tag> listener) {
+    registerListenerToTags(listener);
   }
 
   //TODO needs testing
   @Override
-  public Lifecycle registerToDataTags(final C2monCacheListener<DataTag> dataTagCacheListener) {
-    return dataTagCache.registerListener(dataTagCacheListener);
+  public Lifecycle registerToDataTags(final C2monCacheListener<DataTag> listener) {
+    return dataTagCache.registerListener(listener);
   }
 
   @Override
-  public Lifecycle registerToDataTags(final C2monCacheListener<DataTag> dataTagCacheListener, final int threads) {
+  public Lifecycle registerToDataTags(final C2monCacheListener<DataTag> listener, final int threads) {
     if (threads == 1) {
-      return dataTagCache.registerListener(dataTagCacheListener);
+      return dataTagCache.registerListener(listener);
     } else {
-      return dataTagCache.registerThreadedListener(dataTagCacheListener, QUEUE_SIZE_DEFAULT, threads);
+      return dataTagCache.registerThreadedListener(listener, QUEUE_SIZE_DEFAULT, threads);
     }
   }
 
 
   @Override
-  public Lifecycle registerToRuleTags(final C2monCacheListener<RuleTag> ruleTagCacheListener) {
-    return ruleTagCache.registerListener(ruleTagCacheListener);
+  public Lifecycle registerToRuleTags(final C2monCacheListener<RuleTag> listener) {
+    return ruleTagCache.registerListener(listener);
   }
 
   @Override
-  public Lifecycle registerToRuleTags(final C2monCacheListener<RuleTag> ruleTagCacheListener, final int threads) {
+  public Lifecycle registerToRuleTags(final C2monCacheListener<RuleTag> listener, final int threads) {
     if (threads == 1) {
-      return ruleTagCache.registerListener(ruleTagCacheListener);
+      return ruleTagCache.registerListener(listener);
     } else {
-      return ruleTagCache.registerThreadedListener(ruleTagCacheListener, QUEUE_SIZE_DEFAULT, threads);
+      return ruleTagCache.registerThreadedListener(listener, QUEUE_SIZE_DEFAULT, threads);
     }
   }
 
   @Override
-  public Lifecycle registerBufferedListenerToTags(final C2monBufferedCacheListener<Tag> bufferListener) {
+  public Lifecycle registerBufferedListenerToTags(final C2monBufferedCacheListener<Tag> listener) {
     int frequency = properties.getBufferedListenerPullFrequency();
-    DefaultBufferedCacheListener<Tag> bufferedCacheListener = new DefaultBufferedCacheListener<>(bufferListener, frequency);
+    DefaultBufferedCacheListener<Tag> bufferedCacheListener = new DefaultBufferedCacheListener<>(listener, frequency);
     registerListenerToTags(bufferedCacheListener);
     return bufferedCacheListener;
   }
 
   @Override
   @Deprecated
-  public Lifecycle registerToAlarms(final C2monCacheListener<Alarm> cacheListener) {
-    return alarmCache.registerListener(cacheListener);
+  public Lifecycle registerToAlarms(final C2monCacheListener<Alarm> listener) {
+    return alarmCache.registerListener(listener);
   }
 
   @Override
-  public void registerToAlarmExpressions(final ComparableCacheListener<Tag> compareCacheListener) {
-    dataTagCache.registerComparableListener(compareCacheListener);
-    controlTagCache.registerComparableListener(compareCacheListener);
-    ruleTagCache.registerComparableListener(compareCacheListener);
+  public void registerToAlarms(final ComparableCacheListener<Tag> listener) {
+    dataTagCache.registerComparableListener(listener);
+    controlTagCache.registerComparableListener(listener);
+    ruleTagCache.registerComparableListener(listener);
   }
 
   private void registerListenerToTags(C2monCacheListener<Tag> cacheListener) {
@@ -184,5 +184,4 @@ public class CacheRegistrationServiceImpl implements CacheRegistrationService {
     controlTagCache.registerSynchronousListener(cacheListener);
     ruleTagCache.registerSynchronousListener(cacheListener);
   }
-
 }
