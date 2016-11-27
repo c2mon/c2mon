@@ -37,7 +37,10 @@ import org.springframework.context.annotation.*;
 })
 @ComponentScan("cern.c2mon.daq.common")
 @EnableConfigurationProperties(DaqProperties.class)
-@PropertySource(value = "${c2mon.daq.properties}", ignoreResourceNotFound = true)
+@PropertySources({
+    @PropertySource(value = "classpath:c2mon-daq-default.properties"),
+    @PropertySource(value = "${c2mon.daq.properties}", ignoreResourceNotFound = true)
+})
 @Slf4j
 public class DaqCoreModule {
 

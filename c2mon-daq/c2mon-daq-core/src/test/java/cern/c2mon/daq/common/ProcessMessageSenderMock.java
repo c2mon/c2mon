@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Configuration;
 /**
  * @author Justin Lewis Salmon
  */
-@Configuration
 public class ProcessMessageSenderMock {
 
   public ProcessMessageSender processMessageSender() {

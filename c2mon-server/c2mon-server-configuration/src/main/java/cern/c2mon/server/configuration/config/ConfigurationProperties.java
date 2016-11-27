@@ -14,11 +14,6 @@ public class ConfigurationProperties {
   private boolean allowRunningProcessRemoval = true;
 
   /**
-   * The queue on which the server will listen for configuration requests
-   */
-  private String jmsQueue = "c2mon.config";
-
-  /**
    * JDBC properties
    */
   private Jdbc jdbc = new Jdbc();

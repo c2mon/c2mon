@@ -34,13 +34,8 @@ public class JmsConfig {
   public JmsTemplate sourceUpdateJmsTemplate() {
     JmsTemplate template = new JmsTemplate(singleConnectionFactory());
     template.setDefaultDestination(new ActiveMQQueue(properties.getJms().getQueuePrefix() + ".update." + properties.getName()));
-    template.setMessageConverter(dataTagValueUpdateConverter());
+    template.setMessageConverter(new DataTagValueUpdateConverter());
     return template;
-  }
-
-  @Bean
-  public DataTagValueUpdateConverter dataTagValueUpdateConverter() {
-    return new DataTagValueUpdateConverter();
   }
 
   @Bean
@@ -105,7 +100,7 @@ public class JmsConfig {
   public JmsTemplate secondSourceUpdateJmsTemplate() {
     JmsTemplate template = new JmsTemplate(secondSingleConnectionFactory());
     template.setDefaultDestination(new ActiveMQQueue(properties.getJms().getQueuePrefix() + ".update." + properties.getName()));
-    template.setMessageConverter(dataTagValueUpdateConverter());
+    template.setMessageConverter(new DataTagValueUpdateConverter());
     return template;
   }
 

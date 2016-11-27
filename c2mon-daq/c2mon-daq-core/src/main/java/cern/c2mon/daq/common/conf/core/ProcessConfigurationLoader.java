@@ -59,8 +59,7 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
   private DaqProperties properties;
 
   /**
-   * Reference to the ProcessRequestSender (for requesting the XML config document). This reference is injected in the
-   * Spring xml file, for ease of configuration.
+   * Reference to the ProcessRequestSender (for requesting the XML config document).
    */
   @Autowired
   @Qualifier("primaryRequestSender")

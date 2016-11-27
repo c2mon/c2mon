@@ -14,6 +14,8 @@ public class HistoryProperties {
 
   private String alarmFallbackFile = "/tmp/alarm-fallback.txt";
 
+  private String expressionFallbackFile = "/tmp/expression-fallback.txt";
+
   private String commandFallbackFile = "/tmp/command-fallback.txt";
 
   private Jdbc jdbc = new Jdbc();

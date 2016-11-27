@@ -42,8 +42,7 @@ public class DataTagValueUpdateConverter implements MessageConverter {
 
   private ObjectMapper mapper;
 
-  @PostConstruct
-  public void init() {
+  public DataTagValueUpdateConverter() {
     this.mapper = new ObjectMapper();
     mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     mapper.enable(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY);

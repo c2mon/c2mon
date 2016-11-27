@@ -89,6 +89,6 @@ public class C2monClientProperties {
     /**
      * Name of the queue on which to make configuration requests to the server
      */
-    private String configQueue = "c2mon.config";
+    private String configQueue = "c2mon.client.config";
   }
 }
