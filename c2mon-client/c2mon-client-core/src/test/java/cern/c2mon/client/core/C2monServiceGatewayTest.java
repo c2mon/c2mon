@@ -20,27 +20,15 @@ package cern.c2mon.client.core;
 import cern.c2mon.client.core.config.C2monAutoConfiguration;
 import cern.c2mon.client.core.config.mock.MockServerConfig;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.BeforeClass;
-import javax.jms.ConnectionFactory;
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MalformedObjectNameException;
-
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
 import static org.junit.Assert.assertNotNull;
-import cern.c2mon.client.common.listener.BaseTagListener;
-import cern.c2mon.client.common.tag.Tag;
-import cern.c2mon.client.core.jms.TestBrokerService;
+
 
 /**
  * Integration test of Client API modules.
@@ -50,25 +38,14 @@ import cern.c2mon.client.core.jms.TestBrokerService;
  */
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
-    classes = {
-        C2monAutoConfiguration.class,
-        MockServerConfig.class
-    }
-)
+@ContextConfiguration( classes = {
+    C2monAutoConfiguration.class,
+    MockServerConfig.class
+})
+@TestPropertySource(properties = {
+    "c2mon.client.jms.url=vm://localhost:61616?broker.persistent=false&broker.useShutdownHook=false&broker.useJmx=false"
+})
 public class C2monServiceGatewayTest {
-
-  @BeforeClass
-  public static void setSystemProperty() {
-    System.setProperty("c2mon.client.jms.url", "vm://localhost:61616?broker.persistent=false");
-  }
-
-  private static TestBrokerService testBrokerService = new TestBrokerService();
-
-  @BeforeClass
-  public static void startBroker() throws Exception {
-    testBrokerService.createAndStartBroker();
-  }
 
   @Test
   public void startClient() throws Exception {
