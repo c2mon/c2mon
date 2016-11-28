@@ -53,6 +53,7 @@ import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.rule.RuleFormatException;
 
+import static org.easymock.EasyMock.anyObject;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -188,8 +189,10 @@ public class ClientDataTagCacheImplTest {
       prepareClientDataTagCreateMock(tagId);
     }
     EasyMock.expect(requestHandlerMock.requestTags(tagIds)).andReturn(serverUpdates);
-    EasyMock.expect(requestHandlerMock.requestTagValues(tagIds)).andReturn(new ArrayList<TagValueUpdate>(serverUpdates));
+    EasyMock.expect(requestHandlerMock.requestTagValues(tagIds)).andReturn(new ArrayList<>(serverUpdates));
     EasyMock.expectLastCall();
+    supervisionManagerMock.addSupervisionListener(anyObject(), anyObject(), anyObject(), anyObject());
+    EasyMock.expectLastCall().times(2);
     DataTagUpdateListener listener = EasyMock.createMock(DataTagUpdateListener.class);
 
     // run test
@@ -217,7 +220,7 @@ public class ClientDataTagCacheImplTest {
       prepareClientDataTagCreateMock(tagId);
     }
     EasyMock.expect(requestHandlerMock.requestTags(tagIds)).andReturn(serverUpdates);
-    EasyMock.expect(requestHandlerMock.requestTagValues(tagIds)).andReturn(new ArrayList<TagValueUpdate>(serverUpdates));
+    EasyMock.expect(requestHandlerMock.requestTagValues(tagIds)).andReturn(new ArrayList<>(serverUpdates));
     DataTagUpdateListener listener = EasyMock.createMock(DataTagUpdateListener.class);
 
     // run test

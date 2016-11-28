@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -46,27 +46,27 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Service @Slf4j
 class TagSubscriptionHandler {
-   
+
   /** The cache controller manages the cache references */
   private final CacheController controller;
-  
+
   /** The cache Synchronizer */
   private final CacheSynchronizer cacheSynchronizer;
-  
+
   /** Lock for accessing the <code>listeners</code> variable */
   private final static ReentrantReadWriteLock listenersLock = new ReentrantReadWriteLock();
-  
+
   /** List of subscribed listeners */
   private final Set<TagSubscriptionListener> tagSubscriptionListeners = new HashSet<TagSubscriptionListener>();
 
-  
+
   @Autowired
-  TagSubscriptionHandler(final CacheController cacheController, 
+  TagSubscriptionHandler(final CacheController cacheController,
                          final CacheSynchronizer cacheSynchronizer) {
     this.controller = cacheController;
     this.cacheSynchronizer = cacheSynchronizer;
   }
-  
+
   /**
    * Subscribes the given listener to the list of tags. In case a tag is not yet in the
    * client cache, it is going to be fetched from the server and all the topic subscription will handled.
@@ -79,12 +79,12 @@ class TagSubscriptionHandler {
   void subscribe(final Set<Long> tagIds, final BaseListener listener, final boolean sendInitialUpdateSeperately) throws CacheSynchronizationException {
     // Creates the uninitialised tags
     Set<Long> newTagIds = cacheSynchronizer.initTags(tagIds);
-      
+
     handleTagSubscription(tagIds, newTagIds, listener, sendInitialUpdateSeperately);
   }
-  
+
   /**
-   * Subscribes the given listener to the list of tags matching at least one of the regular expressions. 
+   * Subscribes the given listener to the list of tags matching at least one of the regular expressions.
    * In case a tag is not yet in the client cache, it is fetched from the server. Also all the topic
    * subscription will handled.
    * @param regexList list of regular expressions
@@ -93,16 +93,16 @@ class TagSubscriptionHandler {
    *        {@link DataTagListener} which allows sending the initial updates on a separate method.
    * @throws CacheSynchronizationException In case of errors during the subscription.
    */
-  void subscribeByRegex(final Set<String> regexList, final BaseListener listener, final boolean sendInitialUpdateSeperately) throws CacheSynchronizationException {    
+  void subscribeByRegex(final Set<String> regexList, final BaseListener listener, final boolean sendInitialUpdateSeperately) throws CacheSynchronizationException {
     // list of all matching tags, filled during createMissingTags
     final Set<Long> allMatchingTags = new HashSet<Long>();
-    
+
     // Create the uninitialized tags
     Set<Long> newTagIds = cacheSynchronizer.initTags(regexList, allMatchingTags);
 
     handleTagSubscription(allMatchingTags, newTagIds, listener, sendInitialUpdateSeperately);
   }
-  
+
   /**
    * Handles the listener subscription to the tags. Furthermore it triggers the topic subscription for new tag points
    * @param subscriptionList list of tag ids to which the listner shall be subscribed to
@@ -114,7 +114,7 @@ class TagSubscriptionHandler {
   private void handleTagSubscription(Set<Long> subscriptionList, Set<Long> newTagIds, final BaseListener listener, boolean sendInitialUpdateSeperately) {
     // Needed if, the initial values shall be sent on the separate #onInitialUpdate() method
     final Map<Long, Tag> initialUpdates = new HashMap<>(subscriptionList.size());
-    
+
     TagController cdt = null;
     for (Long tagId : subscriptionList) {
       cdt = controller.getActiveCache().get(tagId);
@@ -122,34 +122,34 @@ class TagSubscriptionHandler {
         initialUpdates.put(tagId, cdt.getTagImpl().clone());
       }
     } // end for
- 
-        
+
+
     // Before subscribing to the update topics we send the initial values,
     // if the listener is of type DataTagListener
     if (sendInitialUpdateSeperately && listener instanceof DataTagListener) {
       if (log.isDebugEnabled()) {
         log.debug("handleTagSubscription() - Sending initial values to DataTagListener");
       }
-      
+
       Collection<Tag> oldFormat = new ArrayList<>(initialUpdates.size());
-      oldFormat.addAll(initialUpdates.values().stream().map(value -> (Tag) value).collect(Collectors.toList()));
+      oldFormat.addAll(initialUpdates.values());
       ((DataTagListener) listener).onInitialUpdate(oldFormat);
     }
     else if (sendInitialUpdateSeperately && listener instanceof TagListener) {
       if (log.isDebugEnabled()) {
         log.debug("handleTagSubscription() - Sending initial values to DataTagListener");
       }
-      
+
       Collection<Tag> values = initialUpdates.values();
       ((TagListener) listener).onInitialUpdate(values);
     }
-    
+
     // Add the listener to all tags
     for (Long tagId : subscriptionList) {
       cdt = controller.getActiveCache().get(tagId);
       cdt.addUpdateListener(listener, initialUpdates.get(tagId));
     }
-    
+
     if (!newTagIds.isEmpty()) {
       // Asynchronously subscribe to the topics and get the latest values again
       cacheSynchronizer.subscribeTags(newTagIds);
@@ -159,7 +159,7 @@ class TagSubscriptionHandler {
     }
 
   }
-  
+
   void unsubscribeAllTags(final BaseListener listener) {
     Set<Long> tagsToRemove = new HashSet<Long>();
     controller.getWriteLock().lock();
@@ -178,7 +178,7 @@ class TagSubscriptionHandler {
     } finally {
       controller.getWriteLock().unlock();
     }
-    
+
     fireOnUnsubscribeEvent(tagsToRemove);
   }
 
@@ -202,10 +202,10 @@ class TagSubscriptionHandler {
     } finally {
       controller.getWriteLock().unlock();
     }
-    
+
     fireOnUnsubscribeEvent(tagsToRemove);
   }
-  
+
   /**
    * Fires an <code>onNewTagSubscriptions()</code> event to all registered <code>TagSubscriptionListener</code>
    * listeners.
@@ -225,7 +225,7 @@ class TagSubscriptionHandler {
       }
     }
   }
-  
+
   void addSubscriptionListener(final TagSubscriptionListener listener) {
     listenersLock.writeLock().lock();
     try {
