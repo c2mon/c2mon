@@ -44,7 +44,7 @@ public interface AlarmServiceNew {
    * @param alarmIds A collection of tag id's
    * @return A collection of all <{@link Tag} objects
    */
-  Collection<Tag> getAlarmExpressions(final Collection<Long> alarmIds);
+  Collection<Tag> getTagsWithAlarms(final Collection<Long> alarmIds);
 
   /**
    * Returns an {@link AlarmValue} object for every active alarm found

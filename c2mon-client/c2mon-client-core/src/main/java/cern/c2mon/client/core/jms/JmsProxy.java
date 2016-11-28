@@ -238,10 +238,10 @@ public interface JmsProxy {
    * Register a listener which gets notified if a tag with an alarm expression
    * is received from the server.
    *
-   * @param alarmExpressionListener the listener to register
+   * @param listener the listener to register
    * @throws JMSException
    */
-  void registerAlarmExpressionListener(final BaseTagListener alarmExpressionListener) throws JMSException;
+  void registerAlarmListenerNew(final BaseTagListener listener) throws JMSException;
 
   /**
    * Unregister the listener from receiving alarm updates.
@@ -254,10 +254,10 @@ public interface JmsProxy {
   /**
    * Unregister the listener from receiving tags with alarm updates.
    *
-   * @param alarmExpressionListener the listener to remove
+   * @param listener the listener to remove
    * @throws JMSException
    */
-  void unregisterAlarmExpressionListener(final BaseTagListener alarmExpressionListener) throws JMSException;
+  void unregisterAlarmListenerNew(final BaseTagListener listener) throws JMSException;
 
   /**
    * Register a listener to be notified of BroadcastMessage events received
@@ -290,7 +290,7 @@ public interface JmsProxy {
   /**
    * Unregister the listener from receiving heartbeat updates.
    *
-   * @param supervisionListener the listener to remove
+   * @param heartbeatListener the listener to remove
    * @throws NullPointerException if argument is null
    */
   void unregisterHeartbeatListener(HeartbeatListener heartbeatListener);

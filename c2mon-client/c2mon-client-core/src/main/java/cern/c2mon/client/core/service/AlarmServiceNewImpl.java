@@ -34,7 +34,6 @@ import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.rule.RuleFormatException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service("alarmServiceNew")
@@ -66,7 +65,7 @@ public class AlarmServiceNewImpl implements AlarmServiceNew, BaseTagListener {
 
     try {
       if (alarmListeners.size() == 0) {
-        jmsProxy.registerAlarmExpressionListener(this);
+        jmsProxy.registerAlarmListenerNew(this);
       }
 
       log.debug("Adding alarm listener " + listener.getClass());
@@ -83,7 +82,7 @@ public class AlarmServiceNewImpl implements AlarmServiceNew, BaseTagListener {
       log.debug("Removing alarm listener");
 
       if (alarmListeners.size() == 1) {
-        jmsProxy.unregisterAlarmExpressionListener(this);
+        jmsProxy.unregisterAlarmListenerNew(this);
       }
 
       alarmListeners.remove(listener);
@@ -93,7 +92,7 @@ public class AlarmServiceNewImpl implements AlarmServiceNew, BaseTagListener {
   }
 
   @Override
-  public Collection<Tag> getAlarmExpressions(final Collection<Long> tagIds) {
+  public Collection<Tag> getTagsWithAlarms(final Collection<Long> tagIds) {
     List<Tag> result = new ArrayList<>();
 
     try {

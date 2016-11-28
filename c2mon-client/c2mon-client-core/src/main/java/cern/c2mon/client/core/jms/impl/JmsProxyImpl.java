@@ -963,8 +963,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   }
 
   @Override
-  public void registerAlarmExpressionListener(BaseTagListener alarmExpressionListener) throws JMSException {
-    if (alarmExpressionListener == null) {
+  public void registerAlarmListenerNew(BaseTagListener listener) throws JMSException {
+    if (listener == null) {
       throw new NullPointerException("Trying to register null alarm expression listener with JmsProxy.");
     }
     // this is our first listener! -> it's time to subscribe to the alarm topic
@@ -976,7 +976,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
         throw e;
       }
     }
-    alarmListenerWrapperNew.addListener(alarmExpressionListener);
+    alarmListenerWrapperNew.addListener(listener);
 
   }
 
@@ -1001,8 +1001,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   }
 
   @Override
-  public void unregisterAlarmExpressionListener(BaseTagListener alarmExpressionListener) throws JMSException {
-    if (alarmExpressionListener == null) {
+  public void unregisterAlarmListenerNew(BaseTagListener listener) throws JMSException {
+    if (listener == null) {
       throw new NullPointerException("Trying to unregister null alarm listener from JmsProxy.");
     }
     if (alarmListenerWrapperNew.getListenerCount() == 1) { // this is our last
@@ -1015,7 +1015,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
         throw e;
       }
     }
-    alarmListenerWrapperNew.removeListener(alarmExpressionListener);
+    alarmListenerWrapperNew.removeListener(listener);
   }
 
   @Override
