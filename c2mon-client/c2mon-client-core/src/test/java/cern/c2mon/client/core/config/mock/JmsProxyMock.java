@@ -11,6 +11,6 @@ public class JmsProxyMock {
 
   @Bean
   public JmsProxy jmsProxy() {
-    return EasyMock.createMock(JmsProxy.class);
+    return EasyMock.createNiceMock(JmsProxy.class);
   }
 }

@@ -381,8 +381,10 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     if (connection != null) {
       try {
         connection.close(); // closes all consumers and sessions also
-      } catch (JMSException jmsEx) {
-        log.error("disconnect() - Exception caught while attempting to disconnect from JMS - aborting this attempt.", jmsEx);
+      } catch (JMSException e) {
+        String message = "Exception caught while attempting to disconnect from JMS: " + e.getMessage();
+        log.error(message);
+        log.debug(message, e);
       }
     }
   }
@@ -439,7 +441,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       subscribeToHeartbeatTopic();
       subscribeToAdminMessageTopic();
     } catch (JMSException e) {
-      log.error("Did not manage to refresh Topic subscriptions.", e);
+      log.error("Did not manage to refresh Topic subscriptions", e);
       throw e;
     } finally {
       refreshLock.writeLock().unlock();
@@ -843,7 +845,9 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    */
   @Override
   public void onException(final JMSException exception) {
-    log.error("JMSException caught by JMS connection exception listener. Attempting to reconnect.", exception);
+    String message = "JMSException caught by JMS connection exception listener (attempting to reconnect): " + exception.getMessage();
+    log.error(message);
+    log.debug(message, exception);
     startReconnectThread();
   }
 
