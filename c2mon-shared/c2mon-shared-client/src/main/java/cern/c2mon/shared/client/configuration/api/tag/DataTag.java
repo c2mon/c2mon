@@ -263,6 +263,13 @@ public class DataTag extends Tag {
       return this;
     }
 
+    public DataTag.UpdateBuilder expression(String name, String expression) {
+      Assert.notNull(name, "Name is required");
+      Assert.isTrue(expression.contains("$value"));
+      this.tagToBuild.addExpression(new Expression(name, expression));
+      return this;
+    }
+
     public DataTag build() {
       tagToBuild.setUpdated(true);
       return this.tagToBuild;
