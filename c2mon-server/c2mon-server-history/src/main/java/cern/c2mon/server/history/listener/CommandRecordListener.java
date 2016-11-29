@@ -63,7 +63,7 @@ public class CommandRecordListener implements CommandPersistenceListener {
    * @param commandExecutionManager from command module
    */
   @Autowired
-  public CommandRecordListener(@Qualifier("commandPersistenceManager") final IPersistenceManager persistenceManager,
+  public CommandRecordListener(@Qualifier("commandHistoryPersistenceManager") final IPersistenceManager persistenceManager,
                                final CommandExecutionManager commandExecutionManager) {
     super();
     this.persistenceManager = persistenceManager;

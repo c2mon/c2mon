@@ -23,7 +23,7 @@ public class CommandHistoryConfig {
   private SqlSessionFactoryBean historySqlSessionFactory;
 
   @Bean
-  public PersistenceManager<CommandRecord> commandPersistenceManager(AlarmListener alarmListener) throws Exception {
+  public PersistenceManager<CommandRecord> commandHistoryPersistenceManager(AlarmListener alarmListener) throws Exception {
     String fallbackFile = properties.getCommandFallbackFile();
     return new PersistenceManager<>(commandLoggerDAO(), fallbackFile, alarmListener, new CommandRecord());
   }

@@ -29,11 +29,11 @@ public class AlarmHistoryConfig {
 
   @Bean
   public BatchLogger<Alarm> alarmLogger(AlarmRecordConverter alarmRecordConverter, AlarmListener alarmListener) throws Exception {
-    return new DefaultLogger<>(alarmRecordConverter, alarmPersistenceManager(alarmListener));
+    return new DefaultLogger<>(alarmRecordConverter, alarmHistoryPersistenceManager(alarmListener));
   }
 
   @Bean
-  public PersistenceManager<AlarmRecord> alarmPersistenceManager(AlarmListener alarmListener) throws Exception {
+  public PersistenceManager<AlarmRecord> alarmHistoryPersistenceManager(AlarmListener alarmListener) throws Exception {
     String fallbackFile = properties.getAlarmFallbackFile();
     return new PersistenceManager<>(alarmLoggerDAO(), fallbackFile, alarmListener, new AlarmRecord());
   }

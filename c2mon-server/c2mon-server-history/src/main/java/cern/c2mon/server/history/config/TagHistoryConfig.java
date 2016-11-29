@@ -28,11 +28,11 @@ public class TagHistoryConfig {
 
   @Bean
   public BatchLogger<Tag> tagLogger(TagRecordConverter tagRecordConverter, AlarmListener alarmListener) throws Exception {
-    return new DefaultLogger<>(tagRecordConverter, tagPersistenceManager(alarmListener));
+    return new DefaultLogger<>(tagRecordConverter, tagHistoryPersistenceManager(alarmListener));
   }
 
   @Bean
-  public PersistenceManager<TagRecord> tagPersistenceManager(AlarmListener alarmListener) throws Exception {
+  public PersistenceManager<TagRecord> tagHistoryPersistenceManager(AlarmListener alarmListener) throws Exception {
     String fallbackFile = properties.getTagFallbackFile();
     return new PersistenceManager<>(tagLoggerDAO(), fallbackFile, alarmListener, new TagRecord());
   }
