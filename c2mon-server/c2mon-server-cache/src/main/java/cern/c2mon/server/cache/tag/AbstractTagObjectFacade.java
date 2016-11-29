@@ -55,12 +55,14 @@ public abstract class AbstractTagObjectFacade<T extends Tag> implements CommonTa
     //update the value... need to adjust this for no obj creation
     abstractTag.setValue(value);
 
-    if (valueDesc.length() > MAX_DESC_LENGTH) {
-      log.warn("Detected oversized value description for tag {} - is being truncated (max size is set at {})",
-          tag.getId(), MAX_DESC_LENGTH);
-      abstractTag.setValueDescription(valueDesc.substring(0, MAX_DESC_LENGTH));
-    } else {
-      abstractTag.setValueDescription(valueDesc);
+    if (valueDesc != null) {
+      if (valueDesc.length() > MAX_DESC_LENGTH) {
+        log.warn("Detected oversized value description for tag {} - is being truncated (max size is set at {})",
+            tag.getId(), MAX_DESC_LENGTH);
+        abstractTag.setValueDescription(valueDesc.substring(0, MAX_DESC_LENGTH));
+      } else {
+        abstractTag.setValueDescription(valueDesc);
+      }
     }
   }
 
