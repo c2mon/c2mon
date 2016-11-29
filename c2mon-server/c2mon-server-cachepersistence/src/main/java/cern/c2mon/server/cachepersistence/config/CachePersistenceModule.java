@@ -26,7 +26,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * This class is responsible for configuring the Spring context and beans for
- * the cachepersistence module.
+ * the cache persistence module.
  *
  * @author Justin Lewis Salmon
  * @author Szymon Halastra

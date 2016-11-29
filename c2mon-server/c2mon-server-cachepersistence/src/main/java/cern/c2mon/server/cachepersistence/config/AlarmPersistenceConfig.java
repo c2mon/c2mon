@@ -11,12 +11,14 @@ import cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener;
 import cern.c2mon.server.common.alarm.Alarm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * @author Justin Lewis Salmon
  */
+@Configuration
 public class AlarmPersistenceConfig extends AbstractPersistenceConfig {
 
   @Autowired
@@ -32,7 +34,7 @@ public class AlarmPersistenceConfig extends AbstractPersistenceConfig {
 
   @Bean
   public BatchPersistenceManager alarmPersistenceManager() {
-    BatchPersistenceManagerImpl<Alarm> manager = new BatchPersistenceManagerImpl<>(alarmPersistenceDAO(), alarmCache,
+    BatchPersistenceManagerImpl manager = new BatchPersistenceManagerImpl<>(alarmPersistenceDAO(), alarmCache,
         clusterCache, cachePersistenceThreadPoolTaskExecutor);
     manager.setTimeoutPerBatch(properties.getTimeoutPerBatch());
     return manager;

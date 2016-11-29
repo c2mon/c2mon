@@ -10,10 +10,12 @@ import cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener;
 import cern.c2mon.server.common.rule.RuleTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Justin Lewis Salmon
  */
+@Configuration
 public class RuleTagPersistenceConfig extends AbstractPersistenceConfig {
 
   @Autowired

@@ -10,10 +10,12 @@ import cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener;
 import cern.c2mon.server.common.datatag.DataTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Justin Lewis Salmon
  */
+@Configuration
 public class DataTagPersistenceConfig extends AbstractPersistenceConfig {
 
   @Autowired
