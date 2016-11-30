@@ -203,7 +203,6 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
 
         ObjectMapper mapper = new ObjectMapper();
         Metadata metadata = mapper.readValue(tmpStr, Metadata.class);
-        metadata.setMetadata(Metadata.fromJSON(tmpStr));
 
         if (!metadata.getRemoveList().isEmpty()) {
           for (String key : metadata.getRemoveList()) {

@@ -22,12 +22,16 @@ import cern.c2mon.shared.common.metadata.Metadata;
 
 import java.util.Properties;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * Utility class which provides builder methods for different Alarm objects.
  * All methods imply that the Alarm is build as instance od a DataTag
  */
 public class ConfigurationAlarmUtil {
 
+  private static ObjectMapper mapper = new ObjectMapper();
 
   /**
    * Expected generated id is 200.
@@ -72,7 +76,7 @@ public class ConfigurationAlarmUtil {
     properties.setProperty("alarmCondition", new ValueCondition(Integer.class, 1).getXMLCondition());
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata",11);
-    properties.setProperty("metadata", Metadata.toJSON(metadata));
+    properties.setProperty("metadata", getJsonMetadata(metadata));
 
     return alarm;
   }
@@ -84,13 +88,14 @@ public class ConfigurationAlarmUtil {
 
     Alarm alarm = Alarm.update(id)
         .alarmCondition(new ValueCondition(Integer.class, 2))
-            .updateMetadata("testMetadata", 12)
+        .updateMetadata("testMetadata", 12)
         .build();
 
     properties.setProperty("alarmCondition", new ValueCondition(Integer.class, 2).getXMLCondition());
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata",12);
-    properties.setProperty("metadata", Metadata.toJSON(metadata));
+    metadata.setUpdate(true);
+    properties.setProperty("metadata", getJsonMetadata(metadata));
 
     return alarm;
   }
@@ -102,5 +107,16 @@ public class ConfigurationAlarmUtil {
     deleteAlarm.setDeleted(true);
 
     return deleteAlarm;
+  }
+
+  private static String getJsonMetadata(Metadata metadata) {
+    String jsonMetadata = null;
+    try {
+      jsonMetadata = mapper.writeValueAsString(metadata);
+    }
+    catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    return jsonMetadata;
   }
 }

@@ -255,7 +255,7 @@ public class ConfigureAlarmsTest {
     assertEquals((long) parsed.get(0).getEntityId(), 200L);
     assertEquals(parsed.get(0).getEntity(), ConfigConstants.Entity.ALARM);
     assertEquals(parsed.get(0).getAction(), ConfigConstants.Action.UPDATE);
-    assertEquals(parsed.get(0).getElementProperties(), expectedProps);
+    assertEquals(expectedProps, parsed.get(0).getElementProperties());
 
     EasyMock.verify(alarmCache);
   }

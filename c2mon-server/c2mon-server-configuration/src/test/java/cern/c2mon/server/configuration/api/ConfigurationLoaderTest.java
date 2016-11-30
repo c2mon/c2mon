@@ -1123,7 +1123,7 @@ public class ConfigurationLoaderTest {
     assertEquals(ConfigConstants.Status.OK, report.getStatus());
     assertTrue(report.getElementReports().size() == 1);
 
-    // get cacheObject from the cache and compare to the an expected cacheObject
+    // get cacheObject from the cache and compare it with the expected cacheObject
     RuleTagCacheObject cacheObjectRule = (RuleTagCacheObject) ruleTagCache.getCopy(1500L);
     cacheObjectRule.setDataTagQuality(new DataTagQualityImpl());
     RuleTagCacheObject expectedCacheObjectRule = cacheObjectFactory.buildRuleTagCacheObject(1500L, ruleTag);

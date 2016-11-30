@@ -33,6 +33,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ConfigurationDataTagUtil {
 
+  private static ObjectMapper mapper = new ObjectMapper();
+
   /**
    * Expected generated id is 100.
    * Expected parent id is 10.
@@ -88,17 +90,7 @@ public class ConfigurationDataTagUtil {
     properties.setProperty("unit", "testUnit");
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata", 11);
-
-    ObjectMapper mapper = new ObjectMapper();
-    String jsonMetadata = null;
-
-    try {
-      jsonMetadata = mapper.writeValueAsString(metadata);
-    }
-    catch (JsonProcessingException e) {
-      e.printStackTrace();
-    }
-    properties.setProperty("metadata", jsonMetadata);
+    properties.setProperty("metadata", getJsonMetadata(metadata));
 
     return dataTag;
   }
@@ -125,17 +117,7 @@ public class ConfigurationDataTagUtil {
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata1", 11);
     metadata.addMetadata("testMetadata2", 22);
-
-    ObjectMapper mapper = new ObjectMapper();
-    String jsonMetadata = null;
-
-    try {
-      jsonMetadata = mapper.writeValueAsString(metadata);
-    }
-    catch (JsonProcessingException e) {
-      e.printStackTrace();
-    }
-    properties.setProperty("metadata", jsonMetadata);
+    properties.setProperty("metadata", getJsonMetadata(metadata));
 
     return dataTag;
   }
@@ -159,16 +141,7 @@ public class ConfigurationDataTagUtil {
     properties.setProperty("address", new DataTagAddress().toConfigXML());
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata", 11);
-
-    ObjectMapper mapper = new ObjectMapper();
-    String jsonMetadata = null;
-    try {
-      jsonMetadata = mapper.writeValueAsString(metadata);
-    }
-    catch (JsonProcessingException e) {
-      e.printStackTrace();
-    }
-    properties.setProperty("metadata", jsonMetadata);
+    properties.setProperty("metadata", getJsonMetadata(metadata));
 
     return dataTag;
   }
@@ -187,16 +160,7 @@ public class ConfigurationDataTagUtil {
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata", 11);
     metadata.setUpdate(true);
-
-    ObjectMapper mapper = new ObjectMapper();
-    String jsonMetadata = null;
-    try {
-      jsonMetadata = mapper.writeValueAsString(metadata);
-    }
-    catch (JsonProcessingException e) {
-      e.printStackTrace();
-    }
-    properties.setProperty("metadata", jsonMetadata);
+    properties.setProperty("metadata", getJsonMetadata(metadata));
 
     return dataTag;
   }
@@ -216,16 +180,7 @@ public class ConfigurationDataTagUtil {
     metadata.addMetadata("testMetadata1", 11);
     metadata.addMetadata("testMetadata2", 22);
     metadata.setUpdate(true);
-
-    ObjectMapper mapper = new ObjectMapper();
-    String jsonMetadata = null;
-    try {
-      jsonMetadata = mapper.writeValueAsString(metadata);
-    }
-    catch (JsonProcessingException e) {
-      e.printStackTrace();
-    }
-    properties.setProperty("metadata", jsonMetadata);
+    properties.setProperty("metadata", getJsonMetadata(metadata));
 
     return dataTag;
   }
@@ -241,15 +196,7 @@ public class ConfigurationDataTagUtil {
 
     Metadata metadata = new Metadata();
     metadata.setRemoveList(Collections.singletonList("testMetadata"));
-    ObjectMapper mapper = new ObjectMapper();
-    String jsonMetadata = null;
-    try {
-      jsonMetadata = mapper.writeValueAsString(metadata);
-    }
-    catch (JsonProcessingException e) {
-      e.printStackTrace();
-    }
-    properties.setProperty("metadata", jsonMetadata);
+    properties.setProperty("metadata", getJsonMetadata(metadata));
 
     return dataTag;
   }
@@ -265,15 +212,7 @@ public class ConfigurationDataTagUtil {
 
     Metadata metadata = new Metadata();
     metadata.setRemoveList(Arrays.asList("testMetadata1", "testMetadata2"));
-    ObjectMapper mapper = new ObjectMapper();
-    String jsonMetadata = null;
-    try {
-      jsonMetadata = mapper.writeValueAsString(metadata);
-    }
-    catch (JsonProcessingException e) {
-      e.printStackTrace();
-    }
-    properties.setProperty("metadata", jsonMetadata);
+    properties.setProperty("metadata", getJsonMetadata(metadata));
 
     return dataTag;
   }
@@ -308,16 +247,7 @@ public class ConfigurationDataTagUtil {
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata_Update", true);
     metadata.setUpdate(true);
-
-    ObjectMapper mapper = new ObjectMapper();
-    String jsonMetadata = null;
-    try {
-      jsonMetadata = mapper.writeValueAsString(metadata);
-    }
-    catch (JsonProcessingException e) {
-      e.printStackTrace();
-    }
-    properties.setProperty("metadata", jsonMetadata);
+    properties.setProperty("metadata", getJsonMetadata(metadata));
 
     return dataTag;
   }
@@ -350,7 +280,6 @@ public class ConfigurationDataTagUtil {
         .maxValue(11)
         .build();
 
-
     properties.setProperty("name", name);
     properties.setProperty("description", "foo_Update");
     properties.setProperty("minValue", String.valueOf(1));
@@ -365,5 +294,16 @@ public class ConfigurationDataTagUtil {
     deleteTag.setDeleted(true);
 
     return deleteTag;
+  }
+
+  private static String getJsonMetadata(Metadata metadata) {
+    String jsonMetadata = null;
+    try {
+      jsonMetadata = mapper.writeValueAsString(metadata);
+    }
+    catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    return jsonMetadata;
   }
 }

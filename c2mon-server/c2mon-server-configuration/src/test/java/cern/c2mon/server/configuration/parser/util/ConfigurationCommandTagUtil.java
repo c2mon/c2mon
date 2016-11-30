@@ -24,7 +24,12 @@ import cern.c2mon.shared.common.metadata.Metadata;
 
 import java.util.Properties;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class ConfigurationCommandTagUtil {
+
+  private static ObjectMapper mapper = new ObjectMapper();
 
   /**
    * Expected generated id is 500.
@@ -64,7 +69,7 @@ public class ConfigurationCommandTagUtil {
     }
 
     CommandTag commandTag = CommandTag.create("CommandTag" + id, Integer.class, new SimpleHardwareAddressImpl("testAddress"),
-        30000 ,6000, 200, 2, "RBAC class", "RBAC device", "RBAC property")
+        30000, 6000, 200, 2, "RBAC class", "RBAC device", "RBAC property")
         .id(id)
         .equipmentId(10L)
         .description("foo")
@@ -78,9 +83,6 @@ public class ConfigurationCommandTagUtil {
     properties.setProperty("description", "foo");
     properties.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
     properties.setProperty("dataType", Integer.class.getName());
-    Metadata metadata = new Metadata();
-    metadata.addMetadata("testMetadata", 11);
-    properties.setProperty("metadata", Metadata.toJSON(metadata));
     properties.setProperty("hardwareAddress", new SimpleHardwareAddressImpl("testAddress").toConfigXML());
     properties.setProperty("equipmentId", String.valueOf(10l));
     properties.setProperty("clientTimeout", String.valueOf(30000));
@@ -92,6 +94,9 @@ public class ConfigurationCommandTagUtil {
     properties.setProperty("rbacProperty", "RBAC property");
     properties.setProperty("maxValue", "100");
     properties.setProperty("minValue", "0");
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("testMetadata", 11);
+    properties.setProperty("metadata", getJsonMetadata(metadata));
 
     return commandTag;
   }
@@ -192,4 +197,14 @@ public class ConfigurationCommandTagUtil {
     return deleteTag;
   }
 
+  private static String getJsonMetadata(Metadata metadata) {
+    String jsonMetadata = null;
+    try {
+      jsonMetadata = mapper.writeValueAsString(metadata);
+    }
+    catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    return jsonMetadata;
+  }
 }

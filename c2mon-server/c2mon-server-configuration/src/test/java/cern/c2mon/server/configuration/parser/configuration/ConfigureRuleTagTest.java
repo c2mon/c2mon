@@ -285,7 +285,7 @@ public class ConfigureRuleTagTest {
     assertEquals((long) parsed.get(0).getEntityId(), 100L);
     assertEquals(parsed.get(0).getEntity(), ConfigConstants.Entity.RULETAG);
     assertEquals(parsed.get(0).getAction(), ConfigConstants.Action.UPDATE);
-    assertEquals(parsed.get(0).getElementProperties(), expectedProps);
+    assertEquals(expectedProps, parsed.get(0).getElementProperties());
 
     EasyMock.verify(tagFacade);
   }

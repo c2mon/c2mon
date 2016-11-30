@@ -181,27 +181,27 @@ public class ConfigureCommandTagTest {
     // Assert stuff
     assertTrue(elements.size() == 5);
 
-    assertEquals(elements.get(0).getElementProperties(), expectedProps1);
+    assertEquals(expectedProps1, elements.get(0).getElementProperties());
     assertTrue(elements.get(0).getEntityId().equals(101L));
     assertTrue(elements.get(0).getEntity().equals(ConfigConstants.Entity.COMMANDTAG));
     assertTrue(elements.get(0).getAction().equals(ConfigConstants.Action.CREATE));
 
-    assertEquals(elements.get(1).getElementProperties(), expectedProps2);
+    assertEquals(expectedProps2, elements.get(1).getElementProperties());
     assertTrue(elements.get(1).getEntityId().equals(102L));
     assertTrue(elements.get(1).getEntity().equals(ConfigConstants.Entity.COMMANDTAG));
     assertTrue(elements.get(1).getAction().equals(ConfigConstants.Action.CREATE));
 
-    assertEquals(elements.get(2).getElementProperties(), expectedProps3);
+    assertEquals(expectedProps3, elements.get(2).getElementProperties());
     assertTrue(elements.get(2).getEntityId().equals(103L));
     assertTrue(elements.get(2).getEntity().equals(ConfigConstants.Entity.COMMANDTAG));
     assertTrue(elements.get(2).getAction().equals(ConfigConstants.Action.CREATE));
 
-    assertEquals(elements.get(3).getElementProperties(), expectedProps4);
+    assertEquals(expectedProps4, elements.get(3).getElementProperties());
     assertTrue(elements.get(3).getEntityId().equals(104L));
     assertTrue(elements.get(3).getEntity().equals(ConfigConstants.Entity.COMMANDTAG));
     assertTrue(elements.get(3).getAction().equals(ConfigConstants.Action.CREATE));
 
-    assertEquals(elements.get(4).getElementProperties(), expectedProps5);
+    assertEquals(expectedProps5, elements.get(4).getElementProperties());
     assertTrue(elements.get(4).getEntityId().equals(105L));
     assertTrue(elements.get(4).getEntity().equals(ConfigConstants.Entity.COMMANDTAG));
     assertTrue(elements.get(4).getAction().equals(ConfigConstants.Action.CREATE));
