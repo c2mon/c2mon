@@ -183,8 +183,12 @@ public class CommandTag extends Tag {
       return this;
     }
 
-    public CommandTag.CreateBuilder metadata(Metadata metadata) {
-      this.tagToBuild.setMetadata(metadata);
+    public CommandTag.CreateBuilder addMetadata(String key, Object value) {
+      if (this.tagToBuild.getMetadata() == null) {
+        Metadata metadata = new Metadata();
+        this.tagToBuild.setMetadata(metadata);
+      }
+      this.tagToBuild.getMetadata().addMetadata(key, value);
       return this;
     }
 
@@ -276,8 +280,20 @@ public class CommandTag extends Tag {
       return this;
     }
 
-    public CommandTag.UpdateBuilder metadata(Metadata metadata) {
-      this.tagToBuild.setMetadata(metadata);
+    public CommandTag.UpdateBuilder updateMetadata(String key, Object value) {
+      if (this.tagToBuild.getMetadata() == null) {
+        Metadata metadata = new Metadata();
+        this.tagToBuild.setMetadata(metadata);
+      }
+      this.tagToBuild.getMetadata().updateMetadata(key, value);
+      return this;
+    }
+
+    public CommandTag.UpdateBuilder removeMetadata(String key) {
+      if (this.tagToBuild.getMetadata() == null) {
+        tagToBuild.setMetadata(new Metadata());
+      }
+      this.tagToBuild.getMetadata().addToRemoveList(key);
       return this;
     }
 

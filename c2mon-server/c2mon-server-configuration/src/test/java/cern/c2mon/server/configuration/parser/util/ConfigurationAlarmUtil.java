@@ -61,7 +61,7 @@ public class ConfigurationAlarmUtil {
 
     Alarm alarm = Alarm.create("faultFamily", "faultMember", 1337, new ValueCondition(Integer.class, 1))
         .id(id)
-        .metadata(Metadata.builder().setNewMetadata("testMetadata", 11).build())
+        .addMetadata("testMetadata", 11)
         .build();
     alarm.setDataTagId(100L);
 
@@ -70,7 +70,9 @@ public class ConfigurationAlarmUtil {
     properties.setProperty("faultCode", "1337");
     properties.setProperty("dataTagId", "100");
     properties.setProperty("alarmCondition", new ValueCondition(Integer.class, 1).getXMLCondition());
-    properties.setProperty("metadata", Metadata.toJSON(Metadata.builder().setNewMetadata("testMetadata",11).build()));
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("testMetadata",11);
+    properties.setProperty("metadata", Metadata.toJSON(metadata));
 
     return alarm;
   }
@@ -82,11 +84,13 @@ public class ConfigurationAlarmUtil {
 
     Alarm alarm = Alarm.update(id)
         .alarmCondition(new ValueCondition(Integer.class, 2))
-        .metadata(Metadata.builder().setNewMetadata("testMetadata", 12).build())
+            .updateMetadata("testMetadata", 12)
         .build();
 
     properties.setProperty("alarmCondition", new ValueCondition(Integer.class, 2).getXMLCondition());
-    properties.setProperty("metadata", Metadata.toJSON(Metadata.builder().setNewMetadata("testMetadata",12).build()));
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("testMetadata",12);
+    properties.setProperty("metadata", Metadata.toJSON(metadata));
 
     return alarm;
   }

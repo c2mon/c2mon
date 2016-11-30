@@ -195,9 +195,22 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
       // TAG metadata
       tmpStr = properties.getProperty("metadata");
       if (tmpStr != null) {
-        Metadata metadata = new Metadata().builder().metadata(Metadata.fromJSON(tmpStr)).build();
 
-        tag.setMetadata(metadata);
+        Metadata metadata = new Metadata();
+        metadata.setMetadata(Metadata.fromJSON(tmpStr));
+
+        if (!metadata.getRemoveList().isEmpty()) {
+          for (String key : metadata.getRemoveList()) {
+            tag.getMetadata().addToRemoveList(key);
+          }
+        }
+        if (metadata.isUpdate()) {
+          for (Map.Entry<String, Object> entry : metadata.getMetadata().entrySet()) {
+            tag.getMetadata().addMetadata(entry.getKey(), entry.getValue());
+          }
+        } else {
+          tag.setMetadata(metadata);
+        }
       }
     } finally {
       tagCache.releaseWriteLockOnKey(tag.getId());

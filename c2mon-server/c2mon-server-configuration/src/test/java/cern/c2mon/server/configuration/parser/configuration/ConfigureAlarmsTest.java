@@ -266,7 +266,7 @@ public class ConfigureAlarmsTest {
     alarmException.expect(ConfigurationParseException.class);
 
     // setup Configuration:
-    Alarm alarm = Alarm.update(200L).metadata(null).build();
+    Alarm alarm = Alarm.update(200L).updateMetadata(null, null).build();
 
     List<Alarm> alarmUpdateList = Arrays.asList(alarm);
 

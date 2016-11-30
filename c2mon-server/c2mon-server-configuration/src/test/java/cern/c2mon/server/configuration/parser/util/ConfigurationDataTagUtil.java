@@ -24,6 +24,8 @@ import cern.c2mon.shared.common.metadata.Metadata;
 
 import java.util.Properties;
 
+import javax.xml.crypto.Data;
+
 public class ConfigurationDataTagUtil {
 
   /**
@@ -65,7 +67,7 @@ public class ConfigurationDataTagUtil {
         .minValue(0)
         .maxValue(10)
         .unit("testUnit")
-        .metadata(Metadata.builder().setNewMetadata("testMetadata", 11).build())
+        .addMetadata("testMetadata", 11)
         .build();
     dataTag.setEquipmentId(10L);
 
@@ -86,18 +88,19 @@ public class ConfigurationDataTagUtil {
     return dataTag;
   }
 
-  public static DataTag buildCreateMultiMetaDataTag(Long id, Properties properties) {
+  public static DataTag buildCreateMultiMetaDataTag(Properties properties) {
     if (properties == null) {
       properties = new Properties();
     }
 
-    DataTag dataTag = DataTag.create("DataTag" + id, Integer.class, new DataTagAddress())
+    DataTag dataTag = DataTag.create("DataTag", Integer.class, new DataTagAddress())
+            .addMetadata("testMetadata1", 66)
             .addMetadata("testMetadata1", 11)
             .addMetadata("testMetadata2", 22)
             .build();
     dataTag.setEquipmentId(10L);
 
-    properties.setProperty("name", "DataTag" + id);
+    properties.setProperty("name", "DataTag");
     properties.setProperty("description", "<no description provided>");
     properties.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
     properties.setProperty("dataType", Integer.class.getName());
@@ -142,7 +145,7 @@ public class ConfigurationDataTagUtil {
     }
 
     DataTag dataTag = DataTag.update(id)
-            .addMetadata("testMetadata", 11)
+            .updateMetadata("testMetadata", 11)
             .build();
     dataTag.setEquipmentId(10L);
 
@@ -160,8 +163,9 @@ public class ConfigurationDataTagUtil {
     }
 
     DataTag dataTag = DataTag.update(id)
-            .addMetadata("testMetadata1", 11)
-            .addMetadata("testMetadata2", 22)
+            .updateMetadata("testMetadata1", 33)
+            .updateMetadata("testMetadata2", 22)
+            .updateMetadata("testMetadata1", 11)
             .build();
 
     Metadata metadata = new Metadata();
@@ -173,14 +177,14 @@ public class ConfigurationDataTagUtil {
     return dataTag;
   }
 
-  public static DataTag removeSingleMetaDataTag(Long id, Properties properties) {
+  public static DataTag buildRemoveSingleMetaDataTag(Long id, Properties properties) {
     if (properties == null) {
       properties = new Properties();
     }
 
     DataTag dataTag = DataTag.update(id)
-            .removeMetadata("testMetadata", 11)
-            .build();
+         .removeMetadata("testMetadata")
+         .build();
 
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata", 11);
@@ -189,20 +193,26 @@ public class ConfigurationDataTagUtil {
     return dataTag;
   }
 
-  public static DataTag removeMultiMetaDataTag(Long id, Properties properties) {
+  public static DataTag buildRemoveMultiMetaDataTag(Long id, Properties properties) {
     if (properties == null) {
       properties = new Properties();
     }
-
-    DataTag dataTag = DataTag.update(id)
-            .removeMetadata("testMetadata1", 11)
-            .removeMetadata("testMetadata2", 22)
-            .build();
-
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata1", 11);
     metadata.addMetadata("testMetadata2", 22);
-    properties.remove("metadata", Metadata.toJSON(metadata));
+    metadata.addMetadata("testMetadata3", 33);
+
+    DataTag dataTag = DataTag.create("DataTag", Integer.class, new DataTagAddress()).build();
+    dataTag.setMetadata(metadata);
+
+    dataTag = DataTag.update(id)
+        .removeMetadata("testMetadata1")
+        .removeMetadata("testMetadata2")
+        .build();
+
+    metadata = new Metadata();
+    metadata.addMetadata("testMetadata3", 33);
+    properties.setProperty("metadata", Metadata.toJSON(metadata));
 
     return dataTag;
   }
@@ -222,7 +232,7 @@ public class ConfigurationDataTagUtil {
         .minValue(1)
         .maxValue(11)
         .address(new DataTagAddress(new PLCHardwareAddressImpl(2, 2, 2, 2, 2, 2.0f, "testAddress_Update")))
-        .addMetadata("testMetadata_Update", true)
+        .updateMetadata("testMetadata_Update", true)
         .build();
 
     properties.setProperty("name", "updateName");
@@ -234,7 +244,9 @@ public class ConfigurationDataTagUtil {
     properties.setProperty("minValue", String.valueOf(1));
     properties.setProperty("maxValue", String.valueOf(11));
     properties.setProperty("address", new DataTagAddress(new PLCHardwareAddressImpl(2, 2, 2, 2, 2, 2.0f, "testAddress_Update")).toConfigXML());
-    properties.setProperty("metadata", Metadata.toJSON(Metadata.builder().setNewMetadata("testMetadata_Update", true).build()));
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("testMetadata_Update", true);
+    properties.setProperty("metadata", Metadata.toJSON(metadata));
 
     return dataTag;
   }

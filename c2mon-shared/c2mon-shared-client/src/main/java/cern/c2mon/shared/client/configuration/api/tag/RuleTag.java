@@ -133,8 +133,12 @@ public class RuleTag extends Tag {
       return this;
     }
 
-    public RuleTag.CreateBuilder metadata(Metadata metadata) {
-      this.tagToBuild.setMetadata(metadata);
+    public RuleTag.CreateBuilder addMetadata(String key, Object value) {
+      if (this.tagToBuild.getMetadata() == null) {
+        Metadata metadata = new Metadata();
+        this.tagToBuild.setMetadata(metadata);
+      }
+      this.tagToBuild.getMetadata().addMetadata(key, value);
       return this;
     }
 
@@ -162,35 +166,48 @@ public class RuleTag extends Tag {
       return this;
     }
 
-    public UpdateBuilder description(String description) {
+    public RuleTag.UpdateBuilder description(String description) {
       this.tagToBuild.setDescription(description);
       return this;
     }
 
-    public UpdateBuilder dataType(Class<?> dataType) {
+    public RuleTag.UpdateBuilder dataType(Class<?> dataType) {
       this.tagToBuild.setDataType(dataType.getName());
       return this;
     }
 
-    public UpdateBuilder mode(TagMode mode) {
+    public RuleTag.UpdateBuilder mode(TagMode mode) {
       this.tagToBuild.setMode(mode);
       return this;
     }
 
-    public UpdateBuilder isLogged(Boolean isLogged) {
+    public RuleTag.UpdateBuilder isLogged(Boolean isLogged) {
       this.tagToBuild.setIsLogged(isLogged);
       return this;
     }
 
-    public UpdateBuilder ruleText(String ruleText) {
+    public RuleTag.UpdateBuilder ruleText(String ruleText) {
       this.tagToBuild.setRuleText(ruleText);
       return this;
     }
 
-    public UpdateBuilder metadata(Metadata metadata) {
-      this.tagToBuild.setMetadata(metadata);
+    public RuleTag.UpdateBuilder updateMetadata(String key, Object value) {
+      if (this.tagToBuild.getMetadata() == null) {
+        Metadata metadata = new Metadata();
+        this.tagToBuild.setMetadata(metadata);
+      }
+      this.tagToBuild.getMetadata().updateMetadata(key, value);
       return this;
     }
+
+    public RuleTag.UpdateBuilder removeMetadata(String key) {
+      if (this.tagToBuild.getMetadata() == null) {
+        tagToBuild.setMetadata(new Metadata());
+      }
+      this.tagToBuild.getMetadata().addToRemoveList(key);
+      return this;
+    }
+
 
     public RuleTag build() {
       this.tagToBuild.setUpdated(true);

@@ -115,8 +115,12 @@ public class Alarm implements ConfigurationEntity {
       return this;
     }
 
-    public Alarm.CreateBuilder metadata(Metadata metadata) {
-      this.alarmToBuild.setMetadata(metadata);
+    public Alarm.CreateBuilder addMetadata(String key, Object value) {
+      if (this.alarmToBuild.getMetadata() == null) {
+        Metadata metadata = new Metadata();
+        this.alarmToBuild.setMetadata(metadata);
+      }
+      this.alarmToBuild.getMetadata().addMetadata(key, value);
       return this;
     }
 
@@ -140,8 +144,20 @@ public class Alarm implements ConfigurationEntity {
       return this;
     }
 
-    public Alarm.UpdateBuilder metadata(Metadata metadata) {
-      this.alarmToBuild.setMetadata(metadata);
+    public Alarm.UpdateBuilder updateMetadata(String key, Object value) {
+      if (this.alarmToBuild.getMetadata() == null) {
+        Metadata metadata = new Metadata();
+        this.alarmToBuild.setMetadata(metadata);
+      }
+      this.alarmToBuild.getMetadata().updateMetadata(key, value);
+      return this;
+    }
+
+    public Alarm.UpdateBuilder removeMetadata(String key) {
+      if (this.alarmToBuild.getMetadata() == null) {
+        alarmToBuild.setMetadata(new Metadata());
+      }
+      this.alarmToBuild.getMetadata().addToRemoveList(key);
       return this;
     }
 

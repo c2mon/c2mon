@@ -55,7 +55,7 @@ public class ConfigurationRuleTagUtil {
         .isLogged(false)
         .mode(TagMode.OPERATIONAL)
         .id(id)
-        .metadata(Metadata.builder().setNewMetadata("testMetadata", 11).build())
+        .addMetadata("testMetadata", 11)
         .build();
 
     properties.setProperty("name", "RuleTag" + id);
@@ -63,7 +63,9 @@ public class ConfigurationRuleTagUtil {
     properties.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
     properties.setProperty("dataType", Integer.class.getName());
     properties.setProperty("isLogged", String.valueOf(false));
-    properties.setProperty("metadata", Metadata.toJSON(Metadata.builder().setNewMetadata("testMetadata", 11).build()));
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("testMetadata", 11);
+    properties.setProperty("metadata", Metadata.toJSON(metadata));
     properties.setProperty("ruleText", "(#1000 < 0)|(#1000 > 200)[1],true[0]");
 
     return ruleTag;
@@ -80,7 +82,7 @@ public class ConfigurationRuleTagUtil {
         .mode(TagMode.OPERATIONAL)
         .dataType(Double.class)
         .isLogged(true)
-        .metadata(Metadata.builder().setNewMetadata("testMetadata_Update", true).build())
+        .updateMetadata("testMetadata_Update", true)
         .ruleText("(#1000 < 20)|(#1000 > 200)[1],true[0]")
         .build();
 
@@ -89,7 +91,9 @@ public class ConfigurationRuleTagUtil {
     properties.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
     properties.setProperty("dataType", Double.class.getName());
     properties.setProperty("isLogged", String.valueOf(true));
-    properties.setProperty("metadata", Metadata.toJSON(Metadata.builder().setNewMetadata("testMetadata_Update", true).build()));
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("testMetadata_Update", true);
+    properties.setProperty("metadata", Metadata.toJSON(metadata));
     properties.setProperty("ruleText", "(#1000 < 20)|(#1000 > 200)[1],true[0]");
 
     return ruleTag;

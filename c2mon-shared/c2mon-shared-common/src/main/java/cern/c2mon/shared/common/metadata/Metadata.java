@@ -17,9 +17,7 @@
 package cern.c2mon.shared.common.metadata;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Builder;
 import lombok.Data;
-import lombok.Singular;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -34,6 +32,8 @@ import java.util.*;
 public class Metadata implements Serializable, Cloneable {
 
   private Map<String, Object> metadata = new HashMap<>();
+  private List<String> removeList = new ArrayList<>();
+  private boolean update = false;
 
   public static String toJSON(Metadata metadata) {
     return toJSON(metadata.getMetadata());
@@ -55,26 +55,25 @@ public class Metadata implements Serializable, Cloneable {
     try {
       return mapper.readValue(jsonString, Map.class);
 
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       log.error("fromJSON() method unable to create a Map", e);
     }
     return null;
   }
 
-  @Builder
-  public Metadata(@Singular("setNewMetadata") Map<String, Object> metadata) {
-    this.metadata = metadata;
-  }
-
-  public Metadata() {
-  }
+  public Metadata() {}
 
   public void addMetadata(String key, Object value) {
     metadata.put(key, value);
   }
 
-  public void removeMetadata(String key, Object value) {
-    metadata.remove(key, value);
+  public void updateMetadata(String key, Object value) {
+    update = true;
+    metadata.put(key, value);
   }
 
+  public void addToRemoveList(String key) {
+    removeList.add(key);
+  }
 }

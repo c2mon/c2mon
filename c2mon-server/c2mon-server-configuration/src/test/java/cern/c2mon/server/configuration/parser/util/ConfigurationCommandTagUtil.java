@@ -69,7 +69,7 @@ public class ConfigurationCommandTagUtil {
         .equipmentId(10L)
         .description("foo")
         .mode(TagMode.OPERATIONAL)
-        .metadata(Metadata.builder().setNewMetadata("testMetadata", 11).build())
+        .addMetadata("testMetadata", 11)
         .maximum(100)
         .minimum(0)
         .build();
@@ -78,7 +78,9 @@ public class ConfigurationCommandTagUtil {
     properties.setProperty("description", "foo");
     properties.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
     properties.setProperty("dataType", Integer.class.getName());
-    properties.setProperty("metadata", Metadata.toJSON(Metadata.builder().setNewMetadata("testMetadata", 11).build()));
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("testMetadata", 11);
+    properties.setProperty("metadata", Metadata.toJSON(metadata));
     properties.setProperty("hardwareAddress", new SimpleHardwareAddressImpl("testAddress").toConfigXML());
     properties.setProperty("equipmentId", String.valueOf(10l));
     properties.setProperty("clientTimeout", String.valueOf(30000));

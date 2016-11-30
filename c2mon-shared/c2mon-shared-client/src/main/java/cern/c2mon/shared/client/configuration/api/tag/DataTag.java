@@ -172,21 +172,12 @@ public class DataTag extends Tag {
       return this;
     }
 
-    public DataTag.CreateBuilder metadata(Metadata metadata) {
-      this.tagToBuild.setMetadata(metadata);
-      return this;
-    }
-
     public DataTag.CreateBuilder addMetadata(String key, Object value) {
-      if (this.tagToBuild.getMetadata() != null) {
-        this.tagToBuild.getMetadata().addMetadata(key, value);
+      if (this.tagToBuild.getMetadata() == null) {
+        Metadata metadata = new Metadata();
+        this.tagToBuild.setMetadata(metadata);
       }
-      else {
-        Metadata meta = new Metadata();
-        meta.addMetadata(key, value);
-        this.tagToBuild.setMetadata(meta);
-      }
-
+      this.tagToBuild.getMetadata().addMetadata(key, value);
       return this;
     }
 
@@ -250,26 +241,20 @@ public class DataTag extends Tag {
       return this;
     }
 
-    public DataTag.UpdateBuilder metadata(Metadata metadata) {
-      this.tagToBuild.setMetadata(metadata);
+    public DataTag.UpdateBuilder updateMetadata(String key, Object value) {
+      if (this.tagToBuild.getMetadata() == null) {
+        Metadata metadata = new Metadata();
+        this.tagToBuild.setMetadata(metadata);
+      }
+      this.tagToBuild.getMetadata().updateMetadata(key, value);
       return this;
     }
 
-    public DataTag.UpdateBuilder addMetadata(String key, Object value) {
-      if (this.tagToBuild.getMetadata() != null) {
-        this.tagToBuild.getMetadata().addMetadata(key, value);
-      } else {
-        Metadata meta = new Metadata();
-        meta.addMetadata(key, value);
-        this.tagToBuild.setMetadata(meta);
+    public DataTag.UpdateBuilder removeMetadata(String key) {
+      if (this.tagToBuild.getMetadata() == null) {
+        tagToBuild.setMetadata(new Metadata());
       }
-      return this;
-    }
-
-    public DataTag.UpdateBuilder removeMetadata(String key, Object value) {
-      if (this.tagToBuild.getMetadata() != null) {
-        this.tagToBuild.getMetadata().removeMetadata(key, value);
-      }
+      this.tagToBuild.getMetadata().addToRemoveList(key);
       return this;
     }
 

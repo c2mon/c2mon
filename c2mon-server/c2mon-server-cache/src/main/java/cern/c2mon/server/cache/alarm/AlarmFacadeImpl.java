@@ -232,7 +232,8 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     // ALARM metadata
     tmpStr = alarmProperties.getProperty("metadata");
     if (tmpStr != null) {
-      Metadata metadata = new Metadata().builder().metadata(Metadata.fromJSON(tmpStr)).build();
+      Metadata metadata = new Metadata();
+      metadata.setMetadata(Metadata.fromJSON(tmpStr));
       alarmCacheObject.setMetadata(metadata);
     }
 

@@ -31,6 +31,7 @@ import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 import cern.c2mon.shared.client.configuration.api.tag.Tag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Rule;
@@ -80,7 +81,7 @@ public class ConfigureDataTagTest {
 
   @Before
   public void resetMocks() {
-    EasyMock.reset(equipmentCache, sequenceDAO, dataTagCache, subEquipmentCache,tagFacadeGateway);
+    EasyMock.reset(equipmentCache, sequenceDAO, dataTagCache, subEquipmentCache, tagFacadeGateway);
   }
 
   @Test
@@ -232,7 +233,7 @@ public class ConfigureDataTagTest {
     EasyMock.expect(equipmentCache.hasKey(10L)).andReturn(false);
 
     // run test
-    EasyMock.replay(equipmentCache );
+    EasyMock.replay(equipmentCache);
     parser.parse(config);
     EasyMock.verify(equipmentCache);
   }
@@ -241,7 +242,7 @@ public class ConfigureDataTagTest {
   public void createDataTagMultiMetadata() {
     // setup Configuration:
     Properties expectedProps = new Properties();
-    DataTag dataTag = buildCreateMultiMetaDataTag(100L, expectedProps);
+    DataTag dataTag = buildCreateMultiMetaDataTag(expectedProps);
 
     List<Tag> tagUpdateList = Arrays.asList(dataTag);
 
@@ -452,7 +453,7 @@ public class ConfigureDataTagTest {
     Properties expectedNewProps = new Properties();
 
     DataTag oldTag = buildCreateSingleMetaDataTag(100L, expectedOldProps);
-    DataTag newTag = removeSingleMetaDataTag(100L, expectedNewProps);
+    DataTag newTag = buildRemoveSingleMetaDataTag(100L, expectedNewProps);
 
     List<Tag> oldTagUpdateList = Arrays.asList(oldTag);
     List<Tag> newTagUpdateList = Arrays.asList(newTag);
@@ -481,6 +482,42 @@ public class ConfigureDataTagTest {
 
     EasyMock.verify(equipmentCache, sequenceDAO, tagFacadeGateway);
   }
+
+//  @Test
+//  public void removeDataTagMultiMetadata() {
+//    // setup Configuration:
+//    Properties expectedProps = new Properties();
+//    DataTag dataTag = new DataTag()
+//        DataTag.create("DataTag", Integer.class, new DataTagAddress())
+//        .addMetadata("testMetadata1", 11)
+//        .addMetadata("testMetadata2", 22)
+//        .addMetadata("testMetadata3", 33)
+//        .build();
+//
+//    //DataTag dataTag = buildRemoveMultiMetaDataTag(100L, expectedProps);
+//
+//    List<Tag> tagUpdateList = Arrays.asList(dataTag);
+//
+//    Configuration config = new Configuration(1L);
+//    config.setEntities(tagUpdateList);
+//
+//    // setUp Mocks:
+//    EasyMock.expect(equipmentCache.hasKey(100L)).andReturn(true);
+//    EasyMock.expect(dataTagCache.get(100L)).andReturn(dataTag);
+//    EasyMock.expect(sequenceDAO.getNextTagId()).andReturn(100L);
+//    EasyMock.expect(tagFacadeGateway.isInTagCache(100L)).andReturn(false);
+//    EasyMock.replay(equipmentCache, sequenceDAO, tagFacadeGateway);
+//
+//    List<ConfigurationElement> parsed = parser.parse(config);
+//
+//    assertEquals(parsed.size(), 1);
+//    assertEquals((long) parsed.get(0).getEntityId(), 100L);
+//    assertEquals(parsed.get(0).getEntity(), ConfigConstants.Entity.DATATAG);
+//    assertEquals(parsed.get(0).getAction(), ConfigConstants.Action.CREATE);
+//    assertEquals(parsed.get(0).getElementProperties(), expectedProps);
+//
+//    EasyMock.verify(equipmentCache, sequenceDAO, tagFacadeGateway);
+//  }
 
   @Test
   public void updateNonExistentDataTag() {

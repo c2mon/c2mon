@@ -217,7 +217,9 @@ public class DataTagMapperTest extends AbstractMapperTest {
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setRuleIdsString("1234");
-    cacheObject.setMetadata(Metadata.builder().setNewMetadata("String",11).build());
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("String",11);
+    cacheObject.setMetadata(metadata);
     cacheObject.setProcessId(50L); //need test process also (P_JAPC01)
 
     //put in database
@@ -337,7 +339,9 @@ public class DataTagMapperTest extends AbstractMapperTest {
     cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
     cacheObject.setDataType("Boolean"); // non null
     cacheObject.setEquipmentId(new Long(150)); //need test equipment inserted
-    cacheObject.setMetadata(Metadata.builder().setNewMetadata("metadata",11).build());
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("metadata",11);
+    cacheObject.setMetadata(metadata);
 
     dataTagMapper.insertDataTag(cacheObject);
 
@@ -347,7 +351,9 @@ public class DataTagMapperTest extends AbstractMapperTest {
     cacheObject.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.UNDEFINED_VALUE,"undefined value"));
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
-    cacheObject.setMetadata(Metadata.builder().setNewMetadata("metadata_boolean",true).build());
+    metadata = new Metadata();
+    metadata.addMetadata("metadata_boolean",true);
+    cacheObject.setMetadata(metadata);
 
     dataTagMapper.updateCacheable(cacheObject);
 
@@ -360,7 +366,9 @@ public class DataTagMapperTest extends AbstractMapperTest {
     assertEquals(cacheObject.getDataTagQuality(), retrievedObject.getDataTagQuality());
     assertEquals(cacheObject.getTimestamp(), retrievedObject.getTimestamp());
     assertEquals(cacheObject.getSourceTimestamp(), retrievedObject.getSourceTimestamp());
-    assertEquals(Metadata.builder().setNewMetadata("metadata",11).build(), retrievedObject.getMetadata());
+    metadata = new Metadata();
+    metadata.addMetadata("metadata",11);
+    assertEquals(metadata, retrievedObject.getMetadata());
 
     //other values should be the same or ...
     assertEquals(cacheObject.getId(), retrievedObject.getId());
