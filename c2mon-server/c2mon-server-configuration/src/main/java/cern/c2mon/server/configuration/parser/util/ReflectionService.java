@@ -33,6 +33,8 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.util.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * Created by fritter on 31/05/16.
  */
@@ -92,7 +94,8 @@ public class ReflectionService {
               tempProp = String.valueOf(((AlarmCondition) pd.getReadMethod().invoke(obj)).getXMLCondition());
 
             } else if (pd.getPropertyType().equals(Metadata.class)) {
-              tempProp = String.valueOf(Metadata.toJSON((Metadata) pd.getReadMethod().invoke(obj)));
+              ObjectMapper mapper = new ObjectMapper();
+              tempProp = String.valueOf(mapper.writeValueAsString(pd.getReadMethod().invoke(obj)));
 
             } else {
               // default call of all properties. Returns the standard toStringValue of the given Type

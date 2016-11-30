@@ -32,10 +32,15 @@ import cern.c2mon.shared.common.metadata.Metadata;
 import cern.c2mon.shared.daq.config.DataTagAddressUpdate;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
 import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.Timestamp;
 import java.util.*;
@@ -196,7 +201,8 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
       tmpStr = properties.getProperty("metadata");
       if (tmpStr != null) {
 
-        Metadata metadata = new Metadata();
+        ObjectMapper mapper = new ObjectMapper();
+        Metadata metadata = mapper.readValue(tmpStr, Metadata.class);
         metadata.setMetadata(Metadata.fromJSON(tmpStr));
 
         if (!metadata.getRemoveList().isEmpty()) {
@@ -212,6 +218,9 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
           tag.setMetadata(metadata);
         }
       }
+    }
+    catch (Exception e) {
+      throw new RuntimeException("Something went wrong while setting the common properties", e);
     } finally {
       tagCache.releaseWriteLockOnKey(tag.getId());
     }
