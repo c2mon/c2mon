@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
+import cern.c2mon.server.common.config.ServerProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,17 +73,21 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
 
   private AliveTimerCache aliveTimerCache;
 
+  private ServerProperties properties;
+
   @Autowired
   public ProcessFacadeImpl(final EquipmentFacade equipmentFacade,
                            final ProcessCache processCache,
                            final SubEquipmentFacade subEquipmentFacade,
                            final AliveTimerCache aliveTimerCache,
-                           final AliveTimerFacade aliveTimerFacade) {
+                           final AliveTimerFacade aliveTimerFacade,
+                           final ServerProperties properties) {
     super(processCache, aliveTimerCache, aliveTimerFacade);
     this.equipmentFacade = equipmentFacade;
     this.processCache = processCache;
     this.subEquipmentFacade = subEquipmentFacade;
     this.aliveTimerCache = aliveTimerCache;
+    this.properties = properties;
   }
 
   @Override
@@ -195,7 +200,7 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
     try {
       process = processCache.get(processId);
 
-      if (isTestMode()) {
+      if (properties.isTestMode()) {
         // If the TEST Mode is on
         startLocal(process, pHostName, pStartupTime);
         LOGGER.trace("start - TEST Mode - Process " + process.getName()
@@ -448,14 +453,5 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
     } finally {
       processCache.releaseWriteLockOnKey(processId);
     }
-  }
-
-  /**
-   * Checks if the TEST mode is on
-   *
-   * @return True if the TEST mode is on and False in any other case
-   */
-  private boolean isTestMode() {
-    return ((System.getProperty("c2mon.server.testMode")) != null && (System.getProperty("c2mon.server.testMode").equals("true")));
   }
 }

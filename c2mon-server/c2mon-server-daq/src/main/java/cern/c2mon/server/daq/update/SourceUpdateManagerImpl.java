@@ -23,6 +23,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
+import cern.c2mon.server.common.config.ServerProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,6 +99,8 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
    */
   private final ProcessCache processCache;
 
+  private final ServerProperties properties;
+
   /**
    * For management only. Number of JMS threads
    * currently active.
@@ -130,7 +133,8 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
                                  final SupervisionManager supervisionManager,
                                  final DataTagValueUpdateConverter dataTagValueUpdateConverter,
                                  final ProcessFacade processFacade,
-                                 final ProcessCache processCache) {
+                                 final ProcessCache processCache,
+                                 final ServerProperties properties) {
     super();
     this.dataTagFacade = dataTagFacade;
     this.controlTagFacade = controlTagFacade;
@@ -138,6 +142,7 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
     this.converter = dataTagValueUpdateConverter;
     this.processFacade = processFacade;
     this.processCache = processCache;
+    this.properties = properties;
   }
 
   /**
@@ -314,7 +319,7 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
         }
 
         // If the Test Mode is on we don't save the PIK
-        if (isTestMode()) {
+        if (properties.isTestMode()) {
           if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("[TEST] Processing incoming update for Process " + process.getName());
           }
@@ -334,14 +339,5 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
 
     // If no problems we accept the update
     return ACCEPT_UPDATE;
-  }
-
-  /**
-   * Checks if the TEST mode is on
-   *
-   * @return True if the TEST mode is on and False in any other case
-   */
-  private boolean isTestMode() {
-    return ((System.getProperty("c2mon.server.testMode")) != null && (System.getProperty("c2mon.server.testMode").equals("true")));
   }
 }

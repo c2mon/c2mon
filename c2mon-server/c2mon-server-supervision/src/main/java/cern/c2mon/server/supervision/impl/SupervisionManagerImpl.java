@@ -21,6 +21,7 @@ import java.util.Collection;
 
 import javax.annotation.Resource;
 
+import cern.c2mon.server.common.config.ServerProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,6 +125,9 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
 
   @Resource
   private ClusterCache clusterCache;
+
+  @Resource
+  private ServerProperties properties;
 
   //@Resource
   //private DataRefreshManager dataRefreshManager;
@@ -1009,9 +1013,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           // If process is already currently running
           if (this.processFacade.isRunning(processId)) {
             // And TEST mode is on
-            if (isTestMode()) {
-              // If the DAQ has not being locally initialised connection is permitted
-              if (process.getProcessPIK() == null) {
+            if (properties.isTestMode()) {
                 LOGGER.info("onProcessConnection - TEST mode - Connection request for DAQ " + process.getName() + " authorized.");
 
                 // Start Up the process
@@ -1024,13 +1026,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
 
                 LOGGER.info("onProcessConnection - TEST Mode - Returning PIKResponse to DAQ " + process.getName()
                     + ", PIK " + process.getProcessPIK());
-              // If the DAQ has being locally initialised no connection is permitted
-              } else {
-                // Reject Connection
-                processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
-                LOGGER.warn("onProcessConnection - The DAQ process is already running, returning rejected connection : "
-                    + processConnectionRequest.getProcessName());
-              }
+
             // If process is already currently running and TEST mode is off no connection is permitted
             } else {
               // Reject Connection
@@ -1070,14 +1066,5 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     }
 
     return this.xmlConverter.toXml(processConnectionResponse);
-  }
-
-  /**
-   * Checks if the TEST mode is on
-   *
-   * @return True if the TEST mode is on and False in any other case
-   */
-  private boolean isTestMode() {
-    return ((System.getProperty("c2mon.server.testMode")) != null && (System.getProperty("c2mon.server.testMode").equals("true")));
   }
 }

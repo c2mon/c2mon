@@ -20,6 +20,7 @@ import static org.junit.Assert.*;
 
 import java.util.Properties;
 
+import cern.c2mon.server.common.config.ServerProperties;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
@@ -69,7 +70,7 @@ public class ProcessFacadeImplTest {
     subEquipmentFacade = control.createMock(SubEquipmentFacade.class);
     aliveTimerFacade = control.createMock(AliveTimerFacade.class);
     aliveTimerCache = control.createMock(AliveTimerCache.class);
-    processFacade = new ProcessFacadeImpl(equipmentFacade, processCache, subEquipmentFacade, aliveTimerCache, aliveTimerFacade);
+    processFacade = new ProcessFacadeImpl(equipmentFacade, processCache, subEquipmentFacade, aliveTimerCache, aliveTimerFacade, new ServerProperties());
   }
 
   @Test(expected=ConfigurationException.class)
