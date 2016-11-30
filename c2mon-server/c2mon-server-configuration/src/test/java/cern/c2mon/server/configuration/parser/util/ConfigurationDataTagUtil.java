@@ -23,6 +23,7 @@ import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
 import cern.c2mon.shared.common.metadata.Metadata;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Properties;
 
 import javax.xml.crypto.Data;
@@ -84,10 +85,20 @@ public class ConfigurationDataTagUtil {
     properties.setProperty("maxValue", String.valueOf(10));
     properties.setProperty("address", new DataTagAddress().toConfigXML());
     properties.setProperty("equipmentId", String.valueOf(10l));
+    properties.setProperty("unit", "testUnit");
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata", 11);
-    properties.setProperty("metadata", Metadata.toJSON(metadata));
-    properties.setProperty("unit", "testUnit");
+
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonMetadata = null;
+
+    try {
+      jsonMetadata = mapper.writeValueAsString(metadata);
+    }
+    catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    properties.setProperty("metadata", jsonMetadata);
 
     return dataTag;
   }
@@ -98,10 +109,10 @@ public class ConfigurationDataTagUtil {
     }
 
     DataTag dataTag = DataTag.create("DataTag", Integer.class, new DataTagAddress())
-            .addMetadata("testMetadata1", 66)
-            .addMetadata("testMetadata1", 11)
-            .addMetadata("testMetadata2", 22)
-            .build();
+        .addMetadata("testMetadata1", 66)
+        .addMetadata("testMetadata1", 11)
+        .addMetadata("testMetadata2", 22)
+        .build();
     dataTag.setEquipmentId(10L);
 
     properties.setProperty("name", "DataTag");
@@ -114,7 +125,17 @@ public class ConfigurationDataTagUtil {
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata1", 11);
     metadata.addMetadata("testMetadata2", 22);
-    properties.setProperty("metadata", Metadata.toJSON(metadata));
+
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonMetadata = null;
+
+    try {
+      jsonMetadata = mapper.writeValueAsString(metadata);
+    }
+    catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    properties.setProperty("metadata", jsonMetadata);
 
     return dataTag;
   }
@@ -138,7 +159,16 @@ public class ConfigurationDataTagUtil {
     properties.setProperty("address", new DataTagAddress().toConfigXML());
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata", 11);
-    properties.setProperty("metadata", Metadata.toJSON(metadata));
+
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonMetadata = null;
+    try {
+      jsonMetadata = mapper.writeValueAsString(metadata);
+    }
+    catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    properties.setProperty("metadata", jsonMetadata);
 
     return dataTag;
   }
@@ -149,14 +179,24 @@ public class ConfigurationDataTagUtil {
     }
 
     DataTag dataTag = DataTag.update(id)
-            .updateMetadata("testMetadata", 11)
-            .build();
+        .updateMetadata("testMetadata", 11)
+        .build();
     dataTag.setEquipmentId(10L);
 
+    properties.setProperty("equipmentId", String.valueOf(10l));
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata", 11);
-    properties.setProperty("metadata", Metadata.toJSON(metadata));
-    properties.setProperty("equipmentId", String.valueOf(10l));
+    metadata.setUpdate(true);
+
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonMetadata = null;
+    try {
+      jsonMetadata = mapper.writeValueAsString(metadata);
+    }
+    catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    properties.setProperty("metadata", jsonMetadata);
 
     return dataTag;
   }
@@ -167,16 +207,25 @@ public class ConfigurationDataTagUtil {
     }
 
     DataTag dataTag = DataTag.update(id)
-            .updateMetadata("testMetadata1", 33)
-            .updateMetadata("testMetadata2", 22)
-            .updateMetadata("testMetadata1", 11)
-            .build();
+        .updateMetadata("testMetadata1", 33)
+        .updateMetadata("testMetadata2", 22)
+        .updateMetadata("testMetadata1", 11)
+        .build();
 
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata1", 11);
     metadata.addMetadata("testMetadata2", 22);
+    metadata.setUpdate(true);
 
-    properties.setProperty("metadata", Metadata.toJSON(metadata));
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonMetadata = null;
+    try {
+      jsonMetadata = mapper.writeValueAsString(metadata);
+    }
+    catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    properties.setProperty("metadata", jsonMetadata);
 
     return dataTag;
   }
@@ -187,12 +236,20 @@ public class ConfigurationDataTagUtil {
     }
 
     DataTag dataTag = DataTag.update(id)
-         .removeMetadata("testMetadata")
-         .build();
+        .removeMetadata("testMetadata")
+        .build();
 
     Metadata metadata = new Metadata();
-    metadata.addMetadata("testMetadata", 11);
-    properties.remove("metadata", Metadata.toJSON(metadata));
+    metadata.setRemoveList(Collections.singletonList("testMetadata"));
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonMetadata = null;
+    try {
+      jsonMetadata = mapper.writeValueAsString(metadata);
+    }
+    catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    properties.setProperty("metadata", jsonMetadata);
 
     return dataTag;
   }
@@ -216,7 +273,7 @@ public class ConfigurationDataTagUtil {
     catch (JsonProcessingException e) {
       e.printStackTrace();
     }
-    properties.setProperty("metadata",jsonMetadata);
+    properties.setProperty("metadata", jsonMetadata);
 
     return dataTag;
   }
@@ -250,7 +307,17 @@ public class ConfigurationDataTagUtil {
     properties.setProperty("address", new DataTagAddress(new PLCHardwareAddressImpl(2, 2, 2, 2, 2, 2.0f, "testAddress_Update")).toConfigXML());
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata_Update", true);
-    properties.setProperty("metadata", Metadata.toJSON(metadata));
+    metadata.setUpdate(true);
+
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonMetadata = null;
+    try {
+      jsonMetadata = mapper.writeValueAsString(metadata);
+    }
+    catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    properties.setProperty("metadata", jsonMetadata);
 
     return dataTag;
   }

@@ -390,10 +390,10 @@ public class ConfigureDataTagTest {
 
     List<ConfigurationElement> parsed = parser.parse(config);
 
-    assertEquals((long) parsed.get(0).getEntityId(), 100L);
-    assertEquals(parsed.get(0).getEntity(), ConfigConstants.Entity.DATATAG);
-    assertEquals(parsed.get(0).getAction(), ConfigConstants.Action.UPDATE);
-    assertEquals(parsed.get(0).getElementProperties(), expectedProps);
+    assertEquals(100L, (long) parsed.get(0).getEntityId());
+    assertEquals(ConfigConstants.Entity.DATATAG, parsed.get(0).getEntity());
+    assertEquals(ConfigConstants.Action.UPDATE, parsed.get(0).getAction());
+    assertEquals(expectedProps, parsed.get(0).getElementProperties());
 
     EasyMock.verify(tagFacadeGateway);
   }
@@ -415,10 +415,10 @@ public class ConfigureDataTagTest {
 
     List<ConfigurationElement> parsed = parser.parse(config);
 
-    assertEquals((long) parsed.get(0).getEntityId(), 100L);
-    assertEquals(parsed.get(0).getEntity(), ConfigConstants.Entity.DATATAG);
-    assertEquals(parsed.get(0).getAction(), ConfigConstants.Action.UPDATE);
-    assertEquals(parsed.get(0).getElementProperties(), expectedProps);
+    assertEquals(100L, (long) parsed.get(0).getEntityId());
+    assertEquals(ConfigConstants.Entity.DATATAG, parsed.get(0).getEntity());
+    assertEquals(ConfigConstants.Action.UPDATE, parsed.get(0).getAction());
+    assertEquals(expectedProps, parsed.get(0).getElementProperties());
 
     EasyMock.verify(tagFacadeGateway);
   }
@@ -440,10 +440,10 @@ public class ConfigureDataTagTest {
 
     List<ConfigurationElement> parsed = parser.parse(config);
 
-    assertEquals((long) parsed.get(0).getEntityId(), 100L);
-    assertEquals(parsed.get(0).getEntity(), ConfigConstants.Entity.DATATAG);
-    assertEquals(parsed.get(0).getAction(), ConfigConstants.Action.UPDATE);
-    assertEquals(parsed.get(0).getElementProperties(), expectedProps);
+    assertEquals(100L, (long) parsed.get(0).getEntityId());
+    assertEquals(ConfigConstants.Entity.DATATAG, parsed.get(0).getEntity());
+    assertEquals(ConfigConstants.Action.UPDATE, parsed.get(0).getAction());
+    assertEquals(expectedProps, parsed.get(0).getElementProperties());
 
     EasyMock.verify(tagFacadeGateway);
   }
@@ -451,38 +451,28 @@ public class ConfigureDataTagTest {
   @Test
   public void removeDataTagSingleMetadata() {
     // setup Configuration:
-    Properties expectedOldProps = new Properties();
-    Properties expectedNewProps = new Properties();
+    Properties expectedProps = new Properties();
 
-    DataTag oldTag = buildCreateSingleMetaDataTag(100L, expectedOldProps);
-    DataTag newTag = buildRemoveSingleMetaDataTag(100L, expectedNewProps);
+    DataTag dataTag = buildRemoveSingleMetaDataTag(100L, expectedProps);
 
-    List<Tag> oldTagUpdateList = Arrays.asList(oldTag);
-    List<Tag> newTagUpdateList = Arrays.asList(newTag);
+    List<Tag> tagUpdateList = Collections.singletonList(dataTag);
 
-    Configuration oldConfig = new Configuration(1L);
-    oldConfig.setEntities(oldTagUpdateList);
-
-    Configuration newConfig = new Configuration(2L);
-    newConfig.setEntities(newTagUpdateList);
+    Configuration config = new Configuration(1L);
+    config.setEntities(tagUpdateList);
 
     // setUp Mocks:
-    EasyMock.expect(equipmentCache.hasKey(10L)).andReturn(true);
-    EasyMock.expect(sequenceDAO.getNextTagId()).andReturn(100L);
-    EasyMock.expect(tagFacadeGateway.isInTagCache(100L)).andReturn(false);
-    EasyMock.replay(equipmentCache, sequenceDAO, tagFacadeGateway);
+    EasyMock.expect(tagFacadeGateway.isInTagCache(100L)).andReturn(true);
+    EasyMock.replay(tagFacadeGateway);
 
-    List<ConfigurationElement> parsedOld = parser.parse(oldConfig);
+    List<ConfigurationElement> parsed = parser.parse(config);
 
+    assertEquals(parsed.size(), 1);
+    assertEquals(100L, (long) parsed.get(0).getEntityId());
+    assertEquals(ConfigConstants.Entity.DATATAG, parsed.get(0).getEntity());
+    assertEquals(ConfigConstants.Action.UPDATE, parsed.get(0).getAction());
+    assertEquals(expectedProps, parsed.get(0).getElementProperties());
 
-    assertEquals(parsedOld.size(), 1);
-    //assertEquals(parsedNew.size(), 1);
-    assertEquals((long) parsedOld.get(0).getEntityId(), 100L);
-    assertEquals(parsedOld.get(0).getEntity(), ConfigConstants.Entity.DATATAG);
-    assertEquals(parsedOld.get(0).getAction(), ConfigConstants.Action.CREATE);
-    assertEquals(parsedOld.get(0).getElementProperties(), expectedOldProps);
-
-    EasyMock.verify(equipmentCache, sequenceDAO, tagFacadeGateway);
+    EasyMock.verify(tagFacadeGateway);
   }
 
   @Test
