@@ -22,9 +22,13 @@ import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
 import cern.c2mon.shared.common.metadata.Metadata;
 
+import java.util.Arrays;
 import java.util.Properties;
 
 import javax.xml.crypto.Data;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ConfigurationDataTagUtil {
 
@@ -197,22 +201,22 @@ public class ConfigurationDataTagUtil {
     if (properties == null) {
       properties = new Properties();
     }
-    Metadata metadata = new Metadata();
-    metadata.addMetadata("testMetadata1", 11);
-    metadata.addMetadata("testMetadata2", 22);
-    metadata.addMetadata("testMetadata3", 33);
-
-    DataTag dataTag = DataTag.create("DataTag", Integer.class, new DataTagAddress()).build();
-    dataTag.setMetadata(metadata);
-
-    dataTag = DataTag.update(id)
+    DataTag dataTag = DataTag.update(id)
         .removeMetadata("testMetadata1")
         .removeMetadata("testMetadata2")
         .build();
 
-    metadata = new Metadata();
-    metadata.addMetadata("testMetadata3", 33);
-    properties.setProperty("metadata", Metadata.toJSON(metadata));
+    Metadata metadata = new Metadata();
+    metadata.setRemoveList(Arrays.asList("testMetadata1", "testMetadata2"));
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonMetadata = null;
+    try {
+      jsonMetadata = mapper.writeValueAsString(metadata);
+    }
+    catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    properties.setProperty("metadata",jsonMetadata);
 
     return dataTag;
   }
