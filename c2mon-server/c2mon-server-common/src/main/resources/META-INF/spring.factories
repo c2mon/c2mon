@@ -1,0 +1,1 @@
+org.springframework.context.ApplicationListener=cern.c2mon.server.common.config.CommonModule

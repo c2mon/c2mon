@@ -26,9 +26,7 @@ import org.springframework.core.io.support.ResourcePropertySource;
 import java.io.IOException;
 
 /**
- * This class is responsible for configuring the C2MON server environment,
- * which involves loading the core modules and processing user-defined
- * property overrides.
+ * This class is responsible for importing the core C2MON server modules.
  *
  * @author Justin Lewis Salmon
  */
@@ -49,34 +47,12 @@ import java.io.IOException;
     AlarmModule.class,
     CommandModule.class
 })
-@EnableConfigurationProperties(ServerProperties.class)
-@PropertySource(value = "${c2mon.server.properties}", ignoreResourceNotFound = true)
-public class EnvironmentConfig implements ApplicationListener<ApplicationEnvironmentPreparedEvent> {
+public class ModuleConfig {
 
   @Bean
   public DefaultLifecycleProcessor lifecycleProcessor() {
     DefaultLifecycleProcessor lifecycleProcessor = new DefaultLifecycleProcessor();
     lifecycleProcessor.setTimeoutPerShutdownPhase(20000);
     return lifecycleProcessor;
-  }
-
-  /**
-   * Listens for the {@link ApplicationEnvironmentPreparedEvent} and injects
-   * ${c2mon.server.properties} into the environment with the highest precedence
-   * (if it exists). This is in order to allow users to point to an external
-   * properties file via ${c2mon.server.properties}.
-   */
-  @Override
-  public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
-    ConfigurableEnvironment environment = event.getEnvironment();
-    String propertySource = environment.getProperty("c2mon.server.properties");
-
-    if (propertySource != null) {
-      try {
-        environment.getPropertySources().addAfter("systemEnvironment", new ResourcePropertySource(propertySource));
-      } catch (IOException e) {
-        throw new RuntimeException("Could not read property source", e);
-      }
-    }
   }
 }
