@@ -15,9 +15,15 @@ import cern.c2mon.server.elasticsearch.config.ElasticsearchModule;
 import cern.c2mon.server.history.config.HistoryModule;
 import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
+import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.DefaultLifecycleProcessor;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.io.support.ResourcePropertySource;
+
+import java.io.IOException;
 
 /**
  * This class is responsible for configuring the C2MON server environment,
@@ -45,12 +51,32 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
 })
 @EnableConfigurationProperties(ServerProperties.class)
 @PropertySource(value = "${c2mon.server.properties}", ignoreResourceNotFound = true)
-public class EnvironmentConfig {
+public class EnvironmentConfig implements ApplicationListener<ApplicationEnvironmentPreparedEvent> {
 
   @Bean
   public DefaultLifecycleProcessor lifecycleProcessor() {
     DefaultLifecycleProcessor lifecycleProcessor = new DefaultLifecycleProcessor();
     lifecycleProcessor.setTimeoutPerShutdownPhase(20000);
     return lifecycleProcessor;
+  }
+
+  /**
+   * Listens for the {@link ApplicationEnvironmentPreparedEvent} and injects
+   * ${c2mon.server.properties} into the environment with the highest precedence
+   * (if it exists). This is in order to allow users to point to an external
+   * properties file via ${c2mon.server.properties}.
+   */
+  @Override
+  public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
+    ConfigurableEnvironment environment = event.getEnvironment();
+    String propertySource = environment.getProperty("c2mon.server.properties");
+
+    if (propertySource != null) {
+      try {
+        environment.getPropertySources().addAfter("systemEnvironment", new ResourcePropertySource(propertySource));
+      } catch (IOException e) {
+        throw new RuntimeException("Could not read property source", e);
+      }
+    }
   }
 }
