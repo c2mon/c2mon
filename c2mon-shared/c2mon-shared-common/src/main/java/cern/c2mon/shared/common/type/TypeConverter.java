@@ -21,8 +21,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This helper class provides methods to cast a given raw type object into
@@ -31,10 +30,8 @@ import org.slf4j.LoggerFactory;
  * @author Matthias Braeger
  * @author Franz Ritter
  */
+@Slf4j
 public final class TypeConverter  {
-
-
-  private static final Logger LOG = LoggerFactory.getLogger(TypeConverter.class);
 
   /**
    * Hidden default constructor
@@ -50,7 +47,11 @@ public final class TypeConverter  {
    * @return <code>true</code>, if the passed object value can be casted in to the given class type
    */
   public static final <T> boolean isConvertible(final Object value, final Class<T> clazz) {
-    return (castToType(value, clazz) != null);
+    try {
+      return (castToType(value, clazz) != null);
+    } catch (ClassCastException e) {
+      return false;
+    }
   }
 
   /**
@@ -63,7 +64,7 @@ public final class TypeConverter  {
    * @see #cast(Object, String)
    */
   public static final boolean isConvertible(final Object value, final String className) {
-    return (cast(value, className) != null);
+      return (cast(value, className) != null);
   }
 
   /**
@@ -549,11 +550,11 @@ public final class TypeConverter  {
         }
 
         if (result == null) {
-          LOG.error("Conversion error: Could not cast input value [" + value + "] of type "
+          log.error("Conversion error: Could not cast input value [" + value + "] of type "
               + value.getClass().getName() + " to resulting type " + className);
         }
       } catch (ClassCastException cce) {
-        LOG.error("Conversion error: {}", cce.getMessage());
+        log.error("Conversion error: {}", cce.getMessage());
         result = null;
       }
     }
