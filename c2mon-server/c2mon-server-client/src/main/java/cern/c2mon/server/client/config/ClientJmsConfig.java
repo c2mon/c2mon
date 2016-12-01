@@ -14,6 +14,7 @@ import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
+import java.util.Collections;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +33,7 @@ public class ClientJmsConfig {
     String url = properties.getJms().getUrl();
     ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
     connectionFactory.setClientIDPrefix("C2MON-SERVER-CLIENT");
+    connectionFactory.setTrustAllPackages(true);
     connectionFactory.setWatchTopicAdvisories(false);
     return connectionFactory;
   }
