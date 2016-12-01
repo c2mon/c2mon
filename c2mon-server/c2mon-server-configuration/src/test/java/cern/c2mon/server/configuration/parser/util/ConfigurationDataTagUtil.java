@@ -112,7 +112,7 @@ public class ConfigurationDataTagUtil {
     properties.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
     properties.setProperty("dataType", Integer.class.getName());
     properties.setProperty("isLogged", String.valueOf(true));
-    properties.setProperty("equipmentId", String.valueOf(10l));
+    properties.setProperty("equipmentId", String.valueOf(10L));
     properties.setProperty("address", new DataTagAddress().toConfigXML());
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata1", 11);

@@ -218,7 +218,7 @@ public class DataTagMapperTest extends AbstractMapperTest {
     cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setRuleIdsString("1234");
     Metadata metadata = new Metadata();
-    metadata.addMetadata("String",11);
+    metadata.addMetadata("String", 11);
     cacheObject.setMetadata(metadata);
     cacheObject.setProcessId(50L); //need test process also (P_JAPC01)
 
@@ -251,24 +251,6 @@ public class DataTagMapperTest extends AbstractMapperTest {
     assertEquals(cacheObject.getSourceTimestamp(), retrievedObject.getSourceTimestamp());
     assertEquals(cacheObject.getRuleIdsString(), retrievedObject.getRuleIdsString());
     assertEquals(cacheObject.getMetadata(), retrievedObject.getMetadata());
-
-//    dataTagMapper.deleteDataTag(cacheObject.getId());
-//    assertFalse(dataTagMapper.isInDb(cacheObject.getId()));
-//
-//    // attach to a subequipment
-//    cacheObject.setId(150001L);
-//    cacheObject.setEquipmentId(null);
-//    cacheObject.setSubEquipmentId(250L);
-//
-//    //put in database
-//    dataTagMapper.insertDataTag(cacheObject);
-//    assertTrue(dataTagMapper.isInDb(cacheObject.getId()));
-//
-//    //retrieve from database
-//    retrievedObject = (DataTagCacheObject) dataTagMapper.getItem(new Long(150001));
-//    assertNotNull(retrievedObject);
-//    assertEquals(null, retrievedObject.getEquipmentId());
-//    assertEquals(cacheObject.getSubEquipmentId(), retrievedObject.getSubEquipmentId());
   }
 
   @Test
@@ -340,7 +322,7 @@ public class DataTagMapperTest extends AbstractMapperTest {
     cacheObject.setDataType("Boolean"); // non null
     cacheObject.setEquipmentId(new Long(150)); //need test equipment inserted
     Metadata metadata = new Metadata();
-    metadata.addMetadata("metadata",11);
+    metadata.addMetadata("metadata", 11);
     cacheObject.setMetadata(metadata);
 
     dataTagMapper.insertDataTag(cacheObject);
@@ -348,11 +330,11 @@ public class DataTagMapperTest extends AbstractMapperTest {
     cacheObject.setValue(Boolean.TRUE);
     cacheObject.setValueDescription("test value description");
     cacheObject.setSimulated(false); //null allowed
-    cacheObject.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.UNDEFINED_VALUE,"undefined value"));
+    cacheObject.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.UNDEFINED_VALUE, "undefined value"));
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
     metadata = new Metadata();
-    metadata.addMetadata("metadata_boolean",true);
+    metadata.addMetadata("metadata_boolean", true);
     cacheObject.setMetadata(metadata);
 
     dataTagMapper.updateCacheable(cacheObject);
@@ -367,7 +349,7 @@ public class DataTagMapperTest extends AbstractMapperTest {
     assertEquals(cacheObject.getTimestamp(), retrievedObject.getTimestamp());
     assertEquals(cacheObject.getSourceTimestamp(), retrievedObject.getSourceTimestamp());
     metadata = new Metadata();
-    metadata.addMetadata("metadata",11);
+    metadata.addMetadata("metadata", 11);
     assertEquals(metadata, retrievedObject.getMetadata());
 
     //other values should be the same or ...
@@ -387,7 +369,6 @@ public class DataTagMapperTest extends AbstractMapperTest {
     assertNull(retrievedObject.getAddress());
 
     dataTagMapper.deleteDataTag(cacheObject.getId());
-
   }
 
   @Test
@@ -401,24 +382,21 @@ public class DataTagMapperTest extends AbstractMapperTest {
   }
 
 
-  private void compareLinkedHashMap(LinkedHashMap<String, Object> map1, LinkedHashMap<String, Object> map2){
+  private void compareLinkedHashMap(LinkedHashMap<String, Object> map1, LinkedHashMap<String, Object> map2) {
     assertEquals(map1.size(), map2.size());
 
-    for(Map.Entry<String, Object> entry : map1.entrySet()){
+    for (Map.Entry<String, Object> entry : map1.entrySet()) {
       String key1 = entry.getKey();
       assertTrue(map2.containsKey(key1));
 
       Object value1 = entry.getValue();
       Object value2 = map2.get(key1);
 
-      if (value1 instanceof LinkedHashMap &&  value2 instanceof LinkedHashMap){
+      if (value1 instanceof LinkedHashMap && value2 instanceof LinkedHashMap) {
         compareLinkedHashMap((LinkedHashMap) value1, (LinkedHashMap) value2);
-      } else if(value1 instanceof Object[] &&  value2 instanceof Object[]){
-
-        assertTrue(Arrays.equals((Object[])value1, (Object[])value2));
-
+      } else if (value1 instanceof Object[] && value2 instanceof Object[]) {
+        assertTrue(Arrays.equals((Object[]) value1, (Object[]) value2));
       } else {
-
         assertEquals(value1, value2);
       }
     }
@@ -428,12 +406,9 @@ public class DataTagMapperTest extends AbstractMapperTest {
   @Builder
   static class ArbitraryObject{
     private Integer[] fields;
-
     private String field1;
-
     private Float field2;
   }
-
 }
 
 /**
