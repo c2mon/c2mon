@@ -17,10 +17,7 @@
 
 package cern.c2mon.server.configuration.parser.configuration;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import cern.c2mon.server.cache.CommandTagCache;
 import cern.c2mon.server.cache.EquipmentCache;
@@ -135,24 +132,21 @@ public class ConfigureCommandTagTest {
 
   @Test
   public void createMultipleCommandTagWithAllFields() {
-    Properties expectedProps1 = new Properties();
-    Properties expectedProps2 = new Properties();
-    Properties expectedProps3 = new Properties();
-    Properties expectedProps4 = new Properties();
-    Properties expectedProps5 = new Properties();
-
-    CommandTag tag1 = buildCreateAllFieldsCommandTag(101L, expectedProps1);
-    CommandTag tag2 = buildCreateAllFieldsCommandTag(102L, expectedProps2);
-    CommandTag tag3 = buildCreateAllFieldsCommandTag(103L, expectedProps3);
-    CommandTag tag4 = buildCreateAllFieldsCommandTag(104L, expectedProps4);
-    CommandTag tag5 = buildCreateAllFieldsCommandTag(105L, expectedProps5);
-
-    List<CommandTag> tagList = Arrays.asList(tag1, tag2, tag3, tag4, tag5);
+    List<Properties> expectedProperties = new ArrayList<>();
+    List<CommandTag> tagList = new ArrayList<>();
+    for(int i=0; i <5;i++) {
+      expectedProperties.add(new Properties());
+      tagList.add(buildCreateAllFieldsCommandTag((long) (i + 100), expectedProperties.get(i)));
+    }
 
     Configuration config = new Configuration(1L);
     config.setEntities(tagList);
 
     // setUp Mocks:
+    EasyMock.expect(commandTagCache.getCommandTagId("CommandTag100")).andReturn(null);
+    EasyMock.expect(commandTagCache.hasKey(100L)).andReturn(false);
+    EasyMock.expect(equipmentCache.hasKey(10L)).andReturn(true);
+
     EasyMock.expect(commandTagCache.getCommandTagId("CommandTag101")).andReturn(null);
     EasyMock.expect(commandTagCache.hasKey(101L)).andReturn(false);
     EasyMock.expect(equipmentCache.hasKey(10L)).andReturn(true);
@@ -169,10 +163,6 @@ public class ConfigureCommandTagTest {
     EasyMock.expect(commandTagCache.hasKey(104L)).andReturn(false);
     EasyMock.expect(equipmentCache.hasKey(10L)).andReturn(true);
 
-    EasyMock.expect(commandTagCache.getCommandTagId("CommandTag105")).andReturn(null);
-    EasyMock.expect(commandTagCache.hasKey(105L)).andReturn(false);
-    EasyMock.expect(equipmentCache.hasKey(10L)).andReturn(true);
-
     EasyMock.replay(equipmentCache, commandTagCache);
 
     // run the parsing
@@ -181,30 +171,13 @@ public class ConfigureCommandTagTest {
     // Assert stuff
     assertTrue(elements.size() == 5);
 
-    assertEquals(expectedProps1, elements.get(0).getElementProperties());
-    assertTrue(elements.get(0).getEntityId().equals(101L));
-    assertTrue(elements.get(0).getEntity().equals(ConfigConstants.Entity.COMMANDTAG));
-    assertTrue(elements.get(0).getAction().equals(ConfigConstants.Action.CREATE));
-
-    assertEquals(expectedProps2, elements.get(1).getElementProperties());
-    assertTrue(elements.get(1).getEntityId().equals(102L));
-    assertTrue(elements.get(1).getEntity().equals(ConfigConstants.Entity.COMMANDTAG));
-    assertTrue(elements.get(1).getAction().equals(ConfigConstants.Action.CREATE));
-
-    assertEquals(expectedProps3, elements.get(2).getElementProperties());
-    assertTrue(elements.get(2).getEntityId().equals(103L));
-    assertTrue(elements.get(2).getEntity().equals(ConfigConstants.Entity.COMMANDTAG));
-    assertTrue(elements.get(2).getAction().equals(ConfigConstants.Action.CREATE));
-
-    assertEquals(expectedProps4, elements.get(3).getElementProperties());
-    assertTrue(elements.get(3).getEntityId().equals(104L));
-    assertTrue(elements.get(3).getEntity().equals(ConfigConstants.Entity.COMMANDTAG));
-    assertTrue(elements.get(3).getAction().equals(ConfigConstants.Action.CREATE));
-
-    assertEquals(expectedProps5, elements.get(4).getElementProperties());
-    assertTrue(elements.get(4).getEntityId().equals(105L));
-    assertTrue(elements.get(4).getEntity().equals(ConfigConstants.Entity.COMMANDTAG));
-    assertTrue(elements.get(4).getAction().equals(ConfigConstants.Action.CREATE));
+    Long id = 100L;
+    for (ConfigurationElement currentElement : elements) {
+      assertEquals(expectedProperties.get(elements.indexOf(currentElement)), currentElement.getElementProperties());
+      assertTrue(currentElement.getEntityId().equals(id++));
+      assertTrue(currentElement.getEntity().equals(ConfigConstants.Entity.COMMANDTAG));
+      assertTrue(currentElement.getAction().equals(ConfigConstants.Action.CREATE));
+    }
 
     EasyMock.verify(equipmentCache, commandTagCache);
   }
