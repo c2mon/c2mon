@@ -49,13 +49,11 @@ public class MetadataTypeHandler implements TypeHandler {
 
   @Override
   public Object getResult(CallableStatement arg0, int arg1) throws SQLException {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public Object getResult(ResultSet rs, int columnIndex) throws SQLException {
-    // TODO Auto-generated method stub
     return null;
   }
 

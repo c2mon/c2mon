@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.shared.common.metadata;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * Created by fritter on 30/11/15.
+ * @author Franz Ritter
  */
 @Data
 @Slf4j
@@ -35,34 +36,38 @@ public class Metadata implements Serializable, Cloneable {
   private List<String> removeList = new ArrayList<>();
   private boolean update = false;
 
+  private static transient ObjectMapper mapper = new ObjectMapper();
+
   public static String toJSON(Metadata metadata) {
-    return toJSON(metadata.getMetadata());
-  }
-
-  public static String toJSON(Map<String, Object> metadata) {
-    ObjectMapper mapper = new ObjectMapper();
     try {
-      return mapper.writeValueAsString(metadata);
-
+      return mapper.writeValueAsString(metadata.getMetadata());
     } catch (IOException e) {
-      log.error("Exception caught while converting Metadata to a JSON String.", e);
+      log.error("Exception caught while serializing metatata to JSON", e);
     }
+
     return null;
   }
 
-  public static Map<String, Object> fromJSON(String jsonString) {
-    ObjectMapper mapper = new ObjectMapper();
+  public static Map<String, Object> fromJSON(String json) {
     try {
-      return mapper.readValue(jsonString, Map.class);
+      TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {};
+      return mapper.readValue(json, typeRef);
+    } catch (IOException e) {
+      log.error("Exception caught while deserializing metatata from JSON", e);
+    }
 
-    }
-    catch (IOException e) {
-      log.error("fromJSON() method unable to create a Map", e);
-    }
     return null;
   }
 
-  public Metadata() {}
+//  public static Metadata fromJSON(String json) {
+//    try {
+//      return mapper.readValue(json, Metadata.class);
+//    } catch (IOException e) {
+//      log.error("Exception caught while deserializing metatata from JSON", e);
+//    }
+//
+//    return null;
+//  }
 
   public void addMetadata(String key, Object value) {
     metadata.put(key, value);
