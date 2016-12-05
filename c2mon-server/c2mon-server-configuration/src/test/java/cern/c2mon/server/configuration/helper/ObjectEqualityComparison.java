@@ -18,6 +18,8 @@ package cern.c2mon.server.configuration.helper;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
@@ -42,7 +44,6 @@ import cern.c2mon.shared.client.device.DeviceProperty;
  * Junit helper class for comparing cache objects.
  *
  * @author Mark Brightwell
- *
  */
 public class ObjectEqualityComparison {
 
@@ -79,7 +80,15 @@ public class ObjectEqualityComparison {
     if (expectedObject.getAddress() != null) {
       assertEquals(expectedObject.getAddress().toConfigXML(), object.getAddress().toConfigXML());
     }
-
+    if (expectedObject.getMetadata() != null) {
+      if (!expectedObject.getMetadata().getRemoveList().isEmpty()) {
+        assertTrue(expectedObject.getMetadata().getRemoveList().containsAll(object.getMetadata().getRemoveList()));
+        assertTrue(object.getMetadata().getRemoveList().containsAll(expectedObject.getMetadata().getRemoveList()));
+      }
+      if (expectedObject.getMetadata().isUpdate()) {
+        assertTrue(object.getMetadata().isUpdate());
+      }
+    }
   }
 
   public static void assertTagConfigEquals(AbstractTagCacheObject expectedObject, AbstractTagCacheObject object) {

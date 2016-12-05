@@ -74,6 +74,7 @@ public class Metadata implements Serializable, Cloneable {
   }
 
   public void addToRemoveList(String key) {
+    update = true;
     removeList.add(key);
   }
 }

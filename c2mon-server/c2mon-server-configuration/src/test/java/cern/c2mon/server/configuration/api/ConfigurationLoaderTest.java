@@ -55,29 +55,29 @@ import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.*;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.NoSimpleValueParseException;
+import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl;
+import cern.c2mon.shared.common.metadata.Metadata;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
+
 import junit.framework.Assert;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import static cern.c2mon.server.configuration.parser.util.ConfigurationProcessUtil.buildCreateAllFieldsProcess;
 import static org.easymock.EasyMock.*;
@@ -108,7 +108,7 @@ public class ConfigurationLoaderTest {
   private CacheObjectFactory cacheObjectFactory;
 
   @Autowired
-  private ProcessCommunicationManager mockManager;
+  private ProcessCommunicationManager communicationManager;
 
   @Autowired
   private ConfigurationLoader configurationLoader;
@@ -182,7 +182,7 @@ public class ConfigurationLoaderTest {
   @Before
   public void beforeTest() throws IOException {
     // reset mock
-    reset(mockManager);
+    reset(communicationManager);
   }
 
   @After
@@ -195,7 +195,7 @@ public class ConfigurationLoaderTest {
 
   @Test
   public void createProcess() {
-    replay(mockManager);
+    replay(communicationManager);
 
     Properties expectedProperties = new Properties();
     Process process = buildCreateAllFieldsProcess(1L, expectedProperties);
@@ -227,7 +227,7 @@ public class ConfigurationLoaderTest {
 
     ObjectEqualityComparison.assertProcessEquals(expectedObjectProcess, cacheObjectProcess);
 
-    verify(mockManager);
+    verify(communicationManager);
 
     // remove the process from the server
     Process removeProcess = ConfigurationProcessUtil.buildDeleteProcess(1L);
@@ -245,14 +245,79 @@ public class ConfigurationLoaderTest {
     assertNull(controlTagMapper.getItem(300_001L));
     assertFalse(aliveTimerCache.hasKey(300_001L));
 
-    verify(mockManager);
+    verify(communicationManager);
+  }
+
+  @Test
+  public void updateRemoveMetadataDataTag() throws ParserConfigurationException, IllegalAccessException, NoSimpleValueParseException, TransformerException, NoSuchFieldException, InstantiationException {
+// called once when updating the equipment;
+    // mock returns a list with the correct number of SUCCESS ChangeReports
+    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(communicationManager);
+
+    // SETUP:
+    Configuration createProcess = TestConfigurationProvider.createProcess();
+    configurationLoader.applyConfiguration(createProcess);
+    Configuration newEquipmentConfig = TestConfigurationProvider.createEquipment();
+    configurationLoader.applyConfiguration(newEquipmentConfig);
+    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+
+    DataTag dataTag = DataTag.create("DataTag", Integer.class, new DataTagAddress())
+        .id(1000L)
+        .description("foo")
+        .mode(TagMode.OPERATIONAL)
+        .isLogged(false)
+        .minValue(0)
+        .maxValue(10)
+        .unit("testUnit")
+        .addMetadata("testMetadata1", 11)
+        .addMetadata("testMetadata2", 22)
+        .addMetadata("testMetadata3", 33)
+        .build();
+    dataTag.setEquipmentId(15L);
+
+    Configuration configuration = new Configuration();
+    configuration.addEntity(dataTag);
+
+    //apply the configuration to the server
+    configurationLoader.applyConfiguration(configuration);
+
+    DataTag updatedDataTag = DataTag.update(1000L)
+        .removeMetadata("testMetadata2")
+        .removeMetadata("testMetadata3")
+        .build();
+
+    configuration = new Configuration();
+    configuration.addEntity(updatedDataTag);
+
+    //apply the configuration to the server
+    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
+
+    // check report result
+    assertEquals(ConfigConstants.Status.OK, report.getStatus());
+    assertTrue(report.getProcessesToReboot().isEmpty());
+    assertTrue(report.getElementReports().size() == 1);
+    assertTrue(report.getElementReports().get(0).getAction().equals(ConfigConstants.Action.UPDATE));
+    assertTrue(report.getElementReports().get(0).getEntity().equals(ConfigConstants.Entity.DATATAG));
+
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("testMetadata1", 11);
+
+    DataTagCacheObject expectedCacheObjectData = cacheObjectFactory.buildDataTagCacheObject(1000L, dataTag);
+    expectedCacheObjectData.setMetadata(metadata);
+
+    // get cacheObject from the cache and compare to the an expected cacheObject
+    DataTagCacheObject cacheObjectData = (DataTagCacheObject) dataTagCache.get(1000L);
+    ObjectEqualityComparison.assertDataTagConfigEquals(expectedCacheObjectData, cacheObjectData);
+
+    verify(communicationManager);
   }
 
   @Test
   public void updateProcess() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
     // called once when updating the equipment;
     // mock returns a list with the correct number of SUCCESS ChangeReports
-    replay(mockManager);
+    replay(communicationManager);
 
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
@@ -279,7 +344,7 @@ public class ConfigurationLoaderTest {
 
     ObjectEqualityComparison.assertProcessEquals(expectedCacheObjectProcess, cacheObjectProcess);
 
-    verify(mockManager);
+    verify(communicationManager);
 
     // remove the process and equipments from the server
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
@@ -294,14 +359,62 @@ public class ConfigurationLoaderTest {
     assertNull(controlTagMapper.getItem(100L));
     assertFalse(aliveTimerCache.hasKey(101L));
 
-    verify(mockManager);
+    verify(communicationManager);
+  }
+
+  @Test
+  public void createMetadataDatatag() throws ParserConfigurationException, IllegalAccessException, NoSimpleValueParseException, TransformerException, NoSuchFieldException, InstantiationException {
+    // called once when updating the equipment;
+    // mock returns a list with the correct number of SUCCESS ChangeReports
+    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(communicationManager);
+
+    // SETUP:
+    Configuration createProcess = TestConfigurationProvider.createProcess();
+    configurationLoader.applyConfiguration(createProcess);
+    Configuration newEquipmentConfig = TestConfigurationProvider.createEquipment();
+    configurationLoader.applyConfiguration(newEquipmentConfig);
+    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+
+    DataTag dataTag = DataTag.create("DataTag", Integer.class, new DataTagAddress())
+        .id(1000L)
+        .description("foo")
+        .mode(TagMode.OPERATIONAL)
+        .isLogged(false)
+        .minValue(0)
+        .maxValue(10)
+        .unit("testUnit")
+        .addMetadata("testMetadata", 11)
+        .build();
+    dataTag.setEquipmentId(15L);
+
+    Configuration configuration = new Configuration();
+    configuration.addEntity(dataTag);
+
+    //apply the configuration to the server
+    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
+
+    // check report result
+    assertEquals(ConfigConstants.Status.OK, report.getStatus());
+    assertTrue(report.getProcessesToReboot().isEmpty());
+    assertTrue(report.getElementReports().size() == 1);
+    assertTrue(report.getElementReports().get(0).getAction().equals(ConfigConstants.Action.CREATE));
+    assertTrue(report.getElementReports().get(0).getEntity().equals(ConfigConstants.Entity.DATATAG));
+
+    // get cacheObject from the cache and compare to the an expected cacheObject
+    DataTagCacheObject cacheObjectData = (DataTagCacheObject) dataTagCache.get(1000L);
+    DataTagCacheObject expectedCacheObjectData = cacheObjectFactory.buildDataTagCacheObject(1000L, dataTag);
+
+    ObjectEqualityComparison.assertDataTagConfigEquals(expectedCacheObjectData, cacheObjectData);
+
+    verify(communicationManager);
   }
 
   @Test
   public void createEquipment() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
     // called once when updating the equipment;
     // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(mockManager.sendConfiguration(eq(5L), isA(List.class))).andAnswer(() -> {
+    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andAnswer(() -> {
       List<Change> changeList = (List<Change>) EasyMock.getCurrentArguments()[1];
       ConfigurationChangeEventReport report = new ConfigurationChangeEventReport();
       for (Change change : changeList) {
@@ -312,7 +425,7 @@ public class ConfigurationLoaderTest {
       return report;
     });
 
-    replay(mockManager);
+    replay(communicationManager);
 
     // SETUP:First add a process to the server
     Configuration createProcess = TestConfigurationProvider.createProcess();
@@ -354,7 +467,7 @@ public class ConfigurationLoaderTest {
     assertNotNull(controlTagMapper.getItem(300_001L));
     assertNotNull(controlTagMapper.getItem(300_002L));
 
-    verify(mockManager);
+    verify(communicationManager);
 
     // remove the process and equipments from the server
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
@@ -379,14 +492,14 @@ public class ConfigurationLoaderTest {
     assertNull(controlTagMapper.getItem(300_002L));
     assertFalse(aliveTimerCache.hasKey(300_002L));
 
-    verify(mockManager);
+    verify(communicationManager);
   }
 
   @Test
   public void updateEquipment() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
     // called once when updating the equipment;
     // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(mockManager.sendConfiguration(eq(5L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
+    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
 
       @Override
       public ConfigurationChangeEventReport answer() throws Throwable {
@@ -401,7 +514,7 @@ public class ConfigurationLoaderTest {
       }
     });
 
-    replay(mockManager);
+    replay(communicationManager);
 
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
@@ -431,7 +544,7 @@ public class ConfigurationLoaderTest {
 
     ObjectEqualityComparison.assertEquipmentEquals(expectedCacheObjectEquipment, cacheObjectEquipment);
 
-    verify(mockManager);
+    verify(communicationManager);
 
     // remove the process and equipments from the server
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
@@ -456,14 +569,14 @@ public class ConfigurationLoaderTest {
     assertNull(controlTagMapper.getItem(202L));
     assertFalse(aliveTimerCache.hasKey(202L));
 
-    verify(mockManager);
+    verify(communicationManager);
   }
 
   @Test
   public void createSubEquipment() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
     // called once when updating the equipment;
     // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(mockManager.sendConfiguration(eq(5L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
+    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
 
       @Override
       public ConfigurationChangeEventReport answer() throws Throwable {
@@ -477,7 +590,7 @@ public class ConfigurationLoaderTest {
         return report;
       }
     });
-    replay(mockManager);
+    replay(communicationManager);
 
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
@@ -521,7 +634,7 @@ public class ConfigurationLoaderTest {
     assertNotNull(controlTagMapper.getItem(300_001L));
     assertNotNull(controlTagMapper.getItem(300_002L));
 
-    verify(mockManager);
+    verify(communicationManager);
 
     // remove the process and equipments from the server
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
@@ -551,14 +664,14 @@ public class ConfigurationLoaderTest {
     assertFalse(commFaultTagCache.hasKey(300_001L));
     assertFalse(aliveTimerCache.hasKey(300_002L));
 
-    verify(mockManager);
+    verify(communicationManager);
   }
 
   @Test
   public void updateSubEquipment() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
     // called once when updating the equipment;
     // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(mockManager.sendConfiguration(eq(5L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
+    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
 
       @Override
       public ConfigurationChangeEventReport answer() throws Throwable {
@@ -572,7 +685,7 @@ public class ConfigurationLoaderTest {
         return report;
       }
     });
-    replay(mockManager);
+    replay(communicationManager);
 
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
@@ -604,7 +717,7 @@ public class ConfigurationLoaderTest {
 
     ObjectEqualityComparison.assertSubEquipmentEquals(expectedCacheObjectEquipment, cacheObjectEquipment);
 
-    verify(mockManager);
+    verify(communicationManager);
 
     // remove the process and equipments from the server
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
@@ -634,12 +747,12 @@ public class ConfigurationLoaderTest {
     assertFalse(commFaultTagCache.hasKey(301L));
     assertFalse(aliveTimerCache.hasKey(302L));
 
-    verify(mockManager);
+    verify(communicationManager);
   }
 
   @Test
   public void updateAliveTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
-    replay(mockManager);
+    replay(communicationManager);
 
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
@@ -668,7 +781,7 @@ public class ConfigurationLoaderTest {
     Assert.assertEquals(cacheObjectAliveControlCache.getDescription(), "new description");
     ObjectEqualityComparison.assertAliveTimerValuesEquals(expectedObjectAlive, cacheObjectAlive);
 
-    verify(mockManager);
+    verify(communicationManager);
 
     // remove the process and equipments from the server
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
@@ -693,12 +806,12 @@ public class ConfigurationLoaderTest {
     assertNull(controlTagMapper.getItem(202L));
     assertFalse(aliveTimerCache.hasKey(202L));
 
-    verify(mockManager);
+    verify(communicationManager);
   }
 
   @Test
   public void updateStatusTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
-    replay(mockManager);
+    replay(communicationManager);
 
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
@@ -723,7 +836,7 @@ public class ConfigurationLoaderTest {
     assertEquals(cacheObjectStatusControlCache.getDescription(), "new description");
     assertEquals(cacheObjectStatusControlCache.getMode(), TagMode.OPERATIONAL.ordinal());
 
-    verify(mockManager);
+    verify(communicationManager);
 
     // remove the process and equipments from the server
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
@@ -738,12 +851,12 @@ public class ConfigurationLoaderTest {
     assertNull(controlTagMapper.getItem(100L));
     assertFalse(aliveTimerCache.hasKey(101L));
 
-    verify(mockManager);
+    verify(communicationManager);
   }
 
   @Test
   public void updateCommFaultTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
-    replay(mockManager);
+    replay(communicationManager);
 
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
@@ -772,7 +885,7 @@ public class ConfigurationLoaderTest {
     assertEquals(cacheObjectStatusControlCache.getDescription(), "new description");
     assertEquals(cacheObjectStatusControlCache.getMode(), TagMode.OPERATIONAL.ordinal());
 
-    verify(mockManager);
+    verify(communicationManager);
 
     // remove the process and equipments from the server
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
@@ -787,15 +900,15 @@ public class ConfigurationLoaderTest {
     assertNull(controlTagMapper.getItem(100L));
     assertFalse(aliveTimerCache.hasKey(101L));
 
-    verify(mockManager);
+    verify(communicationManager);
   }
 
   @Test
   public void createEquipmentDataTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
     // called once when updating the equipment;
     // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(mockManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    replay(mockManager);
+    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(communicationManager);
 
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
@@ -831,7 +944,7 @@ public class ConfigurationLoaderTest {
     assertTrue(equipmentFacade.getDataTagIds(cacheObjectData.getEquipmentId()).contains(1000L));
     equipmentCache.releaseWriteLockOnKey(cacheObjectData.getEquipmentId());
 
-    verify(mockManager);
+    verify(communicationManager);
 
     // remove the process and equipments from the server
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
@@ -858,15 +971,15 @@ public class ConfigurationLoaderTest {
     assertFalse(dataTagCache.hasKey(1000L));
     assertNull(dataTagMapper.getItem(1000L));
 
-    verify(mockManager);
+    verify(communicationManager);
   }
 
   @Test
   public void updateEquipmentDataTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
     // called once when updating the equipment;
     // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(mockManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    replay(mockManager);
+    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(communicationManager);
 
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
@@ -902,7 +1015,7 @@ public class ConfigurationLoaderTest {
 
     ObjectEqualityComparison.assertDataTagConfigEquals(expectedCacheObjectData, cacheObjectData);
 
-    verify(mockManager);
+    verify(communicationManager);
 
     // remove the process and equipments from the server
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
@@ -929,15 +1042,15 @@ public class ConfigurationLoaderTest {
     assertFalse(dataTagCache.hasKey(1000L));
     assertNull(dataTagMapper.getItem(1000L));
 
-    verify(mockManager);
+    verify(communicationManager);
   }
 
   @Test
   public void createSubEquipmentDataTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
     // called once when updating the equipment;
     // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(mockManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    replay(mockManager);
+    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(communicationManager);
 
     /// SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
@@ -978,7 +1091,7 @@ public class ConfigurationLoaderTest {
     assertTrue(subEquipmentFacade.getDataTagIds(cacheObjectData.getSubEquipmentId()).contains(1000L));
     subEquipmentCache.releaseWriteLockOnKey(cacheObjectData.getSubEquipmentId());
 
-    verify(mockManager);
+    verify(communicationManager);
 
     // remove the process and equipments from the server
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
@@ -1010,15 +1123,15 @@ public class ConfigurationLoaderTest {
     assertFalse(dataTagCache.hasKey(1000L));
     assertNull(dataTagMapper.getItem(1000L));
 
-    verify(mockManager);
+    verify(communicationManager);
   }
 
   @Test
   public void updateSubEquipmentDataTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
     // called once when updating the equipment;
     // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(mockManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    replay(mockManager);
+    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(communicationManager);
 
     /// SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
@@ -1056,7 +1169,7 @@ public class ConfigurationLoaderTest {
 
     ObjectEqualityComparison.assertDataTagConfigEquals(expectedCacheObjectData, cacheObjectData);
 
-    verify(mockManager);
+    verify(communicationManager);
 
     // remove the process and equipments and dataTag from the server
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
@@ -1090,14 +1203,14 @@ public class ConfigurationLoaderTest {
     assertFalse(dataTagCache.hasKey(1000L));
     assertNull(dataTagMapper.getItem(1000L));
 
-    verify(mockManager);
+    verify(communicationManager);
   }
 
   @Test
   public void createRuleTag() {
     // called once when updating the equipment;
     // mock returns a list with the correct number of SUCCESS ChangeReports
-    replay(mockManager);
+    replay(communicationManager);
 
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
@@ -1132,7 +1245,7 @@ public class ConfigurationLoaderTest {
     // Check if all caches are updated
     assertNotNull(ruleTagMapper.getItem(1500L));
 
-    verify(mockManager);
+    verify(communicationManager);
 
     // remove the process and equipments from the server
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
@@ -1158,12 +1271,12 @@ public class ConfigurationLoaderTest {
     assertFalse(ruleTagCache.hasKey(1500L));
     assertNull(ruleTagMapper.getItem(1500L));
 
-    verify(mockManager);
+    verify(communicationManager);
   }
 
   @Test
   public void updateRuleTag() throws InterruptedException, IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
-    replay(mockManager);
+    replay(communicationManager);
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
@@ -1201,7 +1314,7 @@ public class ConfigurationLoaderTest {
 
     ObjectEqualityComparison.assertRuleTagConfigEquals(expectedCacheObjectRule, cacheObjectData);
 
-    verify(mockManager);
+    verify(communicationManager);
 
     // remove the process and equipments from the server
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
@@ -1231,15 +1344,15 @@ public class ConfigurationLoaderTest {
     assertFalse(ruleTagCache.hasKey(1500L));
     assertNull(ruleTagMapper.getItem(1500L));
 
-    verify(mockManager);
+    verify(communicationManager);
   }
 
   @Test
   public void deleteRuleWithDeleteDataTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException, InterruptedException {
     // called once when updating the equipment;
     // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(mockManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    replay(mockManager);
+    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(communicationManager);
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
     Configuration createEquipment = TestConfigurationProvider.createEquipment();
@@ -1274,7 +1387,7 @@ public class ConfigurationLoaderTest {
     assertFalse(dataTagCache.hasKey(1000L));
     assertNull(dataTagMapper.getItem(1000L));
 
-    verify(mockManager);
+    verify(communicationManager);
 
     // remove the rest for finishing the test
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
@@ -1298,13 +1411,13 @@ public class ConfigurationLoaderTest {
     assertFalse(controlTagCache.hasKey(201L));
     assertNull(controlTagMapper.getItem(202L));
 
-    verify(mockManager);
+    verify(communicationManager);
   }
 
   @Test
   public void createAlarm() {
     // SETUP:
-    replay(mockManager);
+    replay(communicationManager);
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
     Configuration createEquipment = TestConfigurationProvider.createEquipment();
@@ -1336,7 +1449,7 @@ public class ConfigurationLoaderTest {
     // Check if all caches are updated
     assertNotNull(alarmMapper.getItem(2000L));
 
-    verify(mockManager);
+    verify(communicationManager);
 
     // remove the process and equipments and dataTag from the server
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
@@ -1362,12 +1475,12 @@ public class ConfigurationLoaderTest {
     assertFalse(alarmCache.hasKey(2000L));
     assertNull(alarmMapper.getItem(2000L));
 
-    verify(mockManager);
+    verify(communicationManager);
   }
 
   @Test
   public void updateAlarm() {
-    replay(mockManager);
+    replay(communicationManager);
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
     Configuration createEquipment = TestConfigurationProvider.createEquipment();
@@ -1399,7 +1512,7 @@ public class ConfigurationLoaderTest {
 
     ObjectEqualityComparison.assertAlarmEquals(expectedCacheObjectAlarm, cacheObjectAlarm);
 
-    verify(mockManager);
+    verify(communicationManager);
     // remove the process and equipments and dataTag from the server
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
@@ -1424,13 +1537,13 @@ public class ConfigurationLoaderTest {
     assertFalse(alarmCache.hasKey(2000L));
     assertNull(alarmMapper.getItem(2000L));
 
-    verify(mockManager);
+    verify(communicationManager);
   }
 
   @Test
   public void deleteAlarmWithDeleteDataTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException, InterruptedException {
-    expect(mockManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    replay(mockManager);
+    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(communicationManager);
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
     Configuration createEquipment = TestConfigurationProvider.createEquipment();
@@ -1465,7 +1578,7 @@ public class ConfigurationLoaderTest {
     assertFalse(dataTagCache.hasKey(100L));
     assertNull(dataTagMapper.getItem(100L));
 
-    verify(mockManager);
+    verify(communicationManager);
     // remove the process and equipments and dataTag from the server
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
@@ -1488,15 +1601,15 @@ public class ConfigurationLoaderTest {
     assertFalse(controlTagCache.hasKey(201L));
     assertNull(controlTagMapper.getItem(202L));
 
-    verify(mockManager);
+    verify(communicationManager);
   }
 
   @Test
   public void createCommandTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
     // called once when updating the equipment;
     // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(mockManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    replay(mockManager);
+    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(communicationManager);
 
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
@@ -1528,7 +1641,7 @@ public class ConfigurationLoaderTest {
 
     ObjectEqualityComparison.assertCommandTagEquals(expectedCacheObjectCommand, cacheObjectCommand);
 
-    verify(mockManager);
+    verify(communicationManager);
 
     // remove the process and equipments from the server
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
@@ -1555,15 +1668,15 @@ public class ConfigurationLoaderTest {
     assertFalse(commandTagCache.hasKey(500L));
     assertNull(commandTagMapper.getItem(500L));
 
-    verify(mockManager);
+    verify(communicationManager);
   }
 
   @Test
   public void updateCommandTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
     // called once when updating the equipment;
     // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(mockManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    replay(mockManager);
+    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(communicationManager);
 
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
@@ -1599,7 +1712,7 @@ public class ConfigurationLoaderTest {
 
     ObjectEqualityComparison.assertCommandTagEquals(expectedCacheObjectCommand, cacheObjectCommand);
 
-    verify(mockManager);
+    verify(communicationManager);
 
     // remove the process and equipments from the server
     processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
@@ -1626,6 +1739,6 @@ public class ConfigurationLoaderTest {
     assertFalse(commandTagCache.hasKey(500L));
     assertNull(commandTagMapper.getItem(500L));
 
-    verify(mockManager);
+    verify(communicationManager);
   }
 }

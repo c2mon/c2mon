@@ -31,7 +31,6 @@ import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 import cern.c2mon.shared.client.configuration.api.tag.Tag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.metadata.Metadata;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -244,7 +243,7 @@ public class ConfigureDataTagTest {
   public void createDataTagMultiMetadata() {
     // setup Configuration:
     Properties expectedProps = new Properties();
-    DataTag dataTag = buildCreateMultiMetaDataTag(expectedProps);
+    DataTag dataTag = createDataTagWithMultipleMetadata(expectedProps);
 
     List<Tag> tagUpdateList = Arrays.asList(dataTag);
 

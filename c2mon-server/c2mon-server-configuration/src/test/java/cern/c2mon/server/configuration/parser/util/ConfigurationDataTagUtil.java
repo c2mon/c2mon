@@ -95,7 +95,7 @@ public class ConfigurationDataTagUtil {
     return dataTag;
   }
 
-  public static DataTag buildCreateMultiMetaDataTag(Properties properties) {
+  public static DataTag createDataTagWithMultipleMetadata(Properties properties) {
     if (properties == null) {
       properties = new Properties();
     }
@@ -196,6 +196,7 @@ public class ConfigurationDataTagUtil {
 
     Metadata metadata = new Metadata();
     metadata.setRemoveList(Collections.singletonList("testMetadata"));
+    metadata.setUpdate(true);
     properties.setProperty("metadata", getJsonMetadata(metadata));
 
     return dataTag;
@@ -212,6 +213,7 @@ public class ConfigurationDataTagUtil {
 
     Metadata metadata = new Metadata();
     metadata.setRemoveList(Arrays.asList("testMetadata1", "testMetadata2"));
+    metadata.setUpdate(true);
     properties.setProperty("metadata", getJsonMetadata(metadata));
 
     return dataTag;
