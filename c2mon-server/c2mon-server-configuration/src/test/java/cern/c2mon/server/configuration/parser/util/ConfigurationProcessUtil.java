@@ -30,7 +30,6 @@ import cern.c2mon.shared.common.metadata.Metadata;
 //@Service
 public class ConfigurationProcessUtil {
 
-
   /**
    * Expected generated id is 1.
    * Expected status tag id is 101
@@ -143,5 +142,4 @@ public class ConfigurationProcessUtil {
 
     return deleteProcess;
   }
-
 }

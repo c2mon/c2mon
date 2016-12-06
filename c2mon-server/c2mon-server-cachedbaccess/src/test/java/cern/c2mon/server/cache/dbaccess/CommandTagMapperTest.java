@@ -108,21 +108,20 @@ public class CommandTagMapperTest extends AbstractMapperTest {
     modifiedCommand.setDescription("new description");
     modifiedCommand.setDataType("Integer");
     modifiedCommand.setMode(DataTagConstants.MODE_TEST);
-    modifiedCommand.setEquipmentId(Long.valueOf(160));
+    modifiedCommand.setEquipmentId(160L);
     //must change process manually here for assertions work...
-    modifiedCommand.setProcessId(Long.valueOf(50));
+    modifiedCommand.setProcessId(50L);
     try {
       modifiedCommand.setHardwareAddress(new OPCHardwareAddressImpl("newAddress"));
     } catch (ConfigurationException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     modifiedCommand.setSourceTimeout(10);
     modifiedCommand.setSourceRetries(2);
     modifiedCommand.setExecTimeout(10);
     modifiedCommand.setClientTimeout(3);
-    modifiedCommand.setMinimum(Integer.valueOf(30));
-    modifiedCommand.setMaximum(Integer.valueOf(60));
+    modifiedCommand.setMinimum(30);
+    modifiedCommand.setMaximum(60);
     Metadata metadata = new Metadata();
     metadata.addMetadata("metadata", 11);
     modifiedCommand.setMetadata(metadata);
