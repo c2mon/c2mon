@@ -27,13 +27,10 @@ import cern.c2mon.shared.util.jms.JmsSender;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.google.gson.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 
 /**
  * JMS sender class for sending the Configuration request to the server and
@@ -71,7 +68,7 @@ public class ConfigurationRequestSender {
   public ConfigurationReport applyConfiguration(Configuration configuration, ClientRequestReportListener listener) {
     try {
       String message = mapper.writeValueAsString(configuration);
-      String destination = properties.getJms().getConfigQueue();
+      String destination = properties.getJms().getConfigRequestQueue();
       String reply = jmsSender.sendRequestToQueue(message, destination, DEFAULT_TIMEOUT);
 
       if (reply != null) {

@@ -36,20 +36,19 @@ public class JmsConfig {
   private C2monClientProperties properties;
 
   @Bean
-  public ActiveMQConnectionFactory jmsConnectionFactory() {
+  public ActiveMQConnectionFactory clientJmsConnectionFactory() {
     return new ActiveMQConnectionFactory(properties.getJms().getUrl());
   }
 
   @Bean
-  public JmsSender jmsSender(JmsTemplate jmsTemplate) {
+  public JmsSender jmsSender() {
     ActiveJmsSender jmsSender = new ActiveJmsSender();
-    jmsSender.setJmsTemplate(jmsTemplate);
+    jmsSender.setJmsTemplate(clientJmsTemplate());
     return jmsSender;
   }
 
   @Bean
-  @ConditionalOnMissingBean(JmsTemplate.class)
-  public JmsTemplate jmsTemplate() {
-    return new JmsTemplate(jmsConnectionFactory());
+  public JmsTemplate clientJmsTemplate() {
+    return new JmsTemplate(clientJmsConnectionFactory());
   }
 }

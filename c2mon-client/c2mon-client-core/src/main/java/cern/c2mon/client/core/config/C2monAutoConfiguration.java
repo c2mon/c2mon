@@ -19,6 +19,8 @@ package cern.c2mon.client.core.config;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 
 /**
  * @author Justin Lewis Salmon
@@ -28,5 +30,9 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan({
     "cern.c2mon.client.core",
     "cern.c2mon.client.ext"
+})
+@PropertySources({
+    @PropertySource("classpath:c2mon-client-default.properties"),
+    @PropertySource(value = "${c2mon.client.properties}", ignoreResourceNotFound = true)
 })
 public class C2monAutoConfiguration {}

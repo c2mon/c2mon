@@ -1,5 +1,6 @@
 package cern.c2mon.daq.config;
 
+import cern.c2mon.shared.daq.config.DaqJmsProperties;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -45,7 +46,7 @@ public class DaqProperties {
   private final Jms jms = new Jms();
 
   @Data
-  public static class Jms {
+  public static class Jms extends DaqJmsProperties {
 
     /**
      * Tag publication mode. Possible values are:
@@ -58,21 +59,10 @@ public class DaqProperties {
     private String mode = "single";
 
     /**
-     * URL of the primary JMS broker to which to publish
-     */
-    private String url = "tcp://localhost:61616";
-
-    /**
      * URL of the secondary JMS broker to which to publish (only relevant when
      * running in double publication mode)
      */
     private String secondaryUrl = "tcp://localhost:61617";
-
-    /**
-     * The queue prefix used to publish data tags to the server. The process ID
-     * will be appended to this value
-     */
-    private String queuePrefix = "c2mon.process";
   }
 
   /**

@@ -41,6 +41,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
@@ -239,7 +240,9 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   private ExecutorService topicPollingExecutor;
 
   @Autowired
-  public JmsProxyImpl(final ConnectionFactory connectionFactory, final SlowConsumerListener slowConsumerListener, C2monClientProperties properties) {
+  public JmsProxyImpl(@Qualifier("clientJmsConnectionFactory") final ConnectionFactory connectionFactory,
+                      final SlowConsumerListener slowConsumerListener,
+                      final C2monClientProperties properties) {
     this.jmsConnectionFactory = connectionFactory;
     this.supervisionTopic = new ActiveMQTopic(properties.getJms().getSupervisionTopic());;
     this.heartbeatTopic = new ActiveMQTopic(properties.getJms().getHeartbeatTopic());;

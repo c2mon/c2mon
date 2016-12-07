@@ -1,5 +1,6 @@
 package cern.c2mon.server.daq.config;
 
+import cern.c2mon.shared.daq.config.DaqJmsProperties;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -13,14 +14,10 @@ public class DaqProperties {
   /**
    * JMS properties
    */
-  private Jms jms = new Jms();
+  private final Jms jms = new Jms();
 
   @Data
-  public class Jms {
-
-    private String url = "tcp://localhost:61616";
-
-    private String queuePrefix = "c2mon.process";
+  public class Jms extends DaqJmsProperties {
 
     private int configurationTimeout = 60000;
 
