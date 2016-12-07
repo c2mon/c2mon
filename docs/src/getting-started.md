@@ -19,7 +19,6 @@ We push a Docker image of the server to the [CERN Docker registry](https://gitla
 
 ```bash
 docker run --rm --name c2mon -it -p 0.0.0.0:1099:1099 -p 0.0.0.0:9001:9001 -p 0.0.0.0:61616:61616 -p 0.0.0.0:9200:9200 \
-  -e "c2mon.server.cachedbaccess.insertTestData=true" \
   gitlab-registry.cern.ch/c2mon/c2mon
 ```
 

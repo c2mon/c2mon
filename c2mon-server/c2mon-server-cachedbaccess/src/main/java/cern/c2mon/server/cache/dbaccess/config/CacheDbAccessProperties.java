@@ -11,11 +11,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class CacheDbAccessProperties {
 
   /**
-   * Enable/disable insertion of demo data into the cache backup at startup
-   */
-  private boolean insertTestData = true;
-
-  /**
    * JDBC properties
    */
   private Jdbc jdbc = new Jdbc();

@@ -40,13 +40,7 @@ public class CacheDataSourceConfig {
     // in-process database, start a file-based externally visible database or connect to
     // an external database.
     if (url.contains("hsql")) {
-      HsqlDatabaseBuilder builder = new HsqlDatabaseBuilder().setUrl(url).addScript(new ClassPathResource("sql/cache-schema-hsqldb.sql"));
-
-      if (properties.isInsertTestData()) {
-        builder.addScript(new ClassPathResource("sql/demo/cache-data-demo.sql"));
-      }
-
-      return builder.build();
+      return new HsqlDatabaseBuilder().setUrl(url).addScript(new ClassPathResource("sql/cache-schema-hsqldb.sql")).build();
     } else {
       return DataSourceBuilder.create().build();
     }
