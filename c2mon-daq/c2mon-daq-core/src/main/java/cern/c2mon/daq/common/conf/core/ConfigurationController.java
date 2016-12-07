@@ -131,7 +131,6 @@ public class ConfigurationController {
    * RuntimeException coming from errors while parsing PIK or Configurations XML
    * files.
    */
-  @PostConstruct
   public void initProcess() {
     this.startUp = System.currentTimeMillis();
 

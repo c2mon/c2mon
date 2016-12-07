@@ -222,15 +222,8 @@ public class DriverKernel implements ApplicationContextAware {
   /**
    * Initialization of the DriverKernel at startup, once all dependencies have
    * been set.
-   *
-   * @throws ConfRejectedTypeException Throws a configuration rejected exception
-   *                                   if the server rejected the configuration request of the DAQ.
-   * @throws ConfUnknownTypeException  Throws a configuration unknown type
-   *                                   exception if the configuration requested was unknown on the
-   *                                   server.
    */
-  @PostConstruct
-  public final void init() throws ConfUnknownTypeException, ConfRejectedTypeException {
+  public final void init()  {
     // was originally in main of Driver Kernel
     Runtime.getRuntime().addShutdownHook(this.ksh);
 
@@ -268,15 +261,10 @@ public class DriverKernel implements ApplicationContextAware {
   /**
    * This method does all the daq's configuration job, basing on a DOM
    * configuration XML document given as an argument.
-   *
-   * @throws ConfUnknownTypeException  Thrown if the configuration type is
-   *                                   unknown. That means that the server does not no the requested
-   *                                   configuration.
-   * @throws ConfRejectedTypeException Thrown if the configuration type
-   *                                   indicates that the server rejected the startup request.
    */
-  public void configure() throws ConfUnknownTypeException, ConfRejectedTypeException {
+  public void configure() {
     log.debug("configure - entering configure()..");
+    configurationController.initProcess();
 
     log.debug("configure - connecting to ProcessMessageSender");
     // create and initialize ProccessMessageSender

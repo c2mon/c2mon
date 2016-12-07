@@ -18,6 +18,7 @@ package cern.c2mon.daq;
 
 import java.io.IOException;
 
+import cern.c2mon.daq.common.DriverKernel;
 import cern.c2mon.daq.config.DaqCoreModule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.Banner;
@@ -27,7 +28,9 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
 import org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.AbstractEnvironment;
 
 import static java.lang.String.format;
@@ -58,7 +61,13 @@ public class DaqStartup {
       System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, mode);
     }
 
-    new SpringApplicationBuilder(DaqStartup.class).bannerMode(Banner.Mode.OFF).build().run(args);
+    ConfigurableApplicationContext context = new SpringApplicationBuilder(DaqStartup.class)
+        .bannerMode(Banner.Mode.OFF)
+        .build()
+        .run(args);
+
+    DriverKernel kernel = context.getBean(DriverKernel.class);
+    kernel.init();
 
     log.info("DAQ core is now initialized");
   }
