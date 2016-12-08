@@ -16,21 +16,22 @@
  *****************************************************************************/
 package cern.c2mon.client.core.configuration;
 
-import cern.c2mon.client.common.listener.ClientRequestReportListener;
-import cern.c2mon.client.core.config.C2monClientProperties;
-import cern.c2mon.shared.client.configuration.ConfigConstants;
-import cern.c2mon.shared.client.configuration.ConfigurationReport;
-import cern.c2mon.shared.client.configuration.api.Configuration;
-import cern.c2mon.shared.common.serialisation.HardwareAddressSerializer;
-import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import cern.c2mon.shared.util.jms.JmsSender;
+import java.io.IOException;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import cern.c2mon.client.common.listener.ClientRequestReportListener;
+import cern.c2mon.client.core.config.C2monClientProperties;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.api.Configuration;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.serialisation.HardwareAddressSerializer;
+import cern.c2mon.shared.util.jms.JmsSender;
 
 /**
  * JMS sender class for sending the Configuration request to the server and
@@ -60,10 +61,10 @@ public class ConfigurationRequestSender {
   }
 
   /**
-   * @param configuration The configuration created from the client
-   * @param listener The listener for the configuration
+   * @param configuration the configuration created from the client
+   * @param listener      the listener for the configuration
    *
-   * @return The report of the configuration
+   * @return the report of the configuration
    */
   public ConfigurationReport applyConfiguration(Configuration configuration, ClientRequestReportListener listener) {
     try {

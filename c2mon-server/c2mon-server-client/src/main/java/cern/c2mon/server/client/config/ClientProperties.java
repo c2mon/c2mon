@@ -1,8 +1,9 @@
 package cern.c2mon.server.client.config;
 
-import cern.c2mon.shared.client.config.ClientJmsProperties;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import cern.c2mon.shared.client.config.ClientJmsProperties;
 
 /**
  * @author Justin Lewis Salmon

@@ -17,7 +17,6 @@
 package cern.c2mon.client.core.jms.impl;
 
 import java.io.Serializable;
-import java.lang.IllegalStateException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -32,9 +31,21 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.PreDestroy;
-import javax.jms.*;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.DeliveryMode;
+import javax.jms.Destination;
+import javax.jms.ExceptionListener;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.ObjectMessage;
+import javax.jms.Session;
+import javax.jms.TemporaryQueue;
+import javax.jms.TextMessage;
+import javax.jms.Topic;
 
-import cern.c2mon.client.core.config.C2monClientProperties;
 import com.google.gson.JsonSyntaxException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -44,14 +55,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
+import org.springframework.stereotype.Component;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.common.listener.TagUpdateListener;
-import cern.c2mon.client.core.jms.*;
+import cern.c2mon.client.core.config.C2monClientProperties;
+import cern.c2mon.client.core.jms.AlarmListener;
+import cern.c2mon.client.core.jms.BroadcastMessageListener;
+import cern.c2mon.client.core.jms.ConnectionListener;
+import cern.c2mon.client.core.jms.HeartbeatListener;
+import cern.c2mon.client.core.jms.JmsProxy;
+import cern.c2mon.client.core.jms.SupervisionListener;
+import cern.c2mon.client.core.jms.TopicRegistrationDetails;
 import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
-import org.springframework.stereotype.Component;
 
 /**
  * Implementation of the JmsProxy singleton bean. Also see the interface for
