@@ -229,7 +229,7 @@ need to issue a new pull request when asked to make changes.
 
 [help documentation]: http://help.github.com/send-pull-requests
 [issue tracker]: https://gitlab.cern.ch/c2mon/c2mon/issues
-[C2MON Code Style]: https://gitlab.cern.ch/c2mon/c2mon/blob/master/CODESTYLE.md
+[C2MON code style guide]: https://gitlab.cern.ch/c2mon/c2mon/blob/master/CODESTYLE.md
 [Rewriting History section of Pro Git]: http://git-scm.com/book/en/Git-Tools-Rewriting-History
 [Commit Guidelines section of Pro Git]: http://git-scm.com/book/en/Distributed-Git-Contributing-to-a-Project#Commit-Guidelines
 [building from source]: https://gitlab.cern.ch/c2mon/c2mon#building-from-source
