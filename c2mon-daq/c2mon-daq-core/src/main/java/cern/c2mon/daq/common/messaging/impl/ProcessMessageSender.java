@@ -293,7 +293,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
    */
   public final void setJmsSenders(final Collection<JmsSender> jmsSenders) {
     this.jmsSenders = jmsSenders;
-  };
+  }
 
   /**
    * This class implements SynchroBuffer's SychroBufferListener, so that both

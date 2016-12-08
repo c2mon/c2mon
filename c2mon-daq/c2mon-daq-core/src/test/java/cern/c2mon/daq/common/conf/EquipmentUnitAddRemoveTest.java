@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.conf;
 
+import cern.c2mon.daq.DaqStartup;
 import cern.c2mon.daq.common.DriverKernel;
 import cern.c2mon.daq.common.ProcessMessageSenderMock;
 import cern.c2mon.daq.common.messaging.impl.ProcessMessageSender;
@@ -38,7 +39,7 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
-    DaqCoreModule.class,
+    DaqStartup.class,
     ProcessMessageSenderMock.class
 })
 @TestPropertySource(
@@ -55,7 +56,7 @@ public class EquipmentUnitAddRemoveTest {
 
   @Before
   public void setUp() throws Exception {
-    kernel.setProcessMessageSender(EasyMock.createMock(ProcessMessageSender.class));
+    kernel.init();
   }
 
   @DirtiesContext
