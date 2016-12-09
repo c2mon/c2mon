@@ -300,15 +300,14 @@ public class ConfigurationLoaderTest {
     assertTrue(report.getElementReports().get(0).getAction().equals(ConfigConstants.Action.UPDATE));
     assertTrue(report.getElementReports().get(0).getEntity().equals(ConfigConstants.Entity.DATATAG));
 
+    DataTagCacheObject expectedCacheObjectData = new DataTagCacheObject();
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata1", 11);
-
-    DataTagCacheObject expectedCacheObjectData = cacheObjectFactory.buildDataTagCacheObject(1000L, dataTag);
     expectedCacheObjectData.setMetadata(metadata);
 
     // get cacheObject from the cache and compare to the an expected cacheObject
     DataTagCacheObject cacheObjectData = (DataTagCacheObject) dataTagCache.get(1000L);
-    ObjectEqualityComparison.assertDataTagConfigEquals(expectedCacheObjectData, cacheObjectData);
+    assertEquals(expectedCacheObjectData.getMetadata(), cacheObjectData.getMetadata());
 
     verify(communicationManager);
   }
@@ -403,9 +402,11 @@ public class ConfigurationLoaderTest {
 
     // get cacheObject from the cache and compare to the an expected cacheObject
     DataTagCacheObject cacheObjectData = (DataTagCacheObject) dataTagCache.get(1000L);
-    DataTagCacheObject expectedCacheObjectData = cacheObjectFactory.buildDataTagCacheObject(1000L, dataTag);
-
-    ObjectEqualityComparison.assertDataTagConfigEquals(expectedCacheObjectData, cacheObjectData);
+    DataTagCacheObject expectedCacheObjectData = new DataTagCacheObject();
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("testMetadata", 11);
+    expectedCacheObjectData.setMetadata(metadata);
+    assertEquals(expectedCacheObjectData.getMetadata(), cacheObjectData.getMetadata());
 
     verify(communicationManager);
   }

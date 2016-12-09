@@ -262,7 +262,7 @@ public class ConfigureDataTagTest {
     assertEquals((long) parsed.get(0).getEntityId(), 100L);
     assertTrue(parsed.get(0).getEntity().equals(ConfigConstants.Entity.DATATAG));
     assertTrue(parsed.get(0).getAction().equals(ConfigConstants.Action.CREATE));
-    assertEquals(parsed.get(0).getElementProperties(), expectedProps);
+    assertEquals(expectedProps.getProperty("metadata"), parsed.get(0).getElementProperties().getProperty("metadata"));
 
     EasyMock.verify(equipmentCache, sequenceDAO, tagFacadeGateway);
   }
@@ -290,7 +290,7 @@ public class ConfigureDataTagTest {
     assertEquals((long) parsed.get(0).getEntityId(), 100L);
     assertEquals(parsed.get(0).getEntity(), ConfigConstants.Entity.DATATAG);
     assertEquals(parsed.get(0).getAction(), ConfigConstants.Action.CREATE);
-    assertEquals(parsed.get(0).getElementProperties().getProperty("metadata"), expectedProps.getProperty("metadata"));
+    assertEquals(expectedProps.getProperty("metadata"), parsed.get(0).getElementProperties().getProperty("metadata"));
 
     EasyMock.verify(equipmentCache, sequenceDAO, tagFacadeGateway);
   }
@@ -417,7 +417,7 @@ public class ConfigureDataTagTest {
     assertEquals(100L, (long) parsed.get(0).getEntityId());
     assertEquals(ConfigConstants.Entity.DATATAG, parsed.get(0).getEntity());
     assertEquals(ConfigConstants.Action.UPDATE, parsed.get(0).getAction());
-    assertEquals(expectedProps, parsed.get(0).getElementProperties());
+    assertEquals(expectedProps.getProperty("metadata"), parsed.get(0).getElementProperties().getProperty("metadata"));
 
     EasyMock.verify(tagFacadeGateway);
   }
@@ -442,7 +442,7 @@ public class ConfigureDataTagTest {
     assertEquals(100L, (long) parsed.get(0).getEntityId());
     assertEquals(ConfigConstants.Entity.DATATAG, parsed.get(0).getEntity());
     assertEquals(ConfigConstants.Action.UPDATE, parsed.get(0).getAction());
-    assertEquals(expectedProps, parsed.get(0).getElementProperties());
+    assertEquals(expectedProps.getProperty("metadata"), parsed.get(0).getElementProperties().getProperty("metadata"));
 
     EasyMock.verify(tagFacadeGateway);
   }
@@ -469,7 +469,7 @@ public class ConfigureDataTagTest {
     assertEquals(100L, (long) parsed.get(0).getEntityId());
     assertEquals(ConfigConstants.Entity.DATATAG, parsed.get(0).getEntity());
     assertEquals(ConfigConstants.Action.UPDATE, parsed.get(0).getAction());
-    assertEquals(expectedProps, parsed.get(0).getElementProperties());
+    assertEquals(expectedProps.getProperty("metadata"), parsed.get(0).getElementProperties().getProperty("metadata"));
 
     EasyMock.verify(tagFacadeGateway);
   }
@@ -496,7 +496,7 @@ public class ConfigureDataTagTest {
     assertEquals((long) parsed.get(0).getEntityId(), 100L);
     assertEquals(parsed.get(0).getEntity(), ConfigConstants.Entity.DATATAG);
     assertEquals(parsed.get(0).getAction(), ConfigConstants.Action.UPDATE);
-    assertEquals(expectedProps, parsed.get(0).getElementProperties());
+    assertEquals(expectedProps.getProperty("metadata"), parsed.get(0).getElementProperties().getProperty("metadata"));
 
     EasyMock.verify(tagFacadeGateway);
   }
