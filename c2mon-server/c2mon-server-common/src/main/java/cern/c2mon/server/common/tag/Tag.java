@@ -22,7 +22,7 @@ import java.util.Set;
 
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
-import cern.c2mon.shared.common.metadata.Metadata;
+import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.common.rule.RuleInputValue;
 
 /**

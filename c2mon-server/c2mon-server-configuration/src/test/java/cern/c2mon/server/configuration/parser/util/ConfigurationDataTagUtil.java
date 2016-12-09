@@ -20,7 +20,7 @@ import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
-import cern.c2mon.shared.common.metadata.Metadata;
+import cern.c2mon.shared.client.metadata.Metadata;
 
 import java.util.Arrays;
 import java.util.Collections;

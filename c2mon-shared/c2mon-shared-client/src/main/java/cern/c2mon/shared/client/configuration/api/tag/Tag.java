@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration.api.tag;
 
-import cern.c2mon.shared.common.metadata.Metadata;
+import cern.c2mon.shared.client.metadata.Metadata;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;

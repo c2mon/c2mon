@@ -20,7 +20,7 @@ import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.metadata.Metadata;
+import cern.c2mon.shared.client.metadata.Metadata;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

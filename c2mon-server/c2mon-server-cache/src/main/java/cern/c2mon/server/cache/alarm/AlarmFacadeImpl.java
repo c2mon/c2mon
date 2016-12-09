@@ -17,10 +17,9 @@
 package cern.c2mon.server.cache.alarm;
 
 import java.sql.Timestamp;
-import java.util.Map;
 import java.util.Properties;
 
-import cern.c2mon.shared.common.metadata.Metadata;
+import cern.c2mon.server.common.metadata.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

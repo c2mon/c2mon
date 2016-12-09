@@ -18,7 +18,7 @@ package cern.c2mon.shared.client.configuration.api.alarm;
 
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
 import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
-import cern.c2mon.shared.common.metadata.Metadata;
+import cern.c2mon.shared.client.metadata.Metadata;
 import lombok.Data;
 import org.springframework.util.Assert;
 

@@ -31,7 +31,7 @@ import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.command.CommandExecutionDetails;
 import cern.c2mon.shared.common.datatag.*;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
-import cern.c2mon.shared.common.metadata.Metadata;
+import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 
 import java.sql.Timestamp;

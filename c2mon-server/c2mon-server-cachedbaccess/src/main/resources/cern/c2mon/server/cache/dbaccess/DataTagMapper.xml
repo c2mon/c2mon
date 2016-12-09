@@ -31,7 +31,7 @@
 
       <result property="ruleIdsString" column="TAGRULEIDS" jdbcType="VARCHAR"/>
 
-      <result property="metadata" column="TAGMETADATA" javaType="cern.c2mon.shared.common.metadata.Metadata" jdbcType="VARCHAR"/>
+      <result property="metadata" column="TAGMETADATA" javaType="cern.c2mon.server.common.metadata.Metadata" jdbcType="VARCHAR"/>
 
       <collection property="alarmIds" ofType="Long" javaType="java.util.ArrayList" resultMap="tagAlarmIdsResultMap"/>
 

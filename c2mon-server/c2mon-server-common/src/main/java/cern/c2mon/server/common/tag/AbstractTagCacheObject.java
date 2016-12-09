@@ -19,7 +19,7 @@ package cern.c2mon.server.common.tag;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.metadata.Metadata;
+import cern.c2mon.server.common.metadata.Metadata;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 

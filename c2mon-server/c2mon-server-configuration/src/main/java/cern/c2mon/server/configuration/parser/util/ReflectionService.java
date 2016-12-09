@@ -25,7 +25,7 @@ import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import cern.c2mon.shared.common.metadata.Metadata;
+import cern.c2mon.shared.client.metadata.Metadata;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;

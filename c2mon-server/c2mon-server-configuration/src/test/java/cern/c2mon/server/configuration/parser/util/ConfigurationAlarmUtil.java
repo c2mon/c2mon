@@ -18,7 +18,7 @@ package cern.c2mon.server.configuration.parser.util;
 
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.alarm.ValueCondition;
-import cern.c2mon.shared.common.metadata.Metadata;
+import cern.c2mon.shared.client.metadata.Metadata;
 
 import java.util.Properties;
 
