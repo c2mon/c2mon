@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
 import org.apache.ibatis.type.TypeHandler;
@@ -36,9 +37,11 @@ import static cern.c2mon.shared.common.type.TypeConverter.cast;
 import static cern.c2mon.shared.common.type.TypeConverter.isKnownClass;
 
 /**
- * iBatis TypeHandler used to convert between Comparable Java objects (used for Min and Max value) and Java Object of the type 'Object'.
- * If the columns are empty, a null object is returned when loading from the database.
- * The objects are saved as json String. If loaded from the db jackson will deserialize the json string into the java object.
+ * MyBatis {@link TypeHandler} used to convert between Object entity attributes
+ * and their JSON string representations,
+ * <p>
+ * If a column is empty, a null object is returned when loading from the
+ * database.
  *
  * @author Mark Brightwell
  * @author Franz Ritter
@@ -47,14 +50,11 @@ import static cern.c2mon.shared.common.type.TypeConverter.isKnownClass;
     Object.class,
     Comparable.class
 })
+@Slf4j
 public class ObjectTypeHandler implements TypeHandler {
 
-  /**
-   * Private class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ObjectTypeHandler.class);
-
   private static ObjectMapper mapper = new ObjectMapper();
+
   static {
     mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     mapper.enable(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY);
@@ -62,7 +62,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
   @Override
   public Object getResult(ResultSet rs, String columnName) throws SQLException {
-    Object result  = null;
+    Object result = null;
     String tagDataType;
     String valueAsString;
 
@@ -79,18 +79,21 @@ public class ObjectTypeHandler implements TypeHandler {
         }
       }
     } catch (Exception ex) {
-      LOGGER.error("Unexpected exception caught when constructing a value from the column "+columnName+" from the database (it could be just a NULL DB column value):", ex);
+      log.error("Error constructing a value from the column {}", columnName, ex);
     }
     return result;
   }
 
   /**
-   * Reading the datatype of the object based on the DataType column in the db.
-   * All values saved in the db with the type objects have the data type of the value.
+   * Read the datatype of the object based on the DataType column in the db.
+   * <p>
+   * All entities with {@link Object}-type attributes will have a corresponding
+   * datatype column.
    *
-   * @param rs Result set from the the db.
-   * @param columnName the name of the column.
-   * @return the requested data type.
+   * @param rs         result set from the the db
+   * @param columnName the name of the column
+   *
+   * @return the requested data type
    */
   private String getDataType(final ResultSet rs, final String columnName) {
     String result = "String";
@@ -98,15 +101,13 @@ public class ObjectTypeHandler implements TypeHandler {
     try {
       if (columnName.startsWith("TAG")) {
         result = rs.getString("TAGDATATYPE");
-      }
-      else if (columnName.startsWith("CMD")) {
+      } else if (columnName.startsWith("CMD")) {
         result = rs.getString("CMDDATATYPE");
-      }
-      else {
-        LOGGER.warn("getDataType() - Column " + columnName + " is not supported. Using default data type (String).");
+      } else {
+        log.warn("Column {} is not supported: using default data type (String)", columnName);
       }
     } catch (Exception ex) {
-        LOGGER.error("getDataType() - Error occured whilst determine resulting Java type. Set to default (=String)", ex);
+      log.error("Error determining Java type: using default (String)", ex);
     }
 
     return result;
@@ -114,13 +115,11 @@ public class ObjectTypeHandler implements TypeHandler {
 
   @Override
   public Object getResult(CallableStatement arg0, int arg1) throws SQLException {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public Object getResult(ResultSet rs, int columnIndex) throws SQLException {
-    // TODO Auto-generated method stub
     return null;
   }
 
@@ -128,20 +127,13 @@ public class ObjectTypeHandler implements TypeHandler {
   public void setParameter(PreparedStatement ps, int parameterIndex, Object parameter, JdbcType arg3) throws SQLException {
     try {
       if (parameter != null) {
-      	// Because the value is stored as VARCHAR in the db it have to be transformed to a json string
-      	ps.setString(parameterIndex, mapper.writeValueAsString(parameter));
-        if(parameter != null){
-          LOGGER.debug("ObjectTypeHandler: set min value "+parameter+" for");
-        }
-      }
-      else {
-      	ps.setString(parameterIndex, null);
+        // Because the value is stored as VARCHAR in the db it has to be transformed to a JSON string
+        ps.setString(parameterIndex, mapper.writeValueAsString(parameter));
+      } else {
+        ps.setString(parameterIndex, null);
       }
     } catch (Exception ex) {
-      LOGGER.error(
-        "Exception caught when setting a prepared statement parameter from a tag value "
-        + "Object or java.lang.Comparable (used to Min or Max values)", ex);
-
+      log.error("Error setting a prepared statement parameter from a tag value", ex);
     }
   }
 }
