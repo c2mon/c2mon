@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.shared.common.metadata;
+package cern.c2mon.shared.client.metadata;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +40,7 @@ public class Metadata implements Serializable, Cloneable {
 
   public static String toJSON(Metadata metadata) {
     try {
-      return mapper.writeValueAsString(metadata.getMetadata());
+      return mapper.writeValueAsString(metadata);
     } catch (IOException e) {
       log.error("Exception caught while serializing metatata to JSON", e);
     }
@@ -58,16 +58,6 @@ public class Metadata implements Serializable, Cloneable {
 
     return null;
   }
-
-//  public static Metadata fromJSON(String json) {
-//    try {
-//      return mapper.readValue(json, Metadata.class);
-//    } catch (IOException e) {
-//      log.error("Exception caught while deserializing metatata from JSON", e);
-//    }
-//
-//    return null;
-//  }
 
   public void addMetadata(String key, Object value) {
     metadata.put(key, value);
