@@ -101,10 +101,12 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
 
   /** Request parameter */
   @Getter
+  @Deprecated
   private String requestParameter;
 
   /** Object parameter. Only used by EXECUTE_COMMAND_REQUEST and DEVICE_REQUEST so far */
   @Getter
+  @Deprecated
   private Object objectParameter;
 
   /**
@@ -428,6 +430,7 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
    *          In case of a DEVICE_REQUEST, it is a set of {@link DeviceInfo}
    *          objects.
    */
+  @Deprecated
   public void setObjectParameter(final Object objectParameter) {
     if (!requestType.equals(RequestType.EXECUTE_COMMAND_REQUEST) && !requestType.equals(RequestType.DEVICE_REQUEST)) {
       throw new UnsupportedOperationException(
