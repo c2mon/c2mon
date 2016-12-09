@@ -24,12 +24,7 @@ import cern.c2mon.shared.client.metadata.Metadata;
 
 import java.util.Properties;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class ConfigurationCommandTagUtil {
-
-  private static ObjectMapper mapper = new ObjectMapper();
 
   /**
    * Expected generated id is 500.
@@ -96,7 +91,7 @@ public class ConfigurationCommandTagUtil {
     properties.setProperty("minValue", "0");
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata", 11);
-    properties.setProperty("metadata", getJsonMetadata(metadata));
+    properties.setProperty("metadata", Metadata.toJSON(metadata));
 
     return commandTag;
   }
@@ -195,16 +190,5 @@ public class ConfigurationCommandTagUtil {
     deleteTag.setDeleted(true);
 
     return deleteTag;
-  }
-
-  private static String getJsonMetadata(Metadata metadata) {
-    String jsonMetadata = null;
-    try {
-      jsonMetadata = mapper.writeValueAsString(metadata);
-    }
-    catch (JsonProcessingException e) {
-      e.printStackTrace();
-    }
-    return jsonMetadata;
   }
 }

@@ -22,12 +22,7 @@ import cern.c2mon.shared.client.metadata.Metadata;
 
 import java.util.Properties;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class ConfigurationRuleTagUtil {
-
-  private static ObjectMapper mapper = new ObjectMapper();
 
   /**
    * Expected generated id is 100.
@@ -70,7 +65,7 @@ public class ConfigurationRuleTagUtil {
     properties.setProperty("ruleText", "(#1000 < 0)|(#1000 > 200)[1],true[0]");
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata", 11);
-    properties.setProperty("metadata", getJsonMetadata(metadata));
+    properties.setProperty("metadata", Metadata.toJSON(metadata));
 
     return ruleTag;
   }
@@ -99,7 +94,7 @@ public class ConfigurationRuleTagUtil {
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata_Update", true);
     metadata.setUpdate(true);
-    properties.setProperty("metadata", getJsonMetadata(metadata));
+    properties.setProperty("metadata", Metadata.toJSON(metadata));
 
     return ruleTag;
   }
@@ -143,16 +138,5 @@ public class ConfigurationRuleTagUtil {
     deleteTag.setDeleted(true);
 
     return deleteTag;
-  }
-
-  private static String getJsonMetadata(Metadata metadata) {
-    String jsonMetadata = null;
-    try {
-      jsonMetadata = mapper.writeValueAsString(metadata);
-    }
-    catch (JsonProcessingException e) {
-      e.printStackTrace();
-    }
-    return jsonMetadata;
   }
 }

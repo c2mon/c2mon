@@ -26,14 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 
-import javax.xml.crypto.Data;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class ConfigurationDataTagUtil {
-
-  private static ObjectMapper mapper = new ObjectMapper();
 
   /**
    * Expected generated id is 100.
@@ -90,7 +83,7 @@ public class ConfigurationDataTagUtil {
     properties.setProperty("unit", "testUnit");
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata", 11);
-    properties.setProperty("metadata", getJsonMetadata(metadata));
+    properties.setProperty("metadata", Metadata.toJSON(metadata));
 
     return dataTag;
   }
@@ -117,7 +110,7 @@ public class ConfigurationDataTagUtil {
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata1", 11);
     metadata.addMetadata("testMetadata2", 22);
-    properties.setProperty("metadata", getJsonMetadata(metadata));
+    properties.setProperty("metadata", Metadata.toJSON(metadata));
 
     return dataTag;
   }
@@ -141,7 +134,7 @@ public class ConfigurationDataTagUtil {
     properties.setProperty("address", new DataTagAddress().toConfigXML());
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata", 11);
-    properties.setProperty("metadata", getJsonMetadata(metadata));
+    properties.setProperty("metadata", Metadata.toJSON(metadata));
 
     return dataTag;
   }
@@ -160,7 +153,7 @@ public class ConfigurationDataTagUtil {
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata", 11);
     metadata.setUpdate(true);
-    properties.setProperty("metadata", getJsonMetadata(metadata));
+    properties.setProperty("metadata", Metadata.toJSON(metadata));
 
     return dataTag;
   }
@@ -180,7 +173,7 @@ public class ConfigurationDataTagUtil {
     metadata.addMetadata("testMetadata1", 11);
     metadata.addMetadata("testMetadata2", 22);
     metadata.setUpdate(true);
-    properties.setProperty("metadata", getJsonMetadata(metadata));
+    properties.setProperty("metadata", Metadata.toJSON(metadata));
 
     return dataTag;
   }
@@ -197,7 +190,7 @@ public class ConfigurationDataTagUtil {
     Metadata metadata = new Metadata();
     metadata.setRemoveList(Collections.singletonList("testMetadata"));
     metadata.setUpdate(true);
-    properties.setProperty("metadata", getJsonMetadata(metadata));
+    properties.setProperty("metadata", Metadata.toJSON(metadata));
 
     return dataTag;
   }
@@ -214,7 +207,7 @@ public class ConfigurationDataTagUtil {
     Metadata metadata = new Metadata();
     metadata.setRemoveList(Arrays.asList("testMetadata1", "testMetadata2"));
     metadata.setUpdate(true);
-    properties.setProperty("metadata", getJsonMetadata(metadata));
+    properties.setProperty("metadata", Metadata.toJSON(metadata));
 
     return dataTag;
   }
@@ -249,7 +242,7 @@ public class ConfigurationDataTagUtil {
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata_Update", true);
     metadata.setUpdate(true);
-    properties.setProperty("metadata", getJsonMetadata(metadata));
+    properties.setProperty("metadata", Metadata.toJSON(metadata));
 
     return dataTag;
   }
@@ -296,16 +289,5 @@ public class ConfigurationDataTagUtil {
     deleteTag.setDeleted(true);
 
     return deleteTag;
-  }
-
-  private static String getJsonMetadata(Metadata metadata) {
-    String jsonMetadata = null;
-    try {
-      jsonMetadata = mapper.writeValueAsString(metadata);
-    }
-    catch (JsonProcessingException e) {
-      e.printStackTrace();
-    }
-    return jsonMetadata;
   }
 }
