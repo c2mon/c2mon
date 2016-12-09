@@ -131,16 +131,6 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
     tagCache.acquireWriteLockOnKey(tag.getId());
     try {
       String tmpStr = null;
-      // TAG ID (not used so far as Id stored as entitypkey)
-//      if ((tmpStr = properties.getProperty("id")) != null) {
-//        try {
-//          tag.setId(Long.valueOf(tmpStr));
-//        }
-//        catch (NumberFormatException e) {
-//          throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: "
-//              + "Unable to convert parameter \"id\" to Long: " + tmpStr);
-//        }
-//      }
 
       // TAG name and topic derived from name
       if ((tmpStr = properties.getProperty("name")) != null) {
@@ -200,18 +190,20 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
       if (tmpStr != null) {
 
         ObjectMapper mapper = new ObjectMapper();
-        Metadata metadata = mapper.readValue(tmpStr, Metadata.class);
+        Metadata clientMetadata = mapper.readValue(tmpStr, Metadata.class);
 
-        if (!metadata.getRemoveList().isEmpty()) {
-          for (String key : metadata.getRemoveList()) {
-            tag.getMetadata().getMetadata().remove(key);
+        if (clientMetadata.isUpdate()) {
+          if (!clientMetadata.getRemoveList().isEmpty()) {
+            for (String key : clientMetadata.getRemoveList()) {
+              tag.getMetadata().getMetadata().remove(key);
+            }
           }
-        }
-        if (metadata.isUpdate()) {
-          for (Map.Entry<String, Object> entry : metadata.getMetadata().entrySet()) {
+          for (Map.Entry<String, Object> entry : clientMetadata.getMetadata().entrySet()) {
             tag.getMetadata().addMetadata(entry.getKey(), entry.getValue());
           }
         } else {
+          cern.c2mon.server.common.metadata.Metadata metadata = new cern.c2mon.server.common.metadata.Metadata();
+          metadata.setMetadata(clientMetadata.getMetadata());
           tag.setMetadata(metadata);
         }
       }

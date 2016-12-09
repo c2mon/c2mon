@@ -33,7 +33,8 @@ import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 import cern.c2mon.shared.client.configuration.api.tag.RuleTag;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import org.springframework.beans.factory.annotation.Value;
+import cern.c2mon.server.common.metadata.Metadata;
+
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -220,7 +221,9 @@ public class CacheObjectFactory {
       cacheObject.setUnit(configObject.getUnit());
     }
     if (configObject.getMetadata() != null) {
-      cacheObject.setMetadata(configObject.getMetadata());
+      Metadata metadata = new Metadata();
+      metadata.setMetadata(configObject.getMetadata().getMetadata());
+      cacheObject.setMetadata(metadata);
     }
     if (configObject.getMode() != null) {
       cacheObject.setMode((short) configObject.getMode().ordinal());
@@ -289,7 +292,9 @@ public class CacheObjectFactory {
       cacheObject.setLogged(configObject.getIsLogged());
     }
     if (configObject.getMetadata() != null) {
-      cacheObject.setMetadata(configObject.getMetadata());
+      Metadata metadata = new Metadata();
+      metadata.setMetadata(configObject.getMetadata().getMetadata());
+      cacheObject.setMetadata(metadata);
     }
     if (configObject.getRuleText() != null) {
       cacheObject.setRuleText(configObject.getRuleText());
@@ -335,7 +340,9 @@ public class CacheObjectFactory {
       cacheObject.setCondition(AlarmCondition.fromConfigXML(configObject.getAlarmCondition().getXMLCondition()));
     }
     if (configObject.getMetadata() != null) {
-      cacheObject.setMetadata(configObject.getMetadata());
+      Metadata metadata = new Metadata();
+      metadata.setMetadata(configObject.getMetadata().getMetadata());
+      cacheObject.setMetadata(metadata);
     }
     return cacheObject;
   }
@@ -386,7 +393,9 @@ public class CacheObjectFactory {
       cacheObject.setSourceRetries(configObject.getSourceRetries());
     }
     if (configObject.getMetadata() != null) {
-      cacheObject.setMetadata(configObject.getMetadata());
+      Metadata metadata = new Metadata();
+      metadata.setMetadata(configObject.getMetadata().getMetadata());
+      cacheObject.setMetadata(metadata);
     }
     if (configObject.getMode() != null) {
       cacheObject.setMode((short) configObject.getMode().ordinal());

@@ -290,7 +290,7 @@ public class ConfigureDataTagTest {
     assertEquals((long) parsed.get(0).getEntityId(), 100L);
     assertEquals(parsed.get(0).getEntity(), ConfigConstants.Entity.DATATAG);
     assertEquals(parsed.get(0).getAction(), ConfigConstants.Action.CREATE);
-    assertEquals(parsed.get(0).getElementProperties(), expectedProps);
+    assertEquals(parsed.get(0).getElementProperties().getProperty("metadata"), expectedProps.getProperty("metadata"));
 
     EasyMock.verify(equipmentCache, sequenceDAO, tagFacadeGateway);
   }

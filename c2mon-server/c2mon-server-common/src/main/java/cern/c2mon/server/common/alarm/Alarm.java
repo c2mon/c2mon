@@ -18,12 +18,10 @@
 package cern.c2mon.server.common.alarm;
 
 import java.sql.Timestamp;
-import java.util.Map;
 
 import cern.c2mon.server.common.alarm.AlarmCacheObject.AlarmChangeState;
 import cern.c2mon.shared.common.Cacheable;
-import cern.c2mon.server.common.alarm.AlarmCondition;
-import cern.c2mon.shared.common.metadata.Metadata;
+import cern.c2mon.server.common.metadata.Metadata;
 
 /**
  * Interface giving access to the most important attributes of an Alarm

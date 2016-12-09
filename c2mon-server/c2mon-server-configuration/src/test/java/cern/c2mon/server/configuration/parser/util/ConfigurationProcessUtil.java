@@ -20,12 +20,7 @@ import java.util.Properties;
 
 import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.AliveTag;
-import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
-import cern.c2mon.shared.client.tag.TagMode;
-import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
-import cern.c2mon.shared.common.metadata.Metadata;
 
 //@Service
 public class ConfigurationProcessUtil {
