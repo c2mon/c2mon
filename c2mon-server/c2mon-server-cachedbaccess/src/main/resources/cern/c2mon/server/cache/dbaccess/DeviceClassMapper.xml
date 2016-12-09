@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper
-  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
-  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="cern.c2mon.server.cache.dbaccess.DeviceClassMapper">
 
@@ -17,30 +16,30 @@
   </resultMap>
 
   <resultMap id="propertyResultMap" type="cern.c2mon.server.common.device.Property">
-    <id column="property_id" property="id" />
+    <id column="property_id" property="id" jdbcType="NUMERIC" javaType="java.lang.Long"/>
     <result column="property_name" property="name" />
     <result column="property_description" property="description" />
 
     <collection property="fields" ofType="cern.c2mon.server.common.device.Property" javaType="java.util.ArrayList">
-      <id column="field_id" property="id" />
+      <id column="field_id" property="id" jdbcType="NUMERIC" javaType="java.lang.Long"/>
       <result column="field_name" property="name" />
     </collection>
   </resultMap>
 
   <resultMap id="commandResultMap" type="cern.c2mon.server.common.device.Command">
-    <id column="command_id" property="id" />
+    <id column="command_id" property="id" jdbcType="NUMERIC" javaType="java.lang.Long"/>
     <result column="command_name" property="name" />
     <result column="command_description" property="description" />
   </resultMap>
 
   <resultMap id="deviceIdsResultMap" type="Long">
-    <id column="device_id" />
+    <id column="device_id" jdbcType="NUMERIC" javaType="java.lang.Long"/>
   </resultMap>
 
   <!-- getAll needed for persistent caches -->
   <select id="getAll" resultMap="deviceClassResultMap">
-        SELECT DEVICECLASS.DEVCLASSID as device_class_id, 
-           DEVICECLASS.DEVCLASSNAME as device_class_name, 
+        SELECT DEVICECLASS.DEVCLASSID as device_class_id,
+           DEVICECLASS.DEVCLASSNAME as device_class_name,
            DEVICECLASS.DEVCLASSDESC as device_class_description,
            PROPERTY.PROPID as property_id,
            PROPERTY.PROPNAME as property_name,
@@ -51,7 +50,7 @@
            COMMAND.CMDNAME as command_name,
            COMMAND.CMDDESC as command_description,
            DEVICE.DEVID as device_id
-      FROM DEVICECLASS 
+      FROM DEVICECLASS
            LEFT OUTER JOIN PROPERTY
         ON DEVICECLASS.DEVCLASSID = PROPERTY.PROPDEVCLASSID
            LEFT OUTER JOIN FIELD
@@ -65,8 +64,8 @@
   <!-- getItem needed for persistence caches -->
   <select id="getItem" resultMap="deviceClassResultMap"
     parameterType="Long">
-    SELECT DEVICECLASS.DEVCLASSID as device_class_id, 
-           DEVICECLASS.DEVCLASSNAME as device_class_name, 
+    SELECT DEVICECLASS.DEVCLASSID as device_class_id,
+           DEVICECLASS.DEVCLASSNAME as device_class_name,
            DEVICECLASS.DEVCLASSDESC as device_class_description,
            PROPERTY.PROPID as property_id,
            PROPERTY.PROPNAME as property_name,
@@ -77,7 +76,7 @@
            COMMAND.CMDNAME as command_name,
            COMMAND.CMDDESC as command_description,
            DEVICE.DEVID as device_id
-      FROM DEVICECLASS 
+      FROM DEVICECLASS
            LEFT OUTER JOIN PROPERTY
         ON DEVICECLASS.DEVCLASSID = PROPERTY.PROPDEVCLASSID
            LEFT OUTER JOIN FIELD
@@ -89,7 +88,7 @@
      WHERE DEVICECLASS.DEVCLASSID = #{id}
   </select>
 
-  <insert id="insertDeviceClass" 
+  <insert id="insertDeviceClass"
     parameterType="cern.c2mon.server.common.device.DeviceClassCacheObject">
     INSERT INTO DEVICECLASS
     (DEVCLASSID, DEVCLASSNAME, DEVCLASSDESC)

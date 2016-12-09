@@ -115,7 +115,7 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
 
   /**
    * Current value of the datatag (if any, null before first value reception). The value is of type
-   * Boolean, Float, String etc. as indicated in the {@link DataType} field (and is cloneable with a
+   * Boolean, Float, String etc. as indicated in the {@link #dataType} field (and is cloneable with a
    * shallow copy).
    */
   private Object value;

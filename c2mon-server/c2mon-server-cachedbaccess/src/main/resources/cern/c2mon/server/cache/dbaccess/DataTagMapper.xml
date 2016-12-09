@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper
-  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
-  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
   <!-- take "namespace=Mapper interface" for the mapper SQL statements to be picked up automatically -->
   <mapper namespace="cern.c2mon.server.cache.dbaccess.DataTagMapper">
 
     <!-- result map below corresponds to the abstract AbstractTagCacheObject -->
     <resultMap id="abstractTagResultMap" type="cern.c2mon.server.common.tag.AbstractTagCacheObject">
-      <id property="id" column="TAGID"/>
+      <id property="id" column="TAGID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
       <result property="name" column="TAGNAME"/>
       <result property="description" column="TAGDESC" jdbcType="VARCHAR"/>
       <result property="mode" column="TAGMODE"/>
@@ -39,7 +38,7 @@
     </resultMap>
 
     <resultMap id="tagAlarmIdsResultMap" type="Long">
-      <id column="ALARMID"/>
+      <id column="ALARMID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
     </resultMap>
 
     <resultMap id="dataTagResultMap" type="cern.c2mon.server.common.datatag.DataTagCacheObject"

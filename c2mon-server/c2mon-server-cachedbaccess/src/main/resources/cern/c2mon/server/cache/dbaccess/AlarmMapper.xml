@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper
-  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
-  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
   <mapper namespace="cern.c2mon.server.cache.dbaccess.AlarmMapper">
 
     <resultMap id="alarmResultMap" type="cern.c2mon.server.common.alarm.AlarmCacheObject">
-      <id property="id" column="ALARMID"/>
+      <id property="id" column="ALARMID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
       <result property="faultFamily" column="ALARMFFAMILY" jdbcType="VARCHAR"/>
       <result property="faultMember" column="ALARMFMEMBER" jdbcType="VARCHAR"/>
       <result property="faultCode" column="ALARMFCODE" jdbcType="NUMERIC"/>
@@ -15,7 +14,7 @@
       <result property="published" column="ALA_PUBLISHED" jdbcType="NUMERIC"/>
       <result property="info" column="ALARMINFO" jdbcType="VARCHAR"/>
       <result property="condition" column="ALARMCONDITION" javaType="cern.c2mon.server.common.alarm.AlarmCondition" jdbcType="VARCHAR"/>
-      <result property="dataTagId" column="ALARM_TAGID" jdbcType="NUMERIC"/>
+      <result property="dataTagId" column="ALARM_TAGID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
       <result property="metadata" column="ALARMMETADATA" javaType="cern.c2mon.shared.common.metadata.Metadata" jdbcType="VARCHAR"/>
       <association property="lastPublication" javaType="cern.c2mon.server.common.alarm.AlarmPublication">
         <result property="state" column="ALA_PUB_STATE" jdbcType="VARCHAR"/>

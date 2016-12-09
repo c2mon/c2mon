@@ -42,7 +42,6 @@ import static cern.c2mon.shared.common.type.TypeConverter.isKnownClass;
  *
  * @author Mark Brightwell
  * @author Franz Ritter
- *
  */
 @MappedTypes({
     Object.class,
@@ -75,10 +74,8 @@ public class ObjectTypeHandler implements TypeHandler {
         result = mapper.readValue(valueAsString, Object.class);
 
         // check if the object is NOT an arbitrary object - if so make a cast to the original type
-        if(isKnownClass(tagDataType)){
-
+        if (isKnownClass(tagDataType)) {
           result = cast(result, tagDataType);
-
         }
       }
     } catch (Exception ex) {

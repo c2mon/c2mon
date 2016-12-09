@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper
-  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
-  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
   <mapper namespace="cern.c2mon.server.cache.dbaccess.EquipmentMapper">
 
     <resultMap id="abstractEquipmentResultMap" type="cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject">
-      <id property="id" column="equipment_id" />
+      <id property="id" column="equipment_id" jdbcType="NUMERIC" javaType="java.lang.Long"/>
       <result property="name" column="equipment_name" />
       <result property="description" column="equipment_description"/>
       <result property="handlerClassName" column="equipment_handlerclass"/>
@@ -27,11 +26,11 @@
     </resultMap>
 
     <resultMap id="subEquipmentIdsResultMap" type="Long">
-      <id column="subequipment_id"/>
+      <id column="subequipment_id" jdbcType="NUMERIC" javaType="java.lang.Long"/>
     </resultMap>
 
     <resultMap id="commandTagIdsResultMap" type="Long">
-      <id column="commandtag_id"/>
+      <id column="commandtag_id" jdbcType="NUMERIC" javaType="java.lang.Long"/>
     </resultMap>
 
     <!-- get all equipments, including references to the subequipments and datatags (EXCLUDING CONTROL TAGS!)-->
