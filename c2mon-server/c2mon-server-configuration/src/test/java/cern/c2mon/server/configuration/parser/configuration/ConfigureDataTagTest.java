@@ -30,7 +30,10 @@ import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 import cern.c2mon.shared.client.configuration.api.tag.Tag;
+import cern.c2mon.shared.client.metadata.Metadata;
+import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -241,14 +244,29 @@ public class ConfigureDataTagTest {
 
   @Test
   public void createDataTagMultiMetadata() {
-    // setup Configuration:
-    Properties expectedProps = new Properties();
-    DataTag dataTag = createDataTagWithMultipleMetadata(expectedProps);
+    DataTag dataTag = DataTag.create("DataTag", Integer.class, new DataTagAddress())
+        .addMetadata("testMetadata1", 66)
+        .addMetadata("testMetadata1", 11)
+        .addMetadata("testMetadata2", 22)
+        .build();
+    dataTag.setEquipmentId(10L);
 
     List<Tag> tagUpdateList = Arrays.asList(dataTag);
-
     Configuration config = new Configuration(1L);
     config.setEntities(tagUpdateList);
+
+    Properties expectedProps = new Properties();
+    expectedProps.setProperty("name", "DataTag");
+    expectedProps.setProperty("description", "<no description provided>");
+    expectedProps.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
+    expectedProps.setProperty("dataType", Integer.class.getName());
+    expectedProps.setProperty("isLogged", String.valueOf(true));
+    expectedProps.setProperty("equipmentId", String.valueOf(10L));
+    expectedProps.setProperty("address", new DataTagAddress().toConfigXML());
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("testMetadata1", 11);
+    metadata.addMetadata("testMetadata2", 22);
+    expectedProps.setProperty("metadata", Metadata.toJSON(metadata));
 
     // setUp Mocks:
     EasyMock.expect(equipmentCache.hasKey(10L)).andReturn(true);
@@ -269,14 +287,26 @@ public class ConfigureDataTagTest {
 
   @Test
   public void createDataTagSingleMetadata() {
-    // setup Configuration:
-    Properties expectedProps = new Properties();
-    DataTag dataTag = buildCreateSingleMetaDataTag(100L, expectedProps);
+    DataTag dataTag = DataTag.create("DataTag Name", Integer.class, new DataTagAddress())
+        .addMetadata("testMetadata", 11)
+        .build();
+    dataTag.setEquipmentId(10L);
 
     List<Tag> tagUpdateList = Arrays.asList(dataTag);
-
     Configuration config = new Configuration(1L);
     config.setEntities(tagUpdateList);
+
+    Properties expectedProps = new Properties();
+    expectedProps.setProperty("name", "DataTag Name");
+    expectedProps.setProperty("description", "<no description provided>");
+    expectedProps.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
+    expectedProps.setProperty("dataType", Integer.class.getName());
+    expectedProps.setProperty("isLogged", String.valueOf(true));
+    expectedProps.setProperty("equipmentId", String.valueOf(10l));
+    expectedProps.setProperty("address", new DataTagAddress().toConfigXML());
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("testMetadata", 11);
+    expectedProps.setProperty("metadata", Metadata.toJSON(metadata));
 
     // setUp Mocks:
     EasyMock.expect(equipmentCache.hasKey(10L)).andReturn(true);
@@ -288,8 +318,8 @@ public class ConfigureDataTagTest {
 
     assertEquals(parsed.size(), 1);
     assertEquals((long) parsed.get(0).getEntityId(), 100L);
-    assertEquals(parsed.get(0).getEntity(), ConfigConstants.Entity.DATATAG);
-    assertEquals(parsed.get(0).getAction(), ConfigConstants.Action.CREATE);
+    assertEquals(ConfigConstants.Entity.DATATAG, parsed.get(0).getEntity());
+    assertEquals(ConfigConstants.Action.CREATE, parsed.get(0).getAction());
     assertEquals(expectedProps.getProperty("metadata"), parsed.get(0).getElementProperties().getProperty("metadata"));
 
     EasyMock.verify(equipmentCache, sequenceDAO, tagFacadeGateway);
@@ -373,14 +403,37 @@ public class ConfigureDataTagTest {
 
   @Test
   public void updateDataTagWithAllFields() {
-    // setup Configuration:
-    Properties expectedProps = new Properties();
-    DataTag dataTag = buildUpdateDataTagWithAllFields(100L, expectedProps);
+    DataTag dataTag = DataTag.update(100L)
+        .unit("updateUnit")
+        .name("updateName")
+        .description("foo_Update")
+        .mode(TagMode.OPERATIONAL)
+        .dataType(Double.class)
+        .isLogged(true)
+        .minValue(1)
+        .maxValue(11)
+        .address(new DataTagAddress(new PLCHardwareAddressImpl(2, 2, 2, 2, 2, 2.0f, "testAddress_Update")))
+        .updateMetadata("testMetadata_Update", true)
+        .build();
 
     List<Tag> tagUpdateList = Arrays.asList(dataTag);
-
     Configuration config = new Configuration(1L);
     config.setEntities(tagUpdateList);
+
+    Properties expectedProps = new Properties();
+    expectedProps.setProperty("name", "updateName");
+    expectedProps.setProperty("unit", "updateUnit");
+    expectedProps.setProperty("description", "foo_Update");
+    expectedProps.setProperty("mode", String.valueOf(TagMode.OPERATIONAL.ordinal()));
+    expectedProps.setProperty("dataType", Double.class.getName());
+    expectedProps.setProperty("isLogged", String.valueOf(true));
+    expectedProps.setProperty("minValue", String.valueOf(1));
+    expectedProps.setProperty("maxValue", String.valueOf(11));
+    expectedProps.setProperty("address", new DataTagAddress(new PLCHardwareAddressImpl(2, 2, 2, 2, 2, 2.0f, "testAddress_Update")).toConfigXML());
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("testMetadata_Update", true);
+    metadata.setUpdate(true);
+    expectedProps.setProperty("metadata", Metadata.toJSON(metadata));
 
     // setUp Mocks:
     EasyMock.expect(tagFacadeGateway.isInTagCache(100L)).andReturn(true);
@@ -399,14 +452,21 @@ public class ConfigureDataTagTest {
 
   @Test
   public void updateDataTagSingleMetadata() {
-    // setup Configuration:
-    Properties expectedProps = new Properties();
-    DataTag dataTag = buildAddSingleMetaDataTag(100L, expectedProps);
+    DataTag dataTag = DataTag.update(100L)
+        .updateMetadata("testMetadata", 11)
+        .build();
+    dataTag.setEquipmentId(10L);
 
     List<Tag> tagUpdateList = Arrays.asList(dataTag);
-
     Configuration config = new Configuration(1L);
     config.setEntities(tagUpdateList);
+
+    Properties expectedProps = new Properties();
+    expectedProps.setProperty("equipmentId", String.valueOf(10l));
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("testMetadata", 11);
+    metadata.setUpdate(true);
+    expectedProps.setProperty("metadata", Metadata.toJSON(metadata));
 
     // setUp Mocks:
     EasyMock.expect(tagFacadeGateway.isInTagCache(100L)).andReturn(true);
@@ -424,14 +484,22 @@ public class ConfigureDataTagTest {
 
   @Test
   public void updateDataTagMultiMetadata() {
-    // setup Configuration:
-    Properties expectedProps = new Properties();
-    DataTag dataTag = buildAddMultiMetaDataTag(100L, expectedProps);
-
+    DataTag dataTag = DataTag.update(100L)
+        .updateMetadata("testMetadata1", 33)
+        .updateMetadata("testMetadata2", 22)
+        .updateMetadata("testMetadata1", 11)
+        .build();
     List<Tag> tagUpdateList = Arrays.asList(dataTag);
-
     Configuration config = new Configuration(1L);
     config.setEntities(tagUpdateList);
+
+    // setup Configuration:
+    Properties expectedProps = new Properties();
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("testMetadata1", 11);
+    metadata.addMetadata("testMetadata2", 22);
+    metadata.setUpdate(true);
+    expectedProps.setProperty("metadata", Metadata.toJSON(metadata));
 
     // setUp Mocks:
     EasyMock.expect(tagFacadeGateway.isInTagCache(100L)).andReturn(true);
@@ -449,15 +517,19 @@ public class ConfigureDataTagTest {
 
   @Test
   public void removeDataTagSingleMetadata() {
-    // setup Configuration:
-    Properties expectedProps = new Properties();
-
-    DataTag dataTag = buildRemoveSingleMetaDataTag(100L, expectedProps);
+    DataTag dataTag = DataTag.update(100L)
+        .removeMetadata("testMetadata")
+        .build();
 
     List<Tag> tagUpdateList = Collections.singletonList(dataTag);
-
     Configuration config = new Configuration(1L);
     config.setEntities(tagUpdateList);
+
+    Properties expectedProps = new Properties();
+    Metadata metadata = new Metadata();
+    metadata.setRemoveList(Collections.singletonList("testMetadata"));
+    metadata.setUpdate(true);
+    expectedProps.setProperty("metadata", Metadata.toJSON(metadata));
 
     // setUp Mocks:
     EasyMock.expect(tagFacadeGateway.isInTagCache(100L)).andReturn(true);
@@ -476,15 +548,20 @@ public class ConfigureDataTagTest {
 
   @Test
   public void removeDataTagMultiMetadata() {
-    // setup Configuration:
-    Properties expectedProps = new Properties();
-
-    DataTag dataTag = buildRemoveMultiMetaDataTag(100L, expectedProps);
+    DataTag dataTag = DataTag.update(100L)
+        .removeMetadata("testMetadata1")
+        .removeMetadata("testMetadata2")
+        .build();
 
     List<Tag> tagUpdateList = Collections.singletonList(dataTag);
-
     Configuration config = new Configuration(1L);
     config.setEntities(tagUpdateList);
+
+    Properties expectedProps = new Properties();
+    Metadata metadata = new Metadata();
+    metadata.setRemoveList(Arrays.asList("testMetadata1", "testMetadata2"));
+    metadata.setUpdate(true);
+    expectedProps.setProperty("metadata", Metadata.toJSON(metadata));
 
     // setUp Mocks:
     EasyMock.expect(tagFacadeGateway.isInTagCache(100L)).andReturn(true);
@@ -525,8 +602,9 @@ public class ConfigureDataTagTest {
 
   @Test
   public void deleteDataTag() {
-    // setup Configuration:
-    DataTag dataTag = buildDeleteDataTag(20L);
+    DataTag dataTag = new DataTag();
+    dataTag.setId(20L);
+    dataTag.setDeleted(true);
 
     List<Tag> tagUpdateList = Arrays.asList(dataTag);
 

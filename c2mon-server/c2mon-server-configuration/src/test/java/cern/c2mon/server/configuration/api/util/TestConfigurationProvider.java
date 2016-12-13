@@ -66,7 +66,9 @@ public class TestConfigurationProvider {
 
   public static Configuration deleteDataTag(){
     Configuration configuration = new Configuration();
-    DataTag dataTag = ConfigurationDataTagUtil.buildDeleteDataTag(1000L);
+    DataTag dataTag = new DataTag();
+    dataTag.setId(1000L);
+    dataTag.setDeleted(true);
     configuration.addEntity(dataTag);
     return configuration;
   }
