@@ -37,7 +37,9 @@ public class JmsConfig {
 
   @Bean
   public ActiveMQConnectionFactory clientJmsConnectionFactory() {
-    return new ActiveMQConnectionFactory(properties.getJms().getUrl());
+    ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(properties.getJms().getUrl());
+    factory.setTrustAllPackages(true);
+    return factory;
   }
 
   @Bean
