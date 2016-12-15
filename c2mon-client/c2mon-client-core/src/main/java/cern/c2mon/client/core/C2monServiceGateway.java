@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -19,15 +19,18 @@ package cern.c2mon.client.core;
 import cern.c2mon.client.core.config.C2monAutoConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.boot.Banner;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import cern.c2mon.client.core.manager.CommandManager;
 import cern.c2mon.client.core.manager.SupervisionManager;
 import cern.c2mon.client.core.manager.TagManager;
 import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is the main facade for all applications using the
@@ -40,8 +43,10 @@ import org.springframework.context.support.AbstractApplicationContext;
  *
  *
  * @author Matthias Braeger
+ * @author Justin Lewis Salmon
  */
-public class C2monServiceGateway {
+@Component
+public class C2monServiceGateway implements ApplicationContextAware {
 
   /** Class logger */
   private static final Logger LOG = LoggerFactory.getLogger(C2monServiceGateway.class);
@@ -101,7 +106,7 @@ public class C2monServiceGateway {
   @Deprecated
   public static C2monCommandManager getCommandManager() {
     startC2monClientSynchronous();
-    
+
     return commandManager;
   }
 
@@ -111,7 +116,7 @@ public class C2monServiceGateway {
    */
   public static CommandService getCommandService() {
     startC2monClientSynchronous();
-    
+
     return commandManager;
   }
 
@@ -123,7 +128,7 @@ public class C2monServiceGateway {
   @Deprecated
   public static C2monTagManager getTagManager() {
     startC2monClientSynchronous();
-    
+
     return tagManager;
   }
 
@@ -133,7 +138,7 @@ public class C2monServiceGateway {
    */
   public static AlarmService getAlarmService() {
     startC2monClientSynchronous();
-    
+
     return alarmService;
   }
 
@@ -143,7 +148,7 @@ public class C2monServiceGateway {
    */
   public static StatisticsService getStatisticsService() {
     startC2monClientSynchronous();
-    
+
     return statisticsService;
   }
 
@@ -153,7 +158,7 @@ public class C2monServiceGateway {
    */
   public static ConfigurationService getConfigurationService() {
     startC2monClientSynchronous();
-    
+
     return configurationService;
   }
 
@@ -164,7 +169,7 @@ public class C2monServiceGateway {
    */
   public static TagService getTagService() {
     startC2monClientSynchronous();
-    
+
     return tagService;
   }
 
@@ -175,7 +180,7 @@ public class C2monServiceGateway {
   @Deprecated
   public static C2monSupervisionManager getSupervisionManager() {
     startC2monClientSynchronous();
-    
+
     return supervisionManager;
   }
 
@@ -187,7 +192,7 @@ public class C2monServiceGateway {
    */
   public static SupervisionService getSupervisionService() {
     startC2monClientSynchronous();
-    
+
     return supervisionManager;
   }
 
@@ -245,9 +250,9 @@ public class C2monServiceGateway {
   public static synchronized void startC2monClientSynchronous() throws RuntimeException {
     if (context == null) {
       startC2monClient();
-  
+
       LOG.info("Waiting for C2MON server connection (max " + MAX_INITIALIZATION_TIME / 1000  + " sec)...");
-  
+
       Long startTime = System.currentTimeMillis();
       while (!supervisionManager.isServerConnectionWorking()) {
         try { Thread.sleep(200); } catch (InterruptedException ie) { /* Do nothing */ }
@@ -283,5 +288,11 @@ public class C2monServiceGateway {
    */
   public static synchronized void stopC2monClient() {
     ((ConfigurableApplicationContext) context).close();
+  }
+
+  @Override
+  public void setApplicationContext(ApplicationContext context) throws BeansException {
+    C2monServiceGateway.context = context;
+    initiateGatewayFields(context);
   }
 }
