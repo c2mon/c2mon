@@ -353,6 +353,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     }
   }
 
+  private void ensureConnection() {
+    if (!running) {
+      init();
+    }
+  }
+
   /**
    * Notifies all {@link ConnectionListener}s of a connection.
    */
@@ -550,9 +556,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       throw new NullPointerException("TagUpdateListener must not be null!");
     }
 
-    if (!running) {
-      init();
-    }
+    ensureConnection();
 
     refreshLock.readLock().lock();
     try {
@@ -661,9 +665,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       throw new NullPointerException("sendRequest(..) method called with null request argument");
     }
 
-    if (!running) {
-      init();
-    }
+    ensureConnection();
 
     if (connected) {
       Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -847,6 +849,9 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     if (connectionListener == null) {
       throw new NullPointerException("registerConnectionListener(..) method called with null listener argument");
     }
+
+    ensureConnection();
+
     connectionListenersLock.writeLock().lock();
     try {
       connectionListeners.add(connectionListener);
@@ -877,6 +882,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     if (supervisionListener == null) {
       throw new NullPointerException("Trying to register null Supervision listener with JmsProxy.");
     }
+
+    ensureConnection();
     supervisionListenerWrapper.addListener(supervisionListener);
   }
 
@@ -912,6 +919,9 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     if (alarmListener == null) {
       throw new NullPointerException("Trying to register null alarm listener with JmsProxy.");
     }
+
+    ensureConnection();
+
     if (alarmListenerWrapper.getListenerCount() == 0) { // this is our first
       // listener!
       // -> it's time to subscribe to the alarm topic
@@ -950,6 +960,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     if (heartbeatListener == null) {
       throw new NullPointerException("Trying to register null Heartbeat listener with JmsProxy.");
     }
+
+    ensureConnection();
     heartbeatListenerWrapper.addListener(heartbeatListener);
   }
 
