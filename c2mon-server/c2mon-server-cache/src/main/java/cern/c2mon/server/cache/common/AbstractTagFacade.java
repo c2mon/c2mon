@@ -188,9 +188,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
       // TAG metadata
       tmpStr = properties.getProperty("metadata");
       if (tmpStr != null) {
-
-        ObjectMapper mapper = new ObjectMapper();
-        Metadata clientMetadata = mapper.readValue(tmpStr, Metadata.class);
+        Metadata clientMetadata = Metadata.fromJSON(tmpStr);
 
         if (clientMetadata.isUpdate()) {
           if (!clientMetadata.getRemoveList().isEmpty()) {

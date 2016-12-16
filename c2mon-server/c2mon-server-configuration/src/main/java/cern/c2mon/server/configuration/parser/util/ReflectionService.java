@@ -94,8 +94,7 @@ public class ReflectionService {
               tempProp = String.valueOf(((AlarmCondition) pd.getReadMethod().invoke(obj)).getXMLCondition());
 
             } else if (pd.getPropertyType().equals(Metadata.class)) {
-              ObjectMapper mapper = new ObjectMapper();
-              tempProp = String.valueOf(mapper.writeValueAsString(pd.getReadMethod().invoke(obj)));
+              tempProp = String.valueOf(Metadata.toJSON((Metadata) pd.getReadMethod().invoke(obj)));
 
             } else {
               // default call of all properties. Returns the standard toStringValue of the given Type

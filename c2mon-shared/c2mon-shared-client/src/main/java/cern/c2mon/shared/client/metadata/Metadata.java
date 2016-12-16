@@ -48,9 +48,9 @@ public class Metadata implements Serializable, Cloneable {
     return null;
   }
 
-  public static Map<String, Object> fromJSON(String json) {
+  public static Metadata fromJSON(String json) {
     try {
-      TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {};
+      TypeReference<Metadata> typeRef = new TypeReference<Metadata>() {};
       return mapper.readValue(json, typeRef);
     } catch (IOException e) {
       log.error("Exception caught while deserializing metatata from JSON", e);
