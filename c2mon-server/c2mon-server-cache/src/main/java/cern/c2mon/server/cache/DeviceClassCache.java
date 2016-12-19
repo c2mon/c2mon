@@ -16,6 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.cache;
 
+import java.util.List;
+
 import cern.c2mon.server.common.device.DeviceClass;
 
 /**
@@ -44,4 +46,10 @@ public interface DeviceClassCache extends C2monCacheWithListeners<Long, DeviceCl
    * @param deviceClassId the ID of the device class to update
    */
   public void updateDeviceIds(Long deviceClassId);
+
+  /**
+   *  Get all existing device ids
+   * @return list of device ids
+   */
+  public List<Long> getDeviceIds();
 }

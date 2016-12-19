@@ -16,22 +16,29 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.device;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 
 import cern.c2mon.server.cache.config.CacheProperties;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 import net.sf.ehcache.search.Attribute;
 import net.sf.ehcache.search.Query;
+import net.sf.ehcache.search.Result;
 import net.sf.ehcache.search.Results;
 
+import net.sf.ehcache.search.impl.ResultImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Attr;
 
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.DeviceClassCache;
@@ -113,6 +120,30 @@ public class DeviceClassCacheImpl extends AbstractCache<Long, DeviceClass> imple
     }
 
     return deviceClass;
+  }
+
+  @Override
+  public List<Long> getDeviceIds() {
+    List<Long> deviceIds = new ArrayList<>();
+
+    Results results = null;
+
+    try {
+      Query query = getCache().createQuery();
+      results = query.includeKeys().execute();
+
+      if(results.size() == 0) {
+        throw new CacheElementNotFoundException("Failed to get device ids from cache");
+      }
+
+      results.all().forEach((result) -> deviceIds.add((long) result.getKey()));
+    } finally {
+      if(results != null) {
+        results.discard();
+      }
+    }
+
+    return deviceIds;
   }
 
   @Override

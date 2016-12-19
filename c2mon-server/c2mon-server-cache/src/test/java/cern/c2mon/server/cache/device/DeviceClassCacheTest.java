@@ -90,4 +90,20 @@ public class DeviceClassCacheTest extends AbstractCacheIntegrationTest {
     } catch (CacheElementNotFoundException e) {
     }
   }
+
+  @Test
+  public void getDeviceIds() {
+    DeviceClassCacheObject deviceClass1 = new DeviceClassCacheObject(1L, "test_device_class_name_1", "Test description");
+    DeviceClassCacheObject deviceClass2 = new DeviceClassCacheObject(2L, "test_device_class_name_2", "Test description");
+    DeviceClassCacheObject deviceClass3 = new DeviceClassCacheObject(3L, "test_device_class_name_3", "Test description");
+    deviceClassCache.put(deviceClass1.getId(), deviceClass1);
+    deviceClassCache.put(deviceClass2.getId(), deviceClass2);
+    deviceClassCache.put(deviceClass3.getId(), deviceClass3);
+
+    List<Long> deviceIds = deviceClassCache.getDeviceIds();
+
+    Assert.assertTrue(deviceIds.contains(1L));
+    Assert.assertTrue(deviceIds.contains(2L));
+    Assert.assertTrue(deviceIds.contains(3L));
+  }
 }
