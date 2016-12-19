@@ -160,9 +160,10 @@ public class ConfigurationController {
 
     // If Process PIK is REJECTED we exit
     if (processConnectionResponse.getProcessPIK() == null || processConnectionResponse.getProcessPIK() <= ProcessConnectionResponse.PIK_REJECTED) {
-      System.out.println("\nConnection rejected for process " + processConnectionResponse.getProcessName() +
+      System.err.println("\nConnection rejected for process " + processConnectionResponse.getProcessName() +
               ": Either the process is already running or it didn't shut down cleanly. " +
               "Please stop the existing process or wait until its heartbeat expires (usually ~60 seconds)\n");
+      System.exit(1);
     }
 
     // Set process PIK for future communications with the server (if it exists)
