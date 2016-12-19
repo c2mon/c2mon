@@ -32,11 +32,9 @@ import cern.c2mon.client.core.config.mock.CoreSupervisionManagerMock;
 import cern.c2mon.client.core.config.mock.JmsProxyMock;
 import cern.c2mon.client.core.config.mock.RequestHandlerMock;
 import cern.c2mon.client.core.TagService;
-import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,8 +55,6 @@ import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-
-import static org.easymock.EasyMock.anyObject;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {

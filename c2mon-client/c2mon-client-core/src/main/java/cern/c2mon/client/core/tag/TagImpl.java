@@ -62,6 +62,12 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
   private Object tagValue;
 
   /**
+   * The datatype of the tag value
+   */
+  @Element(required = true)
+  private Class<?> valueType;
+
+  /**
    * The current tag mode
    */
   @Element

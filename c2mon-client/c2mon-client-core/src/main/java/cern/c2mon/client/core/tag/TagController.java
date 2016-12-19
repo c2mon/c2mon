@@ -23,7 +23,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.simpleframework.xml.Root;
 
 import cern.c2mon.client.common.listener.BaseListener;
 import cern.c2mon.client.common.listener.DataTagListener;
@@ -385,6 +384,12 @@ public class TagController implements TagUpdateListener, SupervisionListener {
     tagImpl.setDaqTimestamp(tagValueUpdate.getDaqTimestamp());
     tagImpl.setSourceTimestamp(tagValueUpdate.getSourceTimestamp());
     tagImpl.setTagValue(tagValueUpdate.getValue());
+    try {
+      tagImpl.setValueType(Class.forName(tagValueUpdate.getValueClassName()));
+    }
+    catch (ClassNotFoundException e) {
+      log.error("Error while setting the valueType with valueClassName.", e);
+    }
     tagImpl.setMode(tagValueUpdate.getMode());
     tagImpl.setSimulated(tagValueUpdate.isSimulated());
   }
