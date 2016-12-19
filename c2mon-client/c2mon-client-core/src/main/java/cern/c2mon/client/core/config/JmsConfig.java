@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 
 import cern.c2mon.shared.util.jms.ActiveJmsSender;
@@ -51,6 +52,6 @@ public class JmsConfig {
 
   @Bean
   public JmsTemplate clientJmsTemplate() {
-    return new JmsTemplate(clientJmsConnectionFactory());
+    return new JmsTemplate(new CachingConnectionFactory(clientJmsConnectionFactory()));
   }
 }
