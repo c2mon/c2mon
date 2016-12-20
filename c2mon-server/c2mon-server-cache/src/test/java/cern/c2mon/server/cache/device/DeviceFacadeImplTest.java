@@ -120,13 +120,8 @@ public class DeviceFacadeImplTest {
     device1.setDeviceCommands(new ArrayList<>(Arrays.asList(new DeviceCommand(10L, "test_command", "20", "commandTagId", null))));
     Device device2 = new DeviceCacheObject(2000L, "test_device_2", 1L);
 
-    List<Device> devicesList = new ArrayList<>();
-    devicesList.add(device1);
-    devicesList.add(device2);
-
     // Expect the facade to get the device class object
-    EasyMock.expect(deviceClassCacheMock.getDeviceIdClassByName(deviceClassName)).andReturn(deviceClassReturn.getId());
-    EasyMock.expect(deviceCacheMock.getByDeviceClassId(deviceClassReturn.getId())).andReturn(devicesList);
+    EasyMock.expect(deviceClassCacheMock.getDeviceClassIdByName(deviceClassName)).andReturn(deviceClassReturn.getId());
     // Expect the facade to get the devices
     EasyMock.expect(deviceCacheMock.getCopy(1000L)).andReturn(device1);
     EasyMock.expect(deviceCacheMock.getCopy(2000L)).andReturn(device2);
@@ -344,13 +339,6 @@ public class DeviceFacadeImplTest {
     DeviceCacheObject device2 = new DeviceCacheObject(2L, "device_b", 10L);
     DeviceCacheObject device3 = new DeviceCacheObject(3L, "device_a", 20L);
 
-    List<Device> devices1 = new ArrayList<>();
-    devices1.add(device1);
-    devices1.add(device2);
-
-    List<Device> devices2 = new ArrayList<>();
-    devices2.add(device3);
-
     class1.setDeviceIds(Arrays.asList(device1.getId(), device2.getId()));
     class2.setDeviceIds(Arrays.asList(device3.getId()));
 
@@ -361,10 +349,8 @@ public class DeviceFacadeImplTest {
     Set<DeviceInfo> deviceInfoList = new HashSet<>(Arrays.asList(di1, di2, di3, di4));
 
     // Expectations
-    EasyMock.expect(deviceClassCacheMock.getDeviceIdClassByName(di1.getClassName())).andReturn(class1.getId());
-    EasyMock.expect(deviceClassCacheMock.getDeviceIdClassByName(di3.getClassName())).andReturn(class2.getId());
-    EasyMock.expect(deviceCacheMock.getByDeviceClassId(class1.getId())).andReturn(devices1);
-    EasyMock.expect(deviceCacheMock.getByDeviceClassId(class2.getId())).andReturn(devices2);
+    EasyMock.expect(deviceClassCacheMock.getDeviceClassIdByName(di1.getClassName())).andReturn(class1.getId());
+    EasyMock.expect(deviceClassCacheMock.getDeviceClassIdByName(di3.getClassName())).andReturn(class2.getId());
     EasyMock.expect(deviceCacheMock.getCopy(device1.getId())).andReturn(device1);
     EasyMock.expect(deviceCacheMock.getCopy(device2.getId())).andReturn(device2);
     EasyMock.expect(deviceCacheMock.getCopy(device3.getId())).andReturn(device3);

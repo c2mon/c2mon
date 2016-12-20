@@ -80,7 +80,7 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
 
     try {
       // Search the name attribute of the class cache
-      long deviceClassId = deviceClassCache.getDeviceIdClassByName(deviceClassName);
+      long deviceClassId = deviceClassCache.getDeviceClassIdByName(deviceClassName);
 
       devices = deviceCache.getByDeviceClassId(deviceClassId);
 

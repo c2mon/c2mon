@@ -72,16 +72,16 @@ public class DeviceClassCacheTest extends AbstractCacheIntegrationTest {
     deviceClassCache.put(deviceClass2.getId(), deviceClass2);
     deviceClassCache.put(deviceClass3.getId(), deviceClass3);
 
-    long deviceClassId = deviceClassCache.getDeviceIdClassByName("test_device_class_name_1");
+    long deviceClassId = deviceClassCache.getDeviceClassIdByName("test_device_class_name_1");
     Assert.assertEquals(deviceClassId, (long) deviceClass1.getId());
-    deviceClassId = deviceClassCache.getDeviceIdClassByName("test_device_class_name_2");
+    deviceClassId = deviceClassCache.getDeviceClassIdByName("test_device_class_name_2");
     Assert.assertEquals(deviceClassId, (long) deviceClass2.getId());
-    deviceClassId = deviceClassCache.getDeviceIdClassByName("test_device_class_name_3");
+    deviceClassId = deviceClassCache.getDeviceClassIdByName("test_device_class_name_3");
     Assert.assertEquals(deviceClassId, (long) deviceClass3.getId());
 
     // Test getting an unknown device class
     try {
-      deviceClassId = deviceClassCache.getDeviceIdClassByName("unknown_device_class");
+      deviceClassId = deviceClassCache.getDeviceClassIdByName("unknown_device_class");
       Assert.fail("getDeviceClassByName() did not throw exception");
     } catch (CacheElementNotFoundException e) {
     }
@@ -92,7 +92,7 @@ public class DeviceClassCacheTest extends AbstractCacheIntegrationTest {
     DeviceClassCacheObject deviceClass1 = new DeviceClassCacheObject(1L, "test_device_class_name_1", "Test description");
     deviceClassCache.put(deviceClass1.getId(), deviceClass1);
 
-    long deviceClassId = deviceClassCache.getDeviceIdClassByName("test_device_class_name_1");
+    long deviceClassId = deviceClassCache.getDeviceClassIdByName("test_device_class_name_1");
 
     Assert.assertEquals(1 ,deviceClassId);
   }

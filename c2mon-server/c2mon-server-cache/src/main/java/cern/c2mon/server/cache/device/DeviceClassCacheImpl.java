@@ -85,7 +85,7 @@ public class DeviceClassCacheImpl extends AbstractCache<Long, DeviceClass> imple
   }
 
   @Override
-  public Long getDeviceIdClassByName(String deviceClassName) {
+  public Long getDeviceClassIdByName(String deviceClassName) {
     long deviceClassId;
 
     if (deviceClassName == null || deviceClassName.equalsIgnoreCase("")) {
