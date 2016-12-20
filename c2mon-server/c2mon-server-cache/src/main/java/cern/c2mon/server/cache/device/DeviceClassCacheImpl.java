@@ -16,36 +16,26 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.device;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.annotation.PostConstruct;
 
-import cern.c2mon.server.cache.config.CacheProperties;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 import net.sf.ehcache.search.Attribute;
 import net.sf.ehcache.search.Query;
-import net.sf.ehcache.search.Result;
 import net.sf.ehcache.search.Results;
-
-import net.sf.ehcache.search.impl.ResultImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.Attr;
 
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.DeviceClassCache;
 import cern.c2mon.server.cache.common.AbstractCache;
-import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
+import cern.c2mon.server.cache.config.CacheProperties;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.common.config.C2monCacheName;
 import cern.c2mon.server.common.device.DeviceClass;
 
@@ -95,8 +85,8 @@ public class DeviceClassCacheImpl extends AbstractCache<Long, DeviceClass> imple
   }
 
   @Override
-  public DeviceClass getDeviceClassByName(String deviceClassName) {
-    DeviceClass deviceClass = null;
+  public Long getDeviceIdClassByName(String deviceClassName) {
+    long deviceClassId;
 
     if (deviceClassName == null || deviceClassName.equalsIgnoreCase("")) {
       throw new IllegalArgumentException("Attempting to retrieve a DeviceClass from the cache with a NULL or empty name parameter.");
@@ -106,44 +96,20 @@ public class DeviceClassCacheImpl extends AbstractCache<Long, DeviceClass> imple
     try {
       Attribute<String> className = getCache().getSearchAttribute("deviceClassName");
       Query query = getCache().createQuery();
-      results = query.includeKeys().includeValues().addCriteria(className.eq(deviceClassName)).maxResults(1).execute();
+      results = query.includeKeys().addCriteria(className.eq(deviceClassName)).maxResults(1).execute();
 
       if (results.size() == 0) {
         throw new CacheElementNotFoundException("Failed to find a device class with name " + deviceClassName + " in the cache.");
       }
 
-      deviceClass = (DeviceClass) results.all().get(0).getValue();
+      deviceClassId = (long) results.all().get(0).getKey();
     } finally {
       if (results != null) {
         results.discard();
       }
     }
 
-    return deviceClass;
-  }
-
-  @Override
-  public List<Long> getDeviceIds() {
-    List<Long> deviceIds = new ArrayList<>();
-
-    Results results = null;
-
-    try {
-      Query query = getCache().createQuery();
-      results = query.includeKeys().execute();
-
-      if(results.size() == 0) {
-        throw new CacheElementNotFoundException("Failed to get device ids from cache");
-      }
-
-      results.all().forEach((result) -> deviceIds.add((long) result.getKey()));
-    } finally {
-      if(results != null) {
-        results.discard();
-      }
-    }
-
-    return deviceIds;
+    return deviceClassId;
   }
 
   @Override

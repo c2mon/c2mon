@@ -15,42 +15,32 @@
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.cache.device;
-import static cern.c2mon.server.test.device.ObjectComparison.assertCommandListContains;
-import static cern.c2mon.server.test.device.ObjectComparison.assertDeviceCommandListContains;
-import static cern.c2mon.server.test.device.ObjectComparison.assertDevicePropertyListContains;
-import static cern.c2mon.server.test.device.ObjectComparison.assertPropertyListContains;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
-import cern.c2mon.server.cache.*;
-import cern.c2mon.server.cache.config.CacheModule;
-import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
-import cern.c2mon.server.common.config.CommonModule;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.common.device.Command;
-import cern.c2mon.server.common.device.Device;
-import cern.c2mon.server.common.device.DeviceCacheObject;
-import cern.c2mon.server.common.device.DeviceClass;
-import cern.c2mon.server.common.device.DeviceClassCacheObject;
-import cern.c2mon.server.common.device.Property;
+import cern.c2mon.server.cache.DeviceCache;
+import cern.c2mon.server.cache.DeviceClassCache;
+import cern.c2mon.server.cache.DeviceClassFacade;
+import cern.c2mon.server.cache.DeviceFacade;
+import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
+import cern.c2mon.server.common.config.CommonModule;
+import cern.c2mon.server.common.device.*;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceInfo;
 import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.common.ConfigurationException;
+
+import static cern.c2mon.server.test.device.ObjectComparison.*;
 
 /**
  * @author Justin Lewis Salmon
@@ -130,8 +120,13 @@ public class DeviceFacadeImplTest {
     device1.setDeviceCommands(new ArrayList<>(Arrays.asList(new DeviceCommand(10L, "test_command", "20", "commandTagId", null))));
     Device device2 = new DeviceCacheObject(2000L, "test_device_2", 1L);
 
+    List<Device> devicesList = new ArrayList<>();
+    devicesList.add(device1);
+    devicesList.add(device2);
+
     // Expect the facade to get the device class object
-    EasyMock.expect(deviceClassCacheMock.getDeviceClassByName(deviceClassName)).andReturn(deviceClassReturn);
+    EasyMock.expect(deviceClassCacheMock.getDeviceIdClassByName(deviceClassName)).andReturn(deviceClassReturn.getId());
+    EasyMock.expect(deviceCacheMock.getByDeviceClassId(deviceClassReturn.getId())).andReturn(devicesList);
     // Expect the facade to get the devices
     EasyMock.expect(deviceCacheMock.getCopy(1000L)).andReturn(device1);
     EasyMock.expect(deviceCacheMock.getCopy(2000L)).andReturn(device2);
@@ -349,6 +344,13 @@ public class DeviceFacadeImplTest {
     DeviceCacheObject device2 = new DeviceCacheObject(2L, "device_b", 10L);
     DeviceCacheObject device3 = new DeviceCacheObject(3L, "device_a", 20L);
 
+    List<Device> devices1 = new ArrayList<>();
+    devices1.add(device1);
+    devices1.add(device2);
+
+    List<Device> devices2 = new ArrayList<>();
+    devices2.add(device3);
+
     class1.setDeviceIds(Arrays.asList(device1.getId(), device2.getId()));
     class2.setDeviceIds(Arrays.asList(device3.getId()));
 
@@ -359,8 +361,10 @@ public class DeviceFacadeImplTest {
     Set<DeviceInfo> deviceInfoList = new HashSet<>(Arrays.asList(di1, di2, di3, di4));
 
     // Expectations
-    EasyMock.expect(deviceClassCacheMock.getDeviceClassByName(di1.getClassName())).andReturn(class1);
-    EasyMock.expect(deviceClassCacheMock.getDeviceClassByName(di3.getClassName())).andReturn(class2);
+    EasyMock.expect(deviceClassCacheMock.getDeviceIdClassByName(di1.getClassName())).andReturn(class1.getId());
+    EasyMock.expect(deviceClassCacheMock.getDeviceIdClassByName(di3.getClassName())).andReturn(class2.getId());
+    EasyMock.expect(deviceCacheMock.getByDeviceClassId(class1.getId())).andReturn(devices1);
+    EasyMock.expect(deviceCacheMock.getByDeviceClassId(class2.getId())).andReturn(devices2);
     EasyMock.expect(deviceCacheMock.getCopy(device1.getId())).andReturn(device1);
     EasyMock.expect(deviceCacheMock.getCopy(device2.getId())).andReturn(device2);
     EasyMock.expect(deviceCacheMock.getCopy(device3.getId())).andReturn(device3);
@@ -374,6 +378,5 @@ public class DeviceFacadeImplTest {
 
     // Verify that everything happened as expected
     EasyMock.verify(deviceCacheMock, deviceClassCacheMock);
-
   }
 }

@@ -16,25 +16,21 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.device;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.util.Iterator;
 import java.util.List;
 
-import cern.c2mon.server.cache.AbstractCacheIntegrationTest;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import cern.c2mon.server.cache.AbstractCacheIntegrationTest;
 import cern.c2mon.server.cache.dbaccess.DeviceClassMapper;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Integration test of the DeviceClassCache implementation with the cache
@@ -76,34 +72,28 @@ public class DeviceClassCacheTest extends AbstractCacheIntegrationTest {
     deviceClassCache.put(deviceClass2.getId(), deviceClass2);
     deviceClassCache.put(deviceClass3.getId(), deviceClass3);
 
-    DeviceClass deviceClass = deviceClassCache.getDeviceClassByName("test_device_class_name_1");
-    Assert.assertTrue(deviceClass.getId().equals(deviceClass1.getId()));
-    deviceClass = deviceClassCache.getDeviceClassByName("test_device_class_name_2");
-    Assert.assertTrue(deviceClass.getId().equals(deviceClass2.getId()));
-    deviceClass = deviceClassCache.getDeviceClassByName("test_device_class_name_3");
-    Assert.assertTrue(deviceClass.getId().equals(deviceClass3.getId()));
+    long deviceClassId = deviceClassCache.getDeviceIdClassByName("test_device_class_name_1");
+    Assert.assertEquals(deviceClassId, (long) deviceClass1.getId());
+    deviceClassId = deviceClassCache.getDeviceIdClassByName("test_device_class_name_2");
+    Assert.assertEquals(deviceClassId, (long) deviceClass2.getId());
+    deviceClassId = deviceClassCache.getDeviceIdClassByName("test_device_class_name_3");
+    Assert.assertEquals(deviceClassId, (long) deviceClass3.getId());
 
     // Test getting an unknown device class
     try {
-      deviceClass = deviceClassCache.getDeviceClassByName("unknown_device_class");
+      deviceClassId = deviceClassCache.getDeviceIdClassByName("unknown_device_class");
       Assert.fail("getDeviceClassByName() did not throw exception");
     } catch (CacheElementNotFoundException e) {
     }
   }
 
   @Test
-  public void getDeviceIds() {
+  public void getDeviceIdClassByName() {
     DeviceClassCacheObject deviceClass1 = new DeviceClassCacheObject(1L, "test_device_class_name_1", "Test description");
-    DeviceClassCacheObject deviceClass2 = new DeviceClassCacheObject(2L, "test_device_class_name_2", "Test description");
-    DeviceClassCacheObject deviceClass3 = new DeviceClassCacheObject(3L, "test_device_class_name_3", "Test description");
     deviceClassCache.put(deviceClass1.getId(), deviceClass1);
-    deviceClassCache.put(deviceClass2.getId(), deviceClass2);
-    deviceClassCache.put(deviceClass3.getId(), deviceClass3);
 
-    List<Long> deviceIds = deviceClassCache.getDeviceIds();
+    long deviceClassId = deviceClassCache.getDeviceIdClassByName("test_device_class_name_1");
 
-    Assert.assertTrue(deviceIds.contains(1L));
-    Assert.assertTrue(deviceIds.contains(2L));
-    Assert.assertTrue(deviceIds.contains(3L));
+    Assert.assertEquals(1 ,deviceClassId);
   }
 }

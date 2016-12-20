@@ -16,6 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.cache;
 
+import java.util.List;
+
 import cern.c2mon.server.common.device.Device;
 
 /**
@@ -27,4 +29,6 @@ import cern.c2mon.server.common.device.Device;
 public interface DeviceCache extends C2monCacheWithListeners<Long, Device> {
 
   String cacheInitializedKey = "c2mon.cache.device.initialized";
+
+  List<Device> getByDeviceClassId(Long deviceClassId);
 }

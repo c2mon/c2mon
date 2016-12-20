@@ -16,19 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.device;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,12 +30,7 @@ import cern.c2mon.server.cache.DeviceClassCache;
 import cern.c2mon.server.cache.DeviceFacade;
 import cern.c2mon.server.cache.common.AbstractFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.common.device.Device;
-import cern.c2mon.server.common.device.DeviceCacheObject;
-import cern.c2mon.server.common.device.DeviceClass;
-import cern.c2mon.server.common.device.DeviceClassCacheObject;
-import cern.c2mon.server.common.device.DeviceCommandList;
-import cern.c2mon.server.common.device.DevicePropertyList;
+import cern.c2mon.server.common.device.*;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceInfo;
 import cern.c2mon.shared.client.device.DeviceProperty;
@@ -89,21 +77,17 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
   @Override
   public List<Device> getDevices(String deviceClassName) {
     List<Device> devices = new ArrayList<>();
-    DeviceClassCacheObject deviceClass = null;
 
     try {
       // Search the name attribute of the class cache
-      deviceClass = (DeviceClassCacheObject) deviceClassCache.getDeviceClassByName(deviceClassName);
+      long deviceClassId = deviceClassCache.getDeviceIdClassByName(deviceClassName);
+
+      devices = deviceCache.getByDeviceClassId(deviceClassId);
 
     } catch (CacheElementNotFoundException e) {
       // If we didn't find a class with the given name, return an empty list.
       LOG.warn("Error getting device class by name", e);
       return devices;
-    }
-
-    List<Long> deviceIds = deviceClass.getDeviceIds();
-    for (Long deviceId : deviceIds) {
-      devices.add(deviceCache.getCopy(deviceId));
     }
 
     return devices;

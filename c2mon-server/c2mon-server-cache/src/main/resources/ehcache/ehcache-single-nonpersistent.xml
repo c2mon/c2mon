@@ -140,6 +140,9 @@
       statistics="true"
       transactionalMode="off"
       memoryStoreEvictionPolicy="FIFO">
+      <searchable>
+        <searchAttribute name="deviceClassId" expression="value.getDeviceClassId()"/>
+      </searchable>
     </cache>
 
     <cache
