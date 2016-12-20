@@ -69,10 +69,8 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
     try {
       successful = sendTagToBatch(esTag);
     } catch(Exception e) {
-      throw new IDBPersistenceException(e);
-    }
-    finally {
       clearCache();
+      throw new IDBPersistenceException(e);
     }
 
     if (!successful) {
@@ -91,9 +89,8 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
 
       this.indexTags(data);
     } catch(ElasticsearchException e) {
-      throw new IDBPersistenceException(e);
-    } finally {
       clearCache();
+      throw new IDBPersistenceException(e);
     }
   }
 
