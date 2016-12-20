@@ -17,15 +17,18 @@
 package cern.c2mon.server.elasticsearch.structure.mappings;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
 import cern.c2mon.shared.common.type.TypeConverter;
+
+import static java.util.Collections.singletonList;
 
 /**
  * Allows to create dynamic mappings for the different types that exist in Elasticsearch.
@@ -38,6 +41,7 @@ import cern.c2mon.shared.common.type.TypeConverter;
 public class EsTagMapping implements EsMapping {
   protected Routing _routing;
   protected final Properties properties;
+  protected final List<DynamicTemplate> dynamic_templates = singletonList(new DynamicTemplate());
   private static transient Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
   /**
@@ -59,7 +63,6 @@ public class EsTagMapping implements EsMapping {
     log.trace("getMapping() - Created the mapping : " + json);
     return json;
   }
-
 
   @Getter
   private class Routing {

@@ -16,11 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.structure.mappings;
 
+import java.util.List;
+
 import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+
+import static java.util.Collections.singletonList;
 
 /**
  * EsMapping used for {@link EsAlarm} in Elasticsearch.
@@ -64,6 +68,7 @@ public class EsAlarmMapping implements EsMapping {
 
     class Alarm {
       private final Properties properties;
+      private final List<DynamicTemplate> dynamic_templates = singletonList(new DynamicTemplate());
 
       Alarm() {
         properties = new Properties();
