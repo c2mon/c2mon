@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
@@ -42,6 +43,7 @@ import cern.c2mon.shared.client.request.ClientRequestReport;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Root(name = "ConfigurationReport")
 public class ConfigurationReport extends ClientRequestReport implements Comparable<ConfigurationReport> {
 
@@ -105,7 +107,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Constructor.
-   * 
+   *
    * @param pTotalOperations How many operations to expect for this progress
    *          report.
    * @param pCurrentOperation The current operation.
@@ -123,7 +125,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
   /**
    * Constructor. Needs specifying whether the request executed successfully or
    * not.
-   * 
+   *
    * @param pExecutedSuccessfully True if the client request was executed
    *          successfully, false otherwise.
    * @param pErrorMessage Describes the error that occured in the server side.
@@ -138,7 +140,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Constructor.
-   * 
+   *
    * @param pId id
    * @param pName name
    * @param pUser user
@@ -172,7 +174,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Constructor creating successful successful report.
-   * 
+   *
    * @param pId id
    * @param pName name
    * @param pUser user
@@ -183,7 +185,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Getter.
-   * 
+   *
    * @return the configuration id
    */
   public long getId() {
@@ -192,7 +194,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Getter.
-   * 
+   *
    * @return the configuration name
    */
   public String getName() {
@@ -201,7 +203,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Getter.
-   * 
+   *
    * @return the user who applied the configuration
    */
   public String getUser() {
@@ -210,7 +212,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Getter.
-   * 
+   *
    * @return the status
    */
   public ConfigConstants.Status getStatus() {
@@ -219,7 +221,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Setter method.
-   * 
+   *
    * @param pStatus the status
    */
   public void setStatus(final ConfigConstants.Status pStatus) {
@@ -230,7 +232,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
    * Adjusts the top-level status of the report according to the passed status.
    * If the passed status is more severe than the current one, the top-level
    * status will be overwritten (e.g. failure overrides restart).
-   * 
+   *
    * @param status
    */
   public void addStatus(final ConfigConstants.Status pStatus) {
@@ -241,7 +243,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Getter.
-   * 
+   *
    * @return the status description
    */
   public String getStatusDescription() {
@@ -250,7 +252,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Setter.
-   * 
+   *
    * @param pStatusDescription the status description
    */
   public void setStatusDescription(final String pStatusDescription) {
@@ -266,7 +268,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Adds the Exception trace to the description.
-   * 
+   *
    * @param e the Exception
    */
   public void setExceptionTrace(final Exception e) {
@@ -286,7 +288,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
   /**
    * Adds the element report to the global report and adjusts the overall
    * success flag.
-   * 
+   *
    * @param pReport the report to add
    */
   public void addElementReport(final ConfigurationElementReport pReport) {
@@ -307,7 +309,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
   /**
    * Adds this process to those the list of those that should be rebooted
    * (manually).
-   * 
+   *
    * @param processName the name of the process
    */
   public void addProcessToReboot(final String processName) {
@@ -316,7 +318,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
 
   /**
    * Getter.
-   * 
+   *
    * @return a list of element reports
    */
   public List<ConfigurationElementReport> getElementReports() {
@@ -330,7 +332,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
   /**
    * Encodes the report in XML, ready for sending and displaying in a web
    * browser on the client application (use provided xsl).
-   * 
+   *
    * @return the XML as String
    */
   public String toXML() {
@@ -387,13 +389,18 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
   }
 
   /**
-   * This method will recursively analyse the attached 
+   * This method will recursively analyse the attached
    * {@link ConfigurationElementReport} list and will remove
-   * all nested sub reports that equal to their parent. This can 
+   * all nested sub reports that equal to their parent. This can
    * occur when receiving a DAQ response back.
    */
   public void normalize() {
     for (ConfigurationElementReport report : elementReports) {
+      if (report == null) {
+        log.warn("ConfigurationElementReport was null for report {}", this.id);
+        continue;
+      }
+
       normalizeReport(report);
     }
 
@@ -405,7 +412,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
    */
   private void normalizeReport(ConfigurationElementReport parentReport) {
     int subReportSize = parentReport.getSubreports().size();
-     
+
     if (subReportSize > 1) {
       for (ConfigurationElementReport subReport : parentReport.getSubreports()) {
         normalizeReport(subReport);
@@ -413,23 +420,23 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
     }
     else if (subReportSize == 1) {
       ConfigurationElementReport subReport = parentReport.getSubreports().get(0);
-      
-      if (   parentReport.getAction().equals(subReport.getAction()) 
-          && parentReport.getEntity().equals(subReport.getEntity()) 
+
+      if (   parentReport.getAction().equals(subReport.getAction())
+          && parentReport.getEntity().equals(subReport.getEntity())
           && parentReport.getId().equals(subReport.getId())
           && parentReport.getStatus().equals(subReport.getStatus())) {
-        
+
           parentReport.setStatusMessage(subReport.getStatusMessage());
           parentReport.getSubreports().clear();
       }
-      
+
       subReport = null;
     }
   }
 
   /**
    * For testing.
-   * 
+   *
    * @param args not used
    */
   public static void main(String[] args) {
