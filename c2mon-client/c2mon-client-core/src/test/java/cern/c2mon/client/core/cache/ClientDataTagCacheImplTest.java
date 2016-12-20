@@ -259,7 +259,7 @@ public class ClientDataTagCacheImplTest {
   private TagUpdate createValidTransferTag(final Long tagId, Object value) {
     DataTagQuality tagQuality = new DataTagQualityImpl();
     tagQuality.validate();
-    TagUpdate tagUpdate =
+    TransferTagImpl tagUpdate =
         new TransferTagImpl(
             tagId,
             value,
@@ -272,6 +272,10 @@ public class ClientDataTagCacheImplTest {
             "Test description",
             "My.data.tag.name",
             "My.jms.topic");
+
+    if (value != null) {
+      tagUpdate.setValueClassName(value.getClass().getName());
+    }
 
     return tagUpdate;
   }

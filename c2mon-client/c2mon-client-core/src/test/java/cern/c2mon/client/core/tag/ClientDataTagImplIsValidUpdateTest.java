@@ -738,6 +738,11 @@ public class ClientDataTagImplIsValidUpdateTest {
     }
 
     @Override
+    public String getType() {
+      return this.getValueClassName();
+    }
+
+    @Override
     public String getRuleExpression() {
       return null;
     }

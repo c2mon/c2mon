@@ -385,10 +385,10 @@ public class TagController implements TagUpdateListener, SupervisionListener {
     tagImpl.setSourceTimestamp(tagValueUpdate.getSourceTimestamp());
     tagImpl.setTagValue(tagValueUpdate.getValue());
     try {
-      tagImpl.setValueType(Class.forName(tagValueUpdate.getValueClassName()));
+      tagImpl.setType(Class.forName(tagValueUpdate.getValueClassName()));
     }
     catch (ClassNotFoundException e) {
-      log.error("Error while setting the valueType with valueClassName.", e);
+      log.error("Error instantiating tag value type {}", tagValueUpdate.getValueClassName(), e);
     }
     tagImpl.setMode(tagValueUpdate.getMode());
     tagImpl.setSimulated(tagValueUpdate.isSimulated());
@@ -445,6 +445,10 @@ public class TagController implements TagUpdateListener, SupervisionListener {
     if (tagValueUpdate != null && tagValueUpdate.getId().equals(tagImpl.getId())) {
 
       if (tagValueUpdate.getServerTimestamp() == null) {
+        return false;
+      }
+
+      if (tagValueUpdate.getValueClassName() == null) {
         return false;
       }
 
@@ -692,6 +696,7 @@ public class TagController implements TagUpdateListener, SupervisionListener {
       tagImpl.setDaqTimestamp(null);
       tagImpl.setSourceTimestamp(null);
       tagImpl.setTagValue(null);
+      tagImpl.setType(null);
       for (Long id : tagImpl.getProcessSupervisionStatus().keySet()) {
         tagImpl.getProcessSupervisionStatus().put(id, null);
       }

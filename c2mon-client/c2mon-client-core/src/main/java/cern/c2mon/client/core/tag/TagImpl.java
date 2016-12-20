@@ -65,7 +65,7 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
    * The datatype of the tag value
    */
   @Element(required = true)
-  private Class<?> valueType;
+  private Class<?> type;
 
   /**
    * The current tag mode
@@ -459,20 +459,6 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
     updateTagLock.readLock().lock();
     try {
       return serverTimestamp;
-    } finally {
-      updateTagLock.readLock().unlock();
-    }
-  }
-
-  @Override
-  public final Class<?> getType() {
-    updateTagLock.readLock().lock();
-    try {
-      Class<?> type = null;
-      if (this.tagValue != null) {
-        type = tagValue.getClass();
-      }
-      return type;
     } finally {
       updateTagLock.readLock().unlock();
     }

@@ -58,6 +58,7 @@ public class TransferTagValueImpl extends ClientRequestReport implements TagValu
   private String valueClassName;
 
   /** The value of the tag. Parameter is only used for backward compatibly to the old server */
+  @Deprecated
   private String tagValue;
 
   /** The value of the tag */
@@ -167,6 +168,7 @@ public class TransferTagValueImpl extends ClientRequestReport implements TagValu
    *
    * @param tagValueAsString Tag value represented in String format.
    */
+  @Deprecated
   public void setTagValue(String tagValueAsString) {
     try {
       if (valueClassName != null) {

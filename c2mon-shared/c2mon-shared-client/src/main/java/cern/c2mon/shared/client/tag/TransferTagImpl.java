@@ -176,6 +176,11 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
     return new ArrayList<Long>(equipmentIds);
   }
 
+  @Override
+  public String getType() {
+    return this.getValueClassName();
+  }
+
   /**
    * Adds the sub equipment id as dependency to this tag
    * @param subEquipmentId The sub equipment id

@@ -68,6 +68,12 @@ public interface TagUpdate extends TagValueUpdate {
    */
   String getUnit();
 
+  /**
+   * Returns the type of the value
+   * @return The type of the value
+   */
+  String getType();
+
 
   /**
    * @return The String representation of the <code>RuleExpression</code> object
