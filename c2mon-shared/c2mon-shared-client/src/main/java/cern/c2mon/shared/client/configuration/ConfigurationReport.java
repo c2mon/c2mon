@@ -19,13 +19,12 @@ package cern.c2mon.shared.client.configuration;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
@@ -43,7 +42,6 @@ import cern.c2mon.shared.client.request.ClientRequestReport;
  * @author Mark Brightwell
  *
  */
-@Slf4j
 @Root(name = "ConfigurationReport")
 public class ConfigurationReport extends ClientRequestReport implements Comparable<ConfigurationReport> {
 
@@ -88,7 +86,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
    * List of subreports for each element.
    */
   @ElementList(name = "ConfigurationElementReports")
-  private ArrayList<ConfigurationElementReport> elementReports = new ArrayList<ConfigurationElementReport>();
+  private List<ConfigurationElementReport> elementReports = new CopyOnWriteArrayList<>();
 
   /**
    * A list of the DAQs that need restarting for the configuration to take
@@ -96,7 +94,7 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
    */
   @Element(name = "daq-reboot")
   @Convert(ProcessListConverter.class)
-  private Set<String> processesToReboot = new HashSet<String>();
+  private Set<String> processesToReboot = new HashSet<>();
 
   /**
    * Default constructor. Only for Json deserialization.
@@ -396,14 +394,8 @@ public class ConfigurationReport extends ClientRequestReport implements Comparab
    */
   public void normalize() {
     for (ConfigurationElementReport report : elementReports) {
-      if (report == null) {
-        log.warn("ConfigurationElementReport was null for report {}", this.id);
-        continue;
-      }
-
       normalizeReport(report);
     }
-
   }
 
   /**
