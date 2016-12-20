@@ -376,6 +376,8 @@ public class TransportConnector {
     }
 
     log.debug("Checking if index {} exists" + indexName);
+
+    // TODO: cache this...
     return client.admin().indices().prepareExists(indexName).get().isExists();
   }
 

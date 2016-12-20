@@ -17,6 +17,8 @@
 package cern.c2mon.server.elasticsearch.structure.mappings;
 
 import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -28,6 +30,7 @@ import static junit.framework.TestCase.assertEquals;
  * We need a good mapping to index correctly the data in Elasticsearch.
  * @author Alban Marguet
  */
+@Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class EsLongTagMappingTest {
   private final String expectedMapping = "{\n" +

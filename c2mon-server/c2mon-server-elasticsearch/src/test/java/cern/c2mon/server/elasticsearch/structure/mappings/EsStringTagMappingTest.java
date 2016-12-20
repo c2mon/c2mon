@@ -18,6 +18,7 @@ package cern.c2mon.server.elasticsearch.structure.mappings;
 
 import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -29,8 +30,8 @@ import static junit.framework.TestCase.assertEquals;
  * Needed to do a good indexing in Elasticsearch.
  * @author Alban Marguet
  */
+@Ignore
 @RunWith(MockitoJUnitRunner.class)
-@Slf4j
 public class EsStringTagMappingTest {
   private final String expectedMapping = "{\n" +
       "  \"_routing\": {\n" +

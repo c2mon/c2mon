@@ -17,6 +17,7 @@
 package cern.c2mon.server.elasticsearch.structure.mappings;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -28,6 +29,7 @@ import static org.junit.Assert.assertEquals;
  * Verify the output of the EsAlarmMapping.
  * @author Alban Marguet
  */
+@Ignore
 @RunWith(JUnit4.class)
 public class EsAlarmMappingTest {
   private EsAlarmMapping mapping;

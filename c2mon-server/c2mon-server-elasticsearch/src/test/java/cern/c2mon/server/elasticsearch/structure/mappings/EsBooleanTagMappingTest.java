@@ -17,6 +17,8 @@
 package cern.c2mon.server.elasticsearch.structure.mappings;
 
 import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -27,6 +29,7 @@ import static org.junit.Assert.assertEquals;
  * Verify the good behaviour of the EsBooleanTagMapping class.
  * @author Alban Marguet
  */
+@Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class EsBooleanTagMappingTest {
   private final String expectedMapping = "{\n" +
