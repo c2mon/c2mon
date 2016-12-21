@@ -33,7 +33,7 @@ import org.springframework.jms.support.converter.MessageConverter;
  * @author vilches
  * 
  */
-public final class ProcessMessageConverter implements MessageConverter {
+public final class ProcessMessageConverter {
   /** Log4j instance */
   private static final Logger LOGGER = LoggerFactory.getLogger(ProcessMessageConverter.class);
   
@@ -49,8 +49,7 @@ public final class ProcessMessageConverter implements MessageConverter {
    * @return the converted Java object
    * @throws javax.jms.JMSException if thrown by JMS API methods
    */
-  @Override
-  public Object fromMessage(final Message message) throws JMSException {
+  public Object fromXML(final Message message) throws JMSException {
     if (!(message instanceof TextMessage)) {
       throw new MessageFormatException("Expected TextMessage as response but received " + message.getClass());
     } else {           
@@ -75,7 +74,6 @@ public final class ProcessMessageConverter implements MessageConverter {
    * @throws javax.jms.JMSException if thrown by JMS API methods
    * @throws MessageConversionException iof the type of the object is not supported
    */
-  @Override
   public Message toMessage(Object object, Session session) throws JMSException, MessageConversionException {
     String xmlString = this.xmlConverter.toXml(object);
 

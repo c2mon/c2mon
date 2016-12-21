@@ -373,7 +373,7 @@ public class ActiveRequestSenderTest {
     public synchronized void onMessage(final Message message, final Session session) throws JMSException {
       try {
         LOGGER.debug("onMessage() - Message coming " + message);
-        ProcessRequest processRequest = (ProcessRequest) this.processMessageConverter.fromMessage(message);
+        ProcessRequest processRequest = (ProcessRequest) this.processMessageConverter.fromXML(message);
         LOGGER.debug("onMessage() - Message converted " + processRequest.toString());
 
         // ProcessDisconnectionRequest

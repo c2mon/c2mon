@@ -133,11 +133,6 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
   //private DataRefreshManager dataRefreshManager;
 
   /**
-   * XML Converter helper class
-   */
-  private XMLConverter xmlConverter = new XMLConverter();
-
-  /**
    * Starts the alive timer mechanisms at server start up.
    */
   @Override
@@ -393,14 +388,14 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
    * @return the configuration XML as a String or null if there was an exception
    */
   @Override
-  public String onProcessConfiguration(final ProcessConfigurationRequest processConfigurationRequest) {
+  public ProcessConfigurationResponse onProcessConfiguration(final ProcessConfigurationRequest processConfigurationRequest) {
     ProcessConfigurationResponse processConfigurationResponse = new ProcessConfigurationResponse();
 
     // Protect the method against accidental null parameters
     if (processConfigurationRequest == null) {
       LOGGER.error("onProcessConfiguration(null) called - rejecting the request.");
       processConfigurationResponse.setConfigurationXML(ProcessConfigurationResponse.CONF_REJECTED);
-      return this.xmlConverter.toXml(processConfigurationResponse);
+      return processConfigurationResponse;
     }
 
     // Process name (NO_PROCESS by default)
@@ -440,7 +435,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       processConfigurationResponse.setConfigurationXML(ProcessConfigurationResponse.CONF_REJECTED);
     }
 
-    return this.xmlConverter.toXml(processConfigurationResponse);
+    return processConfigurationResponse;
   }
 
   /**
@@ -978,14 +973,14 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
    * @return the PIK XML as a String or null if there was an exception
    */
   @Override
-  public String onProcessConnection(final ProcessConnectionRequest processConnectionRequest) {
+  public ProcessConnectionResponse onProcessConnection(final ProcessConnectionRequest processConnectionRequest) {
     ProcessConnectionResponse processConnectionResponse = new ProcessConnectionResponse();
 
     // Protect the method against accidental null parameters
     if (processConnectionRequest == null) {
       LOGGER.error("onProcessConfiguration(null) called - rejecting the request.");
       processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
-      return this.xmlConverter.toXml(processConnectionResponse);
+      return processConnectionResponse;
     }
 
     // Process name (NO_PROCESS by default)
@@ -1065,6 +1060,6 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
     }
 
-    return this.xmlConverter.toXml(processConnectionResponse);
+    return processConnectionResponse;
   }
 }

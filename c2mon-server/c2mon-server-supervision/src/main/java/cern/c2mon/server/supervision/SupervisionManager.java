@@ -18,9 +18,7 @@ package cern.c2mon.server.supervision;
 
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
-import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
-import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
-import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
+import cern.c2mon.shared.daq.process.*;
 
 /**
  * Module interface of the bean in charge of the overall supervision
@@ -55,7 +53,7 @@ public interface SupervisionManager {
   /**
    * Takes the necessary steps when a DAQ requests for configuration after connection, 
    * such as starting the alive timers, adjusting the state tag, and recording
-   * the start up time. Returns the configuration XML to send to the
+   * the start up time. Returns the ProcessConfigurationResponse to send to the
    * DAQ.
    * 
    * <p>Synchronizes on the Process object.
@@ -64,14 +62,14 @@ public interface SupervisionManager {
    * the connection request in these cases.
    * 
    * @param processConfigurationRequest the configuration message
-   * @return a reply XML string to send to the DAQ (is never null)
+   * @return ProcessConfigurationResponse to send to the DAQ (is never null)
    */
-  String onProcessConfiguration(ProcessConfigurationRequest processConfigurationRequest);
+  ProcessConfigurationResponse onProcessConfiguration(ProcessConfigurationRequest processConfigurationRequest);
   
   /**
    * Takes the necessary steps when a DAQ requests to connect, 
    * such us retrieving the PIK. 
-   * Returns the PIK XML to send to the DAQ.
+   * Returns the ProcessConnectionResponse to send to the DAQ.
    * 
    * <p>Synchronizes on the Process object.
    * 
@@ -79,9 +77,9 @@ public interface SupervisionManager {
    * the connection request in these cases.
    * 
    * @param processConnectionRequest the PIK message
-   * @return a reply XML string to send to the DAQ (is never null)
+   * @return ProcessConnectionResponse to send to the DAQ (is never null)
    */
-  String onProcessConnection(ProcessConnectionRequest processConnectionRequest);
+  ProcessConnectionResponse onProcessConnection(ProcessConnectionRequest processConnectionRequest);
 
   /**
    * Take the required supervision action when an alive timer expires.

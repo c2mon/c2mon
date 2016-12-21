@@ -21,6 +21,8 @@ import cern.c2mon.daq.common.messaging.ProcessRequestSender;
 import cern.c2mon.daq.config.DaqProperties;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.process.*;
+import cern.c2mon.shared.daq.serialization.MessageConverter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +79,7 @@ public class ActiveRequestSender implements ProcessRequestSender {
     // session
     final Destination requestDestination = jmsTemplate.getDefaultDestination();
     ProcessConfigurationResponse processConfigurationResponse = (ProcessConfigurationResponse) jmsTemplate.execute(new SessionCallback<Object>() {
+
       public Object doInJms(final Session session) throws JMSException {
         TemporaryQueue replyQueue = session.createTemporaryQueue();
 
@@ -98,7 +101,7 @@ public class ActiveRequestSender implements ProcessRequestSender {
             if (replyMessage == null) {
               return null;
             } else {
-              return processMessageConverter.fromMessage(replyMessage);
+              return processMessageConverter.fromXML(replyMessage);
             }
           } finally {
             consumer.close();
@@ -149,7 +152,7 @@ public class ActiveRequestSender implements ProcessRequestSender {
               return null;
             } else {
               // Convert the XML and return it as a ProcessConnectionRespond object
-              return processMessageConverter.fromMessage(replyMessage);
+              return processMessageConverter.fromXML(replyMessage);
             }
           } finally {
             consumer.close();
@@ -196,8 +199,10 @@ public class ActiveRequestSender implements ProcessRequestSender {
 
     LOGGER.trace("sendProcessDisconnectionRequest - Converting and sending disconnection message");
 
-    jmsTemplate.setMessageConverter(this.processMessageConverter);
-    jmsTemplate.convertAndSend(processDisconnectionRequest);
+
+//    jmsTemplate.setMessageConverter(this.processMessageConverter);
+//    jmsTemplate.convertAndSend(processDisconnectionRequest);
+    jmsTemplate.send(session -> processMessageConverter.toMessage(processDisconnectionRequest,session));
 
     LOGGER.trace("sendProcessDisconnectionRequest - Process Disconnection for " + processConfiguration.getProcessName() + " sent");
   }

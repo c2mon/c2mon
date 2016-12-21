@@ -30,11 +30,8 @@ import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.supervision.SupervisionManager;
-import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
-import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
-import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
-import cern.c2mon.shared.daq.process.ProcessMessageConverter;
-import cern.c2mon.shared.daq.process.ProcessRequest;
+import cern.c2mon.shared.daq.process.*;
+import cern.c2mon.shared.daq.serialization.MessageConverter;
 
 
 /**
@@ -90,7 +87,7 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
     LOGGER.debug("onMessage() - Message coming " + message);
 
     try {
-      ProcessRequest processRequest = (ProcessRequest) this.processMessageConverter.fromMessage(message);
+      ProcessRequest processRequest = (ProcessRequest) this.processMessageConverter.fromXML(message);
 
       // ProcessDisconnectionRequest
       if (processRequest instanceof ProcessDisconnectionRequest) {
@@ -106,7 +103,7 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
         LOGGER.info("onMessage - DAQ Connection request received from DAQ " + processConnectionRequest.getProcessName());
 
         // Create the processConnectionResponse
-        String processConnectionResponse = this.supervisionManager.onProcessConnection(processConnectionRequest);
+        ProcessConnectionResponse processConnectionResponse = this.supervisionManager.onProcessConnection(processConnectionRequest);
 
         // Send reply to DAQ on reply queue
         if (LOGGER.isDebugEnabled()) {
@@ -115,7 +112,7 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
         MessageProducer messageProducer = session.createProducer(message.getJMSReplyTo());
         try {
           TextMessage replyMessage = session.createTextMessage();
-          replyMessage.setText(processConnectionResponse);
+          replyMessage.setText(processMessageConverter.fromXML(processConnectionResponse);
           messageProducer.send(replyMessage);
         } finally {
           messageProducer.close();
