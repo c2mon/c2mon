@@ -177,14 +177,6 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
   }
 
   /**
-   * @return The datatype of the tagvalue
-   */
-  @Override
-  public String getType() {
-    return this.getValueClassName();
-  }
-
-  /**
    * Adds the sub equipment id as dependency to this tag
    * @param subEquipmentId The sub equipment id
    * @return <code>true</code>, if the sub equipment id was added, else <code>false</code>
