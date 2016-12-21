@@ -69,7 +69,7 @@ public class ClientDataTagImplIsValidUpdateTest {
 
     clientTagImpl.onUpdate(tagValueUpdate_PAST);
     final boolean status = clientTagImpl.isValidUpdate(tagValueUpdate_2);
-    assertTrue(status == true);
+    assertTrue(status);
 
     // case b: let's make sure Source Timestamp
     // in the PAST does not make a difference..
@@ -511,14 +511,13 @@ public class ClientDataTagImplIsValidUpdateTest {
 
   private TestTagValueUpdate createTagVUpdate() {
 
-    TestTagValueUpdate tagUpdate = new TestTagValueUpdate(new Timestamp(System.currentTimeMillis() - 10000L), null, null);
-
+    TestTagValueUpdate tagUpdate = new TestTagValueUpdate(new Timestamp(System.currentTimeMillis() - 10000L), null, null, "java.lang.String");
     return tagUpdate;
   }
 
   private TestTagUpdate createTagUpdate() {
 
-    TestTagUpdate tagUpdate = new TestTagUpdate(new Timestamp(System.currentTimeMillis() - 10000L), null, null);
+    TestTagUpdate tagUpdate = new TestTagUpdate(new Timestamp(System.currentTimeMillis() - 10000L), null, null, "java.lang.String");
 
     return tagUpdate;
   }
@@ -534,13 +533,16 @@ public class ClientDataTagImplIsValidUpdateTest {
 
     private Timestamp serverTimestamp;
 
+    private String valueClassName;
+
     private final Long id = 1234L;
 
-    public TestTagValueUpdate(final Timestamp sourceTimestamp, final Timestamp daqTimestamp, final Timestamp serverTimestamp) {
+    public TestTagValueUpdate(final Timestamp sourceTimestamp, final Timestamp daqTimestamp, final Timestamp serverTimestamp, final String valueClassName) {
 
       this.sourceTimestamp = sourceTimestamp;
       this.daqTimestamp = daqTimestamp;
       this.serverTimestamp = serverTimestamp;
+      this.valueClassName = valueClassName;
     }
 
     public void setServerTimestamp(Timestamp serverTimestamp) {
@@ -612,7 +614,7 @@ public class ClientDataTagImplIsValidUpdateTest {
 
     @Override
     public String getValueClassName() {
-      return null;
+      return this.valueClassName;
     }
 
     @Override
@@ -631,13 +633,16 @@ public class ClientDataTagImplIsValidUpdateTest {
 
     private Timestamp serverTimestamp;
 
+    private String valueClassName;
+
     private final Long id = 1234L;
 
-    public TestTagUpdate(final Timestamp sourceTimestamp, final Timestamp daqTimestamp, final Timestamp serverTimestamp) {
+    public TestTagUpdate(final Timestamp sourceTimestamp, final Timestamp daqTimestamp, final Timestamp serverTimestamp, final String valueClassName) {
 
       this.sourceTimestamp = sourceTimestamp;
       this.daqTimestamp = daqTimestamp;
       this.serverTimestamp = serverTimestamp;
+      this.valueClassName = valueClassName;
     }
 
     public void setServerTimestamp(Timestamp serverTimestamp) {
@@ -709,7 +714,7 @@ public class ClientDataTagImplIsValidUpdateTest {
 
     @Override
     public String getValueClassName() {
-      return null;
+      return this.valueClassName;
     }
 
     @Override

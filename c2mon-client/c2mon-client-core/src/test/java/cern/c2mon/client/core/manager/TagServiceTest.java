@@ -334,7 +334,7 @@ public class TagServiceTest {
   private TagUpdate createValidTransferTag(final Long tagId, Object value) {
     DataTagQuality tagQuality = new DataTagQualityImpl();
     tagQuality.validate();
-    TagUpdate tagUpdate =
+    TransferTagImpl tagUpdate =
         new TransferTagImpl(
             tagId,
             null,
@@ -347,6 +347,9 @@ public class TagServiceTest {
             "Test description",
             "My.data.tag.name",
             "My.jms.topic");
+    if (value != null) {
+      tagUpdate.setValueClassName(value.getClass().getName());
+    }
 
     return tagUpdate;
   }

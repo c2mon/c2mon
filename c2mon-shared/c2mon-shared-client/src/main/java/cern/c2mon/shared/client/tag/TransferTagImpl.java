@@ -176,6 +176,9 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
     return new ArrayList<Long>(equipmentIds);
   }
 
+  /**
+   * @return The datatype of the tagvalue
+   */
   @Override
   public String getType() {
     return this.getValueClassName();
