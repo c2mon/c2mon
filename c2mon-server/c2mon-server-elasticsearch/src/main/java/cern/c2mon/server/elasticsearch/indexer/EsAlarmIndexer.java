@@ -21,15 +21,14 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
-import cern.c2mon.server.elasticsearch.connector.Connector;
 import cern.c2mon.server.elasticsearch.connector.TransportConnector;
-import cern.c2mon.server.elasticsearch.structure.mappings.EsAlarmMapping;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.elasticsearch.structure.mappings.MappingFactory;
 import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
 
 /**
@@ -40,11 +39,12 @@ import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
 @Component("esAlarmIndexer")
 public class EsAlarmIndexer<T extends EsAlarm> extends EsIndexer<T> {
 
-  private final String alarmMapping = new EsAlarmMapping().getMapping();
+  private final String alarmMapping;
 
   @Autowired
   public EsAlarmIndexer(final TransportConnector connector, ElasticsearchProperties properties) {
     super(connector, properties);
+    this.alarmMapping = MappingFactory.createAlarmMapping();
   }
 
   @Override

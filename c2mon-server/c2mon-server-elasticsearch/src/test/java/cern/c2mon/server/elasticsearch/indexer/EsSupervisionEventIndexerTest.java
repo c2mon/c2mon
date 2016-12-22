@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.connector.TransportConnector;
 import cern.c2mon.server.elasticsearch.structure.converter.EsSupervisionEventConverter;
+import cern.c2mon.server.elasticsearch.structure.mappings.MappingFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +30,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.elasticsearch.structure.mappings.EsSupervisionMapping;
 import cern.c2mon.server.elasticsearch.structure.types.EsSupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
@@ -54,7 +54,6 @@ public class EsSupervisionEventIndexerTest {
   private long id = 1L;
   private String name = "P_TEST";
   private String message = "message";
-  private EsSupervisionMapping mapping;
   private SupervisionEvent event;
   private EsSupervisionEvent esSupervisionEvent;
 
@@ -83,7 +82,6 @@ public class EsSupervisionEventIndexerTest {
     when(connector.logSupervisionEvent(anyString(), anyString(), eq(esSupervisionEvent))).thenReturn(true);
 //    indexer.setIndexFormat("M");
     indexer.setProperties(new ElasticsearchProperties());
-    mapping = new EsSupervisionMapping();
   }
 
   @Test
@@ -95,7 +93,7 @@ public class EsSupervisionEventIndexerTest {
 
   @Test
   public void testLogSupervisionEvent() throws IDBPersistenceException {
-    String expectedMapping = mapping.getMapping();
+    String expectedMapping = MappingFactory.createSupervisionMapping();
 
     indexer.storeData(esSupervisionEvent);
 //    verify(connector).logSupervisionEvent(eq(indexer.getIndexPrefix() + "-supervision_"

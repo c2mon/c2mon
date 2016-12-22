@@ -23,7 +23,7 @@ import java.util.*;
 import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.connector.TransportConnector;
-import cern.c2mon.server.elasticsearch.structure.mappings.EsTagMapping;
+import cern.c2mon.server.elasticsearch.structure.mappings.MappingFactory;
 import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -118,7 +118,7 @@ public class EsIndexerTest extends BaseElasticsearchIntegrationTest {
 
     assertEquals(expectedIndex, indexer.getCacheIndicesTypes().keySet());
 
-    connector.createIndexTypeMapping("c2mon-tag_2015-01", "tag_string", new EsTagMapping(EsTag.TYPE_STRING, String.class.getName()).getMapping());
+    connector.createIndexTypeMapping("c2mon-tag_2015-01", "tag_string", MappingFactory.createTagMapping(String.class.getName()));
     assertEquals(expectedType, indexer.getCacheIndicesTypes().get("c2mon-tag_2015-01"));
   }
 

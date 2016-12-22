@@ -20,7 +20,7 @@ import java.sql.Timestamp;
 
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.connector.TransportConnector;
-import cern.c2mon.server.elasticsearch.structure.mappings.EsAlarmMapping;
+import cern.c2mon.server.elasticsearch.structure.mappings.MappingFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +33,6 @@ import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.elasticsearch.structure.converter.EsAlarmLogConverter;
 import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
 import cern.c2mon.server.test.CacheObjectCreation;
-import org.springframework.core.env.Environment;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.anyString;
@@ -49,7 +48,6 @@ import static org.mockito.Mockito.when;
 public class EsAlarmIndexerTest {
   private Alarm alarm;
   private EsAlarm esAlarm;
-  private EsAlarmMapping esAlarmMapping;
   private Timestamp timestamp;
 
   @InjectMocks
@@ -69,7 +67,6 @@ public class EsAlarmIndexerTest {
     timestamp = alarm.getTimestamp();
     when(connector.logAlarmEvent(anyString(), anyString(), eq(esAlarm))).thenReturn(true);
     properties.setIndexType("M");
-    esAlarmMapping = new EsAlarmMapping();
     indexer.setProperties(properties);
   }
 
@@ -82,7 +79,7 @@ public class EsAlarmIndexerTest {
 
   @Test
   public void testLogAlarm() throws IDBPersistenceException {
-    String expectedMapping = esAlarmMapping.getMapping();
+    String expectedMapping = MappingFactory.createAlarmMapping();
 
     indexer.storeData(esAlarm);
     verify(connector).logAlarmEvent(eq(properties.getIndexPrefix() + "-alarm_"

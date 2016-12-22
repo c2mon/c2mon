@@ -23,7 +23,7 @@ import javax.annotation.PostConstruct;
 
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.connector.TransportConnector;
-import cern.c2mon.server.elasticsearch.structure.mappings.EsTagMapping;
+import cern.c2mon.server.elasticsearch.structure.mappings.MappingFactory;
 import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -256,7 +256,7 @@ public class EsTagIndexer<T extends EsTag> extends EsIndexer<T> {
   }
 
   private String chooseMapping(EsTag tag) {
-    return new EsTagMapping(tag.getType(), tag.getC2mon().getDataType()).getMapping();
+    return MappingFactory.createTagMapping(tag.getC2mon().getDataType());
   }
 
   public synchronized void addIndex(String indexName) {

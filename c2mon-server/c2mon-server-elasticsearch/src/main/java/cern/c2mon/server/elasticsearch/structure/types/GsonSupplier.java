@@ -24,6 +24,7 @@ import java.util.function.Supplier;
 /**
  * Represents a provider for a single {@link Gson} instance.
  */
+@Deprecated
 public enum GsonSupplier implements Supplier<Gson> {
   INSTANCE(GsonFactory.createGson());
 

@@ -569,43 +569,35 @@ public final class TypeConverter  {
 
   /**
    * Checks if the given data type is a Number.
-   * Because of the old representation of data type without the full class name java.lang
-   * the check have to be done separate for all subclasses of {@link Number}.
-   * @param dataType the String name of the data type
-   * @return returns true if the data type is a subclass of {@link Number}.
+   * <p>
+   * Because of the old representation of data type (non fully-qualified class
+   * name) we have to check separately for all subclasses of {@link Number}.
+   *
+   * @param dataType the data type as string
+   * @return returns true if the data type is a subclass of {@link Number}
    */
   public static boolean isNumber(String dataType) {
-
     Class<?> type = getType(dataType);
-
     return type != null && Number.class.isAssignableFrom(type);
-
   }
 
-
   public static boolean isKnownClass(String typeName) {
-
-    Class<?> result = typeName!=null ? getType(typeName): null;
-
+    Class<?> result = typeName != null ? getType(typeName) : null;
     return result != null;
-
   }
 
   /**
-   * @param typeName A simple class name within the java.lang.* package or the full classpath
-   * @return The class for the given name or <code>null</code>, if the class is unknown to the server
+   * @param typeName a simple class name within the java.lang.* package or the
+   *                 fully qualified class name
+   * @return the class for the given name if known, {@literal null} otherwise
    */
   public static Class<?> getType(String typeName) {
-
     String fullPath = !typeName.contains(".") ? "java.lang." + typeName : typeName;
 
     try {
-
       return Class.forName(fullPath);
-
     } catch (ClassNotFoundException e) {
       return null;
     }
-
   }
 }

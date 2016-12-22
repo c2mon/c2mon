@@ -1,0 +1,50 @@
+{
+  "dynamic_templates": [
+    {
+      "nested_metadata_template": {
+        "mapping": {
+          "index": "not_analyzed"
+        },
+        "match_mapping_type": "string",
+        "path_match": "metadata.*"
+      }
+    }
+  ],
+  "properties": {
+    "active": {
+      "type": "boolean"
+    },
+    "activeNumeric": {
+      "type": "double"
+    },
+    "faultCode": {
+      "type": "integer"
+    },
+    "faultFamily": {
+      "type": "string",
+      "index": "not_analyzed"
+    },
+    "faultMember": {
+      "type": "string",
+      "index": "not_analyzed"
+    },
+    "id": {
+      "type": "long"
+    },
+    "info": {
+      "type": "string",
+      "index": "not_analyzed"
+    },
+    "metadata": {
+      "type": "nested",
+      "dynamic": "true"
+    },
+    "tagId": {
+      "type": "long"
+    },
+    "timestamp": {
+      "type": "date",
+      "format": "epoch_millis"
+    }
+  }
+}

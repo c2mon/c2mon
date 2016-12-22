@@ -22,13 +22,10 @@ import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.structure.converter.EsAlarmLogConverter;
 import cern.c2mon.server.elasticsearch.structure.converter.EsSupervisionEventConverter;
-import cern.c2mon.server.elasticsearch.structure.mappings.EsAlarmMapping;
-import cern.c2mon.server.elasticsearch.structure.mappings.EsTagMapping;
+import cern.c2mon.server.elasticsearch.structure.mappings.MappingFactory;
 import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
-import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -132,7 +129,7 @@ public class TransportConnectorTest extends BaseElasticsearchIntegrationTest {
 
     String index = "c2mon_2015-01";
     String type = "type_string";
-    String mapping = new EsTagMapping(EsTag.TYPE_STRING, String.class.getName()).getMapping();
+    String mapping = MappingFactory.createTagMapping(String.class.getName());
 
     connector.setClient(initClient);
 
@@ -160,7 +157,7 @@ public class TransportConnectorTest extends BaseElasticsearchIntegrationTest {
       EsAlarm esAlarm = esAlarmLogConverter.convert(CacheObjectCreation.createTestAlarm1());
       esAlarm.setId(i);
 
-      String mapping = new EsAlarmMapping().getMapping();
+      String mapping = MappingFactory.createAlarmMapping();
       assertTrue(connector.logAlarmEvent(indexName, mapping, esAlarm));
       connector.indexExists(indexName);
 
@@ -183,7 +180,7 @@ public class TransportConnectorTest extends BaseElasticsearchIntegrationTest {
           new Timestamp(123456789),
           "test message");
       EsSupervisionEvent esSupervisionEvent = esSupervisionEventConverter.convert(event);
-      String mapping = new EsAlarmMapping().getMapping();
+      String mapping = MappingFactory.createSupervisionMapping();
 
       assertTrue(connector.logSupervisionEvent(indexName, mapping, esSupervisionEvent));
       connector.indexExists(indexName);

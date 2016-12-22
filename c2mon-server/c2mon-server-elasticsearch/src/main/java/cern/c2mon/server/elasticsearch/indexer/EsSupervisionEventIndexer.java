@@ -21,17 +21,13 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
-import cern.c2mon.server.elasticsearch.connector.Connector;
 import cern.c2mon.server.elasticsearch.connector.TransportConnector;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.elasticsearch.structure.mappings.EsSupervisionMapping;
+import cern.c2mon.server.elasticsearch.structure.mappings.MappingFactory;
 import cern.c2mon.server.elasticsearch.structure.types.EsSupervisionEvent;
 
 /**
@@ -41,11 +37,12 @@ import cern.c2mon.server.elasticsearch.structure.types.EsSupervisionEvent;
 @Component("esSupervisionEventIndexer")
 public class EsSupervisionEventIndexer<T extends EsSupervisionEvent> extends EsIndexer<T> {
 
-  private final String supervisionMapping = new EsSupervisionMapping().getMapping();
+  private final String supervisionMapping;
 
   @Autowired
   public EsSupervisionEventIndexer(final TransportConnector connector, final ElasticsearchProperties properties) {
     super(connector, properties);
+    this.supervisionMapping = MappingFactory.createSupervisionMapping();
   }
 
   @Override
