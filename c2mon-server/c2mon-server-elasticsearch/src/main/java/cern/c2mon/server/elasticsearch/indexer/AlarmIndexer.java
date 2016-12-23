@@ -16,76 +16,75 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.indexer;
 
+import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
-import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
+import cern.c2mon.pmanager.IDBPersistenceHandler;
 import cern.c2mon.server.elasticsearch.connector.TransportConnector;
-import lombok.Data;
+import cern.c2mon.server.elasticsearch.structure.mappings.MappingFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.elasticsearch.structure.mappings.MappingFactory;
 import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
 
 /**
  * @author Alban Marguet
+ * @author Justin Lewis Salmon
  */
 @Slf4j
-@Data
-@Component("esAlarmIndexer")
-public class EsAlarmIndexer<T extends EsAlarm> extends EsIndexer<T> {
+@Component
+public class AlarmIndexer implements IDBPersistenceHandler<EsAlarm> {
 
-  private final String alarmMapping;
+  private TransportConnector connector;
 
   @Autowired
-  public EsAlarmIndexer(final TransportConnector connector, ElasticsearchProperties properties) {
-    super(connector, properties);
-    this.alarmMapping = MappingFactory.createAlarmMapping();
+  public AlarmIndexer(final TransportConnector connector) {
+    this.connector = connector;
   }
 
   @Override
-  @PostConstruct
-  public void init() throws IDBPersistenceException {
-    super.init();
+  public void storeData(EsAlarm alarm) throws IDBPersistenceException {
+    storeData(Collections.singletonList(alarm));
   }
 
   @Override
-  public void storeData(T esAlarm) throws IDBPersistenceException {
-    if (esAlarm == null) {
-      return;
-    }
-
-    boolean logged = false;
+  public void storeData(List<EsAlarm> alarms) throws IDBPersistenceException {
     try {
-        String indexName = generateAlarmIndex(esAlarm.getTimestamp());
-        logged = connector.logAlarmEvent(indexName, alarmMapping, esAlarm);
-    } catch (Exception e) {
-      log.debug("Cluster is not reachable!");
-      throw new IDBPersistenceException(e);
-    }
+      long failed = alarms.stream().filter(alarm -> !this.indexAlarm(alarm)).count();
 
-    if (!logged) {
-      throw new IDBPersistenceException("Alarm could not be stored in Elasticsearch");
-    }
-  }
-
-  @Override
-  public void storeData(List<T> data) throws IDBPersistenceException {
-    try {
-      for (T esAlarm : data) {
-        storeData(esAlarm);
+      if (failed > 0) {
+        throw new IDBPersistenceException("Failed to index " + failed + " of " + alarms.size() + " alarms");
       }
     } catch (Exception e) {
-      log.debug("Cluster is not reachable!");
       throw new IDBPersistenceException(e);
     }
   }
 
-  private String generateAlarmIndex(long time) {
-    return retrieveIndexFormat(properties.getIndexPrefix() + "-alarm_", time);
+  private boolean indexAlarm(EsAlarm alarm) {
+    String indexName = getOrCreateIndex(alarm);
+
+    log.debug("Adding new alarm event to index {}", indexName);
+    return connector.getClient().prepareIndex().setIndex(indexName)
+        .setType("alarm")
+        .setSource(alarm.toString())
+        .setRouting(alarm.getId())
+        .get().isCreated();
+  }
+
+  private String getOrCreateIndex(EsAlarm alarm) {
+    String index = Indices.indexFor(alarm);
+
+    if (!Indices.exists(index)) {
+      Indices.create(index, "alarm", MappingFactory.createAlarmMapping());
+    }
+
+    return index;
+  }
+
+  @Override
+  public String getDBInfo() {
+    return "elasticsearch/alarm";
   }
 }

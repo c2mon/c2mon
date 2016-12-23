@@ -18,12 +18,11 @@ package cern.c2mon.server.elasticsearch.listener;
 
 import javax.annotation.PostConstruct;
 
-import cern.c2mon.server.elasticsearch.indexer.EsAlarmIndexer;
+import cern.c2mon.server.elasticsearch.indexer.AlarmIndexer;
 import cern.c2mon.server.elasticsearch.structure.converter.EsAlarmLogConverter;
 import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +34,7 @@ import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 
 /**
- * Listens to updates in the Alarm cache and send them to Elasticsearch with the {@link EsAlarmIndexer} class.
+ * Listens to updates in the Alarm cache and send them to Elasticsearch with the {@link AlarmIndexer} class.
  *
  * @author Alban Marguet
  */

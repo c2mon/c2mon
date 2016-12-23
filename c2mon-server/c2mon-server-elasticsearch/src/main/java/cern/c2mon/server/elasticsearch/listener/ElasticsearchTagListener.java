@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import cern.c2mon.server.elasticsearch.indexer.EsTagIndexer;
+import cern.c2mon.server.elasticsearch.indexer.TagIndexer;
 import cern.c2mon.server.elasticsearch.structure.converter.ElasticsearchTagConverter;
 import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +42,7 @@ import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.tag.Tag;
 
 /**
- * Listens to updates in the Rule and DataTag caches and calls the {@link EsTagIndexer} for logging these to Elasticsearch.
+ * Listens to updates in the Rule and DataTag caches and calls the {@link TagIndexer} for logging these to Elasticsearch.
  *
  * @author Alban Marguet
  */
@@ -100,7 +100,7 @@ public class ElasticsearchTagListener implements C2monBufferedCacheListener<Tag>
   }
 
   /**
-   * When receiving a cache update, get the metadata for tags and send them to the {@link EsTagIndexer} to log them.
+   * When receiving a cache update, get the metadata for tags and send them to the {@link TagIndexer} to log them.
    *
    * @param tagCollection batch of tags to be logged to Elasticsearch
    */

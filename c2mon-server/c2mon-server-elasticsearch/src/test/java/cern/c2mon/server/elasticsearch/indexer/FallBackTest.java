@@ -17,8 +17,6 @@
 package cern.c2mon.server.elasticsearch.indexer;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.elasticsearch.connector.Connector;
-import cern.c2mon.server.elasticsearch.connector.TransportConnector;
 import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
 import org.elasticsearch.ElasticsearchException;
 import org.junit.Before;
@@ -30,7 +28,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.core.env.Environment;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 /**
@@ -40,22 +38,11 @@ import static org.mockito.Mockito.when;
 public class FallBackTest {
 
   @InjectMocks
-  private EsAlarmIndexer esAlarmIndexer;
-
-  @Mock
-  private TransportConnector connector;
-
-  @Mock
-  private Environment environment;
-
-  @Before
-  public void setup() {
-//    esAlarmIndexer.setIndexFormat("M");
-    when(connector.logAlarmEvent(anyString(), anyString(), any(EsAlarm.class))).thenThrow(new ElasticsearchException("testException"));
-  }
+  private AlarmIndexer alarmIndexer;
 
   @Test(expected = IDBPersistenceException.class)
-  public void ElasticsearchExceptionTriggersIDBPersistenceException() throws IDBPersistenceException {
-    esAlarmIndexer.storeData(new EsAlarm());
+  public void exceptionIsThrown() throws IDBPersistenceException {
+    doThrow(new ElasticsearchException("testException")).when(alarmIndexer).storeData(any(EsAlarm.class));
+    alarmIndexer.storeData(new EsAlarm());
   }
 }

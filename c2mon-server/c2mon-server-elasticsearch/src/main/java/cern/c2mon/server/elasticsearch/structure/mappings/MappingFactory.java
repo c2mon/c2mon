@@ -59,7 +59,7 @@ public class MappingFactory {
       properties.put("valueString", ImmutableMap.of("type", "string", "index", "not_analyzed"));
 
     } else {
-      properties.put("valueObject", ImmutableMap.of("type", "nested", "index", "analyzed"));
+      properties.put("valueObject", ImmutableMap.of("type", "nested", "dynamic", "true"));
     }
 
     try {

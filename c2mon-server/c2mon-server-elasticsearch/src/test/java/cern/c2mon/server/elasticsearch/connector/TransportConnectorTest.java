@@ -70,7 +70,6 @@ public class TransportConnectorTest extends BaseElasticsearchIntegrationTest {
 
   @After
   public void tidyUp() {
-    log.info("@After");
     connector.getClient().admin().indices().delete(new DeleteIndexRequest("*")).actionGet();
   }
 
@@ -86,10 +85,9 @@ public class TransportConnectorTest extends BaseElasticsearchIntegrationTest {
     assertTrue(connector.isConnected());
     assertNotNull(connector.getClient());
     assertTrue(properties.isEmbedded());
-//    assertEquals(expectedSettings, connector.getSettings());
-//    assertEquals(isLocal, connector.getSettings().get("node.local"));
-//    assertEquals(connector.getNode(), connector.getSettings().get("node.name"));
-    assertNotNull(connector.getBulkProcessor());
+    assertEquals(expectedSettings, connector.getClient().settings());
+    assertEquals("true", connector.getClient().settings().get("node.local"));
+    assertEquals(properties.getNodeName(), connector.getClient().settings().get("node.name"));
   }
 
   @Test
@@ -111,85 +109,13 @@ public class TransportConnectorTest extends BaseElasticsearchIntegrationTest {
 //    assertEquals(1, properties.getPort());
 //    assertEquals(isLocal, connector.getSettings().get("node.local"));
   }
-
-  @Test
-  public void testCreateIndex() {
-    Client initClient = connector.getClient();
-
-    connector.setClient(initClient);
-    // creating multiple times the same index should always return true
-    for (int i=0; i <10; i++) {
-      assertTrue(connector.createIndex("c2mon_2015-01"));
-    }
-  }
-
-  @Test
-  public void testCreateIndexTypeMapping() {
-    Client initClient = connector.getClient();
-
-    String index = "c2mon_2015-01";
-    String type = "type_string";
-    String mapping = MappingFactory.createTagMapping(String.class.getName());
-
-    connector.setClient(initClient);
-
-    assertTrue(connector.createIndex(index));
-
-    // creating multiple times the same mapping should always return true
-    for (int i=0; i < 10; i++) {
-      assertTrue(connector.createIndexTypeMapping(index, type, mapping));
-    }
-  }
-
-  @Test
-  public void testBulkAdd() {
-    IndexRequest newIndex = new IndexRequest("c2mon-tag_1973-06", "tag_boolean").source("");
-    boolean result = connector.bulkAdd(newIndex);
-    assertTrue(result);
-  }
-
-  @Test
-  public void testLogAlarmEvent() {
-    final String indexName = "index-test_alarm";
-    EsAlarmLogConverter esAlarmLogConverter = new EsAlarmLogConverter();
-
-    for (long i = 1; i <= 3; i++) {
-      EsAlarm esAlarm = esAlarmLogConverter.convert(CacheObjectCreation.createTestAlarm1());
-      esAlarm.setId(i);
-
-      String mapping = MappingFactory.createAlarmMapping();
-      assertTrue(connector.logAlarmEvent(indexName, mapping, esAlarm));
-      connector.indexExists(indexName);
-
-      sleep(1000);
-      SearchResponse response = connector.getClient().prepareSearch(indexName).setTypes("alarm").setSize(0).execute().actionGet();
-      assertEquals(response.toString(), i, response.getHits().getTotalHits());
-    }
-  }
-
-  @Test
-  public void testLogSupervisionEvent() {
-    final String indexName = "index-test_supervision";
-    EsSupervisionEventConverter esSupervisionEventConverter = new EsSupervisionEventConverter();
-
-    for (long i = 1; i <= 3; i++) {
-      SupervisionEvent event = new SupervisionEventImpl(SupervisionConstants.SupervisionEntity.PROCESS,
-          i,
-          "P_PROCESS" + i,
-          SupervisionConstants.SupervisionStatus.RUNNING,
-          new Timestamp(123456789),
-          "test message");
-      EsSupervisionEvent esSupervisionEvent = esSupervisionEventConverter.convert(event);
-      String mapping = MappingFactory.createSupervisionMapping();
-
-      assertTrue(connector.logSupervisionEvent(indexName, mapping, esSupervisionEvent));
-      connector.indexExists(indexName);
-
-      sleep(1000);
-      SearchResponse response = connector.getClient().prepareSearch(indexName).setTypes("supervision").setSize(0).execute().actionGet();
-      assertEquals(response.toString(), i, response.getHits().getTotalHits());
-    }
-  }
+//
+//  @Test
+//  public void testBulkAdd() {
+//    IndexRequest newIndex = new IndexRequest("c2mon-tag_1973-06", "tag_boolean").source("");
+//    boolean result = connector.bulkAdd(newIndex);
+//    assertTrue(result);
+//  }
 
   private void sleep() {
     sleep(500);
