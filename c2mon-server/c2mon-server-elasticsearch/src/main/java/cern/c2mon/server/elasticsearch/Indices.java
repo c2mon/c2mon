@@ -1,10 +1,10 @@
-package cern.c2mon.server.elasticsearch.indexer;
+package cern.c2mon.server.elasticsearch;
 
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.connector.TransportConnector;
-import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
-import cern.c2mon.server.elasticsearch.structure.types.EsSupervisionEvent;
-import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
+import cern.c2mon.server.elasticsearch.alarm.EsAlarm;
+import cern.c2mon.server.elasticsearch.supervision.EsSupervisionEvent;
+import cern.c2mon.server.elasticsearch.tag.EsTag;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;

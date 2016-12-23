@@ -16,30 +16,16 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.connector;
 
-import java.sql.Timestamp;
-
 import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
-import cern.c2mon.server.elasticsearch.structure.converter.EsAlarmLogConverter;
-import cern.c2mon.server.elasticsearch.structure.converter.EsSupervisionEventConverter;
-import cern.c2mon.server.elasticsearch.structure.mappings.MappingFactory;
-import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import cern.c2mon.server.elasticsearch.structure.types.EsSupervisionEvent;
-import cern.c2mon.server.test.CacheObjectCreation;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
-import cern.c2mon.shared.common.supervision.SupervisionConstants;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;

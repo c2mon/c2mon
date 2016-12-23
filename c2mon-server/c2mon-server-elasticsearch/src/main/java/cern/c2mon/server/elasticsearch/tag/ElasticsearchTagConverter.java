@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.elasticsearch.structure.converter;
+package cern.c2mon.server.elasticsearch.tag;
 
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
-import cern.c2mon.server.elasticsearch.structure.types.tag.EsTagC2monInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +36,6 @@ import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.elasticsearch.structure.types.tag.TagQualityAnalysis;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.elasticsearch.structure.types.tag;
+package cern.c2mon.server.elasticsearch.tag;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +27,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.server.elasticsearch.structure.types.GsonSupplier;
+import cern.c2mon.server.elasticsearch.types.GsonSupplier;
 import cern.c2mon.shared.common.type.TypeConverter;
 
 /**

@@ -19,13 +19,13 @@ package cern.c2mon.server.elasticsearch.structure.type;
 import java.io.IOException;
 import java.util.Collections;
 
-import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
+import cern.c2mon.server.elasticsearch.tag.EsTag;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.server.elasticsearch.structure.types.tag.TagQualityAnalysis;
+import cern.c2mon.server.elasticsearch.tag.TagQualityAnalysis;
 
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;

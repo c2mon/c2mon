@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.elasticsearch.structure.types;
+package cern.c2mon.server.elasticsearch.alarm;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import cern.c2mon.server.elasticsearch.types.GsonSupplier;
 import com.google.gson.Gson;
 import lombok.Data;
 import lombok.NonNull;

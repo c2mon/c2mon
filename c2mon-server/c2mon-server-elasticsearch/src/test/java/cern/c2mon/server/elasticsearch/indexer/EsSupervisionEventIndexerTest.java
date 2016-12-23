@@ -20,8 +20,8 @@
 //
 //import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 //import cern.c2mon.server.elasticsearch.connector.TransportConnector;
-//import cern.c2mon.server.elasticsearch.structure.converter.EsSupervisionEventConverter;
-//import cern.c2mon.server.elasticsearch.structure.mappings.MappingFactory;
+//import cern.c2mon.server.elasticsearch.supervision.EsSupervisionEventConverter;
+//import cern.c2mon.server.elasticsearch.MappingFactory;
 //import org.elasticsearch.action.search.SearchResponse;
 //import org.junit.Assert;
 //import org.junit.Before;
@@ -32,7 +32,7 @@
 //import org.mockito.runners.MockitoJUnitRunner;
 //
 //import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-//import cern.c2mon.server.elasticsearch.structure.types.EsSupervisionEvent;
+//import cern.c2mon.server.elasticsearch.supervision.EsSupervisionEvent;
 //import cern.c2mon.shared.client.supervision.SupervisionEvent;
 //import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 //import cern.c2mon.shared.common.supervision.SupervisionConstants;

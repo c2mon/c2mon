@@ -22,7 +22,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
+import cern.c2mon.server.elasticsearch.tag.EsTag;
+import cern.c2mon.server.elasticsearch.tag.ElasticsearchTagConverter;
 import com.google.gson.GsonBuilder;
 import lombok.Data;
 import org.junit.Before;

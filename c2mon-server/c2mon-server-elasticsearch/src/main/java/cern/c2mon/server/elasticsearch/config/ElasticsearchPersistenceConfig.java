@@ -4,12 +4,10 @@ import cern.c2mon.pmanager.IAlarmListener;
 import cern.c2mon.pmanager.IDBPersistenceHandler;
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.pmanager.persistence.impl.PersistenceManager;
-import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
-import cern.c2mon.server.elasticsearch.structure.types.EsSupervisionEvent;
-import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
+import cern.c2mon.server.elasticsearch.alarm.EsAlarm;
+import cern.c2mon.server.elasticsearch.supervision.EsSupervisionEvent;
+import cern.c2mon.server.elasticsearch.tag.EsTag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
 /**

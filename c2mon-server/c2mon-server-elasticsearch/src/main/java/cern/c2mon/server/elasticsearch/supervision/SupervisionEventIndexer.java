@@ -14,29 +14,20 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.elasticsearch.indexer;
+package cern.c2mon.server.elasticsearch.supervision;
 
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import cern.c2mon.pmanager.IDBPersistenceHandler;
-import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.connector.TransportConnector;
-import cern.c2mon.server.elasticsearch.structure.mappings.Mappings;
-import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
+import cern.c2mon.server.elasticsearch.Indices;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.elasticsearch.structure.mappings.MappingFactory;
-import cern.c2mon.server.elasticsearch.structure.types.EsSupervisionEvent;
+import cern.c2mon.server.elasticsearch.MappingFactory;
 
 /**
  * @author Alban Marguet

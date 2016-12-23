@@ -14,14 +14,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.elasticsearch.indexer;
+package cern.c2mon.server.elasticsearch.tag;
 
 import java.util.*;
 
 import cern.c2mon.pmanager.IDBPersistenceHandler;
-import cern.c2mon.server.elasticsearch.structure.mappings.Mappings;
-import cern.c2mon.server.elasticsearch.structure.types.Types;
-import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
+import cern.c2mon.server.elasticsearch.bulk.BulkProcessorProxy;
+import cern.c2mon.server.elasticsearch.Indices;
+import cern.c2mon.server.elasticsearch.Mappings;
+import cern.c2mon.server.elasticsearch.Types;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.index.IndexRequest;
 import org.springframework.beans.factory.annotation.Autowired;

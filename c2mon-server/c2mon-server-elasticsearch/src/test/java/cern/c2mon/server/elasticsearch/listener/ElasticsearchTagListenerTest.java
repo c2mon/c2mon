@@ -19,7 +19,8 @@ package cern.c2mon.server.elasticsearch.listener;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
+import cern.c2mon.server.elasticsearch.tag.EsTag;
+import cern.c2mon.server.elasticsearch.tag.ElasticsearchTagListener;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +37,7 @@ import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.elasticsearch.structure.converter.ElasticsearchTagConverter;
+import cern.c2mon.server.elasticsearch.tag.ElasticsearchTagConverter;
 import cern.c2mon.server.test.CacheObjectCreation;
 
 import static org.mockito.Matchers.anyList;

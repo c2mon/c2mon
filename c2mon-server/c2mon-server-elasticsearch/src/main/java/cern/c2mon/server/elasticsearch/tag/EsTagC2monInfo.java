@@ -14,42 +14,55 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.elasticsearch.structure.types.tag;
+package cern.c2mon.server.elasticsearch.tag;
 
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import cern.c2mon.server.common.tag.Tag;
 
 /**
- * Represents a detailed quality information provider for an {@link EsTag}.
+ * Represents a detailed and very specific information
+ * about the core functionality of C2MON framework.
+ * The values under that information group are defined directly
+ * on the core C2MON domain, and are extracted from the
  */
-@Slf4j
 @Data
-public final class TagQualityAnalysis {
-  /**
-   * Represents the constant value for e successful
-   * tag quality analysis (no invalid quality statuses)
-   */
-  public transient static final String OK = "OK";
+public class EsTagC2monInfo {
 
   /**
-   * A numeric value that indicates the status of the quality analysis
+   * The name of the monitored process
    */
-  private int status;
+  private String process;
 
   /**
-   * Indicates whether the quality analysis is ok (good state) or not
+   * The name of the monitored equipment
    */
-  private boolean valid;
+  private String equipment;
 
   /**
-   * A collection of the invalid statuses that may derive during the quality analysis.
-   * If the quality analysis is positive, the status info, should contain only one (1) entry.
-   * Otherwise, if the collection will contain all the invalid status information,
-   * as separate entries.
+   * The name of the monitored sub-equipment
    */
-  private Collection<String> statusInfo = new ArrayList<>();
+  private String subEquipment;
+
+  /**
+   * The fully qualified value (classname) of a tag's
+   * enclosed metric value
+   */
+  private final String dataType;
+
+  /**
+   * The time when the server received the {@link Tag}
+   */
+  private long serverTimestamp;
+
+  /**
+   * The time when the {@link Tag} value was collected.
+   */
+  private long sourceTimestamp;
+
+  /**
+   * The time when the DAQ received the {@link Tag}
+   */
+  private long daqTimestamp;
 
 }

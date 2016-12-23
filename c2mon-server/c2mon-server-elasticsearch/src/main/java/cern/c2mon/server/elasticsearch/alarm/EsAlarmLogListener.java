@@ -14,13 +14,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.elasticsearch.listener;
+package cern.c2mon.server.elasticsearch.alarm;
 
 import javax.annotation.PostConstruct;
 
-import cern.c2mon.server.elasticsearch.indexer.AlarmIndexer;
-import cern.c2mon.server.elasticsearch.structure.converter.EsAlarmLogConverter;
-import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;

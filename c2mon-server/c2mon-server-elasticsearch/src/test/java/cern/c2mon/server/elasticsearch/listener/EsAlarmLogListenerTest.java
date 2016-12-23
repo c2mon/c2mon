@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.listener;
 
+import cern.c2mon.server.elasticsearch.alarm.EsAlarmLogListener;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,8 +27,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.elasticsearch.structure.converter.EsAlarmLogConverter;
-import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
+import cern.c2mon.server.elasticsearch.alarm.EsAlarmLogConverter;
+import cern.c2mon.server.elasticsearch.alarm.EsAlarm;
 import cern.c2mon.server.test.CacheObjectCreation;
 
 import static org.mockito.Matchers.eq;

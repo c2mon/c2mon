@@ -19,7 +19,7 @@ package cern.c2mon.server.elasticsearch.structure.type;
 import java.util.HashMap;
 import java.util.Map;
 
-import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
+import cern.c2mon.server.elasticsearch.alarm.EsAlarm;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.Before;

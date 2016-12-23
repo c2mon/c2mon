@@ -20,6 +20,7 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
+import cern.c2mon.server.elasticsearch.alarm.EsAlarmLogConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +29,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
+import cern.c2mon.server.elasticsearch.alarm.EsAlarm;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.metadata.Metadata;
 

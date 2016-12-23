@@ -1,7 +1,6 @@
-package cern.c2mon.server.elasticsearch.structure.mappings;
+package cern.c2mon.server.elasticsearch;
 
 import cern.c2mon.server.elasticsearch.connector.TransportConnector;
-import cern.c2mon.server.elasticsearch.structure.types.Types;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.springframework.beans.factory.annotation.Autowired;

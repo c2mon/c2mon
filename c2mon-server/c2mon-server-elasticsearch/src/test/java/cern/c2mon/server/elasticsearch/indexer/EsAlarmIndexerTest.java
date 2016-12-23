@@ -20,7 +20,7 @@
 //
 //import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 //import cern.c2mon.server.elasticsearch.connector.TransportConnector;
-//import cern.c2mon.server.elasticsearch.structure.mappings.MappingFactory;
+//import cern.c2mon.server.elasticsearch.MappingFactory;
 //import org.elasticsearch.action.search.SearchResponse;
 //import org.junit.Assert;
 //import org.junit.Before;
@@ -32,8 +32,8 @@
 //
 //import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 //import cern.c2mon.server.common.alarm.Alarm;
-//import cern.c2mon.server.elasticsearch.structure.converter.EsAlarmLogConverter;
-//import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
+//import cern.c2mon.server.elasticsearch.alarm.EsAlarmLogConverter;
+//import cern.c2mon.server.elasticsearch.alarm.EsAlarm;
 //import cern.c2mon.server.test.CacheObjectCreation;
 //
 //import static junit.framework.TestCase.assertEquals;

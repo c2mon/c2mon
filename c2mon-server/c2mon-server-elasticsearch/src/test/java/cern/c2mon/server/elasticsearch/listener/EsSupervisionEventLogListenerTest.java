@@ -18,7 +18,8 @@ package cern.c2mon.server.elasticsearch.listener;
 
 import java.sql.Timestamp;
 
-import cern.c2mon.server.elasticsearch.structure.converter.EsSupervisionEventConverter;
+import cern.c2mon.server.elasticsearch.supervision.EsSupervisionEventConverter;
+import cern.c2mon.server.elasticsearch.supervision.EsSupervisionEventListener;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -27,7 +28,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.elasticsearch.structure.types.EsSupervisionEvent;
+import cern.c2mon.server.elasticsearch.supervision.EsSupervisionEvent;
 import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;

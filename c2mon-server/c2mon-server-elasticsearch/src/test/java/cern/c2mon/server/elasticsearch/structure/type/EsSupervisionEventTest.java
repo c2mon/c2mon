@@ -26,7 +26,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.server.elasticsearch.structure.types.EsSupervisionEvent;
+import cern.c2mon.server.elasticsearch.supervision.EsSupervisionEvent;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.fail;

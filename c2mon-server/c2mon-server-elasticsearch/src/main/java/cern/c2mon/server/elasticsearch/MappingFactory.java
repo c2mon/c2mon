@@ -1,4 +1,4 @@
-package cern.c2mon.server.elasticsearch.structure.mappings;
+package cern.c2mon.server.elasticsearch;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,7 +13,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
 import cern.c2mon.shared.common.type.TypeConverter;
 

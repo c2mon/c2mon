@@ -23,8 +23,8 @@
 //import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
 //import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 //import cern.c2mon.server.elasticsearch.connector.TransportConnector;
-//import cern.c2mon.server.elasticsearch.structure.mappings.MappingFactory;
-//import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
+//import cern.c2mon.server.elasticsearch.MappingFactory;
+//import cern.c2mon.server.elasticsearch.tag.EsTag;
 //import lombok.extern.slf4j.Slf4j;
 //import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 //import org.elasticsearch.action.search.SearchResponse;

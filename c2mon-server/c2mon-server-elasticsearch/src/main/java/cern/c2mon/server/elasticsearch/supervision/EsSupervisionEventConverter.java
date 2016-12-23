@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.elasticsearch.structure.converter;
+package cern.c2mon.server.elasticsearch.supervision;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.server.elasticsearch.structure.types.EsSupervisionEvent;
+import cern.c2mon.server.elasticsearch.supervision.EsSupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
 /**

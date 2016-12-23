@@ -17,19 +17,16 @@
 package cern.c2mon.server.elasticsearch.indexer;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.elasticsearch.structure.types.EsAlarm;
+import cern.c2mon.server.elasticsearch.alarm.AlarmIndexer;
+import cern.c2mon.server.elasticsearch.alarm.EsAlarm;
 import org.elasticsearch.ElasticsearchException;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.core.env.Environment;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Alban Marguet

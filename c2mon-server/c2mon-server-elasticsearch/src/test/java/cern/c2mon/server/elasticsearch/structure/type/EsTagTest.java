@@ -19,7 +19,7 @@ package cern.c2mon.server.elasticsearch.structure.type;
 import java.util.HashMap;
 import java.util.Map;
 
-import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
+import cern.c2mon.server.elasticsearch.tag.EsTag;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.Before;
@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import cern.c2mon.server.elasticsearch.structure.types.tag.TagQualityAnalysis;
+import cern.c2mon.server.elasticsearch.tag.TagQualityAnalysis;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.fail;

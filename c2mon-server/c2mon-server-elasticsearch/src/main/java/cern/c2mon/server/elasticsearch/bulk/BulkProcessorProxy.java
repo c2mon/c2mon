@@ -1,4 +1,4 @@
-package cern.c2mon.server.elasticsearch.indexer;
+package cern.c2mon.server.elasticsearch.bulk;
 
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.connector.TransportConnector;

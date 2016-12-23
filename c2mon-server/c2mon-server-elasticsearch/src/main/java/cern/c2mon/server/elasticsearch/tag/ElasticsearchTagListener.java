@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.elasticsearch.listener;
+package cern.c2mon.server.elasticsearch.tag;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,9 +24,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import cern.c2mon.server.elasticsearch.indexer.TagIndexer;
-import cern.c2mon.server.elasticsearch.structure.converter.ElasticsearchTagConverter;
-import cern.c2mon.server.elasticsearch.structure.types.tag.EsTag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -156,14 +153,12 @@ public class ElasticsearchTagListener implements C2monBufferedCacheListener<Tag>
 
   @Override
   public void start() {
-    log.debug("Starting Tag logger (elasticsearch)");
     running = true;
     listenerContainer.start();
   }
 
   @Override
   public void stop() {
-    log.debug("Stopping Tag logger (elasticsearch)");
     listenerContainer.stop();
     running = false;
   }

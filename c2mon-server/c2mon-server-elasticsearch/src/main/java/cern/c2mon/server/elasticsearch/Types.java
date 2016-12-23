@@ -1,4 +1,4 @@
-package cern.c2mon.server.elasticsearch.structure.types;
+package cern.c2mon.server.elasticsearch;
 
 /**
  * @author Justin Lewis Salmon
