@@ -27,53 +27,42 @@ import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.shared.common.metadata.Metadata;
 
 /**
- * Convert an Alarm to an {@link EsAlarm} for Elasticsearch writing.
+ * Convert an Alarm to an {@link AlarmDocument}.
  *
  * @author Alban Marguet
+ * @author Justin Lewis Salmon
  */
 @Component
-public class EsAlarmLogConverter implements Converter<Alarm, EsAlarm> {
+public class AlarmDocumentConverter implements Converter<Alarm, AlarmDocument> {
 
-  /**
-   * Converts an Alarm to an {@link EsAlarm} by getting all its data.
-   */
   @Override
-  public EsAlarm convert(final Alarm alarm) {
-    EsAlarm esAlarm = new EsAlarm();
+  public AlarmDocument convert(final Alarm alarm) {
+    AlarmDocument document = new AlarmDocument();
 
-    if (alarm == null || alarm.getTagId() == null) {
-      return null;
-    }
+    document.put("id", alarm.getId());
+    document.put("tagId", alarm.getTagId());
+    document.put("active", alarm.isActive());
+    document.put("activeNumeric", alarm.isActive() ? 1 : 0);
+    document.put("faultFamily", alarm.getFaultFamily());
+    document.put("faultMember", alarm.getFaultMember());
+    document.put("faultCode", alarm.getFaultCode());
+    document.put("timestamp", alarm.getTimestamp().getTime());
+    document.put("info", alarm.isActive());
+    document.put("metadata", getMetadata(alarm));
 
-    esAlarm.setTagId(alarm.getTagId());
-    esAlarm.setId(alarm.getId());
-
-    esAlarm.setActive(alarm.isActive());
-    esAlarm.setActiveNumeric(alarm.isActive() ? 1 : 0);
-
-    esAlarm.setFaultFamily(alarm.getFaultFamily());
-    esAlarm.setFaultMember(alarm.getFaultMember());
-    esAlarm.setFaultCode(alarm.getFaultCode());
-
-    esAlarm.setTimestamp(alarm.getTimestamp().getTime());
-
-    esAlarm.setInfo(alarm.getInfo());
-
-    esAlarm.getMetadata().putAll(retrieveMetadata(alarm));
-
-    return esAlarm;
+    return document;
   }
 
-  private Map<String, String> retrieveMetadata(final Alarm alarm) {
-    final Metadata metadata = alarm.getMetadata();
-    if (metadata == null) {
-      return Collections.emptyMap();
+  private Map<String, Object> getMetadata(Alarm alarm) {
+    Metadata metadata = alarm.getMetadata();
+
+    if (metadata != null) {
+      return metadata.getMetadata().entrySet().stream().collect(Collectors.toMap(
+          Map.Entry::getKey,
+          e -> e.getValue() == null ? null : e.getValue().toString()
+      ));
     }
 
-    return metadata.getMetadata().entrySet().stream()
-            .collect(Collectors.toMap(
-                    Map.Entry::getKey,
-                    entry -> entry.getValue().toString()));
+    return Collections.emptyMap();
   }
-
 }

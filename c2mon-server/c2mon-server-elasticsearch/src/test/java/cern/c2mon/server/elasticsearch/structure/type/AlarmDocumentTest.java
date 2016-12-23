@@ -19,7 +19,7 @@ package cern.c2mon.server.elasticsearch.structure.type;
 import java.util.HashMap;
 import java.util.Map;
 
-import cern.c2mon.server.elasticsearch.alarm.EsAlarm;
+import cern.c2mon.server.elasticsearch.alarm.AlarmDocument;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.Before;
@@ -34,9 +34,9 @@ import static junit.framework.TestCase.fail;
  * @author Alban Marguet
  */
 @RunWith(JUnit4.class)
-public class EsAlarmTest {
+public class AlarmDocumentTest {
   private Gson gson = new GsonBuilder().create();
-  private EsAlarm esAlarm;
+  private AlarmDocument alarmDocument;
   private String expectedJson;
   private long tagId = 1;
   private long alarmId = 2;
@@ -57,26 +57,26 @@ public class EsAlarmTest {
     metadata.put("test1", "value1");
     metadata.put("test2", "value2");
 
-    esAlarm = new EsAlarm();
-    esAlarm.setId(alarmId);
-    esAlarm.setTagId(tagId);
-    esAlarm.setFaultFamily(faultFamily);
-    esAlarm.setFaultMember(faultMember);
-    esAlarm.setFaultCode(faultCode);
-    esAlarm.setActive(active);
-    esAlarm.setActiveNumeric(activeNumeric);
-    esAlarm.setInfo(info);
-    esAlarm.setTimestamp(serverTimestamp);
-    esAlarm.getMetadata().putAll(metadata);
+    alarmDocument = new AlarmDocument();
+    alarmDocument.setId(alarmId);
+    alarmDocument.setTagId(tagId);
+    alarmDocument.setFaultFamily(faultFamily);
+    alarmDocument.setFaultMember(faultMember);
+    alarmDocument.setFaultCode(faultCode);
+    alarmDocument.setActive(active);
+    alarmDocument.setActiveNumeric(activeNumeric);
+    alarmDocument.setInfo(info);
+    alarmDocument.setTimestamp(serverTimestamp);
+    alarmDocument.getMetadata().putAll(metadata);
 
-    expectedJson = gson.toJson(esAlarm);
+    expectedJson = gson.toJson(alarmDocument);
   }
 
   @Test
   public void testJsonSerialization() {
     try {
-      assertEquals(expectedJson, esAlarm.toString());
-      assertEquals(esAlarm, esAlarm.getObject(expectedJson));
+      assertEquals(expectedJson, alarmDocument.toString());
+      assertEquals(alarmDocument, alarmDocument.getObject(expectedJson));
     } catch(Exception e) {
       fail("Should be able to serialize/deserialize JSON");
     }

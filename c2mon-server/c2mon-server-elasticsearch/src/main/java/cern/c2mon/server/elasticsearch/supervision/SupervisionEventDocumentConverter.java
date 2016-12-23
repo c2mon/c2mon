@@ -19,45 +19,36 @@ package cern.c2mon.server.elasticsearch.supervision;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.server.elasticsearch.supervision.EsSupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
 /**
- * Converts a SupervisionEvent to a {@link EsSupervisionEvent} used in Elasticsearch.
+ * Converts a SupervisionEvent to a {@link SupervisionEventDocument}.
  *
  * @author Alban Marguet
  */
 @Component
-public class EsSupervisionEventConverter implements Converter<SupervisionEvent, EsSupervisionEvent> {
+public class SupervisionEventDocumentConverter implements Converter<SupervisionEvent, SupervisionEventDocument> {
 
-  /**
-   * A supervisionEvent becomes a {@link EsSupervisionEvent}.
-   */
   @Override
-  public EsSupervisionEvent convert(final SupervisionEvent supervisionEvent) {
-    if (supervisionEvent == null) {
-      return null;
-    }
+  public SupervisionEventDocument convert(final SupervisionEvent supervisionEvent) {
+    SupervisionEventDocument event = new SupervisionEventDocument();
 
-    EsSupervisionEvent esSupervisionEvent = new EsSupervisionEvent();
-
-    esSupervisionEvent.setId(supervisionEvent.getEntityId());
-
-    esSupervisionEvent.setName(supervisionEvent.getName());
+    event.put("id", supervisionEvent.getEntityId());
+    event.put("name", supervisionEvent.getName());
+    event.put("message", supervisionEvent.getMessage());
 
     if (supervisionEvent.getEntity() != null) {
-      esSupervisionEvent.setEntity(supervisionEvent.getEntity().name());
+      event.put("entity", supervisionEvent.getEntity().name());
     }
 
     if (supervisionEvent.getEventTime() != null) {
-      esSupervisionEvent.setTimestamp(supervisionEvent.getEventTime().getTime());
+      event.put("timestamp", supervisionEvent.getEventTime().getTime());
     }
-    esSupervisionEvent.setMessage(supervisionEvent.getMessage());
 
     if (supervisionEvent.getStatus() != null) {
-      esSupervisionEvent.setStatus(supervisionEvent.getStatus().name());
+      event.put("status", supervisionEvent.getStatus().name());
     }
 
-    return esSupervisionEvent;
+    return event;
   }
 }

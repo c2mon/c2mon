@@ -1,10 +1,10 @@
 package cern.c2mon.server.elasticsearch;
 
+import cern.c2mon.server.elasticsearch.alarm.AlarmDocument;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.connector.TransportConnector;
-import cern.c2mon.server.elasticsearch.alarm.EsAlarm;
-import cern.c2mon.server.elasticsearch.supervision.EsSupervisionEvent;
-import cern.c2mon.server.elasticsearch.tag.EsTag;
+import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocument;
+import cern.c2mon.server.elasticsearch.tag.TagDocument;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
@@ -94,19 +94,19 @@ public class Indices {
     return false;
   }
 
-  public static String indexFor(EsTag tag) {
+  public static String indexFor(TagDocument tag) {
     String prefix = self.properties.getIndexPrefix() + "-tag_";
-    return getIndexName(prefix, tag.getTimestamp());
+    return getIndexName(prefix, (Long) tag.get("timestamp"));
   }
 
-  public static String indexFor(EsAlarm alarm) {
+  public static String indexFor(AlarmDocument alarm) {
     String prefix = self.properties.getIndexPrefix() + "-alarm_";
-    return getIndexName(prefix, alarm.getTimestamp());
+    return getIndexName(prefix, (Long) alarm.get("timestamp"));
   }
 
-  public static String indexFor(EsSupervisionEvent supervisionEvent) {
+  public static String indexFor(SupervisionEventDocument supervisionEvent) {
     String prefix = self.properties.getIndexPrefix() + "-supervision_";
-    return getIndexName(prefix, supervisionEvent.getTimestamp());
+    return getIndexName(prefix, (Long) supervisionEvent.get("timestamp"));
   }
 
   private static String getIndexName(String prefix, long timestamp) {

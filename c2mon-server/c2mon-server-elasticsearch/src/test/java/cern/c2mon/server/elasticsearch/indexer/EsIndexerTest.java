@@ -24,7 +24,7 @@
 //import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 //import cern.c2mon.server.elasticsearch.connector.TransportConnector;
 //import cern.c2mon.server.elasticsearch.MappingFactory;
-//import cern.c2mon.server.elasticsearch.tag.EsTag;
+//import cern.c2mon.server.elasticsearch.tag.TagDocument;
 //import lombok.extern.slf4j.Slf4j;
 //import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 //import org.elasticsearch.action.search.SearchResponse;
@@ -56,7 +56,7 @@
 //  private static final String TAG_INDEX_SUFFIX = "-tag_";
 //
 //  @Autowired
-//  private EsTagIndexer<EsTag> indexer;
+//  private EsTagIndexer<TagDocument> indexer;
 //
 //  @Autowired
 //  private TransportConnector connector;
@@ -223,8 +223,8 @@
 //
 //  @Test
 //  public void testIndexTags() throws IDBPersistenceException {
-//    List<EsTag> list = new ArrayList<>();
-//    EsTag tag = new EsTag(1L, Boolean.class.getName());
+//    List<TagDocument> list = new ArrayList<>();
+//    TagDocument tag = new TagDocument(1L, Boolean.class.getName());
 //
 //    tag.getC2mon().setServerTimestamp(123456789000L);
 //    tag.setRawValue(true);
@@ -261,7 +261,7 @@
 //
 //    //not all tags have the same metadata and last tag has nothing
 //    for (; id <= size; id++, tagServerTime += 1000) {
-//      tag = new EsTag(id, String.class.getName());
+//      tag = new TagDocument(id, String.class.getName());
 //
 //      tag.getC2mon().setServerTimestamp(tagServerTime);
 //      list.add(tag);

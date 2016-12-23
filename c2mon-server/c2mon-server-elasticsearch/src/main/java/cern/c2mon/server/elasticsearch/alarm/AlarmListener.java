@@ -20,8 +20,9 @@ import javax.annotation.PostConstruct;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.server.cache.C2monCacheListener;
@@ -31,56 +32,28 @@ import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 
 /**
- * Listens to updates in the Alarm cache and send them to Elasticsearch with the {@link AlarmIndexer} class.
+ * Listens to updates in the Alarm cache and sends them to Elasticsearch.
  *
  * @author Alban Marguet
  */
 @Slf4j
-@Service
-public class EsAlarmLogListener implements C2monCacheListener<Alarm>, SmartLifecycle {
-  /**
-   * Reference to registration service.
-   */
-  private final CacheRegistrationService cacheRegistrationService;
+@Component
+public class AlarmListener implements C2monCacheListener<Alarm>, SmartLifecycle {
 
-  /**
-   * Bean that logs Tags into Elasticsearch.
-   */
-  private final IPersistenceManager<EsAlarm> persistenceManager;
+  @Autowired
+  private CacheRegistrationService cacheRegistrationService;
 
-  /**
-   * Allows to get the right information from the Alarm to create an EsAlarm instance.
-   */
-  private final EsAlarmLogConverter esAlarmLogConverter;
+  @Autowired
+  @Qualifier("alarmDocumentPersistenceManager")
+  private IPersistenceManager<AlarmDocument> persistenceManager;
 
-  /**
-   * Listener container lifecycle hook.
-   */
+  @Autowired
+  private AlarmDocumentConverter converter;
+
   private Lifecycle listenerContainer;
 
-  /**
-   * Lifecycle flag.
-   */
   private volatile boolean running = false;
 
-  /**
-   * Autowired constructor.
-   *
-   * @param cacheRegistrationService f or registering cache listeners.
-   * @param esAlarmPersistenceManager for logging cache objects to Elasticsearch.
-   */
-  @Autowired
-  public EsAlarmLogListener(final CacheRegistrationService cacheRegistrationService,
-                            final IPersistenceManager<EsAlarm> esAlarmPersistenceManager,
-                            final EsAlarmLogConverter esAlarmLogConverter) {
-    this.cacheRegistrationService = cacheRegistrationService;
-    this.persistenceManager = esAlarmPersistenceManager;
-    this.esAlarmLogConverter = esAlarmLogConverter;
-  }
-
-  /**
-   * Registers to be notified of all Tag updates (data, rule and control tags).
-   */
   @PostConstruct
   public void init() {
     listenerContainer = cacheRegistrationService.registerToAlarms(this);
@@ -91,24 +64,16 @@ public class EsAlarmLogListener implements C2monCacheListener<Alarm>, SmartLifec
    */
   @Override
   public void notifyElementUpdated(final Alarm alarm) {
-    if(alarm == null) {
-      log.warn("notifyElementUpdated() - Warning: The received alarm was null.");
+    if (alarm == null) {
+      log.warn("Received a null alarm");
       return;
     }
 
-    log.debug("notifyElementUpdated() - Received an Alarm event with body: " + alarm.toString());
-    try {
-      EsAlarm esAlarm = esAlarmLogConverter.convert(alarm);
-      persistenceManager.storeData(esAlarm);
-    } catch(Exception e) {
-      log.error("notifyElementUpdated() - Could not add Alarm to Elasticsearch: Alarm # " + alarm.getId() + ".", e);
-    }
+    persistenceManager.storeData(converter.convert(alarm));
   }
 
   @Override
-  public void confirmStatus(Alarm alarm) {
-    // no confirmation required
-  }
+  public void confirmStatus(Alarm alarm) {}
 
   @Override
   public boolean isAutoStartup() {
@@ -128,14 +93,12 @@ public class EsAlarmLogListener implements C2monCacheListener<Alarm>, SmartLifec
 
   @Override
   public void start() {
-    log.debug("Starting Alarm logger (elasticsearch)");
     running = true;
     listenerContainer.start();
   }
 
   @Override
   public void stop() {
-    log.debug("Stopping Alarm logger (elasticsearch)");
     listenerContainer.stop();
     running = false;
   }

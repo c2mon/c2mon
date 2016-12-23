@@ -35,22 +35,22 @@ import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
  */
 @Slf4j
 @Component
-public class AlarmIndexer implements IDBPersistenceHandler<EsAlarm> {
+public class AlarmDocumentIndexer implements IDBPersistenceHandler<AlarmDocument> {
 
   private TransportConnector connector;
 
   @Autowired
-  public AlarmIndexer(final TransportConnector connector) {
+  public AlarmDocumentIndexer(final TransportConnector connector) {
     this.connector = connector;
   }
 
   @Override
-  public void storeData(EsAlarm alarm) throws IDBPersistenceException {
+  public void storeData(AlarmDocument alarm) throws IDBPersistenceException {
     storeData(Collections.singletonList(alarm));
   }
 
   @Override
-  public void storeData(List<EsAlarm> alarms) throws IDBPersistenceException {
+  public void storeData(List<AlarmDocument> alarms) throws IDBPersistenceException {
     try {
       long failed = alarms.stream().filter(alarm -> !this.indexAlarm(alarm)).count();
 
@@ -62,7 +62,7 @@ public class AlarmIndexer implements IDBPersistenceHandler<EsAlarm> {
     }
   }
 
-  private boolean indexAlarm(EsAlarm alarm) {
+  private boolean indexAlarm(AlarmDocument alarm) {
     String indexName = getOrCreateIndex(alarm);
 
     log.debug("Adding new alarm event to index {}", indexName);
@@ -73,7 +73,7 @@ public class AlarmIndexer implements IDBPersistenceHandler<EsAlarm> {
         .get().isCreated();
   }
 
-  private String getOrCreateIndex(EsAlarm alarm) {
+  private String getOrCreateIndex(AlarmDocument alarm) {
     String index = Indices.indexFor(alarm);
 
     if (!Indices.exists(index)) {

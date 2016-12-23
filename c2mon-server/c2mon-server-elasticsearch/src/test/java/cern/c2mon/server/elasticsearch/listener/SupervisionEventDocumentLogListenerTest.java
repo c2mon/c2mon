@@ -18,8 +18,9 @@ package cern.c2mon.server.elasticsearch.listener;
 
 import java.sql.Timestamp;
 
-import cern.c2mon.server.elasticsearch.supervision.EsSupervisionEventConverter;
-import cern.c2mon.server.elasticsearch.supervision.EsSupervisionEventListener;
+import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocumentConverter;
+import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocument;
+import cern.c2mon.server.elasticsearch.supervision.SupervisionEventListener;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -28,7 +29,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.elasticsearch.supervision.EsSupervisionEvent;
 import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
@@ -38,12 +38,12 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 /**
- * Test if the the SupervisionEvent are well translated into EsSupervisionEvent for Elasticsearch.
+ * Test if the the SupervisionEvent are well translated into SupervisionEventDocument for Elasticsearch.
  *
  * @author Alban Marguet
  */
 @RunWith(MockitoJUnitRunner.class)
-public class EsSupervisionEventLogListenerTest {
+public class SupervisionEventDocumentLogListenerTest {
   private SupervisionConstants.SupervisionEntity entity = SupervisionConstants.SupervisionEntity.PROCESS;
   private SupervisionConstants.SupervisionStatus status = SupervisionConstants.SupervisionStatus.RUNNING;
   private Timestamp timestamp = new Timestamp(123456789);
@@ -51,7 +51,7 @@ public class EsSupervisionEventLogListenerTest {
   private String name = "P_TEST";
   private String message = "message";
   private SupervisionEvent event = new SupervisionEventImpl(entity, id, name, status, timestamp, message);
-  private EsSupervisionEvent esSupervisionEvent;
+  private SupervisionEventDocument supervisionEventDocument;
 
   @Mock
   private SupervisionNotifier supervisionNotifier;
@@ -60,14 +60,14 @@ public class EsSupervisionEventLogListenerTest {
   private IPersistenceManager persistenceManager;
 
   @InjectMocks
-  private EsSupervisionEventListener listener;
+  private SupervisionEventListener listener;
 
   @Mock
-  private EsSupervisionEventConverter esSupervisionEventConverter;
+  private SupervisionEventDocumentConverter supervisionEventDocumentConverter;
 
   @Test
   public void testNotifySupervisionEvent() throws IDBPersistenceException {
-    when(esSupervisionEventConverter.convert(eq(event))).thenReturn(esSupervisionEvent);
+    when(supervisionEventDocumentConverter.convert(eq(event))).thenReturn(supervisionEventDocument);
     listener.notifySupervisionEvent(event);
   }
 

@@ -36,22 +36,22 @@ import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
  */
 @Slf4j
 @Component
-public class TagIndexer implements IDBPersistenceHandler<EsTag> {
+public class TagDocumentIndexer implements IDBPersistenceHandler<TagDocument> {
 
   private final BulkProcessorProxy bulkProcessor;
 
   @Autowired
-  public TagIndexer(BulkProcessorProxy bulkProcessor) {
+  public TagDocumentIndexer(BulkProcessorProxy bulkProcessor) {
     this.bulkProcessor = bulkProcessor;
   }
 
   @Override
-  public void storeData(EsTag tag) throws IDBPersistenceException {
+  public void storeData(TagDocument tag) throws IDBPersistenceException {
     storeData(Collections.singletonList(tag));
   }
 
   @Override
-  public void storeData(List<EsTag> tags) throws IDBPersistenceException {
+  public void storeData(List<TagDocument> tags) throws IDBPersistenceException {
     try {
       log.debug("Trying to send a batch of size {}", tags.size());
       tags.forEach(this::indexTag);
@@ -63,9 +63,9 @@ public class TagIndexer implements IDBPersistenceHandler<EsTag> {
     }
   }
 
-  private void indexTag(EsTag tag) {
+  private void indexTag(TagDocument tag) {
     String index = getOrCreateIndex(tag);
-    String type = Types.of(tag.getC2mon().getDataType());
+    String type = Types.of(((Map) tag.get("c2mon")).get("dataType").toString());
 
     log.trace("Indexing tag (#{}, index={}, type={})", tag.getId(), index, type);
 
@@ -76,7 +76,7 @@ public class TagIndexer implements IDBPersistenceHandler<EsTag> {
     bulkProcessor.add(indexNewTag);
   }
 
-  private String getOrCreateIndex(EsTag tag) {
+  private String getOrCreateIndex(TagDocument tag) {
     String index = Indices.indexFor(tag);
 
     if (!Indices.exists(index)) {

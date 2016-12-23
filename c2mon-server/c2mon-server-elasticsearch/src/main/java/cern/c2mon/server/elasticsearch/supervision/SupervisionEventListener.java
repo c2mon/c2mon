@@ -35,56 +35,29 @@ import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
 /**
- * Listens for Supervision notifications and send the corresponding {@link EsSupervisionEvent} to Elasticsearch.
+ * Listens for supervision notifications and sends the corresponding
+ * {@link SupervisionEventDocument} to Elasticsearch.
  *
  * @author Alban Marguet
  */
 @Slf4j
 @Service
-public class EsSupervisionEventListener implements SupervisionListener, SmartLifecycle {
-  /**
-   * Notifier of supervision module.
-   */
+public class SupervisionEventListener implements SupervisionListener, SmartLifecycle {
+
+  @Autowired
   private SupervisionNotifier supervisionNotifier;
 
-  /**
-   * Supervision Mapper
-   */
-  private IPersistenceManager<EsSupervisionEvent> persistenceManager;
+  @Autowired
+  @Qualifier("supervisionEventDocumentPersistenceManager")
+  private IPersistenceManager<SupervisionEventDocument> persistenceManager;
 
-  /**
-   * Convert SupervisionEvent to EsSupervisionEvent for Elasticsearch.
-   */
-  private EsSupervisionEventConverter esSupervisionEventConverter;
+  @Autowired
+  private SupervisionEventDocumentConverter converter;
 
-  /**
-   * Listener container lifecycle hook.
-   */
   private Lifecycle listenerContainer;
 
-  /**
-   * Lifecycle flag.
-   */
   private volatile boolean running = false;
 
-  /**
-   * Autowired constructor.
-   *
-   * @param supervisionNotifier the notifier to register to
-   * @param persistenceManager  the mapper to write to the DB
-   */
-  @Autowired
-  public EsSupervisionEventListener(final SupervisionNotifier supervisionNotifier,
-                                    @Qualifier("esSupervisionEventPersistenceManager") final IPersistenceManager<EsSupervisionEvent> persistenceManager,
-                                    final EsSupervisionEventConverter esSupervisionEventConverter) {
-    this.supervisionNotifier = supervisionNotifier;
-    this.persistenceManager = persistenceManager;
-    this.esSupervisionEventConverter = esSupervisionEventConverter;
-  }
-
-  /**
-   * Called at bean initialisation. Registers for notifications.
-   */
   @PostConstruct
   public void init() {
     listenerContainer = supervisionNotifier.registerAsListener(this);
@@ -93,21 +66,15 @@ public class EsSupervisionEventListener implements SupervisionListener, SmartLif
   @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
   @Override
   public void notifySupervisionEvent(final SupervisionEvent supervisionEvent) {
-    if(supervisionEvent == null) {
-      log.warn("notifySupervisionEvent() - Warning: Received a null supervision event.");
+    if (supervisionEvent == null) {
+      log.warn("Received a null supervision event");
       return;
     }
 
-    log.debug("notifySupervisionEvent() - Logging supervision status " + supervisionEvent.getStatus()
-        + " for " + supervisionEvent.getEntity()
-        + " " + supervisionEvent.getEntityId() + " to Elasticsearch");
+    log.debug("Indexing supervision event {} for entity {} (#{})",
+        supervisionEvent.getStatus(), supervisionEvent.getEntity(), supervisionEvent.getEntityId());
 
-    try {
-      EsSupervisionEvent esSupervisionEvent = esSupervisionEventConverter.convert(supervisionEvent);
-      persistenceManager.storeData(esSupervisionEvent);
-    } catch(Exception e) {
-      log.error("Could not add SupervisionEvent to Elasticsearch: Event #{}", supervisionEvent.getEntityId(), e);
-    }
+    persistenceManager.storeData(converter.convert(supervisionEvent));
   }
 
   @Override
@@ -128,14 +95,12 @@ public class EsSupervisionEventListener implements SupervisionListener, SmartLif
 
   @Override
   public void start() {
-    log.debug("Starting ES supervision event logger.");
     running = true;
     listenerContainer.start();
   }
 
   @Override
   public void stop() {
-    log.debug("Stopping ES supervision event logger.");
     listenerContainer.stop();
     running = false;
   }

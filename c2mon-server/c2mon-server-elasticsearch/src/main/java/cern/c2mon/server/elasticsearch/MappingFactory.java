@@ -47,7 +47,7 @@ public class MappingFactory {
     } else if (Number.class.isAssignableFrom(clazz)) {
       properties.put("value", ImmutableMap.of("type", "double"));
 
-      if (Long.class.isAssignableFrom(TypeConverter.getType(dataType))) {
+      if (Long.class.isAssignableFrom(clazz)) {
         properties.put("valueLong", ImmutableMap.of("type", "long"));
       }
     } else if (Boolean.class.isAssignableFrom(clazz)) {

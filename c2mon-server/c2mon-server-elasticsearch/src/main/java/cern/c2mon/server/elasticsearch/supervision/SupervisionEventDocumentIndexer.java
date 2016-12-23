@@ -35,22 +35,22 @@ import cern.c2mon.server.elasticsearch.MappingFactory;
  */
 @Slf4j
 @Component
-public class SupervisionEventIndexer implements IDBPersistenceHandler<EsSupervisionEvent> {
+public class SupervisionEventDocumentIndexer implements IDBPersistenceHandler<SupervisionEventDocument> {
 
   private TransportConnector connector;
 
   @Autowired
-  public SupervisionEventIndexer(final TransportConnector connector) {
+  public SupervisionEventDocumentIndexer(final TransportConnector connector) {
     this.connector = connector;
   }
 
   @Override
-  public void storeData(EsSupervisionEvent supervisionEvent) throws IDBPersistenceException {
+  public void storeData(SupervisionEventDocument supervisionEvent) throws IDBPersistenceException {
     storeData(Collections.singletonList(supervisionEvent));
   }
 
   @Override
-  public void storeData(List<EsSupervisionEvent> supervisionEvents) throws IDBPersistenceException {
+  public void storeData(List<SupervisionEventDocument> supervisionEvents) throws IDBPersistenceException {
     try {
       long failed = supervisionEvents.stream().filter(alarm -> !this.indexSupervisionEvent(alarm)).count();
 
@@ -62,7 +62,7 @@ public class SupervisionEventIndexer implements IDBPersistenceHandler<EsSupervis
     }
   }
 
-  private boolean indexSupervisionEvent(EsSupervisionEvent supervisionEvent) {
+  private boolean indexSupervisionEvent(SupervisionEventDocument supervisionEvent) {
     String indexName = getOrCreateIndex(supervisionEvent);
 
     log.debug("Adding new supervision event to index {}", indexName);
@@ -73,7 +73,7 @@ public class SupervisionEventIndexer implements IDBPersistenceHandler<EsSupervis
         .get().isCreated();
   }
 
-  private String getOrCreateIndex(EsSupervisionEvent supervisionEvent) {
+  private String getOrCreateIndex(SupervisionEventDocument supervisionEvent) {
     String index = Indices.indexFor(supervisionEvent);
 
     if (!Indices.exists(index)) {

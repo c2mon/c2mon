@@ -14,47 +14,44 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.elasticsearch.supervision;
-
-import cern.c2mon.server.elasticsearch.types.GsonSupplier;
-import com.google.gson.Gson;
-import lombok.Data;
-import lombok.NonNull;
+package cern.c2mon.server.elasticsearch.alarm;
 
 import cern.c2mon.pmanager.IFallback;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+import java.util.HashMap;
 
 /**
- * Represents a SupervisionEvent for Elasticsearch.
- *
  * @author Alban Marguet
+ * @author Justin Lewis Salmon
  */
-@Data
-public class EsSupervisionEvent implements IFallback {
-  @NonNull
-  private final transient Gson gson = GsonSupplier.INSTANCE.get();
+public class AlarmDocument extends HashMap<String, Object> implements IFallback {
 
-  private long id;
-  private String name;
-  private String entity;
-  private String message;
-  private String status;
-  private long timestamp;
+  private static final ObjectMapper mapper = new ObjectMapper();
 
-  /**
-   * JSON representation of the EsSupervisionEvent
-   */
   @Override
-  public String toString() {
-    return gson.toJson(this);
+  public String getId() {
+    return String.valueOf(this.get("id"));
   }
 
   @Override
   public IFallback getObject(String line) {
-    return gson.fromJson(line, EsSupervisionEvent.class);
+    try {
+      return mapper.readValue(line, AlarmDocument.class);
+    } catch (IOException e) {
+      throw new RuntimeException("Error reading line from fallback", e);
+    }
   }
 
   @Override
-  public String getId() {
-    return String.valueOf(id);
+  public String toString() {
+    try {
+      return mapper.writeValueAsString(this);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Error serializing document", e);
+    }
   }
 }

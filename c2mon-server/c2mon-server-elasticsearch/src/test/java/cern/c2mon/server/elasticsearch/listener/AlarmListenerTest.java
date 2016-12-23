@@ -16,7 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.listener;
 
-import cern.c2mon.server.elasticsearch.alarm.EsAlarmLogListener;
+import cern.c2mon.server.elasticsearch.alarm.AlarmDocument;
+import cern.c2mon.server.elasticsearch.alarm.AlarmListener;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,8 +28,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.elasticsearch.alarm.EsAlarmLogConverter;
-import cern.c2mon.server.elasticsearch.alarm.EsAlarm;
+import cern.c2mon.server.elasticsearch.alarm.AlarmDocumentConverter;
 import cern.c2mon.server.test.CacheObjectCreation;
 
 import static org.mockito.Matchers.eq;
@@ -40,24 +40,24 @@ import static org.mockito.Mockito.when;
  * @author Alban Marguet
  */
 @RunWith(MockitoJUnitRunner.class)
-public class EsAlarmLogListenerTest {
+public class AlarmListenerTest {
   @InjectMocks
-  private EsAlarmLogListener listener;
+  private AlarmListener listener;
   @Mock
   private IPersistenceManager persistenceManager;
   @Mock
-  private EsAlarmLogConverter esAlarmLogConverter;
+  private AlarmDocumentConverter alarmDocumentConverter;
   private Alarm alarm = CacheObjectCreation.createTestAlarm1();
-  private EsAlarm EsAlarm = new EsAlarm();
+  private AlarmDocument AlarmDocument = new AlarmDocument();
 
   @Before
   public void setup() {
-    when(esAlarmLogConverter.convert(eq(alarm))).thenReturn(EsAlarm);
+    when(alarmDocumentConverter.convert(eq(alarm))).thenReturn(AlarmDocument);
   }
 
   @Test
   public void testAlarmIsSentToIndexer() throws IDBPersistenceException {
     listener.notifyElementUpdated(alarm);
-    verify(esAlarmLogConverter).convert(eq(alarm));
+    verify(alarmDocumentConverter).convert(eq(alarm));
   }
 }

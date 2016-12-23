@@ -20,7 +20,7 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
-import cern.c2mon.server.elasticsearch.alarm.EsAlarmLogConverter;
+import cern.c2mon.server.elasticsearch.alarm.AlarmDocumentConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +29,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.elasticsearch.alarm.EsAlarm;
+import cern.c2mon.server.elasticsearch.alarm.AlarmDocument;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.metadata.Metadata;
 
@@ -37,52 +37,52 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNull;
 
 /**
- * Insure that EsAlarmLogConverter converts well Alarm to EsAlarm.
+ * Insure that EsAlarmLogConverter converts well Alarm to AlarmDocument.
  * @author Alban Marguet
  */
 @Slf4j
 @RunWith(MockitoJUnitRunner.class)
-public class EsAlarmLogConverterTest {
+public class AlarmDocumentConverterTest {
   @InjectMocks
-  private EsAlarmLogConverter esAlarmLogConverter;
+  private AlarmDocumentConverter alarmDocumentConverter;
   private Alarm alarm;
-  private EsAlarm esAlarm;
+  private AlarmDocument alarmDocument;
   private String[] arrayString = new String[]{};
 
   @Test
   public void testNullConvertsToNull() {
-    esAlarm = esAlarmLogConverter.convert(alarm);
-    assertNull(esAlarm);
+    alarmDocument = alarmDocumentConverter.convert(alarm);
+    assertNull(alarmDocument);
   }
 
   @Test
   public void testDataIsPreserved() {
     alarm = CacheObjectCreation.createTestAlarm1();
-    esAlarm = esAlarmLogConverter.convert(alarm);
+    alarmDocument = alarmDocumentConverter.convert(alarm);
 
-    callTests(esAlarm, alarm);
+    callTests(alarmDocument, alarm);
   }
 
   @Test
   public void testMetadata() {
     alarm = initAlarmWithMetadata();
 
-    esAlarm = esAlarmLogConverter.convert(alarm);
-    callTests(esAlarm, alarm);
+    alarmDocument = alarmDocumentConverter.convert(alarm);
+    callTests(alarmDocument, alarm);
     log.debug(arrayString.toString());
-    assertEquals(arrayString.toString(), esAlarm.getMetadata().get("array"));
+    assertEquals(arrayString.toString(), alarmDocument.getMetadata().get("array"));
   }
 
-  private void callTests(EsAlarm esAlarm, Alarm alarm) {
-    log.debug(esAlarm.toString());
-    assertEquals(alarm.getTagId().longValue(), esAlarm.getTagId());
-    assertEquals(alarm.getId().longValue(), esAlarm.getIdAsLong());
-    assertEquals(alarm.getFaultFamily(), esAlarm.getFaultFamily());
-    assertEquals(alarm.getFaultMember(), esAlarm.getFaultMember());
-    assertEquals(alarm.getFaultCode(), esAlarm.getFaultCode());
-    assertEquals(alarm.isActive(), esAlarm.isActive());
-    assertEquals(alarm.getInfo(), esAlarm.getInfo());
-    assertEquals(alarm.getTimestamp().getTime(), esAlarm.getTimestamp());
+  private void callTests(AlarmDocument alarmDocument, Alarm alarm) {
+    log.debug(alarmDocument.toString());
+    assertEquals(alarm.getTagId().longValue(), alarmDocument.getTagId());
+    assertEquals(alarm.getId().longValue(), alarmDocument.getIdAsLong());
+    assertEquals(alarm.getFaultFamily(), alarmDocument.getFaultFamily());
+    assertEquals(alarm.getFaultMember(), alarmDocument.getFaultMember());
+    assertEquals(alarm.getFaultCode(), alarmDocument.getFaultCode());
+    assertEquals(alarm.isActive(), alarmDocument.isActive());
+    assertEquals(alarm.getInfo(), alarmDocument.getInfo());
+    assertEquals(alarm.getTimestamp().getTime(), alarmDocument.getTimestamp());
   }
 
   private Alarm initAlarmWithMetadata() {

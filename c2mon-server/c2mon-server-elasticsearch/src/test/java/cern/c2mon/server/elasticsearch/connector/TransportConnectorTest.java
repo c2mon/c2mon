@@ -46,19 +46,6 @@ public class TransportConnectorTest extends BaseElasticsearchIntegrationTest {
   @Autowired
   private ElasticsearchProperties properties;
 
-  @Before
-  public void clientSetup() {
-    while(!connector.isConnected()) {
-      sleep();
-    }
-    log.debug("Connected to the cluster " + properties.getClusterName());
-  }
-
-  @After
-  public void tidyUp() {
-    connector.getClient().admin().indices().delete(new DeleteIndexRequest("*")).actionGet();
-  }
-
   @Test
   public void testInit() {
     Settings expectedSettings = Settings.settingsBuilder()
@@ -68,33 +55,15 @@ public class TransportConnectorTest extends BaseElasticsearchIntegrationTest {
             .put("cluster.name", properties.getClusterName())
             .build();
 
+    assertEquals(expectedSettings, connector.getClient().settings());
+
     assertTrue(connector.isConnected());
     assertNotNull(connector.getClient());
     assertTrue(properties.isEmbedded());
-    assertEquals(expectedSettings, connector.getClient().settings());
     assertEquals("true", connector.getClient().settings().get("node.local"));
     assertEquals(properties.getNodeName(), connector.getClient().settings().get("node.name"));
   }
 
-  @Test
-  public void testInitTestPass() {
-    Client initClient = connector.getClient();
-
-//    connector.setClient(null);
-//    boolean isPassed = connector.waitForYellowStatus();
-//    assertFalse(isPassed);
-//
-//    connector.setClient(initClient);
-//    isPassed = connector.waitForYellowStatus();
-//    assertTrue(isPassed);
-  }
-
-  @Test
-  public void testCreateLocalClient() {
-    assertNotNull(connector.getClient());
-//    assertEquals(1, properties.getPort());
-//    assertEquals(isLocal, connector.getSettings().get("node.local"));
-  }
 //
 //  @Test
 //  public void testBulkAdd() {
@@ -103,15 +72,4 @@ public class TransportConnectorTest extends BaseElasticsearchIntegrationTest {
 //    assertTrue(result);
 //  }
 
-  private void sleep() {
-    sleep(500);
-  }
-
-  private void sleep(long millis) {
-    try {
-      Thread.sleep(millis);
-    } catch(InterruptedException e) {
-      e.printStackTrace();
-    }
-  }
 }

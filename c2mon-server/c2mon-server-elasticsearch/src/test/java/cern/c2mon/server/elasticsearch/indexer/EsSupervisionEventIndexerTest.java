@@ -32,7 +32,7 @@
 //import org.mockito.runners.MockitoJUnitRunner;
 //
 //import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-//import cern.c2mon.server.elasticsearch.supervision.EsSupervisionEvent;
+//import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocument;
 //import cern.c2mon.shared.client.supervision.SupervisionEvent;
 //import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 //import cern.c2mon.shared.common.supervision.SupervisionConstants;
@@ -58,10 +58,10 @@
 //  private String name = "P_TEST";
 //  private String message = "message";
 //  private SupervisionEvent event;
-//  private EsSupervisionEvent esSupervisionEvent;
+//  private SupervisionEventDocument esSupervisionEvent;
 //
 //  @InjectMocks
-//  private EsSupervisionEventIndexer<EsSupervisionEvent> indexer;
+//  private EsSupervisionEventIndexer<SupervisionEventDocument> indexer;
 //
 //  @Mock
 //  private TransportConnector connector;
@@ -75,7 +75,7 @@
 //  @Before
 //  public void setup() throws IDBPersistenceException {
 //    event = new SupervisionEventImpl(entity, id, name, status, timestamp, message);
-//    esSupervisionEvent = new EsSupervisionEvent();
+//    esSupervisionEvent = new SupervisionEventDocument();
 //    esSupervisionEvent.setId(id);
 //    esSupervisionEvent.setName(entity.name());
 //    esSupervisionEvent.setTimestamp(timestamp.getTime());
@@ -105,7 +105,7 @@
 //          SupervisionConstants.SupervisionStatus.RUNNING,
 //          new Timestamp(123456789),
 //          "test message");
-//      EsSupervisionEvent esSupervisionEvent = esSupervisionEventConverter.convert(event);
+//      SupervisionEventDocument esSupervisionEvent = esSupervisionEventConverter.convert(event);
 //      String mapping = MappingFactory.createSupervisionMapping();
 //
 //      Assert.assertTrue(connector.logSupervisionEvent(indexName, mapping, esSupervisionEvent));

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.elasticsearch.alarm;
+package cern.c2mon.server.elasticsearch.fallback;
 
 import java.io.File;
 
@@ -30,7 +30,7 @@ import cern.c2mon.pmanager.IAlarmListener;
  * @author Alban Marguet
  */
 @Component("esAlarmListener")
-public class EsAlarmListener implements IAlarmListener {
+public class FallbackActivationListener implements IAlarmListener {
 
   private final static Logger EMAIL_LOGGER = LoggerFactory.getLogger("AdminMailLogger");
 

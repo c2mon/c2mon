@@ -33,7 +33,7 @@
 //import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 //import cern.c2mon.server.common.alarm.Alarm;
 //import cern.c2mon.server.elasticsearch.alarm.EsAlarmLogConverter;
-//import cern.c2mon.server.elasticsearch.alarm.EsAlarm;
+//import cern.c2mon.server.elasticsearch.alarm.AlarmDocument;
 //import cern.c2mon.server.test.CacheObjectCreation;
 //
 //import static junit.framework.TestCase.assertEquals;
@@ -50,11 +50,11 @@
 //@RunWith(MockitoJUnitRunner.class)
 //public class EsAlarmIndexerTest {
 //  private Alarm alarm;
-//  private EsAlarm esAlarm;
+//  private AlarmDocument esAlarm;
 //  private Timestamp timestamp;
 //
 //  @InjectMocks
-//  private EsAlarmIndexer<EsAlarm> indexer;
+//  private EsAlarmIndexer<AlarmDocument> indexer;
 //
 //  @Mock
 //  private TransportConnector connector;
@@ -95,7 +95,7 @@
 //    EsAlarmLogConverter esAlarmLogConverter = new EsAlarmLogConverter();
 //
 //    for (long i = 1; i <= 3; i++) {
-//      EsAlarm esAlarm = esAlarmLogConverter.convert(CacheObjectCreation.createTestAlarm1());
+//      AlarmDocument esAlarm = esAlarmLogConverter.convert(CacheObjectCreation.createTestAlarm1());
 //      esAlarm.setId(i);
 //
 //      String mapping = MappingFactory.createAlarmMapping();

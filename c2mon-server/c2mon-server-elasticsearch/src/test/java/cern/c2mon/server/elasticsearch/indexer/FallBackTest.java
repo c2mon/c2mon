@@ -17,8 +17,8 @@
 package cern.c2mon.server.elasticsearch.indexer;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.elasticsearch.alarm.AlarmIndexer;
-import cern.c2mon.server.elasticsearch.alarm.EsAlarm;
+import cern.c2mon.server.elasticsearch.alarm.AlarmDocumentIndexer;
+import cern.c2mon.server.elasticsearch.alarm.AlarmDocument;
 import org.elasticsearch.ElasticsearchException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,11 +35,11 @@ import static org.mockito.Mockito.doThrow;
 public class FallBackTest {
 
   @InjectMocks
-  private AlarmIndexer alarmIndexer;
+  private AlarmDocumentIndexer alarmDocumentIndexer;
 
   @Test(expected = IDBPersistenceException.class)
   public void exceptionIsThrown() throws IDBPersistenceException {
-    doThrow(new ElasticsearchException("testException")).when(alarmIndexer).storeData(any(EsAlarm.class));
-    alarmIndexer.storeData(new EsAlarm());
+    doThrow(new ElasticsearchException("testException")).when(alarmDocumentIndexer).storeData(any(AlarmDocument.class));
+    alarmDocumentIndexer.storeData(new AlarmDocument());
   }
 }

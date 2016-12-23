@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.structure.type;
 
+import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocument;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -26,7 +27,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.server.elasticsearch.supervision.EsSupervisionEvent;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.fail;
@@ -36,9 +36,9 @@ import static org.junit.Assert.assertTrue;
  * @author Alban Marguet
  */
 @RunWith(JUnit4.class)
-public class EsSupervisionEventTest {
+public class SupervisionEventDocumentTest {
   private Gson gson = new GsonBuilder().create();
-  private EsSupervisionEvent esSupervisionEvent;
+  private SupervisionEventDocument supervisionEventDocument;
   private String expectedJson;
   private long id = 1;
   private String name = "P_TEST";
@@ -49,12 +49,12 @@ public class EsSupervisionEventTest {
 
   @Before
   public void setup() {
-    esSupervisionEvent = new EsSupervisionEvent();
-    esSupervisionEvent.setId(id);
-    esSupervisionEvent.setName(name);
-    esSupervisionEvent.setEntity(entity);
-    esSupervisionEvent.setMessage(message);
-    esSupervisionEvent.setStatus(status);
+    supervisionEventDocument = new SupervisionEventDocument();
+    supervisionEventDocument.setId(id);
+    supervisionEventDocument.setName(name);
+    supervisionEventDocument.setEntity(entity);
+    supervisionEventDocument.setMessage(message);
+    supervisionEventDocument.setStatus(status);
     JsonObject element = gson.toJsonTree(new Object()).getAsJsonObject();
     element.addProperty("id", id);
     element.addProperty("name", name);
@@ -68,8 +68,8 @@ public class EsSupervisionEventTest {
   @Test
   public void testJsonSerialization() {
     try {
-      assertEquals(expectedJson, esSupervisionEvent.toString());
-      assertEquals(esSupervisionEvent, esSupervisionEvent.getObject(expectedJson));
+      assertEquals(expectedJson, supervisionEventDocument.toString());
+      assertEquals(supervisionEventDocument, supervisionEventDocument.getObject(expectedJson));
     } catch(Exception e) {
       fail("Should be able to serialize/deserialize JSON");
     }
@@ -78,8 +78,8 @@ public class EsSupervisionEventTest {
   @Test
   public void testGetObject() {
     String line = "{\"id\":1,\"name\":\"P_TEST\",\"entity\":\"entity\",\"message\":\"message\",\"status\":\"status\",\"timestamp\":0}";
-    IFallback result = esSupervisionEvent.getObject(line);
-    assertTrue(result instanceof EsSupervisionEvent);
+    IFallback result = supervisionEventDocument.getObject(line);
+    assertTrue(result instanceof SupervisionEventDocument);
     Assert.assertEquals(line, result.toString());
   }
 }
