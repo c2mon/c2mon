@@ -382,16 +382,15 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
 
   /**
    * Synchronized on the Process cache object. Catches all exceptions. There is no need to
-   * send Process PIK to get the configuration file (Test mode can access it then)
+   * send Process PIK to get the configuration file (Test mode can access it then).
    *
    * @param processConfigurationRequest the configuration request object
-   * @return the configuration XML as a String or null if there was an exception
+   * @return processConfigurationResponse
    */
   @Override
   public ProcessConfigurationResponse onProcessConfiguration(final ProcessConfigurationRequest processConfigurationRequest) {
     ProcessConfigurationResponse processConfigurationResponse = new ProcessConfigurationResponse();
 
-    // Protect the method against accidental null parameters
     if (processConfigurationRequest == null) {
       LOGGER.error("onProcessConfiguration(null) called - rejecting the request.");
       processConfigurationResponse.setConfigurationXML(ProcessConfigurationResponse.CONF_REJECTED);

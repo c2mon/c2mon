@@ -112,7 +112,7 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
         MessageProducer messageProducer = session.createProducer(message.getJMSReplyTo());
         try {
           TextMessage replyMessage = session.createTextMessage();
-          replyMessage.setText(processMessageConverter.fromXML(processConnectionResponse);
+          replyMessage.setText(processMessageConverter.toXML(processConnectionResponse));
           messageProducer.send(replyMessage);
         } finally {
           messageProducer.close();
@@ -124,7 +124,7 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
         LOGGER.info("onMessage - DAQ configuration request received from DAQ " + processConfigurationRequest.getProcessName());
 
         // Create the processConfigurationResponse
-        String processConfiguration = this.supervisionManager.onProcessConfiguration(processConfigurationRequest);
+        ProcessConfigurationResponse processConfigurationResponse = this.supervisionManager.onProcessConfiguration(processConfigurationRequest);
 
         //send reply to DAQ on reply queue
         if (LOGGER.isDebugEnabled()) {
@@ -133,7 +133,7 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
         MessageProducer messageProducer = session.createProducer(message.getJMSReplyTo());
         try {
           TextMessage replyMessage = session.createTextMessage();
-          replyMessage.setText(processConfiguration);
+          replyMessage.setText(processMessageConverter.toXML(processConfigurationResponse));
           messageProducer.send(replyMessage);
         } finally {
           messageProducer.close();

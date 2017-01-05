@@ -19,18 +19,16 @@ package cern.c2mon.shared.daq.process;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageFormatException;
-import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jms.support.converter.MessageConversionException;
-import org.springframework.jms.support.converter.MessageConverter;
 
 /**
  * Helper class that specifies a converter between Java objects and JMS messages.
  * 
- * @author vilches
+ * @author Martin Flamm
  * 
  */
 public final class ProcessMessageConverter {
@@ -43,41 +41,38 @@ public final class ProcessMessageConverter {
   private XMLConverter xmlConverter = new XMLConverter();
 
   /**
-   * Convert from a JMS Message to a Java object.
+   * Converts from a XML based JMS Message to a Java object.
    * 
-   * @param message the message to convert for discovering who sends it
+   * @param message the xml based JMS message
    * @return the converted Java object
-   * @throws javax.jms.JMSException if thrown by JMS API methods
+   * @throws JMSException if thrown by JMS API methods
    */
+  @Deprecated
   public Object fromXML(final Message message) throws JMSException {
-    if (!(message instanceof TextMessage)) {
-      throw new MessageFormatException("Expected TextMessage as response but received " + message.getClass());
-    } else {           
-      try {
-//        LOGGER.debug("fromMessage() - Message received: " + ((TextMessage) message).getText());
-        LOGGER.debug("fromMessage() - Message properly received");
-        return this.xmlConverter.fromXml(((TextMessage) message).getText());
-      } catch (Exception ex) {
-        LOGGER.error("fromMessage() - Error caught in conversion of JMS message to Process Object");
-        LOGGER.error("Message was: " + ((TextMessage) message).getText());  
-        throw new JMSException(ex.getMessage());
-      }     
+    try {
+      LOGGER.debug("fromXML() - Message properly received");
+      return this.xmlConverter.fromXml(((TextMessage) message).getText());
+    }
+    catch (Exception ex) {
+      LOGGER.error("fromXML() - Error occurred while converting XML to object. Message was: " + ((TextMessage) message).getText());
+      throw new JMSException(ex.getMessage());
     }
   }
 
-  /**
-   * Convert a Java object to a JMS Message using the supplied session
-   * to create the message object.
-   * @param object The object to convert the message to
-   * @param session The Session to use for creating a JMS Message
-   * @return the JMS Message
-   * @throws javax.jms.JMSException if thrown by JMS API methods
-   * @throws MessageConversionException iof the type of the object is not supported
-   */
-  public Message toMessage(Object object, Session session) throws JMSException, MessageConversionException {
-    String xmlString = this.xmlConverter.toXml(object);
 
-    return session.createTextMessage(xmlString);
+  /**
+   * Convert a Java object to a XML based JMS Message using the supplied session
+   * to create the message object.
+   *
+   * @param object The object to convert to XML
+   * @return the JMS Message
+   * @throws MessageConversionException if the type of the object is not supported
+   */
+  @Deprecated
+  public String toXML(Object object) {
+    return this.xmlConverter.toXml(object);
+  }
+
   }
 
 }

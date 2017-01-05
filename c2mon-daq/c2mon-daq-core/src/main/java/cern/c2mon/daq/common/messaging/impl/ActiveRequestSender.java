@@ -86,7 +86,7 @@ public class ActiveRequestSender implements ProcessRequestSender {
         ProcessConfigurationRequest processConfigurationRequest = new ProcessConfigurationRequest(processName);
         processConfigurationRequest.setprocessPIK(ProcessConfigurationHolder.getInstance().getprocessPIK());
 
-        Message message = processMessageConverter.toMessage(processConfigurationRequest, session);
+        Message message = session.createTextMessage(processMessageConverter.toXML(processConfigurationRequest);
         message.setJMSReplyTo(replyQueue);
         MessageProducer messageProducer = session.createProducer(requestDestination);
         try {
@@ -132,7 +132,7 @@ public class ActiveRequestSender implements ProcessRequestSender {
         ProcessConnectionRequest processConnectionRequest = new ProcessConnectionRequest(processName);
 //        configurationController.setStartUp(processConnectionRequest.getProcessStartupTime().getTime());
 
-        Message message = processMessageConverter.toMessage(processConnectionRequest, session);
+        Message message = session.createTextMessage(processMessageConverter.toXML(processConnectionRequest));
         message.setJMSReplyTo(replyQueue);
         MessageProducer messageProducer = session.createProducer(requestDestination);
         try {
