@@ -115,11 +115,6 @@ public class SupervisionManagerProcessTest {
    */
   private ProcessDisconnectionRequest processDisconnectionRequest;
 
-  /**
-   * XML Converter helper class
-   */
-  private XMLConverter xmlConverter = new XMLConverter();
-
 
   @Before
   public void setUp() {
@@ -363,59 +358,23 @@ public class SupervisionManagerProcessTest {
     // Disconnection done automatic for every test
   }
 
-  /**
-   * Process Connection call
-   */
-  public void onProcessConnection() {
-    LOGGER.info("onProcessConnection - Connection");
-
+  private void onProcessConnection() {
     LOGGER.info("{}", this.processConnectionRequest);
-
-    String xmlprocessConnectionResponse = this.supervisionManager.onProcessConnection(this.processConnectionRequest);
-    assertNotNull(xmlprocessConnectionResponse);
-
-    LOGGER.info(xmlprocessConnectionResponse);
-
-    try {
-      this.processConnectionResponse = (ProcessConnectionResponse) this.xmlConverter.fromXml(xmlprocessConnectionResponse);
-    }
-    catch (Exception e) {
-      LOGGER.error(e.toString());
-    }
+    this.processConnectionResponse = this.supervisionManager.onProcessConnection(this.processConnectionRequest);
     assertNotNull(this.processConnectionResponse);
     LOGGER.info(this.processConnectionResponse.toString());
   }
 
-  /**
-   * Process Configuration call
-   */
-  public void onProcessConfiguration() {
-    LOGGER.info("onProcessConfiguration - Configuration");
-
+  private void onProcessConfiguration() {
     LOGGER.info("{}", this.processConnectionRequest);
 
-    String xmlProcessConfigurationResponse = this.supervisionManager.onProcessConfiguration(this.processConfigurationRequest);
-    assertNotNull(xmlProcessConfigurationResponse);
-    LOGGER.info(xmlProcessConfigurationResponse);
-
-    try {
-      this.processConfigurationResponse = (ProcessConfigurationResponse) this.xmlConverter.fromXml(xmlProcessConfigurationResponse);
-    }
-    catch (Exception e) {
-      LOGGER.error(e.toString());
-    }
+    this.processConfigurationResponse = this.supervisionManager.onProcessConfiguration(this.processConfigurationRequest);
     assertNotNull(this.processConfigurationResponse);
     LOGGER.info(this.processConfigurationResponse.toString());
   }
 
-  /**
-   * Process Disconnection call
-   */
-  public void onProcessDisconnection() {
-    LOGGER.info("Disconnection");
-
+  private void onProcessDisconnection() {
     LOGGER.info("{}", this.processConnectionRequest);
-
     this.supervisionManager.onProcessDisconnection(this.processDisconnectionRequest);
   }
 }
