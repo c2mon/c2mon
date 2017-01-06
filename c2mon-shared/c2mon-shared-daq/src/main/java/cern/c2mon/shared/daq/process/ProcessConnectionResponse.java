@@ -113,7 +113,7 @@ public class ProcessConnectionResponse implements ProcessResponse {
    * 
    * @param processPIK The process PIK
    */
-  public final void setprocessPIK(final Long processPIK) {
+  public final void setProcessPIK(final Long processPIK) {
     this.processPIK = processPIK;
   }
 

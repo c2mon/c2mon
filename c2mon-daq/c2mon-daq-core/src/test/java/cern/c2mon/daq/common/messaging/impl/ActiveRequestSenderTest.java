@@ -60,7 +60,6 @@ import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
 import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
 import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
 import cern.c2mon.shared.daq.process.ProcessMessageConverter;
-import cern.c2mon.shared.daq.process.ProcessRequest;
 import cern.c2mon.shared.daq.process.XMLConverter;
 
 /**
@@ -373,7 +372,8 @@ public class ActiveRequestSenderTest {
     public synchronized void onMessage(final Message message, final Session session) throws JMSException {
       try {
         LOGGER.debug("onMessage() - Message coming " + message);
-        ProcessRequest processRequest = (ProcessRequest) this.processMessageConverter.fromXML(message);
+        String text = ((TextMessage) message).getText();
+        Object processRequest = this.processMessageConverter.fromJSON(text);
         LOGGER.debug("onMessage() - Message converted " + processRequest.toString());
 
         // ProcessDisconnectionRequest
@@ -398,12 +398,12 @@ public class ActiveRequestSenderTest {
           if (ActiveRequestSenderTest.testType != TestType.CONNECT_TIME_OUT) {
             if (ActiveRequestSenderTest.testType == TestType.CONNECT_SUCCESS) {
               // With the emulated good server reply
-              processConnectionResponse.setprocessPIK(PROCESS_PIK);
+              processConnectionResponse.setProcessPIK(PROCESS_PIK);
               stringProcessConnectionResponse = this.xmlConverter.toXml(processConnectionResponse);
               LOGGER.debug("Good reply sent to PIK Request");
             } else if (ActiveRequestSenderTest.testType == TestType.CONNECT_REJECT) {
               // With the emulated Rejected server reply
-              processConnectionResponse.setprocessPIK(PIK_REJECTED);
+              processConnectionResponse.setProcessPIK(PIK_REJECTED);
               stringProcessConnectionResponse = this.xmlConverter.toXml(processConnectionResponse);
               LOGGER.debug("Rejected reply sent to PIK Request");
             } else if (ActiveRequestSenderTest.testType == TestType.CONNECT_BAD_XML) {

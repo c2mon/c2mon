@@ -27,7 +27,7 @@ import org.simpleframework.xml.Root;
  *  - the DAQ core to send a Process Configuration request to C2MON
  *  - the C2MON to get the request from the DAQ core and work with it 
  * 
- * The class is serialized as XML before being sent and
+ * The class is serialized as XML or JSON before being sent and
  * deserialized as Object after being received.
  * 
  * Simpleframework XML needs always a value
@@ -101,7 +101,7 @@ public class ProcessConfigurationRequest implements ProcessRequest {
    * 
    * @param processPIK The process PIK
    */
-  public final void setprocessPIK(final Long processPIK) {
+  public final void setProcessPIK(final Long processPIK) {
     this.processPIK = processPIK;
   }
 

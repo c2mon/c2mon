@@ -31,7 +31,6 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.supervision.SupervisionManager;
 import cern.c2mon.shared.daq.process.*;
-import cern.c2mon.shared.daq.serialization.MessageConverter;
 
 
 /**
@@ -85,9 +84,15 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
   @Override
   public void onMessage(final Message message, final Session session) throws JMSException {
     LOGGER.debug("onMessage() - Message coming " + message);
-
+    String text = ((TextMessage) message).getText();
+    boolean isJSONRequest = isJSON(text);
+    Object processRequest;
     try {
-      ProcessRequest processRequest = (ProcessRequest) this.processMessageConverter.fromXML(message);
+      if (isJSONRequest) {
+        processRequest = this.processMessageConverter.fromJSON(text);
+      } else {
+        processRequest = this.processMessageConverter.fromXML(text);
+      }
 
       // ProcessDisconnectionRequest
       if (processRequest instanceof ProcessDisconnectionRequest) {
@@ -112,7 +117,11 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
         MessageProducer messageProducer = session.createProducer(message.getJMSReplyTo());
         try {
           TextMessage replyMessage = session.createTextMessage();
-          replyMessage.setText(processMessageConverter.toXML(processConnectionResponse));
+          if (isJSONRequest) {
+            replyMessage.setText(processMessageConverter.toJSON(processConnectionResponse));
+          } else {
+            replyMessage.setText(processMessageConverter.toXML(processConnectionResponse));
+          }
           messageProducer.send(replyMessage);
         } finally {
           messageProducer.close();
@@ -133,7 +142,11 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
         MessageProducer messageProducer = session.createProducer(message.getJMSReplyTo());
         try {
           TextMessage replyMessage = session.createTextMessage();
-          replyMessage.setText(processMessageConverter.toXML(processConfigurationResponse));
+          if (isJSONRequest) {
+            replyMessage.setText(processMessageConverter.toJSON(processConfigurationResponse));
+          } else {
+            replyMessage.setText(processMessageConverter.toXML(processConfigurationResponse));
+          }
           messageProducer.send(replyMessage);
         } finally {
           messageProducer.close();
@@ -146,4 +159,9 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
     }
   }
 
+  private static boolean isJSON(String message) {
+    message = message.trim();
+    return message.startsWith("{") && message.endsWith("}")
+        || message.startsWith("[") && message.endsWith("]");
+  }
 }

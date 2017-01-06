@@ -16,11 +16,22 @@
  *****************************************************************************/
 package cern.c2mon.shared.daq.process;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * Interface for all classes sending a Process commnuciations (Request/Response)
  * 
  * @author vilches
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = ProcessConnectionRequest.class, name = "process-connection-request"),
+    @JsonSubTypes.Type(value = ProcessConnectionResponse.class, name = "process-connection-response"),
+    @JsonSubTypes.Type(value = ProcessConfigurationRequest.class, name = "process-configuration-request"),
+    @JsonSubTypes.Type(value = ProcessConfigurationResponse.class, name = "process-configuration-response"),
+    @JsonSubTypes.Type(value = ProcessDisconnectionRequest.class, name = "process-disconnection-request")
+})
 public interface ProcessCommunication {
 
 }

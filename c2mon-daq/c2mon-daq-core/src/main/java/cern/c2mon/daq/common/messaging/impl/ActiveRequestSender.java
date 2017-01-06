@@ -21,7 +21,6 @@ import cern.c2mon.daq.common.messaging.ProcessRequestSender;
 import cern.c2mon.daq.config.DaqProperties;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.process.*;
-import cern.c2mon.shared.daq.serialization.MessageConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,27 +38,11 @@ import javax.jms.*;
  */
 public class ActiveRequestSender implements ProcessRequestSender {
 
-  /**
-   * Class logger.
-   */
   private static final Logger LOGGER = LoggerFactory.getLogger(ActiveRequestSender.class);
-
-  /**
-   * Constant of the PIK request time out
-   */
   private static final long PIK_REQUEST_TIMEOUT = 5000;
 
-  /**
-   * Reference to the JmsTemplate used to send messages to the server
-   * (instantiated in Spring XML).
-   */
   private JmsTemplate jmsTemplate;
-
-  /**
-   * ProcessMessageConverter helper class (fromMessage/ToMessage)
-   */
   private ProcessMessageConverter processMessageConverter;
-
   private DaqProperties properties;
 
   @Autowired
@@ -69,7 +52,12 @@ public class ActiveRequestSender implements ProcessRequestSender {
     this.processMessageConverter = new ProcessMessageConverter();
   }
 
-
+  /**
+   * Requests the initial DAQ configuration from the server through JMS.
+   *
+   * @param processName
+   * @return ProcessConfigurationResponse or null in case of a timeout
+   */
   @Override
   public ProcessConfigurationResponse sendProcessConfigurationRequest(final String processName) {
     LOGGER.debug("sendProcessConfigurationRequest - Sending Process Configuration request to server.");
@@ -84,9 +72,9 @@ public class ActiveRequestSender implements ProcessRequestSender {
         TemporaryQueue replyQueue = session.createTemporaryQueue();
 
         ProcessConfigurationRequest processConfigurationRequest = new ProcessConfigurationRequest(processName);
-        processConfigurationRequest.setprocessPIK(ProcessConfigurationHolder.getInstance().getprocessPIK());
+        processConfigurationRequest.setProcessPIK(ProcessConfigurationHolder.getInstance().getprocessPIK());
 
-        Message message = session.createTextMessage(processMessageConverter.toXML(processConfigurationRequest);
+        Message message = session.createTextMessage(processMessageConverter.toJSON(processConfigurationRequest));
         message.setJMSReplyTo(replyQueue);
         MessageProducer messageProducer = session.createProducer(requestDestination);
         try {
@@ -97,11 +85,11 @@ public class ActiveRequestSender implements ProcessRequestSender {
           // wait for reply (receive timeout is set in XML)
           MessageConsumer consumer = session.createConsumer(replyQueue);
           try {
-            Message replyMessage = consumer.receive(requestTimeout);
+            String replyMessage = ((TextMessage) consumer.receive(requestTimeout)).getText();
             if (replyMessage == null) {
               return null;
             } else {
-              return processMessageConverter.fromXML(replyMessage);
+              return processMessageConverter.fromJSON(replyMessage);
             }
           } finally {
             consumer.close();
@@ -116,6 +104,12 @@ public class ActiveRequestSender implements ProcessRequestSender {
     return processConfigurationResponse;
   }
 
+  /**
+   * Initiates the JMS server connection when the DAQ starts up.
+   *
+   * @param processName
+   * @return ProcessConnectionResponse or null in case of a timeout
+   */
   @Override
   public ProcessConnectionResponse sendProcessConnectionRequest(final String processName) {
     LOGGER.debug("sendProcessConnectionRequest - Sending Process Connection Request to server.");
@@ -128,11 +122,9 @@ public class ActiveRequestSender implements ProcessRequestSender {
     ProcessConnectionResponse processConnectionResponse = (ProcessConnectionResponse) jmsTemplate.execute(new SessionCallback<Object>() {
       public Object doInJms(final Session session) throws JMSException {
         TemporaryQueue replyQueue = session.createTemporaryQueue();
-        // Process PIK Request
         ProcessConnectionRequest processConnectionRequest = new ProcessConnectionRequest(processName);
-//        configurationController.setStartUp(processConnectionRequest.getProcessStartupTime().getTime());
 
-        Message message = session.createTextMessage(processMessageConverter.toXML(processConnectionRequest));
+        Message message = session.createTextMessage(processMessageConverter.toJSON(processConnectionRequest));
         message.setJMSReplyTo(replyQueue);
         MessageProducer messageProducer = session.createProducer(requestDestination);
         try {
@@ -146,13 +138,12 @@ public class ActiveRequestSender implements ProcessRequestSender {
           // wait for reply (receive timeout is set in XML) -> 12000
           MessageConsumer consumer = session.createConsumer(replyQueue);
           try {
-            //Message replyMessage = consumer.receive(commonConfiguration.getRequestTimeout());
             Message replyMessage = consumer.receive(PIK_REQUEST_TIMEOUT);
+
             if (replyMessage == null) {
               return null;
             } else {
-              // Convert the XML and return it as a ProcessConnectionRespond object
-              return processMessageConverter.fromXML(replyMessage);
+              return processMessageConverter.fromJSON(((TextMessage) replyMessage).getText());
             }
           } finally {
             consumer.close();
@@ -167,23 +158,25 @@ public class ActiveRequestSender implements ProcessRequestSender {
     return processConnectionResponse;
   }
 
+  /**
+   * Initiates a DAQ shutdown. No response is needed.
+   *
+   * @param processConfiguration
+   * @param startupTime
+   */
   @Override
   public void sendProcessDisconnectionRequest(ProcessConfiguration processConfiguration, long startupTime) {
     LOGGER.debug("sendProcessDisconnectionRequest - Sending Process Disconnection notification to server.");
-//    ProcessConfiguration processConfiguration = this.configurationController.getProcessConfiguration();
     ProcessDisconnectionRequest processDisconnectionRequest;
 
-    // processConfiguration set up for ProcessDisconnectionRequest compatibility
-
-    // ID
     if (processConfiguration.getProcessID() == null) {
       processConfiguration.setProcessID(ProcessDisconnectionRequest.NO_ID);
     }
-    // Name
+
     if (processConfiguration.getProcessName() == null) {
       processConfiguration.setProcessName(ProcessDisconnectionRequest.NO_PROCESS);
     }
-    // PIK
+
     if (processConfiguration.getprocessPIK() == null) {
       processConfiguration.setprocessPIK(ProcessDisconnectionRequest.NO_PIK);
     }
@@ -198,12 +191,7 @@ public class ActiveRequestSender implements ProcessRequestSender {
     }
 
     LOGGER.trace("sendProcessDisconnectionRequest - Converting and sending disconnection message");
-
-
-//    jmsTemplate.setMessageConverter(this.processMessageConverter);
-//    jmsTemplate.convertAndSend(processDisconnectionRequest);
-    jmsTemplate.send(session -> processMessageConverter.toMessage(processDisconnectionRequest,session));
-
+    jmsTemplate.send(session -> session.createTextMessage(processMessageConverter.toJSON(processDisconnectionRequest)));
     LOGGER.trace("sendProcessDisconnectionRequest - Process Disconnection for " + processConfiguration.getProcessName() + " sent");
   }
 

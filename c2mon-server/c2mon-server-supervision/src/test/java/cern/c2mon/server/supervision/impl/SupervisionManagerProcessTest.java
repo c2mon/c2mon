@@ -34,9 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.supervision.SupervisionManager;
@@ -45,7 +43,6 @@ import cern.c2mon.shared.daq.process.ProcessConfigurationResponse;
 import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
 import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
 import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
-import cern.c2mon.shared.daq.process.XMLConverter;
 
 /**
  * Integration test of supervision module for all Process Messaging (PIK, Connection, Disconnection)
@@ -246,7 +243,7 @@ public class SupervisionManagerProcessTest {
     assertEquals(this.processConnectionResponse.getProcessPIK(), ProcessConnectionResponse.PIK_REJECTED);
 
     // Set process PIK for correct disconnection
-    this.processConnectionResponse.setprocessPIK(goodPIK);
+    this.processConnectionResponse.setProcessPIK(goodPIK);
   }
 
   @Test
@@ -270,7 +267,7 @@ public class SupervisionManagerProcessTest {
     assertEquals(this.processConnectionResponse.getProcessPIK(), ProcessConnectionResponse.PIK_REJECTED);
 
     // Set process PIK for correct disconnection
-    this.processConnectionResponse.setprocessPIK(goodPIK);
+    this.processConnectionResponse.setProcessPIK(goodPIK);
   }
 
   @Test
@@ -295,7 +292,7 @@ public class SupervisionManagerProcessTest {
     assertEquals(this.processConnectionResponse.getProcessPIK(), ProcessConnectionResponse.PIK_REJECTED);
 
     // Set process PIK for correct disconnection
-    this.processConnectionResponse.setprocessPIK(goodPIK);
+    this.processConnectionResponse.setProcessPIK(goodPIK);
   }
 
   @Test
@@ -348,7 +345,7 @@ public class SupervisionManagerProcessTest {
 
     // Configuration
     this.processConfigurationRequest = new ProcessConfigurationRequest(processConnectionResponse.getProcessName());
-    this.processConfigurationRequest.setprocessPIK(this.processConnectionResponse.getProcessPIK());
+    this.processConfigurationRequest.setProcessPIK(this.processConnectionResponse.getProcessPIK());
     onProcessConfiguration();
 
     assertFalse(this.processConfigurationResponse.getProcessName().equals(ProcessConfigurationResponse.NO_PROCESS));

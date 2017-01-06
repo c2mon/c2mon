@@ -59,7 +59,6 @@ import cern.c2mon.shared.daq.process.ProcessConfigurationResponse;
 import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
 import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
 import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
-import cern.c2mon.shared.daq.process.XMLConverter;
 
 
 /**
@@ -978,7 +977,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     // Protect the method against accidental null parameters
     if (processConnectionRequest == null) {
       LOGGER.error("onProcessConfiguration(null) called - rejecting the request.");
-      processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
+      processConnectionResponse.setProcessPIK(ProcessConnectionResponse.PIK_REJECTED);
       return processConnectionResponse;
     }
 
@@ -1016,7 +1015,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
                 process = this.processFacade.start(processId, processConnectionRequest.getProcessHostName(), processConnectionRequest.getProcessStartupTime());
 
                 // PIK
-                processConnectionResponse.setprocessPIK(process.getProcessPIK());
+                processConnectionResponse.setProcessPIK(process.getProcessPIK());
 
                 LOGGER.info("onProcessConnection - TEST Mode - Returning PIKResponse to DAQ " + process.getName()
                     + ", PIK " + process.getProcessPIK());
@@ -1024,7 +1023,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
             // If process is already currently running and TEST mode is off no connection is permitted
             } else {
               // Reject Connection
-              processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
+              processConnectionResponse.setProcessPIK(ProcessConnectionResponse.PIK_REJECTED);
               LOGGER.warn("onProcessConnection - The DAQ process is already running, returning rejected connection : "
                   + processConnectionRequest.getProcessName());
             }
@@ -1038,7 +1037,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
             process = this.processFacade.start(processId, processConnectionRequest.getProcessHostName(), processConnectionRequest.getProcessStartupTime());
 
             // PIK
-            processConnectionResponse.setprocessPIK(process.getProcessPIK());
+            processConnectionResponse.setProcessPIK(process.getProcessPIK());
 
             LOGGER.info("onProcessConnection - Returning PIKResponse to DAQ " + process.getName());
           }
@@ -1053,10 +1052,10 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     } catch (CacheElementNotFoundException cacheEx) {
       LOGGER.warn("onProcessConnection - process not found in cache (name = "
           + processConnectionRequest.getProcessName() + ") - unable to accept connection request.", cacheEx);
-      processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
+      processConnectionResponse.setProcessPIK(ProcessConnectionResponse.PIK_REJECTED);
     } catch (Exception e) {
       LOGGER.error(new StringBuffer("onProcessConnection - An unexpected Exception occurred.").toString(), e);
-      processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
+      processConnectionResponse.setProcessPIK(ProcessConnectionResponse.PIK_REJECTED);
     }
 
     return processConnectionResponse;
