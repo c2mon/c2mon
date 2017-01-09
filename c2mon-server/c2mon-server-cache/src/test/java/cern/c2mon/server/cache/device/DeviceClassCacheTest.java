@@ -88,7 +88,7 @@ public class DeviceClassCacheTest extends AbstractCacheIntegrationTest {
   }
 
   @Test
-  public void getDeviceIdClassByName() {
+  public void getDeviceClassIdByName() {
     DeviceClassCacheObject deviceClass1 = new DeviceClassCacheObject(1L, "test_device_class_name_1", "Test description");
     deviceClassCache.put(deviceClass1.getId(), deviceClass1);
 
