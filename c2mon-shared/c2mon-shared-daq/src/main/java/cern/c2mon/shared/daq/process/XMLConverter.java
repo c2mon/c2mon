@@ -23,6 +23,7 @@ import java.io.StringWriter;
 import javax.jms.MessageFormatException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.simpleframework.xml.Serializer;
@@ -40,20 +41,14 @@ import cern.c2mon.shared.util.parser.SimpleXMLParser;
  * 
  * @author vilches
  *
- * @deprecated
+ *
  */
+@Slf4j
+@Deprecated
 public class XMLConverter {
-  /** Log4j instance */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessMessageConverter.class);
-  
-  /**
-   * Simple DOM parser for parsing XML message content
-   */
+
   private SimpleXMLParser parser;
-  
-  /**
-   * Constructor
-   */
+
   public XMLConverter() { 
     try {
       this.parser = new SimpleXMLParser();
@@ -78,33 +73,33 @@ public class XMLConverter {
       try {
         fw = new StringWriter();
         if(obj instanceof ProcessConnectionRequest) {
-          LOGGER.trace("toXml() : converting from ProcessConnectionRequest to XML.");
+          log.trace("Converting from ProcessConnectionRequest to XML");
           serializer.write(((ProcessConnectionRequest) obj), fw);
         } else if(obj instanceof ProcessConnectionResponse) {
-          LOGGER.trace("toXml() : converting from ProcessConnectionResponse to XML.");
+          log.trace("Converting from ProcessConnectionResponse to XML");
           serializer.write(((ProcessConnectionResponse) obj), fw);
         } else if(obj instanceof ProcessConfigurationRequest) {
-          LOGGER.trace("toXml() : converting from ProcessConfigurationRequest to XML.");
+          log.trace("Converting from ProcessConfigurationRequest to XML");
           serializer.write(((ProcessConfigurationRequest) obj), fw);
         } else if(obj instanceof ProcessConfigurationResponse) {
-          LOGGER.trace("toXml() : converting from ProcessConfigurationResponse to XML.");
+          log.trace("converting from ProcessConfigurationResponse to XML");
           serializer.write(((ProcessConfigurationResponse) obj), fw);
         } else if(obj instanceof ProcessDisconnectionRequest) {
-          LOGGER.trace("toXml() : converting from ProcessDisconnectionRequest to XML.");
+          log.trace("Converting from ProcessDisconnectionRequest to XML");
           serializer.write(((ProcessDisconnectionRequest) obj), fw);
         } else {
-          LOGGER.error("Object type not found: " + obj.getClass());
+          log.error("Object type not found: " + obj.getClass());
           throw new MessageConversionException("toXml() : unsupported type");
         }
         result = fw.toString();
       } catch (Exception e) {
-        LOGGER.error("Error converting object " + obj + " to XML: " + e);
+        log.error("Error converting object " + obj + " to XML: " + e);
       } finally {
         if (fw != null) {
           try {
             fw.close();
           } catch (IOException e) {
-            LOGGER.error("toXml(): Error closing file. " + e);
+            log.error("Error closing file while XML generation " + e);
             e.printStackTrace();
           }
         }
@@ -125,8 +120,8 @@ public class XMLConverter {
       Document doc = this.parser.parse(xml);
       // Getting the XML doc name to make call the proper class
       String docName = doc.getDocumentElement().getNodeName();
-      
-      LOGGER.trace("fromXml() - Message received from " + docName + ": " + xml);
+
+      log.trace("Message received from " + docName + ": " + xml);
       
       if(docName.equals(ProcessMessageType.CONNECT_REQUEST.getName())) {
         return fromXml(xml, ProcessMessageType.CONNECT_REQUEST);
@@ -139,12 +134,12 @@ public class XMLConverter {
       } else if(docName.equals(ProcessMessageType.DISCONNETION_REQUEST.getName())) {
         return fromXml(xml, ProcessMessageType.DISCONNETION_REQUEST); 
       } else {
-        LOGGER.error("fromXml() : Cannot deserialize XML message since the message type could not be determined" + xml);
+        log.error("Cannot deserialize XML message since the message type could not be determined" + xml);
         throw new MessageFormatException("XML TAG Node Name not found: " + xml);  
       }
-    } catch (ParserException ex) {        
-      LOGGER.error("Exception caught in DOM parsing of incoming message: ", ex);
-      LOGGER.error("Message was: " + xml);          
+    } catch (ParserException ex) {
+      log.error("Exception caught in DOM parsing of incoming message: ", ex);
+      log.error("Message was: " + xml);
       throw new MessageConversionException("Exception caught in DOM parsing on process request message");
     }
   }
@@ -165,23 +160,23 @@ public class XMLConverter {
       sr = new StringReader(xml);
       switch(processType) {
         case CONNECT_REQUEST:
-          LOGGER.trace("fromXml() : converting from XML to ProcessConnectionRequest.");
+          log.trace("Converting from XML to ProcessConnectionRequest");
           return serializer.read(ProcessConnectionRequest.class, sr, false);
         case CONNECT_RESPONSE:
-          LOGGER.trace("fromXml() : converting from XML to ProcessConnectionResponse.");
+          log.trace("Converting from XML to ProcessConnectionResponse");
           return serializer.read(ProcessConnectionResponse.class, sr, false);
         case CONFIG_REQUEST:
-          LOGGER.trace("fromXml() : converting from XML to ProcessConfigurationRequest.");
+          log.trace("Converting from XML to ProcessConfigurationRequest");
           return serializer.read(ProcessConfigurationRequest.class, sr, false);
         case CONFIG_RESPONSE:
-          LOGGER.trace("fromXml() : converting from XML to ProcessConfigurationResponse.");
+          log.trace("Converting from XML to ProcessConfigurationResponse");
           return serializer.read(ProcessConfigurationResponse.class, sr, false);
         case DISCONNETION_REQUEST:
-          LOGGER.trace("fromXml() : converting from XML to ProcessDisconnectionRequest.");
+          log.trace("Converting from XML to ProcessDisconnectionRequest");
           return serializer.read(ProcessDisconnectionRequest.class, sr, false);
         default:
-          LOGGER.error("fromXml() : Process type not found: " + processType);
-          throw new MessageFormatException("fromXml(): Process type not found: " + processType);  
+          log.error("Process type not found: " + processType);
+          throw new MessageFormatException("Process type not found while parsing XML: " + processType);
       }
     } finally {
       if (sr != null) {

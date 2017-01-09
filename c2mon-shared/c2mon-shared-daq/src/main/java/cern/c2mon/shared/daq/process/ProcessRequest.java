@@ -22,6 +22,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 /**
  * Interface for all classes sending a Process Request.
  *
- * @author Martin Flamm
+ * @author vilches
  */
 public interface ProcessRequest extends ProcessCommunication {}

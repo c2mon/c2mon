@@ -22,6 +22,7 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,22 +41,14 @@ import cern.c2mon.shared.daq.process.*;
  * @author vilches
  *
  */
+@Slf4j
 @Service("processRequestHandler")
 public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Message> {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessRequestHandlerImpl.class);
 
   /**
    * Reference to the {@link SupervisionManager} bean.
    */
   private SupervisionManager supervisionManager;
-
-  /**
-   * ProcessMessageConverter helper class (fromMessage/ToMessage)
-   */
   private ProcessMessageConverter processMessageConverter;
 
   /**
@@ -83,8 +76,15 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
    */
   @Override
   public void onMessage(final Message message, final Session session) throws JMSException {
-    LOGGER.debug("onMessage() - Message coming " + message);
-    String text = ((TextMessage) message).getText();
+    log.debug("JMS message received " + message);
+
+    String text = "";
+    if (((TextMessage) message).getText() != null) {
+      text = ((TextMessage) message).getText();
+    } else {
+      log.error("Error occurred, incoming JMS message is empty");
+    }
+
     boolean isJSONRequest = isJSON(text);
     Object processRequest;
     try {
@@ -97,22 +97,22 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
       // ProcessDisconnectionRequest
       if (processRequest instanceof ProcessDisconnectionRequest) {
         this.supervisionManager.onProcessDisconnection((ProcessDisconnectionRequest) processRequest);
-        if (LOGGER.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
 
-          LOGGER.debug("onMessage() - Process disconnection completed for DAQ " + ((ProcessDisconnectionRequest) processRequest).getProcessName());
+          log.debug("Process disconnection completed for DAQ " + ((ProcessDisconnectionRequest) processRequest).getProcessName());
         }
       }
       // processConnectionRequest
       else if (processRequest instanceof ProcessConnectionRequest) {
         ProcessConnectionRequest processConnectionRequest = (ProcessConnectionRequest)processRequest;
-        LOGGER.info("onMessage - DAQ Connection request received from DAQ " + processConnectionRequest.getProcessName());
+        log.info("DAQ Connection request received from DAQ " + processConnectionRequest.getProcessName());
 
         // Create the processConnectionResponse
         ProcessConnectionResponse processConnectionResponse = this.supervisionManager.onProcessConnection(processConnectionRequest);
 
         // Send reply to DAQ on reply queue
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("onMessage - Sending Connection response to DAQ " + processConnectionRequest.getProcessName());
+        if (log.isDebugEnabled()) {
+          log.debug("Sending Connection response to DAQ " + processConnectionRequest.getProcessName());
         }
         MessageProducer messageProducer = session.createProducer(message.getJMSReplyTo());
         try {
@@ -130,14 +130,14 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
       // ProcessConfigurationRequest
       else if (processRequest instanceof ProcessConfigurationRequest) {
         ProcessConfigurationRequest processConfigurationRequest = (ProcessConfigurationRequest) processRequest;
-        LOGGER.info("onMessage - DAQ configuration request received from DAQ " + processConfigurationRequest.getProcessName());
+        log.info("DAQ configuration request received from DAQ " + processConfigurationRequest.getProcessName());
 
         // Create the processConfigurationResponse
         ProcessConfigurationResponse processConfigurationResponse = this.supervisionManager.onProcessConfiguration(processConfigurationRequest);
 
         //send reply to DAQ on reply queue
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("onMessage - Sending Configuration Response to DAQ " + processConfigurationRequest.getProcessName());
+        if (log.isDebugEnabled()) {
+          log.debug("Sending Configuration Response to DAQ " + processConfigurationRequest.getProcessName());
         }
         MessageProducer messageProducer = session.createProducer(message.getJMSReplyTo());
         try {
@@ -152,10 +152,10 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
           messageProducer.close();
         }
       } else {
-        LOGGER.error("onMessage - Incoming ProcessRequest object not recognized! - ignoring the request");
+        log.error("Incoming ProcessRequest object not recognized! - ignoring the request");
       }
     } catch (MessageConversionException e) {
-      LOGGER.error("onMessage - Exception caught while converting incoming DAQ request - unable to process request", e);
+      log.error("Exception caught while converting incoming DAQ request - unable to process request", e);
     }
   }
 

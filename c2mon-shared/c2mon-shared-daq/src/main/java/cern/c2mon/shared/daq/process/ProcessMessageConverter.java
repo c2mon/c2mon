@@ -19,6 +19,7 @@ package cern.c2mon.shared.daq.process;
 import java.io.IOException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jms.support.converter.MessageConversionException;
@@ -26,39 +27,39 @@ import org.springframework.jms.support.converter.MessageConversionException;
 /**
  * Helper class that specifies a converter between Java objects and strings.
  * 
- * @author Martin Flamm
+ * @author vilches
  * 
  */
+@Slf4j
 public final class ProcessMessageConverter {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessMessageConverter.class);
   private ObjectMapper mapper = new ObjectMapper();
   private XMLConverter xmlConverter = new XMLConverter();
 
   /**
    * Converts a XML string to a Java object.
    * 
-   * @param xml
+   * @param xml the request or response as a XML string
    * @return the converted Java object
    */
   @Deprecated
   public Object fromXML(final String xml) {
     try {
-      LOGGER.debug("fromXML() - Message properly received");
+      log.debug("Message properly received");
       return this.xmlConverter.fromXml(xml);
     }
     catch (Exception ex) {
-      LOGGER.error("fromXML() - Error occurred while converting XML to object. " + xml);
+      log.error("Error occurred while converting XML to object " + xml);
+      return null;
     }
-    return null;
   }
 
   /**
-   * Convert a Java object to a XML based JMS Message using the supplied session
+   * Convert a Java object to a XML based JMS message using the supplied session
    * to create the message object.
    *
-   * @param object The object to convert to XML
-   * @return the JMS Message
+   * @param object the object to convert to XML
+   * @return the JMS message
    * @throws MessageConversionException if the type of the object is not supported
    */
   @Deprecated
@@ -67,33 +68,33 @@ public final class ProcessMessageConverter {
   }
 
   /**
-   * Converts JSON to a Java object.
+   * Converts JSON String to a Java object.
    *
-   * @param json
-   * @return the converted Java object
+   * @param json the request or response as a JSON string
+   * @return the mapped Java object
    */
   public Object fromJSON(final String json) {
     try {
       return mapper.readValue(json, ProcessCommunication.class);
     }
     catch (IOException e) {
-      LOGGER.error("fromJSON() - Error occurred while parsing JSON. " + json);
+      log.error("Error occurred while parsing JSON " + json);
       return null;
     }
   }
 
   /**
-   * Converts a Java object JSON.
+   * Converts a Java object to JSON.
    *
-   * @param object The object to convert to JSON
-   * @return the converted JSON String
+   * @param object the object to convert to JSON
+   * @return json representation of the given object
    */
   public String toJSON(ProcessCommunication object) {
     try {
       return mapper.writeValueAsString(object);
     }
     catch (JsonProcessingException e) {
-      LOGGER.error("toJSON() - Error occurred while generating JSON. " + object.getClass());
+      log.error("Error occurred while generating JSON " + object.getClass());
       return null;
     }
   }

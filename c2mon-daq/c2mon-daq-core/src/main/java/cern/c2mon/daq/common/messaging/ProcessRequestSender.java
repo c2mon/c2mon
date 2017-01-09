@@ -34,21 +34,17 @@ public interface ProcessRequestSender {
 
   /**
    * This method publishes the ProcessConfigurationRequest message on the configured topic. 
-   * As a result it expects to receive the ProcessConfigurationResponse message. 
+   * As a result it expects to receive the ProcessConfigurationResponse message.
    * 
-   * If the server does not reply within the specified timeout, null will returned.
-   * 
-   * @return the ProcessConfigurationResponse object
+   * @return the ProcessConfigurationResponse object. If the server doesn't reply within a specified time, null will be returned.
    */
   ProcessConfigurationResponse sendProcessConfigurationRequest(final String processName);
 
   /**
    * This method publishes the unique Process Id Key (PIK) message on the configured topic. 
-   * As a result it expects to receive the Process Configuration Response message. 
+   * As a result it expects to receive the Process Configuration Response message.
    * 
-   * If the server does not reply within the specified timeout, null will returned.
-   * 
-   * @return the parsed XML processConnectionResponse object
+   * @return the parsed XML processConnectionResponse object. If the server doesn't reply within a specified time, null will be returned.
    */
   ProcessConnectionResponse sendProcessConnectionRequest(final String processName);
 

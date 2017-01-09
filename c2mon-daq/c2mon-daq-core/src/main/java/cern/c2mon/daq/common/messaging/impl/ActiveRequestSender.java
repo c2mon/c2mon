@@ -22,6 +22,7 @@ import cern.c2mon.daq.config.DaqProperties;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.process.*;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +37,9 @@ import javax.jms.*;
  * @author mbrightw
  * @author vilches (refactoring updates)
  */
+@Slf4j
 public class ActiveRequestSender implements ProcessRequestSender {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ActiveRequestSender.class);
   private static final long PIK_REQUEST_TIMEOUT = 5000;
 
   private JmsTemplate jmsTemplate;
@@ -55,12 +56,12 @@ public class ActiveRequestSender implements ProcessRequestSender {
   /**
    * Requests the initial DAQ configuration from the server through JMS.
    *
-   * @param processName
+   * @param processName name of the process which wants to connect
    * @return ProcessConfigurationResponse or null in case of a timeout
    */
   @Override
   public ProcessConfigurationResponse sendProcessConfigurationRequest(final String processName) {
-    LOGGER.debug("sendProcessConfigurationRequest - Sending Process Configuration request to server.");
+    log.debug("Sending Process Configuration request to server");
     // use of JmsTemplate here means exceptions are caught by Spring and
     // converted!
     // JMS template NOT used for reply as need to use same connection &
@@ -107,12 +108,12 @@ public class ActiveRequestSender implements ProcessRequestSender {
   /**
    * Initiates the JMS server connection when the DAQ starts up.
    *
-   * @param processName
+   * @param processName name of the process which wants to connect
    * @return ProcessConnectionResponse or null in case of a timeout
    */
   @Override
   public ProcessConnectionResponse sendProcessConnectionRequest(final String processName) {
-    LOGGER.debug("sendProcessConnectionRequest - Sending Process Connection Request to server.");
+    log.debug("Sending Process Connection Request to server");
     // use of JmsTemplate here means exceptions are caught by Spring and
     // converted!
     // JMS template NOT used for reply as need to use same connection &
@@ -161,12 +162,12 @@ public class ActiveRequestSender implements ProcessRequestSender {
   /**
    * Initiates a DAQ shutdown. No response is needed.
    *
-   * @param processConfiguration
-   * @param startupTime
+   * @param processConfiguration the process configuration of the DAQ which is shutting down
+   * @param startupTime the timestamp when the DAQ was starting up
    */
   @Override
   public void sendProcessDisconnectionRequest(ProcessConfiguration processConfiguration, long startupTime) {
-    LOGGER.debug("sendProcessDisconnectionRequest - Sending Process Disconnection notification to server.");
+    log.debug("Sending Process Disconnection notification to server");
     ProcessDisconnectionRequest processDisconnectionRequest;
 
     if (processConfiguration.getProcessID() == null) {
@@ -190,9 +191,9 @@ public class ActiveRequestSender implements ProcessRequestSender {
           startupTime);
     }
 
-    LOGGER.trace("sendProcessDisconnectionRequest - Converting and sending disconnection message");
+    log.trace("Converting and sending disconnection message");
     jmsTemplate.send(session -> session.createTextMessage(processMessageConverter.toJSON(processDisconnectionRequest)));
-    LOGGER.trace("sendProcessDisconnectionRequest - Process Disconnection for " + processConfiguration.getProcessName() + " sent");
+    log.trace("Process Disconnection for " + processConfiguration.getProcessName() + " sent");
   }
 
   /**
