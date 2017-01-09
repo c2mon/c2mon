@@ -127,9 +127,6 @@ public class DeviceFacadeImplTest {
     // Expect the facade to get the device class object
     EasyMock.expect(deviceClassCacheMock.getDeviceClassIdByName(deviceClassName)).andReturn(deviceClassReturn.getId());
     EasyMock.expect(deviceCacheMock.getByDeviceClassId(deviceClassReturn.getId())).andReturn(deviceReturn);
-    // Expect the facade to get the devices
-//    EasyMock.expect(deviceCacheMock.getCopy(1000L)).andReturn(device1);
-//    EasyMock.expect(deviceCacheMock.getCopy(2000L)).andReturn(device2);
 
     // Setup is finished, need to activate the mock
     EasyMock.replay(deviceCacheMock, deviceClassCacheMock);
@@ -365,9 +362,6 @@ public class DeviceFacadeImplTest {
     EasyMock.expect(deviceCacheMock.getByDeviceClassId(class2.getId())).andReturn(deviceList2);
     EasyMock.expect(deviceClassCacheMock.getDeviceClassIdByName(di1.getClassName())).andReturn(class1.getId());
     EasyMock.expect(deviceClassCacheMock.getDeviceClassIdByName(di3.getClassName())).andReturn(class2.getId());
-//    EasyMock.expect(deviceCacheMock.getCopy(device1.getId())).andReturn(device1);
-//    EasyMock.expect(deviceCacheMock.getCopy(device2.getId())).andReturn(device2);
-//    EasyMock.expect(deviceCacheMock.getCopy(device3.getId())).andReturn(device3);
 
     // Setup is finished, need to activate the mock
     EasyMock.replay(deviceCacheMock, deviceClassCacheMock);
