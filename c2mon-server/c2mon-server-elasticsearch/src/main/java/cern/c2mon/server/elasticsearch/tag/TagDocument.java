@@ -31,6 +31,10 @@ public class TagDocument extends HashMap<String, Object> implements IFallback {
 
   private static final ObjectMapper mapper = new ObjectMapper();
 
+  public <T> T getProperty(String key, Class<T> klass) {
+    return (T) mapper.convertValue(get(key), klass);
+  }
+
   @Override
   public String getId() {
     return String.valueOf(this.get("id"));

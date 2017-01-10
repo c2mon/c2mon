@@ -1,4 +1,4 @@
-package cern.c2mon.server.elasticsearch.mappings;
+package cern.c2mon.server.elasticsearch;
 
 import cern.c2mon.server.elasticsearch.MappingFactory;
 import org.junit.Test;
@@ -71,7 +71,7 @@ public class MappingFactoryTests {
   @Test
   public void objectTagMapping() {
     String mapping = MappingFactory.createTagMapping(Object.class.getName());
-    assertTrue(mapping.contains("\"valueObject\":{\"type\":\"nested\",\"index\":\"analyzed\"}"));
+    assertTrue(mapping.contains("\"valueObject\":{\"type\":\"nested\",\"dynamic\":\"true\"}"));
   }
 
   @Test

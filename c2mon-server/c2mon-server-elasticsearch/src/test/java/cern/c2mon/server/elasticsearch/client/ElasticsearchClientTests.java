@@ -14,16 +14,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.elasticsearch.connector;
+package cern.c2mon.server.elasticsearch.client;
 
 import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,43 +29,27 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Test the entire functionality of the node.
- *
  * @author Alban Marguet
+ * @author Justin Lewis Salmon
  */
 @Slf4j
-public class TransportConnectorTest extends BaseElasticsearchIntegrationTest {
+public class ElasticsearchClientTests extends BaseElasticsearchIntegrationTest {
 
   @Autowired
-  private TransportConnector connector;
+  private ElasticsearchClient client;
 
   @Autowired
   private ElasticsearchProperties properties;
 
   @Test
-  public void testInit() {
-    Settings expectedSettings = Settings.settingsBuilder()
-            .put("node.local", true)
-            .put("http.enabled", false)
-            .put("node.name", properties.getNodeName())
-            .put("cluster.name", properties.getClusterName())
-            .build();
+  public void init() {
+    client.waitForYellowStatus();
 
-    assertEquals(expectedSettings, connector.getClient().settings());
+    assertTrue(client.isClusterYellow());
+    assertNotNull(client.getClient());
 
-    assertTrue(connector.isConnected());
-    assertNotNull(connector.getClient());
-    assertTrue(properties.isEmbedded());
-    assertEquals("true", connector.getClient().settings().get("node.local"));
-    assertEquals(properties.getNodeName(), connector.getClient().settings().get("node.name"));
+    Settings settings = client.getClient().settings();
+    assertEquals(properties.getNodeName(), settings.get("node.name"));
+    assertEquals(properties.getClusterName(), settings.get("cluster.name"));
   }
-
-//
-//  @Test
-//  public void testBulkAdd() {
-//    IndexRequest newIndex = new IndexRequest("c2mon-tag_1973-06", "tag_boolean").source("");
-//    boolean result = connector.bulkAdd(newIndex);
-//    assertTrue(result);
-//  }
-
 }

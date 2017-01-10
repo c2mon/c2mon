@@ -59,15 +59,7 @@
     "c2mon": {
       "dynamic": "false",
       "properties": {
-        "daqTimestamp": {
-          "type": "date",
-          "format": "epoch_millis"
-        },
         "dataType": {
-          "type": "string",
-          "index": "not_analyzed"
-        },
-        "equipment": {
           "type": "string",
           "index": "not_analyzed"
         },
@@ -75,17 +67,25 @@
           "type": "string",
           "index": "not_analyzed"
         },
+        "equipment": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "subEquipment": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
         "serverTimestamp": {
+          "type": "date",
+          "format": "epoch_millis"
+        },
+        "daqTimestamp": {
           "type": "date",
           "format": "epoch_millis"
         },
         "sourceTimestamp": {
           "type": "date",
           "format": "epoch_millis"
-        },
-        "subEquipment": {
-          "type": "string",
-          "index": "not_analyzed"
         }
       }
     }

@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import cern.c2mon.pmanager.IDBPersistenceHandler;
-import cern.c2mon.server.elasticsearch.connector.TransportConnector;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import cern.c2mon.server.elasticsearch.Indices;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +37,11 @@ import cern.c2mon.server.elasticsearch.MappingFactory;
 @Component
 public class SupervisionEventDocumentIndexer implements IDBPersistenceHandler<SupervisionEventDocument> {
 
-  private TransportConnector connector;
+  private ElasticsearchClient client;
 
   @Autowired
-  public SupervisionEventDocumentIndexer(final TransportConnector connector) {
-    this.connector = connector;
+  public SupervisionEventDocumentIndexer(final ElasticsearchClient client) {
+    this.client = client;;
   }
 
   @Override
@@ -66,7 +66,7 @@ public class SupervisionEventDocumentIndexer implements IDBPersistenceHandler<Su
     String indexName = getOrCreateIndex(supervisionEvent);
 
     log.debug("Adding new supervision event to index {}", indexName);
-    return connector.getClient().prepareIndex().setIndex(indexName)
+    return client.getClient().prepareIndex().setIndex(indexName)
         .setType("supervision")
         .setSource(supervisionEvent.toString())
         .setRouting(supervisionEvent.getId())

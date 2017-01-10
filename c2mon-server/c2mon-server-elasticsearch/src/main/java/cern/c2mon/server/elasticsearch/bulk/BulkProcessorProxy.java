@@ -1,7 +1,7 @@
 package cern.c2mon.server.elasticsearch.bulk;
 
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
-import cern.c2mon.server.elasticsearch.connector.TransportConnector;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -23,12 +23,12 @@ public class BulkProcessorProxy implements BulkProcessor.Listener {
 
   private final BulkProcessor bulkProcessor;
 
-  private final TransportConnector connector;
+  private final ElasticsearchClient client;
 
   @Autowired
-  public BulkProcessorProxy(final TransportConnector connector, final ElasticsearchProperties properties) {
-    this.connector = connector;
-    this.bulkProcessor = BulkProcessor.builder(connector.getClient(), this)
+  public BulkProcessorProxy(final ElasticsearchClient client, final ElasticsearchProperties properties) {
+    this.client = client;
+    this.bulkProcessor = BulkProcessor.builder(client.getClient(), this)
         .setName("BulkProcessor")
         .setBulkActions(properties.getBulkActions())
         .setBulkSize(new ByteSizeValue(properties.getBulkSize(), ByteSizeUnit.MB))
@@ -40,10 +40,6 @@ public class BulkProcessorProxy implements BulkProcessor.Listener {
   public void add(IndexRequest request) {
     Assert.notNull(request, "IndexRequest must not be null!");
     bulkProcessor.add(request);
-  }
-
-  public void refreshIndices() {
-    connector.getClient().admin().indices().prepareRefresh().execute().actionGet();
   }
 
   public void flush() {
@@ -58,13 +54,12 @@ public class BulkProcessorProxy implements BulkProcessor.Listener {
   @Override
   public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
     log.debug("Executed bulk operation composed of {} actions", request.numberOfActions());
-    connector.waitForYellowStatus();
-    refreshIndices();
+    client.waitForYellowStatus();
   }
 
   @Override
   public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
     log.warn("Error executing bulk operation", failure);
-    connector.waitForYellowStatus();
+    client.waitForYellowStatus();
   }
 }

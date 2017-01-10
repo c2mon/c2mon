@@ -17,7 +17,7 @@
 package cern.c2mon.server.elasticsearch;
 
 import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
-import cern.c2mon.server.elasticsearch.connector.TransportConnector;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,19 +32,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ElasticsearchModuleIntegrationTest extends BaseElasticsearchIntegrationTest {
 
   @Autowired
-  private TransportConnector connector;
+  private ElasticsearchClient client;
 
   @Before
   public void setup() {
-    while (!connector.isConnected()) {
-      connector.waitForYellowStatus();
-    }
+    client.waitForYellowStatus();
   }
 
   @Test
   public void testModuleStartup() {
-    String[] indices = connector.getClient().admin().indices().prepareGetIndex().get().indices();
-    log.info("indices in the cluster:");
+    String[] indices = client.getClient().admin().indices().prepareGetIndex().get().indices();
+    log.info("indices in the cluster: ");
     for (String index : indices) {
       log.info(index);
     }

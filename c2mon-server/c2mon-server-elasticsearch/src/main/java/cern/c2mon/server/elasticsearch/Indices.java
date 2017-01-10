@@ -2,9 +2,10 @@ package cern.c2mon.server.elasticsearch;
 
 import cern.c2mon.server.elasticsearch.alarm.AlarmDocument;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
-import cern.c2mon.server.elasticsearch.connector.TransportConnector;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocument;
 import cern.c2mon.server.elasticsearch.tag.TagDocument;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
@@ -26,18 +27,18 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Component
 public class Indices {
 
-  private final TransportConnector connector;
+  private ElasticsearchClient client;
 
-  private final ElasticsearchProperties properties;
+  private ElasticsearchProperties properties;
 
   private final List<String> indexCache = new CopyOnWriteArrayList<>();
 
   private static Indices self;
 
   @Autowired
-  public Indices(ElasticsearchProperties properties, TransportConnector connector) {
+  public Indices(ElasticsearchProperties properties, ElasticsearchClient client) {
     this.properties = properties;
-    this.connector = connector;
+    this.client = client;;
   }
 
   @PostConstruct
@@ -54,7 +55,7 @@ public class Indices {
       return true;
     }
 
-    CreateIndexRequestBuilder builder = self.connector.getClient().admin().indices().prepareCreate(indexName);
+    CreateIndexRequestBuilder builder = self.client.getClient().admin().indices().prepareCreate(indexName);
     builder.setSettings(Settings.settingsBuilder()
         .put("number_of_shards", self.properties.getShardsPerIndex())
         .put("number_of_replicas", self.properties.getReplicasPerShard())
@@ -86,7 +87,7 @@ public class Indices {
       return true;
     }
 
-    if (self.connector.getClient().admin().indices().prepareExists(indexName).get().isExists()) {
+    if (self.client.getClient().admin().indices().prepareExists(indexName).get().isExists()) {
       self.indexCache.add(indexName);
       return true;
     }
@@ -120,7 +121,7 @@ public class Indices {
         break;
       case "W":
       case "w":
-        dateFormat = "yyyy-MM-dd";
+        dateFormat = "yyyy-'W'ww";
         break;
       case "M":
       case "m":
@@ -128,7 +129,10 @@ public class Indices {
         break;
     }
 
-    String result = prefix + new SimpleDateFormat(dateFormat).format(new Date(timestamp));
-    return result.toLowerCase();
+    return prefix + new SimpleDateFormat(dateFormat).format(new Date(timestamp));
+  }
+
+  static ElasticsearchProperties getProperties() {
+    return self.properties;
   }
 }

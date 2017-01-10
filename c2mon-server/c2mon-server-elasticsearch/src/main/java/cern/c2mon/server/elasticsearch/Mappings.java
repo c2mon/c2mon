@@ -1,6 +1,6 @@
 package cern.c2mon.server.elasticsearch;
 
-import cern.c2mon.server.elasticsearch.connector.TransportConnector;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import javax.annotation.PostConstruct;
 public class Mappings {
 
   @Autowired
-  private TransportConnector connector;
+  private ElasticsearchClient client;
 
   private static Mappings self;
 
@@ -34,7 +34,7 @@ public class Mappings {
     PutMappingResponse response = null;
 
     try {
-      response = self.connector.getClient().admin().indices().preparePutMapping(indexName).setType(type).setSource(mapping).get();
+      response = self.client.getClient().admin().indices().preparePutMapping(indexName).setType(type).setSource(mapping).get();
     } catch (Exception e) {
       log.error("Error creating mapping for indexName={}, type={}, mapping={}", indexName, type, mapping, e);
     }

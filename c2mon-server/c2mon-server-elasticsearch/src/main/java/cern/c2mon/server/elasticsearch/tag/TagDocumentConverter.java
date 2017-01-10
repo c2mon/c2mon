@@ -140,7 +140,7 @@ public class TagDocumentConverter implements Converter<Tag, TagDocument> {
     if (metadata != null) {
       return metadata.getMetadata().entrySet().stream().collect(Collectors.toMap(
           Map.Entry::getKey,
-          e -> e.getValue() == null ? null : e.getValue().toString()
+          e -> e.getValue() == null ? null : e.getValue()
       ));
     }
 

@@ -47,7 +47,7 @@ public class AlarmDocumentConverter implements Converter<Alarm, AlarmDocument> {
     document.put("faultMember", alarm.getFaultMember());
     document.put("faultCode", alarm.getFaultCode());
     document.put("timestamp", alarm.getTimestamp().getTime());
-    document.put("info", alarm.isActive());
+    document.put("info", alarm.getInfo());
     document.put("metadata", getMetadata(alarm));
 
     return document;
@@ -59,7 +59,7 @@ public class AlarmDocumentConverter implements Converter<Alarm, AlarmDocument> {
     if (metadata != null) {
       return metadata.getMetadata().entrySet().stream().collect(Collectors.toMap(
           Map.Entry::getKey,
-          e -> e.getValue() == null ? null : e.getValue().toString()
+          e -> e.getValue() == null ? null : e.getValue()
       ));
     }
 

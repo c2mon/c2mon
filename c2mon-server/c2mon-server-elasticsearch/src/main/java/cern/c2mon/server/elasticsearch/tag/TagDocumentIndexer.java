@@ -57,7 +57,6 @@ public class TagDocumentIndexer implements IDBPersistenceHandler<TagDocument> {
       tags.forEach(this::indexTag);
 
       bulkProcessor.flush();
-      bulkProcessor.refreshIndices();
     } catch (Exception e) {
       throw new IDBPersistenceException(e);
     }
@@ -65,7 +64,7 @@ public class TagDocumentIndexer implements IDBPersistenceHandler<TagDocument> {
 
   private void indexTag(TagDocument tag) {
     String index = getOrCreateIndex(tag);
-    String type = Types.of(((Map) tag.get("c2mon")).get("dataType").toString());
+    String type = Types.of(tag.getProperty("c2mon", Map.class).get("dataType").toString());
 
     log.trace("Indexing tag (#{}, index={}, type={})", tag.getId(), index, type);
 

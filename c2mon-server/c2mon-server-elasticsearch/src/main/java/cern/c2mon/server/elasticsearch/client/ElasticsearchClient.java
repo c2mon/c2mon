@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.elasticsearch.connector;
+package cern.c2mon.server.elasticsearch.client;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -42,7 +42,7 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
  */
 @Slf4j
 @Service
-public class TransportConnector {
+public class ElasticsearchClient {
 
   @Autowired
   private ElasticsearchProperties properties;
@@ -51,7 +51,7 @@ public class TransportConnector {
   private Client client;
 
   @Getter
-  private boolean isConnected;
+  private boolean isClusterYellow;
 
   @PostConstruct
   public void init() {
@@ -98,8 +98,8 @@ public class TransportConnector {
         properties.getClusterName(), properties.getHost(), properties.getPort());
 
     new Thread(() -> {
-      waitForYellowStatus();
       log.info("Connected to Elasticsearch cluster {}", properties.getClusterName());
+      waitForYellowStatus();
 
     }, "EsClusterFinder").start();
   }
@@ -108,13 +108,13 @@ public class TransportConnector {
    * Block and wait for the cluster to become yellow.
    */
   public void waitForYellowStatus() {
-    while (!isConnected) {
+    while (!isClusterYellow) {
       log.debug("Waiting for yellow status of Elasticsearch cluster...");
 
       try {
         ClusterHealthStatus status = getClusterHealth().getStatus();
         if (status.equals(ClusterHealthStatus.YELLOW) || status.equals(ClusterHealthStatus.GREEN)) {
-          isConnected = true;
+          isClusterYellow = true;
           break;
         }
       } catch (Exception e) {

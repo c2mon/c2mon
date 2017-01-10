@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import cern.c2mon.pmanager.IDBPersistenceHandler;
-import cern.c2mon.server.elasticsearch.connector.TransportConnector;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import cern.c2mon.server.elasticsearch.Indices;
 import cern.c2mon.server.elasticsearch.MappingFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -37,12 +37,8 @@ import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 @Component
 public class AlarmDocumentIndexer implements IDBPersistenceHandler<AlarmDocument> {
 
-  private TransportConnector connector;
-
   @Autowired
-  public AlarmDocumentIndexer(final TransportConnector connector) {
-    this.connector = connector;
-  }
+  private ElasticsearchClient client;
 
   @Override
   public void storeData(AlarmDocument alarm) throws IDBPersistenceException {
@@ -66,7 +62,7 @@ public class AlarmDocumentIndexer implements IDBPersistenceHandler<AlarmDocument
     String indexName = getOrCreateIndex(alarm);
 
     log.debug("Adding new alarm event to index {}", indexName);
-    return connector.getClient().prepareIndex().setIndex(indexName)
+    return client.getClient().prepareIndex().setIndex(indexName)
         .setType("alarm")
         .setSource(alarm.toString())
         .setRouting(alarm.getId())
