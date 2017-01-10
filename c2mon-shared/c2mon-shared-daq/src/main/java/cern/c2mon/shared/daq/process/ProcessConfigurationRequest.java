@@ -16,9 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.shared.daq.process;
 
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
@@ -36,8 +33,6 @@ import org.simpleframework.xml.Root;
  */
 @Root(name = "process-configuration-request")
 public class ProcessConfigurationRequest implements ProcessRequest {
-  private final static Logger LOGGER = LoggerFactory.getLogger(ProcessConfigurationRequest.class);
-  
   
   /**
    * Constant of NO_PROCESS as default value for process name

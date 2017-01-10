@@ -17,8 +17,6 @@
 
 package cern.c2mon.shared.daq.process;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
@@ -38,9 +36,6 @@ import org.simpleframework.xml.Root;
  */
 @Root(name = "process-connection-response")
 public class ProcessConnectionResponse implements ProcessResponse {
-
-  /** Log4j instance */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessConnectionResponse.class);
 
   /**
    * Constant of the PIK REJECTED. All number which are zero or below
@@ -130,6 +125,4 @@ public class ProcessConnectionResponse implements ProcessResponse {
   public final String toString() {
     return ("Process Name: " + this.processName + ", " + "Process PIK: " + this.processPIK);
   }
-
-
 }

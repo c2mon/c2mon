@@ -16,14 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.shared.daq.process;
 
-
-import java.sql.Timestamp;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
-import org.w3c.dom.Document;
 
 /**
  * This class is used by:
@@ -39,8 +33,6 @@ import org.w3c.dom.Document;
  */
 @Root(name = "process-configuration-response")
 public class ProcessConfigurationResponse implements ProcessResponse {
-  /** Log4j instance */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessConfigurationResponse.class);
   
   /**
    * Constant of the CONF_REJECTED. All number which are zero or below
