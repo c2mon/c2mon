@@ -40,7 +40,7 @@ import cern.c2mon.shared.common.metadata.Metadata;
 
 import static junit.framework.Assert.*;
 
-public class ClientDataTagImplTest {
+public class TagImplTest {
 
   private TagUpdate createValidTransferTag(final Long tagId) {
     return createValidTransferTag(tagId, Float.valueOf(1.234f));
@@ -307,4 +307,12 @@ public class ClientDataTagImplTest {
     assertEquals(cdt.getTagImpl().getId(), cdt2.getId());
   }
 
+  @Test
+  public void retrieveTopicName() {
+    TagController tagController = new TagController(1234L);
+    tagController.onUpdate(createValidTransferTag(1234L));
+    tagController.getTagImpl().setTopicName("test");
+
+    assertTrue(tagController.getTagImpl().getTopicName().equals("test"));
+  }
 }

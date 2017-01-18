@@ -30,7 +30,7 @@ import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl;
 
-public class ClientCommandTagImplTest {
+public class CommandTagImplTest {
 
   @Test
   public void testXMLSerialization() throws Exception {

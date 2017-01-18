@@ -82,7 +82,7 @@ public class TagController implements TagUpdateListener, SupervisionListener {
   }
 
   public TagController(TagImpl tagImpl) {
-    this.tagImpl = tagImpl;
+    this.tagImpl = tagImpl.clone();
   }
 
   @org.simpleframework.xml.core.Persist

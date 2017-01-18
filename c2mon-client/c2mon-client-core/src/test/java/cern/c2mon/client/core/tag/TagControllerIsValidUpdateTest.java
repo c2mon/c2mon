@@ -40,7 +40,7 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
  *
  * @author ekoufaki
  */
-public class ClientDataTagImplIsValidUpdateTest {
+public class TagControllerIsValidUpdateTest {
 
   /** Just a random tag id for our tests */
   private final static long TAG_ID = 1234L;

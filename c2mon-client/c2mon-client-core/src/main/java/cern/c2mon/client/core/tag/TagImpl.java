@@ -64,7 +64,7 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
   /**
    * The datatype of the tag value
    */
-  @Element(required = true)
+  @Element(required = false)
   private Class<?> type;
 
   /**
@@ -508,14 +508,14 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
    */
   @Override
   public String getTopicName() {
-    this.getUpdateTagLock().readLock().lock();
+    updateTagLock.readLock().lock();
     try {
-      if (this.getTopicName() != null) {
-        return this.getTopicName();
+      if (this.topicName != null) {
+        return this.topicName;
       }
       return "";
     } finally {
-      this.getUpdateTagLock().readLock().unlock();
+      updateTagLock.readLock().unlock();
     }
   }
 
