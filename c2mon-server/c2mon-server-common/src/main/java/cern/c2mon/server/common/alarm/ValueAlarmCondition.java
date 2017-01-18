@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -18,19 +18,19 @@ package cern.c2mon.server.common.alarm;
 
 /**
  * <b>NOTE: imported as-is into C2MON</b>
- * 
+ *
  * <p>
  * Simple implementation of the AlarmCondition interface.
- * 
+ *
  * A ValueAlarmCondition is defined for a single alarm value. If the parameter
  * passed to the evaluateState() method is equal to the defined alarm value, the
  * alarm state is supposed to be FaultState.ACTIVE; if the two values differ,
  * the alarm state is supposed to be FaultState.TERMINATE.
- * 
+ *
  * ValueAlarmCondition is Serializable. A serialVersionUID has been defined to
  * ensure that no serialization problems occur after minor modifications to the
  * class.
- * 
+ *
  * @author Jan Stowisek
  * @version $Revision: 1.8 $ ($Date: 2007/03/07 09:48:19 $ - $State: Exp $)
  */
@@ -57,7 +57,7 @@ public class ValueAlarmCondition extends AlarmCondition {
 
   /**
    * Constructor
-   * 
+   *
    * @param alarmValue
    *          the value for which the condition is considered to return ACTIVE
    */
@@ -76,6 +76,7 @@ public class ValueAlarmCondition extends AlarmCondition {
    * @throws IllegalStateException
    *           if type of alarm condition and tag value do not match
    */
+  @Override
   public String evaluateState(final Object pValue) {
     if (pValue == null) {
       throw new NullPointerException("Trying to evaluate alarm condition for null value.");
@@ -86,7 +87,7 @@ public class ValueAlarmCondition extends AlarmCondition {
       Class< ? extends Enum> enumClass = (Class< ? extends Enum>) pValue.getClass();
       enumAdaptedAlarmValue = Enum.valueOf(enumClass, (String) alarmValue);
     } else if (!pValue.getClass().equals(alarmValue.getClass())) {
-      throw new IllegalStateException("The passed tag value type does not match the expected type for this alarm.");
+      throw new IllegalStateException("The passed tag value type does not match the expected type for this alarm (" + pValue.getClass() + " != " + alarmValue.getClass() + ")");
     } else {
       enumAdaptedAlarmValue = alarmValue;
     }
@@ -102,7 +103,7 @@ public class ValueAlarmCondition extends AlarmCondition {
 
   /**
    * Set a new alarm value for the ValueAlarmCondition
-   * 
+   *
    * @param alarmValue
    *          the value for which the condition is supposed to return ACTIVE
    */
@@ -112,7 +113,7 @@ public class ValueAlarmCondition extends AlarmCondition {
 
   /**
    * Return the condition's alarm value
-   * 
+   *
    * @return the value for which the condition is supposed to return ACTIVE
    */
   public final Object getAlarmValue() {
@@ -122,14 +123,17 @@ public class ValueAlarmCondition extends AlarmCondition {
   /**
    * @return a String representation of the object
    */
+  @Override
   public String toString() {
     return this.getClass().getName() + "(alarmValue= " + getAlarmValue() + ")";
   }
 
+  @Override
   public Object clone() {
     return new ValueAlarmCondition(getAlarmValue());
   }
 
+  @Override
   public boolean equals(final Object obj) {
     if (obj instanceof ValueAlarmCondition) {
       ValueAlarmCondition cond = (ValueAlarmCondition) obj;
