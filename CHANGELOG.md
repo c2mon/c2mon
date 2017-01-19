@@ -7,8 +7,12 @@ For more details on a given release, please check also the [Milestone planning](
 
 ## [Unreleased]
 ### Added
-
 ### Changed
+### Fixed
+
+## [1.8.7] - 2016-01-19
+### Fixed
+- Alarm metadata were not sent through the alarm topic (#125)
 
 ## [1.8.6] - 2016-12-20
 ### Added
@@ -26,7 +30,7 @@ For more details on a given release, please check also the [Milestone planning](
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
 
-
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/8
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/9
+[1.8.7]: https://gitlab.cern.ch/c2mon/c2mon/milestones/8
 [1.8.6]: https://gitlab.cern.ch/c2mon/c2mon/milestones/7
 
