@@ -42,7 +42,7 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
  */
 @Slf4j
 @Service
-public class SupervisionEventListener implements SupervisionListener, SmartLifecycle {
+public class SupervisionEventDocumentListener implements SupervisionListener, SmartLifecycle {
 
   @Autowired
   private SupervisionNotifier supervisionNotifier;

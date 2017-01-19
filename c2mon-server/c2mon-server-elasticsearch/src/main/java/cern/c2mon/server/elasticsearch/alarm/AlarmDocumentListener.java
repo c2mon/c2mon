@@ -38,7 +38,7 @@ import cern.c2mon.server.common.config.ServerConstants;
  */
 @Slf4j
 @Component
-public class AlarmListener implements C2monCacheListener<Alarm>, SmartLifecycle {
+public class AlarmDocumentListener implements C2monCacheListener<Alarm>, SmartLifecycle {
 
   @Autowired
   private CacheRegistrationService cacheRegistrationService;

@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @Slf4j
-public class TagListener implements C2monBufferedCacheListener<Tag>, SmartLifecycle {
+public class TagDocumentListener implements C2monBufferedCacheListener<Tag>, SmartLifecycle {
 
   @Autowired
   private CacheRegistrationService cacheRegistrationService;
