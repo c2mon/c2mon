@@ -19,7 +19,7 @@ package cern.c2mon.client.core.tag;
 import cern.c2mon.client.common.tag.Tag;
 
 /**
- * Helper class used by {@link ClientDataTagImpl} to 
+ * Helper class used by {@link TagImpl} to
  * compare two value update objects and to find out whether
  * they are equal.
  *

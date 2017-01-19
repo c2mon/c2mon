@@ -44,6 +44,9 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.rule.RuleExpression;
 
 /**
+ * A class containing implementation of {@link Tag}, {@link TopicRegistrationDetails} and {@link Cloneable}
+ * Stores all needed data about DataTag
+ *
  * @author Szymon Halastra
  */
 @Slf4j
@@ -606,7 +609,7 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
     }
     catch (CloneNotSupportedException cloneException) {
       log.error(
-              "clone() - Cloning the ClientDataTagImpl object failed! No update sent to the client.");
+              "clone() - Cloning the TagImpl object failed! No update sent to the client.");
       throw new RuntimeException(cloneException);
     }
     finally {

@@ -41,6 +41,8 @@ import cern.c2mon.shared.rule.RuleExpression;
 import cern.c2mon.shared.rule.RuleFormatException;
 
 /**
+ * A class providing logic for update/subscribe actions on tags {@link TagImpl}
+ *
  * @author Szymon Halastra
  */
 @Data
@@ -251,16 +253,16 @@ public class TagController implements TagUpdateListener, SupervisionListener {
   }
 
   /**
-   * This thread safe method updates the given <code>ClientDataTag</code> object.
+   * This thread safe method updates the given <code>TagImpl</code> object.
    * It copies every single field of the <code>TransferTagValue</code> object and notifies
    * then the registered listener about the update by providing a copy of the
-   * <code>ClientDataTag</code> object.
+   * <code>TagImpl</code> object.
    * <p>
-   * Please note that the <code>ClientDataTag</code> gets only updated, if the tag id's
+   * Please note that the <code>TagImpl</code> gets only updated, if the tag id's
    * matches and if the server time stamp of the update is older than the current time
    * stamp set.
    *
-   * @param transferTag The object that contains the updates.
+   * @param tagValueUpdate The object that contains the updates.
    *
    * @return <code>true</code>, if the update was successful, otherwise
    * <code>false</code>
@@ -290,12 +292,12 @@ public class TagController implements TagUpdateListener, SupervisionListener {
   }
 
   /**
-   * This thread safe method updates the given <code>ClientDataTag</code> object.
+   * This thread safe method updates the given <code>TagImpl</code> object.
    * It copies every single field of the <code>TransferTag</code> object and notifies
    * then the registered listener about the update by providing a copy of the
-   * <code>ClientDataTag</code> object.
+   * <code>TagImpl</code> object.
    * <p>
-   * Please note that the <code>ClientDataTag</code> gets only updated, if the tag id's
+   * Please note that the <code>TagImpl</code> gets only updated, if the tag id's
    * matches and if the server time stamp
    * of the update is older thatn the current time
    * stamp set.
