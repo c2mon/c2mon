@@ -283,30 +283,6 @@ public class TagImplTest {
     assertFalse(cdt.equals(cdt2));
   }
 
-
-  @Test
-  public void testXMLSerialization() throws Exception {
-
-    TagController cdt = new TagController(1234L);
-    cdt.onUpdate(createValidTransferTag(1234L));
-
-    assertTrue(cdt.getTagImpl().getXml().contains("<isValid>true</isValid>"));
-    TagQualityStatus statusToAdd1 = TagQualityStatus.VALUE_OUT_OF_BOUNDS;
-    TagQualityStatus statusToAdd2 = TagQualityStatus.INACCESSIBLE;
-    cdt.getTagImpl().getDataTagQuality().addInvalidStatus(statusToAdd1, "Value is over 9000!");
-    cdt.getTagImpl().getDataTagQuality().addInvalidStatus(statusToAdd2, "It's down!");
-    assertTrue(cdt.getTagImpl().getXml().contains("<isValid>false</isValid>"));
-    cdt.getTagImpl().getDataTagQuality().removeInvalidStatus(statusToAdd1);
-    cdt.getTagImpl().getDataTagQuality().removeInvalidStatus(statusToAdd2);
-    assertTrue(cdt.getTagImpl().getXml().contains("<isValid>true</isValid>"));
-    cdt.getTagImpl().getDataTagQuality().addInvalidStatus(statusToAdd1, "Value is over 9000!");
-    cdt.getTagImpl().getDataTagQuality().addInvalidStatus(statusToAdd2, "It's down!");
-    assertTrue(cdt.getTagImpl().getXml().contains("<isValid>false</isValid>"));
-
-    TagImpl cdt2 = TagImpl.fromXml(cdt.getTagImpl().toString());
-    assertEquals(cdt.getTagImpl().getId(), cdt2.getId());
-  }
-
   @Test
   public void retrieveTopicName() {
     TagController tagController = new TagController(1234L);
