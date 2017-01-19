@@ -277,7 +277,7 @@ public class TagServiceTest {
     Set<Long> tagId = new HashSet<>();
     tagId.add(1L);
     EasyMock.expect(requestHandlerMock.requestTags(tagId)).andReturn(new ArrayList<>(0));
-    TagController cdt = new TagController(1L, true);
+    TagController tagController = new TagController(1L, true);
     EasyMock.replay(requestHandlerMock, jmsProxyMock);
 
     // run test

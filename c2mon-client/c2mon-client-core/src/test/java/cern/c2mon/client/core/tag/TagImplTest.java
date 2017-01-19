@@ -149,81 +149,81 @@ public class TagImplTest {
 
   @Test
   public void testClean() throws CloneNotSupportedException {
-    final TagController cdt = new TagController(1234L);
-    cdt.onUpdate(createValidTransferTag(1234L));
+    final TagController tagController = new TagController(1234L);
+    tagController.onUpdate(createValidTransferTag(1234L));
 
-    TagController copy = new TagController(cdt.getTagImpl().clone());
+    TagController copy = new TagController(tagController.getTagImpl().clone());
 
     copy.clean();
 
-    assertNotSame("The two objects should not point to the same reference in memory!", cdt, copy);
-    assertTrue(cdt.getTagImpl().equals(copy.getTagImpl()));
+    assertNotSame("The two objects should not point to the same reference in memory!", tagController, copy);
+    assertTrue(tagController.getTagImpl().equals(copy.getTagImpl()));
     assertNotNull(copy.getTagImpl().getServerTimestamp());
-    assertTrue(cdt.getTagImpl().getServerTimestamp().after(copy.getTagImpl().getServerTimestamp()));
+    assertTrue(tagController.getTagImpl().getServerTimestamp().after(copy.getTagImpl().getServerTimestamp()));
     assertNull(copy.getTagImpl().getValue());
     assertEquals(0, copy.getTagImpl().getAlarmIds().size());
     assertEquals(new Timestamp(0L), copy.getTagImpl().getTimestamp());
     assertEquals("Tag not initialised.", copy.getTagImpl().getDescription());
     assertFalse(copy.getTagImpl().getDataTagQuality().isInitialised());
-    assertEquals(cdt.getTagImpl().getName(), copy.getTagImpl().getName());
-    assertEquals(cdt.getTagImpl().getRuleExpression(), copy.getTagImpl().getRuleExpression());
+    assertEquals(tagController.getTagImpl().getName(), copy.getTagImpl().getName());
+    assertEquals(tagController.getTagImpl().getRuleExpression(), copy.getTagImpl().getRuleExpression());
     assertNull(copy.getTagImpl().getType());
     assertEquals(TypeNumeric.TYPE_UNKNOWN, copy.getTagImpl().getTypeNumeric());
-    assertEquals(cdt.getTagImpl().getUnit(), copy.getTagImpl().getUnit());
+    assertEquals(tagController.getTagImpl().getUnit(), copy.getTagImpl().getUnit());
     assertNull(copy.getTagImpl().getValue());
   }
 
   @Test
   public void testTypeNumeric() {
-    final TagController cdt = new TagController(1234L);
+    final TagController tagController = new TagController(1234L);
 
-    cdt.onUpdate(createValidTransferTag(1234L, Float.valueOf(1.234f)));
-    assertEquals(TypeNumeric.TYPE_FLOAT, cdt.getTagImpl().getTypeNumeric());
+    tagController.onUpdate(createValidTransferTag(1234L, Float.valueOf(1.234f)));
+    assertEquals(TypeNumeric.TYPE_FLOAT, tagController.getTagImpl().getTypeNumeric());
 
-    cdt.clean();
-    cdt.onUpdate(createValidTransferTag(1234L, Long.valueOf(234324L)));
-    assertEquals(TypeNumeric.TYPE_LONG, cdt.getTagImpl().getTypeNumeric());
+    tagController.clean();
+    tagController.onUpdate(createValidTransferTag(1234L, Long.valueOf(234324L)));
+    assertEquals(TypeNumeric.TYPE_LONG, tagController.getTagImpl().getTypeNumeric());
 
-    cdt.clean();
-    cdt.onUpdate(createValidTransferTag(1234L, Boolean.FALSE));
-    assertEquals(TypeNumeric.TYPE_BOOLEAN, cdt.getTagImpl().getTypeNumeric());
+    tagController.clean();
+    tagController.onUpdate(createValidTransferTag(1234L, Boolean.FALSE));
+    assertEquals(TypeNumeric.TYPE_BOOLEAN, tagController.getTagImpl().getTypeNumeric());
 
-    cdt.clean();
-    cdt.onUpdate(createValidTransferTag(1234L, Byte.valueOf((byte) 0x000A)));
-    assertEquals(TypeNumeric.TYPE_BYTE, cdt.getTagImpl().getTypeNumeric());
+    tagController.clean();
+    tagController.onUpdate(createValidTransferTag(1234L, Byte.valueOf((byte) 0x000A)));
+    assertEquals(TypeNumeric.TYPE_BYTE, tagController.getTagImpl().getTypeNumeric());
 
-    cdt.clean();
-    cdt.onUpdate(createValidTransferTag(1234L, Double.valueOf(1231231324123d)));
-    assertEquals(TypeNumeric.TYPE_DOUBLE, cdt.getTagImpl().getTypeNumeric());
+    tagController.clean();
+    tagController.onUpdate(createValidTransferTag(1234L, Double.valueOf(1231231324123d)));
+    assertEquals(TypeNumeric.TYPE_DOUBLE, tagController.getTagImpl().getTypeNumeric());
 
-    cdt.clean();
-    cdt.onUpdate(createValidTransferTag(1234L, Integer.valueOf(123324123)));
-    assertEquals(TypeNumeric.TYPE_INTEGER, cdt.getTagImpl().getTypeNumeric());
+    tagController.clean();
+    tagController.onUpdate(createValidTransferTag(1234L, Integer.valueOf(123324123)));
+    assertEquals(TypeNumeric.TYPE_INTEGER, tagController.getTagImpl().getTypeNumeric());
 
-    cdt.clean();
-    cdt.onUpdate(createValidTransferTag(1234L, Short.valueOf((short) -123)));
-    assertEquals(TypeNumeric.TYPE_SHORT, cdt.getTagImpl().getTypeNumeric());
+    tagController.clean();
+    tagController.onUpdate(createValidTransferTag(1234L, Short.valueOf((short) -123)));
+    assertEquals(TypeNumeric.TYPE_SHORT, tagController.getTagImpl().getTypeNumeric());
 
-    cdt.clean();
-    cdt.onUpdate(createValidTransferTag(1234L, "Test string"));
-    assertEquals(TypeNumeric.TYPE_STRING, cdt.getTagImpl().getTypeNumeric());
+    tagController.clean();
+    tagController.onUpdate(createValidTransferTag(1234L, "Test string"));
+    assertEquals(TypeNumeric.TYPE_STRING, tagController.getTagImpl().getTypeNumeric());
 
-    cdt.clean();
-    cdt.onUpdate(createValidTransferTag(1234L, null));
-    assertEquals(TypeNumeric.TYPE_UNKNOWN, cdt.getTagImpl().getTypeNumeric());
+    tagController.clean();
+    tagController.onUpdate(createValidTransferTag(1234L, null));
+    assertEquals(TypeNumeric.TYPE_UNKNOWN, tagController.getTagImpl().getTypeNumeric());
   }
 
   @Test
   public void testUpdateListenerIntialUpdate() throws CloneNotSupportedException {
     //test setup
-    TagController cdt = new TagController(1234L);
-    cdt.onUpdate(createValidTransferTag(1234L));
+    TagController tagController = new TagController(1234L);
+    tagController.onUpdate(createValidTransferTag(1234L));
     BaseListener<Tag> mockUpdateListener = EasyMock.createMock(BaseListener.class);
-    mockUpdateListener.onUpdate(EasyMock.and(EasyMock.not(EasyMock.same(cdt.getTagImpl())), EasyMock.eq(cdt.getTagImpl())));
+    mockUpdateListener.onUpdate(EasyMock.and(EasyMock.not(EasyMock.same(tagController.getTagImpl())), EasyMock.eq(tagController.getTagImpl())));
 
     //run test
     EasyMock.replay(mockUpdateListener);
-    cdt.addUpdateListener(mockUpdateListener);
+    tagController.addUpdateListener(mockUpdateListener);
 
     //check test success
     EasyMock.verify(mockUpdateListener);
@@ -231,56 +231,56 @@ public class TagImplTest {
 
   @Test
   public void testUpdateListener() {
-    final TagController cdt = new TagController(1234L);
-    cdt.addUpdateListener(new DataTagUpdateListener() {
+    final TagController tagController = new TagController(1234L);
+    tagController.addUpdateListener(new DataTagUpdateListener() {
       @Override
       public void onUpdate(final Tag tagUpdate) {
         assertNotNull(tagUpdate);
-        assertEquals(cdt.getTagImpl(), tagUpdate);
-        checkTagValueCopy(cdt.getTagImpl(), tagUpdate);
-        assertFalse(cdt == tagUpdate);
+        assertEquals(tagController.getTagImpl(), tagUpdate);
+        checkTagValueCopy(tagController.getTagImpl(), tagUpdate);
+        assertFalse(tagController == tagUpdate);
       }
     });
 
-    ((TagController) cdt).onUpdate(createValidTransferTag(1234L));
+    ((TagController) tagController).onUpdate(createValidTransferTag(1234L));
   }
 
   @Test
   public void testClone() throws Exception {
-    TagController cdt = new TagController(1234L);
-    TagController clone = new TagController(cdt.getTagImpl().clone());
-    checkTagCopy(cdt, clone);
+    TagController tagController = new TagController(1234L);
+    TagController clone = new TagController(tagController.getTagImpl().clone());
+    checkTagCopy(tagController, clone);
 
-    cdt.update(createValidTransferTag(1234L));
-    clone = new TagController(cdt.getTagImpl().clone());
-    checkTagCopy(cdt, clone);
+    tagController.update(createValidTransferTag(1234L));
+    clone = new TagController(tagController.getTagImpl().clone());
+    checkTagCopy(tagController, clone);
 
-    cdt.addUpdateListener((DataTagUpdateListener) tagUpdate -> {
+    tagController.addUpdateListener((DataTagUpdateListener) tagUpdate -> {
       // Do nothing
     });
 
-    clone = new TagController(cdt.getTagImpl().clone());
-    checkTagCopy(cdt, clone);
+    clone = new TagController(tagController.getTagImpl().clone());
+    checkTagCopy(tagController, clone);
 
-    cdt.invalidate(TagQualityStatus.INACCESSIBLE, "Down");
-    clone = new TagController(cdt.getTagImpl().clone());
-    checkTagCopy(cdt, clone);
+    tagController.invalidate(TagQualityStatus.INACCESSIBLE, "Down");
+    clone = new TagController(tagController.getTagImpl().clone());
+    checkTagCopy(tagController, clone);
 
-    cdt.getTagImpl().getDataTagQuality().validate();
-    clone.setTagImpl(cdt.getTagImpl().clone());
-    checkTagCopy(cdt, clone);
+    tagController.getTagImpl().getDataTagQuality().validate();
+    clone.setTagImpl(tagController.getTagImpl().clone());
+    checkTagCopy(tagController, clone);
   }
 
   @Test
   public void testEquals() throws CloneNotSupportedException {
-    TagController cdt = new TagController(1234L);
-    TagController clone = new TagController(cdt.getTagImpl().clone());
+    TagController tagController = new TagController(1234L);
+    TagController clone = new TagController(tagController.getTagImpl().clone());
     clone.clean();
 
-    assertEquals(cdt.getTagImpl(), clone.getTagImpl());
+    assertEquals(tagController.getTagImpl(), clone.getTagImpl());
 
     TagController cdt2 = new TagController(4321L);
-    assertFalse(cdt.equals(cdt2));
+    assertFalse(tagController.equals(cdt2));
   }
 
   @Test

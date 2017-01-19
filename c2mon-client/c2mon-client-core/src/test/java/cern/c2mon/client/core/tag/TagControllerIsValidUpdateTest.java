@@ -33,7 +33,7 @@ import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
 /**
- * Tests for  {@link ClientDataTagImpl#isValidUpdate(TagValueUpdate)}
+ * Tests for  {@link TagController#isValidUpdate(TagValueUpdate)}
  *
  * Covers all the cases described in the truth table of issue:
  * http://issues.cern.ch/browse/TIMS-826
@@ -59,7 +59,7 @@ public class TagControllerIsValidUpdateTest {
    */
   public void testCase1() {
 
-    TagController clientTagImpl = new TagController(TAG_ID);
+    TagController tagController = new TagController(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_PAST = createTagVUpdate();
     tagValueUpdate_PAST.setServerTimestamp(TIME_JUST_A_BIT_AGO);
@@ -67,38 +67,38 @@ public class TagControllerIsValidUpdateTest {
     TestTagValueUpdate tagValueUpdate_2 = createTagVUpdate();
     tagValueUpdate_2.setServerTimestamp(TIME_JUST_A_BIT_IN_THE_FUTURE);
 
-    clientTagImpl.onUpdate(tagValueUpdate_PAST);
-    final boolean status = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    tagController.onUpdate(tagValueUpdate_PAST);
+    final boolean status = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(status);
 
     // case b: let's make sure Source Timestamp
     // in the PAST does not make a difference..
     tagValueUpdate_2.setSourceTimestamp(TIME_JUST_A_BIT_AGO);
-    final boolean statusB = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusB = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusB == true);
 
     // case c: let's make sure Source Timestamp
     // in the FUTURE does not make a difference..
     tagValueUpdate_2.setSourceTimestamp(TIME_JUST_A_BIT_IN_THE_FUTURE);
-    final boolean statusC = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusC = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusC == true);
 
     // case d: let's make sure DAQ Timestamp
     // in the PAST does not make a difference..
     tagValueUpdate_2.setDaqTimestamp(TIME_JUST_A_BIT_AGO);
-    final boolean statusD = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusD = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusD == true);
 
     // case e: let's make sure DAQ Timestamp
     // in the FUTURE does not make a difference..
     tagValueUpdate_2.setDaqTimestamp(TIME_JUST_A_BIT_IN_THE_FUTURE);
-    final boolean statusE = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusE = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusE == true);
 
     // case f: let's make sure NULL DAQ Timestamp
     // does not make a difference..
     tagValueUpdate_2.setDaqTimestamp(null);
-    final boolean statusF = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusF = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusF == true);
 
     // case g: let's make sure instance of TagUpdate
@@ -107,7 +107,7 @@ public class TagControllerIsValidUpdateTest {
     tagUpdate_2.setServerTimestamp(TIME_JUST_A_BIT_IN_THE_FUTURE);
     tagUpdate_2.setDaqTimestamp(null);
     tagUpdate_2.setSourceTimestamp(null);
-    final boolean statusG = clientTagImpl.isValidUpdate(tagUpdate_2);
+    final boolean statusG = tagController.isValidUpdate(tagUpdate_2);
     assertTrue(statusG == true);
   }
 
@@ -118,7 +118,7 @@ public class TagControllerIsValidUpdateTest {
    */
   public void testCase2() {
 
-    TagController clientTagImpl = new TagController(TAG_ID);
+    TagController tagController = new TagController(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_CURRENT = createTagVUpdate();
     tagValueUpdate_CURRENT.setServerTimestamp(CURRENT_TIME);
@@ -126,43 +126,43 @@ public class TagControllerIsValidUpdateTest {
     TestTagValueUpdate tagValueUpdate_2 = createTagVUpdate();
     tagValueUpdate_2.setServerTimestamp(TIME_JUST_A_BIT_AGO);
 
-    clientTagImpl.onUpdate(tagValueUpdate_CURRENT);
-    final boolean status = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    tagController.onUpdate(tagValueUpdate_CURRENT);
+    final boolean status = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(status == false);
 
     // case b: let's make sure Source Timestamp
     // in the PAST does not make a difference..
     tagValueUpdate_2.setSourceTimestamp(TIME_JUST_A_BIT_AGO);
-    final boolean statusB = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusB = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusB == false);
 
     // case c: let's make sure Source Timestamp
     // in the FUTURE does not make a difference..
     tagValueUpdate_2.setSourceTimestamp(TIME_JUST_A_BIT_IN_THE_FUTURE);
-    final boolean statusC = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusC = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusC == false);
 
     // case d: let's make sure DAQ Timestamp
     // in the PAST does not make a difference..
     tagValueUpdate_2.setDaqTimestamp(TIME_JUST_A_BIT_AGO);
-    final boolean statusD = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusD = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusD == false);
 
     // case e: let's make sure DAQ Timestamp
     // in the FUTURE does not make a difference..
     tagValueUpdate_2.setDaqTimestamp(TIME_JUST_A_BIT_IN_THE_FUTURE);
-    final boolean statusE = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusE = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusE == false);
 
     // case f: let's make sure NULL DAQ Timestamp
     // does not make a difference..
     tagValueUpdate_2.setDaqTimestamp(null);
-    final boolean statusF = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusF = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusF == false);
 
     // case g:let's make sure an update with NULL server timestamp is always ignored
     tagValueUpdate_2.setServerTimestamp(null);
-    final boolean statusG = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusG = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusG == false);
   }
 
@@ -174,7 +174,7 @@ public class TagControllerIsValidUpdateTest {
    */
   public void testCase3() {
 
-    TagController clientTagImpl = new TagController(TAG_ID);
+    TagController tagController = new TagController(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
@@ -184,20 +184,20 @@ public class TagControllerIsValidUpdateTest {
     tagValueUpdate_2.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setDaqTimestamp(CURRENT_TIME);
 
-    clientTagImpl.onUpdate(tagValueUpdate_1);
-    final boolean status = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    tagController.onUpdate(tagValueUpdate_1);
+    final boolean status = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(status == true);
 
     // case b: let's make sure Source Timestamp
     // in the PAST does not make a difference..
     tagValueUpdate_2.setSourceTimestamp(TIME_JUST_A_BIT_AGO);
-    final boolean statusB = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusB = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusB == true);
 
     // case c: let's make sure Source Timestamp
     // in the FUTURE does not make a difference..
     tagValueUpdate_2.setSourceTimestamp(TIME_JUST_A_BIT_IN_THE_FUTURE);
-    final boolean statusC = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusC = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusC == true);
   }
 
@@ -209,29 +209,29 @@ public class TagControllerIsValidUpdateTest {
    */
   public void testCase4() {
 
-    TagController clientTagImpl = new TagController(TAG_ID);
+    TagController tagController = new TagController(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setDaqTimestamp(CURRENT_TIME);
-    clientTagImpl.onUpdate(tagValueUpdate_1);
+    tagController.onUpdate(tagValueUpdate_1);
 
     TestTagValueUpdate tagValueUpdate_2 = createTagVUpdate();
     tagValueUpdate_2.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setDaqTimestamp(null);
-    final boolean status = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean status = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(status == false);
 
     // case b: let's make sure Source Timestamp
     // in the PAST does not make a difference..
     tagValueUpdate_2.setSourceTimestamp(TIME_JUST_A_BIT_AGO);
-    final boolean statusB = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusB = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusB == false);
 
     // case c: let's make sure Source Timestamp
     // in the FUTURE does not make a difference..
     tagValueUpdate_2.setSourceTimestamp(TIME_JUST_A_BIT_IN_THE_FUTURE);
-    final boolean statusC = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusC = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusC == false);
   }
 
@@ -242,29 +242,29 @@ public class TagControllerIsValidUpdateTest {
    */
   public void testCase5() {
 
-    TagController clientTagImpl = new TagController(TAG_ID);
+    TagController tagController = new TagController(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setDaqTimestamp(CURRENT_TIME);
-    clientTagImpl.onUpdate(tagValueUpdate_1);
+    tagController.onUpdate(tagValueUpdate_1);
 
     TestTagValueUpdate tagValueUpdate_2 = createTagVUpdate();
     tagValueUpdate_2.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setDaqTimestamp(TIME_JUST_A_BIT_IN_THE_FUTURE);
-    final boolean status = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean status = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(status == true);
 
     // case b: let's make sure Source Timestamp
     // in the PAST does not make a difference..
     tagValueUpdate_2.setSourceTimestamp(TIME_JUST_A_BIT_AGO);
-    final boolean statusB = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusB = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusB == true);
 
     // case c: let's make sure Source Timestamp
     // in the FUTURE does not make a difference..
     tagValueUpdate_2.setSourceTimestamp(TIME_JUST_A_BIT_IN_THE_FUTURE);
-    final boolean statusC = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusC = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusC == true);
   }
 
@@ -276,30 +276,30 @@ public class TagControllerIsValidUpdateTest {
    */
   public void testCase6() {
 
-    TagController clientTagImpl = new TagController(TAG_ID);
+    TagController tagController = new TagController(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setDaqTimestamp(CURRENT_TIME);
-    clientTagImpl.onUpdate(tagValueUpdate_1);
+    tagController.onUpdate(tagValueUpdate_1);
 
     // case a:
     TestTagValueUpdate tagValueUpdate_2 = createTagVUpdate();
     tagValueUpdate_2.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setDaqTimestamp(TIME_JUST_A_BIT_AGO);
-    final boolean statusA = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusA = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusA == false);
 
     // case b: let's make sure Source Timestamp
     // in the PAST does not make a difference..
     tagValueUpdate_2.setSourceTimestamp(TIME_JUST_A_BIT_AGO);
-    final boolean statusB = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusB = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusB == false);
 
     // case c: let's make sure Source Timestamp
     // in the FUTURE does not make a difference..
     tagValueUpdate_2.setSourceTimestamp(TIME_JUST_A_BIT_IN_THE_FUTURE);
-    final boolean statusC = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusC = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusC == false);
   }
 
@@ -396,14 +396,14 @@ public class TagControllerIsValidUpdateTest {
    */
   public void testCase10() {
 
-    TagController clientTagImpl = new TagController(TAG_ID);
+    TagController tagController = new TagController(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setSourceTimestamp(CURRENT_TIME);
 
-    clientTagImpl.onUpdate(tagValueUpdate_1);
+    tagController.onUpdate(tagValueUpdate_1);
 
     /**
      * Result should be the same for both cases a, b that follow.
@@ -414,7 +414,7 @@ public class TagControllerIsValidUpdateTest {
     tagValueUpdate_2A.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_2A.setSourceTimestamp(null);
 
-    final boolean statusA = clientTagImpl.isValidUpdate(tagValueUpdate_2A);
+    final boolean statusA = tagController.isValidUpdate(tagValueUpdate_2A);
     assertTrue(statusA == false);
 
     // case b: Update is instance of TagUpdate
@@ -423,7 +423,7 @@ public class TagControllerIsValidUpdateTest {
     tagValueUpdate_2B.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_2B.setSourceTimestamp(null);
 
-    final boolean statusB = clientTagImpl.isValidUpdate(tagValueUpdate_2B);
+    final boolean statusB = tagController.isValidUpdate(tagValueUpdate_2B);
     assertTrue(statusB == false);
   }
 
@@ -433,7 +433,7 @@ public class TagControllerIsValidUpdateTest {
    */
   public void testCase11() {
 
-    TagController clientTagImpl = new TagController(TAG_ID);
+    TagController tagController = new TagController(TAG_ID);
 
     TestTagUpdate tagValueUpdate_1 = createTagUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
@@ -445,8 +445,8 @@ public class TagControllerIsValidUpdateTest {
     tagValueUpdate_2.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setSourceTimestamp(CURRENT_TIME);
 
-    clientTagImpl.onUpdate(tagValueUpdate_1);
-    final boolean status = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    tagController.onUpdate(tagValueUpdate_1);
+    final boolean status = tagController.isValidUpdate(tagValueUpdate_2);
 
     assertTrue(status == true);
   }
@@ -457,7 +457,7 @@ public class TagControllerIsValidUpdateTest {
    */
   public void testCase12() {
 
-    TagController clientTagImpl = new TagController(TAG_ID);
+    TagController tagController = new TagController(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
@@ -469,8 +469,8 @@ public class TagControllerIsValidUpdateTest {
     tagValueUpdate_2.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setSourceTimestamp(CURRENT_TIME);
 
-    clientTagImpl.onUpdate(tagValueUpdate_1);
-    final boolean status = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    tagController.onUpdate(tagValueUpdate_1);
+    final boolean status = tagController.isValidUpdate(tagValueUpdate_2);
 
     assertTrue(status == false);
   }
@@ -481,7 +481,7 @@ public class TagControllerIsValidUpdateTest {
    */
   public void testCase13() {
 
-    TagController clientTagImpl = new TagController(TAG_ID);
+    TagController tagController = new TagController(TAG_ID);
 
     TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
@@ -491,7 +491,7 @@ public class TagControllerIsValidUpdateTest {
     /**
      * Source Timestamp just has to be different: whether it is in the future or the past doesn't matter!
      */
-    clientTagImpl.onUpdate(tagValueUpdate_1);
+    tagController.onUpdate(tagValueUpdate_1);
 
     TestTagValueUpdate tagValueUpdate_2 = createTagVUpdate();
     tagValueUpdate_2.setServerTimestamp(CURRENT_TIME);
@@ -499,13 +499,13 @@ public class TagControllerIsValidUpdateTest {
 
     // case a: new source timestamp in the future
     tagValueUpdate_2.setSourceTimestamp(TIME_JUST_A_BIT_IN_THE_FUTURE);
-    final boolean statusA = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    final boolean statusA = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusA == true);
 
     // case b: new source timestamp in the past
     tagValueUpdate_2.setSourceTimestamp(TIME_JUST_A_BIT_AGO);
-    clientTagImpl.onUpdate(tagValueUpdate_1);
-    final boolean statusB = clientTagImpl.isValidUpdate(tagValueUpdate_2);
+    tagController.onUpdate(tagValueUpdate_1);
+    final boolean statusB = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusB == true);
   }
 
