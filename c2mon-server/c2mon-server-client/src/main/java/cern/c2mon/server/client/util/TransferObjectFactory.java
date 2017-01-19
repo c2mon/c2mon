@@ -143,21 +143,23 @@ public abstract class TransferObjectFactory {
    * @return The resulting <code>AlarmValueImpl</code>
    */
   public static AlarmValueImpl createAlarmValue(final Alarm alarm) {
-
     AlarmValueImpl alarmValueImpl = null;
 
     if (alarm != null) {
-
       alarmValueImpl = new AlarmValueImpl(alarm.getId(),
           alarm.getFaultCode(),
           alarm.getFaultMember(),
           alarm.getFaultFamily(),
           alarm.getInfo(),
           alarm.getTagId(),
-
           alarm.getTimestamp(),
           alarm.isActive());
+
+      if (alarm.getMetadata() != null) {
+        alarmValueImpl.setMetadata(alarm.getMetadata().getMetadata());
+      }
     }
+
     return alarmValueImpl;
   }
 
