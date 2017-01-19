@@ -172,21 +172,8 @@ public abstract class TransferObjectFactory {
    * @return The resulting <code>AlarmValueImpl</code>
    */
   public static AlarmValueImpl createAlarmValue(Alarm alarm, Tag tag) {
-
-    AlarmValueImpl alarmValueImpl = null;
-
-    if (alarm != null && tag != null) {
-
-      alarmValueImpl = new AlarmValueImpl(alarm.getId(),
-          alarm.getFaultCode(),
-          alarm.getFaultMember(),
-          alarm.getFaultFamily(),
-          alarm.getInfo(),
-          alarm.getTagId(),
-          tag.getDescription(),
-          alarm.getTimestamp(),
-          alarm.isActive());
-    }
+    AlarmValueImpl alarmValueImpl = createAlarmValue(alarm);
+    alarmValueImpl.setTagDescription(tag.getDescription());
     return alarmValueImpl;
   }
 
