@@ -7,7 +7,11 @@ For more details on a given release, please check also the [Milestone planning](
 
 ## [Unreleased]
 ### Added
+- Client layer: Data type information is now also available, if the value is `null` (uninitialised) (#52)
+
 ### Changed
+- Client layer: Code refactoring of ClientDataTagImpl (#53)
+
 ### Fixed
 
 ## [1.8.7] - 2016-01-19
