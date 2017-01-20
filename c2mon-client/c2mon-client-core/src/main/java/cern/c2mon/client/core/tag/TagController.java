@@ -41,8 +41,6 @@ import cern.c2mon.shared.rule.RuleExpression;
 import cern.c2mon.shared.rule.RuleFormatException;
 
 /**
- * A class providing logic for update/subscribe actions on tags {@link TagImpl}
- *
  * @author Szymon Halastra
  */
 @Data

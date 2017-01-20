@@ -44,9 +44,6 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.rule.RuleExpression;
 
 /**
- * A class containing implementation of {@link Tag}, {@link TopicRegistrationDetails} and {@link Cloneable}
- * Stores all needed data about DataTag
- *
  * @author Szymon Halastra
  */
 @Slf4j
