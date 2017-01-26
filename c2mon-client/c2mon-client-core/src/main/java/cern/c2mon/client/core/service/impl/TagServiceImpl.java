@@ -61,7 +61,7 @@ public class TagServiceImpl implements AdvancedTagService {
   private ClientDataTagCache cache;
 
   /** Reference to the supervision manager singleton */
-  private final CoreSupervisionService supervisionManager;
+  private final CoreSupervisionService supervisionService;
 
   /** Provides methods for requesting tag information from the C2MON server */
   private final RequestHandler clientRequestHandler;
@@ -72,16 +72,16 @@ public class TagServiceImpl implements AdvancedTagService {
   /**
    * Default Constructor, used by Spring to instantiate the Singleton service
    *
-   * @param supervisionManager Needed to compute the tag quality before passing the tag value to the caller
+   * @param supervisionService Needed to compute the tag quality before passing the tag value to the caller
    * @param cache The cache instance which is managing all <code>Tag</code> objects
    * @param requestHandler Provides methods for requesting tag information from the C2MON server
    */
   @Autowired
-  protected TagServiceImpl(final CoreSupervisionService supervisionManager,
+  protected TagServiceImpl(final CoreSupervisionService supervisionService,
                            final ClientDataTagCache cache,
                            final @Qualifier("coreRequestHandler") RequestHandler requestHandler) {
 
-    this.supervisionManager = supervisionManager;
+    this.supervisionService = supervisionService;
     this.cache = cache;
     this.clientRequestHandler = requestHandler;
   }
@@ -320,14 +320,14 @@ public class TagServiceImpl implements AdvancedTagService {
 
             // In case of a CommFault- or Status control tag, we don't register to supervision invalidations
             if (!tagUpdate.isControlTag() || tagUpdate.isAliveTag()) {
-              supervisionManager.addSupervisionListener(tagController, tagImpl.getProcessIds(), tagImpl.getEquipmentIds(), tagImpl.getSubEquipmentIds());
+              supervisionService.addSupervisionListener(tagController, tagImpl.getProcessIds(), tagImpl.getEquipmentIds(), tagImpl.getSubEquipmentIds());
             }
             
             missingTags.remove(tagImpl.getId());
             resultList.add(tagImpl.clone());
 
             if (!tagUpdate.isControlTag() || tagUpdate.isAliveTag()) {
-              supervisionManager.removeSupervisionListener(tagController);
+              supervisionService.removeSupervisionListener(tagController);
             }
           } catch (RuleFormatException e) {
             log.error("get() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
@@ -446,13 +446,13 @@ public class TagServiceImpl implements AdvancedTagService {
           
           // In case of a CommFault- or Status control tag, we don't register to supervision invalidations
           if (!tagUpdate.isControlTag() || tagUpdate.isAliveTag()) {
-            supervisionManager.addSupervisionListener(tagController, tagImpl.getProcessIds(), tagImpl.getEquipmentIds(), tagImpl.getSubEquipmentIds());
+            supervisionService.addSupervisionListener(tagController, tagImpl.getProcessIds(), tagImpl.getEquipmentIds(), tagImpl.getSubEquipmentIds());
           }
           
           resultList.add(tagImpl.clone());
 
           if (!tagUpdate.isControlTag() || tagUpdate.isAliveTag()) {
-            supervisionManager.removeSupervisionListener(tagController);
+            supervisionService.removeSupervisionListener(tagController);
           }
         } catch (RuleFormatException e) {
           log.error("findByName() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);

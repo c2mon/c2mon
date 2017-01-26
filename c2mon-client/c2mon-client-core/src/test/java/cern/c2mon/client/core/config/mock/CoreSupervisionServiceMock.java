@@ -7,10 +7,10 @@ import org.springframework.context.annotation.Bean;
 /**
  * @author Justin Lewis Salmon
  */
-public class CoreSupervisionManagerMock {
+public class CoreSupervisionServiceMock {
 
   @Bean
-  public SupervisionServiceImpl supervisionManager() {
+  public SupervisionServiceImpl supervisionServiceImpl() {
     return EasyMock.createMock(SupervisionServiceImpl.class);
   }
 }

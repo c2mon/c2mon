@@ -36,7 +36,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.config.C2monAutoConfiguration;
-import cern.c2mon.client.core.config.mock.CoreSupervisionManagerMock;
+import cern.c2mon.client.core.config.mock.CoreSupervisionServiceMock;
 import cern.c2mon.client.core.config.mock.JmsProxyMock;
 import cern.c2mon.client.core.config.mock.RequestHandlerMock;
 
@@ -80,7 +80,7 @@ import static junit.framework.Assert.*;
     C2monAutoConfiguration.class,
     JmsProxyMock.class,
     RequestHandlerMock.class,
-    CoreSupervisionManagerMock.class
+    CoreSupervisionServiceMock.class
 })
 @DirtiesContext
 public class ClientDataTagCacheImplTest {

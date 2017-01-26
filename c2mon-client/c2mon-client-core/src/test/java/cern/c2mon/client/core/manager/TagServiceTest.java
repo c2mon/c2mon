@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 import javax.jms.JMSException;
 
 import cern.c2mon.client.core.config.C2monAutoConfiguration;
-import cern.c2mon.client.core.config.mock.CoreSupervisionManagerMock;
+import cern.c2mon.client.core.config.mock.CoreSupervisionServiceMock;
 import cern.c2mon.client.core.config.mock.JmsProxyMock;
 import cern.c2mon.client.core.config.mock.RequestHandlerMock;
 import cern.c2mon.client.core.TagService;
@@ -61,7 +61,7 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
     C2monAutoConfiguration.class,
     JmsProxyMock.class,
     RequestHandlerMock.class,
-    CoreSupervisionManagerMock.class
+    CoreSupervisionServiceMock.class
 })
 public class TagServiceTest {
 
