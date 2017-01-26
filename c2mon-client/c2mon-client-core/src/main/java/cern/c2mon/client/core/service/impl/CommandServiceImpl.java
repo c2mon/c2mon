@@ -32,8 +32,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.tag.CommandTag;
-import cern.c2mon.client.core.CommandService;
-import cern.c2mon.client.core.tag.ClientCommandTagImpl;
+import cern.c2mon.client.core.service.CommandService;
+import cern.c2mon.client.core.tag.CommandTagImpl;
 import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.shared.client.command.CommandExecuteRequest;
 import cern.c2mon.shared.client.command.CommandExecuteRequestImpl;
@@ -56,8 +56,8 @@ public class CommandServiceImpl implements CommandService {
    * The local cache for commands that have already been retrieved from the
    * server.
    */
-  private final Map<Long, ClientCommandTagImpl<Object>> commandCache =
-    new ConcurrentHashMap<Long, ClientCommandTagImpl<Object>>();
+  private final Map<Long, CommandTagImpl<Object>> commandCache =
+    new ConcurrentHashMap<Long, CommandTagImpl<Object>>();
 
   /**
    * The C2MON session manager
@@ -102,7 +102,7 @@ public class CommandServiceImpl implements CommandService {
       getCommandTag(commandId);
     }
 
-    ClientCommandTagImpl<Object> cct = commandCache.get(commandId);
+    CommandTagImpl<Object> cct = commandCache.get(commandId);
 
     if (!cct.isExistingCommand()) {
         return new CommandReportImpl(commandId, CommandExecutionStatus.STATUS_CMD_UNKNOWN, "The command with tagId '" + commandId + "' is not known to the server");
@@ -145,13 +145,13 @@ public class CommandServiceImpl implements CommandService {
     }
 
     // Create ClientDataTags for all IDs and keep in hash table
-    ClientCommandTagImpl commandTag;
+    CommandTagImpl commandTag;
     for (Long commandId : pIds) {
       // skip all fake tags
       if (!commandId.equals(UNKNOWN_TAG_ID)) {
         commandTag = this.commandCache.get(commandId);
         if (commandTag == null) {
-          commandTag = new ClientCommandTagImpl(commandId);
+          commandTag = new CommandTagImpl(commandId);
           // Add the new tag to the global store
           this.commandCache.put(commandId, commandTag);
 
@@ -168,7 +168,7 @@ public class CommandServiceImpl implements CommandService {
 
       Collection<CommandTagHandle> commandTagHandles = clientRequestHandler.requestCommandTagHandles(newCommandTagIds);
       if (commandTagHandles != null) {
-        ClientCommandTagImpl cct = null;
+        CommandTagImpl cct = null;
         for (CommandTagHandle tagHandle : commandTagHandles) {
           cct = this.commandCache.get(tagHandle.getId());
           // update ClientCommandTag object
@@ -194,7 +194,7 @@ public class CommandServiceImpl implements CommandService {
         }
         catch (CloneNotSupportedException e) {
           LOG.error("getCommandTags() - Error while cloning command tag with id " + commandId);
-          throw new RuntimeException("Cloning not supported by ClientCommandTagImpl with id " + commandId, e);
+          throw new RuntimeException("Cloning not supported by CommandTagImpl with id " + commandId, e);
         }
       }
     }
@@ -212,7 +212,7 @@ public class CommandServiceImpl implements CommandService {
    * @return An instance of {@link CommandExecuteRequest}
    * @throws CommandTagValueException Thrown in case an incompatible value type.
    */
-  private <T> CommandExecuteRequest<T> createCommandExecuteRequest(final ClientCommandTagImpl<T> commandTag, T value) throws CommandTagValueException {
+  private <T> CommandExecuteRequest<T> createCommandExecuteRequest(final CommandTagImpl<T> commandTag, T value) throws CommandTagValueException {
     // Check if value is NOT NULL
     if (value == null) {
       throw new CommandTagValueException("Null value : command values cannot be set to null");
@@ -280,7 +280,7 @@ public class CommandServiceImpl implements CommandService {
     }
 
     if (sessionService.isUserLogged(userName)) {
-      ClientCommandTagImpl<Object> cct = commandCache.get(commandId);
+      CommandTagImpl<Object> cct = commandCache.get(commandId);
       if (cct.isExistingCommand()) {
         if (cct.getAuthorizationDetails() != null) {
           return sessionService.isAuthorized(userName, cct.getAuthorizationDetails());

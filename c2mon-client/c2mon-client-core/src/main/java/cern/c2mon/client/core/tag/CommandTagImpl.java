@@ -48,8 +48,8 @@ import cern.c2mon.shared.common.datatag.address.HardwareAddress;
  * @author Matthias Braeger
  * @see CommandServiceImpl
  */
-@Root(name = "ClientCommandTag")
-public class ClientCommandTagImpl<T> implements CommandTag<T>, Cloneable {
+@Root(name = "CommandTag")
+public class CommandTagImpl<T> implements CommandTag<T>, Cloneable {
 
   /** standard String used for unknown commands */
   private static final String CMD_UNKNOWN = "UNKNOWN";
@@ -153,14 +153,14 @@ public class ClientCommandTagImpl<T> implements CommandTag<T>, Cloneable {
   /**
    * Public default constructor.
    */
-  public ClientCommandTagImpl() {    
+  public CommandTagImpl() {
   }
 
   /**
    * Default Constructor
    * @param pId The command tag id
    */
-  public ClientCommandTagImpl(final Long pId) {
+  public CommandTagImpl(final Long pId) {
     this.id = pId;
     this.name = CMD_UNKNOWN;
     this.description = CMD_UNKNOWN;
@@ -336,7 +336,7 @@ public class ClientCommandTagImpl<T> implements CommandTag<T>, Cloneable {
   @SuppressWarnings("unchecked")
   @Override
   public CommandTag<T> clone() throws CloneNotSupportedException {
-    ClientCommandTagImpl<T> clone = (ClientCommandTagImpl<T>) super.clone();
+    CommandTagImpl<T> clone = (CommandTagImpl<T>) super.clone();
     clone.authorizationDetails = null;
     return clone;
   }
@@ -365,15 +365,15 @@ public class ClientCommandTagImpl<T> implements CommandTag<T>, Cloneable {
     return result;
   }
 
-  public static ClientCommandTagImpl fromXml(final String xml) throws Exception {
+  public static CommandTagImpl fromXml(final String xml) throws Exception {
 
-    ClientCommandTagImpl commandTag = null;
+    CommandTagImpl commandTag = null;
     StringReader sr = null;
     Serializer serializer = new Persister(new AnnotationStrategy());
 
     try {
       sr = new StringReader(xml);
-      commandTag = serializer.read(ClientCommandTagImpl.class, new StringReader(xml), false);
+      commandTag = serializer.read(CommandTagImpl.class, new StringReader(xml), false);
     } finally {
 
       if (sr != null) {

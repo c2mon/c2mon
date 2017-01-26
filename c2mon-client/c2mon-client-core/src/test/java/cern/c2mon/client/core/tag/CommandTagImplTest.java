@@ -35,12 +35,12 @@ public class CommandTagImplTest {
   @Test
   public void testXMLSerialization() throws Exception {
       
-    ClientCommandTagImpl<String> commandTag = createCommandTag(12342L);
+    CommandTagImpl<String> commandTag = createCommandTag(12342L);
     
     String xml = commandTag.getXml();
     commandTag.toString();
     
-    ClientCommandTagImpl<String> newCommandTag = ClientCommandTagImpl.fromXml(xml);
+    CommandTagImpl<String> newCommandTag = CommandTagImpl.fromXml(xml);
     
     assertTrue(commandTag.getClientTimeout() == newCommandTag.getClientTimeout());
     assertTrue(commandTag.getId().equals(newCommandTag.getId()));
@@ -65,11 +65,11 @@ public class CommandTagImplTest {
   }
   
   /**
-   * Private helper method. Creates ClientCommandTagImpl.
+   * Private helper method. Creates CommandTagImpl.
    */  
-  private ClientCommandTagImpl createCommandTag (Long id) {
+  private CommandTagImpl createCommandTag (Long id) {
     
-    ClientCommandTagImpl commandTag = new ClientCommandTagImpl(id);
+    CommandTagImpl commandTag = new CommandTagImpl(id);
     commandTag.update(createCommandTagHandleImpl(id));
     
     try {
@@ -82,7 +82,7 @@ public class CommandTagImplTest {
   }
   
   /**
-   * Private helper method. Used to create ClientCommandTagImpl.
+   * Private helper method. Used to create CommandTagImpl.
    */
   private CommandTagHandleImpl<String> createCommandTagHandleImpl (final Long id) {
     Builder<String> builder = new Builder<String>(id);
@@ -100,7 +100,7 @@ public class CommandTagImplTest {
   }
   
   /**
-   * Private helper method. Used to create ClientCommandTagImpl.
+   * Private helper method. Used to create CommandTagImpl.
    */
   private RbacAuthorizationDetails createAuthDetails() {
 
