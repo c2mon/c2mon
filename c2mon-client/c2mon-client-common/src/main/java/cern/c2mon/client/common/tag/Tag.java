@@ -20,11 +20,9 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Map;
 
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
-import cern.c2mon.shared.common.metadata.Metadata;
 import cern.c2mon.shared.common.rule.RuleInputValue;
 import cern.c2mon.shared.rule.RuleExpression;
 
@@ -34,7 +32,6 @@ import cern.c2mon.shared.rule.RuleExpression;
  * <code>DataTagUpdateListener</code>. It only allows to get the different
  * fields from the <code>Tag</code> object.
  * @see Tag
- * @see DataTagUpdateListener
  * @author Matthias Braeger
  *
  * @TODO: Remove ClientDataTagValue inheritence

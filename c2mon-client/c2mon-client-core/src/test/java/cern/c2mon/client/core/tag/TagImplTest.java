@@ -21,11 +21,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import cern.c2mon.client.common.listener.BaseTagListener;
+import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.alarm.AlarmValueImpl;
+import cern.c2mon.shared.common.metadata.Metadata;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
-import cern.c2mon.client.common.listener.BaseListener;
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TypeNumeric;
 import cern.c2mon.shared.client.alarm.AlarmValue;
@@ -49,7 +51,9 @@ public class TagImplTest {
   private TagUpdate createValidTransferTag(final Long tagId, Object value) {
     DataTagQuality tagQuality = new DataTagQualityImpl(
         TagQualityStatus.EQUIPMENT_DOWN, "its down!");
-    Metadata metadata = Metadata.builder().addMetadata("testString", "hello").addMetadata("tesInt", 1).addMetadata("booleanFoo", true).addMetadata("tesLong", 1L).addMetadata("tesFloat", 1.0f).addMetadata("tesDouble", 1.0).build();
+    Metadata metadata = Metadata.builder().addMetadata("testString", "hello").addMetadata("tesInt", 1)
+            .addMetadata("booleanFoo", true).addMetadata("tesLong", 1L).addMetadata("tesFloat", 1.0f)
+            .addMetadata("tesDouble", 1.0).build();
 
     tagQuality.addInvalidStatus(TagQualityStatus.EQUIPMENT_DOWN, "its down!");
     tagQuality.validate();
@@ -78,7 +82,9 @@ public class TagImplTest {
    *
    */
   private static AlarmValueImpl createAlarmValue(Long tagId) {
-    Metadata metadata = Metadata.builder().addMetadata("testString", "hello").addMetadata("tesInt", 1).addMetadata("booleanFoo", true).addMetadata("tesLong", 1L).addMetadata("tesFloat", 1.0f).addMetadata("tesDouble", 1.0).build();
+    Metadata metadata = Metadata.builder().addMetadata("testString", "hello").addMetadata("tesInt", 1)
+            .addMetadata("booleanFoo", true).addMetadata("tesLong", 1L).addMetadata("tesFloat", 1.0f)
+            .addMetadata("tesDouble", 1.0).build();
 
     AlarmValueImpl alarmValue =
         new AlarmValueImpl(
@@ -218,7 +224,7 @@ public class TagImplTest {
     //test setup
     TagController tagController = new TagController(1234L);
     tagController.onUpdate(createValidTransferTag(1234L));
-    BaseListener<Tag> mockUpdateListener = EasyMock.createMock(BaseListener.class);
+    BaseTagListener mockUpdateListener = EasyMock.createMock(BaseTagListener.class);
     mockUpdateListener.onUpdate(EasyMock.and(EasyMock.not(EasyMock.same(tagController.getTagImpl())), EasyMock.eq(tagController.getTagImpl())));
 
     //run test
@@ -232,7 +238,7 @@ public class TagImplTest {
   @Test
   public void testUpdateListener() {
     final TagController tagController = new TagController(1234L);
-    tagController.addUpdateListener(new DataTagUpdateListener() {
+    tagController.addUpdateListener(new BaseTagListener() {
       @Override
       public void onUpdate(final Tag tagUpdate) {
         assertNotNull(tagUpdate);
@@ -255,7 +261,7 @@ public class TagImplTest {
     clone = new TagController(tagController.getTagImpl().clone());
     checkTagCopy(tagController, clone);
 
-    tagController.addUpdateListener((DataTagUpdateListener) tagUpdate -> {
+    tagController.addUpdateListener((BaseTagListener) tagUpdate -> {
       // Do nothing
     });
 

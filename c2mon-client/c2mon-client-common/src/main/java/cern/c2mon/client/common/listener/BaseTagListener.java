@@ -18,7 +18,7 @@
 package cern.c2mon.client.common.listener;
 
 import cern.c2mon.client.common.tag.Tag;
-import cern.c2mon.client.common.tag.Tag;
+
 ;
 
 /**
@@ -28,21 +28,19 @@ import cern.c2mon.client.common.tag.Tag;
  * You can register a <code>DataTagUpdateListener</code> with a 
  * <code>Tag</code> so as to be notified of these property changes.
  * @see Tag
- * @see DataTagListener
  * @author Matthias Braeger
  */
-public interface BaseTagListener extends BaseListener<Tag> {
+public interface BaseTagListener {
 
   /**
    * This method gets called when the value or quality property of a
    * <code>Tag</code> has changed. It receives then a <b>copy</b>
    * of the updated object in the C2MON client cache.<p>
    * Please note that this method will also receive initial tag values, if you
-   * did not subscribe with the {@link DataTagListener} interface.
+   * did not subscribe with the {@link TagListener} interface.
    * 
    * @param tagUpdate A copy of the <code>Tag</code> object with the 
    *                  updated properties
    */
-  @Override
   void onUpdate(Tag tagUpdate);
 }

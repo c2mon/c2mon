@@ -18,7 +18,7 @@ package cern.c2mon.client.core.cache;
 
 import java.util.Set;
 
-import cern.c2mon.client.common.listener.BaseListener;
+import cern.c2mon.client.common.listener.BaseTagListener;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.service.impl.TagServiceImpl;
 
@@ -48,7 +48,7 @@ public interface ClientDataTagCache extends BasicCacheHandler {
    *         server during the refresh process.
    * @see #getHistoryModeSyncLock();
    */
-  <T extends BaseListener> void subscribe(Set<Long> tagIds, T listener) throws CacheSynchronizationException;
+  <T extends BaseTagListener> void subscribe(Set<Long> tagIds, T listener) throws CacheSynchronizationException;
   
   /**
    * Adds the given listener to the tags matching the regular expression. 
@@ -63,7 +63,7 @@ public interface ClientDataTagCache extends BasicCacheHandler {
    *         server during the refresh process.
    * @see #getHistoryModeSyncLock();
    */
-  <T extends BaseListener> void subscribeByRegex(Set<String> regexList, T listener) throws CacheSynchronizationException;
+  <T extends BaseTagListener> void subscribeByRegex(Set<String> regexList, T listener) throws CacheSynchronizationException;
   
   
   /**
@@ -93,7 +93,7 @@ public interface ClientDataTagCache extends BasicCacheHandler {
    * @param listener The listener which shall be unsubscribed.
    * @throws NullPointerException When the parameter is <code>null</code>
    */
-  void unsubscribeAllDataTags(BaseListener<?> listener);
+  void unsubscribeAllDataTags(BaseTagListener listener);
   
   /**
    * Unsubscribes the given listener from all tags specified by the
@@ -102,7 +102,7 @@ public interface ClientDataTagCache extends BasicCacheHandler {
    * @param listener The listener which shall be unsubscribed.
    * @throws NullPointerException When the parameter is <code>null</code>
    */
-  void unsubscribeDataTags(Set<Long> dataTagIds, final BaseListener listener);
+  void unsubscribeDataTags(Set<Long> dataTagIds, final BaseTagListener listener);
   
   /**
    * Returns the cache size.

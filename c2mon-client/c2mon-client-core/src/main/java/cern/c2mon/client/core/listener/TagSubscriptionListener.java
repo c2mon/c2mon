@@ -17,8 +17,7 @@
 package cern.c2mon.client.core.listener;
 
 import java.util.Set;
-
-import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.common.tag.Tag;
 
 /**
  * Is used by {@link TagServiceImpl} to notify listeners about new tag subscriptions
@@ -30,11 +29,11 @@ import cern.c2mon.client.common.tag.ClientDataTag;
 public interface TagSubscriptionListener {
 
   /**
-   * Is invoked whenever a new {@link ClientDataTag} is registered in the cache, 
-   * or when a listener is added to a {@link ClientDataTag} were no listener
+   * Is invoked whenever a new {@link Tag} is registered in the cache,
+   * or when a listener is added to a {@link Tag} were no listener
    * has already been registered
    * @param tagIds
-   *          A collection of {@link ClientDataTag} that now have listeners
+   *          A collection of {@link Tag} that now have listeners
    */
   void onNewTagSubscriptions(final Set<Long> tagIds);
 

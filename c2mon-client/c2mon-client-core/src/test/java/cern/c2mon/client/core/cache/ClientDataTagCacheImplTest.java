@@ -16,7 +16,24 @@
  *****************************************************************************/
 package cern.c2mon.client.core.cache;
 
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.jms.JMSException;
+
+import org.easymock.EasyMock;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.config.C2monAutoConfiguration;
 import cern.c2mon.client.core.config.mock.CoreSupervisionManagerMock;
@@ -53,10 +70,7 @@ import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.rule.RuleFormatException;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static junit.framework.Assert.*;
 
 /**
  * @author Matthias Braeger
@@ -118,7 +132,7 @@ public class ClientDataTagCacheImplTest {
     }
     EasyMock.expect(requestHandlerMock.requestTags(tagIds)).andReturn(serverUpdates);
     EasyMock.expect(requestHandlerMock.requestTagValues(tagIds)).andReturn(new ArrayList<>(serverUpdates));
-    DataTagUpdateListener listener = EasyMock.createMock(DataTagUpdateListener.class);
+    TagListener listener = EasyMock.createMock(TagListener.class);
 
     // run test
     EasyMock.replay(jmsProxyMock, requestHandlerMock);
@@ -150,8 +164,8 @@ public class ClientDataTagCacheImplTest {
     }
     EasyMock.expect(requestHandlerMock.requestTags(tagIds)).andReturn(serverUpdates);
     EasyMock.expect(requestHandlerMock.requestTagValues(tagIds)).andReturn(new ArrayList<TagValueUpdate>(serverUpdates));
-    DataTagUpdateListener listener1 = EasyMock.createMock(DataTagUpdateListener.class);
-    DataTagUpdateListener listener2 = EasyMock.createMock(DataTagUpdateListener.class);
+    TagListener listener1 = EasyMock.createMock(TagListener.class);
+    TagListener listener2 = EasyMock.createMock(TagListener.class);
 
     // run test
     EasyMock.replay(jmsProxyMock, requestHandlerMock);
@@ -193,7 +207,7 @@ public class ClientDataTagCacheImplTest {
     EasyMock.expectLastCall();
     supervisionManagerMock.addSupervisionListener(anyObject(), anyObject(), anyObject(), anyObject());
     EasyMock.expectLastCall().times(2);
-    DataTagUpdateListener listener = EasyMock.createMock(DataTagUpdateListener.class);
+    TagListener listener = EasyMock.createMock(TagListener.class);
 
     // run test
     EasyMock.replay(jmsProxyMock, supervisionManagerMock, requestHandlerMock);
@@ -221,7 +235,7 @@ public class ClientDataTagCacheImplTest {
     }
     EasyMock.expect(requestHandlerMock.requestTags(tagIds)).andReturn(serverUpdates);
     EasyMock.expect(requestHandlerMock.requestTagValues(tagIds)).andReturn(new ArrayList<>(serverUpdates));
-    DataTagUpdateListener listener = EasyMock.createMock(DataTagUpdateListener.class);
+    TagListener listener = EasyMock.createMock(TagListener.class);
 
     // run test
     EasyMock.replay(jmsProxyMock, requestHandlerMock);

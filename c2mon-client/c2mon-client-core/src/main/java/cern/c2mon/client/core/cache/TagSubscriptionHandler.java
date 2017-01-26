@@ -28,8 +28,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.common.listener.BaseListener;
-import cern.c2mon.client.common.listener.DataTagListener;
+import cern.c2mon.client.common.listener.BaseTagListener;
 import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
@@ -73,11 +72,11 @@ class TagSubscriptionHandler {
    * client cache, it is going to be fetched from the server and all the topic subscription will handled.
    * @param tagIds list of tags ids to which the listener shall be subscribed
    * @param listener the listener to subscribe.
-   * @param sendInitialUpdateSeperately {@code true}, if the {@link BaseListener} is in fact a
-   *        {@link DataTagListener} which allows sending the initial updates on a separate method.
+   * @param sendInitialUpdateSeperately {@code true}, if the {@link BaseTagListener} is in fact a
+   *        {@link TagListener} which allows sending the initial updates on a separate method.
    * @throws CacheSynchronizationException In case of errors during the subscription.
    */
-  void subscribe(final Set<Long> tagIds, final BaseListener listener, final boolean sendInitialUpdateSeperately) throws CacheSynchronizationException {
+  void subscribe(final Set<Long> tagIds, final BaseTagListener listener, final boolean sendInitialUpdateSeperately) throws CacheSynchronizationException {
     // Creates the uninitialised tags
     Set<Long> newTagIds = cacheSynchronizer.initTags(tagIds);
 
@@ -90,11 +89,11 @@ class TagSubscriptionHandler {
    * subscription will handled.
    * @param regexList list of regular expressions
    * @param listener the listener to subscribe.
-   * @param sendInitialUpdateSeperately {@code true}, if the {@link BaseListener} is in fact a
-   *        {@link DataTagListener} which allows sending the initial updates on a separate method.
+   * @param sendInitialUpdateSeperately {@code true}, if the {@link BaseTagListener} is in fact a
+   *        {@link TagListener} which allows sending the initial updates on a separate method.
    * @throws CacheSynchronizationException In case of errors during the subscription.
    */
-  void subscribeByRegex(final Set<String> regexList, final BaseListener listener, final boolean sendInitialUpdateSeperately) throws CacheSynchronizationException {
+  void subscribeByRegex(final Set<String> regexList, final BaseTagListener listener, final boolean sendInitialUpdateSeperately) throws CacheSynchronizationException {
     // list of all matching tags, filled during createMissingTags
     final Set<Long> allMatchingTags = new HashSet<Long>();
 
@@ -109,10 +108,11 @@ class TagSubscriptionHandler {
    * @param subscriptionList list of tag ids to which the listner shall be subscribed to
    * @param newTagIds Newly created tags during the subscription process
    * @param listener The tag listener to subscribe
-   * @param sendInitialUpdateSeperately {@code true}, if the {@link BaseListener} is in fact a
-   *        {@link DataTagListener} which allows sending the initial updates on a separate method.
+   * @param sendInitialUpdateSeperately {@code true}, if the {@link BaseTagListener} is in fact a
+   *        {@link TagListener} which allows sending the initial updates on a separate method.
    */
-  private void handleTagSubscription(Set<Long> subscriptionList, Set<Long> newTagIds, final BaseListener listener, boolean sendInitialUpdateSeperately) {
+  private void handleTagSubscription(Set<Long> subscriptionList, Set<Long> newTagIds, final BaseTagListener listener,
+                                     boolean sendInitialUpdateSeperately) {
     // Needed if, the initial values shall be sent on the separate #onInitialUpdate() method
     final Map<Long, Tag> initialUpdates = new HashMap<>(subscriptionList.size());
 
@@ -127,14 +127,14 @@ class TagSubscriptionHandler {
 
     // Before subscribing to the update topics we send the initial values,
     // if the listener is of type DataTagListener
-    if (sendInitialUpdateSeperately && listener instanceof DataTagListener) {
+    if (sendInitialUpdateSeperately && listener instanceof TagListener) {
       if (log.isDebugEnabled()) {
         log.debug("handleTagSubscription() - Sending initial values to DataTagListener");
       }
 
       Collection<Tag> oldFormat = new ArrayList<>(initialUpdates.size());
       oldFormat.addAll(initialUpdates.values());
-      ((DataTagListener) listener).onInitialUpdate(oldFormat);
+      ((TagListener) listener).onInitialUpdate(oldFormat);
     }
     else if (sendInitialUpdateSeperately && listener instanceof TagListener) {
       if (log.isDebugEnabled()) {
@@ -161,7 +161,7 @@ class TagSubscriptionHandler {
 
   }
 
-  void unsubscribeAllTags(final BaseListener listener) {
+  void unsubscribeAllTags(final BaseTagListener listener) {
     Set<Long> tagsToRemove = new HashSet<Long>();
     controller.getWriteLock().lock();
     try {
@@ -183,7 +183,7 @@ class TagSubscriptionHandler {
     fireOnUnsubscribeEvent(tagsToRemove);
   }
 
-  void unsubscribeTags(final Set<Long> dataTagIds, final BaseListener listener) {
+  void unsubscribeTags(final Set<Long> dataTagIds, final BaseTagListener listener) {
     Set<Long> tagsToRemove = new HashSet<>();
     controller.getWriteLock().lock();
     try {

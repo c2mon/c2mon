@@ -24,8 +24,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.common.listener.BaseListener;
-import cern.c2mon.client.common.listener.DataTagListener;
+import cern.c2mon.client.common.listener.BaseTagListener;
 import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
@@ -162,8 +161,8 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public Collection<Tag> getAllTagsForListener(final BaseListener listener) {
-    Collection<Tag> list = new ArrayList<>();
+  public Collection<Tag> getAllTagsForListener(final BaseTagListener listener) {
+    Collection<Tag> list = new ArrayList<Tag>();
 
     cacheReadLock.lock();
     try {
@@ -180,8 +179,8 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public Set<Long> getAllTagIdsForListener(final BaseListener listener) {
-    Set<Long> list = new HashSet<>();
+  public Set<Long> getAllTagIdsForListener(final BaseTagListener listener) {
+    Set<Long> list = new HashSet<Long>();
 
     cacheReadLock.lock();
     try {
@@ -226,12 +225,12 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public void unsubscribeAllDataTags(final BaseListener listener) {
+  public void unsubscribeAllDataTags(final BaseTagListener listener) {
     tagSubscriptionHandler.unsubscribeAllTags(listener);
   }
 
   @Override
-  public void unsubscribeDataTags(final Set<Long> dataTagIds, final BaseListener listener) {
+  public void unsubscribeDataTags(final Set<Long> dataTagIds, final BaseTagListener listener) {
     tagSubscriptionHandler.unsubscribeTags(dataTagIds, listener);
   }
 
@@ -302,8 +301,8 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public <T extends BaseListener> void subscribe(final Set<Long> tagIds, final T listener) throws CacheSynchronizationException {
-    tagSubscriptionHandler.subscribe(tagIds, listener, (listener instanceof DataTagListener) || (listener instanceof TagListener));
+  public <T extends BaseTagListener> void subscribe(final Set<Long> tagIds, final T listener) throws CacheSynchronizationException {
+    tagSubscriptionHandler.subscribe(tagIds, listener, (listener instanceof TagListener));
   }
 
 
@@ -323,7 +322,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public <T extends BaseListener> void subscribeByRegex(Set<String> regexList, T listener) throws CacheSynchronizationException {
+  public <T extends BaseTagListener> void subscribeByRegex(Set<String> regexList, T listener) throws CacheSynchronizationException {
     tagSubscriptionHandler.subscribeByRegex(regexList, listener, (listener instanceof TagListener));
   }
 }

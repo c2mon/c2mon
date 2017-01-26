@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import cern.c2mon.client.common.listener.BaseListener;
+import cern.c2mon.client.common.listener.BaseTagListener;
 import cern.c2mon.client.common.tag.Tag;
 
 /**
@@ -80,7 +80,7 @@ public interface BasicCacheHandler {
    * @return A collection of <code>Tag</code> references
    * @throws NullPointerException When the parameter is <code>null</code>
    */
-  Collection<Tag> getAllTagsForListener(BaseListener<?> listener);
+  Collection<Tag> getAllTagsForListener(BaseTagListener listener);
   
   /**
    * Returns all tag ids for which the given <code>DataTagUpdateListener</code>
@@ -89,7 +89,7 @@ public interface BasicCacheHandler {
    * @return A collection of tag ids
    * @throws NullPointerException When the parameter is <code>null</code>
    */
-  Set<Long> getAllTagIdsForListener(BaseListener<?> listener);
+  Set<Long> getAllTagIdsForListener(BaseTagListener listener);
   
   /**
    * Returns all <code>Tag</code> references in the cache which are linked

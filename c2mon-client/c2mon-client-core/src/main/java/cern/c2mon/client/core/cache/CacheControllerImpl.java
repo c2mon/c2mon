@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.common.listener.BaseListener;
+import cern.c2mon.client.common.listener.BaseTagListener;
 import cern.c2mon.client.core.tag.TagController;
 
 @Service
@@ -137,7 +137,7 @@ class CacheControllerImpl implements CacheController {
    */
   private void disableHistoryMode() {
     TagController historyTag = null;
-    Collection<BaseListener> listeners = null;
+    Collection<BaseTagListener> listeners = null;
     
     for (Entry<Long, TagController> entry : historyCache.entrySet()) {
       historyTag = entry.getValue();
@@ -159,7 +159,7 @@ class CacheControllerImpl implements CacheController {
     historyCache.clear();
     TagController liveTag = null;
     TagController historyTag = null;
-    Collection<BaseListener> listeners = null;
+    Collection<BaseTagListener> listeners = null;
     
     for (Entry<Long, TagController> entry : liveCache.entrySet()) {
       liveTag = entry.getValue();
