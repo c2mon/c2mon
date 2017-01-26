@@ -19,14 +19,13 @@ package cern.c2mon.client.core.manager;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.annotation.PostConstruct;
-
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.core.jms.*;
 import cern.c2mon.client.core.listener.HeartbeatListener;
+import cern.c2mon.client.core.service.CoreSupervisionService;
 import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
@@ -35,15 +34,15 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
  * the connection state to the JMS brokers and the heartbeat of the C2MON
  * server. Furthermore it manages the supervision status information of the DAQ
  * processes and their equipment. Those information are only accessible through
- * the {@link CoreSupervisionManager} interface for other C2MON managers in the
+ * the {@link CoreSupervisionService} interface for other C2MON managers in the
  * core API.
  *
  * @author Matthias Braeger
  */
-@Slf4j
 @Service
-public class SupervisionManager implements CoreSupervisionManager, SupervisionListener, ConnectionListener, HeartbeatListener {
+public class SupervisionServiceImpl implements CoreSupervisionService, SupervisionListener, ConnectionListener, HeartbeatListener {
 
+  private static final Logger log = org.slf4j.LoggerFactory.getLogger(SupervisionServiceImpl.class);
   /**
    * Set to <code>true</code>, if the supervision cache is correctly initialized
    */
@@ -110,8 +109,8 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
   private final ClientHealthMonitor jmsHealthMonitor;
 
   @Autowired
-  protected SupervisionManager(final JmsProxy jmsProxy, final RequestHandler coreRequestHandler, final HeartbeatListenerManager heartbeatManager,
-                               final ClientHealthMonitor clientHealthMonitor) {
+  protected SupervisionServiceImpl(final JmsProxy jmsProxy, final RequestHandler coreRequestHandler, final HeartbeatListenerManager heartbeatManager,
+                                   final ClientHealthMonitor clientHealthMonitor) {
     this.jmsProxy = jmsProxy;
     this.clientRequestHandler = coreRequestHandler;
     this.heartbeatManager = heartbeatManager;

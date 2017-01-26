@@ -41,7 +41,7 @@ import cern.c2mon.shared.client.supervision.Heartbeat;
  * listener registration requests delegated by the <code>SupervisionManager</code> 
  *
  * @author Matthias Braeger
- * @see SupervisionManager
+ * @see SupervisionServiceImpl
  */
 @Service
 class HeartbeatManager extends TimerTask implements cern.c2mon.client.core.jms.HeartbeatListener, HeartbeatListenerManager {

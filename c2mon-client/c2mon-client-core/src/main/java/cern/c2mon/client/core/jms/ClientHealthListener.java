@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.client.core.jms;
 
-import cern.c2mon.client.common.listener.TagUpdateListener;
+import cern.c2mon.client.core.listener.TagUpdateListener;
 
 /**
  * Implement this interface to be notified about problems with the

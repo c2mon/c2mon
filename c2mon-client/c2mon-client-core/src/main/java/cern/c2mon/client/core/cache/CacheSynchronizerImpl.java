@@ -37,8 +37,8 @@ import cern.c2mon.client.core.jms.ConnectionListener;
 import cern.c2mon.client.core.jms.JmsProxy;
 import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.client.core.listener.HeartbeatListener;
-import cern.c2mon.client.core.manager.CoreSupervisionManager;
-import cern.c2mon.client.core.manager.SupervisionManager;
+import cern.c2mon.client.core.service.CoreSupervisionService;
+import cern.c2mon.client.core.manager.SupervisionServiceImpl;
 import cern.c2mon.client.core.tag.TagController;
 import cern.c2mon.client.core.tag.TagImpl;
 
@@ -93,7 +93,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
   private final RequestHandler tagRequestHandler;
 
   /** Reference to the supervision manager singleton */
-  private final CoreSupervisionManager supervisionManager;
+  private final CoreSupervisionService supervisionManager;
 
   /**
    * <code>Map</code> reference containing all subscribed data tags which are
@@ -125,7 +125,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
   @Autowired
   public CacheSynchronizerImpl(JmsProxy pJmsProxy,
                                @Qualifier("coreRequestHandler") RequestHandler pRequestHandler,
-                               CoreSupervisionManager pSupervisionManager,
+                               CoreSupervisionService pSupervisionManager,
                                CacheController pCacheController) {
     this.jmsProxy = pJmsProxy;
     this.tagRequestHandler = pRequestHandler;
@@ -617,7 +617,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
   }
 
   /**
-   * Subscribes the given tag to the {@link SupervisionManager}
+   * Subscribes the given tag to the {@link SupervisionServiceImpl}
    * @param cdt a newly created tag
    */
   private void subscribeToSupervisionManager(final TagController cdt) {

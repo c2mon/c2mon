@@ -1,6 +1,6 @@
 package cern.c2mon.client.core.config.mock;
 
-import cern.c2mon.client.core.manager.SupervisionManager;
+import cern.c2mon.client.core.manager.SupervisionServiceImpl;
 import org.easymock.EasyMock;
 import org.springframework.context.annotation.Bean;
 
@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 public class CoreSupervisionManagerMock {
 
   @Bean
-  public SupervisionManager supervisionManager() {
-    return EasyMock.createMock(SupervisionManager.class);
+  public SupervisionServiceImpl supervisionManager() {
+    return EasyMock.createMock(SupervisionServiceImpl.class);
   }
 }

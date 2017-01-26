@@ -36,7 +36,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
-import cern.c2mon.client.common.listener.TagUpdateListener;
+import cern.c2mon.client.core.listener.TagUpdateListener;
 import cern.c2mon.client.core.config.C2monClientProperties;
 import cern.c2mon.client.core.config.mock.MockServerConfig;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;

@@ -27,7 +27,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import cern.c2mon.client.core.service.impl.CommandServiceImpl;
-import cern.c2mon.client.core.manager.SupervisionManager;
+import cern.c2mon.client.core.manager.SupervisionServiceImpl;
 import cern.c2mon.client.core.service.*;
 
 import org.springframework.context.support.AbstractApplicationContext;
@@ -77,7 +77,7 @@ public class C2monServiceGateway implements ApplicationContextAware {
   private static StatisticsService statisticsService = null;
 
   /** Static reference to the <code>C2monSupervisionManager</code> singleton instance */
-  private static SupervisionManager supervisionManager = null;
+  private static SupervisionServiceImpl supervisionServiceImpl = null;
 
   /**
    * Protected default constructor
@@ -154,8 +154,8 @@ public class C2monServiceGateway implements ApplicationContextAware {
    */
   public static SupervisionService getSupervisionService() {
     startC2monClientSynchronous();
-
-    return supervisionManager;
+    
+    return supervisionServiceImpl;
   }
 
   /**
@@ -216,7 +216,7 @@ public class C2monServiceGateway implements ApplicationContextAware {
       LOG.info("Waiting for C2MON server connection (max " + MAX_INITIALIZATION_TIME / 1000  + " sec)...");
 
       Long startTime = System.currentTimeMillis();
-      while (!supervisionManager.isServerConnectionWorking()) {
+      while (!supervisionServiceImpl.isServerConnectionWorking()) {
         try { Thread.sleep(200); } catch (InterruptedException ie) { /* Do nothing */ }
         if (System.currentTimeMillis() - startTime >= MAX_INITIALIZATION_TIME) {
           throw new RuntimeException(
@@ -235,7 +235,7 @@ public class C2monServiceGateway implements ApplicationContextAware {
    * @param context the application context
    */
   private static void initiateGatewayFields(final ApplicationContext context) {
-    supervisionManager = context.getBean(SupervisionManager.class);
+    supervisionServiceImpl = context.getBean(SupervisionServiceImpl.class);
     commandServiceImpl = context.getBean(CommandServiceImpl.class);
 
     alarmService = context.getBean(AlarmService.class);

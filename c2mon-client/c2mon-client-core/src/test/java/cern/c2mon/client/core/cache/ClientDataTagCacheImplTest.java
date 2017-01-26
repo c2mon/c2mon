@@ -60,8 +60,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.core.jms.JmsProxy;
 import cern.c2mon.client.core.jms.RequestHandler;
-import cern.c2mon.client.core.manager.CoreSupervisionManager;
 import cern.c2mon.client.core.tag.TagController;
+import cern.c2mon.client.core.service.CoreSupervisionService;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
@@ -98,7 +98,7 @@ public class ClientDataTagCacheImplTest {
   private RequestHandler requestHandlerMock;
 
   @Autowired
-  private CoreSupervisionManager supervisionManagerMock;
+  private CoreSupervisionService supervisionManagerMock;
 
   @Autowired
   private CacheController cacheController;

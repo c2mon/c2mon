@@ -33,7 +33,7 @@ import cern.c2mon.client.core.cache.CacheSynchronizationException;
 import cern.c2mon.client.core.cache.ClientDataTagCache;
 import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
-import cern.c2mon.client.core.manager.CoreSupervisionManager;
+import cern.c2mon.client.core.service.CoreSupervisionService;
 import cern.c2mon.client.core.tag.TagController;
 import cern.c2mon.client.core.tag.TagImpl;
 import cern.c2mon.client.core.service.AdvancedTagService;
@@ -61,7 +61,7 @@ public class TagServiceImpl implements AdvancedTagService {
   private ClientDataTagCache cache;
 
   /** Reference to the supervision manager singleton */
-  private final CoreSupervisionManager supervisionManager;
+  private final CoreSupervisionService supervisionManager;
 
   /** Provides methods for requesting tag information from the C2MON server */
   private final RequestHandler clientRequestHandler;
@@ -77,7 +77,7 @@ public class TagServiceImpl implements AdvancedTagService {
    * @param requestHandler Provides methods for requesting tag information from the C2MON server
    */
   @Autowired
-  protected TagServiceImpl(final CoreSupervisionManager supervisionManager, 
+  protected TagServiceImpl(final CoreSupervisionService supervisionManager,
                            final ClientDataTagCache cache,
                            final @Qualifier("coreRequestHandler") RequestHandler requestHandler) {
 
