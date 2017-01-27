@@ -71,6 +71,7 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.rule.RuleFormatException;
 
 import static junit.framework.Assert.*;
+import static org.easymock.EasyMock.anyObject;
 
 /**
  * @author Matthias Braeger

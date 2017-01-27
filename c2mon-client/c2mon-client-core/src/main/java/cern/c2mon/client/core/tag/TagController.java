@@ -24,13 +24,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import cern.c2mon.client.common.listener.BaseListener;
-import cern.c2mon.client.common.listener.DataTagListener;
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
-import cern.c2mon.client.common.listener.TagUpdateListener;
+import cern.c2mon.client.common.listener.BaseTagListener;
+import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.util.ConcurrentIdentitySet;
 import cern.c2mon.client.core.jms.SupervisionListener;
+import cern.c2mon.client.core.listener.TagUpdateListener;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
@@ -58,7 +57,7 @@ public class TagController implements TagUpdateListener, SupervisionListener {
    * Concurrent modifiable collection of DataTagUpdateListeners registered for
    * updates on this DataTag
    */
-  private Set<BaseListener> listeners = new ConcurrentIdentitySet<>();
+  private Set<BaseTagListener> listeners = new ConcurrentIdentitySet<>();
 
   /**
    * Metadata of an Tag object.
@@ -240,7 +239,7 @@ public class TagController implements TagUpdateListener, SupervisionListener {
    * @param Please only provide a clone of this tag
    */
   public synchronized void notifyListeners(final Tag clone) {
-    for (BaseListener updateListener : listeners) {
+    for (BaseTagListener updateListener : listeners) {
       try {
         updateListener.onUpdate(clone);
       }
@@ -517,14 +516,14 @@ public class TagController implements TagUpdateListener, SupervisionListener {
    * an update event to all <code>DataTagUpdateListener</code> objects registered.
    *
    * @param listener     the DataTagUpdateListener that will receive value updates message for this tag
-   * @param initialValue In case the user subscribed with a {@link DataTagListener} provide here
-   *                     the initial value which was sent through {@link DataTagListener#onInitialUpdate(Collection)}
+   * @param initialValue In case the user subscribed with a {@link TagListener} provide here
+   *                     the initial value which was sent through {@link TagListener#onInitialUpdate(Collection)}
    *                     method. Otherwise, pass {@code null} as parameter, if the initial update shall be sent via the
-   *                     {@link DataTagUpdateListener#onUpdate(Tag)}
+   *                     {@link BaseTagListener#onUpdate(Tag)}
    *
-   * @see #removeUpdateListener(DataTagUpdateListener)
+   * @see #removeUpdateListener(BaseTagListener)
    */
-  public void addUpdateListener(final BaseListener<Tag> listener, final Tag initialValue) {
+  public void addUpdateListener(final BaseTagListener listener, final Tag initialValue) {
     if (log.isTraceEnabled()) {
       log.trace("addUpdateListener() called.");
     }
@@ -561,7 +560,7 @@ public class TagController implements TagUpdateListener, SupervisionListener {
    * @return <code>true</code>, if the given listener is registered
    * for receiving updates of that tag.
    */
-  public boolean isUpdateListenerRegistered(final BaseListener<? extends Tag> pListener) {
+  public boolean isUpdateListenerRegistered(final BaseTagListener pListener) {
     boolean isRegistered = this.getListeners().contains(pListener);
     return isRegistered;
   }
@@ -573,14 +572,14 @@ public class TagController implements TagUpdateListener, SupervisionListener {
    *
    * @see #addUpdateListener
    */
-  public void removeUpdateListener(final BaseListener<? extends Tag> pListener) {
+  public void removeUpdateListener(final BaseTagListener pListener) {
     this.getListeners().remove(pListener);
   }
 
   /**
    * @return All listeners registered to this data tag
    */
-  public Collection<BaseListener> getUpdateListeners() {
+  public Collection<BaseTagListener> getUpdateListeners() {
     return new ArrayList<>(this.getListeners());
   }
 
@@ -593,9 +592,9 @@ public class TagController implements TagUpdateListener, SupervisionListener {
    *
    * @param listener the DataTagUpdateListener that will receive value updates message for this tag
    *
-   * @see #removeUpdateListener(DataTagUpdateListener)
+   * @see #removeUpdateListener(BaseTagListener)
    */
-  public void addUpdateListener(final BaseListener listener) {
+  public void addUpdateListener(final BaseTagListener listener) {
     addUpdateListener(listener, null);
   }
 
@@ -610,10 +609,10 @@ public class TagController implements TagUpdateListener, SupervisionListener {
    * @param sendInitialValuesToListener if set to <code>true</code>, the listener will receive the
    *                                    current value of the tag.
    *
-   * @see #removeUpdateListener(DataTagUpdateListener)
+   * @see #removeUpdateListener(BaseTagListener)
    */
-  public void addUpdateListeners(final Collection<BaseListener> listeners) {
-    for (BaseListener listener : listeners) {
+  public void addUpdateListeners(final Collection<BaseTagListener> listeners) {
+    for (BaseTagListener listener : listeners) {
       addUpdateListener(listener);
     }
   }

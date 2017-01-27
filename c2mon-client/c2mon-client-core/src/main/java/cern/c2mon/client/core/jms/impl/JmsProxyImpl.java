@@ -58,9 +58,9 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
-import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.core.config.C2monClientProperties;
 import cern.c2mon.client.core.jms.*;
+import cern.c2mon.client.core.listener.TagUpdateListener;
 import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
