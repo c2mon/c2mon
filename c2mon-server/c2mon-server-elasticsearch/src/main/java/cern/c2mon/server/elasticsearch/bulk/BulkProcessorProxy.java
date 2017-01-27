@@ -54,12 +54,11 @@ public class BulkProcessorProxy implements BulkProcessor.Listener {
   @Override
   public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
     log.debug("Executed bulk operation composed of {} actions", request.numberOfActions());
-    client.waitForYellowStatus();
   }
 
   @Override
   public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
     log.warn("Error executing bulk operation", failure);
-    client.waitForYellowStatus();
+    bulkProcessor.add(request);
   }
 }
