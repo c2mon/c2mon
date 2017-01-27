@@ -86,7 +86,7 @@ public class DeviceClassCacheImpl extends AbstractCache<Long, DeviceClass> imple
 
   @Override
   public Long getDeviceClassIdByName(String deviceClassName) {
-    long deviceClassId;
+    Long deviceClassId;
 
     if (deviceClassName == null || deviceClassName.equalsIgnoreCase("")) {
       throw new IllegalArgumentException("Attempting to retrieve a DeviceClass from the cache with a NULL or empty name parameter.");
