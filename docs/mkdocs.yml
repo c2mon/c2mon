@@ -29,15 +29,11 @@ pages:
     - DAQ API:
       - 'user-guide/daq-api/DAQ_module_developer_guide.md'
       - 'user-guide/daq-api/DAQ_module_testing_guide.md'
-    - Rule Engine: 'user-guide/rule-engine.md'
+    - Server:
+      - Elasticsearch: 'user-guide/server/elasticsearch.md'
+      - Rule Engine: 'user-guide/server/rule-engine.md'
   - Appendices:
     - 'appendices/database_structure.md'
-    - Modules:
-          - 'appendices/modules/index.md'
-          - Elasticsearch module:
-            - 'appendices/modules/elasticsearch-module/index.md'
-            - 'appendices/modules/elasticsearch-module/properties-appendix.md'
-            - 'appendices/modules/elasticsearch-module/getting-started.md'
 
 markdown_extensions:
   - toc:

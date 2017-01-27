@@ -1,4 +1,3 @@
-<a id="_rules_engine"></a>
 # Rule Engine
 
 C2MON provides a simple Domain Specific Language (DSL) that allows expressing complex rules on top of the acquired data.

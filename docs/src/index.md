@@ -9,7 +9,7 @@ This manual includes concepts, instructions and samples to guide you on how to u
     This documentation is currently under construction, since we are migrating it from an internal Wiki page.
     If you are still missing some information, please let us know!
 
-## Getting Started
+## Introduction
 
 For an introduction to the architecture and concepts behind C2MON, see [the overview](overview).
 
