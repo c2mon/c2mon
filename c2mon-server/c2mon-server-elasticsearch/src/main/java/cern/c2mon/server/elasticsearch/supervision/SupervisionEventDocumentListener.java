@@ -35,8 +35,9 @@ import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
 /**
- * Listens for supervision notifications and sends the corresponding
- * {@link SupervisionEventDocument} to Elasticsearch.
+ * Listens for {@link SupervisionEvent} updates and converts them to
+ * {@link SupervisionEventDocument} instances before sending them to the
+ * {@link IPersistenceManager} responsible for indexing them.
  *
  * @author Alban Marguet
  */

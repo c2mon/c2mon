@@ -38,6 +38,9 @@ import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 /**
+ * Wrapper around {@link Client}. Connects asynchronously, but also provides
+ * methods to block until a healthy connection is established.
+ *
  * @author Alban Marguet
  * @author Justin Lewis Salmon
  */

@@ -14,9 +14,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import org.springframework.core.io.ClassPathResource;
 
+import cern.c2mon.server.elasticsearch.alarm.AlarmDocument;
+import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocument;
+import cern.c2mon.server.elasticsearch.tag.TagDocument;
 import cern.c2mon.shared.common.type.TypeConverter;
 
 /**
+ * Factory for creating Elasticsearch mapping sources.
+ *
  * @author Justin Lewis Salmon
  */
 public class MappingFactory {
@@ -27,11 +32,20 @@ public class MappingFactory {
 
   private static final ObjectMapper mapper = new ObjectMapper();
 
+  /**
+   * Create the Elasticsearch mapping for a {@link TagDocument} based on its
+   * data type.
+   *
+   * @param dataType the type of the document
+   *
+   * @return the JSON mapping source
+   */
   public static String createTagMapping(String dataType) {
     Map<String, Map<String, Object>> mapping;
 
     try {
-      mapping = mapper.readValue(loadMapping(TAG_MAPPING), new TypeReference<HashMap<String, Object>>() {});
+      mapping = mapper.readValue(loadMapping(TAG_MAPPING), new TypeReference<HashMap<String, Object>>() {
+      });
     } catch (IOException e) {
       throw new RuntimeException("Error reading tag mapping from JSON resource", e);
     }
@@ -39,8 +53,10 @@ public class MappingFactory {
     Class<?> clazz = TypeConverter.getType(dataType);
     Map<String, Object> properties = mapping.get("properties");
 
-    // For each tag type we store different properties.
-    // TODO: is this still necessary since we use separate mappings per type?
+    // We need to store the tag values inside fields with different names
+    // depending on their type, since Elasticsearch won't allow different types,
+    // each with an identically named field but mapped differently (e.g. one is
+    // a string, the other is a number)
     if (clazz == null) {
       properties.put("valueObject", ImmutableMap.of("type", "object", "index", "analyzed"));
 
@@ -68,10 +84,20 @@ public class MappingFactory {
     }
   }
 
+  /**
+   * Create the Elasticsearch mapping for an {@link AlarmDocument}.
+   *
+   * @return the JSON mapping source
+   */
   public static String createAlarmMapping() {
     return loadMapping(ALARM_MAPPING);
   }
 
+  /**
+   * Create the Elasticsearch mapping for a {@link SupervisionEventDocument}.
+   *
+   * @return the JSON mapping source
+   */
   public static String createSupervisionMapping() {
     return loadMapping(SUPERVISION_MAPPING);
   }

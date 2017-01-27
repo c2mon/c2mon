@@ -36,8 +36,9 @@ import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.tag.Tag;
 
 /**
- * Listens to updates in the Rule and DataTag caches and calls the
- * {@link TagDocumentIndexer} for logging these to Elasticsearch.
+ * Listens for {@link Tag} updates and converts them to {@link TagDocument}
+ * instances before sending them to the {@link IPersistenceManager} responsible
+ * for indexing them.
  *
  * @author Alban Marguet
  */

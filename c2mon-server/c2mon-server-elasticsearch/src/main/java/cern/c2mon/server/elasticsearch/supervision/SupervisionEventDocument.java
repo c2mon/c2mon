@@ -23,8 +23,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
 /**
+ * Intermediate object (created from {@link SupervisionEvent} instances) used
+ * for direct serialization to JSON objects suitable for indexing as
+ * Elasticsearch documents.
+ *
  * @author Alban Marguet
  * @author Justin Lewis Salmon
  */

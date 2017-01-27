@@ -22,8 +22,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
- * This class is responsible for configuring the Spring context for
- * the Elasticsearch module.
+ * This class is responsible for configuring the Spring context for the
+ * Elasticsearch module.
  *
  * @author Justin Lewis Salmon
  * @author Alban Marguet

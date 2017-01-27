@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
  */
 @TestPropertySource(properties = {
     // Setting the number of concurrent requests to 0 causes the flush
-    // operation of the bulk tp be executed in a synchronous manner
+    // operation of the bulk to be executed in a synchronous manner
     "c2mon.server.elasticsearch.concurrentRequests=0"
 })
 public class TagDocumentIndexerTests extends BaseElasticsearchIntegrationTest {

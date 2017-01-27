@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 
 /**
+ * Static utility singleton for working with Elasticsearch mappings.
+ *
  * @author Justin Lewis Salmon
  */
 @Slf4j
@@ -26,6 +28,12 @@ public class Mappings {
     self = this;
   }
 
+  /**
+   * Create a mapping for a given type within a given index.
+   *
+   * @param indexName the name of the index
+   * @param klass     the type of the mapping to create
+   */
   public static void create(String indexName, Class<?> klass) {
     String mapping = MappingFactory.createTagMapping(klass.getName());
     create(indexName, Types.of(klass.getName()), mapping);

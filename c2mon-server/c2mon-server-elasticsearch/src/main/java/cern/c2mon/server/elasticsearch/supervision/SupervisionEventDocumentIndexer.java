@@ -30,6 +30,9 @@ import cern.c2mon.server.elasticsearch.MappingFactory;
 import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 
 /**
+ * This class manages the fallback-aware indexing of {@link SupervisionEventDocument}
+ * instances to the Elasticsearch cluster.
+ *
  * @author Alban Marguet
  * @author Justin Lewis Salmon
  */

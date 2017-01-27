@@ -32,7 +32,9 @@ import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 
 /**
- * Listens to updates in the Alarm cache and sends them to Elasticsearch.
+ * Listens for {@link Alarm} updates and converts them to {@link AlarmDocument}
+ * instances before sending them to the {@link IPersistenceManager} responsible
+ * for indexing them.
  *
  * @author Alban Marguet
  */
@@ -59,9 +61,6 @@ public class AlarmDocumentListener implements C2monCacheListener<Alarm>, SmartLi
     listenerContainer = cacheRegistrationService.registerToAlarms(this);
   }
 
-  /**
-   * New Alarm incoming.
-   */
   @Override
   public void notifyElementUpdated(final Alarm alarm) {
     if (alarm == null) {

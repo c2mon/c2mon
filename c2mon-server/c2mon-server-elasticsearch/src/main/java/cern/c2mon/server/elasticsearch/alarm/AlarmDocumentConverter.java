@@ -27,7 +27,7 @@ import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.shared.common.metadata.Metadata;
 
 /**
- * Convert an Alarm to an {@link AlarmDocument}.
+ * Converts {@link Alarm} instances to {@link AlarmDocument} instances.
  *
  * @author Alban Marguet
  * @author Justin Lewis Salmon

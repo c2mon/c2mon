@@ -16,6 +16,9 @@ import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 
 /**
+ * Wrapper around {@link BulkProcessor}. If a bulk operation fails, this class
+ * will throw a {@link RuntimeException}.
+ *
  * @author Justin Lewis Salmon
  */
 @Slf4j

@@ -25,7 +25,8 @@ import org.springframework.stereotype.Component;
 import cern.c2mon.pmanager.IAlarmListener;
 
 /**
- * Fallback alarm listener that send emails and SMS messages.
+ * Listens for fallback activation/deactivation events and sends warning emails
+ * and SMS messages.
  *
  * @author Alban Marguet
  */

@@ -22,7 +22,8 @@ import org.springframework.stereotype.Component;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
 /**
- * Converts a SupervisionEvent to a {@link SupervisionEventDocument}.
+ * Converts {@link SupervisionEvent} instances to {@link SupervisionEventDocument}
+ * instances.
  *
  * @author Alban Marguet
  */

@@ -33,6 +33,9 @@ import cern.c2mon.server.elasticsearch.Types;
 import cern.c2mon.server.elasticsearch.bulk.BulkProcessorProxy;
 
 /**
+ * This class manages the fallback-aware indexing of {@link TagDocument}
+ * instances to the Elasticsearch cluster.
+ *
  * @author Alban Marguet
  * @author Justin Lewis Salmon
  */

@@ -12,6 +12,8 @@ import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocument;
 import cern.c2mon.server.elasticsearch.tag.TagDocument;
 
 /**
+ * Beans needed for fallback-aware persistence.
+ *
  * @author Justin Lewis Salmon
  */
 public class ElasticsearchPersistenceConfig {

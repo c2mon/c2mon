@@ -25,8 +25,6 @@ import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
 
 /**
- * Integration test with the core modules.
- *
  * @author Alban Marguet
  */
 @Slf4j
