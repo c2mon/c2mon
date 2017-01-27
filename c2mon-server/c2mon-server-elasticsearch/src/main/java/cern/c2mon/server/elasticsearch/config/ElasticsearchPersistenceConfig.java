@@ -20,22 +20,22 @@ public class ElasticsearchPersistenceConfig {
 
   @Bean
   public IPersistenceManager<TagDocument> tagDocumentPersistenceManager(
-      final IDBPersistenceHandler<TagDocument> esTagIndexer, final IAlarmListener esAlarmListener) {
+      final IDBPersistenceHandler<TagDocument> esTagIndexer, final IAlarmListener fallbackActivationListener) {
     String fallbackFile = properties.getTagFallbackFile();
-    return new PersistenceManager<>(esTagIndexer, fallbackFile, esAlarmListener, new TagDocument());
+    return new PersistenceManager<>(esTagIndexer, fallbackFile, fallbackActivationListener, new TagDocument());
   }
 
   @Bean
   public IPersistenceManager<AlarmDocument> alarmDocumentPersistenceManager(
-      final IDBPersistenceHandler<AlarmDocument> esAlarmIndexer, final IAlarmListener esAlarmListener) {
+      final IDBPersistenceHandler<AlarmDocument> esAlarmIndexer, final IAlarmListener fallbackActivationListener) {
     String fallbackFile = properties.getAlarmFallbackFile();
-    return new PersistenceManager<>(esAlarmIndexer, fallbackFile, esAlarmListener, new AlarmDocument());
+    return new PersistenceManager<>(esAlarmIndexer, fallbackFile, fallbackActivationListener, new AlarmDocument());
   }
 
   @Bean
   public IPersistenceManager<SupervisionEventDocument> supervisionEventDocumentPersistenceManager(
-      final IDBPersistenceHandler<SupervisionEventDocument> esSupervisionEventIndexer, final IAlarmListener esAlarmListener) {
+      final IDBPersistenceHandler<SupervisionEventDocument> esSupervisionEventIndexer, final IAlarmListener fallbackActivationListener) {
     String fallbackFile = properties.getSupervisionFallbackFile();
-    return new PersistenceManager<>(esSupervisionEventIndexer, fallbackFile, esAlarmListener, new SupervisionEventDocument());
+    return new PersistenceManager<>(esSupervisionEventIndexer, fallbackFile, fallbackActivationListener, new SupervisionEventDocument());
   }
 }

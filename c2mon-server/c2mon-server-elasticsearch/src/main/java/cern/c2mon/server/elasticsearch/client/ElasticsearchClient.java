@@ -118,7 +118,7 @@ public class ElasticsearchClient {
           break;
         }
       } catch (Exception e) {
-        log.warn("Elasticsearch cluster not yet ready: {}", e.getMessage());
+        log.trace("Elasticsearch cluster not yet ready: {}", e.getMessage());
       }
 
       try {

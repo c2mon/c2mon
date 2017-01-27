@@ -29,12 +29,11 @@ import cern.c2mon.pmanager.IAlarmListener;
  *
  * @author Alban Marguet
  */
-@Component("esAlarmListener")
+@Component
 public class FallbackActivationListener implements IAlarmListener {
 
-  private final static Logger EMAIL_LOGGER = LoggerFactory.getLogger("AdminMailLogger");
-
-  private final static Logger SMS_LOGGER = LoggerFactory.getLogger("AdminSmsLogger");
+  private final static Logger mail = LoggerFactory.getLogger("AdminMailLogger");
+  private final static Logger sms = LoggerFactory.getLogger("AdminSmsLogger");
 
   /**
    * Flags for not sending repeated error messages.
@@ -43,17 +42,16 @@ public class FallbackActivationListener implements IAlarmListener {
   private volatile boolean diskAlarm = false;
   private volatile boolean fileAlarm = false;
 
-
   @Override
   public void dbUnavailable(boolean alarmUp, String exceptionMsg, String dbInfo) {
     if (alarmUp && !dbAlarm) {
       dbAlarm = true;
-      EMAIL_LOGGER.error("Error logging to Elasticsearch: cluster unavailable with error message " + exceptionMsg + ", for cluster " + dbInfo);
-      SMS_LOGGER.error("Error logging to Elasticsearch logging: cluster unavailable. See email for details.");
+      mail.error("Error logging to Elasticsearch ({}): {}", dbInfo, exceptionMsg);
+      sms.error("Error logging to Elasticsearch ({}): {}", dbInfo, exceptionMsg);
     } else if (!alarmUp && dbAlarm) {
       dbAlarm = false;
-      EMAIL_LOGGER.error("Elasticsearch cluster unavailable error has resolved itself");
-      SMS_LOGGER.error("Elasticsearch cluster unavailable error has resolved itself");
+      mail.error("Elasticsearch error has resolved itself");
+      sms.error("Elasticsearch error has resolved itself");
     }
   }
 
@@ -61,12 +59,12 @@ public class FallbackActivationListener implements IAlarmListener {
   public void diskFull(boolean alarmUp, String directoryName) {
     if (alarmUp && !diskAlarm) {
       diskAlarm = true;
-      EMAIL_LOGGER.error("Error in logging to Elasticsearch fallback - the disk is nearly full, directory is " + directoryName);
-      SMS_LOGGER.error("Error in Elasticsearch fallback - the disk is nearly full.");
+      mail.error("Error in Elasticsearch fallback: disk is nearly full: directory is {}", directoryName);
+      sms.error("Error in Elasticsearch fallback: disk is nearly full: directory is {}", directoryName);
     } else if (!alarmUp && diskAlarm) {
       diskAlarm = false;
-      EMAIL_LOGGER.error("Disk full error has resolved itself");
-      SMS_LOGGER.error("Disk full error has resolved itself");
+      mail.error("Disk full error has resolved itself");
+      sms.error("Disk full error has resolved itself");
     }
   }
 
@@ -74,12 +72,12 @@ public class FallbackActivationListener implements IAlarmListener {
   public void fileNotReachable(boolean alarmUp, File file) {
     if (alarmUp && !fileAlarm) {
       fileAlarm = true;
-      EMAIL_LOGGER.error("Error logging to Elasticsearch - the following file is not reachable: " + file.getName());
-      SMS_LOGGER.error("Error in Elasticsearch fallback - file not reachable: " + file.getName());
+      mail.error("Error in Elasticsearch fallback: file not reachable: {}", file.getName());
+      sms.error("Error in Elasticsearch fallback: file not reachable: {}", file.getName());
     } else if (!alarmUp && fileAlarm) {
       fileAlarm = false;
-      EMAIL_LOGGER.error("File unreachable error has resolved itself");
-      SMS_LOGGER.error("File unreachable error has resolved itself");
+      mail.error("File unreachable error has resolved itself");
+      sms.error("File unreachable error has resolved itself");
     }
   }
 }
