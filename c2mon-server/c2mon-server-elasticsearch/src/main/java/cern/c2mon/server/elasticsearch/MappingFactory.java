@@ -42,7 +42,7 @@ public class MappingFactory {
     // For each tag type we store different properties.
     // TODO: is this still necessary since we use separate mappings per type?
     if (clazz == null) {
-      properties.put("valueObject", ImmutableMap.of("type", "nested", "index", "analyzed"));
+      properties.put("valueObject", ImmutableMap.of("type", "object", "index", "analyzed"));
 
     } else if (Number.class.isAssignableFrom(clazz)) {
       properties.put("value", ImmutableMap.of("type", "double"));
@@ -58,7 +58,7 @@ public class MappingFactory {
       properties.put("valueString", ImmutableMap.of("type", "string", "index", "not_analyzed"));
 
     } else {
-      properties.put("valueObject", ImmutableMap.of("type", "nested", "dynamic", "true"));
+      properties.put("valueObject", ImmutableMap.of("type", "object", "dynamic", "true"));
     }
 
     try {
