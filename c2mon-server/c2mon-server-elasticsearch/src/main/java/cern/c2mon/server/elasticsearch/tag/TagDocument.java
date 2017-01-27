@@ -16,12 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.tag;
 
-import cern.c2mon.pmanager.IFallback;
+import java.io.IOException;
+import java.util.HashMap;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
-import java.util.HashMap;
+import cern.c2mon.pmanager.IFallback;
 
 /**
  * @author Alban Marguet

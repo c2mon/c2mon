@@ -1,6 +1,5 @@
 package cern.c2mon.server.elasticsearch;
 
-import cern.c2mon.server.elasticsearch.MappingFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;

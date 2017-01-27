@@ -16,13 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.alarm;
 
-import cern.c2mon.pmanager.IFallback;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.IOException;
 import java.util.HashMap;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import cern.c2mon.pmanager.IFallback;
 
 /**
  * @author Alban Marguet

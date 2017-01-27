@@ -16,19 +16,20 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.tag;
 
-import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.elasticsearch.Indices;
-import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
-import cern.c2mon.server.elasticsearch.junit.CachePopulationRule;
-import cern.c2mon.server.elasticsearch.util.EntityUtils;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
+
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.elasticsearch.Indices;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
+import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
+import cern.c2mon.server.elasticsearch.junit.CachePopulationRule;
+import cern.c2mon.server.elasticsearch.util.EntityUtils;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertTrue;

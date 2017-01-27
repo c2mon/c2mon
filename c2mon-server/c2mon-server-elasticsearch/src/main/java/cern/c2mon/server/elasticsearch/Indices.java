@@ -1,11 +1,12 @@
 package cern.c2mon.server.elasticsearch;
 
-import cern.c2mon.server.elasticsearch.alarm.AlarmDocument;
-import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
-import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocument;
-import cern.c2mon.server.elasticsearch.tag.TagDocument;
-import lombok.Getter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.annotation.PostConstruct;
+
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
@@ -14,11 +15,11 @@ import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import cern.c2mon.server.elasticsearch.alarm.AlarmDocument;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
+import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocument;
+import cern.c2mon.server.elasticsearch.tag.TagDocument;
 
 /**
  * @author Justin Lewis Salmon

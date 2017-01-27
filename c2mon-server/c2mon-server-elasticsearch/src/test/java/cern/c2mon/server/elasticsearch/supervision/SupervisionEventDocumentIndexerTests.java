@@ -16,16 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.supervision;
 
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
+import org.elasticsearch.action.search.SearchResponse;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.elasticsearch.Indices;
 import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
 import cern.c2mon.server.elasticsearch.util.EntityUtils;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
-import org.elasticsearch.action.search.SearchResponse;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;

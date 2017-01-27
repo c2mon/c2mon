@@ -1,8 +1,9 @@
 package cern.c2mon.server.elasticsearch;
 
+import org.junit.Test;
+
 import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
 import cern.c2mon.server.elasticsearch.tag.TagDocument;
-import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
 

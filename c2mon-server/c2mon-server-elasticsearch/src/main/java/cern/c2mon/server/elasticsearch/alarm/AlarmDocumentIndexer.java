@@ -19,15 +19,15 @@ package cern.c2mon.server.elasticsearch.alarm;
 import java.util.Collections;
 import java.util.List;
 
-import cern.c2mon.pmanager.IDBPersistenceHandler;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
-import cern.c2mon.server.elasticsearch.Indices;
-import cern.c2mon.server.elasticsearch.MappingFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import cern.c2mon.pmanager.IDBPersistenceHandler;
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.elasticsearch.Indices;
+import cern.c2mon.server.elasticsearch.MappingFactory;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 
 /**
  * @author Alban Marguet

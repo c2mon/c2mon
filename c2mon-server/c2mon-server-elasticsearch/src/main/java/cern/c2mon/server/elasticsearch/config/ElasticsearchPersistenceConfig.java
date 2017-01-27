@@ -1,5 +1,8 @@
 package cern.c2mon.server.elasticsearch.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+
 import cern.c2mon.pmanager.IAlarmListener;
 import cern.c2mon.pmanager.IDBPersistenceHandler;
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
@@ -7,8 +10,6 @@ import cern.c2mon.pmanager.persistence.impl.PersistenceManager;
 import cern.c2mon.server.elasticsearch.alarm.AlarmDocument;
 import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocument;
 import cern.c2mon.server.elasticsearch.tag.TagDocument;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 
 /**
  * @author Justin Lewis Salmon

@@ -21,7 +21,6 @@ import java.net.UnknownHostException;
 
 import javax.annotation.PostConstruct;
 
-import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -33,6 +32,8 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.unit.TimeValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 

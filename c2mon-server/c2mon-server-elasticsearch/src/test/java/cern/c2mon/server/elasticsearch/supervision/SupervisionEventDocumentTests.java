@@ -16,11 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.supervision;
 
-import cern.c2mon.server.elasticsearch.util.EntityUtils;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import cern.c2mon.server.elasticsearch.util.EntityUtils;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
 import static junit.framework.TestCase.assertEquals;
 

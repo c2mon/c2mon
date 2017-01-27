@@ -16,12 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch;
 
-import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
+import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
 
 /**
  * Integration test with the core modules.

@@ -16,16 +16,16 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.client;
 
-import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
-import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.common.settings.Settings;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
+
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**

@@ -16,18 +16,19 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.alarm;
 
-import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.elasticsearch.Indices;
-import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
-import cern.c2mon.server.elasticsearch.util.EntityUtils;
+import java.sql.Timestamp;
+
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.Timestamp;
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.elasticsearch.Indices;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
+import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
+import cern.c2mon.server.elasticsearch.util.EntityUtils;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;

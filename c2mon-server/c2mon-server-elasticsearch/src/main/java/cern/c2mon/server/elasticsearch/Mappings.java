@@ -1,12 +1,13 @@
 package cern.c2mon.server.elasticsearch;
 
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
+import javax.annotation.PostConstruct;
+
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 
 /**
  * @author Justin Lewis Salmon

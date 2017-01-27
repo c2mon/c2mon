@@ -16,6 +16,18 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.tag;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
+
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
@@ -28,13 +40,6 @@ import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.common.metadata.Metadata;
 import cern.c2mon.shared.common.type.TypeConverter;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.stereotype.Component;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Converts {@link Tag} instances to {@link TagDocument} instances.
@@ -87,7 +92,7 @@ public class TagDocumentConverter implements Converter<Tag, TagDocument> {
       map.put("valueBoolean", tag.getValue());
 
       if (tag.getValue() != null) {
-        map.put("value", tag.getValue() != null ? ? 1 : 0);
+        map.put("value", tag.getValue() != null ? 1 : 0);
       }
     } else if (String.class.isAssignableFrom(clazz)) {
       map.put("valueString", tag.getValue());
