@@ -4,7 +4,9 @@ Once you have access to the `TagService`, you can start to retrieve data from C2
 or the unique tag name.
 
 !!! info "Note"
-    A well-chosen naming convention will enable you to make searching for tags easier in the future.
+    A well-chosen naming convention will enable you to make searching for tags easier in the future. 
+    We suggest using a _folder-like_ structure with `/` as separator.
+    Example: `serviceA/computer/mypc1/memory`
 
 ## Searching for tags by name
 
