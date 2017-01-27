@@ -84,9 +84,11 @@ public class TagDocumentConverter implements Converter<Tag, TagDocument> {
         map.put("valueLong", tag.getValue());
       }
     } else if (Boolean.class.isAssignableFrom(clazz)) {
-      map.put("value", (Boolean) tag.getValue() ? 1 : 0);
       map.put("valueBoolean", tag.getValue());
 
+      if (tag.getValue() != null) {
+        map.put("value", tag.getValue() != null ? ? 1 : 0);
+      }
     } else if (String.class.isAssignableFrom(clazz)) {
       map.put("valueString", tag.getValue());
 
