@@ -24,11 +24,8 @@ public class FreshnessMonitor {
 
   @Autowired
   private DaqProperties properties;
-
   private Map<Long, Runnable> freshnessTasks;
-
   private IEquipmentMessageSender equipmentMessageSender;
-
   private ScheduledThreadPoolExecutor timer;
 
   public FreshnessMonitor() {

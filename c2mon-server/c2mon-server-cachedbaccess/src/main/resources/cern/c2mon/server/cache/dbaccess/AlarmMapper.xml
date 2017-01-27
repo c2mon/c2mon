@@ -15,7 +15,7 @@
       <result property="info" column="ALARMINFO" jdbcType="VARCHAR"/>
       <result property="condition" column="ALARMCONDITION" javaType="cern.c2mon.server.common.alarm.AlarmCondition" jdbcType="VARCHAR"/>
       <result property="dataTagId" column="ALARM_TAGID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
-      <result property="metadata" column="ALARMMETADATA" javaType="cern.c2mon.shared.common.metadata.Metadata" jdbcType="VARCHAR"/>
+      <result property="metadata" column="ALARMMETADATA" javaType="cern.c2mon.server.common.metadata.Metadata" jdbcType="VARCHAR"/>
       <association property="lastPublication" javaType="cern.c2mon.server.common.alarm.AlarmPublication">
         <result property="state" column="ALA_PUB_STATE" jdbcType="VARCHAR"/>
         <result property="publicationTime" column="ALA_PUB_TIME" jdbcType="TIMESTAMP"/>

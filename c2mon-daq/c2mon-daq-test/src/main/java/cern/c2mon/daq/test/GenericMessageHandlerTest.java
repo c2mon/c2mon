@@ -37,6 +37,7 @@ import cern.c2mon.daq.common.impl.EquipmentCommandHandler;
 import cern.c2mon.daq.common.impl.EquipmentMessageSender;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.common.messaging.impl.RequestController;
+import cern.c2mon.daq.common.timer.FreshnessMonitor;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
 import cern.c2mon.daq.filter.dynamic.TimeDifferenceMovingAverageTimeDeadbandActivator;
@@ -77,6 +78,8 @@ public abstract class GenericMessageHandlerTest {
   protected EquipmentConfiguration equipmentConfiguration;
 
   protected ConfigurationController configurationController;
+
+  private FreshnessMonitor freshnessMonitorMock;
 
   static Logger log = LoggerFactory.getLogger(GenericMessageHandlerTest.class);
 
@@ -137,13 +140,14 @@ public abstract class GenericMessageHandlerTest {
 
       messageSender = createMock(IProcessMessageSender.class);
       filterMessageSender = createMock(IFilterMessageSender.class);
+      freshnessMonitorMock = createMock(FreshnessMonitor.class);
 
       lowDynamicTimeDeadbandFilterActivator = new TimeDifferenceMovingAverageTimeDeadbandActivator(10, 110, 150, 30000);
 
       medDynamicTimeDeadbandFilterActivator = new TimeDifferenceMovingAverageTimeDeadbandActivator(6, 6000, 44, 44);
 
       equipmentMessageSender = new EquipmentMessageSender(filterMessageSender, messageSender,
-              medDynamicTimeDeadbandFilterActivator, lowDynamicTimeDeadbandFilterActivator, null);
+              medDynamicTimeDeadbandFilterActivator, lowDynamicTimeDeadbandFilterActivator, freshnessMonitorMock);
 
       configurationController = new ConfigurationController();
       configurationController.setProcessConfiguration(pconf);

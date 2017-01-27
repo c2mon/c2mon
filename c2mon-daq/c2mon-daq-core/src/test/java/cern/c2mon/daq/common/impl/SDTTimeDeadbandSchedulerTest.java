@@ -73,6 +73,7 @@ public class SDTTimeDeadbandSchedulerTest {
     this.processMessageSenderMock = createMock(IProcessMessageSender.class);
     this.filterMessageSenderMock = createMock(IFilterMessageSender.class);
     this.dynamicTimeDeadbandFiltererMock = createMock(IDynamicTimeDeadbandFilterer.class);
+    this.freshnessMonitorMock = createMock(FreshnessMonitor.class);
 
     this.configurationControllerMock = EasyMock.createMockBuilder(ConfigurationController.class).
         addMockedMethod("getProcessConfiguration").
