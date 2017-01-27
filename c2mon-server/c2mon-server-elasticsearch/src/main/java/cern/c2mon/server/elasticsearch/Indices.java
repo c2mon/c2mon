@@ -112,19 +112,17 @@ public class Indices {
 
   private static String getIndexName(String prefix, long timestamp) {
     String indexType = self.properties.getIndexType();
-    String dateFormat = "yyyy-MM";
+    String dateFormat;
 
-    switch (indexType) {
-      case "D":
+    switch (indexType.toLowerCase()) {
       case "d":
         dateFormat = "yyyy-MM-dd";
         break;
-      case "W":
       case "w":
         dateFormat = "yyyy-'W'ww";
         break;
-      case "M":
       case "m":
+      default:
         dateFormat = "yyyy-MM";
         break;
     }
