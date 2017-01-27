@@ -58,6 +58,7 @@ public class TagDocumentIndexer implements IDBPersistenceHandler<TagDocument> {
 
       bulkProcessor.flush();
     } catch (Exception e) {
+      log.warn("Error indexing batch", e);
       throw new IDBPersistenceException(e);
     }
   }

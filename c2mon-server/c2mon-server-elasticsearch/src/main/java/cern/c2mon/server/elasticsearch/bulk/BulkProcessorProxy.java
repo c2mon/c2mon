@@ -1,5 +1,6 @@
 package cern.c2mon.server.elasticsearch.bulk;
 
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import lombok.extern.slf4j.Slf4j;
@@ -23,11 +24,8 @@ public class BulkProcessorProxy implements BulkProcessor.Listener {
 
   private final BulkProcessor bulkProcessor;
 
-  private final ElasticsearchClient client;
-
   @Autowired
   public BulkProcessorProxy(final ElasticsearchClient client, final ElasticsearchProperties properties) {
-    this.client = client;
     this.bulkProcessor = BulkProcessor.builder(client.getClient(), this)
         .setName("BulkProcessor")
         .setBulkActions(properties.getBulkActions())
@@ -59,6 +57,6 @@ public class BulkProcessorProxy implements BulkProcessor.Listener {
   @Override
   public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
     log.warn("Error executing bulk operation", failure);
-    bulkProcessor.add(request);
+    throw new RuntimeException(failure);
   }
 }
