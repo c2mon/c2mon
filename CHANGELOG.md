@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+All issues referenced in parentheses can be consulted under [CERN GitLab](https://gitlab.cern.ch/c2mon/c2mon/issues).
 For more details on a given release, please check also the [Milestone planning](https://gitlab.cern.ch/c2mon/c2mon/milestones?state=all).
 
 ## [Unreleased]
@@ -13,6 +14,7 @@ For more details on a given release, please check also the [Milestone planning](
 - Client layer: Code refactoring of ClientDataTagImpl (#53)
 
 ### Fixed
+- Server exception after device deletion (#119)
 
 ## [1.8.7] - 2016-01-19
 ### Fixed
