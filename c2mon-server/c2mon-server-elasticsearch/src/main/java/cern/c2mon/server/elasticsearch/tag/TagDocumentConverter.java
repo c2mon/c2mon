@@ -104,8 +104,10 @@ public class TagDocumentConverter implements Converter<Tag, TagDocument> {
 
     map.put("dataType", tag.getDataType());
 
-    Process process = processCache.get(tag.getProcessIds().iterator().next());
-    map.put("process", process.getName());
+    if (!tag.getProcessIds().isEmpty()) {
+      Process process = processCache.get(tag.getProcessIds().iterator().next());
+      map.put("process", process.getName());
+    }
 
     if (!tag.getEquipmentIds().isEmpty()) {
       Equipment equipment = equipmentCache.get(tag.getEquipmentIds().iterator().next());
