@@ -61,7 +61,7 @@ public class AlarmDocumentIndexer implements IDBPersistenceHandler<AlarmDocument
   private boolean indexAlarm(AlarmDocument alarm) {
     String indexName = getOrCreateIndex(alarm);
 
-    log.debug("Adding new alarm event to index {}", indexName);
+    log.debug("Indexing alarm #{} to index {}", alarm.getId(), indexName);
     return client.getClient().prepareIndex().setIndex(indexName)
         .setType("alarm")
         .setSource(alarm.toString())
