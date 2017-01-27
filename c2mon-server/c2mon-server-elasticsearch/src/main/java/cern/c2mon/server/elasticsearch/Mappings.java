@@ -36,7 +36,7 @@ public class Mappings {
     try {
       response = self.client.getClient().admin().indices().preparePutMapping(indexName).setType(type).setSource(mapping).get();
     } catch (Exception e) {
-      log.error("Error creating mapping for indexName={}, type={}, mapping={}", indexName, type, mapping, e);
+      log.error("Error creating mapping for index={}, type={}, mapping={}", indexName, type, mapping, e);
     }
 
     return response != null && response.isAcknowledged();
