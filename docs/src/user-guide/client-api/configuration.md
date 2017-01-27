@@ -107,6 +107,11 @@ The following code shows the simplest way to create a `DataTag`:
 configurationService.createDataTag("E_EXAMPLE", "TAG_EXAMPLE", Integer.class, new DataTagAddress());
 ```
 
+!!! info "Note"
+    A well-chosen naming convention will enable you to make searching for tags easier in the future. 
+    We suggest using a _folder-like_ structure with `/` as separator.
+    Example: `serviceA/computer/mypc1/memory`
+
 An ID for the tag will be generated automatically on the server. The first parameter expects the name of an existing `Equipment`.
 
 If you need more control about the created entity (such as adding metadata, setting a description, etc.) you can use the
