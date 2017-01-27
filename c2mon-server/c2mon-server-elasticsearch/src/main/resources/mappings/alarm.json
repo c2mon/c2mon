@@ -36,7 +36,7 @@
       "index": "not_analyzed"
     },
     "metadata": {
-      "type": "nested",
+      "type": "object",
       "dynamic": "true"
     },
     "tagId": {
