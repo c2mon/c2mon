@@ -2,6 +2,11 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
                       http://maven.apache.org/xsd/settings-1.0.0.xsd">
+  
+  <!-- 
+    This file is only required for GitLab CI of https://gitlab.cern.ch/c2mon/c2mon 
+   -->
+  
   <servers>
     <server>
       <id>c2mon-releases</id>
@@ -27,8 +32,8 @@
       
       <!-- Variables used for distributionManagement section in pom.xml  -->
       <properties>
-        <repository.releases.url>${env.REPOSITORY_RELEASES_URL}</repository.releases.url>
-        <repository.snapshots.url>${env.REPOSITORY_SNAPSHOTS_URL}</repository.snapshots.url>
+        <repository.releases.url>http://artifactory/beco-release-local</repository.releases.url>
+        <repository.snapshots.url>http://artifactory/beco-development-local</repository.snapshots.url>
       </properties>
       
       <repositories>
