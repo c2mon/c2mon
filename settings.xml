@@ -4,7 +4,7 @@
                       http://maven.apache.org/xsd/settings-1.0.0.xsd">
   <servers>
     <server>
-      <id>artifactory</id>
+      <id>c2mon-releases</id>
       <username>${env.ARTIFACTORY_USERNAME}</username>
       <password>${env.ARTIFACTORY_PASSWORD}</password>
     </server>
@@ -20,10 +20,17 @@
 
   <profiles>
     <profile>
-      <id>artifactory</id>
+      <id>c2mon-releases</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+      
+      <!-- Variables used for distributionManagement section in pom.xml  -->
+      <properties>
+        <repository.releases.url>${env.REPOSITORY_RELEASES_URL}</repository.releases.url>
+        <repository.snapshots.url>${env.REPOSITORY_SNAPSHOTS_URL}</repository.snapshots.url>
+      </properties>
+      
       <repositories>
         <repository>
           <id>central</id>

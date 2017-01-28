@@ -14,6 +14,17 @@
     <module>c2mon-shared</module>
     <module>docs</module>
   </modules>
+   
+   <distributionManagement>
+     <repository>
+       <id>c2mon-releases</id>
+       <url>${repository.releases.url}</url>
+     </repository>
+     <snapshotRepository>
+       <id>c2mon-releases</id>
+       <url>${repository.snapshots.url}</url>
+     </snapshotRepository>
+  </distributionManagement>
 
   <scm>
     <url>https://gitlab.cern.ch/c2mon/c2mon</url>
