@@ -30,7 +30,7 @@ extracted from the JDK download.
 `git clone git@github.com:c2mon/c2mon.git`
 
 ### Compile and test; build all jars, distribution zips, and docs
-`./mvnw package`
+`./mvnw package -DskipDockerBuild -DskipDockerTag`
 
 ## Contributing
 [Pull requests][] are welcome; see the [contributor guidelines][] for details.
