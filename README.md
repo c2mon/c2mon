@@ -29,7 +29,7 @@ extracted from the JDK download.
 ### Check out sources
 `git clone git@github.com:c2mon/c2mon.git`
 
-### Compile and test; build all jars, distribution zips, and docs
+### Compile and test; build all jars, distribution tarball, and docs
 `./mvnw package -DskipDockerBuild -DskipDockerTag`
 
 ## Contributing
