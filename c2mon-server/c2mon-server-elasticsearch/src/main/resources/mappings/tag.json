@@ -21,38 +21,19 @@
       "type": "string",
       "index": "not_analyzed"
     },
+    "description": {
+      "type": "string",
+      "index": "analyzed"
+    },
     "metadata": {
       "type": "object",
       "dynamic": "true"
-    },
-    "quality": {
-      "dynamic": "false",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "statusInfo": {
-          "type": "string",
-          "index": "not_analyzed"
-        },
-        "valid": {
-          "type": "boolean"
-        }
-      }
-    },
-    "timestamp": {
-      "type": "date",
-      "format": "epoch_millis"
-    },
-    "type": {
-      "type": "string",
-      "index": "not_analyzed"
     },
     "unit": {
       "type": "string",
       "index": "not_analyzed"
     },
-    "valueDescription": {
+    "mode":{
       "type": "string",
       "index": "not_analyzed"
     },
@@ -88,6 +69,29 @@
           "format": "epoch_millis"
         }
       }
+    },
+    "timestamp": {
+      "type": "date",
+      "format": "epoch_millis"
+    },
+    "quality": {
+      "dynamic": "false",
+      "properties": {
+        "status": {
+          "type": "integer"
+        },
+        "statusInfo": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "valueDescription": {
+      "type": "string",
+      "index": "not_analyzed"
     }
   }
 }

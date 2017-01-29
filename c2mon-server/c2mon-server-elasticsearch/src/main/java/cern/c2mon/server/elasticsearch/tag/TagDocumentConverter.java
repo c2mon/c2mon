@@ -70,12 +70,15 @@ public class TagDocumentConverter implements Converter<Tag, TagDocument> {
 
     map.put("id", tag.getId());
     map.put("name", tag.getName());
-    map.put("timestamp", tag.getTimestamp().getTime());
-    map.put("unit", tag.getUnit());
-    map.put("valueDescription", tag.getValueDescription());
-    map.put("c2mon", getC2monMetadata(tag));
+    map.put("description", tag.getDescription());
     map.put("metadata", getMetadata(tag));
+    map.put("unit", tag.getUnit());
+    map.put("mode", tag.getMode());
+    map.put("c2mon", getC2monMetadata(tag));
+
+    map.put("timestamp", tag.getTimestamp().getTime());
     map.put("quality", getQuality(tag));
+    map.put("valueDescription", tag.getValueDescription());
 
     Class<?> clazz = TypeConverter.getType(tag.getDataType());
 
