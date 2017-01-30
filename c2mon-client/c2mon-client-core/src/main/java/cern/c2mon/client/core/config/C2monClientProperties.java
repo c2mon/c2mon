@@ -43,4 +43,27 @@ public class C2monClientProperties {
    * JMS properties
    */
   private final ClientJmsProperties jms = new ClientJmsProperties();
+
+  /**
+   * Elasticsearch properties
+   */
+  private Elasticsearch elasticsearch = new Elasticsearch();
+
+  @Data
+  public static class Elasticsearch {
+
+    /**
+     * URL of the Elasticsearch instance
+     */
+    private String url = "http://localhost:9200";
+
+    /**
+     * Prefix used for all C2MON indices. The final index format becomes:
+     *
+     * indexPrefix + "-" entity + "_" + bucket
+     *
+     * e.g.: c2mon-tag_2017-01
+     */
+    private String indexPrefix = "c2mon";
+  }
 }
