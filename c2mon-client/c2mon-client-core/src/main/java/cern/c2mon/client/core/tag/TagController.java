@@ -348,7 +348,7 @@ public class TagController implements TagUpdateListener, SupervisionListener {
 
         tagImpl.aliveTagFlag = tagUpdate.isAliveTag();
         tagImpl.controlTagFlag = tagUpdate.isControlTag();
-        this.metadata = tagUpdate.getMetadata();
+        tagImpl.setMetadata(tagUpdate.getMetadata());
 
         // Notify all listeners of the update
         clone = tagImpl.clone();
