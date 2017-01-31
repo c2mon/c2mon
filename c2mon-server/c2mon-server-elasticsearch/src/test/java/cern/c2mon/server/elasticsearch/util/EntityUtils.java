@@ -8,12 +8,12 @@ import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.metadata.Metadata;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
 
 /**
@@ -29,10 +29,11 @@ public class EntityUtils {
     alarm.setFaultMember("fault member");
     alarm.setFaultCode(0);
     alarm.setTimestamp(new Timestamp(System.currentTimeMillis()));
-    alarm.setMetadata(Metadata.builder()
-        .addMetadata("building", "1")
-        .addMetadata("array", Collections.singletonList("test"))
-        .addMetadata("responsiblePerson", "Fred").build());
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("building", "1");
+    metadata.addMetadata("array", Collections.singletonList("test"));
+    metadata.addMetadata("responsiblePerson", "Fred");
+    alarm.setMetadata(metadata);
     alarm.setInfo("alarm info");
     alarm.setState(AlarmCondition.TERMINATE);
     return alarm;
@@ -51,10 +52,11 @@ public class EntityUtils {
     tag.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
     tag.setDataTagQuality(new DataTagQualityImpl());
     tag.setLogged(true);
-    tag.setMetadata(Metadata.builder()
-        .addMetadata("building", "1")
-        .addMetadata("array", Collections.singletonList("test"))
-        .addMetadata("responsiblePerson", "Fred").build());
+    Metadata metadata = new Metadata();
+    metadata.addMetadata("building", "1");
+    metadata.addMetadata("array", Collections.singletonList("test"));
+    metadata.addMetadata("responsiblePerson", "Fred");
+    tag.setMetadata(metadata);
     return tag;
   }
 

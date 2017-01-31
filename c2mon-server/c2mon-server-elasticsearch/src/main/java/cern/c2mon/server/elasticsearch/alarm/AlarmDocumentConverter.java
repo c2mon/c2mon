@@ -24,7 +24,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.shared.common.metadata.Metadata;
+import cern.c2mon.server.common.metadata.Metadata;
 
 /**
  * Converts {@link Alarm} instances to {@link AlarmDocument} instances.

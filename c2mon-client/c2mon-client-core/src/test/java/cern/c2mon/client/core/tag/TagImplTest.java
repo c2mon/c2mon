@@ -24,21 +24,18 @@ import java.util.Map;
 import cern.c2mon.client.common.listener.BaseTagListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
-import cern.c2mon.shared.common.metadata.Metadata;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TypeNumeric;
-import cern.c2mon.shared.client.alarm.AlarmValue;
-import cern.c2mon.shared.client.alarm.AlarmValueImpl;
+import cern.c2mon.shared.client.metadata.Metadata;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
-import cern.c2mon.shared.client.metadata.Metadata;
 
 import static junit.framework.Assert.*;
 
