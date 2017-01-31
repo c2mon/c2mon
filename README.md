@@ -8,11 +8,14 @@ of monitoring and control system or a full SCADA application.
 ## Documentation
 See the current [reference docs][].
 
-## Issue Tracking
+## Issue tracking
 Please report issues on GitLab via the [issue tracker][].
 
+## Release notes
+Please have a look into the [CHANGELOG.md][] file.
+
 ## Milestone planning
-[Find here][] the complete list of all existing version milestones including release notes.
+[Find here][] the complete list of all existing version milestones.
 
 ## Building from Source
 C2MON uses a [Maven][]-based build system. In the instructions
@@ -41,6 +44,7 @@ C2MON is released under the [GNU LGPLv3 License][].
 [Javadoc]: https://c2mon.web.cern.ch/c2mon/javadoc/
 [reference docs]: http://c2mon.web.cern.ch/c2mon/docs/latest/
 [issue tracker]: https://gitlab.cern.ch/c2mon/c2mon/issues
+[CHANGELOG.md]: /CHANGELOG.md
 [Find here]: https://gitlab.cern.ch/c2mon/c2mon/milestones?state=all
 [Maven]: http://maven.apache.org
 [Git]: http://help.github.com/set-up-git-redirect
