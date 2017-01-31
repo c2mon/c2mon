@@ -13,6 +13,7 @@ For more details on a given release, please check also the [Milestone planning](
 ### Changed
 - Client layer: Code refactoring of ClientDataTagImpl (#53)
 - Major refactoring of Elasticsearch module (see [merge request #109](https://gitlab.cern.ch/c2mon/c2mon/merge_requests/109))
+- Updating metadata is now additive, not destructive (#89)
 
 ### Fixed
 - Server exception after device deletion (#119)
