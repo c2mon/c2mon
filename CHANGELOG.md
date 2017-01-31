@@ -12,9 +12,13 @@ For more details on a given release, please check also the [Milestone planning](
 
 ### Changed
 - Client layer: Code refactoring of ClientDataTagImpl (#53)
+- Major refactoring of Elasticsearch module (see [merge request #109](https://gitlab.cern.ch/c2mon/c2mon/merge_requests/109))
 
 ### Fixed
 - Server exception after device deletion (#119)
+
+### Removed
+- Client layer: Removed deprecated classes and interfaces (#51)
 
 ## [1.8.7] - 2016-01-19
 ### Fixed
