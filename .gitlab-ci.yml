@@ -14,7 +14,7 @@ build_and_publish:
 build:
   type: build
   script:
-    - mvn -q -U -B clean test -DskipDockerBuild -DskipDockerTag
+    - mvn -q -U -B clean test -DskipDockerBuild -DskipDockerTag --settings settings.xml
   except:
     - master
 
