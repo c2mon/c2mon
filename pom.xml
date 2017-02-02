@@ -141,12 +141,12 @@
         <version>20.0</version>
       </dependency>
       <dependency>
-        <groupId>oracle</groupId>
+        <groupId>com.oracle</groupId>
         <artifactId>ojdbc</artifactId>
         <version>11.2.0.3</version>
       </dependency>
       <dependency>
-        <groupId>oracle</groupId>
+        <groupId>com.oracle</groupId>
         <artifactId>orai18n</artifactId>
         <version>11.2.0.3</version>
       </dependency>

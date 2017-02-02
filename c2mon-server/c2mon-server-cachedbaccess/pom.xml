@@ -62,7 +62,7 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>oracle</groupId>
+      <groupId>com.oracle</groupId>
       <artifactId>orai18n</artifactId>
     </dependency>
     <dependency>
