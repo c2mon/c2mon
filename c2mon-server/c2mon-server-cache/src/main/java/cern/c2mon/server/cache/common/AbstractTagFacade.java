@@ -39,7 +39,7 @@ import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.shared.client.expression.Expression;
+import cern.c2mon.server.common.expression.Expression;
 import cern.c2mon.shared.client.metadata.Metadata;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.SimpleTypeReflectionHandler;

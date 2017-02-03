@@ -32,7 +32,7 @@
 
       <result property="metadata" column="TAGMETADATA" javaType="cern.c2mon.server.common.metadata.Metadata" jdbcType="VARCHAR"/>
 
-      <collection property="expressions" ofType="cern.c2mon.shared.client.expression.Expression" javaType="java.util.ArrayList" 
+      <collection property="expressions" ofType="cern.c2mon.server.common.expression.Expression" javaType="java.util.ArrayList"
                   column="TAGID" select="selectExpressions"/>
 
       <collection property="alarmIds" ofType="Long" javaType="java.util.ArrayList" resultMap="tagAlarmIdsResultMap"/>
@@ -43,7 +43,7 @@
       <id column="ALARMID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
     </resultMap>
 
-    <resultMap id="expressionResultMap" type="cern.c2mon.shared.client.expression.Expression">
+    <resultMap id="expressionResultMap" type="cern.c2mon.server.common.expression.Expression">
       <id column="EXPR_TAGID"/>
       <result property="name" column="EXPR_NAME"/>
       <result property="alarm" column="EXPR_ALARM" javaType="java.lang.Boolean" jdbcType="NUMERIC"/>

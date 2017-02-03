@@ -19,6 +19,7 @@ package cern.c2mon.server.client.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
@@ -33,6 +34,7 @@ import cern.c2mon.shared.client.device.DeviceClassNameResponse;
 import cern.c2mon.shared.client.device.DeviceClassNameResponseImpl;
 import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.client.device.TransferDeviceImpl;
+import cern.c2mon.shared.client.expression.Expression;
 import cern.c2mon.shared.client.tag.Publisher;
 import cern.c2mon.shared.client.tag.TagConfigImpl;
 import cern.c2mon.shared.client.tag.TagMode;
@@ -134,7 +136,7 @@ public abstract class TransferObjectFactory {
       String dataType = isKnownClass(tag.getDataType()) ? getType(tag.getDataType()).getName() : tag.getDataType();
       transferTag.setValueClassName(dataType);
 
-      transferTag.addExpressions(tag.getExpressions());
+      transferTag.addExpressions(tag.getExpressions().stream().map(e -> new Expression(e.getName(), e.getExpression())).collect(Collectors.toList()));
       transferTag.setSimulated(tag.isSimulated());
       transferTag.setUnit(tag.getUnit());
       transferTag.addEquipmentIds(tag.getEquipmentIds());
@@ -210,7 +212,7 @@ public abstract class TransferObjectFactory {
 
       String dataType = isKnownClass(tag.getDataType()) ? getType(tag.getDataType()).getName() : tag.getDataType();
       tagValue.setValueClassName(dataType);
-      tagValue.addExpressions(tag.getExpressions());
+      tagValue.addExpressions(tag.getExpressions().stream().map(e -> new Expression(e.getName(), e.getExpression())).collect(Collectors.toList()));
       tagValue.setSimulated(tag.isSimulated());
     }
 

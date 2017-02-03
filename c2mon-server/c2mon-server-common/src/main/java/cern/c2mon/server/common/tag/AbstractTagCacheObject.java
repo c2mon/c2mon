@@ -33,13 +33,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import cern.c2mon.shared.client.expression.Expression;
-import cern.c2mon.shared.common.metadata.Metadata;
-import groovy.lang.Script;
+import cern.c2mon.server.common.expression.Expression;
 import lombok.Getter;
 import lombok.Setter;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Abstract tag used as basis for all tag objects in the server:

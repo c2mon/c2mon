@@ -29,7 +29,7 @@ import cern.c2mon.server.common.republisher.Publisher;
 import cern.c2mon.server.common.republisher.Republisher;
 import cern.c2mon.server.common.republisher.RepublisherFactory;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.shared.client.expression.Expression;
+import cern.c2mon.server.common.expression.Expression;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.c2mon.shared.util.jms.JmsSender;
