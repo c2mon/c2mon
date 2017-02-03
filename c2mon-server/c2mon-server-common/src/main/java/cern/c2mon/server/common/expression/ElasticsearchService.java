@@ -74,14 +74,15 @@ public class ElasticsearchService {
   public List<Object> q(String name, Map<String, Object> metadata, String interval) {
     log.info("using interval: " + interval);
 
-    BoolQueryBuilder nestedMetadataQuery = boolQuery();
-    metadata.forEach((k, v) -> nestedMetadataQuery.must(wildcardQuery("metadata." + k, v.toString())));
-
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-    searchSourceBuilder.query(boolQuery()
+    BoolQueryBuilder query = boolQuery();
+
+    query
         .filter(termQuery("name", name))
-        .must(rangeQuery("timestamp").gte("now-" + interval))
-        .must(nestedQuery("metadata", nestedMetadataQuery)));
+        .must(rangeQuery("timestamp").gte("now-" + interval));
+
+    metadata.forEach((k, v) -> query.must(wildcardQuery("metadata." + k, v.toString())));
+    searchSourceBuilder.query(query);
 
     SearchResult result;
     Search search = new Search.Builder(searchSourceBuilder.toString()).addIndex("c2mon-tag*").build();

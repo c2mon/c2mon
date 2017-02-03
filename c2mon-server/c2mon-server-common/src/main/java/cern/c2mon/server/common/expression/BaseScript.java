@@ -32,32 +32,4 @@ public abstract class BaseScript extends Script {
 
     return service.q(name, params, interval);
   }
-
-  void q2(Closure closure) {
-    System.out.println("Closure called");
-
-    QuerySpec query = new QuerySpec();
-
-    Closure code = closure.rehydrate(query, this, this);
-    code.setResolveStrategy(Closure.DELEGATE_FIRST);
-
-    Object object = code.call();
-    System.out.println(object);
-  }
-
-  @Data
-  public class QuerySpec {
-    private String name;
-    private String thing;
-
-    QuerySpec name(String name) {
-      this.name = name;
-      return this;
-    }
-
-    QuerySpec thing(String thing) {
-      this.thing = thing;
-      return this;
-    }
-  }
 }
