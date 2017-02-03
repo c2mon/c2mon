@@ -25,7 +25,7 @@ import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.server.history.structure.ExpressionLog;
 import cern.c2mon.server.history.structure.Loggable;
 import cern.c2mon.server.history.structure.LoggerConverter;
-import cern.c2mon.shared.client.expression.Expression;
+import cern.c2mon.server.common.expression.Expression;
 import cern.c2mon.shared.common.Cacheable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

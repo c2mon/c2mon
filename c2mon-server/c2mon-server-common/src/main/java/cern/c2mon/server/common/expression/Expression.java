@@ -1,10 +1,10 @@
-package cern.c2mon.shared.client.expression;
+package cern.c2mon.server.common.expression;
 
 import java.io.Serializable;
 
-import cern.c2mon.shared.client.metadata.Metadata;
-import cern.c2mon.shared.common.Cacheable;
 import lombok.Data;
+
+import cern.c2mon.server.common.metadata.Metadata;
 
 /**
  * @author Franz Ritter

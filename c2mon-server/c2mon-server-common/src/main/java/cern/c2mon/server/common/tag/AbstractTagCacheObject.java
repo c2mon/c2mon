@@ -18,8 +18,6 @@ package cern.c2mon.server.common.tag;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -30,6 +28,7 @@ import groovy.lang.Script;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+
 import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.shared.client.expression.Expression;

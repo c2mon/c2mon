@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.shared.client.expression.Expression;
+import cern.c2mon.server.common.expression.Expression;
 import groovy.lang.GroovyObject;
 import lombok.extern.slf4j.Slf4j;
 
