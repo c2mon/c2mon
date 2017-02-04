@@ -58,6 +58,9 @@ public interface ConfigurationService extends ProcessConfigurationManager,
    *                        Configuration Report object
    * @return A Configuration Report object that also sends reports for the
    * progress of the operation
+   *
+   * @deprecated use {@link #applyConfiguration(Configuration, ClientRequestReportListener)}
+   * instead
    */
   ConfigurationReport applyConfiguration(final Long configurationId);
 
@@ -78,6 +81,9 @@ public interface ConfigurationService extends ProcessConfigurationManager,
    * @return A {@link ConfigurationReport} object
    * @see ClientRequestProgressReport
    * @see ClientRequestErrorReport
+   *
+   * @deprecated use {@link #applyConfiguration(Configuration, ClientRequestReportListener)}
+   * instead
    */
   ConfigurationReport applyConfiguration(final Long configurationId, final ClientRequestReportListener reportListener);
 
@@ -96,7 +102,6 @@ public interface ConfigurationService extends ProcessConfigurationManager,
    * @param listener
    * @return A {@link ConfigurationReport} object
    */
-  @Deprecated
   ConfigurationReport applyConfiguration(final Configuration configuration, final ClientRequestReportListener listener);
 
   /**
@@ -106,7 +111,7 @@ public interface ConfigurationService extends ProcessConfigurationManager,
    * the server.
    * <p>
    * To get the full report(s) for a particular configuration, use
-   * {@link TagService#getConfigurationReports(Long)}.
+   * {@link #getConfigurationReports(Long)}.
    *
    * @return the list of previously applied configuration reports
    */
