@@ -40,7 +40,11 @@ import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.daq.config.DataTagAddressUpdate;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Unit test.
@@ -48,6 +52,8 @@ import org.springframework.context.support.GenericApplicationContext;
  * @author Mark Brightwell
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = GenericApplicationContext.class)
 public class DataTagConfigTransactedImplTest {
 
   IMocksControl control;
@@ -65,6 +71,9 @@ public class DataTagConfigTransactedImplTest {
   private DataTagCache dataTagCache;
   private TagLocationService tagLocationService;
 
+  @Autowired
+  private GenericApplicationContext context;
+
   @Before
   public void setUp() {
     control = EasyMock.createControl();
@@ -77,7 +86,7 @@ public class DataTagConfigTransactedImplTest {
     dataTagCache = control.createMock(DataTagCache.class);
     tagLocationService = control.createMock(TagLocationService.class);
     dataTagConfigTransacted = new DataTagConfigTransactedImpl(dataTagFacade, dataTagLoaderDAO, dataTagCache, equipmentFacade, subEquipmentFacade,
-        tagLocationService, control.createMock(GenericApplicationContext.class));
+        tagLocationService, context);
   }
 
   @Test
