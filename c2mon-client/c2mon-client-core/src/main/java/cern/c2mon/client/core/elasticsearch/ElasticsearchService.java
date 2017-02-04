@@ -182,7 +182,7 @@ public class ElasticsearchService {
 
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder
-        .query(prefixQuery("name", query));
+        .query(regexpQuery("name", query));
 
     SearchResult result;
     Search search = new Search.Builder(searchSourceBuilder.toString())
@@ -194,7 +194,7 @@ public class ElasticsearchService {
       throw new RuntimeException("Error querying tags", e);
     }
 
-    for(SearchResult.Hit<Map, Void> hit : result.getHits(Map.class)) {
+    for (SearchResult.Hit<Map, Void> hit : result.getHits(Map.class)) {
       double id = (double) hit.source.get("id");
       tagIds.add((long) id);
     }
