@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,10 +46,13 @@ public class ElasticsearchService {
 
   private final String configIndex;
 
+  private final String alarmIndex;
+
   @Autowired
   public ElasticsearchService(C2monClientProperties properties) {
     this.timeSeriesIndex = properties.getElasticsearch().getIndexPrefix() + "-tag*";
     this.configIndex = properties.getElasticsearch().getTagConfigIndex();
+    this.alarmIndex = properties.getElasticsearch().getIndexPrefix() + "-alarm*";
 
     JestClientFactory factory = new JestClientFactory();
     factory.setHttpClientConfig(new HttpClientConfig.Builder(properties.getElasticsearch().getUrl())
@@ -152,7 +156,8 @@ public class ElasticsearchService {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.aggregation(AggregationBuilders.terms("group-by-id")
         .field("id")
-        .size(size));
+        .size(size))
+        .sort("timestamp", SortOrder.DESC);
 
     SearchResult result;
     Search search = new Search.Builder(searchSourceBuilder.toString()).addIndex(timeSeriesIndex).build();
@@ -230,7 +235,7 @@ public class ElasticsearchService {
       throw new RuntimeException("Error querying tags", e);
     }
 
-    for(SearchResult.Hit<Map, Void> hit : result.getHits(Map.class)) {
+    for (SearchResult.Hit<Map, Void> hit : result.getHits(Map.class)) {
       double id = (double) hit.source.get("id");
       tagIds.add((long) id);
     }
@@ -274,5 +279,82 @@ public class ElasticsearchService {
     }
 
     return keys;
+  }
+
+  public List<Long> getTopAlarms(Integer size) {
+    List<Long> tagIds = new ArrayList<>();
+
+    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+    searchSourceBuilder.aggregation(AggregationBuilders.terms("group-by-id")
+        .field("id")
+        .size(size));
+
+    SearchResult result;
+    Search search = new Search.Builder(searchSourceBuilder.toString()).addIndex(alarmIndex).build();
+
+    try {
+      result = client.execute(search);
+    } catch (IOException e) {
+      throw new RuntimeException("Error querying top most active alarms", e);
+    }
+
+    tagIds.addAll(result.getAggregations().getTermsAggregation("group-by-id").getBuckets()
+        .stream()
+        .map(bucket -> Long.valueOf(bucket.getKey())).collect(Collectors.toList()));
+
+    return tagIds;
+  }
+
+  public List<Object[]> getAlarmHistory(Long id, Long min, Long max) {
+    List<Object[]> results = new ArrayList<>();
+
+    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+    searchSourceBuilder.query(boolQuery()
+        .must(termQuery("id", id))
+        .must(rangeQuery("timestamp").from(min).to(max)))
+        .sort("timestamp", SortOrder.DESC)
+        .size(100);
+
+    SearchResult result;
+    Search search = new Search.Builder(searchSourceBuilder.toString()).addIndex(alarmIndex).build();
+
+    try {
+      result = client.execute(search);
+    } catch (IOException e) {
+      throw new RuntimeException("Error querying alarm history", e);
+    }
+
+    for (SearchResult.Hit<Map, Void> hit : result.getHits(Map.class)) {
+      results.add(new Object[]{hit.source.get("timestamp"), hit.source.get("active")});
+    }
+
+    return results;
+  }
+
+  public Collection<Long> findAlarmsByName(String query) {
+    List<Long> tagIds = new ArrayList<>();
+
+    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+    searchSourceBuilder.query(boolQuery()
+        .should(regexpQuery("faultFamily", query))
+        .should(regexpQuery("faultMember", query)))
+        .sort("timestamp", SortOrder.DESC);
+
+    SearchResult result;
+    Search search = new Search.Builder(searchSourceBuilder.toString())
+        .addIndex(alarmIndex).build();
+
+    try {
+      result = client.execute(search);
+    } catch (IOException e) {
+      throw new RuntimeException("Error querying alarms by name", e);
+    }
+
+    for (SearchResult.Hit<Map, Void> hit : result.getHits(Map.class)) {
+      double id = (double) hit.source.get("id");
+      tagIds.add((long) id);
+    }
+
+    return tagIds;
   }
 }

@@ -42,7 +42,7 @@ public class Metadata implements Serializable, Cloneable {
     try {
       return mapper.writeValueAsString(metadata);
     } catch (IOException e) {
-      log.error("Exception caught while serializing metatata to JSON", e);
+      log.error("Exception caught while serializing metadata to JSON", e);
     }
 
     return null;
@@ -53,7 +53,7 @@ public class Metadata implements Serializable, Cloneable {
       TypeReference<Metadata> typeRef = new TypeReference<Metadata>() {};
       return mapper.readValue(json, typeRef);
     } catch (IOException e) {
-      log.error("Exception caught while deserializing metatata from JSON", e);
+      log.error("Exception caught while deserializing metadata from JSON", e);
     }
 
     return null;
