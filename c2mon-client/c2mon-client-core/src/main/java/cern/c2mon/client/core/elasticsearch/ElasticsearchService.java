@@ -64,19 +64,27 @@ public class ElasticsearchService {
   /**
    * Retrieve aggregated history for the given tag for the specified time period.
    * <p>
-   * A suitable average aggregation interval is automatically calculated.
+   * A suitable average aggregation interval is automatically calculated if
+   * the given aggregate parameter is set to "auto"
    *
    * @param id  the id of the tag
    * @param min the beginning of the requested date range (ms)
    * @param max the end of the requested date range (ms)
+   * @param aggregate the aggregation interval (bucket size). Possible values
+   *                  are "auto", "1s", "1m", "1h", "none"
    *
    * @return list of [timestamp (ms), value] pairs
    */
-  public List<Object[]> getHistory(Long id, Long min, Long max) {
+  public List<Object[]> getHistory(Long id, Long min, Long max, String aggregate) {
+
+    if (aggregate.equals("none")) {
+      return getRawHistory(id, min, max);
+    }
+
     List<Object[]> results = new ArrayList<>();
 
     // Figure out the right interval
-    String interval = getInterval(min, max);
+    String interval = aggregate.equals("auto") ? getInterval(min, max) : aggregate;
     log.info("Using interval: " + interval);
 
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -141,6 +149,32 @@ public class ElasticsearchService {
     }
 
     return interval;
+  }
+
+  private List<Object[]> getRawHistory(Long id, Long min, Long max) {
+    List<Object[]> results = new ArrayList<>();
+
+    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+    searchSourceBuilder.query(boolQuery()
+        .must(termQuery("id", id))
+        .must(rangeQuery("timestamp").from(min).to(max)))
+        .sort("timestamp", SortOrder.DESC)
+        .size(1000);
+
+    SearchResult result;
+    Search search = new Search.Builder(searchSourceBuilder.toString()).addIndex(timeSeriesIndex).build();
+
+    try {
+      result = client.execute(search);
+    } catch (IOException e) {
+      throw new RuntimeException("Error querying raw tag history", e);
+    }
+
+    for (SearchResult.Hit<Map, Void> hit : result.getHits(Map.class)) {
+      results.add(new Object[]{hit.source.get("timestamp"), hit.source.get("value")});
+    }
+
+    return results;
   }
 
   /**
