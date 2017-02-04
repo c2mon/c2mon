@@ -20,9 +20,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Properties;
 
+import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Isolation;
@@ -73,8 +75,11 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
 
   @Autowired
   public RuleTagConfigTransactedImpl(RuleTagCache ruleTagCache,
-      RuleTagFacade ruleTagFacade, RuleTagLoaderDAO ruleTagLoaderDAO, TagLocationService tagLocationService) {
-    super(ruleTagLoaderDAO, ruleTagFacade, ruleTagCache, tagLocationService);
+                                     RuleTagFacade ruleTagFacade,
+                                     RuleTagLoaderDAO ruleTagLoaderDAO,
+                                     TagLocationService tagLocationService,
+                                     GenericApplicationContext context) {
+    super(ruleTagLoaderDAO, ruleTagFacade, ruleTagCache, tagLocationService, context);
     this.ruleTagFacade = ruleTagFacade;
   }
   
@@ -111,6 +116,11 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
         for (Long tagId : tagIds) {      
           tagConfigGateway.addRuleToTag(tagId, ruleTag.getId()); 
         }
+
+        for (ConfigurationEventListener listener : configurationEventListeners) {
+          listener.onConfigurationEvent(ruleTag, Action.CREATE);
+        }
+
         tagCache.putQuiet(ruleTag); 
       } catch (RuntimeException e) {
         String errMessage = "Exception caught while adding a RuleTag - rolling back DB transaction.";
@@ -159,6 +169,11 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
       try {
         commonTagFacade.updateConfig(ruleTagCopy, properties);
         configurableDAO.updateConfig(ruleTagCopy);
+
+        for (ConfigurationEventListener listener : configurationEventListeners) {
+          listener.onConfigurationEvent(ruleTagCopy, Action.UPDATE);
+        }
+
         tagCache.putQuiet(ruleTagCopy);
       } catch (RuntimeException e) {
         String msg = "Exception caught while updating Rule";
@@ -251,6 +266,11 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
         for (Long inputTagId : ruleInputTagIds) {
           tagConfigGateway.removeRuleFromTag(inputTagId, id); //allowed to lock tag below the rule...
         }
+
+        for (ConfigurationEventListener listener : configurationEventListeners) {
+          listener.onConfigurationEvent(ruleTag, Action.REMOVE);
+        }
+
         configurableDAO.deleteItem(ruleTag.getId());                                           
       }
       catch (RuntimeException rEx) {

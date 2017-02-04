@@ -16,8 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
+import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,8 @@ import cern.c2mon.server.cache.C2monCache;
 import cern.c2mon.server.cache.loading.ConfigurableDAO;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.ConfigurationException;
+
+import java.util.Collection;
 
 /**
  * Public methods in this class should perform the complete
@@ -78,13 +82,20 @@ abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransa
   protected ConfigurableDAO<T> configurableDAO;
   
   protected TagLocationService tagLocationService;
+
+  protected final Collection<ConfigurationEventListener> configurationEventListeners;
   
-  public TagConfigTransactedImpl(ConfigurableDAO<T> configurableDAO, CommonTagFacade<T> configurableTagFacade, C2monCache<Long, T> tagCache, TagLocationService tagLocationService) {
+  public TagConfigTransactedImpl(ConfigurableDAO<T> configurableDAO,
+                                 CommonTagFacade<T> configurableTagFacade,
+                                 C2monCache<Long, T> tagCache,
+                                 TagLocationService tagLocationService,
+                                 final GenericApplicationContext context) {
     super();
     this.commonTagFacade = configurableTagFacade;   
     this.configurableDAO = configurableDAO;
     this.tagCache = tagCache;
     this.tagLocationService = tagLocationService;
+    this.configurationEventListeners = context.getBeansOfType(ConfigurationEventListener.class).values();
   }
 
   /**

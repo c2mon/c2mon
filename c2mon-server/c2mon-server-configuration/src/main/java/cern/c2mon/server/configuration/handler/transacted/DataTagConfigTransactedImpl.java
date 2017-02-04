@@ -89,8 +89,6 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
   @Autowired
   private AlarmConfigHandler alarmConfigHandler;
 
-  private final Collection<ConfigurationEventListener> configurationEventListeners;
-
   @Autowired
   public DataTagConfigTransactedImpl(final DataTagFacade dataTagFacade,
                                      final DataTagLoaderDAO dataTagLoaderDAO,
@@ -99,10 +97,9 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
                                      final SubEquipmentFacade subEquipmentFacade,
                                      final TagLocationService tagLocationService,
                                      final GenericApplicationContext context) {
-    super(dataTagLoaderDAO, dataTagFacade, dataTagCache, tagLocationService);
+    super(dataTagLoaderDAO, dataTagFacade, dataTagCache, tagLocationService, context);
     this.equipmentFacade = equipmentFacade;
     this.subEquipmentFacade = subEquipmentFacade;
-    this.configurationEventListeners = context.getBeansOfType(ConfigurationEventListener.class).values();
   }
 
   /**

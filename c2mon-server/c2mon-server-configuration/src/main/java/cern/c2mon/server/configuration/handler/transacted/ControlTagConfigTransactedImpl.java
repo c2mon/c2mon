@@ -21,6 +21,7 @@ import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.ControlTagLoaderDAO;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
+import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
@@ -33,6 +34,7 @@ import cern.c2mon.shared.daq.config.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Propagation;
@@ -71,11 +73,15 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
   
   @Autowired
   public ControlTagConfigTransactedImpl(ControlTagCache controlTagCache,
-      ControlTagFacade controlTagFacade, DataTagFacade dataTagFacade,
-      EquipmentFacade equipmentFacade,
-      ControlTagLoaderDAO controlTagLoaderDAO, TagLocationService tagLocationService,
-      SubEquipmentFacade subEquipmentFacade, ProcessFacade processFacade) {
-    super(controlTagLoaderDAO, controlTagFacade, controlTagCache, tagLocationService);    
+                                        ControlTagFacade controlTagFacade,
+                                        DataTagFacade dataTagFacade,
+                                        EquipmentFacade equipmentFacade,
+                                        ControlTagLoaderDAO controlTagLoaderDAO,
+                                        TagLocationService tagLocationService,
+                                        SubEquipmentFacade subEquipmentFacade,
+                                        ProcessFacade processFacade,
+                                        GenericApplicationContext context) {
+    super(controlTagLoaderDAO, controlTagFacade, controlTagCache, tagLocationService, context);
     this.dataTagFacade = dataTagFacade;
     this.equipmentFacade = equipmentFacade; 
     this.subEquipmentFacade = subEquipmentFacade;
@@ -121,6 +127,10 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
         throw new UnexpectedRollbackException("Unexpected exception while creating a Control Tag: rolling back the change", e);
       }
       try {
+        for (ConfigurationEventListener listener : configurationEventListeners) {
+          listener.onConfigurationEvent(controlTag, Action.CREATE);
+        }
+
         tagCache.putQuiet(controlTag);      
         ProcessChange processChange = new ProcessChange();
         if (processFacade.getProcessIdFromControlTag(controlTag.getId()) != null) {
@@ -164,6 +174,10 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
       // Setting back equipment and process ID for cache object
       ((ControlTagCacheObject) controlTagCopy).setEquipmentId(eqId);
       ((ControlTagCacheObject) controlTagCopy).setProcessId(processId);
+
+      for (ConfigurationEventListener listener : configurationEventListeners) {
+        listener.onConfigurationEvent(controlTagCopy, Action.UPDATE);
+      }
 
       tagCache.putQuiet(controlTagCopy);
 
@@ -210,7 +224,12 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
             tagReport.addSubReport(alarmReport);
             alarmConfigHandler.removeAlarm(alarmId, alarmReport);
           } 
-        } 
+        }
+
+        for (ConfigurationEventListener listener : configurationEventListeners) {
+          listener.onConfigurationEvent(controlTag, Action.REMOVE);
+        }
+
         //dataTagFacade.invalidate(controlTag, new DataTagQuality(DataTagQuality.REMOVED, "The ControlTag has been removed from the system and is no longer monitored."), new Timestamp(System.currentTimeMillis()));
         configurableDAO.deleteItem(controlTag.getId());        
         //if the ControlTag has no Address, do not send anything to the DAQ so return null
