@@ -163,19 +163,19 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
    * The source timestamp that indicates when the value change was generated
    */
   @Element(required = false)
-  private java.sql.Timestamp sourceTimestamp = null;
+  private Timestamp sourceTimestamp = null;
 
   /**
    * The DAQ timestamp that indicates when the change message passed the DAQ module
    */
   @Element(required = false)
-  private java.sql.Timestamp daqTimestamp = null;
+  private Timestamp daqTimestamp = null;
 
   /**
    * The server timestamp that indicates when the change message passed the server
    */
   @Element
-  private java.sql.Timestamp serverTimestamp = new java.sql.Timestamp(0L);
+  private Timestamp serverTimestamp = new Timestamp(0L);
 
   /**
    * Unit of the tag

@@ -98,7 +98,7 @@ public interface JmsProxy {
    *                  but the caller may wish to invalidate the Tag in the meantime
    * @throws NullPointerException if either argument is null
    */
-  void registerUpdateListener(TagUpdateListener serverUpdateListener, 
+  void registerUpdateListener(TagUpdateListener serverUpdateListener,
                                   TopicRegistrationDetails topicRegistrationDetails) throws JMSException;
 
   /**
@@ -187,7 +187,7 @@ public interface JmsProxy {
    * @throws RuntimeException if the response from the server is null (probable timeout)
    * @throws NullPointerException thrown if either argument is null
    */
-  <T extends ClientRequestResult> Collection<T> sendRequest(JsonRequest<T> jsonRequest, String queueName, int timeout, 
+  <T extends ClientRequestResult> Collection<T> sendRequest(JsonRequest<T> jsonRequest, String queueName, int timeout,
       ClientRequestReportListener reportListener) throws JMSException;
 
   /**

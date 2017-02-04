@@ -40,6 +40,7 @@ import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.daq.config.DataTagAddressUpdate;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
+import org.springframework.context.support.GenericApplicationContext;
 
 /**
  * Unit test.
@@ -76,7 +77,7 @@ public class DataTagConfigTransactedImplTest {
     dataTagCache = control.createMock(DataTagCache.class);
     tagLocationService = control.createMock(TagLocationService.class);
     dataTagConfigTransacted = new DataTagConfigTransactedImpl(dataTagFacade, dataTagLoaderDAO, dataTagCache, equipmentFacade, subEquipmentFacade,
-        tagLocationService);
+        tagLocationService, control.createMock(GenericApplicationContext.class));
   }
 
   @Test

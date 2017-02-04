@@ -58,6 +58,11 @@ public class ElasticsearchProperties {
   private String indexPrefix = "c2mon";
 
   /**
+   * Name of the tag configuration index
+   */
+  private String tagConfigIndex = indexPrefix + "-tag-config";
+
+  /**
    * Timeseries index bucketing strategy. Possible values:
    *
    * - M (or m): monthly indices (YYYY-MM)

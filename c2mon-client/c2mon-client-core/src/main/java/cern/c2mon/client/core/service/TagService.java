@@ -17,6 +17,7 @@
 package cern.c2mon.client.core.service;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 import cern.c2mon.client.common.listener.BaseTagListener;
@@ -26,7 +27,7 @@ import cern.c2mon.client.core.cache.CacheSynchronizationException;
 
 /**
  * This interface describes the methods which are provided by
- * the C2MON TagService singleton. 
+ * the C2MON TagService singleton.
  * <p>
  * The tag service allows e.g. subscribing listeners to tags
  * to get informed when a new update is received.
@@ -49,7 +50,7 @@ public interface TagService {
    *         occurs while subscribing to the tags. In that case the {@link TagService} will
    *         rollback the subscription.
    * @see #subscribe(Set, TagListener)
-   * @see C2monSupervisionManager#isServerConnectionWorking()
+   * @see SupervisionService#isServerConnectionWorking()
    */
   void subscribe(final Set<Long> tagIds, final BaseTagListener listener) throws CacheSynchronizationException;
 
@@ -66,10 +67,10 @@ public interface TagService {
    *         occurs while subscribing to the tag. In that case the {@link TagService} will
    *         rollback the subscription.
    * @see #subscribe(Long, TagListener)
-   * @see C2monSupervisionManager#isServerConnectionWorking();
+   * @see SupervisionService#isServerConnectionWorking();
    */
   void subscribe(final Long tagId, final BaseTagListener listener) throws CacheSynchronizationException;
-  
+
   /**
    * Registers a listener to receive the current (initial) values and updates for all tags where the
    * name matches the regular expression. If the string contains no special characters the server will
@@ -94,15 +95,15 @@ public interface TagService {
    * </ul>
    * The supported wildcard characters can be escaped with a backslash '\', and a literal backslash can be included with '\\'
    * <p />
-   * WARN: Expressions starting with a leading wildcard character are potentially very expensive (ie. full scan) for indexed caches 
+   * WARN: Expressions starting with a leading wildcard character are potentially very expensive (ie. full scan) for indexed caches
    *
    * @param regex A concrete tag name or wildcard expression, which shall be used to subscribe to all matching data tags.
    * @param listener the listener which shall be registered
    * @throws CacheSynchronizationException In case a communication problem with the C2MON server
    *         occurs while subscribing to the tag. In that case the {@link TagService} will
    *         rollback the subscription.
-   * @see #subscribe(String, TagListener)
-   * @see C2monSupervisionManager#isServerConnectionWorking();
+   * @see #subscribeByName(String, TagListener)
+   * @see SupervisionService#isServerConnectionWorking();
    */
   void subscribeByName(final String regex, final BaseTagListener listener) throws CacheSynchronizationException;
 
@@ -133,20 +134,20 @@ public interface TagService {
    * </ul>
    * The supported wildcard characters can be escaped with a backslash '\', and a literal backslash can be included with '\\'
    * <p />
-   * WARN: Expressions starting with a leading wildcard character are potentially very expensive (ie. full scan) for indexed caches 
+   * WARN: Expressions starting with a leading wildcard character are potentially very expensive (ie. full scan) for indexed caches
    *
    * @param regex A concrete tag name or wildcard expression, which shall be used to subscribe to all matching data tags.
-   * @param listener the listener which shall be registered and which will receive the initial values in 
+   * @param listener the listener which shall be registered and which will receive the initial values in
    *                 a separate method
    * @throws CacheSynchronizationException In case a communication problem with the C2MON server
    *         occurs while subscribing to the tag. In that case the {@link TagService} will
    *         rollback the subscription.
-   * @see #subscribe(String, TagListener)
-   * @see C2monSupervisionManager#isServerConnectionWorking();
+   * @see #subscribeByName(String, TagListener)
+   * @see SupervisionService#isServerConnectionWorking();
    */
   void subscribeByName(final String regex, final TagListener listener) throws CacheSynchronizationException;
 
-  
+
   /**
    * Registers a listener to receive the current (initial) values and updates for all tags, where the
    * name matches the regular expression.
@@ -170,15 +171,15 @@ public interface TagService {
    * </ul>
    * The supported wildcard characters can be escaped with a backslash '\', and a literal backslash can be included with '\\'
    * <p />
-   * WARN: Expressions starting with a leading wildcard character are potentially very expensive (ie. full scan) for indexed caches 
+   * WARN: Expressions starting with a leading wildcard character are potentially very expensive (ie. full scan) for indexed caches
    *
    * @param regexList List of concrete tag names and/or wildcard expressions, which shall be used to subscribe to all matching data tags.
    * @param listener the listener which shall be registered
    * @throws CacheSynchronizationException In case a communication problem with the C2MON server
    *         occurs while subscribing to the tag. In that case the {@link TagService} will
    *         rollback the subscription.
-   * @see #subscribe(String, TagListener)
-   * @see C2monSupervisionManager#isServerConnectionWorking();
+   * @see #subscribeByName(String, TagListener)
+   * @see SupervisionService#isServerConnectionWorking();
    */
   void subscribeByName(final Set<String> regexList, final BaseTagListener listener) throws CacheSynchronizationException;
 
@@ -208,19 +209,19 @@ public interface TagService {
    * </ul>
    * The supported wildcard characters can be escaped with a backslash '\', and a literal backslash can be included with '\\'
    * <p />
-   * WARN: Expressions starting with a leading wildcard character are potentially very expensive (ie. full scan) for indexed caches 
+   * WARN: Expressions starting with a leading wildcard character are potentially very expensive (ie. full scan) for indexed caches
    *
    * @param regexList List of concrete tag names and/or wildcard expressions, which shall be used to subscribe to all matching data tags.
    * @param listener the listener which shall be registered
    * @throws CacheSynchronizationException In case a communication problem with the C2MON server
    *         occurs while subscribing to the tag. In that case the {@link TagService} will
    *         rollback the subscription.
-   * @see #subscribe(String, TagListener)
-   * @see C2monSupervisionManager#isServerConnectionWorking();
+   * @see #subscribeByName(String, TagListener)
+   * @see SupervisionService#isServerConnectionWorking();
    */
   void subscribeByName(final Set<String> regexList, final TagListener listener) throws CacheSynchronizationException;
 
-  
+
   /**
    * Registers a listener to receive updates for specific data tags.
    * The method will return the initial values of the subscribed tags to {@link TagListener#onInitialUpdate(Collection)}.
@@ -237,7 +238,7 @@ public interface TagService {
    *         occurs while subscribing to the tags. In that case the {@link TagService} will
    *         rollback the subscription.
    * @see #subscribe(Set, BaseTagListener)
-   * @see C2monSupervisionManager#isServerConnectionWorking()
+   * @see SupervisionService#isServerConnectionWorking()
    */
   void subscribe(final Set<Long> tagIds, final TagListener listener) throws CacheSynchronizationException;
 
@@ -258,12 +259,10 @@ public interface TagService {
    *         occurs while subscribing to the tag. In that case the {@link TagService} will
    *         rollback the subscription.
    * @see #subscribe(Long, BaseTagListener)
-   * @see C2monSupervisionManager#isServerConnectionWorking()
+   * @see SupervisionService#isServerConnectionWorking()
    */
   void subscribe(final Long tagId, final TagListener listener) throws CacheSynchronizationException;
 
-  
-  
   /**
    * Use this method for unregistering a listener from receiving updates for specific data tags.
    *
@@ -280,13 +279,11 @@ public interface TagService {
    */
   void unsubscribe(final Long tagId, final BaseTagListener listener);
 
-
   /**
    * Use this method to unsubscribe from all previously registered data tags.
    * @param listener the listener which shall be registered
    */
   void unsubscribe(final BaseTagListener listener);
-
 
   /**
    * Returns for a given listener a copy of all subscribed data tags with
@@ -323,7 +320,7 @@ public interface TagService {
    *         occurs while trying to retrieve tag information.
    * @see #get(Collection)
    * @see #subscribe(Set, BaseTagListener)
-   * @see C2monSupervisionManager#isServerConnectionWorking()
+   * @see SupervisionService#isServerConnectionWorking()
    */
   Tag get(final Long tagId);
 
@@ -341,10 +338,10 @@ public interface TagService {
    * @throws RuntimeException In case a communication problems with JMS or the C2MON server
    *         occurs while trying to retrieve tag information.
    * @see #subscribe(Set, BaseTagListener)
-   * @see C2monSupervisionManager#isServerConnectionWorking();
+   * @see SupervisionService#isServerConnectionWorking();
    */
   Collection<Tag> get(final Collection<Long> tagIds);
-  
+
   /**
    * Returns a list of tags which match the given wilcard expression. Different to
    * {@link #get(Collection)} this call will always result in a server request.
@@ -358,17 +355,17 @@ public interface TagService {
    * </ul>
    * The supported wildcard characters can be escaped with a backslash '\', and a literal backslash can be included with '\\'
    * <p />
-   * WARN: Expressions starting with a leading wildcard character are potentially very expensive (ie. full scan) for indexed caches 
+   * WARN: Expressions starting with a leading wildcard character are potentially very expensive (ie. full scan) for indexed caches
    *
-   * @param tagIds A collection of data tag id's
+   * @param regex a wildcard expression
    * @return A collection of all <code>Tag</code> objects
    * @throws RuntimeException In case a communication problems with JMS or the C2MON server
    *         occurs while trying to retrieve tag information.
    * @see #subscribe(Set, BaseTagListener)
-   * @see C2monSupervisionManager#isServerConnectionWorking();
+   * @see SupervisionService#isServerConnectionWorking();
    */
   Collection<Tag> findByName(final String regex);
-  
+
   /**
    * Returns a list of all tags which match the given list of wilcard expressions. Different to
    * {@link #get(Collection)} this call will always result in a server request.
@@ -382,16 +379,26 @@ public interface TagService {
    * </ul>
    * The supported wildcard characters can be escaped with a backslash '\', and a literal backslash can be included with '\\'
    * <p />
-   * WARN: Expressions starting with a leading wildcard character are potentially very expensive (ie. full scan) for indexed caches 
+   * WARN: Expressions starting with a leading wildcard character are potentially very expensive (ie. full scan) for indexed caches
    *
-   * @param tagIds A collection of data tag id's
+   * @param regexList a collection of wildcard expressions
    * @return A collection of all <code>Tag</code> objects
    * @throws RuntimeException In case a communication problems with JMS or the C2MON server
    *         occurs while trying to retrieve tag information.
    * @see #subscribe(Set, BaseTagListener)
-   * @see C2monSupervisionManager#isServerConnectionWorking();
+   * @see SupervisionService#isServerConnectionWorking();
    */
   Collection<Tag> findByName(final Set<String> regexList);
+
+  /**
+   * Find all tags which contain the given key/value pair as metadata.
+   *
+   * @param key   the metadata key
+   * @param value the metadata value
+   * @return a list of {@link Tag} instances containing the exact key/value
+   * metadata pairs, or an empty list if none were found
+   */
+  Collection<Tag> findByMetadata(String key, String value);
 
   /**
    * Returns the total number of subscribed tags in the local cache (cache size).

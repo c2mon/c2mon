@@ -22,9 +22,11 @@ import java.util.Properties;
 
 import javax.naming.ConfigurationException;
 
+import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -87,21 +89,20 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
   @Autowired
   private AlarmConfigHandler alarmConfigHandler;
 
-  /**
-   * Autowired constructor.
-   * @param dataTagFacade      reference to facade bean
-   * @param dataTagLoaderDAO   reference to DAO
-   * @param dataTagCache       reference to cache
-   * @param equipmentFacade    reference to equipment facade
-   * @param tagLocationService reference to tag location bean
-   */
+  private final Collection<ConfigurationEventListener> configurationEventListeners;
+
   @Autowired
   public DataTagConfigTransactedImpl(final DataTagFacade dataTagFacade,
-                                     final DataTagLoaderDAO dataTagLoaderDAO, final DataTagCache dataTagCache,
-                                     final EquipmentFacade equipmentFacade, SubEquipmentFacade subEquipmentFacade, final TagLocationService tagLocationService) {
+                                     final DataTagLoaderDAO dataTagLoaderDAO,
+                                     final DataTagCache dataTagCache,
+                                     final EquipmentFacade equipmentFacade,
+                                     final SubEquipmentFacade subEquipmentFacade,
+                                     final TagLocationService tagLocationService,
+                                     final GenericApplicationContext context) {
     super(dataTagLoaderDAO, dataTagFacade, dataTagCache, tagLocationService);
     this.equipmentFacade = equipmentFacade;
     this.subEquipmentFacade = subEquipmentFacade;
+    this.configurationEventListeners = context.getBeansOfType(ConfigurationEventListener.class).values();
   }
 
   /**
@@ -130,6 +131,10 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
         throw new UnexpectedRollbackException("Unexpected exception while creating a DataTag: rolling back the change", e);
       }
       try {
+        for (ConfigurationEventListener listener : configurationEventListeners) {
+          listener.onConfigurationEvent(dataTag, Action.CREATE);
+        }
+
         tagCache.putQuiet(dataTag);
 
         if (dataTag.getEquipmentId() != null) {
@@ -191,6 +196,11 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
       dataTagUpdate = commonTagFacade.updateConfig(dataTagCopy, properties);
 
       configurableDAO.updateConfig(dataTagCopy);
+
+      for (ConfigurationEventListener listener : configurationEventListeners) {
+        listener.onConfigurationEvent(dataTagCopy, Action.UPDATE);
+      }
+
       tagCache.putQuiet(dataTagCopy);
       if (((DataTagUpdate) dataTagUpdate).isEmpty()) {
         return new ProcessChange();
@@ -240,6 +250,11 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
             alarmConfigHandler.removeAlarm(alarmId, alarmReport);
           }
         }
+
+        for (ConfigurationEventListener listener : configurationEventListeners) {
+          listener.onConfigurationEvent(tagCopy, Action.REMOVE);
+        }
+
         configurableDAO.deleteItem(tagCopy.getId());
       } catch (Exception ex) {
         //commonTagFacade.setStatus(dataTag, Status.RECONFIGURATION_ERROR);

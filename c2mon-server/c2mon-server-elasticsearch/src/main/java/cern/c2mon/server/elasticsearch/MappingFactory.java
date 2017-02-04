@@ -17,6 +17,7 @@ import org.springframework.core.io.ClassPathResource;
 import cern.c2mon.server.elasticsearch.alarm.AlarmDocument;
 import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocument;
 import cern.c2mon.server.elasticsearch.tag.TagDocument;
+import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocument;
 import cern.c2mon.shared.common.type.TypeConverter;
 
 /**
@@ -27,6 +28,7 @@ import cern.c2mon.shared.common.type.TypeConverter;
 public class MappingFactory {
 
   private static final String TAG_MAPPING = "mappings/tag.json";
+  private static final String TAG_CONFIG_MAPPING = "mappings/tag-config.json";
   private static final String ALARM_MAPPING = "mappings/alarm.json";
   private static final String SUPERVISION_MAPPING = "mappings/supervision.json";
 
@@ -44,8 +46,7 @@ public class MappingFactory {
     Map<String, Map<String, Object>> mapping;
 
     try {
-      mapping = mapper.readValue(loadMapping(TAG_MAPPING), new TypeReference<HashMap<String, Object>>() {
-      });
+      mapping = mapper.readValue(loadMapping(TAG_MAPPING), new TypeReference<HashMap<String, Object>>() {});
     } catch (IOException e) {
       throw new RuntimeException("Error reading tag mapping from JSON resource", e);
     }
@@ -58,7 +59,7 @@ public class MappingFactory {
     // each with an identically named field but mapped differently (e.g. one is
     // a string, the other is a number)
     if (clazz == null) {
-      properties.put("valueObject", ImmutableMap.of("type", "object", "index", "analyzed"));
+      properties.put("valueObject", ImmutableMap.of("type", "object", "dynamic", "true"));
 
     } else if (Number.class.isAssignableFrom(clazz)) {
       properties.put("value", ImmutableMap.of("type", "double"));
@@ -82,6 +83,15 @@ public class MappingFactory {
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Error creating tag mapping", e);
     }
+  }
+
+  /**
+   * Create the Elasticsearch mapping for a {@link TagConfigDocument}.
+   *
+   * @return the JSON mapping source
+   */
+  public static String createTagConfigMapping() {
+    return loadMapping(TAG_CONFIG_MAPPING);
   }
 
   /**

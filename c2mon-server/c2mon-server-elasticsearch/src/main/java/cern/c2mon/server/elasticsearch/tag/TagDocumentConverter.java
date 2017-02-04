@@ -45,101 +45,85 @@ import cern.c2mon.shared.common.type.TypeConverter;
  */
 @Slf4j
 @Component
-public class TagDocumentConverter implements Converter<Tag, Optional<TagDocument>> {
-
-  private final ProcessCache processCache;
-  private final EquipmentCache equipmentCache;
-  private final SubEquipmentCache subEquipmentCache;
+public class TagDocumentConverter extends BaseTagDocumentConverter {
 
   @Autowired
-  public TagDocumentConverter(final ProcessCache processCache,
-                              final EquipmentCache equipmentCache,
-                              final SubEquipmentCache subEquipmentCache) {
-    this.processCache = processCache;
-    this.equipmentCache = equipmentCache;
-    this.subEquipmentCache = subEquipmentCache;
+  public TagDocumentConverter(final ProcessCache processCache, final EquipmentCache equipmentCache, final SubEquipmentCache subEquipmentCache) {
+    super(processCache, equipmentCache, subEquipmentCache);
   }
 
   @Override
   public Optional<TagDocument> convert(final Tag tag) {
-    try {
-      Map<String, Object> map = new HashMap<>();
+      try{
+    Map<String, Object> map = Map<String, Object> map = super.convert(tag);
 
-      map.put("id", tag.getId());
-      map.put("name", tag.getName());
-      map.put("description", tag.getDescription());
-      map.put("metadata", getMetadata(tag));
-      map.put("unit", tag.getUnit());
-      map.put("mode", tag.getMode());
-      map.put("c2mon", getC2monMetadata(tag));
+    map.put("timestamp", tag.getTimestamp().getTime());
+    map.put("quality", getQuality(tag));
+    map.put("valueDescription", tag.getValueDescription());
 
-      map.put("timestamp", tag.getTimestamp().getTime());
-      map.put("quality", getQuality(tag));
-      map.put("valueDescription", tag.getValueDescription());
+    Class<?> clazz = TypeConverter.getType(tag.getDataType());
 
-      Class<?> clazz = TypeConverter.getType(tag.getDataType());
+    if (clazz == null) {
+      map.put("valueObject", tag.getValue());
 
-      if (clazz == null) {
-        map.put("valueObject", tag.getValue());
+    } else if (Number.class.isAssignableFrom(clazz)) {
+      map.put("value", tag.getValue());
 
-      } else if (Number.class.isAssignableFrom(clazz)) {
-        map.put("value", tag.getValue());
-
-        if (Long.class.isAssignableFrom(clazz)) {
-          map.put("valueLong", tag.getValue());
-        }
-      } else if (Boolean.class.isAssignableFrom(clazz)) {
-        map.put("valueBoolean", tag.getValue());
-
-        if (tag.getValue() != null) {
-          map.put("value", tag.getValue() != null ? 1 : 0);
-        }
-      } else if (String.class.isAssignableFrom(clazz)) {
-        map.put("valueString", tag.getValue());
-
-      } else {
-        map.put("valueObject", tag.getValue());
+      if (Long.class.isAssignableFrom(clazz)) {
+        map.put("valueLong", tag.getValue());
       }
+    } else if (Boolean.class.isAssignableFrom(clazz)) {
+      map.put("valueBoolean", tag.getValue());
 
-      TagDocument tagDocument = new TagDocument();
-      tagDocument.putAll(map);
-      return Optional.of(tagDocument);
-    } catch (Exception e) {
-      log.error("Error occurred during conversion of Tag #{} ({}) to Elasticsearch document. Unable to store update to Elasticsearch!", tag.getId(), tag.getName(), e);
+      if (tag.getValue() != null) {
+        map.put("value", tag.getValue() != null ? 1 : 0);
+      }
+    } else if (String.class.isAssignableFrom(clazz)) {
+      map.put("valueString", tag.getValue());
+
+    } else {
+      map.put("valueObject", tag.getValue());
     }
-    return Optional.empty();
+
+    TagDocument tagDocument = new TagDocument();
+    tagDocument.putAll(map);
+    return Optional.of(tagDocument);
+      } catch (Exception e) {
+          log.error("Error occurred during conversion of Tag #{} ({}) to Elasticsearch document. Unable to store update to Elasticsearch!", tag.getId(), tag.getName(), e);
+      }
   }
 
-  private Map<String, Object> getC2monMetadata(Tag tag) {
-    Map<String, Object> map = new HashMap<>();
+    @Override
+    protected Map<String, Object> getC2monMetadata(Tag tag) {
+        Map<String, Object> map = super.getC2monMetadata(tag);
 
     map.put("dataType", tag.getDataType());
 
     if (!tag.getProcessIds().isEmpty()) {
-      try {
-        Process process = processCache.get(tag.getProcessIds().iterator().next());
-        map.put("process", process.getName());
-      } catch (Exception e) {
-        log.warn("Could not get Process name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
-      }
+        try {
+            Process process = processCache.get(tag.getProcessIds().iterator().next());
+            map.put("process", process.getName());
+        } catch (Exception e) {
+            log.warn("Could not get Process name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
+        }
     }
 
     if (!tag.getEquipmentIds().isEmpty()) {
-      try {
-        Equipment equipment = equipmentCache.get(tag.getEquipmentIds().iterator().next());
-        map.put("equipment", equipment.getName());
-      } catch (Exception e) {
-        log.warn("Could not get Equipment name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
-      }
+        try {
+            Equipment equipment = equipmentCache.get(tag.getEquipmentIds().iterator().next());
+            map.put("equipment", equipment.getName());
+        } catch (Exception e) {
+            log.warn("Could not get Equipment name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
+        }
     }
 
     if (!tag.getSubEquipmentIds().isEmpty()) {
-      try {
-        SubEquipment subEquipment = subEquipmentCache.get(tag.getSubEquipmentIds().iterator().next());
-        map.put("subEquipment", subEquipment.getName());
-      } catch (Exception e) {
-        log.warn("Could not get SubEquipment name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
-      }
+        try {
+            SubEquipment subEquipment = subEquipmentCache.get(tag.getSubEquipmentIds().iterator().next());
+            map.put("subEquipment", subEquipment.getName());
+        } catch (Exception e) {
+            log.warn("Could not get SubEquipment name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
+        }
     }
 
     map.put("serverTimestamp", tag.getCacheTimestamp().getTime());

@@ -65,5 +65,10 @@ public class C2monClientProperties {
      * e.g.: c2mon-tag_2017-01
      */
     private String indexPrefix = "c2mon";
+
+    /**
+     * Name of the tag configuration index
+     */
+    private String tagConfigIndex = indexPrefix + "-tag-config";
   }
 }

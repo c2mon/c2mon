@@ -1,4 +1,4 @@
-/******************************************************************************
+/*******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
@@ -13,27 +13,19 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
- *****************************************************************************/
-package cern.c2mon.server.elasticsearch.tag;
+ ******************************************************************************/
 
-import java.io.IOException;
+package cern.c2mon.server.elasticsearch.tag.config;
+
 import java.util.HashMap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.server.common.tag.Tag;
-
 /**
- * Intermediate object (created from {@link Tag} instances) used for direct
- * serialization to JSON objects suitable for indexing as Elasticsearch
- * documents.
- *
- * @author Alban Marguet
- * @author Justin Lewis Salmon
+ * @author Szymon Halastra
  */
-public class TagDocument extends HashMap<String, Object> implements IFallback {
+public class TagConfigDocument extends HashMap<String, Object> {
 
   private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -41,18 +33,8 @@ public class TagDocument extends HashMap<String, Object> implements IFallback {
     return mapper.convertValue(get(key), klass);
   }
 
-  @Override
   public String getId() {
     return String.valueOf(this.get("id"));
-  }
-
-  @Override
-  public IFallback getObject(String line) {
-    try {
-      return mapper.readValue(line, TagDocument.class);
-    } catch (IOException e) {
-      throw new RuntimeException("Error reading line from fallback", e);
-    }
   }
 
   @Override

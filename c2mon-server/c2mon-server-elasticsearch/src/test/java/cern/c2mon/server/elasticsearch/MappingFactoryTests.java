@@ -70,12 +70,17 @@ public class MappingFactoryTests {
   @Test
   public void objectTagMapping() {
     String mapping = MappingFactory.createTagMapping(Object.class.getName());
-    assertTrue(mapping.contains("\"valueObject\":{\"type\":\"nested\",\"dynamic\":\"true\"}"));
+    assertTrue(mapping.contains("\"valueObject\":{\"type\":\"object\",\"dynamic\":\"true\"}"));
   }
 
   @Test
   public void unknownTypeTagMapping() {
     String mapping = MappingFactory.createTagMapping("com.foo.UnknownType");
-    assertTrue(mapping.contains("\"valueObject\":{\"type\":\"nested\",\"index\":\"analyzed\"}"));
+    assertTrue(mapping.contains("\"valueObject\":{\"type\":\"object\",\"dynamic\":\"true\"}"));
+  }
+
+  @Test
+  public void tagConfigMapping() {
+    assertNotNull(MappingFactory.createTagConfigMapping());
   }
 }

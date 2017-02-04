@@ -43,22 +43,23 @@ import static org.mockito.Mockito.when;
  * @author Justin Lewis Salmon
  */
 @RunWith(MockitoJUnitRunner.class)
-public class TagDocumentConverterTests {
+public class TagDocumentConverterTests extends BaseTagDocumentConverterTest{
 
   @InjectMocks
   private TagDocumentConverter converter;
 
-  @Mock
-  private ProcessCache processCache;
-
-  @Mock
-  private EquipmentCache equipmentCache;
-
   @Test
   public void toAndFromJson() {
     DataTag tag = EntityUtils.createDataTag();
-    when(processCache.get(any())).thenReturn(new ProcessCacheObject(1L));
-    when(equipmentCache.get(any())).thenReturn(new EquipmentCacheObject(1L));
+
+    ProcessCacheObject process = new ProcessCacheObject(1L);
+    process.setName("P_TEST");
+
+    EquipmentCacheObject equipment = new EquipmentCacheObject(1L);
+    equipment.setName("E_TEST");
+
+    when(processCache.get(any())).thenReturn(process);
+    when(equipmentCache.get(any())).thenReturn(equipment);
     TagDocument document = converter.convert(tag).orElseThrow(() -> new IllegalArgumentException("TagDocument conversion failed"));
 
     // Serialize
@@ -67,19 +68,17 @@ public class TagDocumentConverterTests {
     // Deserialize
     document = (TagDocument) document.getObject(json);
 
-    assertEquals(tag.getId().intValue(), document.get("id"));
-    assertEquals(tag.getName(), document.get("name"));
-    assertEquals(tag.getTimestamp().getTime(), document.get("timestamp"));
-    assertEquals(tag.getUnit(), document.get("unit"));
-    assertEquals(tag.getValueDescription(), document.get("valueDescription"));
+    super.assertBaseFieldsMatch(tag, document);
 
+    assertEquals(tag.getTimestamp().getTime(), document.get("timestamp"));
+    assertEquals(tag.getValueDescription(), document.get("valueDescription"));
     Map<String, Object> quality = (Map<String, Object>) document.get("quality");
     assertEquals(tag.getDataTagQuality().isValid(), quality.get("valid"));
 
     Map<String, Object> c2monMetadata = (Map<String, Object>) document.get("c2mon");
     assertEquals(tag.getDataType(), c2monMetadata.get("dataType"));
-    assertEquals(null, c2monMetadata.get("process"));
-    assertEquals(null, c2monMetadata.get("equipment"));
+    assertEquals("P_TEST", c2monMetadata.get("process"));
+    assertEquals("E_TEST", c2monMetadata.get("equipment"));
     assertEquals(tag.getCacheTimestamp().getTime(), c2monMetadata.get("serverTimestamp"));
     assertEquals(tag.getDaqTimestamp().getTime(), c2monMetadata.get("daqTimestamp"));
     assertEquals(tag.getSourceTimestamp().getTime(), c2monMetadata.get("sourceTimestamp"));

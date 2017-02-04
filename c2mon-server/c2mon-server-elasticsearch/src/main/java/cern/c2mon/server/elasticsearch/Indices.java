@@ -20,6 +20,7 @@ import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocument;
 import cern.c2mon.server.elasticsearch.tag.TagDocument;
+import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocument;
 
 /**
  * Static utility singleton for working with Elasticsearch indices.
@@ -136,6 +137,17 @@ public class Indices {
   public static String indexFor(TagDocument tag) {
     String prefix = self.properties.getIndexPrefix() + "-tag_";
     return getIndexName(prefix, (Long) tag.get("timestamp"));
+  }
+
+  /**
+   * Generate an index for the given {@link TagConfigDocument}.
+   *
+   * @param tag the tag to generate an index for
+   *
+   * @return the generated index name
+   */
+  public static String indexFor(TagConfigDocument tag) {
+    return self.properties.getTagConfigIndex();
   }
 
   /**
