@@ -158,7 +158,7 @@ public class ElasticsearchService {
     searchSourceBuilder.query(boolQuery()
         .must(termQuery("id", id))
         .must(rangeQuery("timestamp").from(min).to(max)))
-        .sort("timestamp", SortOrder.DESC)
+        .sort("timestamp", SortOrder.ASC)
         .size(1000);
 
     SearchResult result;
