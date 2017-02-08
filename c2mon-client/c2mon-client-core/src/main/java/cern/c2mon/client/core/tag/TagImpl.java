@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import cern.c2mon.shared.client.expression.Expression;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.Attribute;
@@ -492,6 +493,11 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
    */
   public Map<String, Object> getMetadata() {
     return this.metadata;
+  }
+
+  @Override
+  public Collection<Expression> getExpressions() {
+    return null;
   }
 
   @Override
