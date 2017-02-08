@@ -28,7 +28,7 @@ import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.AlarmServiceNew;
 import cern.c2mon.client.core.jms.JmsProxy;
 import cern.c2mon.client.core.jms.RequestHandler;
-import cern.c2mon.client.core.tag.ClientDataTagImpl;
+import cern.c2mon.client.core.tag.TagController;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.rule.RuleFormatException;
@@ -96,9 +96,9 @@ public class AlarmServiceNewImpl implements AlarmServiceNew, BaseTagListener {
     List<Tag> result = new ArrayList<>();
 
     try {
-      ClientDataTagImpl cdt;
+      TagController cdt;
       for(TagUpdate tagUpdate : clientRequestHandler.requestTags(tagIds)){
-        cdt = new ClientDataTagImpl(tagUpdate.getId());
+        cdt = new TagController(tagUpdate.getId());
         cdt.update(tagUpdate);
       }
     } catch (JMSException e) {

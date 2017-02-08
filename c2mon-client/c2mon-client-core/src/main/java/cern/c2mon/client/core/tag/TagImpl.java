@@ -27,6 +27,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 import lombok.AccessLevel;
+import cern.c2mon.shared.client.expression.Expression;
 import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -457,6 +458,11 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
   @Override
   public Map<String, Object> getMetadata() {
     return this.metadata;
+  }
+
+  @Override
+  public Collection<Expression> getExpressions() {
+    return null;
   }
 
   @Override

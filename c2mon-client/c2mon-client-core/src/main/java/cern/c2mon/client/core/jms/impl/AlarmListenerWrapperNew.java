@@ -24,7 +24,7 @@ import javax.jms.Message;
 import javax.jms.TextMessage;
 
 import cern.c2mon.client.common.listener.BaseTagListener;
-import cern.c2mon.client.core.tag.ClientDataTagImpl;
+import cern.c2mon.client.core.tag.TagController;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
@@ -57,9 +57,9 @@ class AlarmListenerWrapperNew extends AbstractListenerWrapper<BaseTagListener, T
   protected void invokeListener(final BaseTagListener listener, final TagUpdate tag) {
     try {
       log.debug("InvokeListener: {} for tag with alarm expression id:{}", listener.getClass(), tag.getId());
-      ClientDataTagImpl tagWithAlarm = new ClientDataTagImpl(tag.getId());
+      TagController tagWithAlarm = new TagController(tag.getId());
       tagWithAlarm.update(tag);
-      listener.onUpdate(tagWithAlarm);
+      listener.onUpdate(tagWithAlarm.getTagImpl());
 
     } catch (RuleFormatException e) {
       log.error("Received a tag on the alarm topic which triggered a RuleFormatException", e);
