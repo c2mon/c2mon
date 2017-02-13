@@ -27,7 +27,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.client.common.tag.Tag;
-import cern.c2mon.client.core.cache.ClientDataTagCache;
+import cern.c2mon.client.core.cache.TagCache;
 
 /**
  * Spring SchedulerTask which is executed every 5 minutes to ask
@@ -42,7 +42,7 @@ class UnknownTagsRefreshTask {
   /**
    * The cache instance which is managing all <code>Tag</code> objects
    */
-  private final ClientDataTagCache cache;
+  private final TagCache cache;
   
   /** Logger instance */
   private static final Logger LOG = LoggerFactory.getLogger(UnknownTagsRefreshTask.class);
@@ -53,7 +53,7 @@ class UnknownTagsRefreshTask {
    * @param cache The cache instance which is managing all <code>Tag</code> objects
    */
   @Autowired
-  public UnknownTagsRefreshTask(final ClientDataTagCache cache) {
+  public UnknownTagsRefreshTask(final TagCache cache) {
     this.cache = cache;
   }
    

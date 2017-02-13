@@ -21,14 +21,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import cern.c2mon.client.core.tag.TagController;
-import cern.c2mon.client.core.tag.TagImpl;
-import cern.c2mon.client.core.tag.TagController;
 
 /**
  * This interface describes the methods which are provided by the internal
  * cache. The <code>CacheController</code> manages the two cache instances
  * (history and live cache) and provides synchronization locks for the
- * {@link ClientDataTagCache}.
+ * {@link TagCache}.
  *
  * @author Matthias Braeger
  */

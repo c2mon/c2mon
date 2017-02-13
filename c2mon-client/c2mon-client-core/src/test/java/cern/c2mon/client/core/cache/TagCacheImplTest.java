@@ -40,23 +40,6 @@ import cern.c2mon.client.core.config.mock.CoreSupervisionServiceMock;
 import cern.c2mon.client.core.config.mock.JmsProxyMock;
 import cern.c2mon.client.core.config.mock.RequestHandlerMock;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.jms.JMSException;
-
-import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 
 import cern.c2mon.client.core.jms.JmsProxy;
 import cern.c2mon.client.core.jms.RequestHandler;
@@ -84,13 +67,13 @@ import static org.easymock.EasyMock.anyObject;
     CoreSupervisionServiceMock.class
 })
 @DirtiesContext
-public class ClientDataTagCacheImplTest {
+public class TagCacheImplTest {
 
   /**
    * Component to test
    */
   @Autowired
-  private ClientDataTagCacheImpl cache;
+  private TagCacheImpl cache;
 
   @Autowired
   private JmsProxy jmsProxyMock;
@@ -261,10 +244,10 @@ public class ClientDataTagCacheImplTest {
 
 
   private TagController prepareClientDataTagCreateMock(final Long tagId) throws RuleFormatException, JMSException {
-    TagController cdtMock = new TagController(tagId);
-    cdtMock.update(createValidTransferTag(tagId));
+    TagController tagController = new TagController(tagId);
+    tagController.update(createValidTransferTag(tagId));
 
-    return cdtMock;
+    return tagController;
   }
 
   private TagUpdate createValidTransferTag(final Long tagId) {

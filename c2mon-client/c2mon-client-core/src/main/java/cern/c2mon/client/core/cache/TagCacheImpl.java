@@ -42,7 +42,7 @@ import cern.c2mon.client.core.tag.TagController;
  * subscription to the incoming live events. Only the initialization of the tag
  * is performed by the <code>TagServiceImpl</code>.
  * <p>
- * It is possible to switch the <code>ClientDataTagCache</code> from live mode
+ * It is possible to switch the <code>TagCache</code> from live mode
  * into history mode and back. Therefore this class manages internally two
  * <code>Tag</code> map instances, one for live tag updates and the
  * other for historical events. Depending on the cache mode the getter methods
@@ -51,7 +51,7 @@ import cern.c2mon.client.core.tag.TagController;
  * @author Matthias Braeger
  */
 @Service
-public class ClientDataTagCacheImpl implements ClientDataTagCache {
+public class TagCacheImpl implements TagCache {
 
   /** Used to subscribe/unsubscribe listeners from tags */
   private final TagSubscriptionHandler tagSubscriptionHandler;
@@ -77,9 +77,9 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
    *          server
    */
   @Autowired
-  protected ClientDataTagCacheImpl(final CacheController cacheController,
-                                   final CacheSynchronizer cacheSynchronizer,
-                                   final TagSubscriptionHandler tagSubscriptionHandler) {
+  protected TagCacheImpl(final CacheController cacheController,
+                         final CacheSynchronizer cacheSynchronizer,
+                         final TagSubscriptionHandler tagSubscriptionHandler) {
     this.controller = cacheController;
     this.cacheSynchronizer = cacheSynchronizer;
     this.tagSubscriptionHandler = tagSubscriptionHandler;

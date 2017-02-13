@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,7 +36,7 @@ import cern.c2mon.client.core.tag.TagController;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Helper class for {@link ClientDataTagCacheImpl} to handle all tag (un-)subscription requests.
+ * Helper class for {@link TagCacheImpl} to handle all tag (un-)subscription requests.
  * In case a tag is not yet in the client cache, this class will fetch it from the server
  * and all the topic subscription will handled.
  *

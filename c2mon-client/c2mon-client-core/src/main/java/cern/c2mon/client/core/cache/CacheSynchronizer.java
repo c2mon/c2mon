@@ -17,9 +17,11 @@
 package cern.c2mon.client.core.cache;
 
 import java.util.Set;
+
 import cern.c2mon.client.common.listener.BaseTagListener;
+
 /**
- * The <code>CacheSynchronizer</code> interface is used by the {@link ClientDataTagCache}
+ * The <code>CacheSynchronizer</code> interface is used by the {@link TagCache}
  * implementation for creating, removing or refreshing the <code>ClientDataTag</code>
  * references in the cache.
  *
@@ -34,7 +36,7 @@ interface CacheSynchronizer {
    *
    * @param tagIds The ids of the <code>ClientDataTag</code> objects that shall be
    *                      added to the cache.
-   * @see ClientDataTagCache#subscribe(Set, BaseTagListener)
+   * @see TagCache#subscribe(Set, BaseTagListener)
    * @return id list of all tags, which were newly created.
    * @throws CacheSynchronizationException In case of communication problems with
    *         the C2MON server during the tag creation.

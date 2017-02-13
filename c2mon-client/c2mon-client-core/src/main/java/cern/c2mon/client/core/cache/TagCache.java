@@ -33,7 +33,7 @@ import cern.c2mon.client.core.service.impl.TagServiceImpl;
  * @author Matthias Braeger
  * @see BasicCacheHandler
  */
-public interface ClientDataTagCache extends BasicCacheHandler {
+public interface TagCache extends BasicCacheHandler {
   
   /**
    * Adds the given listener to the tags in the cache. If the tag is not yet known to the
