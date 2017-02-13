@@ -202,7 +202,6 @@ public class JmsProxyTest {
     //pause and verify
     Thread.sleep(200);
     EasyMock.verify(listener);
-
   }
 
 

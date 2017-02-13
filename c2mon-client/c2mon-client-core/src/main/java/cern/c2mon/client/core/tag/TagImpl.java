@@ -25,10 +25,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Root;
 
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TypeNumeric;
@@ -46,7 +46,6 @@ import cern.c2mon.shared.rule.RuleExpression;
  */
 @Slf4j
 @Data
-@Root(name = "Tag")
 public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
 
   /**
@@ -55,9 +54,62 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
   public static final String DEFAULT_DESCRIPTION = "Tag not initialised.";
 
   /**
+   * Unique identifier for a DataTag
+   */
+  protected Long id;
+
+  /**
+   * <code>true</code>, if the tag value is currently simulated and not
+   * corresponding to a live event.
+   */
+  private boolean simulated = false;
+
+  /**
+   * <code>true</code>, if tag represents an Alive Control tag
+   */
+  protected boolean aliveTagFlag = false;
+
+  /**
+   * <code>true</code>, if tag represents a CommFault-, Alive- or Status tag
+   */
+  protected boolean controlTagFlag = false;
+
+  /**
+   * The unique name of the tag
+   */
+  private String name = "UNKNOWN";
+
+  /**
+   * Only used for xml serialization.
+   */
+  private String ruleExpressionString;
+
+  /**
+   * String representation of the JMS destination where the DataTag
+   * is published on change.
+   */
+  @Getter(AccessLevel.NONE)
+  protected String topicName = null;
+
+  /**
+   * Unit of the tag
+   */
+  private String unit = null;
+
+  /**
+   * The description of the Tag
+   */
+  private String description = "";
+
+  /**
+   * The description of the value
+   */
+  private String valueDescription = "";
+
+  /**
    * The value of the tag
    */
-  private Object tagValue;
+  private Object value;
 
   /**
    * The datatype of the tag value
@@ -68,17 +120,6 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
    * The current tag mode
    */
   private TagMode mode = TagMode.TEST;
-
-  /**
-   * <code>true</code>, if the tag value is currently simulated and not
-   * corresponding to a live event.
-   */
-  private boolean simulated = false;
-
-  /**
-   * Unique identifier for a DataTag
-   */
-  protected Long id;
 
   /**
    * Containing all process id's which are relevant to compute the
@@ -105,37 +146,9 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
   private Map<Long, SupervisionEvent> subEquipmentSupervisionStatus = new HashMap<>();
 
   /**
-   * The unique name of the tag
+   * Metadata of an Tag object.
    */
-  private String tagName = "UNKNOWN";
-
-  /**
-   * Only used for xml serialization.
-   */
-  private String ruleExpressionString;
-
-  /**
-   * The quality of the tag
-   */
-  private DataTagQuality tagQuality =
-          new DataTagQualityImpl(TagQualityStatus.UNINITIALISED, DEFAULT_DESCRIPTION);
-
-  /**
-   * <code>true</code>, if tag represents an Alive Control tag
-   */
-  protected boolean aliveTagFlag = false;
-
-  /**
-   * <code>true</code>, if tag represents a CommFault-, Alive- or Status tag
-   */
-  protected boolean controlTagFlag = false;
-
-
-  /**
-   * String representation of the JMS destination where the DataTag
-   * is published on change.
-   */
-  protected String topicName = null;
+  private Map<String, Object> metadata = new HashMap<>();
 
   /**
    * The alarm objects associated to this data tag
@@ -158,29 +171,15 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
   private java.sql.Timestamp serverTimestamp = new java.sql.Timestamp(0L);
 
   /**
-   * Unit of the tag
-   */
-  private String unit = null;
-
-  /**
-   * The description of the Tag
-   */
-  private String description = "";
-
-  /**
-   * The description of the value
-   */
-  private String valueDescription = "";
-
-  /**
    * In case this data tag is a rule this variable contains its rule expression
    */
   private RuleExpression ruleExpression = null;
 
   /**
-   * Metadata of an Tag object.
+   * The quality of the tag
    */
-  private Map<String, Object> metadata = new HashMap<>();
+  private DataTagQuality dataTagQuality =
+          new DataTagQualityImpl(TagQualityStatus.UNINITIALISED, DEFAULT_DESCRIPTION);
 
   /**
    * Lock to prevent more than one thread at a time to update the value
@@ -227,75 +226,9 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
     getDataTagQuality().setInvalidStatus(TagQualityStatus.UNDEFINED_TAG, "Tag is not known by the system");
   }
 
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.Tag#getId()
-   */
-  @Override
-  public Long getId() {
-    return this.id;
-  }
-
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.Tag#getName()
-   */
-  @Override
-  public String getName() {
-    updateTagLock.readLock().lock();
-    try {
-        return this.tagName;
-    } finally {
-      updateTagLock.readLock().unlock();
-    }
-  }
-
-  @Override
-  public TagMode getMode() {
-    updateTagLock.readLock().lock();
-    try {
-      return mode;
-    } finally {
-      updateTagLock.readLock().unlock();
-    }
-  }
-
-  @Override
-  public boolean isSimulated() {
-    updateTagLock.readLock().lock();
-    try {
-      return simulated;
-    } finally {
-      updateTagLock.readLock().unlock();
-    }
-  }
-
   @Override
   public boolean isValid() {
-    updateTagLock.readLock().lock();
-    try {
-      return tagQuality.isValid();
-    } finally {
-      updateTagLock.readLock().unlock();
-    }
-  }
-
-  @Override
-  public DataTagQuality getDataTagQuality() {
-    updateTagLock.readLock().lock();
-    try {
-      return tagQuality;
-    } finally {
-      updateTagLock.readLock().unlock();
-    }
-  }
-
-  @Override
-  public Object getValue() {
-    updateTagLock.readLock().lock();
-    try {
-      return tagValue;
-    } finally {
-      updateTagLock.readLock().unlock();
-    }
+      return dataTagQuality.isValid();
   }
 
   private String getLockedString(String str) {
@@ -320,14 +253,11 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
     return this.getLockedString(unit);
   }
 
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.Tag#getAlarms()
-   */
   @Override
   public final Collection<AlarmValue> getAlarms() {
     updateTagLock.readLock().lock();
     try {
-      return new ArrayList<AlarmValue>(alarms);
+      return new ArrayList<>(alarms);
     } finally {
       updateTagLock.readLock().unlock();
     }
@@ -363,9 +293,6 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
     return processSupervisionStatus.keySet();
   }
 
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.Tag#isRuleResult()
-   */
   @Override
   public boolean isRuleResult() {
     updateTagLock.readLock().lock();
@@ -376,9 +303,6 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
     }
   }
 
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.Tag#getRuleExpression()
-   */
   @Override
   public RuleExpression getRuleExpression() {
     updateTagLock.readLock().lock();
@@ -389,9 +313,6 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
     }
   }
 
-  /* (non-Javadoc)
-     * @see cern.c2mon.client.tag.Tag#getDescription()
-     */
   @Override
   public String getDescription() {
     updateTagLock.readLock().lock();
@@ -462,15 +383,6 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
     return TypeNumeric.TYPE_UNKNOWN;
   }
 
-  /**
-   * Returns the metadata to the corresponding tag.
-   *
-   * @return the metadata of the object.
-   */
-  public Map<String, Object> getMetadata() {
-    return this.metadata;
-  }
-
   @Override
   public final boolean isAliveTag() {
     return aliveTagFlag;
@@ -481,20 +393,12 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
     return controlTagFlag;
   }
 
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.Tag#getTopicName()
-   */
   @Override
   public String getTopicName() {
-    updateTagLock.readLock().lock();
-    try {
-      if (this.topicName != null) {
-        return this.topicName;
-      }
-      return "";
-    } finally {
-      updateTagLock.readLock().unlock();
+    if (this.topicName != null) {
+      return this.topicName;
     }
+    return "";
   }
 
   /**
@@ -562,8 +466,8 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
         clone.alarms.add(alarm.clone());
       }
 
-      if (tagQuality != null) {
-        clone.tagQuality = tagQuality.clone();
+      if (dataTagQuality != null) {
+        clone.dataTagQuality = dataTagQuality.clone();
       }
       if (sourceTimestamp != null) {
         clone.sourceTimestamp = (Timestamp) sourceTimestamp.clone();
@@ -582,8 +486,7 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
       return clone;
     }
     catch (CloneNotSupportedException cloneException) {
-      log.error(
-              "clone() - Cloning the TagImpl object failed! No update sent to the client.");
+      log.error("clone() - Cloning the TagImpl object failed! No update sent to the client.");
       throw new RuntimeException(cloneException);
     }
     finally {
@@ -591,17 +494,11 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
     }
   }
 
-  /* (non-Javadoc)
- * @see cern.c2mon.client.tag.Tag#hashCode()
- */
   @Override
   public int hashCode() {
     return this.id.hashCode();
   }
 
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.Tag#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object pRight) {
     if (pRight instanceof TagImpl) {

@@ -342,7 +342,7 @@ public class TagController implements TagUpdateListener, SupervisionListener {
         }
         tagImpl.setSubEquipmentSupervisionStatus(updatedSubEquipmentMap);
 
-        tagImpl.setTagName(tagUpdate.getName());
+        tagImpl.setName(tagUpdate.getName());
         tagImpl.setTopicName(tagUpdate.getTopicName());
         tagImpl.setUnit(tagUpdate.getUnit());
 
@@ -382,7 +382,7 @@ public class TagController implements TagUpdateListener, SupervisionListener {
     tagImpl.setServerTimestamp(tagValueUpdate.getServerTimestamp());
     tagImpl.setDaqTimestamp(tagValueUpdate.getDaqTimestamp());
     tagImpl.setSourceTimestamp(tagValueUpdate.getSourceTimestamp());
-    tagImpl.setTagValue(tagValueUpdate.getValue());
+    tagImpl.setValue(tagValueUpdate.getValue());
     try {
       tagImpl.setType(Class.forName(tagValueUpdate.getValueClassName()));
     }
@@ -694,7 +694,7 @@ public class TagController implements TagUpdateListener, SupervisionListener {
       tagImpl.setServerTimestamp(new Timestamp(0L));
       tagImpl.setDaqTimestamp(null);
       tagImpl.setSourceTimestamp(null);
-      tagImpl.setTagValue(null);
+      tagImpl.setValue(null);
       tagImpl.setType(null);
       for (Long id : tagImpl.getProcessSupervisionStatus().keySet()) {
         tagImpl.getProcessSupervisionStatus().put(id, null);
