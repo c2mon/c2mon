@@ -107,7 +107,7 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
   /**
    * The unique name of the tag
    */
-  private String tagName = null;
+  private String tagName = "UNKNOWN";
 
   /**
    * Only used for xml serialization.
@@ -242,12 +242,7 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
   public String getName() {
     updateTagLock.readLock().lock();
     try {
-      if (this.tagName == null) {
-        return "UNKNOWN";
-      }
-      else {
-        return tagName;
-      }
+        return this.tagName;
     } finally {
       updateTagLock.readLock().unlock();
     }
