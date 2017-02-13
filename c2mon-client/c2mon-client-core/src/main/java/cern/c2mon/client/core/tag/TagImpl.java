@@ -28,8 +28,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
 import cern.c2mon.client.common.tag.Tag;
@@ -59,32 +57,27 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
   /**
    * The value of the tag
    */
-  @Element(required = false)
   private Object tagValue;
 
   /**
    * The datatype of the tag value
    */
-  @Element(required = false)
   private Class<?> type;
 
   /**
    * The current tag mode
    */
-  @Element
   private TagMode mode = TagMode.TEST;
 
   /**
    * <code>true</code>, if the tag value is currently simulated and not
    * corresponding to a live event.
    */
-  @Element
   private boolean simulated = false;
 
   /**
    * Unique identifier for a DataTag
    */
-  @Attribute
   protected Long id;
 
   /**
@@ -114,19 +107,16 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
   /**
    * The unique name of the tag
    */
-  @Element(required = false)
   private String tagName = null;
 
   /**
    * Only used for xml serialization.
    */
-  @Element(required = false)
   private String ruleExpressionString;
 
   /**
    * The quality of the tag
    */
-  @Element(required = false)
   private DataTagQuality tagQuality =
           new DataTagQualityImpl(TagQualityStatus.UNINITIALISED, DEFAULT_DESCRIPTION);
 
@@ -145,49 +135,41 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
    * String representation of the JMS destination where the DataTag
    * is published on change.
    */
-  @Element(required = false)
   protected String topicName = null;
 
   /**
    * The alarm objects associated to this data tag
    */
-  @ElementList
   private ArrayList<AlarmValue> alarms = new ArrayList<>();
 
   /**
    * The source timestamp that indicates when the value change was generated
    */
-  @Element(required = false)
   private java.sql.Timestamp sourceTimestamp = null;
 
   /**
    * The DAQ timestamp that indicates when the change message passed the DAQ module
    */
-  @Element(required = false)
   private java.sql.Timestamp daqTimestamp = null;
 
   /**
    * The server timestamp that indicates when the change message passed the server
    */
-  @Element
   private java.sql.Timestamp serverTimestamp = new java.sql.Timestamp(0L);
 
   /**
    * Unit of the tag
    */
-  @Element(required = false)
   private String unit = null;
 
   /**
    * The description of the Tag
    */
-  @Element(required = false)
   private String description = "";
 
   /**
    * The description of the value
    */
-  @Element(required = false)
   private String valueDescription = "";
 
   /**
