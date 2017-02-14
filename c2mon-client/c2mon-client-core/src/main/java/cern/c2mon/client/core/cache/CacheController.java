@@ -30,7 +30,7 @@ import cern.c2mon.client.core.tag.TagController;
  *
  * @author Matthias Braeger
  */
-interface CacheController {
+public interface CacheController {
   
   /**
    * @return The current active cache reference, which is either the 

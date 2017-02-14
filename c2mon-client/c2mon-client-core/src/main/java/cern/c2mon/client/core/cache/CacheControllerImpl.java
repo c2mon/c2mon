@@ -24,18 +24,16 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.BaseTagListener;
 import cern.c2mon.client.core.tag.TagController;
 
+@Slf4j
 @Service
 class CacheControllerImpl implements CacheController {
-  /** Logger instance */
-  private static final Logger LOG = LoggerFactory.getLogger(CacheControllerImpl.class);
-  
+
   /**
    * Pointer to the actual used cache instance (live or history)
    */
@@ -100,7 +98,7 @@ class CacheControllerImpl implements CacheController {
   public void setHistoryMode(final boolean enable) {
     synchronized (historyModeLock) {
       if (historyMode == enable) {
-        LOG.info("setHistoryMode() - The cache is already in history mode.");
+        log.info("setHistoryMode() - The cache is already in history mode.");
         return;
       }
       
