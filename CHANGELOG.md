@@ -12,6 +12,7 @@ For more details on a given release, please check also the [Milestone planning](
 ### Changed
 
 ### Fixed
+- Elasticsearch module: Exception is now caught in case of an error during the tag conversion for ES (#128)
 
 
 ## [1.8.8] - 2017-01-31
