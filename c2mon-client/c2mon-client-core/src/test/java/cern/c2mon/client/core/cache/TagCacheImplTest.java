@@ -39,12 +39,10 @@ import cern.c2mon.client.core.config.C2monAutoConfiguration;
 import cern.c2mon.client.core.config.mock.CoreSupervisionServiceMock;
 import cern.c2mon.client.core.config.mock.JmsProxyMock;
 import cern.c2mon.client.core.config.mock.RequestHandlerMock;
-
-
-import cern.c2mon.client.core.jms.JmsProxy;
 import cern.c2mon.client.core.jms.RequestHandler;
-import cern.c2mon.client.core.tag.TagController;
+import cern.c2mon.client.core.jms.impl.JmsProxy;
 import cern.c2mon.client.core.service.CoreSupervisionService;
+import cern.c2mon.client.core.tag.TagController;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;

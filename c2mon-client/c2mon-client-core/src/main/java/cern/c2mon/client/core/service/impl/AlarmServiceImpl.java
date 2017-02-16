@@ -24,16 +24,16 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.jms.JMSException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.core.jms.AlarmListener;
-import cern.c2mon.client.core.jms.JmsProxy;
 import cern.c2mon.client.core.jms.RequestHandler;
+import cern.c2mon.client.core.jms.impl.JmsProxy;
 import cern.c2mon.client.core.service.AlarmService;
 import cern.c2mon.shared.client.alarm.AlarmValue;
-import lombok.extern.slf4j.Slf4j;
 
 @Service("alarmService")
 @Slf4j

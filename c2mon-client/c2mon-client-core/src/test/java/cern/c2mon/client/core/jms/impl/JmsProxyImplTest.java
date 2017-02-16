@@ -16,22 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.client.core.jms.impl;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
-import javax.jms.ExceptionListener;
-import javax.jms.JMSException;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.Session;
+import javax.jms.*;
 
-import cern.c2mon.client.core.config.C2monClientProperties;
-import cern.c2mon.client.core.jms.JmsProxy;
-import cern.c2mon.client.core.jms.TopicRegistrationDetails;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
+import cern.c2mon.client.core.config.C2monClientProperties;
+import cern.c2mon.client.core.jms.TopicRegistrationDetails;
 import cern.c2mon.client.core.listener.TagUpdateListener;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
@@ -63,7 +55,7 @@ public class JmsProxyImplTest {
     connection = EasyMock.createNiceMock(Connection.class);
     session = EasyMock.createNiceMock(Session.class);
     SlowConsumerListener slowConsumerListener = EasyMock.createNiceMock(SlowConsumerListener.class);
-    jmsProxy = new JmsProxyImpl(connectionFactory, slowConsumerListener, new C2monClientProperties());
+    jmsProxy = new JmsProxy(connectionFactory, slowConsumerListener, new C2monClientProperties());
   }
   
   /**
@@ -164,7 +156,7 @@ public class JmsProxyImplTest {
     EasyMock.replay(connection);
     EasyMock.replay(session);
     EasyMock.replay(messageConsumer);
-    ((JmsProxyImpl) jmsProxy).init();
+    jmsProxy.init();
     Thread.sleep(2000); //leave time for connection thread to run (and set connected flag to true)
     jmsProxy.sendRequest(null, "test.queue", 1000);
     EasyMock.verify(connectionFactory);
@@ -197,7 +189,7 @@ public class JmsProxyImplTest {
     EasyMock.replay(connection);
     EasyMock.replay(session);
     EasyMock.replay(messageConsumer);
-    ((JmsProxyImpl) jmsProxy).init();
+    jmsProxy.init();
     Thread.sleep(2000); //leave time for connection thread to run (and set connected flag to true)
     jmsProxy.sendRequest(jsonRequest, null, 1000);
     EasyMock.verify(connectionFactory);

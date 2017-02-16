@@ -23,10 +23,10 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.jms.*;
 
-import cern.c2mon.client.core.config.C2monAutoConfiguration;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.easymock.EasyMock;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
@@ -36,9 +36,11 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
-import cern.c2mon.client.core.listener.TagUpdateListener;
+import cern.c2mon.client.core.config.C2monAutoConfiguration;
 import cern.c2mon.client.core.config.C2monClientProperties;
 import cern.c2mon.client.core.config.mock.MockServerConfig;
+import cern.c2mon.client.core.jms.impl.JmsProxy;
+import cern.c2mon.client.core.listener.TagUpdateListener;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.request.*;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;

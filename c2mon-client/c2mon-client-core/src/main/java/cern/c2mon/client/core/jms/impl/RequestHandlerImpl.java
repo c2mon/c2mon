@@ -19,17 +19,10 @@ package cern.c2mon.client.core.jms.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import javax.jms.JMSException;
 
-import cern.c2mon.client.core.config.C2monClientProperties;
-import cern.c2mon.client.core.jms.JmsProxy;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
+import cern.c2mon.client.core.config.C2monClientProperties;
 import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.command.CommandExecuteRequest;

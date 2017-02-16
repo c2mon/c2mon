@@ -23,9 +23,6 @@ import java.util.Collections;
 
 import javax.jms.JMSException;
 
-import cern.c2mon.client.core.config.C2monClientProperties;
-import cern.c2mon.shared.client.request.ClientRequestResult;
-import cern.c2mon.shared.client.tag.TagConfigImpl;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.math.LongRange;
 import org.easymock.EasyMock;
@@ -34,19 +31,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
-import cern.c2mon.client.core.jms.JmsProxy;
+import cern.c2mon.client.core.config.C2monClientProperties;
+import cern.c2mon.shared.client.command.*;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
+import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
-import cern.c2mon.shared.client.command.CommandExecuteRequest;
-import cern.c2mon.shared.client.command.CommandExecuteRequestImpl;
-import cern.c2mon.shared.client.command.CommandExecutionStatus;
-import cern.c2mon.shared.client.command.CommandReport;
-import cern.c2mon.shared.client.command.CommandReportImpl;
-import cern.c2mon.shared.client.command.CommandTagHandleImpl;
-import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.tag.TagConfigImpl;
 
 /**
  * Unit test of the RequestHandler implementation.

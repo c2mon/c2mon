@@ -17,20 +17,12 @@
 package cern.c2mon.client.core.manager;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
 import javax.jms.JMSException;
 
-import cern.c2mon.client.core.config.C2monAutoConfiguration;
-import cern.c2mon.client.core.config.mock.CoreSupervisionServiceMock;
-import cern.c2mon.client.core.config.mock.JmsProxyMock;
-import cern.c2mon.client.core.config.mock.RequestHandlerMock;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
@@ -45,8 +37,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import cern.c2mon.client.common.listener.BaseTagListener;
 import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.common.tag.Tag;
-import cern.c2mon.client.core.jms.JmsProxy;
+import cern.c2mon.client.core.config.C2monAutoConfiguration;
+import cern.c2mon.client.core.config.mock.CoreSupervisionServiceMock;
+import cern.c2mon.client.core.config.mock.JmsProxyMock;
+import cern.c2mon.client.core.config.mock.RequestHandlerMock;
 import cern.c2mon.client.core.jms.RequestHandler;
+import cern.c2mon.client.core.jms.impl.JmsProxy;
 import cern.c2mon.client.core.service.TagService;
 import cern.c2mon.client.core.tag.TagController;
 import cern.c2mon.shared.client.tag.TagMode;

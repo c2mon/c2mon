@@ -30,8 +30,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.client.core.jms.impl.JmsProxy;
 import cern.c2mon.client.core.listener.HeartbeatListener;
-import cern.c2mon.client.core.jms.JmsProxy;
 import cern.c2mon.shared.client.supervision.Heartbeat;
 
 /**
