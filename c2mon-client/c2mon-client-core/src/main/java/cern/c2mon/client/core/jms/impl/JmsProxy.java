@@ -118,7 +118,7 @@ import cern.c2mon.shared.client.request.JsonRequest;
 @Slf4j
 @Component("jmsProxy")
 @ManagedResource(objectName = "cern.c2mon:type=JMS,name=JmsProxy")
-public final class JmsProxy implements ExceptionListener {
+public class JmsProxy implements ExceptionListener {
 
   /**
    * Time between reconnection attempts if the first attempt fails (in
