@@ -10,6 +10,7 @@ temp.json
 .settings/
 .classpath
 .project
+.factorypath
 
 # Package Files
 *.jar
