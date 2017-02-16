@@ -66,8 +66,36 @@ import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
 
 /**
- * Implementation of the JmsProxy singleton bean. Also see the interface for
- * documentation.
+ * <p>There are a number of restrictions on how listeners are registered.
+ * In particular, there is a 1-1 correspondence between updated ClientDataTags
+ * and ServerUpdateListeners (in the current implementation, ClientDataTags are
+ * in fact the ServerUpdateListeners).
+ *
+ * <ul>
+ * <li>a ServerUpdateListener object can only register to receive updates
+ * for a single Tag; if an attempt is made to register it to another one
+ * without first unregistering, the new registration will be ignored
+ * <li>only one ServerUpdateListener can be registered for updates to
+ * destined for a given ClientDataTag; any new registration will result
+ * in the old one being overwritten
+ * </ul>
+ *
+ * <p>The JmsProxy will take care of reestablishing the connection
+ * and subscriptions after any JMS connection problems. JmsExceptions
+ * will still be thrown by the callers so that other actions can be
+ * taken such as invalidating Tags. Once the connection is reestablished,
+ * the registered {@link ConnectionListener}s will be passed
+ * a list of Tags for which a listener is registered, so that a refresh
+ * of the data can be requested. ConnectionListeners are also notified
+ * when the connection is lost.
+ *
+ * <p>The implementation is thread safe, meaning the singleton
+ * should behave correctly without any external synchronization.
+ *
+ * <p>In general, null parameters are not accepted by the methods
+ * and IllegalArgumentExceptions/NullPointerExceptions will be thrown
+ * if a null is passed.
+ *
  * <p>
  * A new session (thread) is created for every Topic subscription. For this
  * reason, the number of different topics across all Tags should be kept to a
@@ -90,7 +118,7 @@ import cern.c2mon.shared.client.request.JsonRequest;
 @Slf4j
 @Component("jmsProxy")
 @ManagedResource(objectName = "cern.c2mon:type=JMS,name=JmsProxy")
-public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
+public final class JmsProxy implements ExceptionListener {
 
   /**
    * Time between reconnection attempts if the first attempt fails (in
@@ -252,7 +280,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   private ExecutorService topicPollingExecutor;
 
   @Autowired
-  public JmsProxyImpl(@Qualifier("clientJmsConnectionFactory") final ConnectionFactory connectionFactory,
+  public JmsProxy(@Qualifier("clientJmsConnectionFactory") final ConnectionFactory connectionFactory,
                       final SlowConsumerListener slowConsumerListener,
                       final C2monClientProperties properties) {
     this.jmsConnectionFactory = connectionFactory;
@@ -532,7 +560,18 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     consumer.setMessageListener(supervisionListenerWrapper);
   }
 
-  @Override
+  /**
+   * Determines if the passed listener is currently registered
+   * (including those awaiting initial subscription if the connection
+   * is down).
+   *
+   * <p>Notice there is not guarantee that the listener will still be registered once
+   * this method returns if the API is being called on multiple threads!
+   *
+   * @param serverUpdateListener the listener to check
+   * @return true if registered
+   * @throws NullPointerException if argument is null
+   */
   public boolean isRegisteredListener(final TagUpdateListener serverUpdateListener) {
     if (serverUpdateListener == null) {
       throw new NullPointerException("isRegisteredListener() method called with null parameter!");
@@ -540,7 +579,23 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     return registeredListeners.containsKey(serverUpdateListener);
   }
 
-  @Override
+  /**
+   * Register the listener to received update notifications destined for the
+   * specified ClientDataTag. This method will in fact "register if not
+   * already registered with some Tag", so can safely be called to
+   * confirm registration.
+   *
+   * <p>Returns even if JMS connection is down; subscriptions will be
+   * done automatically on reconnection.
+   *
+   * @param serverUpdateListener the listener that will be called on update
+   * @param topicRegistrationDetails the details need to register to updates
+   *                                  for a given Tag
+   * @throws JMSException if there is a JMS failure in subscribing; the JmsProxy will
+   *                  subscribe this listener automatically once the connection is back,
+   *                  but the caller may wish to invalidate the Tag in the meantime
+   * @throws NullPointerException if either argument is null
+   */
   public void registerUpdateListener(final TagUpdateListener serverUpdateListener, final TopicRegistrationDetails topicRegistrationDetails) throws JMSException {
     if (topicRegistrationDetails == null) {
       throw new NullPointerException("Trying to register a TagUpdateListener with null RegistrationDetails!");
@@ -602,7 +657,16 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     }
   }
 
-  @Override
+  /**
+   * Replace the current registered listener with another one.
+   *
+   * <p>If the first listener passed is not currently registered, the call
+   * will have no effect.
+   *
+   * @param registeredListener the current registered listener
+   * @param replacementListener the new listener to register
+   * @throws NullPointerException if either argument is null
+   */
   public void replaceListener(final TagUpdateListener registeredListener, final TagUpdateListener replacementListener) {
     if (registeredListener == null && replacementListener == null) {
       throw new NullPointerException("replaceListener(..) method called with null argument");
@@ -622,7 +686,16 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     }
   }
 
-  @Override
+  /**
+   * Sends a message to the given topic.
+   *
+   * @param message the message to send
+   * @param queueName the name of the queue on which to send this request
+   * @param timeToLive how long the message will live on the broker !!This now overridden with default 10 minutes!!
+   * @throws JMSException if not currently connected or
+   *                      if a JMS problem occurs while making the request (reconnection is handled by the JmsProxy)
+   * @throws NullPointerException thrown if either argument is null
+   */
   public void publish(final String message, final String topicName, final long timeToLive) throws JMSException {
     if (topicName == null) {
       throw new NullPointerException("publish(..) method called with null queue name argument");
@@ -647,7 +720,24 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     }
   }
 
-  @Override
+  /**
+   * Send a request to the server and wait "timeout" milliseconds for a response.
+   *
+   * <p>Never returns null.
+   *
+   * @param jsonRequest the request object, convertible to Json format
+   * @param queueName the name of the queue on which to send this request
+   * @param timeout the time to wait for a response (in milliseconds);
+   *                            if no response arrives in this time, a NullPointerException is thrown
+   * @param reportListener Receives updates for <code>ClientRequestProgressReport</code> and <code>ClientRequestErrorReport</code>
+   * @param <T> the type of the response expected (inside the collection)
+   *
+   * @return the response to the request (never null)
+   * @throws JMSException if not currently connected or
+   *                      if a JMS problem occurs while making the request (reconnection is handled by the JmsProxy)
+   * @throws RuntimeException if the response from the server is null (probable timeout)
+   * @throws NullPointerException thrown if either argument is null
+   */
   public <T extends ClientRequestResult> Collection<T> sendRequest(
       final JsonRequest<T> jsonRequest, final String queueName, final int timeout,
       final ClientRequestReportListener reportListener) throws JMSException {
@@ -725,10 +815,24 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   }
 
   /**
+   * Send a request to the server and wait "timeout" milliseconds for a response.
+   *
+   * <p>Never returns null.
+   *
+   * @param jsonRequest the request object, convertible to Json format
+   * @param queueName the name of the queue on which to send this request
+   * @param timeout the time to wait for a response (in milliseconds);
+   *                            if no response arrives in this time, a NullPointerException is thrown
+   * @param <T> the type of the response expected (inside the collection)
+   *
+   * @return the response to the request (never null)
+   * @throws JMSException if not currently connected or
+   *                      if a JMS problem occurs while making the request (reconnection is handled by the JmsProxy)
+   * @throws RuntimeException if the response from the server is null (probable timeout)
+   * @throws NullPointerException thrown if either argument is null
    * ActiveMQ-specific implementation since need to create topic.
    * @return a Collection of ClientRequestResults
    */
-  @Override
   public <T extends ClientRequestResult> Collection<T> sendRequest(
       final JsonRequest<T> jsonRequest, final String queueName, final int timeout)
       throws JMSException {
@@ -804,7 +908,15 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     return clientRequestReport.isResult();
   }
 
-  @Override
+  /**
+   * Unregisters a listener from receiving updates destined for the specified
+   * ClientDataTag. This method will in fact "unregister if currently registered"
+   * so can safely be called without a call to the isRegistered method.
+   *
+   * @param serverUpdateListener the listener to unregister
+   * @throws NullPointerException if argument is null
+   * @throws IllegalStateException if trying to unregister an unrecognized ServerUpdateListener
+   */
   public void unregisterUpdateListener(final TagUpdateListener serverUpdateListener) {
     refreshLock.readLock().lock();
     try {
@@ -838,7 +950,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     }
   }
 
-  @Override
+  /**
+   * Register a listener for connection/disconnection events.
+   *
+   * @param connectionListener the listener to register
+   * @throws NullPointerException if argument is null
+   */
   public void registerConnectionListener(final ConnectionListener connectionListener) {
     if (connectionListener == null) {
       throw new NullPointerException("registerConnectionListener(..) method called with null listener argument");
@@ -871,7 +988,13 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     startReconnectThread();
   }
 
-  @Override
+  /**
+   * Register a listener to be notified of supervision events received
+   * from the server.
+   *
+   * @param supervisionListener the listener to register
+   * @throws NullPointerException if argument is null
+   */
   public void registerSupervisionListener(final SupervisionListener supervisionListener) {
     if (supervisionListener == null) {
       throw new NullPointerException("Trying to register null Supervision listener with JmsProxy.");
@@ -881,7 +1004,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     supervisionListenerWrapper.addListener(supervisionListener);
   }
 
-  @Override
+  /**
+   * Unregister the listener from receiving supervision updates.
+   *
+   * @param supervisionListener the listener to remove
+   * @throws NullPointerException if argument is null
+   */
   public void unregisterSupervisionListener(final SupervisionListener supervisionListener) {
     if (supervisionListener == null) {
       throw new NullPointerException("Trying to unregister null Supervision listener from JmsProxy.");
@@ -889,7 +1017,14 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     supervisionListenerWrapper.removeListener(supervisionListener);
   }
 
-  @Override
+  /**
+   * Register a listener to be notified of BroadcastMessage events received
+   * from the server.
+   *
+   * @param broadcastMessageListener the listener to register
+   * @throws NullPointerException if argument is null
+   * @throws IllegalStateException if
+   */
   public void registerBroadcastMessageListener(final BroadcastMessageListener broadcastMessageListener) {
     if (broadcastMessageListener == null) {
       throw new NullPointerException("Trying to register null BroadcastMessage listener with JmsProxy.");
@@ -900,7 +1035,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     broadcastMessageListenerWrapper.addListener(broadcastMessageListener);
   }
 
-  @Override
+  /**
+   * Unregister the listener from receiving BroadcastMessage updates.
+   *
+   * @param broadcastMessageListener the listener to remove
+   * @throws NullPointerException if argument is null
+   */
   public void unregisterBroadcastMessageListener(final BroadcastMessageListener broadcastMessageListener) {
     if (broadcastMessageListener == null) {
       throw new NullPointerException("Trying to unregister null BroadcastMessage listener from JmsProxy.");
@@ -908,7 +1048,13 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     broadcastMessageListenerWrapper.removeListener(broadcastMessageListener);
   }
 
-  @Override
+  /**
+   * Register a listener to be notified of alarm messages received
+   * from the server.
+   *
+   * @param alarmListener the listener to register
+   * @throws JMSException
+   */
   public void registerAlarmListener(final AlarmListener alarmListener) throws JMSException {
     if (alarmListener == null) {
       throw new NullPointerException("Trying to register null alarm listener with JmsProxy.");
@@ -929,7 +1075,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     alarmListenerWrapper.addListener(alarmListener);
   }
 
-  @Override
+  /**
+   * Unregister the listener from receiving alarm updates.
+   *
+   * @param alarmListener the listener to remove
+   * @throws JMSException
+   */
   public void unregisterAlarmListener(final AlarmListener alarmListener) throws JMSException {
     if (alarmListener == null) {
       throw new NullPointerException("Trying to unregister null alarm listener from JmsProxy.");
@@ -949,7 +1100,13 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     alarmListenerWrapper.removeListener(alarmListener);
   }
 
-  @Override
+  /**
+   * Register a listener to be notified of heartbeat events incoming
+   * from the server.
+   *
+   * @param heartbeatListener the listener to register
+   * @throws NullPointerException if argument is null
+   */
   public void registerHeartbeatListener(final HeartbeatListener heartbeatListener) {
     if (heartbeatListener == null) {
       throw new NullPointerException("Trying to register null Heartbeat listener with JmsProxy.");
@@ -959,7 +1116,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     heartbeatListenerWrapper.addListener(heartbeatListener);
   }
 
-  @Override
+  /**
+   * Unregister the listener from receiving heartbeat updates.
+   *
+   * @param supervisionListener the listener to remove
+   * @throws NullPointerException if argument is null
+   */
   public void unregisterHeartbeatListener(final HeartbeatListener heartbeatListener) {
     if (heartbeatListener == null) {
       throw new NullPointerException("Trying to unregister null Heartbeat listener from JmsProxy.");
@@ -967,7 +1129,13 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     heartbeatListenerWrapper.removeListener(heartbeatListener);
   }
 
-  @Override
+  /**
+   * Sets the admin message topic on which admin messages will be received.
+   * This method can only be called once!
+   *
+   * @param adminMessageTopic the adminMessageTopic to set
+   * @throws IllegalStateException if trying to set the admin message topic a second time
+   */
   public void setBroadcastMessageTopic(final Destination adminMessageTopic) {
     if (this.adminMessageTopic != null) {
       throw new IllegalStateException("Cannot set the admin message topic more than one time");
