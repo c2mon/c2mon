@@ -16,11 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.tag;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -33,12 +29,12 @@ import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
-import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.common.type.TypeConverter;
 
 /**
@@ -66,46 +62,55 @@ public class TagDocumentConverter implements Converter<Tag, TagDocument> {
 
   @Override
   public TagDocument convert(final Tag tag) {
-    Map<String, Object> map = new HashMap<>();
+    TagDocument tagDocument = null;
 
-    map.put("id", tag.getId());
-    map.put("name", tag.getName());
-    map.put("description", tag.getDescription());
-    map.put("metadata", getMetadata(tag));
-    map.put("unit", tag.getUnit());
-    map.put("mode", tag.getMode());
-    map.put("c2mon", getC2monMetadata(tag));
+    try {
+      Map<String, Object> map = new HashMap<>();
 
-    map.put("timestamp", tag.getTimestamp().getTime());
-    map.put("quality", getQuality(tag));
-    map.put("valueDescription", tag.getValueDescription());
+      map.put("id", tag.getId());
+      map.put("name", tag.getName());
+      map.put("description", tag.getDescription());
+      map.put("metadata", getMetadata(tag));
+      map.put("unit", tag.getUnit());
+      map.put("mode", tag.getMode());
+      map.put("c2mon", getC2monMetadata(tag));
 
-    Class<?> clazz = TypeConverter.getType(tag.getDataType());
+      map.put("timestamp", tag.getTimestamp().getTime());
+      map.put("quality", getQuality(tag));
+      map.put("valueDescription", tag.getValueDescription());
 
-    if (clazz == null) {
-      map.put("valueObject", tag.getValue());
+      Class<?> clazz = TypeConverter.getType(tag.getDataType());
 
-    } else if (Number.class.isAssignableFrom(clazz)) {
-      map.put("value", tag.getValue());
+      if (clazz == null) {
+        map.put("valueObject", tag.getValue());
 
-      if (Long.class.isAssignableFrom(clazz)) {
-        map.put("valueLong", tag.getValue());
+      } else if (Number.class.isAssignableFrom(clazz)) {
+        map.put("value", tag.getValue());
+
+        if (Long.class.isAssignableFrom(clazz)) {
+          map.put("valueLong", tag.getValue());
+        }
+      } else if (Boolean.class.isAssignableFrom(clazz)) {
+        map.put("valueBoolean", tag.getValue());
+
+        if (tag.getValue() != null) {
+          map.put("value", tag.getValue() != null ? 1 : 0);
+        }
+      } else if (String.class.isAssignableFrom(clazz)) {
+        map.put("valueString", tag.getValue());
+
+      } else {
+        map.put("valueObject", tag.getValue());
       }
-    } else if (Boolean.class.isAssignableFrom(clazz)) {
-      map.put("valueBoolean", tag.getValue());
 
-      if (tag.getValue() != null) {
-        map.put("value", tag.getValue() != null ? 1 : 0);
-      }
-    } else if (String.class.isAssignableFrom(clazz)) {
-      map.put("valueString", tag.getValue());
+      tagDocument = new TagDocument();
+      tagDocument.putAll(map);
 
-    } else {
-      map.put("valueObject", tag.getValue());
+
+    } catch (Exception e) {
+      log.error("Error occured during conversion of Tag #{} ({}) to Elasticsearch document. Unable to store update to Elasticsearch!", tag.getId(), tag.getName(), e);
     }
 
-    TagDocument tagDocument = new TagDocument();
-    tagDocument.putAll(map);
     return tagDocument;
   }
 
