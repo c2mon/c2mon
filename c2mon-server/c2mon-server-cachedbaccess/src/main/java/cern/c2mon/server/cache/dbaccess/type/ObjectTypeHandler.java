@@ -23,15 +23,10 @@ import java.sql.SQLException;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
 import org.apache.ibatis.type.TypeHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import cern.c2mon.shared.common.type.TypeConverter;
 
 import static cern.c2mon.shared.common.type.TypeConverter.cast;
 import static cern.c2mon.shared.common.type.TypeConverter.isKnownClass;
@@ -126,11 +121,15 @@ public class ObjectTypeHandler implements TypeHandler {
   @Override
   public void setParameter(PreparedStatement ps, int parameterIndex, Object parameter, JdbcType arg3) throws SQLException {
     try {
-      if (parameter != null) {
+      if (parameter == null) {
+        ps.setString(parameterIndex, null);
+      }
+      else if (parameter instanceof String) {
+        ps.setString(parameterIndex, (String) parameter);
+      }
+      else {
         // Because the value is stored as VARCHAR in the db it has to be transformed to a JSON string
         ps.setString(parameterIndex, mapper.writeValueAsString(parameter));
-      } else {
-        ps.setString(parameterIndex, null);
       }
     } catch (Exception ex) {
       log.error("Error setting a prepared statement parameter from a tag value", ex);
