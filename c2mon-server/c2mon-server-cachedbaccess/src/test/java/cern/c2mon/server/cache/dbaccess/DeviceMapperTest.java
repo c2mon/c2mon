@@ -16,17 +16,18 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import cern.c2mon.server.common.device.Device;
-import cern.c2mon.server.common.device.DeviceCacheObject;
-import cern.c2mon.shared.client.device.DeviceCommand;
-import cern.c2mon.shared.client.device.DeviceProperty;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import cern.c2mon.server.common.device.Device;
+import cern.c2mon.server.common.device.DeviceCacheObject;
+import cern.c2mon.shared.client.device.DeviceCommand;
+import cern.c2mon.shared.client.device.DeviceProperty;
 
 import static cern.c2mon.server.test.device.ObjectComparison.assertDeviceCommandEquals;
 import static cern.c2mon.server.test.device.ObjectComparison.assertDevicePropertyListContains;
@@ -74,7 +75,7 @@ public class DeviceMapperTest extends AbstractMapperTest {
     expectedFields.add(new DeviceProperty(3L, "FIELD_SOME_CALCULATIONS", "(#123 + #234) / 2", "clientRule", "Float"));
     expectedFields.add(new DeviceProperty(4L, "FIELD_NUM_CORES", "2", "constantValue", "Integer"));
 
-    DeviceProperty expectedMappedProperty = new DeviceProperty(9L, "mappedProperty", "TEST_PROPERTY_WITH_FIELDS", expectedFields);
+    DeviceProperty expectedMappedProperty = new DeviceProperty(9L, "TEST_PROPERTY_WITH_FIELDS", "mappedProperty", expectedFields);
     assertDevicePropertyListContains(deviceProperties, expectedMappedProperty);
 
     deviceCommands = device2.getDeviceCommands();
@@ -113,12 +114,10 @@ public class DeviceMapperTest extends AbstractMapperTest {
     device.setDeviceCommands(new ArrayList<>(Arrays.asList(dvc1)));
 
     deviceMapper.insertDevice(device);
-    for (DeviceProperty property : ((DeviceCacheObject) device).getDeviceProperties()) {
+    for (DeviceProperty property : device.getDeviceProperties()) {
       deviceMapper.insertDeviceProperty(device.getId(), property);
-
-
     }
-    for (DeviceCommand command : ((DeviceCacheObject) device).getDeviceCommands()) {
+    for (DeviceCommand command : device.getDeviceCommands()) {
       deviceMapper.insertDeviceCommand(device.getId(), command);
     }
 
@@ -134,7 +133,7 @@ public class DeviceMapperTest extends AbstractMapperTest {
 
       if (property.getFields() != null && !property.getFields().isEmpty()) {
         for (DeviceProperty field : property.getFields().values()) {
-          assertDevicePropertyListContains(new ArrayList<DeviceProperty>(property.getFields().values()), field);
+          assertDevicePropertyListContains(new ArrayList<>(property.getFields().values()), field);
         }
       }
     }
