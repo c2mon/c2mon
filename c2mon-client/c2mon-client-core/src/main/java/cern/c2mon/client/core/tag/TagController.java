@@ -36,6 +36,7 @@ import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.rule.RuleExpression;
 import cern.c2mon.shared.rule.RuleFormatException;
 
@@ -383,12 +384,7 @@ public class TagController implements TagUpdateListener, SupervisionListener {
     tagImpl.setDaqTimestamp(tagValueUpdate.getDaqTimestamp());
     tagImpl.setSourceTimestamp(tagValueUpdate.getSourceTimestamp());
     tagImpl.setTagValue(tagValueUpdate.getValue());
-    try {
-      tagImpl.setType(Class.forName(tagValueUpdate.getValueClassName()));
-    }
-    catch (ClassNotFoundException e) {
-      log.error("Error instantiating tag value type {}", tagValueUpdate.getValueClassName(), e);
-    }
+    tagImpl.setType(TypeConverter.getType(tagValueUpdate.getValueClassName()));
     tagImpl.setMode(tagValueUpdate.getMode());
     tagImpl.setSimulated(tagValueUpdate.isSimulated());
   }
