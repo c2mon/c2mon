@@ -48,7 +48,7 @@ public class ObjectComparison {
 
   public static void assertDevicePropertyListContains(List<DeviceProperty> deviceProperties, DeviceProperty expectedObject) throws ClassNotFoundException {
     for (DeviceProperty deviceProperty : deviceProperties) {
-      if (deviceProperty.getName().equals(expectedObject.getName())) {
+      if (deviceProperty.getId().equals(expectedObject.getId())) {
         assertDevicePropertyEquals(expectedObject, deviceProperty);
       }
     }
