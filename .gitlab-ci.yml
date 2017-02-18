@@ -26,3 +26,12 @@ deploy_docs:
     - scp -o 'StrictHostKeyChecking no' -B -r docs/target/* ${KRB_USERNAME}@lxplus:/afs/cern.ch/user/c/${KRB_USERNAME}/www/c2mon.web.cern.ch/docs
   only:
     - master
+
+# CERN-specific triggers.
+trigger:
+  type: deploy
+  script:
+    # Trigger build of tim-server
+    - "curl -X POST -F token=$TIM_SERVER_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9859/trigger/builds"
+  only:
+    - master
