@@ -66,7 +66,19 @@ public class ObjectTypeHandler implements TypeHandler {
         tagDataType = getDataType(rs, columnName);
 
         valueAsString = rs.getString(columnName);
-        result = mapper.readValue(valueAsString, Object.class);
+        if (tagDataType.endsWith("String")) {
+          if (valueAsString.startsWith("\"")) {
+            // Remove of double quotes required to recover from bug in v1.8.8
+            // TODO: Could be removed in a later version
+            result = valueAsString.replace("\"", "");
+          }
+          else {
+            result = valueAsString;
+          }
+        }
+        else {
+          result = mapper.readValue(valueAsString, Object.class);
+        }
 
         // check if the object is NOT an arbitrary object - if so make a cast to the original type
         if (isKnownClass(tagDataType)) {
