@@ -18,8 +18,7 @@ package cern.c2mon.server.daq.out;
 
 import java.util.Collection;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.DataTagFacade;
 import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
@@ -38,47 +36,24 @@ import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service
 @ManagedResource(objectName="cern.c2mon:name=dataRefreshManager")
 public class DataRefreshManagerImpl implements DataRefreshManager {
 
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(DataRefreshManagerImpl.class);
+  /** For updating the cache */
+  private final DataTagFacade dataTagFacade;
 
-  /**
-   * For locating tags in caches.
-   */
-  private TagLocationService tagLocationService;
+  /** For getting the latest value from the DAQ layer */
+  private final ProcessCommunicationManager processCommunicationManager;
 
-  /**
-   * For updating the cache.
-   */
-  private DataTagFacade dataTagFacade;
+  /** For refreshing all tags. */
+  private final ProcessCache processCache;
 
-  /**
-   * For getting the latest value from the DAQ layer.
-   */
-  private ProcessCommunicationManager processCommunicationManager;
-
-  /**
-   * For refreshing all tags.
-   */
-  private ProcessCache processCache;
-
-  /**
-   * Autowired constructor.
-   * @param tagLocationService Tag location service
-   * @param dataTagFacade Tag facade
-   * @param processCommunicationManager DAQ communication manager
-   * @param processCache the Process cache
-   */
   @Autowired
-  public DataRefreshManagerImpl(final TagLocationService tagLocationService, final DataTagFacade dataTagFacade,
-                                final ProcessCommunicationManager processCommunicationManager, final ProcessCache processCache) {
+  public DataRefreshManagerImpl(DataTagFacade dataTagFacade, ProcessCommunicationManager processCommunicationManager,
+      ProcessCache processCache) {
     super();
-    this.tagLocationService = tagLocationService;
     this.dataTagFacade = dataTagFacade;
     this.processCommunicationManager = processCommunicationManager;
     this.processCache = processCache;
@@ -92,13 +67,18 @@ public class DataRefreshManagerImpl implements DataRefreshManager {
     updateCache(latestValues);
   }
 
+  @ManagedOperation(description="Refresh values for a given DAQ from the DAQ cache; provide DAQ name.")
+  public void refreshValuesForProcess(final String name) {
+    refreshValuesForProcess(processCache.getProcessId(name));
+  }
+
   @Override
   public void refreshTagsForAllProcess() {
     for (Long key : processCache.getKeys()) {
       try {
         refreshValuesForProcess(key);
       } catch (Exception e) {
-        LOGGER.error("Exception caught while refreshing values for process " + key, e);
+        log.error("Exception caught while refreshing values for process {} (#{})", processCache.get(key).getName(), key, e);
       }
     }
   }
@@ -113,7 +93,7 @@ public class DataRefreshManagerImpl implements DataRefreshManager {
       try {
         dataTagFacade.updateFromSource(value.getId(), value);
       } catch (Exception e) {
-        LOGGER.error("Exception caught while refreshing a Tag with the latest DAQ cache value (id=" + value.getId() + ")", e);
+        log.error("Exception caught while refreshing a Tag with the latest DAQ cache value (id=" + value.getId() + ")", e);
       }
     }
   }
