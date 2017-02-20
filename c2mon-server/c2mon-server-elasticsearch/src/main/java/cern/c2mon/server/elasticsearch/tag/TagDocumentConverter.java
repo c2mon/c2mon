@@ -120,18 +120,30 @@ public class TagDocumentConverter implements Converter<Tag, TagDocument> {
     map.put("dataType", tag.getDataType());
 
     if (!tag.getProcessIds().isEmpty()) {
-      Process process = processCache.get(tag.getProcessIds().iterator().next());
-      map.put("process", process.getName());
+      try {
+        Process process = processCache.get(tag.getProcessIds().iterator().next());
+        map.put("process", process.getName());
+      } catch (Exception e) {
+        log.warn("Could not get Process name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
+      }
     }
 
     if (!tag.getEquipmentIds().isEmpty()) {
-      Equipment equipment = equipmentCache.get(tag.getEquipmentIds().iterator().next());
-      map.put("equipment", equipment.getName());
+      try {
+        Equipment equipment = equipmentCache.get(tag.getEquipmentIds().iterator().next());
+        map.put("equipment", equipment.getName());
+      } catch (Exception e) {
+        log.warn("Could not get Equipment name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
+      }
     }
 
     if (!tag.getSubEquipmentIds().isEmpty()) {
-      SubEquipment subEquipment = subEquipmentCache.get(tag.getSubEquipmentIds().iterator().next());
-      map.put("subEquipment", subEquipment.getName());
+      try {
+        SubEquipment subEquipment = subEquipmentCache.get(tag.getSubEquipmentIds().iterator().next());
+        map.put("subEquipment", subEquipment.getName());
+      } catch (Exception e) {
+        log.warn("Could not get SubEquipment name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
+      }
     }
 
     map.put("serverTimestamp", tag.getCacheTimestamp().getTime());
