@@ -13,6 +13,10 @@ For more details on a given release, please check also the [Milestone planning](
 
 ### Fixed
 - Elasticsearch module: Exception is now caught in case of an error during the tag conversion for ES (#128)
+- Fixed problem of double quotes in backup database for string values (#129)
+
+### Removed
+- Removed obsolete `video` package in `c2mon-shared-client`
 
 
 ## [1.8.8] - 2017-01-31
