@@ -89,7 +89,7 @@ public class AlarmRecordListener implements C2monCacheListener<Alarm>, SmartLife
 
   @Override
   public void notifyElementUpdated(Alarm cacheable) {
-    ArrayList<Alarm> toSave = new ArrayList<Alarm>();
+    ArrayList<Alarm> toSave = new ArrayList<>();
     toSave.add(cacheable);
     alarmLogger.log(toSave);
   }
@@ -101,7 +101,7 @@ public class AlarmRecordListener implements C2monCacheListener<Alarm>, SmartLife
 
   @Override
   public boolean isAutoStartup() {
-    return false;
+    return true;
   }
 
   @Override

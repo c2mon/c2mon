@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -35,42 +35,42 @@ import cern.c2mon.shared.common.datatag.DataTagAddress;
 
 @Service
 public class BenchmarkListener implements C2monCacheListener<Tag>, SmartLifecycle {
-  
+
   private static final Logger LOGGER = LoggerFactory.getLogger(BenchmarkListener.class);
 
   private Logger dataTagLogger = LoggerFactory.getLogger("BenchmarkDataTag");
-  
+
   private Logger priorityLogger = LoggerFactory.getLogger("BenchmarkPriority");
-  
+
   private CacheRegistrationService cacheRegistrationService;
-  
+
   private static final long BENCHMARK_TIME = 1000; //1s
   private static final long MIDDLE_BENCHMARK_TIME = 2000; //1s
   private static final long HIGH_BENCHMARK_TIME = 5000; //1s
-  
+
   private long maxTagToServer = 0;
   private long maxTagToListener = 0;
   private long maxPriorityToServer = 0;
   private long maxPriorityToListener = 0;
-  
+
   private long nbAboveBenchmark;
   private long nbAboveMiddleBenchmark;
   private long nbAboveHighBenchmark;
-  
+
   private long nbAboveBenchmarkPriority;
   private long nbAboveMiddleBenchmarkPriority;
   private long nbAboveHighBenchmarkPriority;
-  
+
   /**
    * Listener container lifecycle hook.
    */
   private Lifecycle listenerContainer;
-  
+
   /**
    * Lifecycle flag.
    */
   private volatile boolean running = false;
-  
+
   @Autowired
   public BenchmarkListener(CacheRegistrationService cacheRegistrationService) {
     super();
@@ -78,25 +78,25 @@ public class BenchmarkListener implements C2monCacheListener<Tag>, SmartLifecycl
   }
 
   @Override
-  public void notifyElementUpdated(Tag tag) {  
+  public void notifyElementUpdated(Tag tag) {
     if (!running){
       LOGGER.warn("Received notification while component not running - will process anyway");
     }
     if (tag instanceof DataTag) {
       DataTagCacheObject dataTag = (DataTagCacheObject) tag;
       //TODO can remove this once all DAQ updates have DAQ t.s. set
-      long daqTime = dataTag.getDaqTimestamp() == null ? dataTag.getTimestamp().getTime() : dataTag.getDaqTimestamp().getTime();      
+      long daqTime = dataTag.getDaqTimestamp() == null ? dataTag.getTimestamp().getTime() : dataTag.getDaqTimestamp().getTime();
       long serverTime = dataTag.getCacheTimestamp().getTime();
       long currentTime = System.currentTimeMillis();
       long toServer = (serverTime - daqTime);
       long toListener = (currentTime - daqTime);
       if (dataTag.getAddress() != null && dataTag.getAddress().getPriority() == DataTagAddress.PRIORITY_HIGH) {
         priorityLogger.debug("DAQ to server(ms): " + toServer + "; DAQ to listener: " +  toListener + " (Id: " + tag.getId() + ")");
-        if (toServer > maxPriorityToServer) { 
+        if (toServer > maxPriorityToServer) {
           maxPriorityToServer = toServer;
           priorityLogger.warn("max DAQ to server: " + maxPriorityToServer);
         }
-        if (toListener > maxPriorityToListener) { 
+        if (toListener > maxPriorityToListener) {
           maxPriorityToListener = toListener;
           priorityLogger.warn("max DAQ to listener: " + maxPriorityToListener);
         }
@@ -112,11 +112,11 @@ public class BenchmarkListener implements C2monCacheListener<Tag>, SmartLifecycl
         }
       } else {
         dataTagLogger.debug("DAQ to server(ms): " + toServer + "; DAQ to listener: " +  toListener + " (Id: " + tag.getId() + ")");
-        if (toServer > maxTagToServer) { 
+        if (toServer > maxTagToServer) {
           maxTagToServer = toServer;
           dataTagLogger.warn("max DAQ to server: " + maxTagToServer);
         }
-        if (toListener > maxTagToListener) { 
+        if (toListener > maxTagToListener) {
           maxTagToListener = toListener;
           dataTagLogger.warn("max DAQ to listener: " + maxTagToListener);
         }
@@ -129,11 +129,11 @@ public class BenchmarkListener implements C2monCacheListener<Tag>, SmartLifecycl
         } else if (toListener > BENCHMARK_TIME) {
           nbAboveBenchmark++;
           dataTagLogger.info("Number of update above " + BENCHMARK_TIME + ": " + nbAboveBenchmark);
-        } 
-      }       
-    }        
+        }
+      }
+    }
   }
-  
+
   @PostConstruct
   void init() {
     listenerContainer = cacheRegistrationService.registerToAllTags(this,1);
@@ -142,12 +142,12 @@ public class BenchmarkListener implements C2monCacheListener<Tag>, SmartLifecycl
   @Override
   public void confirmStatus(Tag cacheable) {
     // TODO Auto-generated method stub
-    
+
   }
-  
+
   @Override
-  public boolean isAutoStartup() {   
-    return false;
+  public boolean isAutoStartup() {
+    return true;
   }
 
   @Override
@@ -166,7 +166,7 @@ public class BenchmarkListener implements C2monCacheListener<Tag>, SmartLifecycl
   public void start() {
     LOGGER.debug("Starting Benchmark listener");
     running = true;
-    listenerContainer.start();    
+    listenerContainer.start();
   }
 
   @Override
@@ -177,7 +177,7 @@ public class BenchmarkListener implements C2monCacheListener<Tag>, SmartLifecycl
 
   @Override
   public int getPhase() {
-    return ServerConstants.PHASE_STOP_LAST - 1;    
+    return ServerConstants.PHASE_STOP_LAST - 1;
   }
 
 }

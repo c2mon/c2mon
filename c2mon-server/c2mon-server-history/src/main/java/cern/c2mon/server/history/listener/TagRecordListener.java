@@ -28,12 +28,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.history.logger.BatchLogger;
 import cern.c2mon.server.cache.C2monBufferedCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.history.logger.BatchLogger;
 
 /**
  * Listens to updates in the Rule and DataTag caches and calls the DAO
@@ -103,7 +103,7 @@ public class TagRecordListener implements C2monBufferedCacheListener<Tag>, Smart
 
   @Override
   public void notifyElementUpdated(Collection<Tag> tagCollection) {
-    ArrayList<Tag> tagsToLog = new ArrayList<Tag>(tagCollection.size());
+    ArrayList<Tag> tagsToLog = new ArrayList<>(tagCollection.size());
     for (Tag tag : tagCollection) {
       if (tag.isLogged())
         tagsToLog.add(tag);
@@ -113,7 +113,7 @@ public class TagRecordListener implements C2monBufferedCacheListener<Tag>, Smart
 
   @Override
   public boolean isAutoStartup() {
-    return false;
+    return true;
   }
 
   @Override

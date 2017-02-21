@@ -80,7 +80,7 @@ public class SupervisionEventDocumentListener implements SupervisionListener, Sm
 
   @Override
   public boolean isAutoStartup() {
-    return false;
+    return true;
   }
 
   @Override

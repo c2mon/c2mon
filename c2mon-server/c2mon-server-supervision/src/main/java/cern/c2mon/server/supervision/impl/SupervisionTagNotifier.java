@@ -30,27 +30,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.cache.C2monCache;
-import cern.c2mon.server.cache.CacheProvider;
-import cern.c2mon.server.cache.ClusterCache;
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.EquipmentFacade;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.ProcessFacade;
-import cern.c2mon.server.cache.RuleTagCache;
-import cern.c2mon.server.cache.SubEquipmentCache;
-import cern.c2mon.server.cache.SubEquipmentFacade;
-import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.supervision.SupervisionAppender;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.rule.RuleTag;
-import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.supervision.SupervisionListener;
 import cern.c2mon.server.supervision.SupervisionNotifier;
@@ -298,7 +285,7 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
   private void notifyEquipmentTags(final Long equipementId) {
     try {
       //local map so as not to notify rules twice; lock on map when modifying
-      Map<Long, Boolean> notifiedRules = new HashMap<Long, Boolean>();
+      Map<Long, Boolean> notifiedRules = new HashMap<>();
       Collection<Long> tagIds = equipmentFacade.getDataTagIds(equipementId);
       for (Long id : tagIds) {
        try {
@@ -322,7 +309,7 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
   private void notifySubEquipmentTags(final Long subEquipmentId) {
     try {
       //local map so as not to notify rules twice; lock on map when modifying
-      Map<Long, Boolean> notifiedRules = new HashMap<Long, Boolean>();
+      Map<Long, Boolean> notifiedRules = new HashMap<>();
       Collection<Long> tagIds = subEquipmentFacade.getDataTagIds(subEquipmentId);
       for (Long id : tagIds) {
        try {
@@ -383,7 +370,7 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
       }
 
       Collection<Long> ruleIds;
-      ruleIds = new ArrayList<Long>(tagCopy.getRuleIds());
+      ruleIds = new ArrayList<>(tagCopy.getRuleIds());
       for (Long ruleId : ruleIds) {
         callCacheNotification(ruleId, notifiedRules);
         notifiedRules.put(ruleId, true);
@@ -393,7 +380,7 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
 
   @Override
   public boolean isAutoStartup() {
-    return false;
+    return true;
   }
 
   @Override

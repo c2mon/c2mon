@@ -76,7 +76,7 @@ public class AlarmDocumentListener implements C2monCacheListener<Alarm>, SmartLi
 
   @Override
   public boolean isAutoStartup() {
-    return false;
+    return true;
   }
 
   @Override

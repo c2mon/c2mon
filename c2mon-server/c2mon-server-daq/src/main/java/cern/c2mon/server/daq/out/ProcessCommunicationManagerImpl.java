@@ -22,15 +22,11 @@ import javax.jms.ConnectionFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import cern.c2mon.server.daq.config.DaqProperties;
-import cern.c2mon.shared.daq.config.*;
-import cern.c2mon.shared.daq.serialization.MessageConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.core.env.Environment;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +37,7 @@ import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.daq.config.DaqProperties;
 import cern.c2mon.shared.client.command.CommandExecutionStatus;
 import cern.c2mon.shared.client.command.CommandReport;
 import cern.c2mon.shared.client.command.CommandReportImpl;
@@ -48,9 +45,13 @@ import cern.c2mon.shared.common.NoSimpleValueParseException;
 import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.daq.command.SourceCommandTagReport;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
+import cern.c2mon.shared.daq.config.Change;
+import cern.c2mon.shared.daq.config.ChangeRequest;
+import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
 import cern.c2mon.shared.daq.exception.ProcessRequestException;
+import cern.c2mon.shared.daq.serialization.MessageConverter;
 
 
 /**
@@ -283,7 +284,7 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
 
   @Override
   public boolean isAutoStartup() {
-    return false;
+    return true;
   }
 
   @Override

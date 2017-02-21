@@ -21,31 +21,18 @@ import java.util.Collection;
 
 import javax.annotation.Resource;
 
-import cern.c2mon.server.common.config.ServerProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.cache.AliveTimerCache;
-import cern.c2mon.server.cache.AliveTimerFacade;
-import cern.c2mon.server.cache.ClusterCache;
-import cern.c2mon.server.cache.CommFaultTagCache;
-import cern.c2mon.server.cache.ControlTagCache;
-import cern.c2mon.server.cache.ControlTagFacade;
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.EquipmentFacade;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.ProcessFacade;
-import cern.c2mon.server.cache.ProcessXMLProvider;
-import cern.c2mon.server.cache.SubEquipmentCache;
-import cern.c2mon.server.cache.SubEquipmentFacade;
-import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
+import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.config.ServerConstants;
+import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
@@ -54,12 +41,7 @@ import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.supervision.SupervisionManager;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
-import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
-import cern.c2mon.shared.daq.process.ProcessConfigurationResponse;
-import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
-import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
-import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
-import cern.c2mon.shared.daq.process.XMLConverter;
+import cern.c2mon.shared.daq.process.*;
 
 
 /**
@@ -80,12 +62,8 @@ import cern.c2mon.shared.daq.process.XMLConverter;
  *
  */
 @Service("supervisionManager")
+@Slf4j
 public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycle {
-
-  /**
-   * Private class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(SupervisionManagerImpl.class);
 
   @Resource
   private ProcessCache processCache;
@@ -129,9 +107,6 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
   @Resource
   private ServerProperties properties;
 
-  //@Resource
-  //private DataRefreshManager dataRefreshManager;
-
   /**
    * XML Converter helper class
    */
@@ -142,8 +117,8 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
    */
   @Override
   public void start() {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("starting all alive timers");
+    if (log.isDebugEnabled()) {
+      log.debug("starting all alive timers");
     }
 
     //the purpose of this synch block is to wait for all caches to be loaded (from DB only, not "refreshing to node" which can be simultaneous!)
@@ -175,7 +150,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
                   aliveTimerFacade.start(aliveTagId);
                 }
               } else {
-                LOGGER.warn("Unable to locate state tag in cache (id = " + process.getStateTagId() + ") " +
+                log.warn("Unable to locate state tag in cache (id = " + process.getStateTagId() + ") " +
                     "cannot start alive timer for this process.");
               }
             }
@@ -198,7 +173,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
                   aliveTimerFacade.start(aliveTagId);
                 }
               } else {
-                LOGGER.warn("Unable to locate state tag in cache (id = " + equipment.getStateTagId() + ") " +
+                log.warn("Unable to locate state tag in cache (id = " + equipment.getStateTagId() + ") " +
                     "cannot start alive timer for this equipment.");
               }
             }
@@ -222,7 +197,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
                   aliveTimerFacade.start(aliveTagId);
                 }
               } else {
-                LOGGER.warn("Unable to locate state tag in cache (id = " + subEquipment.getStateTagId() + ") cannot " +
+                log.warn("Unable to locate state tag in cache (id = " + subEquipment.getStateTagId() + ") cannot " +
                     "start alive timer for this subequipment.");
               }
             }
@@ -236,7 +211,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       }
 
     } catch (Exception e) {
-      LOGGER.error("initialise() : Error starting alive timer mechanism.", e);
+      log.error("initialise() : Error starting alive timer mechanism.", e);
     } finally {
       clusterCache.releaseWriteLockOnKey(C2monCacheLoader.aliveStatusInitialized);
     }
@@ -245,20 +220,20 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     //aliveTimerManager.start();
 
     //HeartbeatManager.getInstance().start(); //TODO start heartbeatmanager here
-    LOGGER.info("Finished initializing all alive timers.");
+    log.info("Finished initializing all alive timers.");
   }
 
   @Override
   public void onProcessDisconnection(final ProcessDisconnectionRequest processDisconnectionRequest) {
     // Protect the method against accidental null parameters
     if (processDisconnectionRequest == null) {
-      LOGGER.error("onProcessDisconnection(null) called - ignoring the request.");
+      log.error("onProcessDisconnection(null) called - ignoring the request.");
       return;
     }
 
     // (1) Print some debug output
 
-    if (LOGGER.isDebugEnabled()) {
+    if (log.isDebugEnabled()) {
       StringBuffer str = new StringBuffer("onProcessDisconnection([");
       str.append(processDisconnectionRequest.getProcessName());
       str.append(", ");
@@ -266,7 +241,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       str.append(", ");
       str.append(processDisconnectionRequest.getProcessStartupTime());
       str.append("]) called.");
-      LOGGER.debug(str.toString());
+      log.debug(str.toString());
     }
     //TODO remove inaccessible once fixed on client
     //int invalidationFlags = DataTagQuality.INACCESSIBLE + DataTagQuality.PROCESS_DOWN;
@@ -287,7 +262,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
         try {
           // If the process is stopped the PIK is null
           if (processCopy.getProcessPIK() == null) {
-            LOGGER.warn("onProcessDisconnection - Received Process disconnection message for "
+            log.warn("onProcessDisconnection - Received Process disconnection message for "
                 + "a process PIK null. Id is " + processCopy.getId() + ". Message ignored.");
           }
           else {
@@ -297,7 +272,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
               if (processFacade.isRunning(processId)) {
 
                 String processStopMessage = "DAQ process " + processCopy.getName() + " was stopped.";
-                LOGGER.trace("onProcessDisconnection - " + processStopMessage);
+                log.trace("onProcessDisconnection - " + processStopMessage);
 
                 // (5) LEGACY: TODO what does this comment mean?!
                 Timestamp stopTime = new Timestamp(System.currentTimeMillis());
@@ -313,31 +288,31 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
                 //                        true, true, true,                       //invalidate state, alive and commfault tags
                 //                        invalidationFlags, 0);
               } else {
-                LOGGER.warn("onProcessDisconnection - Received Process disconnection message for "
+                log.warn("onProcessDisconnection - Received Process disconnection message for "
                     + "a process that is not running. Id is " + processCopy.getId() + ". Message ignored.");
               }
             }
             else {
-              LOGGER.warn("onProcessDisconnection - Received Process disconnection message for "
+              log.warn("onProcessDisconnection - Received Process disconnection message for "
                   + "a process with a diferent PIK (" + processDisconnectionRequest.getProcessPIK()
                   + " vs " + processCopy.getProcessPIK() + "). Id is " + processCopy.getId() + ". Message ignored.");
             }
           }
         } catch (CacheElementNotFoundException cacheEx) {
-          LOGGER.error("State tag " + processCopy.getStateTagId() + " or the alive tag "
+          log.error("State tag " + processCopy.getStateTagId() + " or the alive tag "
               + processCopy.getAliveTagId() + " for process " + processCopy.getId() + " could not be found in the "
               + "cache - disconnection actions could not be completed.", cacheEx);
         }
 
       } catch (CacheElementNotFoundException cacheEx) {
-        LOGGER.error("Unable to locate process " + processId + " in cache.", cacheEx);
+        log.error("Unable to locate process " + processId + " in cache.", cacheEx);
       }
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.error("Process object could not be retrieved from cache - disconnection actions may be incomplete.", cacheEx);
+      log.error("Process object could not be retrieved from cache - disconnection actions may be incomplete.", cacheEx);
     } catch (IllegalArgumentException argEx) {
-      LOGGER.error("IllegalArgument exception caught on processing DAQ disconnection - disconnection actions may be incomplete.", argEx);
+      log.error("IllegalArgument exception caught on processing DAQ disconnection - disconnection actions may be incomplete.", argEx);
     } catch (NullPointerException nullEx) {
-      LOGGER.error("NullPointer exception caught on processing DAQ disconnection - disconnection actions may be incomplete.", nullEx);
+      log.error("NullPointer exception caught on processing DAQ disconnection - disconnection actions may be incomplete.", nullEx);
     }
   }
 
@@ -362,14 +337,14 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
               stopStateTag(subEquipmentCopy.getStateTagId(), timestamp, message);
               subEquipmentFacade.stop(subId, timestamp);
             } catch (CacheElementNotFoundException ex) {
-              LOGGER.error("Subequipment could not be retrieved from cache - unable to update Subequipment state.", ex);
+              log.error("Subequipment could not be retrieved from cache - unable to update Subequipment state.", ex);
             }
           }
         } catch (CacheElementNotFoundException e) {
-          LOGGER.error("Equipment could not be retrieved from cache - unable to update Equipment state.", e);
+          log.error("Equipment could not be retrieved from cache - unable to update Equipment state.", e);
         }
       } catch (Exception e) {
-        LOGGER.error("Unable to acquire lock on Equipment/SubEquipment object", e);
+        log.error("Unable to acquire lock on Equipment/SubEquipment object", e);
       }
     }
   }
@@ -398,7 +373,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
 
     // Protect the method against accidental null parameters
     if (processConfigurationRequest == null) {
-      LOGGER.error("onProcessConfiguration(null) called - rejecting the request.");
+      log.error("onProcessConfiguration(null) called - rejecting the request.");
       processConfigurationResponse.setConfigurationXML(ProcessConfigurationResponse.CONF_REJECTED);
       return this.xmlConverter.toXml(processConfigurationResponse);
     }
@@ -407,36 +382,36 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     processConfigurationResponse.setProcessName(processConfigurationRequest.getProcessName());
 
     // Print some debug information
-    if (LOGGER.isDebugEnabled()) {
+    if (log.isDebugEnabled()) {
       StringBuilder str = new StringBuilder("onProcessConfiguration([");
       str.append(processConfigurationRequest.getProcessName());
       str.append(", ");
       str.append(processConfigurationRequest.getProcessPIK());
       str.append("]) called.");
-      LOGGER.debug(str.toString());
+      log.debug(str.toString());
     }
 
     // Retrieve the cache object for the process as well as its state tag
     try {
       Long processId = processCache.getProcessId(processConfigurationRequest.getProcessName());
       Process processCopy = processCache.getCopy(processId);
-      LOGGER.info("onProcessConfiguration - Configuration request for DAQ " + processCopy.getName() + " authorized.");
+      log.info("onProcessConfiguration - Configuration request for DAQ " + processCopy.getName() + " authorized.");
 
       // Only If PIK is the same we have in cache we change Y(LOCAL_CONFIG) by N(SERVER_CONFIG) for the current process
       if(processConfigurationRequest.getProcessPIK().equals(processCopy.getProcessPIK())) {
-        LOGGER.info("onProcessConfiguration - SERVER_CONFIG");
+        log.info("onProcessConfiguration - SERVER_CONFIG");
         this.processFacade.setLocalConfig(processId, LocalConfig.N);
       }
 
       // We get the configuration XML file (empty by default)
       processConfigurationResponse.setConfigurationXML(processXMLProvider.getProcessConfigXML(processCopy));
-      LOGGER.info("onProcessConfiguration - Returning configuration XML to DAQ " + processCopy.getName());
+      log.info("onProcessConfiguration - Returning configuration XML to DAQ " + processCopy.getName());
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.warn("onProcessConfiguration - process not found in cache (name = "
+      log.warn("onProcessConfiguration - process not found in cache (name = "
           + processConfigurationRequest.getProcessName() + ") - unable to accept connection request.", cacheEx);
       processConfigurationResponse.setConfigurationXML(ProcessConfigurationResponse.CONF_REJECTED);
     } catch (Exception e) {
-      LOGGER.error(new StringBuffer("onProcessConfiguration - An unexpected Exception occurred.").toString(), e);
+      log.error(new StringBuffer("onProcessConfiguration - An unexpected Exception occurred.").toString(), e);
       processConfigurationResponse.setConfigurationXML(ProcessConfigurationResponse.CONF_REJECTED);
     }
 
@@ -454,7 +429,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
   public void onAliveTimerExpiration(final Long aliveTimerId) {
     // Protect the method against accidental null parameters
     if (aliveTimerId == null) {
-      LOGGER.warn("onAliveTimerExpiration(null) called - ignoring the call.");
+      log.warn("onAliveTimerExpiration(null) called - ignoring the call.");
       return;
     }
 
@@ -469,10 +444,10 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     msg.append(") has expired.");
 
     // Log the message
-    LOGGER.debug(msg.toString());
+    log.debug(msg.toString());
 
     if (aliveTimer.getRelatedId() == null) {
-      LOGGER.error("AliveTimer has not relatedId - unable to take any action on alive reception.");
+      log.error("AliveTimer has not relatedId - unable to take any action on alive reception.");
     } else {
       try {
         final Long processId = processFacade.getProcessIdFromAlive(aliveTimer.getId());
@@ -508,11 +483,11 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           }
         }
       } catch (CacheElementNotFoundException cacheEx) {
-        LOGGER.error("Unable to locate a required element within the cache on Alive Timer expiration.", cacheEx);
+        log.error("Unable to locate a required element within the cache on Alive Timer expiration.", cacheEx);
       } catch (NullPointerException nullEx) {
-        LOGGER.error("NullPointer exception caught on Alive Timer expiration.", nullEx);
+        log.error("NullPointer exception caught on Alive Timer expiration.", nullEx);
       } catch (IllegalArgumentException argEx) {
-        LOGGER.error("IllegalArgument exception caught on Aliver Timer expiration", argEx);
+        log.error("IllegalArgument exception caught on Aliver Timer expiration", argEx);
       }
     }
   }
@@ -531,7 +506,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       controlTagFacade.updateAndValidate(commFaultTagId, value, message, timestamp);
 
     } catch (CacheElementNotFoundException e) {
-      LOGGER.error("Could not locate CommFaultTag (id: " + commFaultTagId + ") in cache");
+      log.error("Could not locate CommFaultTag (id: " + commFaultTagId + ") in cache");
     }
   }
 
@@ -545,14 +520,14 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
    * @param string
    */
   private void onEquipmentDown(final Long equipmentId, final Timestamp timestamp, final String message) {
-    if (LOGGER.isDebugEnabled()) {
+    if (log.isDebugEnabled()) {
       StringBuffer str = new StringBuffer("onEquipmentDown(");
       str.append("Equipment with id " + equipmentId);
       str.append(", ");
       str.append(timestamp);
       str.append(", ");
       str.append(message);
-      LOGGER.debug(str.toString());
+      log.debug(str.toString());
     }
 
     equipmentFacade.suspend(equipmentId, timestamp, message);
@@ -560,13 +535,13 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     final Equipment equipmentCopy = equipmentCache.getCopy(equipmentId);
     Long stateTagId = equipmentCopy.getStateTagId();
     if (stateTagId == null) {
-      LOGGER.error("Could not find any state tag for equipment " + equipmentCopy.getId() + " - this should never happen.");
+      log.error("Could not find any state tag for equipment " + equipmentCopy.getId() + " - this should never happen.");
     } else {
       try {
         controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.DOWN.toString(), message, timestamp);
 
       } catch (CacheElementNotFoundException cacheEx) {
-        LOGGER.error("Could not locate state tag (Id is " + stateTagId + ") in cache for equipment " + equipmentCopy.getId());
+        log.error("Could not locate state tag (Id is " + stateTagId + ") in cache for equipment " + equipmentCopy.getId());
       }
     }
   }
@@ -577,25 +552,25 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
    */
   private void onSubEquipmentDown(final Long subEquipmentId, final Timestamp timestamp, final String message) {
     SubEquipment subEquipmentCopy = subEquipmentCache.getCopy(subEquipmentId);
-    if (LOGGER.isDebugEnabled()) {
+    if (log.isDebugEnabled()) {
       StringBuffer str = new StringBuffer("onSubEquipmentDown(");
       str.append(subEquipmentCopy.getName());
       str.append(", ");
       str.append(timestamp);
       str.append(", ");
       str.append(message);
-      LOGGER.debug(str.toString());
+      log.debug(str.toString());
     }
     subEquipmentFacade.suspend(subEquipmentId, timestamp, message);
     Long stateTagId = subEquipmentCopy.getStateTagId();
     if (stateTagId == null) {
-      LOGGER.error("Could not find any state tag for subequipment " + subEquipmentCopy.getId() + " - this should never happen.");
+      log.error("Could not find any state tag for subequipment " + subEquipmentCopy.getId() + " - this should never happen.");
     } else {
       try {
         controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.DOWN.toString(), message, timestamp);
 
       } catch (CacheElementNotFoundException cacheEx) {
-        LOGGER.error("Could not locate state tag (Id is " + stateTagId + ") in cache for subequipment " + subEquipmentCopy.getId());
+        log.error("Could not locate state tag (Id is " + stateTagId + ") in cache for subequipment " + subEquipmentCopy.getId());
       }
     }
   }
@@ -610,14 +585,14 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
    * <p>Call within block synchronized on Process.
    */
   private void onProcessDown(final Long processId, final Timestamp pTimestamp, final String pMessage) {
-    if (LOGGER.isDebugEnabled()) {
+    if (log.isDebugEnabled()) {
       StringBuffer str = new StringBuffer("onProcessDown(");
       str.append(processId);
       str.append(", ");
       str.append(pTimestamp);
       str.append(", ");
       str.append(pMessage);
-      LOGGER.debug(str.toString());
+      log.debug(str.toString());
     }
 
     processFacade.suspend(processId, pTimestamp, pMessage);
@@ -627,12 +602,12 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     try {
       Long stateTagId = processCopy.getStateTagId();
       if (stateTagId == null) {
-        LOGGER.error("State tag Id is set to null for Process + " + processCopy.getId() + " - unable to update it.");
+        log.error("State tag Id is set to null for Process + " + processCopy.getId() + " - unable to update it.");
       } else {
         controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.DOWN.toString(), pMessage, pTimestamp);
       }
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.error("Cannot locate the Process State tag in the cache - unable to update it.", cacheEx);
+      log.error("Cannot locate the Process State tag in the cache - unable to update it.", cacheEx);
     }
   }
 
@@ -644,8 +619,8 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     // always revalidates even if 2 commfault tags overtook each other (see TIMS-281). To keep the
     // code simple we accept this and do not take any further precautions.
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Incoming update for ControlTag " + sourceDataTagValue.getId() + " (value " + sourceDataTagValue.getValue() + ")");
+    if (log.isDebugEnabled()) {
+      log.debug("Incoming update for ControlTag " + sourceDataTagValue.getId() + " (value " + sourceDataTagValue.getValue() + ")");
     }
     Long tagId = sourceDataTagValue.getId();
     Object tagValue = sourceDataTagValue.getValue();
@@ -685,7 +660,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
         Timestamp aliveTimerTimestamp = new Timestamp(System.currentTimeMillis());
         if (aliveTimerTimestamp.getTime() - useTimestamp.getTime()
                                        > 2 * timerCopy.getAliveInterval()) {
-          LOGGER.warn("Rejecting alive " + tagId + " as delayed arrival at server.");
+          log.debug("Rejecting alive #{} of {} as delayed arrival at server.", tagId, timerCopy.getRelatedName());
         } else {
        // The tag is an alive tag -> we rewind the corresponding alive timer
           //TODO sychronization on alive timers... needed? use id here, so not possible around update
@@ -708,11 +683,11 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
         // The tag is NOT an alive tag -> we check if it is a communication fault tag
 
         CommFaultTag commFaultTagCopy = commFaultTagCache.getCopy(tagId);
-        if (LOGGER.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
           StringBuilder str = new StringBuilder("processControlTag() : tag ");
           str.append(tagId);
           str.append(" is a commfault tag.");
-          LOGGER.debug(str.toString());
+          log.debug(str.toString());
         }
 
         if (equipmentCache.hasKey(commFaultTagCopy.getEquipmentId())) { //check if equipment
@@ -768,13 +743,13 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
             }
           }
         } else {
-          LOGGER.error("Unable to locate equipment/subequipment in cache (id = " + commFaultTagCopy.getEquipmentId() + ") - key could not be located.");
+          log.error("Unable to locate equipment/subequipment in cache (id = " + commFaultTagCopy.getEquipmentId() + ") - key could not be located.");
         }
       }
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.error("Unable to locate a required element within the cache while processing control tag " + tagId + ".", cacheEx);
+      log.error("Unable to locate a required element within the cache while processing control tag " + tagId + ".", cacheEx);
     } catch (Exception ex) {
-      LOGGER.error("Unexpected exception caught on Alive Timer expiration for tag " + tagId + ".", ex);
+      log.error("Unexpected exception caught on Alive Timer expiration for tag " + tagId + ".", ex);
     }
   }
 
@@ -802,13 +777,13 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
    * Notice that the process alive is of course revalidated on reception of a new alive.
    */
   private void onProcessUp(final Long processId, final Timestamp pTimestamp, final String pMessage) {
-    if (LOGGER.isDebugEnabled()) {
+    if (log.isDebugEnabled()) {
       StringBuffer str = new StringBuffer("onProcessUp(");
       str.append("Process with Id " + processId);
       str.append(", ");
       str.append(pTimestamp);
       str.append(") called.");
-      LOGGER.debug(str.toString());
+      log.debug(str.toString());
     }
     processFacade.resume(processId, pTimestamp, pMessage);
 
@@ -824,7 +799,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
         // If the process is running under a local configuration, set the status
         // tag to RUNNING_LOCAL
         if (process.getLocalConfig() != null && process.getLocalConfig().equals(LocalConfig.Y)) {
-          LOGGER.debug("onProcessUp(): Process is running on a local configuration, setting status to RUNNING_LOCAL");
+          log.debug("onProcessUp(): Process is running on a local configuration, setting status to RUNNING_LOCAL");
           controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.RUNNING_LOCAL.toString(), pMessage, pTimestamp);
 
         } else if (stateTag.getValue() == null || !stateTag.getValue().equals(SupervisionStatus.RUNNING.toString())) {
@@ -832,7 +807,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
         }
       }
     } catch (CacheElementNotFoundException  controlCacheEx) {
-      LOGGER.error("Unable to locate state tag in cache (id is " + stateTagId + ")", controlCacheEx);
+      log.error("Unable to locate state tag in cache (id is " + stateTagId + ")", controlCacheEx);
     } finally {
       controlTagCache.releaseWriteLockOnKey(stateTagId);
     }
@@ -853,14 +828,14 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
    * @param pMessage custom message with more information of why the equipment is believed to be up.
    */
   private void onEquipmentUp(final Long pId, final Timestamp pTimestamp, final String pMessage) {
-    if (LOGGER.isDebugEnabled()) {
+    if (log.isDebugEnabled()) {
       StringBuffer str = new StringBuffer("onEquipmentUp(");
       str.append(pId);
       str.append(", ");
       str.append(pTimestamp);
       str.append(", ");
       str.append(pMessage);
-      LOGGER.debug(str.toString());
+      log.debug(str.toString());
     }
     // Try to obtain a copy of the state tag with its current value
     try {
@@ -876,7 +851,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.RUNNING.toString(), pMessage, pTimestamp);
         }
       } catch (CacheElementNotFoundException controlCacheEx) {
-        LOGGER.error("Unable to locate equipment state tag in control tag cache (id is " + stateTagId + ")", controlCacheEx);
+        log.error("Unable to locate equipment state tag in control tag cache (id is " + stateTagId + ")", controlCacheEx);
       } finally {
         controlTagCache.releaseWriteLockOnKey(stateTagId);
       }
@@ -884,7 +859,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       ControlTag commFaultTag = controlTagCache.getCopy(commFaultId);
       setCommFaultTag(commFaultId, true, commFaultTag.getValueDescription(), pTimestamp);
     } catch (CacheElementNotFoundException equipmentCacheEx) {
-      LOGGER.error("Unable to locate equipment in cache (id is " + pId + ") - not taking any invalidation action.", equipmentCacheEx);
+      log.error("Unable to locate equipment in cache (id is " + pId + ") - not taking any invalidation action.", equipmentCacheEx);
     }
   }
 
@@ -907,14 +882,14 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
 
   private void onSubEquipmentUp(final Long pId, final Timestamp pTimestamp, final String pMessage) {
 
-    if (LOGGER.isDebugEnabled()) {
+    if (log.isDebugEnabled()) {
       StringBuffer str = new StringBuffer("onSubEquipmentUp(");
       str.append(pId);
       str.append(", ");
       str.append(pTimestamp);
       str.append(", ");
       str.append(pMessage);
-      LOGGER.debug(str.toString());
+      log.debug(str.toString());
     }
 
     try {
@@ -930,7 +905,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.RUNNING.toString(), pMessage, pTimestamp);
         }
       } catch (CacheElementNotFoundException controlCacheEx) {
-        LOGGER.error("Unable to locate subequipment state tag in control tag cache (id is " + stateTagId + ")", controlCacheEx);
+        log.error("Unable to locate subequipment state tag in control tag cache (id is " + stateTagId + ")", controlCacheEx);
       } finally {
         controlTagCache.releaseWriteLockOnKey(stateTagId);
       }
@@ -938,13 +913,13 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       ControlTag commFaultTag = controlTagCache.getCopy(commFaultId);
       setCommFaultTag(commFaultId, true, commFaultTag.getValueDescription(), pTimestamp);
     } catch (CacheElementNotFoundException subEquipmentCacheEx) {
-      LOGGER.error("Unable to locate subequipment in cache (id is " + pId + ")", subEquipmentCacheEx);
+      log.error("Unable to locate subequipment in cache (id is " + pId + ")", subEquipmentCacheEx);
     }
   }
 
   @Override
   public boolean isAutoStartup() {
-    return false;
+    return true;
   }
 
   @Override
@@ -983,7 +958,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
 
     // Protect the method against accidental null parameters
     if (processConnectionRequest == null) {
-      LOGGER.error("onProcessConfiguration(null) called - rejecting the request.");
+      log.error("onProcessConfiguration(null) called - rejecting the request.");
       processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
       return this.xmlConverter.toXml(processConnectionResponse);
     }
@@ -992,7 +967,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     processConnectionResponse.setProcessName(processConnectionRequest.getProcessName());
 
     // Print some debug information
-    if (LOGGER.isDebugEnabled()) {
+    if (log.isDebugEnabled()) {
       StringBuilder str = new StringBuilder("onProcessConnection([");
       str.append(processConnectionRequest.getProcessName());
       str.append(", ");
@@ -1000,7 +975,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       str.append(", ");
       str.append(processConnectionRequest.getProcessStartupTime());
       str.append("]) called.");
-      LOGGER.debug(str.toString());
+      log.debug(str.toString());
     }
 
     // Retrieve the cache object for the process as well
@@ -1014,7 +989,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           if (this.processFacade.isRunning(processId)) {
             // And TEST mode is on
             if (properties.isTestMode()) {
-                LOGGER.info("onProcessConnection - TEST mode - Connection request for DAQ " + process.getName() + " authorized.");
+                log.info("onProcessConnection - TEST mode - Connection request for DAQ " + process.getName() + " authorized.");
 
                 // Start Up the process
                 this.controlTagFacade.updateAndValidate(process.getStateTagId(), SupervisionStatus.STARTUP.toString(), "ProcessConnection message received.",
@@ -1024,19 +999,19 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
                 // PIK
                 processConnectionResponse.setprocessPIK(process.getProcessPIK());
 
-                LOGGER.info("onProcessConnection - TEST Mode - Returning PIKResponse to DAQ " + process.getName()
+                log.info("onProcessConnection - TEST Mode - Returning PIKResponse to DAQ " + process.getName()
                     + ", PIK " + process.getProcessPIK());
 
             // If process is already currently running and TEST mode is off no connection is permitted
             } else {
               // Reject Connection
               processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
-              LOGGER.warn("onProcessConnection - The DAQ process is already running, returning rejected connection : "
+              log.warn("onProcessConnection - The DAQ process is already running, returning rejected connection : "
                   + processConnectionRequest.getProcessName());
             }
           // If process is not currently running the connection is permitted
           } else {
-            LOGGER.info("onProcessConnection - Connection request for DAQ " + process.getName() + " authorized.");
+            log.info("onProcessConnection - Connection request for DAQ " + process.getName() + " authorized.");
 
             // Start Up the process
             this.controlTagFacade.updateAndValidate(process.getStateTagId(), SupervisionStatus.STARTUP.toString(), "ProcessConnection message received.",
@@ -1046,22 +1021,22 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
             // PIK
             processConnectionResponse.setprocessPIK(process.getProcessPIK());
 
-            LOGGER.info("onProcessConnection - Returning PIKResponse to DAQ " + process.getName());
+            log.info("onProcessConnection - Returning PIKResponse to DAQ " + process.getName());
           }
 
         } catch (CacheElementNotFoundException cacheEx) {
-          LOGGER.error("State tag " + process.getStateTagId() + " or the alive tag for process " + process.getId() +
+          log.error("State tag " + process.getStateTagId() + " or the alive tag for process " + process.getId() +
               "could not be found in the cache.");
         }
       } finally {
         processCache.releaseWriteLockOnKey(processId);
       }
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.warn("onProcessConnection - process not found in cache (name = "
+      log.warn("onProcessConnection - process not found in cache (name = "
           + processConnectionRequest.getProcessName() + ") - unable to accept connection request.", cacheEx);
       processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
     } catch (Exception e) {
-      LOGGER.error(new StringBuffer("onProcessConnection - An unexpected Exception occurred.").toString(), e);
+      log.error(new StringBuffer("onProcessConnection - An unexpected Exception occurred.").toString(), e);
       processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
     }
 

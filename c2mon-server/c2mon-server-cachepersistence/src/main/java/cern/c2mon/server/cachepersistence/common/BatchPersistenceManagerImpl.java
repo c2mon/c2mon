@@ -23,8 +23,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -98,7 +96,7 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
    * be done at later stage to avoid inconsistencies, with server updating
    * DB once it is back).
    */
-  private Set<Long> toBePersisted = new HashSet<Long>();
+  private Set<Long> toBePersisted = new HashSet<>();
 
   /**
    * Lock for accessing toBePersisted collection, used only
@@ -133,7 +131,7 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
       LOGGER.debug("Submitting new persistence task (currently " + cachePersistenceThreadPoolTaskExecutor.getThreadPoolExecutor().getQueue().size() + " tasks in queue)");
 
       //local set, no synch needed; removes duplicates from collection (though unnecessary with current SynchroBuffer)
-      Set<Long> localToBePersisted = new HashSet<Long>(keyCollection);
+      Set<Long> localToBePersisted = new HashSet<>(keyCollection);
 
       toBePersistedLock.writeLock().lock();
       try {
@@ -147,13 +145,13 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
 
       LOGGER.debug("Persisting " + size + " cache object(s) to the database (" + cache.getClass() + ")");
 
-      LinkedList<Future< ? >> taskResults = new LinkedList<Future< ? >>();
-      Map<Future< ? >, Collection<Long>> submittedSets = new HashMap<Future<?>, Collection<Long>>();
+      LinkedList<Future< ? >> taskResults = new LinkedList<>();
+      Map<Future< ? >, Collection<Long>> submittedSets = new HashMap<>();
 
       Iterator<Long> it = localToBePersisted.iterator();
       while (it.hasNext()) {
         PersistenceTask task = new PersistenceTask();
-        LinkedList<Long> persistedIds = new LinkedList<Long>();
+        LinkedList<Long> persistedIds = new LinkedList<>();
         int counter = 0;
         while (it.hasNext() && counter < RECORDS_PER_BATCH) {
           Long currentId = it.next();
@@ -252,7 +250,7 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
     /**
      * Keys of cache elements to persist.
      */
-    private ArrayList<Long> keyList = new ArrayList<Long>(RECORDS_PER_BATCH);
+    private ArrayList<Long> keyList = new ArrayList<>(RECORDS_PER_BATCH);
 
     /**
      * Add the key to the task, prior to execution.
@@ -279,7 +277,7 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
    */
   @Override
   public boolean isAutoStartup() {
-    return false;
+    return true;
   }
 
   @Override
@@ -311,7 +309,7 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
       LOGGER.debug("Detected cache objects that need persisting... trying to persist them.");
       toBePersistedLock.writeLock().lock();
       try {
-        cachePersistenceDAO.persistBatch(new ArrayList<Long>(toBePersisted));
+        cachePersistenceDAO.persistBatch(new ArrayList<>(toBePersisted));
         toBePersisted.clear();
       } catch (PersistenceException e) {
         LOGGER.error("Exception caught while persisting final batch of cache objects - will try again in 1s", e);

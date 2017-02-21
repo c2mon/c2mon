@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -31,7 +31,7 @@ import cern.c2mon.server.common.config.ServerConstants;
 
 /**
  * Bean managing lifecycle of client module.
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -42,27 +42,27 @@ public class ClientModuleLifecycle implements SmartLifecycle {
    * Class logger.
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(ClientModuleLifecycle.class);
-  
+
   /**
    * Flag for lifecycle.
    */
   private volatile boolean running = false;
-  
+
   /**
    * JMS client container.
    */
   private DefaultMessageListenerContainer clientJmsContainer;
-  
+
   /**
    * Thread pool used by container.
    */
   private ThreadPoolExecutor clientExecutor;
-  
+
   /**
    * Need to close down the underlying connection.
    */
   private SingleConnectionFactory singleConnectionFactory;
-  
+
   /**
    * Container for admin requests from client.
    */
@@ -72,16 +72,16 @@ public class ClientModuleLifecycle implements SmartLifecycle {
    * Connections for admin messages.
    */
   private SingleConnectionFactory adminConnectionFactory;
-  
+
   /**
    * Constructor.
    * @param clientJmsContainer JMS container used in client module
    * @param clientExecutor thread pool used by container
    * @param singleConnectionFactory client request connection factory
-   * 
+   *
    */
   @Autowired
-  public ClientModuleLifecycle(@Qualifier("clientRequestJmsContainer") final DefaultMessageListenerContainer clientJmsContainer, 
+  public ClientModuleLifecycle(@Qualifier("clientRequestJmsContainer") final DefaultMessageListenerContainer clientJmsContainer,
                                     @Qualifier("clientExecutor") final ThreadPoolExecutor clientExecutor,
                                     @Qualifier("clientSingleConnectionFactory") final SingleConnectionFactory singleConnectionFactory,
                                     @Qualifier("adminRequestJmsContainer") final DefaultMessageListenerContainer adminJmsContainer,
@@ -95,8 +95,8 @@ public class ClientModuleLifecycle implements SmartLifecycle {
   }
 
   @Override
-  public boolean isAutoStartup() {   
-    return false;
+  public boolean isAutoStartup() {
+    return true;
   }
 
   @Override
@@ -118,9 +118,9 @@ public class ClientModuleLifecycle implements SmartLifecycle {
   }
 
   @Override
-  public synchronized void stop() {    
+  public synchronized void stop() {
     running = false;
-    try {   
+    try {
       LOGGER.info("Shutting down client module JMS connections");
       clientJmsContainer.stop();
       adminJmsContainer.stop();
@@ -131,12 +131,12 @@ public class ClientModuleLifecycle implements SmartLifecycle {
     } catch (Exception e) {
       LOGGER.error("Exception caught while shutting down Client JMS connection/JMS container", e);
     }
-    
+
   }
 
   @Override
   public int getPhase() {
-    return ServerConstants.PHASE_START_LAST - 1;
+    return ServerConstants.PHASE_START_LAST + 1;
   }
 
 }

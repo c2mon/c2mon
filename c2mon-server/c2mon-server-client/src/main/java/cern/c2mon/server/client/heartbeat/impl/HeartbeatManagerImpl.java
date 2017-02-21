@@ -21,23 +21,22 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import cern.c2mon.server.client.heartbeat.HeartbeatListener;
-import cern.c2mon.server.client.heartbeat.HeartbeatManager;
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.stereotype.Component;
 
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
+import cern.c2mon.server.client.heartbeat.HeartbeatListener;
+import cern.c2mon.server.client.heartbeat.HeartbeatManager;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.util.jms.JmsSender;
 import cern.c2mon.shared.util.json.GsonFactory;
-
-import com.google.gson.Gson;
-import org.springframework.stereotype.Component;
 
 /**
  * The HeartbeatManager bean generates regular server heartbeats, which
@@ -104,7 +103,7 @@ public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
     super();
     this.heartbeatSender = heartbeatSender;
     this.timer = new Timer(TIMER_NAME_PREFIX);
-    this.listeners = new ArrayList<HeartbeatListener>();
+    this.listeners = new ArrayList<>();
     this.clusterCache = clusterCache;
   }
 
@@ -142,7 +141,7 @@ public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
    */
   @Override
   public boolean isAutoStartup() {
-    return false;
+    return true;
   }
 
   /**

@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -19,6 +19,7 @@ package cern.c2mon.server.client.publish;
 import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,6 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.republisher.Publisher;
@@ -37,15 +37,14 @@ import cern.c2mon.server.common.republisher.Republisher;
 import cern.c2mon.server.common.republisher.RepublisherFactory;
 import cern.c2mon.server.supervision.SupervisionListener;
 import cern.c2mon.server.supervision.SupervisionNotifier;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.util.jms.JmsSender;
 import cern.c2mon.shared.util.json.GsonFactory;
-
-import com.google.gson.Gson;
 
 /**
  * Publishes supervision events to the C2MON clients. If JMS exceptions occur,
  * re-publication will be attempted until successful.
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -55,25 +54,25 @@ public class SupervisionEventPublisher implements SupervisionListener, SmartLife
 
   /** Class logger */
   private static final Logger LOGGER = LoggerFactory.getLogger(SupervisionEventPublisher.class);
-  
+
   /** Bean providing for sending JMS messages and waiting for a response; default destination set */
   private final JmsSender jmsSender;
-  
+
   /** Reference to the <code>SupervisionNotifier</code> for registering this listener */
   private final SupervisionNotifier supervisionNotifier;
-  
+
   /** Contains re-publication logic */
   private Republisher<SupervisionEvent> republisher;
-  
+
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();
 
   /** Listener container lifecycle hook */
   private Lifecycle listenerContainer;
-  
+
   /** Lifecycle flag */
   private volatile boolean running = false;
-  
+
   /**
    * Default Constructor
    * @param pJmsSender Used for sending JMS messages and waiting for a response
@@ -86,29 +85,29 @@ public class SupervisionEventPublisher implements SupervisionListener, SmartLife
     supervisionNotifier = pSupervisionNotifier;
     republisher = RepublisherFactory.createRepublisher(this, "Supervision Event");
   }
-  
-  
+
+
   /**
    * Init method registering this listener to the <code>TimCache</code>.
    */
   @PostConstruct
   public void init() {
-    listenerContainer = supervisionNotifier.registerAsListener(this);    
+    listenerContainer = supervisionNotifier.registerAsListener(this);
   }
 
   @Override
-  public void notifySupervisionEvent(@Valid final SupervisionEvent supervisionEvent) { 
+  public void notifySupervisionEvent(@Valid final SupervisionEvent supervisionEvent) {
     try {
       publish(supervisionEvent);
     } catch (JmsException e) {
-      LOGGER.error("Error publishing supervision event - submitting for republication", e); 
-      republisher.publicationFailed(supervisionEvent);      
-    } 
+      LOGGER.error("Error publishing supervision event - submitting for republication", e);
+      republisher.publicationFailed(supervisionEvent);
+    }
   }
-  
+
   @Override
-  public boolean isAutoStartup() {   
-    return false;
+  public boolean isAutoStartup() {
+    return true;
   }
 
   @Override
@@ -127,20 +126,20 @@ public class SupervisionEventPublisher implements SupervisionListener, SmartLife
     LOGGER.debug("Starting supervision event publisher");
     running = true;
     republisher.start();
-    listenerContainer.start();    
+    listenerContainer.start();
   }
 
   @Override
   public void stop() {
-    LOGGER.debug("Stopping supervision event publisher");    
+    LOGGER.debug("Stopping supervision event publisher");
     listenerContainer.stop();
     republisher.stop();
-    running = false;    
+    running = false;
   }
 
   @Override
   public int getPhase() {
-    return ServerConstants.PHASE_STOP_LAST - 1;    
+    return ServerConstants.PHASE_STOP_LAST - 1;
   }
 
 
@@ -149,11 +148,11 @@ public class SupervisionEventPublisher implements SupervisionListener, SmartLife
     LOGGER.debug("Publishing supervision event: " + GSON.toJson(supervisionEvent));
     jmsSender.send(GSON.toJson(supervisionEvent));
   }
-  
+
   /**
    * @return the total number of failed publications since the publisher start
    */
-  @ManagedOperation(description = "Returns the total number of failed publication attempts since the application started")  
+  @ManagedOperation(description = "Returns the total number of failed publication attempts since the application started")
   public long getNumberFailedPublications() {
     return republisher.getNumberFailedPublications();
   }
@@ -161,8 +160,8 @@ public class SupervisionEventPublisher implements SupervisionListener, SmartLife
   /**
    * @return the number of current tag updates awaiting publication to the clients
    */
-  @ManagedOperation(description = "Returns the current number of events awaiting re-publication (should be 0 in normal operation)")  
-  public int getSizeUnpublishedList() {    
+  @ManagedOperation(description = "Returns the current number of events awaiting re-publication (should be 0 in normal operation)")
+  public int getSizeUnpublishedList() {
     return republisher.getSizeUnpublishedList();
   }
 }

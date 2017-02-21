@@ -97,7 +97,7 @@ public class TagDocumentListener implements C2monBufferedCacheListener<Tag>, Sma
 
   @Override
   public boolean isAutoStartup() {
-    return false;
+    return true;
   }
 
   @Override
@@ -125,6 +125,6 @@ public class TagDocumentListener implements C2monBufferedCacheListener<Tag>, Sma
 
   @Override
   public int getPhase() {
-    return ServerConstants.PHASE_STOP_LAST - 1;
+    return ServerConstants.PHASE_START_LAST - 1;
   }
 }

@@ -110,7 +110,7 @@ public class RecoveryManager implements SmartLifecycle {
 
   @Override
   public boolean isAutoStartup() {
-    return false;
+    return true;
   }
 
   @Override

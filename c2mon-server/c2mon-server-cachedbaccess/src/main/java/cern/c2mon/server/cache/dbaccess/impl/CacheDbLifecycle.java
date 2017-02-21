@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -42,24 +42,24 @@ import cern.c2mon.server.common.config.ServerConstants;
 public class CacheDbLifecycle implements SmartLifecycle {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CacheDbLifecycle.class);
-  
+
   /**
    * The cache datasource to close down.
    */
   private DataSource cacheDataSource;
-  
+
   /**
-   * Only designed to 
+   * Only designed to
    */
   private volatile boolean started = false;
-  
+
   @Autowired
   public CacheDbLifecycle(@Qualifier("cacheDataSource") DataSource cacheDataSource) {
     super();
     this.cacheDataSource = cacheDataSource;
   }
 
-  
+
   /**
    * For management only.
    * @return the number of active DB connections in the cache datasource pool
@@ -71,7 +71,7 @@ public class CacheDbLifecycle implements SmartLifecycle {
     else
       return 0;
   }
-  
+
   @Override
   public boolean isRunning() {
     return started;
@@ -98,8 +98,8 @@ public class CacheDbLifecycle implements SmartLifecycle {
   }
 
   @Override
-  public boolean isAutoStartup() {    
-    return false;
+  public boolean isAutoStartup() {
+    return true;
   }
 
   /**
@@ -113,7 +113,7 @@ public class CacheDbLifecycle implements SmartLifecycle {
   }
 
   @Override
-  public int getPhase() {    
+  public int getPhase() {
     return ServerConstants.PHASE_STOP_LAST - 1;
   }
 
