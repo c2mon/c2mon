@@ -26,7 +26,6 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
 import org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfiguration;
-import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * This class is responsible for bootstrapping the C2MON application server.
@@ -50,12 +49,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class ServerStartup {
 
   public static void main(final String[] args) throws IOException {
-    ConfigurableApplicationContext context = SpringApplication.run(ServerStartup.class, args);
-
-    // Currently the context needs to be manually started. This could maybe be
-    // removed by playing around with {@link SmartLifecycle#isAutoStartup()}.
-    context.start();
-    context.registerShutdownHook();
+    SpringApplication.run(ServerStartup.class, args);
 
     log.info("C2MON server is now initialised");
   }
