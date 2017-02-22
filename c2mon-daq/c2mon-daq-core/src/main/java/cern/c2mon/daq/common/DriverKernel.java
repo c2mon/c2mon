@@ -171,52 +171,57 @@ public class DriverKernel implements ApplicationContextAware {
     @Override
     @SuppressWarnings("synthetic-access")
     public void run() {
-      log.info("calling DAQ shutdown() ...");
-
-      log.debug("Stopping DAQ alive timer.");
-      processMessageSender.stopAliveTimer();
-
-      log.debug("\tstopping listener for server commands/requests...");
-
-      processMessageReceiver.shutdown();
-
-      log.debug("\tcalling ProcessRequestSender's sendProcessDisconnection()..");
-      if (primaryRequestSender != null) {
-        primaryRequestSender.sendProcessDisconnectionRequest(configurationController.getProcessConfiguration(), configurationController.getStartUp());
-      }
-
-      // send in separate thread as may block if broker problem
-      if (secondaryRequestSender != null) {
-        Thread disconnectSend = new Thread(new Runnable() {
-          @Override
-          public void run() {
-            secondaryRequestSender.sendProcessDisconnectionRequest(configurationController.getProcessConfiguration(), configurationController.getStartUp());
-          }
-        });
-        disconnectSend.setDaemon(true);
-        disconnectSend.start();
-      }
-
-      log.debug("\tcalling disconnectFromDataSource interface of each of registered EMHs");
-      Iterator<EquipmentMessageHandler> eqIt = getEquipmentMessageHandlersTable().values().iterator();
-      while (eqIt.hasNext()) {
-        EquipmentMessageHandler emhandler = eqIt.next();
-        try {
-          emhandler.shutdown();
-        } catch (EqIOException ex) {
-          log.warn("a problem occured while calling disconnectFromDataSourc() of EquipmentMessageHandler id :" + emhandler.getEquipmentConfiguration()
-              .getId() + ", name :" + emhandler.getEquipmentConfiguration().getName());
-        }
-      }
-
-      log.debug("\tdisconnecting FilterMessageSenders...");
-      if (filterMessageSender != null) filterMessageSender.shutdown();
-      log.debug("\tdisconnecting JmsSenders for tag update connection...");
-      // ActiveMQ JmsSender also closes all the ActiveMQ JMS connections so keep
-      // as last
-      if (processMessageSender != null) processMessageSender.shutdown();
-      log.info("DAQ shutdown completed successfully");
+      shutdown();
     }
+  }
+
+  public void shutdown() {
+    log.info("calling DAQ shutdown() ...");
+
+    log.debug("Stopping DAQ alive timer.");
+    processMessageSender.stopAliveTimer();
+
+    log.debug("\tstopping listener for server commands/requests...");
+
+    processMessageReceiver.shutdown();
+
+    log.debug("\tcalling ProcessRequestSender's sendProcessDisconnection()..");
+    if (primaryRequestSender != null) {
+      primaryRequestSender.sendProcessDisconnectionRequest(configurationController.getProcessConfiguration(), configurationController.getStartUp());
+    }
+
+    // send in separate thread as may block if broker problem
+    if (secondaryRequestSender != null) {
+      Thread disconnectSend = new Thread(new Runnable() {
+        @Override
+        public void run() {
+          secondaryRequestSender.sendProcessDisconnectionRequest(configurationController.getProcessConfiguration(), configurationController.getStartUp());
+        }
+      });
+      disconnectSend.setDaemon(true);
+      disconnectSend.start();
+    }
+
+    log.debug("\tcalling disconnectFromDataSource interface of each of registered EMHs");
+    Iterator<EquipmentMessageHandler> eqIt = getEquipmentMessageHandlersTable().values().iterator();
+    while (eqIt.hasNext()) {
+      EquipmentMessageHandler emhandler = eqIt.next();
+      try {
+        emhandler.shutdown();
+      } catch (EqIOException ex) {
+        log.warn("a problem occured while calling disconnectFromDataSourc() of EquipmentMessageHandler id :" + emhandler.getEquipmentConfiguration()
+            .getId() + ", name :" + emhandler.getEquipmentConfiguration().getName());
+      }
+    }
+
+    log.debug("\tdisconnecting FilterMessageSenders...");
+    if (filterMessageSender != null) filterMessageSender.shutdown();
+    log.debug("\tdisconnecting JmsSenders for tag update connection...");
+    // ActiveMQ JmsSender also closes all the ActiveMQ JMS connections so keep
+    // as last
+    if (processMessageSender != null) processMessageSender.shutdown();
+    Runtime.getRuntime().removeShutdownHook(this.ksh);
+    log.info("DAQ shutdown completed successfully");
   }
 
   /**

@@ -22,6 +22,7 @@ import cern.c2mon.daq.common.DriverKernel;
 import cern.c2mon.daq.config.DaqCoreModule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.Banner;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -30,9 +31,9 @@ import org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfigura
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.AbstractEnvironment;
 
+import static com.sun.tools.internal.jxc.SchemaGenerator.run;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 
@@ -49,7 +50,14 @@ import static java.lang.System.getProperty;
 @Slf4j
 public class DaqStartup {
 
+  private static SpringApplication APPLICATION = null;
+  private static ConfigurableApplicationContext CONTEXT = null;
+
   public static void main(String[] args) throws IOException {
+    start(args);
+  }
+
+  public static void start(String[] args) throws IOException {
     String daqName = getProperty("c2mon.daq.name");
     if (daqName == null) {
       throw new RuntimeException("Please specify the DAQ process name using 'c2mon.daq.name'");
@@ -61,14 +69,24 @@ public class DaqStartup {
       System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, mode);
     }
 
-    ConfigurableApplicationContext context = new SpringApplicationBuilder(DaqStartup.class)
-        .bannerMode(Banner.Mode.OFF)
-        .build()
-        .run(args);
+    if (APPLICATION == null) {
+      APPLICATION = new SpringApplicationBuilder(DaqStartup.class)
+              .bannerMode(Banner.Mode.OFF)
+              .build();
+    }
+    CONTEXT = APPLICATION.run(args);
 
-    DriverKernel kernel = context.getBean(DriverKernel.class);
+
+    DriverKernel kernel = CONTEXT.getBean(DriverKernel.class);
     kernel.init();
 
     log.info("DAQ core is now initialized");
   }
+
+  public static void stop() {
+    DriverKernel kernel = CONTEXT.getBean(DriverKernel.class);
+    kernel.shutdown();
+    CONTEXT.close();
+  }
+
 }
