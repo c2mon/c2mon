@@ -12,6 +12,10 @@ For more details on a given release, please check also the [Milestone planning](
 ### Changed
 
 ### Fixed
+
+
+## [1.8.9] - 2017-02-22
+### Fixed
 - Elasticsearch module: Exception is now caught in case of an error during the tag conversion for ES (#128)
 - Fixed problem of double quotes in backup database for string values (#129)
 - Server: Lifecycle problems and start/stop behaviour (!117)
@@ -57,7 +61,8 @@ For more details on a given release, please check also the [Milestone planning](
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
 
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/10
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/11
+[1.8.9]: https://gitlab.cern.ch/c2mon/c2mon/milestones/10
 [1.8.8]: https://gitlab.cern.ch/c2mon/c2mon/milestones/9
 [1.8.7]: https://gitlab.cern.ch/c2mon/c2mon/milestones/8
 [1.8.6]: https://gitlab.cern.ch/c2mon/c2mon/milestones/7
