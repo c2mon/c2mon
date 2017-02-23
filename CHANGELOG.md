@@ -13,13 +13,22 @@ For more details on a given release, please check also the [Milestone planning](
 
 ### Fixed
 
-## [1.8.10] - 2017-02-23
+## 1.8.11 - 2017-02-23
+### Fixed
+- Fixed critical lifecycle bug introduced with version [1.8.9] that prevented DAQs to startup
+
+
+## 1.8.10 - 2017-02-23
+**This version contains a critical bug that prevents DAQs to startup. Please use instead v1.8.11 or higher.**
+
 ### Fixed
 - Added missing search attributes on Ehcache cluster configuration
 - Elasticseach module: Fixed NPE problem on metadata conversion
 
 
 ## [1.8.9] - 2017-02-22
+**This version contains a critical bug that prevents DAQs to startup. Please use instead v1.8.11 or higher.**
+
 ### Fixed
 - Elasticsearch module: Exception is now caught in case of an error during the tag conversion for ES (#128)
 - Fixed problem of double quotes in backup database for string values (#129)
