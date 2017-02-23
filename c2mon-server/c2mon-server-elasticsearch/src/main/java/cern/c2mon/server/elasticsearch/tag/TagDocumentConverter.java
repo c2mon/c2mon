@@ -167,9 +167,11 @@ public class TagDocumentConverter implements Converter<Tag, TagDocument> {
     Metadata metadata = tag.getMetadata();
 
     if (metadata != null) {
-      return metadata.getMetadata().entrySet().stream().collect(Collectors.toMap(
+      return metadata.getMetadata().entrySet().stream()
+          .filter(Objects::nonNull)
+          .collect(Collectors.toMap(
           Map.Entry::getKey,
-          e -> e.getValue() == null ? null : e.getValue()
+          e -> e.getValue()
       ));
     }
 
