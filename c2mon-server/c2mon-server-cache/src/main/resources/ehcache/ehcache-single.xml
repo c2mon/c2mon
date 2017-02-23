@@ -109,6 +109,9 @@
     statistics="true" transactionalMode="off" memoryStoreEvictionPolicy="FIFO">
     <persistence strategy="localRestartable"
       synchronousWrites="false" />
+      <searchable>
+        <searchAttribute name="deviceClassId" expression="value.getDeviceClassId()"/>
+      </searchable>
   </cache>
 
   <cache name="deviceClassCache" eternal="true"
