@@ -1,8 +1,5 @@
 package cern.c2mon.server.daq.config;
 
-import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.daq.request.ProcessRequestHandlerImpl;
-import cern.c2mon.shared.daq.datatag.DataTagValueUpdateConverter;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +7,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
+
+import cern.c2mon.server.common.config.ServerConstants;
+import cern.c2mon.server.daq.request.ProcessRequestHandlerImpl;
+import cern.c2mon.shared.daq.datatag.DataTagValueUpdateConverter;
 
 /**
  * @author Justin Lewis Salmon
@@ -37,7 +38,6 @@ public class DaqJmsConfig {
     container.setConcurrentConsumers(properties.getJms().getRequest().getInitialConsumers());
     container.setMaxConcurrentConsumers(properties.getJms().getRequest().getMaxConsumers());
     container.setSessionTransacted(properties.getJms().getRequest().isTransacted());
-    container.setAutoStartup(false);
     container.setPhase(ServerConstants.PHASE_START_LAST);
     container.setBeanName("Process request JMS container");
     return container;
