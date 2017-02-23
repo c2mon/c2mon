@@ -13,6 +13,11 @@ For more details on a given release, please check also the [Milestone planning](
 
 ### Fixed
 
+## [1.8.10] - 2017-02-23
+### Fixed
+- Added missing search attributes on Ehcache cluster configuration
+- Elasticseach module: Fixed NPE problem on metadata conversion
+
 
 ## [1.8.9] - 2017-02-22
 ### Fixed
@@ -61,7 +66,8 @@ For more details on a given release, please check also the [Milestone planning](
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
 
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/11
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/12
+[1.8.10]: https://gitlab.cern.ch/c2mon/c2mon/milestones/11
 [1.8.9]: https://gitlab.cern.ch/c2mon/c2mon/milestones/10
 [1.8.8]: https://gitlab.cern.ch/c2mon/c2mon/milestones/9
 [1.8.7]: https://gitlab.cern.ch/c2mon/c2mon/milestones/8
