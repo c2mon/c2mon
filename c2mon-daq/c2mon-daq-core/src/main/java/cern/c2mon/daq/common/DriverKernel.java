@@ -30,8 +30,6 @@ import cern.c2mon.daq.filter.FilterConnectorThread;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.tools.StackTraceHelper;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
-import cern.c2mon.daq.tools.processexceptions.ConfRejectedTypeException;
-import cern.c2mon.daq.tools.processexceptions.ConfUnknownTypeException;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
@@ -52,7 +50,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -144,7 +141,7 @@ public class DriverKernel implements ApplicationContextAware {
   private EquipmentConfigurationFactory equipmentConfigurationFactory;
 
   /**
-   * This class coordinates the shutdown of the DAQ. This involves, in the
+   * This class coordinates the shutdownInternal of the DAQ. This involves, in the
    * following order:
    * <ol>
    * <li>Stop listening for message from the server.
@@ -153,8 +150,8 @@ public class DriverKernel implements ApplicationContextAware {
    * <li>Shutdown the filter connection.
    * </ol>
    * <p>
-   * Notice that the DAQ does not rely on the Spring shutdown hook to close
-   * down. This means all shutdown methods must be called explicitly in the
+   * Notice that the DAQ does not rely on the Spring shutdownInternal hook to close
+   * down. This means all shutdownInternal methods must be called explicitly in the
    * appropriate methods.
    */
   public class KernelShutdownHook extends Thread {
@@ -171,12 +168,12 @@ public class DriverKernel implements ApplicationContextAware {
     @Override
     @SuppressWarnings("synthetic-access")
     public void run() {
-      shutdown();
+      shutdownInternal();
     }
   }
 
-  public void shutdown() {
-    log.info("calling DAQ shutdown() ...");
+  private void shutdownInternal() {
+    log.info("calling DAQ shutdownInternal() ...");
 
     log.debug("Stopping DAQ alive timer.");
     processMessageSender.stopAliveTimer();
@@ -220,8 +217,12 @@ public class DriverKernel implements ApplicationContextAware {
     // ActiveMQ JmsSender also closes all the ActiveMQ JMS connections so keep
     // as last
     if (processMessageSender != null) processMessageSender.shutdown();
+    log.info("DAQ shutdownInternal completed successfully");
+  }
+
+  public void shutdown(){
+    shutdownInternal();
     Runtime.getRuntime().removeShutdownHook(this.ksh);
-    log.info("DAQ shutdown completed successfully");
   }
 
   /**
@@ -242,7 +243,7 @@ public class DriverKernel implements ApplicationContextAware {
    * This method is responsible for all cleaning stuff that has to be taken
    * before the DAQ terminates, such as e.g. sending ProcessDisconnectionRequest
    * message to the application server. It is currently only used in the DAQ
-   * test web application (the kernel shutdown hook performs the same role for
+   * test web application (the kernel shutdownInternal hook performs the same role for
    * the usual runtime environment).
    */
   public void terminateDAQ() {
@@ -251,7 +252,7 @@ public class DriverKernel implements ApplicationContextAware {
     this.processMessageSender.closeSourceDataTagsBuffers();
 
     // disconnect the FilterMessageSender object from JMS
-    // and perform and shutdown logic
+    // and perform and shutdownInternal logic
     filterMessageSender.shutdown();
 
     this.primaryRequestSender.sendProcessDisconnectionRequest(configurationController.getProcessConfiguration(), configurationController.getStartUp());
