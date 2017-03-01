@@ -141,7 +141,7 @@ public class DriverKernel implements ApplicationContextAware {
   private EquipmentConfigurationFactory equipmentConfigurationFactory;
 
   /**
-   * This class coordinates the shutdownInternal of the DAQ. This involves, in the
+   * This class coordinates the shutdown of the DAQ. This involves, in the
    * following order:
    * <ol>
    * <li>Stop listening for message from the server.
@@ -150,8 +150,8 @@ public class DriverKernel implements ApplicationContextAware {
    * <li>Shutdown the filter connection.
    * </ol>
    * <p>
-   * Notice that the DAQ does not rely on the Spring shutdownInternal hook to close
-   * down. This means all shutdownInternal methods must be called explicitly in the
+   * Notice that the DAQ does not rely on the Spring shutdown hook to close
+   * down. This means all shutdown methods must be called explicitly in the
    * appropriate methods.
    */
   public class KernelShutdownHook extends Thread {
@@ -243,7 +243,7 @@ public class DriverKernel implements ApplicationContextAware {
    * This method is responsible for all cleaning stuff that has to be taken
    * before the DAQ terminates, such as e.g. sending ProcessDisconnectionRequest
    * message to the application server. It is currently only used in the DAQ
-   * test web application (the kernel shutdownInternal hook performs the same role for
+   * test web application (the kernel shutdown hook performs the same role for
    * the usual runtime environment).
    */
   public void terminateDAQ() {
@@ -252,7 +252,7 @@ public class DriverKernel implements ApplicationContextAware {
     this.processMessageSender.closeSourceDataTagsBuffers();
 
     // disconnect the FilterMessageSender object from JMS
-    // and perform and shutdownInternal logic
+    // and perform and shutdown logic
     filterMessageSender.shutdown();
 
     this.primaryRequestSender.sendProcessDisconnectionRequest(configurationController.getProcessConfiguration(), configurationController.getStartUp());
