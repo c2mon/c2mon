@@ -16,8 +16,6 @@
  ******************************************************************************/
 package cern.c2mon.daq;
 
-import java.io.IOException;
-
 import cern.c2mon.daq.common.DriverKernel;
 import cern.c2mon.daq.config.DaqCoreModule;
 import lombok.extern.slf4j.Slf4j;
@@ -32,9 +30,12 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.AbstractEnvironment;
+import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 
-import static com.sun.tools.internal.jxc.SchemaGenerator.run;
-import static java.lang.String.format;
+import java.io.IOException;
+
 import static java.lang.System.getProperty;
 
 /**
@@ -52,6 +53,7 @@ public class DaqStartup {
 
   private static SpringApplication APPLICATION = null;
   private static ConfigurableApplicationContext CONTEXT = null;
+  private static DriverKernel driverKernel;
 
   public static void main(String[] args) throws IOException {
     start(args);
@@ -77,16 +79,24 @@ public class DaqStartup {
     CONTEXT = APPLICATION.run(args);
 
 
-    DriverKernel kernel = CONTEXT.getBean(DriverKernel.class);
-    kernel.init();
+    driverKernel = CONTEXT.getBean(DriverKernel.class);
+    driverKernel.init();
 
     log.info("DAQ core is now initialized");
   }
 
   public static void stop() {
-    DriverKernel kernel = CONTEXT.getBean(DriverKernel.class);
-    kernel.shutdown();
-    CONTEXT.close();
+    try {
+      log.info("Stopping DAQ Module");
+      if (driverKernel != null) {
+        driverKernel.shutdown();
+      }
+	    if (CONTEXT.isRunning()) {
+		    CONTEXT.close();
+	    }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
 }
