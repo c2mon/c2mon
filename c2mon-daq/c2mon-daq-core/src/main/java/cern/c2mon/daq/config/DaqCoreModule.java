@@ -23,7 +23,7 @@ import org.springframework.context.annotation.*;
 
 /**
  * This configuration class is responsible for importing an externalised
- * properties file specified by c2mon.daq.properties.location (if it exists)
+ * properties file specified by c2mon.daq.properties (if it exists)
  * and using it to override the default properties embedded inside the package.
  *
  * @author Justin Lewis Salmon
