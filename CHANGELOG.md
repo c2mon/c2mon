@@ -13,6 +13,14 @@ For more details on a given release, please check also the [Milestone planning](
 
 ### Fixed
 
+## [1.8.12] - 2017-03-10
+### Added
+- Added a fully documented list of all default variables to `conf/c2mon-daq.properties` file for DAQ tarball (#132)
+
+### Fixed
+-  DAQ Core: Fixed a possible exception on DAQ side when sending configuration update for an address field (#136)
+
+
 ## 1.8.11 - 2017-02-23
 ### Fixed
 - Fixed critical lifecycle bug introduced with version [1.8.9] that prevented DAQs to startup
@@ -76,7 +84,7 @@ For more details on a given release, please check also the [Milestone planning](
 
 
 [Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/12
-[1.8.10]: https://gitlab.cern.ch/c2mon/c2mon/milestones/11
+[1.8.12]: https://gitlab.cern.ch/c2mon/c2mon/milestones/11
 [1.8.9]: https://gitlab.cern.ch/c2mon/c2mon/milestones/10
 [1.8.8]: https://gitlab.cern.ch/c2mon/c2mon/milestones/9
 [1.8.7]: https://gitlab.cern.ch/c2mon/c2mon/milestones/8
