@@ -13,6 +13,17 @@ For more details on a given release, please check also the [Milestone planning](
 
 ### Fixed
 
+
+## 1.8.13 - 2017-03-10
+This patch contains bug fixes for the DAQ layer.
+
+### Fixed
+- DAQ: Corrected property variables in `C2MON-DAQ-STARTUP.jvm` script
+- DAQ: Loading of local configuration file from default location `$DAQ_HOME/conf/local/<process-name>.xml`
+
+### Removed
+- DAQ: Removed obsolete `conf/log4j.properties` file from tarball
+
 ## [1.8.12] - 2017-03-10
 ### Added
 - Added a fully documented list of all default variables to `conf/c2mon-daq.properties` file for DAQ tarball (#132)
