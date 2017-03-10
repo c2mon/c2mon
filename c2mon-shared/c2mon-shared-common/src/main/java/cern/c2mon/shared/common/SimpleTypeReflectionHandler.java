@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -20,9 +20,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+
+import cern.c2mon.shared.common.type.TypeConverter;
 /**
  * A simple class to cover modifications on simple fields of a pojo.
- * 
+ *
  * @author Andreas Lang
  *
  */
@@ -33,7 +35,7 @@ public class SimpleTypeReflectionHandler {
      * @param pojo Plain old Java object.
      * @param fieldName The java name of the field to set.
      * @param value The value to set the field to (unconverted).
-     * @throws NoSuchFieldException Throws a {@link NoSuchFieldException} if the 
+     * @throws NoSuchFieldException Throws a {@link NoSuchFieldException} if the
      * field to use the type to parse is not found in the provided class.
      * @throws IllegalAccessException May throw a IllegalAccessException.
      * @throws NoSimpleValueParseException This exception is thrown if the field
@@ -47,7 +49,7 @@ public class SimpleTypeReflectionHandler {
         }
         setSimpleField(pojo, fieldName, parse(value, field));
     }
-    
+
     /**
      * Sets a field of a pojo corresponding to the provided name with to the
      * provided value.
@@ -65,7 +67,13 @@ public class SimpleTypeReflectionHandler {
                     + "in " + configClass.getClass().getName());
         }
         field.setAccessible(true);
-        field.set(pojo, value);
+
+        if (field.getType().isInstance(value)) {
+          field.set(pojo, value);
+        }
+        else {
+          field.set(pojo, TypeConverter.castToType(value, field.getType()));
+        }
     }
 
     /**
@@ -77,7 +85,7 @@ public class SimpleTypeReflectionHandler {
      * @return The parsed object.
      * @throws NoSimpleValueParseException Throws a no simple value parse exception
      * if you try to use it with a non simple type.
-     * @throws NoSuchFieldException Throws a {@link NoSuchFieldException} if the 
+     * @throws NoSuchFieldException Throws a {@link NoSuchFieldException} if the
      * field to use the type to parse is not found in the provided class.
      */
     public Object parse(final String value, final String javaName, final Class< ? > clazz) throws NoSimpleValueParseException, NoSuchFieldException {
@@ -98,56 +106,16 @@ public class SimpleTypeReflectionHandler {
      * if you try to use it with a non simple type.
      */
     public Object parse(final String value, final Field field) throws NoSimpleValueParseException {
-        Object parsedValue = null;
-        Class< ? > clazz = field.getType();
-        if (clazz.isAssignableFrom(Short.class)
-                || clazz.isAssignableFrom(Short.TYPE)) {
-            parsedValue = Short.parseShort(value);
-        }
-        else if (clazz.isAssignableFrom(Integer.class)
-                || clazz.isAssignableFrom(Integer.TYPE)) {
-            parsedValue = Integer.parseInt(value);
-        }
-        else if (clazz.isAssignableFrom(Float.class)
-                || clazz.isAssignableFrom(Float.TYPE)) {
-            parsedValue = Float.parseFloat(value);
-        }
-        else if (clazz.isAssignableFrom(Double.class)
-                || clazz.isAssignableFrom(Double.TYPE)) {
-            parsedValue = Double.parseDouble(value);
-        }
-        else if (clazz.isAssignableFrom(Long.class)
-                || clazz.isAssignableFrom(Long.TYPE)) {
-            parsedValue = Long.parseLong(value);
-        }
-        else if (clazz.isAssignableFrom(Byte.class)
-                || clazz.isAssignableFrom(Byte.TYPE)) {
-            parsedValue = Byte.parseByte(value);
-        }
-        else if (clazz.isAssignableFrom(Character.class)
-                || clazz.isAssignableFrom(Character.TYPE)) {
-            parsedValue = value.charAt(0);
-        }
-        else if (clazz.isAssignableFrom(Boolean.class)
-                || clazz.isAssignableFrom(Boolean.TYPE)) {
-            parsedValue = Boolean.parseBoolean(value);
-        }
-        else if (clazz.isAssignableFrom(String.class)) {
-            parsedValue = value;
-        }
-        else if (clazz.isEnum()) {
-            Object[] enumConstants = clazz.getEnumConstants();
-            for (Object enumConstant : enumConstants) {
-                if (enumConstant.toString().equals(value)) {
-                    parsedValue = enumConstant;
-                }
-            }
-            
-        }
-        if (parsedValue == null) {
-            throw new NoSimpleValueParseException();
-        }
-        return parsedValue;
+      if (value == null) {
+        return null;
+      }
+
+      Object parsedValue = TypeConverter.castToType(value, field.getType());
+
+      if (parsedValue == null) {
+        throw new NoSimpleValueParseException();
+      }
+      return parsedValue;
     }
 
     /**
@@ -170,7 +138,7 @@ public class SimpleTypeReflectionHandler {
         }
         return field;
     }
-    
+
     /**
      * Returns all non transient field of this class and all its superclasses.
      * Not simple and static field are excluded.
@@ -178,10 +146,10 @@ public class SimpleTypeReflectionHandler {
      * @return All non transient fields of this class and its superclasses.
      */
     public List<Field> getNonTransientSimpleFields(final Class< ? > clazz) {
-        List<Field> result = new ArrayList<Field>();
+        List<Field> result = new ArrayList<>();
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
-            if (!Modifier.isTransient(field.getModifiers()) 
+            if (!Modifier.isTransient(field.getModifiers())
                     && !Modifier.isStatic(field.getModifiers())
                     && isSimpleTypeOrSimpleObject(field)) {
                 result.add(field);
@@ -192,7 +160,7 @@ public class SimpleTypeReflectionHandler {
         }
         return result;
     }
-    
+
     /**
      * Checks if the provided field is a simple type field or an object like this.
      * @param field The field to check.
@@ -200,7 +168,7 @@ public class SimpleTypeReflectionHandler {
      */
     public boolean isSimpleTypeOrSimpleObject(final Field field) {
         Class< ? > type = field.getType();
-        boolean simpleType = 
+        boolean simpleType =
                   (type.isAssignableFrom(Short.class)
                 || type.isAssignableFrom(Short.TYPE)
                 || type.isAssignableFrom(Integer.class)
@@ -221,7 +189,7 @@ public class SimpleTypeReflectionHandler {
                 || type.isEnum();
         return simpleType;
     }
-    
+
     /**
      * Checks if the provided field is a simple type field .
      * @param field The field to check.
@@ -229,7 +197,7 @@ public class SimpleTypeReflectionHandler {
      */
     public boolean isSimpleType(final Field field) {
         Class< ? > type = field.getType();
-        boolean simpleType = 
+        boolean simpleType =
                    type.isAssignableFrom(Short.TYPE)
                 || type.isAssignableFrom(Integer.TYPE)
                 || type.isAssignableFrom(Float.TYPE)
