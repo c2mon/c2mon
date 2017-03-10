@@ -23,10 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.PostConstruct;
-
-import cern.c2mon.daq.common.timer.FreshnessMonitor;
-import cern.c2mon.daq.config.DaqProperties;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +34,8 @@ import org.w3c.dom.ls.LSSerializer;
 
 import cern.c2mon.daq.common.conf.equipment.*;
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
+import cern.c2mon.daq.common.timer.FreshnessMonitor;
+import cern.c2mon.daq.config.DaqProperties;
 import cern.c2mon.daq.tools.StackTraceHelper;
 import cern.c2mon.daq.tools.processexceptions.ConfUnknownTypeException;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -184,15 +182,19 @@ public class ConfigurationController {
     log.trace("Configuration process started");
 
     String localConfigFile = properties.getLocalConfigFile();
-    boolean localConfiguration = false;
+    // e.g. $DAQ_HOME/conf/local/P_TEST.xml
+    File defaultLocalConfigFile = new File(System.getProperty("user.dir") + "/conf/local/" + properties.getName().toUpperCase() + ".xml");
+
+    boolean localConfiguration = true;
 
     if (localConfigFile != null) {
-      localConfiguration = true;
-
-      log.info("Loading configuration from file: {}", localConfigFile);
-      xmlConfiguration = this.processConfigurationLoader.fromFiletoDOC(localConfigFile);
+      xmlConfiguration = loadFromLocalConfigFile(localConfigFile);
+    }
+    else if (defaultLocalConfigFile.exists()) {
+      xmlConfiguration = loadFromLocalConfigFile(defaultLocalConfigFile.toString());
     }
     else {
+      localConfiguration = false;
       log.info("Loading configuration from server");
       processConfigurationResponse = this.processConfigurationLoader.getProcessConfiguration();
 
@@ -240,6 +242,14 @@ public class ConfigurationController {
       sendDisconnectionNotification();
       throw new RuntimeException("Exception caught while configuring the DAQ. Check the configuration XML", ex);
     }
+  }
+
+  /**
+   * Helper method to load configuration from local file
+   */
+  private Document loadFromLocalConfigFile(String localConfigFile) {
+    log.info("Loading configuration from file: {}", localConfigFile);
+    return this.processConfigurationLoader.fromFiletoDOC(localConfigFile);
   }
 
   /**
