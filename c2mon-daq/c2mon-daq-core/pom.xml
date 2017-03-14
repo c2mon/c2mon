@@ -56,6 +56,11 @@
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-client</artifactId>
     </dependency>
+    <!-- Required stay backward compatible to older ActiveMQ broker -->
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-openwire-legacy</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
