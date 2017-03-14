@@ -10,8 +10,10 @@ For more details on a given release, please check also the [Milestone planning](
 ### Added
 
 ### Changed
+- Updated Elasticsearch version from 2.3.3 to 2.4.1  (#138)
 
 ### Fixed
+- DAQ: Fixed JMS initialization bug appearing in 'double' mode (#137)
 
 
 ## 1.8.13 - 2017-03-10
