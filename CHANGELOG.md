@@ -8,6 +8,7 @@ For more details on a given release, please check also the [Milestone planning](
 
 ## [Unreleased]
 ### Added
+- ActiveMQ openwire legacy support to DAQ Core and Client API
 
 ### Changed
 - Updated Elasticsearch version from 2.3.3 to 2.4.1  (#138)
