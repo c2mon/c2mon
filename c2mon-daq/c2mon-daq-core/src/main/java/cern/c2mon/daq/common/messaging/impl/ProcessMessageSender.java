@@ -19,15 +19,12 @@ package cern.c2mon.daq.common.messaging.impl;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 
-import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import cern.c2mon.daq.common.conf.core.ConfigurationController;
+import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.common.messaging.JmsSender;
 import cern.c2mon.shared.common.datatag.DataTagAddress;

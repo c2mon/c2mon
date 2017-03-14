@@ -16,20 +16,16 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
-import cern.c2mon.daq.common.conf.core.ConfigurationController;
+import javax.jms.JMSException;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.jms.core.JmsTemplate;
+
 import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
 import cern.c2mon.daq.common.messaging.JmsSender;
 import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jms.core.JmsTemplate;
-
-import javax.jms.JMSException;
 
 /**
  * Implementation of the JMSSender interface for sending update messages to
@@ -57,8 +53,7 @@ public class ActiveJmsSender implements JmsSender {
    *
    * @param jmsTemplate             The JMS template.
    */
-  @Autowired
-  public ActiveJmsSender(@Qualifier("sourceUpdateJmsTemplate") final JmsTemplate jmsTemplate) {
+  public ActiveJmsSender(final JmsTemplate jmsTemplate) {
     this.jmsTemplate = jmsTemplate;
   }
 
@@ -140,7 +135,7 @@ public class ActiveJmsSender implements JmsSender {
       // if it's persistent or not (all those in the collection will have
       // the same persistence setting).
       // The message's alive-time will be also set by taking the value
-      SourceDataTagValue sdtValue = (SourceDataTagValue) dataTagValueUpdate.getValues().iterator().next();
+      SourceDataTagValue sdtValue = dataTagValueUpdate.getValues().iterator().next();
 
       // set priority and TTL from the first value in the message
       // (priority is always LOW for values

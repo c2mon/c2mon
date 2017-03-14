@@ -21,7 +21,8 @@ import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jms.core.JmsTemplate;
 
 import cern.c2mon.daq.common.messaging.JmsSender;
@@ -91,25 +92,19 @@ public class ProcessMessageSenderConfig {
     return processMessageSender;
   }
 
-  @Bean
-  public JmsSender activeJmsSender() {
+  private JmsSender activeJmsSender() {
     return new ActiveJmsSender(sourceUpdateJmsTemplate);
   }
 
-  @Bean
-  public JmsSender secondActiveJmsSender() {
+  private JmsSender secondActiveJmsSender() {
     return new ActiveJmsSender(secondSourceUpdateJmsTemplate);
   }
 
-  @Bean
-  public JmsSender proxyJmsSender() {
-    ProxyJmsSender proxyJmsSender = new ProxyJmsSender();
-    proxyJmsSender.setWrappedSender(secondActiveJmsSender());
-    return proxyJmsSender;
+  private JmsSender proxyJmsSender() {
+    return new ProxyJmsSender(secondActiveJmsSender());
   }
 
-  @Bean
-  public JmsSender dummyJmsSender() {
+  private JmsSender dummyJmsSender() {
     return new DummyJmsSender();
   }
 

@@ -16,6 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
+import java.util.Iterator;
+
+import javax.jms.JMSException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cern.c2mon.daq.common.messaging.JmsSender;
 import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
@@ -23,12 +30,6 @@ import cern.c2mon.shared.util.buffer.PullEvent;
 import cern.c2mon.shared.util.buffer.PullException;
 import cern.c2mon.shared.util.buffer.SynchroBuffer;
 import cern.c2mon.shared.util.buffer.SynchroBufferListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.PostConstruct;
-import javax.jms.JMSException;
-import java.util.Iterator;
 
 /**
  * This class wraps a JMSSender so that all JMS sending occurs on separate threads from
@@ -53,7 +54,7 @@ public class ProxyJmsSender implements JmsSender {
   /**
    * The JMSSender to wrap.
    */
-  private JmsSender wrappedSender;
+  private final JmsSender wrappedSender;
 
   /**
    * Buffer storing the high priority messages
@@ -67,11 +68,15 @@ public class ProxyJmsSender implements JmsSender {
    */
   private SynchroBuffer lowPriorityBuffer;
 
+  public ProxyJmsSender(final JmsSender wrappedSender) {
+    this.wrappedSender = wrappedSender;
+    init();
+  }
+
   /**
    * Init method called on bean initialization.
    */
-  @PostConstruct
-  public void init() {
+  private void init() {
     //initialize high priority buffer
     highPriorityBuffer = new SynchroBuffer(100, 200, 100, SynchroBuffer.DUPLICATE_OK, 10000);
     highPriorityBuffer.setSynchroBufferListener(new HighPriorityListener());
@@ -131,15 +136,6 @@ public class ProxyJmsSender implements JmsSender {
   }
 
   /**
-   * Setter method.
-   * @param wrappedSender the wrappedSender to set
-   */
-  public final void setWrappedSender(final JmsSender wrappedSender) {
-    this.wrappedSender = wrappedSender;
-  }
-
-
-   /**
    * The buffer used to store the received collections of updates.
    * @author mbrightw
    *
