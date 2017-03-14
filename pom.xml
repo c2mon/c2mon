@@ -38,7 +38,7 @@
     <org.springframework.version>4.3.4.RELEASE</org.springframework.version>
     <org.springframework.boot.version>1.4.2.RELEASE</org.springframework.boot.version>
     <org.slf4j.version>1.7.5</org.slf4j.version>
-    <elasticsearch.version>2.3.3</elasticsearch.version>
+    <elasticsearch.version>2.4.1</elasticsearch.version>
     <mockito-all.version>1.10.19</mockito-all.version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
