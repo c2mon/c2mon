@@ -8,6 +8,13 @@ For more details on a given release, please check also the [Milestone planning](
 
 ## [Unreleased]
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.8.14] - 2017-03-14
+### Added
 - ActiveMQ openwire legacy support to DAQ Core and Client API
 
 ### Changed
@@ -97,7 +104,8 @@ This patch contains bug fixes for the DAQ layer.
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
 
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/12
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/13
+[1.8.14]: https://gitlab.cern.ch/c2mon/c2mon/milestones/12
 [1.8.12]: https://gitlab.cern.ch/c2mon/c2mon/milestones/11
 [1.8.9]: https://gitlab.cern.ch/c2mon/c2mon/milestones/10
 [1.8.8]: https://gitlab.cern.ch/c2mon/c2mon/milestones/9
