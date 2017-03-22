@@ -73,6 +73,20 @@
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-elasticsearch</artifactId>
     </dependency>
+    
+    <!-- Runtime dependencies required to support HTTP via ActiveMQ -->
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-http</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

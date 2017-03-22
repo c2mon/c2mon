@@ -176,12 +176,33 @@
         <artifactId>activemq-broker</artifactId>
         <version>${org.apache.activemq.version}</version>
       </dependency>
-       <dependency>
+      <dependency>
         <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-openwire-legacy</artifactId>
         <version>${org.apache.activemq.version}</version>
         <scope>runtime</scope>
       </dependency>
+
+      <!-- Required dependencies for HTTP via ActiveMQ -->
+      <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-http</artifactId>
+        <version>${org.apache.activemq.version}</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-server</artifactId>
+        <version>9.2.14.v20151106</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>4.5.1</version>
+        <scope>runtime</scope>
+      </dependency>
+
       <dependency>
         <groupId>commons-dbcp</groupId>
         <artifactId>commons-dbcp</artifactId>
