@@ -8,6 +8,7 @@ For more details on a given release, please check also the [Milestone planning](
 
 ## [Unreleased]
 ### Added
+- Runtime support for HTTP via ActiveMQ (#113)
 
 ### Changed
 
